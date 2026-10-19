@@ -1,11 +1,12 @@
 from collections import defaultdict
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain.demand import Baseline
 from novelo.domain.vocab import TextileDestination, WeighingMethod
+from novelo.features.network.models import Parish
 from novelo.features.textile.models import TextileEntity, TextileFlow, WasteShare
 from novelo.features.textile.schemas import (
     EntityBaseline,
@@ -17,8 +18,8 @@ from novelo.features.textile.schemas import (
     WasteShareOut,
 )
 
-# Plano de Ação para a Circularidade Têxtil de Guimarães (nov. 2025).
-POPULATION = 156_277
+# População de reserva (INE, Censos 2021) quando a tabela de freguesias ainda não foi semeada.
+FALLBACK_POPULATION = 156_830
 KG_PER_INHAB_MONTH_PLAN = 0.7
 PT_KG_PER_INHAB_YEAR = 517  # Portugal continental, 2024
 BASELINE_YEAR = 2025
@@ -69,13 +70,20 @@ async def _entity_rows(db: AsyncSession, year: int) -> list[EntityBaseline]:
     return entities
 
 
+async def _population(db: AsyncSession) -> int:
+    """População do concelho: soma das freguesias (INE), a mesma que alimenta o simulador e o mapa."""
+    total = await db.scalar(select(func.sum(Parish.population)))
+    return int(total) if total else FALLBACK_POPULATION
+
+
 async def get_baseline(db: AsyncSession, year: int = BASELINE_YEAR) -> TextileBaseline:
+    population = await _population(db)
     entities = await _entity_rows(db, year)
     total = sum(e.total_t for e in entities)
-    base = Baseline(total, POPULATION, KG_PER_INHAB_MONTH_PLAN)
+    base = Baseline(total, population, KG_PER_INHAB_MONTH_PLAN)
     return TextileBaseline(
         year=year,
-        population=POPULATION,
+        population=population,
         entities=entities,
         total_t=round(total, 3),
         reuse_t=round(sum(e.reuse_t for e in entities), 3),

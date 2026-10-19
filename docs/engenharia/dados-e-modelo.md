@@ -21,7 +21,7 @@ Têxtil gerado na zona *z* por ano, a partir da população e do valor por habit
 D_z = P_z \cdot q \cdot 12 \qquad q = 0{,}7\ \text{kg por habitante por mês}
 ```
 
-Com os 156 277 habitantes do concelho, isto dá cerca de 1.300 t/ano. Onde a caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona.
+Com os 156 830 habitantes do concelho, isto dá cerca de 1.300 t/ano. Onde a caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona.
 
 Têxtil captado depende do modo de recolha *m* que serve a zona:
 
@@ -79,7 +79,7 @@ c_m^{\text{nova}} = \frac{k \cdot c_m^{\text{pressuposto}} + s \cdot c_m^{\text{
 | Parâmetro | Valor | Estado |
 | --- | --- | --- |
 | Têxtil por habitante (*q*) | 0,7 kg/hab/mês | Fonte: plano municipal |
-| Habitantes | 156 277 | Fonte: plano municipal |
+| Habitantes | 156 830 | Fonte: plano municipal |
 | Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto, a calibrar no piloto |
 | Distância máxima a pé por modo | a definir | Pressuposto, validar com o mentor |
 | Custo por recolha e por km | a pedir | Vitrus, dia 1 |

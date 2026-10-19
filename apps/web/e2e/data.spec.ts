@@ -46,7 +46,7 @@ test.describe('dados reais da Vitrus', () => {
   test('qualidade dos dados: resolver e reabrir um alerta', async ({ page }) => {
     await page.goto('/pt/data-quality');
     await expect(page.getByRole('heading', { name: 'Fontes recebidas' })).toBeVisible();
-    await expect(page.getByText('Circuitos_Viaturas_Guimaraes.xlsx')).toBeVisible();
+    await expect(page.getByText('Circuitos_Viaturas_Guimaraes.xlsx').locator('visible=true')).toBeVisible();
     // O estado persiste na base de dados: se uma corrida anterior deixou o alerta resolvido, reabre-o.
     await page.getByRole('button', { name: 'Todas', exact: true }).click();
     const existing = page.getByRole('listitem').filter({ hasText: 'Alerta 3' });

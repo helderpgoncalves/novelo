@@ -89,7 +89,7 @@ export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
 
   return (
     <form
-      className="grid gap-8 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]"
+      className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,22rem)_minmax(0,1fr)]"
       onSubmit={(e) => {
         e.preventDefault();
         submit();

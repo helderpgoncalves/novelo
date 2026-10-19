@@ -9,6 +9,7 @@ import type {
   TriageResult,
 } from '@/client';
 import { NumberField } from '@/components/number-field';
+import { StickyActions } from '@/components/sticky-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -230,7 +231,7 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         />
       </div>
 
-      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+      <StickyActions className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button
           type="button"
           variant="outline"
@@ -244,7 +245,7 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
           {pending && <Loader2 className="animate-spin" />}
           {m.triage_add_to_lot()}
         </Button>
-      </div>
+      </StickyActions>
     </form>
   );
 }

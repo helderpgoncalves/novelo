@@ -12,7 +12,7 @@ Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia 
 
 - **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025, e o município fixou a meta de aumentar a recolha seletiva em 30%.
 - **A conta muda em 2028.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a ter, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem.
-- **O território torna-o caro.** Guimarães tem 156 277 habitantes em 55 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
+- **O território torna-o caro.** Guimarães tem 156 830 habitantes em 55 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
 - **Ninguém tem os dados.** A triagem é manual, as microempresas têxteis deitam retalhos no lixo urbano sem registo, e só 4 dos 27 operadores licenciados na zona reciclam ou valorizam têxteis.
 
 A pergunta da Vitrus Ambiente é simples: como garantir têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?

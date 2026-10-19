@@ -3,6 +3,7 @@ import { Suspense, useState } from 'react';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Topbar } from '@/components/layout/topbar';
+import { OfflineBanner } from '@/components/offline-banner';
 import { PageSkeleton } from '@/components/states';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { getLocale, switchLocale } from '@/lib/i18n';
@@ -37,9 +38,10 @@ function AppLayout() {
       <AppSidebar role={user.role} mobileOpen={menuOpen} onMobileOpenChange={setMenuOpen} />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar user={user} onMenuClick={() => setMenuOpen(true)} />
+        <OfflineBanner />
         <VerifyEmailBanner user={user} />
         <main id="content" className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-6xl px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
             <Suspense fallback={<PageSkeleton />}>
               <Outlet />
             </Suspense>

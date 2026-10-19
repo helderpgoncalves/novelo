@@ -147,7 +147,7 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
         </table>
       </div>
       <p className="text-muted-foreground text-xs">{m.compare_note()}</p>
-      <div className="grid gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         {[a, b].map((s) => (
           <div key={s.id} className="space-y-2">
             <p className="font-medium font-serif text-lg">{s.label}</p>

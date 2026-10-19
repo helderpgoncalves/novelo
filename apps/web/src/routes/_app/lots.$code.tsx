@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CheckCheck, ExternalLink, ScanLine, Truck } from 'lucide-react';
 import { toast } from 'sonner';
-import type { GetLotQrData } from '@/client';
+import type { GetLotQrData, LotItemOut } from '@/client';
 import {
   changeLotStateMutation,
   getLotOptions,
@@ -10,18 +10,11 @@ import {
   listLotsQueryKey,
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
+import { type Column, DataTable } from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { CompositionBar, EventTimeline } from '@/features/lots/lot-parts';
 import { getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
@@ -130,7 +123,7 @@ function LotPage() {
         />
       </StatStrip>
 
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
         <aside className="space-y-6 self-start">
           <div className="space-y-4 rounded-xl bg-card p-5 text-center ring-1 ring-foreground/10 print:ring-0">
             <img src={qr} alt={m.lot_qr_alt({ code: lot.code })} className="mx-auto size-48" />
@@ -163,49 +156,12 @@ function LotPage() {
               {m.lot_items_empty()}
             </p>
           ) : (
-            <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
-              <Table>
-                <TableHeader>
-                  <TableRow className="hover:bg-transparent">
-                    <TableHead className="h-10 px-4">{m.triage_garment()}</TableHead>
-                    <TableHead className="h-10">{m.triage_condition()}</TableHead>
-                    <TableHead className="h-10">{m.lots_col_fibre()}</TableHead>
-                    <TableHead className="h-10">{m.triage_brand()}</TableHead>
-                    <TableHead className="h-10 text-right">{m.lots_col_weight()}</TableHead>
-                    <TableHead className="h-10 pr-4 text-right">
-                      {m.lot_item_confidence()}
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {lot.item_list.map((i) => (
-                    <TableRow key={i.id}>
-                      <TableCell className="px-4 font-medium">
-                        {garmentLabel[i.garment_type]()}
-                      </TableCell>
-                      <TableCell>
-                        <Badge
-                          variant={i.condition === 'reject' ? 'outline' : 'secondary'}
-                          className="font-semibold text-[10px] uppercase tracking-wider"
-                        >
-                          {destinationLabel[i.condition]()}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>{fibreLabel[i.dominant_fibre]()}</TableCell>
-                      <TableCell className="text-muted-foreground">
-                        {i.brand ?? m.common_dash()}
-                      </TableCell>
-                      <TableCell className="text-right tabular-nums">
-                        {i.estimated_weight_g} g
-                      </TableCell>
-                      <TableCell className="pr-4 text-right tabular-nums">
-                        {Math.round(i.confidence * 100)}%
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <DataTable
+              columns={itemColumns}
+              rows={lot.item_list}
+              getKey={(i) => i.id}
+              caption={m.lot_items_title()}
+            />
           )}
           {lot.reservation && (
             <div className="space-y-1 rounded-xl bg-card p-5 text-sm ring-1 ring-foreground/10">
@@ -222,3 +178,44 @@ function LotPage() {
     </div>
   );
 }
+
+const itemColumns: Column<LotItemOut>[] = [
+  {
+    id: 'garment',
+    header: m.triage_garment(),
+    primary: true,
+    cell: (i) => garmentLabel[i.garment_type](),
+  },
+  {
+    id: 'condition',
+    header: m.triage_condition(),
+    badge: true,
+    cell: (i) => (
+      <Badge
+        variant={i.condition === 'reject' ? 'outline' : 'secondary'}
+        className="font-semibold text-[10px] uppercase tracking-wider"
+      >
+        {destinationLabel[i.condition]()}
+      </Badge>
+    ),
+  },
+  { id: 'fibre', header: m.lots_col_fibre(), cell: (i) => fibreLabel[i.dominant_fibre]() },
+  {
+    id: 'brand',
+    header: m.triage_brand(),
+    className: 'text-muted-foreground',
+    cell: (i) => i.brand ?? m.common_dash(),
+  },
+  {
+    id: 'weight',
+    header: m.lots_col_weight(),
+    align: 'right',
+    cell: (i) => `${i.estimated_weight_g} g`,
+  },
+  {
+    id: 'confidence',
+    header: m.lot_item_confidence(),
+    align: 'right',
+    cell: (i) => `${Math.round(i.confidence * 100)}%`,
+  },
+];

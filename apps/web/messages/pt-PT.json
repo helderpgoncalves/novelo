@@ -68,7 +68,7 @@
   "auth_aside_text": "Do saco ao fio: planear a rede, decidir em português, seguir cada lote até à indústria e entregar à câmara o dossiê de 2028.",
   "auth_fact_parishes_value": "55",
   "auth_fact_parishes_label": "freguesias dispersas",
-  "auth_fact_inhabitants_value": "156 277",
+  "auth_fact_inhabitants_value": "156 830",
   "auth_fact_inhabitants_label": "habitantes",
   "auth_fact_deadline_value": "17 abr 2028",
   "auth_fact_deadline_label": "prazo da RAP têxtil",
@@ -834,5 +834,6 @@
   "reports_max": "Máximo de 3 cenários",
   "tipau_apu": "Predominantemente urbana",
   "tipau_amu": "Mediamente urbana",
-  "tipau_apr": "Predominantemente rural"
+  "tipau_apr": "Predominantemente rural",
+  "offline_banner": "Sem ligação à internet. Os dados já abertos continuam visíveis; o resto volta quando a rede voltar."
 }

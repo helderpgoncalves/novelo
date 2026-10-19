@@ -1,19 +1,13 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Info } from 'lucide-react';
+import type { BrandStat } from '@/client';
 import { getBrandEvidenceOptions } from '@/client/@tanstack/react-query.gen';
+import { type Column, DataTable } from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { fibreLabel } from '@/lib/lots';
 import { m } from '@/paraglide/messages';
@@ -30,6 +24,42 @@ function Brands() {
   const { data } = useSuspenseQuery(getBrandEvidenceOptions());
   const small = data.sample_items < MIN_SAMPLE;
   const max = Math.max(1, ...data.brands.map((b) => b.weight_kg));
+
+  const columns: Column<BrandStat>[] = [
+    { id: 'brand', header: m.brands_col_brand(), primary: true, cell: (b) => b.brand },
+    {
+      id: 'share',
+      header: m.brands_col_share(),
+      badge: true,
+      cell: (b) => formatPercent(b.share_pct),
+    },
+    {
+      id: 'weight',
+      header: m.brands_col_weight(),
+      className: 'w-56',
+      full: true,
+      cell: (b) => (
+        <div className="flex items-center gap-3">
+          <span className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
+            <span
+              className="block h-full rounded-full bg-primary"
+              style={{ width: `${(b.weight_kg / max) * 100}%` }}
+            />
+          </span>
+          <span className="w-16 text-right text-xs tabular-nums">
+            {formatNumber(b.weight_kg, 2)} kg
+          </span>
+        </div>
+      ),
+    },
+    { id: 'items', header: m.lots_col_items(), align: 'right', cell: (b) => b.items },
+    {
+      id: 'fibre',
+      header: m.brands_col_fibre(),
+      className: 'text-muted-foreground',
+      cell: (b) => fibreLabel[b.top_fibre](),
+    },
+  ];
 
   return (
     <div className="space-y-8">
@@ -65,46 +95,12 @@ function Brands() {
       {data.brands.length === 0 ? (
         <EmptyState title={m.brands_empty_title()} description={m.brands_empty_text()} />
       ) : (
-        <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
-          <Table>
-            <TableHeader>
-              <TableRow className="hover:bg-transparent">
-                <TableHead className="h-10 px-4">{m.brands_col_brand()}</TableHead>
-                <TableHead className="h-10 w-56">{m.brands_col_weight()}</TableHead>
-                <TableHead className="h-10 text-right">{m.lots_col_items()}</TableHead>
-                <TableHead className="h-10 text-right">{m.brands_col_share()}</TableHead>
-                <TableHead className="h-10 pr-4">{m.brands_col_fibre()}</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {data.brands.map((b) => (
-                <TableRow key={b.brand}>
-                  <TableCell className="px-4 font-medium">{b.brand}</TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                      <span className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
-                        <span
-                          className="block h-full rounded-full bg-primary"
-                          style={{ width: `${(b.weight_kg / max) * 100}%` }}
-                        />
-                      </span>
-                      <span className="w-16 text-right text-xs tabular-nums">
-                        {formatNumber(b.weight_kg, 2)} kg
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right tabular-nums">{b.items}</TableCell>
-                  <TableCell className="text-right tabular-nums">
-                    {formatPercent(b.share_pct)}
-                  </TableCell>
-                  <TableCell className="pr-4 text-muted-foreground">
-                    {fibreLabel[b.top_fibre]()}
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </div>
+        <DataTable
+          columns={columns}
+          rows={data.brands}
+          getKey={(b) => b.brand}
+          caption={m.brands_title()}
+        />
       )}
       <p className="text-muted-foreground text-xs">{m.brands_privacy()}</p>
     </div>
