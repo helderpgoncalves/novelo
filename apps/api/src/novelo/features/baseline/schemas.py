@@ -67,3 +67,16 @@ class Flows(BaseModel):
     observed: bool
     nodes: list[FlowNode]
     links: list[FlowLink]
+
+
+class WasteShare(BaseModel):
+    scope: str = Field(description="Europa ou Portugal")
+    category: str
+    share_pct: float
+
+
+class WasteComposition(BaseModel):
+    """Composição dos resíduos urbanos (EEA para a Europa, caracterização nacional para Portugal)."""
+
+    shares: list[WasteShare]
+    kg_per_inhab_year_pt: float = Field(description="Capitação de resíduos urbanos em Portugal continental, 2024")

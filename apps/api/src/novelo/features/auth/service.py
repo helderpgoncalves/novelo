@@ -24,7 +24,7 @@ from novelo.core.security import (
     verify_password,
 )
 from novelo.features.auth import emails
-from novelo.features.auth.models import PasswordResetToken, RefreshToken
+from novelo.features.auth.models import EmailVerificationToken, PasswordResetToken, RefreshToken
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
@@ -39,16 +39,13 @@ class RegistrationClosedError(AppError):
     code = "registration_closed"
 
 
-async def _issue_session(db: AsyncSession, user: User) -> tuple[str, str]:
+async def _issue_session(db: AsyncSession, user: User, remember: bool = True) -> tuple[str, str]:
     settings = get_settings()
-    refresh = create_refresh_token(user.id)
-    db.add(
-        RefreshToken(
-            user_id=user.id,
-            token_hash=hash_token(refresh),
-            expires_at=datetime.now(UTC) + timedelta(days=settings.refresh_token_days),
-        )
+    refresh = create_refresh_token(user.id, remember)
+    lifetime = (
+        timedelta(days=settings.refresh_token_days) if remember else timedelta(hours=settings.session_token_hours)
     )
+    db.add(RefreshToken(user_id=user.id, token_hash=hash_token(refresh), expires_at=datetime.now(UTC) + lifetime))
     user.last_login_at = datetime.now(UTC)
     await db.commit()
     return create_access_token(user.id, user.role), refresh
@@ -62,7 +59,7 @@ async def revoke_all_sessions(db: AsyncSession, user_id: object) -> None:
     )
 
 
-async def login(db: AsyncSession, email: str, password: str) -> tuple[User, str, str]:
+async def login(db: AsyncSession, email: str, password: str, remember: bool = True) -> tuple[User, str, str]:
     user = await users.get_by_email(db, email)
     stored = user.hashed_password if user and user.hashed_password else _DUMMY_HASH
     valid = verify_password(password, stored)
@@ -72,12 +69,12 @@ async def login(db: AsyncSession, email: str, password: str) -> tuple[User, str,
         raise UnauthorizedError("Conta inativa")
     if needs_rehash(user.hashed_password):
         user.hashed_password = hash_password(password)
-    access, refresh = await _issue_session(db, user)
+    access, refresh = await _issue_session(db, user, remember)
     return user, access, refresh
 
 
 async def register(
-    db: AsyncSession, sender: EmailSender, email: str, password: str, name: str | None
+    db: AsyncSession, sender: EmailSender, email: str, password: str, name: str | None, remember: bool = True
 ) -> tuple[User, str, str]:
     settings = get_settings()
     if not settings.allow_registration:
@@ -85,9 +82,8 @@ async def register(
     if await users.get_by_email(db, email):
         raise ConflictError("Já existe uma conta com este email")
     user = await users.create_user(db, email=email, password=password, name=name)
-    access, refresh = await _issue_session(db, user)
-    subject, html, text = emails.welcome(settings.app_url, name)
-    await _send_quietly(sender, user.email, subject, html, text)
+    access, refresh = await _issue_session(db, user, remember)
+    await send_verification(db, sender, user)
     return user, access, refresh
 
 
@@ -111,7 +107,7 @@ async def rotate_refresh(db: AsyncSession, token: str) -> tuple[str, str]:
     if row.expires_at < datetime.now(UTC) or user is None or not user.is_active or str(user.id) != payload["sub"]:
         raise UnauthorizedError("Sessão expirada")
     row.revoked = True
-    return await _issue_session(db, user)
+    return await _issue_session(db, user, bool(payload.get("remember", True)))
 
 
 async def logout(db: AsyncSession, refresh_token: str | None) -> None:
@@ -215,3 +211,43 @@ async def _send_quietly(sender: EmailSender, to: str, subject: str, html: str, t
         await sender.send(to=to, subject=subject, html=html, text=text)
     except AppError:
         log.exception("falha ao enviar email para %s", to)
+
+
+async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -> None:
+    """Gera um link de confirmação de email e envia-o. Não faz nada se o email já está confirmado."""
+    if user.email_verified:
+        return
+    settings = get_settings()
+    token = new_opaque_token()
+    db.add(
+        EmailVerificationToken(
+            user_id=user.id,
+            token_hash=hash_token(token),
+            expires_at=datetime.now(UTC) + timedelta(hours=settings.email_verify_hours),
+        )
+    )
+    await db.commit()
+    url = f"{settings.app_url.rstrip('/')}/verificar-email?token={token}"
+    subject, html, text = emails.verify_email(url, user.name, settings.email_verify_hours)
+    await _send_quietly(sender, user.email, subject, html, text)
+
+
+async def verify_email(db: AsyncSession, token: str) -> None:
+    row = (
+        await db.execute(select(EmailVerificationToken).where(EmailVerificationToken.token_hash == hash_token(token)))
+    ).scalar_one_or_none()
+    now = datetime.now(UTC)
+    if row is None or row.used_at is not None or row.expires_at < now:
+        raise AppError("O link de confirmação é inválido ou expirou. Pede um novo na tua conta.")
+    user = await db.get(User, row.user_id)
+    if user is None:
+        raise AppError("O link de confirmação é inválido ou expirou. Pede um novo na tua conta.")
+    user.email_verified = True
+    row.used_at = now
+    await db.commit()
+
+
+async def update_profile(db: AsyncSession, user: User, name: str | None) -> User:
+    user.name = name.strip() if name and name.strip() else None
+    await db.commit()
+    return user

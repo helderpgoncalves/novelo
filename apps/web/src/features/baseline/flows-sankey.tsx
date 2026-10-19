@@ -2,53 +2,70 @@ import { SankeyChart } from 'echarts/charts';
 import { TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
+import { useTheme } from 'next-themes';
 import { useEffect, useRef } from 'react';
 import type { Flows } from '@/client';
+import { DESTINATIONS } from './destination';
 
 echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
 
-const COLORS: Record<string, string> = {
-  reuse: '#2e6b57',
-  recycle: '#7fb39c',
-  reject: '#c4a06a',
-};
+const ENTITY_SHADES = ['#2e6b57', '#5e6b66', '#7fb39c', '#8a9a93'];
 
 export function FlowsSankey({ flows }: { flows: Flows }) {
   const ref = useRef<HTMLDivElement>(null);
+  const { resolvedTheme } = useTheme();
 
   useEffect(() => {
     if (!ref.current) return;
-    const chart = echarts.init(ref.current);
+    const mode = resolvedTheme === 'dark' ? 'dark' : 'light';
+    const text = mode === 'dark' ? '#f1eee6' : '#14211d';
+    const label = (id: string) => flows.nodes.find((n) => n.id === id)?.label ?? id;
+    const entities = flows.nodes.filter((n) => n.column === 0);
+
+    const chart = echarts.init(ref.current, undefined, { renderer: 'canvas' });
     chart.setOption({
-      tooltip: { trigger: 'item', valueFormatter: (v: number) => `${v.toLocaleString('pt-PT')} t` },
+      animationDuration: 600,
+      tooltip: {
+        trigger: 'item',
+        confine: true,
+        valueFormatter: (v: number) =>
+          `${v.toLocaleString('pt-PT', { maximumFractionDigits: 1 })} t`,
+      },
       series: [
         {
           type: 'sankey',
-          left: 8,
-          right: 120,
-          nodeGap: 14,
+          left: 4,
+          right: 150,
+          top: 8,
+          bottom: 8,
+          nodeWidth: 14,
+          nodeGap: 16,
           emphasis: { focus: 'adjacency' },
           data: flows.nodes.map((n) => ({
             name: n.label,
-            itemStyle: { color: COLORS[n.id] ?? '#14211d' },
+            itemStyle: {
+              color:
+                DESTINATIONS.find((d) => d.key === n.id)?.hex[mode] ??
+                ENTITY_SHADES[entities.findIndex((e) => e.id === n.id) % ENTITY_SHADES.length],
+            },
           })),
           links: flows.links.map((l) => ({
-            source: flows.nodes.find((n) => n.id === l.source)?.label,
-            target: flows.nodes.find((n) => n.id === l.target)?.label,
+            source: label(l.source),
+            target: label(l.target),
             value: l.tonnes,
           })),
-          lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.45 },
-          label: { fontFamily: 'Inter', color: '#14211d' },
+          lineStyle: { color: 'target', curveness: 0.5, opacity: 0.35 },
+          label: { fontFamily: 'Inter, sans-serif', fontSize: 12, color: text },
         },
       ],
     });
-    const onResize = () => chart.resize();
-    window.addEventListener('resize', onResize);
+    const observer = new ResizeObserver(() => chart.resize());
+    observer.observe(ref.current);
     return () => {
-      window.removeEventListener('resize', onResize);
+      observer.disconnect();
       chart.dispose();
     };
-  }, [flows]);
+  }, [flows, resolvedTheme]);
 
   return (
     <div

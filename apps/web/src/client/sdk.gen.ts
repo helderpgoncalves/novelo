@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, HealthData, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListUsersData, ListUsersErrors, ListUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -52,6 +52,16 @@ export const forgotPassword = <ThrowOnError extends boolean = false>(options: Op
 });
 
 /**
+ * Google Callback
+ */
+export const googleCallback = <ThrowOnError extends boolean = false>(options?: Options<GoogleCallbackData, ThrowOnError>): RequestResult<unknown, GoogleCallbackErrors, ThrowOnError> => (options?.client ?? client).get<unknown, GoogleCallbackErrors, ThrowOnError>({ url: '/api/v1/auth/google/callback', ...options });
+
+/**
+ * Google Login
+ */
+export const googleLogin = <ThrowOnError extends boolean = false>(options?: Options<GoogleLoginData, ThrowOnError>): RequestResult<unknown, GoogleLoginErrors, ThrowOnError> => (options?.client ?? client).get<unknown, GoogleLoginErrors, ThrowOnError>({ url: '/api/v1/auth/google/login', ...options });
+
+/**
  * Login
  */
 export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>): RequestResult<LoginResponses, LoginErrors, ThrowOnError> => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
@@ -69,9 +79,28 @@ export const login = <ThrowOnError extends boolean = false>(options: Options<Log
 export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>): RequestResult<LogoutResponses, LogoutErrors, ThrowOnError> => (options?.client ?? client).post<LogoutResponses, LogoutErrors, ThrowOnError>({ url: '/api/v1/auth/logout', ...options });
 
 /**
+ * Logout All
+ *
+ * Termina a sessão em todos os dispositivos.
+ */
+export const logoutAll = <ThrowOnError extends boolean = false>(options?: Options<LogoutAllData, ThrowOnError>): RequestResult<LogoutAllResponses, LogoutAllErrors, ThrowOnError> => (options?.client ?? client).post<LogoutAllResponses, LogoutAllErrors, ThrowOnError>({ url: '/api/v1/auth/logout-all', ...options });
+
+/**
  * Get Me
  */
 export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/api/v1/auth/me', ...options });
+
+/**
+ * Update Me
+ */
+export const updateMe = <ThrowOnError extends boolean = false>(options: Options<UpdateMeData, ThrowOnError>): RequestResult<UpdateMeResponses, UpdateMeErrors, ThrowOnError> => (options.client ?? client).patch<UpdateMeResponses, UpdateMeErrors, ThrowOnError>({
+    url: '/api/v1/auth/me',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Refresh
@@ -91,10 +120,27 @@ export const register = <ThrowOnError extends boolean = false>(options: Options<
 });
 
 /**
+ * Resend Verification
+ */
+export const resendVerification = <ThrowOnError extends boolean = false>(options?: Options<ResendVerificationData, ThrowOnError>): RequestResult<ResendVerificationResponses, ResendVerificationErrors, ThrowOnError> => (options?.client ?? client).post<ResendVerificationResponses, ResendVerificationErrors, ThrowOnError>({ url: '/api/v1/auth/resend-verification', ...options });
+
+/**
  * Reset Password
  */
 export const resetPassword = <ThrowOnError extends boolean = false>(options: Options<ResetPasswordData, ThrowOnError>): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> => (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
     url: '/api/v1/auth/reset-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Verify Email
+ */
+export const verifyEmail = <ThrowOnError extends boolean = false>(options: Options<VerifyEmailData, ThrowOnError>): RequestResult<VerifyEmailResponses, VerifyEmailErrors, ThrowOnError> => (options.client ?? client).post<VerifyEmailResponses, VerifyEmailErrors, ThrowOnError>({
+    url: '/api/v1/auth/verify-email',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -124,6 +170,13 @@ export const getObservedFlows = <ThrowOnError extends boolean = false>(options?:
 export const getTextileBaseline = <ThrowOnError extends boolean = false>(options?: Options<GetTextileBaselineData, ThrowOnError>): RequestResult<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError> => (options?.client ?? client).get<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError>({ url: '/api/v1/baseline/textile', ...options });
 
 /**
+ * Get Waste Composition
+ *
+ * Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.
+ */
+export const getWasteComposition = <ThrowOnError extends boolean = false>(options?: Options<GetWasteCompositionData, ThrowOnError>): RequestResult<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError> => (options?.client ?? client).get<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError>({ url: '/api/v1/baseline/waste', ...options });
+
+/**
  * Health
  *
  * Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.
@@ -136,3 +189,24 @@ export const health = <ThrowOnError extends boolean = false>(options?: Options<H
  * Readiness: a base de dados responde e diz se a IA está ligada.
  */
 export const ready = <ThrowOnError extends boolean = false>(options?: Options<ReadyData, ThrowOnError>): RequestResult<ReadyResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ReadyResponses, unknown, ThrowOnError>({ url: '/api/v1/ready', ...options });
+
+/**
+ * List Users
+ *
+ * Contas da plataforma (só administradores).
+ */
+export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>): RequestResult<ListUsersResponses, ListUsersErrors, ThrowOnError> => (options?.client ?? client).get<ListUsersResponses, ListUsersErrors, ThrowOnError>({ url: '/api/v1/users', ...options });
+
+/**
+ * Update User
+ *
+ * Muda o perfil ou ativa/desativa uma conta. Não se pode alterar a própria conta.
+ */
+export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>): RequestResult<UpdateUserResponses, UpdateUserErrors, ThrowOnError> => (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
+    url: '/api/v1/users/{user_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});

@@ -246,6 +246,20 @@ export type LoginRequest = {
      * Password
      */
     password: string;
+    /**
+     * Remember Me
+     */
+    remember_me?: boolean;
+};
+
+/**
+ * ProfileUpdate
+ */
+export type ProfileUpdate = {
+    /**
+     * Name
+     */
+    name?: string | null;
 };
 
 /**
@@ -282,6 +296,10 @@ export type RegisterRequest = {
      * Password
      */
     password: string;
+    /**
+     * Remember Me
+     */
+    remember_me?: boolean;
 };
 
 /**
@@ -353,6 +371,64 @@ export type TextileBaseline = {
 };
 
 /**
+ * UserAdminOut
+ *
+ * Visão de administração: inclui estado da conta e último acesso.
+ */
+export type UserAdminOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
+    /**
+     * Google Linked
+     */
+    google_linked: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Last Login At
+     */
+    last_login_at: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Role
+     */
+    role: 'admin' | 'operator';
+};
+
+/**
+ * UserAdminUpdate
+ */
+export type UserAdminUpdate = {
+    /**
+     * Is Active
+     */
+    is_active?: boolean | null;
+    /**
+     * Role
+     */
+    role?: 'admin' | 'operator' | null;
+};
+
+/**
  * UserOut
  */
 export type UserOut = {
@@ -364,6 +440,10 @@ export type UserOut = {
      * Email
      */
     email: string;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
     /**
      * Google Linked
      */
@@ -412,6 +492,54 @@ export type ValidationError = {
      * Error Type
      */
     type: string;
+};
+
+/**
+ * VerifyEmailRequest
+ */
+export type VerifyEmailRequest = {
+    /**
+     * Token
+     */
+    token: string;
+};
+
+/**
+ * WasteComposition
+ *
+ * Composição dos resíduos urbanos (EEA para a Europa, caracterização nacional para Portugal).
+ */
+export type WasteComposition = {
+    /**
+     * Kg Per Inhab Year Pt
+     *
+     * Capitação de resíduos urbanos em Portugal continental, 2024
+     */
+    kg_per_inhab_year_pt: number;
+    /**
+     * Shares
+     */
+    shares: Array<WasteShare>;
+};
+
+/**
+ * WasteShare
+ */
+export type WasteShare = {
+    /**
+     * Category
+     */
+    category: string;
+    /**
+     * Scope
+     *
+     * Europa ou Portugal
+     */
+    scope: string;
+    /**
+     * Share Pct
+     */
+    share_pct: number;
 };
 
 export type ChangePasswordData = {
@@ -480,6 +608,58 @@ export type ForgotPasswordResponses = {
 
 export type ForgotPasswordResponse = ForgotPasswordResponses[keyof ForgotPasswordResponses];
 
+export type GoogleCallbackData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Code
+         */
+        code?: string | null;
+        /**
+         * State
+         */
+        state?: string | null;
+        /**
+         * Error
+         */
+        error?: string | null;
+    };
+    url: '/api/v1/auth/google/callback';
+};
+
+export type GoogleCallbackErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoogleCallbackError = GoogleCallbackErrors[keyof GoogleCallbackErrors];
+
+export type GoogleLoginData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Next
+         *
+         * Caminho para onde voltar depois de entrar
+         */
+        next?: string;
+    };
+    url: '/api/v1/auth/google/login';
+};
+
+export type GoogleLoginErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GoogleLoginError = GoogleLoginErrors[keyof GoogleLoginErrors];
+
 export type LoginData = {
     body: LoginRequest;
     path?: never;
@@ -530,6 +710,31 @@ export type LogoutResponses = {
 
 export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
 
+export type LogoutAllData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/logout-all';
+};
+
+export type LogoutAllErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LogoutAllError = LogoutAllErrors[keyof LogoutAllErrors];
+
+export type LogoutAllResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type LogoutAllResponse = LogoutAllResponses[keyof LogoutAllResponses];
+
 export type GetMeData = {
     body?: never;
     path?: never;
@@ -554,6 +759,31 @@ export type GetMeResponses = {
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type UpdateMeData = {
+    body: ProfileUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/me';
+};
+
+export type UpdateMeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateMeError = UpdateMeErrors[keyof UpdateMeErrors];
+
+export type UpdateMeResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserOut;
+};
+
+export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
 export type RefreshData = {
     body?: never;
@@ -605,6 +835,31 @@ export type RegisterResponses = {
 
 export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
 
+export type ResendVerificationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/resend-verification';
+};
+
+export type ResendVerificationErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ResendVerificationError = ResendVerificationErrors[keyof ResendVerificationErrors];
+
+export type ResendVerificationResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ResendVerificationResponse = ResendVerificationResponses[keyof ResendVerificationResponses];
+
 export type ResetPasswordData = {
     body: ResetPasswordRequest;
     path?: never;
@@ -629,6 +884,31 @@ export type ResetPasswordResponses = {
 };
 
 export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
+
+export type VerifyEmailData = {
+    body: VerifyEmailRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/verify-email';
+};
+
+export type VerifyEmailErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type VerifyEmailError = VerifyEmailErrors[keyof VerifyEmailErrors];
+
+export type VerifyEmailResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type VerifyEmailResponse = VerifyEmailResponses[keyof VerifyEmailResponses];
 
 export type ListCircuitsData = {
     body?: never;
@@ -705,6 +985,31 @@ export type GetTextileBaselineResponses = {
 
 export type GetTextileBaselineResponse = GetTextileBaselineResponses[keyof GetTextileBaselineResponses];
 
+export type GetWasteCompositionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/baseline/waste';
+};
+
+export type GetWasteCompositionErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetWasteCompositionError = GetWasteCompositionErrors[keyof GetWasteCompositionErrors];
+
+export type GetWasteCompositionResponses = {
+    /**
+     * Successful Response
+     */
+    200: WasteComposition;
+};
+
+export type GetWasteCompositionResponse = GetWasteCompositionResponses[keyof GetWasteCompositionResponses];
+
 export type HealthData = {
     body?: never;
     path?: never;
@@ -736,3 +1041,60 @@ export type ReadyResponses = {
 };
 
 export type ReadyResponse = ReadyResponses[keyof ReadyResponses];
+
+export type ListUsersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users';
+};
+
+export type ListUsersErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListUsersError = ListUsersErrors[keyof ListUsersErrors];
+
+export type ListUsersResponses = {
+    /**
+     * Response List Users
+     *
+     * Successful Response
+     */
+    200: Array<UserAdminOut>;
+};
+
+export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
+
+export type UpdateUserData = {
+    body: UserAdminUpdate;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}';
+};
+
+export type UpdateUserErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateUserError = UpdateUserErrors[keyof UpdateUserErrors];
+
+export type UpdateUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminOut;
+};
+
+export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];

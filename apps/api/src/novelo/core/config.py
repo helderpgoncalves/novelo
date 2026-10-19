@@ -40,6 +40,8 @@ class Settings(BaseSettings):
     secret_key: str = Field("dev-only-change-me-dev-only-change-me", alias="SECRET_KEY")
     access_token_minutes: int = Field(15, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
     refresh_token_days: int = Field(30, alias="REFRESH_TOKEN_EXPIRE_DAYS")
+    session_token_hours: int = Field(24, alias="SESSION_TOKEN_HOURS")  # sem "manter sessão iniciada"
+    email_verify_hours: int = Field(48, alias="EMAIL_VERIFY_EXPIRE_HOURS")
     password_reset_minutes: int = Field(60, alias="PASSWORD_RESET_EXPIRE_MINUTES")
     app_url: str = Field("http://localhost:3190", alias="APP_URL")
     allow_registration: bool = Field(True, alias="ALLOW_REGISTRATION")

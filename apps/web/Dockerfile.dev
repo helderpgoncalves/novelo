@@ -10,4 +10,5 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile --filter web...
 WORKDIR /repo/apps/web
 EXPOSE 3190
-CMD ["pnpm", "dev"]
+# Sincroniza dependências ao arrancar (os node_modules vivem em volumes): barato quando nada mudou.
+CMD ["sh", "-c", "cd /repo && pnpm install --frozen-lockfile --filter web... && cd apps/web && pnpm dev"]

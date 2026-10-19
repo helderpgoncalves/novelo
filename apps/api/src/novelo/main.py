@@ -16,6 +16,7 @@ from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
 from novelo.features.baseline.router import router as baseline_router
 from novelo.features.health.router import router as health_router
+from novelo.features.users.router import router as users_router
 
 API_PREFIX = "/api/v1"
 
@@ -56,6 +57,7 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router, prefix=API_PREFIX, tags=["health"])
     app.include_router(auth_router, prefix=f"{API_PREFIX}/auth", tags=["auth"])
+    app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"])
     # Dados da Vitrus: só para utilizadores autenticados.
     app.include_router(
         baseline_router,

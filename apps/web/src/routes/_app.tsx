@@ -1,0 +1,46 @@
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { Suspense, useState } from 'react';
+import { getMeOptions } from '@/client/@tanstack/react-query.gen';
+import { AppSidebar } from '@/components/layout/app-sidebar';
+import { Topbar } from '@/components/layout/topbar';
+import { PageSkeleton } from '@/components/states';
+
+export const Route = createFileRoute('/_app')({
+  beforeLoad: async ({ context: { queryClient }, location }) => {
+    try {
+      const user = await queryClient.fetchQuery({ ...getMeOptions(), staleTime: 30_000 });
+      return { user };
+    } catch {
+      throw redirect({ to: '/entrar', search: { next: location.href } });
+    }
+  },
+  pendingComponent: PageSkeleton,
+  component: AppLayout,
+});
+
+function AppLayout() {
+  const { user } = Route.useRouteContext();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  return (
+    <div className="flex h-dvh overflow-hidden bg-background">
+      <a
+        href="#conteudo"
+        className="sr-only z-50 rounded-md bg-primary px-3 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-2 focus:left-2"
+      >
+        Saltar para o conteúdo
+      </a>
+      <AppSidebar mobileOpen={menuOpen} onMobileOpenChange={setMenuOpen} />
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <Topbar user={user} onMenuClick={() => setMenuOpen(true)} />
+        <main id="conteudo" className="flex-1 overflow-y-auto">
+          <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">
+            <Suspense fallback={<PageSkeleton />}>
+              <Outlet />
+            </Suspense>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}

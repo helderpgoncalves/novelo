@@ -15,6 +15,8 @@ from novelo.features.baseline.schemas import (
     FlowNode,
     Flows,
     TextileBaseline,
+    WasteComposition,
+    WasteShare,
 )
 
 POPULATION = 156_277
@@ -104,3 +106,9 @@ def get_observed_flows() -> Flows:
             FlowLink(source=e.entity, target="reject", tonnes=e.reject_t),
         ]
     return Flows(observed=True, nodes=nodes, links=links)
+
+
+def get_waste_composition() -> WasteComposition:
+    rows = _rows(get_settings().data_dir / "waste_composition.csv")
+    shares = [WasteShare(scope=r["scope"], category=r["category"], share_pct=float(r["share_pct"])) for r in rows]
+    return WasteComposition(shares=shares, kg_per_inhab_year_pt=517)

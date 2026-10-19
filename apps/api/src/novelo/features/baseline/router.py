@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from novelo.features.baseline import service
-from novelo.features.baseline.schemas import CircuitsSummary, Flows, TextileBaseline
+from novelo.features.baseline.schemas import CircuitsSummary, Flows, TextileBaseline, WasteComposition
 
 router = APIRouter()
 
@@ -22,3 +22,9 @@ def list_circuits() -> CircuitsSummary:
 def get_observed_flows() -> Flows:
     """Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida)."""
     return service.get_observed_flows()
+
+
+@router.get("/waste", response_model=WasteComposition)
+def get_waste_composition() -> WasteComposition:
+    """Composição dos resíduos urbanos: onde os têxteis pesam face ao resto."""
+    return service.get_waste_composition()

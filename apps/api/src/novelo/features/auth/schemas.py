@@ -12,12 +12,14 @@ def _check_password(value: str) -> str:
 class LoginRequest(BaseModel):
     email: EmailStr
     password: str = Field(min_length=1, max_length=128)
+    remember_me: bool = True
 
 
 class RegisterRequest(BaseModel):
     email: EmailStr
     password: str = Field(max_length=128)
     name: str | None = Field(default=None, max_length=120)
+    remember_me: bool = True
 
     _pw = field_validator("password")(_check_password)
 
@@ -44,3 +46,7 @@ class AuthConfig(BaseModel):
     google_enabled: bool
     registration_open: bool
     password_min_length: int = PASSWORD_MIN
+
+
+class VerifyEmailRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)

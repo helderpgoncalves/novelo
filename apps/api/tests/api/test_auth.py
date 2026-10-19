@@ -120,3 +120,47 @@ async def test_login_is_rate_limited(client: httpx.AsyncClient) -> None:
 async def test_auth_config(client: httpx.AsyncClient) -> None:
     body = (await client.get(f"{AUTH}/config")).json()
     assert body == {"google_enabled": False, "registration_open": True, "password_min_length": 10}
+
+
+async def test_remember_me_controls_cookie_lifetime(client: httpx.AsyncClient) -> None:
+    await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
+    persistent = await client.post(f"{AUTH}/login", json={"email": "a@b.pt", "password": PASSWORD, "remember_me": True})
+    session_only = await client.post(
+        f"{AUTH}/login", json={"email": "a@b.pt", "password": PASSWORD, "remember_me": False}
+    )
+    refresh_header = lambda r: next(h for h in r.headers.get_list("set-cookie") if h.startswith("refresh_token"))  # noqa: E731
+    assert "Max-Age" in refresh_header(persistent)
+    assert "Max-Age" not in refresh_header(session_only)
+    # O refresh mantém a escolha ao rodar.
+    rotated = await client.post(f"{AUTH}/refresh")
+    assert rotated.status_code == 204
+    assert "Max-Age" not in refresh_header(rotated)
+
+
+async def test_email_verification_flow(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
+    await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
+    assert (await client.get(f"{AUTH}/me")).json()["email_verified"] is False
+    assert len(outbox.sent) == 1 and "verificar-email?token=" in outbox.sent[0]["text"]
+    token = re.search(r"token=([\w-]+)", outbox.sent[0]["text"]).group(1)  # type: ignore[union-attr]
+
+    assert (await client.post(f"{AUTH}/verify-email", json={"token": token})).status_code == 204
+    assert (await client.get(f"{AUTH}/me")).json()["email_verified"] is True
+    assert (await client.post(f"{AUTH}/verify-email", json={"token": token})).status_code == 400  # uso único
+
+    outbox.sent.clear()
+    assert (await client.post(f"{AUTH}/resend-verification")).status_code == 204
+    assert outbox.sent == []  # já confirmado: nada a enviar
+
+
+async def test_resend_verification_sends_new_link(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
+    await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
+    outbox.sent.clear()
+    assert (await client.post(f"{AUTH}/resend-verification")).status_code == 204
+    assert len(outbox.sent) == 1
+
+
+async def test_update_profile_and_logout_all(logged_in: httpx.AsyncClient) -> None:
+    resp = await logged_in.patch(f"{AUTH}/me", json={"name": "  Ana Silva "})
+    assert resp.json()["name"] == "Ana Silva"
+    assert (await logged_in.post(f"{AUTH}/logout-all")).status_code == 204
+    assert (await logged_in.post(f"{AUTH}/refresh")).status_code == 401

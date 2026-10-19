@@ -28,3 +28,10 @@ async def test_circuits_summary(logged_in: httpx.AsyncClient) -> None:
 async def test_observed_flows_conserve_mass(logged_in: httpx.AsyncClient) -> None:
     body = (await logged_in.get("/api/v1/baseline/flows")).json()
     assert sum(link["tonnes"] for link in body["links"]) == pytest.approx(301.265, abs=0.01)
+
+
+async def test_waste_composition_has_textiles(logged_in: httpx.AsyncClient) -> None:
+    body = (await logged_in.get("/api/v1/baseline/waste")).json()
+    pt = {s["category"]: s["share_pct"] for s in body["shares"] if s["scope"] == "Portugal"}
+    assert pt["Têxteis"] == pytest.approx(4.55)
+    assert pt["Têxteis Sanitários"] == pytest.approx(9.1)

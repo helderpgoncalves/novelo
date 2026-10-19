@@ -9,68 +9,228 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as CircuitosRouteImport } from './routes/circuitos'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppCircuitosRouteImport } from './routes/_app/circuitos'
+import { Route as AppContaRouteImport } from './routes/_app/conta'
+import { Route as AuthCriarContaRouteImport } from './routes/_auth/criar-conta'
+import { Route as AuthEntrarRouteImport } from './routes/_auth/entrar'
+import { Route as AuthRecuperarPasswordRouteImport } from './routes/_auth/recuperar-password'
+import { Route as AuthRedefinirPasswordRouteImport } from './routes/_auth/redefinir-password'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
-const CircuitosRoute = CircuitosRouteImport.update({
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCircuitosRoute = AppCircuitosRouteImport.update({
   id: '/circuitos',
   path: '/circuitos',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AppRoute,
+} as any)
+const AppContaRoute = AppContaRouteImport.update({
+  id: '/conta',
+  path: '/conta',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthCriarContaRoute = AuthCriarContaRouteImport.update({
+  id: '/criar-conta',
+  path: '/criar-conta',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthEntrarRoute = AuthEntrarRouteImport.update({
+  id: '/entrar',
+  path: '/entrar',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRecuperarPasswordRoute = AuthRecuperarPasswordRouteImport.update({
+  id: '/recuperar-password',
+  path: '/recuperar-password',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthRedefinirPasswordRoute = AuthRedefinirPasswordRouteImport.update({
+  id: '/redefinir-password',
+  path: '/redefinir-password',
+  getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/circuitos': typeof CircuitosRoute
+  '/': typeof AppIndexRoute
+  '/circuitos': typeof AppCircuitosRoute
+  '/conta': typeof AppContaRoute
+  '/criar-conta': typeof AuthCriarContaRoute
+  '/entrar': typeof AuthEntrarRoute
+  '/recuperar-password': typeof AuthRecuperarPasswordRoute
+  '/redefinir-password': typeof AuthRedefinirPasswordRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/circuitos': typeof CircuitosRoute
+  '/': typeof AppIndexRoute
+  '/circuitos': typeof AppCircuitosRoute
+  '/conta': typeof AppContaRoute
+  '/criar-conta': typeof AuthCriarContaRoute
+  '/entrar': typeof AuthEntrarRoute
+  '/recuperar-password': typeof AuthRecuperarPasswordRoute
+  '/redefinir-password': typeof AuthRedefinirPasswordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/circuitos': typeof CircuitosRoute
+  '/_app': typeof AppRouteWithChildren
+  '/_auth': typeof AuthRouteWithChildren
+  '/_app/circuitos': typeof AppCircuitosRoute
+  '/_app/conta': typeof AppContaRoute
+  '/_auth/criar-conta': typeof AuthCriarContaRoute
+  '/_auth/entrar': typeof AuthEntrarRoute
+  '/_auth/recuperar-password': typeof AuthRecuperarPasswordRoute
+  '/_auth/redefinir-password': typeof AuthRedefinirPasswordRoute
+  '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/circuitos'
+  fullPaths:
+    | '/'
+    | '/circuitos'
+    | '/conta'
+    | '/criar-conta'
+    | '/entrar'
+    | '/recuperar-password'
+    | '/redefinir-password'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/circuitos'
-  id: '__root__' | '/' | '/circuitos'
+  to:
+    | '/'
+    | '/circuitos'
+    | '/conta'
+    | '/criar-conta'
+    | '/entrar'
+    | '/recuperar-password'
+    | '/redefinir-password'
+  id:
+    | '__root__'
+    | '/_app'
+    | '/_auth'
+    | '/_app/circuitos'
+    | '/_app/conta'
+    | '/_auth/criar-conta'
+    | '/_auth/entrar'
+    | '/_auth/recuperar-password'
+    | '/_auth/redefinir-password'
+    | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CircuitosRoute: typeof CircuitosRoute
+  AppRoute: typeof AppRouteWithChildren
+  AuthRoute: typeof AuthRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
+    '/_app': {
+      id: '/_app'
+      path: ''
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/circuitos': {
-      id: '/circuitos'
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app/': {
+      id: '/_app/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/circuitos': {
+      id: '/_app/circuitos'
       path: '/circuitos'
       fullPath: '/circuitos'
-      preLoaderRoute: typeof CircuitosRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AppCircuitosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/conta': {
+      id: '/_app/conta'
+      path: '/conta'
+      fullPath: '/conta'
+      preLoaderRoute: typeof AppContaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_auth/criar-conta': {
+      id: '/_auth/criar-conta'
+      path: '/criar-conta'
+      fullPath: '/criar-conta'
+      preLoaderRoute: typeof AuthCriarContaRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/entrar': {
+      id: '/_auth/entrar'
+      path: '/entrar'
+      fullPath: '/entrar'
+      preLoaderRoute: typeof AuthEntrarRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/recuperar-password': {
+      id: '/_auth/recuperar-password'
+      path: '/recuperar-password'
+      fullPath: '/recuperar-password'
+      preLoaderRoute: typeof AuthRecuperarPasswordRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/redefinir-password': {
+      id: '/_auth/redefinir-password'
+      path: '/redefinir-password'
+      fullPath: '/redefinir-password'
+      preLoaderRoute: typeof AuthRedefinirPasswordRouteImport
+      parentRoute: typeof AuthRoute
     }
   }
 }
 
+interface AppRouteChildren {
+  AppCircuitosRoute: typeof AppCircuitosRoute
+  AppContaRoute: typeof AppContaRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCircuitosRoute: AppCircuitosRoute,
+  AppContaRoute: AppContaRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
+interface AuthRouteChildren {
+  AuthCriarContaRoute: typeof AuthCriarContaRoute
+  AuthEntrarRoute: typeof AuthEntrarRoute
+  AuthRecuperarPasswordRoute: typeof AuthRecuperarPasswordRoute
+  AuthRedefinirPasswordRoute: typeof AuthRedefinirPasswordRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthCriarContaRoute: AuthCriarContaRoute,
+  AuthEntrarRoute: AuthEntrarRoute,
+  AuthRecuperarPasswordRoute: AuthRecuperarPasswordRoute,
+  AuthRedefinirPasswordRoute: AuthRedefinirPasswordRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CircuitosRoute: CircuitosRoute,
+  AppRoute: AppRouteWithChildren,
+  AuthRoute: AuthRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
