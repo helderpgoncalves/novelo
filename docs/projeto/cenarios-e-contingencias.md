@@ -6,7 +6,7 @@ Escrito a 19 de outubro de 2026. Dono: **H** = Hélder Gonçalves, **F** = Fláv
 
 Estado das funcionalidades novas (copiloto de IA, painel de IA, cobertura de contentores, sensibilidade e robustez, cenário francês, recomendador de piloto, resolvedor de alertas, avaliação da triagem): **em integração**. Só entram na demo as que estiverem testadas e ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
 
-Os projetos são avaliados por quatro critérios ponderados (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%); ver [Critérios de avaliação](criterios-de-avaliacao.md).
+O prazo de submissão na plataforma é **23 de outubro às 17h30**; depois, nada se edita. O júri é designado pela organização, com especialistas nas áreas temáticas e sem votação pública. Os projetos são avaliados por quatro critérios ponderados (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%); ver [Critérios de avaliação](criterios-de-avaliacao.md).
 
 Documentos relacionados: [Estratégia para ganhar](estrategia-para-ganhar.md) · [Mentores](mentores.md) · [Narrativa do pitch](narrativa-do-pitch.md) · [Guião de slides](pitch-slides.md) · [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
 
@@ -32,6 +32,7 @@ Documentos relacionados: [Estratégia para ganhar](estrategia-para-ganhar.md) ·
 | **Júri de negócio** (empresas, investidores) | Média | Perguntas sobre quem paga, escala, modelo de negócio | Voltar à tese de 2028: município paga hoje, produtores amanhã, o Novelo dá o custo eficiente por tonelada. Mostrar o relatório RAP e o €/t por tipo de território | H |
 | **Júri institucional** (Câmara, Vitrus, universidade) | Alta | Perguntas sobre dados, território, operação | Mostrar circuitos, viaturas, alertas de qualidade e a cobertura. Pedir o piloto de 3 meses em duas freguesias. Agradecer os dados da Vitrus pelo nome | HF |
 | **Júri misto sem perfil técnico** | Alta | Caras vazias quando se fala de "VRP" | Contar a história do saco ao fio; usar uma única frase-âncora; só mostrar o €/t e as toneladas | H |
+| **Júri de especialistas de outra área** (o júri compara os cinco desafios na classificação geral) | Média | Perguntas fora do têxtil, pedido de "o essencial" | Abrir com o problema e o número-âncora, sem jargão; só mostrar €/t, toneladas e o QR | H |
 | **Jurado conhece a Vitrus melhor do que nós** | Média | Corrige um número | "Obrigado. Esse número é da vossa folha ou nosso cálculo? Ajustamos já." Abrir o registo e atualizar na hora | H |
 
 ### A.2 Tempo e formato
@@ -75,6 +76,9 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 | **Inovação privilegia tecnologia nova** | Baixa | "Estado da arte", "tecnologia disruptiva" | Dar mais tempo ao "E se...?" e ao verificador, **dentro dos 65 s** de inovação; não cortar impacto nem viabilidade | H |
 | **Continuidade exige equipa, escalabilidade ou plano de negócio por escrito** | Média | Pedem entrega escrita ou apresentação do plano | Preparar uma página com piloto, roadmap pós-26 out, replicabilidade e parceiros "em conversa"; mesmo conteúdo do slide 8 | HF |
 | **As Regras impõem entrega escrita ou vídeo além do pitch** | Média | Prazo antes de 26 de outubro | Usar a [descrição do projeto](../marca/descricao.md), o README e o vídeo de 60 s; nada novo, só adaptado ao formato | F |
+| **Perder a submissão de 23 de outubro às 17h30** (falha da plataforma, campo em falta, atraso) | Baixa | Rascunho ainda por fazer a 22 | Rascunho a 22; congelar o código às 15h00 de 23 e submeter até às 16h30; etiqueta Git da versão submetida; se a plataforma falhar, contactar a organização pelo evento e guardar capturas da tentativa | HF |
+| **A produção muda depois da submissão** (deploy a cada push em `main`) | Média | Commit em `main` depois das 17h30 de 23 | Depois da submissão só entram correções; trabalho novo em ramo; verificar a versão em produção 15 minutos antes do pitch | F |
+| **Dúvida sobre originalidade ou uso de IA** | Baixa | Pergunta da organização ou do júri | O histórico do Git começa a 19 de outubro; as ferramentas de IA estão identificadas na submissão e no README; **nunca reescrever o histórico** | H |
 | **As Regras mudam o tempo ou proíbem a demo ao vivo** | Baixa | Duração diferente de 5 minutos ou "sem demo" | Aplicar as versões de 3 minutos ou o cenário "sem demo" de A.2; manter uma frase e uma prova por critério | H |
 
 ---
@@ -118,7 +122,7 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 | Cenário | Prob. | Sinal de aviso | Resposta preparada | Dono |
 | --- | --- | --- | --- | --- |
 | **Pergunta sobre RGPD e fotos** | Média | "As fotos ficam guardadas?" | Não guardamos fotos de quem entrega; apagadas depois de processadas; ficam marca, composição, estado e peso | H |
-| **Pedido para retirar dados da Vitrus do repositório público** | Baixa | Mentor ou Vitrus | Remover de `data/raw` com `git rm` e reescrever histórico **só se pedido** e com cuidado; avisar a equipa | HF |
+| **Pedido para retirar dados da Vitrus do repositório público** | Baixa | Mentor ou Vitrus | Remover de `data/raw` com `git rm` num novo commit. Reescrever o histórico **só se pedido por escrito**, porque a organização pode verificar a originalidade pelo histórico dos repositórios; avisar a equipa e a organização | HF |
 
 ---
 

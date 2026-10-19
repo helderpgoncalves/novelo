@@ -1,6 +1,6 @@
 # Estratégia para ganhar
 
-Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 19 de outubro de 2026; pitch a 26 e vencedores a 28.
+Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 19 de outubro de 2026; **submissão a 23 às 17h30 (fecho rígido)**, pitch a 26 a partir das 14h30 e vencedores a 28.
 
 | Ligações | |
 | --- | --- |
@@ -89,7 +89,31 @@ Os projetos são avaliados por **quatro critérios ponderados**. Fonte: página 
 | Apresentação e potencial de continuidade | **20%** | +0,20 |
 | **Total** | **100%** | |
 
-> **O que ainda não sabemos.** O detalhe de cada critério está na secção "Regras" da página, que **ainda não temos** (E6). A coluna "o que o júri provavelmente procura" é, por isso, **hipótese**: vem de guias de hackathons [F38] e do tipo de desafio, não do texto oficial. Quando lermos as Regras, cola-se o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras) e esta matriz revê-se no mesmo dia. Composição do júri e formato do pitch e das perguntas continuam desconhecidos (E7).
+> **O que ainda não sabemos.** O detalhe de cada critério está no separador **Rules** da página do evento na plataforma TAIKAI, que **ainda não temos** (E6). A coluna "o que o júri provavelmente procura" é, por isso, **hipótese**: vem de guias de hackathons [F38] e do tipo de desafio, não do texto oficial. Quando lermos as Regras, cola-se o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras) e esta matriz revê-se no mesmo dia. Os nomes do júri, o formato do pitch e das perguntas e a duração continuam desconhecidos (E5, E7).
+
+### O que a organização escreve, e o que isso muda
+
+Palavras oficiais da FAQ [F61] e do enunciado do desafio [F62]. São um resumo, não os critérios detalhados.
+
+| Critério | Palavras oficiais | O que muda para nós |
+| --- | --- | --- |
+| Inovação e originalidade | "a inovação da solução" | Provar a novidade com a ligação saco, lote e fio, não com tecnologia |
+| Viabilidade técnica | "a solidez técnica **do que foi construído**"; "demonstrar que a ideia funciona na prática" | Conta o que está construído e a funcionar, não o que está em integração: sem E2E verde, não se mostra |
+| Impacto e relevância | "o impacto **no território**" | Dados locais: freguesias, 40 circuitos, 29 viaturas, população do INE; o piloto em duas freguesias |
+| Apresentação e potencial de continuidade | "a clareza com que a equipa o apresenta"; "um protótipo funcional com potencial de continuidade, **não um produto acabado**"; "pode evoluir depois do hackathon" | Dizer que é um protótipo e mostrar o caminho: piloto, roadmap, replicabilidade |
+
+### As regras do jogo
+
+| Facto | Valor | Registo |
+| --- | --- | --- |
+| **Submissão** | Até **23 de outubro às 17h30**; depois, os projetos ficam fechados e não se cria nem edita nada | E8 |
+| Pitches | 26 de outubro a partir das 14h30, presenciais; presença obrigatória | E2, E9 |
+| Júri | Designado pela organização, especialistas nas áreas temáticas, **sem votação pública**, decisões finais; avalia a 26 e 27 | E7 |
+| Prémios | 7 500 €, 4 500 € e 3 000 € na classificação geral; 1 000 € para o melhor de cada desafio; acumulam. Neste desafio, a Vitrus atribui o prémio | E3, E13, E14 |
+| IA e código de terceiros | Permitidos e encorajados, **desde que identificados** | E11 |
+| Originalidade | Trabalho substancial feito durante o hackathon; a organização pode verificar o histórico dos repositórios. O nosso primeiro commit é de 19 de outubro | E12 |
+
+**Implicações.** 1) Competimos na classificação geral com os outros quatro desafios, perante especialistas de várias áreas: a clareza (não o jargão de VRP) pesa. 2) O que se submete a 23 às 17h30 é o que fica; a produção faz deploy a cada push em `main`, por isso depois de submeter só entram correções. 3) Identificar na submissão e no README as ferramentas de IA, APIs e bibliotecas usadas (Claude Code, GLM/Z.ai, OpenRouter e o modelo configurado, OR-Tools, OSRM). 4) Nunca reescrever o histórico do Git.
 
 ### Matriz: critério, prova e ação
 
@@ -224,7 +248,7 @@ gantt
     section Produto
     Backend e ecrãs novos em integração      :b1, 2026-10-19, 3d
     Integração e E2E                         :b2, 2026-10-22, 2d
-    Congelar código                          :milestone, b3, 2026-10-23, 0d
+    Submeter na TAIKAI (até 17h30)           :milestone, b3, 2026-10-23, 0d
     section Pitch
     Narrativa e registo verificado           :c1, 2026-10-20, 3d
     Deck e vídeo plano B                     :c2, 2026-10-24, 1d
@@ -238,8 +262,8 @@ gantt
 | **Seg 19** | Arranque | Confirmar inscrição; mensagem ao Lucas com 5 pedidos; obter o texto das Regras (secção da página oficial) | Integração dos novos ecrãs; `just check` verde; chave OpenRouter e saldo verificados | **Go** se: inscrição confirmada, mensagem enviada, API e web a arrancar |
 | **Ter 20** | Dados novos | Receber contentores e custos; mensagem ao Luís Miguel; contactos à indústria | Importar contentores, mapa e cobertura | **Go** se: contentores no mapa ou plano B definido |
 | **Qua 21** | Modelo e mentores | 10 min com o Prof. Paulo Afonso; fixar cenários A, B e francês | Sensibilidade, robustez e piloto no web | **Go** se: três cenários calculados e a frase-âncora preenchida |
-| **Qui 22** | Prova | Medir a triagem (30 a 50 peças); resposta de um reciclador; narrativa final | Copiloto e resolvedor de alertas; painel de IA | **No-go** de cada funcionalidade nova sem E2E verde: sai da demo |
-| **Sex 23** | Fechar produto | Slides em rascunho; registo de afirmações | Polimento; E2E completo; imagens de produção; deploy de ensaio | **Código congelado à noite** |
+| **Qui 22** | Prova | Medir a triagem (30 a 50 peças); resposta de um reciclador; narrativa final; rascunho da submissão na plataforma | Copiloto e resolvedor de alertas; painel de IA | **No-go** de cada funcionalidade nova sem E2E verde: sai da demo |
+| **Sex 23** | Fechar produto e **submeter** | Texto da submissão, ferramentas de IA identificadas, registo de afirmações; slides em rascunho | Polimento; E2E completo; imagens de produção; deploy de ensaio; etiqueta Git da versão submetida | **Código congelado às 15h00; submetido até às 16h30** (fecho às 17h30). Depois, só correções |
 | **Sáb 24** | Deck | Deck v1; vídeo de 60 s | Plano B (relatório pré-gerado, stack local, dump da base); verificar Coolify | Deck e vídeo prontos |
 | **Dom 25** | Ensaio | 3 ensaios cronometrados com as 48 perguntas e as 12 por critério | Ensaio técnico (rede, projetor, QR no telemóvel de um jurado) | **Go/no-go final**: o que não foi ensaiado sai |
 | **Seg 26** | **Pitch** | Apresenta | Opera a demo | — |
@@ -249,6 +273,7 @@ gantt
 
 ## Checklist de pitch
 
+- [ ] **Submetido na TAIKAI até 23 de outubro às 17h30**, com as ferramentas de IA identificadas e uma etiqueta Git da versão submetida
 - [ ] Inscrição confirmada; texto das Regras colado em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras); duração e formato do pitch e das perguntas confirmados
 - [ ] Cada critério tem uma frase e uma prova na demo (ver o [slide de apoio](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova))
 - [ ] Cenários A, B e francês calculados; frase-âncora com X e Y preenchidos
@@ -278,9 +303,11 @@ gantt
 | 8 | O modelo ignora a operação real | Alta | Baixa | Rotas atuais no modelo; falar com o Lucas sobre restrições | H |
 | 9 | Meta francesa mal interpretada | Baixa | Média | Dizer "referência", mostrar a distância e o potencial como teto | H |
 | 10 | Datas da regulação mal ditas | Média | Baixa | Só as marcadas "Primária" | H |
-| 11 | Cansaço no dia 26 | Média | Média | Congelar código a 23; ensaios a 25; dormir | HF |
+| 11 | Cansaço no dia 26 | Média | Média | Congelar código e submeter a 23; ensaios a 25; dormir | HF |
 | 12 | Identificação errada de um mentor | Baixa | Baixa | Confirmar logo na primeira mensagem | H |
 | 13 | As Regras mudam a interpretação dos critérios | Média | Média | Protocolo de uma hora em [Cenários](cenarios-e-contingencias.md#a4-critérios-e-regras); matriz revista no mesmo dia | HF |
+| 14 | Perder a submissão de 23 às 17h30 (plataforma, ficheiro em falta, hora) ou submeter uma versão que depois muda | Alta | Baixa | Rascunho a 22; congelar às 15h00 e submeter até às 16h30; etiqueta Git; sem push em `main` depois, exceto correções; contactar a organização pela plataforma se falhar | HF |
+| 15 | Não identificar as ferramentas de IA usadas | Média | Média | Lista no texto da submissão e no README, a 23 | H |
 
 ## Métricas de sucesso
 

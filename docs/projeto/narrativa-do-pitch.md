@@ -2,7 +2,7 @@
 
 A história completa do Novelo, em três durações, com **cada afirmação ligada a um número e a uma linha do [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)**. O [guião de slides](pitch-slides.md) usa esta narrativa; a [estratégia](estrategia-para-ganhar.md) explica porquê.
 
-Duração do pitch **desconhecida**: assumimos 5 minutos e preparamos versões de 30 segundos e de 3 minutos. A avaliação segue quatro critérios ponderados; ver [a repartição do tempo](#repartição-do-tempo-pelos-quatro-critérios). Referências do tipo `A1` remetem para o registo.
+Os pitches são presenciais a 26 de outubro a partir das 14h30. Duração do pitch **desconhecida**: assumimos 5 minutos e preparamos versões de 30 segundos e de 3 minutos. A avaliação segue quatro critérios ponderados; ver [a repartição do tempo](#repartição-do-tempo-pelos-quatro-critérios). Referências do tipo `A1` remetem para o registo.
 
 ## A estrutura em sete passos
 
@@ -85,6 +85,8 @@ Apenas estes. Todos têm estado **Dado Vitrus**, **Primária**, **Secundária** 
 | **59,4% / 26,5% / 14,1%** | Para onde vai | A4 | "Hoje, cerca de 59% do que se recolhe é reutilizado." (dizer "estimativa" para duas das entidades, A5) |
 | **2 000 t/mês** Sasia (e **5,5%**) | A indústria tem capacidade | C16 (C17 só depois de A8 verificado) | "A indústria do Vale do Ave tem capacidade, sobretudo para pré-consumo; o que lhe falta são lotes limpos de pós-consumo." |
 | **X t por ano a Y € por tonelada** | Frase-âncora | cenário B | Preencher a 22 de outubro com os números calculados |
+
+**O enunciado do desafio fala em 73% a 80%** dos têxteis descartados em aterro ou incineração (C25, sem fonte indicada). O júri leu esse texto. Mede outra coisa que o nosso 72% (indiferenciado, AEA, C10): se alguém o citar, dizer "segundo o enunciado" e que o nosso número é o da AEA, com fonte. Não os misturar no mesmo slide.
 
 **Não levar ao palco** até verificação: 5,4% (A10), "4 de 27" (A11), 0,7 kg e 1 317 t como facto (A8; só como "potencial do plano municipal, por confirmar"), qualquer preço, e a exatidão da triagem (D4).
 
@@ -181,7 +183,7 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 
 ## Preparação
 
-1. **22 out:** preencher X e Y da frase-âncora com o cenário B calculado; atualizar o registo.
-2. **23 out:** slides em rascunho com rodapés de fonte; confirmar C10, B11 e A8 nas fontes primárias.
+1. **22 out:** preencher X e Y da frase-âncora com o cenário B calculado; atualizar o registo. Rascunhar o texto da submissão com os mesmos números.
+2. **23 out:** **submeter até às 17h30 (fecho rígido; depois não se edita nada)**, com as ferramentas de IA identificadas; slides em rascunho com rodapés de fonte; confirmar C10, B11 e A8 nas fontes primárias.
 3. **24 out:** vídeo de 60 s da demo e relatório RAP pré-gerado (plano B).
 4. **25 out:** três ensaios cronometrados; o registo impresso; um colega faz de júri e faz as perguntas da tabela de objeções.
