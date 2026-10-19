@@ -12,6 +12,7 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { type Column, DataTable } from '@/components/data-table';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
@@ -63,7 +64,7 @@ function Reports() {
     );
 
   return (
-    <div className="space-y-10">
+    <Page>
       <PageHeader
         eyebrow={m.reports_eyebrow()}
         title={m.reports_title()}
@@ -83,7 +84,7 @@ function Reports() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <section className="space-y-3">
             <div className="space-y-1">
-              <h2 className="text-2xl">{m.reports_pick()}</h2>
+              <SectionTitle>{m.reports_pick()}</SectionTitle>
               <p className="text-muted-foreground text-sm">{m.reports_pick_hint()}</p>
             </div>
             <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
@@ -152,7 +153,7 @@ function Reports() {
       )}
 
       <section className="space-y-3">
-        <h2 className="text-2xl">{m.reports_history()}</h2>
+        <SectionTitle>{m.reports_history()}</SectionTitle>
         {reports.length === 0 ? (
           <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
             {m.reports_history_empty()}
@@ -168,7 +169,7 @@ function Reports() {
           />
         )}
       </section>
-    </div>
+    </Page>
   );
 }
 

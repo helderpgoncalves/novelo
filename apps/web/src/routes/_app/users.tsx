@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { listUsersOptions } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { UsersTable } from '@/features/users/users-table';
@@ -22,7 +23,7 @@ function Users() {
   const { data } = useSuspenseQuery(listUsersOptions());
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow="Administração"
         title="Utilizadores"
@@ -45,6 +46,6 @@ function Users() {
         />
       </StatStrip>
       <UsersTable users={data} currentUserId={user.id} />
-    </div>
+    </Page>
   );
 }

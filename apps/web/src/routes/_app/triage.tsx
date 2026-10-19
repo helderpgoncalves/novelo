@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { listLotsOptions, listZonesOptions } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { TriageFlow } from '@/features/triage/triage-flow';
 import { m } from '@/paraglide/messages';
@@ -23,13 +24,13 @@ function Triage() {
   const { data: openLots } = useSuspenseQuery(listLotsOptions({ query: { state: 'collected' } }));
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.triage_eyebrow()}
         title={m.triage_title()}
         description={m.triage_description()}
       />
       <TriageFlow zones={zones} openLots={openLots} initialLot={lot} />
-    </div>
+    </Page>
   );
 }

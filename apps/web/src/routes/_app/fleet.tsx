@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 import { getFleetOptions } from '@/client/@tanstack/react-query.gen';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { OccupancyHeatmap } from '@/features/fleet/occupancy-heatmap';
@@ -29,7 +30,7 @@ function Section({
   return (
     <section className="space-y-4">
       <div className="space-y-1">
-        <h2 className="text-2xl">{title}</h2>
+        <SectionTitle>{title}</SectionTitle>
         {description && (
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
         )}
@@ -49,7 +50,7 @@ function Fleet() {
       : '';
 
   return (
-    <div className="space-y-12">
+    <Page>
       <PageHeader
         eyebrow={m.fleet_eyebrow({ period })}
         title={m.fleet_title()}
@@ -87,6 +88,6 @@ function Fleet() {
       <Section title={m.fleet_vehicles_title()} description={m.fleet_vehicles_description()}>
         <VehiclesTable vehicles={data.vehicles} />
       </Section>
-    </div>
+    </Page>
   );
 }

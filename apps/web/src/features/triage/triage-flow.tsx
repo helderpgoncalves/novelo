@@ -11,6 +11,7 @@ import {
   listLotsQueryKey,
   openLotMutation,
 } from '@/client/@tanstack/react-query.gen';
+import { SectionTitle } from '@/components/page';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -79,7 +80,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
     return (
       <div className="mx-auto max-w-lg space-y-5 rounded-xl bg-card p-6 ring-1 ring-foreground/10">
         <div className="space-y-1">
-          <h2 className="text-2xl">{m.triage_open_title()}</h2>
+          <SectionTitle>{m.triage_open_title()}</SectionTitle>
           <p className="text-muted-foreground text-sm">{m.triage_open_text()}</p>
         </div>
         {openLots.length > 0 && (
@@ -164,7 +165,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
 
       {analyse.data ? (
         <div className="space-y-4 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
-          <h2 className="text-2xl">{m.triage_review_title()}</h2>
+          <SectionTitle>{m.triage_review_title()}</SectionTitle>
           <ReviewForm
             result={analyse.data}
             pending={confirm.isPending}

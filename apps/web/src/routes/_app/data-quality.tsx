@@ -4,6 +4,7 @@ import { useState } from 'react';
 import type { AlertStatus } from '@/client';
 import { getDataQualityOptions } from '@/client/@tanstack/react-query.gen';
 import { FilterChips } from '@/components/filter-chips';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { AlertCard } from '@/features/quality/alert-card';
@@ -25,7 +26,7 @@ function DataQuality() {
   const resolved = data.alerts.length - data.open_alerts;
 
   return (
-    <div className="space-y-12">
+    <Page>
       <PageHeader
         eyebrow={m.quality_eyebrow()}
         title={m.quality_title()}
@@ -50,12 +51,12 @@ function DataQuality() {
         />
       </StatStrip>
       <section className="space-y-4">
-        <h2 className="text-2xl">{m.quality_sources_title()}</h2>
+        <SectionTitle>{m.quality_sources_title()}</SectionTitle>
         <SourcesTable sources={data.sources} />
       </section>
       <section className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-2xl">{m.quality_alerts_title()}</h2>
+          <SectionTitle>{m.quality_alerts_title()}</SectionTitle>
           <FilterChips<AlertStatus>
             legend={m.quality_filter_status()}
             value={status}
@@ -75,6 +76,6 @@ function DataQuality() {
           ))}
         </ul>
       </section>
-    </div>
+    </Page>
   );
 }

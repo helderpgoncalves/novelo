@@ -8,6 +8,7 @@ import {
   getPlanningParametersQueryKey,
   updatePlanningParametersMutation,
 } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { Button } from '@/components/ui/button';
 import { validateParams } from '@/features/assumptions/param-fields';
@@ -43,7 +44,7 @@ function Assumptions() {
   });
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.assumptions_eyebrow({ version: data.version })}
         title={m.assumptions_title()}
@@ -85,6 +86,6 @@ function Assumptions() {
       <p className="text-muted-foreground text-xs tabular-nums">
         {m.assumptions_updated({ date: formatDateTime(data.updated_at) })}
       </p>
-    </div>
+    </Page>
   );
 }

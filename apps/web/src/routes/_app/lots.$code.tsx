@@ -11,6 +11,7 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { type Column, DataTable } from '@/components/data-table';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Badge } from '@/components/ui/badge';
@@ -50,7 +51,7 @@ function LotPage() {
   });
 
   return (
-    <div className="space-y-10">
+    <Page>
       <PageHeader
         eyebrow={`${lot.parish_name ?? m.lot_no_parish()} · ${formatDateTime(lot.opened_at)}`}
         title={lot.code}
@@ -150,7 +151,7 @@ function LotPage() {
         </aside>
 
         <section className="min-w-0 space-y-3 print:hidden">
-          <h2 className="text-2xl">{m.lot_items_title()}</h2>
+          <SectionTitle>{m.lot_items_title()}</SectionTitle>
           {lot.item_list.length === 0 ? (
             <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
               {m.lot_items_empty()}
@@ -176,7 +177,7 @@ function LotPage() {
           )}
         </section>
       </div>
-    </div>
+    </Page>
   );
 }
 
