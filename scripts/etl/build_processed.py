@@ -6,13 +6,18 @@
 
 Uso: `just etl` (ou `uv run scripts/etl/build_processed.py`).
 Os ficheiros em data/raw/ nunca se editam à mão; tudo o que é derivado sai daqui.
+
+Os textos originais (em português) ficam como vieram; ao lado de cada categoria há uma chave estável
+(`*_key`) em inglês, que a API expõe como enum e o web traduz.
 """
 
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import re
+from collections import defaultdict
 from pathlib import Path
 
 import openpyxl
@@ -21,12 +26,55 @@ ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
 OUT = ROOT / "data" / "processed"
 
-# Habitantes do concelho (Plano de Ação para a Circularidade Têxtil de Guimarães).
-POPULATION = 156_277
+POPULATION = 156_277  # Plano de Ação para a Circularidade Têxtil de Guimarães
+KG_PER_INHAB_MONTH = 0.7  # Plano de Ação: têxtil no indiferenciado
 MONTHS = 12
-KG_PER_INHAB_MONTH = 0.7  # Plano de Ação: 0,7 kg/hab/mês de têxtil no indiferenciado
 
+TYPOLOGY = {
+    "Orgânicos": "organic",
+    "Indiferenciados": "undifferentiated",
+    "Recicláveis": "recyclable",
+    "Volumosos (Monstros)": "bulky",
+    "PAYT": "payt",
+    "Serviços de apoio": "support",
+    "A confirmar": "to_confirm",
+    "Sem afetação": "unassigned",
+}
+COLLECTION = {"PAP": "door_to_door", "Moloks": "moloks", "Contentores": "containers", "": "unspecified"}
+STATUS = {"OK": "ok", "Sem viatura atribuída": "no_vehicle", "Só ao fim de semana": "weekend_only", "—": "unassigned"}
+DAY_GROUP = {"Semana (2ª a 6ª)": "weekday", "Sábado": "saturday", "Domingo": "sunday"}
+SHIFT = {"Manhã": "morning", "Tarde": "afternoon", "Noite": "night"}
+ALERT = {
+    "Circuito sem viatura": "circuit_without_vehicle",
+    "Código de viatura": "vehicle_code",
+    "Circuito desconhecido": "unknown_circuit",
+    "Circuito incompleto": "incomplete_circuit",
+    "Viatura em duplicado": "duplicate_vehicle",
+    "Possível erro de matrícula": "possible_plate_error",
+    "Viatura multi-tipologia": "multi_typology_vehicle",
+    "Viaturas sem circuito": "vehicle_without_circuit",
+    "Circuitos não documentados": "undocumented_circuits",
+    "Datas diferentes": "different_dates",
+    "Escrita normalizada": "normalized_spelling",
+}
+WASTE = {
+    "Biorresíduos": "biowaste",
+    "Indiferenciados": "undifferentiated",
+    "Papel": "paper",
+    "Plástico": "plastic",
+    "Vidro": "glass",
+    "Madeira": "wood",
+    "Metais": "metals",
+    "outros": "others",
+    "Compósitos": "composites",
+    "Têxteis": "textiles",
+    "Têxteis Sanitários": "sanitary_textiles",
+    "Volumosos": "bulky",
+}
 CIRCUIT_SHEETS = ["Orgânicos", "Indiferenciados", "Recicláveis", "Volumosos", "Outros serviços"]
+# Dias: 1=segunda ... 6=sábado, 7=domingo (ISO).
+DAY_TOKENS = {"2ª": 1, "3ª": 2, "4ª": 3, "5ª": 4, "6ª": 5, "SAB": 6, "DOM": 7}
+SITE_WORDS = re.compile(r"horeca|cemit|contentores|escolas|supermercado|todos os|nascional", re.I)
 
 
 def _clean(value: object) -> str:
@@ -41,35 +89,59 @@ def _write_csv(name: str, rows: list[dict]) -> None:
         writer.writerows(rows)
 
 
-def textile_baseline() -> dict:
+def _days_from_text(text: str) -> set[int]:
+    """Lê "2ª, 4ª & 6ª", "Todos os dias" ou "Segunda-feria Sexta-feira". Vazio se não houver dados."""
+    low = text.lower()
+    if "todos os dias" in low:
+        return set(range(1, 8))
+    days = {d for token, d in DAY_TOKENS.items() if re.search(rf"(?<!\w){re.escape(token)}", text, re.I)}
+    if "segunda" in low:
+        days.add(1)
+    if "sexta" in low:
+        days.add(5)
+    return days
+
+
+def _days_from_shifts(groups: set[str]) -> set[int]:
+    days: set[int] = set()
+    if "weekday" in groups:
+        days |= {1, 2, 3, 4, 5}
+    if "saturday" in groups:
+        days.add(6)
+    if "sunday" in groups:
+        days.add(7)
+    return days
+
+
+# --- Têxtil e resíduos ---------------------------------------------------------------------------------------
+
+
+def textile_flows() -> dict:
+    """Destinos do têxtil recolhido por entidade em 2025, em formato longo (uma linha por destino)."""
     ws = openpyxl.load_workbook(RAW / "dados_textil.xlsx", data_only=True)["têxtil"]
     rows = []
     for entity, total, reuse, recycle, reject, source, *_ in ws.iter_rows(min_row=4, values_only=True):
         if not entity or str(entity).startswith(("TOTAL", "%")):
             continue
-        rows.append(
-            {
-                "entity": entity,
-                "total_t": round(total, 4),
-                "reuse_t": round(reuse, 4),
-                "recycle_t": round(recycle, 4),
-                "reject_t": round(reject, 4),
-                "reuse_pct": round(reuse / total * 100, 1),
-                "recycle_pct": round(recycle / total * 100, 1),
-                "reject_pct": round(reject / total * 100, 1),
-                "source": _clean(source),
-                "exact_weights": "kg exatos" in (source or ""),
-            }
-        )
-    _write_csv("textile_baseline_2025.csv", rows)
-
-    total = sum(r["total_t"] for r in rows)
+        method = "weighed" if "kg exatos" in (source or "") else "percentage"
+        for destination, tonnes in (("reuse", reuse), ("recycle", recycle), ("reject", reject)):
+            rows.append(
+                {
+                    "entity": entity,
+                    "year": 2025,
+                    "destination": destination,
+                    "tonnes": round(tonnes, 4),
+                    "method": method,
+                    "provenance": _clean(source),
+                }
+            )
+    _write_csv("textile_flows.csv", rows)
+    total = sum(r["tonnes"] for r in rows)
     demand_t = POPULATION * KG_PER_INHAB_MONTH * MONTHS / 1000
+    by_dest = {d: round(sum(r["tonnes"] for r in rows if r["destination"] == d), 3) for d in ("reuse", "recycle", "reject")}
     return {
         "total_t": round(total, 3),
-        "reuse_t": round(sum(r["reuse_t"] for r in rows), 3),
-        "recycle_t": round(sum(r["recycle_t"] for r in rows), 3),
-        "reject_t": round(sum(r["reject_t"] for r in rows), 3),
+        **{f"{d}_t": v for d, v in by_dest.items()},
         "kg_per_inhab_month": round(total * 1000 / POPULATION / MONTHS, 3),
         "estimated_demand_t": round(demand_t, 1),
         "capture_of_demand_pct": round(total / demand_t * 100, 1),
@@ -81,95 +153,183 @@ def waste_composition() -> None:
     """Composição dos RSU: colunas L:M da folha RSU, Europa primeiro e Portugal a seguir."""
     ws = openpyxl.load_workbook(RAW / "dados_textil.xlsx", data_only=True)["RSU"]
     rows: list[dict] = []
-    scope = "Europa"
+    scope = "europe"
     for row in ws.iter_rows(min_row=3, values_only=True):
-        label, value = _clean(row[11]).replace("Biorrsesíduos", "Biorresíduos"), row[12]
+        label = _clean(row[11]).replace("Biorrsesíduos", "Biorresíduos").replace("Compositos", "Compósitos")
+        value = row[12]
         if not label or not isinstance(value, (int, float)):
             continue
         if label == "Biorresíduos" and rows:  # a segunda tabela (Portugal) recomeça em Biorresíduos
-            scope = "Portugal"
-        rows.append({"scope": scope, "category": label.replace("Compositos", "Compósitos"), "share_pct": value})
+            scope = "portugal"
+        rows.append({"scope": scope, "category_key": WASTE[label], "category": label, "share_pct": value})
     _write_csv("waste_composition.csv", rows)
+
+
+# --- Circuitos, turnos e viaturas ------------------------------------------------------------------------------
+
+
+def _localities(places: object) -> list[str]:
+    parts = [p.strip() for p in re.split(r"[\n,]| e ", str(places or "")) if p.strip()]
+    return [p for p in parts if not SITE_WORDS.search(p)]
 
 
 def circuits() -> dict:
     wb = openpyxl.load_workbook(RAW / "Circuitos_Viaturas_Guimaraes.xlsx", data_only=True)
 
-    circuit_rows = []
-    for sheet in CIRCUIT_SHEETS:
-        for row in wb[sheet].iter_rows(min_row=5, values_only=True):
-            typology, circuit, kind, places, days, *_rest, status, note = row[:1] + row[1:5] + row[5:13] + row[13:15]
-            if not circuit or circuit == "SEM CIRCUITO":
-                continue
-            localities = [p.strip() for p in re.split(r"[\n,]| e ", str(places or "")) if p.strip()]
-            circuit_rows.append(
-                {
-                    "typology": typology,
-                    "circuit": circuit,
-                    "collection_type": kind or "",
-                    "localities": "; ".join(localities),
-                    "days": _clean(days),
-                    "status": status or "",
-                    "note": _clean(note),
-                }
-            )
-    _write_csv("circuits.csv", circuit_rows)
-
+    # Turnos planeados (Base_Dados): uma linha por circuito, viatura e turno.
     shifts = []
-    ws = wb["Base_Dados"]
-    for row in list(ws.iter_rows(values_only=True))[1:]:
+    for row in list(wb["Base_Dados"].iter_rows(values_only=True))[1:]:
         day, shift, circuit, typology, plate, crew, kind, places, written, sheet, note = row[:11]
         if not circuit:
             continue
         shifts.append(
             {
-                "day": day,
-                "shift": shift,
+                "day_group": DAY_GROUP[day],
+                "shift": SHIFT[shift],
                 "circuit": circuit,
-                "typology": typology,
+                "typology_key": TYPOLOGY[typology],
                 "plate": plate,
-                "crew": crew or 0,
-                "collection_type": kind or "",
-                "localities": _clean(places),
+                "crew": int(crew or 0),
+                "collection_key": COLLECTION[kind or ""],
+                "localities": "; ".join(_localities(places)),
                 "note": _clean(note),
             }
         )
     _write_csv("shifts.csv", shifts)
 
+    groups_by_circuit: dict[str, set[str]] = defaultdict(set)
+    for s in shifts:
+        groups_by_circuit[s["circuit"]].add(s["day_group"])
+
+    # Circuitos (folhas por tipologia) com dias de recolha e frequência semanal.
+    circuit_rows = []
+    for sheet in CIRCUIT_SHEETS:
+        for row in wb[sheet].iter_rows(min_row=5, values_only=True):
+            typology, circuit, kind, places, days, *_rest = row[:6]
+            status, note = row[13], row[14]
+            if not circuit or circuit == "SEM CIRCUITO":
+                continue
+            day_set = _days_from_text(_clean(days)) or _days_from_shifts(groups_by_circuit.get(circuit, set()))
+            circuit_rows.append(
+                {
+                    "typology_key": TYPOLOGY[typology],
+                    "circuit": circuit,
+                    "collection_key": COLLECTION[kind or ""],
+                    "localities": "; ".join(_localities(places)),
+                    "days_text": _clean(days),
+                    "days": " ".join(str(d) for d in sorted(day_set)),
+                    "days_per_week": len(day_set),
+                    "status_key": STATUS[status or "—"],
+                    "note": _clean(note),
+                }
+            )
+    _write_csv("circuits.csv", circuit_rows)
+
+    # Cobertura por localidade: que circuitos passam, em que dias, com que tipo de recolha.
+    by_locality: dict[str, dict] = {}
+    for c in circuit_rows:
+        for name in [x for x in c["localities"].split("; ") if x]:
+            entry = by_locality.setdefault(name, {"circuits": [], "typologies": set(), "kinds": set(), "days": set()})
+            entry["circuits"].append(c["circuit"])
+            entry["typologies"].add(c["typology_key"])
+            if c["collection_key"] != "unspecified":
+                entry["kinds"].add(c["collection_key"])
+            entry["days"] |= {int(d) for d in c["days"].split()}
+    locality_rows = [
+        {
+            "locality": name,
+            "circuits": "; ".join(sorted(set(e["circuits"]))),
+            "typologies": "; ".join(sorted(e["typologies"])),
+            "collection_kinds": "; ".join(sorted(e["kinds"])),
+            "days": " ".join(str(d) for d in sorted(e["days"])),
+            "days_per_week": len(e["days"]),
+        }
+        for name, e in sorted(by_locality.items())
+    ]
+    _write_csv("localities.csv", locality_rows)
+
+    # Viaturas: a lista completa da folha Viaturas (inclui as que nunca têm circuito).
+    vehicle_rows = [
+        {"plate": row[0], "note": _clean(row[8])} for row in wb["Viaturas"].iter_rows(min_row=5, values_only=True) if row[0]
+    ]
+    _write_csv("vehicles.csv", vehicle_rows)
+
+    # Capacidade da frota por tipologia ("Total de Viaturas" e "Total de RH" da folha Resumo, dados do Miguel).
+    capacity_rows = [
+        {"typology": TYPOLOGY[row[0]], "vehicles": int(row[10]), "crew": int(row[11])}
+        for row in wb["Resumo"].iter_rows(min_row=5, values_only=True)
+        if row[0] and row[0] != "TOTAL" and isinstance(row[10], (int, float)) and isinstance(row[11], (int, float))
+    ]
+    _write_csv("fleet_capacity.csv", capacity_rows)
+
     alerts = []
     for row in list(wb["Alertas"].iter_rows(min_row=4, values_only=True)):
         if row[0]:
-            alerts.append({"id": row[0], "type": row[1], "detail": _clean(row[2]), "suggestion": _clean(row[3])})
+            alerts.append(
+                {
+                    "id": row[0],
+                    "type_key": ALERT[row[1]],
+                    "detail": _clean(row[2]),
+                    "suggestion": _clean(row[3]),
+                }
+            )
     _write_csv("data_alerts.csv", alerts)
 
     plates = {s["plate"] for s in shifts}
-    no_circuit = {s["plate"] for s in shifts if s["circuit"] == "SEM CIRCUITO"}
-    with_circuit = {s["plate"] for s in shifts if s["circuit"] != "SEM CIRCUITO"}
-    fixed_kinds = {"Moloks", "PAP", "Contentores"}
     return {
         "circuits": len(circuit_rows),
-        "circuits_without_vehicle": sum(1 for c in circuit_rows if c["status"] == "Sem viatura atribuída"),
+        "circuits_without_vehicle": sum(1 for c in circuit_rows if c["status_key"] == "no_vehicle"),
         "vehicles": len(plates),
-        "vehicles_never_assigned": sorted(no_circuit - with_circuit),
-        "shifts": len(shifts),
-        "crew_shifts_all_days": sum(int(s["crew"]) for s in shifts),
-        "circuits_by_kind": {
-            k: sum(1 for c in circuit_rows if c["collection_type"] == k) for k in sorted(fixed_kinds)
-        },
-        "localities": sorted(
-            {loc for c in circuit_rows for loc in c["localities"].split("; ") if loc}
+        "vehicles_never_assigned": sorted(
+            {v["plate"] for v in vehicle_rows} - {s["plate"] for s in shifts if s["circuit"] != "SEM CIRCUITO"}
         ),
+        "shifts": len(shifts),
+        "localities": len(locality_rows),
+        "alerts": len(alerts),
     }
 
 
+def sources() -> None:
+    """Manifesto de proveniência: ficheiro, origem, período e impressão digital (SHA-256) de cada Excel."""
+
+    def sha(name: str) -> str:
+        return hashlib.sha256((RAW / name).read_bytes()).hexdigest()
+
+    manifest = [
+        {
+            "key": "vitrus_textile_2025",
+            "title": "Têxteis recolhidos em 2025 e composição dos RSU",
+            "provider": "Vitrus Ambiente",
+            "file_name": "dados_textil.xlsx",
+            "file_sha256": sha("dados_textil.xlsx"),
+            "received_on": "2026-10-19",
+            "period_start": "2025-01-01",
+            "period_end": "2025-12-31",
+            "notes": "Sarah Trading e Ultriplo com kg exatos por destino; Nova Etapa e Vitrus com percentagens de relatórios.",
+        },
+        {
+            "key": "vitrus_circuits_2026_09",
+            "title": "Circuitos, viaturas e turnos de recolha",
+            "provider": "Vitrus Ambiente",
+            "file_name": "Circuitos_Viaturas_Guimaraes.xlsx",
+            "file_sha256": sha("Circuitos_Viaturas_Guimaraes.xlsx"),
+            "received_on": "2026-10-19",
+            "period_start": "2026-09-19",
+            "period_end": "2026-09-25",
+            "notes": "Semana de 21 a 25/09/2026, sábado 19/09 e domingo 20/09 (fim de semana anterior).",
+        },
+    ]
+    OUT.mkdir(parents=True, exist_ok=True)
+    (OUT / "sources.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
 def main() -> None:
-    summary = {"textile": textile_baseline(), "circuits": circuits()}
+    summary = {"textile": textile_flows(), "circuits": circuits()}
     waste_composition()
+    sources()
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
-    print(json.dumps({k: v for k, v in summary.items() if k != "circuits"}, ensure_ascii=False, indent=2))
-    c = summary["circuits"]
-    print({k: v for k, v in c.items() if k != "localities"}, "localidades:", len(c["localities"]))
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
 
 
 if __name__ == "__main__":

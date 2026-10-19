@@ -3,6 +3,40 @@
 import * as z from 'zod';
 
 /**
+ * AlertKind
+ */
+export const zAlertKind = z.enum([
+    'circuit_without_vehicle',
+    'vehicle_code',
+    'unknown_circuit',
+    'incomplete_circuit',
+    'duplicate_vehicle',
+    'possible_plate_error',
+    'multi_typology_vehicle',
+    'vehicle_without_circuit',
+    'undocumented_circuits',
+    'different_dates',
+    'normalized_spelling'
+]);
+
+/**
+ * AlertStatus
+ */
+export const zAlertStatus = z.enum([
+    'open',
+    'resolved',
+    'wont_fix'
+]);
+
+/**
+ * AlertUpdate
+ */
+export const zAlertUpdate = z.object({
+    resolution_note: z.string().max(1000).nullish(),
+    status: zAlertStatus
+});
+
+/**
  * AuthConfig
  */
 export const zAuthConfig = z.object({
@@ -20,47 +54,116 @@ export const zChangePasswordRequest = z.object({
 });
 
 /**
- * Circuit
+ * CircuitStatus
  */
-export const zCircuit = z.object({
-    circuit: z.string(),
-    collection_type: z.string(),
-    days: z.string(),
-    localities: z.array(z.string()),
-    note: z.string(),
-    status: z.string(),
-    typology: z.string()
+export const zCircuitStatus = z.enum([
+    'ok',
+    'no_vehicle',
+    'weekend_only',
+    'unassigned'
+]);
+
+/**
+ * CollectionType
+ */
+export const zCollectionType = z.enum([
+    'door_to_door',
+    'moloks',
+    'containers',
+    'unspecified'
+]);
+
+/**
+ * ContainerKind
+ */
+export const zContainerKind = z.enum([
+    'textile',
+    'undifferentiated',
+    'organic',
+    'recyclable',
+    'other'
+]);
+
+/**
+ * ContainerStatus
+ */
+export const zContainerStatus = z.enum([
+    'active',
+    'inactive',
+    'planned'
+]);
+
+/**
+ * ContainerOut
+ */
+export const zContainerOut = z.object({
+    address: z.string().nullable(),
+    capacity_litres: z.int().nullable(),
+    external_ref: z.string(),
+    id: z.uuid(),
+    kind: zContainerKind,
+    latitude: z.string(),
+    locality: z.string().nullable(),
+    longitude: z.string(),
+    status: zContainerStatus
 });
 
 /**
- * CircuitsSummary
+ * ContainerList
  */
-export const zCircuitsSummary = z.object({
-    circuits: z.array(zCircuit),
-    localities: z.array(z.string()),
-    total: z.int(),
-    vehicles: z.int(),
-    vehicles_never_assigned: z.array(z.string()),
-    without_vehicle: z.int()
+export const zContainerList = z.object({
+    items: z.array(zContainerOut),
+    total: z.int()
 });
 
 /**
- * EntityBaseline
- *
- * Têxtil recolhido por uma entidade em 2025 e destino final (toneladas).
+ * DataAlertOut
  */
-export const zEntityBaseline = z.object({
-    entity: z.string(),
-    exact_weights: z.boolean(),
-    recycle_pct: z.number(),
-    recycle_t: z.number(),
-    reject_pct: z.number(),
-    reject_t: z.number(),
-    reuse_pct: z.number(),
-    reuse_t: z.number(),
-    source: z.string(),
-    total_t: z.number()
+export const zDataAlertOut = z.object({
+    detail: z.string(),
+    id: z.uuid(),
+    kind: zAlertKind,
+    number: z.int(),
+    resolution_note: z.string().nullable(),
+    resolved_at: z.iso.datetime().nullable(),
+    source_key: z.string(),
+    status: zAlertStatus,
+    suggestion: z.string()
 });
+
+/**
+ * DataSourceOut
+ */
+export const zDataSourceOut = z.object({
+    file_name: z.string(),
+    file_sha256: z.string(),
+    imported_at: z.iso.datetime(),
+    key: z.string(),
+    notes: z.string().nullable(),
+    period_end: z.iso.date().nullable(),
+    period_start: z.iso.date().nullable(),
+    provider: z.string(),
+    received_on: z.iso.date().nullable(),
+    title: z.string()
+});
+
+/**
+ * DataQuality
+ */
+export const zDataQuality = z.object({
+    alerts: z.array(zDataAlertOut),
+    open_alerts: z.int(),
+    sources: z.array(zDataSourceOut)
+});
+
+/**
+ * DayGroup
+ */
+export const zDayGroup = z.enum([
+    'weekday',
+    'saturday',
+    'sunday'
+]);
 
 /**
  * ErrorBody
@@ -107,24 +210,6 @@ export const zFlowLink = z.object({
     source: z.string(),
     target: z.string(),
     tonnes: z.number()
-});
-
-/**
- * FlowNode
- */
-export const zFlowNode = z.object({
-    column: z.int(),
-    id: z.string(),
-    label: z.string()
-});
-
-/**
- * Flows
- */
-export const zFlows = z.object({
-    links: z.array(zFlowLink),
-    nodes: z.array(zFlowNode),
-    observed: z.boolean()
 });
 
 /**
@@ -188,20 +273,130 @@ export const zResetPasswordRequest = z.object({
 });
 
 /**
- * TextileBaseline
+ * Shift
  */
-export const zTextileBaseline = z.object({
-    capture_of_demand_pct: z.number(),
-    entities: z.array(zEntityBaseline),
-    estimated_demand_t: z.number(),
-    gap_t: z.number(),
-    kg_per_inhab_month: z.number(),
-    population: z.int(),
-    recycle_t: z.number(),
-    reject_t: z.number(),
-    reuse_t: z.number(),
-    total_t: z.number(),
-    year: z.int().optional().default(2025)
+export const zShift = z.enum([
+    'morning',
+    'afternoon',
+    'night'
+]);
+
+/**
+ * SlotCount
+ */
+export const zSlotCount = z.object({
+    assignments: z.int(),
+    crew: z.int(),
+    day_group: zDayGroup,
+    shift: zShift
+});
+
+/**
+ * TextileDestination
+ */
+export const zTextileDestination = z.enum([
+    'reuse',
+    'recycle',
+    'reject'
+]);
+
+/**
+ * FlowNode
+ */
+export const zFlowNode = z.object({
+    column: z.int(),
+    destination: zTextileDestination.nullish(),
+    id: z.string(),
+    label: z.string().nullish()
+});
+
+/**
+ * Flows
+ */
+export const zFlows = z.object({
+    links: z.array(zFlowLink),
+    nodes: z.array(zFlowNode),
+    observed: z.boolean()
+});
+
+/**
+ * Typology
+ *
+ * Tipologia de resíduo do circuito (folha "Resumo").
+ */
+export const zTypology = z.enum([
+    'organic',
+    'undifferentiated',
+    'recyclable',
+    'bulky',
+    'payt',
+    'support',
+    'to_confirm',
+    'unassigned'
+]);
+
+/**
+ * CircuitOut
+ */
+export const zCircuitOut = z.object({
+    code: z.string(),
+    collection_type: zCollectionType,
+    days_text: z.string(),
+    localities: z.array(z.string()),
+    note: z.string().nullable(),
+    status: zCircuitStatus,
+    typology: zTypology,
+    vehicles: z.array(z.string()),
+    weekdays: z.array(z.int())
+});
+
+/**
+ * CircuitsSummary
+ */
+export const zCircuitsSummary = z.object({
+    circuits: z.array(zCircuitOut),
+    localities: z.int(),
+    total: z.int(),
+    vehicles: z.int(),
+    vehicles_never_assigned: z.array(z.string()),
+    without_vehicle: z.int()
+});
+
+/**
+ * LocalityOut
+ */
+export const zLocalityOut = z.object({
+    circuits: z.array(z.string()),
+    collection_types: z.array(zCollectionType),
+    days_per_week: z.int(),
+    name: z.string(),
+    typologies: z.array(zTypology),
+    weekdays: z.array(z.int())
+});
+
+/**
+ * ScheduleEntry
+ */
+export const zScheduleEntry = z.object({
+    circuit: z.string(),
+    crew: z.int(),
+    day_group: zDayGroup,
+    shift: zShift,
+    typology: zTypology
+});
+
+/**
+ * TypologyFleet
+ */
+export const zTypologyFleet = z.object({
+    circuits: z.int(),
+    circuits_without_vehicle: z.int(),
+    crew_shifts_week: z.int(),
+    fleet_crew: z.int().nullable(),
+    fleet_vehicles: z.int().nullable(),
+    slots: z.array(zSlotCount),
+    typology: zTypology,
+    vehicle_shifts_week: z.int()
 });
 
 /**
@@ -254,6 +449,34 @@ export const zValidationErrorBody = z.object({
 });
 
 /**
+ * VehicleOut
+ */
+export const zVehicleOut = z.object({
+    assignments: z.int(),
+    circuits: z.array(z.string()),
+    max_crew: z.int(),
+    multi_typology: z.boolean(),
+    never_assigned: z.boolean(),
+    note: z.string().nullable(),
+    plate: z.string(),
+    schedule: z.array(zScheduleEntry),
+    typologies: z.array(zTypology),
+    weekday_shifts: z.int()
+});
+
+/**
+ * FleetSummary
+ */
+export const zFleetSummary = z.object({
+    period_end: z.iso.date().nullable(),
+    period_start: z.iso.date().nullable(),
+    total_assignments: z.int(),
+    total_crew_shifts_week: z.int(),
+    typologies: z.array(zTypologyFleet),
+    vehicles: z.array(zVehicleOut)
+});
+
+/**
  * VerifyEmailRequest
  */
 export const zVerifyEmailRequest = z.object({
@@ -261,11 +484,34 @@ export const zVerifyEmailRequest = z.object({
 });
 
 /**
- * WasteShare
+ * WasteCategory
  */
-export const zWasteShare = z.object({
-    category: z.string(),
-    scope: z.string(),
+export const zWasteCategory = z.enum([
+    'biowaste',
+    'undifferentiated',
+    'paper',
+    'plastic',
+    'glass',
+    'wood',
+    'metals',
+    'others',
+    'composites',
+    'textiles',
+    'sanitary_textiles',
+    'bulky'
+]);
+
+/**
+ * WasteScope
+ */
+export const zWasteScope = z.enum(['europe', 'portugal']);
+
+/**
+ * WasteShareOut
+ */
+export const zWasteShareOut = z.object({
+    category: zWasteCategory,
+    scope: zWasteScope,
     share_pct: z.number()
 });
 
@@ -276,7 +522,47 @@ export const zWasteShare = z.object({
  */
 export const zWasteComposition = z.object({
     kg_per_inhab_year_pt: z.number(),
-    shares: z.array(zWasteShare)
+    shares: z.array(zWasteShareOut)
+});
+
+/**
+ * WeighingMethod
+ */
+export const zWeighingMethod = z.enum(['weighed', 'percentage']);
+
+/**
+ * EntityBaseline
+ *
+ * Têxtil recolhido por uma entidade num ano e o destino final (toneladas).
+ */
+export const zEntityBaseline = z.object({
+    entity: z.string(),
+    method: zWeighingMethod,
+    provenance: z.string().nullable(),
+    recycle_pct: z.number(),
+    recycle_t: z.number(),
+    reject_pct: z.number(),
+    reject_t: z.number(),
+    reuse_pct: z.number(),
+    reuse_t: z.number(),
+    total_t: z.number()
+});
+
+/**
+ * TextileBaseline
+ */
+export const zTextileBaseline = z.object({
+    capture_of_demand_pct: z.number(),
+    entities: z.array(zEntityBaseline),
+    estimated_demand_t: z.number(),
+    gap_t: z.number(),
+    kg_per_inhab_month: z.number(),
+    population: z.int(),
+    recycle_t: z.number(),
+    reject_t: z.number(),
+    reuse_t: z.number(),
+    total_t: z.number(),
+    year: z.int()
 });
 
 export const zChangePasswordBody = zChangePasswordRequest;
@@ -369,25 +655,21 @@ export const zVerifyEmailBody = zVerifyEmailRequest;
  */
 export const zVerifyEmailResponse = z.void();
 
-/**
- * Successful Response
- */
-export const zListCircuitsResponse = zCircuitsSummary;
+export const zUpdateDataAlertBody = zAlertUpdate;
+
+export const zUpdateDataAlertPath = z.object({
+    alert_id: z.uuid()
+});
 
 /**
  * Successful Response
  */
-export const zGetObservedFlowsResponse = zFlows;
+export const zUpdateDataAlertResponse = zDataAlertOut;
 
 /**
  * Successful Response
  */
-export const zGetTextileBaselineResponse = zTextileBaseline;
-
-/**
- * Successful Response
- */
-export const zGetWasteCompositionResponse = zWasteComposition;
+export const zGetDataQualityResponse = zDataQuality;
 
 /**
  * Successful Response
@@ -397,7 +679,49 @@ export const zHealthResponse = zHealth;
 /**
  * Successful Response
  */
+export const zListCircuitsResponse = zCircuitsSummary;
+
+export const zListContainersQuery = z.object({
+    limit: z.int().gte(1).lte(1000).optional().default(200),
+    offset: z.int().gte(0).optional().default(0)
+});
+
+/**
+ * Successful Response
+ */
+export const zListContainersResponse = zContainerList;
+
+/**
+ * Successful Response
+ */
+export const zGetFleetResponse = zFleetSummary;
+
+/**
+ * Response List Localities
+ *
+ * Successful Response
+ */
+export const zListLocalitiesResponse = z.array(zLocalityOut);
+
+/**
+ * Successful Response
+ */
 export const zReadyResponse = zReadiness;
+
+/**
+ * Successful Response
+ */
+export const zGetTextileBaselineResponse = zTextileBaseline;
+
+/**
+ * Successful Response
+ */
+export const zGetObservedFlowsResponse = zFlows;
+
+/**
+ * Successful Response
+ */
+export const zGetWasteCompositionResponse = zWasteComposition;
 
 /**
  * Response List Users

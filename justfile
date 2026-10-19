@@ -74,6 +74,10 @@ migration MSG:
 migrate:
     cd apps/api && uv run alembic upgrade head
 
+# Importa data/processed para a base de dados (idempotente; corre sozinho no arranque da API)
+seed:
+    cd apps/api && uv run python -m novelo.cli seed
+
 # --- Produção local -------------------------------------------------------------
 # Constrói as imagens de produção (o que o Coolify vai construir)
 build:

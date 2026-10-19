@@ -1,41 +1,41 @@
-typology,circuit,collection_type,localities,days,status,note
-Orgânicos,BIO 1,PAP,Centro histórico,Todos os dias Manhã e tarde,OK,
-Orgânicos,BIO 2,Contentores,HORECA; Cemitérios; Contentores 1000L Taipas; Creixomil,Todos os dias Manhã e tarde,OK,
-Orgânicos,BIO 3,Contentores,Todos os cemitérios do concelho,Todos os dias,OK,
-Orgânicos,BIO 4,Contentores,Cidade; Costa; Urgezes; Azúrem; Creixomil; Campelos,,OK,
-Orgânicos,BIO 5,Contentores,Aldão (compactador),,Sem viatura atribuída,
-Orgânicos,BIO 6,Contentores,Ponte; Fermentões,Segunda-feria Sexta-feira,OK,
-Orgânicos,BIO (s/ nº),,,,OK,"Escrito só ""Bio"" no planeamento. Confirmar qual circuito BIO."
-Indiferenciados,C1,Moloks,Costa; Azurém; Moreira de Cónegos; Mesão Frio; São Torcato,Conforme planeamento,OK,
-Indiferenciados,C2,Moloks,Cidade; Costa; Senhora da Conceição,Conforme planeamento,OK,
-Indiferenciados,C3,Moloks,Fermentões; Caldelas; Barco; Santo Eufémia; Ponte; Sande S. Martinho; Prazins; Souto,Conforme planeamento,OK,
-Indiferenciados,C4,Moloks,Urgezes; Selho; Campelos; Ronfe; Serzedelo; Gandarela; Silvares; Brito; Gondar; Guardizela,Conforme planeamento,OK,
-Indiferenciados,C5,Moloks,Creixomil (zona alta),Conforme planeamento,OK,
-Indiferenciados,C6,Moloks,Urgezes; Abação; Creixomil (zona baixa); Penha; Polvoreira; Conde; Nespereira; Lordelo,Conforme planeamento,OK,
-Indiferenciados,C7,PAP,Donin; Briteiros S. Estevão,"3ª, 5ª & SAB",OK,
-Indiferenciados,C8,PAP,Ponte,4ª (manhã) 2ª & 6ª (tarde),Sem viatura atribuída,
-Indiferenciados,C9,PAP,Balazar; Longos; Sande São Lourenço; Santa Leocadia de Briteiros,"2ª, 4ª & 6ª",OK,
-Indiferenciados,C10,PAP,Arosa; Castelões; Souto São Salvador; Gondomar; Souto Santa Maria,"3ª, 5ª, & SAB.",OK,
-Indiferenciados,C11,PAP,Contentores Ponte ( 2º E 6º); Taipas; Sande São Martinho; São Salvador de Briteiros; Nascional de Brito/taips; Escolas Taipas; Supermercado,"2ª, 4ª, 6ª (manhã) 3ª, 5ª, SAB (tarde)",OK,
-Indiferenciados,C12,PAP,Santo Amaro; Santiago Candoso; Silvares,"2ª, 4ª & 6ª",Sem viatura atribuída,
-Indiferenciados,C13,PAP,Pencelo; Fermentões; Gominhães; Selho São Lourenço; Corvite; Prazins; Santo Eufémia; Nacional Selho São Lourenço,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",OK,
-Indiferenciados,C14,PAP,Contentores Cidade; Salgueiral; Vila Nova Ruas Estreitas; São Clemente Rua Estreitas; Campelos ( 4ª); Selho Ruas Estreitas; São Torcato Rua Estreitas Vermil Creixomil (5ª),"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",OK,
-Indiferenciados,C15,PAP,Conde; Guardizela; Gandarela; Serzedelo,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",Sem viatura atribuída,
-Indiferenciados,C16,PAP,Vila Nova Sande; São Clemente; Figueiredo; Oleiros; Santa Maria Airão; Airão São João,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",OK,
-Indiferenciados,C17,PAP,São Martinho Candoso; Selho São Cristovão,"3ª, 5ª & SAB",OK,
-Indiferenciados,C18,PAP,Ronfe,"3ª, 5ª & SAB",OK,
-Indiferenciados,C19,PAP,Brito,"2ª, 4ª & 6ª",OK,
-Indiferenciados,C20,PAP,Aldão; Atães; Rendufe,"2ª, 4ª & 6ª",Sem viatura atribuída,
-Indiferenciados,C21,PAP,São Torcato; Gonça,"3ª, 5ª & SAB",Sem viatura atribuída,
-Indiferenciados,C22,PAP,Ruas Estreitas; Abação; São Cristovão; Pinheiro; Polvoreira; Nespereira; Moreira; Lordelo; Ruas Estreitas; Urgezess(5ª); Cidade Contentores; Costa; Contentores Mesão Frio,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",Sem viatura atribuída,
-Indiferenciados,C23,PAP,Lordelo,"2ª, 4ª & 6ª",Sem viatura atribuída,
-Indiferenciados,C24,PAP,Moreira de Conégos,"3ª, 5ª & SAB",Sem viatura atribuída,
-Recicláveis,CARTÃO,,,,OK,Não consta no ficheiro de circuitos.
-Recicláveis,RECICLAGEM,,,,OK,Não consta no ficheiro de circuitos.
-Recicláveis,SELETIVO,,,,OK,Não consta no ficheiro de circuitos.
-Volumosos (Monstros),MONSTROS,,,,OK,Recolha de volumosos. Não consta no ficheiro de circuitos.
-A confirmar,1A/1B,,,,OK,"Código ""1 A/ 1B"" não existe no ficheiro de circuitos. Confirmar."
-A confirmar,C.H (Centro Histórico),,,,Só ao fim de semana,"Escrito ""C.H"" no domingo. Pode ser BIO 1 (Centro histórico). Confirmar."
-Serviços de apoio,CONTENTORES,,,,OK,Serviço de apoio (colocação/reparação de contentores?). Confirmar.
-Serviços de apoio,LAVAGEM CONTENTORES,,,,OK,"Escrito ""LAVAGEM"" e ""LAVA-CONTENTORES"" no planeamento."
-PAYT,PAYT,,,,OK,"Pay-As-You-Throw (Centro Histórico, folha CHG). Não consta no ficheiro de circuitos."
+typology_key,circuit,collection_key,localities,days_text,days,days_per_week,status_key,note
+organic,BIO 1,door_to_door,Centro histórico,Todos os dias Manhã e tarde,1 2 3 4 5 6 7,7,ok,
+organic,BIO 2,containers,Creixomil,Todos os dias Manhã e tarde,1 2 3 4 5 6 7,7,ok,
+organic,BIO 3,containers,,Todos os dias,1 2 3 4 5 6 7,7,ok,
+organic,BIO 4,containers,Cidade; Costa; Urgezes; Azúrem; Creixomil; Campelos,,1 2 3 4 5,5,ok,
+organic,BIO 5,containers,Aldão (compactador),,,0,no_vehicle,
+organic,BIO 6,containers,Ponte; Fermentões,Segunda-feria Sexta-feira,1 5,2,ok,
+organic,BIO (s/ nº),unspecified,,,1 2 3 4 5 6,6,ok,"Escrito só ""Bio"" no planeamento. Confirmar qual circuito BIO."
+undifferentiated,C1,moloks,Costa; Azurém; Moreira de Cónegos; Mesão Frio; São Torcato,Conforme planeamento,1 2 3 4 5 6 7,7,ok,
+undifferentiated,C2,moloks,Cidade; Costa; Senhora da Conceição,Conforme planeamento,1 2 3 4 5 6,6,ok,
+undifferentiated,C3,moloks,Fermentões; Caldelas; Barco; Santo Eufémia; Ponte; Sande S. Martinho; Prazins; Souto,Conforme planeamento,1 2 3 4 5 6,6,ok,
+undifferentiated,C4,moloks,Urgezes; Selho; Campelos; Ronfe; Serzedelo; Gandarela; Silvares; Brito; Gondar; Guardizela,Conforme planeamento,1 2 3 4 5 6,6,ok,
+undifferentiated,C5,moloks,Creixomil (zona alta),Conforme planeamento,1 2 3 4 5 6,6,ok,
+undifferentiated,C6,moloks,Urgezes; Abação; Creixomil (zona baixa); Penha; Polvoreira; Conde; Nespereira; Lordelo,Conforme planeamento,1 2 3 4 5 6,6,ok,
+undifferentiated,C7,door_to_door,Donin; Briteiros S. Estevão,"3ª, 5ª & SAB",2 4 6,3,ok,
+undifferentiated,C8,door_to_door,Ponte,4ª (manhã) 2ª & 6ª (tarde),1 3 5,3,no_vehicle,
+undifferentiated,C9,door_to_door,Balazar; Longos; Sande São Lourenço; Santa Leocadia de Briteiros,"2ª, 4ª & 6ª",1 3 5,3,ok,
+undifferentiated,C10,door_to_door,Arosa; Castelões; Souto São Salvador; Gondomar; Souto Santa Maria,"3ª, 5ª, & SAB.",2 4 6,3,ok,
+undifferentiated,C11,door_to_door,Taipas; Sande São Martinho; São Salvador de Briteiros,"2ª, 4ª, 6ª (manhã) 3ª, 5ª, SAB (tarde)",1 2 3 4 5 6,6,ok,
+undifferentiated,C12,door_to_door,Santo Amaro; Santiago Candoso; Silvares,"2ª, 4ª & 6ª",1 3 5,3,no_vehicle,
+undifferentiated,C13,door_to_door,Pencelo; Fermentões; Gominhães; Selho São Lourenço; Corvite; Prazins; Santo Eufémia; Nacional Selho São Lourenço,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",1 2 3 4 5 6,6,ok,
+undifferentiated,C14,door_to_door,Salgueiral; Vila Nova Ruas Estreitas; São Clemente Rua Estreitas; Campelos ( 4ª); Selho Ruas Estreitas; São Torcato Rua Estreitas Vermil Creixomil (5ª),"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",1 2 3 4 5 6,6,ok,
+undifferentiated,C15,door_to_door,Conde; Guardizela; Gandarela; Serzedelo,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",1 2 3 4 5 6,6,no_vehicle,
+undifferentiated,C16,door_to_door,Vila Nova Sande; São Clemente; Figueiredo; Oleiros; Santa Maria Airão; Airão São João,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",1 2 3 4 5 6,6,ok,
+undifferentiated,C17,door_to_door,São Martinho Candoso; Selho São Cristovão,"3ª, 5ª & SAB",2 4 6,3,ok,
+undifferentiated,C18,door_to_door,Ronfe,"3ª, 5ª & SAB",2 4 6,3,ok,
+undifferentiated,C19,door_to_door,Brito,"2ª, 4ª & 6ª",1 3 5,3,ok,
+undifferentiated,C20,door_to_door,Aldão; Atães; Rendufe,"2ª, 4ª & 6ª",1 3 5,3,no_vehicle,
+undifferentiated,C21,door_to_door,São Torcato; Gonça,"3ª, 5ª & SAB",2 4 6,3,no_vehicle,
+undifferentiated,C22,door_to_door,Ruas Estreitas; Abação; São Cristovão; Pinheiro; Polvoreira; Nespereira; Moreira; Lordelo; Ruas Estreitas; Urgezess(5ª); Costa,"2ª, 4ª & 6ª (manhã) 3ª, 5ª & SAB (tarde)",1 2 3 4 5 6,6,no_vehicle,
+undifferentiated,C23,door_to_door,Lordelo,"2ª, 4ª & 6ª",1 3 5,3,no_vehicle,
+undifferentiated,C24,door_to_door,Moreira de Conégos,"3ª, 5ª & SAB",2 4 6,3,no_vehicle,
+recyclable,CARTÃO,unspecified,,,1 2 3 4 5 6,6,ok,Não consta no ficheiro de circuitos.
+recyclable,RECICLAGEM,unspecified,,,1 2 3 4 5 6,6,ok,Não consta no ficheiro de circuitos.
+recyclable,SELETIVO,unspecified,,,1 2 3 4 5 6,6,ok,Não consta no ficheiro de circuitos.
+bulky,MONSTROS,unspecified,,,1 2 3 4 5 6,6,ok,Recolha de volumosos. Não consta no ficheiro de circuitos.
+to_confirm,1A/1B,unspecified,,,1 2 3 4 5 6,6,ok,"Código ""1 A/ 1B"" não existe no ficheiro de circuitos. Confirmar."
+to_confirm,C.H (Centro Histórico),unspecified,,,7,1,weekend_only,"Escrito ""C.H"" no domingo. Pode ser BIO 1 (Centro histórico). Confirmar."
+support,CONTENTORES,unspecified,,,1 2 3 4 5 6,6,ok,Serviço de apoio (colocação/reparação de contentores?). Confirmar.
+support,LAVAGEM CONTENTORES,unspecified,,,1 2 3 4 5,5,ok,"Escrito ""LAVAGEM"" e ""LAVA-CONTENTORES"" no planeamento."
+payt,PAYT,unspecified,,,1 2 3 4 5 6 7,7,ok,"Pay-As-You-Throw (Centro Histórico, folha CHG). Não consta no ficheiro de circuitos."

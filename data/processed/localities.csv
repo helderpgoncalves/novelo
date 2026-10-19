@@ -1,0 +1,83 @@
+locality,circuits,typologies,collection_kinds,days,days_per_week
+Abação,C22; C6,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Airão São João,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Aldão,C20,undifferentiated,door_to_door,1 3 5,3
+Aldão (compactador),BIO 5,organic,containers,,0
+Arosa,C10,undifferentiated,door_to_door,2 4 6,3
+Atães,C20,undifferentiated,door_to_door,1 3 5,3
+Azurém,C1,undifferentiated,moloks,1 2 3 4 5 6 7,7
+Azúrem,BIO 4,organic,containers,1 2 3 4 5,5
+Balazar,C9,undifferentiated,door_to_door,1 3 5,3
+Barco,C3,undifferentiated,moloks,1 2 3 4 5 6,6
+Briteiros S. Estevão,C7,undifferentiated,door_to_door,2 4 6,3
+Brito,C19; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Caldelas,C3,undifferentiated,moloks,1 2 3 4 5 6,6
+Campelos,BIO 4; C4,organic; undifferentiated,containers; moloks,1 2 3 4 5 6,6
+Campelos ( 4ª),C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Castelões,C10,undifferentiated,door_to_door,2 4 6,3
+Centro histórico,BIO 1,organic,door_to_door,1 2 3 4 5 6 7,7
+Cidade,BIO 4; C2,organic; undifferentiated,containers; moloks,1 2 3 4 5 6,6
+Conde,C15; C6,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Corvite,C13,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Costa,BIO 4; C1; C2; C22,organic; undifferentiated,containers; door_to_door; moloks,1 2 3 4 5 6 7,7
+Creixomil,BIO 2; BIO 4,organic,containers,1 2 3 4 5 6 7,7
+Creixomil (zona alta),C5,undifferentiated,moloks,1 2 3 4 5 6,6
+Creixomil (zona baixa),C6,undifferentiated,moloks,1 2 3 4 5 6,6
+Donin,C7,undifferentiated,door_to_door,2 4 6,3
+Fermentões,BIO 6; C13; C3,organic; undifferentiated,containers; door_to_door; moloks,1 2 3 4 5 6,6
+Figueiredo,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Gandarela,C15; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Gominhães,C13,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Gondar,C4,undifferentiated,moloks,1 2 3 4 5 6,6
+Gondomar,C10,undifferentiated,door_to_door,2 4 6,3
+Gonça,C21,undifferentiated,door_to_door,2 4 6,3
+Guardizela,C15; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Longos,C9,undifferentiated,door_to_door,1 3 5,3
+Lordelo,C22; C23; C6,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Mesão Frio,C1,undifferentiated,moloks,1 2 3 4 5 6 7,7
+Moreira,C22,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Moreira de Conégos,C24,undifferentiated,door_to_door,2 4 6,3
+Moreira de Cónegos,C1,undifferentiated,moloks,1 2 3 4 5 6 7,7
+Nacional Selho São Lourenço,C13,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Nespereira,C22; C6,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Oleiros,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Pencelo,C13,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Penha,C6,undifferentiated,moloks,1 2 3 4 5 6,6
+Pinheiro,C22,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Polvoreira,C22; C6,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Ponte,BIO 6; C3; C8,organic; undifferentiated,containers; door_to_door; moloks,1 2 3 4 5 6,6
+Prazins,C13; C3,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Rendufe,C20,undifferentiated,door_to_door,1 3 5,3
+Ronfe,C18; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Ruas Estreitas,C22,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Salgueiral,C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Sande S. Martinho,C3,undifferentiated,moloks,1 2 3 4 5 6,6
+Sande São Lourenço,C9,undifferentiated,door_to_door,1 3 5,3
+Sande São Martinho,C11,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Santa Leocadia de Briteiros,C9,undifferentiated,door_to_door,1 3 5,3
+Santa Maria Airão,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Santiago Candoso,C12,undifferentiated,door_to_door,1 3 5,3
+Santo Amaro,C12,undifferentiated,door_to_door,1 3 5,3
+Santo Eufémia,C13; C3,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Selho,C4,undifferentiated,moloks,1 2 3 4 5 6,6
+Selho Ruas Estreitas,C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Selho São Cristovão,C17,undifferentiated,door_to_door,2 4 6,3
+Selho São Lourenço,C13,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Senhora da Conceição,C2,undifferentiated,moloks,1 2 3 4 5 6,6
+Serzedelo,C15; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Silvares,C12; C4,undifferentiated,door_to_door; moloks,1 2 3 4 5 6,6
+Souto,C3,undifferentiated,moloks,1 2 3 4 5 6,6
+Souto Santa Maria,C10,undifferentiated,door_to_door,2 4 6,3
+Souto São Salvador,C10,undifferentiated,door_to_door,2 4 6,3
+São Clemente,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6
+São Clemente Rua Estreitas,C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+São Cristovão,C22,undifferentiated,door_to_door,1 2 3 4 5 6,6
+São Martinho Candoso,C17,undifferentiated,door_to_door,2 4 6,3
+São Salvador de Briteiros,C11,undifferentiated,door_to_door,1 2 3 4 5 6,6
+São Torcato,C1; C21,undifferentiated,door_to_door; moloks,1 2 3 4 5 6 7,7
+São Torcato Rua Estreitas Vermil Creixomil (5ª),C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Taipas,C11,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Urgezes,BIO 4; C4; C6,organic; undifferentiated,containers; moloks,1 2 3 4 5 6,6
+Urgezess(5ª),C22,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Vila Nova Ruas Estreitas,C14,undifferentiated,door_to_door,1 2 3 4 5 6,6
+Vila Nova Sande,C16,undifferentiated,door_to_door,1 2 3 4 5 6,6

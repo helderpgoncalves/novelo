@@ -14,8 +14,10 @@ from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
-from novelo.features.baseline.router import router as baseline_router
+from novelo.features.datasets.router import router as datasets_router
 from novelo.features.health.router import router as health_router
+from novelo.features.network.router import router as network_router
+from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
 
 API_PREFIX = "/api/v1"
@@ -59,13 +61,11 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix=f"{API_PREFIX}/auth", tags=["auth"], responses=COMMON_ERRORS)
     app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"], responses=COMMON_ERRORS)
     # Dados da Vitrus: só para utilizadores autenticados.
-    app.include_router(
-        baseline_router,
-        prefix=f"{API_PREFIX}/baseline",
-        tags=["baseline"],
-        dependencies=[Depends(get_current_user)],
-        responses=COMMON_ERRORS,
-    )
+    protected = [Depends(get_current_user)]
+    for router, name in ((textile_router, "textile"), (network_router, "network"), (datasets_router, "datasets")):
+        app.include_router(
+            router, prefix=f"{API_PREFIX}/{name}", tags=[name], dependencies=protected, responses=COMMON_ERRORS
+        )
     return app
 
 

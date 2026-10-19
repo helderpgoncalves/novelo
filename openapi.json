@@ -1,6 +1,56 @@
 {
   "components": {
     "schemas": {
+      "AlertKind": {
+        "enum": [
+          "circuit_without_vehicle",
+          "vehicle_code",
+          "unknown_circuit",
+          "incomplete_circuit",
+          "duplicate_vehicle",
+          "possible_plate_error",
+          "multi_typology_vehicle",
+          "vehicle_without_circuit",
+          "undocumented_circuits",
+          "different_dates",
+          "normalized_spelling"
+        ],
+        "title": "AlertKind",
+        "type": "string"
+      },
+      "AlertStatus": {
+        "enum": [
+          "open",
+          "resolved",
+          "wont_fix"
+        ],
+        "title": "AlertStatus",
+        "type": "string"
+      },
+      "AlertUpdate": {
+        "properties": {
+          "resolution_note": {
+            "anyOf": [
+              {
+                "maxLength": 1000,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AlertStatus"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "AlertUpdate",
+        "type": "object"
+      },
       "AuthConfig": {
         "properties": {
           "google_enabled": {
@@ -50,18 +100,18 @@
         "title": "ChangePasswordRequest",
         "type": "object"
       },
-      "Circuit": {
+      "CircuitOut": {
         "properties": {
-          "circuit": {
-            "title": "Circuit",
+          "code": {
+            "title": "Code",
             "type": "string"
           },
           "collection_type": {
-            "title": "Collection Type",
-            "type": "string"
+            "$ref": "#/components/schemas/CollectionType"
           },
-          "days": {
-            "title": "Days",
+          "days_text": {
+            "description": "Dias como escritos no planeamento da Vitrus",
+            "title": "Days Text",
             "type": "string"
           },
           "localities": {
@@ -72,45 +122,75 @@
             "type": "array"
           },
           "note": {
-            "title": "Note",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
           },
           "status": {
-            "title": "Status",
-            "type": "string"
+            "$ref": "#/components/schemas/CircuitStatus"
           },
           "typology": {
-            "title": "Typology",
-            "type": "string"
+            "$ref": "#/components/schemas/Typology"
+          },
+          "vehicles": {
+            "description": "Matrículas das viaturas que o servem no planeamento",
+            "items": {
+              "type": "string"
+            },
+            "title": "Vehicles",
+            "type": "array"
+          },
+          "weekdays": {
+            "description": "Dias em que passa: 1 = segunda ... 7 = domingo",
+            "items": {
+              "type": "integer"
+            },
+            "title": "Weekdays",
+            "type": "array"
           }
         },
         "required": [
+          "code",
           "typology",
-          "circuit",
           "collection_type",
-          "localities",
-          "days",
           "status",
+          "localities",
+          "weekdays",
+          "days_text",
+          "vehicles",
           "note"
         ],
-        "title": "Circuit",
+        "title": "CircuitOut",
         "type": "object"
+      },
+      "CircuitStatus": {
+        "enum": [
+          "ok",
+          "no_vehicle",
+          "weekend_only",
+          "unassigned"
+        ],
+        "title": "CircuitStatus",
+        "type": "string"
       },
       "CircuitsSummary": {
         "properties": {
           "circuits": {
             "items": {
-              "$ref": "#/components/schemas/Circuit"
+              "$ref": "#/components/schemas/CircuitOut"
             },
             "title": "Circuits",
             "type": "array"
           },
           "localities": {
-            "items": {
-              "type": "string"
-            },
             "title": "Localities",
-            "type": "array"
+            "type": "integer"
           },
           "total": {
             "title": "Total",
@@ -143,17 +223,348 @@
         "title": "CircuitsSummary",
         "type": "object"
       },
+      "CollectionType": {
+        "enum": [
+          "door_to_door",
+          "moloks",
+          "containers",
+          "unspecified"
+        ],
+        "title": "CollectionType",
+        "type": "string"
+      },
+      "ContainerKind": {
+        "enum": [
+          "textile",
+          "undifferentiated",
+          "organic",
+          "recyclable",
+          "other"
+        ],
+        "title": "ContainerKind",
+        "type": "string"
+      },
+      "ContainerList": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ContainerOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "ContainerList",
+        "type": "object"
+      },
+      "ContainerOut": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "capacity_litres": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity Litres"
+          },
+          "external_ref": {
+            "title": "External Ref",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ContainerKind"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "string"
+          },
+          "locality": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ContainerStatus"
+          }
+        },
+        "required": [
+          "id",
+          "external_ref",
+          "kind",
+          "status",
+          "latitude",
+          "longitude",
+          "address",
+          "locality",
+          "capacity_litres"
+        ],
+        "title": "ContainerOut",
+        "type": "object"
+      },
+      "ContainerStatus": {
+        "enum": [
+          "active",
+          "inactive",
+          "planned"
+        ],
+        "title": "ContainerStatus",
+        "type": "string"
+      },
+      "DataAlertOut": {
+        "properties": {
+          "detail": {
+            "description": "Texto original da Vitrus (em português)",
+            "title": "Detail",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AlertKind"
+          },
+          "number": {
+            "title": "Number",
+            "type": "integer"
+          },
+          "resolution_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolution Note"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "source_key": {
+            "title": "Source Key",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/AlertStatus"
+          },
+          "suggestion": {
+            "title": "Suggestion",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "number",
+          "kind",
+          "detail",
+          "suggestion",
+          "status",
+          "resolution_note",
+          "resolved_at",
+          "source_key"
+        ],
+        "title": "DataAlertOut",
+        "type": "object"
+      },
+      "DataQuality": {
+        "properties": {
+          "alerts": {
+            "items": {
+              "$ref": "#/components/schemas/DataAlertOut"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "open_alerts": {
+            "title": "Open Alerts",
+            "type": "integer"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/DataSourceOut"
+            },
+            "title": "Sources",
+            "type": "array"
+          }
+        },
+        "required": [
+          "sources",
+          "alerts",
+          "open_alerts"
+        ],
+        "title": "DataQuality",
+        "type": "object"
+      },
+      "DataSourceOut": {
+        "properties": {
+          "file_name": {
+            "title": "File Name",
+            "type": "string"
+          },
+          "file_sha256": {
+            "title": "File Sha256",
+            "type": "string"
+          },
+          "imported_at": {
+            "format": "date-time",
+            "title": "Imported At",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "notes": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notes"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "received_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Received On"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "provider",
+          "file_name",
+          "file_sha256",
+          "received_on",
+          "period_start",
+          "period_end",
+          "notes",
+          "imported_at"
+        ],
+        "title": "DataSourceOut",
+        "type": "object"
+      },
+      "DayGroup": {
+        "enum": [
+          "weekday",
+          "saturday",
+          "sunday"
+        ],
+        "title": "DayGroup",
+        "type": "string"
+      },
       "EntityBaseline": {
-        "description": "Têxtil recolhido por uma entidade em 2025 e destino final (toneladas).",
+        "description": "Têxtil recolhido por uma entidade num ano e o destino final (toneladas).",
         "properties": {
           "entity": {
             "title": "Entity",
             "type": "string"
           },
-          "exact_weights": {
-            "description": "False se o destino vem de percentagens do relatório",
-            "title": "Exact Weights",
-            "type": "boolean"
+          "method": {
+            "$ref": "#/components/schemas/WeighingMethod",
+            "description": "`weighed`: kg exatos por destino; `percentage`: percentagens do relatório"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "De onde vem o dado (ficheiro ou relatório de origem)",
+            "title": "Provenance"
           },
           "recycle_pct": {
             "title": "Recycle Pct",
@@ -179,10 +590,6 @@
             "title": "Reuse T",
             "type": "number"
           },
-          "source": {
-            "title": "Source",
-            "type": "string"
-          },
           "total_t": {
             "title": "Total T",
             "type": "number"
@@ -197,8 +604,8 @@
           "reuse_pct",
           "recycle_pct",
           "reject_pct",
-          "source",
-          "exact_weights"
+          "method",
+          "provenance"
         ],
         "title": "EntityBaseline",
         "type": "object"
@@ -268,6 +675,66 @@
         "title": "FieldError",
         "type": "object"
       },
+      "FleetSummary": {
+        "properties": {
+          "period_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "total_assignments": {
+            "title": "Total Assignments",
+            "type": "integer"
+          },
+          "total_crew_shifts_week": {
+            "title": "Total Crew Shifts Week",
+            "type": "integer"
+          },
+          "typologies": {
+            "items": {
+              "$ref": "#/components/schemas/TypologyFleet"
+            },
+            "title": "Typologies",
+            "type": "array"
+          },
+          "vehicles": {
+            "items": {
+              "$ref": "#/components/schemas/VehicleOut"
+            },
+            "title": "Vehicles",
+            "type": "array"
+          }
+        },
+        "required": [
+          "typologies",
+          "vehicles",
+          "total_assignments",
+          "total_crew_shifts_week",
+          "period_start",
+          "period_end"
+        ],
+        "title": "FleetSummary",
+        "type": "object"
+      },
       "FlowLink": {
         "properties": {
           "source": {
@@ -297,18 +764,36 @@
             "title": "Column",
             "type": "integer"
           },
+          "destination": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TextileDestination"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Preenchido nos nós de destino"
+          },
           "id": {
             "title": "Id",
             "type": "string"
           },
           "label": {
-            "title": "Label",
-            "type": "string"
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome da entidade; vazio nos nós de destino (o web traduz)",
+            "title": "Label"
           }
         },
         "required": [
           "id",
-          "label",
           "column"
         ],
         "title": "FlowNode",
@@ -376,6 +861,57 @@
           }
         },
         "title": "Health",
+        "type": "object"
+      },
+      "LocalityOut": {
+        "properties": {
+          "circuits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Circuits",
+            "type": "array"
+          },
+          "collection_types": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionType"
+            },
+            "title": "Collection Types",
+            "type": "array"
+          },
+          "days_per_week": {
+            "description": "Dias distintos da semana com algum circuito a passar",
+            "title": "Days Per Week",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "typologies": {
+            "items": {
+              "$ref": "#/components/schemas/Typology"
+            },
+            "title": "Typologies",
+            "type": "array"
+          },
+          "weekdays": {
+            "items": {
+              "type": "integer"
+            },
+            "title": "Weekdays",
+            "type": "array"
+          }
+        },
+        "required": [
+          "name",
+          "circuits",
+          "typologies",
+          "collection_types",
+          "weekdays",
+          "days_per_week"
+        ],
+        "title": "LocalityOut",
         "type": "object"
       },
       "LoginRequest": {
@@ -531,6 +1067,72 @@
         "title": "ResetPasswordRequest",
         "type": "object"
       },
+      "ScheduleEntry": {
+        "properties": {
+          "circuit": {
+            "title": "Circuit",
+            "type": "string"
+          },
+          "crew": {
+            "title": "Crew",
+            "type": "integer"
+          },
+          "day_group": {
+            "$ref": "#/components/schemas/DayGroup"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/Shift"
+          },
+          "typology": {
+            "$ref": "#/components/schemas/Typology"
+          }
+        },
+        "required": [
+          "day_group",
+          "shift",
+          "circuit",
+          "typology",
+          "crew"
+        ],
+        "title": "ScheduleEntry",
+        "type": "object"
+      },
+      "Shift": {
+        "enum": [
+          "morning",
+          "afternoon",
+          "night"
+        ],
+        "title": "Shift",
+        "type": "string"
+      },
+      "SlotCount": {
+        "properties": {
+          "assignments": {
+            "description": "Linhas do planeamento (viatura + circuito) neste turno",
+            "title": "Assignments",
+            "type": "integer"
+          },
+          "crew": {
+            "title": "Crew",
+            "type": "integer"
+          },
+          "day_group": {
+            "$ref": "#/components/schemas/DayGroup"
+          },
+          "shift": {
+            "$ref": "#/components/schemas/Shift"
+          }
+        },
+        "required": [
+          "day_group",
+          "shift",
+          "assignments",
+          "crew"
+        ],
+        "title": "SlotCount",
+        "type": "object"
+      },
       "TextileBaseline": {
         "properties": {
           "capture_of_demand_pct": {
@@ -554,7 +1156,7 @@
             "type": "number"
           },
           "kg_per_inhab_month": {
-            "description": "Observado: toneladas recolhidas por habitante",
+            "description": "Observado: toneladas recolhidas por habitante e mês",
             "title": "Kg Per Inhab Month",
             "type": "number"
           },
@@ -579,12 +1181,12 @@
             "type": "number"
           },
           "year": {
-            "default": 2025,
             "title": "Year",
             "type": "integer"
           }
         },
         "required": [
+          "year",
           "population",
           "entities",
           "total_t",
@@ -597,6 +1199,96 @@
           "gap_t"
         ],
         "title": "TextileBaseline",
+        "type": "object"
+      },
+      "TextileDestination": {
+        "enum": [
+          "reuse",
+          "recycle",
+          "reject"
+        ],
+        "title": "TextileDestination",
+        "type": "string"
+      },
+      "Typology": {
+        "description": "Tipologia de resíduo do circuito (folha \"Resumo\").",
+        "enum": [
+          "organic",
+          "undifferentiated",
+          "recyclable",
+          "bulky",
+          "payt",
+          "support",
+          "to_confirm",
+          "unassigned"
+        ],
+        "title": "Typology",
+        "type": "string"
+      },
+      "TypologyFleet": {
+        "properties": {
+          "circuits": {
+            "title": "Circuits",
+            "type": "integer"
+          },
+          "circuits_without_vehicle": {
+            "title": "Circuits Without Vehicle",
+            "type": "integer"
+          },
+          "crew_shifts_week": {
+            "title": "Crew Shifts Week",
+            "type": "integer"
+          },
+          "fleet_crew": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recursos humanos totais para esta tipologia, se fornecido",
+            "title": "Fleet Crew"
+          },
+          "fleet_vehicles": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Viaturas totais da frota para esta tipologia, se fornecido",
+            "title": "Fleet Vehicles"
+          },
+          "slots": {
+            "items": {
+              "$ref": "#/components/schemas/SlotCount"
+            },
+            "title": "Slots",
+            "type": "array"
+          },
+          "typology": {
+            "$ref": "#/components/schemas/Typology"
+          },
+          "vehicle_shifts_week": {
+            "title": "Vehicle Shifts Week",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "typology",
+          "circuits",
+          "circuits_without_vehicle",
+          "slots",
+          "vehicle_shifts_week",
+          "crew_shifts_week",
+          "fleet_vehicles",
+          "fleet_crew"
+        ],
+        "title": "TypologyFleet",
         "type": "object"
       },
       "UserAdminOut": {
@@ -809,6 +1501,83 @@
         "title": "ValidationErrorBody",
         "type": "object"
       },
+      "VehicleOut": {
+        "properties": {
+          "assignments": {
+            "title": "Assignments",
+            "type": "integer"
+          },
+          "circuits": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Circuits",
+            "type": "array"
+          },
+          "max_crew": {
+            "title": "Max Crew",
+            "type": "integer"
+          },
+          "multi_typology": {
+            "description": "Serve mais do que uma tipologia (exige lavagem da caixa entre fluxos)",
+            "title": "Multi Typology",
+            "type": "boolean"
+          },
+          "never_assigned": {
+            "description": "Aparece no planeamento mas nunca com um circuito",
+            "title": "Never Assigned",
+            "type": "boolean"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "plate": {
+            "title": "Plate",
+            "type": "string"
+          },
+          "schedule": {
+            "items": {
+              "$ref": "#/components/schemas/ScheduleEntry"
+            },
+            "title": "Schedule",
+            "type": "array"
+          },
+          "typologies": {
+            "items": {
+              "$ref": "#/components/schemas/Typology"
+            },
+            "title": "Typologies",
+            "type": "array"
+          },
+          "weekday_shifts": {
+            "description": "Turnos distintos usados de segunda a sexta",
+            "title": "Weekday Shifts",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "plate",
+          "note",
+          "assignments",
+          "weekday_shifts",
+          "circuits",
+          "typologies",
+          "max_crew",
+          "never_assigned",
+          "multi_typology",
+          "schedule"
+        ],
+        "title": "VehicleOut",
+        "type": "object"
+      },
       "VerifyEmailRequest": {
         "properties": {
           "token": {
@@ -824,6 +1593,24 @@
         "title": "VerifyEmailRequest",
         "type": "object"
       },
+      "WasteCategory": {
+        "enum": [
+          "biowaste",
+          "undifferentiated",
+          "paper",
+          "plastic",
+          "glass",
+          "wood",
+          "metals",
+          "others",
+          "composites",
+          "textiles",
+          "sanitary_textiles",
+          "bulky"
+        ],
+        "title": "WasteCategory",
+        "type": "string"
+      },
       "WasteComposition": {
         "description": "Composição dos resíduos urbanos (EEA para a Europa, caracterização nacional para Portugal).",
         "properties": {
@@ -834,7 +1621,7 @@
           },
           "shares": {
             "items": {
-              "$ref": "#/components/schemas/WasteShare"
+              "$ref": "#/components/schemas/WasteShareOut"
             },
             "title": "Shares",
             "type": "array"
@@ -847,16 +1634,21 @@
         "title": "WasteComposition",
         "type": "object"
       },
-      "WasteShare": {
+      "WasteScope": {
+        "enum": [
+          "europe",
+          "portugal"
+        ],
+        "title": "WasteScope",
+        "type": "string"
+      },
+      "WasteShareOut": {
         "properties": {
           "category": {
-            "title": "Category",
-            "type": "string"
+            "$ref": "#/components/schemas/WasteCategory"
           },
           "scope": {
-            "description": "Europa ou Portugal",
-            "title": "Scope",
-            "type": "string"
+            "$ref": "#/components/schemas/WasteScope"
           },
           "share_pct": {
             "title": "Share Pct",
@@ -868,8 +1660,16 @@
           "category",
           "share_pct"
         ],
-        "title": "WasteShare",
+        "title": "WasteShareOut",
         "type": "object"
+      },
+      "WeighingMethod": {
+        "enum": [
+          "weighed",
+          "percentage"
+        ],
+        "title": "WeighingMethod",
+        "type": "string"
       }
     }
   },
@@ -2917,9 +3717,431 @@
         ]
       }
     },
-    "/api/v1/baseline/circuits": {
+    "/api/v1/datasets/alerts/{alert_id}": {
+      "patch": {
+        "description": "Marca uma inconsistência como resolvida, ignorada ou volta a abri-la.",
+        "operationId": "update_data_alert",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "alert_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Alert Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AlertUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataAlertOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update Data Alert",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/quality": {
       "get": {
-        "description": "Circuitos e viaturas de recolha atuais da Vitrus (base para a recolha a pedido).",
+        "description": "Fontes de dados recebidas (com proveniência) e inconsistências a confirmar com a Vitrus.",
+        "operationId": "get_data_quality",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataQuality"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Data Quality",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "description": "Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/network/circuits": {
+      "get": {
+        "description": "Circuitos de recolha atuais da Vitrus, com localidades, dias e viaturas.",
         "operationId": "list_circuits",
         "parameters": [
           {
@@ -3053,15 +4275,38 @@
         },
         "summary": "List Circuits",
         "tags": [
-          "baseline"
+          "network"
         ]
       }
     },
-    "/api/v1/baseline/flows": {
+    "/api/v1/network/containers": {
       "get": {
-        "description": "Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).",
-        "operationId": "get_observed_flows",
+        "description": "Contentores georreferenciados (vazio até chegarem as localizações).",
+        "operationId": "list_containers",
         "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
           {
             "in": "cookie",
             "name": "access_token",
@@ -3084,7 +4329,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Flows"
+                  "$ref": "#/components/schemas/ContainerList"
                 }
               }
             },
@@ -3191,13 +4436,419 @@
             "description": "Funcionalidade indisponível"
           }
         },
-        "summary": "Get Observed Flows",
+        "summary": "List Containers",
         "tags": [
-          "baseline"
+          "network"
         ]
       }
     },
-    "/api/v1/baseline/textile": {
+    "/api/v1/network/fleet": {
+      "get": {
+        "description": "Frota e turnos: ocupação por tipologia e turno, e o horário de cada viatura.",
+        "operationId": "get_fleet",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FleetSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Fleet",
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/v1/network/localities": {
+      "get": {
+        "description": "Cobertura por localidade: que circuitos passam e em que dias (base da recolha a pedido).",
+        "operationId": "list_localities",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LocalityOut"
+                  },
+                  "title": "Response List Localities",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Localities",
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "description": "Readiness: a base de dados responde e diz se a IA está ligada.",
+        "operationId": "ready",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/textile/baseline": {
       "get": {
         "description": "Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.",
         "operationId": "get_textile_baseline",
@@ -3333,11 +4984,151 @@
         },
         "summary": "Get Textile Baseline",
         "tags": [
-          "baseline"
+          "textile"
         ]
       }
     },
-    "/api/v1/baseline/waste": {
+    "/api/v1/textile/flows": {
+      "get": {
+        "description": "Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).",
+        "operationId": "get_observed_flows",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Flows"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Observed Flows",
+        "tags": [
+          "textile"
+        ]
+      }
+    },
+    "/api/v1/textile/waste": {
       "get": {
         "description": "Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.",
         "operationId": "get_waste_composition",
@@ -3473,251 +5264,7 @@
         },
         "summary": "Get Waste Composition",
         "tags": [
-          "baseline"
-        ]
-      }
-    },
-    "/api/v1/health": {
-      "get": {
-        "description": "Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.",
-        "operationId": "health",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Health"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Pedido inválido"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Sem sessão ou credenciais inválidas"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Sem permissão"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Não encontrado"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Conflito"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorBody"
-                }
-              }
-            },
-            "description": "Dados inválidos"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Demasiados pedidos"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Erro interno"
-          },
-          "502": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Falha num serviço externo"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Funcionalidade indisponível"
-          }
-        },
-        "summary": "Health",
-        "tags": [
-          "health"
-        ]
-      }
-    },
-    "/api/v1/ready": {
-      "get": {
-        "description": "Readiness: a base de dados responde e diz se a IA está ligada.",
-        "operationId": "ready",
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Readiness"
-                }
-              }
-            },
-            "description": "Successful Response"
-          },
-          "400": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Pedido inválido"
-          },
-          "401": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Sem sessão ou credenciais inválidas"
-          },
-          "403": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Sem permissão"
-          },
-          "404": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Não encontrado"
-          },
-          "409": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Conflito"
-          },
-          "422": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationErrorBody"
-                }
-              }
-            },
-            "description": "Dados inválidos"
-          },
-          "429": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Demasiados pedidos"
-          },
-          "500": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Erro interno"
-          },
-          "502": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Falha num serviço externo"
-          },
-          "503": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            },
-            "description": "Funcionalidade indisponível"
-          }
-        },
-        "summary": "Ready",
-        "tags": [
-          "health"
+          "textile"
         ]
       }
     },
