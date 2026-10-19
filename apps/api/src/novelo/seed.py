@@ -8,6 +8,7 @@
 import csv
 import json
 import logging
+import unicodedata
 import uuid
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -17,11 +18,14 @@ from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.domain.geo import point_in_geometry
+from novelo.domain.parish_area import geometry_area_km2
 from novelo.features.datasets.models import DataAlert, DataSource
 from novelo.features.network.models import (
     Circuit,
     CircuitDay,
     CircuitLocality,
+    Container,
     FleetCapacity,
     Locality,
     Parish,
@@ -36,6 +40,7 @@ log = logging.getLogger(__name__)
 GEO_SOURCES = ("ine_census_2021", "osm_nominatim")
 TEXTILE_SOURCE = "vitrus_textile_2025"
 CIRCUITS_SOURCE = "vitrus_circuits_2026_09"
+CONTAINERS_SOURCE = "vitrus_containers"  # só existe se scripts/etl/containers.py encontrou ficheiro em data/raw/
 NO_CIRCUIT = "SEM CIRCUITO"
 
 
@@ -58,6 +63,17 @@ async def _upsert(
     stmt = stmt.on_conflict_do_update(index_elements=keys, set_={c: stmt.excluded[c] for c in update})
     ids = (await db.execute(stmt.returning(*(getattr(model, k) for k in keys), model.id))).all()
     return {tuple(r[:-1]): r[-1] for r in ids}
+
+
+MIN_PLAUSIBLE_PARISH_KM2 = (
+    0.1  # abaixo disto o contorno do OSM é um engano (ex.: Briteiros: 0,004 km²), não uma freguesia
+)
+
+
+def parish_area_km2(geometry_json: str) -> float | None:
+    """Área geodésica da freguesia (km², 3 casas) a partir do contorno do OpenStreetMap; None se não for fiável."""
+    area = geometry_area_km2(json.loads(geometry_json)) if geometry_json else None
+    return round(area, 3) if area is not None and area >= MIN_PLAUSIBLE_PARISH_KM2 else None
 
 
 async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
@@ -212,6 +228,7 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
                 "latitude": r["latitude"],
                 "longitude": r["longitude"],
                 "geometry": json.loads(r["geometry"]) if r["geometry"] else None,
+                "area_km2": parish_area_km2(r["geometry"]),
                 "source_id": sources[(GEO_SOURCES[0],)],
             }
             for r in _read(data_dir, "parishes.csv")
@@ -221,7 +238,17 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
             Parish,
             parish_rows,
             ["dicofre"],
-            ["name", "population", "population_year", "tipau", "latitude", "longitude", "geometry", "source_id"],
+            [
+                "name",
+                "population",
+                "population_year",
+                "tipau",
+                "latitude",
+                "longitude",
+                "geometry",
+                "area_km2",
+                "source_id",
+            ],
         )
         counts["parishes"] = len(parish_rows)
         for r in _read(data_dir, "localities_geo.csv"):
@@ -236,6 +263,10 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
                     parish_id=parish_ids.get((r["dicofre"],)) if r["dicofre"] else None,
                 )
             )
+
+    # --- Contentores (opcional: só depois de a Vitrus enviar as localizações) ------------------------------------
+    if (CONTAINERS_SOURCE,) in sources and (data_dir / "containers.csv").exists():
+        counts.update(await import_containers(db, data_dir, sources[(CONTAINERS_SOURCE,)]))
 
     # --- Pressupostos do simulador (conjunto ativo; nunca sobrescreve os editados) -------------------------------
     await ensure_default_parameters(db)
@@ -257,6 +288,74 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
     await db.commit()
     log.info("seed concluído: %s", counts)
     return counts
+
+
+def _norm(text: str) -> str:
+    plain = "".join(c for c in unicodedata.normalize("NFKD", text) if not unicodedata.combining(c))
+    return " ".join("".join(ch if ch.isalnum() else " " for ch in plain.lower()).split())
+
+
+async def import_containers(db: AsyncSession, data_dir: Path, source_id: uuid.UUID) -> dict[str, int]:
+    """containers.csv -> tabela `containers`. Idempotente: upsert por (fonte, referência); remove o que saiu.
+
+    Só entram linhas com coordenadas; as pendentes (só morada) ficam no CSV e no alerta de qualidade.
+    A freguesia vem do polígono que contém o ponto (ou, se não cair em nenhum, do nome indicado no ficheiro).
+    """
+    rows = [r for r in _read(data_dir, "containers.csv") if r["coord_status"] == "ok"]
+    parishes = (await db.execute(select(Parish.id, Parish.name, Parish.geometry))).all()
+    parish_by_name = {_norm(name): pid for pid, name, _ in parishes}
+    locality_by_name = {_norm(n): i for i, n in (await db.execute(select(Locality.id, Locality.name))).all()}
+    operator_by_name = {_norm(n): i for i, n in (await db.execute(select(TextileEntity.id, TextileEntity.name))).all()}
+
+    def parish_of(lat: float, lon: float, name: str) -> uuid.UUID | None:
+        for pid, _, geometry in parishes:
+            if geometry and point_in_geometry(lat, lon, geometry):
+                return pid  # type: ignore[no-any-return]
+        return parish_by_name.get(_norm(name)) if name else None
+
+    values = [
+        {
+            "source_id": source_id,
+            "external_ref": r["external_ref"],
+            "kind": r["kind"],
+            "status": r["status"],
+            "operator_id": operator_by_name.get(_norm(r["operator"])) if r["operator"] else None,
+            "locality_id": locality_by_name.get(_norm(r["locality"])) if r["locality"] else None,
+            "parish_id": parish_of(float(r["latitude"]), float(r["longitude"]), r["parish"]),
+            "latitude": r["latitude"],
+            "longitude": r["longitude"],
+            "address": r["address"] or None,
+            "capacity_litres": int(r["capacity_litres"]) if r["capacity_litres"] else None,
+            "installed_on": _date(r["installed_on"]),
+        }
+        for r in rows
+    ]
+    update_cols = [c for c in values[0] if c not in ("source_id", "external_ref")] if values else []
+    for i in range(0, len(values), 500):
+        await _upsert(db, Container, values[i : i + 500], ["source_id", "external_ref"], update_cols)
+    await db.execute(
+        delete(Container).where(
+            Container.source_id == source_id, Container.external_ref.not_in([v["external_ref"] for v in values])
+        )
+    )
+
+    alerts = [
+        {
+            "source_id": source_id,
+            "number": int(a["id"]),
+            "kind": a["type_key"],
+            "detail": a["detail"],
+            "suggestion": a["suggestion"],
+        }
+        for a in _read(data_dir, "containers_alerts.csv")
+    ]
+    await _upsert(db, DataAlert, alerts, ["source_id", "number"], ["kind", "detail", "suggestion"])
+    await db.execute(
+        delete(DataAlert).where(
+            DataAlert.source_id == source_id, DataAlert.number.not_in([a["number"] for a in alerts])
+        )
+    )
+    return {"containers": len(values), "container_alerts": len(alerts)}
 
 
 async def is_seeded(db: AsyncSession) -> bool:

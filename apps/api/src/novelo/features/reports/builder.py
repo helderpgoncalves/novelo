@@ -12,6 +12,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from starlette.concurrency import run_in_threadpool
 
+from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.errors import NotFoundError
 from novelo.features.datasets.models import DataSource
 from novelo.features.lots import service as lots
@@ -19,6 +20,7 @@ from novelo.features.network.models import Parish
 from novelo.features.planning import service as planning
 from novelo.features.planning.params import params_meta
 from novelo.features.planning.schemas import ScenarioOut
+from novelo.features.reports import briefing as briefing_mod
 from novelo.features.reports.texts import PARAM_LABELS, TEXTS
 from novelo.features.textile import service as textile
 
@@ -84,7 +86,9 @@ def _territory_rows(
     return rows, row(t["total"], total)
 
 
-async def build_rap(db: AsyncSession, scenario_ids: list[Any], locale: str) -> tuple[str, bytes, dict[str, Any]]:
+async def build_rap(
+    db: AsyncSession, scenario_ids: list[Any], locale: str, llm: OpenRouterClient | None = None
+) -> tuple[str, bytes, dict[str, Any]]:
     t = TEXTS.get(locale, TEXTS["pt-PT"])
     f = Formatter(locale)
     scenarios = [await planning.get_scenario(db, sid) for sid in scenario_ids]
@@ -156,7 +160,10 @@ async def build_rap(db: AsyncSession, scenario_ids: list[Any], locale: str) -> t
         for s in (await db.execute(select(DataSource).order_by(DataSource.received_on))).scalars()
     ]  # fmt: skip
 
+    brief = await briefing_mod.executive_briefing(llm, briefing_mod.build_facts(scenarios, baseline, locale))
+
     html = _ENV.get_template("rap.html").render(
+        briefing=brief,
         t=t, locale=locale, fonts=(_DIR / "fonts").as_uri(), date=datetime.now(UTC).strftime("%d/%m/%Y" if f.pt else "%Y-%m-%d"),
         scenarios=scenario_views, comparison=comparison, entities=entities, totals=totals, fibres=fibres,
         potential_t=f.num(first.result.kpis.potential_t), collected_t=f.num(baseline.total_t, 1),
@@ -173,6 +180,8 @@ async def build_rap(db: AsyncSession, scenario_ids: list[Any], locale: str) -> t
         "best_eur_per_tonne": best,
         "scenarios": [s.label for s in scenarios],
         "sha256": hashlib.sha256(pdf).hexdigest(),
+        "briefing_source": brief.source,
+        "briefing_prompt_version": brief.prompt_version,
     }
     return t["title"], pdf, summary
 

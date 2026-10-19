@@ -32,9 +32,18 @@ class Settings(BaseSettings):
     # LLM via OpenRouter (API compatível com OpenAI). Sem chave, as features de IA ficam desligadas.
     openrouter_api_key: str = Field("", alias="OPENROUTER_API_KEY")
     openrouter_base_url: str = Field("https://openrouter.ai/api/v1", alias="OPENROUTER_BASE_URL")
-    llm_model_text: str = Field("anthropic/claude-sonnet-4.5", alias="LLM_MODEL_TEXT")
-    llm_model_vision: str = Field("anthropic/claude-sonnet-4.5", alias="LLM_MODEL_VISION")
+    llm_model_text: str = Field("openai/gpt-6-luna", alias="LLM_MODEL_TEXT")
+    llm_model_vision: str = Field("openai/gpt-6-luna", alias="LLM_MODEL_VISION")
     llm_timeout_s: float = Field(30.0, alias="LLM_TIMEOUT_S")
+    # Valores iniciais da tabela `ai_settings`: depois de criada, a base de dados manda (painel /admin/ai).
+    llm_model_fallback: str = Field("", alias="LLM_MODEL_FALLBACK")
+    llm_max_output_tokens: int = Field(0, ge=0, le=8000, alias="LLM_MAX_OUTPUT_TOKENS")  # 0 = limite de cada tarefa
+    llm_reasoning_effort: Literal["low", "medium", "high"] = Field("low", alias="LLM_REASONING_EFFORT")
+    llm_monthly_budget_usd: float = Field(0.0, ge=0, alias="LLM_MONTHLY_BUDGET_USD")  # 0 = sem limite
+    llm_max_concurrency: int = Field(4, ge=1, le=32, alias="LLM_MAX_CONCURRENCY")
+    llm_chat_timeout_s: float = Field(90.0, alias="LLM_CHAT_TIMEOUT_S")  # limite total de uma conversa com ferramentas
+    llm_max_retries: int = Field(2, ge=0, le=5, alias="LLM_MAX_RETRIES")  # falhas transitórias (timeout, 429, 5xx)
+    llm_retry_backoff_s: float = Field(0.5, ge=0, alias="LLM_RETRY_BACKOFF_S")
 
     # --- Sessão e autenticação -------------------------------------------------------
     secret_key: str = Field("dev-only-change-me-dev-only-change-me", alias="SECRET_KEY")

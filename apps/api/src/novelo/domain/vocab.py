@@ -58,6 +58,9 @@ class AlertKind(StrEnum):
     UNDOCUMENTED_CIRCUITS = "undocumented_circuits"
     DIFFERENT_DATES = "different_dates"
     NORMALIZED_SPELLING = "normalized_spelling"
+    CONTAINER_ROWS_REJECTED = "container_rows_rejected"
+    CONTAINER_PENDING_LOCATION = "container_pending_location"
+    CONTAINER_ASSUMED_VALUES = "container_assumed_values"
 
 
 class AlertStatus(StrEnum):
@@ -109,6 +112,11 @@ class ContainerStatus(StrEnum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PLANNED = "planned"
+
+
+class CoverageState(StrEnum):
+    OK = "ok"
+    AWAITING_DATA = "awaiting_data"  # ainda não há contentores importados
 
 
 class ScenarioObjective(StrEnum):

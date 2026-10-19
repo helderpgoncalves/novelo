@@ -71,6 +71,9 @@ class ZoneOut(BaseModel):
     longitude: float
     tipau: Tipau | None = Field(description="Tipologia de áreas urbanas do INE")
     service_days: int = Field(description="Dias/semana com algum circuito da Vitrus a passar")
+    existing_containers: int = Field(
+        default=0, description="Contentores têxteis ativos já na freguesia (0 se ainda não há localizações)"
+    )
     localities: list[str]
     geometry: dict[str, object] | None
 

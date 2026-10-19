@@ -52,6 +52,10 @@ gen:
     uv run --project apps/api python scripts/export_openapi.py
     pnpm gen
 
+# Avalia a triagem por foto (data/eval/triage/truth.csv + imagens) e compara modelos: just eval-triage --models a,b
+eval-triage *ARGS:
+    uv run --project apps/api python scripts/eval_triage.py {{ARGS}}
+
 # Converte os Excel de data/raw em data/processed
 etl:
     uv run scripts/etl/build_processed.py

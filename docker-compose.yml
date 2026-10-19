@@ -34,8 +34,8 @@ services:
       - CORS_ORIGINS=["https://${DOMAIN:-novelo.bitsapiens.io}"]
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
-      - LLM_MODEL_TEXT=${LLM_MODEL_TEXT:-anthropic/claude-sonnet-4.5}
-      - LLM_MODEL_VISION=${LLM_MODEL_VISION:-anthropic/claude-sonnet-4.5}
+      - LLM_MODEL_TEXT=${LLM_MODEL_TEXT:-openai/gpt-6-luna}
+      - LLM_MODEL_VISION=${LLM_MODEL_VISION:-openai/gpt-6-luna}
       - SOLVER_TIME_LIMIT_S=${SOLVER_TIME_LIMIT_S:-20}
     depends_on:
       db:

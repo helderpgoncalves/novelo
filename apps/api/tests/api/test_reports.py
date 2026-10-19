@@ -4,6 +4,8 @@ import httpx
 import pytest
 from pypdf import PdfReader
 
+from tests.conftest import FakeLlm
+
 
 def _pdf_available() -> bool:
     try:
@@ -67,3 +69,34 @@ async def test_rap_report_in_english_and_validation(logged_in: httpx.AsyncClient
     assert (await logged_in.post(f"{P}/reports/rap", json={"scenario_ids": []})).status_code == 422
     unknown = await logged_in.post(f"{P}/reports/rap", json={"scenario_ids": ["00000000-0000-0000-0000-000000000000"]})
     assert unknown.json()["code"] == "not_found"
+
+
+async def test_briefing_uses_verified_ai_text_or_the_deterministic_fallback(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    from novelo.features.reports.briefing import _Briefing  # noqa: PLC0415
+
+    a = await scenario(logged_in, "Contido", 25000)
+    kpis = (await logged_in.get(f"{P}/planning/scenarios/{a}")).json()
+    tonnes = f"{kpis['tonnes_year']:.1f}".replace(".", ",")
+
+    async def pdf_text(locale: str = "pt-PT") -> str:
+        report = (await logged_in.post(f"{P}/reports/rap", json={"scenario_ids": [a], "locale": locale})).json()
+        return text_of((await logged_in.get(f"{P}/reports/{report['id']}/pdf")).content)
+
+    good = f"O cenário Contido capta {tonnes} t por ano, valor estimado com base nos pressupostos indicados."
+    llm.queue("_Briefing", _Briefing(text=good))
+    with_ai = await pdf_text()
+    assert "Em resumo" in with_ai and good in with_ai and "gerado por IA" in with_ai
+
+    bad = _Briefing(text="O cenário Contido capta 99999 t por ano, um valor excecional face aos restantes.")
+    llm.queue("_Briefing", bad, bad)  # duas tentativas inventadas: texto determinístico
+    fallback = await pdf_text()
+    assert (
+        "99999" not in fallback
+        and "Os valores previstos são estimativas" in fallback
+        and "gerado por IA" not in fallback
+    )
+
+    english = await pdf_text("en")  # sem respostas na fila: o modelo falso falha e o relatório sai na mesma
+    assert "In brief" in english and "Projected values are estimates" in english

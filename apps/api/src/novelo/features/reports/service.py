@@ -4,6 +4,7 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.errors import NotFoundError
 from novelo.features.reports import builder
 from novelo.features.reports.models import Report
@@ -23,8 +24,10 @@ def _out(r: Report) -> ReportOut:
     )
 
 
-async def create_rap(db: AsyncSession, body: ReportRequest, user: User) -> ReportOut:
-    title, pdf, summary = await builder.build_rap(db, body.scenario_ids, body.locale)
+async def create_rap(
+    db: AsyncSession, body: ReportRequest, user: User, llm: OpenRouterClient | None = None
+) -> ReportOut:
+    title, pdf, summary = await builder.build_rap(db, body.scenario_ids, body.locale, llm)
     report = Report(
         title=title,
         locale=body.locale,

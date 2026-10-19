@@ -5,19 +5,27 @@ from fastapi import APIRouter, Depends
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
+from novelo.features.lots.router import get_llm
 from novelo.features.reports import service
 from novelo.features.reports.schemas import ReportOut, ReportRequest
 
 router = APIRouter()
 Db = Annotated[AsyncSession, Depends(get_db)]
+Llm = Annotated[OpenRouterClient, Depends(get_llm)]
 
 
 @router.post("/rap", response_model=ReportOut, status_code=201)
-async def create_rap_report(body: ReportRequest, user: CurrentUser, db: Db) -> ReportOut:
-    """Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método)."""
-    return await service.create_rap(db, body, user)
+async def create_rap_report(body: ReportRequest, user: CurrentUser, db: Db, llm: Llm) -> ReportOut:
+    """Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).
+
+    Inclui um briefing executivo: da IA, verificado contra os números, ou texto fixo sem IA."""
+    try:
+        return await service.create_rap(db, body, user, llm)
+    finally:
+        await llm.aclose()
 
 
 @router.get("", response_model=list[ReportOut])

@@ -29,8 +29,11 @@ public_router = APIRouter()
 Db = Annotated[AsyncSession, Depends(get_db)]
 
 
-def get_llm() -> OpenRouterClient:
-    return OpenRouterClient()
+async def get_llm(db: Db, user: CurrentUser) -> OpenRouterClient:
+    """Cliente do OpenRouter ligado à configuração da base de dados (modelo por tarefa, orçamento, registo de uso)."""
+    from novelo.features.ai_admin.service import build_client  # noqa: PLC0415  (evita import circular)
+
+    return await build_client(db, user)
 
 
 @router.post("/lots", response_model=LotSummary, status_code=201)

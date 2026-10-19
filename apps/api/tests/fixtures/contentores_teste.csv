@@ -1,0 +1,12 @@
+Código;Tipo de Contentor;Estado;Latitude;Longitude;Morada;Freguesia;Operador;Capacidade (L);Data de Instalação
+TESTE-001;Têxtil;Ativo;"41,4539";"-8,2902";Rua Falsa de Teste 1;Azurém;Operador Falso;2500;15/03/2024
+TESTE-002;Roupa e calçado;Em funcionamento;41,4600;-8,3000;Rua Falsa de Teste 2;Azurém;;;
+TESTE-003;Indiferenciados;Inativo;41,4700;-8,2700;Rua Falsa de Teste 3;;;;
+TESTE-004;Papel;Planeado;41,4100;-8,3300;Rua Falsa de Teste 4;;;;
+TESTE-005;Têxtil;Ativo;;;Rua Sem Coordenadas;Ronfe;;;
+TESTE-006;Têxtil;Ativo;0;0;Rua Falsa no Atlântico;;;;
+TESTE-007;Têxtil;Ativo;abc;def;Rua Ilegível;;;;
+TESTE-001;Têxtil;Ativo;41,4430;-8,2920;Rua Repetida;;;;
+TESTE-009;Têxtil;Ativo;-8,2918;41,4425;Rua Com Eixos Trocados;;;;
+TESTE-010;Misterioso;Quebrado;41,4400;-8,3050;Rua Falsa de Teste 10;;;;
+;Têxtil;Ativo;;;;;;;

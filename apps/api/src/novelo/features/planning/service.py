@@ -4,15 +4,15 @@ import uuid
 from collections import defaultdict
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from novelo.core.errors import NotFoundError
 from novelo.domain import network
 from novelo.domain.demand import yearly_demand_t
-from novelo.domain.vocab import CollectionMode, ScenarioStatus, TextileDestination
-from novelo.features.network.models import Circuit, Locality, Parish
+from novelo.domain.vocab import CollectionMode, ContainerKind, ContainerStatus, ScenarioStatus, TextileDestination
+from novelo.features.network.models import Circuit, Container, Locality, Parish
 from novelo.features.planning.models import ParameterSet, Scenario
 from novelo.features.planning.params import default_params, params_meta
 from novelo.features.planning.schemas import (
@@ -92,6 +92,17 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
     for c in circuits:
         for cl in c.localities:
             days_by_locality[cl.locality_id] = max(days_by_locality.get(cl.locality_id, 0), len(c.days))
+    # Contentores têxteis ativos por freguesia (vazio até chegarem as localizações da Vitrus).
+    container_counts = await db.execute(
+        select(Container.parish_id, func.count())
+        .where(
+            Container.kind == ContainerKind.TEXTILE,
+            Container.status == ContainerStatus.ACTIVE,
+            Container.parish_id.is_not(None),
+        )
+        .group_by(Container.parish_id)
+    )
+    containers_by_parish = {pid: n for pid, n in container_counts.all() if pid is not None}
     by_parish: dict[uuid.UUID, list[Locality]] = defaultdict(list)
     for loc in localities:
         if loc.parish_id:
@@ -113,6 +124,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 longitude=float(p.longitude),
                 tipau=p.tipau,
                 service_days=max((days_by_locality.get(loc.id, 0) for loc in locs), default=0),
+                existing_containers=containers_by_parish.get(p.id, 0),
                 localities=sorted(loc.name for loc in locs),
                 geometry=p.geometry,
             )
@@ -148,7 +160,12 @@ def compute(
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs."""
     dp = _domain_params(params)
-    dzones = [network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days) for z in zones]
+    dzones = [
+        network.Zone(
+            z.code, z.name, z.population, z.latitude, z.longitude, z.service_days, z.existing_containers or None
+        )
+        for z in zones
+    ]
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
     options = network.build_options(dzones, dp, allowed or None)
 

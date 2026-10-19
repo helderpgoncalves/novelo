@@ -3,6 +3,66 @@
 import * as z from 'zod';
 
 /**
+ * AiCreditsOut
+ */
+export const zAiCreditsOut = z.object({
+    available: z.boolean(),
+    is_free_tier: z.boolean().nullable(),
+    key_usage_usd: z.number().nullable(),
+    limit_remaining_usd: z.number().nullable(),
+    limit_usd: z.number().nullable(),
+    message: z.string().nullable(),
+    total_credits_usd: z.number().nullable(),
+    total_usage_usd: z.number().nullable()
+});
+
+/**
+ * AiModelOut
+ */
+export const zAiModelOut = z.object({
+    compatible: z.boolean().nullable(),
+    context_length: z.int().nullable(),
+    cost_basis: z.enum(['measured', 'estimate']).nullable(),
+    cost_per_operation_usd: z.number().nullable(),
+    cost_samples: z.int(),
+    dynamic_pricing: z.boolean(),
+    id: z.string(),
+    input_modalities: z.array(z.string()),
+    input_per_m_usd: z.number().nullable(),
+    name: z.string(),
+    output_per_m_usd: z.number().nullable(),
+    recommended: z.boolean(),
+    supports_image: z.boolean(),
+    supports_structured_outputs: z.boolean(),
+    supports_tools: z.boolean()
+});
+
+/**
+ * AiTask
+ */
+export const zAiTask = z.enum([
+    'copilot',
+    'whatif',
+    'explain',
+    'briefing',
+    'alert_resolution',
+    'triage',
+    'test'
+]);
+
+/**
+ * AiModelsOut
+ */
+export const zAiModelsOut = z.object({
+    models: z.array(zAiModelOut),
+    operation: z.string().nullable(),
+    recommended_model: z.string().nullable(),
+    stale: z.boolean(),
+    task: zAiTask.nullable(),
+    total: z.int()
+});
+
+/**
  * AlertKind
  */
 export const zAlertKind = z.enum([
@@ -16,7 +76,10 @@ export const zAlertKind = z.enum([
     'vehicle_without_circuit',
     'undocumented_circuits',
     'different_dates',
-    'normalized_spelling'
+    'normalized_spelling',
+    'container_rows_rejected',
+    'container_pending_location',
+    'container_assumed_values'
 ]);
 
 /**
@@ -62,11 +125,46 @@ export const zBrandCount = z.object({
 });
 
 /**
+ * BudgetOut
+ */
+export const zBudgetOut = z.object({
+    monthly_budget_usd: z.number().nullable(),
+    spent_usd: z.number(),
+    state: z.enum([
+        'unlimited',
+        'ok',
+        'warning',
+        'exceeded'
+    ]),
+    used_pct: z.number().nullable(),
+    warn_pct: z.number()
+});
+
+/**
+ * CardKpis
+ */
+export const zCardKpis = z.object({
+    annual_cost_eur: z.number(),
+    capex_eur: z.number(),
+    coverage_pct: z.number(),
+    eur_per_tonne: z.number().nullable(),
+    tonnes_year: z.number()
+});
+
+/**
  * ChangePasswordRequest
  */
 export const zChangePasswordRequest = z.object({
     current_password: z.string().max(128).nullish(),
     new_password: z.string().max(128)
+});
+
+/**
+ * ChatTurn
+ */
+export const zChatTurn = z.object({
+    content: z.string().min(1).max(2000),
+    role: z.enum(['user', 'assistant'])
 });
 
 /**
@@ -124,6 +222,27 @@ export const zAllocation = z.object({
 });
 
 /**
+ * BenchmarkOut
+ */
+export const zBenchmarkOut = z.object({
+    current_people_per_point: z.int(),
+    density_mode: zCollectionMode,
+    implied_capture_pct: z.number(),
+    key: z.string(),
+    kg_per_inhab_year: z.number(),
+    label: z.string(),
+    max_capturable_t: z.number(),
+    observed_capture_pct: z.number(),
+    observed_kg_per_inhab_year: z.number(),
+    people_per_point: z.int(),
+    population: z.int(),
+    reachable: z.boolean(),
+    source: z.string(),
+    target_tonnes: z.number(),
+    verified: z.boolean()
+});
+
+/**
  * CaptureScale
  */
 export const zCaptureScale = z.object({
@@ -173,6 +292,7 @@ export const zContainerOut = z.object({
     latitude: z.string(),
     locality: z.string().nullable(),
     longitude: z.string(),
+    parish_code: z.string().nullable(),
     status: zContainerStatus
 });
 
@@ -183,6 +303,22 @@ export const zContainerList = z.object({
     items: z.array(zContainerOut),
     total: z.int()
 });
+
+/**
+ * CopilotRequest
+ *
+ * O servidor não guarda conversas: o web envia o histórico (máx. 20 mensagens) em cada pedido.
+ */
+export const zCopilotRequest = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    messages: z.array(zChatTurn).min(1).max(20),
+    scenario_id: z.uuid().nullish()
+});
+
+/**
+ * CoverageState
+ */
+export const zCoverageState = z.enum(['ok', 'awaiting_data']);
 
 /**
  * DataAlertOut
@@ -234,6 +370,44 @@ export const zDayGroup = z.enum([
 ]);
 
 /**
+ * EffectiveTask
+ */
+export const zEffectiveTask = z.object({
+    fallback_model: z.string().nullable(),
+    fallback_source: z.enum([
+        'database',
+        'global_default',
+        'env',
+        'code'
+    ]),
+    max_output_tokens: z.int(),
+    max_tokens_source: z.enum([
+        'database',
+        'global_default',
+        'env',
+        'code'
+    ]),
+    model: z.string(),
+    model_source: z.enum([
+        'database',
+        'global_default',
+        'env',
+        'code'
+    ]),
+    reasoning_effort: z.enum([
+        'low',
+        'medium',
+        'high'
+    ]),
+    reasoning_source: z.enum([
+        'database',
+        'global_default',
+        'env',
+        'code'
+    ])
+});
+
+/**
  * ErrorBody
  *
  * Corpo de qualquer erro da API (exceto validação, que tem `fields`).
@@ -258,6 +432,7 @@ export const zErrorBody = z.object({
         'rate_limited',
         'feature_disabled',
         'upstream_error',
+        'ai_budget_exceeded',
         'internal_error'
     ]),
     message: z.string()
@@ -321,6 +496,39 @@ export const zFieldError = z.object({
 });
 
 /**
+ * FieldFix
+ */
+export const zFieldFix = z.object({
+    current_value: z.string().max(200).nullish(),
+    field: z.string().max(80),
+    proposed_value: z.string().max(200).nullish()
+});
+
+/**
+ * AlertSuggestionOut
+ */
+export const zAlertSuggestionOut = z.object({
+    action: z.enum([
+        'confirm_with_vitrus',
+        'correct_data',
+        'accept_as_is',
+        'ignore'
+    ]),
+    alert_id: z.uuid(),
+    applied: z.literal(false).optional().default(false),
+    confidence: z.number().gte(0).lte(1),
+    fields_to_fix: z.array(zFieldFix).max(6).optional(),
+    justification: z.string().max(500),
+    model: z.string().nullable(),
+    prompt_version: z.string().nullable(),
+    question_for_vitrus: z.string().max(400).nullish(),
+    resolution_note: z.string().max(300),
+    source: z.enum(['model', 'fallback']),
+    suggested_status: zAlertStatus,
+    verified: z.boolean()
+});
+
+/**
  * FlowLink
  */
 export const zFlowLink = z.object({
@@ -352,6 +560,23 @@ export const zGarmentType = z.enum([
     'towel',
     'other'
 ]);
+
+/**
+ * GlobalDefaults
+ *
+ * Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.
+ */
+export const zGlobalDefaults = z.object({
+    fallback_model: z.string().max(120).nullish(),
+    max_output_tokens: z.int().gte(16).lte(8000).nullish(),
+    reasoning_effort: z.enum([
+        'low',
+        'medium',
+        'high'
+    ]).nullish(),
+    text_model: z.string().max(120).nullish(),
+    vision_model: z.string().max(120).nullish()
+});
 
 /**
  * Health
@@ -469,6 +694,15 @@ export const zMarketEntry = z.object({
 });
 
 /**
+ * MetricsOut
+ */
+export const zMetricsOut = z.object({
+    annual_cost_eur: z.number(),
+    eur_per_tonne: z.number().nullable(),
+    tonnes: z.number()
+});
+
+/**
  * ModeParams
  */
 export const zModeParams = z.object({
@@ -513,6 +747,23 @@ export const zParamMeta = z.object({
 });
 
 /**
+ * ParishCoverage
+ */
+export const zParishCoverage = z.object({
+    containers: z.int(),
+    containers_per_1000: z.number(),
+    covered_pct: z.number(),
+    covered_population: z.int(),
+    demand_points: z.int(),
+    gap_points: z.int(),
+    nearest_container_m: z.number().nullable(),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    population: z.int(),
+    reference_points: z.int()
+});
+
+/**
  * Passport
  *
  * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
@@ -531,6 +782,62 @@ export const zPassport = z.object({
     reuse_pct: z.number(),
     state: zLotState,
     weight_kg: z.number()
+});
+
+/**
+ * PilotFact
+ *
+ * Um número que justifica a escolha, com a sua origem.
+ */
+export const zPilotFact = z.object({
+    key: z.string(),
+    source: z.string(),
+    unit: z.string(),
+    value: z.number()
+});
+
+/**
+ * PilotKpiOut
+ */
+export const zPilotKpiOut = z.object({
+    basis: z.string(),
+    key: z.enum([
+        'tonnes',
+        'eur_per_tonne',
+        'reject_rate_pct'
+    ]),
+    p10: z.number(),
+    p90: z.number(),
+    unit: z.string(),
+    value: z.number()
+});
+
+/**
+ * PilotRequest
+ */
+export const zPilotRequest = z.object({
+    k: z.int().gte(2).lte(4).optional().default(2),
+    min_tonnes_pilot: z.number().gte(0).nullish(),
+    modes: z.array(zCollectionMode).min(1).optional(),
+    months: z.int().gte(1).lte(12).optional().default(3),
+    n_samples: z.int().gte(50).lte(5000).optional().default(500),
+    seed: z.int().optional().default(7),
+    swing: z.number().gte(0.05).lte(0.9).optional().default(0.3)
+});
+
+/**
+ * PilotScoreOut
+ */
+export const zPilotScoreOut = z.object({
+    cost: z.number(),
+    coverage: z.number(),
+    density_contrast: z.number(),
+    score: z.number(),
+    tipau_diversity: z.number(),
+    weight_cost: z.number(),
+    weight_coverage: z.number(),
+    weight_density: z.number(),
+    weight_tipau: z.number()
 });
 
 /**
@@ -570,12 +877,52 @@ export const zProfileUpdate = z.object({
 });
 
 /**
+ * QuantilesOut
+ */
+export const zQuantilesOut = z.object({
+    p10: z.number(),
+    p50: z.number(),
+    p90: z.number()
+});
+
+/**
  * Readiness
  */
 export const zReadiness = z.object({
     database: z.boolean(),
     llm_enabled: z.boolean(),
     status: z.enum(['ok', 'degraded'])
+});
+
+/**
+ * ReferenceStandard
+ */
+export const zReferenceStandard = z.object({
+    name: z.string(),
+    note: z.string(),
+    people_per_point: z.int(),
+    points: z.int(),
+    verified: z.boolean()
+});
+
+/**
+ * CoverageSummary
+ */
+export const zCoverageSummary = z.object({
+    containers: z.int(),
+    containers_per_1000: z.number().nullable(),
+    containers_total: z.int(),
+    covered_pct: z.number().nullable(),
+    covered_population: z.int().nullable(),
+    gap_points: z.int().nullable(),
+    is_estimate: z.boolean().optional().default(true),
+    kind: zContainerKind,
+    method: z.string(),
+    parishes: z.array(zParishCoverage),
+    population: z.int(),
+    radius_m: z.int(),
+    reference: zReferenceStandard,
+    state: zCoverageState
 });
 
 /**
@@ -649,6 +996,28 @@ export const zResolvedChange = z.object({
 });
 
 /**
+ * RobustnessOut
+ */
+export const zRobustnessOut = z.object({
+    alternative_id: z.uuid(),
+    base_alternative: zMetricsOut,
+    base_recommended: zMetricsOut,
+    criterion: z.enum([
+        'eur_per_tonne',
+        'annual_cost_eur',
+        'tonnes'
+    ]),
+    holds: z.boolean(),
+    median_advantage: z.number(),
+    min_share: z.number(),
+    n_samples: z.int(),
+    recommended_id: z.uuid(),
+    seed: z.int(),
+    share_recommended_better: z.number(),
+    swing: z.number()
+});
+
+/**
  * RouteStop
  */
 export const zRouteStop = z.object({
@@ -675,6 +1044,29 @@ export const zRouteOut = z.object({
  * ScenarioObjective
  */
 export const zScenarioObjective = z.enum(['max_tonnes', 'min_cost']);
+
+/**
+ * BenchmarkScenarioRequest
+ */
+export const zBenchmarkScenarioRequest = z.object({
+    budget_eur_year: z.number().gte(0).nullish(),
+    label: z.string().min(1).max(80).nullish(),
+    objective: zScenarioObjective.optional().default('min_cost')
+});
+
+/**
+ * ScenarioCard
+ *
+ * Resultado de uma ferramenta para o web desenhar. Os números vêm do otimizador, nunca do texto do modelo.
+ */
+export const zScenarioCard = z.object({
+    created_now: z.boolean(),
+    kpis: zCardKpis,
+    label: z.string(),
+    objective: zScenarioObjective,
+    parent_id: z.uuid().nullable(),
+    scenario_id: z.uuid()
+});
 
 /**
  * ScenarioRename
@@ -759,6 +1151,16 @@ export const zScenarioSummary = z.object({
 });
 
 /**
+ * SensitivityRequest
+ */
+export const zSensitivityRequest = z.object({
+    n_samples: z.int().gte(50).lte(5000).optional().default(500),
+    seed: z.int().optional().default(7),
+    swing: z.number().gte(0.05).lte(0.9).optional().default(0.3),
+    threshold_eur_per_tonne: z.number().gt(0).nullish()
+});
+
+/**
  * Shift
  */
 export const zShift = z.enum([
@@ -768,6 +1170,22 @@ export const zShift = z.enum([
 ]);
 
 /**
+ * SignalFloorOut
+ *
+ * Piso de sinal: toneladas mínimas do piloto e o que ficou de fora por não o atingir.
+ */
+export const zSignalFloorOut = z.object({
+    calculation: z.array(zPilotFact),
+    combos_below_floor: z.int(),
+    combos_total: z.int(),
+    computed: z.boolean(),
+    explanation: z.string(),
+    floor_met: z.boolean(),
+    min_tonnes_pilot: z.number(),
+    tonnes_pilot: z.number()
+});
+
+/**
  * SlotCount
  */
 export const zSlotCount = z.object({
@@ -775,6 +1193,93 @@ export const zSlotCount = z.object({
     crew: z.int(),
     day_group: zDayGroup,
     shift: zShift
+});
+
+/**
+ * TaskConfigIn
+ */
+export const zTaskConfigIn = z.object({
+    fallback_model: z.string().max(120).nullish(),
+    max_output_tokens: z.int().gte(16).lte(8000).nullish(),
+    model: z.string().max(120).nullish(),
+    reasoning_effort: z.enum([
+        'low',
+        'medium',
+        'high'
+    ]).nullish(),
+    task: zAiTask
+});
+
+/**
+ * AiSettingsUpdate
+ *
+ * Substitui a configuração: o que vier nulo volta a herdar (da tarefa para o global, do global para o `.env`).
+ */
+export const zAiSettingsUpdate = z.object({
+    defaults: zGlobalDefaults,
+    monthly_budget_usd: z.number().gte(0).lte(100000).nullish(),
+    tasks: z.array(zTaskConfigIn).max(10).optional()
+});
+
+/**
+ * TaskOverride
+ *
+ * Valores próprios de uma tarefa. Campos nulos herdam o valor global.
+ */
+export const zTaskOverride = z.object({
+    fallback_model: z.string().max(120).nullish(),
+    max_output_tokens: z.int().gte(16).lte(8000).nullish(),
+    model: z.string().max(120).nullish(),
+    reasoning_effort: z.enum([
+        'low',
+        'medium',
+        'high'
+    ]).nullish()
+});
+
+/**
+ * TaskConfigOut
+ */
+export const zTaskConfigOut = z.object({
+    effective: zEffectiveTask,
+    override: zTaskOverride,
+    recommended_model: z.string(),
+    requirements: z.array(z.string()),
+    task: zAiTask
+});
+
+/**
+ * AiSettingsOut
+ */
+export const zAiSettingsOut = z.object({
+    budget: zBudgetOut,
+    defaults: zGlobalDefaults,
+    enabled: z.boolean(),
+    env: zGlobalDefaults,
+    tasks: z.array(zTaskConfigOut),
+    updated_at: z.iso.datetime().nullable()
+});
+
+/**
+ * TestModelOut
+ */
+export const zTestModelOut = z.object({
+    completion_tokens: z.int().nullable(),
+    cost_usd: z.number().nullable(),
+    error: z.string().nullable(),
+    latency_ms: z.int().nullable(),
+    missing_capabilities: z.array(z.string()),
+    model: z.string(),
+    ok: z.boolean(),
+    prompt_tokens: z.int().nullable()
+});
+
+/**
+ * TestModelRequest
+ */
+export const zTestModelRequest = z.object({
+    model: z.string().min(3).max(120),
+    task: zAiTask.nullish()
 });
 
 /**
@@ -869,6 +1374,90 @@ export const zTipau = z.enum([
 ]);
 
 /**
+ * PilotZoneOut
+ */
+export const zPilotZoneOut = z.object({
+    facts: z.array(zPilotFact),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    tipau: zTipau.nullable()
+});
+
+/**
+ * PilotOut
+ */
+export const zPilotOut = z.object({
+    estimate: z.boolean().optional().default(true),
+    k: z.int(),
+    kpis: z.array(zPilotKpiOut),
+    modes: z.array(zCollectionMode),
+    months: z.int(),
+    rationale: z.array(z.string()),
+    score: zPilotScoreOut,
+    signal_floor: zSignalFloorOut,
+    startup_cost_eur: z.number(),
+    zones: z.array(zPilotZoneOut)
+});
+
+/**
+ * ToolTrace
+ */
+export const zToolTrace = z.object({
+    name: z.string(),
+    ok: z.boolean()
+});
+
+/**
+ * CopilotReply
+ */
+export const zCopilotReply = z.object({
+    cards: z.array(zScenarioCard),
+    language: z.enum(['pt-PT', 'en']),
+    model: z.string(),
+    prompt_version: z.string(),
+    text: z.string(),
+    tools_used: z.array(zToolTrace),
+    verified: z.boolean(),
+    warning: z.literal('numbers_unverified').nullable()
+});
+
+/**
+ * TornadoBarOut
+ */
+export const zTornadoBarOut = z.object({
+    base_value: z.number(),
+    high: zMetricsOut,
+    high_value: z.number(),
+    key: z.string(),
+    low: zMetricsOut,
+    low_value: z.number(),
+    source: zParamSource,
+    swing_cost_eur: z.number(),
+    swing_eur_per_tonne: z.number(),
+    swing_tonnes: z.number(),
+    unit: z.string()
+});
+
+/**
+ * SensitivityOut
+ */
+export const zSensitivityOut = z.object({
+    annual_cost_eur: zQuantilesOut,
+    assumption_share_of_top_drivers: z.number(),
+    base: zMetricsOut,
+    eur_per_tonne: zQuantilesOut,
+    method: z.string(),
+    n_samples: z.int(),
+    prob_below_threshold: z.number().nullable(),
+    scenario_id: z.uuid(),
+    seed: z.int(),
+    swing: z.number(),
+    threshold_eur_per_tonne: z.number().nullable(),
+    tonnes: zQuantilesOut,
+    tornado: z.array(zTornadoBarOut)
+});
+
+/**
  * TriageAnalysis
  *
  * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
@@ -880,6 +1469,33 @@ export const zTriageAnalysis = z.object({
     confidence: z.number().gte(0).lte(1),
     garment_type: zGarmentType,
     notes: z.string().max(240)
+});
+
+/**
+ * TriageEvalModel
+ */
+export const zTriageEvalModel = z.object({
+    accuracy: z.record(z.string(), z.number()),
+    avg_cost_usd: z.number().nullable(),
+    avg_latency_s: z.number(),
+    confusion_condition: z.record(z.string(), z.record(z.string(), z.int())),
+    confusion_garment_type: z.record(z.string(), z.record(z.string(), z.int())),
+    errors: z.array(z.string()),
+    failures: z.int(),
+    model: z.string(),
+    p95_latency_s: z.number(),
+    pieces: z.int(),
+    total_cost_usd: z.number().nullable()
+});
+
+/**
+ * TriageEvalReport
+ */
+export const zTriageEvalReport = z.object({
+    generated_at: z.iso.datetime(),
+    images: z.int(),
+    models: z.array(zTriageEvalModel),
+    prompt_version: z.string()
 });
 
 /**
@@ -974,6 +1590,54 @@ export const zTypologyFleet = z.object({
     slots: z.array(zSlotCount),
     typology: zTypology,
     vehicle_shifts_week: z.int()
+});
+
+/**
+ * UsageDay
+ */
+export const zUsageDay = z.object({
+    calls: z.int(),
+    cost_usd: z.number(),
+    day: z.iso.date()
+});
+
+/**
+ * UsageGroup
+ */
+export const zUsageGroup = z.object({
+    avg_latency_ms: z.number(),
+    calls: z.int(),
+    completion_tokens: z.int(),
+    cost_usd: z.number(),
+    errors: z.int(),
+    model: z.string().nullable(),
+    prompt_tokens: z.int(),
+    task: z.string().nullable()
+});
+
+/**
+ * UsageTotals
+ */
+export const zUsageTotals = z.object({
+    avg_latency_ms: z.number(),
+    calls: z.int(),
+    completion_tokens: z.int(),
+    cost_usd: z.number(),
+    errors: z.int(),
+    prompt_tokens: z.int()
+});
+
+/**
+ * AiUsageOut
+ */
+export const zAiUsageOut = z.object({
+    by_day: z.array(zUsageDay),
+    by_model: z.array(zUsageGroup),
+    by_task: z.array(zUsageGroup),
+    by_task_model: z.array(zUsageGroup),
+    days: z.int(),
+    month: zBudgetOut,
+    totals: zUsageTotals
 });
 
 /**
@@ -1190,6 +1854,7 @@ export const zWhatIfOut = z.object({
 export const zZoneOut = z.object({
     code: z.string(),
     demand_t: z.number(),
+    existing_containers: z.int().optional().default(0),
     geometry: z.record(z.string(), z.unknown()).nullable(),
     latitude: z.number(),
     localities: z.array(z.string()),
@@ -1200,6 +1865,65 @@ export const zZoneOut = z.object({
     service_days: z.int(),
     tipau: zTipau.nullable()
 });
+
+/**
+ * Successful Response
+ */
+export const zGetAiCreditsResponse = zAiCreditsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetTriageEvalResponse = zTriageEvalReport;
+
+export const zListAiModelsQuery = z.object({
+    task: zAiTask.nullish(),
+    capability: z.array(z.enum([
+        'image',
+        'tools',
+        'structured_outputs'
+    ])).nullish(),
+    q: z.string().max(80).nullish(),
+    sort: z.enum([
+        'name',
+        'cost',
+        'price'
+    ]).optional().default('name'),
+    limit: z.int().gte(1).lte(500).optional().default(100)
+});
+
+/**
+ * Successful Response
+ */
+export const zListAiModelsResponse = zAiModelsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetAiSettingsResponse = zAiSettingsOut;
+
+export const zUpdateAiSettingsBody = zAiSettingsUpdate;
+
+/**
+ * Successful Response
+ */
+export const zUpdateAiSettingsResponse = zAiSettingsOut;
+
+export const zTestAiModelBody = zTestModelRequest;
+
+/**
+ * Successful Response
+ */
+export const zTestAiModelResponse = zTestModelOut;
+
+export const zGetAiUsageQuery = z.object({
+    days: z.int().gte(1).lte(365).optional().default(30)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetAiUsageResponse = zAiUsageOut;
 
 export const zChangePasswordBody = zChangePasswordRequest;
 
@@ -1296,6 +2020,13 @@ export const zVerifyEmailResponse = z.void();
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
 
+export const zCopilotChatBody = zCopilotRequest;
+
+/**
+ * Successful Response
+ */
+export const zCopilotChatResponse = zCopilotReply;
+
 export const zUpdateDataAlertBody = zAlertUpdate;
 
 export const zUpdateDataAlertPath = z.object({
@@ -1306,6 +2037,15 @@ export const zUpdateDataAlertPath = z.object({
  * Successful Response
  */
 export const zUpdateDataAlertResponse = zDataAlertOut;
+
+export const zSuggestAlertResolutionPath = z.object({
+    alert_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zSuggestAlertResolutionResponse = zAlertSuggestionOut;
 
 /**
  * Successful Response
@@ -1397,13 +2137,25 @@ export const zListCircuitsResponse = zCircuitsSummary;
 
 export const zListContainersQuery = z.object({
     limit: z.int().gte(1).lte(1000).optional().default(200),
-    offset: z.int().gte(0).optional().default(0)
+    offset: z.int().gte(0).optional().default(0),
+    kind: zContainerKind.nullish(),
+    status: zContainerStatus.nullish()
 });
 
 /**
  * Successful Response
  */
 export const zListContainersResponse = zContainerList;
+
+export const zGetCoverageQuery = z.object({
+    radius_m: z.int().gte(50).lte(5000).optional().default(300),
+    kind: zContainerKind.optional().default('textile')
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCoverageResponse = zCoverageSummary;
 
 /**
  * Successful Response
@@ -1418,6 +2170,43 @@ export const zGetFleetResponse = zFleetSummary;
 export const zListLocalitiesResponse = z.array(zLocalityOut);
 
 /**
+ * Response List Benchmarks
+ *
+ * Successful Response
+ */
+export const zListBenchmarksResponse = z.array(zBenchmarkOut);
+
+export const zCreateBenchmarkScenarioBody = zBenchmarkScenarioRequest;
+
+export const zCreateBenchmarkScenarioPath = z.object({
+    key: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateBenchmarkScenarioResponse = zScenarioOut;
+
+export const zCompareScenarioRobustnessQuery = z.object({
+    recommended_id: z.uuid(),
+    alternative_id: z.uuid(),
+    n_samples: z.int().gte(50).lte(5000).optional().default(500),
+    seed: z.int().optional().default(7),
+    swing: z.number().gte(0.05).lte(0.9).optional().default(0.3),
+    criterion: z.enum([
+        'eur_per_tonne',
+        'annual_cost_eur',
+        'tonnes'
+    ]).optional().default('eur_per_tonne'),
+    min_share: z.number().gte(0).lte(1).optional().default(0.8)
+});
+
+/**
+ * Successful Response
+ */
+export const zCompareScenarioRobustnessResponse = zRobustnessOut;
+
+/**
  * Successful Response
  */
 export const zGetPlanningParametersResponse = zParametersOut;
@@ -1428,6 +2217,13 @@ export const zUpdatePlanningParametersBody = zPlanningParams;
  * Successful Response
  */
 export const zUpdatePlanningParametersResponse = zParametersOut;
+
+export const zRecommendPilotBody = zPilotRequest;
+
+/**
+ * Successful Response
+ */
+export const zRecommendPilotResponse = zPilotOut;
 
 /**
  * Response List Scenarios
@@ -1480,6 +2276,17 @@ export const zGetScenarioFlowsPath = z.object({
  * Successful Response
  */
 export const zGetScenarioFlowsResponse = zFlows;
+
+export const zRunScenarioSensitivityBody = zSensitivityRequest;
+
+export const zRunScenarioSensitivityPath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRunScenarioSensitivityResponse = zSensitivityOut;
 
 /**
  * Response List Zones

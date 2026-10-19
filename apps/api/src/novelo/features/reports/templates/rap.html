@@ -43,6 +43,7 @@
   tr.total td { font-weight: 600; border-top: .4mm solid var(--tinta); border-bottom: 0; }
   .bar { height: 2.4mm; background: #ECE7DC; border-radius: 2mm; overflow: hidden; display: flex; width: 38mm; }
   .bar i { display: block; height: 100%; }
+  p.brief { margin: 0 0 1.5mm; max-width: 160mm; }
   .note { font-size: 7.5pt; color: var(--pedra); }
   .method { background: #FAF8F3; border: .3mm solid var(--linha); border-radius: 2.5mm; padding: 4mm; font-size: 8.5pt; }
   .small td, .small th { font-size: 7.6pt; }
@@ -69,6 +70,11 @@
   <div class="eyebrow">{{ t.s_summary }}</div>
   <h2>{{ t.s_summary }}</h2>
   <p class="lead">{{ t.summary_lead }}</p>
+  {% if briefing %}
+  <h3>{{ t.briefing_title }}</h3>
+  <p class="brief">{{ briefing.text }}</p>
+  {% if briefing.source == "ai" %}<p class="note">{{ t.briefing_ai }}</p>{% endif %}
+  {% endif %}
   <div class="kpis">
     <div class="kpi"><div class="l">{{ t.kpi_potential }}<span class="tag">{{ t.estimate }}</span></div><div class="v">{{ potential_t }} t</div><div class="h">{{ t.kpi_potential_hint }}</div></div>
     <div class="kpi"><div class="l">{{ t.kpi_collected }}</div><div class="v">{{ collected_t }} t</div><div class="h">{{ t.kpi_collected_hint }}</div></div>

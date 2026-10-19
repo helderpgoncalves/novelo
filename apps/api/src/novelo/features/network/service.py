@@ -5,7 +5,15 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from novelo.domain.vocab import CircuitStatus, CollectionType, DayGroup, Shift, Typology
+from novelo.domain.vocab import (
+    CircuitStatus,
+    CollectionType,
+    ContainerKind,
+    ContainerStatus,
+    DayGroup,
+    Shift,
+    Typology,
+)
 from novelo.features.datasets.models import DataSource
 from novelo.features.network.models import (
     Circuit,
@@ -211,12 +219,25 @@ async def list_localities(db: AsyncSession) -> list[LocalityOut]:
     return out
 
 
-async def list_containers(db: AsyncSession, limit: int, offset: int) -> ContainerList:
-    total = (await db.execute(select(func.count()).select_from(Container))).scalar_one()
+async def list_containers(
+    db: AsyncSession,
+    limit: int,
+    offset: int,
+    kind: ContainerKind | None = None,
+    status: ContainerStatus | None = None,
+) -> ContainerList:
+    filters = []
+    if kind is not None:
+        filters.append(Container.kind == kind)
+    if status is not None:
+        filters.append(Container.status == status)
+    total = (await db.execute(select(func.count()).select_from(Container).where(*filters))).scalar_one()
     rows = (
         await db.execute(
-            select(Container, Locality.name)
+            select(Container, Locality.name, Parish.dicofre)
             .outerjoin(Locality, Locality.id == Container.locality_id)
+            .outerjoin(Parish, Parish.id == Container.parish_id)
+            .where(*filters)
             .order_by(Container.external_ref)
             .limit(limit)
             .offset(offset)
@@ -232,8 +253,9 @@ async def list_containers(db: AsyncSession, limit: int, offset: int) -> Containe
             longitude=c.longitude,
             address=c.address,
             locality=locality,
+            parish_code=parish_code,
             capacity_litres=c.capacity_litres,
         )
-        for c, locality in rows
+        for c, locality, parish_code in rows
     ]
     return ContainerList(items=items, total=total)

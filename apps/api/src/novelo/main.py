@@ -12,14 +12,17 @@ from novelo.core.database import SessionLocal
 from novelo.core.deps import get_current_user
 from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging
+from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
+from novelo.features.copilot.router import router as copilot_router
 from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
 from novelo.features.health.router import router as health_router
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
 from novelo.features.network.router import router as network_router
+from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
 from novelo.features.reports.router import router as reports_router
@@ -82,6 +85,23 @@ def create_app() -> FastAPI:
         whatif_router, prefix=f"{API_PREFIX}/whatif", tags=["whatif"], dependencies=protected, responses=COMMON_ERRORS
     )
     # Operação (lotes, bolsa, triagem, marcas): autenticada. O passaporte do lote é público: o QR abre sem sessão.
+    app.include_router(
+        insights_router,
+        prefix=f"{API_PREFIX}/planning",
+        tags=["planning"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
+    app.include_router(
+        ai_router, prefix=f"{API_PREFIX}/ai", tags=["ai"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    app.include_router(
+        copilot_router,
+        prefix=f"{API_PREFIX}/copilot",
+        tags=["copilot"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
     app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     if settings.environment == "development":
