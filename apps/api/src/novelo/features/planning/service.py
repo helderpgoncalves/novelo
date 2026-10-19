@@ -111,6 +111,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 demand_t=round(yearly_demand_t(p.population, kg_per_inhab_month), 2),
                 latitude=float(p.latitude),
                 longitude=float(p.longitude),
+                tipau=p.tipau,
                 service_days=max((days_by_locality.get(loc.id, 0) for loc in locs), default=0),
                 localities=sorted(loc.name for loc in locs),
                 geometry=p.geometry,

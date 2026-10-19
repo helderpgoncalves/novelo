@@ -22,6 +22,7 @@ import { Route as AppFleetRouteImport } from './routes/_app/fleet'
 import { Route as AppLocalitiesRouteImport } from './routes/_app/localities'
 import { Route as AppMapRouteImport } from './routes/_app/map'
 import { Route as AppMarketRouteImport } from './routes/_app/market'
+import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppSimulatorRouteImport } from './routes/_app/simulator'
 import { Route as AppTriageRouteImport } from './routes/_app/triage'
 import { Route as AppUsersRouteImport } from './routes/_app/users'
@@ -97,6 +98,11 @@ const AppMapRoute = AppMapRouteImport.update({
 const AppMarketRoute = AppMarketRouteImport.update({
   id: '/market',
   path: '/market',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
   getParentRoute: () => AppRoute,
 } as any)
 const AppSimulatorRoute = AppSimulatorRouteImport.update({
@@ -177,6 +183,7 @@ export interface FileRoutesByFullPath {
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
@@ -203,6 +210,7 @@ export interface FileRoutesByTo {
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
@@ -231,6 +239,7 @@ export interface FileRoutesById {
   '/_app/localities': typeof AppLocalitiesRoute
   '/_app/map': typeof AppMapRoute
   '/_app/market': typeof AppMarketRoute
+  '/_app/reports': typeof AppReportsRoute
   '/_app/simulator': typeof AppSimulatorRoute
   '/_app/triage': typeof AppTriageRoute
   '/_app/users': typeof AppUsersRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/localities'
     | '/map'
     | '/market'
+    | '/reports'
     | '/simulator'
     | '/triage'
     | '/users'
@@ -286,6 +296,7 @@ export interface FileRouteTypes {
     | '/localities'
     | '/map'
     | '/market'
+    | '/reports'
     | '/simulator'
     | '/triage'
     | '/users'
@@ -313,6 +324,7 @@ export interface FileRouteTypes {
     | '/_app/localities'
     | '/_app/map'
     | '/_app/market'
+    | '/_app/reports'
     | '/_app/simulator'
     | '/_app/triage'
     | '/_app/users'
@@ -429,6 +441,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMarketRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/reports': {
+      id: '/_app/reports'
+      path: '/reports'
+      fullPath: '/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/simulator': {
       id: '/_app/simulator'
       path: '/simulator'
@@ -533,6 +552,7 @@ interface AppRouteChildren {
   AppLocalitiesRoute: typeof AppLocalitiesRoute
   AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
+  AppReportsRoute: typeof AppReportsRoute
   AppSimulatorRoute: typeof AppSimulatorRoute
   AppTriageRoute: typeof AppTriageRoute
   AppUsersRoute: typeof AppUsersRoute
@@ -554,6 +574,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLocalitiesRoute: AppLocalitiesRoute,
   AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
+  AppReportsRoute: AppReportsRoute,
   AppSimulatorRoute: AppSimulatorRoute,
   AppTriageRoute: AppTriageRoute,
   AppUsersRoute: AppUsersRoute,

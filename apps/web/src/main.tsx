@@ -3,6 +3,7 @@ import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { PageSkeleton } from '@/components/states';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api-config';
@@ -23,6 +24,10 @@ const router = createRouter({
   context: { queryClient },
   defaultPreload: 'intent',
   scrollRestoration: true,
+  // Carregamento de rotas: esqueleto da página (só aparece se demorar mais de 150 ms).
+  defaultPendingComponent: PageSkeleton,
+  defaultPendingMs: 150,
+  defaultPendingMinMs: 300,
   // As rotas existem uma só vez; o prefixo do idioma é tirado à entrada e posto à saída.
   rewrite: {
     input: ({ url }) => deLocalizeUrl(url),

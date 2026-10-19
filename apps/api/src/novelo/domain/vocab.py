@@ -175,3 +175,11 @@ class WhatIfStatus(StrEnum):
     PROPOSED = "proposed"  # o modelo percebeu a pergunta; aguarda confirmação
     APPLIED = "applied"  # confirmada e calculada
     REJECTED = "rejected"  # ambígua ou fora das listas fechadas
+
+
+class Tipau(StrEnum):
+    """Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural."""
+
+    APU = "apu"  # predominantemente urbana
+    AMU = "amu"  # mediamente urbana
+    APR = "apr"  # predominantemente rural

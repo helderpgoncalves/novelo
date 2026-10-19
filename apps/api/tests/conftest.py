@@ -20,6 +20,7 @@ from novelo.features.lots.router import get_llm
 from novelo.features.network import models as _network_models  # noqa: F401
 from novelo.features.planning import models as _planning_models  # noqa: F401
 from novelo.features.planning import whatif_models as _whatif_models  # noqa: F401
+from novelo.features.reports import models as _report_models  # noqa: F401
 from novelo.features.textile import models as _textile_models  # noqa: F401
 from novelo.features.users import models as _user_models  # noqa: F401
 from novelo.main import create_app

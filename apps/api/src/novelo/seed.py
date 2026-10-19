@@ -208,6 +208,7 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
                 "name": r["name"],
                 "population": int(r["population"]),
                 "population_year": int(r["population_year"]),
+                "tipau": r.get("tipau") or None,
                 "latitude": r["latitude"],
                 "longitude": r["longitude"],
                 "geometry": json.loads(r["geometry"]) if r["geometry"] else None,
@@ -220,7 +221,7 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
             Parish,
             parish_rows,
             ["dicofre"],
-            ["name", "population", "population_year", "latitude", "longitude", "geometry", "source_id"],
+            ["name", "population", "population_year", "tipau", "latitude", "longitude", "geometry", "source_id"],
         )
         counts["parishes"] = len(parish_rows)
         for r in _read(data_dir, "localities_geo.csv"):

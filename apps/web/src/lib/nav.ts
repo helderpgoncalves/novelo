@@ -31,6 +31,7 @@ export interface NavItem {
     | '/lots'
     | '/market'
     | '/brands'
+    | '/reports'
     | '/simulator'
     | '/scenarios'
     | '/assumptions'
@@ -74,7 +75,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_lots(), to: '/lots', icon: Boxes },
       { label: () => m.nav_market(), to: '/market', icon: Store },
       { label: () => m.nav_brands(), to: '/brands', icon: Tags },
-      { label: () => m.nav_rap(), icon: FileText, soon: true },
+      { label: () => m.nav_rap(), to: '/reports', icon: FileText },
     ],
   },
   {

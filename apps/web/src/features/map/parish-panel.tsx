@@ -2,6 +2,7 @@ import { MousePointerClick } from 'lucide-react';
 import type { ZoneOut } from '@/client';
 import { WeekdayDots } from '@/components/weekdays';
 import { formatNumber, formatTonnes } from '@/lib/format';
+import { tipauLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
 export function ParishPanel({ zone }: { zone: ZoneOut | null }) {
@@ -19,6 +20,7 @@ export function ParishPanel({ zone }: { zone: ZoneOut | null }) {
         <p className="eyebrow">{m.map_panel_eyebrow({ code: zone.code })}</p>
         <h2 className="mt-1 text-2xl">{zone.name}</h2>
       </div>
+      {zone.tipau && <p className="text-muted-foreground text-xs">{tipauLabel[zone.tipau]()}</p>}
       <dl className="grid grid-cols-2 gap-3 text-sm">
         <div>
           <dt className="text-muted-foreground text-xs">

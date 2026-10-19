@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addLotItem, analyseGarment, applyWhatIf, askWhatIf, changeLotState, changePassword, createScenario, deleteScenario, forgotPassword, getAuthConfig, getBrandEvidence, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getTextileBaseline, getWasteComposition, googleCallback, googleLogin, health, listCircuits, listContainers, listLocalities, listLots, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, ready, refresh, register, renameScenario, resendVerification, reserveLot, resetPassword, updateDataAlert, updateMe, updatePlanningParameters, updateUser, verifyEmail } from '../sdk.gen';
-import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, ReadyData, ReadyError, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
+import { addLotItem, analyseGarment, applyWhatIf, askWhatIf, changeLotState, changePassword, createRapReport, createScenario, deleteScenario, downloadReport, forgotPassword, getAuthConfig, getBrandEvidence, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getTextileBaseline, getWasteComposition, googleCallback, googleLogin, health, listCircuits, listContainers, listLocalities, listLots, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, ready, refresh, register, renameScenario, resendVerification, reserveLot, resetPassword, updateDataAlert, updateMe, updatePlanningParameters, updateUser, verifyEmail } from '../sdk.gen';
+import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, ReadyData, ReadyError, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
 
 /**
  * Change Password
@@ -882,6 +882,61 @@ export const readyOptions = (options?: Options<ReadyData>) => queryOptions<Ready
         return data;
     },
     queryKey: readyQueryKey(options)
+});
+
+export const listReportsQueryKey = (options?: Options<ListReportsData>) => createQueryKey('listReports', options);
+
+/**
+ * List Reports
+ */
+export const listReportsOptions = (options?: Options<ListReportsData>) => queryOptions<ListReportsResponse, ListReportsError, ListReportsResponse, ReturnType<typeof listReportsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listReports({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listReportsQueryKey(options)
+});
+
+/**
+ * Create Rap Report
+ *
+ * Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).
+ */
+export const createRapReportMutation = (options?: Partial<Options<CreateRapReportData>>): UseMutationOptions<CreateRapReportResponse, CreateRapReportError, Options<CreateRapReportData>> => {
+    const mutationOptions: UseMutationOptions<CreateRapReportResponse, CreateRapReportError, Options<CreateRapReportData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createRapReport({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const downloadReportQueryKey = (options: Options<DownloadReportData>) => createQueryKey('downloadReport', options);
+
+/**
+ * Download Report
+ */
+export const downloadReportOptions = (options: Options<DownloadReportData>) => queryOptions<DownloadReportResponse, DownloadReportError, DownloadReportResponse, ReturnType<typeof downloadReportQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await downloadReport({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: downloadReportQueryKey(options)
 });
 
 export const getTextileBaselineQueryKey = (options?: Options<GetTextileBaselineData>) => createQueryKey('getTextileBaseline', options);

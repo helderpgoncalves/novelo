@@ -26,6 +26,7 @@ from novelo.domain.vocab import (
     ContainerStatus,
     DayGroup,
     Shift,
+    Tipau,
     Typology,
 )
 
@@ -34,12 +35,13 @@ class Parish(Base, UuidPkMixin, TimestampMixin):
     """Freguesia (CAOP/INE). Vazia até importarmos os Censos; é a unidade da procura no simulador."""
 
     __tablename__ = "parishes"
-    __table_args__ = (CheckConstraint("population >= 0", name="population_non_negative"),)
+    __table_args__ = (CheckConstraint("population >= 0", name="population_non_negative"), enum_check("tipau", Tipau))
 
     dicofre: Mapped[str] = mapped_column(String(6), unique=True)  # código INE/DGT de 6 dígitos
     name: Mapped[str] = mapped_column(String(120))
     population: Mapped[int | None] = mapped_column(Integer)
     population_year: Mapped[int | None] = mapped_column(SmallInteger)
+    tipau: Mapped[Tipau | None] = mapped_column(enum_column(Tipau))
     area_km2: Mapped[Decimal | None] = mapped_column(Numeric(9, 3))
     # Ponto representativo (dentro do polígono) e contorno em GeoJSON, do OpenStreetMap.
     latitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))

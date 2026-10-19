@@ -6,6 +6,7 @@ import type {
   DayGroup,
   Shift,
   TextileDestination,
+  Tipau,
   Typology,
   WasteCategory,
 } from '@/client';
@@ -90,4 +91,10 @@ export const wasteCategoryLabel: Record<WasteCategory, () => string> = {
   textiles: () => m.waste_category_textiles(),
   sanitary_textiles: () => m.waste_category_sanitary_textiles(),
   bulky: () => m.waste_category_bulky(),
+};
+
+export const tipauLabel: Record<Tipau, () => string> = {
+  apu: () => m.tipau_apu(),
+  amu: () => m.tipau_amu(),
+  apr: () => m.tipau_apr(),
 };

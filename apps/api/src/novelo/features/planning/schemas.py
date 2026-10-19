@@ -5,7 +5,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from novelo.domain.vocab import CollectionMode, ScenarioObjective, ScenarioStatus
+from novelo.domain.vocab import CollectionMode, ScenarioObjective, ScenarioStatus, Tipau
 
 
 class ParamSource(StrEnum):
@@ -69,6 +69,7 @@ class ZoneOut(BaseModel):
     demand_t: float
     latitude: float
     longitude: float
+    tipau: Tipau | None = Field(description="Tipologia de áreas urbanas do INE")
     service_days: int = Field(description="Dias/semana com algum circuito da Vitrus a passar")
     localities: list[str]
     geometry: dict[str, object] | None

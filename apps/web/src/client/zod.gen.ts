@@ -590,6 +590,27 @@ export const zRegisterRequest = z.object({
 });
 
 /**
+ * ReportOut
+ */
+export const zReportOut = z.object({
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    locale: z.enum(['pt-PT', 'en']),
+    scenario_ids: z.array(z.uuid()),
+    sha256: z.string(),
+    size_bytes: z.int(),
+    title: z.string()
+});
+
+/**
+ * ReportRequest
+ */
+export const zReportRequest = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    scenario_ids: z.array(z.uuid()).min(1).max(3)
+});
+
+/**
  * ReservationOut
  */
 export const zReservationOut = z.object({
@@ -835,6 +856,17 @@ export const zLotDetail = z.object({
     state: zLotState,
     weight_kg: z.number()
 });
+
+/**
+ * Tipau
+ *
+ * Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.
+ */
+export const zTipau = z.enum([
+    'apu',
+    'amu',
+    'apr'
+]);
 
 /**
  * TriageAnalysis
@@ -1165,7 +1197,8 @@ export const zZoneOut = z.object({
     name: z.string(),
     population: z.int(),
     population_year: z.int().nullable(),
-    service_days: z.int()
+    service_days: z.int(),
+    tipau: zTipau.nullable()
 });
 
 export const zChangePasswordBody = zChangePasswordRequest;
@@ -1477,6 +1510,29 @@ export const zGetLotQrResponse = z.string();
  * Successful Response
  */
 export const zReadyResponse = zReadiness;
+
+/**
+ * Response List Reports
+ *
+ * Successful Response
+ */
+export const zListReportsResponse = z.array(zReportOut);
+
+export const zCreateRapReportBody = zReportRequest;
+
+/**
+ * Successful Response
+ */
+export const zCreateRapReportResponse = zReportOut;
+
+export const zDownloadReportPath = z.object({
+    report_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDownloadReportResponse = z.string();
 
 /**
  * Successful Response
