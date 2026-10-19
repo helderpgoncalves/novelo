@@ -2,7 +2,9 @@
 
 Três pessoas podem desbloquear o que mais falta ao Novelo: **dados e custos reais** (Lucas Nascimento, Vitrus), **validação científica do que fazemos com o lote** (Luís Miguel Oliveira, Fibrenamics) e **validação do modelo de custos e de rede** (Prof. Paulo Afonso, UMinho). Este documento diz quem são, o que podem dar, como abordá-los em dois minutos e o que perguntar, por ordem de impacto.
 
-Fontes: [Fontes](../pesquisa/fontes.md) (F41 a F60) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md#f-mentores-fibrenamics-e-hackathon) (M1 a M17). Escrito a 19 de outubro de 2026. Estados usados: **verificado** (lido numa fonte), **hipótese** (inferência nossa) e **por verificar**.
+Os projetos são avaliados por quatro critérios ponderados: inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20% ([Critérios de avaliação](criterios-de-avaliacao.md)). Cada mentor influencia mais uns do que outros, e cada secção abaixo tem as perguntas que **sobem a nota** nos critérios dele. O detalhe de cada critério (Regras) ainda não o temos.
+
+Fontes: [Fontes](../pesquisa/fontes.md) (F41 a F61) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md#f-mentores-fibrenamics-e-hackathon) (M1 a M17). Escrito a 19 de outubro de 2026. Estados usados: **verificado** (lido numa fonte), **hipótese** (inferência nossa) e **por verificar**.
 
 > **Regra de ouro com mentores:** chegar com o telemóvel aberto no Novelo, uma pergunta por vez, números com a palavra "estimativa" quando o forem, e **nunca** apresentar como validado o que ainda não foi ouvido. Anotar de imediato cada resposta no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md) com data e nome.
 
@@ -24,6 +26,20 @@ flowchart LR
     T --> R
     R --> G["Pitch e<br/>pós-hackathon"]
 ```
+
+## Pergunta comum às Regras e ao formato
+
+Antes de afinar qualquer critério, precisamos do texto das Regras. **Quem pergunta:** Hélder, hoje. **A quem:** à organização, e ao Lucas em paralelo.
+
+> Podem indicar-nos onde está, ou enviar, o texto completo da secção **Regras** do Hack4Guimarães 2035? Queremos perceber o detalhe de cada um dos quatro critérios de avaliação, a duração do pitch, se há perguntas e respostas do júri e quanto tempo duram, se a demo ao vivo é permitida, se há entrega escrita ou vídeo, e quem integra o júri.
+
+**O que fazemos com a resposta:** colar o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras) e seguir o [protocolo de uma hora](cenarios-e-contingencias.md#a4-critérios-e-regras).
+
+| Mentor | Critérios que mais influencia | Onde estão as perguntas |
+| --- | --- | --- |
+| **Lucas Nascimento** | Impacto e relevância (30%), dados reais; continuidade (é a Vitrus que pilota) | [Perguntas que sobem a nota](#lucas-perguntas-que-sobem-a-nota) |
+| **Luís Miguel Oliveira** | Viabilidade técnica das fibras (25%); continuidade e parcerias (20%); inovação (25%) | [Perguntas que sobem a nota](#luís-miguel-perguntas-que-sobem-a-nota) |
+| **Prof. Paulo Afonso** | Viabilidade do modelo (25%) e métricas de impacto (30%) | [Perguntas que sobem a nota](#prof-afonso-perguntas-que-sobem-a-nota) |
 
 ---
 
@@ -98,6 +114,17 @@ flowchart LR
 | 15 | Que termos podemos usar em público: "validado pela Fibrenamics", "em conversa com a Fibrenamics" ou nada? | Evita sobre-afirmar | Frase no slide e no relatório |
 | 16 | O que tornaria este projeto **interessante para a Fibrenamics** daqui a seis meses? | Perceber o caminho pós-hackathon | Plano de continuidade |
 
+### Luís Miguel: perguntas que sobem a nota
+
+Estas quatro servem os critérios que ele mais influencia. Seguem a numeração anterior.
+
+| # | Pergunta | Critério | O que fazemos com a resposta |
+| --- | --- | --- | --- |
+| 17 | Que **erro de composição** tolera um lote para ser ensaiado, e como devemos declarar a incerteza de uma composição lida da etiqueta? | Viabilidade técnica (25%) | Campo "declarada ou medida" no passaporte e frase honesta no slide da indústria |
+| 18 | Pode **rever em 10 minutos** o esquema do passaporte e a taxonomia de fibras e dizer o que está tecnicamente errado ou em falta? | Viabilidade técnica (25%) | Corrigimos antes de 25 de outubro; "revisto por" só se ele autorizar |
+| 19 | O que teria de acontecer para a Fibrenamics ser **parceira nomeada do piloto** (carta de intenção, 3 a 5 fardos para caracterização)? | Continuidade (20%) | Entra no slide 8 como "em conversa" ou "confirmado", conforme a resposta |
+| 20 | Conhece **trabalho semelhante** na região ou na Europa que devamos citar para sermos justos sobre o que é novo? | Inovação (25%) | Resposta à pergunta "isto já existe?" (I1) com nomes e sem exagero |
+
 **Reserva (se houver tempo):** reunião inicial sem custos com a Fibrenamics via formulário em linha ([F41](https://fibrenamics.com)), ou `green@fibrenamics.com`.
 
 ---
@@ -131,7 +158,7 @@ flowchart LR
 | **Plano municipal** | Fonte dos 5,4%, 0,7 kg/hab/mês e "4 de 27" (A8, A10, A11) |
 | **Contentores e depósito** | Mapa, cobertura e VRP |
 | **Preços e contratos das frações** | Receita e €/t |
-| **Critérios do júri e duração do pitch** | Guião final |
+| **Texto das Regras, duração do pitch e formato das perguntas** | Guião final e revisão da matriz de critérios |
 | **Projetos europeus** | Posicionamento pós-hackathon |
 | **Autorização de uso dos dados** | Slides e demo públicos |
 
@@ -141,7 +168,7 @@ flowchart LR
 
 **Mensagem (30 segundos):**
 
-> Olá Lucas. Somos o Hélder e o Flávio. Já pusemos os vossos dados (301,3 t, 40 circuitos, 29 viaturas) num simulador que compara cenários de recolha em €/t. Para trocar os nossos pressupostos pelos vossos números precisamos de **cinco coisas**: custo por recolha, por km e por contentor; localização do depósito; a fonte do plano municipal (5,4% e 0,7 kg/hab/mês); os critérios do júri; e se podemos usar os dados em público. Pode ser por escrito, se for mais fácil.
+> Olá Lucas. Somos o Hélder e o Flávio. Já pusemos os vossos dados (301,3 t, 40 circuitos, 29 viaturas) num simulador que compara cenários de recolha em €/t. Para trocar os nossos pressupostos pelos vossos números precisamos de **cinco coisas**: custo por recolha, por km e por contentor; localização do depósito; a fonte do plano municipal (5,4% e 0,7 kg/hab/mês); o texto das Regras do hackathon (o detalhe de cada critério); e se podemos usar os dados em público. Pode ser por escrito, se for mais fácil.
 
 **Dois minutos no telemóvel:**
 
@@ -156,7 +183,7 @@ flowchart LR
 | --- | --- | --- | --- |
 | 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
 | 2 | **Plano municipal:** qual o documento e a página de onde vêm 5,4% de têxtil no indiferenciado, 0,7 kg/hab/mês e "4 de 27 operadores"? | A fonte pública não foi encontrada (A8, A10, A11) | Passam de "por verificar" a "verificado"; entram (ou não) em slide |
-| 3 | **Critérios do júri**, duração do pitch, formato da demo e quem avalia. | Não são públicos (M16) | Afinamos o guião e o tempo |
+| 3 | **Texto das Regras**: detalhe de cada um dos quatro critérios, duração do pitch, formato da demo e das perguntas, e quem avalia. Ver a [pergunta comum](#pergunta-comum-às-regras-e-ao-formato). | Os pesos são públicos (E4); o detalhe não (E6, M16) | Afinamos o guião e o tempo |
 | 4 | **Contentores:** formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | Chegam amanhã; formato desconhecido | ETL tolerante e cobertura prontas; decidimos o tratamento de "sem tipo" |
 | 5 | **Depósito:** de onde saem os circuitos e onde se descarrega? | O VRP assume o centro de Guimarães | Parametrizamos o ponto de partida |
 | 6 | **Preço por fração** e contratos (Ultriplo, H Sarah, Nova Etapa): quanto recebem por reutilização, reciclagem e quanto custa o rejeito? | A receita é pressuposto | Receita real no €/t e na sensibilidade |
@@ -170,6 +197,17 @@ flowchart LR
 | 14 | Que **KPI** usam hoje para o custo por tonelada de têxtil? | Falar na linguagem deles | Alinhamos definições (custo total vs marginal) |
 | 15 | Podemos **usar o nome da Vitrus e os dados** em slides, demo e relatório? Há algo confidencial? | Evitar problemas no dia 26 | Marcamos o que se pode mostrar |
 | 16 | O que considerariam **sucesso** deste desafio, e o que levaria a Vitrus a pilotar? | Perceber o pedido final | Ajustamos o "pedido" do pitch |
+
+### Lucas: perguntas que sobem a nota
+
+Servem sobretudo o **impacto e relevância (30%)** e a **continuidade (20%)**. Seguem a numeração anterior.
+
+| # | Pergunta | Critério | O que fazemos com a resposta |
+| --- | --- | --- | --- |
+| 17 | Qual é o **custo real por tonelada** de têxtil que a Vitrus tem hoje (recolha, triagem, destino), ainda que aproximado? Podemos usá-lo como linha de base do cenário A? | Impacto (30%) | X e Y deixam de ser só estimativa |
+| 18 | Que **resultado tornaria o piloto interessante** para a Vitrus: que €/t, que toneladas, que taxa de rejeito? | Impacto e continuidade | Define a meta que o pitch declara e os KPIs do piloto |
+| 19 | Que **dados de 2025** permitem medir o antes e o depois no piloto (toneladas por circuito e por mês)? | Impacto e viabilidade | Linha de base real e medição credível |
+| 20 | Se o piloto avançar, **quem decide** na Vitrus e no município, em que prazo e com que tipo de orçamento? | Continuidade (20%) | Pedido final realista no slide 8 |
 
 ---
 
@@ -239,6 +277,17 @@ flowchart LR
 | 13 | **Pós-hackathon:** vê valor em dissertação de mestrado, projeto de investigação ou incubação? | Continuidade | Plano de continuidade |
 | 14 | Que **perguntas faria** se fosse jurado? | Treino do pitch | Entram nas [perguntas difíceis](cenarios-e-contingencias.md#e-perguntas-difíceis-do-júri) |
 
+### Prof. Afonso: perguntas que sobem a nota
+
+Servem a **viabilidade técnica (25%)**, no modelo, e o **impacto (30%)**, nas métricas. Seguem a numeração anterior.
+
+| # | Pergunta | Critério | O que fazemos com a resposta |
+| --- | --- | --- | --- |
+| 15 | Que **três métricas** mostraria a um júri para provar que o modelo é fiável (por exemplo, erro face a dados observados, folga do solver, estabilidade da recomendação)? | Viabilidade técnica (25%) | Passam a estar no ecrã e no slide 5 |
+| 16 | Como **calibrar** o modelo com a recolha de 2025 (301,3 t) sem sobreajustar, se os custos são pressupostos? | Viabilidade técnica (25%) | Ajustamos a calibração e a nota metodológica |
+| 17 | Que **métrica de impacto** é mais defensável perante um júri: custo anual equivalente, € por tonelada evitada ou custo por habitante coberto? | Impacto (30%) | Escolhemos a métrica da frase-âncora |
+| 18 | Que **limitações do modelo** devemos dizer em voz alta antes de nos perguntarem? | Viabilidade e apresentação | Frase de honestidade no slide 5 |
+
 ---
 
 ## Pós-hackathon e financiamento
@@ -255,7 +304,7 @@ flowchart LR
 
 | Quando | Quem | Ação |
 | --- | --- | --- |
-| Hoje (19) | Hélder | Mensagem ao Lucas (cinco pedidos) e inscrição confirmada |
+| Hoje (19) | Hélder | Mensagem ao Lucas (cinco pedidos), [pergunta às Regras](#pergunta-comum-às-regras-e-ao-formato) à organização e inscrição confirmada |
 | Terça (20) | Hélder | Mensagem ao Luís Miguel; receber contentores |
 | Quarta (21) | Hélder + Flávio | 10 minutos com o Prof. Paulo Afonso; cenários A, B e francês prontos |
 | Quinta (22) | Hélder | Respostas do Luís Miguel e dos recicladores; atualizar o [registo](../pesquisa/registo-de-afirmacoes.md) |
