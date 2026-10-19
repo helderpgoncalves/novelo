@@ -11,7 +11,9 @@
       "!src/paraglide",
       "!messages",
       "e2e/**",
-      "playwright.config.ts"
+      "playwright.config.ts",
+      "!paraglide.options.mjs",
+      "!scripts"
     ]
   },
   "formatter": {
@@ -38,5 +40,20 @@
         "organizeImports": "on"
       }
     }
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["src/components/ui/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noArrayIndexKey": "off"
+          },
+          "a11y": {
+            "useSemanticElements": "off"
+          }
+        }
+      }
+    }
+  ]
 }
