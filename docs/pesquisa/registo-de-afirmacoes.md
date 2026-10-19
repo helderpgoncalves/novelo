@@ -2,7 +2,7 @@
 
 **Regra: nenhum número vai para um slide, para a demo ou para o relatório sem uma linha aqui.** Se a linha estiver em "Por verificar", o número não se usa em público; se for "Pressuposto nosso" ou "Cálculo nosso", diz-se com essa palavra.
 
-Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F61 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
+Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F62 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
 
 Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
 
@@ -75,6 +75,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | C22 | Reciclagem mecânica aceita 15 a 20% de fibra reciclada num fio | 15 a 20% | [F36] | Secundária | não usar |
 | C23 | Custo de recolha e triagem | cerca de 430 € por tonelada | VTT via [F35] | **Por verificar** | não usar |
 | C24 | Menos de 1% do vestuário usado vira vestuário novo; 78% dos têxteis exigem desmontagem antes da reciclagem | 1%; 78% | Considerando 26 [F1] | Primária | 6 |
+| C25 | O enunciado do desafio afirma que, contando os resíduos urbanos mistos, entre **73% e 80%** dos têxteis descartados acabam em aterro ou incineração | 73% a 80% | [F62] (sem fonte indicada) | **Secundária**: dizer "segundo o enunciado". Mede outra coisa que C10 (indiferenciado, 72%); não os misturar | não usar em slide sem a ressalva |
 
 ## D. Tecnologia
 
@@ -90,13 +91,20 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 
 | # | Afirmação | Valor | Fonte | Estado | Slide |
 | --- | --- | --- | --- | --- | --- |
-| E1 | Semana de trabalho | 19 a 23 out 2026, CIAJG | [F21], [F22] | Secundária | — |
-| E2 | Apresentações e vencedores | 26 out e 28 out | [F21], [F22] | Secundária | — |
-| E3 | Prémios totais | 20 000 € para os cinco desafios | [F21] | Secundária | — |
+| E1 | Semana de trabalho | 19 a 23 out 2026, CIAJG (09h30 a 17h30); formato híbrido | [F61], [F21], [F22] | **Primária** | — |
+| E2 | Pitches presenciais | 26 out a partir das 14h30; avaliação do júri 26 e 27 out; vencedores 28 out | [F61] | **Primária** | — |
+| E3 | Prémios | 20 000 €: 7 500 €, 4 500 € e 3 000 € para os três primeiros da classificação geral, e 1 000 € para o melhor projeto de cada um dos cinco desafios; **acumulam** | [F61] | **Primária** | — |
 | E4 | Os projetos são avaliados por **4 critérios ponderados**: inovação e originalidade **25%**, viabilidade técnica **25%**, impacto e relevância **30%**, apresentação e potencial de continuidade **20%** (soma 100%) | 25 / 25 / 30 / 20 | Página oficial do Hack4Guimarães 2035, FAQ "Como são avaliados os projetos?" [F61]; texto colado pelo utilizador a 2026-10-19 | **Primária** (verificado). Ver [Critérios de avaliação](../projeto/criterios-de-avaliacao.md) | todos |
 | E5 | Duração do pitch | **desconhecida**; assumimos 5 minutos (repartidos pelos 4 critérios na [narrativa](../projeto/narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios)) | — | Pressuposto | — |
-| E6 | O **detalhe de cada critério** (o que conta como inovação, viabilidade, impacto e continuidade) | **por obter**: está na secção "Regras" da página oficial, que ainda não lemos | [F61] | **Por verificar**: colar o texto das Regras em [Critérios de avaliação](../projeto/criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras). Até lá, a leitura de cada critério é **hipótese** | — |
-| E7 | Composição do júri, formato do pitch e das perguntas e respostas, e se a demo ao vivo é permitida | **desconhecidos** | [F59], [F61] não os indicam | **Por verificar**: perguntar à organização e ao Lucas ([pergunta comum](../projeto/mentores.md#pergunta-comum-às-regras-e-ao-formato)) | — |
+| E6 | O **detalhe de cada critério** (o que conta como inovação, viabilidade, impacto e continuidade) | **por obter**: está no separador **Rules** da página do evento na plataforma TAIKAI, que ainda não lemos | [F61], [F62] | **Por verificar**: colar o texto em [Critérios de avaliação](../projeto/criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras). O enunciado resume o que conta: inovação da solução, solidez técnica do que foi construído, impacto no território e clareza da apresentação. Até lermos o separador, o resto é **hipótese** | — |
+| E7 | Júri e formato: o júri é **designado pela organização, composto por especialistas nas áreas temáticas, sem votação pública, decisões finais**. **Desconhecidos:** os nomes, o formato do pitch e das perguntas e respostas, e se a demo ao vivo é permitida | júri: especialistas; resto por obter | [F61] | **Primária** (composição geral); **Por verificar** (o resto): perguntar à organização e ao Lucas ([pergunta comum](../projeto/mentores.md#pergunta-comum-às-regras-e-ao-formato)) | — |
+| E8 | **Submissão até 23 out 2026 às 17h30**; depois disso os projetos ficam fechados na plataforma e não se cria nem edita nada | 23 out, 17h30 | [F61] | **Primária** | — |
+| E9 | Presença obrigatória nos pitches (26 out) e na cerimónia de prémios (28 out) | 26 e 28 out | [F61] | **Primária** | — |
+| E10 | O que se espera: um **protótipo funcional com potencial de continuidade**, não um produto acabado; conta demonstrar que a ideia funciona na prática e pode evoluir depois | — | [F61] | **Primária** | frase de fecho |
+| E11 | Ferramentas de IA, bibliotecas, APIs e código aberto ou de terceiros são permitidos e encorajados, **desde que devidamente identificados** | — | [F61] | **Primária**. Ação: identificá-los na submissão e no README | — |
+| E12 | Todo o trabalho substancial tem de ser feito durante o hackathon; a organização pode verificar a originalidade, nomeadamente pelo histórico dos repositórios | — | [F61], [F62] | **Primária**. O primeiro commit do nosso repositório é de 2026-10-19 (histórico do Git) | — |
+| E13 | O desafio TexVitrus é proposto pela Vitrus Ambiente, **que atribui o prémio ao vencedor deste desafio**; os mentores indicados são Lucas Nascimento (Vitrus) e, para qualquer desafio, o Prof. Paulo Afonso (UMinho, Departamento de Produção e Sistemas) | — | [F62] | **Primária** | — |
+| E14 | Os cinco desafios competem na **mesma classificação geral** (três prémios) e cada um tem o seu prémio de 1 000 € | — | [F61] | **Primária** | — |
 
 ## F. Mentores, Fibrenamics e hackathon
 
@@ -118,9 +126,10 @@ Referências F41 a F60 em [Fontes](fontes.md#mentores-fibrenamics-e-hackathon). 
 | M12 | A Vitrus participa em dois projetos europeus de circularidade de comércio e serviços não alimentares, incluindo têxteis (URBACT Let's Go Circular e Circular Ecosystems) | 2 | [F17], [F18] | Secundária; **projetos exatos por confirmar** | Conversa com o Lucas |
 | M13 | Guimarães e a Vitrus ganharam um lugar no Horizon Europe (periASTY, missão de cidades neutras em carbono) | 1.º de 3 | [F58] | Secundária; não é de resíduos | Não usar |
 | M14 | A campanha nas escolas recolheu cerca de 3 t em mais de 30 escolas, destino To Be Green | 3 t; 30 | [F57], [F19] | Secundária | Conversa |
-| M15 | Paulo Afonso, do Departamento de Produção e Sistemas, é investigador em custos, avaliação de investimentos, modelos de negócio e logística (SLOTS) | — | [F54], [F55] | Primária (instituição); **é o mentor do desafio por inferência** | Perfil |
-| M16 | Hack4Guimarães: mentores e duração do pitch | **não públicos** (os critérios e pesos são públicos: ver E4) | [F59], [F61] | Por verificar: Regras, formulário de inscrição e organização | Perguntar |
-| M17 | Hack4Guimarães: formato híbrido, propriedade intelectual dos autores | — | [F59] | Primária | Cenários pós-hackathon |
+| M15 | Paulo Afonso, do Departamento de Produção e Sistemas, é investigador em custos, avaliação de investimentos, modelos de negócio e logística (SLOTS) | — | [F54], [F55] | Primária (instituição); o enunciado [F62] confirma-o como mentor "para qualquer desafio", mas **a identificação da pessoa continua por inferência** | Perfil |
+| M16 | Hack4Guimarães: composição nominal do júri e duração do pitch | **não públicos** (critérios e pesos: E4; júri em geral: E7; mentores do nosso desafio: M18) | [F59], [F61], [F62] | Por verificar: Regras e organização | Perguntar |
+| M17 | Hack4Guimarães: formato híbrido; os participantes mantêm a titularidade da propriedade intelectual dos projetos (os desafios e tecnologias de empresas e parceiros podem ter condições próprias, comunicadas com cada desafio) | — | [F59], [F61] | Primária | Cenários pós-hackathon |
+| M18 | O enunciado do nosso desafio indica como mentores **Lucas Nascimento (Vitrus Ambiente)** e, "para qualquer desafio", o **Prof. Paulo Afonso** (Universidade do Minho, Departamento de Produção e Sistemas). **Luís Miguel Oliveira não consta** no texto que temos | — | [F62] | **Primária**; o papel do Luís Miguel (indicado pelo utilizador como mentor) fica **por confirmar** | Mentores |
 
 ## Como atualizar este registo
 
