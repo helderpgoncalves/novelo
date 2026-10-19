@@ -156,7 +156,7 @@ openapi.json         contrato exportado e versionado
 
 ## Documentação
 
-Estratégia e pitch em [docs/projeto/estrategia-para-ganhar.md](docs/projeto/estrategia-para-ganhar.md) e [docs/projeto/narrativa-do-pitch.md](docs/projeto/narrativa-do-pitch.md); pesquisa e fontes em [docs/pesquisa/](docs/pesquisa/README.md). Índice completo em [docs/README.md](docs/README.md). Para trabalhar com agentes de código: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) e [docs/engenharia/workflow-ia.md](docs/engenharia/workflow-ia.md).
+Estratégia e pitch em [docs/projeto/estrategia-para-ganhar.md](docs/projeto/estrategia-para-ganhar.md), [mentores](docs/projeto/mentores.md), [cenários e contingências](docs/projeto/cenarios-e-contingencias.md) e [docs/projeto/narrativa-do-pitch.md](docs/projeto/narrativa-do-pitch.md); pesquisa e fontes em [docs/pesquisa/](docs/pesquisa/README.md). Índice completo em [docs/README.md](docs/README.md). Para trabalhar com agentes de código: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) e [docs/engenharia/workflow-ia.md](docs/engenharia/workflow-ia.md).
 
 ## Equipa e créditos
 

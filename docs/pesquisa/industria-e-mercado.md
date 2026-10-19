@@ -75,17 +75,18 @@ Também vale perceber a posição das entidades de economia social, que o artigo
 | Prioridade | Quem | Pedido | Porquê |
 | --- | --- | --- | --- |
 | 1 | **Lucas Nascimento (Vitrus Ambiente)**, mentor | Custos unitários, depósito, contentores, preços das frações, critérios do júri | Sem isto os €/t são estimativa |
-| 2 | **Prof. Paulo Afonso (UMinho, Produção e Sistemas)** | 15 minutos de revisão do modelo de localização e rotas | Credibilidade técnica |
-| 3 | **Sasia** (Miguel Silva, administrador, citado na imprensa) | Uma frase: "compramos lotes com mais de X% de uma fibra, a Y €/t" | Prova de procura |
-| 4 | **Recutex** | Percebem pós-consumo? Aceitam lotes triados? | Alternativa à Sasia |
-| 5 | **CITEVE** | Parecer sobre o passaporte do lote e a classificação por fibra; ligação ao RegioGreenTex | Validação técnica e rede |
-| 6 | **Humana** ou outra entidade de economia social | Como se articula com um novo ponto de recolha; dados de triagem | Parceiro e dados reais |
-| 7 | **Wippytex** | Como trabalham com 30 municípios; o que pedem às câmaras | Boa prática |
-| 8 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil; localizar a fonte dos 5,4% | Fonte do plano e legitimidade |
-| 9 | **Resinorte** | Gestão de ecopontos; articulação com a Vitrus | Rede existente |
-| 10 | **To Be Green** | Destino atual do têxtil das escolas | Caso local |
+| 2 | **Prof. Paulo Afonso (UMinho, Produção e Sistemas)**: custos, investimento, redes e logística | 15 minutos de revisão da estrutura de custos, do método de avaliação de investimento e do modelo de rede | Credibilidade técnica |
+| 3 | **Luís Miguel Oliveira (Fibrenamics)**, mentor | Critérios de lote pós-consumo, destino da fração de baixo valor, ensaio de lotes | Liga o passaporte à ciência e à indústria |
+| 4 | **Sasia** (Miguel Silva, administrador, citado na imprensa) | Uma frase: "compramos lotes com mais de X% de uma fibra, a Y €/t" | Prova de procura |
+| 5 | **Recutex** | Percebem pós-consumo? Aceitam lotes triados? | Alternativa à Sasia |
+| 6 | **CITEVE** | Parecer sobre o passaporte do lote e a classificação por fibra; ligação ao RegioGreenTex | Validação técnica e rede |
+| 7 | **Humana** ou outra entidade de economia social | Como se articula com um novo ponto de recolha; dados de triagem | Parceiro e dados reais |
+| 8 | **Wippytex** | Como trabalham com 30 municípios; o que pedem às câmaras | Boa prática |
+| 9 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil; localizar a fonte dos 5,4% | Fonte do plano e legitimidade |
+| 10 | **Resinorte** | Gestão de ecopontos; articulação com a Vitrus | Rede existente |
+| 11 | **To Be Green** | Destino atual do têxtil das escolas | Caso local |
 
-Guião de perguntas por interlocutor: [Estratégia para ganhar](../projeto/estrategia-para-ganhar.md#perguntas-para-os-mentores-e-contactos).
+Guião de perguntas por interlocutor: [Estratégia para ganhar](../projeto/mentores.md).
 
 ## Contexto local de Guimarães
 

@@ -34,6 +34,8 @@ flowchart LR
 Documentos de estratégia que usam esta pesquisa:
 
 - [Estratégia para ganhar](../projeto/estrategia-para-ganhar.md)
+- [Mentores](../projeto/mentores.md)
+- [Cenários e contingências](../projeto/cenarios-e-contingencias.md)
 - [Narrativa do pitch](../projeto/narrativa-do-pitch.md)
 - [Guião de slides](../projeto/pitch-slides.md)
 
@@ -56,4 +58,6 @@ Documentos de estratégia que usam esta pesquisa:
 4. **O gargalo da indústria é a qualidade, não a capacidade.** A Sasia recicla cerca de 2 000 t por mês, quase tudo pré-consumo; o potencial anual de Guimarães inteiro (≈1 317 t) é cerca de 5% disso. O que falta são lotes limpos e por composição.
 5. **O setor da recolha está sob pressão.** Sintra está a retirar centenas de contentores de roupa usada e os recicladores falam em saturação de mercado. Um município não pode simplesmente "pôr contentores".
 6. **Guimarães está a 1,9 kg/hab/ano**; a França recolhe 4,27, a UE em média 4,4 e a Catalunha 2,7. Há margem, mas a meta tem de ser dita como referência, não como promessa.
-7. **Não foi possível confirmar** os critérios do júri do Hack4Guimarães, o plano municipal que dá os 5,4% e os "4 de 27 operadores", nem os custos por tonelada da Vitrus. Estão marcados como por verificar e levam perguntas na [estratégia](../projeto/estrategia-para-ganhar.md).
+7. **A Fibrenamics está em Guimarães e tem projetos de fios de fibras recicladas (Lusitano) e de valorização de resíduos (Green), mas a informação pública não diz se aceita têxtil pós-consumo**; a investigação da UMinho aponta não tecidos e isolamento para misturas. Ver [Indústria e mercado](industria-e-mercado.md#fibrenamics-e-a-investigação-da-uminho).
+8. **O "Prof. Paulo Afonso" do Departamento de Produção e Sistemas é, muito provavelmente, um investigador de custos, avaliação de investimentos e logística (grupo SLOTS)**, não só de otimização matemática: o que lhe mostrarmos deve ser a estrutura de custos e a incerteza. Identificação por confirmar.
+9. **Não foi possível confirmar** os critérios do júri do Hack4Guimarães, o plano municipal que dá os 5,4% e os "4 de 27 operadores", nem os custos por tonelada da Vitrus. Estão marcados como por verificar e levam perguntas na [estratégia](../projeto/estrategia-para-ganhar.md).

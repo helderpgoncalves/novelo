@@ -93,7 +93,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | E1 | Semana de trabalho | 19 a 23 out 2026, CIAJG | [F21], [F22] | Secundária | — |
 | E2 | Apresentações e vencedores | 26 out e 28 out | [F21], [F22] | Secundária | — |
 | E3 | Prémios totais | 20 000 € para os cinco desafios | [F21] | Secundária | — |
-| E4 | Critérios do júri | **desconhecidos** | — | Por verificar: perguntar à organização | — |
+| E4 | Critérios do júri | **desconhecidos**: a página da organização não os publica (nem mentores nem duração do pitch); o formulário de inscrição ligado a partir dela não foi aberto | [F59] | Por verificar: perguntar à organização | — |
 | E5 | Duração do pitch | **desconhecida**; assumimos 5 minutos | — | Pressuposto | — |
 
 ## F. Mentores, Fibrenamics e hackathon
