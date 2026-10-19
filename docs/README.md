@@ -10,6 +10,7 @@ Só Markdown, em pt-PT. Nomes de ficheiros em português, minúsculas e hífens.
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
 | [Estratégia para ganhar](projeto/estrategia-para-ganhar.md) | Documento mestre: resumo executivo, decisores, arquitetura da prova, calendário 19 a 28 out, checklist, riscos e métricas |
 | [Critérios de avaliação](projeto/criterios-de-avaliacao.md) | Os 4 critérios e pesos do hackathon, a matriz critério → prova e o que falta ler nas Regras |
+| [Visualizações por página](projeto/visualizacoes-por-pagina.md) | Data storytelling: princípios, 2 a 4 visuais por página com dados e prioridade, a home em detalhe, reaproveitamento na app, no RAP e nos slides, e dependências em falta |
 | [Mentores](projeto/mentores.md) | Lucas Nascimento (Vitrus), Luís Miguel Oliveira (Fibrenamics) e Prof. Paulo Afonso (UMinho): perfis, abordagem e perguntas por ordem de impacto |
 | [Cenários e contingências](projeto/cenarios-e-contingencias.md) | Pitch, dados, mentoria, concorrência, 48 perguntas difíceis do júri, 12 por critério, cenário das Regras e pós-hackathon |
 | [Narrativa do pitch](projeto/narrativa-do-pitch.md) | Storyline em 30 s, 3 min e 5 min, falas, roteiro da demo e objeções, com a fonte de cada número |
