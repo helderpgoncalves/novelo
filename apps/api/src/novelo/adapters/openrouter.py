@@ -17,9 +17,7 @@ T = TypeVar("T", bound=BaseModel)
 
 
 class OpenRouterClient:
-    def __init__(
-        self, settings: Settings | None = None, transport: httpx.AsyncBaseTransport | None = None
-    ) -> None:
+    def __init__(self, settings: Settings | None = None, transport: httpx.AsyncBaseTransport | None = None) -> None:
         self._s = settings or get_settings()
         self._http = httpx.AsyncClient(
             base_url=self._s.openrouter_base_url,

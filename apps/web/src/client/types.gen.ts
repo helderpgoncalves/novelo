@@ -5,6 +5,38 @@ export type ClientOptions = {
 };
 
 /**
+ * AuthConfig
+ */
+export type AuthConfig = {
+    /**
+     * Google Enabled
+     */
+    google_enabled: boolean;
+    /**
+     * Password Min Length
+     */
+    password_min_length?: number;
+    /**
+     * Registration Open
+     */
+    registration_open: boolean;
+};
+
+/**
+ * ChangePasswordRequest
+ */
+export type ChangePasswordRequest = {
+    /**
+     * Current Password
+     */
+    current_password?: string | null;
+    /**
+     * New Password
+     */
+    new_password: string;
+};
+
+/**
  * Circuit
  */
 export type Circuit = {
@@ -173,6 +205,26 @@ export type Flows = {
 };
 
 /**
+ * ForgotPasswordRequest
+ */
+export type ForgotPasswordRequest = {
+    /**
+     * Email
+     */
+    email: string;
+};
+
+/**
+ * HTTPValidationError
+ */
+export type HttpValidationError = {
+    /**
+     * Detail
+     */
+    detail?: Array<ValidationError>;
+};
+
+/**
  * Health
  */
 export type Health = {
@@ -180,6 +232,20 @@ export type Health = {
      * Status
      */
     status?: 'ok';
+};
+
+/**
+ * LoginRequest
+ */
+export type LoginRequest = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Password
+     */
+    password: string;
 };
 
 /**
@@ -198,6 +264,38 @@ export type Readiness = {
      * Status
      */
     status: 'ok' | 'degraded';
+};
+
+/**
+ * RegisterRequest
+ */
+export type RegisterRequest = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Password
+     */
+    password: string;
+};
+
+/**
+ * ResetPasswordRequest
+ */
+export type ResetPasswordRequest = {
+    /**
+     * Password
+     */
+    password: string;
+    /**
+     * Token
+     */
+    token: string;
 };
 
 /**
@@ -254,12 +352,299 @@ export type TextileBaseline = {
     year?: number;
 };
 
+/**
+ * UserOut
+ */
+export type UserOut = {
+    /**
+     * Avatar Url
+     */
+    avatar_url: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Google Linked
+     */
+    google_linked: boolean;
+    /**
+     * Has Password
+     */
+    has_password: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Role
+     */
+    role: 'admin' | 'operator';
+};
+
+/**
+ * ValidationError
+ */
+export type ValidationError = {
+    /**
+     * Context
+     */
+    ctx?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Input
+     */
+    input?: unknown;
+    /**
+     * Location
+     */
+    loc: Array<string | number>;
+    /**
+     * Message
+     */
+    msg: string;
+    /**
+     * Error Type
+     */
+    type: string;
+};
+
+export type ChangePasswordData = {
+    body: ChangePasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/change-password';
+};
+
+export type ChangePasswordErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ChangePasswordError = ChangePasswordErrors[keyof ChangePasswordErrors];
+
+export type ChangePasswordResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ChangePasswordResponse = ChangePasswordResponses[keyof ChangePasswordResponses];
+
+export type GetAuthConfigData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/config';
+};
+
+export type GetAuthConfigResponses = {
+    /**
+     * Successful Response
+     */
+    200: AuthConfig;
+};
+
+export type GetAuthConfigResponse = GetAuthConfigResponses[keyof GetAuthConfigResponses];
+
+export type ForgotPasswordData = {
+    body: ForgotPasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/forgot-password';
+};
+
+export type ForgotPasswordErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ForgotPasswordError = ForgotPasswordErrors[keyof ForgotPasswordErrors];
+
+export type ForgotPasswordResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ForgotPasswordResponse = ForgotPasswordResponses[keyof ForgotPasswordResponses];
+
+export type LoginData = {
+    body: LoginRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/login';
+};
+
+export type LoginErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LoginError = LoginErrors[keyof LoginErrors];
+
+export type LoginResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserOut;
+};
+
+export type LoginResponse = LoginResponses[keyof LoginResponses];
+
+export type LogoutData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/logout';
+};
+
+export type LogoutErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type LogoutError = LogoutErrors[keyof LogoutErrors];
+
+export type LogoutResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type LogoutResponse = LogoutResponses[keyof LogoutResponses];
+
+export type GetMeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/me';
+};
+
+export type GetMeErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetMeError = GetMeErrors[keyof GetMeErrors];
+
+export type GetMeResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserOut;
+};
+
+export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
+
+export type RefreshData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/refresh';
+};
+
+export type RefreshErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RefreshError = RefreshErrors[keyof RefreshErrors];
+
+export type RefreshResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type RefreshResponse = RefreshResponses[keyof RefreshResponses];
+
+export type RegisterData = {
+    body: RegisterRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/register';
+};
+
+export type RegisterErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RegisterError = RegisterErrors[keyof RegisterErrors];
+
+export type RegisterResponses = {
+    /**
+     * Successful Response
+     */
+    201: UserOut;
+};
+
+export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
+
+export type ResetPasswordData = {
+    body: ResetPasswordRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/reset-password';
+};
+
+export type ResetPasswordErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ResetPasswordError = ResetPasswordErrors[keyof ResetPasswordErrors];
+
+export type ResetPasswordResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ResetPasswordResponse = ResetPasswordResponses[keyof ResetPasswordResponses];
+
 export type ListCircuitsData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/v1/baseline/circuits';
 };
+
+export type ListCircuitsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListCircuitsError = ListCircuitsErrors[keyof ListCircuitsErrors];
 
 export type ListCircuitsResponses = {
     /**
@@ -277,6 +662,15 @@ export type GetObservedFlowsData = {
     url: '/api/v1/baseline/flows';
 };
 
+export type GetObservedFlowsErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetObservedFlowsError = GetObservedFlowsErrors[keyof GetObservedFlowsErrors];
+
 export type GetObservedFlowsResponses = {
     /**
      * Successful Response
@@ -292,6 +686,15 @@ export type GetTextileBaselineData = {
     query?: never;
     url: '/api/v1/baseline/textile';
 };
+
+export type GetTextileBaselineErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetTextileBaselineError = GetTextileBaselineErrors[keyof GetTextileBaselineErrors];
 
 export type GetTextileBaselineResponses = {
     /**

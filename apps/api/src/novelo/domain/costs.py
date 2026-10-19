@@ -15,11 +15,7 @@ def annual_cost_eur(
 ) -> float:
     if lifetime_years <= 0:
         raise ValueError("a vida útil tem de ser positiva")
-    return (
-        capex_eur / lifetime_years
-        + collections_per_year * cost_per_collection_eur
-        + km_per_year * cost_per_km_eur
-    )
+    return capex_eur / lifetime_years + collections_per_year * cost_per_collection_eur + km_per_year * cost_per_km_eur
 
 
 def eur_per_tonne(annual_cost: float, tonnes: float) -> float | None:
