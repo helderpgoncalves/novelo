@@ -8,6 +8,7 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { Panel } from '@/components/panel';
 import { EmptyState } from '@/components/states';
 import {
   Select,
@@ -36,6 +37,7 @@ export const Route = createFileRoute('/_app/scenarios/compare')({
         ? queryClient.ensureQueryData(getScenarioOptions({ path: { scenario_id: deps.b } }))
         : Promise.resolve(null),
     ]),
+  staticData: { skeleton: 'dashboard' },
   head: () => ({ meta: [{ title: m.title_compare() }] }),
   component: Compare,
 });
@@ -86,7 +88,7 @@ function Compare() {
         title={m.compare_title()}
         description={m.compare_description()}
       />
-      <div className="flex flex-wrap gap-4">
+      <Panel className="flex flex-wrap gap-4 space-y-0">
         <Picker
           label={m.compare_scenario_a()}
           value={a}
@@ -99,7 +101,7 @@ function Compare() {
           exclude={a}
           onChange={(id) => navigate({ to: '/scenarios/compare', search: { a, b: id } })}
         />
-      </div>
+      </Panel>
       {scenarioA && scenarioB ? (
         <CompareView a={scenarioA} b={scenarioB} zones={zones} />
       ) : (

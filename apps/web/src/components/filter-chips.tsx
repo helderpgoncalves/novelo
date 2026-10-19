@@ -24,7 +24,7 @@ export function FilterChips<T extends string>({
           onClick={() => onChange(o.value)}
           aria-pressed={value === o.value}
           className={cn(
-            'h-8 rounded-full border px-3 text-xs transition-colors',
+            'h-10 rounded-full border px-4 text-xs transition-colors sm:h-8 sm:px-3',
             value === o.value
               ? 'border-primary bg-primary/10 font-medium text-primary'
               : 'text-muted-foreground hover:bg-muted',

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { UserOut } from '@/client';
@@ -67,8 +66,8 @@ export function ProfileForm({ user }: { user: UserOut }) {
           type="submit"
           className="h-10 font-semibold"
           disabled={update.isPending || !form.formState.isDirty}
+          loading={update.isPending}
         >
-          {update.isPending && <Loader2 className="animate-spin" />}
           {m.account_save_profile()}
         </Button>
       </form>

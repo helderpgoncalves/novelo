@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { getMeQueryKey, registerMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
@@ -100,8 +99,12 @@ export function RegisterForm({ next }: { next: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-10 w-full font-semibold" disabled={register.isPending}>
-          {register.isPending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-10 w-full font-semibold"
+          disabled={register.isPending}
+          loading={register.isPending}
+        >
           {m.register_submit()}
         </Button>
       </form>

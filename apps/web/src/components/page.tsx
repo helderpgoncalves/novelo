@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 
 /** Raiz de cada página: o mesmo ritmo vertical em todo o produto (mais apertado em telemóvel). */
@@ -34,5 +34,21 @@ export function Section({ title, description, actions, children, className }: Se
       </div>
       {children}
     </section>
+  );
+}
+
+/** Painel: o contentor de cartão usado para gráficos, listas e formulários. */
+export function Panel({
+  children,
+  className,
+  ...props
+}: { children: ReactNode; className?: string } & Omit<ComponentProps<'div'>, 'className'>) {
+  return (
+    <div
+      className={cn('rounded-xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5', className)}
+      {...props}
+    >
+      {children}
+    </div>
   );
 }

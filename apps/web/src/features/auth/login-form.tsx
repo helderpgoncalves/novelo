@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { getMeQueryKey, loginMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
@@ -100,8 +99,12 @@ export function LoginForm({ next }: { next: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-10 w-full font-semibold" disabled={login.isPending}>
-          {login.isPending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-10 w-full font-semibold"
+          disabled={login.isPending}
+          loading={login.isPending}
+        >
           {m.login_submit()}
         </Button>
       </form>

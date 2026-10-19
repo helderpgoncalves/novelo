@@ -8,6 +8,7 @@ import { TriageFlow } from '@/features/triage/triage-flow';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/triage')({
+  staticData: { skeleton: 'form' },
   validateSearch: z.object({ lot: z.string().max(16).optional().catch(undefined) }),
   loader: ({ context: { queryClient } }) =>
     Promise.all([
@@ -28,7 +29,7 @@ function Triage() {
       <PageHeader
         eyebrow={m.triage_eyebrow()}
         title={m.triage_title()}
-        description={m.triage_description()}
+        description={m.rw_triage_description()}
       />
       <TriageFlow zones={zones} openLots={openLots} initialLot={lot} />
     </Page>

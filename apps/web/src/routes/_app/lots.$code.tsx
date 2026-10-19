@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CheckCheck, ExternalLink, ScanLine, Truck } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import type { Fibre, GarmentType, GetLotQrData, LotItemOut, TextileDestination } from '@/client';
 import {
@@ -11,9 +12,11 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { type Column, DataTable } from '@/components/data-table';
-import { Page, SectionTitle } from '@/components/page';
+import { Page, Panel } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
+import { EmptyState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline } from '@/features/lots/lot-parts';
@@ -25,6 +28,7 @@ import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/lots/$code')({
+  staticData: { skeleton: 'detail' },
   loader: ({ context: { queryClient }, params }) =>
     queryClient.ensureQueryData(getLotOptions({ path: { code: params.code } })),
   head: () => ({ meta: [{ title: m.title_lot() }] }),
@@ -33,6 +37,7 @@ export const Route = createFileRoute('/_app/lots/$code')({
 
 function LotPage() {
   const { code } = Route.useParams();
+  const [tab, setTab] = useState<'items' | 'history'>('items');
   const queryClient = useQueryClient();
   const { data: lot } = useSuspenseQuery(getLotOptions({ path: { code } }));
   const qr = client.buildUrl<GetLotQrData>({
@@ -84,11 +89,6 @@ function LotPage() {
                 <Truck /> {m.lot_mark_delivered()}
               </Button>
             )}
-            <Button asChild variant="outline" className="h-10 gap-2">
-              <a href={`/passport/${lot.code}`} target="_blank" rel="noreferrer">
-                <ExternalLink /> {m.lot_open_passport()}
-              </a>
-            </Button>
           </>
         }
       />
@@ -124,58 +124,89 @@ function LotPage() {
         />
       </StatStrip>
 
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,20rem)_minmax(0,1fr)]">
-        <aside className="space-y-6 self-start">
-          <div className="space-y-4 rounded-xl bg-card p-5 text-center ring-1 ring-foreground/10 print:ring-0">
-            <img src={qr} alt={m.lot_qr_alt({ code: lot.code })} className="mx-auto size-48" />
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <aside className="space-y-4 self-start lg:col-span-4 xl:col-span-3">
+          <Panel className="space-y-4 text-center print:ring-0">
+            <img src={qr} alt={m.lot_qr_alt({ code: lot.code })} className="mx-auto size-44" />
             <p className="font-medium font-serif text-xl tracking-widest">{lot.code}</p>
-            <div className="flex justify-center gap-2 print:hidden">
-              <Button variant="outline" size="sm" onClick={() => window.print()}>
+            <div className="flex flex-wrap justify-center gap-2 print:hidden">
+              <Button variant="outline" size="sm" className="h-9" onClick={() => window.print()}>
                 {m.lot_print_label()}
               </Button>
-              <Button asChild variant="ghost" size="sm">
+              <Button asChild variant="ghost" size="sm" className="h-9">
                 <a href={qr} download={`${lot.code}.svg`}>
                   {m.lot_download_qr()}
                 </a>
               </Button>
             </div>
-          </div>
-          <div className="space-y-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10 print:hidden">
+            <Button asChild variant="outline" className="h-10 w-full gap-2 print:hidden">
+              <a href={`/passport/${lot.code}`} target="_blank" rel="noreferrer">
+                <ExternalLink /> {m.lot_open_passport()}
+              </a>
+            </Button>
+          </Panel>
+          <Panel className="space-y-3 print:hidden">
             <h2 className="text-lg">{m.lot_composition_title()}</h2>
             <CompositionBar composition={lot.composition} />
-          </div>
-          <div className="space-y-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10 print:hidden">
-            <h2 className="text-lg">{m.lot_history_title()}</h2>
-            <EventTimeline events={lot.events} />
-          </div>
-        </aside>
-
-        <section className="min-w-0 space-y-3 print:hidden">
-          <SectionTitle>{m.lot_items_title()}</SectionTitle>
-          {lot.item_list.length === 0 ? (
-            <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
-              {m.lot_items_empty()}
-            </p>
-          ) : (
-            <DataTable
-              id="lot-items"
-              columns={itemColumns}
-              rows={lot.item_list}
-              getKey={(i) => i.id}
-              caption={m.lot_items_title()}
-            />
-          )}
+          </Panel>
           {lot.reservation && (
-            <div className="space-y-1 rounded-xl bg-card p-5 text-sm ring-1 ring-foreground/10">
+            <Panel className="space-y-1 text-sm print:hidden">
               <p className="eyebrow">{m.lot_reservation_title()}</p>
               <p className="font-medium">{lot.reservation.recycler_name}</p>
               <p className="text-muted-foreground">{lot.reservation.contact}</p>
               {lot.reservation.note && (
                 <p className="text-muted-foreground">{lot.reservation.note}</p>
               )}
-            </div>
+            </Panel>
           )}
-        </section>
+        </aside>
+
+        <div className="min-w-0 lg:col-span-8 xl:col-span-9 print:hidden">
+          <PageTabs
+            label={m.rw_tabs_label()}
+            value={tab}
+            onValueChange={(next) => setTab(next)}
+            tabs={[
+              {
+                id: 'items',
+                label: m.lot_items_title(),
+                count: lot.item_list.length,
+                content:
+                  lot.item_list.length === 0 ? (
+                    <EmptyState
+                      title={m.lot_items_empty()}
+                      action={
+                        lot.state === 'collected' ? (
+                          <Button asChild>
+                            <Link to="/triage" search={{ lot: lot.code }}>
+                              {m.lot_add_items()}
+                            </Link>
+                          </Button>
+                        ) : undefined
+                      }
+                    />
+                  ) : (
+                    <DataTable
+                      id="lot-items"
+                      columns={itemColumns}
+                      rows={lot.item_list}
+                      getKey={(i) => i.id}
+                      caption={m.lot_items_title()}
+                    />
+                  ),
+              },
+              {
+                id: 'history',
+                label: m.lot_history_title(),
+                content: (
+                  <Panel>
+                    <EventTimeline events={lot.events} />
+                  </Panel>
+                ),
+              },
+            ]}
+          />
+        </div>
       </div>
     </Page>
   );

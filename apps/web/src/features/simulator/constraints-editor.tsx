@@ -51,7 +51,7 @@ export function ConstraintsEditor({ zones, value, onChange }: ConstraintsEditorP
               </span>
               <button
                 type="button"
-                className="grid size-6 place-items-center rounded-full hover:bg-background"
+                className="grid size-9 place-items-center rounded-full hover:bg-background"
                 aria-label={m.sim_constraint_remove({ name: nameOf(c) })}
                 onClick={() => {
                   const { [c]: _removed, ...rest } = value;
@@ -75,6 +75,8 @@ export function ConstraintsEditor({ zones, value, onChange }: ConstraintsEditorP
               {free.map((z) => (
                 <SelectItem key={z.code} value={z.code}>
                   {z.name}
+                  {(z.existing_containers ?? 0) > 0 &&
+                    ` · ${m.sim_constraint_containers({ n: z.existing_containers ?? 0 })}`}
                 </SelectItem>
               ))}
             </SelectContent>

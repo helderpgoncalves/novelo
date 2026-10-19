@@ -17,11 +17,13 @@ import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
 import { Route as AppBrandsRouteImport } from './routes/_app/brands'
 import { Route as AppCircuitsRouteImport } from './routes/_app/circuits'
+import { Route as AppCoverageRouteImport } from './routes/_app/coverage'
 import { Route as AppDataQualityRouteImport } from './routes/_app/data-quality'
 import { Route as AppFleetRouteImport } from './routes/_app/fleet'
 import { Route as AppLocalitiesRouteImport } from './routes/_app/localities'
 import { Route as AppMapRouteImport } from './routes/_app/map'
 import { Route as AppMarketRouteImport } from './routes/_app/market'
+import { Route as AppPilotRouteImport } from './routes/_app/pilot'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppSimulatorRouteImport } from './routes/_app/simulator'
 import { Route as AppTriageRouteImport } from './routes/_app/triage'
@@ -31,6 +33,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
+import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
 import { Route as AppLotsCodeRouteImport } from './routes/_app/lots.$code'
 import { Route as AppScenariosIndexRouteImport } from './routes/_app/scenarios.index'
@@ -75,6 +78,11 @@ const AppCircuitsRoute = AppCircuitsRouteImport.update({
   path: '/circuits',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCoverageRoute = AppCoverageRouteImport.update({
+  id: '/coverage',
+  path: '/coverage',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDataQualityRoute = AppDataQualityRouteImport.update({
   id: '/data-quality',
   path: '/data-quality',
@@ -98,6 +106,11 @@ const AppMapRoute = AppMapRouteImport.update({
 const AppMarketRoute = AppMarketRouteImport.update({
   id: '/market',
   path: '/market',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPilotRoute = AppPilotRouteImport.update({
+  id: '/pilot',
+  path: '/pilot',
   getParentRoute: () => AppRoute,
 } as any)
 const AppReportsRoute = AppReportsRouteImport.update({
@@ -145,6 +158,11 @@ const PassportCodeRoute = PassportCodeRouteImport.update({
   path: '/passport/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppAdminAiRoute = AppAdminAiRouteImport.update({
+  id: '/admin/ai',
+  path: '/admin/ai',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLotsIndexRoute = AppLotsIndexRouteImport.update({
   id: '/lots/',
   path: '/lots/',
@@ -178,11 +196,13 @@ export interface FileRoutesByFullPath {
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
   '/circuits': typeof AppCircuitsRoute
+  '/coverage': typeof AppCoverageRoute
   '/data-quality': typeof AppDataQualityRoute
   '/fleet': typeof AppFleetRoute
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/pilot': typeof AppPilotRoute
   '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
@@ -192,6 +212,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
@@ -205,11 +226,13 @@ export interface FileRoutesByTo {
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
   '/circuits': typeof AppCircuitsRoute
+  '/coverage': typeof AppCoverageRoute
   '/data-quality': typeof AppDataQualityRoute
   '/fleet': typeof AppFleetRoute
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/pilot': typeof AppPilotRoute
   '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
@@ -219,6 +242,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
@@ -234,11 +258,13 @@ export interface FileRoutesById {
   '/_app/assumptions': typeof AppAssumptionsRoute
   '/_app/brands': typeof AppBrandsRoute
   '/_app/circuits': typeof AppCircuitsRoute
+  '/_app/coverage': typeof AppCoverageRoute
   '/_app/data-quality': typeof AppDataQualityRoute
   '/_app/fleet': typeof AppFleetRoute
   '/_app/localities': typeof AppLocalitiesRoute
   '/_app/map': typeof AppMapRoute
   '/_app/market': typeof AppMarketRoute
+  '/_app/pilot': typeof AppPilotRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/simulator': typeof AppSimulatorRoute
   '/_app/triage': typeof AppTriageRoute
@@ -249,6 +275,7 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
   '/_app/': typeof AppIndexRoute
+  '/_app/admin/ai': typeof AppAdminAiRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/_app/scenarios/compare': typeof AppScenariosCompareRoute
@@ -264,11 +291,13 @@ export interface FileRouteTypes {
     | '/assumptions'
     | '/brands'
     | '/circuits'
+    | '/coverage'
     | '/data-quality'
     | '/fleet'
     | '/localities'
     | '/map'
     | '/market'
+    | '/pilot'
     | '/reports'
     | '/simulator'
     | '/triage'
@@ -278,6 +307,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/admin/ai'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
@@ -291,11 +321,13 @@ export interface FileRouteTypes {
     | '/assumptions'
     | '/brands'
     | '/circuits'
+    | '/coverage'
     | '/data-quality'
     | '/fleet'
     | '/localities'
     | '/map'
     | '/market'
+    | '/pilot'
     | '/reports'
     | '/simulator'
     | '/triage'
@@ -305,6 +337,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/admin/ai'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
@@ -319,11 +352,13 @@ export interface FileRouteTypes {
     | '/_app/assumptions'
     | '/_app/brands'
     | '/_app/circuits'
+    | '/_app/coverage'
     | '/_app/data-quality'
     | '/_app/fleet'
     | '/_app/localities'
     | '/_app/map'
     | '/_app/market'
+    | '/_app/pilot'
     | '/_app/reports'
     | '/_app/simulator'
     | '/_app/triage'
@@ -334,6 +369,7 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/passport/$code'
     | '/_app/'
+    | '/_app/admin/ai'
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
     | '/_app/scenarios/compare'
@@ -406,6 +442,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppCircuitsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/coverage': {
+      id: '/_app/coverage'
+      path: '/coverage'
+      fullPath: '/coverage'
+      preLoaderRoute: typeof AppCoverageRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/data-quality': {
       id: '/_app/data-quality'
       path: '/data-quality'
@@ -439,6 +482,13 @@ declare module '@tanstack/react-router' {
       path: '/market'
       fullPath: '/market'
       preLoaderRoute: typeof AppMarketRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/pilot': {
+      id: '/_app/pilot'
+      path: '/pilot'
+      fullPath: '/pilot'
+      preLoaderRoute: typeof AppPilotRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/reports': {
@@ -504,6 +554,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassportCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/admin/ai': {
+      id: '/_app/admin/ai'
+      path: '/admin/ai'
+      fullPath: '/admin/ai'
+      preLoaderRoute: typeof AppAdminAiRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/lots/': {
       id: '/_app/lots/'
       path: '/lots'
@@ -547,16 +604,19 @@ interface AppRouteChildren {
   AppAssumptionsRoute: typeof AppAssumptionsRoute
   AppBrandsRoute: typeof AppBrandsRoute
   AppCircuitsRoute: typeof AppCircuitsRoute
+  AppCoverageRoute: typeof AppCoverageRoute
   AppDataQualityRoute: typeof AppDataQualityRoute
   AppFleetRoute: typeof AppFleetRoute
   AppLocalitiesRoute: typeof AppLocalitiesRoute
   AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
+  AppPilotRoute: typeof AppPilotRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSimulatorRoute: typeof AppSimulatorRoute
   AppTriageRoute: typeof AppTriageRoute
   AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
+  AppAdminAiRoute: typeof AppAdminAiRoute
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
   AppScenariosCompareRoute: typeof AppScenariosCompareRoute
@@ -569,16 +629,19 @@ const AppRouteChildren: AppRouteChildren = {
   AppAssumptionsRoute: AppAssumptionsRoute,
   AppBrandsRoute: AppBrandsRoute,
   AppCircuitsRoute: AppCircuitsRoute,
+  AppCoverageRoute: AppCoverageRoute,
   AppDataQualityRoute: AppDataQualityRoute,
   AppFleetRoute: AppFleetRoute,
   AppLocalitiesRoute: AppLocalitiesRoute,
   AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
+  AppPilotRoute: AppPilotRoute,
   AppReportsRoute: AppReportsRoute,
   AppSimulatorRoute: AppSimulatorRoute,
   AppTriageRoute: AppTriageRoute,
   AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
+  AppAdminAiRoute: AppAdminAiRoute,
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,
   AppScenariosCompareRoute: AppScenariosCompareRoute,

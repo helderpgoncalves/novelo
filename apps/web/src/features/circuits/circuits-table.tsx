@@ -57,6 +57,7 @@ export function CircuitsTable({ circuits }: { circuits: CircuitOut[] }) {
       header: m.circuits_table_vehicles(),
       value: (c) => c.vehicles.join(', '),
       cell: (c) => c.vehicles.join(', ') || dash,
+      className: 'max-w-[12rem] whitespace-normal',
     },
     {
       id: 'localities',
@@ -65,7 +66,7 @@ export function CircuitsTable({ circuits }: { circuits: CircuitOut[] }) {
       cell: (c) => (
         <span className="text-muted-foreground">{c.localities.join(', ') || m.common_dash()}</span>
       ),
-      className: 'max-w-xs whitespace-normal',
+      className: 'min-w-56 max-w-xs whitespace-normal',
     },
   ];
 

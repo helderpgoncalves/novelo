@@ -92,8 +92,8 @@ export function WhatIfPanel({ scenario }: { scenario: ScenarioOut }) {
             type="submit"
             className="h-9 font-semibold"
             disabled={busy || question.trim().length < 5}
+            loading={ask.isPending}
           >
-            {ask.isPending && <Loader2 className="animate-spin" />}
             {m.whatif_ask()}
           </Button>
           {EXAMPLES.map((example) => (

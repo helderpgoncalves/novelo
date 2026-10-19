@@ -1,8 +1,12 @@
 import { Link } from '@tanstack/react-router';
 import type { ScenarioOut, ZoneOut } from '@/client';
+import { type Column, DataTable } from '@/components/data-table';
+import { Section } from '@/components/page';
+import { StatCell, StatStrip } from '@/components/stat-strip';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { RobustnessCard } from './robustness-card';
 import { ScenarioMap } from './scenario-map';
 
 interface Metric {
@@ -93,73 +97,117 @@ function Delta({ metric, a, b }: { metric: Metric; a: number | null; b: number |
   );
 }
 
+function signed(diff: number, format: (v: number) => string): string {
+  if (Math.abs(diff) < 1e-9) return '=';
+  return `${diff > 0 ? '+' : '−'}${format(Math.abs(diff))}`;
+}
+
 export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; zones: ZoneOut[] }) {
+  const columns: Column<Metric>[] = [
+    {
+      id: 'metric',
+      header: m.compare_metric(),
+      primary: true,
+      cell: (x) => x.label(),
+    },
+    ...[a, b].map(
+      (s, i): Column<Metric> => ({
+        id: i === 0 ? 'a' : 'b',
+        label: s.label,
+        align: 'right',
+        header: (
+          <span className="block">
+            <span className="eyebrow block">
+              {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
+            </span>
+            <Link
+              to="/scenarios/$scenarioId"
+              params={{ scenarioId: s.id }}
+              className="font-medium font-serif text-base normal-case tracking-normal hover:underline"
+            >
+              {s.label}
+            </Link>
+          </span>
+        ),
+        cell: (x) => {
+          const v = x.get(s);
+          return v == null ? m.common_dash() : x.format(v);
+        },
+      }),
+    ),
+    {
+      id: 'delta',
+      header: m.compare_delta(),
+      align: 'right',
+      cell: (x) => <Delta metric={x} a={x.get(a)} b={x.get(b)} />,
+    },
+  ];
+
+  const kpiDelta = (key: string) => {
+    const metric = METRICS.find((x) => x.key === key);
+    const va = metric?.get(a);
+    const vb = metric?.get(b);
+    return metric && va != null && vb != null ? signed(vb - va, metric.format) : m.common_dash();
+  };
+
   return (
-    <div className="space-y-10">
-      <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
-        <table className="w-full min-w-[34rem] text-sm">
-          <thead>
-            <tr className="border-border border-b text-left">
-              <th scope="col" className="p-4 font-medium text-muted-foreground">
-                {m.compare_metric()}
-              </th>
-              {[a, b].map((s, i) => (
-                <th key={s.id} scope="col" className="p-4 text-right">
-                  <p className="eyebrow">
-                    {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
-                  </p>
-                  <Link
-                    to="/scenarios/$scenarioId"
-                    params={{ scenarioId: s.id }}
-                    className="font-medium font-serif text-xl hover:underline"
-                  >
-                    {s.label}
-                  </Link>
-                </th>
-              ))}
-              <th scope="col" className="p-4 text-right font-medium text-muted-foreground">
-                {m.compare_delta()}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {METRICS.map((metric) => {
-              const va = metric.get(a);
-              const vb = metric.get(b);
-              return (
-                <tr key={metric.key} className="border-border border-b last:border-0">
-                  <th scope="row" className="p-4 text-left font-medium">
-                    {metric.label()}
-                  </th>
-                  <td className="p-4 text-right tabular-nums">
-                    {va == null ? m.common_dash() : metric.format(va)}
-                  </td>
-                  <td className="p-4 text-right tabular-nums">
-                    {vb == null ? m.common_dash() : metric.format(vb)}
-                  </td>
-                  <td className="p-4 text-right">
-                    <Delta metric={metric} a={va} b={vb} />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+    <div className="space-y-8 sm:space-y-12">
+      <StatStrip className="lg:grid-cols-3">
+        <StatCell
+          label={m.compare_delta_of({ label: m.kpi_tonnes() })}
+          value={kpiDelta('tonnes')}
+          tone="primary"
+          tag={m.common_estimate()}
+          hint={m.compare_delta_hint()}
+        />
+        <StatCell
+          label={m.compare_delta_of({ label: m.kpi_eur_per_tonne() })}
+          value={kpiDelta('eur_t')}
+          tone="primary"
+          tag={m.common_estimate()}
+          hint={m.compare_delta_hint()}
+        />
+        <StatCell
+          label={m.compare_delta_of({ label: m.kpi_annual_cost() })}
+          value={kpiDelta('annual')}
+          tag={m.common_estimate()}
+          hint={m.compare_delta_hint()}
+        />
+      </StatStrip>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
+        <div className="min-w-0 space-y-3 lg:col-span-8">
+          <DataTable
+            id="compare-metrics"
+            columns={columns}
+            rows={METRICS}
+            getKey={(x) => x.key}
+            controls="never"
+            pageSize={20}
+            caption={m.compare_title()}
+          />
+          <p className="text-muted-foreground text-xs">{m.compare_note()}</p>
+        </div>
+        <div className="lg:col-span-4">
+          <RobustnessCard a={a} b={b} />
+        </div>
       </div>
-      <p className="text-muted-foreground text-xs">{m.compare_note()}</p>
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        {[a, b].map((s) => (
-          <div key={s.id} className="space-y-2">
-            <p className="font-medium font-serif text-lg">{s.label}</p>
-            <ScenarioMap
-              zones={zones}
-              result={s.result}
-              showRoutes={false}
-              className="h-96 overflow-hidden rounded-xl ring-1 ring-foreground/10"
-            />
-          </div>
-        ))}
-      </div>
+
+      <Section title={m.compare_maps_title()}>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {[a, b].map((s) => (
+            <div key={s.id} className="space-y-2">
+              <p className="font-medium font-serif text-lg">{s.label}</p>
+              <ScenarioMap
+                zones={zones}
+                result={s.result}
+                showRoutes={false}
+                className="h-96 overflow-hidden rounded-xl ring-1 ring-foreground/10"
+              />
+            </div>
+          ))}
+        </div>
+      </Section>
     </div>
   );
 }

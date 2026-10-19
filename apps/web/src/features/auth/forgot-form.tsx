@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
-import { Loader2, MailCheck } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { forgotPasswordMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
@@ -65,8 +65,12 @@ export function ForgotForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-10 w-full font-semibold" disabled={forgot.isPending}>
-          {forgot.isPending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-10 w-full font-semibold"
+          disabled={forgot.isPending}
+          loading={forgot.isPending}
+        >
           {m.forgot_submit()}
         </Button>
       </form>

@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Page } from '@/components/page';
+import type { ReactNode } from 'react';
+import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -12,21 +13,36 @@ import { getLocale, LOCALE_LABELS, type Locale, locales } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/account')({
+  staticData: { skeleton: 'form' },
   head: () => ({ meta: [{ title: m.title_account() }] }),
   component: Account,
 });
 
-function LanguageCard() {
-  const switchLanguage = useSwitchLanguage(true);
+function AccountCard({
+  title,
+  description,
+  children,
+}: {
+  title: string;
+  description: string;
+  children: ReactNode;
+}) {
   return (
     <Card className="gap-4 shadow-none ring-1 ring-foreground/10">
       <CardHeader>
-        <CardTitle className="font-sans font-semibold text-base">
-          {m.account_language_title()}
-        </CardTitle>
-        <CardDescription>{m.account_language_description()}</CardDescription>
+        <CardTitle className="font-sans font-semibold text-base">{title}</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="flex flex-wrap gap-2">
+      <CardContent className="space-y-5">{children}</CardContent>
+    </Card>
+  );
+}
+
+function LanguageCard() {
+  const switchLanguage = useSwitchLanguage(true);
+  return (
+    <AccountCard title={m.account_language_title()} description={m.account_language_description()}>
+      <div className="flex flex-wrap gap-2">
         {locales.map((locale: Locale) => (
           <Button
             key={locale}
@@ -39,8 +55,8 @@ function LanguageCard() {
             {LOCALE_LABELS[locale]}
           </Button>
         ))}
-      </CardContent>
-    </Card>
+      </div>
+    </AccountCard>
   );
 }
 
@@ -53,58 +69,45 @@ function Account() {
         title={m.account_title()}
         description={m.account_description()}
       />
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
-        <div className="space-y-6">
-          <Card className="gap-4 shadow-none ring-1 ring-foreground/10">
-            <CardHeader>
-              <CardTitle className="font-sans font-semibold text-base">
-                {m.account_profile_title()}
-              </CardTitle>
-              <CardDescription>{m.account_profile_description()}</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-5">
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="secondary">
-                  {user.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
-                </Badge>
-                <Badge variant={user.email_verified ? 'secondary' : 'outline'}>
-                  {user.email_verified ? m.account_email_verified() : m.account_email_unverified()}
-                </Badge>
-                {user.google_linked && <Badge variant="outline">{m.account_google_linked()}</Badge>}
-              </div>
-              <ProfileForm user={user} />
-            </CardContent>
-          </Card>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
+        <Section title={m.rw_account_profile_section()} className="space-y-4 lg:col-span-7">
+          <AccountCard
+            title={m.account_profile_title()}
+            description={m.account_profile_description()}
+          >
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary">
+                {user.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
+              </Badge>
+              <Badge variant={user.email_verified ? 'secondary' : 'outline'}>
+                {user.email_verified ? m.account_email_verified() : m.account_email_unverified()}
+              </Badge>
+              {user.google_linked && <Badge variant="outline">{m.account_google_linked()}</Badge>}
+            </div>
+            <ProfileForm user={user} />
+          </AccountCard>
           <LanguageCard />
-          <Card className="gap-4 shadow-none ring-1 ring-foreground/10">
-            <CardHeader>
-              <CardTitle className="font-sans font-semibold text-base">
-                {m.account_sessions_title()}
-              </CardTitle>
-              <CardDescription>{m.account_sessions_description()}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <LogoutAllButton />
-            </CardContent>
-          </Card>
-        </div>
-        <Card className="gap-4 self-start shadow-none ring-1 ring-foreground/10">
-          <CardHeader>
-            <CardTitle className="font-sans font-semibold text-base">
-              {user.has_password
-                ? m.account_password_change_title()
-                : m.account_password_set_title()}
-            </CardTitle>
-            <CardDescription>
-              {user.has_password
+        </Section>
+        <Section title={m.rw_account_security_section()} className="space-y-4 lg:col-span-5">
+          <AccountCard
+            title={
+              user.has_password ? m.account_password_change_title() : m.account_password_set_title()
+            }
+            description={
+              user.has_password
                 ? m.account_password_change_description()
-                : m.account_password_set_description()}
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
+                : m.account_password_set_description()
+            }
+          >
             <ChangePasswordForm user={user} />
-          </CardContent>
-        </Card>
+          </AccountCard>
+          <AccountCard
+            title={m.account_sessions_title()}
+            description={m.account_sessions_description()}
+          >
+            <LogoutAllButton />
+          </AccountCard>
+        </Section>
       </div>
     </Page>
   );

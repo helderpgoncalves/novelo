@@ -9,6 +9,7 @@ import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/users')({
+  staticData: { skeleton: 'table' },
   // Só administradores: a API também o impõe (403), isto evita um ecrã de erro.
   beforeLoad: ({ context: { user } }) => {
     if (user.role !== 'admin') throw redirect({ to: '/' });
@@ -25,9 +26,9 @@ function Users() {
   return (
     <Page>
       <PageHeader
-        eyebrow="Administração"
-        title="Utilizadores"
-        description="Quem tem acesso ao Novelo e com que perfil. Desativar uma conta termina logo as suas sessões."
+        eyebrow={m.users_eyebrow()}
+        title={m.users_title()}
+        description={m.users_description()}
       />
       <StatStrip>
         <StatCell label={m.users_stat_accounts()} value={formatNumber(data.length)} />
@@ -40,9 +41,9 @@ function Users() {
           value={formatNumber(data.filter((u) => u.is_active).length)}
         />
         <StatCell
-          label="Por confirmar"
+          label={m.users_stat_unverified()}
           value={formatNumber(data.filter((u) => !u.email_verified).length)}
-          hint="email ainda não confirmado"
+          hint={m.users_stat_unverified_hint()}
         />
       </StatStrip>
       <UsersTable users={data} currentUserId={user.id} />

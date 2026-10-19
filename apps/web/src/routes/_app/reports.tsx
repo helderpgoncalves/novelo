@@ -12,8 +12,9 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { type Column, DataTable } from '@/components/data-table';
-import { Page, SectionTitle } from '@/components/page';
+import { Page, Panel, Section, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -26,6 +27,7 @@ import { formatDateTime, getLocale, LOCALE_LABELS, type Locale, locales } from '
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/reports')({
+  staticData: { skeleton: 'form' },
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(listScenariosOptions()),
@@ -34,6 +36,8 @@ export const Route = createFileRoute('/_app/reports')({
   head: () => ({ meta: [{ title: m.title_reports() }] }),
   component: Reports,
 });
+
+const MAX_SCENARIOS = 3;
 
 const pdfUrl = (id: string) =>
   client.buildUrl<DownloadReportData>({
@@ -60,7 +64,11 @@ function Reports() {
 
   const toggle = (id: string) =>
     setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : prev.length >= 3 ? prev : [...prev, id],
+      prev.includes(id)
+        ? prev.filter((x) => x !== id)
+        : prev.length >= MAX_SCENARIOS
+          ? prev
+          : [...prev, id],
     );
 
   return (
@@ -68,8 +76,28 @@ function Reports() {
       <PageHeader
         eyebrow={m.reports_eyebrow()}
         title={m.reports_title()}
-        description={m.reports_description()}
+        description={m.rw_reports_description()}
       />
+
+      <StatStrip className="lg:grid-cols-3">
+        <StatCell
+          label={m.rw_reports_stat_scenarios()}
+          value={formatNumber(computed.length)}
+          hint={m.rw_reports_stat_scenarios_hint()}
+        />
+        <StatCell
+          label={m.rw_reports_stat_selected()}
+          value={`${selected.length}/${MAX_SCENARIOS}`}
+          tone="primary"
+          hint={m.rw_reports_stat_selected_hint()}
+        />
+        <StatCell
+          label={m.rw_reports_stat_generated()}
+          value={formatNumber(reports.length)}
+          hint={m.rw_reports_stat_generated_hint()}
+        />
+      </StatStrip>
+
       {computed.length === 0 ? (
         <EmptyState
           title={m.reports_no_scenarios_title()}
@@ -81,24 +109,24 @@ function Reports() {
           }
         />
       ) : (
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
-          <section className="space-y-3">
-            <div className="space-y-1">
-              <SectionTitle>{m.reports_pick()}</SectionTitle>
-              <p className="text-muted-foreground text-sm">{m.reports_pick_hint()}</p>
-            </div>
-            <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
+          <Section
+            title={m.reports_pick()}
+            description={m.reports_pick_hint()}
+            className="min-w-0 lg:col-span-8"
+          >
+            <ul className="max-h-[36rem] divide-y divide-border overflow-y-auto rounded-xl bg-card ring-1 ring-foreground/10">
               {computed.map((s) => (
                 <li key={s.id}>
                   <Label
                     htmlFor={`sc-${s.id}`}
-                    className="flex cursor-pointer items-center gap-3 px-4 py-3 font-normal hover:bg-muted/40"
+                    className="flex min-h-14 cursor-pointer items-center gap-3 px-4 py-3 font-normal hover:bg-muted/40"
                   >
                     <Checkbox
                       id={`sc-${s.id}`}
                       checked={selected.includes(s.id)}
                       onCheckedChange={() => toggle(s.id)}
-                      disabled={!selected.includes(s.id) && selected.length >= 3}
+                      disabled={!selected.includes(s.id) && selected.length >= MAX_SCENARIOS}
                     />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{s.label}</span>
@@ -114,50 +142,50 @@ function Reports() {
                 </li>
               ))}
             </ul>
-            {selected.length >= 3 && (
+            {selected.length >= MAX_SCENARIOS && (
               <p className="text-muted-foreground text-xs">{m.reports_max()}</p>
             )}
-          </section>
+          </Section>
 
-          <aside className="space-y-5 self-start rounded-xl bg-card p-5 ring-1 ring-foreground/10">
-            <FormAlert message={generate.isError ? getErrorMessage(generate.error) : null} />
-            <fieldset className="space-y-2">
-              <legend className="mb-1 font-medium text-sm">{m.reports_language()}</legend>
-              <RadioGroup
-                value={locale}
-                onValueChange={(v) => setLocale(v as Locale)}
-                className="gap-2"
+          <aside className="self-start lg:sticky lg:top-4 lg:col-span-4">
+            <Panel className="space-y-5">
+              <SectionTitle>{m.rw_reports_step_generate()}</SectionTitle>
+              <FormAlert message={generate.isError ? getErrorMessage(generate.error) : null} />
+              <fieldset className="space-y-2">
+                <legend className="mb-1 font-medium text-sm">{m.reports_language()}</legend>
+                <RadioGroup
+                  value={locale}
+                  onValueChange={(v) => setLocale(v as Locale)}
+                  className="gap-1"
+                >
+                  {locales.map((l) => (
+                    <Label
+                      key={l}
+                      htmlFor={`rl-${l}`}
+                      className="flex min-h-10 cursor-pointer items-center gap-2 font-normal text-sm"
+                    >
+                      <RadioGroupItem id={`rl-${l}`} value={l} />
+                      {LOCALE_LABELS[l]}
+                    </Label>
+                  ))}
+                </RadioGroup>
+              </fieldset>
+              <Button
+                className="h-11 w-full gap-2 font-semibold"
+                disabled={selected.length === 0 || generate.isPending}
+                onClick={() => generate.mutate({ body: { scenario_ids: selected, locale } })}
               >
-                {locales.map((l) => (
-                  <Label
-                    key={l}
-                    htmlFor={`rl-${l}`}
-                    className="flex cursor-pointer items-center gap-2 font-normal text-sm"
-                  >
-                    <RadioGroupItem id={`rl-${l}`} value={l} />
-                    {LOCALE_LABELS[l]}
-                  </Label>
-                ))}
-              </RadioGroup>
-            </fieldset>
-            <Button
-              className="h-11 w-full gap-2 font-semibold"
-              disabled={selected.length === 0 || generate.isPending}
-              onClick={() => generate.mutate({ body: { scenario_ids: selected, locale } })}
-            >
-              {generate.isPending ? <Loader2 className="animate-spin" /> : <FileText />}
-              {generate.isPending ? m.reports_generating() : m.reports_generate()}
-            </Button>
+                {generate.isPending ? <Loader2 className="animate-spin" /> : <FileText />}
+                {generate.isPending ? m.reports_generating() : m.reports_generate()}
+              </Button>
+            </Panel>
           </aside>
         </div>
       )}
 
-      <section className="space-y-3">
-        <SectionTitle>{m.reports_history()}</SectionTitle>
+      <Section title={m.reports_history()}>
         {reports.length === 0 ? (
-          <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
-            {m.reports_history_empty()}
-          </p>
+          <EmptyState title={m.reports_history_empty()} />
         ) : (
           <DataTable
             id="reports"
@@ -168,7 +196,7 @@ function Reports() {
             caption={m.reports_history()}
           />
         )}
-      </section>
+      </Section>
     </Page>
   );
 }

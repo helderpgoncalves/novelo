@@ -14,6 +14,7 @@ import { fibreLabel } from '@/lib/lots';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/market')({
+  staticData: { skeleton: 'cards' },
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getFibreMarketOptions()),
   head: () => ({ meta: [{ title: m.title_market() }] }),
   component: Market,
@@ -30,7 +31,7 @@ function Market() {
       <PageHeader
         eyebrow={m.market_eyebrow()}
         title={m.market_title()}
-        description={m.market_description()}
+        description={m.rw_market_description()}
       />
       <StatStrip className="lg:grid-cols-3">
         <StatCell
@@ -64,7 +65,7 @@ function Market() {
         />
       ) : (
         data.map((entry) => (
-          <section key={entry.fibre} className="space-y-3">
+          <section key={entry.fibre} className="space-y-4">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <SectionTitle>{fibreLabel[entry.fibre]()}</SectionTitle>
               <p className="text-muted-foreground text-sm tabular-nums">
@@ -75,9 +76,12 @@ function Market() {
                 })}
               </p>
             </div>
-            <ul className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border md:grid-cols-2">
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
               {entry.items.map((lot) => (
-                <li key={lot.code} className="space-y-3 bg-card p-5">
+                <li
+                  key={lot.code}
+                  className="space-y-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5"
+                >
                   <div className="flex items-center justify-between gap-2">
                     <p className="font-medium tabular-nums">{lot.code}</p>
                     <LotStateBadge state={lot.state} />
@@ -89,13 +93,13 @@ function Market() {
                   <div className="flex gap-2 pt-1">
                     <Button
                       size="sm"
-                      className="h-8"
+                      className="h-10 sm:h-9"
                       disabled={lot.state !== 'sorted'}
                       onClick={() => setReserving(lot.code)}
                     >
                       {lot.state === 'sorted' ? m.market_reserve() : m.market_reserved_label()}
                     </Button>
-                    <Button asChild size="sm" variant="ghost" className="h-8">
+                    <Button asChild size="sm" variant="ghost" className="h-10 sm:h-9">
                       <a href={`/passport/${lot.code}`} target="_blank" rel="noreferrer">
                         {m.lot_open_passport()}
                       </a>

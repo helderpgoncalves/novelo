@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { Loader2, MailWarning } from 'lucide-react';
+import { MailWarning } from 'lucide-react';
 import { toast } from 'sonner';
 import type { UserOut } from '@/client';
 import { resendVerificationMutation } from '@/client/@tanstack/react-query.gen';
@@ -30,8 +30,8 @@ export function VerifyEmailBanner({ user }: { user: UserOut }) {
         className="h-8"
         onClick={() => resend.mutate({})}
         disabled={resend.isPending}
+        loading={resend.isPending}
       >
-        {resend.isPending && <Loader2 className="animate-spin" />}
         {m.verify_banner_resend()}
       </Button>
     </div>

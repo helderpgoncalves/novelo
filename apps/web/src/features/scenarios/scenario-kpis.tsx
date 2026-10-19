@@ -1,12 +1,13 @@
 import type { Kpis } from '@/client';
 import { StatCell, StatStrip } from '@/components/stat-strip';
-import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
+import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
+/** Os quatro números que decidem: toneladas, €/t, custo anual e investimento. */
 export function ScenarioKpis({ kpis }: { kpis: Kpis }) {
   const uplift = kpis.tonnes_year - kpis.baseline_observed_t;
   return (
-    <StatStrip className="lg:grid-cols-3">
+    <StatStrip>
       <StatCell
         label={m.kpi_tonnes()}
         value={formatTonnes(kpis.tonnes_year)}
@@ -39,16 +40,6 @@ export function ScenarioKpis({ kpis }: { kpis: Kpis }) {
         value={formatEur(kpis.capex_eur)}
         tag={m.common_estimate()}
         hint={m.kpi_capex_hint({ points: kpis.points })}
-      />
-      <StatCell
-        label={m.kpi_coverage()}
-        value={formatPercent(kpis.coverage_pct)}
-        hint={m.kpi_coverage_hint()}
-      />
-      <StatCell
-        label={m.kpi_km()}
-        value={`${formatNumber(kpis.km_year)} km`}
-        hint={m.kpi_km_hint()}
       />
     </StatStrip>
   );

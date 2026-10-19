@@ -1,31 +1,41 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { AlertTriangle } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
+import { z } from 'zod';
 import {
   getScenarioFlowsOptions,
   getScenarioOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
-import { Page, SectionTitle } from '@/components/page';
+import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { Panel } from '@/components/panel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FlowsSankey } from '@/features/baseline/flows-sankey';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ParameterSummary } from '@/features/scenarios/parameter-summary';
 import { RoutesTable } from '@/features/scenarios/routes-table';
 import { ScenarioActions } from '@/features/scenarios/scenario-actions';
+import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
+import { UncertaintyPanel } from '@/features/scenarios/uncertainty-panel';
 import { WhatIfPanel } from '@/features/whatif/whatif-panel';
 import { formatEur, formatTonnes } from '@/lib/format';
 import { objectiveLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 
+const TABS = ['summary', 'network', 'uncertainty', 'whatif'] as const;
+type TabId = (typeof TABS)[number];
+
 export const Route = createFileRoute('/_app/scenarios/$scenarioId')({
+  validateSearch: z.object({ tab: z.enum(TABS).optional().catch(undefined) }),
   loader: ({ context: { queryClient }, params }) =>
     Promise.all([
       queryClient.ensureQueryData(getScenarioOptions({ path: { scenario_id: params.scenarioId } })),
@@ -34,34 +44,22 @@ export const Route = createFileRoute('/_app/scenarios/$scenarioId')({
       ),
       queryClient.ensureQueryData(listZonesOptions()),
     ]),
+  staticData: { skeleton: 'detail' },
   head: () => ({ meta: [{ title: m.title_scenario() }] }),
   component: ScenarioPage,
 });
 
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-4">
-      <div className="space-y-1">
-        <SectionTitle>{title}</SectionTitle>
-        {description && (
-          <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-}
+const tabLabel: Record<TabId, () => string> = {
+  summary: () => m.scn_tab_summary(),
+  network: () => m.scn_tab_network(),
+  uncertainty: () => m.scn_tab_uncertainty(),
+  whatif: () => m.scn_tab_whatif(),
+};
 
 function ScenarioPage() {
   const { scenarioId } = Route.useParams();
+  const { tab = 'summary' } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
   const { data: scenario } = useSuspenseQuery(
     getScenarioOptions({ path: { scenario_id: scenarioId } }),
   );
@@ -93,48 +91,90 @@ function ScenarioPage() {
         </Alert>
       )}
 
-      <ScenarioKpis kpis={result.kpis} />
+      <div className="space-y-4">
+        <ScenarioKpis kpis={result.kpis} />
+        <ScenarioAnchor scenario={scenario} />
+      </div>
 
-      <Section title={m.whatif_title()} description={m.whatif_description()}>
-        <WhatIfPanel scenario={scenario} />
-      </Section>
+      <Tabs
+        value={tab}
+        onValueChange={(next) =>
+          navigate({
+            search: { tab: next === 'summary' ? undefined : (next as TabId) },
+            replace: true,
+          })
+        }
+        className="gap-6"
+      >
+        <TabsList
+          variant="line"
+          className="h-11 w-full justify-start gap-1 overflow-x-auto border-b"
+        >
+          {TABS.map((id) => (
+            <TabsTrigger key={id} value={id} className="h-11 flex-none px-3 sm:px-4">
+              {tabLabel[id]()}
+            </TabsTrigger>
+          ))}
+        </TabsList>
 
-      <Section title={m.scenario_map_title()} description={m.scenario_map_description()}>
-        <div className="flex justify-end">
-          <Label className="flex items-center gap-2 font-normal text-sm">
-            <Switch checked={showRoutes} onCheckedChange={setShowRoutes} />
-            {m.scenario_show_routes()}
-          </Label>
-        </div>
-        <ScenarioMap
-          zones={zones}
-          result={result}
-          showRoutes={showRoutes}
-          className="h-[32rem] overflow-hidden rounded-xl ring-1 ring-foreground/10"
-        />
-      </Section>
+        <TabsContent value="summary" className="space-y-8">
+          <Section title={m.scenario_modes_title()} description={m.scenario_modes_description()}>
+            <ModeSummaryCards modes={result.modes} totalTonnes={result.kpis.tonnes_year} />
+          </Section>
+          <Section title={m.scenario_flows_title()} description={m.scenario_flows_description()}>
+            <Panel>
+              <FlowsSankey flows={flows} />
+            </Panel>
+          </Section>
+          <Collapsible className="rounded-xl bg-card ring-1 ring-foreground/10">
+            <CollapsibleTrigger className="flex min-h-12 w-full items-center justify-between gap-3 px-5 py-3 text-left font-medium text-sm">
+              {m.scenario_params_title()}
+              <span className="text-muted-foreground text-xs">
+                {m.scenario_params_description()}
+              </span>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="px-5 pb-5">
+              <ParameterSummary params={scenario.params} />
+            </CollapsibleContent>
+          </Collapsible>
+        </TabsContent>
 
-      <Section title={m.scenario_modes_title()} description={m.scenario_modes_description()}>
-        <ModeSummaryCards modes={result.modes} totalTonnes={result.kpis.tonnes_year} />
-      </Section>
+        <TabsContent value="network" className="space-y-8">
+          <Section
+            title={m.scenario_map_title()}
+            description={m.scenario_map_description()}
+            actions={
+              <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
+                <Switch checked={showRoutes} onCheckedChange={setShowRoutes} />
+                {m.scenario_show_routes()}
+              </Label>
+            }
+          >
+            <ScenarioMap
+              zones={zones}
+              result={result}
+              showRoutes={showRoutes}
+              className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 lg:h-[36rem]"
+            />
+          </Section>
+          <Section title={m.scenario_routes_title()} description={m.scenario_routes_description()}>
+            <RoutesTable routes={result.routes} />
+          </Section>
+          <Section title={m.scenario_alloc_title()}>
+            <AllocationsTable allocations={result.allocations} />
+          </Section>
+        </TabsContent>
 
-      <Section title={m.scenario_flows_title()} description={m.scenario_flows_description()}>
-        <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-          <FlowsSankey flows={flows} />
-        </div>
-      </Section>
+        <TabsContent value="uncertainty">
+          <UncertaintyPanel scenario={scenario} />
+        </TabsContent>
 
-      <Section title={m.scenario_routes_title()} description={m.scenario_routes_description()}>
-        <RoutesTable routes={result.routes} />
-      </Section>
-
-      <Section title={m.scenario_alloc_title()}>
-        <AllocationsTable allocations={result.allocations} />
-      </Section>
-
-      <Section title={m.scenario_params_title()} description={m.scenario_params_description()}>
-        <ParameterSummary params={scenario.params} />
-      </Section>
+        <TabsContent value="whatif">
+          <Section title={m.whatif_title()} description={m.whatif_description()}>
+            <WhatIfPanel scenario={scenario} />
+          </Section>
+        </TabsContent>
+      </Tabs>
     </Page>
   );
 }
