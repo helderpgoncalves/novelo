@@ -19,8 +19,9 @@ from novelo.features.auth.schemas import (
     LoginRequest,
     RegisterRequest,
     ResetPasswordRequest,
+    VerifyEmailRequest,
 )
-from novelo.features.users.schemas import UserOut
+from novelo.features.users.schemas import ProfileUpdate, UserOut
 from novelo.features.users.service import to_out
 
 router = APIRouter()
@@ -34,7 +35,8 @@ STATE_COOKIE = "oauth_state"
 REFRESH_PATH = "/api/v1/auth"
 
 
-def _set_cookie(response: Response, key: str, value: str, max_age: int, path: str) -> None:
+def _set_cookie(response: Response, key: str, value: str, max_age: int | None, path: str) -> None:
+    # max_age=None cria um cookie de sessão: some quando o browser fecha ("não manter sessão").
     response.set_cookie(
         key,
         value,
@@ -46,10 +48,11 @@ def _set_cookie(response: Response, key: str, value: str, max_age: int, path: st
     )
 
 
-def _set_session(response: Response, access: str, refresh: str) -> None:
+def _set_session(response: Response, access: str, refresh: str, remember: bool = True) -> None:
     s = get_settings()
     _set_cookie(response, ACCESS_COOKIE, access, s.access_token_minutes * 60, "/")
-    _set_cookie(response, REFRESH_COOKIE, refresh, s.refresh_token_days * 86400, REFRESH_PATH)
+    max_age = s.refresh_token_days * 86400 if remember else None
+    _set_cookie(response, REFRESH_COOKIE, refresh, max_age, REFRESH_PATH)
 
 
 def _clear_session(response: Response) -> None:
@@ -66,15 +69,15 @@ def get_auth_config() -> AuthConfig:
 
 @router.post("/login", response_model=UserOut, dependencies=[Depends(auth_limiter)])
 async def login(body: LoginRequest, response: Response, db: Db) -> UserOut:
-    user, access, refresh = await service.login(db, body.email, body.password)
-    _set_session(response, access, refresh)
+    user, access, refresh = await service.login(db, body.email, body.password, body.remember_me)
+    _set_session(response, access, refresh, body.remember_me)
     return to_out(user)
 
 
 @router.post("/register", response_model=UserOut, status_code=201, dependencies=[Depends(auth_limiter)])
 async def register(body: RegisterRequest, response: Response, db: Db, sender: Sender) -> UserOut:
-    user, access, refresh = await service.register(db, sender, body.email, body.password, body.name)
-    _set_session(response, access, refresh)
+    user, access, refresh = await service.register(db, sender, body.email, body.password, body.name, body.remember_me)
+    _set_session(response, access, refresh, body.remember_me)
     return to_out(user)
 
 
@@ -84,7 +87,8 @@ async def refresh(response: Response, db: Db, refresh_token: Annotated[str | Non
         _clear_session(response)
         raise UnauthorizedError("Sem sessão")
     access, new_refresh = await service.rotate_refresh(db, refresh_token)
-    _set_session(response, access, new_refresh)
+    remember = bool(decode_token(new_refresh, "refresh").get("remember", True))
+    _set_session(response, access, new_refresh, remember)
 
 
 @router.post("/logout", status_code=204)
@@ -96,6 +100,29 @@ async def logout(response: Response, db: Db, refresh_token: Annotated[str | None
 @router.get("/me", response_model=UserOut)
 async def get_me(user: CurrentUser) -> UserOut:
     return to_out(user)
+
+
+@router.patch("/me", response_model=UserOut)
+async def update_me(body: ProfileUpdate, user: CurrentUser, db: Db) -> UserOut:
+    return to_out(await service.update_profile(db, user, body.name))
+
+
+@router.post("/logout-all", status_code=204)
+async def logout_all(response: Response, user: CurrentUser, db: Db) -> None:
+    """Termina a sessão em todos os dispositivos."""
+    await service.revoke_all_sessions(db, user.id)
+    await db.commit()
+    _clear_session(response)
+
+
+@router.post("/verify-email", status_code=204, dependencies=[Depends(reset_limiter)])
+async def verify_email(body: VerifyEmailRequest, db: Db) -> None:
+    await service.verify_email(db, body.token)
+
+
+@router.post("/resend-verification", status_code=204, dependencies=[Depends(reset_limiter)])
+async def resend_verification(user: CurrentUser, db: Db, sender: Sender) -> None:
+    await service.send_verification(db, sender, user)
 
 
 @router.post("/forgot-password", status_code=204, dependencies=[Depends(reset_limiter)])
@@ -116,8 +143,15 @@ async def change_password(body: ChangePasswordRequest, response: Response, user:
     _clear_session(response)
 
 
-@router.get("/google/login", include_in_schema=False)
-def google_login(next: Annotated[str, Query()] = "/") -> RedirectResponse:
+@router.get(
+    "/google/login",
+    status_code=302,
+    responses={302: {"description": "Redireciona para a Google"}},
+    response_class=RedirectResponse,
+)
+def google_login(
+    next: Annotated[str, Query(description="Caminho para onde voltar depois de entrar")] = "/",
+) -> RedirectResponse:
     s = get_settings()
     if not s.google_enabled:
         raise AppError("Entrar com a Google não está configurado")
@@ -129,7 +163,12 @@ def google_login(next: Annotated[str, Query()] = "/") -> RedirectResponse:
     return redirect
 
 
-@router.get("/google/callback", include_in_schema=False)
+@router.get(
+    "/google/callback",
+    status_code=302,
+    responses={302: {"description": "Volta à aplicação com a sessão criada"}},
+    response_class=RedirectResponse,
+)
 async def google_callback(
     request: Request,
     db: Db,

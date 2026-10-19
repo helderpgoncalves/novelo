@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:is(.dark *));
+
 @font-face {
   font-family: "Inter";
   src: url("/fonts/inter-latin-standard-normal.woff2") format("woff2");
@@ -13,24 +15,149 @@
   font-display: swap;
 }
 
-/* Identidade Novelo: docs/marca/guia-de-marca.md */
-@theme {
-  --color-linho: #f4f1ea;
-  --color-tinta: #14211d;
-  --color-floresta: #2e6b57;
-  --color-floresta-clara: #7fb39c;
-  --color-pedra: #5e6b66;
+/* Identidade Novelo (docs/marca/guia-de-marca.md) expressa nos tokens do shadcn.
+   Linho #F4F1EA · Tinta #14211D · Floresta #2E6B57 · Pedra #5E6B66 · Areia #C4A06A · Linha #DCD5C8 */
+:root {
+  --radius: 0.625rem;
+  --background: #f4f1ea;
+  --foreground: #14211d;
+  --card: #faf8f3;
+  --card-foreground: #14211d;
+  --popover: #faf8f3;
+  --popover-foreground: #14211d;
+  --primary: #2e6b57;
+  --primary-foreground: #f4f1ea;
+  --secondary: #e9e4d8;
+  --secondary-foreground: #14211d;
+  --muted: #ece7dc;
+  --muted-foreground: #566360;
+  --accent: #e3eae2;
+  --accent-foreground: #14211d;
+  --destructive: #a63d2f;
+  --border: #dcd5c8;
+  --input: #cfc8b9;
+  --ring: #2e6b57;
+  --chart-1: #2e6b57;
+  --chart-2: #7fb39c;
+  --chart-3: #c4a06a;
+  --chart-4: #5e6b66;
+  --chart-5: #14211d;
+  --sidebar: #eeeadf;
+  --sidebar-foreground: #14211d;
+  --sidebar-primary: #2e6b57;
+  --sidebar-primary-foreground: #f4f1ea;
+  --sidebar-accent: #e1e6dd;
+  --sidebar-accent-foreground: #14211d;
+  --sidebar-border: #dcd5c8;
+  --sidebar-ring: #2e6b57;
+}
+
+.dark {
+  --background: #0f1815;
+  --foreground: #f1eee6;
+  --card: #14211d;
+  --card-foreground: #f1eee6;
+  --popover: #14211d;
+  --popover-foreground: #f1eee6;
+  --primary: #7fb39c;
+  --primary-foreground: #0f1815;
+  --secondary: #1c2c26;
+  --secondary-foreground: #f1eee6;
+  --muted: #1a2823;
+  --muted-foreground: #9fb0a9;
+  --accent: #1f322b;
+  --accent-foreground: #f1eee6;
+  --destructive: #e0705f;
+  --border: #26362f;
+  --input: #2e4038;
+  --ring: #7fb39c;
+  --chart-1: #7fb39c;
+  --chart-2: #2e6b57;
+  --chart-3: #c4a06a;
+  --chart-4: #9fb0a9;
+  --chart-5: #f1eee6;
+  --sidebar: #111c18;
+  --sidebar-foreground: #f1eee6;
+  --sidebar-primary: #7fb39c;
+  --sidebar-primary-foreground: #0f1815;
+  --sidebar-accent: #1a2a24;
+  --sidebar-accent-foreground: #f1eee6;
+  --sidebar-border: #26362f;
+  --sidebar-ring: #7fb39c;
+}
+
+@theme inline {
+  --font-sans: "Inter", system-ui, sans-serif;
+  --font-serif: "Newsreader", Georgia, serif;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  /* Areia: só detalhe (fios, traços), nunca texto. */
   --color-areia: #c4a06a;
-  --color-linha: #dcd5c8;
-  --font-titulo: "Newsreader", Georgia, serif;
-  --font-texto: "Inter", system-ui, sans-serif;
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
   body {
-    @apply bg-linho font-texto text-tinta antialiased;
+    @apply bg-background font-sans text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
   }
-  h1, h2, h3 {
-    @apply font-titulo font-medium tracking-tight;
+  h1,
+  h2,
+  h3 {
+    @apply font-serif font-medium tracking-[-0.018em];
+    font-optical-sizing: auto;
   }
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@utility eyebrow {
+  @apply font-semibold text-[11px] text-primary uppercase tracking-[0.18em];
 }

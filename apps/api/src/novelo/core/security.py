@@ -42,9 +42,12 @@ def create_access_token(user_id: uuid.UUID, role: str) -> str:
     return _encode({"sub": str(user_id), "role": role, "type": "access"}, timedelta(minutes=minutes))
 
 
-def create_refresh_token(user_id: uuid.UUID) -> str:
-    days = get_settings().refresh_token_days
-    return _encode({"sub": str(user_id), "type": "refresh"}, timedelta(days=days))
+def create_refresh_token(user_id: uuid.UUID, remember: bool = True) -> str:
+    """`remember` = "manter sessão iniciada": 30 dias; caso contrário a sessão dura 24 horas."""
+    settings = get_settings()
+    days, hours = settings.refresh_token_days, settings.session_token_hours
+    lifetime = timedelta(days=days) if remember else timedelta(hours=hours)
+    return _encode({"sub": str(user_id), "type": "refresh", "remember": remember}, lifetime)
 
 
 def create_state_token(claims: dict[str, Any], minutes: int = 10) -> str:

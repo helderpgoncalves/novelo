@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.security import hash_password
 from novelo.features.users.models import User
-from novelo.features.users.schemas import UserOut
+from novelo.features.users.schemas import UserAdminOut, UserOut
 
 
 def to_out(user: User) -> UserOut:
@@ -15,6 +15,7 @@ def to_out(user: User) -> UserOut:
         role=user.role,
         has_password=user.hashed_password is not None,
         google_linked=user.google_sub is not None,
+        email_verified=user.email_verified,
     )
 
 
@@ -49,3 +50,21 @@ async def create_user(
     db.add(user)
     await db.commit()
     return user
+
+
+def to_admin_out(user: User) -> UserAdminOut:
+    return UserAdminOut(
+        id=user.id,
+        email=user.email,
+        name=user.name,
+        role=user.role,
+        is_active=user.is_active,
+        email_verified=user.email_verified,
+        google_linked=user.google_sub is not None,
+        last_login_at=user.last_login_at,
+        created_at=user.created_at,
+    )
+
+
+async def list_users(db: AsyncSession) -> list[User]:
+    return list((await db.execute(select(User).order_by(User.created_at))).scalars())

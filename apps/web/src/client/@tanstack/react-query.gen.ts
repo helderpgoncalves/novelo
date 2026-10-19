@@ -3,8 +3,8 @@
 import { type DefaultError, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changePassword, forgotPassword, getAuthConfig, getMe, getObservedFlows, getTextileBaseline, health, listCircuits, login, logout, type Options, ready, refresh, register, resetPassword } from '../sdk.gen';
-import type { ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, HealthData, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, LoginData, LoginError, LoginResponse, LogoutData, LogoutError, LogoutResponse, ReadyData, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse } from '../types.gen';
+import { changePassword, forgotPassword, getAuthConfig, getMe, getObservedFlows, getTextileBaseline, getWasteComposition, googleCallback, googleLogin, health, listCircuits, listUsers, login, logout, logoutAll, type Options, ready, refresh, register, resendVerification, resetPassword, updateMe, updateUser, verifyEmail } from '../sdk.gen';
+import type { ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListUsersData, ListUsersError, ListUsersResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, ReadyData, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
 
 /**
  * Change Password
@@ -95,6 +95,42 @@ export const forgotPasswordMutation = (options?: Partial<Options<ForgotPasswordD
     return mutationOptions;
 };
 
+export const googleCallbackQueryKey = (options?: Options<GoogleCallbackData>) => createQueryKey('googleCallback', options);
+
+/**
+ * Google Callback
+ */
+export const googleCallbackOptions = (options?: Options<GoogleCallbackData>) => queryOptions<unknown, GoogleCallbackError, unknown, ReturnType<typeof googleCallbackQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await googleCallback({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: googleCallbackQueryKey(options)
+});
+
+export const googleLoginQueryKey = (options?: Options<GoogleLoginData>) => createQueryKey('googleLogin', options);
+
+/**
+ * Google Login
+ */
+export const googleLoginOptions = (options?: Options<GoogleLoginData>) => queryOptions<unknown, GoogleLoginError, unknown, ReturnType<typeof googleLoginQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await googleLogin({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: googleLoginQueryKey(options)
+});
+
 /**
  * Login
  */
@@ -129,6 +165,25 @@ export const logoutMutation = (options?: Partial<Options<LogoutData>>): UseMutat
     return mutationOptions;
 };
 
+/**
+ * Logout All
+ *
+ * Termina a sessão em todos os dispositivos.
+ */
+export const logoutAllMutation = (options?: Partial<Options<LogoutAllData>>): UseMutationOptions<LogoutAllResponse, LogoutAllError, Options<LogoutAllData>> => {
+    const mutationOptions: UseMutationOptions<LogoutAllResponse, LogoutAllError, Options<LogoutAllData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await logoutAll({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const getMeQueryKey = (options?: Options<GetMeData>) => createQueryKey('getMe', options);
 
 /**
@@ -146,6 +201,23 @@ export const getMeOptions = (options?: Options<GetMeData>) => queryOptions<GetMe
     },
     queryKey: getMeQueryKey(options)
 });
+
+/**
+ * Update Me
+ */
+export const updateMeMutation = (options?: Partial<Options<UpdateMeData>>): UseMutationOptions<UpdateMeResponse, UpdateMeError, Options<UpdateMeData>> => {
+    const mutationOptions: UseMutationOptions<UpdateMeResponse, UpdateMeError, Options<UpdateMeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateMe({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Refresh
@@ -182,12 +254,46 @@ export const registerMutation = (options?: Partial<Options<RegisterData>>): UseM
 };
 
 /**
+ * Resend Verification
+ */
+export const resendVerificationMutation = (options?: Partial<Options<ResendVerificationData>>): UseMutationOptions<ResendVerificationResponse, ResendVerificationError, Options<ResendVerificationData>> => {
+    const mutationOptions: UseMutationOptions<ResendVerificationResponse, ResendVerificationError, Options<ResendVerificationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await resendVerification({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
  * Reset Password
  */
 export const resetPasswordMutation = (options?: Partial<Options<ResetPasswordData>>): UseMutationOptions<ResetPasswordResponse, ResetPasswordError, Options<ResetPasswordData>> => {
     const mutationOptions: UseMutationOptions<ResetPasswordResponse, ResetPasswordError, Options<ResetPasswordData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await resetPassword({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Verify Email
+ */
+export const verifyEmailMutation = (options?: Partial<Options<VerifyEmailData>>): UseMutationOptions<VerifyEmailResponse, VerifyEmailError, Options<VerifyEmailData>> => {
+    const mutationOptions: UseMutationOptions<VerifyEmailResponse, VerifyEmailError, Options<VerifyEmailData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await verifyEmail({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -258,6 +364,26 @@ export const getTextileBaselineOptions = (options?: Options<GetTextileBaselineDa
     queryKey: getTextileBaselineQueryKey(options)
 });
 
+export const getWasteCompositionQueryKey = (options?: Options<GetWasteCompositionData>) => createQueryKey('getWasteComposition', options);
+
+/**
+ * Get Waste Composition
+ *
+ * Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.
+ */
+export const getWasteCompositionOptions = (options?: Options<GetWasteCompositionData>) => queryOptions<GetWasteCompositionResponse, GetWasteCompositionError, GetWasteCompositionResponse, ReturnType<typeof getWasteCompositionQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getWasteComposition({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getWasteCompositionQueryKey(options)
+});
+
 export const healthQueryKey = (options?: Options<HealthData>) => createQueryKey('health', options);
 
 /**
@@ -297,3 +423,42 @@ export const readyOptions = (options?: Options<ReadyData>) => queryOptions<Ready
     },
     queryKey: readyQueryKey(options)
 });
+
+export const listUsersQueryKey = (options?: Options<ListUsersData>) => createQueryKey('listUsers', options);
+
+/**
+ * List Users
+ *
+ * Contas da plataforma (só administradores).
+ */
+export const listUsersOptions = (options?: Options<ListUsersData>) => queryOptions<ListUsersResponse, ListUsersError, ListUsersResponse, ReturnType<typeof listUsersQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listUsers({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listUsersQueryKey(options)
+});
+
+/**
+ * Update User
+ *
+ * Muda o perfil ou ativa/desativa uma conta. Não se pode alterar a própria conta.
+ */
+export const updateUserMutation = (options?: Partial<Options<UpdateUserData>>): UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> => {
+    const mutationOptions: UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};

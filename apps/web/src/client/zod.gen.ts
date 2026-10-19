@@ -108,7 +108,15 @@ export const zHealth = z.object({
  */
 export const zLoginRequest = z.object({
     email: z.email(),
-    password: z.string().min(1).max(128)
+    password: z.string().min(1).max(128),
+    remember_me: z.boolean().optional().default(true)
+});
+
+/**
+ * ProfileUpdate
+ */
+export const zProfileUpdate = z.object({
+    name: z.string().max(120).nullish()
 });
 
 /**
@@ -126,7 +134,8 @@ export const zReadiness = z.object({
 export const zRegisterRequest = z.object({
     email: z.email(),
     name: z.string().max(120).nullish(),
-    password: z.string().max(128)
+    password: z.string().max(128),
+    remember_me: z.boolean().optional().default(true)
 });
 
 /**
@@ -155,11 +164,37 @@ export const zTextileBaseline = z.object({
 });
 
 /**
+ * UserAdminOut
+ *
+ * Visão de administração: inclui estado da conta e último acesso.
+ */
+export const zUserAdminOut = z.object({
+    created_at: z.iso.datetime(),
+    email: z.string(),
+    email_verified: z.boolean(),
+    google_linked: z.boolean(),
+    id: z.uuid(),
+    is_active: z.boolean(),
+    last_login_at: z.iso.datetime().nullable(),
+    name: z.string().nullable(),
+    role: z.enum(['admin', 'operator'])
+});
+
+/**
+ * UserAdminUpdate
+ */
+export const zUserAdminUpdate = z.object({
+    is_active: z.boolean().nullish(),
+    role: z.enum(['admin', 'operator']).nullish()
+});
+
+/**
  * UserOut
  */
 export const zUserOut = z.object({
     avatar_url: z.string().nullable(),
     email: z.string(),
+    email_verified: z.boolean(),
     google_linked: z.boolean(),
     has_password: z.boolean(),
     id: z.uuid(),
@@ -185,6 +220,32 @@ export const zHttpValidationError = z.object({
     detail: z.array(zValidationError).optional()
 });
 
+/**
+ * VerifyEmailRequest
+ */
+export const zVerifyEmailRequest = z.object({
+    token: z.string().min(20).max(200)
+});
+
+/**
+ * WasteShare
+ */
+export const zWasteShare = z.object({
+    category: z.string(),
+    scope: z.string(),
+    share_pct: z.number()
+});
+
+/**
+ * WasteComposition
+ *
+ * Composição dos resíduos urbanos (EEA para a Europa, caracterização nacional para Portugal).
+ */
+export const zWasteComposition = z.object({
+    kg_per_inhab_year_pt: z.number(),
+    shares: z.array(zWasteShare)
+});
+
 export const zChangePasswordBody = zChangePasswordRequest;
 
 /**
@@ -204,6 +265,16 @@ export const zForgotPasswordBody = zForgotPasswordRequest;
  */
 export const zForgotPasswordResponse = z.void();
 
+export const zGoogleCallbackQuery = z.object({
+    code: z.string().nullish(),
+    state: z.string().nullish(),
+    error: z.string().nullish()
+});
+
+export const zGoogleLoginQuery = z.object({
+    next: z.string().optional().default('/')
+});
+
 export const zLoginBody = zLoginRequest;
 
 /**
@@ -219,7 +290,19 @@ export const zLogoutResponse = z.void();
 /**
  * Successful Response
  */
+export const zLogoutAllResponse = z.void();
+
+/**
+ * Successful Response
+ */
 export const zGetMeResponse = zUserOut;
+
+export const zUpdateMeBody = zProfileUpdate;
+
+/**
+ * Successful Response
+ */
+export const zUpdateMeResponse = zUserOut;
 
 /**
  * Successful Response
@@ -233,12 +316,24 @@ export const zRegisterBody = zRegisterRequest;
  */
 export const zRegisterResponse = zUserOut;
 
+/**
+ * Successful Response
+ */
+export const zResendVerificationResponse = z.void();
+
 export const zResetPasswordBody = zResetPasswordRequest;
 
 /**
  * Successful Response
  */
 export const zResetPasswordResponse = z.void();
+
+export const zVerifyEmailBody = zVerifyEmailRequest;
+
+/**
+ * Successful Response
+ */
+export const zVerifyEmailResponse = z.void();
 
 /**
  * Successful Response
@@ -258,9 +353,32 @@ export const zGetTextileBaselineResponse = zTextileBaseline;
 /**
  * Successful Response
  */
+export const zGetWasteCompositionResponse = zWasteComposition;
+
+/**
+ * Successful Response
+ */
 export const zHealthResponse = zHealth;
 
 /**
  * Successful Response
  */
 export const zReadyResponse = zReadiness;
+
+/**
+ * Response List Users
+ *
+ * Successful Response
+ */
+export const zListUsersResponse = z.array(zUserAdminOut);
+
+export const zUpdateUserBody = zUserAdminUpdate;
+
+export const zUpdateUserPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateUserResponse = zUserAdminOut;

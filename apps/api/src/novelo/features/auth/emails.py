@@ -32,13 +32,10 @@ def password_reset(url: str, minutes: int) -> tuple[str, str, str]:
     return subject, _layout("Redefinir a password", body, "Redefinir password", url, footer), text
 
 
-def welcome(url: str, name: str | None) -> tuple[str, str, str]:
-    subject = "Bem-vindo ao Novelo"
+def verify_email(url: str, name: str | None, hours: int) -> tuple[str, str, str]:
+    subject = "Confirma o teu email no Novelo"
     greeting = f"Olá, {escape(name)}. " if name else ""
-    body = (
-        f"{greeting}A tua conta está pronta. "
-        "Já podes explorar o ponto de partida de Guimarães e desenhar cenários de recolha."
-    )
-    footer = "Recolha seletiva de têxteis, desenhada ao menor custo."
-    text = f"{body}\n\nEntrar: {url}\n\n{footer}"
-    return subject, _layout("Bem-vindo ao Novelo", body, "Abrir o Novelo", url, footer), text
+    body = f"{greeting}Falta só confirmar o teu email para ativares a conta. O link é válido durante {hours} horas."
+    footer = "Se não criaste uma conta no Novelo, ignora este email."
+    text = f"{body}\n\nConfirmar email: {url}\n\n{footer}"
+    return subject, _layout("Confirma o teu email", body, "Confirmar email", url, footer), text
