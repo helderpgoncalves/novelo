@@ -4,7 +4,7 @@ import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { OfflineBanner } from '@/components/offline-banner';
-import { PageSkeleton } from '@/components/states';
+import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
@@ -19,7 +19,7 @@ export const Route = createFileRoute('/_app')({
     if (user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
   },
-  pendingComponent: PageSkeleton,
+  pendingComponent: RouteSkeleton,
   component: AppLayout,
 });
 
@@ -42,7 +42,7 @@ function AppLayout() {
         <VerifyEmailBanner user={user} />
         <main id="content" className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-[96rem] px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:px-10 lg:py-8 2xl:px-14">
-            <Suspense fallback={<PageSkeleton />}>
+            <Suspense fallback={<RouteSkeleton />}>
               <Outlet />
             </Suspense>
           </div>

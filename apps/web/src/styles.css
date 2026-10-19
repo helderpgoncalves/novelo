@@ -188,3 +188,31 @@
 @utility eyebrow {
   @apply font-semibold text-[11px] text-primary uppercase tracking-[0.18em];
 }
+
+/* Esqueletos: brilho que percorre o bloco; sem movimento para quem pede menos animação. */
+.skeleton {
+  background-color: var(--accent);
+  background-image: linear-gradient(
+    100deg,
+    transparent 30%,
+    color-mix(in oklab, var(--background) 55%, transparent) 50%,
+    transparent 70%
+  );
+  background-size: 220% 100%;
+  background-repeat: no-repeat;
+  animation: skeleton-shimmer 1.6s ease-in-out infinite;
+}
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 160% 0;
+  }
+  to {
+    background-position: -60% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background-image: none;
+  }
+}
