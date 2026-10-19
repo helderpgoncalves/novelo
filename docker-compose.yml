@@ -22,6 +22,15 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-info}
       - DATABASE_URL=postgresql+asyncpg://novelo:${SERVICE_PASSWORD_POSTGRES}@db:5432/novelo
       - DATA_DIR=/app/data/processed
+      - SECRET_KEY=${SERVICE_PASSWORD_64_SECRETKEY}
+      - APP_URL=https://${DOMAIN:-novelo.bitsapiens.io}
+      - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-true}
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
+      - RESEND_API_KEY=${RESEND_API_KEY:-}
+      - EMAIL_FROM=${EMAIL_FROM:-Novelo <noreply@bitsapiens.io>}
       - CORS_ORIGINS=["https://${DOMAIN:-novelo.bitsapiens.io}"]
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}

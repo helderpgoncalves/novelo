@@ -1,3 +1,5 @@
+import type { GoogleLoginData } from '@/client';
+import { client } from '@/client/client.gen';
 import { Button } from '@/components/ui/button';
 
 function GoogleMark() {
@@ -22,7 +24,11 @@ function GoogleMark() {
 
 // Fluxo completo no servidor: /auth/google/login redireciona para a Google e o callback volta com a sessão.
 export function GoogleButton({ next }: { next?: string }) {
-  const href = `/api/v1/auth/google/login${next ? `?next=${encodeURIComponent(next)}` : ''}`;
+  // URL construído pelo cliente gerado, tipado contra o contrato (nada de strings soltas).
+  const href = client.buildUrl<GoogleLoginData>({
+    url: '/api/v1/auth/google/login',
+    query: { next },
+  });
   return (
     <Button asChild variant="outline" className="h-10 w-full gap-2.5 font-medium">
       <a href={href}>

@@ -4,6 +4,7 @@ import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { PageSkeleton } from '@/components/states';
+import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
@@ -30,9 +31,10 @@ function AppLayout() {
       >
         Saltar para o conteúdo
       </a>
-      <AppSidebar mobileOpen={menuOpen} onMobileOpenChange={setMenuOpen} />
+      <AppSidebar role={user.role} mobileOpen={menuOpen} onMobileOpenChange={setMenuOpen} />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Topbar user={user} onMenuClick={() => setMenuOpen(true)} />
+        <VerifyEmailBanner user={user} />
         <main id="conteudo" className="flex-1 overflow-y-auto">
           <div className="mx-auto w-full max-w-6xl p-4 sm:p-6 lg:p-8">
             <Suspense fallback={<PageSkeleton />}>

@@ -29,6 +29,13 @@ web:
 db:
     docker compose -f docker-compose.dev.yml up -d db
 
+db-wait:
+    docker compose -f docker-compose.dev.yml up -d --wait db
+
+# Logs de um serviço (ex.: just logs api para ver o link de recuperar password em dev)
+logs SERVICE="api":
+    docker compose -f docker-compose.dev.yml logs -f --tail 100 {{SERVICE}}
+
 # --- Contrato e dados ---------------------------------------------------------
 # Regenera openapi.json e o cliente TypeScript (hey-api). Correr sempre que a API mudar.
 gen:
@@ -42,7 +49,7 @@ etl:
 # --- Qualidade: o mesmo que a CI corre ----------------------------------------
 check: check-api check-web check-contract
 
-check-api:
+check-api: db-wait
     cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest -q
 
 check-web:

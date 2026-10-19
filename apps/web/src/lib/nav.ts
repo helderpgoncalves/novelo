@@ -10,11 +10,13 @@ import {
   Route as RouteIcon,
   ScanLine,
   Store,
+  Users,
 } from 'lucide-react';
 
 export interface NavItem {
   label: string;
-  to?: '/' | '/circuitos';
+  to?: '/' | '/circuitos' | '/utilizadores';
+  adminOnly?: boolean;
   icon: LucideIcon;
   soon?: boolean;
 }
@@ -50,5 +52,9 @@ export const NAV: NavSection[] = [
       { label: 'Bolsa de fibra', icon: Store, soon: true },
       { label: 'Relatório RAP', icon: FileText, soon: true },
     ],
+  },
+  {
+    title: 'Administração',
+    items: [{ label: 'Utilizadores', to: '/utilizadores', icon: Users, adminOnly: true }],
   },
 ];
