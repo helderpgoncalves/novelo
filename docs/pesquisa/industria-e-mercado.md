@@ -74,7 +74,7 @@ Também vale perceber a posição das entidades de economia social, que o artigo
 
 | Prioridade | Quem | Pedido | Porquê |
 | --- | --- | --- | --- |
-| 1 | **Lucas Nascimento (Vitrus Ambiente)**, mentor | Custos unitários, depósito, contentores, preços das frações, critérios do júri | Sem isto os €/t são estimativa |
+| 1 | **Lucas Nascimento (Vitrus Ambiente)**, mentor | Custos unitários, depósito, contentores, preços das frações, texto das Regras do hackathon | Sem isto os €/t são estimativa |
 | 2 | **Prof. Paulo Afonso (UMinho, Produção e Sistemas)**: custos, investimento, redes e logística | 15 minutos de revisão da estrutura de custos, do método de avaliação de investimento e do modelo de rede | Credibilidade técnica |
 | 3 | **Luís Miguel Oliveira (Fibrenamics)**, mentor | Critérios de lote pós-consumo, destino da fração de baixo valor, ensaio de lotes | Liga o passaporte à ciência e à indústria |
 | 4 | **Sasia** (Miguel Silva, administrador, citado na imprensa) | Uma frase: "compramos lotes com mais de X% de uma fibra, a Y €/t" | Prova de procura |

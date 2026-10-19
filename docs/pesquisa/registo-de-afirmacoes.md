@@ -2,7 +2,7 @@
 
 **Regra: nenhum número vai para um slide, para a demo ou para o relatório sem uma linha aqui.** Se a linha estiver em "Por verificar", o número não se usa em público; se for "Pressuposto nosso" ou "Cálculo nosso", diz-se com essa palavra.
 
-Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F60 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
+Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F61 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
 
 Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
 
@@ -93,8 +93,10 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | E1 | Semana de trabalho | 19 a 23 out 2026, CIAJG | [F21], [F22] | Secundária | — |
 | E2 | Apresentações e vencedores | 26 out e 28 out | [F21], [F22] | Secundária | — |
 | E3 | Prémios totais | 20 000 € para os cinco desafios | [F21] | Secundária | — |
-| E4 | Critérios do júri | **desconhecidos**: a página da organização não os publica (nem mentores nem duração do pitch); o formulário de inscrição ligado a partir dela não foi aberto | [F59] | Por verificar: perguntar à organização | — |
-| E5 | Duração do pitch | **desconhecida**; assumimos 5 minutos | — | Pressuposto | — |
+| E4 | Os projetos são avaliados por **4 critérios ponderados**: inovação e originalidade **25%**, viabilidade técnica **25%**, impacto e relevância **30%**, apresentação e potencial de continuidade **20%** (soma 100%) | 25 / 25 / 30 / 20 | Página oficial do Hack4Guimarães 2035, FAQ "Como são avaliados os projetos?" [F61]; texto colado pelo utilizador a 2026-10-19 | **Primária** (verificado). Ver [Critérios de avaliação](../projeto/criterios-de-avaliacao.md) | todos |
+| E5 | Duração do pitch | **desconhecida**; assumimos 5 minutos (repartidos pelos 4 critérios na [narrativa](../projeto/narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios)) | — | Pressuposto | — |
+| E6 | O **detalhe de cada critério** (o que conta como inovação, viabilidade, impacto e continuidade) | **por obter**: está na secção "Regras" da página oficial, que ainda não lemos | [F61] | **Por verificar**: colar o texto das Regras em [Critérios de avaliação](../projeto/criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras). Até lá, a leitura de cada critério é **hipótese** | — |
+| E7 | Composição do júri, formato do pitch e das perguntas e respostas, e se a demo ao vivo é permitida | **desconhecidos** | [F59], [F61] não os indicam | **Por verificar**: perguntar à organização e ao Lucas ([pergunta comum](../projeto/mentores.md#pergunta-comum-às-regras-e-ao-formato)) | — |
 
 ## F. Mentores, Fibrenamics e hackathon
 
@@ -117,7 +119,7 @@ Referências F41 a F60 em [Fontes](fontes.md#mentores-fibrenamics-e-hackathon). 
 | M13 | Guimarães e a Vitrus ganharam um lugar no Horizon Europe (periASTY, missão de cidades neutras em carbono) | 1.º de 3 | [F58] | Secundária; não é de resíduos | Não usar |
 | M14 | A campanha nas escolas recolheu cerca de 3 t em mais de 30 escolas, destino To Be Green | 3 t; 30 | [F57], [F19] | Secundária | Conversa |
 | M15 | Paulo Afonso, do Departamento de Produção e Sistemas, é investigador em custos, avaliação de investimentos, modelos de negócio e logística (SLOTS) | — | [F54], [F55] | Primária (instituição); **é o mentor do desafio por inferência** | Perfil |
-| M16 | Hack4Guimarães: critérios do júri, mentores e duração do pitch | **não públicos** | [F59] | Por verificar: formulário de inscrição e organização | Perguntar |
+| M16 | Hack4Guimarães: mentores e duração do pitch | **não públicos** (os critérios e pesos são públicos: ver E4) | [F59], [F61] | Por verificar: Regras, formulário de inscrição e organização | Perguntar |
 | M17 | Hack4Guimarães: formato híbrido, propriedade intelectual dos autores | — | [F59] | Primária | Cenários pós-hackathon |
 
 ## Como atualizar este registo
