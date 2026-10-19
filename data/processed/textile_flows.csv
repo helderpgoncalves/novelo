@@ -1,0 +1,13 @@
+entity,year,destination,tonnes,method,provenance
+H Sarah Trading,2025,reuse,59.316,weighed,Ficheiro 'Sarah Trading Destinos' (kg exatos por mês e por destino).
+H Sarah Trading,2025,recycle,43.8938,weighed,Ficheiro 'Sarah Trading Destinos' (kg exatos por mês e por destino).
+H Sarah Trading,2025,reject,15.4222,weighed,Ficheiro 'Sarah Trading Destinos' (kg exatos por mês e por destino).
+Nova Etapa,2025,reuse,21.4415,percentage,"Percentagens do relatório 'nova etapa Recolha Têxtil' (Reutilização 50%, Reciclagem 40%, Aterro 10%) aplicadas ao total pesado (RU_2025)."
+Nova Etapa,2025,recycle,17.1532,percentage,"Percentagens do relatório 'nova etapa Recolha Têxtil' (Reutilização 50%, Reciclagem 40%, Aterro 10%) aplicadas ao total pesado (RU_2025)."
+Nova Etapa,2025,reject,4.2883,percentage,"Percentagens do relatório 'nova etapa Recolha Têxtil' (Reutilização 50%, Reciclagem 40%, Aterro 10%) aplicadas ao total pesado (RU_2025)."
+Ultriplo,2025,reuse,97.7223,weighed,"Relatório operacional Ultriplo 2025 (kg exatos por destino: Reutilização, Reciclagem, Aterro)."
+Ultriplo,2025,recycle,16.9775,weighed,"Relatório operacional Ultriplo 2025 (kg exatos por destino: Reutilização, Reciclagem, Aterro)."
+Ultriplo,2025,reject,19.4303,weighed,"Relatório operacional Ultriplo 2025 (kg exatos por destino: Reutilização, Reciclagem, Aterro)."
+Vitrus,2025,reuse,0.515,percentage,"Percentagens do relatório 'To Be Green' (DOAR 9,16% ; outros lotes de reciclagem 33,96% ; LIXO+DESPERDÍCIOS 56,88%) aplicadas ao total pesado (RU_2025)."
+Vitrus,2025,recycle,1.909,percentage,"Percentagens do relatório 'To Be Green' (DOAR 9,16% ; outros lotes de reciclagem 33,96% ; LIXO+DESPERDÍCIOS 56,88%) aplicadas ao total pesado (RU_2025)."
+Vitrus,2025,reject,3.197,percentage,"Percentagens do relatório 'To Be Green' (DOAR 9,16% ; outros lotes de reciclagem 33,96% ; LIXO+DESPERDÍCIOS 56,88%) aplicadas ao total pesado (RU_2025)."

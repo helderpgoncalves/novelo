@@ -1,0 +1,24 @@
+[
+  {
+    "key": "vitrus_textile_2025",
+    "title": "Têxteis recolhidos em 2025 e composição dos RSU",
+    "provider": "Vitrus Ambiente",
+    "file_name": "dados_textil.xlsx",
+    "file_sha256": "336a8f1599d00af54b48ec0720fa548a5e5c07c5429aa06c63981ac26738ac5a",
+    "received_on": "2026-10-19",
+    "period_start": "2025-01-01",
+    "period_end": "2025-12-31",
+    "notes": "Sarah Trading e Ultriplo com kg exatos por destino; Nova Etapa e Vitrus com percentagens de relatórios."
+  },
+  {
+    "key": "vitrus_circuits_2026_09",
+    "title": "Circuitos, viaturas e turnos de recolha",
+    "provider": "Vitrus Ambiente",
+    "file_name": "Circuitos_Viaturas_Guimaraes.xlsx",
+    "file_sha256": "b522e73a015ddb4928c188c025cb506be8acdfb7efd8d7c93cb9b46a010d6234",
+    "received_on": "2026-10-19",
+    "period_start": "2026-09-19",
+    "period_end": "2026-09-25",
+    "notes": "Semana de 21 a 25/09/2026, sábado 19/09 e domingo 20/09 (fim de semana anterior)."
+  }
+]

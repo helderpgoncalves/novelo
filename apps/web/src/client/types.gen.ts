@@ -5,6 +5,27 @@ export type ClientOptions = {
 };
 
 /**
+ * AlertKind
+ */
+export type AlertKind = 'circuit_without_vehicle' | 'vehicle_code' | 'unknown_circuit' | 'incomplete_circuit' | 'duplicate_vehicle' | 'possible_plate_error' | 'multi_typology_vehicle' | 'vehicle_without_circuit' | 'undocumented_circuits' | 'different_dates' | 'normalized_spelling';
+
+/**
+ * AlertStatus
+ */
+export type AlertStatus = 'open' | 'resolved' | 'wont_fix';
+
+/**
+ * AlertUpdate
+ */
+export type AlertUpdate = {
+    /**
+     * Resolution Note
+     */
+    resolution_note?: string | null;
+    status: AlertStatus;
+};
+
+/**
  * AuthConfig
  */
 export type AuthConfig = {
@@ -37,21 +58,20 @@ export type ChangePasswordRequest = {
 };
 
 /**
- * Circuit
+ * CircuitOut
  */
-export type Circuit = {
+export type CircuitOut = {
     /**
-     * Circuit
+     * Code
      */
-    circuit: string;
+    code: string;
+    collection_type: CollectionType;
     /**
-     * Collection Type
+     * Days Text
+     *
+     * Dias como escritos no planeamento da Vitrus
      */
-    collection_type: string;
-    /**
-     * Days
-     */
-    days: string;
+    days_text: string;
     /**
      * Localities
      */
@@ -59,16 +79,27 @@ export type Circuit = {
     /**
      * Note
      */
-    note: string;
+    note: string | null;
+    status: CircuitStatus;
+    typology: Typology;
     /**
-     * Status
+     * Vehicles
+     *
+     * Matrículas das viaturas que o servem no planeamento
      */
-    status: string;
+    vehicles: Array<string>;
     /**
-     * Typology
+     * Weekdays
+     *
+     * Dias em que passa: 1 = segunda ... 7 = domingo
      */
-    typology: string;
+    weekdays: Array<number>;
 };
+
+/**
+ * CircuitStatus
+ */
+export type CircuitStatus = 'ok' | 'no_vehicle' | 'weekend_only' | 'unassigned';
 
 /**
  * CircuitsSummary
@@ -77,11 +108,11 @@ export type CircuitsSummary = {
     /**
      * Circuits
      */
-    circuits: Array<Circuit>;
+    circuits: Array<CircuitOut>;
     /**
      * Localities
      */
-    localities: Array<string>;
+    localities: number;
     /**
      * Total
      */
@@ -101,9 +132,181 @@ export type CircuitsSummary = {
 };
 
 /**
+ * CollectionType
+ */
+export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
+
+/**
+ * ContainerKind
+ */
+export type ContainerKind = 'textile' | 'undifferentiated' | 'organic' | 'recyclable' | 'other';
+
+/**
+ * ContainerList
+ */
+export type ContainerList = {
+    /**
+     * Items
+     */
+    items: Array<ContainerOut>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * ContainerOut
+ */
+export type ContainerOut = {
+    /**
+     * Address
+     */
+    address: string | null;
+    /**
+     * Capacity Litres
+     */
+    capacity_litres: number | null;
+    /**
+     * External Ref
+     */
+    external_ref: string;
+    /**
+     * Id
+     */
+    id: string;
+    kind: ContainerKind;
+    /**
+     * Latitude
+     */
+    latitude: string;
+    /**
+     * Locality
+     */
+    locality: string | null;
+    /**
+     * Longitude
+     */
+    longitude: string;
+    status: ContainerStatus;
+};
+
+/**
+ * ContainerStatus
+ */
+export type ContainerStatus = 'active' | 'inactive' | 'planned';
+
+/**
+ * DataAlertOut
+ */
+export type DataAlertOut = {
+    /**
+     * Detail
+     *
+     * Texto original da Vitrus (em português)
+     */
+    detail: string;
+    /**
+     * Id
+     */
+    id: string;
+    kind: AlertKind;
+    /**
+     * Number
+     */
+    number: number;
+    /**
+     * Resolution Note
+     */
+    resolution_note: string | null;
+    /**
+     * Resolved At
+     */
+    resolved_at: string | null;
+    /**
+     * Source Key
+     */
+    source_key: string;
+    status: AlertStatus;
+    /**
+     * Suggestion
+     */
+    suggestion: string;
+};
+
+/**
+ * DataQuality
+ */
+export type DataQuality = {
+    /**
+     * Alerts
+     */
+    alerts: Array<DataAlertOut>;
+    /**
+     * Open Alerts
+     */
+    open_alerts: number;
+    /**
+     * Sources
+     */
+    sources: Array<DataSourceOut>;
+};
+
+/**
+ * DataSourceOut
+ */
+export type DataSourceOut = {
+    /**
+     * File Name
+     */
+    file_name: string;
+    /**
+     * File Sha256
+     */
+    file_sha256: string;
+    /**
+     * Imported At
+     */
+    imported_at: string;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Notes
+     */
+    notes: string | null;
+    /**
+     * Period End
+     */
+    period_end: string | null;
+    /**
+     * Period Start
+     */
+    period_start: string | null;
+    /**
+     * Provider
+     */
+    provider: string;
+    /**
+     * Received On
+     */
+    received_on: string | null;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * DayGroup
+ */
+export type DayGroup = 'weekday' | 'saturday' | 'sunday';
+
+/**
  * EntityBaseline
  *
- * Têxtil recolhido por uma entidade em 2025 e destino final (toneladas).
+ * Têxtil recolhido por uma entidade num ano e o destino final (toneladas).
  */
 export type EntityBaseline = {
     /**
@@ -111,11 +314,15 @@ export type EntityBaseline = {
      */
     entity: string;
     /**
-     * Exact Weights
-     *
-     * False se o destino vem de percentagens do relatório
+     * `weighed`: kg exatos por destino; `percentage`: percentagens do relatório
      */
-    exact_weights: boolean;
+    method: WeighingMethod;
+    /**
+     * Provenance
+     *
+     * De onde vem o dado (ficheiro ou relatório de origem)
+     */
+    provenance: string | null;
     /**
      * Recycle Pct
      */
@@ -140,10 +347,6 @@ export type EntityBaseline = {
      * Reuse T
      */
     reuse_t: number;
-    /**
-     * Source
-     */
-    source: string;
     /**
      * Total T
      */
@@ -191,6 +394,36 @@ export type FieldError = {
 };
 
 /**
+ * FleetSummary
+ */
+export type FleetSummary = {
+    /**
+     * Period End
+     */
+    period_end: string | null;
+    /**
+     * Period Start
+     */
+    period_start: string | null;
+    /**
+     * Total Assignments
+     */
+    total_assignments: number;
+    /**
+     * Total Crew Shifts Week
+     */
+    total_crew_shifts_week: number;
+    /**
+     * Typologies
+     */
+    typologies: Array<TypologyFleet>;
+    /**
+     * Vehicles
+     */
+    vehicles: Array<VehicleOut>;
+};
+
+/**
  * FlowLink
  */
 export type FlowLink = {
@@ -217,13 +450,19 @@ export type FlowNode = {
      */
     column: number;
     /**
+     * Preenchido nos nós de destino
+     */
+    destination?: TextileDestination | null;
+    /**
      * Id
      */
     id: string;
     /**
      * Label
+     *
+     * Nome da entidade; vazio nos nós de destino (o web traduz)
      */
-    label: string;
+    label?: string | null;
 };
 
 /**
@@ -266,6 +505,38 @@ export type Health = {
      * Status
      */
     status?: 'ok';
+};
+
+/**
+ * LocalityOut
+ */
+export type LocalityOut = {
+    /**
+     * Circuits
+     */
+    circuits: Array<string>;
+    /**
+     * Collection Types
+     */
+    collection_types: Array<CollectionType>;
+    /**
+     * Days Per Week
+     *
+     * Dias distintos da semana com algum circuito a passar
+     */
+    days_per_week: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Typologies
+     */
+    typologies: Array<Typology>;
+    /**
+     * Weekdays
+     */
+    weekdays: Array<number>;
 };
 
 /**
@@ -359,6 +630,46 @@ export type ResetPasswordRequest = {
 };
 
 /**
+ * ScheduleEntry
+ */
+export type ScheduleEntry = {
+    /**
+     * Circuit
+     */
+    circuit: string;
+    /**
+     * Crew
+     */
+    crew: number;
+    day_group: DayGroup;
+    shift: Shift;
+    typology: Typology;
+};
+
+/**
+ * Shift
+ */
+export type Shift = 'morning' | 'afternoon' | 'night';
+
+/**
+ * SlotCount
+ */
+export type SlotCount = {
+    /**
+     * Assignments
+     *
+     * Linhas do planeamento (viatura + circuito) neste turno
+     */
+    assignments: number;
+    /**
+     * Crew
+     */
+    crew: number;
+    day_group: DayGroup;
+    shift: Shift;
+};
+
+/**
  * TextileBaseline
  */
 export type TextileBaseline = {
@@ -383,7 +694,7 @@ export type TextileBaseline = {
     /**
      * Kg Per Inhab Month
      *
-     * Observado: toneladas recolhidas por habitante
+     * Observado: toneladas recolhidas por habitante e mês
      */
     kg_per_inhab_month: number;
     /**
@@ -409,7 +720,58 @@ export type TextileBaseline = {
     /**
      * Year
      */
-    year?: number;
+    year: number;
+};
+
+/**
+ * TextileDestination
+ */
+export type TextileDestination = 'reuse' | 'recycle' | 'reject';
+
+/**
+ * Typology
+ *
+ * Tipologia de resíduo do circuito (folha "Resumo").
+ */
+export type Typology = 'organic' | 'undifferentiated' | 'recyclable' | 'bulky' | 'payt' | 'support' | 'to_confirm' | 'unassigned';
+
+/**
+ * TypologyFleet
+ */
+export type TypologyFleet = {
+    /**
+     * Circuits
+     */
+    circuits: number;
+    /**
+     * Circuits Without Vehicle
+     */
+    circuits_without_vehicle: number;
+    /**
+     * Crew Shifts Week
+     */
+    crew_shifts_week: number;
+    /**
+     * Fleet Crew
+     *
+     * Recursos humanos totais para esta tipologia, se fornecido
+     */
+    fleet_crew: number | null;
+    /**
+     * Fleet Vehicles
+     *
+     * Viaturas totais da frota para esta tipologia, se fornecido
+     */
+    fleet_vehicles: number | null;
+    /**
+     * Slots
+     */
+    slots: Array<SlotCount>;
+    typology: Typology;
+    /**
+     * Vehicle Shifts Week
+     */
+    vehicle_shifts_week: number;
 };
 
 /**
@@ -531,6 +893,58 @@ export type ValidationErrorBody = {
 };
 
 /**
+ * VehicleOut
+ */
+export type VehicleOut = {
+    /**
+     * Assignments
+     */
+    assignments: number;
+    /**
+     * Circuits
+     */
+    circuits: Array<string>;
+    /**
+     * Max Crew
+     */
+    max_crew: number;
+    /**
+     * Multi Typology
+     *
+     * Serve mais do que uma tipologia (exige lavagem da caixa entre fluxos)
+     */
+    multi_typology: boolean;
+    /**
+     * Never Assigned
+     *
+     * Aparece no planeamento mas nunca com um circuito
+     */
+    never_assigned: boolean;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Plate
+     */
+    plate: string;
+    /**
+     * Schedule
+     */
+    schedule: Array<ScheduleEntry>;
+    /**
+     * Typologies
+     */
+    typologies: Array<Typology>;
+    /**
+     * Weekday Shifts
+     *
+     * Turnos distintos usados de segunda a sexta
+     */
+    weekday_shifts: number;
+};
+
+/**
  * VerifyEmailRequest
  */
 export type VerifyEmailRequest = {
@@ -539,6 +953,11 @@ export type VerifyEmailRequest = {
      */
     token: string;
 };
+
+/**
+ * WasteCategory
+ */
+export type WasteCategory = 'biowaste' | 'undifferentiated' | 'paper' | 'plastic' | 'glass' | 'wood' | 'metals' | 'others' | 'composites' | 'textiles' | 'sanitary_textiles' | 'bulky';
 
 /**
  * WasteComposition
@@ -555,28 +974,30 @@ export type WasteComposition = {
     /**
      * Shares
      */
-    shares: Array<WasteShare>;
+    shares: Array<WasteShareOut>;
 };
 
 /**
- * WasteShare
+ * WasteScope
  */
-export type WasteShare = {
-    /**
-     * Category
-     */
-    category: string;
-    /**
-     * Scope
-     *
-     * Europa ou Portugal
-     */
-    scope: string;
+export type WasteScope = 'europe' | 'portugal';
+
+/**
+ * WasteShareOut
+ */
+export type WasteShareOut = {
+    category: WasteCategory;
+    scope: WasteScope;
     /**
      * Share Pct
      */
     share_pct: number;
 };
+
+/**
+ * WeighingMethod
+ */
+export type WeighingMethod = 'weighed' | 'percentage';
 
 export type ChangePasswordData = {
     body: ChangePasswordRequest;
@@ -1501,14 +1922,19 @@ export type VerifyEmailResponses = {
 
 export type VerifyEmailResponse = VerifyEmailResponses[keyof VerifyEmailResponses];
 
-export type ListCircuitsData = {
-    body?: never;
-    path?: never;
+export type UpdateDataAlertData = {
+    body: AlertUpdate;
+    path: {
+        /**
+         * Alert Id
+         */
+        alert_id: string;
+    };
     query?: never;
-    url: '/api/v1/baseline/circuits';
+    url: '/api/v1/datasets/alerts/{alert_id}';
 };
 
-export type ListCircuitsErrors = {
+export type UpdateDataAlertErrors = {
     /**
      * Pedido inválido
      */
@@ -1551,25 +1977,25 @@ export type ListCircuitsErrors = {
     503: ErrorBody;
 };
 
-export type ListCircuitsError = ListCircuitsErrors[keyof ListCircuitsErrors];
+export type UpdateDataAlertError = UpdateDataAlertErrors[keyof UpdateDataAlertErrors];
 
-export type ListCircuitsResponses = {
+export type UpdateDataAlertResponses = {
     /**
      * Successful Response
      */
-    200: CircuitsSummary;
+    200: DataAlertOut;
 };
 
-export type ListCircuitsResponse = ListCircuitsResponses[keyof ListCircuitsResponses];
+export type UpdateDataAlertResponse = UpdateDataAlertResponses[keyof UpdateDataAlertResponses];
 
-export type GetObservedFlowsData = {
+export type GetDataQualityData = {
     body?: never;
     path?: never;
     query?: never;
-    url: '/api/v1/baseline/flows';
+    url: '/api/v1/datasets/quality';
 };
 
-export type GetObservedFlowsErrors = {
+export type GetDataQualityErrors = {
     /**
      * Pedido inválido
      */
@@ -1612,138 +2038,16 @@ export type GetObservedFlowsErrors = {
     503: ErrorBody;
 };
 
-export type GetObservedFlowsError = GetObservedFlowsErrors[keyof GetObservedFlowsErrors];
+export type GetDataQualityError = GetDataQualityErrors[keyof GetDataQualityErrors];
 
-export type GetObservedFlowsResponses = {
+export type GetDataQualityResponses = {
     /**
      * Successful Response
      */
-    200: Flows;
+    200: DataQuality;
 };
 
-export type GetObservedFlowsResponse = GetObservedFlowsResponses[keyof GetObservedFlowsResponses];
-
-export type GetTextileBaselineData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/baseline/textile';
-};
-
-export type GetTextileBaselineErrors = {
-    /**
-     * Pedido inválido
-     */
-    400: ErrorBody;
-    /**
-     * Sem sessão ou credenciais inválidas
-     */
-    401: ErrorBody;
-    /**
-     * Sem permissão
-     */
-    403: ErrorBody;
-    /**
-     * Não encontrado
-     */
-    404: ErrorBody;
-    /**
-     * Conflito
-     */
-    409: ErrorBody;
-    /**
-     * Dados inválidos
-     */
-    422: ValidationErrorBody;
-    /**
-     * Demasiados pedidos
-     */
-    429: ErrorBody;
-    /**
-     * Erro interno
-     */
-    500: ErrorBody;
-    /**
-     * Falha num serviço externo
-     */
-    502: ErrorBody;
-    /**
-     * Funcionalidade indisponível
-     */
-    503: ErrorBody;
-};
-
-export type GetTextileBaselineError = GetTextileBaselineErrors[keyof GetTextileBaselineErrors];
-
-export type GetTextileBaselineResponses = {
-    /**
-     * Successful Response
-     */
-    200: TextileBaseline;
-};
-
-export type GetTextileBaselineResponse = GetTextileBaselineResponses[keyof GetTextileBaselineResponses];
-
-export type GetWasteCompositionData = {
-    body?: never;
-    path?: never;
-    query?: never;
-    url: '/api/v1/baseline/waste';
-};
-
-export type GetWasteCompositionErrors = {
-    /**
-     * Pedido inválido
-     */
-    400: ErrorBody;
-    /**
-     * Sem sessão ou credenciais inválidas
-     */
-    401: ErrorBody;
-    /**
-     * Sem permissão
-     */
-    403: ErrorBody;
-    /**
-     * Não encontrado
-     */
-    404: ErrorBody;
-    /**
-     * Conflito
-     */
-    409: ErrorBody;
-    /**
-     * Dados inválidos
-     */
-    422: ValidationErrorBody;
-    /**
-     * Demasiados pedidos
-     */
-    429: ErrorBody;
-    /**
-     * Erro interno
-     */
-    500: ErrorBody;
-    /**
-     * Falha num serviço externo
-     */
-    502: ErrorBody;
-    /**
-     * Funcionalidade indisponível
-     */
-    503: ErrorBody;
-};
-
-export type GetWasteCompositionError = GetWasteCompositionErrors[keyof GetWasteCompositionErrors];
-
-export type GetWasteCompositionResponses = {
-    /**
-     * Successful Response
-     */
-    200: WasteComposition;
-};
-
-export type GetWasteCompositionResponse = GetWasteCompositionResponses[keyof GetWasteCompositionResponses];
+export type GetDataQualityResponse = GetDataQualityResponses[keyof GetDataQualityResponses];
 
 export type HealthData = {
     body?: never;
@@ -1806,6 +2110,261 @@ export type HealthResponses = {
 
 export type HealthResponse = HealthResponses[keyof HealthResponses];
 
+export type ListCircuitsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/network/circuits';
+};
+
+export type ListCircuitsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCircuitsError = ListCircuitsErrors[keyof ListCircuitsErrors];
+
+export type ListCircuitsResponses = {
+    /**
+     * Successful Response
+     */
+    200: CircuitsSummary;
+};
+
+export type ListCircuitsResponse = ListCircuitsResponses[keyof ListCircuitsResponses];
+
+export type ListContainersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/network/containers';
+};
+
+export type ListContainersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListContainersError = ListContainersErrors[keyof ListContainersErrors];
+
+export type ListContainersResponses = {
+    /**
+     * Successful Response
+     */
+    200: ContainerList;
+};
+
+export type ListContainersResponse = ListContainersResponses[keyof ListContainersResponses];
+
+export type GetFleetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/network/fleet';
+};
+
+export type GetFleetErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetFleetError = GetFleetErrors[keyof GetFleetErrors];
+
+export type GetFleetResponses = {
+    /**
+     * Successful Response
+     */
+    200: FleetSummary;
+};
+
+export type GetFleetResponse = GetFleetResponses[keyof GetFleetResponses];
+
+export type ListLocalitiesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/network/localities';
+};
+
+export type ListLocalitiesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLocalitiesError = ListLocalitiesErrors[keyof ListLocalitiesErrors];
+
+export type ListLocalitiesResponses = {
+    /**
+     * Response List Localities
+     *
+     * Successful Response
+     */
+    200: Array<LocalityOut>;
+};
+
+export type ListLocalitiesResponse = ListLocalitiesResponses[keyof ListLocalitiesResponses];
+
 export type ReadyData = {
     body?: never;
     path?: never;
@@ -1866,6 +2425,189 @@ export type ReadyResponses = {
 };
 
 export type ReadyResponse = ReadyResponses[keyof ReadyResponses];
+
+export type GetTextileBaselineData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/textile/baseline';
+};
+
+export type GetTextileBaselineErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetTextileBaselineError = GetTextileBaselineErrors[keyof GetTextileBaselineErrors];
+
+export type GetTextileBaselineResponses = {
+    /**
+     * Successful Response
+     */
+    200: TextileBaseline;
+};
+
+export type GetTextileBaselineResponse = GetTextileBaselineResponses[keyof GetTextileBaselineResponses];
+
+export type GetObservedFlowsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/textile/flows';
+};
+
+export type GetObservedFlowsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetObservedFlowsError = GetObservedFlowsErrors[keyof GetObservedFlowsErrors];
+
+export type GetObservedFlowsResponses = {
+    /**
+     * Successful Response
+     */
+    200: Flows;
+};
+
+export type GetObservedFlowsResponse = GetObservedFlowsResponses[keyof GetObservedFlowsResponses];
+
+export type GetWasteCompositionData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/textile/waste';
+};
+
+export type GetWasteCompositionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetWasteCompositionError = GetWasteCompositionErrors[keyof GetWasteCompositionErrors];
+
+export type GetWasteCompositionResponses = {
+    /**
+     * Successful Response
+     */
+    200: WasteComposition;
+};
+
+export type GetWasteCompositionResponse = GetWasteCompositionResponses[keyof GetWasteCompositionResponses];
 
 export type ListUsersData = {
     body?: never;

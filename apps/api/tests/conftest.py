@@ -1,5 +1,6 @@
 """Fixtures partilhadas. Os testes de API usam um Postgres real (DATABASE_URL de teste)."""
 
+import asyncio
 import os
 from collections.abc import AsyncGenerator, Iterator
 
@@ -9,12 +10,25 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from novelo.adapters.email import get_email_sender
+from novelo.core.config import get_settings
 from novelo.core.database import Base, get_db
 from novelo.core.ratelimit import auth_limiter, reset_limiter
 from novelo.features.auth import models as _auth_models  # noqa: F401
+from novelo.features.datasets import models as _dataset_models  # noqa: F401
+from novelo.features.network import models as _network_models  # noqa: F401
 from novelo.features.scenarios import models as _scenario_models  # noqa: F401
+from novelo.features.textile import models as _textile_models  # noqa: F401
 from novelo.features.users import models as _user_models  # noqa: F401
 from novelo.main import create_app
+from novelo.seed import seed
+
+
+async def _seed_reference_data() -> None:
+    engine = create_async_engine(TEST_DB)
+    async with async_sessionmaker(engine, expire_on_commit=False)() as db:
+        await seed(db, get_settings().data_dir)
+    await engine.dispose()
+
 
 TEST_DB = os.environ.get("TEST_DATABASE_URL", "postgresql+asyncpg://novelo:novelo@localhost:5590/novelo_test")
 
@@ -44,6 +58,7 @@ def _database() -> Iterator[None]:
         return
     sync = create_engine(TEST_DB.replace("+asyncpg", "+psycopg2"))
     Base.metadata.create_all(sync)
+    asyncio.run(_seed_reference_data())
     yield
 
 

@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListUsersData, ListUsersErrors, ListUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyErrors, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListUsersData, ListUsersErrors, ListUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyErrors, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -149,32 +149,25 @@ export const verifyEmail = <ThrowOnError extends boolean = false>(options: Optio
 });
 
 /**
- * List Circuits
+ * Update Data Alert
  *
- * Circuitos e viaturas de recolha atuais da Vitrus (base para a recolha a pedido).
+ * Marca uma inconsistência como resolvida, ignorada ou volta a abri-la.
  */
-export const listCircuits = <ThrowOnError extends boolean = false>(options?: Options<ListCircuitsData, ThrowOnError>): RequestResult<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError> => (options?.client ?? client).get<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError>({ url: '/api/v1/baseline/circuits', ...options });
+export const updateDataAlert = <ThrowOnError extends boolean = false>(options: Options<UpdateDataAlertData, ThrowOnError>): RequestResult<UpdateDataAlertResponses, UpdateDataAlertErrors, ThrowOnError> => (options.client ?? client).patch<UpdateDataAlertResponses, UpdateDataAlertErrors, ThrowOnError>({
+    url: '/api/v1/datasets/alerts/{alert_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
- * Get Observed Flows
+ * Get Data Quality
  *
- * Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).
+ * Fontes de dados recebidas (com proveniência) e inconsistências a confirmar com a Vitrus.
  */
-export const getObservedFlows = <ThrowOnError extends boolean = false>(options?: Options<GetObservedFlowsData, ThrowOnError>): RequestResult<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError> => (options?.client ?? client).get<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError>({ url: '/api/v1/baseline/flows', ...options });
-
-/**
- * Get Textile Baseline
- *
- * Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.
- */
-export const getTextileBaseline = <ThrowOnError extends boolean = false>(options?: Options<GetTextileBaselineData, ThrowOnError>): RequestResult<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError> => (options?.client ?? client).get<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError>({ url: '/api/v1/baseline/textile', ...options });
-
-/**
- * Get Waste Composition
- *
- * Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.
- */
-export const getWasteComposition = <ThrowOnError extends boolean = false>(options?: Options<GetWasteCompositionData, ThrowOnError>): RequestResult<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError> => (options?.client ?? client).get<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError>({ url: '/api/v1/baseline/waste', ...options });
+export const getDataQuality = <ThrowOnError extends boolean = false>(options?: Options<GetDataQualityData, ThrowOnError>): RequestResult<GetDataQualityResponses, GetDataQualityErrors, ThrowOnError> => (options?.client ?? client).get<GetDataQualityResponses, GetDataQualityErrors, ThrowOnError>({ url: '/api/v1/datasets/quality', ...options });
 
 /**
  * Health
@@ -184,11 +177,60 @@ export const getWasteComposition = <ThrowOnError extends boolean = false>(option
 export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, HealthErrors, ThrowOnError> => (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({ url: '/api/v1/health', ...options });
 
 /**
+ * List Circuits
+ *
+ * Circuitos de recolha atuais da Vitrus, com localidades, dias e viaturas.
+ */
+export const listCircuits = <ThrowOnError extends boolean = false>(options?: Options<ListCircuitsData, ThrowOnError>): RequestResult<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError> => (options?.client ?? client).get<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError>({ url: '/api/v1/network/circuits', ...options });
+
+/**
+ * List Containers
+ *
+ * Contentores georreferenciados (vazio até chegarem as localizações).
+ */
+export const listContainers = <ThrowOnError extends boolean = false>(options?: Options<ListContainersData, ThrowOnError>): RequestResult<ListContainersResponses, ListContainersErrors, ThrowOnError> => (options?.client ?? client).get<ListContainersResponses, ListContainersErrors, ThrowOnError>({ url: '/api/v1/network/containers', ...options });
+
+/**
+ * Get Fleet
+ *
+ * Frota e turnos: ocupação por tipologia e turno, e o horário de cada viatura.
+ */
+export const getFleet = <ThrowOnError extends boolean = false>(options?: Options<GetFleetData, ThrowOnError>): RequestResult<GetFleetResponses, GetFleetErrors, ThrowOnError> => (options?.client ?? client).get<GetFleetResponses, GetFleetErrors, ThrowOnError>({ url: '/api/v1/network/fleet', ...options });
+
+/**
+ * List Localities
+ *
+ * Cobertura por localidade: que circuitos passam e em que dias (base da recolha a pedido).
+ */
+export const listLocalities = <ThrowOnError extends boolean = false>(options?: Options<ListLocalitiesData, ThrowOnError>): RequestResult<ListLocalitiesResponses, ListLocalitiesErrors, ThrowOnError> => (options?.client ?? client).get<ListLocalitiesResponses, ListLocalitiesErrors, ThrowOnError>({ url: '/api/v1/network/localities', ...options });
+
+/**
  * Ready
  *
  * Readiness: a base de dados responde e diz se a IA está ligada.
  */
 export const ready = <ThrowOnError extends boolean = false>(options?: Options<ReadyData, ThrowOnError>): RequestResult<ReadyResponses, ReadyErrors, ThrowOnError> => (options?.client ?? client).get<ReadyResponses, ReadyErrors, ThrowOnError>({ url: '/api/v1/ready', ...options });
+
+/**
+ * Get Textile Baseline
+ *
+ * Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.
+ */
+export const getTextileBaseline = <ThrowOnError extends boolean = false>(options?: Options<GetTextileBaselineData, ThrowOnError>): RequestResult<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError> => (options?.client ?? client).get<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError>({ url: '/api/v1/textile/baseline', ...options });
+
+/**
+ * Get Observed Flows
+ *
+ * Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).
+ */
+export const getObservedFlows = <ThrowOnError extends boolean = false>(options?: Options<GetObservedFlowsData, ThrowOnError>): RequestResult<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError> => (options?.client ?? client).get<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError>({ url: '/api/v1/textile/flows', ...options });
+
+/**
+ * Get Waste Composition
+ *
+ * Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.
+ */
+export const getWasteComposition = <ThrowOnError extends boolean = false>(options?: Options<GetWasteCompositionData, ThrowOnError>): RequestResult<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError> => (options?.client ?? client).get<GetWasteCompositionResponses, GetWasteCompositionErrors, ThrowOnError>({ url: '/api/v1/textile/waste', ...options });
 
 /**
  * List Users

@@ -1,13 +1,13 @@
-id,type,detail,suggestion
-1,Circuito sem viatura,"Circuitos do ficheiro de circuitos que não aparecem no planeamento: BIO 5, C8, C12, C15, C20, C21, C22, C23, C24.",Confirmar se estão integrados noutros circuitos ou se faltam no planeamento.
-2,Código de viatura,"O ficheiro de circuitos usa V1–V4. Pelo planeamento, a correspondência provável é: V1 = AR-93-SQ (faz BIO 4 de manhã e BIO 1 à tarde); V2 = AR-81-SQ (BIO 2); V3 = 60-93-ZG / AS-75-SG (BIO 3); V4 = AN-50-LT (BIO 6).",Confirmar e substituir V1–V4 por matrículas no ficheiro de circuitos.
-3,Circuito desconhecido,"""1 A/ 1B"" (47-LP-50, manhã) não existe no ficheiro de circuitos.",Identificar o circuito e a tipologia.
-4,Circuito incompleto,"""Bio"" sem número: 58-PF-10 (semana manhã), AN-50-LT e AR-93-SQ (sábado manhã).",Indicar o número do circuito BIO.
-5,Circuito incompleto,"""C.H"" (58-PF-10, domingo manhã).",Confirmar se é BIO 1 (Centro histórico) ou outro serviço.
-6,Viatura em duplicado,75-ZQ-24 aparece em 2 linhas na semana à tarde (SELETIVO e MONSTROS). 65-RB-29 aparece 2 vezes no sábado de manhã.,Confirmar qual o serviço real.
-7,Possível erro de matrícula,"AT-28-PM aparece só uma vez (semana, noite, PAYT). Nos outros dias o PAYT noite é feito pela AT-98-PM.",Confirmar a matrícula.
-8,Viatura multi-tipologia,60-93-ZG faz C7 (indiferenciados) e BIO 3 (orgânicos) no mesmo turno. 24-ZZ-64 faz C6 de manhã e CARTÃO à tarde.,Verificar lavagem da caixa entre fluxos e o registo de pesagens separado.
-9,Viaturas sem circuito,74-HN-36 e 29-48-XU nunca têm circuito. AJ-49-UO e 65-RB-29 têm linhas extra sem circuito.,"Confirmar se são reserva, oficina ou equipa de apoio."
-10,Circuitos não documentados,"SELETIVO, RECICLAGEM, CARTÃO, MONSTROS, PAYT, CONTENTORES e LAVAGEM têm viaturas mas não têm localidades nem dias no ficheiro de circuitos.",Completar o ficheiro de circuitos com estes serviços.
-11,Datas diferentes,Semana: 21 a 25/09/2026. Sábado: 19/09/2026. Domingo: 20/09/2026 (fim de semana anterior). Folha FERIADOS CHG: 04/06/2026 (não usada).,Garantir que o planeamento de fim de semana é o da mesma semana.
-12,Escrita normalizada,"Corrigido: ""Bio 6""→BIO 6, ""C 1""→C1, ""CA 27 DS""→CA-27-DS, ""LAVA-CONTENTORES""/""LAVAGEM""→LAVAGEM CONTENTORES. Circuitos agrupados (""C18/C19"") divididos em linhas.",Usar lista pendente (validação de dados) no planeamento para evitar variações.
+id,type_key,detail,suggestion
+1,circuit_without_vehicle,"Circuitos do ficheiro de circuitos que não aparecem no planeamento: BIO 5, C8, C12, C15, C20, C21, C22, C23, C24.",Confirmar se estão integrados noutros circuitos ou se faltam no planeamento.
+2,vehicle_code,"O ficheiro de circuitos usa V1–V4. Pelo planeamento, a correspondência provável é: V1 = AR-93-SQ (faz BIO 4 de manhã e BIO 1 à tarde); V2 = AR-81-SQ (BIO 2); V3 = 60-93-ZG / AS-75-SG (BIO 3); V4 = AN-50-LT (BIO 6).",Confirmar e substituir V1–V4 por matrículas no ficheiro de circuitos.
+3,unknown_circuit,"""1 A/ 1B"" (47-LP-50, manhã) não existe no ficheiro de circuitos.",Identificar o circuito e a tipologia.
+4,incomplete_circuit,"""Bio"" sem número: 58-PF-10 (semana manhã), AN-50-LT e AR-93-SQ (sábado manhã).",Indicar o número do circuito BIO.
+5,incomplete_circuit,"""C.H"" (58-PF-10, domingo manhã).",Confirmar se é BIO 1 (Centro histórico) ou outro serviço.
+6,duplicate_vehicle,75-ZQ-24 aparece em 2 linhas na semana à tarde (SELETIVO e MONSTROS). 65-RB-29 aparece 2 vezes no sábado de manhã.,Confirmar qual o serviço real.
+7,possible_plate_error,"AT-28-PM aparece só uma vez (semana, noite, PAYT). Nos outros dias o PAYT noite é feito pela AT-98-PM.",Confirmar a matrícula.
+8,multi_typology_vehicle,60-93-ZG faz C7 (indiferenciados) e BIO 3 (orgânicos) no mesmo turno. 24-ZZ-64 faz C6 de manhã e CARTÃO à tarde.,Verificar lavagem da caixa entre fluxos e o registo de pesagens separado.
+9,vehicle_without_circuit,74-HN-36 e 29-48-XU nunca têm circuito. AJ-49-UO e 65-RB-29 têm linhas extra sem circuito.,"Confirmar se são reserva, oficina ou equipa de apoio."
+10,undocumented_circuits,"SELETIVO, RECICLAGEM, CARTÃO, MONSTROS, PAYT, CONTENTORES e LAVAGEM têm viaturas mas não têm localidades nem dias no ficheiro de circuitos.",Completar o ficheiro de circuitos com estes serviços.
+11,different_dates,Semana: 21 a 25/09/2026. Sábado: 19/09/2026. Domingo: 20/09/2026 (fim de semana anterior). Folha FERIADOS CHG: 04/06/2026 (não usada).,Garantir que o planeamento de fim de semana é o da mesma semana.
+12,normalized_spelling,"Corrigido: ""Bio 6""→BIO 6, ""C 1""→C1, ""CA 27 DS""→CA-27-DS, ""LAVA-CONTENTORES""/""LAVAGEM""→LAVAGEM CONTENTORES. Circuitos agrupados (""C18/C19"") divididos em linhas.",Usar lista pendente (validação de dados) no planeamento para evitar variações.
