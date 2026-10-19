@@ -862,5 +862,9 @@
   "localities_days_filter": "{days} dias por semana",
   "table_filters": "Filtros",
   "nav_section_data": "Dados da Vitrus",
-  "nav_section_reporting": "Prestação de contas"
+  "nav_section_reporting": "Prestação de contas",
+  "error_ai_budget_exceeded": "O orçamento mensal de IA foi atingido. Um administrador pode aumentá-lo em Administração · IA.",
+  "alert_kind_container_rows_rejected": "Contentores rejeitados",
+  "alert_kind_container_pending_location": "Contentores sem localização",
+  "alert_kind_container_assumed_values": "Valores assumidos nos contentores"
 }
