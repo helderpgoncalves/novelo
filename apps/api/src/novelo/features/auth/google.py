@@ -45,7 +45,7 @@ async def fetch_profile(code: str, transport: httpx.AsyncBaseTransport | None = 
             info.raise_for_status()
             profile: dict[str, str] = info.json()
     except (httpx.HTTPError, KeyError) as exc:
-        raise UpstreamError("Não foi possível entrar com a Google") from exc
+        raise UpstreamError("Google sign-in failed") from exc
     if not profile.get("email_verified") or not profile.get("email") or not profile.get("sub"):
-        raise UpstreamError("A conta Google não tem email verificado")
+        raise UpstreamError("The Google account has no verified email")
     return profile

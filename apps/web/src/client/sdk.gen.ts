@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListUsersData, ListUsersErrors, ListUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListUsersData, ListUsersErrors, ListUsersResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyErrors, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -35,7 +35,7 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
  *
  * O que o ecrã de entrada precisa de saber: Google ligado? registo aberto?
  */
-export const getAuthConfig = <ThrowOnError extends boolean = false>(options?: Options<GetAuthConfigData, ThrowOnError>): RequestResult<GetAuthConfigResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetAuthConfigResponses, unknown, ThrowOnError>({ url: '/api/v1/auth/config', ...options });
+export const getAuthConfig = <ThrowOnError extends boolean = false>(options?: Options<GetAuthConfigData, ThrowOnError>): RequestResult<GetAuthConfigResponses, GetAuthConfigErrors, ThrowOnError> => (options?.client ?? client).get<GetAuthConfigResponses, GetAuthConfigErrors, ThrowOnError>({ url: '/api/v1/auth/config', ...options });
 
 /**
  * Forgot Password
@@ -181,26 +181,26 @@ export const getWasteComposition = <ThrowOnError extends boolean = false>(option
  *
  * Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.
  */
-export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, unknown, ThrowOnError> => (options?.client ?? client).get<HealthResponses, unknown, ThrowOnError>({ url: '/api/v1/health', ...options });
+export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, HealthErrors, ThrowOnError> => (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({ url: '/api/v1/health', ...options });
 
 /**
  * Ready
  *
  * Readiness: a base de dados responde e diz se a IA está ligada.
  */
-export const ready = <ThrowOnError extends boolean = false>(options?: Options<ReadyData, ThrowOnError>): RequestResult<ReadyResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ReadyResponses, unknown, ThrowOnError>({ url: '/api/v1/ready', ...options });
+export const ready = <ThrowOnError extends boolean = false>(options?: Options<ReadyData, ThrowOnError>): RequestResult<ReadyResponses, ReadyErrors, ThrowOnError> => (options?.client ?? client).get<ReadyResponses, ReadyErrors, ThrowOnError>({ url: '/api/v1/ready', ...options });
 
 /**
  * List Users
  *
- * Contas da plataforma (só administradores).
+ * Platform accounts (admins only).
  */
 export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>): RequestResult<ListUsersResponses, ListUsersErrors, ThrowOnError> => (options?.client ?? client).get<ListUsersResponses, ListUsersErrors, ThrowOnError>({ url: '/api/v1/users', ...options });
 
 /**
  * Update User
  *
- * Muda o perfil ou ativa/desativa uma conta. Não se pode alterar a própria conta.
+ * Change role or activate/deactivate an account. Admins cannot change themselves.
  */
 export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>): RequestResult<UpdateUserResponses, UpdateUserErrors, ThrowOnError> => (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
     url: '/api/v1/users/{user_id}',

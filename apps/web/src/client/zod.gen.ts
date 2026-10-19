@@ -63,6 +63,44 @@ export const zEntityBaseline = z.object({
 });
 
 /**
+ * ErrorBody
+ *
+ * Corpo de qualquer erro da API (exceto validação, que tem `fields`).
+ */
+export const zErrorBody = z.object({
+    code: z.enum([
+        'bad_request',
+        'validation_error',
+        'unauthenticated',
+        'session_expired',
+        'invalid_credentials',
+        'account_inactive',
+        'current_password_incorrect',
+        'invalid_token',
+        'forbidden',
+        'registration_closed',
+        'not_found',
+        'user_not_found',
+        'email_taken',
+        'cannot_modify_self',
+        'rate_limited',
+        'feature_disabled',
+        'upstream_error',
+        'internal_error'
+    ]),
+    message: z.string()
+});
+
+/**
+ * FieldError
+ */
+export const zFieldError = z.object({
+    field: z.string(),
+    message: z.string(),
+    type: z.string()
+});
+
+/**
  * FlowLink
  */
 export const zFlowLink = z.object({
@@ -93,7 +131,8 @@ export const zFlows = z.object({
  * ForgotPasswordRequest
  */
 export const zForgotPasswordRequest = z.object({
-    email: z.email()
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
 });
 
 /**
@@ -116,6 +155,7 @@ export const zLoginRequest = z.object({
  * ProfileUpdate
  */
 export const zProfileUpdate = z.object({
+    locale: z.enum(['pt-PT', 'en']).nullish(),
     name: z.string().max(120).nullish()
 });
 
@@ -133,6 +173,7 @@ export const zReadiness = z.object({
  */
 export const zRegisterRequest = z.object({
     email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
     name: z.string().max(120).nullish(),
     password: z.string().max(128),
     remember_me: z.boolean().optional().default(true)
@@ -198,26 +239,18 @@ export const zUserOut = z.object({
     google_linked: z.boolean(),
     has_password: z.boolean(),
     id: z.uuid(),
+    locale: z.enum(['pt-PT', 'en']),
     name: z.string().nullable(),
     role: z.enum(['admin', 'operator'])
 });
 
 /**
- * ValidationError
+ * ValidationErrorBody
  */
-export const zValidationError = z.object({
-    ctx: z.record(z.string(), z.unknown()).optional(),
-    input: z.unknown().optional(),
-    loc: z.array(z.union([z.string(), z.int()])),
-    msg: z.string(),
-    type: z.string()
-});
-
-/**
- * HTTPValidationError
- */
-export const zHttpValidationError = z.object({
-    detail: z.array(zValidationError).optional()
+export const zValidationErrorBody = z.object({
+    code: z.literal('validation_error').optional().default('validation_error'),
+    fields: z.array(zFieldError),
+    message: z.string()
 });
 
 /**
@@ -272,7 +305,8 @@ export const zGoogleCallbackQuery = z.object({
 });
 
 export const zGoogleLoginQuery = z.object({
-    next: z.string().optional().default('/')
+    next: z.string().optional().default('/'),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
 });
 
 export const zLoginBody = zLoginRequest;

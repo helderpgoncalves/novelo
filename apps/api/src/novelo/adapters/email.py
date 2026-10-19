@@ -35,7 +35,7 @@ class ResendSender:
                 resp = await http.post(RESEND_URL, json=payload, headers=headers)
                 resp.raise_for_status()
         except httpx.HTTPError as exc:
-            raise UpstreamError("Não foi possível enviar o email", details=str(exc)) from exc
+            raise UpstreamError(f"Could not send the email: {exc}") from exc
 
 
 class LogSender:

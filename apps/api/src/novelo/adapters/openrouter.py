@@ -41,7 +41,7 @@ class OpenRouterClient:
     ) -> T:
         """Pede JSON que cumpra `schema`; volta a pedir `retries` vezes se não validar."""
         if not self._s.llm_enabled:
-            raise FeatureDisabledError("IA desligada: falta OPENROUTER_API_KEY")
+            raise FeatureDisabledError("AI is disabled: OPENROUTER_API_KEY is not set")
         payload = {
             "model": model or self._s.llm_model_text,
             "temperature": 0,
@@ -67,7 +67,7 @@ class OpenRouterClient:
                 return schema.model_validate(json.loads(content))
             except (httpx.HTTPError, KeyError, json.JSONDecodeError, ValidationError) as exc:
                 last_error = exc
-        raise UpstreamError("O modelo não devolveu uma resposta válida", details=str(last_error))
+        raise UpstreamError(f"The model did not return a valid response: {last_error}")
 
     async def aclose(self) -> None:
         await self._http.aclose()

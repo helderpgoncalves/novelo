@@ -5,12 +5,7 @@ from collections import defaultdict, deque
 
 from fastapi import Request
 
-from novelo.core.errors import AppError
-
-
-class RateLimitError(AppError):
-    status_code = 429
-    code = "rate_limited"
+from novelo.core.errors import RateLimitError
 
 
 class RateLimiter:
@@ -24,7 +19,7 @@ class RateLimiter:
         while hits and now - hits[0] > self.window_s:
             hits.popleft()
         if len(hits) >= self.limit:
-            raise RateLimitError("Demasiadas tentativas. Tenta de novo dentro de alguns minutos.")
+            raise RateLimitError("Too many attempts. Try again in a few minutes.")
         hits.append(now)
 
     def reset(self) -> None:

@@ -16,6 +16,7 @@ def to_out(user: User) -> UserOut:
         has_password=user.hashed_password is not None,
         google_linked=user.google_sub is not None,
         email_verified=user.email_verified,
+        locale=user.locale,
     )
 
 
@@ -37,6 +38,7 @@ async def create_user(
     google_sub: str | None = None,
     avatar_url: str | None = None,
     email_verified: bool = False,
+    locale: str = "pt-PT",
 ) -> User:
     user = User(
         email=email.lower(),
@@ -46,6 +48,7 @@ async def create_user(
         google_sub=google_sub,
         avatar_url=avatar_url,
         email_verified=email_verified,
+        locale=locale,
     )
     db.add(user)
     await db.commit()
