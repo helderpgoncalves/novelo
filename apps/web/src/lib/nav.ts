@@ -6,11 +6,12 @@ import {
   Layers,
   type LucideIcon,
   MapPinned,
-  MessageSquareQuote,
   Route as RouteIcon,
   ScanLine,
   ShieldCheck,
+  SlidersHorizontal,
   Store,
+  Tags,
   Truck,
   Users,
   Waypoints,
@@ -19,7 +20,21 @@ import { m } from '@/paraglide/messages';
 
 export interface NavItem {
   label: () => string;
-  to?: '/' | '/circuits' | '/fleet' | '/localities' | '/data-quality' | '/users';
+  to?:
+    | '/'
+    | '/circuits'
+    | '/fleet'
+    | '/localities'
+    | '/data-quality'
+    | '/map'
+    | '/triage'
+    | '/lots'
+    | '/market'
+    | '/brands'
+    | '/simulator'
+    | '/scenarios'
+    | '/assumptions'
+    | '/users';
   icon: LucideIcon;
   /** No backlog, ainda sem ecrã. */
   soon?: boolean;
@@ -41,23 +56,24 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_fleet(), to: '/fleet', icon: Truck },
       { label: () => m.nav_localities(), to: '/localities', icon: Waypoints },
       { label: () => m.nav_data_quality(), to: '/data-quality', icon: ShieldCheck },
-      { label: () => m.nav_map(), icon: MapPinned, soon: true },
+      { label: () => m.nav_map(), to: '/map', icon: MapPinned },
     ],
   },
   {
     title: () => m.nav_section_planning(),
     items: [
-      { label: () => m.nav_simulator(), icon: Layers, soon: true },
-      { label: () => m.nav_scenarios(), icon: GitCompareArrows, soon: true },
-      { label: () => m.nav_whatif(), icon: MessageSquareQuote, soon: true },
+      { label: () => m.nav_simulator(), to: '/simulator', icon: Layers },
+      { label: () => m.nav_scenarios(), to: '/scenarios', icon: GitCompareArrows },
+      { label: () => m.nav_assumptions(), to: '/assumptions', icon: SlidersHorizontal },
     ],
   },
   {
     title: () => m.nav_section_operations(),
     items: [
-      { label: () => m.nav_triage(), icon: ScanLine, soon: true },
-      { label: () => m.nav_lots(), icon: Boxes, soon: true },
-      { label: () => m.nav_market(), icon: Store, soon: true },
+      { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
+      { label: () => m.nav_lots(), to: '/lots', icon: Boxes },
+      { label: () => m.nav_market(), to: '/market', icon: Store },
+      { label: () => m.nav_brands(), to: '/brands', icon: Tags },
       { label: () => m.nav_rap(), icon: FileText, soon: true },
     ],
   },

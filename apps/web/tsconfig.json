@@ -15,7 +15,7 @@
     "checkJs": false,
     "skipLibCheck": true,
     "noEmit": true,
-    "types": ["node", "vite/client", "vitest/globals", "@testing-library/jest-dom"],
+    "types": ["node", "geojson", "vite/client", "vitest/globals", "@testing-library/jest-dom"],
     "paths": { "@/*": ["./src/*"] }
   },
   "include": ["src", "e2e", "playwright.config.ts", "vite.config.ts", "openapi-ts.config.ts"]

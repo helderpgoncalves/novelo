@@ -4,9 +4,11 @@ import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useEffect, useRef } from 'react';
 import type { Flows } from '@/client';
+import { MODE_COLORS } from '@/lib/map';
+import { modeLabel } from '@/lib/scenario';
 import { useTheme } from '@/lib/theme';
 import { destinationLabel } from '@/lib/vocab';
-import { m } from '@/paraglide/messages';
+import { m, m as messages } from '@/paraglide/messages';
 import { DESTINATIONS } from './destination';
 
 echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
@@ -21,7 +23,11 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
     if (!ref.current) return;
     const text = resolvedTheme === 'dark' ? '#f1eee6' : '#14211d';
     const nodeName = (n: Flows['nodes'][number]) =>
-      n.destination ? destinationLabel[n.destination]() : (n.label ?? n.id);
+      n.destination
+        ? destinationLabel[n.destination]()
+        : n.mode
+          ? modeLabel[n.mode]()
+          : (n.label ?? messages.sankey_others());
     const name = (id: string) => {
       const node = flows.nodes.find((n) => n.id === id);
       return node ? nodeName(node) : id;
@@ -51,6 +57,7 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
             name: nodeName(n),
             itemStyle: {
               color:
+                (n.mode ? MODE_COLORS[n.mode] : undefined) ??
                 DESTINATIONS.find((d) => d.key === n.destination)?.hex[resolvedTheme] ??
                 ENTITY_SHADES[entities.findIndex((e) => e.id === n.id) % ENTITY_SHADES.length],
             },

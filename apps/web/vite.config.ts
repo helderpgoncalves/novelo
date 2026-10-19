@@ -4,6 +4,7 @@ import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
 import { defineConfig } from 'vitest/config';
+import paraglideOptions from './paraglide.options.mjs';
 
 // Em dev, /api vai para a API (no Docker: http://api:8000; fora do Docker: localhost:8190).
 const apiTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:8190';
@@ -11,20 +12,7 @@ const apiTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:8190';
 export default defineConfig({
   plugins: [
     // Mensagens tipadas (messages/*.json -> src/paraglide). O idioma vem do URL (/pt, /en), depois da preferência guardada.
-    paraglideVitePlugin({
-      project: './project.inlang',
-      outdir: './src/paraglide',
-      strategy: ['url', 'localStorage', 'preferredLanguage', 'baseLocale'],
-      urlPatterns: [
-        {
-          pattern: '/:path(.*)?',
-          localized: [
-            ['pt-PT', '/pt/:path(.*)?'],
-            ['en', '/en/:path(.*)?'],
-          ],
-        },
-      ],
-    }),
+    paraglideVitePlugin(paraglideOptions as Parameters<typeof paraglideVitePlugin>[0]),
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),
@@ -62,6 +50,8 @@ export default defineConfig({
     }),
   ],
   resolve: { alias: { '@': '/src' } },
+  // O worker do MapLibre não sobrevive à pré-otimização de dependências do Vite em dev.
+  optimizeDeps: { exclude: ['maplibre-gl'] },
   server: {
     proxy: { '/api': { target: apiTarget, changeOrigin: true } },
     watch: { usePolling: process.env.CHOKIDAR_USEPOLLING === 'true' },

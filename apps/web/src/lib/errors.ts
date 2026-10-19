@@ -20,6 +20,7 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   user_not_found: () => m.error_user_not_found(),
   email_taken: () => m.error_email_taken(),
   cannot_modify_self: () => m.error_cannot_modify_self(),
+  conflict: () => m.error_conflict(),
   rate_limited: () => m.error_rate_limited(),
   feature_disabled: () => m.error_feature_disabled(),
   upstream_error: () => m.error_upstream_error(),
