@@ -5,7 +5,7 @@ export function StatStrip({ children, className }: { children: ReactNode; classN
   return (
     <dl
       className={cn(
-        'grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border sm:grid-cols-2 lg:grid-cols-4',
+        'grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border lg:grid-cols-4 [&>*:last-child:nth-child(odd)]:col-span-2 lg:[&>*:last-child:nth-child(odd)]:col-span-1',
         className,
       )}
     >
@@ -24,8 +24,8 @@ interface StatCellProps {
 
 export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCellProps) {
   return (
-    <div className="flex flex-col gap-1.5 bg-card p-5">
-      <dt className="flex items-center gap-2 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
+    <div className="flex min-w-0 flex-col gap-1.5 bg-card p-4 sm:p-5">
+      <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.14em] sm:tracking-[0.18em]">
         {label}
         {tag && (
           <span className="rounded-full bg-areia/25 px-1.5 py-px font-semibold text-[9px] text-foreground/80">
@@ -35,7 +35,7 @@ export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCell
       </dt>
       <dd
         className={cn(
-          'font-medium font-serif text-4xl tabular-nums leading-none tracking-tight',
+          'font-medium font-serif text-[1.65rem] tabular-nums leading-none tracking-tight sm:text-4xl',
           tone === 'primary' && 'text-primary',
         )}
       >

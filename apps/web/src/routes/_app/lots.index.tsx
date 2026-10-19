@@ -2,20 +2,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { ScanLine } from 'lucide-react';
 import { useState } from 'react';
-import type { LotState } from '@/client';
+import type { LotState, LotSummary } from '@/client';
 import { listLotsOptions } from '@/client/@tanstack/react-query.gen';
+import { type Column, DataTable } from '@/components/data-table';
 import { FilterChips } from '@/components/data-table-toolbar';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { LotStateBadge } from '@/features/lots/lot-parts';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
@@ -70,48 +63,54 @@ function Lots() {
               ...STATES.map((s) => ({ value: s, label: lotStateLabel[s]() })),
             ]}
           />
-          <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-10 px-4">{m.lots_col_code()}</TableHead>
-                  <TableHead className="h-10">{m.lots_col_state()}</TableHead>
-                  <TableHead className="h-10">{m.lots_col_parish()}</TableHead>
-                  <TableHead className="h-10">{m.lots_col_fibre()}</TableHead>
-                  <TableHead className="h-10 text-right">{m.lots_col_items()}</TableHead>
-                  <TableHead className="h-10 text-right">{m.lots_col_weight()}</TableHead>
-                  <TableHead className="h-10 pr-4">{m.lots_col_opened()}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {rows.map((l) => (
-                  <TableRow key={l.code}>
-                    <TableCell className="px-4 font-medium tabular-nums">
-                      <Link to="/lots/$code" params={{ code: l.code }} className="hover:underline">
-                        {l.code}
-                      </Link>
-                    </TableCell>
-                    <TableCell>
-                      <LotStateBadge state={l.state} />
-                    </TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {l.parish_name ?? m.common_dash()}
-                    </TableCell>
-                    <TableCell>{fibreLabel[l.dominant_fibre]()}</TableCell>
-                    <TableCell className="text-right tabular-nums">{l.items}</TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatNumber(l.weight_kg, 2)} kg
-                    </TableCell>
-                    <TableCell className="pr-4 text-muted-foreground tabular-nums">
-                      {formatDateTime(l.opened_at)}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <DataTable
+            columns={columns}
+            rows={rows}
+            getKey={(l) => l.code}
+            caption={m.lots_title()}
+          />
         </div>
       )}
     </div>
   );
 }
+
+const columns: Column<LotSummary>[] = [
+  {
+    id: 'code',
+    header: m.lots_col_code(),
+    primary: true,
+    className: 'tabular-nums',
+    cell: (l) => (
+      <Link to="/lots/$code" params={{ code: l.code }} className="hover:underline">
+        {l.code}
+      </Link>
+    ),
+  },
+  {
+    id: 'state',
+    header: m.lots_col_state(),
+    badge: true,
+    cell: (l) => <LotStateBadge state={l.state} />,
+  },
+  {
+    id: 'parish',
+    header: m.lots_col_parish(),
+    className: 'text-muted-foreground',
+    cell: (l) => l.parish_name ?? m.common_dash(),
+  },
+  { id: 'fibre', header: m.lots_col_fibre(), cell: (l) => fibreLabel[l.dominant_fibre]() },
+  { id: 'items', header: m.lots_col_items(), align: 'right', cell: (l) => l.items },
+  {
+    id: 'weight',
+    header: m.lots_col_weight(),
+    align: 'right',
+    cell: (l) => `${formatNumber(l.weight_kg, 2)} kg`,
+  },
+  {
+    id: 'opened',
+    header: m.lots_col_opened(),
+    className: 'text-muted-foreground',
+    cell: (l) => formatDateTime(l.opened_at),
+  },
+];

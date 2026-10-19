@@ -52,7 +52,7 @@ function Account() {
         title={m.account_title()}
         description={m.account_description()}
       />
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
         <div className="space-y-6">
           <Card className="gap-4 shadow-none ring-1 ring-foreground/10">
             <CardHeader>

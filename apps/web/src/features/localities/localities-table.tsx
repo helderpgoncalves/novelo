@@ -1,19 +1,13 @@
 import { useDeferredValue, useMemo, useState } from 'react';
 import type { LocalityOut } from '@/client';
+import { type Column, DataTable } from '@/components/data-table';
 import { FilterChips, normalizeText, SearchBox } from '@/components/data-table-toolbar';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { WeekdayDots } from '@/components/weekdays';
 import { collectionLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
 type Frequency = 'frequent' | 'sparse';
+const dash = <span className="text-muted-foreground">{m.common_dash()}</span>;
 
 export function LocalitiesTable({ localities }: { localities: LocalityOut[] }) {
   const [query, setQuery] = useState('');
@@ -32,9 +26,39 @@ export function LocalitiesTable({ localities }: { localities: LocalityOut[] }) {
     );
   }, [localities, deferred, frequency]);
 
+  const columns: Column<LocalityOut>[] = [
+    { id: 'name', header: m.localities_table_locality(), cell: (l) => l.name, primary: true },
+    {
+      id: 'frequency',
+      header: m.localities_table_frequency(),
+      cell: (l) => l.days_per_week,
+      badge: true,
+      align: 'right',
+    },
+    {
+      id: 'circuits',
+      header: m.localities_table_circuits(),
+      cell: (l) => <span className="text-muted-foreground">{l.circuits.join(', ')}</span>,
+    },
+    {
+      id: 'collection',
+      header: m.localities_table_collection(),
+      cell: (l) => (
+        <span className="text-muted-foreground">
+          {l.collection_types.map((c) => collectionLabel[c]()).join(', ') || m.common_dash()}
+        </span>
+      ),
+    },
+    {
+      id: 'days',
+      header: m.localities_table_days(),
+      cell: (l) => (l.weekdays.length ? <WeekdayDots days={l.weekdays} /> : dash),
+    },
+  ];
+
   return (
     <div className="space-y-3">
-      <div className="flex flex-wrap items-center gap-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <SearchBox value={query} onChange={setQuery} label={m.localities_search()} />
         <FilterChips<Frequency>
           legend={m.localities_filter_frequency()}
@@ -47,50 +71,17 @@ export function LocalitiesTable({ localities }: { localities: LocalityOut[] }) {
           ]}
         />
       </div>
-      <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
-        <Table>
-          <TableHeader>
-            <TableRow className="hover:bg-transparent">
-              <TableHead className="h-10 px-4">{m.localities_table_locality()}</TableHead>
-              <TableHead className="h-10">{m.localities_table_circuits()}</TableHead>
-              <TableHead className="h-10">{m.localities_table_collection()}</TableHead>
-              <TableHead className="h-10">{m.localities_table_days()}</TableHead>
-              <TableHead className="h-10 pr-4 text-right">
-                {m.localities_table_frequency()}
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {rows.map((l) => (
-              <TableRow key={l.name} className="align-top">
-                <TableCell className="px-4 font-medium">{l.name}</TableCell>
-                <TableCell className="text-muted-foreground">{l.circuits.join(', ')}</TableCell>
-                <TableCell className="text-muted-foreground">
-                  {l.collection_types.map((c) => collectionLabel[c]()).join(', ') ||
-                    m.common_dash()}
-                </TableCell>
-                <TableCell>
-                  {l.weekdays.length > 0 ? (
-                    <WeekdayDots days={l.weekdays} />
-                  ) : (
-                    <span className="text-muted-foreground">{m.common_dash()}</span>
-                  )}
-                </TableCell>
-                <TableCell className="pr-4 text-right font-medium tabular-nums">
-                  {l.days_per_week}
-                </TableCell>
-              </TableRow>
-            ))}
-            {rows.length === 0 && (
-              <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  {m.localities_no_results()}
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
+      <DataTable
+        columns={columns}
+        rows={rows}
+        getKey={(l) => l.name}
+        caption={m.localities_title()}
+        empty={
+          <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
+            {m.localities_no_results()}
+          </p>
+        }
+      />
       <p className="text-muted-foreground text-xs tabular-nums" aria-live="polite">
         {m.localities_count({ shown: rows.length, total: localities.length })}
       </p>

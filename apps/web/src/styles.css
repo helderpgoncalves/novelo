@@ -148,6 +148,33 @@
   :focus-visible {
     @apply outline-2 outline-offset-2 outline-ring;
   }
+  /* Ecrãs tácteis: alvos de pelo menos 40px e sem zoom automático ao focar campos (iOS). */
+  @media (pointer: coarse) {
+    button:not([role='checkbox']):not([role='radio']):not([role='switch']):not([role='slider']):not([data-slot='tooltip-trigger']),
+    [role='button'],
+    a[data-slot='button'] {
+      min-height: 2.5rem;
+    }
+    /* Caixas, rádios e interruptores mantêm o desenho, mas ganham uma área de toque maior. */
+    [role='checkbox'],
+    [role='radio'],
+    [role='switch'] {
+      position: relative;
+    }
+    [role='checkbox']::after,
+    [role='radio']::after,
+    [role='switch']::after {
+      content: '';
+      position: absolute;
+      inset: -0.75rem;
+    }
+    input:not([type='checkbox']):not([type='radio']),
+    textarea,
+    select {
+      font-size: 16px;
+      min-height: 2.5rem;
+    }
+  }
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

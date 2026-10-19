@@ -3,7 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { FileText, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { DownloadReportData } from '@/client';
+import type { DownloadReportData, ReportOut } from '@/client';
 import {
   createRapReportMutation,
   listReportsOptions,
@@ -11,20 +11,13 @@ import {
   listScenariosOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
+import { type Column, DataTable } from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
@@ -87,7 +80,7 @@ function Reports() {
           }
         />
       ) : (
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_20rem]">
           <section className="space-y-3">
             <div className="space-y-1">
               <h2 className="text-2xl">{m.reports_pick()}</h2>
@@ -165,51 +158,61 @@ function Reports() {
             {m.reports_history_empty()}
           </p>
         ) : (
-          <div className="overflow-x-auto rounded-xl bg-card ring-1 ring-foreground/10">
-            <Table>
-              <TableHeader>
-                <TableRow className="hover:bg-transparent">
-                  <TableHead className="h-10 px-4">{m.reports_col_title()}</TableHead>
-                  <TableHead className="h-10">{m.reports_col_scenarios()}</TableHead>
-                  <TableHead className="h-10">{m.reports_col_created()}</TableHead>
-                  <TableHead className="h-10 text-right">{m.reports_col_size()}</TableHead>
-                  <TableHead className="h-10 pr-4 text-right">
-                    <span className="sr-only">{m.reports_open()}</span>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {reports.map((r) => (
-                  <TableRow key={r.id}>
-                    <TableCell className="px-4 font-medium">
-                      {r.title}{' '}
-                      <span className="text-muted-foreground text-xs">
-                        ({LOCALE_LABELS[r.locale]})
-                      </span>
-                    </TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
-                      {r.scenario_ids.length}
-                    </TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
-                      {formatDateTime(r.created_at)}
-                    </TableCell>
-                    <TableCell className="text-right tabular-nums">
-                      {formatNumber(r.size_bytes / 1024, 0)} kB
-                    </TableCell>
-                    <TableCell className="pr-4 text-right">
-                      <Button asChild variant="outline" size="sm" className="h-8">
-                        <a href={pdfUrl(r.id)} target="_blank" rel="noreferrer">
-                          {m.reports_open()}
-                        </a>
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+          <DataTable
+            columns={historyColumns}
+            rows={reports}
+            getKey={(r) => r.id}
+            caption={m.reports_history()}
+          />
         )}
       </section>
     </div>
   );
 }
+
+const historyColumns: Column<ReportOut>[] = [
+  {
+    id: 'title',
+    header: m.reports_col_title(),
+    primary: true,
+    cell: (r) => (
+      <>
+        {r.title}{' '}
+        <span className="font-normal text-muted-foreground text-xs">
+          ({LOCALE_LABELS[r.locale]})
+        </span>
+      </>
+    ),
+  },
+  {
+    id: 'scenarios',
+    header: m.reports_col_scenarios(),
+    className: 'text-muted-foreground',
+    cell: (r) => r.scenario_ids.length,
+  },
+  {
+    id: 'created',
+    header: m.reports_col_created(),
+    className: 'text-muted-foreground',
+    cell: (r) => formatDateTime(r.created_at),
+  },
+  {
+    id: 'size',
+    header: m.reports_col_size(),
+    align: 'right',
+    cell: (r) => `${formatNumber(r.size_bytes / 1024, 0)} kB`,
+  },
+  {
+    id: 'open',
+    header: <span className="sr-only">{m.reports_open()}</span>,
+    align: 'right',
+    full: true,
+    cell: (r) => (
+      <Button asChild variant="outline" size="sm" className="w-full md:w-auto">
+        <a href={pdfUrl(r.id)} target="_blank" rel="noreferrer">
+          {m.reports_open()}
+        </a>
+      </Button>
+    ),
+  },
+];

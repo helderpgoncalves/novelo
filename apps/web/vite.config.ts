@@ -27,6 +27,11 @@ export default defineConfig({
         start_url: '/',
         scope: '/',
         display: 'standalone',
+        orientation: 'portrait',
+        shortcuts: [
+          { name: 'Triagem', url: '/triage', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+          { name: 'Simulador', url: '/simulator', icons: [{ src: '/icons/icon-192.png', sizes: '192x192' }] },
+        ],
         background_color: '#F4F1EA',
         theme_color: '#2E6B57',
         icons: [

@@ -68,7 +68,7 @@
   "auth_aside_text": "From bag to yarn: plan the network, decide in plain language, follow every lot to industry and hand the municipality its 2028 dossier.",
   "auth_fact_parishes_value": "55",
   "auth_fact_parishes_label": "scattered parishes",
-  "auth_fact_inhabitants_value": "156,277",
+  "auth_fact_inhabitants_value": "156,830",
   "auth_fact_inhabitants_label": "inhabitants",
   "auth_fact_deadline_value": "17 Apr 2028",
   "auth_fact_deadline_label": "textile EPR deadline",
@@ -834,5 +834,6 @@
   "reports_max": "Maximum of 3 scenarios",
   "tipau_apu": "Predominantly urban",
   "tipau_amu": "Moderately urban",
-  "tipau_apr": "Predominantly rural"
+  "tipau_apr": "Predominantly rural",
+  "offline_banner": "No internet connection. Data already open stays visible; the rest returns when the network is back."
 }
