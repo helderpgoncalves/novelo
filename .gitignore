@@ -30,3 +30,7 @@ CLAUDE.local.md
 
 # Gerado a partir de messages/*.json (pnpm i18n)
 apps/web/src/paraglide/
+
+# Resultados de testes ponta a ponta
+apps/web/test-results/
+apps/web/playwright-report/

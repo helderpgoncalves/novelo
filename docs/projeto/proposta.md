@@ -1,6 +1,6 @@
 # Novelo: proposta para o Desafio 5 do Hack4Guimarães 2035
 
-![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](img/banner.png)
+![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](../img/banner-proposta.png)
 
 *19 de outubro de 2026 · Hélder Gonçalves e Flávio Fernandes*
 
@@ -23,8 +23,8 @@ Guimarães publicou em novembro de 2025 um Plano de Ação Integrado para a Circ
 
 | Tema | O que diz o plano | Porque nos interessa |
 | --- | --- | --- |
-| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Com 156 830 hab. e 315 kg/hab de não triados, são cerca de 1.300 a 2.650 t/ano a ir para o indiferenciado (cálculo nosso) |
-| Território | Ocupação dispersa, 55 freguesias; porta a porta pode ser inviável | O custo está nas zonas dispersas: é aí que se ganha |
+| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Com 156 830 hab. e 315 kg/hab de não triados, são cerca de 1 300 a 2 650 t/ano a ir para o indiferenciado (cálculo nosso) |
+| Território | Ocupação dispersa, 48 freguesias; porta a porta pode ser inviável | O custo está nas zonas dispersas: é aí que se ganha |
 | Fluxo escondido | Microempresas têxteis deitam retalhos no lixo urbano; com menos de 10 trabalhadores não têm mapa de resíduos | Ninguém sabe onde está esse têxtil |
 | Custo operacional | As fibras enrolam-se nas máquinas | Tirar têxtil do indiferenciado poupa dinheiro além do aterro |
 | Triagem | Ainda manual; automação (NIR) cara e incipiente | Espaço para triagem barata por imagem |

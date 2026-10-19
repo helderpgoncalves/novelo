@@ -7,11 +7,12 @@ O `CLAUDE.md` importa este ficheiro. **Lê-o inteiro antes de mexer em código.*
 
 Novelo é a ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães ao menor custo
 (Desafio 5 TexVitrus, Hack4Guimarães 2035). Orçamento e meta entram, saem cenários comparáveis em
-€, toneladas e €/t. Cinco features: simulador da rede, "E se...?" em português sobre o otimizador,
-lote com passaporte e bolsa de fibra, fluxo Sankey, relatório RAP. Domínio completo: `docs/engenharia/features.md`.
+€, toneladas e €/t. Funcionalidades: simulador da rede (CP-SAT e VRP), cenários e comparação, "E se...?" em português com verificador de números,
+triagem por foto, lotes com QR e passaporte público, bolsa de fibra, evidência por marca, relatório RAP em PDF e mapa. Domínio completo: `docs/engenharia/features.md`.
 
 - **Equipa:** Hélder Gonçalves e Flávio Fernandes. Hackathon de 5 dias: velocidade e perfeição, sem desperdício.
 - **Produção:** https://novelo.bitsapiens.io (Coolify, `docker-compose.yml`). Dev: `just dev`.
+- **Ambiente:** `docs/engenharia/ambiente.md` (variáveis), `docs/engenharia/ia.md` (OpenRouter), `docs/engenharia/workflow-ia.md` (agentes).
 
 ## Regra zero: usar os dados reais da Vitrus
 
@@ -21,9 +22,9 @@ e `data/processed/` (gerado por `just etl`). Análise e limites em `docs/dados/a
 | Facto | Valor | Onde se usa |
 | --- | --- | --- |
 | Têxtil recolhido em 2025 (4 entidades) | 301,3 t = 0,16 kg/hab/mês | Ponto de partida; calibração da taxa de captura |
-| Potencial estimado (Plano municipal) | 1 313 t/ano (0,7 kg/hab/mês) | Procura; captura atual ≈ 23% |
+| Potencial estimado (0,7 kg/hab/mês × 156 830 hab. do INE) | ≈ 1 317 t/ano | Procura; captura atual ≈ 22,9% |
 | Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Sankey observado; receita e €/t |
-| Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 93 localidades | Recolha a pedido sem km novos |
+| Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 82 localidades | Recolha a pedido sem km novos |
 | Localizações dos contentores | **chegam a 20 out 2026**: `data/raw/` + ETL | Pontos atuais da rede de partida |
 
 Nunca inventar um valor: ou vem dos dados, ou está em `docs/engenharia/dados-e-modelo.md` como pressuposto
@@ -34,7 +35,7 @@ com fonte, ou leva a etiqueta "estimativa" no ecrã.
 | Comando | O que faz |
 | --- | --- |
 | `just dev` | Stack completa com hot reload (Docker): web :3190, api :8190, postgres :5590 |
-| `just check` | Lint + tipos + testes + contrato. **O mesmo que a CI. Tem de passar antes de cada push** |
+| `just check` | Lint + tipos + testes + contrato. Corre localmente (não há CI remota por agora). **Tem de passar antes de cada push** |
 | `just gen` | Regenera `openapi.json` e o cliente TypeScript. Correr sempre que a API mudar |
 | `just etl` | Excel de `data/raw/` para `data/processed/` |
 | `just fix` | Formata e corrige o que o lint conseguir |
@@ -74,6 +75,8 @@ O `operationId` é o nome da função Python: nomes claros (`list_zones`, `creat
 **TypeScript (web).**
 - `strict` + `noUncheckedIndexedAccess`. Biome para lint e formatação. Sem `any`, sem `// @ts-ignore`.
 - Rotas file-based em `src/routes/`; dados nos `loader` com `queryClient.ensureQueryData`; estado partilhável na URL (`validateSearch`).
+- **Tabelas: sempre `DataTable`** (`src/components/data-table`). Cada coluna declara `cell` e, para ordenar, pesquisar e filtrar, `value`; mais `filter`, `sortable`, `searchable`, `hideable`, `defaultHidden`, e `primary`/`badge`/`full` para o cartão em telemóvel. Dá pesquisa, filtros, colunas e paginação sem código extra; nunca uma tabela à mão.
+- **Telemóvel primeiro:** alvos de toque ≥ 40 px, campos a 16 px, `Page`/`Section` para o ritmo vertical, `StickyActions` em formulários longos, diálogos como folha inferior.
 - Pastas por funcionalidade em `src/features/<nome>/`; componentes sem lógica de negócio.
 - UI com shadcn/ui + tokens da marca (`docs/marca/guia-de-marca.md`). Estados obrigatórios em todo o ecrã de dados: a carregar, vazio, erro, sucesso.
 - Números em pt-PT com unidade (`lib/format.ts`). KPIs estimados levam "estimativa". Acessibilidade AA, tudo usável por teclado.
@@ -87,7 +90,7 @@ Nomes de ficheiros de docs em português, minúsculas e hífens.
 
 ## Git e entrega
 
-- Branch `main` é produção: o Coolify faz deploy a cada push. Trabalho em `feat/…`, `fix/…`, `chore/…` e PR pequeno; em hackathon permite-se push direto só com `just check` verde.
+- Branch `main` é produção: o Coolify faz deploy a cada push. Neste hackathon o push é direto para `main`, só com `just check` verde (PR pequeno continua a ser bem-vindo para mudanças arriscadas).
 - Commits em Conventional Commits, no imperativo, em inglês: `feat(api): add on-demand collection mode`.
 - Nunca commitar `.env`, nunca `--force` em `main`, nunca `--no-verify`.
 - Definição de pronto: `just check` verde, contrato regenerado, ecrã com os 4 estados, docs atualizados se mudou comportamento, funciona em `just dev`.
@@ -118,7 +121,7 @@ procedimento lendo diretamente `.claude/skills/<nome>/SKILL.md`. `.agents/skills
 | `optimization-engineer` | `domain/` e o otimizador |
 | `data-engineer` | `scripts/etl/` e `data/` |
 | `ai-engineer` | `ai/` e `adapters/openrouter.py` |
-| `devops` | Docker, Coolify, CI |
+| `devops` | Docker, Coolify e diagnóstico de produção |
 | `reviewer` | Revisão só de leitura antes de merge |
 | `docs-writer` | `docs/` |
 

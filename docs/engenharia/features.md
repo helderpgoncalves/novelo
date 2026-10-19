@@ -2,7 +2,7 @@
 
 Cinco features, uma história: **do saco ao fio**. Planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028. Cada feature usa a anterior, e todas cabem numa demo de dois minutos.
 
-![Do saco ao fio: cada passo alimenta o seguinte](img/diagrama-do-saco-ao-fio.png)
+![Do saco ao fio: cada passo alimenta o seguinte](../img/diagrama-do-saco-ao-fio.png)
 
 A linha tracejada à esquerda é o copiloto (feature 6): o que os lotes mostram no terreno volta a calibrar o plano.
 
@@ -16,7 +16,7 @@ O decisor pergunta em português e recebe um cenário novo, calculado pelo otimi
 
 **Como funciona, passo a passo:**
 
-1. O modelo (Claude, pela API da Anthropic) recebe a pergunta, o cenário atual e as listas fechadas de freguesias, modos e parâmetros.
+1. O modelo (via OpenRouter, ver [IA](ia.md)) recebe a pergunta, o cenário atual e as listas fechadas de freguesias, modos e parâmetros.
 2. Devolve **só** uma alteração estruturada, `ScenarioDelta`, validada por Pydantic. Exemplo: `{"zones": ["Serzedelo"], "remove_modes": ["street"], "add_modes": ["on_demand"]}`.
 3. O ecrã mostra "Entendi: ..." antes de correr, para o decisor confirmar ou corrigir.
 4. O OR-Tools corre o cenário novo e devolve os KPIs em JSON.
@@ -28,7 +28,7 @@ O decisor pergunta em português e recebe um cenário novo, calculado pelo otimi
 - Pergunta ambígua ("e se pouparmos?") → o Novelo pergunta de volta em vez de adivinhar.
 - Freguesia ou modo fora das listas → recusa explícita, com sugestões próximas.
 - Cada resposta guarda pergunta, alteração, cenário e versão do prompt: tudo auditável.
-- Um conjunto de 20 perguntas de teste com alteração esperada corre na CI (evals), para mudanças de prompt não partirem nada.
+- Um conjunto de perguntas de teste com alteração esperada protege cada mudança de prompt (`tests/api/test_whatif.py`).
 
 ## 2. Lote com passaporte e bolsa de fibra
 
@@ -64,7 +64,7 @@ Um botão gera o PDF que a câmara vai precisar para negociar com as entidades g
 | Evidência por marca | As marcas mais encontradas e a sua composição (ver feature 5) |
 | Método e fontes | Fórmulas, pressupostos e fontes de cada número, com a etiqueta "estimativa" onde se aplica |
 
-Gerado a partir de um modelo HTML com a identidade Novelo e convertido para PDF no servidor (WeasyPrint). Cada relatório fica guardado com data e versão dos parâmetros, para se poder reproduzir.
+Gerado a partir de um modelo HTML com a identidade Novelo e convertido para PDF no servidor (WeasyPrint). O ecrã "Relatório RAP" guarda o histórico e descarrega cada PDF. Cada relatório fica guardado com data e versão dos parâmetros, para se poder reproduzir.
 
 ## 4. Fluxo do saco ao fio
 
@@ -87,11 +87,23 @@ Na triagem, a foto da etiqueta dá também a marca, quando está visível. O Nov
 Um agente que corre todas as segundas-feiras e fecha o ciclo entre o plano e o terreno:
 
 1. Lê os lotes da semana e compara toneladas reais com as previstas por ponto.
-2. Recalibra as taxas de captura por modo (ver [Dados e modelo](04-dados-e-modelo.md)).
+2. Recalibra as taxas de captura por modo (ver [Dados e modelo](dados-e-modelo.md)).
 3. Volta a correr o otimizador e propõe alterações com a poupança esperada ("mover o ponto da Junta X para o supermercado Y: +0,4 t/mês").
 4. Escreve um resumo para a Vitrus. **Nada é aplicado sem aprovação humana.**
 
 No hackathon mostra-se uma execução, com dados simulados de uma semana. No pitch entra como o próximo passo natural.
+
+## Estado de implementação
+
+| Funcionalidade | Estado |
+| --- | --- |
+| Simulador, cenários e comparação, pressupostos com origem | Feito |
+| "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito |
+| Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
+| Mapa da rede, circuitos, frota, localidades, qualidade dos dados | Feito |
+| Camada dos contentores existentes no mapa | Falta: dados a chegar a 20 de outubro de 2026 |
+| Copiloto de operações | Não iniciado (fica para depois) |
 
 ## O que fica de fora, de propósito
 
