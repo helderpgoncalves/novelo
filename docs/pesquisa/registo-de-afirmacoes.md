@@ -2,7 +2,7 @@
 
 **Regra: nenhum número vai para um slide, para a demo ou para o relatório sem uma linha aqui.** Se a linha estiver em "Por verificar", o número não se usa em público; se for "Pressuposto nosso" ou "Cálculo nosso", diz-se com essa palavra.
 
-Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F40 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
+Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F60 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
 
 Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
 
@@ -95,6 +95,30 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | E3 | Prémios totais | 20 000 € para os cinco desafios | [F21] | Secundária | — |
 | E4 | Critérios do júri | **desconhecidos** | — | Por verificar: perguntar à organização | — |
 | E5 | Duração do pitch | **desconhecida**; assumimos 5 minutos | — | Pressuposto | — |
+
+## F. Mentores, Fibrenamics e hackathon
+
+Referências F41 a F60 em [Fontes](fontes.md#mentores-fibrenamics-e-hackathon). "M" de mentores.
+
+| # | Afirmação | Valor | Fonte | Estado | Uso |
+| --- | --- | --- | --- | --- | --- |
+| M1 | Luís Miguel Oliveira é o responsável executivo (CEO) da Fibrenamics | CEO | ECO 2026 [F48], diretórios; o utilizador indicou que é mentor e trabalha lá | **Por verificar** (título não confirmado em página oficial) | Dizer "Fibrenamics", não o título, até confirmar |
+| M2 | A Fibrenamics está em Guimarães (Azurém) e existe desde 2011 | 2011 | [F41] | Primária | Conversa e slide de parceiros |
+| M3 | Raul Fangueiro é presidente da Fibrenamics | Presidente | [F45] | Secundária | Conversa |
+| M4 | A Fibrenamics tem o projeto Lusitano de fios de fibras recicladas (2022 a 30 jun 2026), com Riopele, Twintex e outros | 2022 a 2026 | [F42] | Primária | Conversa; não diz se é pós-consumo |
+| M5 | A Fibrenamics Green já envolveu mais de 100 empresas, com cerca de 553 000 € de apoio (Norte 2020, FEDER) | 100; 553 000 € | [F45] | Secundária | Conversa |
+| M6 | O resíduo fibroso listado pela Fibrenamics Green é de produção e corte (pré-consumo): cerca de 85% celulósico, 10% poliéster | 85/10/2/3 | [F44] | Primária (página antiga) | Só em conversa |
+| M7 | A Fibrenamics aceita têxtil pós-consumo | **desconhecido** | [F43] não o menciona | **Por verificar**: pergunta 1 ao mentor | Não afirmar |
+| M8 | Investigação da UMinho encaminha misturas e fração de baixo valor para não tecidos, compósitos e isolamento | qualitativo | [F49], [F50], [F51], [F52] | Primária (investigação, via pesquisa) | Slide da indústria, só como "a investigação aponta" |
+| M9 | Cerca de 39% de denim pós-consumo reciclado chega à resistência térmica-alvo num não tecido | 39% | [F52] | Primária (investigação, via pesquisa) | Só em conversa |
+| M10 | A Sasia participa em projetos de isolamento acústico (construção e automóvel) | qualitativo | [F53] | Secundária | Conversa |
+| M11 | Lucas Nascimento é doutorando/doutorado em Gestão e Tratamento de Resíduos (UMinho) e investigador da Vitrus | — | [F56], utilizador | Secundária + indicado pelo utilizador | Perfil |
+| M12 | A Vitrus participa em dois projetos europeus de circularidade de comércio e serviços não alimentares, incluindo têxteis (URBACT Let's Go Circular e Circular Ecosystems) | 2 | [F17], [F18] | Secundária; **projetos exatos por confirmar** | Conversa com o Lucas |
+| M13 | Guimarães e a Vitrus ganharam um lugar no Horizon Europe (periASTY, missão de cidades neutras em carbono) | 1.º de 3 | [F58] | Secundária; não é de resíduos | Não usar |
+| M14 | A campanha nas escolas recolheu cerca de 3 t em mais de 30 escolas, destino To Be Green | 3 t; 30 | [F57], [F19] | Secundária | Conversa |
+| M15 | Paulo Afonso, do Departamento de Produção e Sistemas, é investigador em custos, avaliação de investimentos, modelos de negócio e logística (SLOTS) | — | [F54], [F55] | Primária (instituição); **é o mentor do desafio por inferência** | Perfil |
+| M16 | Hack4Guimarães: critérios do júri, mentores e duração do pitch | **não públicos** | [F59] | Por verificar: formulário de inscrição e organização | Perguntar |
+| M17 | Hack4Guimarães: formato híbrido, propriedade intelectual dos autores | — | [F59] | Primária | Cenários pós-hackathon |
 
 ## Como atualizar este registo
 

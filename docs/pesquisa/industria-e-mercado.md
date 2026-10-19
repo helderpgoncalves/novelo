@@ -24,6 +24,26 @@ Consultado a 19 de outubro de 2026. Fontes em [Fontes](fontes.md).
 
 **Limite técnico da reciclagem mecânica:** uma fonte de recicladores refere que só entram cerca de 15 a 20% de fibra reciclada num fio sem perda de qualidade [F36]. Por isso os lotes de uma só fibra valem mais.
 
+## Fibrenamics e a investigação da UMinho
+
+A [Fibrenamics](https://fibrenamics.com) [F41] é o centro de inovação em materiais fibrosos e compósitos da Universidade do Minho, em Azurém, Guimarães, a 5 km do centro, e um dos mentores deste hackathon (Luís Miguel Oliveira, ver [Mentores](../projeto/mentores.md)). Para o Novelo é o elo mais curto entre o lote de têxtil triado e **o que a ciência sabe fazer com ele**.
+
+| O que encontrámos | Estado | Para o Novelo |
+| --- | --- | --- |
+| Projeto **Lusitano** (2022 a 30 jun 2026): fios de fibras recicladas e naturais, com Riopele, Twintex, Calvelex, Polopiqué, UBI, IST e outros, financiado pelo PRR [F42] | Primária | Mostra que a ligação "resíduo fibroso para fio" existe na região; a página **não diz se o resíduo é pós-consumo** |
+| **Fibrenamics Green**: valorização de resíduos industriais (infusão sob vácuo, moldação por compressão, não tecidos), mais de 100 empresas e cerca de 553 000 € [F43] [F45] | Primária e secundária | Os destinos "não tecido" e "compósito" são os de fração de baixo valor; a lista pública de resíduos **não menciona têxteis** |
+| Resíduo fibroso listado: **pré-consumo** (produção e corte), cerca de 85% celulósico, 10% poliéster, 2% lã, 3% impurezas [F44] | Primária (página antiga) | Dá um critério de referência (composição homogénea, poucas impurezas), mas é pré-consumo |
+| Investigação da UMinho: misturas multicomponente entram por não tecidos, compósitos, automóvel, construção e isolamento; pós-consumo de calçado e de denim em isolamento térmico e acústico [F49] a [F52] | Primária (investigação, via pesquisa) | **Destino plausível para a fração rejeitada pelo fio**: o rejeito de 14,1% e as misturas |
+| Serviços de caracterização estrutural, funcional e de durabilidade [F46] | Primária | Via para medir a qualidade dos nossos lotes (ensaio externo) |
+| Novas instalações: Fábrica do Arquinho (protocolo de 2024) e, segundo o ECO, um edifício no AvePark (Defense & Protection) [F47] [F48] | Primária e secundária; **relação entre os dois por confirmar** | Contexto; não afirmar morada |
+| Reunião inicial sem custos com a Fibrenamics (marcação em linha) e emails `fibrenamics@` e `green@` [F41] [F43] | Primária | Contacto de reserva se o mentor não responder |
+
+**Hipóteses a testar (não factos):**
+
+1. A Fibrenamics pode ser o **destino de ensaio** de lotes de pós-consumo triados pelo Novelo (caracterização e prova de conceito em não tecido), mesmo que não compre material.
+2. A lista de resíduos que aceita para o Green pode vir a incluir pós-consumo se houver lotes **homogéneos e rastreados**; é o que o passaporte do lote entrega.
+3. A experiência dos projetos europeus e do PRR pode abrir um **consórcio de piloto** (ver [Mentores](../projeto/mentores.md#pós-hackathon-e-financiamento)).
+
 ## O que a Vitrus nos disse, e o que não sabemos
 
 | Facto | Valor | Origem | Estado |
