@@ -159,6 +159,8 @@ function Reports() {
           </p>
         ) : (
           <DataTable
+            id="reports"
+            controls="auto"
             columns={historyColumns}
             rows={reports}
             getKey={(r) => r.id}
@@ -175,6 +177,8 @@ const historyColumns: Column<ReportOut>[] = [
     id: 'title',
     header: m.reports_col_title(),
     primary: true,
+    label: m.reports_col_title(),
+    value: (r) => r.title,
     cell: (r) => (
       <>
         {r.title}{' '}
@@ -188,18 +192,24 @@ const historyColumns: Column<ReportOut>[] = [
     id: 'scenarios',
     header: m.reports_col_scenarios(),
     className: 'text-muted-foreground',
+    value: (r) => r.scenario_ids.length,
+    searchable: false,
     cell: (r) => r.scenario_ids.length,
   },
   {
     id: 'created',
     header: m.reports_col_created(),
     className: 'text-muted-foreground',
+    value: (r) => r.created_at,
+    searchable: false,
     cell: (r) => formatDateTime(r.created_at),
   },
   {
     id: 'size',
     header: m.reports_col_size(),
     align: 'right',
+    value: (r) => r.size_bytes,
+    searchable: false,
     cell: (r) => `${formatNumber(r.size_bytes / 1024, 0)} kB`,
   },
   {
@@ -207,6 +217,8 @@ const historyColumns: Column<ReportOut>[] = [
     header: <span className="sr-only">{m.reports_open()}</span>,
     align: 'right',
     full: true,
+    label: m.reports_open(),
+    hideable: false,
     cell: (r) => (
       <Button asChild variant="outline" size="sm" className="w-full md:w-auto">
         <a href={pdfUrl(r.id)} target="_blank" rel="noreferrer">

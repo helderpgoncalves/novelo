@@ -31,17 +31,26 @@ function DestinationBar({ entity }: { entity: EntityBaseline }) {
 export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
   const pct = (v: number) => formatPercent(v);
   const columns: Column<EntityBaseline>[] = [
-    { id: 'entity', header: m.entity_table_entity(), cell: (e) => e.entity, primary: true },
+    {
+      id: 'entity',
+      header: m.entity_table_entity(),
+      cell: (e) => e.entity,
+      value: (e) => e.entity,
+      primary: true,
+    },
     {
       id: 'method',
       header: m.entity_table_data(),
       badge: true,
+      value: (e) => e.method,
+      filter: { format: (v) => (v === 'weighed' ? m.method_weighed() : m.method_percentage()) },
       cell: (e) => <MethodBadge entity={e} />,
     },
     {
       id: 'collected',
       header: m.entity_table_collected(),
       align: 'right',
+      value: (e) => e.total_t,
       cell: (e) => formatTonnes(e.total_t),
     },
     {
@@ -49,24 +58,35 @@ export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
       header: m.entity_table_destination(),
       className: 'w-44',
       full: true,
+      sortable: false,
       cell: (e) => <DestinationBar entity={e} />,
     },
-    { id: 'reuse', header: m.entity_table_reuse(), align: 'right', cell: (e) => pct(e.reuse_pct) },
+    {
+      id: 'reuse',
+      header: m.entity_table_reuse(),
+      align: 'right',
+      value: (e) => e.reuse_pct,
+      cell: (e) => pct(e.reuse_pct),
+    },
     {
       id: 'recycle',
       header: m.entity_table_recycle(),
       align: 'right',
+      value: (e) => e.recycle_pct,
       cell: (e) => pct(e.recycle_pct),
     },
     {
       id: 'reject',
       header: m.entity_table_reject(),
       align: 'right',
+      value: (e) => e.reject_pct,
       cell: (e) => pct(e.reject_pct),
     },
   ];
   return (
     <DataTable
+      id="entities"
+      controls="never"
       columns={columns}
       rows={entities}
       getKey={(e) => e.entity}

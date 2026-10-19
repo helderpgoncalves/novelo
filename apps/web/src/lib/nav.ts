@@ -53,11 +53,16 @@ export const NAV: NavSection[] = [
     title: () => m.nav_section_overview(),
     items: [
       { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
+      { label: () => m.nav_map(), to: '/map', icon: MapPinned },
+    ],
+  },
+  {
+    title: () => m.nav_section_data(),
+    items: [
       { label: () => m.nav_circuits(), to: '/circuits', icon: RouteIcon },
       { label: () => m.nav_fleet(), to: '/fleet', icon: Truck },
       { label: () => m.nav_localities(), to: '/localities', icon: Waypoints },
       { label: () => m.nav_data_quality(), to: '/data-quality', icon: ShieldCheck },
-      { label: () => m.nav_map(), to: '/map', icon: MapPinned },
     ],
   },
   {
@@ -75,8 +80,11 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_lots(), to: '/lots', icon: Boxes },
       { label: () => m.nav_market(), to: '/market', icon: Store },
       { label: () => m.nav_brands(), to: '/brands', icon: Tags },
-      { label: () => m.nav_rap(), to: '/reports', icon: FileText },
     ],
+  },
+  {
+    title: () => m.nav_section_reporting(),
+    items: [{ label: () => m.nav_rap(), to: '/reports', icon: FileText }],
   },
   {
     title: () => m.nav_section_admin(),

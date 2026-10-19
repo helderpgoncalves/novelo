@@ -16,14 +16,33 @@ test.describe('dados reais da Vitrus', () => {
     await expect(page.getByRole('row', { name: /Nova Etapa/ })).toContainText('estimativa');
   });
 
-  test('circuitos: pesquisa e filtro por tipologia', async ({ page }) => {
+  test('circuitos: pesquisa, filtro, ordenação, colunas e paginação', async ({ page }) => {
     await page.goto('/pt/circuits');
-    await expect(page.getByText('40 de 40 circuitos')).toBeVisible();
+    const table = page.getByRole('table');
+    await expect(page.getByText('1–25 de 40')).toBeVisible();
+    await expect(page.getByText('Página 1 de 2')).toBeVisible();
+    await page.getByRole('button', { name: 'Página seguinte' }).click();
+    await expect(page.getByText('26–40 de 40')).toBeVisible();
+
     await page.getByLabel('Pesquisar circuito ou localidade').fill('Ronfe');
-    await expect(page.getByRole('row', { name: /C18/ })).toBeVisible();
-    await page.getByLabel('Pesquisar circuito ou localidade').fill('');
-    await page.getByRole('button', { name: 'Orgânicos' }).click();
-    await expect(page.getByText('7 de 40 circuitos')).toBeVisible();
+    await expect(table.getByRole('row', { name: /C18/ })).toBeVisible();
+    await page.getByRole('button', { name: 'Limpar tudo' }).click();
+
+    await page.getByRole('button', { name: /^Tipologia/ }).click();
+    await page.getByRole('menuitemcheckbox', { name: /Orgânicos/ }).click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByText('1–7 de 7 · filtrado de 40')).toBeVisible();
+
+    await page.getByRole('button', { name: 'Ordenar por Circuito' }).click();
+    await expect(table.getByRole('columnheader', { name: /Circuito/ })).toHaveAttribute(
+      'aria-sort',
+      'ascending',
+    );
+
+    await page.getByRole('button', { name: 'Colunas' }).click();
+    await page.getByRole('menuitemcheckbox', { name: 'Viaturas' }).click();
+    await page.keyboard.press('Escape');
+    await expect(table.getByRole('columnheader', { name: /Viaturas/ })).toHaveCount(0);
   });
 
   test('frota: mapa de ocupação e viaturas sem circuito', async ({ page }) => {
@@ -36,9 +55,11 @@ test.describe('dados reais da Vitrus', () => {
 
   test('localidades: filtro por frequência', async ({ page }) => {
     await page.goto('/pt/localities');
-    await page.getByRole('button', { name: '3+ dias' }).click();
-    const count = page.getByText(/de \d+ localidades/);
-    await expect(count).toBeVisible();
+    await page.getByRole('button', { name: /^Dias\/semana/ }).click();
+    await page.getByRole('menuitemcheckbox').first().click();
+    await page.keyboard.press('Escape');
+    await expect(page.getByText(/filtrado de \d+/)).toBeVisible();
+    await page.getByRole('button', { name: 'Limpar tudo' }).click();
     await page.getByLabel('Pesquisar localidade').fill('Ronfe');
     await expect(page.getByRole('row', { name: /Ronfe/ })).toBeVisible();
   });

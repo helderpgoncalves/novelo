@@ -2,7 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listLocalitiesOptions, listZonesOptions } from '@/client/@tanstack/react-query.gen';
-import { FilterChips } from '@/components/data-table-toolbar';
+import { FilterChips } from '@/components/filter-chips';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Label } from '@/components/ui/label';

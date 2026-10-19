@@ -9,6 +9,8 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
       id: 'file',
       header: m.quality_source_file(),
       primary: true,
+      label: m.quality_source_file(),
+      value: (s) => `${s.file_name} ${s.title} ${s.notes ?? ''}`,
       className: 'whitespace-normal',
       cell: (s) => (
         <div className="min-w-0">
@@ -24,15 +26,24 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
         </div>
       ),
     },
-    { id: 'provider', header: m.quality_source_provider(), cell: (s) => s.provider },
+    {
+      id: 'provider',
+      header: m.quality_source_provider(),
+      value: (s) => s.provider,
+      filter: true,
+      cell: (s) => s.provider,
+    },
     {
       id: 'received',
       header: m.quality_source_received(),
+      value: (s) => s.received_on,
       cell: (s) => (s.received_on ? formatDate(s.received_on) : m.common_dash()),
     },
     {
       id: 'period',
       header: m.quality_source_period(),
+      value: (s) => s.period_start,
+      searchable: false,
       cell: (s) =>
         s.period_start && s.period_end
           ? `${formatDate(s.period_start, 'short')} - ${formatDate(s.period_end, 'short')}`
@@ -41,12 +52,16 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
     {
       id: 'fingerprint',
       header: m.quality_source_fingerprint(),
+      defaultHidden: true,
+      sortable: false,
+      value: (s) => s.file_sha256,
       className: 'font-mono text-muted-foreground text-xs',
       cell: (s) => <span title={s.file_sha256}>{s.file_sha256.slice(0, 12)}…</span>,
     },
   ];
   return (
     <DataTable
+      id="sources"
       columns={columns}
       rows={sources}
       getKey={(s) => s.key}

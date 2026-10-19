@@ -1,7 +1,8 @@
-import type { RouteOut } from '@/client';
+import type { CollectionMode, RouteOut } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { ModeBadge } from '@/components/mode-badge';
 import { formatNumber, formatTonnes } from '@/lib/format';
+import { modeLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 
 export function RoutesTable({ routes }: { routes: RouteOut[] }) {
@@ -10,26 +11,46 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
       id: 'vehicle',
       header: m.route_vehicle(),
       primary: true,
+      value: (r) => r.vehicle,
       cell: (r) => <span className="tabular-nums">#{r.vehicle}</span>,
     },
-    { id: 'mode', header: m.alloc_mode(), badge: true, cell: (r) => <ModeBadge mode={r.mode} /> },
+    {
+      id: 'mode',
+      header: m.alloc_mode(),
+      badge: true,
+      value: (r) => r.mode,
+      filter: { format: (v) => modeLabel[v as CollectionMode]() },
+      cell: (r) => <ModeBadge mode={r.mode} />,
+    },
     {
       id: 'stops',
       header: m.route_stops(),
       full: true,
+      value: (r) => r.stops.map((s) => s.parish_name).join(' '),
+      sortable: false,
       className: 'max-w-md whitespace-normal text-muted-foreground',
       cell: (r) => r.stops.map((s) => s.parish_name).join(' → '),
     },
-    { id: 'load', header: m.route_load(), align: 'right', cell: (r) => formatTonnes(r.load_t, 2) },
+    {
+      id: 'load',
+      header: m.route_load(),
+      align: 'right',
+      value: (r) => r.load_t,
+      searchable: false,
+      cell: (r) => formatTonnes(r.load_t, 2),
+    },
     {
       id: 'km',
       header: m.route_km_round(),
       align: 'right',
+      value: (r) => r.km,
+      searchable: false,
       cell: (r) => `${formatNumber(r.km, 1)} km`,
     },
   ];
   return (
     <DataTable
+      id="routes"
       columns={columns}
       rows={routes}
       getKey={(r) => `${r.mode}-${r.vehicle}`}
