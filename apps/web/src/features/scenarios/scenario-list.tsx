@@ -1,7 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { GitCompareArrows } from 'lucide-react';
 import { useState } from 'react';
-import type { ScenarioSummary } from '@/client';
+import type { ScenarioObjective, ScenarioSummary } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -25,6 +25,8 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       header: <span className="sr-only">{m.scenarios_select()}</span>,
       className: 'w-10',
       desktopOnly: true,
+      label: m.scenarios_select(),
+      hideable: false,
       cell: (s) => (
         <Checkbox
           checked={selected.includes(s.id)}
@@ -37,6 +39,8 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'name',
       header: m.scenarios_col_name(),
       primary: true,
+      label: m.scenarios_col_name(),
+      value: (s) => s.label,
       cell: (s) => (
         <span className="flex flex-wrap items-center gap-x-2 gap-y-1">
           <Link
@@ -61,18 +65,22 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'objective',
       header: m.scenarios_col_objective(),
       className: 'text-muted-foreground',
+      value: (s) => s.objective,
+      filter: { format: (v) => objectiveLabel[v as ScenarioObjective]() },
       cell: (s) => objectiveLabel[s.objective](),
     },
     {
       id: 'tonnes',
       header: m.kpi_tonnes(),
       align: 'right',
+      value: (s) => s.tonnes_year,
       cell: (s) => formatTonnes(s.tonnes_year),
     },
     {
       id: 'eurt',
       header: m.kpi_eur_per_tonne(),
       align: 'right',
+      value: (s) => s.eur_per_tonne,
       cell: (s) =>
         s.eur_per_tonne == null ? m.common_dash() : `${formatNumber(s.eur_per_tonne, 0)} €`,
     },
@@ -80,19 +88,29 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'cost',
       header: m.kpi_annual_cost(),
       align: 'right',
+      value: (s) => s.annual_cost_eur,
       cell: (s) => formatEur(s.annual_cost_eur),
     },
-    { id: 'capex', header: m.kpi_capex(), align: 'right', cell: (s) => formatEur(s.capex_eur) },
+    {
+      id: 'capex',
+      header: m.kpi_capex(),
+      align: 'right',
+      value: (s) => s.capex_eur,
+      cell: (s) => formatEur(s.capex_eur),
+    },
     {
       id: 'coverage',
       header: m.kpi_coverage(),
       align: 'right',
+      value: (s) => s.coverage_pct,
       cell: (s) => formatPercent(s.coverage_pct),
     },
     {
       id: 'created',
       header: m.scenarios_col_created(),
       className: 'text-muted-foreground',
+      value: (s) => s.created_at,
+      searchable: false,
       cell: (s) => formatDateTime(s.created_at),
     },
   ];
@@ -113,6 +131,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
         </Button>
       </div>
       <DataTable
+        id="scenarios"
         columns={columns}
         rows={scenarios}
         getKey={(s) => s.id}

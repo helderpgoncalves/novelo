@@ -2,7 +2,7 @@ import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-q
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CheckCheck, ExternalLink, ScanLine, Truck } from 'lucide-react';
 import { toast } from 'sonner';
-import type { GetLotQrData, LotItemOut } from '@/client';
+import type { Fibre, GarmentType, GetLotQrData, LotItemOut, TextileDestination } from '@/client';
 import {
   changeLotStateMutation,
   getLotOptions,
@@ -157,6 +157,7 @@ function LotPage() {
             </p>
           ) : (
             <DataTable
+              id="lot-items"
               columns={itemColumns}
               rows={lot.item_list}
               getKey={(i) => i.id}
@@ -184,12 +185,16 @@ const itemColumns: Column<LotItemOut>[] = [
     id: 'garment',
     header: m.triage_garment(),
     primary: true,
+    value: (i) => i.garment_type,
+    filter: { format: (v) => garmentLabel[v as GarmentType]() },
     cell: (i) => garmentLabel[i.garment_type](),
   },
   {
     id: 'condition',
     header: m.triage_condition(),
     badge: true,
+    value: (i) => i.condition,
+    filter: { format: (v) => destinationLabel[v as TextileDestination]() },
     cell: (i) => (
       <Badge
         variant={i.condition === 'reject' ? 'outline' : 'secondary'}
@@ -199,23 +204,34 @@ const itemColumns: Column<LotItemOut>[] = [
       </Badge>
     ),
   },
-  { id: 'fibre', header: m.lots_col_fibre(), cell: (i) => fibreLabel[i.dominant_fibre]() },
+  {
+    id: 'fibre',
+    header: m.lots_col_fibre(),
+    value: (i) => i.dominant_fibre,
+    filter: { format: (v) => fibreLabel[v as Fibre]() },
+    cell: (i) => fibreLabel[i.dominant_fibre](),
+  },
   {
     id: 'brand',
     header: m.triage_brand(),
     className: 'text-muted-foreground',
+    value: (i) => i.brand,
     cell: (i) => i.brand ?? m.common_dash(),
   },
   {
     id: 'weight',
     header: m.lots_col_weight(),
     align: 'right',
+    value: (i) => i.estimated_weight_g,
+    searchable: false,
     cell: (i) => `${i.estimated_weight_g} g`,
   },
   {
     id: 'confidence',
     header: m.lot_item_confidence(),
     align: 'right',
+    value: (i) => i.confidence,
+    searchable: false,
     cell: (i) => `${Math.round(i.confidence * 100)}%`,
   },
 ];

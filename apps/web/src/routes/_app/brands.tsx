@@ -1,7 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Info } from 'lucide-react';
-import type { BrandStat } from '@/client';
+import type { BrandStat, Fibre } from '@/client';
 import { getBrandEvidenceOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
 import { PageHeader } from '@/components/page-header';
@@ -26,11 +26,19 @@ function Brands() {
   const max = Math.max(1, ...data.brands.map((b) => b.weight_kg));
 
   const columns: Column<BrandStat>[] = [
-    { id: 'brand', header: m.brands_col_brand(), primary: true, cell: (b) => b.brand },
+    {
+      id: 'brand',
+      header: m.brands_col_brand(),
+      primary: true,
+      value: (b) => b.brand,
+      cell: (b) => b.brand,
+    },
     {
       id: 'share',
       header: m.brands_col_share(),
       badge: true,
+      value: (b) => b.share_pct,
+      searchable: false,
       cell: (b) => formatPercent(b.share_pct),
     },
     {
@@ -38,6 +46,8 @@ function Brands() {
       header: m.brands_col_weight(),
       className: 'w-56',
       full: true,
+      value: (b) => b.weight_kg,
+      searchable: false,
       cell: (b) => (
         <div className="flex items-center gap-3">
           <span className="h-2 flex-1 overflow-hidden rounded-full bg-muted">
@@ -52,11 +62,20 @@ function Brands() {
         </div>
       ),
     },
-    { id: 'items', header: m.lots_col_items(), align: 'right', cell: (b) => b.items },
+    {
+      id: 'items',
+      header: m.lots_col_items(),
+      align: 'right',
+      value: (b) => b.items,
+      searchable: false,
+      cell: (b) => b.items,
+    },
     {
       id: 'fibre',
       header: m.brands_col_fibre(),
       className: 'text-muted-foreground',
+      value: (b) => b.top_fibre,
+      filter: { format: (v) => fibreLabel[v as Fibre]() },
       cell: (b) => fibreLabel[b.top_fibre](),
     },
   ];
@@ -96,6 +115,7 @@ function Brands() {
         <EmptyState title={m.brands_empty_title()} description={m.brands_empty_text()} />
       ) : (
         <DataTable
+          id="brands"
           columns={columns}
           rows={data.brands}
           getKey={(b) => b.brand}

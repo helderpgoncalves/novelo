@@ -11,10 +11,13 @@ function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }
     items: section.items.filter((item) => !item.adminOnly || role === 'admin'),
   })).filter((section) => section.items.length > 0);
   return (
-    <nav aria-label={m.nav_main_aria()} className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
+    <nav
+      aria-label={m.nav_main_aria()}
+      className="flex-1 space-y-5 overflow-y-auto overscroll-contain px-3 py-4"
+    >
       {sections.map((section) => (
         <div key={section.title()}>
-          <p className="mb-1.5 px-2 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
+          <p className="mb-1 px-2.5 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
             {section.title()}
           </p>
           <ul className="space-y-0.5">
@@ -46,7 +49,7 @@ function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }
                     onClick={onNavigate}
                     activeOptions={{ exact: item.to === '/' }}
                     className={cn(
-                      'flex h-9 items-center gap-2.5 rounded-lg px-2 text-muted-foreground text-sm transition-colors',
+                      'flex h-10 items-center gap-2.5 rounded-lg px-2.5 text-muted-foreground text-sm transition-colors lg:h-9',
                       'hover:bg-sidebar-accent hover:text-foreground',
                     )}
                     activeProps={{
@@ -76,7 +79,7 @@ function SidebarBody({ role, onNavigate }: { role: string; onNavigate?: () => vo
         </Link>
       </div>
       <NavList role={role} onNavigate={onNavigate} />
-      <div className="border-sidebar-border border-t p-4">
+      <div className="border-sidebar-border border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <p className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
           {m.sidebar_event()}
         </p>
@@ -103,7 +106,11 @@ export function AppSidebar({
         <SidebarBody role={role} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
-        <SheetContent side="left" className="w-72 gap-0 bg-sidebar p-0">
+        <SheetContent
+          side="left"
+          className="w-[18rem] max-w-[85vw] gap-0 bg-sidebar p-0"
+          onOpenAutoFocus={(e) => e.preventDefault()}
+        >
           <SheetTitle className="sr-only">{m.nav_sheet_title()}</SheetTitle>
           <SheetDescription className="sr-only">{m.nav_sheet_description()}</SheetDescription>
           <SidebarBody role={role} onNavigate={() => onMobileOpenChange(false)} />

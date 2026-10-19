@@ -1,30 +1,4 @@
-import { Search } from 'lucide-react';
-import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-
-interface SearchBoxProps {
-  value: string;
-  onChange: (value: string) => void;
-  label: string;
-}
-
-export function SearchBox({ value, onChange, label }: SearchBoxProps) {
-  return (
-    <div className="relative w-full sm:max-w-xs">
-      <Search
-        className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
-        aria-hidden="true"
-      />
-      <Input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={label}
-        aria-label={label}
-        className="h-10 pl-9"
-      />
-    </div>
-  );
-}
 
 interface FilterChipsProps<T extends string> {
   legend: string;
@@ -62,9 +36,3 @@ export function FilterChips<T extends string>({
     </fieldset>
   );
 }
-
-export const normalizeText = (value: string) =>
-  value
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();

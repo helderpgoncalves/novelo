@@ -3,7 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import type { AlertStatus } from '@/client';
 import { getDataQualityOptions } from '@/client/@tanstack/react-query.gen';
-import { FilterChips } from '@/components/data-table-toolbar';
+import { FilterChips } from '@/components/filter-chips';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { AlertCard } from '@/features/quality/alert-card';

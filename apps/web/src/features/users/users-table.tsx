@@ -31,6 +31,8 @@ export function UsersTable({
       id: 'user',
       header: m.users_table_user(),
       primary: true,
+      label: m.users_table_user(),
+      value: (u) => `${u.name ?? ''} ${u.email}`,
       cell: (u) => (
         <div className="min-w-0">
           <p className="break-words font-medium">{u.name ?? u.email}</p>
@@ -45,6 +47,10 @@ export function UsersTable({
     {
       id: 'role',
       header: m.users_table_role(),
+      value: (u) => u.role,
+      filter: {
+        format: (v) => (v === 'admin' ? m.account_role_admin() : m.account_role_operator()),
+      },
       cell: (u) => (
         <Badge variant={u.role === 'admin' ? 'default' : 'secondary'}>
           {u.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
@@ -54,6 +60,10 @@ export function UsersTable({
     {
       id: 'status',
       header: m.users_table_status(),
+      value: (u) => (u.is_active ? 'active' : 'inactive'),
+      filter: {
+        format: (v) => (v === 'active' ? m.users_status_active() : m.users_status_inactive()),
+      },
       cell: (u) => (
         <Badge variant={u.is_active ? 'outline' : 'destructive'}>
           {u.is_active ? m.users_status_active() : m.users_status_inactive()}
@@ -64,11 +74,15 @@ export function UsersTable({
       id: 'login',
       header: m.users_table_last_login(),
       className: 'text-muted-foreground',
+      value: (u) => u.last_login_at,
+      searchable: false,
       cell: (u) => (u.last_login_at ? formatDateTime(u.last_login_at) : m.common_never()),
     },
     {
       id: 'actions',
       header: m.users_table_actions(),
+      label: m.users_table_actions(),
+      hideable: false,
       align: 'right',
       full: true,
       cell: (u) => {
@@ -106,6 +120,13 @@ export function UsersTable({
   ];
 
   return (
-    <DataTable columns={columns} rows={users} getKey={(u) => u.id} caption={m.users_title()} />
+    <DataTable
+      id="users"
+      columns={columns}
+      rows={users}
+      getKey={(u) => u.id}
+      caption={m.users_title()}
+      searchLabel={m.users_search()}
+    />
   );
 }
