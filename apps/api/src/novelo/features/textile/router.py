@@ -1,14 +1,24 @@
+from datetime import UTC, datetime
+from datetime import date as Date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
-from novelo.features.textile import service
-from novelo.features.textile.schemas import Flows, TextileBaseline, WasteComposition
+from novelo.features.textile import overview, service
+from novelo.features.textile.schemas import Flows, Overview, TextileBaseline, WasteComposition
 
 router = APIRouter()
 Db = Annotated[AsyncSession, Depends(get_db)]
+
+
+def get_today() -> Date:
+    """Relógio do servidor (UTC); os testes substituem-no com `dependency_overrides`."""
+    return datetime.now(UTC).date()
+
+
+Today = Annotated[Date, Depends(get_today)]
 
 
 @router.get("/baseline", response_model=TextileBaseline)
@@ -27,3 +37,9 @@ async def get_observed_flows(db: Db) -> Flows:
 async def get_waste_composition(db: Db) -> WasteComposition:
     """Composição dos resíduos urbanos: onde os têxteis pesam face ao resto."""
     return await service.get_waste_composition(db)
+
+
+@router.get("/overview", response_model=Overview)
+async def get_overview(db: Db, today: Today) -> Overview:
+    """Página inicial: lacuna, referências, prazos regulatórios, freguesias, fronteira de cenários e manchetes."""
+    return await overview.get_overview(db, today)

@@ -8,7 +8,15 @@ import { m } from '@/paraglide/messages';
  * para a página não "saltar" quando os dados chegam. Cada rota só declara `staticData: { skeleton }`
  * e o router escolhe o esqueleto certo (ver `RouteSkeleton`).
  */
-export type SkeletonVariant = 'dashboard' | 'table' | 'cards' | 'detail' | 'form' | 'map' | 'chart';
+export type SkeletonVariant =
+  | 'home'
+  | 'dashboard'
+  | 'table'
+  | 'cards'
+  | 'detail'
+  | 'form'
+  | 'map'
+  | 'chart';
 
 export function HeaderSkeleton({ actions = false }: { actions?: boolean }) {
   return (
@@ -143,7 +151,51 @@ export function FormSkeleton({ fields = 5 }: { fields?: number }) {
   );
 }
 
+/** Página inicial: gancho (frase + anel), indicadores e capítulos com título à esquerda e visual à direita. */
+function HomeSkeleton() {
+  return (
+    <div className="space-y-10 sm:space-y-14">
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
+        <div className="space-y-6 lg:col-span-8 lg:py-4">
+          <Skeleton className="h-3 w-40" />
+          <div className="space-y-3">
+            <Skeleton className="h-11 w-full sm:h-14" />
+            <Skeleton className="h-11 w-4/5 sm:h-14" />
+            <Skeleton className="h-11 w-3/5 sm:h-14" />
+          </div>
+          <Skeleton className="h-5 w-full max-w-2xl" />
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <Skeleton className="h-12 w-full sm:w-44" />
+            <Skeleton className="h-12 w-full sm:w-52" />
+          </div>
+        </div>
+        <div className="space-y-4 rounded-xl bg-card p-5 ring-1 ring-foreground/10 lg:col-span-4">
+          <Skeleton className="mx-auto aspect-square w-full max-w-[17rem] rounded-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+      </div>
+      <StatStripSkeleton />
+      {[0, 1].map((i) => (
+        <div
+          key={i}
+          className="grid grid-cols-1 gap-6 border-border border-t pt-8 lg:grid-cols-12 lg:gap-x-10"
+        >
+          <div className="space-y-3 lg:col-span-4">
+            <Skeleton className="h-3 w-32" />
+            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-3/4" />
+            <Skeleton className="h-4 w-full" />
+          </div>
+          <ChartSkeleton className="h-80 lg:col-span-8" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
 const VARIANTS: Record<SkeletonVariant, () => React.ReactNode> = {
+  home: () => <HomeSkeleton />,
   dashboard: () => (
     <>
       <StatStripSkeleton />
@@ -220,7 +272,7 @@ export function PageSkeleton({
   return (
     <div className="space-y-8 sm:space-y-12" aria-busy="true" aria-live="polite">
       <span className="sr-only">{m.common_loading()}</span>
-      <HeaderSkeleton actions={actions} />
+      {variant !== 'home' && <HeaderSkeleton actions={actions} />}
       {VARIANTS[variant]()}
     </div>
   );

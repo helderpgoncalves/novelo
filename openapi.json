@@ -387,6 +387,7 @@
           "explain",
           "briefing",
           "alert_resolution",
+          "copilot_aux",
           "triage",
           "test"
         ],
@@ -741,6 +742,65 @@
         "title": "AllocationPart",
         "type": "object"
       },
+      "AttachmentOut": {
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "image",
+              "pdf",
+              "table",
+              "text"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "meta": {
+            "additionalProperties": true,
+            "description": "Páginas, colunas, dimensões... (nunca o ficheiro)",
+            "title": "Meta",
+            "type": "object"
+          },
+          "mime": {
+            "title": "Mime",
+            "type": "string"
+          },
+          "model_can_see": {
+            "description": "Falso para imagens se o modelo do copiloto não aceita imagens",
+            "title": "Model Can See",
+            "type": "boolean"
+          },
+          "preview": {
+            "description": "Início do texto extraído ou resumo da tabela",
+            "title": "Preview",
+            "type": "string"
+          },
+          "size_bytes": {
+            "title": "Size Bytes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "filename",
+          "mime",
+          "size_bytes",
+          "preview",
+          "meta",
+          "model_can_see"
+        ],
+        "title": "AttachmentOut",
+        "type": "object"
+      },
       "AuthConfig": {
         "properties": {
           "google_enabled": {
@@ -923,6 +983,24 @@
           "item_photo"
         ],
         "title": "Body_analyse_garment",
+        "type": "object"
+      },
+      "Body_upload_copilot_attachments": {
+        "properties": {
+          "files": {
+            "description": "Até 5 ficheiros, 10 MB cada",
+            "items": {
+              "contentMediaType": "application/octet-stream",
+              "type": "string"
+            },
+            "title": "Files",
+            "type": "array"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "title": "Body_upload_copilot_attachments",
         "type": "object"
       },
       "BrandCount": {
@@ -1315,6 +1393,63 @@
         "title": "CollectionType",
         "type": "string"
       },
+      "CommandsOut": {
+        "properties": {
+          "commands": {
+            "items": {
+              "$ref": "#/components/schemas/CopilotCommand"
+            },
+            "title": "Commands",
+            "type": "array"
+          },
+          "composer_actions": {
+            "description": "Ações do composer: attach_file, attach_current_screen, mention",
+            "items": {
+              "type": "string"
+            },
+            "title": "Composer Actions",
+            "type": "array"
+          }
+        },
+        "required": [
+          "commands",
+          "composer_actions"
+        ],
+        "title": "CommandsOut",
+        "type": "object"
+      },
+      "CompactOut": {
+        "properties": {
+          "compacted_messages": {
+            "title": "Compacted Messages",
+            "type": "integer"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadSummaryOut"
+          },
+          "used_tokens": {
+            "title": "Used Tokens",
+            "type": "integer"
+          },
+          "window_tokens": {
+            "title": "Window Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "thread",
+          "compacted_messages",
+          "summary",
+          "used_tokens",
+          "window_tokens"
+        ],
+        "title": "CompactOut",
+        "type": "object"
+      },
       "CompositionPart": {
         "properties": {
           "fibre": {
@@ -1461,6 +1596,259 @@
         "title": "ContainerStatus",
         "type": "string"
       },
+      "CopilotCardEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "card": {
+            "$ref": "#/components/schemas/ScenarioCard"
+          },
+          "type": {
+            "const": "card",
+            "default": "card",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "card"
+        ],
+        "title": "CopilotCardEvent",
+        "type": "object"
+      },
+      "CopilotCommand": {
+        "properties": {
+          "admin_only": {
+            "title": "Admin Only",
+            "type": "boolean"
+          },
+          "description_key": {
+            "title": "Description Key",
+            "type": "string"
+          },
+          "kind": {
+            "description": "server: enviado em /copilot/stream; client: tratado no web",
+            "enum": [
+              "server",
+              "client"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label_key": {
+            "title": "Label Key",
+            "type": "string"
+          },
+          "name": {
+            "description": "Comando com barra, ex.: /compact",
+            "title": "Name",
+            "type": "string"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Route"
+          }
+        },
+        "required": [
+          "name",
+          "label_key",
+          "description_key",
+          "kind",
+          "admin_only"
+        ],
+        "title": "CopilotCommand",
+        "type": "object"
+      },
+      "CopilotContextEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "compacted": {
+            "title": "Compacted",
+            "type": "boolean"
+          },
+          "type": {
+            "const": "context",
+            "default": "context",
+            "title": "Type",
+            "type": "string"
+          },
+          "used_tokens": {
+            "title": "Used Tokens",
+            "type": "integer"
+          },
+          "window_tokens": {
+            "title": "Window Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "used_tokens",
+          "window_tokens",
+          "compacted"
+        ],
+        "title": "CopilotContextEvent",
+        "type": "object"
+      },
+      "CopilotDoneEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "finish": {
+            "default": "stop",
+            "enum": [
+              "stop",
+              "cancelled",
+              "error"
+            ],
+            "title": "Finish",
+            "type": "string"
+          },
+          "type": {
+            "const": "done",
+            "default": "done",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "CopilotDoneEvent",
+        "type": "object"
+      },
+      "CopilotErrorEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "enum": [
+              "bad_request",
+              "validation_error",
+              "unauthenticated",
+              "session_expired",
+              "invalid_credentials",
+              "account_inactive",
+              "current_password_incorrect",
+              "invalid_token",
+              "forbidden",
+              "registration_closed",
+              "not_found",
+              "user_not_found",
+              "email_taken",
+              "cannot_modify_self",
+              "conflict",
+              "rate_limited",
+              "feature_disabled",
+              "upstream_error",
+              "ai_budget_exceeded",
+              "internal_error"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "const": "error",
+            "default": "error",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "CopilotErrorEvent",
+        "type": "object"
+      },
+      "CopilotEventCatalog": {
+        "description": "Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.",
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/CopilotEventMessage"
+            },
+            "title": "Events",
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "title": "CopilotEventCatalog",
+        "type": "object"
+      },
+      "CopilotEventMessage": {
+        "description": "Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).",
+        "discriminator": {
+          "mapping": {
+            "card": "#/components/schemas/CopilotCardEvent",
+            "context": "#/components/schemas/CopilotContextEvent",
+            "done": "#/components/schemas/CopilotDoneEvent",
+            "error": "#/components/schemas/CopilotErrorEvent",
+            "retract": "#/components/schemas/CopilotRetractEvent",
+            "start": "#/components/schemas/CopilotStartEvent",
+            "status": "#/components/schemas/CopilotStatusEvent",
+            "suggestions": "#/components/schemas/CopilotSuggestionsEvent",
+            "text_delta": "#/components/schemas/CopilotTextDeltaEvent",
+            "title": "#/components/schemas/CopilotTitleEvent",
+            "tool_result": "#/components/schemas/CopilotToolResultEvent",
+            "tool_start": "#/components/schemas/CopilotToolStartEvent",
+            "usage": "#/components/schemas/CopilotUsageEvent",
+            "verification": "#/components/schemas/CopilotVerificationEvent"
+          },
+          "propertyName": "type"
+        },
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CopilotStartEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotStatusEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotToolStartEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotToolResultEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotTextDeltaEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotCardEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotRetractEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotVerificationEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotSuggestionsEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotContextEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotUsageEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotTitleEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotErrorEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotDoneEvent"
+          }
+        ],
+        "title": "CopilotEventMessage"
+      },
       "CopilotReply": {
         "properties": {
           "cards": {
@@ -1568,6 +1956,380 @@
           "messages"
         ],
         "title": "CopilotRequest",
+        "type": "object"
+      },
+      "CopilotRetractEvent": {
+        "additionalProperties": false,
+        "description": "O texto já enviado falhou a verificação: apagar o texto desta mensagem. Segue-se o texto reescrito.",
+        "properties": {
+          "reason": {
+            "const": "numbers_unverified",
+            "default": "numbers_unverified",
+            "title": "Reason",
+            "type": "string"
+          },
+          "type": {
+            "const": "retract",
+            "default": "retract",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "title": "CopilotRetractEvent",
+        "type": "object"
+      },
+      "CopilotStartEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "message_id": {
+            "format": "uuid",
+            "title": "Message Id",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "thread_id": {
+            "format": "uuid",
+            "title": "Thread Id",
+            "type": "string"
+          },
+          "type": {
+            "const": "start",
+            "default": "start",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "thread_id",
+          "message_id",
+          "model",
+          "prompt_version"
+        ],
+        "title": "CopilotStartEvent",
+        "type": "object"
+      },
+      "CopilotStatusEvent": {
+        "additionalProperties": false,
+        "description": "Fase da tarefa. `label_key` é uma chave de tradução (status.running_optimizer); `detail` é um dado.",
+        "properties": {
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "label_key": {
+            "title": "Label Key",
+            "type": "string"
+          },
+          "phase": {
+            "enum": [
+              "thinking",
+              "planning",
+              "tool",
+              "verifying",
+              "writing",
+              "compacting"
+            ],
+            "title": "Phase",
+            "type": "string"
+          },
+          "type": {
+            "const": "status",
+            "default": "status",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "phase",
+          "label_key"
+        ],
+        "title": "CopilotStatusEvent",
+        "type": "object"
+      },
+      "CopilotStreamRequest": {
+        "description": "Uma mensagem nova numa conversa (nova se `thread_id` for nulo). Comandos: `/compact`.",
+        "properties": {
+          "attachment_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 5,
+            "title": "Attachment Ids",
+            "type": "array"
+          },
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/components/schemas/MentionRef"
+            },
+            "maxItems": 10,
+            "title": "Mentions",
+            "type": "array"
+          },
+          "message": {
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Message",
+            "type": "string"
+          },
+          "page_context": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PageContext"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "thread_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Thread Id"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "CopilotStreamRequest",
+        "type": "object"
+      },
+      "CopilotSuggestionsEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 3,
+            "title": "Items",
+            "type": "array"
+          },
+          "type": {
+            "const": "suggestions",
+            "default": "suggestions",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "CopilotSuggestionsEvent",
+        "type": "object"
+      },
+      "CopilotTextDeltaEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "delta": {
+            "title": "Delta",
+            "type": "string"
+          },
+          "type": {
+            "const": "text_delta",
+            "default": "text_delta",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "delta"
+        ],
+        "title": "CopilotTextDeltaEvent",
+        "type": "object"
+      },
+      "CopilotTitleEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "type": {
+            "const": "title",
+            "default": "title",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "CopilotTitleEvent",
+        "type": "object"
+      },
+      "CopilotToolResultEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "duration_ms": {
+            "title": "Duration Ms",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "type": {
+            "const": "tool_result",
+            "default": "tool_result",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "ok",
+          "summary",
+          "duration_ms"
+        ],
+        "title": "CopilotToolResultEvent",
+        "type": "object"
+      },
+      "CopilotToolStartEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "args_summary": {
+            "title": "Args Summary",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "type": {
+            "const": "tool_start",
+            "default": "tool_start",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "args_summary"
+        ],
+        "title": "CopilotToolStartEvent",
+        "type": "object"
+      },
+      "CopilotUsageEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "completion_tokens": {
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "prompt_tokens": {
+            "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "tokens": {
+            "title": "Tokens",
+            "type": "integer"
+          },
+          "type": {
+            "const": "usage",
+            "default": "usage",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "prompt_tokens",
+          "completion_tokens",
+          "tokens",
+          "cost_usd"
+        ],
+        "title": "CopilotUsageEvent",
+        "type": "object"
+      },
+      "CopilotVerificationEvent": {
+        "additionalProperties": false,
+        "properties": {
+          "type": {
+            "const": "verification",
+            "default": "verification",
+            "title": "Type",
+            "type": "string"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "const": "numbers_unverified",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Warning"
+          }
+        },
+        "required": [
+          "verified"
+        ],
+        "title": "CopilotVerificationEvent",
         "type": "object"
       },
       "CoverageState": {
@@ -2081,6 +2843,58 @@
         "title": "ErrorBody",
         "type": "object"
       },
+      "FeedbackIn": {
+        "properties": {
+          "comment": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Comment"
+          },
+          "rating": {
+            "enum": [
+              1,
+              -1
+            ],
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rating"
+        ],
+        "title": "FeedbackIn",
+        "type": "object"
+      },
+      "FeedbackOut": {
+        "properties": {
+          "message_id": {
+            "format": "uuid",
+            "title": "Message Id",
+            "type": "string"
+          },
+          "rating": {
+            "enum": [
+              1,
+              -1
+            ],
+            "title": "Rating",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "message_id",
+          "rating"
+        ],
+        "title": "FeedbackOut",
+        "type": "object"
+      },
       "Fibre": {
         "enum": [
           "cotton",
@@ -2347,6 +3161,80 @@
           "email"
         ],
         "title": "ForgotPasswordRequest",
+        "type": "object"
+      },
+      "FrontierPoint": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_pareto": {
+            "description": "Não dominado em (menos €/t, mais toneladas); só cenários viáveis",
+            "title": "Is Pareto",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "modes": {
+            "description": "Modos de recolha usados em pelo menos uma freguesia",
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "status": {
+            "enum": [
+              "feasible",
+              "infeasible"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "tonnes_year",
+          "eur_per_tonne",
+          "annual_cost_eur",
+          "capex_eur",
+          "modes",
+          "status",
+          "objective",
+          "is_pareto"
+        ],
+        "title": "FrontierPoint",
         "type": "object"
       },
       "GarmentType": {
@@ -3096,6 +3984,281 @@
         "title": "MarketLot",
         "type": "object"
       },
+      "MentionGroup": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MentionItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MentionType"
+          }
+        },
+        "required": [
+          "type",
+          "items"
+        ],
+        "title": "MentionGroup",
+        "type": "object"
+      },
+      "MentionItem": {
+        "properties": {
+          "icon": {
+            "description": "Nome de ícone sugerido (lucide): map, truck, package, file-text...",
+            "title": "Icon",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "route": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rota do web para abrir a entidade, se existir",
+            "title": "Route"
+          },
+          "sublabel": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sublabel"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MentionType"
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "label",
+          "icon"
+        ],
+        "title": "MentionItem",
+        "type": "object"
+      },
+      "MentionRef": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Id",
+            "type": "string"
+          },
+          "type": {
+            "$ref": "#/components/schemas/MentionType"
+          }
+        },
+        "required": [
+          "type",
+          "id"
+        ],
+        "title": "MentionRef",
+        "type": "object"
+      },
+      "MentionType": {
+        "enum": [
+          "scenario",
+          "parish",
+          "circuit",
+          "locality",
+          "vehicle",
+          "lot",
+          "alert",
+          "report",
+          "brand",
+          "fibre",
+          "page",
+          "data_source"
+        ],
+        "title": "MentionType",
+        "type": "string"
+      },
+      "MentionsOut": {
+        "properties": {
+          "groups": {
+            "items": {
+              "$ref": "#/components/schemas/MentionGroup"
+            },
+            "title": "Groups",
+            "type": "array"
+          },
+          "query": {
+            "title": "Query",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "query",
+          "groups",
+          "total"
+        ],
+        "title": "MentionsOut",
+        "type": "object"
+      },
+      "MessageOut": {
+        "properties": {
+          "attachments": {
+            "items": {
+              "$ref": "#/components/schemas/AttachmentOut"
+            },
+            "title": "Attachments",
+            "type": "array"
+          },
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioCard"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "feedback": {
+            "anyOf": [
+              {
+                "enum": [
+                  1,
+                  -1
+                ],
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Feedback"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "mentions": {
+            "items": {
+              "$ref": "#/components/schemas/MentionRef"
+            },
+            "title": "Mentions",
+            "type": "array"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "complete",
+              "cancelled",
+              "error"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tokens"
+          },
+          "tools": {
+            "items": {
+              "$ref": "#/components/schemas/ToolTraceOut"
+            },
+            "title": "Tools",
+            "type": "array"
+          },
+          "verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Verified"
+          }
+        },
+        "required": [
+          "id",
+          "role",
+          "text",
+          "attachments",
+          "mentions",
+          "tools",
+          "cards",
+          "verified",
+          "status",
+          "model",
+          "tokens",
+          "cost_usd",
+          "feedback",
+          "created_at"
+        ],
+        "title": "MessageOut",
+        "type": "object"
+      },
       "MetricsOut": {
         "properties": {
           "annual_cost_eur": {
@@ -3213,6 +4376,640 @@
           "annual_cost_eur"
         ],
         "title": "ModeSummary",
+        "type": "object"
+      },
+      "Overview": {
+        "description": "Tudo o que a página inicial mostra, num só pedido.",
+        "properties": {
+          "data_sources": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewDataSource"
+            },
+            "title": "Data Sources",
+            "type": "array"
+          },
+          "gap": {
+            "$ref": "#/components/schemas/OverviewGap"
+          },
+          "highlights": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewHighlight"
+            },
+            "title": "Highlights",
+            "type": "array"
+          },
+          "pareto_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "title": "Pareto Ids",
+            "type": "array"
+          },
+          "parishes": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewParish"
+            },
+            "title": "Parishes",
+            "type": "array"
+          },
+          "references": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewReference"
+            },
+            "title": "References",
+            "type": "array"
+          },
+          "scenario_frontier": {
+            "items": {
+              "$ref": "#/components/schemas/FrontierPoint"
+            },
+            "title": "Scenario Frontier",
+            "type": "array"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/OverviewMilestone"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "gap",
+          "references",
+          "timeline",
+          "parishes",
+          "scenario_frontier",
+          "pareto_ids",
+          "data_sources",
+          "highlights"
+        ],
+        "title": "Overview",
+        "type": "object"
+      },
+      "OverviewDataSource": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "operator",
+              "public_statistics",
+              "public_geodata",
+              "other"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "methods": {
+            "description": "Só no têxtil: `weighed` e/ou `percentage`",
+            "items": {
+              "$ref": "#/components/schemas/WeighingMethod"
+            },
+            "title": "Methods",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "period_end": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period End"
+          },
+          "period_start": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Period Start"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "rows": {
+            "description": "Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, ...)",
+            "title": "Rows",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "name",
+          "provider",
+          "kind",
+          "period_start",
+          "period_end",
+          "methods",
+          "rows"
+        ],
+        "title": "OverviewDataSource",
+        "type": "object"
+      },
+      "OverviewDestinations": {
+        "properties": {
+          "recycle_t": {
+            "title": "Recycle T",
+            "type": "number"
+          },
+          "reject_t": {
+            "title": "Reject T",
+            "type": "number"
+          },
+          "reuse_t": {
+            "title": "Reuse T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "reuse_t",
+          "recycle_t",
+          "reject_t"
+        ],
+        "title": "OverviewDestinations",
+        "type": "object"
+      },
+      "OverviewGap": {
+        "description": "A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.",
+        "properties": {
+          "capture_pct": {
+            "description": "collected_t / potential_t, em %",
+            "title": "Capture Pct",
+            "type": "number"
+          },
+          "collected_t": {
+            "description": "Dado Vitrus: recolhido em 2025 pelas 4 entidades",
+            "title": "Collected T",
+            "type": "number"
+          },
+          "destinations": {
+            "$ref": "#/components/schemas/OverviewDestinations",
+            "description": "Destino observado do recolhido"
+          },
+          "is_estimate": {
+            "default": true,
+            "description": "Capture e lacuna dependem do potencial estimado",
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "kg_per_inhab_month": {
+            "description": "Observado: recolhido por habitante e mês",
+            "title": "Kg Per Inhab Month",
+            "type": "number"
+          },
+          "kg_per_inhab_year": {
+            "description": "Observado: recolhido por habitante e ano",
+            "title": "Kg Per Inhab Year",
+            "type": "number"
+          },
+          "missing_t": {
+            "description": "potential_t − collected_t",
+            "title": "Missing T",
+            "type": "number"
+          },
+          "parishes_count": {
+            "title": "Parishes Count",
+            "type": "integer"
+          },
+          "population": {
+            "description": "Soma das freguesias (INE, Censos 2021)",
+            "title": "Population",
+            "type": "integer"
+          },
+          "potential_is_estimate": {
+            "default": true,
+            "description": "O potencial é estimativa; o recolhido não",
+            "title": "Potential Is Estimate",
+            "type": "boolean"
+          },
+          "potential_kg_per_inhab_month": {
+            "description": "Estimativa do plano: 0,7",
+            "title": "Potential Kg Per Inhab Month",
+            "type": "number"
+          },
+          "potential_kg_per_inhab_year": {
+            "description": "Estimativa do plano: 0,7 × 12",
+            "title": "Potential Kg Per Inhab Year",
+            "type": "number"
+          },
+          "potential_t": {
+            "description": "Estimativa: população × 0,7 kg/hab/mês × 12 (plano municipal)",
+            "title": "Potential T",
+            "type": "number"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "potential_t",
+          "collected_t",
+          "missing_t",
+          "capture_pct",
+          "destinations",
+          "kg_per_inhab_year",
+          "kg_per_inhab_month",
+          "potential_kg_per_inhab_year",
+          "potential_kg_per_inhab_month",
+          "population",
+          "parishes_count"
+        ],
+        "title": "OverviewGap",
+        "type": "object"
+      },
+      "OverviewHighlight": {
+        "properties": {
+          "context": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "number"
+                }
+              ]
+            },
+            "description": "Valores para interpolar no texto (nomes, totais)",
+            "title": "Context",
+            "type": "object"
+          },
+          "is_estimate": {
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "text_key": {
+            "description": "Chave i18n do texto da manchete",
+            "title": "Text Key",
+            "type": "string"
+          },
+          "unit": {
+            "enum": [
+              "pct",
+              "t",
+              "x",
+              "kg_per_inhab_year"
+            ],
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "unit",
+          "text_key",
+          "context",
+          "source_label",
+          "verified",
+          "is_estimate"
+        ],
+        "title": "OverviewHighlight",
+        "type": "object"
+      },
+      "OverviewMilestone": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "title": "Date",
+            "type": "string"
+          },
+          "days_remaining": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Dias até à data (relógio do servidor, UTC); vazio se já passou",
+            "title": "Days Remaining"
+          },
+          "key": {
+            "description": "municipal_obligation | transposition_deadline | epr_regimes",
+            "title": "Key",
+            "type": "string"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "status": {
+            "enum": [
+              "done",
+              "upcoming"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "verified": {
+            "title": "Verified",
+            "type": "boolean"
+          },
+          "who_pays": {
+            "enum": [
+              "municipality",
+              "producers"
+            ],
+            "title": "Who Pays",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "key",
+          "status",
+          "days_remaining",
+          "who_pays",
+          "source_label",
+          "source_url",
+          "verified"
+        ],
+        "title": "OverviewMilestone",
+        "type": "object"
+      },
+      "OverviewParish": {
+        "properties": {
+          "area_km2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Da base de dados ou calculada a partir do contorno OSM",
+            "title": "Area Km2"
+          },
+          "centroid": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OverviewPoint"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "circuits_count": {
+            "description": "Circuitos da Vitrus que passam em localidades da freguesia",
+            "title": "Circuits Count",
+            "type": "integer"
+          },
+          "code": {
+            "description": "Código INE/DGT de 6 dígitos",
+            "title": "Code",
+            "type": "string"
+          },
+          "containers_count": {
+            "description": "Contentores ativos importados (0 até chegarem as localizações)",
+            "title": "Containers Count",
+            "type": "integer"
+          },
+          "localities_count": {
+            "title": "Localities Count",
+            "type": "integer"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "potential_is_estimate": {
+            "default": true,
+            "title": "Potential Is Estimate",
+            "type": "boolean"
+          },
+          "potential_t": {
+            "description": "Estimativa: população × 0,7 kg/hab/mês × 12 / 1000",
+            "title": "Potential T",
+            "type": "number"
+          },
+          "share_of_population_pct": {
+            "title": "Share Of Population Pct",
+            "type": "number"
+          },
+          "tipau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tipau"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "population",
+          "tipau",
+          "potential_t",
+          "circuits_count",
+          "localities_count",
+          "containers_count",
+          "area_km2",
+          "centroid",
+          "share_of_population_pct"
+        ],
+        "title": "OverviewParish",
+        "type": "object"
+      },
+      "OverviewPoint": {
+        "properties": {
+          "lat": {
+            "title": "Lat",
+            "type": "number"
+          },
+          "lon": {
+            "title": "Lon",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lat",
+          "lon"
+        ],
+        "title": "OverviewPoint",
+        "type": "object"
+      },
+      "OverviewReference": {
+        "properties": {
+          "evidence": {
+            "enum": [
+              "dado_vitrus",
+              "primary",
+              "secondary",
+              "unverified"
+            ],
+            "title": "Evidence",
+            "type": "string"
+          },
+          "is_estimate": {
+            "description": "Verdadeiro para o potencial do plano e valores aproximados",
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kg_per_inhab_year": {
+            "title": "Kg Per Inhab Year",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "scope": {
+            "enum": [
+              "municipality",
+              "region",
+              "country",
+              "eu"
+            ],
+            "title": "Scope",
+            "type": "string"
+          },
+          "source_label": {
+            "title": "Source Label",
+            "type": "string"
+          },
+          "source_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Url"
+          },
+          "verified": {
+            "description": "Falso: valor registado mas por verificar; não usar em público",
+            "title": "Verified",
+            "type": "boolean"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "kg_per_inhab_year",
+          "year",
+          "scope",
+          "source_label",
+          "source_url",
+          "verified",
+          "evidence",
+          "is_estimate"
+        ],
+        "title": "OverviewReference",
+        "type": "object"
+      },
+      "PageContext": {
+        "additionalProperties": false,
+        "description": "O que o utilizador está a ver. Só estrutura: o servidor resolve as entidades, sem confiar no texto.",
+        "properties": {
+          "params": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Parâmetros da rota, ex.: scenarioId",
+            "title": "Params",
+            "type": "object"
+          },
+          "route": {
+            "description": "Rota do ecrã, ex.: /scenarios/$scenarioId",
+            "maxLength": 200,
+            "title": "Route",
+            "type": "string"
+          },
+          "search": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Query string validada do ecrã",
+            "title": "Search",
+            "type": "object"
+          },
+          "selected_filters": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Selected Filters",
+            "type": "object"
+          },
+          "visible_entity_ids": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 20,
+            "title": "Visible Entity Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "route"
+        ],
+        "title": "PageContext",
         "type": "object"
       },
       "ParamMeta": {
@@ -5402,6 +7199,185 @@
         "title": "TextileDestination",
         "type": "string"
       },
+      "ThreadExport": {
+        "properties": {
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "markdown": {
+            "title": "Markdown",
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "markdown"
+        ],
+        "title": "ThreadExport",
+        "type": "object"
+      },
+      "ThreadOut": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "has_summary": {
+            "title": "Has Summary",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message_count": {
+            "title": "Message Count",
+            "type": "integer"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/MessageOut"
+            },
+            "title": "Messages",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "used_tokens": {
+            "title": "Used Tokens",
+            "type": "integer"
+          },
+          "window_tokens": {
+            "title": "Window Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "archived",
+          "message_count",
+          "has_summary",
+          "created_at",
+          "updated_at",
+          "summary",
+          "messages",
+          "used_tokens",
+          "window_tokens"
+        ],
+        "title": "ThreadOut",
+        "type": "object"
+      },
+      "ThreadPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadSummaryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "ThreadPage",
+        "type": "object"
+      },
+      "ThreadRename": {
+        "properties": {
+          "title": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "ThreadRename",
+        "type": "object"
+      },
+      "ThreadSummaryOut": {
+        "properties": {
+          "archived": {
+            "title": "Archived",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "has_summary": {
+            "title": "Has Summary",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "message_count": {
+            "title": "Message Count",
+            "type": "integer"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "archived",
+          "message_count",
+          "has_summary",
+          "created_at",
+          "updated_at"
+        ],
+        "title": "ThreadSummaryOut",
+        "type": "object"
+      },
       "Tipau": {
         "description": "Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.",
         "enum": [
@@ -5428,6 +7404,29 @@
           "ok"
         ],
         "title": "ToolTrace",
+        "type": "object"
+      },
+      "ToolTraceOut": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "ok",
+          "summary"
+        ],
+        "title": "ToolTraceOut",
         "type": "object"
       },
       "TornadoBarOut": {
@@ -9873,9 +11872,163 @@
         ]
       }
     },
+    "/api/v1/copilot/attachments": {
+      "post": {
+        "description": "Imagens, PDF, CSV/XLSX, TXT/MD/JSON. O ficheiro é validado pelo conteúdo e descartado: guarda-se só o texto extraído.",
+        "operationId": "upload_copilot_attachments",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_upload_copilot_attachments"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/AttachmentOut"
+                  },
+                  "title": "Response Upload Copilot Attachments",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Upload Copilot Attachments",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
     "/api/v1/copilot/chat": {
       "post": {
-        "description": "Conversa em pt-PT/en. O modelo escolhe ferramentas; os números do texto são verificados contra os resultados.",
+        "description": "Conversa em pt-PT/en sem streaming. O modelo escolhe ferramentas; os números do texto são verificados.",
         "operationId": "copilot_chat",
         "parameters": [
           {
@@ -10018,6 +12171,1876 @@
           }
         },
         "summary": "Copilot Chat",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/commands": {
+      "get": {
+        "description": "Comandos `/` disponíveis para o utilizador e as ações do composer (anexar ficheiro, anexar ecrã atual, @).",
+        "operationId": "list_copilot_commands",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Copilot Commands",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/event-schema": {
+      "get": {
+        "description": "Um exemplo de cada evento do stream, na ordem típica. Documenta o contrato e dá ao cliente gerado os tipos.",
+        "operationId": "get_copilot_event_schema",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotEventCatalog"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Copilot Event Schema",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/mentions": {
+      "get": {
+        "description": "Auto-completar de `@`: entidades tipadas, ordenadas por relevância (prefixo, depois aproximado, sem acentos).",
+        "operationId": "search_copilot_mentions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "maxLength": 80,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "types",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MentionType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Types"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 12,
+              "maximum": 30,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "required": false,
+            "schema": {
+              "default": "pt-PT",
+              "enum": [
+                "pt-PT",
+                "en"
+              ],
+              "title": "Locale",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MentionsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Search Copilot Mentions",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/messages/{message_id}/feedback": {
+      "put": {
+        "description": "👍 (1) ou 👎 (-1) numa resposta; enviar outra vez substitui.",
+        "operationId": "send_copilot_feedback",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "message_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Message Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FeedbackIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FeedbackOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Send Copilot Feedback",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/stream": {
+      "post": {
+        "description": "Responde em `text/event-stream` com eventos tipados (ver `CopilotEventMessage`). Menções, anexos e contexto\nda página são validados e resolvidos no servidor antes de abrir o stream; erros dessa fase são HTTP normais.",
+        "operationId": "copilot_stream",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopilotStreamRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotEventMessage"
+                }
+              }
+            },
+            "description": "Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Copilot Stream",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/threads": {
+      "get": {
+        "description": "Conversas do utilizador, a mais recente primeiro.",
+        "operationId": "list_copilot_threads",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "archived",
+            "required": false,
+            "schema": {
+              "default": false,
+              "title": "Archived",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Copilot Threads",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/threads/{thread_id}": {
+      "delete": {
+        "description": "Apaga a conversa e o texto extraído dos anexos que usou.",
+        "operationId": "delete_copilot_thread",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete Copilot Thread",
+        "tags": [
+          "copilot"
+        ]
+      },
+      "get": {
+        "operationId": "get_copilot_thread",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Copilot Thread",
+        "tags": [
+          "copilot"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_copilot_thread",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ThreadRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadSummaryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Rename Copilot Thread",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/threads/{thread_id}/compact": {
+      "post": {
+        "description": "Resume as voltas antigas num memo e reduz os resultados de ferramentas a digests (comando `/compact`).",
+        "operationId": "compact_copilot_thread",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompactOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Compact Copilot Thread",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/threads/{thread_id}/export": {
+      "get": {
+        "description": "A conversa em Markdown, para o comando `/exportar`.",
+        "operationId": "export_copilot_thread",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadExport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Export Copilot Thread",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
+    "/api/v1/copilot/threads/{thread_id}/regenerate": {
+      "post": {
+        "description": "Apaga a última resposta e volta a gerá-la a partir da última pergunta (mesmos anexos e menções).",
+        "operationId": "regenerate_copilot_response",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "thread_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Thread Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "required": false,
+            "schema": {
+              "default": "pt-PT",
+              "enum": [
+                "pt-PT",
+                "en"
+              ],
+              "title": "Locale",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotEventMessage"
+                }
+              }
+            },
+            "description": "Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Regenerate Copilot Response",
         "tags": [
           "copilot"
         ]
@@ -15752,6 +19775,146 @@
           }
         },
         "summary": "Get Observed Flows",
+        "tags": [
+          "textile"
+        ]
+      }
+    },
+    "/api/v1/textile/overview": {
+      "get": {
+        "description": "Página inicial: lacuna, referências, prazos regulatórios, freguesias, fronteira de cenários e manchetes.",
+        "operationId": "get_overview",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Overview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Overview",
         "tags": [
           "textile"
         ]
