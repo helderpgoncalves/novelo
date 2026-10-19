@@ -24,11 +24,33 @@ Custam dinheiro por contentor e o desafio pede o menor investimento. O Novelo fu
 
 **"A triagem por foto é fiável?"**
 
-Para separar reutilizável, reciclável e rejeito, serve como primeira triagem e gera dados. A composição vem da etiqueta, que é texto. Não substitui a triagem final do operador, e não dizemos que substitui.
+Para separar reutilizável, reciclável e rejeito, serve como primeira triagem e gera dados; o operador pode corrigir. A composição e a marca vêm da etiqueta, que é texto. Não substitui a triagem final do operador, e não dizemos que substitui.
 
 **"Isto não é o que a To-Be-Green já faz?"**
 
 Não. A To-Be-Green trabalha com o cidadão e a reutilização. O Novelo é para quem opera a recolha: onde, como e a que custo. São complementares.
+
+## Sobre a IA, os lotes e os dados
+
+**"E se a IA se enganar nos números?"**
+
+A IA não faz contas. Traduz a pergunta numa alteração ao cenário, mostra "Entendi: ..." para confirmarmos, e quem calcula é o otimizador. Um verificador rejeita qualquer número na resposta que não venha do resultado calculado.
+
+**"Ler a marca na etiqueta não levanta problemas de privacidade?"**
+
+Não guardamos nada de quem entrega a peça. As fotografias são apagadas depois de processadas; ficam marca, composição, estado e peso. A marca é de uma empresa, não de uma pessoa.
+
+**"Os recicladores querem mesmo estes lotes?"**
+
+O próprio plano municipal diz que falta têxtil limpo e homogéneo para haver mercado de matérias-primas secundárias, e só 4 dos 27 operadores licenciados da zona valorizam têxteis. Lotes separados por fibra são exatamente o que falta. O piloto valida com eles.
+
+**"Porque não usam blockchain no passaporte?"**
+
+Porque um registo com histórico na base de dados chega para rastrear lotes. O valor está nos dados que o passaporte leva, não na tecnologia por baixo.
+
+**"Quanto custa a IA a funcionar?"**
+
+Uma ou duas chamadas por peça triada e uma por pergunta "E se...?", com limites e cache. O custo real por peça é uma das métricas do piloto.
 
 ## Sobre o futuro
 

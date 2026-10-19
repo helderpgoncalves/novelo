@@ -19,13 +19,16 @@ A pergunta da Vitrus Ambiente é simples: como garantir têxtil reutilizável e 
 
 ## A solução
 
-O Novelo é uma ferramenta de decisão que desenha a rede de recolha de têxteis ao menor custo e mostra, lado a lado, quanto custa cada cenário.
+O Novelo acompanha o têxtil **do saco ao fio**: planeia a rede de recolha ao menor custo, deixa o decisor testar ideias em português, segue cada lote até à indústria e entrega à câmara o dossiê de que vai precisar em 2028.
 
-| Peça | O que faz | O que o decisor ganha |
+| Feature | O que faz | O que ninguém tem |
 | --- | --- | --- |
-| **Simulador da rede** | Estima quanto têxtil há em cada zona, escolhe onde pôr pontos de recolha, que modo usar em cada zona e que rotas fazer | Cenários com investimento, custo anual, toneladas desviadas do aterro e €/t |
-| **Triagem na entrega** | Uma foto da peça e outra da etiqueta classificam-na como reutilizável, reciclável ou rejeito e indicam o destino da fibra | Dados de qualidade por ponto de recolha, que hoje não existem |
-| **Incentivo e destino** | Liga as entregas ao sistema PAYT e estima toneladas por tipo de fibra para a indústria do Vale do Ave | Mais captura sem mais contentores, e material com destino de valor |
+| **Simulador da rede** | Estima o têxtil por zona e escolhe onde pôr pontos, que modo usar e que rotas fazer | Cenários com investimento, custo anual, toneladas e €/t lado a lado |
+| **"E se...?"** | O decisor pergunta em português ("e se passarmos Serzedelo a recolha a pedido?") e o otimizador responde com um cenário novo | A IA conduz um modelo matemático; todos os números são verificados, nenhum é inventado |
+| **Triagem e lote com passaporte** | Uma foto da peça e da etiqueta dá estado, composição e marca; a peça entra num lote com QR | Rastreabilidade de cada saco, alinhada com o futuro Passaporte Digital do Produto |
+| **Bolsa de fibra** | Lotes agregados por fibra ("algodão 100%, 320 kg") visíveis para os recicladores do Vale do Ave | Liga a recolha municipal à indústria têxtil local |
+| **Fluxo do saco ao fio** | Um Sankey mostra as toneladas de cada freguesia até ao destino final | Onde se perde valor, num relance |
+| **Relatório RAP num clique** | PDF com custo por tonelada por tipo de território, toneladas por fibra e marcas mais encontradas | A resposta a "quem paga isto?" com dados do próprio concelho |
 
 **Três modos de recolha, combinados por zona.** A poupança está em não usar o mesmo modo em todo o lado:
 
@@ -54,8 +57,8 @@ O Novelo transforma uma obrigação legal num plano com preço. É útil já par
 
 ## Depois do hackathon
 
-1. **Piloto com a Vitrus (3 meses):** uma ou duas freguesias, um modo de recolha de cada tipo, medir toneladas e custo real contra o previsto.
-2. **Calibração:** acertar o modelo com os dados do piloto e do PAYT.
+1. **Piloto com a Vitrus (3 meses):** uma ou duas freguesias, um modo de recolha de cada tipo, balança nos pontos, medir toneladas e custo real contra o previsto.
+2. **Copiloto de operações:** um agente que todas as semanas recalibra o modelo com os lotes reais, volta a otimizar e propõe alterações, sempre com aprovação humana.
 3. **Escala:** levar o modelo a outros municípios e às entidades gestoras da RAP, com os dados abertos de cada concelho.
 
 Em aberto: custos unitários reais da Vitrus e quem opera hoje os contentores têxteis. São as primeiras perguntas ao mentor.
@@ -65,4 +68,5 @@ Em aberto: custos unitários reais da Vitrus e quem opera hoje os contentores t�
 - [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf), Município de Guimarães / URBACT, nov. 2025
 - [Diretiva 2025/1892 que altera a Diretiva-Quadro dos Resíduos](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/), VdA, out. 2025
 - [Resumo oficial do ato final, Diretiva (UE) 2025/1892](https://oeil.europarl.europa.eu/oeil/en/procedure-document-summary/pdf?id=1845495), Parlamento Europeu
+- [EU Parliament mandates EPR for textiles](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles), AMI, set. 2025
 - Desafio 5 TexVitrus, slide oficial do Hack4Guimarães 2035
