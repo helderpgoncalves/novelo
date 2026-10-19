@@ -1,7 +1,6 @@
 import { AlertTriangle, Inbox } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
@@ -42,16 +41,4 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
   );
 }
 
-export function PageSkeleton() {
-  return (
-    <div className="space-y-8" aria-busy="true">
-      <span className="sr-only">{m.common_loading()}</span>
-      <div className="space-y-3">
-        <Skeleton className="h-3 w-24" />
-        <Skeleton className="h-10 w-2/3 max-w-lg" />
-      </div>
-      <Skeleton className="h-28 w-full rounded-xl" />
-      <Skeleton className="h-80 w-full rounded-xl" />
-    </div>
-  );
-}
+export { PageSkeleton } from '@/components/skeletons';
