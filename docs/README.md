@@ -8,8 +8,25 @@ Só Markdown, em pt-PT. Nomes de ficheiros em português, minúsculas e hífens.
 | --- | --- |
 | [Visão geral](projeto/visao-geral.md) | O problema, a solução e o impacto em duas páginas |
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
-| [Pitch](projeto/pitch.md) | Guião de 5 minutos, slide a slide |
+| [Estratégia para ganhar](projeto/estrategia-para-ganhar.md) | Leitura do desafio, o que o júri valoriza (hipóteses), riscos, plano dia a dia, perguntas aos mentores |
+| [Narrativa do pitch](projeto/narrativa-do-pitch.md) | Storyline em 30 s, 3 min e 5 min, falas, roteiro da demo e objeções, com a fonte de cada número |
+| [Guião de slides](projeto/pitch-slides.md) | Oito slides prontos para o deck |
+| [Pitch](projeto/pitch.md) | Resumo do guião de 5 minutos |
 | [Perguntas do júri](projeto/perguntas-do-juri.md) | Respostas preparadas |
+
+## Pesquisa
+
+Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem linha no registo.
+
+| Documento | Para quê |
+| --- | --- |
+| [Índice da pesquisa](pesquisa/README.md) | Como usar o dossier e principais descobertas |
+| [Enquadramento regulatório](pesquisa/enquadramento-regulatorio.md) | Diretiva (UE) 2025/1892, RGGR, prazos, o que Portugal ainda não tem |
+| [Benchmarks internacionais](pesquisa/benchmarks-internacionais.md) | França, Catalunha, UE: kg por habitante, densidade, € por tonelada |
+| [Tecnologia de triagem](pesquisa/tecnologia-de-triagem.md) | O que a foto, a etiqueta e o NIR conseguem, e os limites |
+| [Indústria e mercado](pesquisa/industria-e-mercado.md) | Vale do Ave, recicladores, economia social, quem contactar |
+| [Registo de afirmações](pesquisa/registo-de-afirmacoes.md) | Cada afirmação do pitch com fonte, data e estado |
+| [Fontes](pesquisa/fontes.md) | Bibliografia numerada |
 
 ## Engenharia
 

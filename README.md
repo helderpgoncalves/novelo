@@ -147,7 +147,7 @@ Passo a passo e variáveis em [docs/engenharia/deploy.md](docs/engenharia/deploy
 apps/api/            FastAPI (src/novelo/{core,features,domain,adapters,ai}), migrações e testes
 apps/web/            React + Vite. src/client é gerado; src/components/data-table é a tabela única do produto
 data/raw|processed/  Excel recebidos | CSV e JSON limpos (gerados)
-docs/                projeto/ · engenharia/ · dados/ · marca/ (só Markdown)
+docs/                projeto/ · pesquisa/ · engenharia/ · dados/ · marca/ (só Markdown)
 brand/               símbolo, logotipos, fontes e avatares
 scripts/             etl/ e export_openapi.py
 .claude/             agentes e skills partilhados (Claude Code, GLM/Z.ai, ZCode)
@@ -156,7 +156,7 @@ openapi.json         contrato exportado e versionado
 
 ## Documentação
 
-Índice completo em [docs/README.md](docs/README.md). Para trabalhar com agentes de código: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) e [docs/engenharia/workflow-ia.md](docs/engenharia/workflow-ia.md).
+Estratégia e pitch em [docs/projeto/estrategia-para-ganhar.md](docs/projeto/estrategia-para-ganhar.md) e [docs/projeto/narrativa-do-pitch.md](docs/projeto/narrativa-do-pitch.md); pesquisa e fontes em [docs/pesquisa/](docs/pesquisa/README.md). Índice completo em [docs/README.md](docs/README.md). Para trabalhar com agentes de código: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) e [docs/engenharia/workflow-ia.md](docs/engenharia/workflow-ia.md).
 
 ## Equipa e créditos
 
