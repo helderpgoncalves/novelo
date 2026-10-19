@@ -2,7 +2,8 @@ import { AlertTriangle, Inbox } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { m } from '@/paraglide/messages';
 
 export function EmptyState({
   title,
@@ -30,11 +31,11 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
       className="flex flex-col items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/5 px-6 py-10 text-center"
     >
       <AlertTriangle className="size-6 text-destructive" aria-hidden="true" />
-      <p className="font-medium">Não foi possível carregar</p>
+      <p className="font-medium">{m.error_load_title()}</p>
       <p className="max-w-md text-muted-foreground text-sm">{getErrorMessage(error)}</p>
       {onRetry && (
         <Button variant="outline" size="sm" onClick={onRetry}>
-          Tentar de novo
+          {m.common_retry()}
         </Button>
       )}
     </div>
@@ -44,7 +45,7 @@ export function ErrorState({ error, onRetry }: { error: unknown; onRetry?: () =>
 export function PageSkeleton() {
   return (
     <div className="space-y-8" aria-busy="true">
-      <span className="sr-only">A carregar</span>
+      <span className="sr-only">{m.common_loading()}</span>
       <div className="space-y-3">
         <Skeleton className="h-3 w-24" />
         <Skeleton className="h-10 w-2/3 max-w-lg" />

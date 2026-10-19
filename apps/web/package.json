@@ -4,13 +4,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite --host 0.0.0.0 --port 3190",
-    "build": "tsc --noEmit && vite build",
+    "build": "vite build && tsc --noEmit",
     "preview": "vite preview --port 3190",
     "gen": "openapi-ts",
     "lint": "biome check .",
     "lint:fix": "biome check --write .",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "typecheck": "pnpm i18n && tsc --noEmit",
+    "test": "pnpm i18n && vitest run",
+    "i18n": "paraglide-js compile --project ./project.inlang --outdir ./src/paraglide",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^6.0.0",
@@ -22,7 +24,6 @@
     "cn": "^0.5.0",
     "echarts": "^6.1.0",
     "lucide-react": "^1.59.0",
-    "next-themes": "^0.4.6",
     "radix-ui": "^1.8.1",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
@@ -35,6 +36,7 @@
     "@biomejs/biome": "^2.5.15",
     "@hey-api/openapi-ts": "^0.99.0",
     "@inlang/paraglide-js": "^2.29.0",
+    "@playwright/test": "^1.64.1",
     "@tailwindcss/vite": "^4.3.3",
     "@tanstack/react-query-devtools": "^5.104.5",
     "@tanstack/react-router-devtools": "^1.167.2",

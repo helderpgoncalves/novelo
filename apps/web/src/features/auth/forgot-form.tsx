@@ -13,7 +13,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { getLocale } from '@/lib/i18n';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { type ForgotValues, forgotSchema } from './schemas';
 
@@ -28,11 +30,9 @@ export function ForgotForm() {
     return (
       <div role="status" className="space-y-3 rounded-xl border bg-card p-5">
         <MailCheck className="size-6 text-primary" aria-hidden="true" />
-        <p className="font-medium">Verifica o teu email</p>
+        <p className="font-medium">{m.forgot_sent_title()}</p>
         <p className="text-muted-foreground text-sm leading-relaxed">
-          Se existir uma conta com{' '}
-          <strong className="text-foreground">{form.getValues('email')}</strong>, enviámos um link
-          para redefinires a password. O link expira em 60 minutos.
+          {m.forgot_sent_text({ email: form.getValues('email') })}
         </p>
       </div>
     );
@@ -41,7 +41,7 @@ export function ForgotForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) => forgot.mutate({ body: v }))}
+        onSubmit={form.handleSubmit((v) => forgot.mutate({ body: { ...v, locale: getLocale() } }))}
         className="space-y-4"
         noValidate
       >
@@ -51,7 +51,7 @@ export function ForgotForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email da conta</FormLabel>
+              <FormLabel>{m.forgot_email()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
@@ -67,7 +67,7 @@ export function ForgotForm() {
         />
         <Button type="submit" className="h-10 w-full font-semibold" disabled={forgot.isPending}>
           {forgot.isPending && <Loader2 className="animate-spin" />}
-          Enviar link de recuperação
+          {m.forgot_submit()}
         </Button>
       </form>
     </Form>

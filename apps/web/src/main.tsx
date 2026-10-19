@@ -1,21 +1,33 @@
 import { registerSW } from 'virtual:pwa-register';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { ThemeProvider } from 'next-themes';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api-config';
 import { queryClient } from '@/lib/query-client';
+import { ThemeProvider } from '@/lib/theme';
+import { deLocalizeUrl, getLocale, localizeUrl } from '@/paraglide/runtime';
 import { routeTree } from './routeTree.gen';
 import './styles.css';
+
+// URLs com prefixo de idioma (/pt/..., /en/...): sem prefixo, redireciona para o idioma preferido.
+const current = window.location.href;
+const localized = localizeUrl(current).href;
+if (localized !== current) window.history.replaceState(null, '', localized);
+document.documentElement.lang = getLocale();
 
 const router = createRouter({
   routeTree,
   context: { queryClient },
   defaultPreload: 'intent',
   scrollRestoration: true,
+  // As rotas existem uma só vez; o prefixo do idioma é tirado à entrada e posto à saída.
+  rewrite: {
+    input: ({ url }) => deLocalizeUrl(url),
+    output: ({ url }) => localizeUrl(url),
+  },
 });
 
 declare module '@tanstack/react-router' {
@@ -27,9 +39,9 @@ declare module '@tanstack/react-router' {
 // Sessão terminada (refresh falhou): limpa a cache e volta à entrada, guardando onde estavas.
 window.addEventListener(SESSION_EXPIRED_EVENT, () => {
   queryClient.clear();
-  const { pathname, search } = window.location;
-  if (!pathname.startsWith('/entrar')) {
-    void router.navigate({ to: '/entrar', search: { next: `${pathname}${search}` } });
+  const path = deLocalizeUrl(window.location.href);
+  if (!path.pathname.startsWith('/login')) {
+    void router.navigate({ to: '/login', search: { next: `${path.pathname}${path.search}` } });
   }
 });
 
@@ -41,7 +53,7 @@ if (!root) throw new Error('#root não existe');
 
 createRoot(root).render(
   <StrictMode>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider delayDuration={150}>
           <RouterProvider router={router} />

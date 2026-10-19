@@ -1,5 +1,7 @@
 import type { TextileBaseline } from '@/client';
 import { formatPercent, formatTonnes } from '@/lib/format';
+import { destinationLabel } from '@/lib/vocab';
+import { m } from '@/paraglide/messages';
 import { DESTINATIONS } from './destination';
 
 /** O que já se recolhe (por destino) face ao potencial estimado de Guimarães. */
@@ -11,7 +13,11 @@ export function CaptureBar({ baseline }: { baseline: TextileBaseline }) {
     <div className="space-y-3">
       <div
         role="img"
-        aria-label={`${formatTonnes(baseline.total_t)} recolhidas de ${formatTonnes(potential, 0)} estimadas (${formatPercent(baseline.capture_of_demand_pct)})`}
+        aria-label={m.capture_aria({
+          collected: formatTonnes(baseline.total_t),
+          potential: formatTonnes(potential, 0),
+          pct: formatPercent(baseline.capture_of_demand_pct),
+        })}
         className="flex h-9 overflow-hidden rounded-lg bg-[repeating-linear-gradient(135deg,transparent_0_6px,var(--border)_6px_7px)] ring-1 ring-border"
       >
         {parts.map((p) => (
@@ -19,7 +25,7 @@ export function CaptureBar({ baseline }: { baseline: TextileBaseline }) {
             key={p.key}
             className={p.className}
             style={{ width: `${(p.tonnes / potential) * 100}%` }}
-            title={`${p.label}: ${formatTonnes(p.tonnes)}`}
+            title={`${destinationLabel[p.key]()}: ${formatTonnes(p.tonnes)}`}
           />
         ))}
       </div>
@@ -28,7 +34,7 @@ export function CaptureBar({ baseline }: { baseline: TextileBaseline }) {
           {parts.map((p) => (
             <li key={p.key} className="flex items-center gap-1.5 text-muted-foreground">
               <span className={`size-2.5 rounded-sm ${p.className}`} aria-hidden="true" />
-              {p.label}{' '}
+              {destinationLabel[p.key]()}{' '}
               <span className="font-medium text-foreground tabular-nums">
                 {formatTonnes(p.tonnes)}
               </span>
@@ -36,11 +42,7 @@ export function CaptureBar({ baseline }: { baseline: TextileBaseline }) {
           ))}
         </ul>
         <p className="text-muted-foreground">
-          A tracejado:{' '}
-          <span className="font-medium text-foreground tabular-nums">
-            {formatTonnes(baseline.gap_t, 0)}
-          </span>{' '}
-          por captar
+          {m.capture_gap_label({ tonnes: formatTonnes(baseline.gap_t, 0) })}
         </p>
       </div>
     </div>

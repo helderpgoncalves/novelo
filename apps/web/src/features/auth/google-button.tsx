@@ -1,6 +1,8 @@
 import type { GoogleLoginData } from '@/client';
 import { client } from '@/client/client.gen';
 import { Button } from '@/components/ui/button';
+import { getLocale } from '@/lib/i18n';
+import { m } from '@/paraglide/messages';
 
 function GoogleMark() {
   return (
@@ -27,13 +29,13 @@ export function GoogleButton({ next }: { next?: string }) {
   // URL construído pelo cliente gerado, tipado contra o contrato (nada de strings soltas).
   const href = client.buildUrl<GoogleLoginData>({
     url: '/api/v1/auth/google/login',
-    query: { next },
+    query: { next, locale: getLocale() },
   });
   return (
     <Button asChild variant="outline" className="h-10 w-full gap-2.5 font-medium">
       <a href={href}>
         <GoogleMark />
-        Continuar com a Google
+        {m.login_google()}
       </a>
     </Button>
   );

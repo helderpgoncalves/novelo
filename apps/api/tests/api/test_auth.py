@@ -140,7 +140,7 @@ async def test_remember_me_controls_cookie_lifetime(client: httpx.AsyncClient) -
 async def test_email_verification_flow(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
     await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
     assert (await client.get(f"{AUTH}/me")).json()["email_verified"] is False
-    assert len(outbox.sent) == 1 and "verificar-email?token=" in outbox.sent[0]["text"]
+    assert len(outbox.sent) == 1 and "verify-email?token=" in outbox.sent[0]["text"]
     token = re.search(r"token=([\w-]+)", outbox.sent[0]["text"]).group(1)  # type: ignore[union-attr]
 
     assert (await client.post(f"{AUTH}/verify-email", json={"token": token})).status_code == 204

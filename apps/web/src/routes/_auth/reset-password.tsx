@@ -2,10 +2,11 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { z } from 'zod';
 import { EmptyState } from '@/components/states';
 import { ResetForm } from '@/features/auth/reset-form';
+import { m } from '@/paraglide/messages';
 
-export const Route = createFileRoute('/_auth/redefinir-password')({
+export const Route = createFileRoute('/_auth/reset-password')({
   validateSearch: z.object({ token: z.string().optional().catch(undefined) }),
-  head: () => ({ meta: [{ title: 'Redefinir password · Novelo' }] }),
+  head: () => ({ meta: [{ title: m.title_reset() }] }),
   component: ResetPage,
 });
 
@@ -14,14 +15,11 @@ function ResetPage() {
   if (!token) {
     return (
       <EmptyState
-        title="Link inválido"
-        description="O link de recuperação está incompleto. Pede um novo."
+        title={m.reset_invalid_title()}
+        description={m.reset_invalid_text()}
         action={
-          <Link
-            to="/recuperar-password"
-            className="font-medium text-primary text-sm hover:underline"
-          >
-            Pedir um novo link
+          <Link to="/forgot-password" className="font-medium text-primary text-sm hover:underline">
+            {m.reset_request_new()}
           </Link>
         }
       />
@@ -30,10 +28,8 @@ function ResetPage() {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl">Nova password</h1>
-        <p className="text-muted-foreground text-sm">
-          Escolhe uma password que não uses noutros sítios.
-        </p>
+        <h1 className="text-3xl">{m.reset_title()}</h1>
+        <p className="text-muted-foreground text-sm">{m.reset_subtitle()}</p>
       </div>
       <ResetForm token={token} />
     </div>

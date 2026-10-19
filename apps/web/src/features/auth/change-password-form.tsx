@@ -16,8 +16,9 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
 import { queryClient } from '@/lib/query-client';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type ChangePasswordValues, changePasswordSchema, PASSWORD_MIN } from './schemas';
@@ -32,9 +33,9 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
     ...changePasswordMutation(),
     onSuccess: async () => {
       // O servidor termina todas as sessões ao mudar a password.
-      toast.success('Password alterada. Entra de novo com a nova password.');
+      toast.success(m.account_password_changed());
       queryClient.clear();
-      await navigate({ to: '/entrar' });
+      await navigate({ to: '/login' });
     },
   });
 
@@ -43,7 +44,7 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
       <form
         onSubmit={form.handleSubmit((v) => {
           if (user.has_password && !v.current)
-            return form.setError('current', { message: 'Indica a password atual' });
+            return form.setError('current', { message: m.validation_current_required() });
           change.mutate({
             body: { current_password: v.current || null, new_password: v.password },
           });
@@ -58,7 +59,7 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
             name="current"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Password atual</FormLabel>
+                <FormLabel>{m.account_current_password()}</FormLabel>
                 <FormControl>
                   <PasswordInput {...field} autoComplete="current-password" className="h-10" />
                 </FormControl>
@@ -72,11 +73,13 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{user.has_password ? 'Nova password' : 'Definir uma password'}</FormLabel>
+              <FormLabel>
+                {user.has_password ? m.account_new_password() : m.account_set_password()}
+              </FormLabel>
               <FormControl>
                 <PasswordInput {...field} autoComplete="new-password" className="h-10" />
               </FormControl>
-              <FormDescription>Pelo menos {PASSWORD_MIN} caracteres.</FormDescription>
+              <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -86,7 +89,7 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
           name="confirm"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Repete a nova password</FormLabel>
+              <FormLabel>{m.account_repeat_password()}</FormLabel>
               <FormControl>
                 <PasswordInput {...field} autoComplete="new-password" className="h-10" />
               </FormControl>
@@ -96,7 +99,7 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
         />
         <Button type="submit" className="h-10 font-semibold" disabled={change.isPending}>
           {change.isPending && <Loader2 className="animate-spin" />}
-          Guardar password
+          {m.account_save_password()}
         </Button>
       </form>
     </Form>

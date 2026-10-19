@@ -15,6 +15,7 @@ from novelo.core.logging import RequestLoggingMiddleware, configure_logging
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
 from novelo.features.datasets.router import router as datasets_router
+from novelo.features.dev.router import router as dev_router
 from novelo.features.health.router import router as health_router
 from novelo.features.network.router import router as network_router
 from novelo.features.textile.router import router as textile_router
@@ -66,6 +67,8 @@ def create_app() -> FastAPI:
         app.include_router(
             router, prefix=f"{API_PREFIX}/{name}", tags=[name], dependencies=protected, responses=COMMON_ERRORS
         )
+    if settings.environment == "development":
+        app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app
 
 

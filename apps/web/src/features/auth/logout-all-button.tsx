@@ -4,8 +4,9 @@ import { Loader2, MonitorOff } from 'lucide-react';
 import { toast } from 'sonner';
 import { logoutAllMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
 import { queryClient } from '@/lib/query-client';
+import { m } from '@/paraglide/messages';
 
 export function LogoutAllButton() {
   const navigate = useNavigate();
@@ -13,8 +14,8 @@ export function LogoutAllButton() {
     ...logoutAllMutation(),
     onSuccess: async () => {
       queryClient.clear();
-      toast.success('Sessão terminada em todos os dispositivos.');
-      await navigate({ to: '/entrar' });
+      toast.success(m.account_logout_all_done());
+      await navigate({ to: '/login' });
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -27,7 +28,7 @@ export function LogoutAllButton() {
       disabled={logoutAll.isPending}
     >
       {logoutAll.isPending ? <Loader2 className="animate-spin" /> : <MonitorOff />}
-      Terminar sessão em todos os dispositivos
+      {m.account_logout_all()}
     </Button>
   );
 }

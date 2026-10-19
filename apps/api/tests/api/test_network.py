@@ -27,6 +27,7 @@ async def test_fleet_matches_summary_sheet(logged_in: httpx.AsyncClient) -> None
     assert organic["fleet_vehicles"] == 6 and organic["fleet_crew"] == 12
     assert by_typology["undifferentiated"]["fleet_crew"] == 72
     assert body["total_assignments"] == 101
+    assert body["total_crew_shifts_week"] == 101  # TOTAL de tripulantes-turno da folha Resumo
     never = {v["plate"] for v in body["vehicles"] if v["never_assigned"]}
     assert never == {"29-48-XU", "74-HN-36"}
     assert next(v for v in body["vehicles"] if v["plate"] == "60-93-ZG")["multi_typology"] is True

@@ -9,52 +9,60 @@ import {
   MessageSquareQuote,
   Route as RouteIcon,
   ScanLine,
+  ShieldCheck,
   Store,
+  Truck,
   Users,
+  Waypoints,
 } from 'lucide-react';
+import { m } from '@/paraglide/messages';
 
 export interface NavItem {
-  label: string;
-  to?: '/' | '/circuitos' | '/utilizadores';
-  adminOnly?: boolean;
+  label: () => string;
+  to?: '/' | '/circuits' | '/fleet' | '/localities' | '/data-quality' | '/users';
   icon: LucideIcon;
+  /** No backlog, ainda sem ecrã. */
   soon?: boolean;
+  adminOnly?: boolean;
 }
 
 export interface NavSection {
-  title: string;
+  title: () => string;
   items: NavItem[];
 }
 
-// A mesma fonte alimenta a sidebar e a navegação móvel. `soon` = no backlog, ainda sem ecrã.
+// A mesma fonte alimenta a sidebar desktop e o menu móvel.
 export const NAV: NavSection[] = [
   {
-    title: 'Visão geral',
+    title: () => m.nav_section_overview(),
     items: [
-      { label: 'Ponto de partida', to: '/', icon: BarChart3 },
-      { label: 'Circuitos atuais', to: '/circuitos', icon: RouteIcon },
-      { label: 'Mapa da rede', icon: MapPinned, soon: true },
+      { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
+      { label: () => m.nav_circuits(), to: '/circuits', icon: RouteIcon },
+      { label: () => m.nav_fleet(), to: '/fleet', icon: Truck },
+      { label: () => m.nav_localities(), to: '/localities', icon: Waypoints },
+      { label: () => m.nav_data_quality(), to: '/data-quality', icon: ShieldCheck },
+      { label: () => m.nav_map(), icon: MapPinned, soon: true },
     ],
   },
   {
-    title: 'Planeamento',
+    title: () => m.nav_section_planning(),
     items: [
-      { label: 'Simulador da rede', icon: Layers, soon: true },
-      { label: 'Comparar cenários', icon: GitCompareArrows, soon: true },
-      { label: 'E se...?', icon: MessageSquareQuote, soon: true },
+      { label: () => m.nav_simulator(), icon: Layers, soon: true },
+      { label: () => m.nav_scenarios(), icon: GitCompareArrows, soon: true },
+      { label: () => m.nav_whatif(), icon: MessageSquareQuote, soon: true },
     ],
   },
   {
-    title: 'Operação',
+    title: () => m.nav_section_operations(),
     items: [
-      { label: 'Triagem', icon: ScanLine, soon: true },
-      { label: 'Lotes e passaporte', icon: Boxes, soon: true },
-      { label: 'Bolsa de fibra', icon: Store, soon: true },
-      { label: 'Relatório RAP', icon: FileText, soon: true },
+      { label: () => m.nav_triage(), icon: ScanLine, soon: true },
+      { label: () => m.nav_lots(), icon: Boxes, soon: true },
+      { label: () => m.nav_market(), icon: Store, soon: true },
+      { label: () => m.nav_rap(), icon: FileText, soon: true },
     ],
   },
   {
-    title: 'Administração',
-    items: [{ label: 'Utilizadores', to: '/utilizadores', icon: Users, adminOnly: true }],
+    title: () => m.nav_section_admin(),
+    items: [{ label: () => m.nav_users(), to: '/users', icon: Users, adminOnly: true }],
   },
 ];

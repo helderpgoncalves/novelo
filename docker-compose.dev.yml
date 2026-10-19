@@ -28,6 +28,7 @@ services:
         required: false
     environment:
       APP_ENV: development
+      RATE_LIMIT_ENABLED: "false"  # os testes E2E partilham o mesmo IP; a lógica tem testes de API próprios
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-novelo}:${POSTGRES_PASSWORD:-novelo}@db:5432/${POSTGRES_DB:-novelo}
       DATA_DIR: /data/processed
       APP_URL: http://localhost:${WEB_PORT:-3190}

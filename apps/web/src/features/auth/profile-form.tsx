@@ -16,7 +16,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { type ProfileValues, profileSchema } from './schemas';
 
@@ -33,7 +34,7 @@ export function ProfileForm({ user }: { user: UserOut }) {
       queryClient.setQueryData(getMeQueryKey(), updated);
       form.reset({ name: updated.name ?? '' });
       await router.invalidate();
-      toast.success('Perfil atualizado');
+      toast.success(m.account_profile_saved());
     },
   });
 
@@ -50,7 +51,7 @@ export function ProfileForm({ user }: { user: UserOut }) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>{m.account_name()}</FormLabel>
               <FormControl>
                 <Input {...field} autoComplete="name" className="h-10" />
               </FormControl>
@@ -59,7 +60,7 @@ export function ProfileForm({ user }: { user: UserOut }) {
           )}
         />
         <div className="space-y-1.5">
-          <p className="font-medium text-sm">Email</p>
+          <p className="font-medium text-sm">{m.account_email()}</p>
           <p className="text-muted-foreground text-sm">{user.email}</p>
         </div>
         <Button
@@ -68,7 +69,7 @@ export function ProfileForm({ user }: { user: UserOut }) {
           disabled={update.isPending || !form.formState.isDirty}
         >
           {update.isPending && <Loader2 className="animate-spin" />}
-          Guardar perfil
+          {m.account_save_profile()}
         </Button>
       </form>
     </Form>

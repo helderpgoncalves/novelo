@@ -1,8 +1,7 @@
-import { Search } from 'lucide-react';
 import { useDeferredValue, useMemo, useState } from 'react';
-import type { Circuit } from '@/client';
+import type { CircuitOut, Typology } from '@/client';
+import { FilterChips, normalizeText, SearchBox } from '@/components/data-table-toolbar';
 import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import {
   Table,
   TableBody,
@@ -11,103 +10,93 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { cn } from '@/lib/utils';
+import { WeekdayDots } from '@/components/weekdays';
+import { circuitStatusLabel, collectionLabel, typologyLabel } from '@/lib/vocab';
+import { m } from '@/paraglide/messages';
 
-const normalize = (value: string) =>
-  value
-    .normalize('NFD')
-    .replace(/\p{Diacritic}/gu, '')
-    .toLowerCase();
-
-export function CircuitsTable({ circuits }: { circuits: Circuit[] }) {
+export function CircuitsTable({ circuits }: { circuits: CircuitOut[] }) {
   const [query, setQuery] = useState('');
-  const [typology, setTypology] = useState<string | null>(null);
+  const [typology, setTypology] = useState<Typology | null>(null);
   const deferred = useDeferredValue(query);
 
   const typologies = useMemo(() => [...new Set(circuits.map((c) => c.typology))], [circuits]);
   const rows = useMemo(() => {
-    const q = normalize(deferred.trim());
+    const q = normalizeText(deferred.trim());
     return circuits.filter(
       (c) =>
         (!typology || c.typology === typology) &&
         (!q ||
-          normalize(`${c.circuit} ${c.localities.join(' ')} ${c.collection_type}`).includes(q)),
+          normalizeText(`${c.code} ${c.localities.join(' ')} ${c.vehicles.join(' ')}`).includes(q)),
     );
   }, [circuits, deferred, typology]);
 
   return (
     <div className="space-y-3">
       <div className="flex flex-wrap items-center gap-3">
-        <div className="relative w-full sm:max-w-xs">
-          <Search
-            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
-            aria-hidden="true"
-          />
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Pesquisar circuito ou localidade"
-            aria-label="Pesquisar circuito ou localidade"
-            className="h-10 pl-9"
-          />
-        </div>
-        <fieldset className="flex flex-wrap gap-1.5">
-          <legend className="sr-only">Filtrar por tipologia</legend>
-          {[null, ...typologies].map((t) => (
-            <button
-              key={t ?? 'todas'}
-              type="button"
-              onClick={() => setTypology(t)}
-              aria-pressed={typology === t}
-              className={cn(
-                'h-8 rounded-full border px-3 text-xs transition-colors',
-                typology === t
-                  ? 'border-primary bg-primary/10 font-medium text-primary'
-                  : 'text-muted-foreground hover:bg-muted',
-              )}
-            >
-              {t ?? 'Todas'}
-            </button>
-          ))}
-        </fieldset>
+        <SearchBox value={query} onChange={setQuery} label={m.circuits_search()} />
+        <FilterChips
+          legend={m.circuits_filter_typology()}
+          value={typology}
+          onChange={setTypology}
+          options={[
+            { value: null, label: m.common_all() },
+            ...typologies.map((t) => ({ value: t, label: typologyLabel[t]() })),
+          ]}
+        />
       </div>
 
       <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
-              <TableHead className="h-10 px-4">Circuito</TableHead>
-              <TableHead className="h-10">Tipologia</TableHead>
-              <TableHead className="h-10">Recolha</TableHead>
-              <TableHead className="h-10">Localidades</TableHead>
-              <TableHead className="h-10 pr-4">Estado</TableHead>
+              <TableHead className="h-10 px-4">{m.circuits_table_circuit()}</TableHead>
+              <TableHead className="h-10">{m.circuits_table_typology()}</TableHead>
+              <TableHead className="h-10">{m.circuits_table_collection()}</TableHead>
+              <TableHead className="h-10">{m.circuits_table_localities()}</TableHead>
+              <TableHead className="h-10">{m.circuits_table_days()}</TableHead>
+              <TableHead className="h-10">{m.circuits_table_vehicles()}</TableHead>
+              <TableHead className="h-10 pr-4">{m.circuits_table_status()}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {rows.map((c) => (
-              <TableRow key={`${c.typology}-${c.circuit}`} className="align-top">
-                <TableCell className="px-4 font-medium">{c.circuit}</TableCell>
-                <TableCell>{c.typology}</TableCell>
+              <TableRow key={c.code} className="align-top">
+                <TableCell className="px-4 font-medium">{c.code}</TableCell>
+                <TableCell>{typologyLabel[c.typology]()}</TableCell>
                 <TableCell>
-                  {c.collection_type || <span className="text-muted-foreground">-</span>}
+                  {c.collection_type === 'unspecified' ? (
+                    <span className="text-muted-foreground">{m.common_dash()}</span>
+                  ) : (
+                    collectionLabel[c.collection_type]()
+                  )}
                 </TableCell>
-                <TableCell className="max-w-md whitespace-normal text-muted-foreground">
-                  {c.localities.join(', ') || '-'}
+                <TableCell className="max-w-xs whitespace-normal text-muted-foreground">
+                  {c.localities.join(', ') || m.common_dash()}
+                </TableCell>
+                <TableCell>
+                  {c.weekdays.length > 0 ? (
+                    <WeekdayDots days={c.weekdays} />
+                  ) : (
+                    <span className="text-muted-foreground">{m.common_dash()}</span>
+                  )}
+                </TableCell>
+                <TableCell className="max-w-40 whitespace-normal text-muted-foreground tabular-nums">
+                  {c.vehicles.join(', ') || m.common_dash()}
                 </TableCell>
                 <TableCell className="pr-4">
                   <Badge
-                    variant={c.status === 'OK' ? 'secondary' : 'outline'}
+                    variant={c.status === 'ok' ? 'secondary' : 'outline'}
                     className="whitespace-nowrap font-semibold text-[10px] uppercase tracking-wider"
                   >
-                    {c.status}
+                    {circuitStatusLabel[c.status]()}
                   </Badge>
                 </TableCell>
               </TableRow>
             ))}
             {rows.length === 0 && (
               <TableRow className="hover:bg-transparent">
-                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                  Nenhum circuito corresponde à pesquisa.
+                <TableCell colSpan={7} className="h-24 text-center text-muted-foreground">
+                  {m.circuits_no_results()}
                 </TableCell>
               </TableRow>
             )}
@@ -115,7 +104,7 @@ export function CircuitsTable({ circuits }: { circuits: Circuit[] }) {
         </Table>
       </div>
       <p className="text-muted-foreground text-xs tabular-nums" aria-live="polite">
-        {rows.length} de {circuits.length} circuitos
+        {m.circuits_count({ shown: rows.length, total: circuits.length })}
       </p>
     </div>
   );

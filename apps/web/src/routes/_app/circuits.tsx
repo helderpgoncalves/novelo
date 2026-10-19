@@ -6,10 +6,11 @@ import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
 import { CircuitsTable } from '@/features/circuits/circuits-table';
 import { formatNumber } from '@/lib/format';
+import { m } from '@/paraglide/messages';
 
-export const Route = createFileRoute('/_app/circuitos')({
+export const Route = createFileRoute('/_app/circuits')({
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(listCircuitsOptions()),
-  head: () => ({ meta: [{ title: 'Circuitos atuais · Novelo' }] }),
+  head: () => ({ meta: [{ title: m.title_circuits() }] }),
   component: Circuits,
 });
 
@@ -19,34 +20,34 @@ function Circuits() {
   return (
     <div className="space-y-8">
       <PageHeader
-        eyebrow="Dados da Vitrus · planeamento de recolha"
-        title="Circuitos e viaturas atuais"
-        description="As rotas que já passam por cada localidade são a base da recolha de têxteis a pedido: onde já há camião, o quilómetro extra é perto de zero."
+        eyebrow={m.circuits_eyebrow()}
+        title={m.circuits_title()}
+        description={m.circuits_description()}
       />
-      <StatStrip className="lg:grid-cols-4">
+      <StatStrip>
         <StatCell
-          label="Circuitos"
+          label={m.circuits_stat_circuits()}
           value={formatNumber(data.total)}
-          hint={`${formatNumber(data.without_vehicle)} sem viatura atribuída`}
+          hint={m.circuits_stat_circuits_hint({ count: data.without_vehicle })}
         />
         <StatCell
-          label="Viaturas"
+          label={m.circuits_stat_vehicles()}
           value={formatNumber(data.vehicles)}
-          hint={`${data.vehicles_never_assigned.length} nunca têm circuito (reserva ou oficina)`}
+          hint={m.circuits_stat_vehicles_hint({ count: data.vehicles_never_assigned.length })}
         />
         <StatCell
-          label="Localidades"
-          value={formatNumber(data.localities.length)}
-          hint="com pelo menos um circuito"
+          label={m.circuits_stat_localities()}
+          value={formatNumber(data.localities)}
+          hint={m.circuits_stat_localities_hint()}
         />
         <StatCell
-          label="Por confirmar"
+          label={m.circuits_stat_notes()}
           value={formatNumber(data.circuits.filter((c) => c.note).length)}
-          hint="circuitos com observação nos dados"
+          hint={m.circuits_stat_notes_hint()}
         />
       </StatStrip>
       {data.circuits.length === 0 ? (
-        <EmptyState title="Sem circuitos" description="Corre o ETL para gerar data/processed." />
+        <EmptyState title={m.circuits_empty_title()} description={m.circuits_empty_text()} />
       ) : (
         <CircuitsTable circuits={data.circuits} />
       )}

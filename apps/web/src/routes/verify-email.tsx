@@ -5,13 +5,15 @@ import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { verifyEmailMutation } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
 import { queryClient } from '@/lib/query-client';
+import { m } from '@/paraglide/messages';
 
-export const Route = createFileRoute('/verificar-email')({
+export const Route = createFileRoute('/verify-email')({
   validateSearch: z.object({ token: z.string().optional().catch(undefined) }),
-  head: () => ({ meta: [{ title: 'Confirmar email · Novelo' }] }),
+  head: () => ({ meta: [{ title: m.title_verify() }] }),
   component: VerifyEmail,
 });
 
@@ -35,6 +37,9 @@ function VerifyEmail() {
 
   return (
     <div className="grid min-h-dvh place-items-center px-6">
+      <div className="absolute top-4 right-4">
+        <LanguageSwitcher />
+      </div>
       <div className="w-full max-w-sm space-y-6 text-center">
         <BrandLogo className="justify-center" />
         <div
@@ -44,29 +49,30 @@ function VerifyEmail() {
           {state === 'loading' && (
             <>
               <Loader2 className="mx-auto size-7 animate-spin text-primary" aria-hidden="true" />
-              <p className="font-medium">A confirmar o teu email…</p>
+              <p className="font-medium">{m.verify_loading()}</p>
             </>
           )}
           {state === 'ok' && (
             <>
               <CheckCircle2 className="mx-auto size-7 text-primary" aria-hidden="true" />
-              <h1 className="text-2xl">Email confirmado</h1>
-              <p className="text-muted-foreground text-sm">A tua conta está protegida.</p>
+              <h1 className="text-2xl">{m.verify_ok_title()}</h1>
+              <p className="text-muted-foreground text-sm">{m.verify_ok_text()}</p>
               <Button asChild className="w-full">
-                <Link to="/">Abrir o Novelo</Link>
+                <Link to="/">{m.verify_open_app()}</Link>
               </Button>
             </>
           )}
           {state === 'error' && (
             <>
               <XCircle className="mx-auto size-7 text-destructive" aria-hidden="true" />
-              <h1 className="text-2xl">Link inválido</h1>
+              <h1 className="text-2xl">{m.verify_error_title()}</h1>
               <p className="text-muted-foreground text-sm">
-                {token ? getErrorMessage(verify.error) : 'O link está incompleto.'} Entra na tua
-                conta e pede um novo link.
+                {m.verify_error_text({
+                  reason: token ? getErrorMessage(verify.error) : m.verify_error_incomplete(),
+                })}
               </p>
               <Button asChild variant="outline" className="w-full">
-                <Link to="/entrar">Ir para a entrada</Link>
+                <Link to="/login">{m.verify_go_login()}</Link>
               </Button>
             </>
           )}

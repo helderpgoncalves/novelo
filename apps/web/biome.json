@@ -7,7 +7,11 @@
       "*.json",
       "!src/client",
       "!src/routeTree.gen.ts",
-      "!src/styles.css"
+      "!src/styles.css",
+      "!src/paraglide",
+      "!messages",
+      "e2e/**",
+      "playwright.config.ts"
     ]
   },
   "formatter": {

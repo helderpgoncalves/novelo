@@ -11,15 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
-import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
-import { Route as AppCircuitosRouteImport } from './routes/_app/circuitos'
-import { Route as AppContaRouteImport } from './routes/_app/conta'
-import { Route as AppUtilizadoresRouteImport } from './routes/_app/utilizadores'
-import { Route as AuthCriarContaRouteImport } from './routes/_auth/criar-conta'
-import { Route as AuthEntrarRouteImport } from './routes/_auth/entrar'
-import { Route as AuthRecuperarPasswordRouteImport } from './routes/_auth/recuperar-password'
-import { Route as AuthRedefinirPasswordRouteImport } from './routes/_auth/redefinir-password'
+import { Route as AppAccountRouteImport } from './routes/_app/account'
+import { Route as AppCircuitsRouteImport } from './routes/_app/circuits'
+import { Route as AppDataQualityRouteImport } from './routes/_app/data-quality'
+import { Route as AppFleetRouteImport } from './routes/_app/fleet'
+import { Route as AppLocalitiesRouteImport } from './routes/_app/localities'
+import { Route as AppUsersRouteImport } from './routes/_app/users'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -29,9 +32,9 @@ const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
   getParentRoute: () => rootRouteImport,
 } as any)
-const VerificarEmailRoute = VerificarEmailRouteImport.update({
-  id: '/verificar-email',
-  path: '/verificar-email',
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -39,120 +42,153 @@ const AppIndexRoute = AppIndexRouteImport.update({
   path: '/',
   getParentRoute: () => AppRoute,
 } as any)
-const AppCircuitosRoute = AppCircuitosRouteImport.update({
-  id: '/circuitos',
-  path: '/circuitos',
+const AppAccountRoute = AppAccountRouteImport.update({
+  id: '/account',
+  path: '/account',
   getParentRoute: () => AppRoute,
 } as any)
-const AppContaRoute = AppContaRouteImport.update({
-  id: '/conta',
-  path: '/conta',
+const AppCircuitsRoute = AppCircuitsRouteImport.update({
+  id: '/circuits',
+  path: '/circuits',
   getParentRoute: () => AppRoute,
 } as any)
-const AppUtilizadoresRoute = AppUtilizadoresRouteImport.update({
-  id: '/utilizadores',
-  path: '/utilizadores',
+const AppDataQualityRoute = AppDataQualityRouteImport.update({
+  id: '/data-quality',
+  path: '/data-quality',
   getParentRoute: () => AppRoute,
 } as any)
-const AuthCriarContaRoute = AuthCriarContaRouteImport.update({
-  id: '/criar-conta',
-  path: '/criar-conta',
+const AppFleetRoute = AppFleetRouteImport.update({
+  id: '/fleet',
+  path: '/fleet',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppLocalitiesRoute = AppLocalitiesRouteImport.update({
+  id: '/localities',
+  path: '/localities',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUsersRoute = AppUsersRouteImport.update({
+  id: '/users',
+  path: '/users',
+  getParentRoute: () => AppRoute,
+} as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthEntrarRoute = AuthEntrarRouteImport.update({
-  id: '/entrar',
-  path: '/entrar',
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthRecuperarPasswordRoute = AuthRecuperarPasswordRouteImport.update({
-  id: '/recuperar-password',
-  path: '/recuperar-password',
+const AuthRegisterRoute = AuthRegisterRouteImport.update({
+  id: '/register',
+  path: '/register',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthRedefinirPasswordRoute = AuthRedefinirPasswordRouteImport.update({
-  id: '/redefinir-password',
-  path: '/redefinir-password',
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
-  '/verificar-email': typeof VerificarEmailRoute
-  '/circuitos': typeof AppCircuitosRoute
-  '/conta': typeof AppContaRoute
-  '/utilizadores': typeof AppUtilizadoresRoute
-  '/criar-conta': typeof AuthCriarContaRoute
-  '/entrar': typeof AuthEntrarRoute
-  '/recuperar-password': typeof AuthRecuperarPasswordRoute
-  '/redefinir-password': typeof AuthRedefinirPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/account': typeof AppAccountRoute
+  '/circuits': typeof AppCircuitsRoute
+  '/data-quality': typeof AppDataQualityRoute
+  '/fleet': typeof AppFleetRoute
+  '/localities': typeof AppLocalitiesRoute
+  '/users': typeof AppUsersRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
-  '/verificar-email': typeof VerificarEmailRoute
-  '/circuitos': typeof AppCircuitosRoute
-  '/conta': typeof AppContaRoute
-  '/utilizadores': typeof AppUtilizadoresRoute
-  '/criar-conta': typeof AuthCriarContaRoute
-  '/entrar': typeof AuthEntrarRoute
-  '/recuperar-password': typeof AuthRecuperarPasswordRoute
-  '/redefinir-password': typeof AuthRedefinirPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/account': typeof AppAccountRoute
+  '/circuits': typeof AppCircuitsRoute
+  '/data-quality': typeof AppDataQualityRoute
+  '/fleet': typeof AppFleetRoute
+  '/localities': typeof AppLocalitiesRoute
+  '/users': typeof AppUsersRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
+  '/login': typeof AuthLoginRoute
+  '/register': typeof AuthRegisterRoute
+  '/reset-password': typeof AuthResetPasswordRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
-  '/verificar-email': typeof VerificarEmailRoute
-  '/_app/circuitos': typeof AppCircuitosRoute
-  '/_app/conta': typeof AppContaRoute
-  '/_app/utilizadores': typeof AppUtilizadoresRoute
-  '/_auth/criar-conta': typeof AuthCriarContaRoute
-  '/_auth/entrar': typeof AuthEntrarRoute
-  '/_auth/recuperar-password': typeof AuthRecuperarPasswordRoute
-  '/_auth/redefinir-password': typeof AuthRedefinirPasswordRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/_app/account': typeof AppAccountRoute
+  '/_app/circuits': typeof AppCircuitsRoute
+  '/_app/data-quality': typeof AppDataQualityRoute
+  '/_app/fleet': typeof AppFleetRoute
+  '/_app/localities': typeof AppLocalitiesRoute
+  '/_app/users': typeof AppUsersRoute
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
+  '/_auth/login': typeof AuthLoginRoute
+  '/_auth/register': typeof AuthRegisterRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/verificar-email'
-    | '/circuitos'
-    | '/conta'
-    | '/utilizadores'
-    | '/criar-conta'
-    | '/entrar'
-    | '/recuperar-password'
-    | '/redefinir-password'
+    | '/verify-email'
+    | '/account'
+    | '/circuits'
+    | '/data-quality'
+    | '/fleet'
+    | '/localities'
+    | '/users'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/verificar-email'
-    | '/circuitos'
-    | '/conta'
-    | '/utilizadores'
-    | '/criar-conta'
-    | '/entrar'
-    | '/recuperar-password'
-    | '/redefinir-password'
+    | '/verify-email'
+    | '/account'
+    | '/circuits'
+    | '/data-quality'
+    | '/fleet'
+    | '/localities'
+    | '/users'
+    | '/forgot-password'
+    | '/login'
+    | '/register'
+    | '/reset-password'
   id:
     | '__root__'
     | '/_app'
     | '/_auth'
-    | '/verificar-email'
-    | '/_app/circuitos'
-    | '/_app/conta'
-    | '/_app/utilizadores'
-    | '/_auth/criar-conta'
-    | '/_auth/entrar'
-    | '/_auth/recuperar-password'
-    | '/_auth/redefinir-password'
+    | '/verify-email'
+    | '/_app/account'
+    | '/_app/circuits'
+    | '/_app/data-quality'
+    | '/_app/fleet'
+    | '/_app/localities'
+    | '/_app/users'
+    | '/_auth/forgot-password'
+    | '/_auth/login'
+    | '/_auth/register'
+    | '/_auth/reset-password'
     | '/_app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
-  VerificarEmailRoute: typeof VerificarEmailRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -171,11 +207,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/verificar-email': {
-      id: '/verificar-email'
-      path: '/verificar-email'
-      fullPath: '/verificar-email'
-      preLoaderRoute: typeof VerificarEmailRouteImport
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -185,86 +221,113 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppIndexRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/circuitos': {
-      id: '/_app/circuitos'
-      path: '/circuitos'
-      fullPath: '/circuitos'
-      preLoaderRoute: typeof AppCircuitosRouteImport
+    '/_app/account': {
+      id: '/_app/account'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AppAccountRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/conta': {
-      id: '/_app/conta'
-      path: '/conta'
-      fullPath: '/conta'
-      preLoaderRoute: typeof AppContaRouteImport
+    '/_app/circuits': {
+      id: '/_app/circuits'
+      path: '/circuits'
+      fullPath: '/circuits'
+      preLoaderRoute: typeof AppCircuitsRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/utilizadores': {
-      id: '/_app/utilizadores'
-      path: '/utilizadores'
-      fullPath: '/utilizadores'
-      preLoaderRoute: typeof AppUtilizadoresRouteImport
+    '/_app/data-quality': {
+      id: '/_app/data-quality'
+      path: '/data-quality'
+      fullPath: '/data-quality'
+      preLoaderRoute: typeof AppDataQualityRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_auth/criar-conta': {
-      id: '/_auth/criar-conta'
-      path: '/criar-conta'
-      fullPath: '/criar-conta'
-      preLoaderRoute: typeof AuthCriarContaRouteImport
+    '/_app/fleet': {
+      id: '/_app/fleet'
+      path: '/fleet'
+      fullPath: '/fleet'
+      preLoaderRoute: typeof AppFleetRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/localities': {
+      id: '/_app/localities'
+      path: '/localities'
+      fullPath: '/localities'
+      preLoaderRoute: typeof AppLocalitiesRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/users': {
+      id: '/_app/users'
+      path: '/users'
+      fullPath: '/users'
+      preLoaderRoute: typeof AppUsersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/entrar': {
-      id: '/_auth/entrar'
-      path: '/entrar'
-      fullPath: '/entrar'
-      preLoaderRoute: typeof AuthEntrarRouteImport
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/recuperar-password': {
-      id: '/_auth/recuperar-password'
-      path: '/recuperar-password'
-      fullPath: '/recuperar-password'
-      preLoaderRoute: typeof AuthRecuperarPasswordRouteImport
+    '/_auth/register': {
+      id: '/_auth/register'
+      path: '/register'
+      fullPath: '/register'
+      preLoaderRoute: typeof AuthRegisterRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/redefinir-password': {
-      id: '/_auth/redefinir-password'
-      path: '/redefinir-password'
-      fullPath: '/redefinir-password'
-      preLoaderRoute: typeof AuthRedefinirPasswordRouteImport
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
   }
 }
 
 interface AppRouteChildren {
-  AppCircuitosRoute: typeof AppCircuitosRoute
-  AppContaRoute: typeof AppContaRoute
-  AppUtilizadoresRoute: typeof AppUtilizadoresRoute
+  AppAccountRoute: typeof AppAccountRoute
+  AppCircuitsRoute: typeof AppCircuitsRoute
+  AppDataQualityRoute: typeof AppDataQualityRoute
+  AppFleetRoute: typeof AppFleetRoute
+  AppLocalitiesRoute: typeof AppLocalitiesRoute
+  AppUsersRoute: typeof AppUsersRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppCircuitosRoute: AppCircuitosRoute,
-  AppContaRoute: AppContaRoute,
-  AppUtilizadoresRoute: AppUtilizadoresRoute,
+  AppAccountRoute: AppAccountRoute,
+  AppCircuitsRoute: AppCircuitsRoute,
+  AppDataQualityRoute: AppDataQualityRoute,
+  AppFleetRoute: AppFleetRoute,
+  AppLocalitiesRoute: AppLocalitiesRoute,
+  AppUsersRoute: AppUsersRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 
 interface AuthRouteChildren {
-  AuthCriarContaRoute: typeof AuthCriarContaRoute
-  AuthEntrarRoute: typeof AuthEntrarRoute
-  AuthRecuperarPasswordRoute: typeof AuthRecuperarPasswordRoute
-  AuthRedefinirPasswordRoute: typeof AuthRedefinirPasswordRoute
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
+  AuthLoginRoute: typeof AuthLoginRoute
+  AuthRegisterRoute: typeof AuthRegisterRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
 }
 
 const AuthRouteChildren: AuthRouteChildren = {
-  AuthCriarContaRoute: AuthCriarContaRoute,
-  AuthEntrarRoute: AuthEntrarRoute,
-  AuthRecuperarPasswordRoute: AuthRecuperarPasswordRoute,
-  AuthRedefinirPasswordRoute: AuthRedefinirPasswordRoute,
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
+  AuthLoginRoute: AuthLoginRoute,
+  AuthRegisterRoute: AuthRegisterRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
 }
 
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
@@ -272,7 +335,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
-  VerificarEmailRoute: VerificarEmailRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

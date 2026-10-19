@@ -27,3 +27,6 @@ data/runtime/
 .claude/settings.local.json
 .claude/worktrees/
 CLAUDE.local.md
+
+# Gerado a partir de messages/*.json (pnpm i18n)
+apps/web/src/paraglide/

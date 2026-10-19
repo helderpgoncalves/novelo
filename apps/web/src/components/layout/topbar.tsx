@@ -1,7 +1,9 @@
 import { Menu } from 'lucide-react';
 import type { UserOut } from '@/client';
+import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { m } from '@/paraglide/messages';
 import { UserMenu } from './user-menu';
 
 export function Topbar({ user, onMenuClick }: { user: UserOut; onMenuClick: () => void }) {
@@ -12,12 +14,13 @@ export function Topbar({ user, onMenuClick }: { user: UserOut; onMenuClick: () =
         size="icon"
         className="size-9 lg:hidden"
         onClick={onMenuClick}
-        aria-label="Abrir navegação"
+        aria-label={m.common_open_navigation()}
       >
         <Menu className="size-5" />
       </Button>
       <div className="hidden lg:block" />
       <div className="flex items-center gap-1">
+        <LanguageSwitcher signedIn />
         <ThemeToggle />
         <UserMenu user={user} />
       </div>

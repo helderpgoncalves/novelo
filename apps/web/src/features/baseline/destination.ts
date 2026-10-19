@@ -1,23 +1,12 @@
-// Cores dos destinos (tokens de gráfico). Usadas em barras HTML e no Sankey.
-export const DESTINATIONS = [
-  {
-    key: 'reuse',
-    label: 'Reutilização',
-    className: 'bg-chart-1',
-    hex: { light: '#2e6b57', dark: '#7fb39c' },
-  },
-  {
-    key: 'recycle',
-    label: 'Reciclagem',
-    className: 'bg-chart-2',
-    hex: { light: '#7fb39c', dark: '#2e6b57' },
-  },
-  {
-    key: 'reject',
-    label: 'Rejeito',
-    className: 'bg-chart-3',
-    hex: { light: '#c4a06a', dark: '#c4a06a' },
-  },
-] as const;
+import type { TextileDestination } from '@/client';
 
-export type DestinationKey = (typeof DESTINATIONS)[number]['key'];
+// Cores dos destinos (tokens de gráfico). Usadas em barras HTML e no Sankey.
+export const DESTINATIONS: {
+  key: TextileDestination;
+  className: string;
+  hex: { light: string; dark: string };
+}[] = [
+  { key: 'reuse', className: 'bg-chart-1', hex: { light: '#2e6b57', dark: '#7fb39c' } },
+  { key: 'recycle', className: 'bg-chart-2', hex: { light: '#7fb39c', dark: '#2e6b57' } },
+  { key: 'reject', className: 'bg-chart-3', hex: { light: '#c4a06a', dark: '#c4a06a' } },
+];
