@@ -6,15 +6,17 @@ Escrito a 19 de outubro de 2026. Dono: **H** = Hélder Gonçalves, **F** = Fláv
 
 Estado das funcionalidades novas (copiloto de IA, painel de IA, cobertura de contentores, sensibilidade e robustez, cenário francês, recomendador de piloto, resolvedor de alertas, avaliação da triagem): **em integração**. Só entram na demo as que estiverem testadas e ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
 
+Os projetos são avaliados por quatro critérios ponderados (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%); ver [Critérios de avaliação](criterios-de-avaliacao.md).
+
 Documentos relacionados: [Estratégia para ganhar](estrategia-para-ganhar.md) · [Mentores](mentores.md) · [Narrativa do pitch](narrativa-do-pitch.md) · [Guião de slides](pitch-slides.md) · [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
 
 ## Índice
 
-- [A. Cenários de pitch](#a-cenários-de-pitch)
+- [A. Cenários de pitch](#a-cenários-de-pitch), incluindo [A.4 Critérios e Regras](#a4-critérios-e-regras)
 - [B. Cenários de dados](#b-cenários-de-dados)
 - [C. Cenários de mentoria](#c-cenários-de-mentoria)
 - [D. Cenários de concorrência](#d-cenários-de-concorrência)
-- [E. Perguntas difíceis do júri](#e-perguntas-difíceis-do-júri)
+- [E. Perguntas difíceis do júri](#e-perguntas-difíceis-do-júri), incluindo [E.5 Perguntas por critério](#e5-perguntas-por-critério-de-avaliação)
 - [F. Cenários pós-hackathon](#f-cenários-pós-hackathon)
 - [Kit de contingência](#kit-de-contingência)
 
@@ -36,7 +38,7 @@ Documentos relacionados: [Estratégia para ganhar](estrategia-para-ganhar.md) ·
 
 | Cenário | Prob. | Sinal de aviso | Resposta preparada | Dono |
 | --- | --- | --- | --- | --- |
-| **Pitch cortado a 3 minutos** | Média | Organização avisa na véspera | Versão de 3 minutos em [Narrativa do pitch](narrativa-do-pitch.md#versão-de-3-minutos); cortar o slide de IA e o de 2028 em fala; demo só com o cenário B e o relatório RAP | H |
+| **Pitch cortado a 3 minutos** | Média | Organização avisa na véspera | Versão de 3 minutos em [Narrativa do pitch](narrativa-do-pitch.md#versão-de-3-minutos); manter **uma frase por critério**; cortar o slide da indústria e encurtar o de IA; demo só com o cenário B, o "E se...?" e o relatório RAP; o pedido do piloto fica sempre | H |
 | **Pitch alargado a 10 minutos** | Baixa | Organização anuncia 10 | Acrescentar o piloto recomendado, a incerteza e a triagem medida; deixar 2 minutos para perguntas | HF |
 | **Sem demo (só slides)** | Baixa | Sem ligação ou sem ecrã de demo | Vídeo de 60 s embutido no deck e relatório RAP em PDF pré-gerado; narrar os ecrãs com capturas | F |
 | **Sem internet** | Média | Wi-Fi do local falha no ensaio | Stack local em `just dev` com dados processados; vídeo e PDF offline; partilha de ligação do telemóvel; **IA só com internet**: descrever o copiloto com vídeo | F |
@@ -60,6 +62,20 @@ Documentos relacionados: [Estratégia para ganhar](estrategia-para-ganhar.md) ·
 | **Jurado não faz a pergunta "E se..."** | Média | Silêncio | Tirar uma das 5 de reserva da lista (ver [Narrativa](narrativa-do-pitch.md#roteiro-da-demo)) | H |
 | **Dispositivo do jurado sem rede (PWA)** | Baixa | Passaporte a carregar | O passaporte é leve e público; ter o PDF/captura equivalente | F |
 | **Um ecrã novo "em construção" quebra** | Média | E2E vermelho | Regra de corte: sem E2E verde a 25 de outubro, o ecrã **não** entra na demo | HF |
+
+### A.4 Critérios e Regras
+
+Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%), mas o **detalhe de cada critério está nas Regras, que ainda não lemos**. Tudo o que está abaixo é condicional: não sabemos o que as Regras dizem.
+
+| Cenário | Prob. | Sinal de aviso | Resposta preparada | Dono |
+| --- | --- | --- | --- | --- |
+| **O detalhe das Regras muda a interpretação dos critérios** | Média | Um critério tem subcritérios que não previmos (por exemplo, "impacto" inclui impacto social, ou "viabilidade" inclui a financeira) | **Protocolo de uma hora:** 1) colar o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras); 2) sublinhar subcritérios e palavras-chave; 3) refazer a coluna "o que o júri procura" da [matriz](estrategia-para-ganhar.md#matriz-critério-prova-e-ação); 4) rever a autoavaliação e a [repartição do tempo](narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios); 5) mudar slides e frases só onde um subcritério fique sem prova; 6) passar E6 do registo a verificado | HF |
+| **Impacto inclui impacto social ou ambiental** | Média | A palavra "social", "ambiental" ou "comunidade" nas Regras | Reforçar a reutilização (59,4%), a economia social como parceira (artigo 22.º-C n.º 11) e a recolha mais próxima do cidadão. **Não** afirmar emissões de CO₂: não estão no modelo | H |
+| **Viabilidade inclui viabilidade financeira ou de negócio** | Média | "Modelo de negócio", "sustentabilidade financeira" | Subir ao palco o custo, o investimento e o intervalo, e a hipótese de quem paga (município hoje, entidades gestoras em 2028). Dizer que o preço depende do piloto | H |
+| **Inovação privilegia tecnologia nova** | Baixa | "Estado da arte", "tecnologia disruptiva" | Dar mais tempo ao "E se...?" e ao verificador, **dentro dos 65 s** de inovação; não cortar impacto nem viabilidade | H |
+| **Continuidade exige equipa, escalabilidade ou plano de negócio por escrito** | Média | Pedem entrega escrita ou apresentação do plano | Preparar uma página com piloto, roadmap pós-26 out, replicabilidade e parceiros "em conversa"; mesmo conteúdo do slide 8 | HF |
+| **As Regras impõem entrega escrita ou vídeo além do pitch** | Média | Prazo antes de 26 de outubro | Usar a [descrição do projeto](../marca/descricao.md), o README e o vídeo de 60 s; nada novo, só adaptado ao formato | F |
+| **As Regras mudam o tempo ou proíbem a demo ao vivo** | Baixa | Duração diferente de 5 minutos ou "sem demo" | Aplicar as versões de 3 minutos ou o cenário "sem demo" de A.2; manter uma frase e uma prova por critério | H |
 
 ---
 
@@ -214,6 +230,25 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | 47 | Quanto custa por tonelada? | Depende do cenário: estimamos um intervalo (P10 a P90) e mostramos "estimativa"; o exemplo de 60 000 €/ano dá cerca de 123 €/t no caso central (intervalo de cerca de 93 a 165), que **muda** com os custos da Vitrus | Incerteza (em integração) |
 | 48 | A França paga 156 €/t aos municípios? | Os produtores franceses pagam em média 156 € por tonelada colocada no mercado (secundária); o custo real de triagem é discutido (por verificar); não é comparável diretamente com o nosso €/t | Benchmarks (C4) |
 
+### E.5 Perguntas por critério de avaliação
+
+Doze perguntas, três por critério ou menos, que acrescem às 48 anteriores. Os códigos ligam cada uma ao critério: **I** inovação e originalidade (25%), **V** viabilidade técnica (25%), **P** impacto e relevância (30%), **C** apresentação e potencial de continuidade (20%). Fonte dos pesos: [Critérios de avaliação](criterios-de-avaliacao.md). Onde a resposta tem X e Y, preenchem-se com o cenário B de 22 de outubro.
+
+| # | Pergunta | Resposta (20 s) | Evidência a abrir |
+| --- | --- | --- | --- |
+| **I1** | Isto já existe? | Existem peças soltas: otimizadores de rotas, apps de contentores, classificadores por foto. Na pesquisa que fizemos não encontrámos quem ligue, com dados reais do concelho, a decisão da rede, o lote até ao reciclador e o dossiê de 2028. A pesquisa não é exaustiva: se conhecerem um caso, dizem-nos e comparamos | "E se...?" e lote com QR; [Indústria e mercado](../pesquisa/industria-e-mercado.md) |
+| **I2** | A novidade é só pôr IA em cima de um otimizador? | Não: a IA é a interface. A novidade é a cadeia ligada e a regra de que a IA nunca faz contas, porque um verificador rejeita números que não saíram do cálculo | Verificador a recusar um número; Sankey e relatório RAP |
+| **V1** | E se a IA falhar? | O simulador, o otimizador e o relatório funcionam sem IA; sem chave a API responde 503 nas funcionalidades de IA em vez de falhar. Na demo há modelo de reserva, cinco perguntas em cache e vídeo | Painel de IA (em integração); plano B |
+| **V2** | E se os custos estiverem errados? | São pressupostos visíveis, com a origem de cada um. Mostramos o intervalo e o tornado (em integração). Quando a Vitrus enviar os custos, substituem-se e recalcula-se; se a recomendação mudar, dizemo-lo | "Pressupostos"; incerteza (em integração) |
+| **V3** | Isto é mais do que um protótipo de hackathon? | Está em produção em novelo.bitsapiens.io com dados reais; só entra na demo o que tem E2E verde, e o que não está ensaiado a 25 de outubro sai | Produção; [regra de corte](estrategia-para-ganhar.md#regras-de-corte-em-função-dos-pesos) |
+| **P1** | Quantas toneladas, quanto custa, para quem? | Hoje, 301,3 t por ano (dados da Vitrus). Com o cenário B, X t por ano a Y € por tonelada, **estimativa** com intervalo. Hoje paga o município; desde 17 de abril de 2028, os produtores, só o custo eficiente | Comparação A/B; relatório RAP |
+| **P2** | E o impacto ambiental, não só o custo? | Medimos toneladas que saem do indiferenciado e o destino: 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito (dados da Vitrus; duas entidades estimadas). Não calculamos emissões de CO₂: não estão no modelo e não as afirmamos | Ponto de partida; Sankey |
+| **P3** | Isto resolve um problema de Guimarães ou é genérico? | De Guimarães: parte dos 40 circuitos e das 29 viaturas da Vitrus e da população das 48 freguesias do INE, e usa as rotas atuais sem km novos | Circuitos e frota; mapa |
+| **C1** | E depois do hackathon? | Pedimos um piloto de três meses em duas freguesias, com três KPIs (toneladas, €/t, taxa de rejeito) e um piso de sinal. A seguir, trocar pressupostos por dados medidos e validar lotes com um parceiro de fibra. O repositório fica público e a propriedade é dos autores [F59] | Slide 8; [roadmap](narrativa-do-pitch.md#o-fecho-slide-8-40-s-serve-a-continuidade) |
+| **C2** | Quem paga o Novelo daqui para a frente? | Hipótese a validar no piloto: o município hoje e as entidades gestoras em 2028, pelo planeamento, pelo relatório e pela rastreabilidade. Ainda não há contrato nem preço | Estratégia; pergunta 44 |
+| **C3** | Funciona noutro município? | A lógica assenta em dados abertos (INE, mapas, rede viária) mais os dados e custos do operador local. Ainda **não** o testámos noutro município; é parte do roteiro depois do piloto | Documentação de dados |
+| **C4** | Quem são os vossos parceiros? | Dados e desafio: Vitrus. Os mentores do desafio vêm também da Fibrenamics e da UMinho, mas ainda não há parceria nem validação; só os nomeamos como parceiros depois de os ouvirmos e de escrever o que disseram | [Mentores](mentores.md) |
+
 **Regra:** se a pergunta não tem resposta aqui, dizer "Não sei; vamos confirmar e enviar" é melhor do que inventar.
 
 ---
@@ -228,7 +263,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | **Pedido de licença ou propriedade intelectual** | Baixa | Email | A propriedade dos protótipos é dos autores [F59]; escolher uma licença antes de partilhar mais (hoje o repositório é público); aconselhamento jurídico se houver interesse comercial | HF |
 | **Interesse em financiamento ou consórcio** | Baixa | Contacto de mentor | Reunir Vitrus, Fibrenamics e UMinho; identificar uma candidatura concreta (**hipótese**, nenhuma identificada) | H |
 | **Pedido de um serviço pago** | Baixa | Município ou entidade | Definir âmbito mínimo (planeamento e relatório), preço e responsabilidade; só aceitar com custos unitários reais | H |
-| **Conflito entre a equipa e a organização** (por exemplo, sobre direitos de uso) | Baixa | Contrato ou regulamento | Ler o regulamento completo (não público); perguntar à organização | HF |
+| **Conflito entre a equipa e a organização** (por exemplo, sobre direitos de uso) | Baixa | Contrato ou regulamento | Ler as Regras e o regulamento completo (a secção Regras ainda não a temos); perguntar à organização | HF |
 | **Continuação como dissertação ou projeto UMinho** | Baixa | Conversa com o Prof. Paulo Afonso | Tema e orientador por escrito; manter o código aberto | H |
 | **Fim do suporte de IA** (chave sem saldo) | Média | 503 | Orçamento mensal e alerta a 80%; desligar a IA mantém o resto a funcionar | F |
 
