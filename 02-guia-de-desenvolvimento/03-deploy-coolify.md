@@ -65,7 +65,7 @@ services:
       - CORS_ORIGINS=${SERVICE_URL_WEB_3000}
       - OSRM_URL=http://osrm:5000
       - DATABASE_PATH=/data/novelo.db
-      - VISION_API_KEY=${VISION_API_KEY:?}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:?}
       - LOG_LEVEL=${LOG_LEVEL:-info}
     volumes:
       - api-data:/data
@@ -174,7 +174,7 @@ Os nomes vivem em `.env.example`, versionado; os valores só no Coolify (Environ
 | `CORS_ORIGINS` | api | A partir de `SERVICE_URL_WEB_3000` | Só o domínio do front; nunca `*` |
 | `OSRM_URL` | api | Fixo no compose | `http://osrm:5000` |
 | `DATABASE_PATH` | api | Fixo no compose | SQLite no volume `api-data` |
-| `VISION_API_KEY` | api | **Segredo**, no Coolify | Obrigatória; rodar se for exposta |
+| `ANTHROPIC_API_KEY` | api | **Segredo**, no Coolify | Obrigatória; rodar se for exposta |
 | `LOG_LEVEL` | api | Opcional | `info` por omissão |
 | `APP_ENV` | api | Fixo no compose | `production` desliga `/docs` público, se quisermos |
 
@@ -206,8 +206,9 @@ Os nomes vivem em `.env.example`, versionado; os valores só no Coolify (Environ
 
 - Só 22, 80 e 443 abertas; SSH só por chave; nenhum serviço publica portas no compose.
 - Contentores sem root; imagens base com versão fixa.
-- CORS só para o domínio do front; `/triage` com limite de pedidos por IP e de tamanho de ficheiro, porque cada chamada custa dinheiro.
-- `VISION_API_KEY` só existe na API; nada sensível com prefixo `VITE_`.
+- CORS só para o domínio do front; `/whatif` e `/triage` com limite de pedidos por IP (e de tamanho de ficheiro na triagem), porque cada chamada ao modelo custa dinheiro.
+- `ANTHROPIC_API_KEY` só existe na API; nada sensível com prefixo `VITE_`.
+- Fotografias da triagem apagadas depois de processadas; a página pública do lote não tem dados pessoais.
 
 **Saber quando algo cai:** notificações do Coolify para deploys falhados (email ou Discord) e um monitor externo de uptime a bater em `https://api.novelo.<domínio>/health` de minuto a minuto.
 

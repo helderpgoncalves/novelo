@@ -49,6 +49,31 @@ A taxa de captura *c* por modo não tem fonte local. Na demo usamos três nívei
 2. **Rotas (VRP, OR-Tools):** com os pontos abertos, calcular rotas por veículo com capacidade e frequência de recolha, usando a matriz de distâncias do OSRM.
 3. **KPIs:** investimento, custo anual, toneladas, €/t, % de população coberta.
 
+## 4. Lotes, fluxos e calibração
+
+Os lotes são o lado real do modelo: o que foi mesmo recolhido, triado e entregue.
+
+| Entidade | Campos principais |
+| --- | --- |
+| Peça triada | estado, composição, marca (se visível), peso estimado, ponto, data |
+| Lote | código, ponto, freguesia, fibra dominante, estado, peso total, histórico |
+| Evento do lote | tipo (recolhido, triado, reservado, entregue), data, quem |
+| Reserva | lote, reciclador, data |
+
+**Peso no MVP:** cada peça recebe o peso médio do seu tipo (camisola, calças, lençol...), que é um pressuposto marcado como tal. No piloto passa a vir de uma balança no ponto.
+
+**Fluxos (Sankey):** soma de toneladas por freguesia → modo → estado → destino, a partir do cenário (previsto) ou dos lotes (observado).
+
+**Calibração das taxas de captura** pelo copiloto: cada semana, a taxa de cada modo aproxima-se do que foi observado, com um peso que cresce com as semanas de dados.
+
+```latex
+c_m^{\text{nova}} = \frac{k \cdot c_m^{\text{pressuposto}} + s \cdot c_m^{\text{observada}}}{k + s}
+```
+
+*s* = semanas com dados; *k* = peso dado ao pressuposto (ex.: 4 semanas). Ao fim de um mês, observado e pressuposto pesam o mesmo.
+
+**Tipologia de território** para o relatório RAP: Tipologia de Áreas Urbanas do INE (predominantemente urbanas, medianamente urbanas, predominantemente rurais), cruzada com as freguesias.
+
 ## Pressupostos
 
 | Parâmetro | Valor | Estado |

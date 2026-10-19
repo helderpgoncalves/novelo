@@ -30,7 +30,7 @@ Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia.
 
 O Novelo responde a isso. Cruza população, caracterização do lixo e rede viária para propor onde colocar pontos de recolha, que modo usar em cada zona (pontos em locais existentes, contentores de rua ou recolha a pedido) e que rotas fazer. Cada cenário mostra investimento, custo anual de operação, toneladas desviadas de aterro e custo por tonelada, lado a lado.
 
-No ponto de entrega, uma fotografia da peça e da etiqueta chega para a classificar como reutilizável, reciclável ou rejeito e indicar o destino certo para a fibra.
+O decisor pode perguntar em português ("e se passarmos esta freguesia a recolha a pedido?") e o otimizador responde com um cenário novo, com números verificados. No ponto de entrega, uma fotografia da peça e da etiqueta classifica-a e junta-a a um lote com QR e passaporte; os lotes agregam-se por fibra numa bolsa para os recicladores do Vale do Ave. Um clique gera o relatório que a câmara vai precisar em 2028 para negociar a responsabilidade alargada do produtor.
 
 ## Description (EN)
 
@@ -38,7 +38,7 @@ In Guimarães, textiles make up 5.4% of mixed municipal waste, above the EU aver
 
 Novelo answers that. It combines population, waste composition and the road network to propose where to place collection points, which mode fits each area (drop-off at existing venues, street containers or on-demand pickup) and which routes to run. Each scenario shows investment, yearly operating cost, tonnes diverted from landfill and cost per tonne, side by side.
 
-At drop-off, one photo of the garment and its label is enough to classify it as reusable, recyclable or reject and point the fibre to the right destination.
+Decision-makers can ask in plain Portuguese ("what if this parish switched to on-demand pickup?") and the optimiser answers with a new scenario and verified numbers. At drop-off, one photo of the garment and its label classifies it and adds it to a lot with a QR passport; lots are pooled by fibre in a marketplace for Ave Valley recyclers. One click produces the report the municipality will need in 2028 to negotiate extended producer responsibility.
 
 ## Palavras-chave
 
