@@ -1,9 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import { z } from 'zod';
 import { getFleetOptions } from '@/client/@tanstack/react-query.gen';
-import { Page, SectionTitle } from '@/components/page';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { OccupancyHeatmap } from '@/features/fleet/occupancy-heatmap';
 import { TypologyTable } from '@/features/fleet/typology-table';
@@ -13,35 +14,19 @@ import { formatDate } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/fleet')({
+  staticData: { skeleton: 'table' },
+  validateSearch: z.object({
+    tab: z.enum(['occupancy', 'vehicles', 'typologies']).optional().catch(undefined),
+  }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getFleetOptions()),
   head: () => ({ meta: [{ title: m.title_fleet() }] }),
   component: Fleet,
 });
 
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-4">
-      <div className="space-y-1">
-        <SectionTitle>{title}</SectionTitle>
-        {description && (
-          <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-}
-
 function Fleet() {
   const { data } = useSuspenseQuery(getFleetOptions());
+  const { tab = 'occupancy' } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const idle = data.vehicles.filter((v) => v.never_assigned).length;
   const multi = data.vehicles.filter((v) => v.multi_typology).length;
   const period =
@@ -54,7 +39,7 @@ function Fleet() {
       <PageHeader
         eyebrow={m.fleet_eyebrow({ period })}
         title={m.fleet_title()}
-        description={m.fleet_description()}
+        description={m.rw_fleet_description()}
       />
       <StatStrip>
         <StatCell
@@ -79,15 +64,36 @@ function Fleet() {
           hint={m.fleet_stat_multi_hint()}
         />
       </StatStrip>
-      <Section title={m.fleet_heatmap_title()} description={m.fleet_heatmap_description()}>
-        <OccupancyHeatmap typologies={data.typologies} />
-      </Section>
-      <Section title={m.fleet_summary_title()}>
-        <TypologyTable typologies={data.typologies} />
-      </Section>
-      <Section title={m.fleet_vehicles_title()} description={m.fleet_vehicles_description()}>
-        <VehiclesTable vehicles={data.vehicles} />
-      </Section>
+      <PageTabs
+        label={m.rw_tabs_label()}
+        value={tab}
+        onValueChange={(next) => void navigate({ search: { tab: next }, replace: true })}
+        tabs={[
+          {
+            id: 'occupancy',
+            label: m.fleet_heatmap_title(),
+            content: (
+              <div className="space-y-3">
+                <p className="max-w-3xl text-muted-foreground text-sm">
+                  {m.fleet_heatmap_description()}
+                </p>
+                <OccupancyHeatmap typologies={data.typologies} />
+              </div>
+            ),
+          },
+          {
+            id: 'vehicles',
+            label: m.fleet_vehicles_title(),
+            count: data.vehicles.length,
+            content: <VehiclesTable vehicles={data.vehicles} />,
+          },
+          {
+            id: 'typologies',
+            label: m.fleet_summary_title(),
+            content: <TypologyTable typologies={data.typologies} />,
+          },
+        ]}
+      />
     </Page>
   );
 }

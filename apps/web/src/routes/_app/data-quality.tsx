@@ -1,29 +1,36 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
-import type { AlertStatus } from '@/client';
+import { useQuery } from '@tanstack/react-query';
+import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { z } from 'zod';
 import { getDataQualityOptions } from '@/client/@tanstack/react-query.gen';
-import { FilterChips } from '@/components/filter-chips';
-import { Page, SectionTitle } from '@/components/page';
+import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
-import { AlertCard } from '@/features/quality/alert-card';
+import { ErrorState, PageSkeleton } from '@/components/states';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AlertsPanel } from '@/features/quality/alerts-panel';
 import { SourcesTable } from '@/features/quality/sources-table';
 import { formatNumber } from '@/lib/format';
-import { alertStatusLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/data-quality')({
+  staticData: { skeleton: 'table' },
+  validateSearch: z.object({
+    tab: z.enum(['alerts', 'sources']).optional().catch(undefined),
+  }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getDataQualityOptions()),
   head: () => ({ meta: [{ title: m.title_data_quality() }] }),
   component: DataQuality,
 });
 
 function DataQuality() {
-  const { data } = useSuspenseQuery(getDataQualityOptions());
-  const [status, setStatus] = useState<AlertStatus | null>('open');
-  const alerts = data.alerts.filter((a) => !status || a.status === status);
-  const resolved = data.alerts.length - data.open_alerts;
+  const { tab = 'alerts' } = Route.useSearch();
+  const navigate = useNavigate({ from: Route.fullPath });
+  const { data, isPending, error, refetch } = useQuery(getDataQualityOptions());
+
+  if (isPending) return <PageSkeleton />;
+  if (error || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
+
+  const count = (s: string) => data.alerts.filter((a) => a.status === s).length;
 
   return (
     <Page>
@@ -32,7 +39,7 @@ function DataQuality() {
         title={m.quality_title()}
         description={m.quality_description()}
       />
-      <StatStrip className="lg:grid-cols-3">
+      <StatStrip>
         <StatCell
           label={m.quality_stat_sources()}
           value={formatNumber(data.sources.length)}
@@ -46,36 +53,41 @@ function DataQuality() {
         />
         <StatCell
           label={m.quality_stat_resolved()}
-          value={formatNumber(resolved)}
+          value={formatNumber(count('resolved'))}
           hint={m.quality_stat_resolved_hint()}
         />
+        <StatCell
+          label={m.quality_stat_wont_fix()}
+          value={formatNumber(count('wont_fix'))}
+          hint={m.quality_stat_wont_fix_hint()}
+        />
       </StatStrip>
-      <section className="space-y-4">
-        <SectionTitle>{m.quality_sources_title()}</SectionTitle>
-        <SourcesTable sources={data.sources} />
-      </section>
-      <section className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <SectionTitle>{m.quality_alerts_title()}</SectionTitle>
-          <FilterChips<AlertStatus>
-            legend={m.quality_filter_status()}
-            value={status}
-            onChange={setStatus}
-            options={[
-              { value: null, label: m.common_all() },
-              ...(['open', 'resolved', 'wont_fix'] as const).map((s) => ({
-                value: s,
-                label: alertStatusLabel[s](),
-              })),
-            ]}
-          />
-        </div>
-        <ul className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border md:grid-cols-2">
-          {alerts.map((a) => (
-            <AlertCard key={a.id} alert={a} />
-          ))}
-        </ul>
-      </section>
+      <Tabs
+        value={tab}
+        onValueChange={(v) =>
+          void navigate({ search: { tab: v === 'sources' ? 'sources' : undefined }, replace: true })
+        }
+        className="gap-6"
+      >
+        <TabsList className="h-10 w-full sm:w-fit">
+          <TabsTrigger value="alerts" className="h-9 sm:min-w-36">
+            {m.quality_tab_alerts()} ({formatNumber(data.alerts.length)})
+          </TabsTrigger>
+          <TabsTrigger value="sources" className="h-9 sm:min-w-36">
+            {m.quality_tab_sources()} ({formatNumber(data.sources.length)})
+          </TabsTrigger>
+        </TabsList>
+        <TabsContent value="alerts">
+          <Section title={m.quality_alerts_title()} description={m.quality_alerts_description()}>
+            <AlertsPanel alerts={data.alerts} />
+          </Section>
+        </TabsContent>
+        <TabsContent value="sources">
+          <Section title={m.quality_sources_title()} description={m.quality_sources_description()}>
+            <SourcesTable sources={data.sources} />
+          </Section>
+        </TabsContent>
+      </Tabs>
     </Page>
   );
 }

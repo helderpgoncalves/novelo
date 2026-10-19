@@ -1,4 +1,4 @@
-import { Loader2, Plus, X } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import type {
   CompositionPart,
@@ -241,8 +241,12 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         >
           {m.triage_discard()}
         </Button>
-        <Button type="submit" className="h-11 font-semibold" disabled={!valid || pending}>
-          {pending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-11 font-semibold"
+          disabled={!valid || pending}
+          loading={pending}
+        >
           {m.triage_add_to_lot()}
         </Button>
       </StickyActions>

@@ -6,6 +6,7 @@ import { listLotsOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { LotStateBadge } from '@/features/lots/lot-parts';
@@ -15,6 +16,7 @@ import { fibreLabel, lotStateLabel } from '@/lib/lots';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/lots/')({
+  staticData: { skeleton: 'table' },
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(listLotsOptions()),
   head: () => ({ meta: [{ title: m.title_lots() }] }),
   component: Lots,
@@ -22,13 +24,16 @@ export const Route = createFileRoute('/_app/lots/')({
 
 function Lots() {
   const { data } = useSuspenseQuery(listLotsOptions());
+  const count = (...states: LotState[]) => data.filter((l) => states.includes(l.state)).length;
+  const items = data.reduce((sum, l) => sum + l.items, 0);
+  const kg = data.reduce((sum, l) => sum + l.weight_kg, 0);
 
   return (
     <Page>
       <PageHeader
         eyebrow={m.lots_eyebrow()}
         title={m.lots_title()}
-        description={m.lots_description()}
+        description={m.rw_lots_description()}
         actions={
           <Button asChild className="h-10 gap-2 font-semibold">
             <Link to="/triage">
@@ -37,6 +42,29 @@ function Lots() {
           </Button>
         }
       />
+      <StatStrip>
+        <StatCell
+          label={m.rw_lots_stat_total()}
+          value={formatNumber(data.length)}
+          hint={m.rw_lots_stat_total_hint({ items: formatNumber(items), kg: formatNumber(kg, 1) })}
+        />
+        <StatCell
+          label={m.rw_lots_stat_open()}
+          value={formatNumber(count('collected'))}
+          hint={m.rw_lots_stat_open_hint()}
+          tone="primary"
+        />
+        <StatCell
+          label={m.rw_lots_stat_ready()}
+          value={formatNumber(count('sorted'))}
+          hint={m.rw_lots_stat_ready_hint()}
+        />
+        <StatCell
+          label={m.rw_lots_stat_out()}
+          value={formatNumber(count('reserved', 'delivered'))}
+          hint={m.rw_lots_stat_out_hint()}
+        />
+      </StatStrip>
       {data.length === 0 ? (
         <EmptyState
           title={m.lots_empty_title()}

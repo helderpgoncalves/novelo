@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { UserOut } from '@/client';
@@ -97,8 +96,12 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-10 font-semibold" disabled={change.isPending}>
-          {change.isPending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-10 font-semibold"
+          disabled={change.isPending}
+          loading={change.isPending}
+        >
           {m.account_save_password()}
         </Button>
       </form>

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { resetPasswordMutation } from '@/client/@tanstack/react-query.gen';
@@ -77,8 +76,12 @@ export function ResetForm({ token }: { token: string }) {
             </FormItem>
           )}
         />
-        <Button type="submit" className="h-10 w-full font-semibold" disabled={reset.isPending}>
-          {reset.isPending && <Loader2 className="animate-spin" />}
+        <Button
+          type="submit"
+          className="h-10 w-full font-semibold"
+          disabled={reset.isPending}
+          loading={reset.isPending}
+        >
           {m.reset_submit()}
         </Button>
       </form>

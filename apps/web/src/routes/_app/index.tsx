@@ -1,13 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
+import { z } from 'zod';
 import {
   getObservedFlowsOptions,
   getTextileBaselineOptions,
   getWasteCompositionOptions,
 } from '@/client/@tanstack/react-query.gen';
-import { Page, SectionTitle } from '@/components/page';
+import { Page, Panel, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { CaptureBar } from '@/features/baseline/capture-bar';
 import { EntityTable } from '@/features/baseline/entity-table';
@@ -17,7 +18,11 @@ import { WasteCompositionChart } from '@/features/baseline/waste-composition';
 import { formatKg, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
+const TABS = ['entities', 'waste'] as const;
+
 export const Route = createFileRoute('/_app/')({
+  staticData: { skeleton: 'dashboard' },
+  validateSearch: z.object({ tab: z.enum(TABS).optional().catch(undefined) }),
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(getTextileBaselineOptions()),
@@ -28,32 +33,12 @@ export const Route = createFileRoute('/_app/')({
   component: Baseline,
 });
 
-function Section({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description?: string;
-  children: ReactNode;
-}) {
-  return (
-    <section className="space-y-4">
-      <div className="space-y-1">
-        <SectionTitle>{title}</SectionTitle>
-        {description && (
-          <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
-        )}
-      </div>
-      {children}
-    </section>
-  );
-}
-
 function Baseline() {
   const { data: b } = useSuspenseQuery(getTextileBaselineOptions());
   const { data: flows } = useSuspenseQuery(getObservedFlowsOptions());
   const { data: waste } = useSuspenseQuery(getWasteCompositionOptions());
+  const { tab = 'entities' } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const insights = buildInsights(b);
 
   return (
@@ -92,40 +77,62 @@ function Baseline() {
       </StatStrip>
 
       <Section title={m.section_gap_title()} description={m.section_gap_description()}>
-        <div className="rounded-xl bg-card p-5 ring-1 ring-foreground/10">
+        <Panel>
           <CaptureBar baseline={b} />
-        </div>
+        </Panel>
       </Section>
 
-      <Section
-        title={m.section_flows_title()}
-        description={m.section_flows_description({ year: b.year })}
-      >
-        <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
-          <FlowsSankey flows={flows} />
-        </div>
-        <EntityTable entities={b.entities} />
-      </Section>
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
+        <Section
+          title={m.section_flows_title()}
+          description={m.section_flows_description({ year: b.year })}
+          className="min-w-0 lg:col-span-8"
+        >
+          <Panel className="p-3 sm:p-4">
+            <FlowsSankey flows={flows} className="lg:h-[26rem]" />
+          </Panel>
+        </Section>
+        <Section title={m.section_insights_title()} className="lg:col-span-4">
+          <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
+            {insights.map((i) => (
+              <li key={i.title} className="space-y-1 p-4">
+                <p className="font-medium text-sm">{i.title}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{i.body}</p>
+              </li>
+            ))}
+          </ul>
+        </Section>
+      </div>
 
-      <Section title={m.section_insights_title()}>
-        <ul className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border sm:grid-cols-2">
-          {insights.map((i) => (
-            <li key={i.title} className="space-y-1.5 bg-card p-5">
-              <p className="font-medium">{i.title}</p>
-              <p className="text-muted-foreground text-sm leading-relaxed">{i.body}</p>
-            </li>
-          ))}
-        </ul>
-      </Section>
-
-      <Section
-        title={m.section_waste_title()}
-        description={m.section_waste_description({ kg: formatNumber(waste.kg_per_inhab_year_pt) })}
-      >
-        <div className="rounded-xl bg-card p-5 ring-1 ring-foreground/10">
-          <WasteCompositionChart waste={waste} />
-        </div>
-      </Section>
+      <PageTabs
+        label={m.rw_tabs_label()}
+        value={tab}
+        onValueChange={(next) => void navigate({ search: { tab: next }, replace: true })}
+        tabs={[
+          {
+            id: 'entities',
+            label: m.rw_baseline_tab_entities(),
+            count: b.entities.length,
+            content: <EntityTable entities={b.entities} />,
+          },
+          {
+            id: 'waste',
+            label: m.rw_baseline_tab_waste(),
+            content: (
+              <Section
+                title={m.section_waste_title()}
+                description={m.section_waste_description({
+                  kg: formatNumber(waste.kg_per_inhab_year_pt),
+                })}
+              >
+                <Panel>
+                  <WasteCompositionChart waste={waste} />
+                </Panel>
+              </Section>
+            ),
+          },
+        ]}
+      />
     </Page>
   );
 }

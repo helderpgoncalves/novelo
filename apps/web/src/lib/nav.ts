@@ -1,11 +1,14 @@
 import {
   BarChart3,
+  Bot,
   Boxes,
   FileText,
+  FlaskConical,
   GitCompareArrows,
   Layers,
   type LucideIcon,
   MapPinned,
+  Radar,
   Route as RouteIcon,
   ScanLine,
   ShieldCheck,
@@ -27,6 +30,7 @@ export interface NavItem {
     | '/localities'
     | '/data-quality'
     | '/map'
+    | '/coverage'
     | '/triage'
     | '/lots'
     | '/market'
@@ -34,8 +38,10 @@ export interface NavItem {
     | '/reports'
     | '/simulator'
     | '/scenarios'
+    | '/pilot'
     | '/assumptions'
-    | '/users';
+    | '/users'
+    | '/admin/ai';
   icon: LucideIcon;
   /** No backlog, ainda sem ecrã. */
   soon?: boolean;
@@ -54,6 +60,7 @@ export const NAV: NavSection[] = [
     items: [
       { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
       { label: () => m.nav_map(), to: '/map', icon: MapPinned },
+      { label: () => m.nav_coverage(), to: '/coverage', icon: Radar },
     ],
   },
   {
@@ -70,6 +77,7 @@ export const NAV: NavSection[] = [
     items: [
       { label: () => m.nav_simulator(), to: '/simulator', icon: Layers },
       { label: () => m.nav_scenarios(), to: '/scenarios', icon: GitCompareArrows },
+      { label: () => m.nav_pilot(), to: '/pilot', icon: FlaskConical },
       { label: () => m.nav_assumptions(), to: '/assumptions', icon: SlidersHorizontal },
     ],
   },
@@ -88,6 +96,9 @@ export const NAV: NavSection[] = [
   },
   {
     title: () => m.nav_section_admin(),
-    items: [{ label: () => m.nav_users(), to: '/users', icon: Users, adminOnly: true }],
+    items: [
+      { label: () => m.nav_users(), to: '/users', icon: Users, adminOnly: true },
+      { label: () => m.nav_ai_admin(), to: '/admin/ai', icon: Bot, adminOnly: true },
+    ],
   },
 ];

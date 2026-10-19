@@ -1,15 +1,20 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { z } from 'zod';
 import { listCircuitsOptions } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
 import { CircuitsTable } from '@/features/circuits/circuits-table';
+import { TypologySummary } from '@/features/circuits/typology-summary';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/circuits')({
+  staticData: { skeleton: 'table' },
+  validateSearch: z.object({ tab: z.enum(['list', 'typology']).optional().catch(undefined) }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(listCircuitsOptions()),
   head: () => ({ meta: [{ title: m.title_circuits() }] }),
   component: Circuits,
@@ -17,13 +22,15 @@ export const Route = createFileRoute('/_app/circuits')({
 
 function Circuits() {
   const { data } = useSuspenseQuery(listCircuitsOptions());
+  const { tab = 'list' } = Route.useSearch();
+  const navigate = Route.useNavigate();
 
   return (
     <Page>
       <PageHeader
         eyebrow={m.circuits_eyebrow()}
         title={m.circuits_title()}
-        description={m.circuits_description()}
+        description={m.rw_circuits_description()}
       />
       <StatStrip>
         <StatCell
@@ -50,7 +57,24 @@ function Circuits() {
       {data.circuits.length === 0 ? (
         <EmptyState title={m.circuits_empty_title()} description={m.circuits_empty_text()} />
       ) : (
-        <CircuitsTable circuits={data.circuits} />
+        <PageTabs
+          label={m.rw_tabs_label()}
+          value={tab}
+          onValueChange={(next) => void navigate({ search: { tab: next }, replace: true })}
+          tabs={[
+            {
+              id: 'list',
+              label: m.rw_circuits_tab_list(),
+              count: data.circuits.length,
+              content: <CircuitsTable circuits={data.circuits} />,
+            },
+            {
+              id: 'typology',
+              label: m.rw_circuits_tab_typology(),
+              content: <TypologySummary circuits={data.circuits} />,
+            },
+          ]}
+        />
       )}
     </Page>
   );

@@ -24,6 +24,7 @@ export const Route = createFileRoute('/_app/simulator')({
         ? queryClient.ensureQueryData(getScenarioOptions({ path: { scenario_id: deps.from } }))
         : Promise.resolve(null),
     ]),
+  staticData: { skeleton: 'form' },
   head: () => ({ meta: [{ title: m.title_simulator() }] }),
   component: Simulator,
 });

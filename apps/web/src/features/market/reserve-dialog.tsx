@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
@@ -132,8 +131,7 @@ export function ReserveDialog({
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
                 {m.common_cancel()}
               </Button>
-              <Button type="submit" disabled={reserve.isPending}>
-                {reserve.isPending && <Loader2 className="animate-spin" />}
+              <Button type="submit" disabled={reserve.isPending} loading={reserve.isPending}>
                 {m.market_reserve()}
               </Button>
             </DialogFooter>

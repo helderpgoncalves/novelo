@@ -14,16 +14,22 @@ import { fibreLabel } from '@/lib/lots';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/brands')({
+  staticData: { skeleton: 'table' },
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getBrandEvidenceOptions()),
   head: () => ({ meta: [{ title: m.title_brands() }] }),
   component: Brands,
 });
 
 const MIN_SAMPLE = 30;
+const TOP = 5;
 
 function Brands() {
   const { data } = useSuspenseQuery(getBrandEvidenceOptions());
   const small = data.sample_items < MIN_SAMPLE;
+  const topShare = [...data.brands]
+    .sort((a, b) => b.weight_kg - a.weight_kg)
+    .slice(0, TOP)
+    .reduce((sum, b) => sum + b.share_pct, 0);
   const max = Math.max(1, ...data.brands.map((b) => b.weight_kg));
 
   const columns: Column<BrandStat>[] = [
@@ -86,9 +92,9 @@ function Brands() {
       <PageHeader
         eyebrow={m.brands_eyebrow()}
         title={m.brands_title()}
-        description={m.brands_description()}
+        description={m.rw_brands_description()}
       />
-      <StatStrip className="lg:grid-cols-3">
+      <StatStrip>
         <StatCell
           label={m.brands_stat_sample()}
           value={formatNumber(data.sample_items)}
@@ -104,6 +110,12 @@ function Brands() {
           value={`${formatNumber(data.total_kg, 1)} kg`}
           tag={m.common_estimate()}
           hint={m.brands_stat_weight_hint()}
+        />
+        <StatCell
+          label={m.rw_brands_stat_top()}
+          value={formatPercent(topShare)}
+          tone="primary"
+          hint={m.rw_brands_stat_top_hint({ count: Math.min(TOP, data.brands.length) })}
         />
       </StatStrip>
       {small && (

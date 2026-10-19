@@ -40,12 +40,14 @@ test.describe('simulador e cenários', () => {
     await expect(page.getByRole('heading', { level: 1, name: 'Cenário E2E' })).toBeVisible();
     await expect(page.getByText('Têxtil captado')).toBeVisible();
     await expect(page.getByText('Custo por tonelada')).toBeVisible();
+    await page.getByRole('tab', { name: 'Rede e rotas' }).click();
     await expect(page.locator('canvas.maplibregl-canvas').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();
+    await page.getByRole('tab', { name: 'E se...?' }).click();
     // E se...?: sem chave do OpenRouter a IA está desligada e diz porquê.
     await page.getByLabel('A tua pergunta').fill('E se Serzedelo passar a recolha a pedido?');
     await page.getByRole('button', { name: 'Perguntar' }).click();
-    await expect(page.getByText(/está desligado|Entendi/)).toBeVisible();
+    await expect(page.getByText(/está desligado|Entendi/).first()).toBeVisible();
   });
 
   test('comparar dois cenários mostra as diferenças', async ({ page }) => {

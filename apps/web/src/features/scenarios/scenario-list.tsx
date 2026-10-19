@@ -107,6 +107,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
     },
     {
       id: 'created',
+      defaultHidden: true,
       header: m.scenarios_col_created(),
       className: 'text-muted-foreground',
       value: (s) => s.created_at,
@@ -117,8 +118,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
 
   return (
     <div className="space-y-3">
-      <div className="flex items-center justify-between gap-3">
-        <p className="text-muted-foreground text-sm">{m.scenarios_compare_hint()}</p>
+      <div className="flex justify-end">
         <Button
           variant="outline"
           className="h-9 gap-2"

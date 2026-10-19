@@ -3,6 +3,7 @@ import type { UserOut } from '@/client';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { CopilotLauncher } from '@/features/copilot/copilot-launcher';
 import { m } from '@/paraglide/messages';
 import { UserMenu } from './user-menu';
 
@@ -20,6 +21,7 @@ export function Topbar({ user, onMenuClick }: { user: UserOut; onMenuClick: () =
       </Button>
       <div className="hidden lg:block" />
       <div className="flex items-center gap-1">
+        <CopilotLauncher />
         <LanguageSwitcher signedIn />
         <ThemeToggle />
         <UserMenu user={user} />

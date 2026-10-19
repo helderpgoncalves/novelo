@@ -47,8 +47,9 @@ test.describe('dados reais da Vitrus', () => {
 
   test('frota: mapa de ocupação e viaturas sem circuito', async ({ page }) => {
     await page.goto('/pt/fleet');
-    await expect(page.getByRole('heading', { name: 'Ocupação por turno' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: 'Ocupação por turno' })).toBeVisible();
     await expect(page.getByRole('row', { name: /Orgânicos/ }).first()).toBeVisible();
+    await page.getByRole('tab', { name: /^Viaturas/ }).click();
     await page.getByLabel('Pesquisar matrícula ou circuito').fill('29-48-XU');
     await expect(page.getByRole('row', { name: /29-48-XU/ })).toContainText('Sem circuito');
   });
@@ -66,8 +67,11 @@ test.describe('dados reais da Vitrus', () => {
 
   test('qualidade dos dados: resolver e reabrir um alerta', async ({ page }) => {
     await page.goto('/pt/data-quality');
-    await expect(page.getByRole('heading', { name: 'Fontes recebidas' })).toBeVisible();
-    await expect(page.getByText('Circuitos_Viaturas_Guimaraes.xlsx').locator('visible=true')).toBeVisible();
+    await page.getByRole('tab', { name: 'Fontes recebidas' }).click();
+    await expect(
+      page.getByText('Circuitos_Viaturas_Guimaraes.xlsx').locator('visible=true'),
+    ).toBeVisible();
+    await page.getByRole('tab', { name: 'Alertas' }).click();
     // O estado persiste na base de dados: se uma corrida anterior deixou o alerta resolvido, reabre-o.
     await page.getByRole('button', { name: 'Todas', exact: true }).click();
     const existing = page.getByRole('listitem').filter({ hasText: 'Alerta 3' });

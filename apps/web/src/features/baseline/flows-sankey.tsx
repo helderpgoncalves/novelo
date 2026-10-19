@@ -7,6 +7,7 @@ import type { Flows } from '@/client';
 import { MODE_COLORS } from '@/lib/map';
 import { modeLabel } from '@/lib/scenario';
 import { useTheme } from '@/lib/theme';
+import { cn } from '@/lib/utils';
 import { destinationLabel } from '@/lib/vocab';
 import { m, m as messages } from '@/paraglide/messages';
 import { DESTINATIONS } from './destination';
@@ -15,7 +16,7 @@ echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
 
 const ENTITY_SHADES = ['#2e6b57', '#5e6b66', '#7fb39c', '#8a9a93'];
 
-export function FlowsSankey({ flows }: { flows: Flows }) {
+export function FlowsSankey({ flows, className }: { flows: Flows; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
   const { resolvedTheme } = useTheme();
 
@@ -32,6 +33,7 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
       const node = flows.nodes.find((n) => n.id === id);
       return node ? nodeName(node) : id;
     };
+    const narrow = ref.current.clientWidth < 520;
     const entities = flows.nodes.filter((n) => n.column === 0);
 
     const chart = echarts.init(ref.current, undefined, { renderer: 'canvas' });
@@ -47,7 +49,7 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
         {
           type: 'sankey',
           left: 4,
-          right: 150,
+          right: narrow ? 84 : 150,
           top: 8,
           bottom: 8,
           nodeWidth: 14,
@@ -68,7 +70,7 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
             value: l.tonnes,
           })),
           lineStyle: { color: 'target', curveness: 0.5, opacity: 0.35 },
-          label: { fontFamily: 'Inter, sans-serif', fontSize: 12, color: text },
+          label: { fontFamily: 'Inter, sans-serif', fontSize: narrow ? 11 : 12, color: text },
         },
       ],
     });
@@ -80,5 +82,12 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
     };
   }, [flows, resolvedTheme]);
 
-  return <div ref={ref} role="img" aria-label={m.sankey_aria()} className="h-80 w-full" />;
+  return (
+    <div
+      ref={ref}
+      role="img"
+      aria-label={m.sankey_aria()}
+      className={cn('h-80 w-full', className)}
+    />
+  );
 }
