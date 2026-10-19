@@ -1,30 +1,42 @@
 # Backlog
 
-Ordenado por dia. Cada frente pode ter um agente do Claude Code a trabalhar contra o contrato do dia 1, com um dono humano que revê e faz merge. A coluna Quem fica para a equipa preencher.
+O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que muda a realidade.
 
-| Dia | Frente | Tarefa | Quem | Estado |
-| --- | --- | --- | --- | --- |
-| 1 | Produto | Reunião com o mentor: dados, custos unitários, quem opera os contentores têxteis hoje |  | Por fazer |
-| 1 | Contrato | Todos os endpoints em Pydantic (incluindo `/whatif`, `/lots`, `/market`, `/flows`, `/brands`, `/reports/rap`), respostas mock e cliente gerado. A partir daqui as frentes trabalham em paralelo |  | Por fazer |
-| 1 | Dados | INE (BGRI 2021), CAOP, extrato OSM e tipologia TIPAU; scripts para `data/processed` |  | Por fazer |
-| 1 | Front | Esqueleto TanStack Start (Router, Query, Tailwind, Biome) com mapa de Guimarães e freguesias |  | Por fazer |
-| 1 | Infra | VPS, DNS e Coolify prontos; CI no GitHub Actions com deploy por webhook |  | Por fazer |
-| 2 | Otimizador | Procura por zona, modelo de custos e MIP de localização e modo com dados reais |  | Por fazer |
-| 2 | Triagem | `POST /triage` com Claude: estado, composição e marca a partir de duas fotos; 20 etiquetas de teste |  | Por fazer |
-| 2 | Lotes | Modelo de lotes e eventos, QR, `GET /lots/{code}` (passaporte) |  | Por fazer |
-| 2 | Front | Painéis de orçamento e meta, camada de procura, ecrã de triagem no telemóvel |  | Por fazer |
-| 3 | Otimizador | Rotas (VRP) com matriz OSRM ou plano B em linha reta; `POST /scenarios` completo |  | Por fazer |
-| 3 | E se | `POST /whatif`: ScenarioDelta, confirmação, verificador de números, 20 perguntas de teste |  | Por fazer |
-| 3 | Bolsa e fluxos | `GET /market`, reservas, `GET /flows` e `GET /brands` |  | Por fazer |
-| 3 | Front | Pontos e rotas no mapa, página pública do lote, bolsa de fibra |  | Por fazer |
-| 4 | Relatório | `POST /reports/rap`: modelo HTML com a identidade Novelo e PDF |  | Por fazer |
-| 4 | Front | Ecrã de comparação, caixa "E se...?", Sankey a crescer em direto |  | Por fazer |
-| 4 | Produto | Fixar cenários A e B, frase-âncora e 5 perguntas "E se...?" de reserva para o júri |  | Por fazer |
-| 4 | Infra | Deploy final e teste fora da rede do evento; QR impressos para a demo |  | Por fazer |
-| 4 | Pitch | Slides com a identidade Novelo |  | Por fazer |
-| 5 | Copiloto | Uma execução com uma semana de dados simulados (só se o resto estiver fechado) |  | Por fazer |
-| 5 | Pitch | Vídeo de 60 s da demo (plano B) e relatório RAP pré-gerado de reserva |  | Por fazer |
-| 5 | Pitch | 3 ensaios cronometrados, com perguntas do júri |  | Por fazer |
-| 5 | Entrega | Checklist de entrega completa |  | Por fazer |
+## Feito (2026-10-19)
 
-Se o tempo apertar, segue-se a [ordem de corte das features](02-features.md#ordem-de-corte). A comparação de cenários, o "E se...?" e o relatório RAP nunca se cortam.
+| Frente | Entregue |
+| --- | --- |
+| Infra | Monorepo, Docker Compose de desenvolvimento e produção para o Coolify, `justfile`, `.env.example` completo |
+| Contrato | OpenAPI exportado, cliente hey-api (SDK, Zod, React Query) e verificação com `just check-contract` |
+| Dados | ETL dos Excel da Vitrus, INE (população e TIPAU), CAOP e OSM; seed idempotente no Postgres; alertas de qualidade |
+| Autenticação | Login, registo, Google, confirmação de email, recuperar password, "manter sessão iniciada", administração de utilizadores |
+| Planeamento | Otimizador (CP-SAT e VRP), três modos combináveis, cenários, comparação, pressupostos com origem |
+| "E se...?" | `ScenarioDelta`, confirmação, explicação e verificador de números |
+| Operação | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra, evidência por marca |
+| Relatório | PDF RAP com custo por tipo de território (WeasyPrint) e histórico |
+| Web | Mapa, todos os ecrãs de dados, pt/en, claro/escuro, PWA mobile-first, `DataTable` com pesquisa, filtros, colunas e paginação |
+| Qualidade | 76 testes pytest, Vitest e 27 testes Playwright |
+
+## Falta
+
+| Prioridade | Tarefa | Estado |
+| --- | --- | --- |
+| Alta | Localizações dos contentores (chegam a **2026-10-20**): colocar em `data/raw`, correr `just etl`, popular `containers` e mostrar a camada no mapa e como pontos de partida do simulador | Por fazer |
+| Alta | Custos unitários (recolha, quilómetro, contentor) da Vitrus para trocar os pressupostos por dados | Por pedir |
+| Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` | Por validar |
+| Média | Confirmar o depósito real da Vitrus (hoje o centro de Guimarães) | Por pedir |
+| Média | Verificar as imagens de produção com `just build` e um deploy de ensaio no Coolify | Por fazer |
+| Média | Cenários A e B fixos, cinco perguntas "E se...?" de reserva, lote de demonstração | Por fazer |
+| Baixa | Integração contínua remota (por agora só `just check` local) | Adiado |
+| Baixa | Copiloto de operações (execução com uma semana simulada) | Adiado |
+
+## Pitch e entrega
+
+| Tarefa | Estado |
+| --- | --- |
+| Slides com a identidade Novelo | Por fazer |
+| Vídeo de 60 s da demo (plano B) e relatório RAP pré-gerado | Por fazer |
+| 3 ensaios cronometrados, com perguntas do júri | Por fazer |
+| Checklist de entrega ([Demo e entrega](demo-e-entrega.md)) | Por fazer |
+
+Se o tempo apertar, segue-se a [ordem de corte das features](features.md#ordem-de-corte). A comparação de cenários, o "E se...?" e o relatório RAP nunca se cortam.

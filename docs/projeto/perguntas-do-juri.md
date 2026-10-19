@@ -10,7 +10,7 @@ Pode, mas paga contentores e recolhas onde quase não há têxtil. O território
 
 **"Os números são reais?"**
 
-Os dados de partida sim: 5,4% de têxtil no indiferenciado e 0,7 kg por habitante por mês vêm do plano municipal. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
+Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; os 5,4% de têxtil no indiferenciado e os 0,7 kg por habitante por mês vêm do plano municipal. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
 
 **"Quem paga isto?"**
 

@@ -1,214 +1,130 @@
-# Novelo: guia de desenvolvimento
+# Arquitetura
 
-*Hack4Guimarães 2035 · 19 de outubro de 2026 · Hélder Gonçalves e Flávio Fernandes*
+Um monorepo com duas aplicações, uma base de dados e três serviços externos. O web fala só com a API; só a API toca em dados e serviços.
 
-Tudo o que a equipa precisa para construir o Novelo em 5 dias: arquitetura, [features](02-features.md), [deploy](03-deploy-coolify.md), [dados e modelo](04-dados-e-modelo.md), [backlog](05-backlog.md) e [demo](06-demo-e-entrega.md).
-
-## Arquitetura
-
-![O front fala só com a API; só a API toca em dados e serviços](img/diagrama-arquitetura.png)
-
-O coração é o par otimização e comparação: se tudo o resto falhar, estes dois têm de funcionar para a demo.
+```mermaid
+flowchart TB
+    subgraph web["apps/web (React + Vite, PWA)"]
+        R["TanStack Router<br/>rotas por ficheiros"]
+        Q["TanStack Query<br/>hooks gerados"]
+        C["src/client (hey-api)<br/>GERADO do openapi.json"]
+        R --> Q --> C
+    end
+    subgraph api["apps/api (FastAPI)"]
+        RT["routers finos"]
+        SV["services (AppError)"]
+        DM["domain: funções puras<br/>procura, custos, rede"]
+        AD["adapters: OpenRouter, email"]
+        RT --> SV --> DM
+        SV --> AD
+    end
+    C -->|"HTTP /api/v1 (cookies HttpOnly)"| RT
+    SV --> DB[("Postgres 17<br/>Alembic")]
+    AD --> OR["OpenRouter"]
+    AD --> RS["Resend"]
+    SV -.->|"seed"| DP["data/processed"]
+```
 
 ## Stack e repositório
 
-Um monorepo com dois serviços e um contrato: o FastAPI publica o OpenAPI, o front gera o cliente a partir dele, e nada fala com a API à mão.
-
 | Camada | Escolha | Porquê |
 | --- | --- | --- |
-| Front | TanStack Start (React, SSR) + TypeScript strict + Tailwind | Rotas e loaders type-safe, SSR para a primeira carga do mapa |
-| Rotas e dados | TanStack Router (file-based) + TanStack Query | Cache, invalidação e estados de carregamento sem código repetido |
-| Cliente da API | `@hey-api/openapi-ts`: cliente fetch, Zod e hooks do TanStack Query | Tipos e hooks gerados do contrato; uma mudança na API parte o build se o front não acompanhar |
-| Mapa | MapLibre GL | Gratuito, vetorial, camadas por freguesia |
-| Gráficos | Apache ECharts (Sankey e comparação) | Sankey de raiz, bom desempenho, tema configurável |
-| Back | Python 3.12 + FastAPI + Pydantic v2 + pydantic-settings | Contrato tipado e OpenAPI de graça |
-| Pacotes Python | uv, com `uv.lock` | Instalação reprodutível e rápida, local e no Docker |
-| Geo e otimização | GeoPandas, Shapely, Google OR-Tools | Localização (MIP) e rotas (VRP) no mesmo pacote |
-| Distâncias | OSRM em contentor próprio, com o mapa recortado ao concelho | Matriz de tempos e km sem custos de API |
-| IA | Claude, pela API da Anthropic: "E se...?" com saída estruturada e triagem por imagem | Um só fornecedor, saídas validadas por Pydantic |
-| Relatórios | Modelo HTML + WeasyPrint | PDF com a identidade Novelo, gerado no servidor |
-| QR | `segno` | QR em SVG, sem dependências nativas |
-| Persistência | SQLite num volume: cenários, lotes, relatórios | Os dados de base são ficheiros versionados; o resto cabe numa base pequena |
-| Pacotes JS | pnpm workspaces | Um lockfile, instalações rápidas |
-| Deploy | VPS com Coolify, Docker Compose, Traefik com HTTPS automático | Um sítio, um `git push`; ver [Deploy](03-deploy-coolify.md) |
+| API | Python 3.12, FastAPI, SQLAlchemy 2 assíncrono, Pydantic v2, uv | Tipagem total e contrato OpenAPI automático |
+| Otimização | OR-Tools: CP-SAT para pontos e modos, VRP para rotas | Resolve o problema real, com limite de tempo e sementes fixas |
+| Base de dados | PostgreSQL 17, migrações Alembic | Escala, integridade e consultas simples |
+| Web | React, Vite, TanStack Router e Query, Tailwind v4, shadcn/ui | SPA rápida; a API é a única fonte de dados |
+| Mapa | MapLibre com estilos CARTO por omissão | Sem chave |
+| i18n | Paraglide, pt-PT e inglês, prefixo de língua no URL | Mensagens tipadas, compiladas |
+| PWA | vite-plugin-pwa (autoUpdate); a API nunca fica em cache | Instalável, boa em telemóvel |
+| IA | OpenRouter com saída estruturada | Um fornecedor, vários modelos ([IA](ia.md)) |
+| PDF | WeasyPrint com as fontes da marca | Relatório RAP |
+| Deploy | Docker Compose no Coolify | Um push, um deploy ([Deploy](deploy.md)) |
 
 ```
-novelo/
-  apps/
-    api/
-      pyproject.toml  uv.lock  Dockerfile
-      src/novelo_api/
-        main.py           # create_app(), routers, /health
-        settings.py       # pydantic-settings: tudo o que vem do ambiente
-        params.py         # params.yaml validado com Pydantic no arranque
-        routers/          # zones, scenarios, whatif, triage, lots, market,
-                          # flows, brands, reports (finos)
-        schemas/          # modelos Pydantic = o contrato da API
-        services/         # orquestração: junta domínio, dados, IA e cache
-        domain/           # demand, costs, optimize, routes, lots, calibrate
-                          # funções puras, sem FastAPI, 100% testadas
-        ai/               # prompts versionados, ScenarioDelta, verificação
-        reports/          # modelo HTML do relatório RAP
-        adapters/         # osrm.py, claude.py, storage.py (I/O externo)
-      tests/              # unit/, api/, evals/ (perguntas E se), fixtures/
-    web/
-      package.json  vite.config.ts  openapi-ts.config.ts  Dockerfile
-      src/routes/         # rotas file-based do TanStack Router
-      src/features/       # map/, scenarios/, compare/, whatif/, triage/,
-                          # lots/, market/, flows/, reports/
-      src/client/         # GERADO pelo hey-api: nunca editar à mão
-      src/lib/            # queryClient, formatação pt-PT, utilitários
-  data/raw/  data/processed/
-  scripts/                # etl/, export_openapi.py, osrm_prepare.sh
-  openapi.json            # contrato exportado, versionado
-  docker-compose.yml      # produção, lido pelo Coolify
-  docker-compose.dev.yml  # desenvolvimento local
-  justfile                # comandos únicos: just dev, just gen, just check
-  .github/workflows/ci.yml
+apps/api/src/novelo/
+  core/        config, base de dados, erros tipados, segurança, limites de pedidos
+  features/    auth · users · textile · network · datasets · planning · lots · reports · health
+  domain/      procura, custos, geografia, rede: só funções puras
+  adapters/    OpenRouter e email (Resend ou log)
+  ai/          prompts versionados e verificador de números
+apps/web/src/
+  routes/      rotas por ficheiros (_app/* exige sessão)
+  features/    ecrãs por funcionalidade
+  components/  ui (shadcn), data-table, page, states, sticky-actions, layout
+  client/      GERADO
+  lib/         formatação, erros, i18n, tema, vocabulário
 ```
 
 ## API
 
-Tudo em JSON; geometrias em GeoJSON. Os endpoints das features estão especificados em [Features](02-features.md).
+Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `main.py`. As rotas de dados são autenticadas; o passaporte do lote (`/api/v1/public/lots/{code}`) é público para o QR abrir sem sessão.
 
-| Método | Rota | Entrada | Saída |
-| --- | --- | --- | --- |
-| GET | `/health` | - | `{"status":"ok"}`; usado pelo healthcheck do Coolify |
-| GET | `/zones` | - | Freguesias com população e procura estimada (t/ano) |
-| GET | `/candidates` | `mode?` | Locais candidatos a ponto de recolha, com tipo |
-| POST | `/scenarios` | `budget_eur`, `capture_target`, `modes[]`, `params?` | Cenário: pontos, modo por zona, rotas, KPIs |
-| GET | `/scenarios/{id}` | - | Cenário guardado, para o ecrã de comparação |
-| POST | `/whatif` | `scenario_id`, `question` | Alteração entendida, cenário novo, comparação, explicação verificada |
-| POST | `/triage` | Foto da peça + foto da etiqueta (multipart, máx. 5 MB cada) | Estado, composição, marca, destino sugerido, confiança; peça entra num lote |
-| GET | `/lots` | `fiber?`, `zone?`, `state?` | Lotes com peso, composição e estado |
-| GET | `/lots/{code}` | - | Passaporte público do lote (o QR aponta para aqui) |
-| GET | `/market` | `fiber?` | Bolsa de fibra: lotes agregados por fibra e estado |
-| POST | `/market/{code}/interest` | reciclador | Reserva do lote |
-| GET | `/flows` | `scenario_id?` ou `observed=true` | Nós e ligações do Sankey, em toneladas |
-| GET | `/brands` | `from?`, `to?` | Quilos por marca e composição, com tamanho da amostra |
-| POST | `/reports/rap` | `scenario_ids[]` | PDF do relatório RAP |
+| Grupo | Exemplos |
+| --- | --- |
+| `auth` | `login`, `register`, `refresh`, `logout`, `me`, `verify-email`, `forgot-password`, `reset-password`, `change-password`, Google, `config` |
+| `users` | listar e alterar papel e estado (só administradores) |
+| `textile` | `baseline`, `flows`, `waste` |
+| `network` | `circuits`, `fleet`, `localities`, `containers` |
+| `datasets` | `quality`, resolver e reabrir alertas |
+| `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, fluxos) |
+| `whatif` | criar, aplicar e listar perguntas "E se...?" |
+| `lots` | lotes, itens, estado, `triage`, `market` e reservas, `brands` |
+| `reports` | `rap` (gera o PDF), listar, `{id}/pdf` |
 
-```json
-// POST /scenarios -> resposta
-{
-  "id": "B",
-  "kpis": {
-    "capex_eur": 0,
-    "opex_eur_year": 0,
-    "tonnes_year": 0,
-    "eur_per_tonne": 0,
-    "coverage_pct": 0
-  },
-  "points": [{"id": "...", "mode": "existing|street|on_demand", "lat": 0, "lon": 0, "tonnes_year": 0}],
-  "routes": [{"vehicle": 1, "km": 0, "stops": ["..."], "geometry": {}}]
-}
-```
+Erros no formato `{code, message, details}` com um `ErrorCode` tipado, publicado no OpenAPI; `apps/web/src/lib/errors.ts` traduz cada código de forma exaustiva.
 
 ## Contrato OpenAPI e cliente gerado
 
-O OpenAPI é a única fonte de verdade entre back e front. O fluxo tem quatro passos e corre com `just gen`:
+1. O FastAPI define o contrato; o `operationId` é o nome da função Python (`list_zones`, `create_scenario`).
+2. `just gen` exporta `openapi.json` (`scripts/export_openapi.py`) e corre o hey-api (`apps/web/openapi-ts.config.ts`): cliente fetch, SDK, esquemas Zod e hooks do React Query.
+3. O web usa `xxxOptions()` e `xxxMutation()` de `@/client/@tanstack/react-query.gen`. Nunca há `fetch` à mão, nem rotas ou tipos escritos à mão.
+4. O `authFetch` renova a sessão em silêncio quando o token de acesso expira.
+5. `just check-contract` regenera tudo e falha se `openapi.json` ou `src/client` mudarem. O cliente gerado é versionado de propósito.
 
-1. **FastAPI define o contrato** com modelos Pydantic em `schemas/` e `response_model` em todas as rotas.
-2. **`scripts/export_openapi.py`** escreve `openapi.json` a partir de `create_app().openapi()`, sem arrancar o servidor.
-3. **`@hey-api/openapi-ts`** gera em `apps/web/src/client/` os tipos, o SDK, os esquemas Zod e os hooks do TanStack Query.
-4. **A CI volta a gerar tudo** e falha se houver diferenças (`git diff --exit-code`). O cliente gerado é versionado de propósito.
+## Base de dados
 
-**Nomes limpos no cliente.** Por omissão o FastAPI gera operation IDs longos. Usar o nome da função:
+Postgres com migrações Alembic (`apps/api/alembic`). Tabelas por domínio:
 
-```python
-# apps/api/src/novelo_api/main.py
-from fastapi import FastAPI
-from fastapi.routing import APIRoute
+| Domínio | Tabelas |
+| --- | --- |
+| Contas | `users`, `refresh_tokens`, `password_reset_tokens`, `email_verification_tokens` (tokens guardados como hash) |
+| Têxtil | `textile_entities`, `textile_flows`, `waste_shares` |
+| Rede | `parishes`, `localities`, `vehicles`, `circuits`, `circuit_days`, `circuit_localities`, `shift_assignments`, `fleet_capacity`, `containers` |
+| Dados | `data_sources`, `data_alerts` |
+| Planeamento | `parameter_sets`, `scenarios`, `whatif_runs` |
+| Operação | `lots`, `lot_items`, `lot_events`, `lot_reservations`, `reports` |
 
-def _operation_id(route: APIRoute) -> str:
-    return route.name  # list_zones -> listZonesOptions no front
+`data/processed` é importado no arranque da API de forma idempotente (`just seed` também o faz). Os ficheiros de origem ficam registados com impressão digital.
 
-def create_app() -> FastAPI:
-    app = FastAPI(title="Novelo API", version="0.1.0",
-                  generate_unique_id_function=_operation_id)
-    ...
-    return app
-```
+## Autenticação
 
-```ts
-// apps/web/openapi-ts.config.ts
-import { defineConfig } from '@hey-api/openapi-ts';
+Palavras-passe com argon2; JWT em cookies HttpOnly com rotação do token de renovação; "manter sessão iniciada" alonga a validade (`REFRESH_TOKEN_EXPIRE_DAYS` contra `SESSION_TOKEN_HOURS`). Confirmação de email e recuperar password usam tokens de uso único guardados como hash; os emails saem pelo Resend (ou pelo log em dev). Google OAuth. Limites de pedidos nas rotas sensíveis. O primeiro administrador é criado no arranque a partir de `ADMIN_EMAIL` e `ADMIN_PASSWORD`.
 
-export default defineConfig({
-  input: '../../openapi.json',
-  output: 'src/client',
-  plugins: ['@hey-api/client-fetch', 'zod', '@tanstack/react-query'],
-});
-```
+## Web
 
-```tsx
-// uso num componente: nunca fetch à mão
-const zones = useQuery(listZonesOptions());
-const navigate = useNavigate();
-const create = useMutation({
-  ...createScenarioMutation(),
-  onSuccess: (scenario) =>
-    navigate({ to: '/cenarios/$id', params: { id: scenario.id } }),
-});
-```
+- **Rotas** em `src/routes/`; dados nos `loader` com `queryClient.ensureQueryData`; estado partilhável no URL com `validateSearch`.
+- **Estados obrigatórios** em todo o ecrã de dados: a carregar (skeleton), vazio, erro, sucesso (`components/states.tsx`).
+- **DataTable** (`components/data-table/`): a mesma tabela em todo o produto. Em ecrãs largos é uma tabela; em telemóvel é uma lista de cartões. Cada coluna declara `cell` e, opcionalmente, `value` (para ordenar, pesquisar e filtrar), `filter`, `sortable`, `searchable`, `hideable` e `defaultHidden`. Traz pesquisa que ignora acentos, filtros por coluna com contagens, ordenação, menu de colunas, paginação (10, 25, 50 ou 100 linhas) e memória das escolhas por tabela.
+- **Layout** com `Page` e `Section`, `PageHeader`, `StatStrip`, `StickyActions` (barra de ações fixa em telemóvel) e `OfflineBanner`.
+- **Telemóvel primeiro:** áreas de toque de pelo menos 40 px, campos a 16 px (sem zoom no iOS), margens de segurança, diálogos que abrem como folha inferior.
+- **Tema, língua e tipografia:** claro e escuro, pt-PT e inglês; Inter no texto e Newsreader nos títulos; tokens da marca em [Guia de marca](../marca/guia-de-marca.md).
 
-Nos loaders das rotas, `queryClient.ensureQueryData(listZonesOptions())` pré-carrega os dados no servidor, e o componente lê-os do cache sem segundo pedido.
+## Boas práticas
 
-## Boas práticas de código
+**Python.** Feature-based (`router`, `service`, `models`, `schemas`); services sem FastAPI levantam `AppError`; `domain/` só com funções puras, testadas com valores calculados à mão; I/O externo só em `adapters/`; `mypy --strict` e Ruff limpos; rotas que chamam OR-Tools são `def` com limite de tempo (`SOLVER_TIME_LIMIT_S`); nunca editar uma migração já aplicada.
 
-### Python (API)
+**TypeScript.** `strict` e `noUncheckedIndexedAccess`, Biome, sem `any`; componentes sem lógica de negócio; números em pt-PT com unidade (`lib/format.ts`); acessibilidade AA e uso total por teclado.
 
-- **Camadas com uma só direção:** `routers` → `services` → `domain`. O `domain` não importa FastAPI nem faz I/O; recebe dados e devolve resultados. É aí que vivem as fórmulas e é aí que estão os testes.
-- **I/O isolado em `adapters/`** (OSRM, modelo de visão, SQLite), injetado com `Depends`. Nos testes troca-se por falsos.
-- **Tudo tipado:** modelos Pydantic em todos os pedidos e respostas, `response_model` explícito, `mypy --strict` sem exceções.
-- **Configuração só por ambiente:** `Settings(BaseSettings)` lê variáveis e falha no arranque se faltar alguma obrigatória. `params.yaml` é validado por um modelo Pydantic, com a fonte de cada valor em comentário.
-- **Um formato de erro:** handlers globais devolvem `{"code", "message", "details"}`; nunca rebentar com 500 e stack trace para o cliente.
-- **Otimização sem bloquear o servidor:** rotas que chamam o OR-Tools são `def` (correm em threadpool), com limite de tempo do solver (ex.: 20 s) e resultados em cache pela hash dos parâmetros. Mesma entrada, mesmo cenário: sementes fixas.
-- **Logs estruturados** em JSON, com `request_id` em cada pedido.
+## Qualidade
 
-### IA com rédea curta
+`just check` corre localmente e é a barreira antes de cada push.
 
-- **Saídas estruturadas sempre:** o modelo devolve JSON que um modelo Pydantic valida (`ScenarioDelta`, `TriageResult`). Texto livre só na explicação final.
-- **A IA não faz contas:** todos os números vêm do otimizador ou da base de dados, e um verificador rejeita qualquer número que não esteja no JSON de origem.
-- **Prompts versionados** em `ai/prompts/`, com a versão guardada em cada resposta.
-- **Evals na CI:** perguntas "E se...?" e etiquetas de teste com resultado esperado; a CI corre-as com respostas gravadas, e uma vez por dia contra a API real.
-- **Custos e limites:** timeout por chamada, limite de pedidos por IP em `/whatif` e `/triage`, e cache por pergunta e cenário.
-- **Privacidade:** fotografias apagadas depois de processadas; só se guardam marca, composição, estado e peso.
+| Área | Ferramentas |
+| --- | --- |
+| Python | Ruff (lint e formato), mypy strict, pytest (76 testes) |
+| TypeScript | Biome, `tsc --noEmit`, Vitest |
+| Contrato | `just gen` e `git diff --exit-code` em `openapi.json` e `src/client` |
+| Ponta a ponta | Playwright (`pnpm exec playwright test` em `apps/web`) contra a stack de `just dev` |
+| Imagens | `just build` constrói as duas imagens de produção |
 
-### TypeScript (web)
-
-- `strict: true` e `noUncheckedIndexedAccess: true` no `tsconfig`.
-- **Nunca `fetch` à mão:** só o cliente e os hooks gerados. Query keys vêm dos helpers gerados, não de strings.
-- **Pastas por funcionalidade** em `src/features/`; componentes sem lógica de negócio, que vive em hooks ou na API.
-- **Dados das rotas nos loaders** (`ensureQueryData`), parâmetros de URL validados com o `validateSearch` do Router: o estado do cenário vive na URL e pode ser partilhado.
-- **Números em pt-PT** com `Intl.NumberFormat('pt-PT')`, sempre com unidade (t, €, €/t). KPIs estimados levam a etiqueta "estimativa".
-- **Acessível:** cada camada do mapa tem uma tabela equivalente; contraste AA; tudo usável por teclado.
-
-### Testes
-
-- **Domínio:** testes unitários às fórmulas de procura e custo, com valores calculados à mão.
-- **Cenário de referência:** um fixture pequeno (3 freguesias, 6 candidatos) com resultado esperado fixo; apanha regressões na otimização.
-- **API:** testes com `httpx` contra `create_app()`, adapters falsos.
-- **Web:** Vitest para lógica e formatação; um teste Playwright que percorre a demo de ponta a ponta.
-
-## Qualidade e CI
-
-Um comando local, o mesmo que a CI corre: `just check`. Se passa no portátil, passa na CI.
-
-| Âmbito | Ferramentas | Corre em |
-| --- | --- | --- |
-| Python | Ruff (lint e formatação), mypy strict, pytest com cobertura do `domain/` | pre-commit e CI |
-| TypeScript | Biome (lint e formatação), `tsc --noEmit`, Vitest | pre-commit e CI |
-| Contrato | `just gen` + `git diff --exit-code` em `openapi.json` e `src/client/` | CI |
-| Imagens | `docker build` das duas imagens | CI |
-| Ponta a ponta | Playwright contra o docker compose de desenvolvimento | CI, só em PR para `main` |
-
-**Pipeline (GitHub Actions):** jobs `api`, `web` e `contract` em paralelo; `docker` depois deles. Só com tudo verde, um último job chama o webhook de deploy do Coolify. O Coolify não faz deploy sozinho a cada push: assim nada chega à VPS sem passar a CI.
-
-**Regras de Git:**
-
-- `main` protegido: só por PR, com CI verde e uma aprovação.
-- Branches `feat/…`, `fix/…`, `chore/…`; commits no formato Conventional Commits (`feat(api): cenários com recolha a pedido`).
-- PRs pequenos: uma coisa de cada vez, revistos no mesmo dia.
-- Segredos nunca no repositório: `.env.example` com os nomes, valores só no Coolify.
-- A partir do fim do dia 4, só correções e polimento.
+Por agora não há integração contínua remota. O fluxo é: `just check` verde, commit em Conventional Commits e push direto para `main`, que o Coolify publica.

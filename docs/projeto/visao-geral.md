@@ -1,6 +1,6 @@
 # Novelo
 
-![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](img/banner.png)
+![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](../img/banner-projeto.png)
 
 *Hack4Guimarães 2035 · 19 de outubro de 2026 · Hélder Gonçalves e Flávio Fernandes*
 
@@ -8,11 +8,11 @@
 
 ## O problema
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1.300 e 2.650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa a partir dos dados do município).
+Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1 300 e 2 650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa a partir dos dados do município).
 
 - **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025, e o município fixou a meta de aumentar a recolha seletiva em 30%.
 - **A conta muda em 2028.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a ter, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem.
-- **O território torna-o caro.** Guimarães tem 156 830 habitantes em 55 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
+- **O território torna-o caro.** Guimarães tem 156 830 habitantes em 48 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
 - **Ninguém tem os dados.** A triagem é manual, as microempresas têxteis deitam retalhos no lixo urbano sem registo, e só 4 dos 27 operadores licenciados na zona reciclam ou valorizam têxteis.
 
 A pergunta da Vitrus Ambiente é simples: como garantir têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?
@@ -38,7 +38,7 @@ O Novelo acompanha o têxtil **do saco ao fio**: planeia a rede de recolha ao me
 
 ## Como funciona
 
-![Dos dados abertos a cenários com preço; o terreno corrige o modelo](img/diagrama-como-funciona.png)
+![Dos dados abertos a cenários com preço; o terreno corrige o modelo](../img/diagrama-como-funciona.png)
 
 Cada entrega triada no terreno devolve dados reais de quantidade e qualidade, e o modelo fica mais certo a cada ciclo.
 

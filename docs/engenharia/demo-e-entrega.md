@@ -13,7 +13,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 ## Dados da demo
 
-- Cenários A e B pré-calculados e guardados (`/scenarios/A`, `/scenarios/B`); a demo nunca depende de correr a otimização inteira ao vivo.
+- Cenários A e B pré-calculados e guardados (ecrã Cenários); a demo nunca depende de correr a otimização inteira ao vivo.
 - Cinco perguntas "E se...?" de reserva, testadas e em cache, caso o jurado não queira perguntar ou a rede falhe. A pergunta do jurado corre a sério.
 - Um lote de demonstração já com histórico (recolhido, triado), para o passaporte não aparecer vazio; a peça em palco junta-se a ele.
 - A peça para a triagem: uma camisola com etiqueta legível, testada antes no mesmo telemóvel e com a mesma luz.
@@ -21,7 +21,8 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 ## Checklist de entrega
 
-- [ ] Link público do front a funcionar fora da rede do evento
+- [ ] https://novelo.bitsapiens.io a funcionar fora da rede do evento
+- [ ] `just check` verde e a stack de produção testada com `just build`
 - [ ] Cenários A e B carregam em menos de 2 segundos
 - [ ] "E se...?" responde em menos de 15 segundos; perguntas de reserva em cache
 - [ ] QR impresso no saco da demo e testado com dois telemóveis diferentes
