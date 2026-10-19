@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as VerificarEmailRouteImport } from './routes/verificar-email'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppCircuitosRouteImport } from './routes/_app/circuitos'
 import { Route as AppContaRouteImport } from './routes/_app/conta'
+import { Route as AppUtilizadoresRouteImport } from './routes/_app/utilizadores'
 import { Route as AuthCriarContaRouteImport } from './routes/_auth/criar-conta'
 import { Route as AuthEntrarRouteImport } from './routes/_auth/entrar'
 import { Route as AuthRecuperarPasswordRouteImport } from './routes/_auth/recuperar-password'
@@ -25,6 +27,11 @@ const AppRoute = AppRouteImport.update({
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificarEmailRoute = VerificarEmailRouteImport.update({
+  id: '/verificar-email',
+  path: '/verificar-email',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -40,6 +47,11 @@ const AppCircuitosRoute = AppCircuitosRouteImport.update({
 const AppContaRoute = AppContaRouteImport.update({
   id: '/conta',
   path: '/conta',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppUtilizadoresRoute = AppUtilizadoresRouteImport.update({
+  id: '/utilizadores',
+  path: '/utilizadores',
   getParentRoute: () => AppRoute,
 } as any)
 const AuthCriarContaRoute = AuthCriarContaRouteImport.update({
@@ -65,8 +77,10 @@ const AuthRedefinirPasswordRoute = AuthRedefinirPasswordRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/verificar-email': typeof VerificarEmailRoute
   '/circuitos': typeof AppCircuitosRoute
   '/conta': typeof AppContaRoute
+  '/utilizadores': typeof AppUtilizadoresRoute
   '/criar-conta': typeof AuthCriarContaRoute
   '/entrar': typeof AuthEntrarRoute
   '/recuperar-password': typeof AuthRecuperarPasswordRoute
@@ -74,8 +88,10 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/verificar-email': typeof VerificarEmailRoute
   '/circuitos': typeof AppCircuitosRoute
   '/conta': typeof AppContaRoute
+  '/utilizadores': typeof AppUtilizadoresRoute
   '/criar-conta': typeof AuthCriarContaRoute
   '/entrar': typeof AuthEntrarRoute
   '/recuperar-password': typeof AuthRecuperarPasswordRoute
@@ -85,8 +101,10 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/verificar-email': typeof VerificarEmailRoute
   '/_app/circuitos': typeof AppCircuitosRoute
   '/_app/conta': typeof AppContaRoute
+  '/_app/utilizadores': typeof AppUtilizadoresRoute
   '/_auth/criar-conta': typeof AuthCriarContaRoute
   '/_auth/entrar': typeof AuthEntrarRoute
   '/_auth/recuperar-password': typeof AuthRecuperarPasswordRoute
@@ -97,8 +115,10 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/verificar-email'
     | '/circuitos'
     | '/conta'
+    | '/utilizadores'
     | '/criar-conta'
     | '/entrar'
     | '/recuperar-password'
@@ -106,8 +126,10 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/verificar-email'
     | '/circuitos'
     | '/conta'
+    | '/utilizadores'
     | '/criar-conta'
     | '/entrar'
     | '/recuperar-password'
@@ -116,8 +138,10 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/verificar-email'
     | '/_app/circuitos'
     | '/_app/conta'
+    | '/_app/utilizadores'
     | '/_auth/criar-conta'
     | '/_auth/entrar'
     | '/_auth/recuperar-password'
@@ -128,6 +152,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  VerificarEmailRoute: typeof VerificarEmailRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -144,6 +169,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verificar-email': {
+      id: '/verificar-email'
+      path: '/verificar-email'
+      fullPath: '/verificar-email'
+      preLoaderRoute: typeof VerificarEmailRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -165,6 +197,13 @@ declare module '@tanstack/react-router' {
       path: '/conta'
       fullPath: '/conta'
       preLoaderRoute: typeof AppContaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/utilizadores': {
+      id: '/_app/utilizadores'
+      path: '/utilizadores'
+      fullPath: '/utilizadores'
+      preLoaderRoute: typeof AppUtilizadoresRouteImport
       parentRoute: typeof AppRoute
     }
     '/_auth/criar-conta': {
@@ -201,12 +240,14 @@ declare module '@tanstack/react-router' {
 interface AppRouteChildren {
   AppCircuitosRoute: typeof AppCircuitosRoute
   AppContaRoute: typeof AppContaRoute
+  AppUtilizadoresRoute: typeof AppUtilizadoresRoute
   AppIndexRoute: typeof AppIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppCircuitosRoute: AppCircuitosRoute,
   AppContaRoute: AppContaRoute,
+  AppUtilizadoresRoute: AppUtilizadoresRoute,
   AppIndexRoute: AppIndexRoute,
 }
 
@@ -231,6 +272,7 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  VerificarEmailRoute: VerificarEmailRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

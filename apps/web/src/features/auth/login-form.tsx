@@ -5,6 +5,7 @@ import { Loader2 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { getMeQueryKey, loginMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Form,
   FormControl,
@@ -24,7 +25,7 @@ export function LoginForm({ next }: { next: string }) {
   const navigate = useNavigate();
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '' },
+    defaultValues: { email: '', password: '', remember_me: true },
   });
 
   const login = useMutation({
@@ -78,6 +79,23 @@ export function LoginForm({ next }: { next: string }) {
                 <PasswordInput {...field} autoComplete="current-password" className="h-10" />
               </FormControl>
               <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="remember_me"
+          render={({ field }) => (
+            <FormItem className="flex items-center gap-2 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={(checked) => field.onChange(checked === true)}
+                />
+              </FormControl>
+              <FormLabel className="font-normal text-muted-foreground">
+                Manter sessão iniciada neste dispositivo
+              </FormLabel>
             </FormItem>
           )}
         />

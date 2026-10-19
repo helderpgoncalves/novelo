@@ -9,11 +9,18 @@ const newPassword = z
   .max(128, 'A password é demasiado longa')
   .refine((value) => value.trim() === value, 'Sem espaços no início ou no fim');
 
-export const loginSchema = z.object({ email, password: z.string().min(1, 'Indica a password') });
+export const loginSchema = z.object({
+  email,
+  password: z.string().min(1, 'Indica a password'),
+  remember_me: z.boolean(),
+});
 export const registerSchema = z.object({
   name: z.string().trim().max(120).optional(),
   email,
   password: newPassword,
+});
+export const profileSchema = z.object({
+  name: z.string().trim().max(120, 'O nome é demasiado longo'),
 });
 export const forgotSchema = z.object({ email });
 export const resetSchema = z
@@ -31,6 +38,7 @@ export const changePasswordSchema = z
 
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;
+export type ProfileValues = z.infer<typeof profileSchema>;
 export type ForgotValues = z.infer<typeof forgotSchema>;
 export type ResetValues = z.infer<typeof resetSchema>;
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;

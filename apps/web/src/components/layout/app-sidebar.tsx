@@ -5,10 +5,14 @@ import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/
 import { NAV } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 
-function NavList({ onNavigate }: { onNavigate?: () => void }) {
+function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }) {
+  const sections = NAV.map((section) => ({
+    ...section,
+    items: section.items.filter((item) => !item.adminOnly || role === 'admin'),
+  })).filter((section) => section.items.length > 0);
   return (
     <nav aria-label="Principal" className="flex-1 space-y-6 overflow-y-auto px-3 py-4">
-      {NAV.map((section) => (
+      {sections.map((section) => (
         <div key={section.title}>
           <p className="mb-1.5 px-2 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
             {section.title}
@@ -63,7 +67,7 @@ function NavList({ onNavigate }: { onNavigate?: () => void }) {
   );
 }
 
-function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
+function SidebarBody({ role, onNavigate }: { role: string; onNavigate?: () => void }) {
   return (
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center border-sidebar-border border-b px-5">
@@ -71,7 +75,7 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
           <BrandLogo />
         </Link>
       </div>
-      <NavList onNavigate={onNavigate} />
+      <NavList role={role} onNavigate={onNavigate} />
       <div className="border-sidebar-border border-t p-4">
         <p className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
           Hack4Guimarães 2035
@@ -85,22 +89,24 @@ function SidebarBody({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function AppSidebar({
+  role,
   mobileOpen,
   onMobileOpenChange,
 }: {
+  role: string;
   mobileOpen: boolean;
   onMobileOpenChange: (open: boolean) => void;
 }) {
   return (
     <>
       <aside className="hidden w-64 shrink-0 border-sidebar-border border-r bg-sidebar lg:block">
-        <SidebarBody />
+        <SidebarBody role={role} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
         <SheetContent side="left" className="w-72 gap-0 bg-sidebar p-0">
           <SheetTitle className="sr-only">Navegação</SheetTitle>
           <SheetDescription className="sr-only">Secções do Novelo</SheetDescription>
-          <SidebarBody onNavigate={() => onMobileOpenChange(false)} />
+          <SidebarBody role={role} onNavigate={() => onMobileOpenChange(false)} />
         </SheetContent>
       </Sheet>
     </>

@@ -13,9 +13,11 @@ const NO_REFRESH = [
 
 let refreshing: Promise<boolean> | null = null;
 
+// Usa o SDK gerado (import dinâmico para não criar um ciclo com client.gen.ts).
 function refreshSession(): Promise<boolean> {
-  refreshing ??= fetch('/api/v1/auth/refresh', { method: 'POST', credentials: 'include' })
-    .then((res) => res.ok)
+  refreshing ??= import('../client/sdk.gen')
+    .then(({ refresh }) => refresh({ throwOnError: false }))
+    .then((result) => result.response?.ok === true)
     .catch(() => false)
     .finally(() => {
       refreshing = null;
