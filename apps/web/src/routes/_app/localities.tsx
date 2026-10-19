@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { listLocalitiesOptions } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { LocalitiesTable } from '@/features/localities/localities-table';
@@ -20,7 +21,7 @@ function Localities() {
   const none = data.filter((l) => l.days_per_week === 0).length;
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.localities_eyebrow()}
         title={m.localities_title()}
@@ -50,6 +51,6 @@ function Localities() {
         />
       </StatStrip>
       <LocalitiesTable localities={data} />
-    </div>
+    </Page>
   );
 }

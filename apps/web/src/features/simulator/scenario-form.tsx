@@ -11,6 +11,7 @@ import type {
 } from '@/client';
 import { createScenarioMutation } from '@/client/@tanstack/react-query.gen';
 import { NumberField } from '@/components/number-field';
+import { SectionTitle } from '@/components/page';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -198,7 +199,7 @@ export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
       <div className="min-w-0 space-y-8">
         <section className="space-y-3">
           <div className="space-y-1">
-            <h2 className="text-2xl">{m.sim_assumptions_title()}</h2>
+            <SectionTitle>{m.sim_assumptions_title()}</SectionTitle>
             <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">
               {m.sim_assumptions_description()}
             </p>
@@ -220,7 +221,7 @@ export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
           </Button>
         </section>
         <section className="space-y-3">
-          <h2 className="text-2xl">{m.sim_constraints_title()}</h2>
+          <SectionTitle>{m.sim_constraints_title()}</SectionTitle>
           <ConstraintsEditor zones={zones} value={constraints} onChange={setConstraints} />
         </section>
       </div>

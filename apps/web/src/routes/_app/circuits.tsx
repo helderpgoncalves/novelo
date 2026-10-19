@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { listCircuitsOptions } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
@@ -18,7 +19,7 @@ function Circuits() {
   const { data } = useSuspenseQuery(listCircuitsOptions());
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.circuits_eyebrow()}
         title={m.circuits_title()}
@@ -51,6 +52,6 @@ function Circuits() {
       ) : (
         <CircuitsTable circuits={data.circuits} />
       )}
-    </div>
+    </Page>
   );
 }

@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { getFibreMarketOptions } from '@/client/@tanstack/react-query.gen';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
@@ -25,7 +26,7 @@ function Market() {
   const totalLots = data.reduce((s, e) => s + e.lots, 0);
 
   return (
-    <div className="space-y-10">
+    <Page>
       <PageHeader
         eyebrow={m.market_eyebrow()}
         title={m.market_title()}
@@ -65,7 +66,7 @@ function Market() {
         data.map((entry) => (
           <section key={entry.fibre} className="space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-2xl">{fibreLabel[entry.fibre]()}</h2>
+              <SectionTitle>{fibreLabel[entry.fibre]()}</SectionTitle>
               <p className="text-muted-foreground text-sm tabular-nums">
                 {m.market_group_summary({
                   lots: entry.lots,
@@ -111,6 +112,6 @@ function Market() {
         open={reserving !== null}
         onOpenChange={(open) => !open && setReserving(null)}
       />
-    </div>
+    </Page>
   );
 }

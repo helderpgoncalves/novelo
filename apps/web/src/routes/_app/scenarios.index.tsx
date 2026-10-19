@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { Plus } from 'lucide-react';
 import { listScenariosOptions } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
@@ -17,7 +18,7 @@ export const Route = createFileRoute('/_app/scenarios/')({
 function Scenarios() {
   const { data } = useSuspenseQuery(listScenariosOptions());
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.scenarios_eyebrow()}
         title={m.scenarios_title()}
@@ -43,6 +44,6 @@ function Scenarios() {
       ) : (
         <ScenarioList scenarios={data} />
       )}
-    </div>
+    </Page>
   );
 }

@@ -7,6 +7,7 @@ import {
   getScenarioOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Label } from '@/components/ui/label';
@@ -49,7 +50,7 @@ function Section({
   return (
     <section className="space-y-4">
       <div className="space-y-1">
-        <h2 className="text-2xl">{title}</h2>
+        <SectionTitle>{title}</SectionTitle>
         {description && (
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
         )}
@@ -76,7 +77,7 @@ function ScenarioPage() {
       : m.scenario_subtitle_target({ value: formatTonnes(scenario.target_tonnes ?? 0, 0) });
 
   return (
-    <div className="space-y-12">
+    <Page>
       <PageHeader
         eyebrow={`${objectiveLabel[scenario.objective]()} · ${budgetOrTarget}`}
         title={scenario.label}
@@ -134,6 +135,6 @@ function ScenarioPage() {
       <Section title={m.scenario_params_title()} description={m.scenario_params_description()}>
         <ParameterSummary params={scenario.params} />
       </Section>
-    </div>
+    </Page>
   );
 }

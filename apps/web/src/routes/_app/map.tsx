@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useState } from 'react';
 import { listLocalitiesOptions, listZonesOptions } from '@/client/@tanstack/react-query.gen';
 import { FilterChips } from '@/components/filter-chips';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Label } from '@/components/ui/label';
@@ -34,7 +35,7 @@ function NetworkMapPage() {
   const located = localities.filter((l) => l.latitude != null).length;
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.map_eyebrow()}
         title={m.map_title()}
@@ -95,6 +96,6 @@ function NetworkMapPage() {
         <ParishPanel zone={zones.find((z) => z.code === selected) ?? null} />
       </div>
       <p className="text-muted-foreground text-xs">{m.map_containers_note()}</p>
-    </div>
+    </Page>
   );
 }

@@ -7,6 +7,7 @@ import {
   getScenarioOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { type FormSeed, ScenarioForm } from '@/features/simulator/scenario-form';
 import { m } from '@/paraglide/messages';
@@ -61,7 +62,7 @@ function Simulator() {
   const seed = seedFrom(base, defaults);
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.sim_eyebrow()}
         title={m.sim_title()}
@@ -69,6 +70,6 @@ function Simulator() {
       />
       {/* A chave recria o formulário quando se muda de cenário de origem */}
       <ScenarioForm key={from ?? 'new'} parameters={parameters} zones={zones} seed={seed} />
-    </div>
+    </Page>
   );
 }

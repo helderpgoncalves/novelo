@@ -6,6 +6,7 @@ import {
   listScenariosOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import {
@@ -79,7 +80,7 @@ function Compare() {
   const [, , scenarioA, scenarioB] = Route.useLoaderData();
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.compare_eyebrow()}
         title={m.compare_title()}
@@ -104,6 +105,6 @@ function Compare() {
       ) : (
         <EmptyState title={m.compare_empty_title()} description={m.compare_empty_text()} />
       )}
-    </div>
+    </Page>
   );
 }

@@ -14,13 +14,18 @@ interface SectionProps {
   className?: string;
 }
 
+/** Título de secção, para os sítios onde a secção tem estrutura própria. */
+export function SectionTitle({ children, className }: { children: ReactNode; className?: string }) {
+  return <h2 className={cn('text-balance text-[1.4rem] sm:text-2xl', className)}>{children}</h2>;
+}
+
 /** Secção de página: título serifado, descrição curta e conteúdo. */
 export function Section({ title, description, actions, children, className }: SectionProps) {
   return (
     <section className={cn('space-y-4', className)}>
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div className="min-w-0 space-y-1">
-          <h2 className="text-balance text-[1.4rem] sm:text-2xl">{title}</h2>
+          <SectionTitle>{title}</SectionTitle>
           {description && (
             <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
           )}

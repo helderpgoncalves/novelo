@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -46,7 +47,7 @@ function LanguageCard() {
 function Account() {
   const { user } = Route.useRouteContext();
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.account_eyebrow()}
         title={m.account_title()}
@@ -105,6 +106,6 @@ function Account() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </Page>
   );
 }

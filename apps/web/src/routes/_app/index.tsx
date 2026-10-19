@@ -6,6 +6,7 @@ import {
   getTextileBaselineOptions,
   getWasteCompositionOptions,
 } from '@/client/@tanstack/react-query.gen';
+import { Page, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { CaptureBar } from '@/features/baseline/capture-bar';
@@ -39,7 +40,7 @@ function Section({
   return (
     <section className="space-y-4">
       <div className="space-y-1">
-        <h2 className="text-2xl">{title}</h2>
+        <SectionTitle>{title}</SectionTitle>
         {description && (
           <p className="max-w-2xl text-muted-foreground text-sm leading-relaxed">{description}</p>
         )}
@@ -56,7 +57,7 @@ function Baseline() {
   const insights = buildInsights(b);
 
   return (
-    <div className="space-y-12">
+    <Page>
       <PageHeader
         eyebrow={m.baseline_eyebrow({ year: b.year })}
         title={m.baseline_title()}
@@ -125,6 +126,6 @@ function Baseline() {
           <WasteCompositionChart waste={waste} />
         </div>
       </Section>
-    </div>
+    </Page>
   );
 }

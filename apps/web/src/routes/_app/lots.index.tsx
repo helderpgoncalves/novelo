@@ -4,6 +4,7 @@ import { ScanLine } from 'lucide-react';
 import type { Fibre, LotState, LotSummary } from '@/client';
 import { listLotsOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { EmptyState } from '@/components/states';
 import { Button } from '@/components/ui/button';
@@ -23,7 +24,7 @@ function Lots() {
   const { data } = useSuspenseQuery(listLotsOptions());
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.lots_eyebrow()}
         title={m.lots_title()}
@@ -56,7 +57,7 @@ function Lots() {
           searchLabel={m.lots_search()}
         />
       )}
-    </div>
+    </Page>
   );
 }
 

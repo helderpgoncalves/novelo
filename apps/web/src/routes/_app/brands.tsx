@@ -4,6 +4,7 @@ import { Info } from 'lucide-react';
 import type { BrandStat, Fibre } from '@/client';
 import { getBrandEvidenceOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
+import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { EmptyState } from '@/components/states';
@@ -81,7 +82,7 @@ function Brands() {
   ];
 
   return (
-    <div className="space-y-8">
+    <Page>
       <PageHeader
         eyebrow={m.brands_eyebrow()}
         title={m.brands_title()}
@@ -123,6 +124,6 @@ function Brands() {
         />
       )}
       <p className="text-muted-foreground text-xs">{m.brands_privacy()}</p>
-    </div>
+    </Page>
   );
 }
