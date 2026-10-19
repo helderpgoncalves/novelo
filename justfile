@@ -36,6 +36,13 @@ db-wait:
 logs SERVICE="api":
     docker compose -f docker-compose.dev.yml logs -f --tail 100 {{SERVICE}}
 
+# Adiciona componentes shadcn/ui. O CLI instala por engano o pacote npm `cn`: isto corrige-o logo a seguir.
+ui +COMPONENTS:
+    cd apps/web && pnpm dlx shadcn@latest add {{COMPONENTS}} -y --overwrite
+    grep -rl "from [\"']cn[\"']" apps/web/src | xargs -r sed -i '' "s#from [\"']cn[\"']#from '@/lib/utils'#"
+    pnpm --filter web remove cn || true
+    pnpm --filter web exec biome check --write src/components/ui
+
 # --- Contrato e dados ---------------------------------------------------------
 # Regenera openapi.json e o cliente TypeScript (hey-api). Correr sempre que a API mudar.
 gen:

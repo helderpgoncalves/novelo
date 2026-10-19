@@ -17,7 +17,11 @@ from novelo.features.auth.router import router as auth_router
 from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
 from novelo.features.health.router import router as health_router
+from novelo.features.lots.router import public_router as public_lots_router
+from novelo.features.lots.router import router as lots_router
 from novelo.features.network.router import router as network_router
+from novelo.features.planning.router import router as planning_router
+from novelo.features.planning.whatif_router import router as whatif_router
 from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
 
@@ -63,10 +67,21 @@ def create_app() -> FastAPI:
     app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"], responses=COMMON_ERRORS)
     # Dados da Vitrus: só para utilizadores autenticados.
     protected = [Depends(get_current_user)]
-    for router, name in ((textile_router, "textile"), (network_router, "network"), (datasets_router, "datasets")):
+    for router, name in (
+        (textile_router, "textile"),
+        (network_router, "network"),
+        (datasets_router, "datasets"),
+        (planning_router, "planning"),
+    ):
         app.include_router(
             router, prefix=f"{API_PREFIX}/{name}", tags=[name], dependencies=protected, responses=COMMON_ERRORS
         )
+    app.include_router(
+        whatif_router, prefix=f"{API_PREFIX}/whatif", tags=["whatif"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    # Operação (lotes, bolsa, triagem, marcas): autenticada. O passaporte do lote é público: o QR abre sem sessão.
+    app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
+    app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app

@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises:
-Create Date: 2026-10-19 19:46:11.487606
+Create Date: 2026-10-19 20:33:52.869452
 """
 
 from collections.abc import Sequence
@@ -36,18 +36,6 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_data_sources")),
         sa.UniqueConstraint("key", name=op.f("uq_data_sources_key")),
-    )
-    op.create_table(
-        "scenarios",
-        sa.Column("label", sa.String(length=80), nullable=False),
-        sa.Column("params", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("result", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
-        sa.Column("params_version", sa.String(length=40), nullable=False),
-        sa.Column("parent_id", sa.Uuid(), nullable=True),
-        sa.Column("id", sa.UUID(), nullable=False),
-        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.PrimaryKeyConstraint("id", name=op.f("pk_scenarios")),
     )
     op.create_table(
         "textile_entities",
@@ -267,12 +255,32 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_fleet_capacity_source_id"), "fleet_capacity", ["source_id"], unique=False)
     op.create_table(
+        "parameter_sets",
+        sa.Column("name", sa.String(length=80), nullable=False),
+        sa.Column("description", sa.Text(), nullable=True),
+        sa.Column("is_default", sa.Boolean(), nullable=False),
+        sa.Column("version", sa.Integer(), nullable=False),
+        sa.Column("values", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("updated_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["updated_by_id"], ["users.id"], name=op.f("fk_parameter_sets_updated_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_parameter_sets")),
+        sa.UniqueConstraint("name", name=op.f("uq_parameter_sets_name")),
+    )
+    op.create_table(
         "parishes",
         sa.Column("dicofre", sa.String(length=6), nullable=False),
         sa.Column("name", sa.String(length=120), nullable=False),
         sa.Column("population", sa.Integer(), nullable=True),
         sa.Column("population_year", sa.SmallInteger(), nullable=True),
         sa.Column("area_km2", sa.Numeric(precision=9, scale=3), nullable=True),
+        sa.Column("latitude", sa.Numeric(precision=9, scale=6), nullable=True),
+        sa.Column("longitude", sa.Numeric(precision=9, scale=6), nullable=True),
+        sa.Column("geometry", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
         sa.Column("source_id", sa.UUID(), nullable=True),
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -314,6 +322,51 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_refresh_tokens_token_hash"), "refresh_tokens", ["token_hash"], unique=True)
     op.create_index(op.f("ix_refresh_tokens_user_id"), "refresh_tokens", ["user_id"], unique=False)
+    op.create_table(
+        "scenarios",
+        sa.Column("label", sa.String(length=80), nullable=False),
+        sa.Column(
+            "objective",
+            sa.Enum("max_tonnes", "min_cost", name="scenarioobjective", native_enum=False, length=32),
+            nullable=False,
+        ),
+        sa.Column("budget_eur_year", sa.Numeric(precision=12, scale=2), nullable=True),
+        sa.Column("target_tonnes", sa.Numeric(precision=10, scale=3), nullable=True),
+        sa.Column(
+            "status",
+            sa.Enum("computed", "infeasible", name="scenariostatus", native_enum=False, length=32),
+            nullable=False,
+        ),
+        sa.Column("solver_status", sa.String(length=20), nullable=False),
+        sa.Column("params", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("parameter_set_version", sa.SmallInteger(), nullable=False),
+        sa.Column("constraints", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("result", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("tonnes_year", sa.Numeric(precision=10, scale=3), nullable=False),
+        sa.Column("capex_eur", sa.Numeric(precision=12, scale=2), nullable=False),
+        sa.Column("annual_cost_eur", sa.Numeric(precision=12, scale=2), nullable=False),
+        sa.Column("eur_per_tonne", sa.Numeric(precision=10, scale=2), nullable=True),
+        sa.Column("coverage_pct", sa.Numeric(precision=5, scale=2), nullable=False),
+        sa.Column("parent_id", sa.UUID(), nullable=True),
+        sa.Column("created_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.CheckConstraint("objective IN ('max_tonnes', 'min_cost')", name=op.f("ck_scenarios_objective_valid")),
+        sa.CheckConstraint("status IN ('computed', 'infeasible')", name=op.f("ck_scenarios_status_valid")),
+        sa.CheckConstraint(
+            "budget_eur_year IS NULL OR budget_eur_year >= 0", name=op.f("ck_scenarios_budget_non_negative")
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by_id"], ["users.id"], name=op.f("fk_scenarios_created_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["parent_id"], ["scenarios.id"], name=op.f("fk_scenarios_parent_id_scenarios"), ondelete="SET NULL"
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_scenarios")),
+    )
+    op.create_index(op.f("ix_scenarios_created_by_id"), "scenarios", ["created_by_id"], unique=False)
+    op.create_index(op.f("ix_scenarios_parent_id"), "scenarios", ["parent_id"], unique=False)
     op.create_table(
         "textile_flows",
         sa.Column("entity_id", sa.UUID(), nullable=False),
@@ -414,6 +467,8 @@ def upgrade() -> None:
     op.create_table(
         "localities",
         sa.Column("name", sa.String(length=160), nullable=False),
+        sa.Column("latitude", sa.Numeric(precision=9, scale=6), nullable=True),
+        sa.Column("longitude", sa.Numeric(precision=9, scale=6), nullable=True),
         sa.Column("parish_id", sa.UUID(), nullable=True),
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
@@ -508,6 +563,45 @@ def upgrade() -> None:
     op.create_index(op.f("ix_shift_assignments_source_id"), "shift_assignments", ["source_id"], unique=False)
     op.create_index(op.f("ix_shift_assignments_vehicle_id"), "shift_assignments", ["vehicle_id"], unique=False)
     op.create_table(
+        "whatif_runs",
+        sa.Column("base_scenario_id", sa.UUID(), nullable=False),
+        sa.Column("new_scenario_id", sa.UUID(), nullable=True),
+        sa.Column("question", sa.Text(), nullable=False),
+        sa.Column(
+            "status",
+            sa.Enum("proposed", "applied", "rejected", name="whatifstatus", native_enum=False, length=32),
+            nullable=False,
+        ),
+        sa.Column("delta", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("understood", sa.Text(), nullable=False),
+        sa.Column("explanation", sa.Text(), nullable=True),
+        sa.Column("explanation_verified", sa.Boolean(), nullable=True),
+        sa.Column("prompt_version", sa.String(length=20), nullable=False),
+        sa.Column("model", sa.String(length=80), nullable=False),
+        sa.Column("created_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.CheckConstraint("status IN ('proposed', 'applied', 'rejected')", name=op.f("ck_whatif_runs_status_valid")),
+        sa.ForeignKeyConstraint(
+            ["base_scenario_id"],
+            ["scenarios.id"],
+            name=op.f("fk_whatif_runs_base_scenario_id_scenarios"),
+            ondelete="CASCADE",
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by_id"], ["users.id"], name=op.f("fk_whatif_runs_created_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["new_scenario_id"],
+            ["scenarios.id"],
+            name=op.f("fk_whatif_runs_new_scenario_id_scenarios"),
+            ondelete="SET NULL",
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_whatif_runs")),
+    )
+    op.create_index(op.f("ix_whatif_runs_base_scenario_id"), "whatif_runs", ["base_scenario_id"], unique=False)
+    op.create_table(
         "circuit_localities",
         sa.Column("circuit_id", sa.UUID(), nullable=False),
         sa.Column("locality_id", sa.UUID(), nullable=False),
@@ -590,11 +684,198 @@ def upgrade() -> None:
     op.create_index(op.f("ix_containers_operator_id"), "containers", ["operator_id"], unique=False)
     op.create_index(op.f("ix_containers_parish_id"), "containers", ["parish_id"], unique=False)
     op.create_index(op.f("ix_containers_source_id"), "containers", ["source_id"], unique=False)
+    op.create_table(
+        "lots",
+        sa.Column("code", sa.String(length=16), nullable=False),
+        sa.Column(
+            "state",
+            sa.Enum("collected", "sorted", "reserved", "delivered", name="lotstate", native_enum=False, length=32),
+            server_default="collected",
+            nullable=False,
+        ),
+        sa.Column("parish_id", sa.UUID(), nullable=True),
+        sa.Column("container_id", sa.UUID(), nullable=True),
+        sa.Column(
+            "dominant_fibre",
+            sa.Enum(
+                "cotton",
+                "wool",
+                "polyester",
+                "nylon",
+                "viscose",
+                "linen",
+                "acrylic",
+                "elastane",
+                "silk",
+                "other",
+                "unknown",
+                name="fibre",
+                native_enum=False,
+                length=32,
+            ),
+            server_default="unknown",
+            nullable=False,
+        ),
+        sa.Column("created_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.CheckConstraint(
+            "dominant_fibre IN ('cotton', 'wool', 'polyester', 'nylon', 'viscose', 'linen', 'acrylic', 'elastane', 'silk', 'other', 'unknown')",
+            name=op.f("ck_lots_dominant_fibre_valid"),
+        ),
+        sa.CheckConstraint(
+            "state IN ('collected', 'sorted', 'reserved', 'delivered')", name=op.f("ck_lots_state_valid")
+        ),
+        sa.ForeignKeyConstraint(
+            ["container_id"], ["containers.id"], name=op.f("fk_lots_container_id_containers"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["created_by_id"], ["users.id"], name=op.f("fk_lots_created_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["parish_id"], ["parishes.id"], name=op.f("fk_lots_parish_id_parishes"), ondelete="SET NULL"
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_lots")),
+        sa.UniqueConstraint("code", name=op.f("uq_lots_code")),
+    )
+    op.create_index(op.f("ix_lots_parish_id"), "lots", ["parish_id"], unique=False)
+    op.create_index("ix_lots_state_dominant_fibre", "lots", ["state", "dominant_fibre"], unique=False)
+    op.create_table(
+        "lot_events",
+        sa.Column("lot_id", sa.UUID(), nullable=False),
+        sa.Column(
+            "kind",
+            sa.Enum(
+                "opened",
+                "item_added",
+                "sorted",
+                "reserved",
+                "delivered",
+                name="loteventkind",
+                native_enum=False,
+                length=32,
+            ),
+            nullable=False,
+        ),
+        sa.Column("occurred_at", sa.DateTime(timezone=True), nullable=False),
+        sa.Column("actor_id", sa.UUID(), nullable=True),
+        sa.Column("note", sa.Text(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.CheckConstraint(
+            "kind IN ('opened', 'item_added', 'sorted', 'reserved', 'delivered')", name=op.f("ck_lot_events_kind_valid")
+        ),
+        sa.ForeignKeyConstraint(
+            ["actor_id"], ["users.id"], name=op.f("fk_lot_events_actor_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(["lot_id"], ["lots.id"], name=op.f("fk_lot_events_lot_id_lots"), ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_lot_events")),
+    )
+    op.create_index(op.f("ix_lot_events_lot_id"), "lot_events", ["lot_id"], unique=False)
+    op.create_table(
+        "lot_items",
+        sa.Column("lot_id", sa.UUID(), nullable=False),
+        sa.Column(
+            "garment_type",
+            sa.Enum(
+                "tshirt",
+                "shirt",
+                "trousers",
+                "jumper",
+                "jacket",
+                "dress",
+                "skirt",
+                "bedding",
+                "towel",
+                "other",
+                name="garmenttype",
+                native_enum=False,
+                length=32,
+            ),
+            nullable=False,
+        ),
+        sa.Column(
+            "condition",
+            sa.Enum("reuse", "recycle", "reject", name="textiledestination", native_enum=False, length=32),
+            nullable=False,
+        ),
+        sa.Column("composition", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column(
+            "dominant_fibre",
+            sa.Enum(
+                "cotton",
+                "wool",
+                "polyester",
+                "nylon",
+                "viscose",
+                "linen",
+                "acrylic",
+                "elastane",
+                "silk",
+                "other",
+                "unknown",
+                name="fibre",
+                native_enum=False,
+                length=32,
+            ),
+            nullable=False,
+        ),
+        sa.Column("brand", sa.String(length=80), nullable=True),
+        sa.Column("estimated_weight_g", sa.Integer(), nullable=False),
+        sa.Column("confidence", sa.Numeric(precision=3, scale=2), nullable=False),
+        sa.Column("prompt_version", sa.String(length=20), nullable=True),
+        sa.Column("confirmed_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.CheckConstraint("condition IN ('reuse', 'recycle', 'reject')", name=op.f("ck_lot_items_condition_valid")),
+        sa.CheckConstraint(
+            "dominant_fibre IN ('cotton', 'wool', 'polyester', 'nylon', 'viscose', 'linen', 'acrylic', 'elastane', 'silk', 'other', 'unknown')",
+            name=op.f("ck_lot_items_dominant_fibre_valid"),
+        ),
+        sa.CheckConstraint(
+            "garment_type IN ('tshirt', 'shirt', 'trousers', 'jumper', 'jacket', 'dress', 'skirt', 'bedding', 'towel', 'other')",
+            name=op.f("ck_lot_items_garment_type_valid"),
+        ),
+        sa.CheckConstraint("confidence >= 0 AND confidence <= 1", name=op.f("ck_lot_items_confidence_range")),
+        sa.CheckConstraint("estimated_weight_g > 0", name=op.f("ck_lot_items_weight_positive")),
+        sa.ForeignKeyConstraint(
+            ["confirmed_by_id"], ["users.id"], name=op.f("fk_lot_items_confirmed_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(["lot_id"], ["lots.id"], name=op.f("fk_lot_items_lot_id_lots"), ondelete="CASCADE"),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_lot_items")),
+    )
+    op.create_index(op.f("ix_lot_items_brand"), "lot_items", ["brand"], unique=False)
+    op.create_index(op.f("ix_lot_items_lot_id"), "lot_items", ["lot_id"], unique=False)
+    op.create_table(
+        "lot_reservations",
+        sa.Column("lot_id", sa.UUID(), nullable=False),
+        sa.Column("recycler_name", sa.String(length=120), nullable=False),
+        sa.Column("contact", sa.String(length=160), nullable=False),
+        sa.Column("note", sa.Text(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["lot_id"], ["lots.id"], name=op.f("fk_lot_reservations_lot_id_lots"), ondelete="CASCADE"
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_lot_reservations")),
+        sa.UniqueConstraint("lot_id", name=op.f("uq_lot_reservations_lot_id")),
+    )
     # ### end Alembic commands ###
 
 
 def downgrade() -> None:
     # ### commands auto generated by Alembic - please adjust! ###
+    op.drop_table("lot_reservations")
+    op.drop_index(op.f("ix_lot_items_lot_id"), table_name="lot_items")
+    op.drop_index(op.f("ix_lot_items_brand"), table_name="lot_items")
+    op.drop_table("lot_items")
+    op.drop_index(op.f("ix_lot_events_lot_id"), table_name="lot_events")
+    op.drop_table("lot_events")
+    op.drop_index("ix_lots_state_dominant_fibre", table_name="lots")
+    op.drop_index(op.f("ix_lots_parish_id"), table_name="lots")
+    op.drop_table("lots")
     op.drop_index(op.f("ix_containers_source_id"), table_name="containers")
     op.drop_index(op.f("ix_containers_parish_id"), table_name="containers")
     op.drop_index(op.f("ix_containers_operator_id"), table_name="containers")
@@ -603,6 +884,8 @@ def downgrade() -> None:
     op.drop_table("containers")
     op.drop_index("ix_circuit_localities_locality_id", table_name="circuit_localities")
     op.drop_table("circuit_localities")
+    op.drop_index(op.f("ix_whatif_runs_base_scenario_id"), table_name="whatif_runs")
+    op.drop_table("whatif_runs")
     op.drop_index(op.f("ix_shift_assignments_vehicle_id"), table_name="shift_assignments")
     op.drop_index(op.f("ix_shift_assignments_source_id"), table_name="shift_assignments")
     op.drop_index("ix_shift_assignments_day_group_shift", table_name="shift_assignments")
@@ -616,6 +899,9 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_textile_flows_source_id"), table_name="textile_flows")
     op.drop_index(op.f("ix_textile_flows_entity_id"), table_name="textile_flows")
     op.drop_table("textile_flows")
+    op.drop_index(op.f("ix_scenarios_parent_id"), table_name="scenarios")
+    op.drop_index(op.f("ix_scenarios_created_by_id"), table_name="scenarios")
+    op.drop_table("scenarios")
     op.drop_index(op.f("ix_refresh_tokens_user_id"), table_name="refresh_tokens")
     op.drop_index(op.f("ix_refresh_tokens_token_hash"), table_name="refresh_tokens")
     op.drop_table("refresh_tokens")
@@ -623,6 +909,7 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_password_reset_tokens_token_hash"), table_name="password_reset_tokens")
     op.drop_table("password_reset_tokens")
     op.drop_table("parishes")
+    op.drop_table("parameter_sets")
     op.drop_index(op.f("ix_fleet_capacity_source_id"), table_name="fleet_capacity")
     op.drop_table("fleet_capacity")
     op.drop_index(op.f("ix_email_verification_tokens_user_id"), table_name="email_verification_tokens")
@@ -637,6 +924,5 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_users_email"), table_name="users")
     op.drop_table("users")
     op.drop_table("textile_entities")
-    op.drop_table("scenarios")
     op.drop_table("data_sources")
     # ### end Alembic commands ###

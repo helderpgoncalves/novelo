@@ -47,7 +47,12 @@ async def test_containers_empty_until_locations_arrive(logged_in: httpx.AsyncCli
 async def test_data_quality_alerts_workflow(logged_in: httpx.AsyncClient) -> None:
     quality = (await logged_in.get("/api/v1/datasets/quality")).json()
     assert len(quality["alerts"]) == 12 and quality["open_alerts"] == 12
-    assert {s["key"] for s in quality["sources"]} == {"vitrus_textile_2025", "vitrus_circuits_2026_09"}
+    assert {s["key"] for s in quality["sources"]} == {
+        "vitrus_textile_2025",
+        "vitrus_circuits_2026_09",
+        "ine_census_2021",
+        "osm_nominatim",
+    }
     alert = quality["alerts"][0]
 
     resolved = await logged_in.patch(

@@ -289,6 +289,34 @@ def circuits() -> dict:
     }
 
 
+def geography() -> dict:
+    """Dados públicos descarregados por `fetch_public_data.py`: população por freguesia e coordenadas."""
+    public = RAW / "public"
+    if not (public / "parishes.geojson").exists():
+        return {"parishes": 0, "localities_located": 0}
+    collection = json.loads((public / "parishes.geojson").read_text(encoding="utf-8"))
+    parish_rows = [
+        {
+            "dicofre": f["properties"]["dicofre"],
+            "name": f["properties"]["name"],
+            "population": f["properties"]["population"],
+            "population_year": f["properties"]["year"],
+            "latitude": f["properties"]["lat"],
+            "longitude": f["properties"]["lon"],
+            "geometry": json.dumps(f["geometry"], separators=(",", ":")) if f["geometry"] else "",
+        }
+        for f in collection["features"]
+    ]
+    _write_csv("parishes.csv", sorted(parish_rows, key=lambda r: r["dicofre"]))
+    located = json.loads((public / "localities_geocoded.json").read_text(encoding="utf-8"))
+    locality_rows = [
+        {"locality": x["locality"], "latitude": x["lat"] or "", "longitude": x["lon"] or "", "dicofre": x["dicofre"] or ""}
+        for x in located
+    ]
+    _write_csv("localities_geo.csv", locality_rows)
+    return {"parishes": len(parish_rows), "localities_located": sum(1 for r in locality_rows if r["latitude"] != "")}
+
+
 def sources() -> None:
     """Manifesto de proveniência: ficheiro, origem, período e impressão digital (SHA-256) de cada Excel."""
 
@@ -319,12 +347,39 @@ def sources() -> None:
             "notes": "Semana de 21 a 25/09/2026, sábado 19/09 e domingo 20/09 (fim de semana anterior).",
         },
     ]
+    public = RAW / "public"
+    if (public / "parishes.geojson").exists():
+        digest = hashlib.sha256((public / "parishes.geojson").read_bytes() + (public / "localities_geocoded.json").read_bytes()).hexdigest()
+        manifest += [
+            {
+                "key": "ine_census_2021",
+                "title": "População residente por freguesia (Censos 2021, indicador 0011609)",
+                "provider": "INE, I.P.",
+                "file_name": "data/raw/public/parishes.geojson",
+                "file_sha256": digest,
+                "received_on": "2026-10-19",
+                "period_start": "2021-01-01",
+                "period_end": "2021-12-31",
+                "notes": "API pública do INE (pindica.jsp), um pedido por freguesia.",
+            },
+            {
+                "key": "osm_nominatim",
+                "title": "Contornos das freguesias e coordenadas das localidades",
+                "provider": "OpenStreetMap contributors (ODbL)",
+                "file_name": "data/raw/public/localities_geocoded.json",
+                "file_sha256": digest,
+                "received_on": "2026-10-19",
+                "period_start": None,
+                "period_end": None,
+                "notes": "Geocodificação Nominatim. Algumas localidades dos circuitos (ex.: 'Ruas Estreitas') não são lugares e ficam sem coordenadas.",
+            },
+        ]
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "sources.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def main() -> None:
-    summary = {"textile": textile_flows(), "circuits": circuits()}
+    summary = {"textile": textile_flows(), "circuits": circuits(), "geography": geography()}
     waste_composition()
     sources()
     OUT.mkdir(parents=True, exist_ok=True)

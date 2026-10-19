@@ -109,3 +109,69 @@ class ContainerStatus(StrEnum):
     ACTIVE = "active"
     INACTIVE = "inactive"
     PLANNED = "planned"
+
+
+class ScenarioObjective(StrEnum):
+    MAX_TONNES = "max_tonnes"  # maximizar o têxtil captado com um orçamento
+    MIN_COST = "min_cost"  # minimizar o custo para atingir uma meta de captura
+
+
+class ScenarioStatus(StrEnum):
+    COMPUTED = "computed"
+    INFEASIBLE = "infeasible"
+
+
+class CollectionMode(StrEnum):
+    """Modos de recolha de têxteis que o simulador compara."""
+
+    EXISTING = "existing"  # ponto em local existente (junta, escola, supermercado)
+    STREET = "street"  # contentor de rua
+    ON_DEMAND = "on_demand"  # recolha a pedido, aproveitando rotas existentes
+
+
+class Fibre(StrEnum):
+    COTTON = "cotton"
+    WOOL = "wool"
+    POLYESTER = "polyester"
+    NYLON = "nylon"
+    VISCOSE = "viscose"
+    LINEN = "linen"
+    ACRYLIC = "acrylic"
+    ELASTANE = "elastane"
+    SILK = "silk"
+    OTHER = "other"
+    UNKNOWN = "unknown"
+
+
+class GarmentType(StrEnum):
+    TSHIRT = "tshirt"
+    SHIRT = "shirt"
+    TROUSERS = "trousers"
+    JUMPER = "jumper"
+    JACKET = "jacket"
+    DRESS = "dress"
+    SKIRT = "skirt"
+    BEDDING = "bedding"
+    TOWEL = "towel"
+    OTHER = "other"
+
+
+class LotState(StrEnum):
+    COLLECTED = "collected"  # aberto no ponto de recolha, a receber peças
+    SORTED = "sorted"  # triado e fechado: visível na bolsa de fibra
+    RESERVED = "reserved"  # um reciclador manifestou interesse
+    DELIVERED = "delivered"  # entregue ao destino
+
+
+class LotEventKind(StrEnum):
+    OPENED = "opened"
+    ITEM_ADDED = "item_added"
+    SORTED = "sorted"
+    RESERVED = "reserved"
+    DELIVERED = "delivered"
+
+
+class WhatIfStatus(StrEnum):
+    PROPOSED = "proposed"  # o modelo percebeu a pergunta; aguarda confirmação
+    APPLIED = "applied"  # confirmada e calculada
+    REJECTED = "rejected"  # ambígua ou fora das listas fechadas

@@ -1,6 +1,7 @@
 import uuid
 from datetime import date
 from decimal import Decimal
+from typing import Any
 
 from sqlalchemy import (
     CheckConstraint,
@@ -14,7 +15,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from novelo.core.database import Base, TimestampMixin, UuidPkMixin, enum_check, enum_column
@@ -40,6 +41,10 @@ class Parish(Base, UuidPkMixin, TimestampMixin):
     population: Mapped[int | None] = mapped_column(Integer)
     population_year: Mapped[int | None] = mapped_column(SmallInteger)
     area_km2: Mapped[Decimal | None] = mapped_column(Numeric(9, 3))
+    # Ponto representativo (dentro do polígono) e contorno em GeoJSON, do OpenStreetMap.
+    latitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    longitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    geometry: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     source_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("data_sources.id"))
 
 
@@ -49,6 +54,8 @@ class Locality(Base, UuidPkMixin, TimestampMixin):
     __tablename__ = "localities"
 
     name: Mapped[str] = mapped_column(String(160), unique=True)
+    latitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
+    longitude: Mapped[Decimal | None] = mapped_column(Numeric(9, 6))
     parish_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("parishes.id", ondelete="SET NULL"), index=True
     )

@@ -51,6 +51,130 @@
         "title": "AlertUpdate",
         "type": "object"
       },
+      "Allocation": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "covered_population": {
+            "title": "Covered Population",
+            "type": "number"
+          },
+          "demand_t": {
+            "title": "Demand T",
+            "type": "number"
+          },
+          "km_year": {
+            "title": "Km Year",
+            "type": "number"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionMode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Modo principal (o que mais capta); nulo = sem recolha"
+          },
+          "modes": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "parts": {
+            "items": {
+              "$ref": "#/components/schemas/AllocationPart"
+            },
+            "title": "Parts",
+            "type": "array"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "tonnes": {
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "population",
+          "demand_t",
+          "mode",
+          "modes",
+          "parts",
+          "points",
+          "tonnes",
+          "covered_population",
+          "capex_eur",
+          "annual_cost_eur",
+          "km_year"
+        ],
+        "title": "Allocation",
+        "type": "object"
+      },
+      "AllocationPart": {
+        "description": "Contributo de um modo numa freguesia (uma freguesia pode combinar modos).",
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "km_year": {
+            "title": "Km Year",
+            "type": "number"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CollectionMode"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "tonnes": {
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "mode",
+          "points",
+          "tonnes",
+          "capex_eur",
+          "annual_cost_eur",
+          "km_year"
+        ],
+        "title": "AllocationPart",
+        "type": "object"
+      },
       "AuthConfig": {
         "properties": {
           "google_enabled": {
@@ -72,6 +196,136 @@
           "registration_open"
         ],
         "title": "AuthConfig",
+        "type": "object"
+      },
+      "Body_analyse_garment": {
+        "properties": {
+          "item_photo": {
+            "contentMediaType": "application/octet-stream",
+            "description": "Foto da peça",
+            "title": "Item Photo",
+            "type": "string"
+          },
+          "label_photo": {
+            "anyOf": [
+              {
+                "contentMediaType": "application/octet-stream",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Foto da etiqueta de composição",
+            "title": "Label Photo"
+          }
+        },
+        "required": [
+          "item_photo"
+        ],
+        "title": "Body_analyse_garment",
+        "type": "object"
+      },
+      "BrandCount": {
+        "properties": {
+          "brand": {
+            "title": "Brand",
+            "type": "string"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "brand",
+          "items"
+        ],
+        "title": "BrandCount",
+        "type": "object"
+      },
+      "BrandStat": {
+        "properties": {
+          "brand": {
+            "title": "Brand",
+            "type": "string"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "share_pct": {
+            "title": "Share Pct",
+            "type": "number"
+          },
+          "top_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "brand",
+          "items",
+          "weight_kg",
+          "top_fibre",
+          "share_pct"
+        ],
+        "title": "BrandStat",
+        "type": "object"
+      },
+      "BrandsOut": {
+        "description": "Evidência por marca para a RAP: quilos e composição, com o tamanho da amostra para não concluir de pouco.",
+        "properties": {
+          "brands": {
+            "items": {
+              "$ref": "#/components/schemas/BrandStat"
+            },
+            "title": "Brands",
+            "type": "array"
+          },
+          "items_without_brand": {
+            "title": "Items Without Brand",
+            "type": "integer"
+          },
+          "sample_items": {
+            "title": "Sample Items",
+            "type": "integer"
+          },
+          "total_kg": {
+            "title": "Total Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "brands",
+          "sample_items",
+          "items_without_brand",
+          "total_kg"
+        ],
+        "title": "BrandsOut",
+        "type": "object"
+      },
+      "CaptureScale": {
+        "properties": {
+          "factor": {
+            "description": "1,2 = mais 20%",
+            "exclusiveMinimum": 0.0,
+            "maximum": 5.0,
+            "title": "Factor",
+            "type": "number"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CollectionMode"
+          }
+        },
+        "required": [
+          "mode",
+          "factor"
+        ],
+        "title": "CaptureScale",
         "type": "object"
       },
       "ChangePasswordRequest": {
@@ -223,6 +477,16 @@
         "title": "CircuitsSummary",
         "type": "object"
       },
+      "CollectionMode": {
+        "description": "Modos de recolha de têxteis que o simulador compara.",
+        "enum": [
+          "existing",
+          "street",
+          "on_demand"
+        ],
+        "title": "CollectionMode",
+        "type": "string"
+      },
       "CollectionType": {
         "enum": [
           "door_to_door",
@@ -232,6 +496,25 @@
         ],
         "title": "CollectionType",
         "type": "string"
+      },
+      "CompositionPart": {
+        "properties": {
+          "fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "pct": {
+            "maximum": 100.0,
+            "minimum": 0.0,
+            "title": "Pct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "fibre",
+          "pct"
+        ],
+        "title": "CompositionPart",
+        "type": "object"
       },
       "ContainerKind": {
         "enum": [
@@ -629,6 +912,7 @@
               "user_not_found",
               "email_taken",
               "cannot_modify_self",
+              "conflict",
               "rate_limited",
               "feature_disabled",
               "upstream_error",
@@ -649,6 +933,23 @@
         ],
         "title": "ErrorBody",
         "type": "object"
+      },
+      "Fibre": {
+        "enum": [
+          "cotton",
+          "wool",
+          "polyester",
+          "nylon",
+          "viscose",
+          "linen",
+          "acrylic",
+          "elastane",
+          "silk",
+          "other",
+          "unknown"
+        ],
+        "title": "Fibre",
+        "type": "string"
       },
       "FieldError": {
         "properties": {
@@ -788,8 +1089,19 @@
                 "type": "null"
               }
             ],
-            "description": "Nome da entidade; vazio nos nós de destino (o web traduz)",
+            "description": "Nome da entidade ou freguesia; vazio nos nós de modo e destino (o web traduz)",
             "title": "Label"
+          },
+          "mode": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionMode"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Preenchido nos nós de modo de recolha (cenários)"
           }
         },
         "required": [
@@ -851,6 +1163,22 @@
         "title": "ForgotPasswordRequest",
         "type": "object"
       },
+      "GarmentType": {
+        "enum": [
+          "tshirt",
+          "shirt",
+          "trousers",
+          "jumper",
+          "jacket",
+          "dress",
+          "skirt",
+          "bedding",
+          "towel",
+          "other"
+        ],
+        "title": "GarmentType",
+        "type": "string"
+      },
       "Health": {
         "properties": {
           "status": {
@@ -861,6 +1189,74 @@
           }
         },
         "title": "Health",
+        "type": "object"
+      },
+      "Kpis": {
+        "properties": {
+          "annual_cost_eur": {
+            "description": "Capex anualizado + custos de operação",
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "baseline_observed_t": {
+            "description": "Recolhido em 2025 (dados da Vitrus)",
+            "title": "Baseline Observed T",
+            "type": "number"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "coverage_pct": {
+            "description": "População servida / população total",
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "km_year": {
+            "title": "Km Year",
+            "type": "number"
+          },
+          "opex_eur_year": {
+            "title": "Opex Eur Year",
+            "type": "number"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "potential_t": {
+            "title": "Potential T",
+            "type": "number"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          }
+        },
+        "required": [
+          "capex_eur",
+          "opex_eur_year",
+          "annual_cost_eur",
+          "tonnes_year",
+          "eur_per_tonne",
+          "coverage_pct",
+          "points",
+          "km_year",
+          "potential_t",
+          "baseline_observed_t"
+        ],
+        "title": "Kpis",
         "type": "object"
       },
       "LocalityOut": {
@@ -884,9 +1280,44 @@
             "title": "Days Per Week",
             "type": "integer"
           },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "OpenStreetMap (Nominatim); vazio se a localidade não é um lugar",
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
           "name": {
             "title": "Name",
             "type": "string"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesia onde cai o ponto (código INE)",
+            "title": "Parish Code"
           },
           "typologies": {
             "items": {
@@ -905,6 +1336,9 @@
         },
         "required": [
           "name",
+          "latitude",
+          "longitude",
+          "parish_code",
           "circuits",
           "typologies",
           "collection_types",
@@ -938,6 +1372,806 @@
           "password"
         ],
         "title": "LoginRequest",
+        "type": "object"
+      },
+      "LotDetail": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "composition": {
+            "description": "Composição agregada, ponderada pelo peso",
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/LotEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "item_list": {
+            "items": {
+              "$ref": "#/components/schemas/LotItemOut"
+            },
+            "title": "Item List",
+            "type": "array"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "opened_at": {
+            "format": "date-time",
+            "title": "Opened At",
+            "type": "string"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Code"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "recycle_kg": {
+            "title": "Recycle Kg",
+            "type": "number"
+          },
+          "reject_kg": {
+            "title": "Reject Kg",
+            "type": "number"
+          },
+          "reservation": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ReservationOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "reuse_kg": {
+            "title": "Reuse Kg",
+            "type": "number"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LotState"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "parish_code",
+          "parish_name",
+          "dominant_fibre",
+          "items",
+          "weight_kg",
+          "opened_at",
+          "composition",
+          "reuse_kg",
+          "recycle_kg",
+          "reject_kg",
+          "item_list",
+          "events",
+          "reservation"
+        ],
+        "title": "LotDetail",
+        "type": "object"
+      },
+      "LotEventKind": {
+        "enum": [
+          "opened",
+          "item_added",
+          "sorted",
+          "reserved",
+          "delivered"
+        ],
+        "title": "LotEventKind",
+        "type": "string"
+      },
+      "LotEventOut": {
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/LotEventKind"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "occurred_at": {
+            "format": "date-time",
+            "title": "Occurred At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "occurred_at",
+          "note"
+        ],
+        "title": "LotEventOut",
+        "type": "object"
+      },
+      "LotItemIn": {
+        "description": "Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).",
+        "properties": {
+          "brand": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "composition": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "maxItems": 6,
+            "title": "Composition",
+            "type": "array"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/TextileDestination"
+          },
+          "confidence": {
+            "default": 1.0,
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "estimated_weight_g": {
+            "exclusiveMinimum": 0.0,
+            "maximum": 20000.0,
+            "title": "Estimated Weight G",
+            "type": "integer"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          }
+        },
+        "required": [
+          "garment_type",
+          "condition",
+          "composition",
+          "estimated_weight_g"
+        ],
+        "title": "LotItemIn",
+        "type": "object"
+      },
+      "LotItemOut": {
+        "properties": {
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "composition": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/TextileDestination"
+          },
+          "confidence": {
+            "title": "Confidence",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "estimated_weight_g": {
+            "title": "Estimated Weight G",
+            "type": "integer"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "garment_type",
+          "condition",
+          "composition",
+          "dominant_fibre",
+          "brand",
+          "estimated_weight_g",
+          "confidence",
+          "created_at"
+        ],
+        "title": "LotItemOut",
+        "type": "object"
+      },
+      "LotOpen": {
+        "properties": {
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesia do ponto de recolha (código INE)",
+            "title": "Parish Code"
+          }
+        },
+        "title": "LotOpen",
+        "type": "object"
+      },
+      "LotState": {
+        "enum": [
+          "collected",
+          "sorted",
+          "reserved",
+          "delivered"
+        ],
+        "title": "LotState",
+        "type": "string"
+      },
+      "LotStateChange": {
+        "properties": {
+          "state": {
+            "$ref": "#/components/schemas/LotState"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "LotStateChange",
+        "type": "object"
+      },
+      "LotSummary": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "opened_at": {
+            "format": "date-time",
+            "title": "Opened At",
+            "type": "string"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Code"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LotState"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "parish_code",
+          "parish_name",
+          "dominant_fibre",
+          "items",
+          "weight_kg",
+          "opened_at"
+        ],
+        "title": "LotSummary",
+        "type": "object"
+      },
+      "MarketEntry": {
+        "description": "Bolsa de fibra: lotes triados e agregados por fibra dominante.",
+        "properties": {
+          "fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MarketLot"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "lots": {
+            "title": "Lots",
+            "type": "integer"
+          },
+          "parishes": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Parishes",
+            "type": "array"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "fibre",
+          "lots",
+          "weight_kg",
+          "parishes",
+          "items"
+        ],
+        "title": "MarketEntry",
+        "type": "object"
+      },
+      "MarketLot": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "composition": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LotState"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "parish_name",
+          "weight_kg",
+          "state",
+          "dominant_fibre",
+          "composition"
+        ],
+        "title": "MarketLot",
+        "type": "object"
+      },
+      "ModeParams": {
+        "properties": {
+          "capex_per_point_eur": {
+            "minimum": 0.0,
+            "title": "Capex Per Point Eur",
+            "type": "number"
+          },
+          "capture_rate": {
+            "description": "Fração do têxtil gerado que o modo capta",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Capture Rate",
+            "type": "number"
+          },
+          "collections_per_year": {
+            "description": "Recolhas por ano de cada ponto",
+            "minimum": 0.0,
+            "title": "Collections Per Year",
+            "type": "number"
+          },
+          "coverage_factor": {
+            "description": "Fração da população da zona servida (distância a pé)",
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Coverage Factor",
+            "type": "number"
+          },
+          "lifetime_years": {
+            "exclusiveMinimum": 0.0,
+            "title": "Lifetime Years",
+            "type": "number"
+          },
+          "min_points": {
+            "minimum": 0.0,
+            "title": "Min Points",
+            "type": "integer"
+          },
+          "people_per_point": {
+            "description": "1 ponto por cada N habitantes",
+            "minimum": 1.0,
+            "title": "People Per Point",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "capture_rate",
+          "coverage_factor",
+          "capex_per_point_eur",
+          "people_per_point",
+          "min_points",
+          "lifetime_years",
+          "collections_per_year"
+        ],
+        "title": "ModeParams",
+        "type": "object"
+      },
+      "ModeSummary": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CollectionMode"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          },
+          "tonnes": {
+            "title": "Tonnes",
+            "type": "number"
+          },
+          "zones": {
+            "title": "Zones",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "zones",
+          "points",
+          "tonnes",
+          "annual_cost_eur"
+        ],
+        "title": "ModeSummary",
+        "type": "object"
+      },
+      "ParamMeta": {
+        "properties": {
+          "key": {
+            "description": "Caminho do parâmetro, ex.: `modes.street.capture_rate`",
+            "title": "Key",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ParamSource"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "unit",
+          "source"
+        ],
+        "title": "ParamMeta",
+        "type": "object"
+      },
+      "ParamSource": {
+        "description": "Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.",
+        "enum": [
+          "plan",
+          "vitrus_data",
+          "assumption"
+        ],
+        "title": "ParamSource",
+        "type": "string"
+      },
+      "ParametersOut": {
+        "properties": {
+          "meta": {
+            "items": {
+              "$ref": "#/components/schemas/ParamMeta"
+            },
+            "title": "Meta",
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "values": {
+            "$ref": "#/components/schemas/PlanningParams"
+          },
+          "version": {
+            "title": "Version",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "values",
+          "version",
+          "meta",
+          "updated_at"
+        ],
+        "title": "ParametersOut",
+        "type": "object"
+      },
+      "Passport": {
+        "description": "Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.",
+        "properties": {
+          "brands": {
+            "items": {
+              "$ref": "#/components/schemas/BrandCount"
+            },
+            "title": "Brands",
+            "type": "array"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "composition": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/LotEventOut"
+            },
+            "title": "Events",
+            "type": "array"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "opened_at": {
+            "format": "date-time",
+            "title": "Opened At",
+            "type": "string"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "recycle_pct": {
+            "title": "Recycle Pct",
+            "type": "number"
+          },
+          "reject_pct": {
+            "title": "Reject Pct",
+            "type": "number"
+          },
+          "reuse_pct": {
+            "title": "Reuse Pct",
+            "type": "number"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LotState"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "parish_name",
+          "dominant_fibre",
+          "composition",
+          "weight_kg",
+          "items",
+          "reuse_pct",
+          "recycle_pct",
+          "reject_pct",
+          "brands",
+          "events",
+          "opened_at"
+        ],
+        "title": "Passport",
+        "type": "object"
+      },
+      "PlanningParams": {
+        "properties": {
+          "cost_per_collection_eur": {
+            "minimum": 0.0,
+            "title": "Cost Per Collection Eur",
+            "type": "number"
+          },
+          "cost_per_km_eur": {
+            "minimum": 0.0,
+            "title": "Cost Per Km Eur",
+            "type": "number"
+          },
+          "depot_lat": {
+            "maximum": 90.0,
+            "minimum": -90.0,
+            "title": "Depot Lat",
+            "type": "number"
+          },
+          "depot_lon": {
+            "maximum": 180.0,
+            "minimum": -180.0,
+            "title": "Depot Lon",
+            "type": "number"
+          },
+          "detour_factor": {
+            "description": "Estrada real / linha reta",
+            "maximum": 3.0,
+            "minimum": 1.0,
+            "title": "Detour Factor",
+            "type": "number"
+          },
+          "kg_per_inhab_month": {
+            "description": "Têxtil gerado por habitante e mês",
+            "exclusiveMinimum": 0.0,
+            "maximum": 5.0,
+            "title": "Kg Per Inhab Month",
+            "type": "number"
+          },
+          "modes": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ModeParams"
+            },
+            "propertyNames": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Modes",
+            "type": "object"
+          },
+          "on_demand_kg_per_pickup": {
+            "exclusiveMinimum": 0.0,
+            "title": "On Demand Kg Per Pickup",
+            "type": "number"
+          },
+          "piggyback_extra_km": {
+            "description": "Desvio médio quando já passa um circuito",
+            "minimum": 0.0,
+            "title": "Piggyback Extra Km",
+            "type": "number"
+          },
+          "piggyback_min_days": {
+            "description": "Dias/semana de circuito para aproveitar a rota",
+            "maximum": 7.0,
+            "minimum": 1.0,
+            "title": "Piggyback Min Days",
+            "type": "integer"
+          },
+          "solver_time_limit_s": {
+            "maximum": 120.0,
+            "minimum": 1.0,
+            "title": "Solver Time Limit S",
+            "type": "integer"
+          },
+          "vehicle_capacity_t": {
+            "exclusiveMinimum": 0.0,
+            "title": "Vehicle Capacity T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "kg_per_inhab_month",
+          "modes",
+          "cost_per_collection_eur",
+          "cost_per_km_eur",
+          "detour_factor",
+          "on_demand_kg_per_pickup",
+          "piggyback_extra_km",
+          "piggyback_min_days",
+          "vehicle_capacity_t",
+          "depot_lat",
+          "depot_lon",
+          "solver_time_limit_s"
+        ],
+        "title": "PlanningParams",
         "type": "object"
       },
       "ProfileUpdate": {
@@ -1046,6 +2280,76 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "ReservationOut": {
+        "properties": {
+          "contact": {
+            "title": "Contact",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "recycler_name": {
+            "title": "Recycler Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recycler_name",
+          "contact",
+          "note",
+          "created_at"
+        ],
+        "title": "ReservationOut",
+        "type": "object"
+      },
+      "ReserveRequest": {
+        "properties": {
+          "contact": {
+            "maxLength": 160,
+            "minLength": 3,
+            "title": "Contact",
+            "type": "string"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "recycler_name": {
+            "maxLength": 120,
+            "minLength": 2,
+            "title": "Recycler Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "recycler_name",
+          "contact"
+        ],
+        "title": "ReserveRequest",
+        "type": "object"
+      },
       "ResetPasswordRequest": {
         "properties": {
           "password": {
@@ -1065,6 +2369,500 @@
           "password"
         ],
         "title": "ResetPasswordRequest",
+        "type": "object"
+      },
+      "ResolvedChange": {
+        "description": "Alteração já validada contra as listas fechadas (freguesias e modos).",
+        "properties": {
+          "allowed_modes": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Allowed Modes",
+            "type": "array"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "allowed_modes"
+        ],
+        "title": "ResolvedChange",
+        "type": "object"
+      },
+      "RouteOut": {
+        "properties": {
+          "km": {
+            "title": "Km",
+            "type": "number"
+          },
+          "load_t": {
+            "title": "Load T",
+            "type": "number"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/CollectionMode"
+          },
+          "path": {
+            "description": "[latitude, longitude]: depósito, paragens, depósito",
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "title": "Path",
+            "type": "array"
+          },
+          "stops": {
+            "items": {
+              "$ref": "#/components/schemas/RouteStop"
+            },
+            "title": "Stops",
+            "type": "array"
+          },
+          "vehicle": {
+            "title": "Vehicle",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "mode",
+          "vehicle",
+          "stops",
+          "km",
+          "load_t",
+          "path"
+        ],
+        "title": "RouteOut",
+        "type": "object"
+      },
+      "RouteStop": {
+        "properties": {
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "load_t": {
+            "title": "Load T",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "latitude",
+          "longitude",
+          "load_t"
+        ],
+        "title": "RouteStop",
+        "type": "object"
+      },
+      "ScenarioObjective": {
+        "enum": [
+          "max_tonnes",
+          "min_cost"
+        ],
+        "title": "ScenarioObjective",
+        "type": "string"
+      },
+      "ScenarioOut": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Eur Year"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "constraints": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/CollectionMode"
+              },
+              "type": "array"
+            },
+            "title": "Constraints",
+            "type": "object"
+          },
+          "coverage_pct": {
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "params": {
+            "$ref": "#/components/schemas/PlanningParams"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "result": {
+            "$ref": "#/components/schemas/ScenarioResult"
+          },
+          "solver_status": {
+            "enum": [
+              "optimal",
+              "feasible",
+              "infeasible"
+            ],
+            "title": "Solver Status",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScenarioStatus"
+          },
+          "target_tonnes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Tonnes"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "objective",
+          "status",
+          "budget_eur_year",
+          "target_tonnes",
+          "tonnes_year",
+          "capex_eur",
+          "annual_cost_eur",
+          "eur_per_tonne",
+          "coverage_pct",
+          "parent_id",
+          "created_at",
+          "solver_status",
+          "params",
+          "constraints",
+          "result"
+        ],
+        "title": "ScenarioOut",
+        "type": "object"
+      },
+      "ScenarioRename": {
+        "properties": {
+          "label": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label"
+        ],
+        "title": "ScenarioRename",
+        "type": "object"
+      },
+      "ScenarioRequest": {
+        "properties": {
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo anual máximo (max_tonnes)",
+            "title": "Budget Eur Year"
+          },
+          "constraints": {
+            "additionalProperties": {
+              "items": {
+                "$ref": "#/components/schemas/CollectionMode"
+              },
+              "type": "array"
+            },
+            "description": "Modos permitidos por freguesia (código INE); omitido = todos",
+            "title": "Constraints",
+            "type": "object"
+          },
+          "label": {
+            "maxLength": 80,
+            "minLength": 1,
+            "title": "Label",
+            "type": "string"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "params": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanningParams"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pressupostos; omitido = os do conjunto ativo"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "target_tonnes": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Meta de captura (min_cost)",
+            "title": "Target Tonnes"
+          }
+        },
+        "required": [
+          "label",
+          "objective"
+        ],
+        "title": "ScenarioRequest",
+        "type": "object"
+      },
+      "ScenarioResult": {
+        "properties": {
+          "allocations": {
+            "items": {
+              "$ref": "#/components/schemas/Allocation"
+            },
+            "title": "Allocations",
+            "type": "array"
+          },
+          "depot": {
+            "items": {
+              "type": "number"
+            },
+            "title": "Depot",
+            "type": "array"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/Kpis"
+          },
+          "modes": {
+            "items": {
+              "$ref": "#/components/schemas/ModeSummary"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "routes": {
+            "items": {
+              "$ref": "#/components/schemas/RouteOut"
+            },
+            "title": "Routes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kpis",
+          "allocations",
+          "routes",
+          "modes",
+          "depot"
+        ],
+        "title": "ScenarioResult",
+        "type": "object"
+      },
+      "ScenarioStatus": {
+        "enum": [
+          "computed",
+          "infeasible"
+        ],
+        "title": "ScenarioStatus",
+        "type": "string"
+      },
+      "ScenarioSummary": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Eur Year"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "coverage_pct": {
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScenarioStatus"
+          },
+          "target_tonnes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Tonnes"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "objective",
+          "status",
+          "budget_eur_year",
+          "target_tonnes",
+          "tonnes_year",
+          "capex_eur",
+          "annual_cost_eur",
+          "eur_per_tonne",
+          "coverage_pct",
+          "parent_id",
+          "created_at"
+        ],
+        "title": "ScenarioSummary",
         "type": "object"
       },
       "ScheduleEntry": {
@@ -1209,6 +3007,89 @@
         ],
         "title": "TextileDestination",
         "type": "string"
+      },
+      "TriageAnalysis": {
+        "description": "O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.",
+        "properties": {
+          "brand": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "composition": {
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "maxItems": 6,
+            "title": "Composition",
+            "type": "array"
+          },
+          "condition": {
+            "$ref": "#/components/schemas/TextileDestination",
+            "description": "reuse, recycle ou reject"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "notes": {
+            "maxLength": 240,
+            "title": "Notes",
+            "type": "string"
+          }
+        },
+        "required": [
+          "garment_type",
+          "condition",
+          "composition",
+          "confidence",
+          "notes"
+        ],
+        "title": "TriageAnalysis",
+        "type": "object"
+      },
+      "TriageResult": {
+        "properties": {
+          "analysis": {
+            "$ref": "#/components/schemas/TriageAnalysis"
+          },
+          "dominant_fibre": {
+            "$ref": "#/components/schemas/Fibre"
+          },
+          "estimated_weight_g": {
+            "title": "Estimated Weight G",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "analysis",
+          "dominant_fibre",
+          "estimated_weight_g",
+          "prompt_version",
+          "model"
+        ],
+        "title": "TriageResult",
+        "type": "object"
       },
       "Typology": {
         "description": "Tipologia de resíduo do circuito (folha \"Resumo\").",
@@ -1670,6 +3551,289 @@
         ],
         "title": "WeighingMethod",
         "type": "string"
+      },
+      "WhatIfOut": {
+        "properties": {
+          "base_scenario_id": {
+            "format": "uuid",
+            "title": "Base Scenario Id",
+            "type": "string"
+          },
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Eur Year"
+          },
+          "capture_scale": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CaptureScale"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "changes": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedChange"
+            },
+            "title": "Changes",
+            "type": "array"
+          },
+          "clarification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Clarification"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "explanation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Explanation"
+          },
+          "explanation_verified": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "True se todos os números da explicação existem nos resultados",
+            "title": "Explanation Verified"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "new_scenario_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "New Scenario Id"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ScenarioObjective"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/WhatIfStatus"
+          },
+          "suggestions": {
+            "description": "Freguesias parecidas, para corrigir a pergunta",
+            "items": {
+              "type": "string"
+            },
+            "title": "Suggestions",
+            "type": "array"
+          },
+          "target_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Pct"
+          },
+          "understood": {
+            "title": "Understood",
+            "type": "string"
+          },
+          "unknown_parishes": {
+            "description": "Freguesias que não existem na lista oficial",
+            "items": {
+              "type": "string"
+            },
+            "title": "Unknown Parishes",
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "question",
+          "understood",
+          "clarification",
+          "changes",
+          "budget_eur_year",
+          "target_pct",
+          "objective",
+          "capture_scale",
+          "unknown_parishes",
+          "suggestions",
+          "base_scenario_id",
+          "new_scenario_id",
+          "explanation",
+          "explanation_verified",
+          "prompt_version",
+          "created_at"
+        ],
+        "title": "WhatIfOut",
+        "type": "object"
+      },
+      "WhatIfRequest": {
+        "properties": {
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "question": {
+            "maxLength": 500,
+            "minLength": 5,
+            "title": "Question",
+            "type": "string"
+          },
+          "scenario_id": {
+            "format": "uuid",
+            "title": "Scenario Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "question"
+        ],
+        "title": "WhatIfRequest",
+        "type": "object"
+      },
+      "WhatIfStatus": {
+        "enum": [
+          "proposed",
+          "applied",
+          "rejected"
+        ],
+        "title": "WhatIfStatus",
+        "type": "string"
+      },
+      "ZoneOut": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "demand_t": {
+            "title": "Demand T",
+            "type": "number"
+          },
+          "geometry": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Geometry"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "localities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Localities",
+            "type": "array"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "population_year": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Population Year"
+          },
+          "service_days": {
+            "description": "Dias/semana com algum circuito da Vitrus a passar",
+            "title": "Service Days",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "name",
+          "population",
+          "population_year",
+          "demand_t",
+          "latitude",
+          "longitude",
+          "service_days",
+          "localities",
+          "geometry"
+        ],
+        "title": "ZoneOut",
+        "type": "object"
       }
     }
   },
@@ -3717,6 +5881,146 @@
         ]
       }
     },
+    "/api/v1/brands": {
+      "get": {
+        "description": "Quilos e composição por marca, com o tamanho da amostra (evidência para a RAP).",
+        "operationId": "get_brand_evidence",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BrandsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Brand Evidence",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
     "/api/v1/datasets/alerts/{alert_id}": {
       "patch": {
         "description": "Marca uma inconsistência como resolvida, ignorada ou volta a abri-la.",
@@ -4136,6 +6440,1131 @@
         "summary": "Health",
         "tags": [
           "health"
+        ]
+      }
+    },
+    "/api/v1/lots": {
+      "get": {
+        "operationId": "list_lots",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fibre",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Fibre"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fibre"
+            }
+          },
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/LotState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "parish_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 6,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parish Code"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LotSummary"
+                  },
+                  "title": "Response List Lots",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Lots",
+        "tags": [
+          "lots"
+        ]
+      },
+      "post": {
+        "description": "Abre um lote no ponto de recolha: gera o código que vai no QR.",
+        "operationId": "open_lot",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotOpen"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Open Lot",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}": {
+      "get": {
+        "operationId": "get_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Lot",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/items": {
+      "post": {
+        "description": "Acrescenta ao lote uma peça confirmada pelo operador.",
+        "operationId": "add_lot_item",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotItemIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotItemOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Add Lot Item",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/state": {
+      "post": {
+        "description": "Fecha o lote (triado) ou regista a entrega. O estado só avança.",
+        "operationId": "change_lot_state",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotStateChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Change Lot State",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/market": {
+      "get": {
+        "description": "Bolsa de fibra: lotes triados agregados por fibra, para os recicladores do Vale do Ave.",
+        "operationId": "get_fibre_market",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fibre",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Fibre"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fibre"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/MarketEntry"
+                  },
+                  "title": "Response Get Fibre Market",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Fibre Market",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/market/{code}/reserve": {
+      "post": {
+        "description": "Reserva um lote em nome de um reciclador. Sem preços nem pagamentos no MVP.",
+        "operationId": "reserve_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReserveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Reserve Lot",
+        "tags": [
+          "lots"
         ]
       }
     },
@@ -4726,6 +8155,1587 @@
         ]
       }
     },
+    "/api/v1/planning/parameters": {
+      "get": {
+        "description": "Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto).",
+        "operationId": "get_planning_parameters",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParametersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Planning Parameters",
+        "tags": [
+          "planning"
+        ]
+      },
+      "put": {
+        "description": "Atualiza os pressupostos ativos (só administradores). Os cenários já gravados mantêm os seus.",
+        "operationId": "update_planning_parameters",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlanningParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParametersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update Planning Parameters",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/scenarios": {
+      "get": {
+        "operationId": "list_scenarios",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ScenarioSummary"
+                  },
+                  "title": "Response List Scenarios",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Scenarios",
+        "tags": [
+          "planning"
+        ]
+      },
+      "post": {
+        "description": "Corre o otimizador (localização e modo por freguesia, mais rotas) e guarda o cenário.",
+        "operationId": "create_scenario",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Scenario",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/scenarios/{scenario_id}": {
+      "delete": {
+        "operationId": "delete_scenario",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete Scenario",
+        "tags": [
+          "planning"
+        ]
+      },
+      "get": {
+        "operationId": "get_scenario",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Scenario",
+        "tags": [
+          "planning"
+        ]
+      },
+      "patch": {
+        "operationId": "rename_scenario",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ScenarioRename"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Rename Scenario",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/scenarios/{scenario_id}/flows": {
+      "get": {
+        "description": "Fluxo previsto do cenário: freguesia, modo de recolha e destino, em toneladas.",
+        "operationId": "get_scenario_flows",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Flows"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Scenario Flows",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/zones": {
+      "get": {
+        "description": "Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus.",
+        "operationId": "list_zones",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ZoneOut"
+                  },
+                  "title": "Response List Zones",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Zones",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/public/lots/{code}": {
+      "get": {
+        "description": "Passaporte público do lote: o QR aponta para aqui. Sem dados pessoais e sem sessão.",
+        "operationId": "get_passport",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Passport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Passport",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/lots/{code}/qr": {
+      "get": {
+        "description": "QR em SVG do passaporte.",
+        "operationId": "get_lot_qr",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/svg+xml": {}
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Lot Qr",
+        "tags": [
+          "public"
+        ]
+      }
+    },
     "/api/v1/ready": {
       "get": {
         "description": "Readiness: a base de dados responde e diz se a IA está ligada.",
@@ -5268,6 +10278,156 @@
         ]
       }
     },
+    "/api/v1/triage": {
+      "post": {
+        "description": "Analisa as fotos com o modelo de visão. Não grava nada: o operador confirma e só então a peça entra no lote.",
+        "operationId": "analyse_garment",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_analyse_garment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriageResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Analyse Garment",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
     "/api/v1/users": {
       "get": {
         "description": "Platform accounts (admins only).",
@@ -5569,6 +10729,472 @@
         "summary": "Update User",
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/v1/whatif": {
+      "get": {
+        "description": "Perguntas feitas sobre um cenário (histórico auditável).",
+        "operationId": "list_what_ifs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/WhatIfOut"
+                  },
+                  "title": "Response List What Ifs",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List What Ifs",
+        "tags": [
+          "whatif"
+        ]
+      },
+      "post": {
+        "description": "Passo 1: o modelo percebe a pergunta e descreve a alteração. Nada é calculado até o utilizador confirmar.",
+        "operationId": "ask_what_if",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WhatIfRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatIfOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Ask What If",
+        "tags": [
+          "whatif"
+        ]
+      }
+    },
+    "/api/v1/whatif/{run_id}/apply": {
+      "post": {
+        "description": "Passo 2: corre o otimizador com a alteração confirmada e explica o resultado, com números verificados.",
+        "operationId": "apply_what_if",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "run_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Run Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "locale",
+            "required": false,
+            "schema": {
+              "default": "pt-PT",
+              "enum": [
+                "pt-PT",
+                "en"
+              ],
+              "title": "Locale",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WhatIfOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Apply What If",
+        "tags": [
+          "whatif"
         ]
       }
     }

@@ -36,3 +36,5 @@ class RateLimiter:
 
 auth_limiter = RateLimiter(limit=10, window_s=60, name="auth")
 reset_limiter = RateLimiter(limit=5, window_s=600, name="reset")
+triage_limiter = RateLimiter(limit=20, window_s=60, name="triage")  # cada chamada ao modelo de visão custa dinheiro
+whatif_limiter = RateLimiter(limit=15, window_s=60, name="whatif")

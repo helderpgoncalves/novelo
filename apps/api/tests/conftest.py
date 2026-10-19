@@ -12,11 +12,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 from novelo.adapters.email import get_email_sender
 from novelo.core.config import get_settings
 from novelo.core.database import Base, get_db
-from novelo.core.ratelimit import auth_limiter, reset_limiter
+from novelo.core.ratelimit import auth_limiter, reset_limiter, triage_limiter, whatif_limiter
 from novelo.features.auth import models as _auth_models  # noqa: F401
 from novelo.features.datasets import models as _dataset_models  # noqa: F401
+from novelo.features.lots import models as _lot_models  # noqa: F401
+from novelo.features.lots.router import get_llm
 from novelo.features.network import models as _network_models  # noqa: F401
-from novelo.features.scenarios import models as _scenario_models  # noqa: F401
+from novelo.features.planning import models as _planning_models  # noqa: F401
+from novelo.features.planning import whatif_models as _whatif_models  # noqa: F401
 from novelo.features.textile import models as _textile_models  # noqa: F401
 from novelo.features.users import models as _user_models  # noqa: F401
 from novelo.main import create_app
@@ -74,13 +77,44 @@ async def session() -> AsyncGenerator[AsyncSession, None]:
     await engine.dispose()
 
 
+class FakeLlm:
+    """Substitui o OpenRouter: devolve respostas preparadas por tipo de schema e regista os pedidos."""
+
+    def __init__(self) -> None:
+        self.responses: dict[str, list[object]] = {}
+        self.calls: list[dict[str, object]] = []
+
+    def queue(self, schema_name: str, *responses: object) -> None:
+        self.responses.setdefault(schema_name, []).extend(responses)
+
+    async def structured(
+        self, *, system: str, user: object, schema: type, model: str | None = None, retries: int = 1
+    ) -> object:
+        self.calls.append({"schema": schema.__name__, "system": system, "user": user})
+        queue = self.responses.get(schema.__name__, [])
+        if not queue:
+            raise AssertionError(f"Sem resposta preparada para {schema.__name__}")
+        item = queue.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        return item
+
+    async def aclose(self) -> None:
+        return None
+
+
+@pytest.fixture
+def llm() -> FakeLlm:
+    return FakeLlm()
+
+
 @pytest.fixture
 def outbox() -> OutboxSender:
     return OutboxSender()
 
 
 @pytest.fixture
-async def client(session: AsyncSession, outbox: OutboxSender) -> AsyncGenerator[httpx.AsyncClient, None]:
+async def client(session: AsyncSession, outbox: OutboxSender, llm: FakeLlm) -> AsyncGenerator[httpx.AsyncClient, None]:
     app = create_app()
 
     async def _db() -> AsyncGenerator[AsyncSession, None]:
@@ -88,8 +122,11 @@ async def client(session: AsyncSession, outbox: OutboxSender) -> AsyncGenerator[
 
     app.dependency_overrides[get_db] = _db
     app.dependency_overrides[get_email_sender] = lambda: outbox
+    app.dependency_overrides[get_llm] = lambda: llm
     auth_limiter.reset()
     reset_limiter.reset()
+    triage_limiter.reset()
+    whatif_limiter.reset()
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
         yield c
 
