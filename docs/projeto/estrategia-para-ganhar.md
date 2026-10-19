@@ -5,8 +5,9 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 | Ligações | |
 | --- | --- |
 | Pessoas | [Mentores](mentores.md): perfis, abordagem e perguntas por ordem de impacto |
-| Imprevistos | [Cenários e contingências](cenarios-e-contingencias.md): pitch, dados, mentoria, concorrência, 48 perguntas do júri, pós-hackathon |
+| Imprevistos | [Cenários e contingências](cenarios-e-contingencias.md): pitch, dados, mentoria, concorrência, 48 perguntas do júri mais 12 por critério, pós-hackathon |
 | História | [Narrativa do pitch](narrativa-do-pitch.md) e [Guião de slides](pitch-slides.md) |
+| Critérios | [Critérios de avaliação](criterios-de-avaliacao.md): pesos, matriz e o que falta ler nas Regras |
 | Provas | [Dossier de pesquisa](../pesquisa/README.md) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md) |
 
 ## Resumo executivo
@@ -24,7 +25,7 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 5. **Cadeia completa, do saco ao fio:** recolha, triagem, lote com passaporte, bolsa de fibra, relatório RAP.
 6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (em integração).
 
-**O que ainda nos falta** (por ordem): custos unitários da Vitrus; fonte do plano municipal (5,4%, 0,7 kg/hab/mês, "4 de 27"); critérios do júri; contentores (chegam a 20); uma frase de um reciclador; exatidão medida da triagem.
+**O que ainda nos falta** (por ordem): custos unitários da Vitrus; fonte do plano municipal (5,4%, 0,7 kg/hab/mês, "4 de 27"); o texto das Regras (os quatro critérios e pesos já são conhecidos, falta o detalhe de cada um); contentores (chegam a 20); uma frase de um reciclador; exatidão medida da triagem.
 
 **A única regra que não se pode violar:** nenhum número vai para o palco sem estar no [registo](../pesquisa/registo-de-afirmacoes.md) com o seu estado.
 
@@ -55,7 +56,7 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 
 ```mermaid
 flowchart TB
-    J["Júri<br/>critérios não públicos"] --> V["Vitrus Ambiente<br/>atribui o prémio"]
+    J["Júri<br/>4 critérios ponderados"] --> V["Vitrus Ambiente<br/>atribui o prémio"]
     V --> LN["Lucas Nascimento<br/>mentor, dados e custos"]
     J --> O["Organização<br/>Hack4Guimarães, município"]
     UM["UMinho"] --> PA["Prof. Paulo Afonso<br/>custos e redes"]
@@ -69,27 +70,98 @@ flowchart TB
 | --- | --- | --- | --- |
 | **Vitrus** (prémio) | Uma resposta operacional e defensável com os seus dados | Cenários em €/t, qualidade dos dados, piloto | A construir confiança |
 | **Município** | Cumprir a obrigação desde 2025 e preparar 2028 sem pagar sozinho | Relatório RAP e custo eficiente | A explorar |
-| **Júri** | Problema real, dados, impacto, viabilidade, demo, clareza (**hipóteses**) | Ver abaixo | Critérios por confirmar |
+| **Júri** | Inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20% (detalhe de cada um por ler nas Regras) | [Como somos avaliados](#como-somos-avaliados) | Pesos confirmados; Regras por ler |
 | **Lucas Nascimento** | Otimização de recursos e reporte de projetos | Dados em €/t e KPIs | Contactar hoje |
 | **Luís Miguel Oliveira** | Impacto mensurável, clareza, ciência aplicada às fibras | Passaporte do lote e protocolo de medição | Contactar 20 e 21 |
 | **Prof. Paulo Afonso** | Custos, investimento, redes, rigor | Modelo e incerteza | Contactar 21 |
 | **Indústria** | Lotes homogéneos e rastreáveis | Passaporte e bolsa de fibra | Procurar uma frase |
 | **Economia social** | Manter os seus pontos e a reutilização | Modo adicional da rede | A explorar |
 
-## O que o júri vai valorizar (hipóteses)
+## Como somos avaliados
 
-> **Os critérios do Hack4Guimarães 2035 não são públicos.** Não os encontrámos na [página da organização](https://www.fpguimaraes.pt/events/hack4guimaraes-2035/) [F59], no regulamento nem na imprensa [F21] [F22]. Perguntar à organização e ao Lucas **hoje**. O que segue são hipóteses a partir de guias de hackathons e do tipo de desafio.
+Os projetos são avaliados por **quatro critérios ponderados**. Fonte: página oficial do Hack4Guimarães 2035, FAQ "Como são avaliados os projetos?", consultada a 19 de outubro de 2026 [F61] (registo [E4](../pesquisa/registo-de-afirmacoes.md)).
 
-| Hipótese de critério | Porque é plausível | Como a cobrimos | Evidência a mostrar |
+| Critério | Peso | Valor de +1 ponto na nossa nota (0 a 10) |
+| --- | --- | --- |
+| Inovação e originalidade | **25%** | +0,25 |
+| Viabilidade técnica | **25%** | +0,25 |
+| Impacto e relevância | **30%** | +0,30 |
+| Apresentação e potencial de continuidade | **20%** | +0,20 |
+| **Total** | **100%** | |
+
+> **O que ainda não sabemos.** O detalhe de cada critério está na secção "Regras" da página, que **ainda não temos** (E6). A coluna "o que o júri provavelmente procura" é, por isso, **hipótese**: vem de guias de hackathons [F38] e do tipo de desafio, não do texto oficial. Quando lermos as Regras, cola-se o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras) e esta matriz revê-se no mesmo dia. Composição do júri e formato do pitch e das perguntas continuam desconhecidos (E7).
+
+### Matriz: critério, prova e ação
+
+A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os restantes campos são factos do projeto. Os slides são os do [guião](pitch-slides.md); os passos da demo, os do [roteiro](narrativa-do-pitch.md#roteiro-da-demo).
+
+| Critério | O que o júri provavelmente procura (**hipótese**) | Evidência Novelo | Onde se mostra | Risco | Ação para subir a nota |
+| --- | --- | --- | --- | --- | --- |
+| **Inovação e originalidade** (25%) | Uma ideia que não seja a solução óbvia (a app do cidadão, mais contentores); IA com sentido; uma ligação nova entre peças | A IA conduz o otimizador e um verificador rejeita números fora do resultado; a cadeia do saco ao fio numa só ferramenta: decisão da rede, lote com passaporte e QR, bolsa de fibra, relatório RAP ([funcionalidades](../engenharia/features.md)) | Slides 5 e 6; demo: "E se...?" (passo 6) e lote com QR (passo 8) | "Isto já existe?": cada peça existe isolada, e a nossa pesquisa de concorrência não é exaustiva | Dizer a novidade como **ligação**, não como tecnologia; mostrar o verificador a recusar um número; ter uma frase de comparação. **Não investir mais engenharia aqui** |
+| **Viabilidade técnica** (25%) | Funciona a sério; usa dados reais; os pressupostos estão à vista; sabe-se o que acontece quando falha | Em produção ([novelo.bitsapiens.io](https://novelo.bitsapiens.io)); dados da Vitrus (301,3 t, 40 circuitos, 29 viaturas) e do INE; pressupostos visíveis; domínio testado com valores calculados à mão; 12 alertas de qualidade dos dados | Slide 5; demo: ponto de partida (passo 1) e sensibilidade (passo 5); plano B | Custos unitários ainda são pressupostos; sensibilidade, piloto e copiloto em integração; exatidão da triagem por medir | E2E verde em tudo o que entra; mostrar intervalo e tornado; "estamos a medir" com protocolo; cenários pré-calculados |
+| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); captura de 22,9% do potencial do plano municipal (cálculo; potencial **por verificar**); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP em 17 abr 2028; **cenário B: X t/ano a Y €/t (estimativa, por preencher a 22 out)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | X e Y por preencher; custos da Vitrus por chegar; 5,4% e 0,7 kg/hab/mês por verificar (fora de slide); sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
+| **Apresentação e potencial de continuidade** (20%) | História clara, tempo cumprido, demo sem falhas; um plano para depois do hackathon, parceiros, replicação, sustentabilidade | Narrativa em sete passos; demo mínima de cinco passos; plano B; pedido do piloto (duas freguesias, 3 meses, KPIs, piso de sinal de 1,71 t, estimativa); repositório público, propriedade dos autores [F59] | Slides 1 e 8; slide de apoio 9 ("critério → prova"); QR lido no telemóvel de um jurado | Deck por fazer; duração e formato por confirmar; nenhum parceiro confirmou o piloto; modelo de sustentabilidade é hipótese | Três ensaios a 25 out; mensagem à Vitrus e à Fibrenamics com o pedido; roadmap pós-26 out com datas; replicação dita com prova (dados abertos) |
+
+### Autoavaliação honesta
+
+**Estimativa nossa, subjetiva e sem avaliador externo.** Serve para decidir onde gastar horas, não para prever o resultado. Nota ponderada = soma de peso × nota.
+
+| Critério | Peso | Nota hoje (0 a 10) | Contributo | Porquê | Alvo a 25 out | Contributo alvo |
+| --- | --- | --- | --- | --- | --- | --- |
+| Inovação e originalidade | 25% | **7** | 1,75 | A cadeia ligada e o verificador distinguem-nos; mas as peças existem isoladas e não temos prova externa de novidade | 7 | 1,75 |
+| Viabilidade técnica | 25% | **6** | 1,50 | Produto no ar com dados reais; mas custos são pressupostos, várias funcionalidades estão em integração sem E2E e a triagem não tem exatidão medida | 8 | 2,00 |
+| Impacto e relevância | 30% | **6** | 1,80 | Problema e prazos com fonte primária; mas X e Y não estão preenchidos, faltam custos da Vitrus e o potencial do plano municipal está por verificar | 8 | 2,40 |
+| Apresentação e continuidade | 20% | **5** | 1,00 | Narrativa e guião escritos; mas o deck não existe, a demo não foi ensaiada, o formato é desconhecido e nenhum parceiro confirmou o piloto | 8 | 1,60 |
+| **Nota ponderada** | 100% | | **6,05** | | | **7,75** |
+
+**Onde está o ganho.** Impacto +2 pontos vale +0,60. Apresentação e continuidade +3 pontos vale +0,60. Viabilidade +2 pontos vale +0,50. Inovação +0 pontos. Total: +1,70.
+
+**As três maiores lacunas** (por ganho ponderado):
+
+1. **Impacto sem número-âncora:** X toneladas a Y €/t por preencher e sem custos reais da Vitrus. É o critério que mais pesa.
+2. **Continuidade sem parceiro confirmado e sem deck ensaiado:** o piloto é o nosso pedido, mas ninguém da Vitrus, da Fibrenamics ou da UMinho o confirmou.
+3. **Viabilidade apoiada em funcionalidades por integrar:** sensibilidade, piloto recomendado e triagem medida só contam se tiverem E2E verde a 25 de outubro.
+
+### Prioridades de esforço, pelos pesos
+
+Impacto (30%) e viabilidade (25%) somam 55% da nota. A inovação vale 25%, a mesma que a viabilidade, mas é onde já estamos mais fortes e onde cada hora rende menos. **Não gastar tempo em funcionalidades vistosas sem prova de impacto.**
+
+| Ordem | Critério | O que fazer primeiro |
+| --- | --- | --- |
+| 1 | Impacto e relevância (30%) | Cenários A, B e francês fechados; frase-âncora com X e Y; custo por tonelada com intervalo; "quem paga em 2028" no relatório RAP |
+| 2 | Apresentação e continuidade (20%) | Maior margem (de 5 para 8) e custo baixo: deck, vídeo, três ensaios, pedido do piloto por escrito |
+| 3 | Viabilidade técnica (25%) | E2E verde; sensibilidade à vista; protocolo de medição da triagem; plano B testado |
+| 4 | Inovação e originalidade (25%) | Manter. Só polir o que já aparece na demo ("E se...?", QR) |
+
+### Regras de corte em função dos pesos
+
+1. **Teste de entrada.** Cada funcionalidade, slide ou frase tem de nomear o critério que sobe e a prova que se abre. Sem as duas coisas, sai.
+2. **Desempate pelo peso.** Se há conflito de horas de engenharia: impacto, depois viabilidade, depois inovação. As horas de ensaio não se cortam (são a nota de apresentação).
+3. **Sem vistoso sem prova.** O copiloto, o painel de IA e o resolvedor de alertas só vão ao palco se acabarem numa grandeza de impacto (€/t, toneladas, cobertura) ou de viabilidade (erro evitado, número verificado).
+4. **Sem E2E verde a 25 de outubro, não se mostra** (regra de corte já existente, agora justificada pelo critério de viabilidade).
+
+| Critério | O que conta (entra) | O que não conta (sai) |
+| --- | --- | --- |
+| **Viabilidade técnica** | E2E verde; dados reais; custos como **pressupostos explícitos**; sensibilidade (intervalo e tornado); cenários pré-calculados; plano B | Funcionalidade sem E2E; número sem fonte; "funciona na minha máquina" |
+| **Impacto e relevância** | €/t; toneladas desviadas; cobertura do território; **quem paga em 2028**; piloto de 3 meses com KPIs (toneladas, €/t, taxa de rejeito) | Métricas de utilização do ecrã; números "por verificar"; adjetivos |
+| **Apresentação e potencial de continuidade** | Storyline de sete passos; demo ensaiada três vezes; plano B; **plano pós-hackathon** (piloto, roadmap); replicabilidade a outros municípios; modelo de sustentabilidade (hipótese dita como tal); parceiros Vitrus, Fibrenamics e UMinho **só como "em conversa" depois de falar** | Slides densos; improviso na demo; parceiros nomeados sem os ter ouvido |
+| **Inovação e originalidade** | A ligação do saco ao fio; a IA que conduz e não calcula; o verificador | Tecnologia pela tecnologia (blockchain, sensores, robôs de triagem) |
+
+### Ordem de corte, por valor ponderado
+
+Do primeiro a sair ao último. Mantém a [ordem de corte](#calendário-dia-a-dia-19-a-28-de-outubro) abaixo, agora com o critério que cada peça serve.
+
+| Sai por ordem | Funcionalidade | Critério que serve | Porque nesta posição |
 | --- | --- | --- | --- |
-| **Problema real e bem compreendido** | O desafio é de uma empresa que atribui o prémio | Números reais da Vitrus e do INE; regulação 2025 e 2028 | Slide do problema com fontes |
-| **Uso dos dados disponíveis** | O enunciado lista os dados | Todos usados; contentores quando chegarem | Qualidade dos dados |
-| **Impacto em investimento e custo** | É a pergunta | €/t, investimento e custo anual por cenário | Comparação A/B |
-| **Viabilidade** | "Pode continuar depois do hackathon?" [F38] | Piloto de 3 meses; custos como pressuposto visível | Recomendador de piloto (em integração) |
-| **Demo a funcionar** | Padrão dos júris | Demo ao vivo com plano B em vídeo | Demo ensaiada 3 vezes |
-| **Inovação com sentido (IA)** | Vantagem da equipa | A IA conduz o otimizador | "E se...?" ao vivo |
-| **Clareza do pitch** | Sempre | Uma ideia, um número-âncora | Narrativa |
-| **Sustentabilidade e impacto ambiental** | A área é Sustentabilidade | Toneladas desviadas do aterro, hierarquia reutilização > reciclagem | Sankey |
+| 1.º | Resolvedor de alertas na demo | Viabilidade (qualidade dos dados) | Já temos os 12 alertas à vista sem IA |
+| 2.º | Painel de IA na demo | Viabilidade | Não muda nenhum número de impacto |
+| 3.º | Copiloto no palco | Inovação | Vistoso; o "E se...?" simples já prova a IA |
+| 4.º | Triagem medida | Viabilidade | Fica como "estamos a medir" |
+| 5.º | Cenário francês | Impacto | Referência, não promessa |
+| 6.º | Piloto recomendado | Impacto e continuidade | É o pedido final |
+| 7.º | Sensibilidade | Viabilidade e impacto | Transforma a falta de custos em argumento |
+
+**Nunca se corta:** comparação de cenários (impacto), "E se...?" (inovação), relatório RAP (impacto), dados reais (viabilidade).
 
 ## Tese e diferenciadores
 
@@ -163,13 +235,13 @@ gantt
 
 | Dia | Foco | Hélder | Flávio | Checkpoint (go/no-go) |
 | --- | --- | --- | --- | --- |
-| **Seg 19** | Arranque | Confirmar inscrição; mensagem ao Lucas com 5 pedidos; pedir critérios do júri | Integração dos novos ecrãs; `just check` verde; chave OpenRouter e saldo verificados | **Go** se: inscrição confirmada, mensagem enviada, API e web a arrancar |
+| **Seg 19** | Arranque | Confirmar inscrição; mensagem ao Lucas com 5 pedidos; obter o texto das Regras (secção da página oficial) | Integração dos novos ecrãs; `just check` verde; chave OpenRouter e saldo verificados | **Go** se: inscrição confirmada, mensagem enviada, API e web a arrancar |
 | **Ter 20** | Dados novos | Receber contentores e custos; mensagem ao Luís Miguel; contactos à indústria | Importar contentores, mapa e cobertura | **Go** se: contentores no mapa ou plano B definido |
 | **Qua 21** | Modelo e mentores | 10 min com o Prof. Paulo Afonso; fixar cenários A, B e francês | Sensibilidade, robustez e piloto no web | **Go** se: três cenários calculados e a frase-âncora preenchida |
 | **Qui 22** | Prova | Medir a triagem (30 a 50 peças); resposta de um reciclador; narrativa final | Copiloto e resolvedor de alertas; painel de IA | **No-go** de cada funcionalidade nova sem E2E verde: sai da demo |
 | **Sex 23** | Fechar produto | Slides em rascunho; registo de afirmações | Polimento; E2E completo; imagens de produção; deploy de ensaio | **Código congelado à noite** |
 | **Sáb 24** | Deck | Deck v1; vídeo de 60 s | Plano B (relatório pré-gerado, stack local, dump da base); verificar Coolify | Deck e vídeo prontos |
-| **Dom 25** | Ensaio | 3 ensaios cronometrados com as 48 perguntas | Ensaio técnico (rede, projetor, QR no telemóvel de um jurado) | **Go/no-go final**: o que não foi ensaiado sai |
+| **Dom 25** | Ensaio | 3 ensaios cronometrados com as 48 perguntas e as 12 por critério | Ensaio técnico (rede, projetor, QR no telemóvel de um jurado) | **Go/no-go final**: o que não foi ensaiado sai |
 | **Seg 26** | **Pitch** | Apresenta | Opera a demo | — |
 | **Qua 28** | Resultados | Preparar a resposta para [cada resultado](cenarios-e-contingencias.md#f-cenários-pós-hackathon) | — | — |
 
@@ -177,7 +249,8 @@ gantt
 
 ## Checklist de pitch
 
-- [ ] Inscrição confirmada, critérios do júri e duração perguntados
+- [ ] Inscrição confirmada; texto das Regras colado em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras); duração e formato do pitch e das perguntas confirmados
+- [ ] Cada critério tem uma frase e uma prova na demo (ver o [slide de apoio](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova))
 - [ ] Cenários A, B e francês calculados; frase-âncora com X e Y preenchidos
 - [ ] Registo de afirmações impresso, com "slide" preenchido e nada "por verificar" em slide
 - [ ] Cinco perguntas "E se..." de reserva testadas, com respostas em cache
@@ -187,7 +260,7 @@ gantt
 - [ ] E2E completo verde; `just check` verde; imagens de produção compiladas
 - [ ] Vídeo de 60 s, relatório RAP pré-gerado e deck em PDF, em dois dispositivos
 - [ ] Saldo e orçamento de IA verificados; modelo de reserva configurado
-- [ ] Três ensaios cronometrados; respostas às 48 perguntas lidas
+- [ ] Três ensaios cronometrados; respostas às 48 perguntas e às 12 por critério lidas
 - [ ] Kit físico (adaptadores, carregadores, powerbank)
 - [ ] Verificação 15 minutos antes: API, login, cenário B, PDF, QR, Wi-Fi
 
@@ -207,16 +280,18 @@ gantt
 | 10 | Datas da regulação mal ditas | Média | Baixa | Só as marcadas "Primária" | H |
 | 11 | Cansaço no dia 26 | Média | Média | Congelar código a 23; ensaios a 25; dormir | HF |
 | 12 | Identificação errada de um mentor | Baixa | Baixa | Confirmar logo na primeira mensagem | H |
+| 13 | As Regras mudam a interpretação dos critérios | Média | Média | Protocolo de uma hora em [Cenários](cenarios-e-contingencias.md#a4-critérios-e-regras); matriz revista no mesmo dia | HF |
 
 ## Métricas de sucesso
 
 | Métrica | Alvo |
 | --- | --- |
-| Pitch dentro do tempo | ≤ 5:00 em 3 ensaios |
+| Pitch dentro do tempo | ≤ 5:00 em 3 ensaios, com a [repartição pelos critérios](narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios) |
 | Demo | ≤ 2 minutos, sem erro, com o QR lido pelo telemóvel de um jurado |
 | Números em slide | 100% no registo, 0 "por verificar" |
 | Qualidade de código | `just check` verde; E2E completo verde |
-| Respostas às perguntas | 48 respondidas em ≤ 20 s |
+| Respostas às perguntas | 48 mais as 12 por critério ([E.5](cenarios-e-contingencias.md#e5-perguntas-por-critério-de-avaliação)) respondidas em ≤ 20 s |
+| Nota ponderada (autoavaliação, estimativa) | De 6,05 para ≥ 7,75 a 25 de outubro, com as ações da [matriz](#matriz-critério-prova-e-ação) |
 | Evidência externa | ≥ 1 frase de um reciclador; ≥ 1 validação de um mentor; custos recebidos (ou intervalo) |
 | Resultado | Ganhar; senão, convite para piloto ou feedback escrito |
 
