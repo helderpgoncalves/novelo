@@ -1,6 +1,6 @@
 # Guião de slides
 
-Pronto a passar para o deck. Oito slides para cinco minutos, **uma ideia por slide, título que diz a conclusão**, fonte no rodapé de cada um. A história e as falas completas estão na [narrativa do pitch](narrativa-do-pitch.md); os números, no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
+Pronto a passar para o deck. Oito slides para cinco minutos mais um slide de apoio, **uma ideia por slide, título que diz a conclusão**, fonte no rodapé de cada um. Cada slide declara o critério de avaliação que serve e o seu peso (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%; ver [Critérios de avaliação](criterios-de-avaliacao.md)). A história e as falas completas estão na [narrativa do pitch](narrativa-do-pitch.md); os números, no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
 
 ## Regras do deck
 
@@ -24,6 +24,7 @@ flowchart LR
     S5 --> S6[6 Indústria]
     S6 --> S7[7 2028]
     S7 --> S8[8 Pedido]
+    S8 -.-> S9[9 Apoio]
 ```
 
 ## Slides
@@ -32,6 +33,7 @@ flowchart LR
 
 | | |
 | --- | --- |
+| **Critério e peso** | Apresentação e continuidade (20%): gancho e clareza, 20 s |
 | **Título** | Do saco ao fio |
 | **Subtítulo** | Novelo: a decisão da recolha de têxteis de Guimarães |
 | **Visual** | Símbolo e logótipo Novelo sobre linho; uma linha: "Hack4Guimarães 2035 · Desafio TexVitrus" |
@@ -40,10 +42,11 @@ flowchart LR
 | **Rodapé** | AEA, Briefing 03/2024 (dados de 2020) |
 | **Registo** | C10 |
 
-### 2. Problema · 0:20 a 1:00
+### 2. Problema · 0:20 a 0:45
 
 | | |
 | --- | --- |
+| **Critério e peso** | Impacto e relevância (30%), 25 s |
 | **Título** | A recolha é obrigatória desde 2025 e ninguém a paga ainda |
 | **Visual** | Linha do tempo horizontal: 1 jan 2025 (município obrigado) · 17 jun 2027 (transposição) · **17 abr 2028 (produtores pagam)**. Faixa a vermelho entre 2025 e 2028: "paga o município" |
 | **Número** | 17 de abril de 2028 |
@@ -51,10 +54,11 @@ flowchart LR
 | **Rodapé** | APA, FAQ têxteis, dez 2025; Diretiva (UE) 2025/1892 |
 | **Registo** | B1, B4, B11, B12 |
 
-### 3. Referência · 1:00 a 1:30
+### 3. Referência · 0:45 a 1:00
 
 | | |
 | --- | --- |
+| **Critério e peso** | Impacto e relevância (30%), 15 s |
 | **Título** | Guimarães recolhe menos de metade do que a França recolheria |
 | **Visual** | Barras horizontais: Guimarães 1,9 · Catalunha 2,7 · França 4,27 · UE 4,4 (kg/hab/ano). Tracejado "à nossa escala: ≈ 670 t" |
 | **Número** | 1,9 kg contra 4,27 kg por habitante |
@@ -62,10 +66,11 @@ flowchart LR
 | **Rodapé** | Vitrus e INE, 2025; Refashion, 2024; ARC, 2024; AEA, 2020 |
 | **Registo** | A2, C1, C8, C11, C14, C21 |
 
-### 4. Demo · 1:30 a 3:30
+### 4. Demo · 1:00 a 3:00
 
 | | |
 | --- | --- |
+| **Critério e peso** | Os quatro, 120 s: viabilidade 40 s, impacto 40 s, inovação 40 s (ver [roteiro](narrativa-do-pitch.md#roteiro-da-demo)) |
 | **Título** | Do orçamento ao relatório, em dois minutos |
 | **Visual** | Captura do simulador com cenários A e B lado a lado; o resto é a app ao vivo |
 | **Número** | O do cenário B (€/t e toneladas), "estimativa" |
@@ -73,21 +78,23 @@ flowchart LR
 | **Rodapé** | Cenários calculados pelo Novelo; pressupostos em "Pressupostos" |
 | **Plano B** | Vídeo de 60 s e PDF RAP pré-gerado, num ficheiro local |
 
-### 5. IA · 3:30 a 3:50
+### 5. IA · 3:00 a 3:30
 
 | | |
 | --- | --- |
+| **Critério e peso** | Viabilidade técnica (25%), 30 s |
 | **Título** | A IA conduz o otimizador; nunca faz contas |
 | **Visual** | Diagrama em 4 passos: pergunta em português → alteração estruturada → otimizador → verificador de números |
 | **Número** | Zero números calculados pelo modelo |
-| **Nota do orador** | Responde à pergunta que o júri vai fazer: "e se a IA se engana?" |
+| **Nota do orador** | Responde às perguntas que o júri vai fazer: "e se a IA se engana?" e "e se a IA falha?". Dizer: sem IA, o simulador e o relatório continuam a funcionar |
 | **Rodapé** | Verificador: todo o número da resposta tem de existir no resultado calculado |
 | **Registo** | — |
 
-### 6. Indústria · 3:50 a 4:15
+### 6. Indústria · 3:30 a 3:55
 
 | | |
 | --- | --- |
+| **Critério e peso** | Inovação e originalidade (25%), 25 s |
 | **Título** | A indústria tem capacidade; faltam lotes limpos |
 | **Visual** | Lote com QR e composição ao lado do passaporte; ao lado, "Sasia ≈ 2 000 t/mês, pré-consumo" |
 | **Número** | 2 000 t por mês, sobretudo pré-consumo (C16). A comparação com o potencial de Guimarães (5,5%) só se A8 estiver verificado |
@@ -95,10 +102,11 @@ flowchart LR
 | **Rodapé** | Público/Lusa, dez 2024; avaliação da triagem do Novelo |
 | **Registo** | C16, D3, D4 |
 
-### 7. 2028 · 4:15 a 4:40
+### 7. 2028 · 3:55 a 4:20
 
 | | |
 | --- | --- |
+| **Critério e peso** | Impacto e relevância (30%), 25 s |
 | **Título** | Em 2028, quem provar o custo eficiente negoceia com os produtores |
 | **Visual** | Captura do relatório RAP: custo por tipo de território (predominantemente urbana, mediamente urbana, predominantemente rural) |
 | **Número** | "economicamente eficiente" (artigo 22.º-A, n.º 12) |
@@ -106,16 +114,35 @@ flowchart LR
 | **Rodapé** | Diretiva (UE) 2025/1892, artigos 22.º-A e 22.º-C |
 | **Registo** | B6, B10 |
 
-### 8. Pedido · 4:40 a 5:00
+### 8. Pedido · 4:20 a 5:00
 
 | | |
 | --- | --- |
+| **Critério e peso** | Apresentação e potencial de continuidade (20%), 40 s |
 | **Título** | Peço um piloto de três meses em duas freguesias |
-| **Visual** | As duas freguesias recomendadas no mapa e três KPIs: toneladas, €/t, taxa de rejeito |
+| **Visual** | As duas freguesias recomendadas no mapa, três KPIs (toneladas, €/t, taxa de rejeito) e uma linha do tempo: 26 a 28 out feedback · 48 h plano · 3 meses piloto · depois dados medidos |
 | **Número** | A frase-âncora: "X toneladas por ano a Y € por tonelada" |
-| **Nota do orador** | Fecha com a frase-âncora e o pedido. Agradece e para. |
+| **Nota do orador** | Frase-âncora, pedido, replicabilidade ("outro município precisa dos seus dados", ainda não testado) e roadmap pós-26 out (proposta nossa). Parceiros só como "em conversa" se já falámos. Agradece e para. |
 | **Rodapé** | Cenário B, estimativa a validar no piloto |
 | **Registo** | cenário B; recomendador de piloto (em construção) |
+
+### 9. Slide de apoio: checklist critério e prova
+
+Fora dos cinco minutos. Cola-se no fim do deck e abre-se nas perguntas ou se sobrar tempo.
+
+| | |
+| --- | --- |
+| **Título** | Os quatro critérios, cada um com a sua prova |
+| **Visual** | A tabela abaixo, quatro linhas, um visto por prova mostrada |
+| **Nota do orador** | Só para o Q&A: "Se quiserem ver a prova de um critério, abrimos agora." |
+| **Rodapé** | Pesos: Hack4Guimarães 2035, FAQ de avaliação, 2026 |
+
+| Critério (peso) | Prova mostrada | Onde |
+| --- | --- | --- |
+| **Inovação e originalidade (25%)** | A IA conduz o otimizador e o verificador recusa números inventados; do saco ao fio num lote com QR | "E se...?" (passo 6) e lote (passo 8) |
+| **Viabilidade técnica (25%)** | Dados reais da Vitrus; custos como pressupostos à vista com intervalo; produção e plano B | Ponto de partida (passo 1) e sensibilidade (passo 5) |
+| **Impacto e relevância (30%)** | X t por ano a Y €/t (estimativa); quem paga hoje e em 2028 | Cenário A contra B (passo 3) e relatório RAP (passo 10) |
+| **Apresentação e potencial de continuidade (20%)** | Pedido do piloto de 3 meses com KPIs; replicabilidade; roadmap pós-26 out | Slide 8 |
 
 ## Checklist final do deck
 
@@ -125,4 +152,6 @@ flowchart LR
 - [ ] Rodapés de fonte em todos os slides.
 - [ ] Vídeo de 60 s e PDF RAP guardados fora da rede.
 - [ ] Os passos "em construção" só aparecem na demo se ensaiados a 25 de outubro.
+- [ ] Cada critério tem uma frase dita e uma prova aberta ([frases](narrativa-do-pitch.md#a-frase-e-a-prova-de-cada-critério)); o slide de apoio 9 está no fim do deck.
+- [ ] O texto das Regras foi lido e a repartição do tempo foi revista (ou está registado que ainda não o temos).
 - [ ] Três ensaios cronometrados e dentro de 5 minutos.

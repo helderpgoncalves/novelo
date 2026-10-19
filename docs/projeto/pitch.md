@@ -1,20 +1,26 @@
 # Pitch
 
-O pitch tem uma ideia central: **sabemos dizer à Vitrus quanto custa cada tonelada de têxtil tirada do aterro, e como baixar esse custo.** Assumimos 5 minutos; ajustar ao tempo do regulamento.
+O pitch tem uma ideia central: **sabemos dizer à Vitrus quanto custa cada tonelada de têxtil tirada do aterro, e como baixar esse custo.** Assumimos 5 minutos; ajustar ao tempo das Regras quando as tivermos.
 
 Este é o resumo. A versão completa, com as falas, as objeções e a fonte de cada número, está na [narrativa do pitch](narrativa-do-pitch.md); o guião de slides pronto para o deck está em [Guião de slides](pitch-slides.md); os números vêm do [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
 
+## Os quatro critérios
+
+Os projetos são avaliados por quatro critérios ponderados: **inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20%** ([Critérios de avaliação](criterios-de-avaliacao.md)). O detalhe de cada um (Regras) ainda não o temos. O guião abaixo reparte os 300 segundos por eles: impacto 105 s, viabilidade 70 s, inovação 65 s, apresentação e continuidade 60 s ([como e porquê](narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios)).
+
 ## Guião, slide a slide
 
-| # | Tempo | Slide | O que se diz |
-| --- | --- | --- | --- |
-| 1 | 0:00 a 0:20 | Capa Novelo | "Na Europa, cerca de 72% dos têxteis descartados vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro, ao menor custo." |
-| 2 | 0:20 a 0:50 | O problema | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar; Guimarães recolhe 1,9 kg por habitante, a França 4,27. (O 5,4% de têxtil no indiferenciado só se usa depois de confirmada a fonte.) |
-| 3 | 0:50 a 1:05 | A pergunta | A pergunta da Vitrus: menor investimento, menor custo de operação. "Respondemos com números, não com contentores." |
-| 4 | 1:05 a 3:15 | **Demo ao vivo** | Cenários A e B; um jurado faz uma pergunta "E se...?"; uma peça real vai do saco ao lote com QR, ao Sankey e à bolsa de fibra; relatório RAP num clique. Guião detalhado em [Demo e entrega](../engenharia/demo-e-entrega.md). |
-| 5 | 3:15 a 3:45 | Como funciona | O diagrama do saco ao fio, e a regra de ouro: a IA conduz o otimizador, nunca inventa números. |
-| 6 | 3:45 a 4:30 | Impacto | Para a Vitrus agora; para as entidades da RAP em 2028, com evidência por marca; replicável em qualquer município. |
-| 7 | 4:30 a 5:00 | Fecho | A frase-âncora com os números do cenário escolhido, e o pedido: um piloto de 3 meses em duas freguesias. |
+| # | Tempo | Slide | Critério | O que se diz |
+| --- | --- | --- | --- | --- |
+| 1 | 0:00 a 0:20 | Capa Novelo | Apresentação | "Na Europa, cerca de 72% dos têxteis descartados vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro, ao menor custo." |
+| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar. (O 5,4% de têxtil no indiferenciado só se usa depois de confirmada a fonte.) |
+| 3 | 0:45 a 1:00 | A referência | Impacto | Guimarães recolhe 1,9 kg por habitante, a França 4,27. "Respondemos com números, não com contentores." |
+| 4 | 1:00 a 3:00 | **Demo ao vivo** | Viabilidade, impacto e inovação (40 s cada) | Cenários A e B; um jurado faz uma pergunta "E se...?"; uma peça real vai do saco ao lote com QR; relatório RAP num clique. Guião detalhado em [Demo e entrega](../engenharia/demo-e-entrega.md) e [roteiro](narrativa-do-pitch.md#roteiro-da-demo). |
+| 5 | 3:00 a 3:30 | Como funciona | Viabilidade | O diagrama do saco ao fio, e a regra de ouro: a IA conduz o otimizador, nunca inventa números. Sem IA, o resto funciona. |
+| 6 | 3:30 a 3:55 | Do saco ao fio | Inovação | Lotes com passaporte e bolsa de fibra: a indústria tem capacidade, faltam lotes limpos. |
+| 7 | 3:55 a 4:20 | 2028 | Impacto | Quem paga hoje (o município) e em 2028 (os produtores, só o custo eficiente); replicável com dados abertos. |
+| 8 | 4:20 a 5:00 | Fecho e pedido | Continuidade | A frase-âncora com os números do cenário escolhido; o pedido: um piloto de 3 meses em duas freguesias; replicabilidade e roadmap depois de 26 de outubro. |
+| 9 | fora do tempo | Apoio | Os quatro | [Checklist critério e prova](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova), para as perguntas. |
 
 ## Frase-âncora
 
@@ -27,6 +33,7 @@ Este é o resumo. A versão completa, com as falas, as objeções e a fonte de c
 - O QR do saco é lido pelo telemóvel de um jurado, não pelo nosso.
 - Plano B: vídeo de 60 segundos da demo e relatório RAP pré-gerado, prontos se a rede ou o portátil falharem.
 - Nenhum número no ecrã que não saibamos explicar em uma frase.
+- Cada critério tem uma frase dita e uma prova aberta; o fecho aborda a continuidade (piloto, replicabilidade, roadmap).
 
 ## Slides
 
