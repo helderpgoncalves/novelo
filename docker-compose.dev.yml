@@ -1,0 +1,68 @@
+# Desenvolvimento local com hot reload:  just dev   (ou: docker compose -f docker-compose.dev.yml up --build)
+# Web http://localhost:3190 · API http://localhost:8190/api/docs · Postgres localhost:5590
+name: novelo-dev
+
+services:
+  db:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-novelo}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-novelo}
+      POSTGRES_DB: ${POSTGRES_DB:-novelo}
+    ports:
+      - "${DB_PORT:-5590}:5432"
+    volumes:
+      - dev_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-novelo} -d ${POSTGRES_DB:-novelo}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile.dev
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_ENV: development
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-novelo}:${POSTGRES_PASSWORD:-novelo}@db:5432/${POSTGRES_DB:-novelo}
+      DATA_DIR: /data/processed
+      CORS_ORIGINS: '["http://localhost:${WEB_PORT:-3190}"]'
+      WATCHFILES_FORCE_POLLING: "true"  # file watching fiável em bind mounts
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api/src:/app/src
+      - ./apps/api/alembic:/app/alembic
+      - ./apps/api/alembic.ini:/app/alembic.ini
+      - ./apps/api/tests:/app/tests
+      - ./apps/api/pyproject.toml:/app/pyproject.toml
+      - ./data:/data
+    ports:
+      - "${API_PORT:-8190}:8000"
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile.dev
+    environment:
+      API_PROXY_TARGET: http://api:8000
+      CHOKIDAR_USEPOLLING: "true"
+    depends_on:
+      - api
+    volumes:
+      - ./apps/web:/repo/apps/web
+      - ./openapi.json:/repo/openapi.json
+      - web_node_modules:/repo/apps/web/node_modules
+      - root_node_modules:/repo/node_modules
+    ports:
+      - "${WEB_PORT:-3190}:3190"
+
+volumes:
+  dev_pgdata:
+  web_node_modules:
+  root_node_modules:

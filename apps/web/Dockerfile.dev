@@ -1,0 +1,13 @@
+# syntax=docker/dockerfile:1.7
+# Desenvolvimento: Vite com hot reload; código por bind mount.
+FROM node:22-slim
+ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH
+RUN corepack enable
+WORKDIR /repo
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY apps/web/package.json apps/web/
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
+    pnpm install --frozen-lockfile --filter web...
+WORKDIR /repo/apps/web
+EXPOSE 3190
+CMD ["pnpm", "dev"]

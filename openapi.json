@@ -1,0 +1,458 @@
+{
+  "components": {
+    "schemas": {
+      "Circuit": {
+        "properties": {
+          "circuit": {
+            "title": "Circuit",
+            "type": "string"
+          },
+          "collection_type": {
+            "title": "Collection Type",
+            "type": "string"
+          },
+          "days": {
+            "title": "Days",
+            "type": "string"
+          },
+          "localities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Localities",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "typology": {
+            "title": "Typology",
+            "type": "string"
+          }
+        },
+        "required": [
+          "typology",
+          "circuit",
+          "collection_type",
+          "localities",
+          "days",
+          "status",
+          "note"
+        ],
+        "title": "Circuit",
+        "type": "object"
+      },
+      "CircuitsSummary": {
+        "properties": {
+          "circuits": {
+            "items": {
+              "$ref": "#/components/schemas/Circuit"
+            },
+            "title": "Circuits",
+            "type": "array"
+          },
+          "localities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Localities",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "vehicles": {
+            "title": "Vehicles",
+            "type": "integer"
+          },
+          "vehicles_never_assigned": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Vehicles Never Assigned",
+            "type": "array"
+          },
+          "without_vehicle": {
+            "title": "Without Vehicle",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "circuits",
+          "total",
+          "without_vehicle",
+          "vehicles",
+          "vehicles_never_assigned",
+          "localities"
+        ],
+        "title": "CircuitsSummary",
+        "type": "object"
+      },
+      "EntityBaseline": {
+        "description": "Têxtil recolhido por uma entidade em 2025 e destino final (toneladas).",
+        "properties": {
+          "entity": {
+            "title": "Entity",
+            "type": "string"
+          },
+          "exact_weights": {
+            "description": "False se o destino vem de percentagens do relatório",
+            "title": "Exact Weights",
+            "type": "boolean"
+          },
+          "recycle_pct": {
+            "title": "Recycle Pct",
+            "type": "number"
+          },
+          "recycle_t": {
+            "title": "Recycle T",
+            "type": "number"
+          },
+          "reject_pct": {
+            "title": "Reject Pct",
+            "type": "number"
+          },
+          "reject_t": {
+            "title": "Reject T",
+            "type": "number"
+          },
+          "reuse_pct": {
+            "title": "Reuse Pct",
+            "type": "number"
+          },
+          "reuse_t": {
+            "title": "Reuse T",
+            "type": "number"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "total_t": {
+            "title": "Total T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "entity",
+          "total_t",
+          "reuse_t",
+          "recycle_t",
+          "reject_t",
+          "reuse_pct",
+          "recycle_pct",
+          "reject_pct",
+          "source",
+          "exact_weights"
+        ],
+        "title": "EntityBaseline",
+        "type": "object"
+      },
+      "FlowLink": {
+        "properties": {
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target": {
+            "title": "Target",
+            "type": "string"
+          },
+          "tonnes": {
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "source",
+          "target",
+          "tonnes"
+        ],
+        "title": "FlowLink",
+        "type": "object"
+      },
+      "FlowNode": {
+        "properties": {
+          "column": {
+            "title": "Column",
+            "type": "integer"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "column"
+        ],
+        "title": "FlowNode",
+        "type": "object"
+      },
+      "Flows": {
+        "properties": {
+          "links": {
+            "items": {
+              "$ref": "#/components/schemas/FlowLink"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "nodes": {
+            "items": {
+              "$ref": "#/components/schemas/FlowNode"
+            },
+            "title": "Nodes",
+            "type": "array"
+          },
+          "observed": {
+            "title": "Observed",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "observed",
+          "nodes",
+          "links"
+        ],
+        "title": "Flows",
+        "type": "object"
+      },
+      "Health": {
+        "properties": {
+          "status": {
+            "const": "ok",
+            "default": "ok",
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "title": "Health",
+        "type": "object"
+      },
+      "Readiness": {
+        "properties": {
+          "database": {
+            "title": "Database",
+            "type": "boolean"
+          },
+          "llm_enabled": {
+            "title": "Llm Enabled",
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "degraded"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "database",
+          "llm_enabled"
+        ],
+        "title": "Readiness",
+        "type": "object"
+      },
+      "TextileBaseline": {
+        "properties": {
+          "capture_of_demand_pct": {
+            "title": "Capture Of Demand Pct",
+            "type": "number"
+          },
+          "entities": {
+            "items": {
+              "$ref": "#/components/schemas/EntityBaseline"
+            },
+            "title": "Entities",
+            "type": "array"
+          },
+          "estimated_demand_t": {
+            "description": "Estimativa do plano municipal: 0,7 kg/hab/mês",
+            "title": "Estimated Demand T",
+            "type": "number"
+          },
+          "gap_t": {
+            "title": "Gap T",
+            "type": "number"
+          },
+          "kg_per_inhab_month": {
+            "description": "Observado: toneladas recolhidas por habitante",
+            "title": "Kg Per Inhab Month",
+            "type": "number"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "recycle_t": {
+            "title": "Recycle T",
+            "type": "number"
+          },
+          "reject_t": {
+            "title": "Reject T",
+            "type": "number"
+          },
+          "reuse_t": {
+            "title": "Reuse T",
+            "type": "number"
+          },
+          "total_t": {
+            "title": "Total T",
+            "type": "number"
+          },
+          "year": {
+            "default": 2025,
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "population",
+          "entities",
+          "total_t",
+          "reuse_t",
+          "recycle_t",
+          "reject_t",
+          "kg_per_inhab_month",
+          "estimated_demand_t",
+          "capture_of_demand_pct",
+          "gap_t"
+        ],
+        "title": "TextileBaseline",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "title": "Novelo API",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/api/v1/baseline/circuits": {
+      "get": {
+        "description": "Circuitos e viaturas de recolha atuais da Vitrus (base para a recolha a pedido).",
+        "operationId": "list_circuits",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CircuitsSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Circuits",
+        "tags": [
+          "baseline"
+        ]
+      }
+    },
+    "/api/v1/baseline/flows": {
+      "get": {
+        "description": "Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).",
+        "operationId": "get_observed_flows",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Flows"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Observed Flows",
+        "tags": [
+          "baseline"
+        ]
+      }
+    },
+    "/api/v1/baseline/textile": {
+      "get": {
+        "description": "Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.",
+        "operationId": "get_textile_baseline",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TextileBaseline"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Textile Baseline",
+        "tags": [
+          "baseline"
+        ]
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "description": "Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/api/v1/ready": {
+      "get": {
+        "description": "Readiness: a base de dados responde e diz se a IA está ligada.",
+        "operationId": "ready",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Readiness"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    }
+  }
+}
