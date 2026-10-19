@@ -1,6 +1,451 @@
 {
   "components": {
     "schemas": {
+      "AiCreditsOut": {
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "boolean"
+          },
+          "is_free_tier": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Is Free Tier"
+          },
+          "key_usage_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Key Usage Usd"
+          },
+          "limit_remaining_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Remaining Usd"
+          },
+          "limit_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Limit Usd"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "total_credits_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Credits Usd"
+          },
+          "total_usage_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Usage Usd"
+          }
+        },
+        "required": [
+          "available",
+          "message",
+          "limit_usd",
+          "limit_remaining_usd",
+          "key_usage_usd",
+          "total_credits_usd",
+          "total_usage_usd",
+          "is_free_tier"
+        ],
+        "title": "AiCreditsOut",
+        "type": "object"
+      },
+      "AiModelOut": {
+        "properties": {
+          "compatible": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cumpre os requisitos da tarefa pedida; nulo sem tarefa",
+            "title": "Compatible"
+          },
+          "context_length": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Context Length"
+          },
+          "cost_basis": {
+            "anyOf": [
+              {
+                "enum": [
+                  "measured",
+                  "estimate"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "measured = média real do ai_usage; estimate = tokens típicos",
+            "title": "Cost Basis"
+          },
+          "cost_per_operation_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo de uma operação da tarefa pedida",
+            "title": "Cost Per Operation Usd"
+          },
+          "cost_samples": {
+            "title": "Cost Samples",
+            "type": "integer"
+          },
+          "dynamic_pricing": {
+            "title": "Dynamic Pricing",
+            "type": "boolean"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "input_modalities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Input Modalities",
+            "type": "array"
+          },
+          "input_per_m_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Input Per M Usd"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "output_per_m_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Output Per M Usd"
+          },
+          "recommended": {
+            "title": "Recommended",
+            "type": "boolean"
+          },
+          "supports_image": {
+            "title": "Supports Image",
+            "type": "boolean"
+          },
+          "supports_structured_outputs": {
+            "title": "Supports Structured Outputs",
+            "type": "boolean"
+          },
+          "supports_tools": {
+            "title": "Supports Tools",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "context_length",
+          "input_per_m_usd",
+          "output_per_m_usd",
+          "dynamic_pricing",
+          "input_modalities",
+          "supports_image",
+          "supports_tools",
+          "supports_structured_outputs",
+          "recommended",
+          "compatible",
+          "cost_per_operation_usd",
+          "cost_basis",
+          "cost_samples"
+        ],
+        "title": "AiModelOut",
+        "type": "object"
+      },
+      "AiModelsOut": {
+        "properties": {
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/AiModelOut"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "operation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "per_item_sorted, per_question, per_briefing, per_explanation, per_alert",
+            "title": "Operation"
+          },
+          "recommended_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recommended Model"
+          },
+          "stale": {
+            "description": "O catálogo do OpenRouter não respondeu: serve-se a cópia anterior",
+            "title": "Stale",
+            "type": "boolean"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiTask"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "models",
+          "total",
+          "task",
+          "operation",
+          "stale",
+          "recommended_model"
+        ],
+        "title": "AiModelsOut",
+        "type": "object"
+      },
+      "AiSettingsOut": {
+        "properties": {
+          "budget": {
+            "$ref": "#/components/schemas/BudgetOut"
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/GlobalDefaults",
+            "description": "Valores globais guardados na base de dados"
+          },
+          "enabled": {
+            "description": "Há chave do OpenRouter configurada",
+            "title": "Enabled",
+            "type": "boolean"
+          },
+          "env": {
+            "$ref": "#/components/schemas/GlobalDefaults",
+            "description": "Valores do .env, usados quando a base de dados não define o campo"
+          },
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/TaskConfigOut"
+            },
+            "title": "Tasks",
+            "type": "array"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "enabled",
+          "defaults",
+          "env",
+          "tasks",
+          "budget",
+          "updated_at"
+        ],
+        "title": "AiSettingsOut",
+        "type": "object"
+      },
+      "AiSettingsUpdate": {
+        "description": "Substitui a configuração: o que vier nulo volta a herdar (da tarefa para o global, do global para o `.env`).",
+        "properties": {
+          "defaults": {
+            "$ref": "#/components/schemas/GlobalDefaults"
+          },
+          "monthly_budget_usd": {
+            "anyOf": [
+              {
+                "maximum": 100000.0,
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "0 = sem limite; nulo = .env",
+            "title": "Monthly Budget Usd"
+          },
+          "tasks": {
+            "items": {
+              "$ref": "#/components/schemas/TaskConfigIn"
+            },
+            "maxItems": 10,
+            "title": "Tasks",
+            "type": "array"
+          }
+        },
+        "required": [
+          "defaults"
+        ],
+        "title": "AiSettingsUpdate",
+        "type": "object"
+      },
+      "AiTask": {
+        "enum": [
+          "copilot",
+          "whatif",
+          "explain",
+          "briefing",
+          "alert_resolution",
+          "triage",
+          "test"
+        ],
+        "title": "AiTask",
+        "type": "string"
+      },
+      "AiUsageOut": {
+        "properties": {
+          "by_day": {
+            "items": {
+              "$ref": "#/components/schemas/UsageDay"
+            },
+            "title": "By Day",
+            "type": "array"
+          },
+          "by_model": {
+            "items": {
+              "$ref": "#/components/schemas/UsageGroup"
+            },
+            "title": "By Model",
+            "type": "array"
+          },
+          "by_task": {
+            "items": {
+              "$ref": "#/components/schemas/UsageGroup"
+            },
+            "title": "By Task",
+            "type": "array"
+          },
+          "by_task_model": {
+            "items": {
+              "$ref": "#/components/schemas/UsageGroup"
+            },
+            "title": "By Task Model",
+            "type": "array"
+          },
+          "days": {
+            "title": "Days",
+            "type": "integer"
+          },
+          "month": {
+            "$ref": "#/components/schemas/BudgetOut"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/UsageTotals"
+          }
+        },
+        "required": [
+          "days",
+          "totals",
+          "month",
+          "by_day",
+          "by_task",
+          "by_model",
+          "by_task_model"
+        ],
+        "title": "AiUsageOut",
+        "type": "object"
+      },
       "AlertKind": {
         "enum": [
           "circuit_without_vehicle",
@@ -13,7 +458,10 @@
           "vehicle_without_circuit",
           "undocumented_circuits",
           "different_dates",
-          "normalized_spelling"
+          "normalized_spelling",
+          "container_rows_rejected",
+          "container_pending_location",
+          "container_assumed_values"
         ],
         "title": "AlertKind",
         "type": "string"
@@ -26,6 +474,124 @@
         ],
         "title": "AlertStatus",
         "type": "string"
+      },
+      "AlertSuggestionOut": {
+        "properties": {
+          "action": {
+            "enum": [
+              "confirm_with_vitrus",
+              "correct_data",
+              "accept_as_is",
+              "ignore"
+            ],
+            "title": "Action",
+            "type": "string"
+          },
+          "alert_id": {
+            "format": "uuid",
+            "title": "Alert Id",
+            "type": "string"
+          },
+          "applied": {
+            "const": false,
+            "default": false,
+            "description": "Sempre falso. Para aplicar: PATCH /datasets/alerts/{id} com suggested_status e nota",
+            "title": "Applied",
+            "type": "boolean"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "fields_to_fix": {
+            "items": {
+              "$ref": "#/components/schemas/FieldFix"
+            },
+            "maxItems": 6,
+            "title": "Fields To Fix",
+            "type": "array"
+          },
+          "justification": {
+            "description": "Porquê esta ação (inglês, 1 a 3 frases)",
+            "maxLength": 500,
+            "title": "Justification",
+            "type": "string"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          },
+          "question_for_vitrus": {
+            "anyOf": [
+              {
+                "maxLength": 400,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Em português",
+            "title": "Question For Vitrus"
+          },
+          "resolution_note": {
+            "description": "Nota em português para guardar ao confirmar",
+            "maxLength": 300,
+            "title": "Resolution Note",
+            "type": "string"
+          },
+          "source": {
+            "description": "fallback = regra determinística, sem IA",
+            "enum": [
+              "model",
+              "fallback"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "suggested_status": {
+            "$ref": "#/components/schemas/AlertStatus"
+          },
+          "verified": {
+            "description": "Os números e os valores propostos existem no texto do alerta",
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "action",
+          "suggested_status",
+          "justification",
+          "resolution_note",
+          "confidence",
+          "alert_id",
+          "source",
+          "verified",
+          "prompt_version",
+          "model"
+        ],
+        "title": "AlertSuggestionOut",
+        "type": "object"
       },
       "AlertUpdate": {
         "properties": {
@@ -198,6 +764,139 @@
         "title": "AuthConfig",
         "type": "object"
       },
+      "BenchmarkOut": {
+        "properties": {
+          "current_people_per_point": {
+            "description": "Densidade atual do pressuposto para o mesmo modo",
+            "title": "Current People Per Point",
+            "type": "integer"
+          },
+          "density_mode": {
+            "$ref": "#/components/schemas/CollectionMode",
+            "description": "Modo a que a densidade se aplica"
+          },
+          "implied_capture_pct": {
+            "description": "Fração do potencial (0,7 kg/hab/mês) que a meta exige captar",
+            "title": "Implied Capture Pct",
+            "type": "number"
+          },
+          "key": {
+            "description": "Identificador estável do preset, ex.: `french_performance`",
+            "title": "Key",
+            "type": "string"
+          },
+          "kg_per_inhab_year": {
+            "description": "Meta de recolha de têxtil (kg/hab/ano)",
+            "title": "Kg Per Inhab Year",
+            "type": "number"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "max_capturable_t": {
+            "description": "Teto do modelo com todos os modos ligados e a densidade do preset",
+            "title": "Max Capturable T",
+            "type": "number"
+          },
+          "observed_capture_pct": {
+            "description": "Captura atual da Vitrus (22,9%)",
+            "title": "Observed Capture Pct",
+            "type": "number"
+          },
+          "observed_kg_per_inhab_year": {
+            "description": "Recolhido em 2025 / habitantes (dados da Vitrus)",
+            "title": "Observed Kg Per Inhab Year",
+            "type": "number"
+          },
+          "people_per_point": {
+            "description": "Densidade: 1 ponto por cada N habitantes",
+            "title": "People Per Point",
+            "type": "integer"
+          },
+          "population": {
+            "description": "Habitantes (INE, Censos 2021) das freguesias com dados",
+            "title": "Population",
+            "type": "integer"
+          },
+          "reachable": {
+            "description": "A meta cabe dentro do teto do modelo",
+            "title": "Reachable",
+            "type": "boolean"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "target_tonnes": {
+            "description": "Meta em t/ano: kg/hab/ano × população",
+            "title": "Target Tonnes",
+            "type": "number"
+          },
+          "verified": {
+            "description": "Falso: referência externa por confirmar na fonte original",
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "kg_per_inhab_year",
+          "people_per_point",
+          "density_mode",
+          "source",
+          "verified",
+          "population",
+          "target_tonnes",
+          "implied_capture_pct",
+          "observed_capture_pct",
+          "observed_kg_per_inhab_year",
+          "current_people_per_point",
+          "max_capturable_t",
+          "reachable"
+        ],
+        "title": "BenchmarkOut",
+        "type": "object"
+      },
+      "BenchmarkScenarioRequest": {
+        "properties": {
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Obrigatório em max_tonnes",
+            "title": "Budget Eur Year"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omitido = nome do preset",
+            "title": "Label"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective",
+            "default": "min_cost",
+            "description": "min_cost: custo mínimo para a meta; max_tonnes: com orçamento"
+          }
+        },
+        "title": "BenchmarkScenarioRequest",
+        "type": "object"
+      },
       "Body_analyse_garment": {
         "properties": {
           "item_photo": {
@@ -308,6 +1007,61 @@
         "title": "BrandsOut",
         "type": "object"
       },
+      "BudgetOut": {
+        "properties": {
+          "monthly_budget_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nulo = sem limite",
+            "title": "Monthly Budget Usd"
+          },
+          "spent_usd": {
+            "description": "Custo acumulado no mês corrente (UTC)",
+            "title": "Spent Usd",
+            "type": "number"
+          },
+          "state": {
+            "enum": [
+              "unlimited",
+              "ok",
+              "warning",
+              "exceeded"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "used_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Used Pct"
+          },
+          "warn_pct": {
+            "title": "Warn Pct",
+            "type": "number"
+          }
+        },
+        "required": [
+          "monthly_budget_usd",
+          "spent_usd",
+          "used_pct",
+          "state",
+          "warn_pct"
+        ],
+        "title": "BudgetOut",
+        "type": "object"
+      },
       "CaptureScale": {
         "properties": {
           "factor": {
@@ -326,6 +1080,46 @@
           "factor"
         ],
         "title": "CaptureScale",
+        "type": "object"
+      },
+      "CardKpis": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "coverage_pct": {
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tonnes_year",
+          "annual_cost_eur",
+          "eur_per_tonne",
+          "capex_eur",
+          "coverage_pct"
+        ],
+        "title": "CardKpis",
         "type": "object"
       },
       "ChangePasswordRequest": {
@@ -352,6 +1146,30 @@
           "new_password"
         ],
         "title": "ChangePasswordRequest",
+        "type": "object"
+      },
+      "ChatTurn": {
+        "properties": {
+          "content": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "title": "Content",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatTurn",
         "type": "object"
       },
       "CircuitOut": {
@@ -603,6 +1421,18 @@
             "title": "Longitude",
             "type": "string"
           },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesia onde cai o ponto (código INE), se foi possível atribuir",
+            "title": "Parish Code"
+          },
           "status": {
             "$ref": "#/components/schemas/ContainerStatus"
           }
@@ -616,6 +1446,7 @@
           "longitude",
           "address",
           "locality",
+          "parish_code",
           "capacity_litres"
         ],
         "title": "ContainerOut",
@@ -629,6 +1460,237 @@
         ],
         "title": "ContainerStatus",
         "type": "string"
+      },
+      "CopilotReply": {
+        "properties": {
+          "cards": {
+            "items": {
+              "$ref": "#/components/schemas/ScenarioCard"
+            },
+            "title": "Cards",
+            "type": "array"
+          },
+          "language": {
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Language",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          },
+          "tools_used": {
+            "items": {
+              "$ref": "#/components/schemas/ToolTrace"
+            },
+            "title": "Tools Used",
+            "type": "array"
+          },
+          "verified": {
+            "description": "Todos os números do texto existem nos resultados das ferramentas",
+            "title": "Verified",
+            "type": "boolean"
+          },
+          "warning": {
+            "anyOf": [
+              {
+                "const": "numbers_unverified",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Se presente, o texto foi substituído por um aviso e só valem os cartões",
+            "title": "Warning"
+          }
+        },
+        "required": [
+          "text",
+          "cards",
+          "tools_used",
+          "verified",
+          "warning",
+          "prompt_version",
+          "model",
+          "language"
+        ],
+        "title": "CopilotReply",
+        "type": "object"
+      },
+      "CopilotRequest": {
+        "description": "O servidor não guarda conversas: o web envia o histórico (máx. 20 mensagens) em cada pedido.",
+        "properties": {
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatTurn"
+            },
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages",
+            "type": "array"
+          },
+          "scenario_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cenário aberto no ecrã, se houver",
+            "title": "Scenario Id"
+          }
+        },
+        "required": [
+          "messages"
+        ],
+        "title": "CopilotRequest",
+        "type": "object"
+      },
+      "CoverageState": {
+        "enum": [
+          "ok",
+          "awaiting_data"
+        ],
+        "title": "CoverageState",
+        "type": "string"
+      },
+      "CoverageSummary": {
+        "properties": {
+          "containers": {
+            "description": "Contentores ativos do tipo pedido",
+            "title": "Containers",
+            "type": "integer"
+          },
+          "containers_per_1000": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Containers Per 1000"
+          },
+          "containers_total": {
+            "description": "Todos os contentores importados, de qualquer tipo e estado",
+            "title": "Containers Total",
+            "type": "integer"
+          },
+          "covered_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered Pct"
+          },
+          "covered_population": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Covered Population"
+          },
+          "gap_points": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pontos em falta face à referência; vazio sem dados",
+            "title": "Gap Points"
+          },
+          "is_estimate": {
+            "default": true,
+            "description": "A cobertura é uma estimativa, não uma medição",
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ContainerKind",
+            "description": "Tipo de contentor contado (só ativos)"
+          },
+          "method": {
+            "description": "Como se calcula, em português, para mostrar no ecrã",
+            "title": "Method",
+            "type": "string"
+          },
+          "parishes": {
+            "items": {
+              "$ref": "#/components/schemas/ParishCoverage"
+            },
+            "title": "Parishes",
+            "type": "array"
+          },
+          "population": {
+            "description": "População residente das freguesias (INE)",
+            "title": "Population",
+            "type": "integer"
+          },
+          "radius_m": {
+            "title": "Radius M",
+            "type": "integer"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/ReferenceStandard"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CoverageState",
+            "description": "awaiting_data enquanto não houver contentores importados"
+          }
+        },
+        "required": [
+          "state",
+          "method",
+          "radius_m",
+          "kind",
+          "population",
+          "containers",
+          "containers_total",
+          "containers_per_1000",
+          "covered_population",
+          "covered_pct",
+          "reference",
+          "gap_points",
+          "parishes"
+        ],
+        "title": "CoverageSummary",
+        "type": "object"
       },
       "DataAlertOut": {
         "properties": {
@@ -826,6 +1888,90 @@
         "title": "DayGroup",
         "type": "string"
       },
+      "EffectiveTask": {
+        "properties": {
+          "fallback_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Model"
+          },
+          "fallback_source": {
+            "enum": [
+              "database",
+              "global_default",
+              "env",
+              "code"
+            ],
+            "title": "Fallback Source",
+            "type": "string"
+          },
+          "max_output_tokens": {
+            "title": "Max Output Tokens",
+            "type": "integer"
+          },
+          "max_tokens_source": {
+            "enum": [
+              "database",
+              "global_default",
+              "env",
+              "code"
+            ],
+            "title": "Max Tokens Source",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "model_source": {
+            "enum": [
+              "database",
+              "global_default",
+              "env",
+              "code"
+            ],
+            "title": "Model Source",
+            "type": "string"
+          },
+          "reasoning_effort": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ],
+            "title": "Reasoning Effort",
+            "type": "string"
+          },
+          "reasoning_source": {
+            "enum": [
+              "database",
+              "global_default",
+              "env",
+              "code"
+            ],
+            "title": "Reasoning Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "model",
+          "model_source",
+          "fallback_model",
+          "fallback_source",
+          "max_output_tokens",
+          "max_tokens_source",
+          "reasoning_effort",
+          "reasoning_source"
+        ],
+        "title": "EffectiveTask",
+        "type": "object"
+      },
       "EntityBaseline": {
         "description": "Têxtil recolhido por uma entidade num ano e o destino final (toneladas).",
         "properties": {
@@ -916,6 +2062,7 @@
               "rate_limited",
               "feature_disabled",
               "upstream_error",
+              "ai_budget_exceeded",
               "internal_error"
             ],
             "title": "Code",
@@ -974,6 +2121,45 @@
           "message"
         ],
         "title": "FieldError",
+        "type": "object"
+      },
+      "FieldFix": {
+        "properties": {
+          "current_value": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Current Value"
+          },
+          "field": {
+            "maxLength": 80,
+            "title": "Field",
+            "type": "string"
+          },
+          "proposed_value": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só valores escritos no alerta",
+            "title": "Proposed Value"
+          }
+        },
+        "required": [
+          "field"
+        ],
+        "title": "FieldFix",
         "type": "object"
       },
       "FleetSummary": {
@@ -1178,6 +2364,78 @@
         ],
         "title": "GarmentType",
         "type": "string"
+      },
+      "GlobalDefaults": {
+        "description": "Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.",
+        "properties": {
+          "fallback_model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Model"
+          },
+          "max_output_tokens": {
+            "anyOf": [
+              {
+                "maximum": 8000.0,
+                "minimum": 16.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Output Tokens"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort"
+          },
+          "text_model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text Model"
+          },
+          "vision_model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vision Model"
+          }
+        },
+        "title": "GlobalDefaults",
+        "type": "object"
       },
       "Health": {
         "properties": {
@@ -1838,6 +3096,37 @@
         "title": "MarketLot",
         "type": "object"
       },
+      "MetricsOut": {
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "tonnes": {
+            "description": "t/ano",
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tonnes",
+          "annual_cost_eur",
+          "eur_per_tonne"
+        ],
+        "title": "MetricsOut",
+        "type": "object"
+      },
       "ModeParams": {
         "properties": {
           "capex_per_point_eur": {
@@ -1990,6 +3279,84 @@
         "title": "ParametersOut",
         "type": "object"
       },
+      "ParishCoverage": {
+        "properties": {
+          "containers": {
+            "description": "Contentores contados que caem nesta freguesia",
+            "title": "Containers",
+            "type": "integer"
+          },
+          "containers_per_1000": {
+            "description": "Contentores por 1000 habitantes",
+            "title": "Containers Per 1000",
+            "type": "number"
+          },
+          "covered_pct": {
+            "description": "Estimativa: % da população coberta (0 a 100)",
+            "title": "Covered Pct",
+            "type": "number"
+          },
+          "covered_population": {
+            "description": "Estimativa: população a ≤ radius_m de um contentor",
+            "title": "Covered Population",
+            "type": "integer"
+          },
+          "demand_points": {
+            "description": "Pontos onde se assume que a população vive (localidades ou centroide)",
+            "title": "Demand Points",
+            "type": "integer"
+          },
+          "gap_points": {
+            "description": "Pontos em falta face à referência (nunca negativo)",
+            "title": "Gap Points",
+            "type": "integer"
+          },
+          "nearest_container_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Distância em linha reta ao contentor mais próximo",
+            "title": "Nearest Container M"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "reference_points": {
+            "description": "Pontos que a referência francesa daria a esta freguesia",
+            "title": "Reference Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "population",
+          "demand_points",
+          "containers",
+          "containers_per_1000",
+          "covered_population",
+          "covered_pct",
+          "nearest_container_m",
+          "reference_points",
+          "gap_points"
+        ],
+        "title": "ParishCoverage",
+        "type": "object"
+      },
       "Passport": {
         "description": "Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.",
         "properties": {
@@ -2077,6 +3444,306 @@
           "opened_at"
         ],
         "title": "Passport",
+        "type": "object"
+      },
+      "PilotFact": {
+        "description": "Um número que justifica a escolha, com a sua origem.",
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "value",
+          "unit",
+          "source"
+        ],
+        "title": "PilotFact",
+        "type": "object"
+      },
+      "PilotKpiOut": {
+        "properties": {
+          "basis": {
+            "description": "De onde vem a previsão",
+            "title": "Basis",
+            "type": "string"
+          },
+          "key": {
+            "enum": [
+              "tonnes",
+              "eur_per_tonne",
+              "reject_rate_pct"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          },
+          "value": {
+            "description": "Valor previsto (estimativa)",
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "unit",
+          "value",
+          "p10",
+          "p90",
+          "basis"
+        ],
+        "title": "PilotKpiOut",
+        "type": "object"
+      },
+      "PilotOut": {
+        "properties": {
+          "estimate": {
+            "default": true,
+            "description": "Os valores previstos são estimativas",
+            "title": "Estimate",
+            "type": "boolean"
+          },
+          "k": {
+            "title": "K",
+            "type": "integer"
+          },
+          "kpis": {
+            "items": {
+              "$ref": "#/components/schemas/PilotKpiOut"
+            },
+            "title": "Kpis",
+            "type": "array"
+          },
+          "modes": {
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "months": {
+            "title": "Months",
+            "type": "integer"
+          },
+          "rationale": {
+            "description": "Justificação em frases; todos os números vêm de `zones[].facts`",
+            "items": {
+              "type": "string"
+            },
+            "title": "Rationale",
+            "type": "array"
+          },
+          "score": {
+            "$ref": "#/components/schemas/PilotScoreOut"
+          },
+          "signal_floor": {
+            "$ref": "#/components/schemas/SignalFloorOut"
+          },
+          "startup_cost_eur": {
+            "description": "Investimento e operação do piloto (estimativa)",
+            "title": "Startup Cost Eur",
+            "type": "number"
+          },
+          "zones": {
+            "items": {
+              "$ref": "#/components/schemas/PilotZoneOut"
+            },
+            "title": "Zones",
+            "type": "array"
+          }
+        },
+        "required": [
+          "k",
+          "months",
+          "modes",
+          "zones",
+          "score",
+          "kpis",
+          "signal_floor",
+          "startup_cost_eur",
+          "rationale"
+        ],
+        "title": "PilotOut",
+        "type": "object"
+      },
+      "PilotRequest": {
+        "properties": {
+          "k": {
+            "default": 2,
+            "description": "Número de freguesias do piloto",
+            "maximum": 4.0,
+            "minimum": 2.0,
+            "title": "K",
+            "type": "integer"
+          },
+          "min_tonnes_pilot": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Piso de sinal em toneladas no piloto; omitido = calculado para medir a taxa de rejeito (3 p.p.)",
+            "title": "Min Tonnes Pilot"
+          },
+          "modes": {
+            "description": "Modos de recolha a testar no piloto",
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "minItems": 1,
+            "title": "Modes",
+            "type": "array"
+          },
+          "months": {
+            "default": 3,
+            "description": "Duração do piloto em meses",
+            "maximum": 12.0,
+            "minimum": 1.0,
+            "title": "Months",
+            "type": "integer"
+          },
+          "n_samples": {
+            "default": 500,
+            "maximum": 5000.0,
+            "minimum": 50.0,
+            "title": "N Samples",
+            "type": "integer"
+          },
+          "seed": {
+            "default": 7,
+            "title": "Seed",
+            "type": "integer"
+          },
+          "swing": {
+            "default": 0.3,
+            "description": "Incerteza ± dos pressupostos nos intervalos",
+            "maximum": 0.9,
+            "minimum": 0.05,
+            "title": "Swing",
+            "type": "number"
+          }
+        },
+        "title": "PilotRequest",
+        "type": "object"
+      },
+      "PilotScoreOut": {
+        "properties": {
+          "cost": {
+            "title": "Cost",
+            "type": "number"
+          },
+          "coverage": {
+            "title": "Coverage",
+            "type": "number"
+          },
+          "density_contrast": {
+            "title": "Density Contrast",
+            "type": "number"
+          },
+          "score": {
+            "description": "Valor de aprendizagem do conjunto, de 0 a 1",
+            "title": "Score",
+            "type": "number"
+          },
+          "tipau_diversity": {
+            "title": "Tipau Diversity",
+            "type": "number"
+          },
+          "weight_cost": {
+            "title": "Weight Cost",
+            "type": "number"
+          },
+          "weight_coverage": {
+            "title": "Weight Coverage",
+            "type": "number"
+          },
+          "weight_density": {
+            "title": "Weight Density",
+            "type": "number"
+          },
+          "weight_tipau": {
+            "title": "Weight Tipau",
+            "type": "number"
+          }
+        },
+        "required": [
+          "score",
+          "tipau_diversity",
+          "density_contrast",
+          "coverage",
+          "cost",
+          "weight_tipau",
+          "weight_density",
+          "weight_coverage",
+          "weight_cost"
+        ],
+        "title": "PilotScoreOut",
+        "type": "object"
+      },
+      "PilotZoneOut": {
+        "properties": {
+          "facts": {
+            "items": {
+              "$ref": "#/components/schemas/PilotFact"
+            },
+            "title": "Facts",
+            "type": "array"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "tipau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tipau"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "tipau",
+          "facts"
+        ],
+        "title": "PilotZoneOut",
         "type": "object"
       },
       "PlanningParams": {
@@ -2207,6 +3874,29 @@
         "title": "ProfileUpdate",
         "type": "object"
       },
+      "QuantilesOut": {
+        "properties": {
+          "p10": {
+            "title": "P10",
+            "type": "number"
+          },
+          "p50": {
+            "title": "P50",
+            "type": "number"
+          },
+          "p90": {
+            "title": "P90",
+            "type": "number"
+          }
+        },
+        "required": [
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "title": "QuantilesOut",
+        "type": "object"
+      },
       "Readiness": {
         "properties": {
           "database": {
@@ -2232,6 +3922,42 @@
           "llm_enabled"
         ],
         "title": "Readiness",
+        "type": "object"
+      },
+      "ReferenceStandard": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "people_per_point": {
+            "description": "1 ponto por cada N habitantes",
+            "title": "People Per Point",
+            "type": "integer"
+          },
+          "points": {
+            "description": "Pontos que a referência daria ao concelho",
+            "title": "Points",
+            "type": "integer"
+          },
+          "verified": {
+            "description": "Falso: o valor ainda tem de ser confirmado na fonte",
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "people_per_point",
+          "points",
+          "verified",
+          "note"
+        ],
+        "title": "ReferenceStandard",
         "type": "object"
       },
       "RegisterRequest": {
@@ -2480,6 +4206,82 @@
         "title": "ResolvedChange",
         "type": "object"
       },
+      "RobustnessOut": {
+        "properties": {
+          "alternative_id": {
+            "format": "uuid",
+            "title": "Alternative Id",
+            "type": "string"
+          },
+          "base_alternative": {
+            "$ref": "#/components/schemas/MetricsOut"
+          },
+          "base_recommended": {
+            "$ref": "#/components/schemas/MetricsOut"
+          },
+          "criterion": {
+            "enum": [
+              "eur_per_tonne",
+              "annual_cost_eur",
+              "tonnes"
+            ],
+            "title": "Criterion",
+            "type": "string"
+          },
+          "holds": {
+            "description": "O recomendado é melhor em pelo menos `min_share` das amostras",
+            "title": "Holds",
+            "type": "boolean"
+          },
+          "median_advantage": {
+            "description": "Mediana de (alternativo − recomendado) no critério; positivo = ganho",
+            "title": "Median Advantage",
+            "type": "number"
+          },
+          "min_share": {
+            "title": "Min Share",
+            "type": "number"
+          },
+          "n_samples": {
+            "title": "N Samples",
+            "type": "integer"
+          },
+          "recommended_id": {
+            "format": "uuid",
+            "title": "Recommended Id",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "share_recommended_better": {
+            "description": "Fração das amostras em que o recomendado é melhor (0 a 1)",
+            "title": "Share Recommended Better",
+            "type": "number"
+          },
+          "swing": {
+            "title": "Swing",
+            "type": "number"
+          }
+        },
+        "required": [
+          "recommended_id",
+          "alternative_id",
+          "criterion",
+          "n_samples",
+          "seed",
+          "swing",
+          "share_recommended_better",
+          "min_share",
+          "holds",
+          "median_advantage",
+          "base_recommended",
+          "base_alternative"
+        ],
+        "title": "RobustnessOut",
+        "type": "object"
+      },
       "RouteOut": {
         "properties": {
           "km": {
@@ -2558,6 +4360,53 @@
           "load_t"
         ],
         "title": "RouteStop",
+        "type": "object"
+      },
+      "ScenarioCard": {
+        "description": "Resultado de uma ferramenta para o web desenhar. Os números vêm do otimizador, nunca do texto do modelo.",
+        "properties": {
+          "created_now": {
+            "description": "Cenário criado pelo copiloto neste pedido",
+            "title": "Created Now",
+            "type": "boolean"
+          },
+          "kpis": {
+            "$ref": "#/components/schemas/CardKpis"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "scenario_id": {
+            "format": "uuid",
+            "title": "Scenario Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "label",
+          "objective",
+          "kpis",
+          "created_now",
+          "parent_id"
+        ],
+        "title": "ScenarioCard",
         "type": "object"
       },
       "ScenarioObjective": {
@@ -2977,6 +4826,138 @@
         "title": "ScheduleEntry",
         "type": "object"
       },
+      "SensitivityOut": {
+        "properties": {
+          "annual_cost_eur": {
+            "$ref": "#/components/schemas/QuantilesOut"
+          },
+          "assumption_share_of_top_drivers": {
+            "description": "Fração dos 5 maiores fatores de incerteza que são pressupostos sem dado (estimativa)",
+            "title": "Assumption Share Of Top Drivers",
+            "type": "number"
+          },
+          "base": {
+            "$ref": "#/components/schemas/MetricsOut",
+            "description": "Plano com os pressupostos centrais (reproduz os KPIs do cenário)"
+          },
+          "eur_per_tonne": {
+            "$ref": "#/components/schemas/QuantilesOut"
+          },
+          "method": {
+            "description": "Como foi calculado (o plano otimizado é reavaliado, o solver não corre de novo)",
+            "title": "Method",
+            "type": "string"
+          },
+          "n_samples": {
+            "title": "N Samples",
+            "type": "integer"
+          },
+          "prob_below_threshold": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "P(€/t < limiar), de 0 a 1",
+            "title": "Prob Below Threshold"
+          },
+          "scenario_id": {
+            "format": "uuid",
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "seed": {
+            "title": "Seed",
+            "type": "integer"
+          },
+          "swing": {
+            "title": "Swing",
+            "type": "number"
+          },
+          "threshold_eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Threshold Eur Per Tonne"
+          },
+          "tonnes": {
+            "$ref": "#/components/schemas/QuantilesOut"
+          },
+          "tornado": {
+            "items": {
+              "$ref": "#/components/schemas/TornadoBarOut"
+            },
+            "title": "Tornado",
+            "type": "array"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "swing",
+          "n_samples",
+          "seed",
+          "method",
+          "base",
+          "tornado",
+          "eur_per_tonne",
+          "annual_cost_eur",
+          "tonnes",
+          "threshold_eur_per_tonne",
+          "prob_below_threshold",
+          "assumption_share_of_top_drivers"
+        ],
+        "title": "SensitivityOut",
+        "type": "object"
+      },
+      "SensitivityRequest": {
+        "properties": {
+          "n_samples": {
+            "default": 500,
+            "description": "Amostras do Monte Carlo",
+            "maximum": 5000.0,
+            "minimum": 50.0,
+            "title": "N Samples",
+            "type": "integer"
+          },
+          "seed": {
+            "default": 7,
+            "description": "Semente fixa: mesma entrada, mesmo resultado",
+            "title": "Seed",
+            "type": "integer"
+          },
+          "swing": {
+            "default": 0.3,
+            "description": "Variação ± de cada parâmetro (0,3 = ±30%)",
+            "maximum": 0.9,
+            "minimum": 0.05,
+            "title": "Swing",
+            "type": "number"
+          },
+          "threshold_eur_per_tonne": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Limiar de €/t para calcular a probabilidade de ficar abaixo",
+            "title": "Threshold Eur Per Tonne"
+          }
+        },
+        "title": "SensitivityRequest",
+        "type": "object"
+      },
       "Shift": {
         "enum": [
           "morning",
@@ -2985,6 +4966,64 @@
         ],
         "title": "Shift",
         "type": "string"
+      },
+      "SignalFloorOut": {
+        "description": "Piso de sinal: toneladas mínimas do piloto e o que ficou de fora por não o atingir.",
+        "properties": {
+          "calculation": {
+            "description": "A conta do piso, passo a passo",
+            "items": {
+              "$ref": "#/components/schemas/PilotFact"
+            },
+            "title": "Calculation",
+            "type": "array"
+          },
+          "combos_below_floor": {
+            "description": "Combinações descartadas por ficarem abaixo do piso",
+            "title": "Combos Below Floor",
+            "type": "integer"
+          },
+          "combos_total": {
+            "title": "Combos Total",
+            "type": "integer"
+          },
+          "computed": {
+            "description": "Falso: valor imposto no pedido",
+            "title": "Computed",
+            "type": "boolean"
+          },
+          "explanation": {
+            "title": "Explanation",
+            "type": "string"
+          },
+          "floor_met": {
+            "description": "Falso: nenhuma combinação atinge o piso; devolvida a de mais toneladas",
+            "title": "Floor Met",
+            "type": "boolean"
+          },
+          "min_tonnes_pilot": {
+            "description": "t mínimas no piloto (estimativa)",
+            "title": "Min Tonnes Pilot",
+            "type": "number"
+          },
+          "tonnes_pilot": {
+            "description": "t previstas no piloto escolhido",
+            "title": "Tonnes Pilot",
+            "type": "number"
+          }
+        },
+        "required": [
+          "min_tonnes_pilot",
+          "computed",
+          "tonnes_pilot",
+          "floor_met",
+          "combos_total",
+          "combos_below_floor",
+          "calculation",
+          "explanation"
+        ],
+        "title": "SignalFloorOut",
+        "type": "object"
       },
       "SlotCount": {
         "properties": {
@@ -3011,6 +5050,279 @@
           "crew"
         ],
         "title": "SlotCount",
+        "type": "object"
+      },
+      "TaskConfigIn": {
+        "properties": {
+          "fallback_model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Model"
+          },
+          "max_output_tokens": {
+            "anyOf": [
+              {
+                "maximum": 8000.0,
+                "minimum": 16.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Output Tokens"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Slug do OpenRouter, ex.: openai/gpt-6-luna",
+            "title": "Model"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort"
+          },
+          "task": {
+            "$ref": "#/components/schemas/AiTask"
+          }
+        },
+        "required": [
+          "task"
+        ],
+        "title": "TaskConfigIn",
+        "type": "object"
+      },
+      "TaskConfigOut": {
+        "properties": {
+          "effective": {
+            "$ref": "#/components/schemas/EffectiveTask"
+          },
+          "override": {
+            "$ref": "#/components/schemas/TaskOverride"
+          },
+          "recommended_model": {
+            "title": "Recommended Model",
+            "type": "string"
+          },
+          "requirements": {
+            "description": "Capacidades que o modelo tem de ter: image, tools, structured_outputs",
+            "items": {
+              "type": "string"
+            },
+            "title": "Requirements",
+            "type": "array"
+          },
+          "task": {
+            "$ref": "#/components/schemas/AiTask"
+          }
+        },
+        "required": [
+          "task",
+          "requirements",
+          "recommended_model",
+          "override",
+          "effective"
+        ],
+        "title": "TaskConfigOut",
+        "type": "object"
+      },
+      "TaskOverride": {
+        "description": "Valores próprios de uma tarefa. Campos nulos herdam o valor global.",
+        "properties": {
+          "fallback_model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallback Model"
+          },
+          "max_output_tokens": {
+            "anyOf": [
+              {
+                "maximum": 8000.0,
+                "minimum": 16.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Max Output Tokens"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Slug do OpenRouter, ex.: openai/gpt-6-luna",
+            "title": "Model"
+          },
+          "reasoning_effort": {
+            "anyOf": [
+              {
+                "enum": [
+                  "low",
+                  "medium",
+                  "high"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reasoning Effort"
+          }
+        },
+        "title": "TaskOverride",
+        "type": "object"
+      },
+      "TestModelOut": {
+        "properties": {
+          "completion_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Completion Tokens"
+          },
+          "cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cost Usd"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error"
+          },
+          "latency_ms": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latency Ms"
+          },
+          "missing_capabilities": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing Capabilities",
+            "type": "array"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "prompt_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Tokens"
+          }
+        },
+        "required": [
+          "ok",
+          "model",
+          "latency_ms",
+          "cost_usd",
+          "prompt_tokens",
+          "completion_tokens",
+          "missing_capabilities",
+          "error"
+        ],
+        "title": "TestModelOut",
+        "type": "object"
+      },
+      "TestModelRequest": {
+        "properties": {
+          "model": {
+            "maxLength": 120,
+            "minLength": 3,
+            "title": "Model",
+            "type": "string"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AiTask"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Se indicada, verifica também a compatibilidade"
+          }
+        },
+        "required": [
+          "model"
+        ],
+        "title": "TestModelRequest",
         "type": "object"
       },
       "TextileBaseline": {
@@ -3100,6 +5412,89 @@
         "title": "Tipau",
         "type": "string"
       },
+      "ToolTrace": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "ok": {
+            "title": "Ok",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name",
+          "ok"
+        ],
+        "title": "ToolTrace",
+        "type": "object"
+      },
+      "TornadoBarOut": {
+        "properties": {
+          "base_value": {
+            "title": "Base Value",
+            "type": "number"
+          },
+          "high": {
+            "$ref": "#/components/schemas/MetricsOut"
+          },
+          "high_value": {
+            "description": "Valor do parâmetro com +swing",
+            "title": "High Value",
+            "type": "number"
+          },
+          "key": {
+            "description": "Caminho do parâmetro, igual ao de `ParamMeta.key`",
+            "title": "Key",
+            "type": "string"
+          },
+          "low": {
+            "$ref": "#/components/schemas/MetricsOut"
+          },
+          "low_value": {
+            "description": "Valor do parâmetro com -swing",
+            "title": "Low Value",
+            "type": "number"
+          },
+          "source": {
+            "$ref": "#/components/schemas/ParamSource",
+            "description": "Origem do pressuposto: dado, plano ou pressuposto da equipa"
+          },
+          "swing_cost_eur": {
+            "title": "Swing Cost Eur",
+            "type": "number"
+          },
+          "swing_eur_per_tonne": {
+            "description": "Impacto em €/t (|alto − baixo|); critério de ordenação",
+            "title": "Swing Eur Per Tonne",
+            "type": "number"
+          },
+          "swing_tonnes": {
+            "title": "Swing Tonnes",
+            "type": "number"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "unit",
+          "source",
+          "base_value",
+          "low_value",
+          "high_value",
+          "low",
+          "high",
+          "swing_eur_per_tonne",
+          "swing_tonnes",
+          "swing_cost_eur"
+        ],
+        "title": "TornadoBarOut",
+        "type": "object"
+      },
       "TriageAnalysis": {
         "description": "O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.",
         "properties": {
@@ -3150,6 +5545,135 @@
           "notes"
         ],
         "title": "TriageAnalysis",
+        "type": "object"
+      },
+      "TriageEvalModel": {
+        "properties": {
+          "accuracy": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "description": "Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp",
+            "title": "Accuracy",
+            "type": "object"
+          },
+          "avg_cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Por peça, custo real devolvido pelo OpenRouter",
+            "title": "Avg Cost Usd"
+          },
+          "avg_latency_s": {
+            "title": "Avg Latency S",
+            "type": "number"
+          },
+          "confusion_condition": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Confusion Condition",
+            "type": "object"
+          },
+          "confusion_garment_type": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "type": "integer"
+              },
+              "type": "object"
+            },
+            "title": "Confusion Garment Type",
+            "type": "object"
+          },
+          "errors": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Errors",
+            "type": "array"
+          },
+          "failures": {
+            "title": "Failures",
+            "type": "integer"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "p95_latency_s": {
+            "title": "P95 Latency S",
+            "type": "number"
+          },
+          "pieces": {
+            "title": "Pieces",
+            "type": "integer"
+          },
+          "total_cost_usd": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total Cost Usd"
+          }
+        },
+        "required": [
+          "model",
+          "pieces",
+          "failures",
+          "accuracy",
+          "avg_latency_s",
+          "p95_latency_s",
+          "avg_cost_usd",
+          "total_cost_usd",
+          "confusion_garment_type",
+          "confusion_condition",
+          "errors"
+        ],
+        "title": "TriageEvalModel",
+        "type": "object"
+      },
+      "TriageEvalReport": {
+        "properties": {
+          "generated_at": {
+            "format": "date-time",
+            "title": "Generated At",
+            "type": "string"
+          },
+          "images": {
+            "title": "Images",
+            "type": "integer"
+          },
+          "models": {
+            "items": {
+              "$ref": "#/components/schemas/TriageEvalModel"
+            },
+            "title": "Models",
+            "type": "array"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "generated_at",
+          "prompt_version",
+          "images",
+          "models"
+        ],
+        "title": "TriageEvalReport",
         "type": "object"
       },
       "TriageResult": {
@@ -3262,6 +5786,130 @@
           "fleet_crew"
         ],
         "title": "TypologyFleet",
+        "type": "object"
+      },
+      "UsageDay": {
+        "properties": {
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "day": {
+            "format": "date",
+            "title": "Day",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "calls",
+          "cost_usd"
+        ],
+        "title": "UsageDay",
+        "type": "object"
+      },
+      "UsageGroup": {
+        "properties": {
+          "avg_latency_ms": {
+            "title": "Avg Latency Ms",
+            "type": "number"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "errors": {
+            "title": "Errors",
+            "type": "integer"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "prompt_tokens": {
+            "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "task": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Task"
+          }
+        },
+        "required": [
+          "task",
+          "model",
+          "calls",
+          "errors",
+          "prompt_tokens",
+          "completion_tokens",
+          "cost_usd",
+          "avg_latency_ms"
+        ],
+        "title": "UsageGroup",
+        "type": "object"
+      },
+      "UsageTotals": {
+        "properties": {
+          "avg_latency_ms": {
+            "title": "Avg Latency Ms",
+            "type": "number"
+          },
+          "calls": {
+            "title": "Calls",
+            "type": "integer"
+          },
+          "completion_tokens": {
+            "title": "Completion Tokens",
+            "type": "integer"
+          },
+          "cost_usd": {
+            "title": "Cost Usd",
+            "type": "number"
+          },
+          "errors": {
+            "title": "Errors",
+            "type": "integer"
+          },
+          "prompt_tokens": {
+            "title": "Prompt Tokens",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "calls",
+          "errors",
+          "prompt_tokens",
+          "completion_tokens",
+          "cost_usd",
+          "avg_latency_ms"
+        ],
+        "title": "UsageTotals",
         "type": "object"
       },
       "UserAdminOut": {
@@ -3860,6 +6508,12 @@
             "title": "Demand T",
             "type": "number"
           },
+          "existing_containers": {
+            "default": 0,
+            "description": "Contentores têxteis ativos já na freguesia (0 se ainda não há localizações)",
+            "title": "Existing Containers",
+            "type": "integer"
+          },
           "geometry": {
             "anyOf": [
               {
@@ -3947,6 +6601,1100 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/ai/credits": {
+      "get": {
+        "description": "Saldo e limite da chave no OpenRouter. Se o fornecedor não responder, `available` é falso.",
+        "operationId": "get_ai_credits",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiCreditsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Ai Credits",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/eval/triage": {
+      "get": {
+        "description": "Última avaliação da triagem por modelo (exatidão, custo e latência), gerada por `just eval-triage`.",
+        "operationId": "get_triage_eval",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TriageEvalReport"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Triage Eval",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/models": {
+      "get": {
+        "description": "Catálogo do OpenRouter (cache de 1 h). Com `task`, só modelos compatíveis e o custo por operação dessa tarefa.",
+        "operationId": "list_ai_models",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "task",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/AiTask"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Task"
+            }
+          },
+          {
+            "in": "query",
+            "name": "capability",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "enum": [
+                      "image",
+                      "tools",
+                      "structured_outputs"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Capability"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "default": "name",
+              "enum": [
+                "name",
+                "cost",
+                "price"
+              ],
+              "title": "Sort",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiModelsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Ai Models",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/settings": {
+      "get": {
+        "description": "Configuração de IA por tarefa: modelo, reserva, tokens e raciocínio efetivos, com a origem de cada valor.",
+        "operationId": "get_ai_settings",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Ai Settings",
+        "tags": [
+          "ai"
+        ]
+      },
+      "put": {
+        "description": "Grava a configuração. Cada modelo tem de existir no catálogo e suportar o que as suas tarefas exigem.",
+        "operationId": "update_ai_settings",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update Ai Settings",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/test": {
+      "post": {
+        "description": "Uma chamada mínima ao modelo: devolve latência e custo reais (conta para o orçamento).",
+        "operationId": "test_ai_model",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TestModelRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TestModelOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Test Ai Model",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
+    "/api/v1/ai/usage": {
+      "get": {
+        "description": "Chamadas, tokens, custo e latência por dia, tarefa e modelo; custo do mês contra o orçamento.",
+        "operationId": "get_ai_usage",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 30,
+              "maximum": 365,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiUsageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Ai Usage",
+        "tags": [
+          "ai"
+        ]
+      }
+    },
     "/api/v1/auth/change-password": {
       "post": {
         "operationId": "change_password",
@@ -6125,6 +9873,156 @@
         ]
       }
     },
+    "/api/v1/copilot/chat": {
+      "post": {
+        "description": "Conversa em pt-PT/en. O modelo escolhe ferramentas; os números do texto são verificados contra os resultados.",
+        "operationId": "copilot_chat",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CopilotRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CopilotReply"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Copilot Chat",
+        "tags": [
+          "copilot"
+        ]
+      }
+    },
     "/api/v1/datasets/alerts/{alert_id}": {
       "patch": {
         "description": "Marca uma inconsistência como resolvida, ignorada ou volta a abri-la.",
@@ -6280,6 +10178,156 @@
           }
         },
         "summary": "Update Data Alert",
+        "tags": [
+          "datasets"
+        ]
+      }
+    },
+    "/api/v1/datasets/alerts/{alert_id}/suggest": {
+      "post": {
+        "description": "A IA propõe como resolver o alerta (ação, justificação, campos a corrigir). Não aplica nada:\nquem confirma usa `PATCH /alerts/{id}` com o estado e a nota sugeridos.",
+        "operationId": "suggest_alert_resolution",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "alert_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Alert Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AlertSuggestionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Suggest Alert Resolution",
         "tags": [
           "datasets"
         ]
@@ -7814,7 +11862,7 @@
     },
     "/api/v1/network/containers": {
       "get": {
-        "description": "Contentores georreferenciados (vazio até chegarem as localizações).",
+        "description": "Contentores georreferenciados, paginados (vazio até chegarem as localizações).",
         "operationId": "list_containers",
         "parameters": [
           {
@@ -7838,6 +11886,38 @@
               "minimum": 0,
               "title": "Offset",
               "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ContainerKind"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/ContainerStatus"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
             }
           },
           {
@@ -7970,6 +12050,169 @@
           }
         },
         "summary": "List Containers",
+        "tags": [
+          "network"
+        ]
+      }
+    },
+    "/api/v1/network/coverage": {
+      "get": {
+        "description": "Cobertura estimada (população a ≤ radius_m de um contentor) por freguesia e total, face à referência francesa.",
+        "operationId": "get_coverage",
+        "parameters": [
+          {
+            "description": "Raio a pé até ao contentor, em metros",
+            "in": "query",
+            "name": "radius_m",
+            "required": false,
+            "schema": {
+              "default": 300,
+              "description": "Raio a pé até ao contentor, em metros",
+              "maximum": 5000,
+              "minimum": 50,
+              "title": "Radius M",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ContainerKind",
+              "default": "textile"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CoverageSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Coverage",
         "tags": [
           "network"
         ]
@@ -8259,6 +12502,530 @@
         ]
       }
     },
+    "/api/v1/planning/benchmarks": {
+      "get": {
+        "description": "Cenários de referência externos, com pressupostos, fonte e o que implicam com os dados atuais.",
+        "operationId": "list_benchmarks",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BenchmarkOut"
+                  },
+                  "title": "Response List Benchmarks",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Benchmarks",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/benchmarks/{key}/scenario": {
+      "post": {
+        "description": "Cria um cenário (como `create_scenario`) com a meta e a densidade do benchmark.",
+        "operationId": "create_benchmark_scenario",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "key",
+            "required": true,
+            "schema": {
+              "title": "Key",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BenchmarkScenarioRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Benchmark Scenario",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/compare-robustness": {
+      "get": {
+        "description": "Em que fração das amostras (emparelhadas) o cenário recomendado continua melhor que o alternativo.",
+        "operationId": "compare_scenario_robustness",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "recommended_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Recommended Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "alternative_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Alternative Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "n_samples",
+            "required": false,
+            "schema": {
+              "default": 500,
+              "maximum": 5000,
+              "minimum": 50,
+              "title": "N Samples",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "seed",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "title": "Seed",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "swing",
+            "required": false,
+            "schema": {
+              "default": 0.3,
+              "maximum": 0.9,
+              "minimum": 0.05,
+              "title": "Swing",
+              "type": "number"
+            }
+          },
+          {
+            "in": "query",
+            "name": "criterion",
+            "required": false,
+            "schema": {
+              "default": "eur_per_tonne",
+              "enum": [
+                "eur_per_tonne",
+                "annual_cost_eur",
+                "tonnes"
+              ],
+              "title": "Criterion",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_share",
+            "required": false,
+            "schema": {
+              "default": 0.8,
+              "maximum": 1,
+              "minimum": 0,
+              "title": "Min Share",
+              "type": "number"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RobustnessOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Compare Scenario Robustness",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
     "/api/v1/planning/parameters": {
       "get": {
         "description": "Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto).",
@@ -8542,6 +13309,156 @@
           }
         },
         "summary": "Update Planning Parameters",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/pilot": {
+      "post": {
+        "description": "Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.",
+        "operationId": "recommend_pilot",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PilotRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PilotOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Recommend Pilot",
         "tags": [
           "planning"
         ]
@@ -9434,6 +14351,166 @@
         ]
       }
     },
+    "/api/v1/planning/scenarios/{scenario_id}/sensitivity": {
+      "post": {
+        "description": "Tornado (±30% de cada parâmetro) e Monte Carlo (P10/P50/P90 de €/t e custo) sobre o plano do cenário.",
+        "operationId": "run_scenario_sensitivity",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SensitivityRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SensitivityOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Run Scenario Sensitivity",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
     "/api/v1/planning/zones": {
       "get": {
         "description": "Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus.",
@@ -10107,7 +15184,7 @@
     },
     "/api/v1/reports/rap": {
       "post": {
-        "description": "Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).",
+        "description": "Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).\n\nInclui um briefing executivo: da IA, verificado contra os números, ou texto fixo sem IA.",
         "operationId": "create_rap_report",
         "parameters": [
           {

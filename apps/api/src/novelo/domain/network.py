@@ -67,6 +67,7 @@ class Zone:
     lat: float
     lon: float
     service_days: int  # dias por semana em que já passa um circuito da Vitrus (0 a 7)
+    existing_points: int | None = None  # contentores têxteis ativos já na freguesia (None = sem dados)
 
 
 @dataclass(frozen=True)
@@ -143,7 +144,10 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
             collections_year=pickups,
         )
 
-    points = max(mp.min_points, math.ceil(zone.population / mp.people_per_point))
+    if mode == Mode.EXISTING and zone.existing_points:
+        points = zone.existing_points  # localizações reais da Vitrus em vez da densidade assumida
+    else:
+        points = max(mp.min_points, math.ceil(zone.population / mp.people_per_point))
     collections = points * mp.collections_per_year
     # Uma ronda por frequência: os pontos da zona são recolhidos na mesma viagem.
     km = mp.collections_per_year * round_trip

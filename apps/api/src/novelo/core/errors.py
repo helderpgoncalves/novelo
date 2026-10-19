@@ -32,6 +32,7 @@ ErrorCode = Literal[
     "rate_limited",
     "feature_disabled",
     "upstream_error",
+    "ai_budget_exceeded",
     "internal_error",
 ]
 
@@ -137,6 +138,13 @@ class RateLimitError(AppError):
 class FeatureDisabledError(AppError):
     status_code = 503
     code = "feature_disabled"
+
+
+class AiBudgetExceededError(AppError):
+    """Orçamento mensal de IA esgotado: paragem dura até ao mês seguinte ou até um admin subir o limite."""
+
+    status_code = 503
+    code = "ai_budget_exceeded"
 
 
 class UpstreamError(AppError):

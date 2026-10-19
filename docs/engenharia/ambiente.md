@@ -11,7 +11,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Contas | `ALLOW_REGISTRATION`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PASSWORD_RESET_EXPIRE_MINUTES`, `EMAIL_VERIFY_EXPIRE_HOURS`, `RATE_LIMIT_ENABLED` | O administrador é criado no arranque se não existir |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Ver abaixo |
 | Email | `RESEND_API_KEY`, `EMAIL_FROM` | Ver abaixo |
-| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_TIMEOUT_S` | Ver [IA](ia.md) |
+| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
 | Otimização | `SOLVER_TIME_LIMIT_S`, `OSRM_URL` | O OSRM é opcional |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
 
@@ -29,7 +29,20 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 
 ## OpenRouter
 
-Criar uma chave em [openrouter.ai/keys](https://openrouter.ai/keys) e pô-la em `OPENROUTER_API_KEY`. Confirmar os slugs dos modelos em [openrouter.ai/models](https://openrouter.ai/models) antes de os fixar. Sem chave, as funcionalidades de IA respondem 503.
+Criar uma chave em [openrouter.ai/keys](https://openrouter.ai/keys) e pô-la em `OPENROUTER_API_KEY`. Sem chave, as funcionalidades de IA respondem 503.
+
+Os modelos por omissão são `openai/gpt-6-luna` para texto e para visão (US$ 0,10 por milhão de tokens de entrada, US$ 0,50 por milhão de saída, contexto de 1,05 M, aceita imagem). Estas variáveis só são o **valor inicial**: o modelo de cada funcionalidade, a reserva, os limites e o orçamento mensal mudam-se no painel de administração (`/admin/ai`), sem novo deploy, e ficam na base de dados.
+
+| Variável | Por omissão | Para que serve |
+| --- | --- | --- |
+| `LLM_MODEL_TEXT` / `LLM_MODEL_VISION` | `openai/gpt-6-luna` | Modelo global de texto e de visão (a triagem usa o de visão) |
+| `LLM_MODEL_FALLBACK` | vazio | Modelo de reserva se o principal falhar |
+| `LLM_MAX_OUTPUT_TOKENS` | `0` (limite próprio de cada tarefa) | Teto global de tokens de saída |
+| `LLM_REASONING_EFFORT` | `low` | `low`, `medium` ou `high`: mais esforço custa mais e demora mais |
+| `LLM_MONTHLY_BUDGET_USD` | `0` (sem limite) | Acima deste valor, a IA responde 503 `ai_budget_exceeded` |
+| `LLM_MAX_CONCURRENCY` | `4` | Chamadas simultâneas ao fornecedor |
+| `LLM_TIMEOUT_S` / `LLM_CHAT_TIMEOUT_S` | `30` / `90` | Limite por chamada e limite total de uma conversa com ferramentas |
+| `LLM_MAX_RETRIES` / `LLM_RETRY_BACKOFF_S` | `2` / `0.5` | Repetições de falhas transitórias, com espera exponencial |
 
 ## Desenvolvimento
 

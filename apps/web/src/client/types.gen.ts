@@ -5,14 +5,303 @@ export type ClientOptions = {
 };
 
 /**
+ * AiCreditsOut
+ */
+export type AiCreditsOut = {
+    /**
+     * Available
+     */
+    available: boolean;
+    /**
+     * Is Free Tier
+     */
+    is_free_tier: boolean | null;
+    /**
+     * Key Usage Usd
+     */
+    key_usage_usd: number | null;
+    /**
+     * Limit Remaining Usd
+     */
+    limit_remaining_usd: number | null;
+    /**
+     * Limit Usd
+     */
+    limit_usd: number | null;
+    /**
+     * Message
+     */
+    message: string | null;
+    /**
+     * Total Credits Usd
+     */
+    total_credits_usd: number | null;
+    /**
+     * Total Usage Usd
+     */
+    total_usage_usd: number | null;
+};
+
+/**
+ * AiModelOut
+ */
+export type AiModelOut = {
+    /**
+     * Compatible
+     *
+     * Cumpre os requisitos da tarefa pedida; nulo sem tarefa
+     */
+    compatible: boolean | null;
+    /**
+     * Context Length
+     */
+    context_length: number | null;
+    /**
+     * Cost Basis
+     *
+     * measured = média real do ai_usage; estimate = tokens típicos
+     */
+    cost_basis: 'measured' | 'estimate' | null;
+    /**
+     * Cost Per Operation Usd
+     *
+     * Custo de uma operação da tarefa pedida
+     */
+    cost_per_operation_usd: number | null;
+    /**
+     * Cost Samples
+     */
+    cost_samples: number;
+    /**
+     * Dynamic Pricing
+     */
+    dynamic_pricing: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Input Modalities
+     */
+    input_modalities: Array<string>;
+    /**
+     * Input Per M Usd
+     */
+    input_per_m_usd: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Output Per M Usd
+     */
+    output_per_m_usd: number | null;
+    /**
+     * Recommended
+     */
+    recommended: boolean;
+    /**
+     * Supports Image
+     */
+    supports_image: boolean;
+    /**
+     * Supports Structured Outputs
+     */
+    supports_structured_outputs: boolean;
+    /**
+     * Supports Tools
+     */
+    supports_tools: boolean;
+};
+
+/**
+ * AiModelsOut
+ */
+export type AiModelsOut = {
+    /**
+     * Models
+     */
+    models: Array<AiModelOut>;
+    /**
+     * Operation
+     *
+     * per_item_sorted, per_question, per_briefing, per_explanation, per_alert
+     */
+    operation: string | null;
+    /**
+     * Recommended Model
+     */
+    recommended_model: string | null;
+    /**
+     * Stale
+     *
+     * O catálogo do OpenRouter não respondeu: serve-se a cópia anterior
+     */
+    stale: boolean;
+    task: AiTask | null;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * AiSettingsOut
+ */
+export type AiSettingsOut = {
+    budget: BudgetOut;
+    /**
+     * Valores globais guardados na base de dados
+     */
+    defaults: GlobalDefaults;
+    /**
+     * Enabled
+     *
+     * Há chave do OpenRouter configurada
+     */
+    enabled: boolean;
+    /**
+     * Valores do .env, usados quando a base de dados não define o campo
+     */
+    env: GlobalDefaults;
+    /**
+     * Tasks
+     */
+    tasks: Array<TaskConfigOut>;
+    /**
+     * Updated At
+     */
+    updated_at: string | null;
+};
+
+/**
+ * AiSettingsUpdate
+ *
+ * Substitui a configuração: o que vier nulo volta a herdar (da tarefa para o global, do global para o `.env`).
+ */
+export type AiSettingsUpdate = {
+    defaults: GlobalDefaults;
+    /**
+     * Monthly Budget Usd
+     *
+     * 0 = sem limite; nulo = .env
+     */
+    monthly_budget_usd?: number | null;
+    /**
+     * Tasks
+     */
+    tasks?: Array<TaskConfigIn>;
+};
+
+/**
+ * AiTask
+ */
+export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'triage' | 'test';
+
+/**
+ * AiUsageOut
+ */
+export type AiUsageOut = {
+    /**
+     * By Day
+     */
+    by_day: Array<UsageDay>;
+    /**
+     * By Model
+     */
+    by_model: Array<UsageGroup>;
+    /**
+     * By Task
+     */
+    by_task: Array<UsageGroup>;
+    /**
+     * By Task Model
+     */
+    by_task_model: Array<UsageGroup>;
+    /**
+     * Days
+     */
+    days: number;
+    month: BudgetOut;
+    totals: UsageTotals;
+};
+
+/**
  * AlertKind
  */
-export type AlertKind = 'circuit_without_vehicle' | 'vehicle_code' | 'unknown_circuit' | 'incomplete_circuit' | 'duplicate_vehicle' | 'possible_plate_error' | 'multi_typology_vehicle' | 'vehicle_without_circuit' | 'undocumented_circuits' | 'different_dates' | 'normalized_spelling';
+export type AlertKind = 'circuit_without_vehicle' | 'vehicle_code' | 'unknown_circuit' | 'incomplete_circuit' | 'duplicate_vehicle' | 'possible_plate_error' | 'multi_typology_vehicle' | 'vehicle_without_circuit' | 'undocumented_circuits' | 'different_dates' | 'normalized_spelling' | 'container_rows_rejected' | 'container_pending_location' | 'container_assumed_values';
 
 /**
  * AlertStatus
  */
 export type AlertStatus = 'open' | 'resolved' | 'wont_fix';
+
+/**
+ * AlertSuggestionOut
+ */
+export type AlertSuggestionOut = {
+    /**
+     * Action
+     */
+    action: 'confirm_with_vitrus' | 'correct_data' | 'accept_as_is' | 'ignore';
+    /**
+     * Alert Id
+     */
+    alert_id: string;
+    /**
+     * Applied
+     *
+     * Sempre falso. Para aplicar: PATCH /datasets/alerts/{id} com suggested_status e nota
+     */
+    applied?: false;
+    /**
+     * Confidence
+     */
+    confidence: number;
+    /**
+     * Fields To Fix
+     */
+    fields_to_fix?: Array<FieldFix>;
+    /**
+     * Justification
+     *
+     * Porquê esta ação (inglês, 1 a 3 frases)
+     */
+    justification: string;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string | null;
+    /**
+     * Question For Vitrus
+     *
+     * Em português
+     */
+    question_for_vitrus?: string | null;
+    /**
+     * Resolution Note
+     *
+     * Nota em português para guardar ao confirmar
+     */
+    resolution_note: string;
+    /**
+     * Source
+     *
+     * fallback = regra determinística, sem IA
+     */
+    source: 'model' | 'fallback';
+    suggested_status: AlertStatus;
+    /**
+     * Verified
+     *
+     * Os números e os valores propostos existem no texto do alerta
+     */
+    verified: boolean;
+};
 
 /**
  * AlertUpdate
@@ -131,6 +420,118 @@ export type AuthConfig = {
 };
 
 /**
+ * BenchmarkOut
+ */
+export type BenchmarkOut = {
+    /**
+     * Current People Per Point
+     *
+     * Densidade atual do pressuposto para o mesmo modo
+     */
+    current_people_per_point: number;
+    /**
+     * Modo a que a densidade se aplica
+     */
+    density_mode: CollectionMode;
+    /**
+     * Implied Capture Pct
+     *
+     * Fração do potencial (0,7 kg/hab/mês) que a meta exige captar
+     */
+    implied_capture_pct: number;
+    /**
+     * Key
+     *
+     * Identificador estável do preset, ex.: `french_performance`
+     */
+    key: string;
+    /**
+     * Kg Per Inhab Year
+     *
+     * Meta de recolha de têxtil (kg/hab/ano)
+     */
+    kg_per_inhab_year: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Max Capturable T
+     *
+     * Teto do modelo com todos os modos ligados e a densidade do preset
+     */
+    max_capturable_t: number;
+    /**
+     * Observed Capture Pct
+     *
+     * Captura atual da Vitrus (22,9%)
+     */
+    observed_capture_pct: number;
+    /**
+     * Observed Kg Per Inhab Year
+     *
+     * Recolhido em 2025 / habitantes (dados da Vitrus)
+     */
+    observed_kg_per_inhab_year: number;
+    /**
+     * People Per Point
+     *
+     * Densidade: 1 ponto por cada N habitantes
+     */
+    people_per_point: number;
+    /**
+     * Population
+     *
+     * Habitantes (INE, Censos 2021) das freguesias com dados
+     */
+    population: number;
+    /**
+     * Reachable
+     *
+     * A meta cabe dentro do teto do modelo
+     */
+    reachable: boolean;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Target Tonnes
+     *
+     * Meta em t/ano: kg/hab/ano × população
+     */
+    target_tonnes: number;
+    /**
+     * Verified
+     *
+     * Falso: referência externa por confirmar na fonte original
+     */
+    verified: boolean;
+};
+
+/**
+ * BenchmarkScenarioRequest
+ */
+export type BenchmarkScenarioRequest = {
+    /**
+     * Budget Eur Year
+     *
+     * Obrigatório em max_tonnes
+     */
+    budget_eur_year?: number | null;
+    /**
+     * Label
+     *
+     * Omitido = nome do preset
+     */
+    label?: string | null;
+    /**
+     * min_cost: custo mínimo para a meta; max_tonnes: com orçamento
+     */
+    objective?: ScenarioObjective;
+};
+
+/**
  * Body_analyse_garment
  */
 export type BodyAnalyseGarment = {
@@ -210,6 +611,36 @@ export type BrandsOut = {
 };
 
 /**
+ * BudgetOut
+ */
+export type BudgetOut = {
+    /**
+     * Monthly Budget Usd
+     *
+     * Nulo = sem limite
+     */
+    monthly_budget_usd: number | null;
+    /**
+     * Spent Usd
+     *
+     * Custo acumulado no mês corrente (UTC)
+     */
+    spent_usd: number;
+    /**
+     * State
+     */
+    state: 'unlimited' | 'ok' | 'warning' | 'exceeded';
+    /**
+     * Used Pct
+     */
+    used_pct: number | null;
+    /**
+     * Warn Pct
+     */
+    warn_pct: number;
+};
+
+/**
  * CaptureScale
  */
 export type CaptureScale = {
@@ -220,6 +651,32 @@ export type CaptureScale = {
      */
     factor: number;
     mode: CollectionMode;
+};
+
+/**
+ * CardKpis
+ */
+export type CardKpis = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Coverage Pct
+     */
+    coverage_pct: number;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
 };
 
 /**
@@ -234,6 +691,20 @@ export type ChangePasswordRequest = {
      * New Password
      */
     new_password: string;
+};
+
+/**
+ * ChatTurn
+ */
+export type ChatTurn = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Role
+     */
+    role: 'user' | 'assistant';
 };
 
 /**
@@ -385,6 +856,12 @@ export type ContainerOut = {
      * Longitude
      */
     longitude: string;
+    /**
+     * Parish Code
+     *
+     * Freguesia onde cai o ponto (código INE), se foi possível atribuir
+     */
+    parish_code: string | null;
     status: ContainerStatus;
 };
 
@@ -392,6 +869,146 @@ export type ContainerOut = {
  * ContainerStatus
  */
 export type ContainerStatus = 'active' | 'inactive' | 'planned';
+
+/**
+ * CopilotReply
+ */
+export type CopilotReply = {
+    /**
+     * Cards
+     */
+    cards: Array<ScenarioCard>;
+    /**
+     * Language
+     */
+    language: 'pt-PT' | 'en';
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Tools Used
+     */
+    tools_used: Array<ToolTrace>;
+    /**
+     * Verified
+     *
+     * Todos os números do texto existem nos resultados das ferramentas
+     */
+    verified: boolean;
+    /**
+     * Warning
+     *
+     * Se presente, o texto foi substituído por um aviso e só valem os cartões
+     */
+    warning: 'numbers_unverified' | null;
+};
+
+/**
+ * CopilotRequest
+ *
+ * O servidor não guarda conversas: o web envia o histórico (máx. 20 mensagens) em cada pedido.
+ */
+export type CopilotRequest = {
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Messages
+     */
+    messages: Array<ChatTurn>;
+    /**
+     * Scenario Id
+     *
+     * Cenário aberto no ecrã, se houver
+     */
+    scenario_id?: string | null;
+};
+
+/**
+ * CoverageState
+ */
+export type CoverageState = 'ok' | 'awaiting_data';
+
+/**
+ * CoverageSummary
+ */
+export type CoverageSummary = {
+    /**
+     * Containers
+     *
+     * Contentores ativos do tipo pedido
+     */
+    containers: number;
+    /**
+     * Containers Per 1000
+     */
+    containers_per_1000: number | null;
+    /**
+     * Containers Total
+     *
+     * Todos os contentores importados, de qualquer tipo e estado
+     */
+    containers_total: number;
+    /**
+     * Covered Pct
+     */
+    covered_pct: number | null;
+    /**
+     * Covered Population
+     */
+    covered_population: number | null;
+    /**
+     * Gap Points
+     *
+     * Pontos em falta face à referência; vazio sem dados
+     */
+    gap_points: number | null;
+    /**
+     * Is Estimate
+     *
+     * A cobertura é uma estimativa, não uma medição
+     */
+    is_estimate?: boolean;
+    /**
+     * Tipo de contentor contado (só ativos)
+     */
+    kind: ContainerKind;
+    /**
+     * Method
+     *
+     * Como se calcula, em português, para mostrar no ecrã
+     */
+    method: string;
+    /**
+     * Parishes
+     */
+    parishes: Array<ParishCoverage>;
+    /**
+     * Population
+     *
+     * População residente das freguesias (INE)
+     */
+    population: number;
+    /**
+     * Radius M
+     */
+    radius_m: number;
+    reference: ReferenceStandard;
+    /**
+     * awaiting_data enquanto não houver contentores importados
+     */
+    state: CoverageState;
+};
 
 /**
  * DataAlertOut
@@ -501,6 +1118,44 @@ export type DataSourceOut = {
 export type DayGroup = 'weekday' | 'saturday' | 'sunday';
 
 /**
+ * EffectiveTask
+ */
+export type EffectiveTask = {
+    /**
+     * Fallback Model
+     */
+    fallback_model: string | null;
+    /**
+     * Fallback Source
+     */
+    fallback_source: 'database' | 'global_default' | 'env' | 'code';
+    /**
+     * Max Output Tokens
+     */
+    max_output_tokens: number;
+    /**
+     * Max Tokens Source
+     */
+    max_tokens_source: 'database' | 'global_default' | 'env' | 'code';
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Model Source
+     */
+    model_source: 'database' | 'global_default' | 'env' | 'code';
+    /**
+     * Reasoning Effort
+     */
+    reasoning_effort: 'low' | 'medium' | 'high';
+    /**
+     * Reasoning Source
+     */
+    reasoning_source: 'database' | 'global_default' | 'env' | 'code';
+};
+
+/**
  * EntityBaseline
  *
  * Têxtil recolhido por uma entidade num ano e o destino final (toneladas).
@@ -559,7 +1214,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'internal_error';
     /**
      * Message
      *
@@ -593,6 +1248,26 @@ export type FieldError = {
      * Tipo de erro do Pydantic, ex.: `string_too_short`
      */
     type: string;
+};
+
+/**
+ * FieldFix
+ */
+export type FieldFix = {
+    /**
+     * Current Value
+     */
+    current_value?: string | null;
+    /**
+     * Field
+     */
+    field: string;
+    /**
+     * Proposed Value
+     *
+     * Só valores escritos no alerta
+     */
+    proposed_value?: string | null;
 };
 
 /**
@@ -707,6 +1382,34 @@ export type ForgotPasswordRequest = {
  * GarmentType
  */
 export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'other';
+
+/**
+ * GlobalDefaults
+ *
+ * Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.
+ */
+export type GlobalDefaults = {
+    /**
+     * Fallback Model
+     */
+    fallback_model?: string | null;
+    /**
+     * Max Output Tokens
+     */
+    max_output_tokens?: number | null;
+    /**
+     * Reasoning Effort
+     */
+    reasoning_effort?: 'low' | 'medium' | 'high' | null;
+    /**
+     * Text Model
+     */
+    text_model?: string | null;
+    /**
+     * Vision Model
+     */
+    vision_model?: string | null;
+};
 
 /**
  * Health
@@ -1084,6 +1787,26 @@ export type MarketLot = {
 };
 
 /**
+ * MetricsOut
+ */
+export type MetricsOut = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Tonnes
+     *
+     * t/ano
+     */
+    tonnes: number;
+};
+
+/**
  * ModeParams
  */
 export type ModeParams = {
@@ -1192,6 +1915,72 @@ export type ParametersOut = {
 };
 
 /**
+ * ParishCoverage
+ */
+export type ParishCoverage = {
+    /**
+     * Containers
+     *
+     * Contentores contados que caem nesta freguesia
+     */
+    containers: number;
+    /**
+     * Containers Per 1000
+     *
+     * Contentores por 1000 habitantes
+     */
+    containers_per_1000: number;
+    /**
+     * Covered Pct
+     *
+     * Estimativa: % da população coberta (0 a 100)
+     */
+    covered_pct: number;
+    /**
+     * Covered Population
+     *
+     * Estimativa: população a ≤ radius_m de um contentor
+     */
+    covered_population: number;
+    /**
+     * Demand Points
+     *
+     * Pontos onde se assume que a população vive (localidades ou centroide)
+     */
+    demand_points: number;
+    /**
+     * Gap Points
+     *
+     * Pontos em falta face à referência (nunca negativo)
+     */
+    gap_points: number;
+    /**
+     * Nearest Container M
+     *
+     * Distância em linha reta ao contentor mais próximo
+     */
+    nearest_container_m: number | null;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Reference Points
+     *
+     * Pontos que a referência francesa daria a esta freguesia
+     */
+    reference_points: number;
+};
+
+/**
  * Passport
  *
  * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
@@ -1243,6 +2032,217 @@ export type Passport = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * PilotFact
+ *
+ * Um número que justifica a escolha, com a sua origem.
+ */
+export type PilotFact = {
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Unit
+     */
+    unit: string;
+    /**
+     * Value
+     */
+    value: number;
+};
+
+/**
+ * PilotKpiOut
+ */
+export type PilotKpiOut = {
+    /**
+     * Basis
+     *
+     * De onde vem a previsão
+     */
+    basis: string;
+    /**
+     * Key
+     */
+    key: 'tonnes' | 'eur_per_tonne' | 'reject_rate_pct';
+    /**
+     * P10
+     */
+    p10: number;
+    /**
+     * P90
+     */
+    p90: number;
+    /**
+     * Unit
+     */
+    unit: string;
+    /**
+     * Value
+     *
+     * Valor previsto (estimativa)
+     */
+    value: number;
+};
+
+/**
+ * PilotOut
+ */
+export type PilotOut = {
+    /**
+     * Estimate
+     *
+     * Os valores previstos são estimativas
+     */
+    estimate?: boolean;
+    /**
+     * K
+     */
+    k: number;
+    /**
+     * Kpis
+     */
+    kpis: Array<PilotKpiOut>;
+    /**
+     * Modes
+     */
+    modes: Array<CollectionMode>;
+    /**
+     * Months
+     */
+    months: number;
+    /**
+     * Rationale
+     *
+     * Justificação em frases; todos os números vêm de `zones[].facts`
+     */
+    rationale: Array<string>;
+    score: PilotScoreOut;
+    signal_floor: SignalFloorOut;
+    /**
+     * Startup Cost Eur
+     *
+     * Investimento e operação do piloto (estimativa)
+     */
+    startup_cost_eur: number;
+    /**
+     * Zones
+     */
+    zones: Array<PilotZoneOut>;
+};
+
+/**
+ * PilotRequest
+ */
+export type PilotRequest = {
+    /**
+     * K
+     *
+     * Número de freguesias do piloto
+     */
+    k?: number;
+    /**
+     * Min Tonnes Pilot
+     *
+     * Piso de sinal em toneladas no piloto; omitido = calculado para medir a taxa de rejeito (3 p.p.)
+     */
+    min_tonnes_pilot?: number | null;
+    /**
+     * Modes
+     *
+     * Modos de recolha a testar no piloto
+     */
+    modes?: Array<CollectionMode>;
+    /**
+     * Months
+     *
+     * Duração do piloto em meses
+     */
+    months?: number;
+    /**
+     * N Samples
+     */
+    n_samples?: number;
+    /**
+     * Seed
+     */
+    seed?: number;
+    /**
+     * Swing
+     *
+     * Incerteza ± dos pressupostos nos intervalos
+     */
+    swing?: number;
+};
+
+/**
+ * PilotScoreOut
+ */
+export type PilotScoreOut = {
+    /**
+     * Cost
+     */
+    cost: number;
+    /**
+     * Coverage
+     */
+    coverage: number;
+    /**
+     * Density Contrast
+     */
+    density_contrast: number;
+    /**
+     * Score
+     *
+     * Valor de aprendizagem do conjunto, de 0 a 1
+     */
+    score: number;
+    /**
+     * Tipau Diversity
+     */
+    tipau_diversity: number;
+    /**
+     * Weight Cost
+     */
+    weight_cost: number;
+    /**
+     * Weight Coverage
+     */
+    weight_coverage: number;
+    /**
+     * Weight Density
+     */
+    weight_density: number;
+    /**
+     * Weight Tipau
+     */
+    weight_tipau: number;
+};
+
+/**
+ * PilotZoneOut
+ */
+export type PilotZoneOut = {
+    /**
+     * Facts
+     */
+    facts: Array<PilotFact>;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    tipau: Tipau | null;
 };
 
 /**
@@ -1324,6 +2324,24 @@ export type ProfileUpdate = {
 };
 
 /**
+ * QuantilesOut
+ */
+export type QuantilesOut = {
+    /**
+     * P10
+     */
+    p10: number;
+    /**
+     * P50
+     */
+    p50: number;
+    /**
+     * P90
+     */
+    p90: number;
+};
+
+/**
  * Readiness
  */
 export type Readiness = {
@@ -1339,6 +2357,38 @@ export type Readiness = {
      * Status
      */
     status: 'ok' | 'degraded';
+};
+
+/**
+ * ReferenceStandard
+ */
+export type ReferenceStandard = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Note
+     */
+    note: string;
+    /**
+     * People Per Point
+     *
+     * 1 ponto por cada N habitantes
+     */
+    people_per_point: number;
+    /**
+     * Points
+     *
+     * Pontos que a referência daria ao concelho
+     */
+    points: number;
+    /**
+     * Verified
+     *
+     * Falso: o valor ainda tem de ser confirmado na fonte
+     */
+    verified: boolean;
 };
 
 /**
@@ -1492,6 +2542,60 @@ export type ResolvedChange = {
 };
 
 /**
+ * RobustnessOut
+ */
+export type RobustnessOut = {
+    /**
+     * Alternative Id
+     */
+    alternative_id: string;
+    base_alternative: MetricsOut;
+    base_recommended: MetricsOut;
+    /**
+     * Criterion
+     */
+    criterion: 'eur_per_tonne' | 'annual_cost_eur' | 'tonnes';
+    /**
+     * Holds
+     *
+     * O recomendado é melhor em pelo menos `min_share` das amostras
+     */
+    holds: boolean;
+    /**
+     * Median Advantage
+     *
+     * Mediana de (alternativo − recomendado) no critério; positivo = ganho
+     */
+    median_advantage: number;
+    /**
+     * Min Share
+     */
+    min_share: number;
+    /**
+     * N Samples
+     */
+    n_samples: number;
+    /**
+     * Recommended Id
+     */
+    recommended_id: string;
+    /**
+     * Seed
+     */
+    seed: number;
+    /**
+     * Share Recommended Better
+     *
+     * Fração das amostras em que o recomendado é melhor (0 a 1)
+     */
+    share_recommended_better: number;
+    /**
+     * Swing
+     */
+    swing: number;
+};
+
+/**
  * RouteOut
  */
 export type RouteOut = {
@@ -1544,6 +2648,34 @@ export type RouteStop = {
      * Parish Name
      */
     parish_name: string;
+};
+
+/**
+ * ScenarioCard
+ *
+ * Resultado de uma ferramenta para o web desenhar. Os números vêm do otimizador, nunca do texto do modelo.
+ */
+export type ScenarioCard = {
+    /**
+     * Created Now
+     *
+     * Cenário criado pelo copiloto neste pedido
+     */
+    created_now: boolean;
+    kpis: CardKpis;
+    /**
+     * Label
+     */
+    label: string;
+    objective: ScenarioObjective;
+    /**
+     * Parent Id
+     */
+    parent_id: string | null;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
 };
 
 /**
@@ -1762,9 +2894,146 @@ export type ScheduleEntry = {
 };
 
 /**
+ * SensitivityOut
+ */
+export type SensitivityOut = {
+    annual_cost_eur: QuantilesOut;
+    /**
+     * Assumption Share Of Top Drivers
+     *
+     * Fração dos 5 maiores fatores de incerteza que são pressupostos sem dado (estimativa)
+     */
+    assumption_share_of_top_drivers: number;
+    /**
+     * Plano com os pressupostos centrais (reproduz os KPIs do cenário)
+     */
+    base: MetricsOut;
+    eur_per_tonne: QuantilesOut;
+    /**
+     * Method
+     *
+     * Como foi calculado (o plano otimizado é reavaliado, o solver não corre de novo)
+     */
+    method: string;
+    /**
+     * N Samples
+     */
+    n_samples: number;
+    /**
+     * Prob Below Threshold
+     *
+     * P(€/t < limiar), de 0 a 1
+     */
+    prob_below_threshold: number | null;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Seed
+     */
+    seed: number;
+    /**
+     * Swing
+     */
+    swing: number;
+    /**
+     * Threshold Eur Per Tonne
+     */
+    threshold_eur_per_tonne: number | null;
+    tonnes: QuantilesOut;
+    /**
+     * Tornado
+     */
+    tornado: Array<TornadoBarOut>;
+};
+
+/**
+ * SensitivityRequest
+ */
+export type SensitivityRequest = {
+    /**
+     * N Samples
+     *
+     * Amostras do Monte Carlo
+     */
+    n_samples?: number;
+    /**
+     * Seed
+     *
+     * Semente fixa: mesma entrada, mesmo resultado
+     */
+    seed?: number;
+    /**
+     * Swing
+     *
+     * Variação ± de cada parâmetro (0,3 = ±30%)
+     */
+    swing?: number;
+    /**
+     * Threshold Eur Per Tonne
+     *
+     * Limiar de €/t para calcular a probabilidade de ficar abaixo
+     */
+    threshold_eur_per_tonne?: number | null;
+};
+
+/**
  * Shift
  */
 export type Shift = 'morning' | 'afternoon' | 'night';
+
+/**
+ * SignalFloorOut
+ *
+ * Piso de sinal: toneladas mínimas do piloto e o que ficou de fora por não o atingir.
+ */
+export type SignalFloorOut = {
+    /**
+     * Calculation
+     *
+     * A conta do piso, passo a passo
+     */
+    calculation: Array<PilotFact>;
+    /**
+     * Combos Below Floor
+     *
+     * Combinações descartadas por ficarem abaixo do piso
+     */
+    combos_below_floor: number;
+    /**
+     * Combos Total
+     */
+    combos_total: number;
+    /**
+     * Computed
+     *
+     * Falso: valor imposto no pedido
+     */
+    computed: boolean;
+    /**
+     * Explanation
+     */
+    explanation: string;
+    /**
+     * Floor Met
+     *
+     * Falso: nenhuma combinação atinge o piso; devolvida a de mais toneladas
+     */
+    floor_met: boolean;
+    /**
+     * Min Tonnes Pilot
+     *
+     * t mínimas no piloto (estimativa)
+     */
+    min_tonnes_pilot: number;
+    /**
+     * Tonnes Pilot
+     *
+     * t previstas no piloto escolhido
+     */
+    tonnes_pilot: number;
+};
 
 /**
  * SlotCount
@@ -1782,6 +3051,128 @@ export type SlotCount = {
     crew: number;
     day_group: DayGroup;
     shift: Shift;
+};
+
+/**
+ * TaskConfigIn
+ */
+export type TaskConfigIn = {
+    /**
+     * Fallback Model
+     */
+    fallback_model?: string | null;
+    /**
+     * Max Output Tokens
+     */
+    max_output_tokens?: number | null;
+    /**
+     * Model
+     *
+     * Slug do OpenRouter, ex.: openai/gpt-6-luna
+     */
+    model?: string | null;
+    /**
+     * Reasoning Effort
+     */
+    reasoning_effort?: 'low' | 'medium' | 'high' | null;
+    task: AiTask;
+};
+
+/**
+ * TaskConfigOut
+ */
+export type TaskConfigOut = {
+    effective: EffectiveTask;
+    override: TaskOverride;
+    /**
+     * Recommended Model
+     */
+    recommended_model: string;
+    /**
+     * Requirements
+     *
+     * Capacidades que o modelo tem de ter: image, tools, structured_outputs
+     */
+    requirements: Array<string>;
+    task: AiTask;
+};
+
+/**
+ * TaskOverride
+ *
+ * Valores próprios de uma tarefa. Campos nulos herdam o valor global.
+ */
+export type TaskOverride = {
+    /**
+     * Fallback Model
+     */
+    fallback_model?: string | null;
+    /**
+     * Max Output Tokens
+     */
+    max_output_tokens?: number | null;
+    /**
+     * Model
+     *
+     * Slug do OpenRouter, ex.: openai/gpt-6-luna
+     */
+    model?: string | null;
+    /**
+     * Reasoning Effort
+     */
+    reasoning_effort?: 'low' | 'medium' | 'high' | null;
+};
+
+/**
+ * TestModelOut
+ */
+export type TestModelOut = {
+    /**
+     * Completion Tokens
+     */
+    completion_tokens: number | null;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number | null;
+    /**
+     * Error
+     */
+    error: string | null;
+    /**
+     * Latency Ms
+     */
+    latency_ms: number | null;
+    /**
+     * Missing Capabilities
+     */
+    missing_capabilities: Array<string>;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Ok
+     */
+    ok: boolean;
+    /**
+     * Prompt Tokens
+     */
+    prompt_tokens: number | null;
+};
+
+/**
+ * TestModelRequest
+ */
+export type TestModelRequest = {
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Se indicada, verifica também a compatibilidade
+     */
+    task?: AiTask | null;
 };
 
 /**
@@ -1851,6 +3242,72 @@ export type TextileDestination = 'reuse' | 'recycle' | 'reject';
 export type Tipau = 'apu' | 'amu' | 'apr';
 
 /**
+ * ToolTrace
+ */
+export type ToolTrace = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Ok
+     */
+    ok: boolean;
+};
+
+/**
+ * TornadoBarOut
+ */
+export type TornadoBarOut = {
+    /**
+     * Base Value
+     */
+    base_value: number;
+    high: MetricsOut;
+    /**
+     * High Value
+     *
+     * Valor do parâmetro com +swing
+     */
+    high_value: number;
+    /**
+     * Key
+     *
+     * Caminho do parâmetro, igual ao de `ParamMeta.key`
+     */
+    key: string;
+    low: MetricsOut;
+    /**
+     * Low Value
+     *
+     * Valor do parâmetro com -swing
+     */
+    low_value: number;
+    /**
+     * Origem do pressuposto: dado, plano ou pressuposto da equipa
+     */
+    source: ParamSource;
+    /**
+     * Swing Cost Eur
+     */
+    swing_cost_eur: number;
+    /**
+     * Swing Eur Per Tonne
+     *
+     * Impacto em €/t (|alto − baixo|); critério de ordenação
+     */
+    swing_eur_per_tonne: number;
+    /**
+     * Swing Tonnes
+     */
+    swing_tonnes: number;
+    /**
+     * Unit
+     */
+    unit: string;
+};
+
+/**
  * TriageAnalysis
  *
  * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
@@ -1877,6 +3334,92 @@ export type TriageAnalysis = {
      * Notes
      */
     notes: string;
+};
+
+/**
+ * TriageEvalModel
+ */
+export type TriageEvalModel = {
+    /**
+     * Accuracy
+     *
+     * Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp
+     */
+    accuracy: {
+        [key: string]: number;
+    };
+    /**
+     * Avg Cost Usd
+     *
+     * Por peça, custo real devolvido pelo OpenRouter
+     */
+    avg_cost_usd: number | null;
+    /**
+     * Avg Latency S
+     */
+    avg_latency_s: number;
+    /**
+     * Confusion Condition
+     */
+    confusion_condition: {
+        [key: string]: {
+            [key: string]: number;
+        };
+    };
+    /**
+     * Confusion Garment Type
+     */
+    confusion_garment_type: {
+        [key: string]: {
+            [key: string]: number;
+        };
+    };
+    /**
+     * Errors
+     */
+    errors: Array<string>;
+    /**
+     * Failures
+     */
+    failures: number;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * P95 Latency S
+     */
+    p95_latency_s: number;
+    /**
+     * Pieces
+     */
+    pieces: number;
+    /**
+     * Total Cost Usd
+     */
+    total_cost_usd: number | null;
+};
+
+/**
+ * TriageEvalReport
+ */
+export type TriageEvalReport = {
+    /**
+     * Generated At
+     */
+    generated_at: string;
+    /**
+     * Images
+     */
+    images: number;
+    /**
+     * Models
+     */
+    models: Array<TriageEvalModel>;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
 };
 
 /**
@@ -1943,6 +3486,92 @@ export type TypologyFleet = {
      * Vehicle Shifts Week
      */
     vehicle_shifts_week: number;
+};
+
+/**
+ * UsageDay
+ */
+export type UsageDay = {
+    /**
+     * Calls
+     */
+    calls: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number;
+    /**
+     * Day
+     */
+    day: string;
+};
+
+/**
+ * UsageGroup
+ */
+export type UsageGroup = {
+    /**
+     * Avg Latency Ms
+     */
+    avg_latency_ms: number;
+    /**
+     * Calls
+     */
+    calls: number;
+    /**
+     * Completion Tokens
+     */
+    completion_tokens: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number;
+    /**
+     * Errors
+     */
+    errors: number;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
+     * Prompt Tokens
+     */
+    prompt_tokens: number;
+    /**
+     * Task
+     */
+    task: string | null;
+};
+
+/**
+ * UsageTotals
+ */
+export type UsageTotals = {
+    /**
+     * Avg Latency Ms
+     */
+    avg_latency_ms: number;
+    /**
+     * Calls
+     */
+    calls: number;
+    /**
+     * Completion Tokens
+     */
+    completion_tokens: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number;
+    /**
+     * Errors
+     */
+    errors: number;
+    /**
+     * Prompt Tokens
+     */
+    prompt_tokens: number;
 };
 
 /**
@@ -2281,6 +3910,12 @@ export type ZoneOut = {
      */
     demand_t: number;
     /**
+     * Existing Containers
+     *
+     * Contentores têxteis ativos já na freguesia (0 se ainda não há localizações)
+     */
+    existing_containers?: number;
+    /**
      * Geometry
      */
     geometry: {
@@ -2321,6 +3956,459 @@ export type ZoneOut = {
      */
     tipau: Tipau | null;
 };
+
+export type GetAiCreditsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ai/credits';
+};
+
+export type GetAiCreditsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetAiCreditsError = GetAiCreditsErrors[keyof GetAiCreditsErrors];
+
+export type GetAiCreditsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AiCreditsOut;
+};
+
+export type GetAiCreditsResponse = GetAiCreditsResponses[keyof GetAiCreditsResponses];
+
+export type GetTriageEvalData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ai/eval/triage';
+};
+
+export type GetTriageEvalErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetTriageEvalError = GetTriageEvalErrors[keyof GetTriageEvalErrors];
+
+export type GetTriageEvalResponses = {
+    /**
+     * Successful Response
+     */
+    200: TriageEvalReport;
+};
+
+export type GetTriageEvalResponse = GetTriageEvalResponses[keyof GetTriageEvalResponses];
+
+export type ListAiModelsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Task
+         */
+        task?: AiTask | null;
+        /**
+         * Capability
+         */
+        capability?: Array<'image' | 'tools' | 'structured_outputs'> | null;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Sort
+         */
+        sort?: 'name' | 'cost' | 'price';
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/ai/models';
+};
+
+export type ListAiModelsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAiModelsError = ListAiModelsErrors[keyof ListAiModelsErrors];
+
+export type ListAiModelsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AiModelsOut;
+};
+
+export type ListAiModelsResponse = ListAiModelsResponses[keyof ListAiModelsResponses];
+
+export type GetAiSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ai/settings';
+};
+
+export type GetAiSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetAiSettingsError = GetAiSettingsErrors[keyof GetAiSettingsErrors];
+
+export type GetAiSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AiSettingsOut;
+};
+
+export type GetAiSettingsResponse = GetAiSettingsResponses[keyof GetAiSettingsResponses];
+
+export type UpdateAiSettingsData = {
+    body: AiSettingsUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ai/settings';
+};
+
+export type UpdateAiSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateAiSettingsError = UpdateAiSettingsErrors[keyof UpdateAiSettingsErrors];
+
+export type UpdateAiSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AiSettingsOut;
+};
+
+export type UpdateAiSettingsResponse = UpdateAiSettingsResponses[keyof UpdateAiSettingsResponses];
+
+export type TestAiModelData = {
+    body: TestModelRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/ai/test';
+};
+
+export type TestAiModelErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type TestAiModelError = TestAiModelErrors[keyof TestAiModelErrors];
+
+export type TestAiModelResponses = {
+    /**
+     * Successful Response
+     */
+    200: TestModelOut;
+};
+
+export type TestAiModelResponse = TestAiModelResponses[keyof TestAiModelResponses];
+
+export type GetAiUsageData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Days
+         */
+        days?: number;
+    };
+    url: '/api/v1/ai/usage';
+};
+
+export type GetAiUsageErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetAiUsageError = GetAiUsageErrors[keyof GetAiUsageErrors];
+
+export type GetAiUsageResponses = {
+    /**
+     * Successful Response
+     */
+    200: AiUsageOut;
+};
+
+export type GetAiUsageResponse = GetAiUsageResponses[keyof GetAiUsageResponses];
 
 export type ChangePasswordData = {
     body: ChangePasswordRequest;
@@ -3306,6 +5394,67 @@ export type GetBrandEvidenceResponses = {
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
 
+export type CopilotChatData = {
+    body: CopilotRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/chat';
+};
+
+export type CopilotChatErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CopilotChatError = CopilotChatErrors[keyof CopilotChatErrors];
+
+export type CopilotChatResponses = {
+    /**
+     * Successful Response
+     */
+    200: CopilotReply;
+};
+
+export type CopilotChatResponse = CopilotChatResponses[keyof CopilotChatResponses];
+
 export type UpdateDataAlertData = {
     body: AlertUpdate;
     path: {
@@ -3371,6 +5520,72 @@ export type UpdateDataAlertResponses = {
 };
 
 export type UpdateDataAlertResponse = UpdateDataAlertResponses[keyof UpdateDataAlertResponses];
+
+export type SuggestAlertResolutionData = {
+    body?: never;
+    path: {
+        /**
+         * Alert Id
+         */
+        alert_id: string;
+    };
+    query?: never;
+    url: '/api/v1/datasets/alerts/{alert_id}/suggest';
+};
+
+export type SuggestAlertResolutionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SuggestAlertResolutionError = SuggestAlertResolutionErrors[keyof SuggestAlertResolutionErrors];
+
+export type SuggestAlertResolutionResponses = {
+    /**
+     * Successful Response
+     */
+    200: AlertSuggestionOut;
+};
+
+export type SuggestAlertResolutionResponse = SuggestAlertResolutionResponses[keyof SuggestAlertResolutionResponses];
 
 export type GetDataQualityData = {
     body?: never;
@@ -4036,6 +6251,14 @@ export type ListContainersData = {
          * Offset
          */
         offset?: number;
+        /**
+         * Kind
+         */
+        kind?: ContainerKind | null;
+        /**
+         * Status
+         */
+        status?: ContainerStatus | null;
     };
     url: '/api/v1/network/containers';
 };
@@ -4093,6 +6316,75 @@ export type ListContainersResponses = {
 };
 
 export type ListContainersResponse = ListContainersResponses[keyof ListContainersResponses];
+
+export type GetCoverageData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Radius M
+         *
+         * Raio a pé até ao contentor, em metros
+         */
+        radius_m?: number;
+        kind?: ContainerKind;
+    };
+    url: '/api/v1/network/coverage';
+};
+
+export type GetCoverageErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCoverageError = GetCoverageErrors[keyof GetCoverageErrors];
+
+export type GetCoverageResponses = {
+    /**
+     * Successful Response
+     */
+    200: CoverageSummary;
+};
+
+export type GetCoverageResponse = GetCoverageResponses[keyof GetCoverageResponses];
 
 export type GetFleetData = {
     body?: never;
@@ -4218,6 +6510,225 @@ export type ListLocalitiesResponses = {
 
 export type ListLocalitiesResponse = ListLocalitiesResponses[keyof ListLocalitiesResponses];
 
+export type ListBenchmarksData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/benchmarks';
+};
+
+export type ListBenchmarksErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListBenchmarksError = ListBenchmarksErrors[keyof ListBenchmarksErrors];
+
+export type ListBenchmarksResponses = {
+    /**
+     * Response List Benchmarks
+     *
+     * Successful Response
+     */
+    200: Array<BenchmarkOut>;
+};
+
+export type ListBenchmarksResponse = ListBenchmarksResponses[keyof ListBenchmarksResponses];
+
+export type CreateBenchmarkScenarioData = {
+    body: BenchmarkScenarioRequest;
+    path: {
+        /**
+         * Key
+         */
+        key: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/benchmarks/{key}/scenario';
+};
+
+export type CreateBenchmarkScenarioErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateBenchmarkScenarioError = CreateBenchmarkScenarioErrors[keyof CreateBenchmarkScenarioErrors];
+
+export type CreateBenchmarkScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    201: ScenarioOut;
+};
+
+export type CreateBenchmarkScenarioResponse = CreateBenchmarkScenarioResponses[keyof CreateBenchmarkScenarioResponses];
+
+export type CompareScenarioRobustnessData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Recommended Id
+         */
+        recommended_id: string;
+        /**
+         * Alternative Id
+         */
+        alternative_id: string;
+        /**
+         * N Samples
+         */
+        n_samples?: number;
+        /**
+         * Seed
+         */
+        seed?: number;
+        /**
+         * Swing
+         */
+        swing?: number;
+        /**
+         * Criterion
+         */
+        criterion?: 'eur_per_tonne' | 'annual_cost_eur' | 'tonnes';
+        /**
+         * Min Share
+         */
+        min_share?: number;
+    };
+    url: '/api/v1/planning/compare-robustness';
+};
+
+export type CompareScenarioRobustnessErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CompareScenarioRobustnessError = CompareScenarioRobustnessErrors[keyof CompareScenarioRobustnessErrors];
+
+export type CompareScenarioRobustnessResponses = {
+    /**
+     * Successful Response
+     */
+    200: RobustnessOut;
+};
+
+export type CompareScenarioRobustnessResponse = CompareScenarioRobustnessResponses[keyof CompareScenarioRobustnessResponses];
+
 export type GetPlanningParametersData = {
     body?: never;
     path?: never;
@@ -4339,6 +6850,67 @@ export type UpdatePlanningParametersResponses = {
 };
 
 export type UpdatePlanningParametersResponse = UpdatePlanningParametersResponses[keyof UpdatePlanningParametersResponses];
+
+export type RecommendPilotData = {
+    body: PilotRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/pilot';
+};
+
+export type RecommendPilotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RecommendPilotError = RecommendPilotErrors[keyof RecommendPilotErrors];
+
+export type RecommendPilotResponses = {
+    /**
+     * Successful Response
+     */
+    200: PilotOut;
+};
+
+export type RecommendPilotResponse = RecommendPilotResponses[keyof RecommendPilotResponses];
 
 export type ListScenariosData = {
     body?: never;
@@ -4727,6 +7299,72 @@ export type GetScenarioFlowsResponses = {
 };
 
 export type GetScenarioFlowsResponse = GetScenarioFlowsResponses[keyof GetScenarioFlowsResponses];
+
+export type RunScenarioSensitivityData = {
+    body: SensitivityRequest;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}/sensitivity';
+};
+
+export type RunScenarioSensitivityErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RunScenarioSensitivityError = RunScenarioSensitivityErrors[keyof RunScenarioSensitivityErrors];
+
+export type RunScenarioSensitivityResponses = {
+    /**
+     * Successful Response
+     */
+    200: SensitivityOut;
+};
+
+export type RunScenarioSensitivityResponse = RunScenarioSensitivityResponses[keyof RunScenarioSensitivityResponses];
 
 export type ListZonesData = {
     body?: never;

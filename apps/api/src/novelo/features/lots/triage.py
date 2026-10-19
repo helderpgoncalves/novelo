@@ -7,8 +7,9 @@ import base64
 from typing import Literal
 
 from novelo.adapters.openrouter import OpenRouterClient
+from novelo.ai.images import UnreadableImageError, shrink_for_vision
 from novelo.ai.prompts import load
-from novelo.core.config import get_settings
+from novelo.ai.tasks import AiTask
 from novelo.core.errors import AppError
 from novelo.features.lots.schemas import TriageAnalysis, TriageResult
 from novelo.features.lots.service import dominant_fibre, estimate_weight_g
@@ -41,10 +42,17 @@ def _data_url(data: bytes) -> str:
         raise InvalidImageError("Empty image")
     if len(data) > MAX_BYTES:
         raise InvalidImageError("Each photo must be at most 5 MB")
-    return f"data:{sniff_mime(data)};base64,{base64.b64encode(data).decode()}"
+    sniff_mime(data)  # valida o formato real; o que se envia é sempre JPEG reduzido
+    try:
+        small = shrink_for_vision(data)
+    except UnreadableImageError as exc:
+        raise InvalidImageError("The image could not be read") from exc
+    return f"data:image/jpeg;base64,{base64.b64encode(small).decode()}"
 
 
-async def analyse(client: OpenRouterClient, item_photo: bytes, label_photo: bytes | None) -> TriageResult:
+async def analyse(
+    client: OpenRouterClient, item_photo: bytes, label_photo: bytes | None, model: str | None = None
+) -> TriageResult:
     system, version = load("triage")
     content: list[dict[str, object]] = [
         {"type": "text", "text": "Photo 1: the garment."},
@@ -55,12 +63,14 @@ async def analyse(client: OpenRouterClient, item_photo: bytes, label_photo: byte
             {"type": "text", "text": "Photo 2: the care/composition label."},
             {"type": "image_url", "image_url": {"url": _data_url(label_photo)}},
         ]
-    model = get_settings().llm_model_vision
-    analysis = await client.structured(system=system, user=content, schema=TriageAnalysis, model=model)
+    chosen = model or client.model_for(AiTask.TRIAGE)
+    analysis = await client.structured(
+        system=system, user=content, schema=TriageAnalysis, model=model, task=AiTask.TRIAGE
+    )
     return TriageResult(
         analysis=analysis,
         dominant_fibre=dominant_fibre(analysis.composition),
         estimated_weight_g=estimate_weight_g(analysis.garment_type.value),
         prompt_version=version,
-        model=model,
+        model=chosen,
     )

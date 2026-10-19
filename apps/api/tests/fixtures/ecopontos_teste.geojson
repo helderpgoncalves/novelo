@@ -1,0 +1,14 @@
+{
+  "type": "FeatureCollection",
+  "name": "ecopontos_teste_FALSO",
+  "features": [
+    {"type": "Feature", "properties": {"ID": 101, "Fluxo": "Têxtil", "Situação": "Ativo", "Local": "Praça Falsa de Teste"},
+     "geometry": {"type": "Point", "coordinates": [-8.2902, 41.4539]}},
+    {"type": "Feature", "properties": {"ID": 102, "Fluxo": "Têxteis", "Situação": "Removido", "Local": "Largo Falso"},
+     "geometry": {"type": "Point", "coordinates": [-8.3, 41.46]}},
+    {"type": "Feature", "properties": {"ID": 103, "Fluxo": "Têxtil", "Local": "Zona de polígono"},
+     "geometry": {"type": "Polygon", "coordinates": [[[-8.3, 41.4], [-8.2, 41.4], [-8.2, 41.5], [-8.3, 41.4]]]}},
+    {"type": "Feature", "properties": {"ID": 104, "Fluxo": "Têxtil", "Local": "Rua Falsa Sem Geometria", "Freguesia": "Creixomil"},
+     "geometry": null}
+  ]
+}

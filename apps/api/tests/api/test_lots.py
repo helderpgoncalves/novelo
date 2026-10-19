@@ -129,3 +129,21 @@ async def test_triage_analyses_photos_without_storing_them(logged_in: httpx.Asyn
 async def test_triage_rejects_non_images(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
     resp = await logged_in.post("/api/v1/triage", files={"item_photo": ("a.png", b"not an image", "image/png")})
     assert resp.status_code == 400
+
+
+async def test_triage_sends_reduced_jpeg_photos_to_the_vision_model(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
+    llm.queue(
+        "TriageAnalysis",
+        TriageAnalysis(
+            garment_type="shirt",
+            condition="reuse",
+            composition=[CompositionPart(fibre="cotton", pct=100)],
+            brand=None,
+            confidence=0.8,
+            notes="ok",
+        ),
+    )
+    resp = await logged_in.post("/api/v1/triage", files={"item_photo": ("a.png", PNG, "image/png")})
+    assert resp.status_code == 200 and resp.json()["model"] == "fake/model"
+    urls = [p["image_url"]["url"] for p in llm.calls[-1]["user"] if p["type"] == "image_url"]  # type: ignore[union-attr]
+    assert urls and all(u.startswith("data:image/jpeg;base64,") for u in urls)

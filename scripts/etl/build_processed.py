@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["openpyxl>=3.1"]
+# dependencies = ["openpyxl>=3.1", "pyproj>=3.6"]
 # ///
 """Converte os Excel recebidos da Vitrus em ficheiros limpos em data/processed/.
 
@@ -22,6 +22,8 @@ from collections import defaultdict
 from pathlib import Path
 
 import openpyxl
+
+import containers  # mesmo diretório (scripts/etl); `uv run` põe-no no sys.path
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
@@ -391,6 +393,7 @@ def main() -> None:
     summary = {"textile": textile_flows(), "circuits": circuits(), "geography": geography()}
     waste_composition()
     sources()
+    summary["containers"] = containers.run()  # sem ficheiro em data/raw/: awaiting_data, não escreve nada
     OUT.mkdir(parents=True, exist_ok=True)
     (OUT / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=2), encoding="utf-8")
     print(json.dumps(summary, ensure_ascii=False, indent=2))

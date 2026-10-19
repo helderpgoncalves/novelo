@@ -9,6 +9,7 @@ from novelo.domain.vocab import (
     CollectionType,
     ContainerKind,
     ContainerStatus,
+    CoverageState,
     DayGroup,
     Shift,
     Typology,
@@ -105,9 +106,49 @@ class ContainerOut(BaseModel):
     longitude: Decimal
     address: str | None
     locality: str | None
+    parish_code: str | None = Field(description="Freguesia onde cai o ponto (código INE), se foi possível atribuir")
     capacity_litres: int | None
 
 
 class ContainerList(BaseModel):
     items: list[ContainerOut]
     total: int
+
+
+class ParishCoverage(BaseModel):
+    parish_code: str
+    parish_name: str
+    population: int
+    demand_points: int = Field(description="Pontos onde se assume que a população vive (localidades ou centroide)")
+    containers: int = Field(description="Contentores contados que caem nesta freguesia")
+    containers_per_1000: float = Field(description="Contentores por 1000 habitantes")
+    covered_population: int = Field(description="Estimativa: população a ≤ radius_m de um contentor")
+    covered_pct: float = Field(description="Estimativa: % da população coberta (0 a 100)")
+    nearest_container_m: float | None = Field(description="Distância em linha reta ao contentor mais próximo")
+    reference_points: int = Field(description="Pontos que a referência francesa daria a esta freguesia")
+    gap_points: int = Field(description="Pontos em falta face à referência (nunca negativo)")
+
+
+class ReferenceStandard(BaseModel):
+    name: str
+    people_per_point: int = Field(description="1 ponto por cada N habitantes")
+    points: int = Field(description="Pontos que a referência daria ao concelho")
+    verified: bool = Field(description="Falso: o valor ainda tem de ser confirmado na fonte")
+    note: str
+
+
+class CoverageSummary(BaseModel):
+    state: CoverageState = Field(description="awaiting_data enquanto não houver contentores importados")
+    is_estimate: bool = Field(default=True, description="A cobertura é uma estimativa, não uma medição")
+    method: str = Field(description="Como se calcula, em português, para mostrar no ecrã")
+    radius_m: int
+    kind: ContainerKind = Field(description="Tipo de contentor contado (só ativos)")
+    population: int = Field(description="População residente das freguesias (INE)")
+    containers: int = Field(description="Contentores ativos do tipo pedido")
+    containers_total: int = Field(description="Todos os contentores importados, de qualquer tipo e estado")
+    containers_per_1000: float | None
+    covered_population: int | None
+    covered_pct: float | None
+    reference: ReferenceStandard
+    gap_points: int | None = Field(description="Pontos em falta face à referência; vazio sem dados")
+    parishes: list[ParishCoverage]

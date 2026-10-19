@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, ReadyData, ReadyErrors, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
+import type { AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, ReadyData, ReadyErrors, ReadyResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,69 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+/**
+ * Get Ai Credits
+ *
+ * Saldo e limite da chave no OpenRouter. Se o fornecedor não responder, `available` é falso.
+ */
+export const getAiCredits = <ThrowOnError extends boolean = false>(options?: Options<GetAiCreditsData, ThrowOnError>): RequestResult<GetAiCreditsResponses, GetAiCreditsErrors, ThrowOnError> => (options?.client ?? client).get<GetAiCreditsResponses, GetAiCreditsErrors, ThrowOnError>({ url: '/api/v1/ai/credits', ...options });
+
+/**
+ * Get Triage Eval
+ *
+ * Última avaliação da triagem por modelo (exatidão, custo e latência), gerada por `just eval-triage`.
+ */
+export const getTriageEval = <ThrowOnError extends boolean = false>(options?: Options<GetTriageEvalData, ThrowOnError>): RequestResult<GetTriageEvalResponses, GetTriageEvalErrors, ThrowOnError> => (options?.client ?? client).get<GetTriageEvalResponses, GetTriageEvalErrors, ThrowOnError>({ url: '/api/v1/ai/eval/triage', ...options });
+
+/**
+ * List Ai Models
+ *
+ * Catálogo do OpenRouter (cache de 1 h). Com `task`, só modelos compatíveis e o custo por operação dessa tarefa.
+ */
+export const listAiModels = <ThrowOnError extends boolean = false>(options?: Options<ListAiModelsData, ThrowOnError>): RequestResult<ListAiModelsResponses, ListAiModelsErrors, ThrowOnError> => (options?.client ?? client).get<ListAiModelsResponses, ListAiModelsErrors, ThrowOnError>({ url: '/api/v1/ai/models', ...options });
+
+/**
+ * Get Ai Settings
+ *
+ * Configuração de IA por tarefa: modelo, reserva, tokens e raciocínio efetivos, com a origem de cada valor.
+ */
+export const getAiSettings = <ThrowOnError extends boolean = false>(options?: Options<GetAiSettingsData, ThrowOnError>): RequestResult<GetAiSettingsResponses, GetAiSettingsErrors, ThrowOnError> => (options?.client ?? client).get<GetAiSettingsResponses, GetAiSettingsErrors, ThrowOnError>({ url: '/api/v1/ai/settings', ...options });
+
+/**
+ * Update Ai Settings
+ *
+ * Grava a configuração. Cada modelo tem de existir no catálogo e suportar o que as suas tarefas exigem.
+ */
+export const updateAiSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateAiSettingsData, ThrowOnError>): RequestResult<UpdateAiSettingsResponses, UpdateAiSettingsErrors, ThrowOnError> => (options.client ?? client).put<UpdateAiSettingsResponses, UpdateAiSettingsErrors, ThrowOnError>({
+    url: '/api/v1/ai/settings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Test Ai Model
+ *
+ * Uma chamada mínima ao modelo: devolve latência e custo reais (conta para o orçamento).
+ */
+export const testAiModel = <ThrowOnError extends boolean = false>(options: Options<TestAiModelData, ThrowOnError>): RequestResult<TestAiModelResponses, TestAiModelErrors, ThrowOnError> => (options.client ?? client).post<TestAiModelResponses, TestAiModelErrors, ThrowOnError>({
+    url: '/api/v1/ai/test',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Ai Usage
+ *
+ * Chamadas, tokens, custo e latência por dia, tarefa e modelo; custo do mês contra o orçamento.
+ */
+export const getAiUsage = <ThrowOnError extends boolean = false>(options?: Options<GetAiUsageData, ThrowOnError>): RequestResult<GetAiUsageResponses, GetAiUsageErrors, ThrowOnError> => (options?.client ?? client).get<GetAiUsageResponses, GetAiUsageErrors, ThrowOnError>({ url: '/api/v1/ai/usage', ...options });
 
 /**
  * Change Password
@@ -156,6 +219,20 @@ export const verifyEmail = <ThrowOnError extends boolean = false>(options: Optio
 export const getBrandEvidence = <ThrowOnError extends boolean = false>(options?: Options<GetBrandEvidenceData, ThrowOnError>): RequestResult<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError> => (options?.client ?? client).get<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError>({ url: '/api/v1/brands', ...options });
 
 /**
+ * Copilot Chat
+ *
+ * Conversa em pt-PT/en. O modelo escolhe ferramentas; os números do texto são verificados contra os resultados.
+ */
+export const copilotChat = <ThrowOnError extends boolean = false>(options: Options<CopilotChatData, ThrowOnError>): RequestResult<CopilotChatResponses, CopilotChatErrors, ThrowOnError> => (options.client ?? client).post<CopilotChatResponses, CopilotChatErrors, ThrowOnError>({
+    url: '/api/v1/copilot/chat',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Update Data Alert
  *
  * Marca uma inconsistência como resolvida, ignorada ou volta a abri-la.
@@ -168,6 +245,14 @@ export const updateDataAlert = <ThrowOnError extends boolean = false>(options: O
         ...options.headers
     }
 });
+
+/**
+ * Suggest Alert Resolution
+ *
+ * A IA propõe como resolver o alerta (ação, justificação, campos a corrigir). Não aplica nada:
+ * quem confirma usa `PATCH /alerts/{id}` com o estado e a nota sugeridos.
+ */
+export const suggestAlertResolution = <ThrowOnError extends boolean = false>(options: Options<SuggestAlertResolutionData, ThrowOnError>): RequestResult<SuggestAlertResolutionResponses, SuggestAlertResolutionErrors, ThrowOnError> => (options.client ?? client).post<SuggestAlertResolutionResponses, SuggestAlertResolutionErrors, ThrowOnError>({ url: '/api/v1/datasets/alerts/{alert_id}/suggest', ...options });
 
 /**
  * Get Data Quality
@@ -266,9 +351,16 @@ export const listCircuits = <ThrowOnError extends boolean = false>(options?: Opt
 /**
  * List Containers
  *
- * Contentores georreferenciados (vazio até chegarem as localizações).
+ * Contentores georreferenciados, paginados (vazio até chegarem as localizações).
  */
 export const listContainers = <ThrowOnError extends boolean = false>(options?: Options<ListContainersData, ThrowOnError>): RequestResult<ListContainersResponses, ListContainersErrors, ThrowOnError> => (options?.client ?? client).get<ListContainersResponses, ListContainersErrors, ThrowOnError>({ url: '/api/v1/network/containers', ...options });
+
+/**
+ * Get Coverage
+ *
+ * Cobertura estimada (população a ≤ radius_m de um contentor) por freguesia e total, face à referência francesa.
+ */
+export const getCoverage = <ThrowOnError extends boolean = false>(options?: Options<GetCoverageData, ThrowOnError>): RequestResult<GetCoverageResponses, GetCoverageErrors, ThrowOnError> => (options?.client ?? client).get<GetCoverageResponses, GetCoverageErrors, ThrowOnError>({ url: '/api/v1/network/coverage', ...options });
 
 /**
  * Get Fleet
@@ -285,6 +377,34 @@ export const getFleet = <ThrowOnError extends boolean = false>(options?: Options
 export const listLocalities = <ThrowOnError extends boolean = false>(options?: Options<ListLocalitiesData, ThrowOnError>): RequestResult<ListLocalitiesResponses, ListLocalitiesErrors, ThrowOnError> => (options?.client ?? client).get<ListLocalitiesResponses, ListLocalitiesErrors, ThrowOnError>({ url: '/api/v1/network/localities', ...options });
 
 /**
+ * List Benchmarks
+ *
+ * Cenários de referência externos, com pressupostos, fonte e o que implicam com os dados atuais.
+ */
+export const listBenchmarks = <ThrowOnError extends boolean = false>(options?: Options<ListBenchmarksData, ThrowOnError>): RequestResult<ListBenchmarksResponses, ListBenchmarksErrors, ThrowOnError> => (options?.client ?? client).get<ListBenchmarksResponses, ListBenchmarksErrors, ThrowOnError>({ url: '/api/v1/planning/benchmarks', ...options });
+
+/**
+ * Create Benchmark Scenario
+ *
+ * Cria um cenário (como `create_scenario`) com a meta e a densidade do benchmark.
+ */
+export const createBenchmarkScenario = <ThrowOnError extends boolean = false>(options: Options<CreateBenchmarkScenarioData, ThrowOnError>): RequestResult<CreateBenchmarkScenarioResponses, CreateBenchmarkScenarioErrors, ThrowOnError> => (options.client ?? client).post<CreateBenchmarkScenarioResponses, CreateBenchmarkScenarioErrors, ThrowOnError>({
+    url: '/api/v1/planning/benchmarks/{key}/scenario',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Compare Scenario Robustness
+ *
+ * Em que fração das amostras (emparelhadas) o cenário recomendado continua melhor que o alternativo.
+ */
+export const compareScenarioRobustness = <ThrowOnError extends boolean = false>(options: Options<CompareScenarioRobustnessData, ThrowOnError>): RequestResult<CompareScenarioRobustnessResponses, CompareScenarioRobustnessErrors, ThrowOnError> => (options.client ?? client).get<CompareScenarioRobustnessResponses, CompareScenarioRobustnessErrors, ThrowOnError>({ url: '/api/v1/planning/compare-robustness', ...options });
+
+/**
  * Get Planning Parameters
  *
  * Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto).
@@ -298,6 +418,20 @@ export const getPlanningParameters = <ThrowOnError extends boolean = false>(opti
  */
 export const updatePlanningParameters = <ThrowOnError extends boolean = false>(options: Options<UpdatePlanningParametersData, ThrowOnError>): RequestResult<UpdatePlanningParametersResponses, UpdatePlanningParametersErrors, ThrowOnError> => (options.client ?? client).put<UpdatePlanningParametersResponses, UpdatePlanningParametersErrors, ThrowOnError>({
     url: '/api/v1/planning/parameters',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Recommend Pilot
+ *
+ * Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.
+ */
+export const recommendPilot = <ThrowOnError extends boolean = false>(options: Options<RecommendPilotData, ThrowOnError>): RequestResult<RecommendPilotResponses, RecommendPilotErrors, ThrowOnError> => (options.client ?? client).post<RecommendPilotResponses, RecommendPilotErrors, ThrowOnError>({
+    url: '/api/v1/planning/pilot',
     ...options,
     headers: {
         'Content-Type': 'application/json',
@@ -354,6 +488,20 @@ export const renameScenario = <ThrowOnError extends boolean = false>(options: Op
 export const getScenarioFlows = <ThrowOnError extends boolean = false>(options: Options<GetScenarioFlowsData, ThrowOnError>): RequestResult<GetScenarioFlowsResponses, GetScenarioFlowsErrors, ThrowOnError> => (options.client ?? client).get<GetScenarioFlowsResponses, GetScenarioFlowsErrors, ThrowOnError>({ url: '/api/v1/planning/scenarios/{scenario_id}/flows', ...options });
 
 /**
+ * Run Scenario Sensitivity
+ *
+ * Tornado (±30% de cada parâmetro) e Monte Carlo (P10/P50/P90 de €/t e custo) sobre o plano do cenário.
+ */
+export const runScenarioSensitivity = <ThrowOnError extends boolean = false>(options: Options<RunScenarioSensitivityData, ThrowOnError>): RequestResult<RunScenarioSensitivityResponses, RunScenarioSensitivityErrors, ThrowOnError> => (options.client ?? client).post<RunScenarioSensitivityResponses, RunScenarioSensitivityErrors, ThrowOnError>({
+    url: '/api/v1/planning/scenarios/{scenario_id}/sensitivity',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * List Zones
  *
  * Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus.
@@ -390,6 +538,8 @@ export const listReports = <ThrowOnError extends boolean = false>(options?: Opti
  * Create Rap Report
  *
  * Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).
+ *
+ * Inclui um briefing executivo: da IA, verificado contra os números, ou texto fixo sem IA.
  */
 export const createRapReport = <ThrowOnError extends boolean = false>(options: Options<CreateRapReportData, ThrowOnError>): RequestResult<CreateRapReportResponses, CreateRapReportErrors, ThrowOnError> => (options.client ?? client).post<CreateRapReportResponses, CreateRapReportErrors, ThrowOnError>({
     url: '/api/v1/reports/rap',
