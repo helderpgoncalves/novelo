@@ -4,6 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+Locale = Literal["pt-PT", "en"]
+
 
 class UserOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
@@ -16,6 +18,7 @@ class UserOut(BaseModel):
     has_password: bool
     google_linked: bool
     email_verified: bool
+    locale: Locale
 
 
 class UserAdminOut(BaseModel):
@@ -41,3 +44,4 @@ class UserAdminUpdate(BaseModel):
 
 class ProfileUpdate(BaseModel):
     name: str | None = Field(default=None, max_length=120)
+    locale: Locale | None = None

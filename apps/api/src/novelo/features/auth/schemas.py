@@ -1,11 +1,13 @@
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+from novelo.features.users.schemas import Locale
+
 PASSWORD_MIN = 10
 
 
 def _check_password(value: str) -> str:
     if value.strip() != value or len(value) < PASSWORD_MIN:
-        raise ValueError(f"A password deve ter pelo menos {PASSWORD_MIN} caracteres, sem espaços nas pontas")
+        raise ValueError(f"Password must be at least {PASSWORD_MIN} characters with no surrounding spaces")
     return value
 
 
@@ -20,12 +22,14 @@ class RegisterRequest(BaseModel):
     password: str = Field(max_length=128)
     name: str | None = Field(default=None, max_length=120)
     remember_me: bool = True
+    locale: Locale = "pt-PT"
 
     _pw = field_validator("password")(_check_password)
 
 
 class ForgotPasswordRequest(BaseModel):
     email: EmailStr
+    locale: Locale = "pt-PT"  # idioma do email se a conta ainda não tiver preferência
 
 
 class ResetPasswordRequest(BaseModel):

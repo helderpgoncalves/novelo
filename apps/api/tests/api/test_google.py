@@ -25,7 +25,7 @@ async def test_google_login_redirects_with_state(client: httpx.AsyncClient, goog
 
 async def test_callback_with_wrong_state_is_refused(client: httpx.AsyncClient, google_on: None) -> None:
     resp = await client.get(f"{AUTH}/google/callback?code=x&state=forjado", follow_redirects=False)
-    assert resp.status_code == 302 and "erro=google" in resp.headers["location"]
+    assert resp.status_code == 302 and "error=google_failed" in resp.headers["location"]
 
 
 async def test_callback_creates_and_links_user(

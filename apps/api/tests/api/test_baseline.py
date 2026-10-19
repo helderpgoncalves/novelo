@@ -9,7 +9,7 @@ async def test_health(client: httpx.AsyncClient) -> None:
 async def test_baseline_requires_login(client: httpx.AsyncClient) -> None:
     resp = await client.get("/api/v1/baseline/textile")
     assert resp.status_code == 401
-    assert resp.json()["code"] == "unauthorized"
+    assert resp.json()["code"] == "unauthenticated"
 
 
 async def test_textile_baseline_matches_excel_totals(logged_in: httpx.AsyncClient) -> None:

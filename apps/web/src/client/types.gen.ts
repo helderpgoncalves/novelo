@@ -151,6 +151,46 @@ export type EntityBaseline = {
 };
 
 /**
+ * ErrorBody
+ *
+ * Corpo de qualquer erro da API (exceto validação, que tem `fields`).
+ */
+export type ErrorBody = {
+    /**
+     * Code
+     */
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'internal_error';
+    /**
+     * Message
+     *
+     * Mensagem técnica em inglês; o web traduz a partir de `code`
+     */
+    message: string;
+};
+
+/**
+ * FieldError
+ */
+export type FieldError = {
+    /**
+     * Field
+     *
+     * Caminho do campo, ex.: `password` ou `body.email`
+     */
+    field: string;
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Type
+     *
+     * Tipo de erro do Pydantic, ex.: `string_too_short`
+     */
+    type: string;
+};
+
+/**
  * FlowLink
  */
 export type FlowLink = {
@@ -212,16 +252,10 @@ export type ForgotPasswordRequest = {
      * Email
      */
     email: string;
-};
-
-/**
- * HTTPValidationError
- */
-export type HttpValidationError = {
     /**
-     * Detail
+     * Locale
      */
-    detail?: Array<ValidationError>;
+    locale?: 'pt-PT' | 'en';
 };
 
 /**
@@ -257,6 +291,10 @@ export type LoginRequest = {
  */
 export type ProfileUpdate = {
     /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en' | null;
+    /**
      * Name
      */
     name?: string | null;
@@ -288,6 +326,10 @@ export type RegisterRequest = {
      * Email
      */
     email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
     /**
      * Name
      */
@@ -457,6 +499,10 @@ export type UserOut = {
      */
     id: string;
     /**
+     * Locale
+     */
+    locale: 'pt-PT' | 'en';
+    /**
      * Name
      */
     name: string | null;
@@ -467,31 +513,21 @@ export type UserOut = {
 };
 
 /**
- * ValidationError
+ * ValidationErrorBody
  */
-export type ValidationError = {
+export type ValidationErrorBody = {
     /**
-     * Context
+     * Code
      */
-    ctx?: {
-        [key: string]: unknown;
-    };
+    code?: 'validation_error';
     /**
-     * Input
+     * Fields
      */
-    input?: unknown;
-    /**
-     * Location
-     */
-    loc: Array<string | number>;
+    fields: Array<FieldError>;
     /**
      * Message
      */
-    msg: string;
-    /**
-     * Error Type
-     */
-    type: string;
+    message: string;
 };
 
 /**
@@ -551,9 +587,45 @@ export type ChangePasswordData = {
 
 export type ChangePasswordErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ChangePasswordError = ChangePasswordErrors[keyof ChangePasswordErrors];
@@ -574,6 +646,51 @@ export type GetAuthConfigData = {
     url: '/api/v1/auth/config';
 };
 
+export type GetAuthConfigErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetAuthConfigError = GetAuthConfigErrors[keyof GetAuthConfigErrors];
+
 export type GetAuthConfigResponses = {
     /**
      * Successful Response
@@ -592,9 +709,45 @@ export type ForgotPasswordData = {
 
 export type ForgotPasswordErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ForgotPasswordError = ForgotPasswordErrors[keyof ForgotPasswordErrors];
@@ -630,9 +783,45 @@ export type GoogleCallbackData = {
 
 export type GoogleCallbackErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GoogleCallbackError = GoogleCallbackErrors[keyof GoogleCallbackErrors];
@@ -644,18 +833,60 @@ export type GoogleLoginData = {
         /**
          * Next
          *
-         * Caminho para onde voltar depois de entrar
+         * Path to return to after signing in
          */
         next?: string;
+        /**
+         * Locale
+         *
+         * Interface language for new accounts
+         */
+        locale?: 'pt-PT' | 'en';
     };
     url: '/api/v1/auth/google/login';
 };
 
 export type GoogleLoginErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GoogleLoginError = GoogleLoginErrors[keyof GoogleLoginErrors];
@@ -669,9 +900,45 @@ export type LoginData = {
 
 export type LoginErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type LoginError = LoginErrors[keyof LoginErrors];
@@ -694,9 +961,45 @@ export type LogoutData = {
 
 export type LogoutErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type LogoutError = LogoutErrors[keyof LogoutErrors];
@@ -719,9 +1022,45 @@ export type LogoutAllData = {
 
 export type LogoutAllErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type LogoutAllError = LogoutAllErrors[keyof LogoutAllErrors];
@@ -744,9 +1083,45 @@ export type GetMeData = {
 
 export type GetMeErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GetMeError = GetMeErrors[keyof GetMeErrors];
@@ -769,9 +1144,45 @@ export type UpdateMeData = {
 
 export type UpdateMeErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type UpdateMeError = UpdateMeErrors[keyof UpdateMeErrors];
@@ -794,9 +1205,45 @@ export type RefreshData = {
 
 export type RefreshErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type RefreshError = RefreshErrors[keyof RefreshErrors];
@@ -819,9 +1266,45 @@ export type RegisterData = {
 
 export type RegisterErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type RegisterError = RegisterErrors[keyof RegisterErrors];
@@ -844,9 +1327,45 @@ export type ResendVerificationData = {
 
 export type ResendVerificationErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ResendVerificationError = ResendVerificationErrors[keyof ResendVerificationErrors];
@@ -869,9 +1388,45 @@ export type ResetPasswordData = {
 
 export type ResetPasswordErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ResetPasswordError = ResetPasswordErrors[keyof ResetPasswordErrors];
@@ -894,9 +1449,45 @@ export type VerifyEmailData = {
 
 export type VerifyEmailErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type VerifyEmailError = VerifyEmailErrors[keyof VerifyEmailErrors];
@@ -919,9 +1510,45 @@ export type ListCircuitsData = {
 
 export type ListCircuitsErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ListCircuitsError = ListCircuitsErrors[keyof ListCircuitsErrors];
@@ -944,9 +1571,45 @@ export type GetObservedFlowsData = {
 
 export type GetObservedFlowsErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GetObservedFlowsError = GetObservedFlowsErrors[keyof GetObservedFlowsErrors];
@@ -969,9 +1632,45 @@ export type GetTextileBaselineData = {
 
 export type GetTextileBaselineErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GetTextileBaselineError = GetTextileBaselineErrors[keyof GetTextileBaselineErrors];
@@ -994,9 +1693,45 @@ export type GetWasteCompositionData = {
 
 export type GetWasteCompositionErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type GetWasteCompositionError = GetWasteCompositionErrors[keyof GetWasteCompositionErrors];
@@ -1017,6 +1752,51 @@ export type HealthData = {
     url: '/api/v1/health';
 };
 
+export type HealthErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type HealthError = HealthErrors[keyof HealthErrors];
+
 export type HealthResponses = {
     /**
      * Successful Response
@@ -1032,6 +1812,51 @@ export type ReadyData = {
     query?: never;
     url: '/api/v1/ready';
 };
+
+export type ReadyErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ReadyError = ReadyErrors[keyof ReadyErrors];
 
 export type ReadyResponses = {
     /**
@@ -1051,9 +1876,45 @@ export type ListUsersData = {
 
 export type ListUsersErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type ListUsersError = ListUsersErrors[keyof ListUsersErrors];
@@ -1083,9 +1944,45 @@ export type UpdateUserData = {
 
 export type UpdateUserErrors = {
     /**
-     * Validation Error
+     * Pedido inválido
      */
-    422: HttpValidationError;
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
 };
 
 export type UpdateUserError = UpdateUserErrors[keyof UpdateUserErrors];

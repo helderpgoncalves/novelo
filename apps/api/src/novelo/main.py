@@ -10,7 +10,7 @@ from fastapi.routing import APIRoute
 from novelo.core.config import get_settings
 from novelo.core.database import SessionLocal
 from novelo.core.deps import get_current_user
-from novelo.core.errors import register_error_handlers
+from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
@@ -55,15 +55,16 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestLoggingMiddleware)
     register_error_handlers(app)
 
-    app.include_router(health_router, prefix=API_PREFIX, tags=["health"])
-    app.include_router(auth_router, prefix=f"{API_PREFIX}/auth", tags=["auth"])
-    app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"])
+    app.include_router(health_router, prefix=API_PREFIX, tags=["health"], responses=COMMON_ERRORS)
+    app.include_router(auth_router, prefix=f"{API_PREFIX}/auth", tags=["auth"], responses=COMMON_ERRORS)
+    app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"], responses=COMMON_ERRORS)
     # Dados da Vitrus: só para utilizadores autenticados.
     app.include_router(
         baseline_router,
         prefix=f"{API_PREFIX}/baseline",
         tags=["baseline"],
         dependencies=[Depends(get_current_user)],
+        responses=COMMON_ERRORS,
     )
     return app
 

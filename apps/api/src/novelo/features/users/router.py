@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
 from novelo.core.deps import require_role
-from novelo.core.errors import ConflictError, NotFoundError
+from novelo.core.errors import CannotModifySelfError, UserNotFoundError
 from novelo.features.auth import service as auth_service
 from novelo.features.users import service
 from novelo.features.users.models import User
@@ -20,18 +20,18 @@ Admin = Annotated[User, Depends(require_role("admin"))]
 
 @router.get("", response_model=list[UserAdminOut])
 async def list_users(_: Admin, db: Db) -> list[UserAdminOut]:
-    """Contas da plataforma (só administradores)."""
+    """Platform accounts (admins only)."""
     return [service.to_admin_out(u) for u in await service.list_users(db)]
 
 
 @router.patch("/{user_id}", response_model=UserAdminOut)
 async def update_user(user_id: uuid.UUID, body: UserAdminUpdate, admin: Admin, db: Db) -> UserAdminOut:
-    """Muda o perfil ou ativa/desativa uma conta. Não se pode alterar a própria conta."""
+    """Change role or activate/deactivate an account. Admins cannot change themselves."""
     if user_id == admin.id:
-        raise ConflictError("Não podes alterar o teu próprio perfil ou estado")
+        raise CannotModifySelfError("You cannot change your own role or status")
     user = await db.get(User, user_id)
     if user is None:
-        raise NotFoundError("Utilizador não encontrado")
+        raise UserNotFoundError("User not found")
     if body.role is not None:
         user.role = body.role
     if body.is_active is not None:

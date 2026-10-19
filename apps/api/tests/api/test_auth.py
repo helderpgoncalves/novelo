@@ -102,7 +102,7 @@ async def test_change_password_requires_current(logged_in: httpx.AsyncClient) ->
         f"{AUTH}/change-password",
         json={"current_password": "errada-errada-1", "new_password": "nova-password-segura-1"},
     )
-    assert bad.status_code == 401
+    assert bad.status_code == 400 and bad.json()["code"] == "current_password_incorrect"
     ok = await logged_in.post(
         f"{AUTH}/change-password", json={"current_password": PASSWORD, "new_password": "nova-password-segura-1"}
     )
@@ -164,3 +164,27 @@ async def test_update_profile_and_logout_all(logged_in: httpx.AsyncClient) -> No
     assert resp.json()["name"] == "Ana Silva"
     assert (await logged_in.post(f"{AUTH}/logout-all")).status_code == 204
     assert (await logged_in.post(f"{AUTH}/refresh")).status_code == 401
+
+
+async def test_errors_have_stable_typed_codes(client: httpx.AsyncClient) -> None:
+    wrong = await client.post(f"{AUTH}/login", json={"email": "x@b.pt", "password": "x"})
+    assert wrong.json() == {"code": "invalid_credentials", "message": "Wrong email or password"}
+
+    invalid = await client.post(f"{AUTH}/register", json={"email": "no-es-email", "password": "curta"})
+    body = invalid.json()
+    assert invalid.status_code == 422 and body["code"] == "validation_error"
+    assert {f["field"] for f in body["fields"]} == {"email", "password"}
+
+    token = await client.post(f"{AUTH}/reset-password", json={"token": "x" * 30, "password": PASSWORD})
+    assert token.json()["code"] == "invalid_token"
+
+
+async def test_emails_follow_the_account_language(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
+    await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD, "locale": "en"})
+    assert outbox.sent[0]["subject"] == "Confirm your email on Novelo"
+    assert (await client.get(f"{AUTH}/me")).json()["locale"] == "en"
+    patched = await client.patch(f"{AUTH}/me", json={"locale": "pt-PT"})
+    assert patched.json()["locale"] == "pt-PT"
+    outbox.sent.clear()
+    await client.post(f"{AUTH}/forgot-password", json={"email": "a@b.pt", "locale": "en"})
+    assert outbox.sent[0]["subject"] == "Recuperar a password do Novelo"  # a preferência da conta tem prioridade
