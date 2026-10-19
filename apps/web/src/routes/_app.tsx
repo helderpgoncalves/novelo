@@ -41,7 +41,7 @@ function AppLayout() {
         <OfflineBanner />
         <VerifyEmailBanner user={user} />
         <main id="content" className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-6xl px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:p-8">
+          <div className="mx-auto w-full max-w-[96rem] px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:px-10 lg:py-8 2xl:px-14">
             <Suspense fallback={<PageSkeleton />}>
               <Outlet />
             </Suspense>

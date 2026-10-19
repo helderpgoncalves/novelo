@@ -64,6 +64,9 @@ export const alertKindLabel: Record<AlertKind, () => string> = {
   undocumented_circuits: () => m.alert_kind_undocumented_circuits(),
   different_dates: () => m.alert_kind_different_dates(),
   normalized_spelling: () => m.alert_kind_normalized_spelling(),
+  container_rows_rejected: () => m.alert_kind_container_rows_rejected(),
+  container_pending_location: () => m.alert_kind_container_pending_location(),
+  container_assumed_values: () => m.alert_kind_container_assumed_values(),
 };
 
 export const alertStatusLabel: Record<AlertStatus, () => string> = {

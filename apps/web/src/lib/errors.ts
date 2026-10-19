@@ -24,6 +24,7 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   rate_limited: () => m.error_rate_limited(),
   feature_disabled: () => m.error_feature_disabled(),
   upstream_error: () => m.error_upstream_error(),
+  ai_budget_exceeded: () => m.error_ai_budget_exceeded(),
   internal_error: () => m.error_internal_error(),
 };
 
