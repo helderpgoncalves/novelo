@@ -1,0 +1,28 @@
+import uuid
+from datetime import datetime
+from typing import Literal
+
+from sqlalchemy import Boolean, DateTime, String
+from sqlalchemy.orm import Mapped, mapped_column
+
+from novelo.core.database import Base, TimestampMixin, UuidPkMixin
+
+Role = Literal["admin", "operator"]
+
+
+class User(Base, UuidPkMixin, TimestampMixin):
+    __tablename__ = "users"
+
+    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
+    name: Mapped[str | None] = mapped_column(String(255))
+    # Nulo em contas criadas só com Google.
+    hashed_password: Mapped[str | None] = mapped_column(String(255))
+    google_sub: Mapped[str | None] = mapped_column(String(64), unique=True)
+    avatar_url: Mapped[str | None] = mapped_column(String(1024))
+    role: Mapped[str] = mapped_column(String(20), default="operator")
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    email_verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+__all__ = ["Role", "User", "uuid"]

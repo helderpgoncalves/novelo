@@ -87,9 +87,9 @@ Nomes de ficheiros de docs em português, minúsculas e hífens.
 
 ## Git e entrega
 
-- Branch `master` é produção: o Coolify faz deploy a cada push. Trabalho em `feat/…`, `fix/…`, `chore/…` e PR pequeno; em hackathon permite-se push direto só com `just check` verde.
+- Branch `main` é produção: o Coolify faz deploy a cada push. Trabalho em `feat/…`, `fix/…`, `chore/…` e PR pequeno; em hackathon permite-se push direto só com `just check` verde.
 - Commits em Conventional Commits, no imperativo, em inglês: `feat(api): add on-demand collection mode`.
-- Nunca commitar `.env`, nunca `--force` em `master`, nunca `--no-verify`.
+- Nunca commitar `.env`, nunca `--force` em `main`, nunca `--no-verify`.
 - Definição de pronto: `just check` verde, contrato regenerado, ecrã com os 4 estados, docs atualizados se mudou comportamento, funciona em `just dev`.
 
 ## Agentes e skills

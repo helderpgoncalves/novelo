@@ -3,6 +3,23 @@
 import * as z from 'zod';
 
 /**
+ * AuthConfig
+ */
+export const zAuthConfig = z.object({
+    google_enabled: z.boolean(),
+    password_min_length: z.int().optional().default(10),
+    registration_open: z.boolean()
+});
+
+/**
+ * ChangePasswordRequest
+ */
+export const zChangePasswordRequest = z.object({
+    current_password: z.string().max(128).nullish(),
+    new_password: z.string().max(128)
+});
+
+/**
  * Circuit
  */
 export const zCircuit = z.object({
@@ -73,10 +90,25 @@ export const zFlows = z.object({
 });
 
 /**
+ * ForgotPasswordRequest
+ */
+export const zForgotPasswordRequest = z.object({
+    email: z.email()
+});
+
+/**
  * Health
  */
 export const zHealth = z.object({
     status: z.literal('ok').optional().default('ok')
+});
+
+/**
+ * LoginRequest
+ */
+export const zLoginRequest = z.object({
+    email: z.email(),
+    password: z.string().min(1).max(128)
 });
 
 /**
@@ -86,6 +118,23 @@ export const zReadiness = z.object({
     database: z.boolean(),
     llm_enabled: z.boolean(),
     status: z.enum(['ok', 'degraded'])
+});
+
+/**
+ * RegisterRequest
+ */
+export const zRegisterRequest = z.object({
+    email: z.email(),
+    name: z.string().max(120).nullish(),
+    password: z.string().max(128)
+});
+
+/**
+ * ResetPasswordRequest
+ */
+export const zResetPasswordRequest = z.object({
+    password: z.string().max(128),
+    token: z.string().min(20).max(200)
 });
 
 /**
@@ -104,6 +153,92 @@ export const zTextileBaseline = z.object({
     total_t: z.number(),
     year: z.int().optional().default(2025)
 });
+
+/**
+ * UserOut
+ */
+export const zUserOut = z.object({
+    avatar_url: z.string().nullable(),
+    email: z.string(),
+    google_linked: z.boolean(),
+    has_password: z.boolean(),
+    id: z.uuid(),
+    name: z.string().nullable(),
+    role: z.enum(['admin', 'operator'])
+});
+
+/**
+ * ValidationError
+ */
+export const zValidationError = z.object({
+    ctx: z.record(z.string(), z.unknown()).optional(),
+    input: z.unknown().optional(),
+    loc: z.array(z.union([z.string(), z.int()])),
+    msg: z.string(),
+    type: z.string()
+});
+
+/**
+ * HTTPValidationError
+ */
+export const zHttpValidationError = z.object({
+    detail: z.array(zValidationError).optional()
+});
+
+export const zChangePasswordBody = zChangePasswordRequest;
+
+/**
+ * Successful Response
+ */
+export const zChangePasswordResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetAuthConfigResponse = zAuthConfig;
+
+export const zForgotPasswordBody = zForgotPasswordRequest;
+
+/**
+ * Successful Response
+ */
+export const zForgotPasswordResponse = z.void();
+
+export const zLoginBody = zLoginRequest;
+
+/**
+ * Successful Response
+ */
+export const zLoginResponse = zUserOut;
+
+/**
+ * Successful Response
+ */
+export const zLogoutResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetMeResponse = zUserOut;
+
+/**
+ * Successful Response
+ */
+export const zRefreshResponse = z.void();
+
+export const zRegisterBody = zRegisterRequest;
+
+/**
+ * Successful Response
+ */
+export const zRegisterResponse = zUserOut;
+
+export const zResetPasswordBody = zResetPasswordRequest;
+
+/**
+ * Successful Response
+ */
+export const zResetPasswordResponse = z.void();
 
 /**
  * Successful Response

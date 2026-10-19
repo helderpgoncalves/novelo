@@ -1,0 +1,91 @@
+"""Fixtures partilhadas. Os testes de API usam um Postgres real (DATABASE_URL de teste)."""
+
+import os
+from collections.abc import AsyncGenerator, Iterator
+
+import httpx
+import pytest
+from sqlalchemy import create_engine, text
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
+
+from novelo.adapters.email import get_email_sender
+from novelo.core.database import Base, get_db
+from novelo.core.ratelimit import auth_limiter, reset_limiter
+from novelo.features.auth import models as _auth_models  # noqa: F401
+from novelo.features.scenarios import models as _scenario_models  # noqa: F401
+from novelo.features.users import models as _user_models  # noqa: F401
+from novelo.main import create_app
+
+TEST_DB = os.environ.get("TEST_DATABASE_URL", "postgresql+asyncpg://novelo:novelo@localhost:5590/novelo_test")
+
+
+class OutboxSender:
+    """Guarda os emails enviados para os testes lerem o link de recuperação."""
+
+    def __init__(self) -> None:
+        self.sent: list[dict[str, str]] = []
+
+    async def send(self, *, to: str, subject: str, html: str, text: str) -> None:
+        self.sent.append({"to": to, "subject": subject, "html": html, "text": text})
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _database() -> Iterator[None]:
+    admin = create_engine(
+        TEST_DB.replace("+asyncpg", "+psycopg2").rsplit("/", 1)[0] + "/postgres", isolation_level="AUTOCOMMIT"
+    )
+    name = TEST_DB.rsplit("/", 1)[1]
+    try:
+        with admin.connect() as conn:
+            conn.execute(text(f'DROP DATABASE IF EXISTS "{name}"'))
+            conn.execute(text(f'CREATE DATABASE "{name}"'))
+    except Exception:  # sem Postgres: só correm os testes que não precisam da BD
+        yield
+        return
+    sync = create_engine(TEST_DB.replace("+asyncpg", "+psycopg2"))
+    Base.metadata.create_all(sync)
+    yield
+
+
+@pytest.fixture
+async def session() -> AsyncGenerator[AsyncSession, None]:
+    engine = create_async_engine(TEST_DB)
+    async with engine.connect() as conn:
+        trans = await conn.begin()
+        maker = async_sessionmaker(bind=conn, expire_on_commit=False, join_transaction_mode="create_savepoint")
+        async with maker() as s:
+            yield s
+        await trans.rollback()
+    await engine.dispose()
+
+
+@pytest.fixture
+def outbox() -> OutboxSender:
+    return OutboxSender()
+
+
+@pytest.fixture
+async def client(session: AsyncSession, outbox: OutboxSender) -> AsyncGenerator[httpx.AsyncClient, None]:
+    app = create_app()
+
+    async def _db() -> AsyncGenerator[AsyncSession, None]:
+        yield session
+
+    app.dependency_overrides[get_db] = _db
+    app.dependency_overrides[get_email_sender] = lambda: outbox
+    auth_limiter.reset()
+    reset_limiter.reset()
+    async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
+        yield c
+
+
+PASSWORD = "uma-password-segura-123"
+
+
+@pytest.fixture
+async def logged_in(client: httpx.AsyncClient) -> httpx.AsyncClient:
+    resp = await client.post(
+        "/api/v1/auth/register", json={"email": "ana@vitrus.pt", "password": PASSWORD, "name": "Ana"}
+    )
+    assert resp.status_code == 201
+    return client

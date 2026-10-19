@@ -5,7 +5,9 @@ from sqlalchemy import create_engine, pool
 
 from novelo.core.config import get_settings
 from novelo.core.database import Base
-from novelo.features.scenarios import models  # noqa: F401  (todos os modelos têm de ser importados)
+from novelo.features.auth import models as auth_models  # noqa: F401
+from novelo.features.scenarios import models as scenario_models  # noqa: F401
+from novelo.features.users import models as user_models  # noqa: F401
 
 target_metadata = Base.metadata
 url = get_settings().database_url.replace("+asyncpg", "+psycopg2")

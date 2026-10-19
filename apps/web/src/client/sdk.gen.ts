@@ -2,7 +2,7 @@
 
 import type { Client, ClientMeta, Options as Options2, RequestResult, TDataShape } from './client';
 import { client } from './client.gen';
-import type { GetObservedFlowsData, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineResponses, HealthData, HealthResponses, ListCircuitsData, ListCircuitsResponses, ReadyData, ReadyResponses } from './types.gen';
+import type { ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAuthConfigData, GetAuthConfigResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, HealthData, HealthResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, LoginData, LoginErrors, LoginResponses, LogoutData, LogoutErrors, LogoutResponses, ReadyData, ReadyResponses, RefreshData, RefreshErrors, RefreshResponses, RegisterData, RegisterErrors, RegisterResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -19,25 +19,109 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
 };
 
 /**
+ * Change Password
+ */
+export const changePassword = <ThrowOnError extends boolean = false>(options: Options<ChangePasswordData, ThrowOnError>): RequestResult<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError> => (options.client ?? client).post<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/change-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Auth Config
+ *
+ * O que o ecrã de entrada precisa de saber: Google ligado? registo aberto?
+ */
+export const getAuthConfig = <ThrowOnError extends boolean = false>(options?: Options<GetAuthConfigData, ThrowOnError>): RequestResult<GetAuthConfigResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetAuthConfigResponses, unknown, ThrowOnError>({ url: '/api/v1/auth/config', ...options });
+
+/**
+ * Forgot Password
+ *
+ * Responde 204 exista ou não a conta: não revela que emails estão registados.
+ */
+export const forgotPassword = <ThrowOnError extends boolean = false>(options: Options<ForgotPasswordData, ThrowOnError>): RequestResult<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError> => (options.client ?? client).post<ForgotPasswordResponses, ForgotPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/forgot-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Login
+ */
+export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>): RequestResult<LoginResponses, LoginErrors, ThrowOnError> => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
+    url: '/api/v1/auth/login',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Logout
+ */
+export const logout = <ThrowOnError extends boolean = false>(options?: Options<LogoutData, ThrowOnError>): RequestResult<LogoutResponses, LogoutErrors, ThrowOnError> => (options?.client ?? client).post<LogoutResponses, LogoutErrors, ThrowOnError>({ url: '/api/v1/auth/logout', ...options });
+
+/**
+ * Get Me
+ */
+export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/api/v1/auth/me', ...options });
+
+/**
+ * Refresh
+ */
+export const refresh = <ThrowOnError extends boolean = false>(options?: Options<RefreshData, ThrowOnError>): RequestResult<RefreshResponses, RefreshErrors, ThrowOnError> => (options?.client ?? client).post<RefreshResponses, RefreshErrors, ThrowOnError>({ url: '/api/v1/auth/refresh', ...options });
+
+/**
+ * Register
+ */
+export const register = <ThrowOnError extends boolean = false>(options: Options<RegisterData, ThrowOnError>): RequestResult<RegisterResponses, RegisterErrors, ThrowOnError> => (options.client ?? client).post<RegisterResponses, RegisterErrors, ThrowOnError>({
+    url: '/api/v1/auth/register',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Reset Password
+ */
+export const resetPassword = <ThrowOnError extends boolean = false>(options: Options<ResetPasswordData, ThrowOnError>): RequestResult<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError> => (options.client ?? client).post<ResetPasswordResponses, ResetPasswordErrors, ThrowOnError>({
+    url: '/api/v1/auth/reset-password',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * List Circuits
  *
  * Circuitos e viaturas de recolha atuais da Vitrus (base para a recolha a pedido).
  */
-export const listCircuits = <ThrowOnError extends boolean = false>(options?: Options<ListCircuitsData, ThrowOnError>): RequestResult<ListCircuitsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<ListCircuitsResponses, unknown, ThrowOnError>({ url: '/api/v1/baseline/circuits', ...options });
+export const listCircuits = <ThrowOnError extends boolean = false>(options?: Options<ListCircuitsData, ThrowOnError>): RequestResult<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError> => (options?.client ?? client).get<ListCircuitsResponses, ListCircuitsErrors, ThrowOnError>({ url: '/api/v1/baseline/circuits', ...options });
 
 /**
  * Get Observed Flows
  *
  * Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).
  */
-export const getObservedFlows = <ThrowOnError extends boolean = false>(options?: Options<GetObservedFlowsData, ThrowOnError>): RequestResult<GetObservedFlowsResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetObservedFlowsResponses, unknown, ThrowOnError>({ url: '/api/v1/baseline/flows', ...options });
+export const getObservedFlows = <ThrowOnError extends boolean = false>(options?: Options<GetObservedFlowsData, ThrowOnError>): RequestResult<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError> => (options?.client ?? client).get<GetObservedFlowsResponses, GetObservedFlowsErrors, ThrowOnError>({ url: '/api/v1/baseline/flows', ...options });
 
 /**
  * Get Textile Baseline
  *
  * Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.
  */
-export const getTextileBaseline = <ThrowOnError extends boolean = false>(options?: Options<GetTextileBaselineData, ThrowOnError>): RequestResult<GetTextileBaselineResponses, unknown, ThrowOnError> => (options?.client ?? client).get<GetTextileBaselineResponses, unknown, ThrowOnError>({ url: '/api/v1/baseline/textile', ...options });
+export const getTextileBaseline = <ThrowOnError extends boolean = false>(options?: Options<GetTextileBaselineData, ThrowOnError>): RequestResult<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError> => (options?.client ?? client).get<GetTextileBaselineResponses, GetTextileBaselineErrors, ThrowOnError>({ url: '/api/v1/baseline/textile', ...options });
 
 /**
  * Health
