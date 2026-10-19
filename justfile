@@ -1,6 +1,9 @@
 # Comandos únicos do projeto. `just` sem argumentos lista tudo.
 set shell := ["bash", "-cu"]
 
+# WeasyPrint (PDF do relatório RAP) precisa das bibliotecas Pango; no macOS vêm do Homebrew (`brew install pango`).
+export DYLD_FALLBACK_LIBRARY_PATH := env_var_or_default("DYLD_FALLBACK_LIBRARY_PATH", "/opt/homebrew/lib")
+
 default:
     @just --list
 

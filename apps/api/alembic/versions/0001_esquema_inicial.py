@@ -2,7 +2,7 @@
 
 Revision ID: 0001
 Revises:
-Create Date: 2026-10-19 20:33:52.869452
+Create Date: 2026-10-19 21:11:01.078464
 """
 
 from collections.abc import Sequence
@@ -277,6 +277,7 @@ def upgrade() -> None:
         sa.Column("name", sa.String(length=120), nullable=False),
         sa.Column("population", sa.Integer(), nullable=True),
         sa.Column("population_year", sa.SmallInteger(), nullable=True),
+        sa.Column("tipau", sa.Enum("apu", "amu", "apr", name="tipau", native_enum=False, length=32), nullable=True),
         sa.Column("area_km2", sa.Numeric(precision=9, scale=3), nullable=True),
         sa.Column("latitude", sa.Numeric(precision=9, scale=6), nullable=True),
         sa.Column("longitude", sa.Numeric(precision=9, scale=6), nullable=True),
@@ -285,6 +286,7 @@ def upgrade() -> None:
         sa.Column("id", sa.UUID(), nullable=False),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.CheckConstraint("tipau IN ('apu', 'amu', 'apr')", name=op.f("ck_parishes_tipau_valid")),
         sa.CheckConstraint("population >= 0", name=op.f("ck_parishes_population_non_negative")),
         sa.ForeignKeyConstraint(["source_id"], ["data_sources.id"], name=op.f("fk_parishes_source_id_data_sources")),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_parishes")),
@@ -322,6 +324,24 @@ def upgrade() -> None:
     )
     op.create_index(op.f("ix_refresh_tokens_token_hash"), "refresh_tokens", ["token_hash"], unique=True)
     op.create_index(op.f("ix_refresh_tokens_user_id"), "refresh_tokens", ["user_id"], unique=False)
+    op.create_table(
+        "reports",
+        sa.Column("title", sa.String(length=160), nullable=False),
+        sa.Column("locale", sa.String(length=8), nullable=False),
+        sa.Column("scenario_ids", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("summary", postgresql.JSONB(astext_type=sa.Text()), nullable=False),
+        sa.Column("pdf", sa.LargeBinary(), nullable=False),
+        sa.Column("size_bytes", sa.Integer(), nullable=False),
+        sa.Column("sha256", sa.String(length=64), nullable=False),
+        sa.Column("created_by_id", sa.UUID(), nullable=True),
+        sa.Column("id", sa.UUID(), nullable=False),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
+        sa.ForeignKeyConstraint(
+            ["created_by_id"], ["users.id"], name=op.f("fk_reports_created_by_id_users"), ondelete="SET NULL"
+        ),
+        sa.PrimaryKeyConstraint("id", name=op.f("pk_reports")),
+    )
     op.create_table(
         "scenarios",
         sa.Column("label", sa.String(length=80), nullable=False),
@@ -902,6 +922,7 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_scenarios_parent_id"), table_name="scenarios")
     op.drop_index(op.f("ix_scenarios_created_by_id"), table_name="scenarios")
     op.drop_table("scenarios")
+    op.drop_table("reports")
     op.drop_index(op.f("ix_refresh_tokens_user_id"), table_name="refresh_tokens")
     op.drop_index(op.f("ix_refresh_tokens_token_hash"), table_name="refresh_tokens")
     op.drop_table("refresh_tokens")

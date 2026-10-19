@@ -22,6 +22,7 @@ from novelo.features.lots.router import router as lots_router
 from novelo.features.network.router import router as network_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
+from novelo.features.reports.router import router as reports_router
 from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
 
@@ -72,6 +73,7 @@ def create_app() -> FastAPI:
         (network_router, "network"),
         (datasets_router, "datasets"),
         (planning_router, "planning"),
+        (reports_router, "reports"),
     ):
         app.include_router(
             router, prefix=f"{API_PREFIX}/{name}", tags=[name], dependencies=protected, responses=COMMON_ERRORS

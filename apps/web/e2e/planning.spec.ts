@@ -65,4 +65,20 @@ test.describe('simulador e cenários', () => {
     await page.goto('/pt/scenarios');
     await expect(page.getByRole('link', { name: 'Pequeno' }).first()).toBeVisible();
   });
+
+  test('relatório RAP: gerar o PDF a partir de cenários', async ({ page }) => {
+    await page.goto('/pt/reports');
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Relatório RAP num clique' }),
+    ).toBeVisible();
+    const generate = page.getByRole('button', { name: 'Gerar relatório' });
+    await expect(generate).toBeEnabled();
+    await Promise.all([page.waitForEvent('popup').catch(() => null), generate.click()]);
+    await expect(page.getByText('Relatório gerado')).toBeVisible();
+    const list = (await (await page.request.get('/api/v1/reports')).json()) as { id: string }[];
+    const pdf = await page.request.get(`/api/v1/reports/${list[0]?.id}/pdf`);
+    expect(pdf.headers()['content-type']).toBe('application/pdf');
+    expect((await pdf.body()).subarray(0, 4).toString()).toBe('%PDF');
+    await expect(page.getByRole('row', { name: /Relatório RAP/ }).first()).toBeVisible();
+  });
 });

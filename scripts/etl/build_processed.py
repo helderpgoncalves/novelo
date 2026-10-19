@@ -17,6 +17,7 @@ import csv
 import hashlib
 import json
 import re
+import unicodedata
 from collections import defaultdict
 from pathlib import Path
 
@@ -295,12 +296,20 @@ def geography() -> dict:
     if not (public / "parishes.geojson").exists():
         return {"parishes": 0, "localities_located": 0}
     collection = json.loads((public / "parishes.geojson").read_text(encoding="utf-8"))
+    tipau_file = public / "tipau.json"
+    tipau = json.loads(tipau_file.read_text(encoding="utf-8")) if tipau_file.exists() else {}
+
+    def norm(text: str) -> str:
+        plain = "".join(c for c in unicodedata.normalize("NFD", text.lower()) if not unicodedata.combining(c))
+        return re.sub(r"[^a-z0-9]+", " ", plain).strip()
+
     parish_rows = [
         {
             "dicofre": f["properties"]["dicofre"],
             "name": f["properties"]["name"],
             "population": f["properties"]["population"],
             "population_year": f["properties"]["year"],
+            "tipau": tipau.get(norm(f["properties"]["name"]), ""),
             "latitude": f["properties"]["lat"],
             "longitude": f["properties"]["lon"],
             "geometry": json.dumps(f["geometry"], separators=(",", ":")) if f["geometry"] else "",

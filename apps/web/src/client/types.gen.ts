@@ -1368,6 +1368,56 @@ export type RegisterRequest = {
 };
 
 /**
+ * ReportOut
+ */
+export type ReportOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locale
+     */
+    locale: 'pt-PT' | 'en';
+    /**
+     * Scenario Ids
+     */
+    scenario_ids: Array<string>;
+    /**
+     * Sha256
+     */
+    sha256: string;
+    /**
+     * Size Bytes
+     */
+    size_bytes: number;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * ReportRequest
+ */
+export type ReportRequest = {
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Scenario Ids
+     *
+     * 1 a 3 cenários a incluir
+     */
+    scenario_ids: Array<string>;
+};
+
+/**
  * ReservationOut
  */
 export type ReservationOut = {
@@ -1792,6 +1842,13 @@ export type TextileBaseline = {
  * TextileDestination
  */
 export type TextileDestination = 'reuse' | 'recycle' | 'reject';
+
+/**
+ * Tipau
+ *
+ * Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.
+ */
+export type Tipau = 'apu' | 'amu' | 'apr';
 
 /**
  * TriageAnalysis
@@ -2259,6 +2316,10 @@ export type ZoneOut = {
      * Dias/semana com algum circuito da Vitrus a passar
      */
     service_days: number;
+    /**
+     * Tipologia de áreas urbanas do INE
+     */
+    tipau: Tipau | null;
 };
 
 export type ChangePasswordData = {
@@ -4922,6 +4983,196 @@ export type ReadyResponses = {
 };
 
 export type ReadyResponse = ReadyResponses[keyof ReadyResponses];
+
+export type ListReportsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/reports';
+};
+
+export type ListReportsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListReportsError = ListReportsErrors[keyof ListReportsErrors];
+
+export type ListReportsResponses = {
+    /**
+     * Response List Reports
+     *
+     * Successful Response
+     */
+    200: Array<ReportOut>;
+};
+
+export type ListReportsResponse = ListReportsResponses[keyof ListReportsResponses];
+
+export type CreateRapReportData = {
+    body: ReportRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/reports/rap';
+};
+
+export type CreateRapReportErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateRapReportError = CreateRapReportErrors[keyof CreateRapReportErrors];
+
+export type CreateRapReportResponses = {
+    /**
+     * Successful Response
+     */
+    201: ReportOut;
+};
+
+export type CreateRapReportResponse = CreateRapReportResponses[keyof CreateRapReportResponses];
+
+export type DownloadReportData = {
+    body?: never;
+    path: {
+        /**
+         * Report Id
+         */
+        report_id: string;
+    };
+    query?: never;
+    url: '/api/v1/reports/{report_id}/pdf';
+};
+
+export type DownloadReportErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DownloadReportError = DownloadReportErrors[keyof DownloadReportErrors];
+
+export type DownloadReportResponses = {
+    /**
+     * Successful Response
+     */
+    200: Blob | File;
+};
+
+export type DownloadReportResponse = DownloadReportResponses[keyof DownloadReportResponses];
 
 export type GetTextileBaselineData = {
     body?: never;

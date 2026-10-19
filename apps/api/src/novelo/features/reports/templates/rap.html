@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="{{ locale }}">
+<head>
+<meta charset="utf-8">
+<title>{{ t.title }}</title>
+<style>
+  @font-face { font-family: "Inter"; src: url("{{ fonts }}/inter-latin-standard-normal.woff2") format("woff2"); font-weight: 100 900; }
+  @font-face { font-family: "Newsreader"; src: url("{{ fonts }}/newsreader-latin-standard-normal.woff2") format("woff2"); font-weight: 200 800; }
+  :root { --linho:#F4F1EA; --tinta:#14211D; --floresta:#2E6B57; --pedra:#5E6B66; --areia:#C4A06A; --linha:#DCD5C8; --clara:#7FB39C; }
+  @page { size: A4; margin: 22mm 18mm 20mm;
+    @bottom-left { content: "{{ t.footer }}"; font: 7.5pt Inter, sans-serif; color: #5E6B66; }
+    @bottom-right { content: "{{ t.page }} " counter(page); font: 7.5pt Inter, sans-serif; color: #5E6B66; } }
+  @page :first { margin: 0; @bottom-left { content: none; } @bottom-right { content: none; } }
+  * { box-sizing: border-box; }
+  body { font: 9.5pt/1.5 Inter, sans-serif; color: var(--tinta); margin: 0; }
+  h1, h2, h3 { font-family: Newsreader, Georgia, serif; font-weight: 500; letter-spacing: -0.01em; margin: 0; }
+  .cover { height: 297mm; background: var(--tinta); color: var(--linho); padding: 28mm 22mm; position: relative; page-break-after: always; overflow: hidden; }
+  .cover .brand { font: 500 26pt Newsreader, serif; display: flex; align-items: center; gap: 4mm; }
+  .cover .brand svg { width: 14mm; height: 14mm; }
+  .cover .kicker { margin-top: 62mm; font: 600 8pt Inter; letter-spacing: .2em; text-transform: uppercase; color: var(--clara); }
+  .cover h1 { font-size: 36pt; line-height: 1.05; margin-top: 6mm; max-width: 150mm; }
+  .cover .subtitle { margin-top: 8mm; max-width: 130mm; color: rgba(244,241,234,.72); font-size: 11pt; }
+  .cover .meta { position: absolute; left: 22mm; right: 22mm; bottom: 24mm; border-top: .3mm solid rgba(244,241,234,.2); padding-top: 5mm; font-size: 8.5pt; color: rgba(244,241,234,.7); }
+  .cover .meta li { margin: 0 0 1.2mm; }
+  .cover ul { list-style: none; margin: 2mm 0 0; padding: 0; }
+  section { page-break-inside: auto; margin-bottom: 9mm; }
+  h2 { font-size: 20pt; margin-bottom: 3mm; page-break-after: avoid; }
+  h3 { font-size: 12pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+  .eyebrow { font: 600 7.5pt Inter; letter-spacing: .18em; text-transform: uppercase; color: var(--floresta); margin-bottom: 1.5mm; }
+  p.lead { color: var(--pedra); margin: 0 0 4mm; max-width: 150mm; }
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); border: .3mm solid var(--linha); border-radius: 2.5mm; overflow: hidden; margin: 4mm 0 6mm; }
+  .kpi { padding: 4mm; border-right: .3mm solid var(--linha); }
+  .kpi:last-child { border-right: 0; }
+  .kpi .l { font: 600 6.5pt Inter; letter-spacing: .16em; text-transform: uppercase; color: var(--pedra); }
+  .kpi .v { font: 500 21pt Newsreader, serif; margin-top: 1mm; line-height: 1.05; }
+  .kpi .v.green { color: var(--floresta); }
+  .kpi .h { font-size: 7.5pt; color: var(--pedra); margin-top: 1mm; }
+  .tag { font: 600 6pt Inter; text-transform: uppercase; background: rgba(196,160,106,.25); padding: .3mm 1.6mm; border-radius: 3mm; margin-left: 1.5mm; vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; margin: 2mm 0 5mm; font-size: 8.5pt; }
+  th { text-align: left; font: 600 6.8pt Inter; letter-spacing: .1em; text-transform: uppercase; color: var(--pedra); border-bottom: .4mm solid var(--tinta); padding: 1.8mm 2mm; }
+  td { padding: 1.8mm 2mm; border-bottom: .2mm solid var(--linha); vertical-align: top; }
+  td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  tr.total td { font-weight: 600; border-top: .4mm solid var(--tinta); border-bottom: 0; }
+  .bar { height: 2.4mm; background: #ECE7DC; border-radius: 2mm; overflow: hidden; display: flex; width: 38mm; }
+  .bar i { display: block; height: 100%; }
+  .note { font-size: 7.5pt; color: var(--pedra); }
+  .method { background: #FAF8F3; border: .3mm solid var(--linha); border-radius: 2.5mm; padding: 4mm; font-size: 8.5pt; }
+  .small td, .small th { font-size: 7.6pt; }
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="brand">
+    <svg viewBox="-512 -512 1024 1024"><path d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10" fill="none" stroke="#3E6658" stroke-width="56" stroke-linecap="round"/><path d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71" fill="none" stroke="#7FB39C" stroke-width="56" stroke-linecap="round"/><path d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32" fill="none" stroke="#C4A06A" stroke-width="56" stroke-linecap="round"/><circle r="92" fill="#F4F1EA"/><circle r="38" fill="#14211D"/></svg>
+    Novelo
+  </div>
+  <div class="kicker">{{ t.kicker }}</div>
+  <h1>{{ t.title }}</h1>
+  <p class="subtitle">{{ t.subtitle }}</p>
+  <div class="meta">
+    <div>{{ t.generated.format(date=date) }}</div>
+    <div style="margin-top:3mm;font-weight:600;color:#7FB39C;">{{ t.scenarios_included }}</div>
+    <ul>{% for s in scenarios %}<li>{{ s.label }} · {{ s.objective }}</li>{% endfor %}</ul>
+  </div>
+</div>
+
+<section>
+  <div class="eyebrow">{{ t.s_summary }}</div>
+  <h2>{{ t.s_summary }}</h2>
+  <p class="lead">{{ t.summary_lead }}</p>
+  <div class="kpis">
+    <div class="kpi"><div class="l">{{ t.kpi_potential }}<span class="tag">{{ t.estimate }}</span></div><div class="v">{{ potential_t }} t</div><div class="h">{{ t.kpi_potential_hint }}</div></div>
+    <div class="kpi"><div class="l">{{ t.kpi_collected }}</div><div class="v">{{ collected_t }} t</div><div class="h">{{ t.kpi_collected_hint }}</div></div>
+    <div class="kpi"><div class="l">{{ t.kpi_capture }}<span class="tag">{{ t.estimate }}</span></div><div class="v green">{{ capture_pct }}%</div><div class="h">{{ t.kpi_capture_hint }}</div></div>
+    <div class="kpi"><div class="l">{{ t.kpi_best }}<span class="tag">{{ t.estimate }}</span></div><div class="v green">{{ best_eur_t }}</div><div class="h">{{ t.kpi_best_hint }}</div></div>
+  </div>
+</section>
+
+<section>
+  <div class="eyebrow">{{ t.s_territory }}</div>
+  <h2>{{ t.s_territory }}</h2>
+  <p class="lead">{{ t.territory_lead }}</p>
+  {% for s in scenarios %}
+  <h3>{{ s.label }}</h3>
+  <table>
+    <thead><tr><th>{{ t.col_territory }}</th><th class="n">{{ t.col_parishes }}</th><th class="n">{{ t.col_population }}</th><th class="n">{{ t.col_demand }}</th><th class="n">{{ t.col_tonnes }}</th><th class="n">{{ t.col_cost }}</th><th class="n">{{ t.col_eur_t }}</th></tr></thead>
+    <tbody>
+    {% for r in s.territory %}<tr><td>{{ r.name }}</td><td class="n">{{ r.parishes }}</td><td class="n">{{ r.population }}</td><td class="n">{{ r.demand }}</td><td class="n">{{ r.tonnes }}</td><td class="n">{{ r.cost }}</td><td class="n"><strong>{{ r.eur_t }}</strong></td></tr>{% endfor %}
+    <tr class="total"><td>{{ t.total }}</td><td class="n">{{ s.territory_total.parishes }}</td><td class="n">{{ s.territory_total.population }}</td><td class="n">{{ s.territory_total.demand }}</td><td class="n">{{ s.territory_total.tonnes }}</td><td class="n">{{ s.territory_total.cost }}</td><td class="n">{{ s.territory_total.eur_t }}</td></tr>
+    </tbody>
+  </table>
+  {% endfor %}
+</section>
+
+<section>
+  <div class="eyebrow">{{ t.s_material }}</div>
+  <h2>{{ t.s_material }}</h2>
+  <p class="lead">{{ t.material_lead }}</p>
+  <table>
+    <thead><tr><th>{{ t.col_entity }}</th><th class="n">{{ t.col_collected }}</th><th></th><th class="n">{{ t.col_reuse }}</th><th class="n">{{ t.col_recycle }}</th><th class="n">{{ t.col_reject }}</th><th>{{ t.col_data }}</th></tr></thead>
+    <tbody>
+    {% for e in entities %}<tr><td>{{ e.entity }}</td><td class="n">{{ e.total }}</td><td><div class="bar"><i style="width:{{ e.reuse_pct_raw }}%;background:#2E6B57"></i><i style="width:{{ e.recycle_pct_raw }}%;background:#7FB39C"></i><i style="width:{{ e.reject_pct_raw }}%;background:#C4A06A"></i></div></td><td class="n">{{ e.reuse_pct }}</td><td class="n">{{ e.recycle_pct }}</td><td class="n">{{ e.reject_pct }}</td><td>{{ t[e.method] }}</td></tr>{% endfor %}
+    <tr class="total"><td>{{ t.total }}</td><td class="n">{{ collected_t }}</td><td></td><td class="n">{{ totals.reuse }}</td><td class="n">{{ totals.recycle }}</td><td class="n">{{ totals.reject }}</td><td></td></tr>
+    </tbody>
+  </table>
+  <h3>{{ t.lots_title }}</h3>
+  {% if fibres %}
+  <table class="small"><thead><tr><th>{{ t.col_fibre }}</th><th class="n">{{ t.col_lots }}</th><th class="n">{{ t.col_kg }}</th></tr></thead>
+  <tbody>{% for f in fibres %}<tr><td>{{ f.fibre }}</td><td class="n">{{ f.lots }}</td><td class="n">{{ f.kg }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}<p class="note">{{ t.lots_none }}</p>{% endif %}
+</section>
+
+<section>
+  <div class="eyebrow">{{ t.s_scenarios }}</div>
+  <h2>{{ t.s_scenarios }}</h2>
+  <p class="lead">{{ t.scenarios_lead }}</p>
+  <table>
+    <thead><tr><th>{{ t.col_metric }}</th>{% for s in scenarios %}<th class="n">{{ s.label }}</th>{% endfor %}</tr></thead>
+    <tbody>
+    {% for row in comparison %}<tr><td>{{ row.label }}</td>{% for v in row.cells %}<td class="n">{{ v }}</td>{% endfor %}</tr>{% endfor %}
+    </tbody>
+  </table>
+</section>
+
+<section>
+  <div class="eyebrow">{{ t.s_brands }}</div>
+  <h2>{{ t.s_brands }}</h2>
+  {% if brands %}
+  <p class="lead">{{ t.brands_lead.format(n=brand_sample) }}</p>
+  <table><thead><tr><th>{{ t.col_brand }}</th><th class="n">{{ t.col_items }}</th><th class="n">{{ t.col_kg }}</th><th class="n">{{ t.col_share }}</th><th>{{ t.col_fibre }}</th></tr></thead>
+  <tbody>{% for b in brands %}<tr><td>{{ b.brand }}</td><td class="n">{{ b.items }}</td><td class="n">{{ b.kg }}</td><td class="n">{{ b.share }}</td><td>{{ b.fibre }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}<p class="lead">{{ t.brands_none }}</p>{% endif %}
+</section>
+
+<section>
+  <div class="eyebrow">{{ t.s_method }}</div>
+  <h2>{{ t.s_method }}</h2>
+  <div class="method"><strong>{{ t.method_formulas }}.</strong> {{ t.method_text }}</div>
+  <h3>{{ t.method_assumptions }}</h3>
+  <table class="small"><thead><tr><th>{{ t.col_param }}</th><th class="n">{{ t.col_value }}</th><th>{{ t.col_origin }}</th></tr></thead>
+  <tbody>{% for p in assumptions %}<tr><td>{{ p.label }}</td><td class="n">{{ p.value }}</td><td>{{ p.origin }}</td></tr>{% endfor %}</tbody></table>
+  <h3>{{ t.method_sources }}</h3>
+  <table class="small"><thead><tr><th>{{ t.col_source }}</th><th>{{ t.col_provider }}</th><th>{{ t.col_period }}</th></tr></thead>
+  <tbody>{% for s in sources %}<tr><td>{{ s.title }}<br><span class="note">{{ s.file }}</span></td><td>{{ s.provider }}</td><td>{{ s.period }}</td></tr>{% endfor %}</tbody></table>
+</section>
+
+</body>
+</html>
