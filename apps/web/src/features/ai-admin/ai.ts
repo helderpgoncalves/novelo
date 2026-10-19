@@ -26,6 +26,7 @@ export const taskLabel: Record<AiTask, () => string> = {
   explain: () => m.aiadm_task_explain(),
   briefing: () => m.aiadm_task_briefing(),
   alert_resolution: () => m.aiadm_task_alert_resolution(),
+  copilot_aux: () => m.aiadm_task_copilot_aux(),
   triage: () => m.aiadm_task_triage(),
   test: () => m.aiadm_task_test(),
 };

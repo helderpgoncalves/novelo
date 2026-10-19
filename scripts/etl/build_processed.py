@@ -29,7 +29,7 @@ ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
 OUT = ROOT / "data" / "processed"
 
-POPULATION = 156_277  # Plano de Ação para a Circularidade Têxtil de Guimarães
+POPULATION = 156_830  # Censos 2021 (INE), soma das 48 freguesias; é a mesma população que a API usa
 KG_PER_INHAB_MONTH = 0.7  # Plano de Ação: têxtil no indiferenciado
 MONTHS = 12
 

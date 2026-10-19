@@ -46,6 +46,7 @@ export const zAiTask = z.enum([
     'explain',
     'briefing',
     'alert_resolution',
+    'copilot_aux',
     'triage',
     'test'
 ]);
@@ -100,6 +101,25 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * AttachmentOut
+ */
+export const zAttachmentOut = z.object({
+    filename: z.string(),
+    id: z.uuid(),
+    kind: z.enum([
+        'image',
+        'pdf',
+        'table',
+        'text'
+    ]),
+    meta: z.record(z.string(), z.unknown()),
+    mime: z.string(),
+    model_can_see: z.boolean(),
+    preview: z.string(),
+    size_bytes: z.int()
+});
+
+/**
  * AuthConfig
  */
 export const zAuthConfig = z.object({
@@ -114,6 +134,13 @@ export const zAuthConfig = z.object({
 export const zBodyAnalyseGarment = z.object({
     item_photo: z.string(),
     label_photo: z.string().nullish()
+});
+
+/**
+ * Body_upload_copilot_attachments
+ */
+export const zBodyUploadCopilotAttachments = z.object({
+    files: z.array(z.string())
 });
 
 /**
@@ -305,6 +332,78 @@ export const zContainerList = z.object({
 });
 
 /**
+ * CopilotCommand
+ */
+export const zCopilotCommand = z.object({
+    admin_only: z.boolean(),
+    description_key: z.string(),
+    kind: z.enum(['server', 'client']),
+    label_key: z.string(),
+    name: z.string(),
+    route: z.string().nullish()
+});
+
+/**
+ * CommandsOut
+ */
+export const zCommandsOut = z.object({
+    commands: z.array(zCopilotCommand),
+    composer_actions: z.array(z.string())
+});
+
+/**
+ * CopilotContextEvent
+ */
+export const zCopilotContextEvent = z.object({
+    compacted: z.boolean(),
+    type: z.literal('context').optional().default('context'),
+    used_tokens: z.int(),
+    window_tokens: z.int()
+});
+
+/**
+ * CopilotDoneEvent
+ */
+export const zCopilotDoneEvent = z.object({
+    finish: z.enum([
+        'stop',
+        'cancelled',
+        'error'
+    ]).optional().default('stop'),
+    type: z.literal('done').optional().default('done')
+});
+
+/**
+ * CopilotErrorEvent
+ */
+export const zCopilotErrorEvent = z.object({
+    code: z.enum([
+        'bad_request',
+        'validation_error',
+        'unauthenticated',
+        'session_expired',
+        'invalid_credentials',
+        'account_inactive',
+        'current_password_incorrect',
+        'invalid_token',
+        'forbidden',
+        'registration_closed',
+        'not_found',
+        'user_not_found',
+        'email_taken',
+        'cannot_modify_self',
+        'conflict',
+        'rate_limited',
+        'feature_disabled',
+        'upstream_error',
+        'ai_budget_exceeded',
+        'internal_error'
+    ]),
+    message: z.string(),
+    type: z.literal('error').optional().default('error')
+});
+
+/**
  * CopilotRequest
  *
  * O servidor não guarda conversas: o web envia o histórico (máx. 20 mensagens) em cada pedido.
@@ -313,6 +412,112 @@ export const zCopilotRequest = z.object({
     locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
     messages: z.array(zChatTurn).min(1).max(20),
     scenario_id: z.uuid().nullish()
+});
+
+/**
+ * CopilotRetractEvent
+ *
+ * O texto já enviado falhou a verificação: apagar o texto desta mensagem. Segue-se o texto reescrito.
+ */
+export const zCopilotRetractEvent = z.object({
+    reason: z.literal('numbers_unverified').optional().default('numbers_unverified'),
+    type: z.literal('retract').optional().default('retract')
+});
+
+/**
+ * CopilotStartEvent
+ */
+export const zCopilotStartEvent = z.object({
+    message_id: z.uuid(),
+    model: z.string(),
+    prompt_version: z.string(),
+    thread_id: z.uuid(),
+    type: z.literal('start').optional().default('start')
+});
+
+/**
+ * CopilotStatusEvent
+ *
+ * Fase da tarefa. `label_key` é uma chave de tradução (status.running_optimizer); `detail` é um dado.
+ */
+export const zCopilotStatusEvent = z.object({
+    detail: z.string().nullish(),
+    label_key: z.string(),
+    phase: z.enum([
+        'thinking',
+        'planning',
+        'tool',
+        'verifying',
+        'writing',
+        'compacting'
+    ]),
+    type: z.literal('status').optional().default('status')
+});
+
+/**
+ * CopilotSuggestionsEvent
+ */
+export const zCopilotSuggestionsEvent = z.object({
+    items: z.array(z.string()).max(3),
+    type: z.literal('suggestions').optional().default('suggestions')
+});
+
+/**
+ * CopilotTextDeltaEvent
+ */
+export const zCopilotTextDeltaEvent = z.object({
+    delta: z.string(),
+    type: z.literal('text_delta').optional().default('text_delta')
+});
+
+/**
+ * CopilotTitleEvent
+ */
+export const zCopilotTitleEvent = z.object({
+    title: z.string(),
+    type: z.literal('title').optional().default('title')
+});
+
+/**
+ * CopilotToolResultEvent
+ */
+export const zCopilotToolResultEvent = z.object({
+    duration_ms: z.int(),
+    id: z.string(),
+    name: z.string(),
+    ok: z.boolean(),
+    summary: z.string(),
+    type: z.literal('tool_result').optional().default('tool_result')
+});
+
+/**
+ * CopilotToolStartEvent
+ */
+export const zCopilotToolStartEvent = z.object({
+    args_summary: z.string(),
+    id: z.string(),
+    name: z.string(),
+    type: z.literal('tool_start').optional().default('tool_start')
+});
+
+/**
+ * CopilotUsageEvent
+ */
+export const zCopilotUsageEvent = z.object({
+    completion_tokens: z.int(),
+    cost_usd: z.number().nullable(),
+    prompt_tokens: z.int(),
+    tokens: z.int(),
+    type: z.literal('usage').optional().default('usage')
+});
+
+/**
+ * CopilotVerificationEvent
+ */
+export const zCopilotVerificationEvent = z.object({
+    type: z.literal('verification').optional().default('verification'),
+    verified: z.boolean(),
+    warning: z.literal('numbers_unverified').nullish()
 });
 
 /**
@@ -436,6 +641,22 @@ export const zErrorBody = z.object({
         'internal_error'
     ]),
     message: z.string()
+});
+
+/**
+ * FeedbackIn
+ */
+export const zFeedbackIn = z.object({
+    comment: z.string().max(500).nullish(),
+    rating: z.union([z.literal(1), z.literal(-1)])
+});
+
+/**
+ * FeedbackOut
+ */
+export const zFeedbackOut = z.object({
+    message_id: z.uuid(),
+    rating: z.union([z.literal(1), z.literal(-1)])
 });
 
 /**
@@ -694,6 +915,61 @@ export const zMarketEntry = z.object({
 });
 
 /**
+ * MentionType
+ */
+export const zMentionType = z.enum([
+    'scenario',
+    'parish',
+    'circuit',
+    'locality',
+    'vehicle',
+    'lot',
+    'alert',
+    'report',
+    'brand',
+    'fibre',
+    'page',
+    'data_source'
+]);
+
+/**
+ * MentionItem
+ */
+export const zMentionItem = z.object({
+    icon: z.string(),
+    id: z.string(),
+    label: z.string(),
+    route: z.string().nullish(),
+    sublabel: z.string().nullish(),
+    type: zMentionType
+});
+
+/**
+ * MentionGroup
+ */
+export const zMentionGroup = z.object({
+    items: z.array(zMentionItem),
+    type: zMentionType
+});
+
+/**
+ * MentionRef
+ */
+export const zMentionRef = z.object({
+    id: z.string().min(1).max(120),
+    type: zMentionType
+});
+
+/**
+ * MentionsOut
+ */
+export const zMentionsOut = z.object({
+    groups: z.array(zMentionGroup),
+    query: z.string(),
+    total: z.int()
+});
+
+/**
  * MetricsOut
  */
 export const zMetricsOut = z.object({
@@ -724,6 +1000,134 @@ export const zModeSummary = z.object({
     points: z.int(),
     tonnes: z.number(),
     zones: z.int()
+});
+
+/**
+ * OverviewDestinations
+ */
+export const zOverviewDestinations = z.object({
+    recycle_t: z.number(),
+    reject_t: z.number(),
+    reuse_t: z.number()
+});
+
+/**
+ * OverviewGap
+ *
+ * A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.
+ */
+export const zOverviewGap = z.object({
+    capture_pct: z.number(),
+    collected_t: z.number(),
+    destinations: zOverviewDestinations,
+    is_estimate: z.boolean().optional().default(true),
+    kg_per_inhab_month: z.number(),
+    kg_per_inhab_year: z.number(),
+    missing_t: z.number(),
+    parishes_count: z.int(),
+    population: z.int(),
+    potential_is_estimate: z.boolean().optional().default(true),
+    potential_kg_per_inhab_month: z.number(),
+    potential_kg_per_inhab_year: z.number(),
+    potential_t: z.number(),
+    year: z.int()
+});
+
+/**
+ * OverviewHighlight
+ */
+export const zOverviewHighlight = z.object({
+    context: z.record(z.string(), z.union([
+        z.string(),
+        z.number()
+    ])),
+    is_estimate: z.boolean(),
+    key: z.string(),
+    source_label: z.string(),
+    text_key: z.string(),
+    unit: z.enum([
+        'pct',
+        't',
+        'x',
+        'kg_per_inhab_year'
+    ]),
+    value: z.number(),
+    verified: z.boolean()
+});
+
+/**
+ * OverviewMilestone
+ */
+export const zOverviewMilestone = z.object({
+    date: z.iso.date(),
+    days_remaining: z.int().nullable(),
+    key: z.string(),
+    source_label: z.string(),
+    source_url: z.string().nullable(),
+    status: z.enum(['done', 'upcoming']),
+    verified: z.boolean(),
+    who_pays: z.enum(['municipality', 'producers'])
+});
+
+/**
+ * OverviewPoint
+ */
+export const zOverviewPoint = z.object({
+    lat: z.number(),
+    lon: z.number()
+});
+
+/**
+ * OverviewReference
+ */
+export const zOverviewReference = z.object({
+    evidence: z.enum([
+        'dado_vitrus',
+        'primary',
+        'secondary',
+        'unverified'
+    ]),
+    is_estimate: z.boolean(),
+    key: z.string(),
+    kg_per_inhab_year: z.number(),
+    label: z.string(),
+    scope: z.enum([
+        'municipality',
+        'region',
+        'country',
+        'eu'
+    ]),
+    source_label: z.string(),
+    source_url: z.string().nullable(),
+    verified: z.boolean(),
+    year: z.int()
+});
+
+/**
+ * PageContext
+ *
+ * O que o utilizador está a ver. Só estrutura: o servidor resolve as entidades, sem confiar no texto.
+ */
+export const zPageContext = z.object({
+    params: z.record(z.string(), z.string()).optional(),
+    route: z.string().max(200),
+    search: z.record(z.string(), z.string()).optional(),
+    selected_filters: z.record(z.string(), z.string()).optional(),
+    visible_entity_ids: z.array(z.string()).max(20).optional()
+});
+
+/**
+ * CopilotStreamRequest
+ *
+ * Uma mensagem nova numa conversa (nova se `thread_id` for nulo). Comandos: `/compact`.
+ */
+export const zCopilotStreamRequest = z.object({
+    attachment_ids: z.array(z.uuid()).max(5).optional(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    mentions: z.array(zMentionRef).max(10).optional(),
+    message: z.string().min(1).max(4000),
+    page_context: zPageContext.nullish(),
+    thread_id: z.uuid().nullish()
 });
 
 /**
@@ -1055,6 +1459,22 @@ export const zBenchmarkScenarioRequest = z.object({
 });
 
 /**
+ * FrontierPoint
+ */
+export const zFrontierPoint = z.object({
+    annual_cost_eur: z.number(),
+    capex_eur: z.number(),
+    eur_per_tonne: z.number().nullable(),
+    id: z.uuid(),
+    is_pareto: z.boolean(),
+    label: z.string(),
+    modes: z.array(zCollectionMode),
+    objective: zScenarioObjective,
+    status: z.enum(['feasible', 'infeasible']),
+    tonnes_year: z.number()
+});
+
+/**
  * ScenarioCard
  *
  * Resultado de uma ferramenta para o web desenhar. Os números vêm do otimizador, nunca do texto do modelo.
@@ -1066,6 +1486,45 @@ export const zScenarioCard = z.object({
     objective: zScenarioObjective,
     parent_id: z.uuid().nullable(),
     scenario_id: z.uuid()
+});
+
+/**
+ * CopilotCardEvent
+ */
+export const zCopilotCardEvent = z.object({
+    card: zScenarioCard,
+    type: z.literal('card').optional().default('card')
+});
+
+/**
+ * CopilotEventMessage
+ *
+ * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
+ */
+export const zCopilotEventMessage = z.discriminatedUnion('type', [
+    zCopilotStartEvent,
+    zCopilotStatusEvent,
+    zCopilotToolStartEvent,
+    zCopilotToolResultEvent,
+    zCopilotTextDeltaEvent,
+    zCopilotCardEvent,
+    zCopilotRetractEvent,
+    zCopilotVerificationEvent,
+    zCopilotSuggestionsEvent,
+    zCopilotContextEvent,
+    zCopilotUsageEvent,
+    zCopilotTitleEvent,
+    zCopilotErrorEvent,
+    zCopilotDoneEvent
+]);
+
+/**
+ * CopilotEventCatalog
+ *
+ * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
+ */
+export const zCopilotEventCatalog = z.object({
+    events: z.array(zCopilotEventMessage)
 });
 
 /**
@@ -1363,6 +1822,55 @@ export const zLotDetail = z.object({
 });
 
 /**
+ * ThreadExport
+ */
+export const zThreadExport = z.object({
+    filename: z.string(),
+    markdown: z.string()
+});
+
+/**
+ * ThreadRename
+ */
+export const zThreadRename = z.object({
+    title: z.string().min(1).max(120)
+});
+
+/**
+ * ThreadSummaryOut
+ */
+export const zThreadSummaryOut = z.object({
+    archived: z.boolean(),
+    created_at: z.iso.datetime(),
+    has_summary: z.boolean(),
+    id: z.uuid(),
+    message_count: z.int(),
+    title: z.string(),
+    updated_at: z.iso.datetime()
+});
+
+/**
+ * CompactOut
+ */
+export const zCompactOut = z.object({
+    compacted_messages: z.int(),
+    summary: z.string(),
+    thread: zThreadSummaryOut,
+    used_tokens: z.int(),
+    window_tokens: z.int()
+});
+
+/**
+ * ThreadPage
+ */
+export const zThreadPage = z.object({
+    items: z.array(zThreadSummaryOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
  * Tipau
  *
  * Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.
@@ -1372,6 +1880,24 @@ export const zTipau = z.enum([
     'amu',
     'apr'
 ]);
+
+/**
+ * OverviewParish
+ */
+export const zOverviewParish = z.object({
+    area_km2: z.number().nullable(),
+    centroid: zOverviewPoint.nullable(),
+    circuits_count: z.int(),
+    code: z.string(),
+    containers_count: z.int(),
+    localities_count: z.int(),
+    name: z.string(),
+    population: z.int(),
+    potential_is_estimate: z.boolean().optional().default(true),
+    potential_t: z.number(),
+    share_of_population_pct: z.number(),
+    tipau: zTipau.nullable()
+});
 
 /**
  * PilotZoneOut
@@ -1419,6 +1945,56 @@ export const zCopilotReply = z.object({
     tools_used: z.array(zToolTrace),
     verified: z.boolean(),
     warning: z.literal('numbers_unverified').nullable()
+});
+
+/**
+ * ToolTraceOut
+ */
+export const zToolTraceOut = z.object({
+    name: z.string(),
+    ok: z.boolean(),
+    summary: z.string()
+});
+
+/**
+ * MessageOut
+ */
+export const zMessageOut = z.object({
+    attachments: z.array(zAttachmentOut),
+    cards: z.array(zScenarioCard),
+    cost_usd: z.number().nullable(),
+    created_at: z.iso.datetime(),
+    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
+    id: z.uuid(),
+    mentions: z.array(zMentionRef),
+    model: z.string().nullable(),
+    role: z.enum(['user', 'assistant']),
+    status: z.enum([
+        'complete',
+        'cancelled',
+        'error'
+    ]),
+    text: z.string(),
+    tokens: z.int().nullable(),
+    tools: z.array(zToolTraceOut),
+    verified: z.boolean().nullable()
+});
+
+/**
+ * ThreadOut
+ */
+export const zThreadOut = z.object({
+    archived: z.boolean(),
+    created_at: z.iso.datetime(),
+    has_summary: z.boolean(),
+    id: z.uuid(),
+    message_count: z.int(),
+    messages: z.array(zMessageOut),
+    summary: z.string(),
+    title: z.string(),
+    updated_at: z.iso.datetime(),
+    used_tokens: z.int(),
+    window_tokens: z.int()
 });
 
 /**
@@ -1790,6 +2366,41 @@ export const zEntityBaseline = z.object({
 });
 
 /**
+ * OverviewDataSource
+ */
+export const zOverviewDataSource = z.object({
+    key: z.string(),
+    kind: z.enum([
+        'operator',
+        'public_statistics',
+        'public_geodata',
+        'other'
+    ]),
+    methods: z.array(zWeighingMethod),
+    name: z.string(),
+    period_end: z.iso.date().nullable(),
+    period_start: z.iso.date().nullable(),
+    provider: z.string(),
+    rows: z.int()
+});
+
+/**
+ * Overview
+ *
+ * Tudo o que a página inicial mostra, num só pedido.
+ */
+export const zOverview = z.object({
+    data_sources: z.array(zOverviewDataSource),
+    gap: zOverviewGap,
+    highlights: z.array(zOverviewHighlight),
+    pareto_ids: z.array(z.uuid()),
+    parishes: z.array(zOverviewParish),
+    references: z.array(zOverviewReference),
+    scenario_frontier: z.array(zFrontierPoint),
+    timeline: z.array(zOverviewMilestone)
+});
+
+/**
  * TextileBaseline
  */
 export const zTextileBaseline = z.object({
@@ -2020,12 +2631,132 @@ export const zVerifyEmailResponse = z.void();
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
 
+export const zUploadCopilotAttachmentsBody = zBodyUploadCopilotAttachments;
+
+/**
+ * Response Upload Copilot Attachments
+ *
+ * Successful Response
+ */
+export const zUploadCopilotAttachmentsResponse = z.array(zAttachmentOut);
+
 export const zCopilotChatBody = zCopilotRequest;
 
 /**
  * Successful Response
  */
 export const zCopilotChatResponse = zCopilotReply;
+
+/**
+ * Successful Response
+ */
+export const zListCopilotCommandsResponse = zCommandsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetCopilotEventSchemaResponse = zCopilotEventCatalog;
+
+export const zSearchCopilotMentionsQuery = z.object({
+    q: z.string().max(80).optional().default(''),
+    types: z.array(zMentionType).nullish(),
+    limit: z.int().gte(1).lte(30).optional().default(12),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zSearchCopilotMentionsResponse = zMentionsOut;
+
+export const zSendCopilotFeedbackBody = zFeedbackIn;
+
+export const zSendCopilotFeedbackPath = z.object({
+    message_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zSendCopilotFeedbackResponse = zFeedbackOut;
+
+export const zCopilotStreamBody = zCopilotStreamRequest;
+
+/**
+ * Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`
+ */
+export const zCopilotStreamResponse = zCopilotEventMessage;
+
+export const zListCopilotThreadsQuery = z.object({
+    offset: z.int().gte(0).optional().default(0),
+    limit: z.int().gte(1).lte(100).optional().default(30),
+    archived: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zListCopilotThreadsResponse = zThreadPage;
+
+export const zDeleteCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteCopilotThreadResponse = z.void();
+
+export const zGetCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetCopilotThreadResponse = zThreadOut;
+
+export const zRenameCopilotThreadBody = zThreadRename;
+
+export const zRenameCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRenameCopilotThreadResponse = zThreadSummaryOut;
+
+export const zCompactCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zCompactCopilotThreadResponse = zCompactOut;
+
+export const zExportCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zExportCopilotThreadResponse = zThreadExport;
+
+export const zRegenerateCopilotResponsePath = z.object({
+    thread_id: z.uuid()
+});
+
+export const zRegenerateCopilotResponseQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`
+ */
+export const zRegenerateCopilotResponseResponse = zCopilotEventMessage;
 
 export const zUpdateDataAlertBody = zAlertUpdate;
 
@@ -2350,6 +3081,11 @@ export const zGetTextileBaselineResponse = zTextileBaseline;
  * Successful Response
  */
 export const zGetObservedFlowsResponse = zFlows;
+
+/**
+ * Successful Response
+ */
+export const zGetOverviewResponse = zOverview;
 
 /**
  * Successful Response

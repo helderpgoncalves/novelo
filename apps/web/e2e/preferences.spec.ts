@@ -7,17 +7,13 @@ test.describe('idioma e tema', () => {
     await page.getByRole('button', { name: 'Mudar idioma' }).click();
     await page.getByRole('menuitemradio', { name: 'English' }).click();
     await expect(page).toHaveURL(/\/en\/?$/);
-    await expect(
-      page.getByRole('heading', { level: 1, name: "Guimarães' starting point" }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Guimarães collects/ })).toBeVisible();
     await expect(page.locator('dl').first()).toContainText('301.3 t');
     await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
     // Um novo contexto sem preferência local segue a preferência guardada na conta.
     await page.reload();
-    await expect(
-      page.getByRole('heading', { level: 1, name: "Guimarães' starting point" }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Guimarães collects/ })).toBeVisible();
 
     // Volta a português para não afetar os outros testes.
     await page.getByRole('button', { name: 'Change language' }).click();

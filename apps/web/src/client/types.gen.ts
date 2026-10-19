@@ -196,7 +196,7 @@ export type AiSettingsUpdate = {
 /**
  * AiTask
  */
-export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'triage' | 'test';
+export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'copilot_aux' | 'triage' | 'test';
 
 /**
  * AiUsageOut
@@ -402,6 +402,52 @@ export type AllocationPart = {
 };
 
 /**
+ * AttachmentOut
+ */
+export type AttachmentOut = {
+    /**
+     * Filename
+     */
+    filename: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Kind
+     */
+    kind: 'image' | 'pdf' | 'table' | 'text';
+    /**
+     * Meta
+     *
+     * Páginas, colunas, dimensões... (nunca o ficheiro)
+     */
+    meta: {
+        [key: string]: unknown;
+    };
+    /**
+     * Mime
+     */
+    mime: string;
+    /**
+     * Model Can See
+     *
+     * Falso para imagens se o modelo do copiloto não aceita imagens
+     */
+    model_can_see: boolean;
+    /**
+     * Preview
+     *
+     * Início do texto extraído ou resumo da tabela
+     */
+    preview: string;
+    /**
+     * Size Bytes
+     */
+    size_bytes: number;
+};
+
+/**
  * AuthConfig
  */
 export type AuthConfig = {
@@ -547,6 +593,18 @@ export type BodyAnalyseGarment = {
      * Foto da etiqueta de composição
      */
     label_photo?: Blob | File | null;
+};
+
+/**
+ * Body_upload_copilot_attachments
+ */
+export type BodyUploadCopilotAttachments = {
+    /**
+     * Files
+     *
+     * Até 5 ficheiros, 10 MB cada
+     */
+    files: Array<Blob | File>;
 };
 
 /**
@@ -794,6 +852,45 @@ export type CollectionMode = 'existing' | 'street' | 'on_demand';
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
 
 /**
+ * CommandsOut
+ */
+export type CommandsOut = {
+    /**
+     * Commands
+     */
+    commands: Array<CopilotCommand>;
+    /**
+     * Composer Actions
+     *
+     * Ações do composer: attach_file, attach_current_screen, mention
+     */
+    composer_actions: Array<string>;
+};
+
+/**
+ * CompactOut
+ */
+export type CompactOut = {
+    /**
+     * Compacted Messages
+     */
+    compacted_messages: number;
+    /**
+     * Summary
+     */
+    summary: string;
+    thread: ThreadSummaryOut;
+    /**
+     * Used Tokens
+     */
+    used_tokens: number;
+    /**
+     * Window Tokens
+     */
+    window_tokens: number;
+};
+
+/**
  * CompositionPart
  */
 export type CompositionPart = {
@@ -871,6 +968,152 @@ export type ContainerOut = {
 export type ContainerStatus = 'active' | 'inactive' | 'planned';
 
 /**
+ * CopilotCardEvent
+ */
+export type CopilotCardEvent = {
+    card: ScenarioCard;
+    /**
+     * Type
+     */
+    type?: 'card';
+};
+
+/**
+ * CopilotCommand
+ */
+export type CopilotCommand = {
+    /**
+     * Admin Only
+     */
+    admin_only: boolean;
+    /**
+     * Description Key
+     */
+    description_key: string;
+    /**
+     * Kind
+     *
+     * server: enviado em /copilot/stream; client: tratado no web
+     */
+    kind: 'server' | 'client';
+    /**
+     * Label Key
+     */
+    label_key: string;
+    /**
+     * Name
+     *
+     * Comando com barra, ex.: /compact
+     */
+    name: string;
+    /**
+     * Route
+     */
+    route?: string | null;
+};
+
+/**
+ * CopilotContextEvent
+ */
+export type CopilotContextEvent = {
+    /**
+     * Compacted
+     */
+    compacted: boolean;
+    /**
+     * Type
+     */
+    type?: 'context';
+    /**
+     * Used Tokens
+     */
+    used_tokens: number;
+    /**
+     * Window Tokens
+     */
+    window_tokens: number;
+};
+
+/**
+ * CopilotDoneEvent
+ */
+export type CopilotDoneEvent = {
+    /**
+     * Finish
+     */
+    finish?: 'stop' | 'cancelled' | 'error';
+    /**
+     * Type
+     */
+    type?: 'done';
+};
+
+/**
+ * CopilotErrorEvent
+ */
+export type CopilotErrorEvent = {
+    /**
+     * Code
+     */
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'internal_error';
+    /**
+     * Message
+     */
+    message: string;
+    /**
+     * Type
+     */
+    type?: 'error';
+};
+
+/**
+ * CopilotEventCatalog
+ *
+ * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
+ */
+export type CopilotEventCatalog = {
+    /**
+     * Events
+     */
+    events: Array<CopilotEventMessage>;
+};
+
+/**
+ * CopilotEventMessage
+ *
+ * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
+ */
+export type CopilotEventMessage = ({
+    type: 'start';
+} & CopilotStartEvent) | ({
+    type: 'status';
+} & CopilotStatusEvent) | ({
+    type: 'tool_start';
+} & CopilotToolStartEvent) | ({
+    type: 'tool_result';
+} & CopilotToolResultEvent) | ({
+    type: 'text_delta';
+} & CopilotTextDeltaEvent) | ({
+    type: 'card';
+} & CopilotCardEvent) | ({
+    type: 'retract';
+} & CopilotRetractEvent) | ({
+    type: 'verification';
+} & CopilotVerificationEvent) | ({
+    type: 'suggestions';
+} & CopilotSuggestionsEvent) | ({
+    type: 'context';
+} & CopilotContextEvent) | ({
+    type: 'usage';
+} & CopilotUsageEvent) | ({
+    type: 'title';
+} & CopilotTitleEvent) | ({
+    type: 'error';
+} & CopilotErrorEvent) | ({
+    type: 'done';
+} & CopilotDoneEvent);
+
+/**
  * CopilotReply
  */
 export type CopilotReply = {
@@ -932,6 +1175,239 @@ export type CopilotRequest = {
      * Cenário aberto no ecrã, se houver
      */
     scenario_id?: string | null;
+};
+
+/**
+ * CopilotRetractEvent
+ *
+ * O texto já enviado falhou a verificação: apagar o texto desta mensagem. Segue-se o texto reescrito.
+ */
+export type CopilotRetractEvent = {
+    /**
+     * Reason
+     */
+    reason?: 'numbers_unverified';
+    /**
+     * Type
+     */
+    type?: 'retract';
+};
+
+/**
+ * CopilotStartEvent
+ */
+export type CopilotStartEvent = {
+    /**
+     * Message Id
+     */
+    message_id: string;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Type
+     */
+    type?: 'start';
+};
+
+/**
+ * CopilotStatusEvent
+ *
+ * Fase da tarefa. `label_key` é uma chave de tradução (status.running_optimizer); `detail` é um dado.
+ */
+export type CopilotStatusEvent = {
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Label Key
+     */
+    label_key: string;
+    /**
+     * Phase
+     */
+    phase: 'thinking' | 'planning' | 'tool' | 'verifying' | 'writing' | 'compacting';
+    /**
+     * Type
+     */
+    type?: 'status';
+};
+
+/**
+ * CopilotStreamRequest
+ *
+ * Uma mensagem nova numa conversa (nova se `thread_id` for nulo). Comandos: `/compact`.
+ */
+export type CopilotStreamRequest = {
+    /**
+     * Attachment Ids
+     */
+    attachment_ids?: Array<string>;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Mentions
+     */
+    mentions?: Array<MentionRef>;
+    /**
+     * Message
+     */
+    message: string;
+    page_context?: PageContext | null;
+    /**
+     * Thread Id
+     */
+    thread_id?: string | null;
+};
+
+/**
+ * CopilotSuggestionsEvent
+ */
+export type CopilotSuggestionsEvent = {
+    /**
+     * Items
+     */
+    items: Array<string>;
+    /**
+     * Type
+     */
+    type?: 'suggestions';
+};
+
+/**
+ * CopilotTextDeltaEvent
+ */
+export type CopilotTextDeltaEvent = {
+    /**
+     * Delta
+     */
+    delta: string;
+    /**
+     * Type
+     */
+    type?: 'text_delta';
+};
+
+/**
+ * CopilotTitleEvent
+ */
+export type CopilotTitleEvent = {
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Type
+     */
+    type?: 'title';
+};
+
+/**
+ * CopilotToolResultEvent
+ */
+export type CopilotToolResultEvent = {
+    /**
+     * Duration Ms
+     */
+    duration_ms: number;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Ok
+     */
+    ok: boolean;
+    /**
+     * Summary
+     */
+    summary: string;
+    /**
+     * Type
+     */
+    type?: 'tool_result';
+};
+
+/**
+ * CopilotToolStartEvent
+ */
+export type CopilotToolStartEvent = {
+    /**
+     * Args Summary
+     */
+    args_summary: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Type
+     */
+    type?: 'tool_start';
+};
+
+/**
+ * CopilotUsageEvent
+ */
+export type CopilotUsageEvent = {
+    /**
+     * Completion Tokens
+     */
+    completion_tokens: number;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number | null;
+    /**
+     * Prompt Tokens
+     */
+    prompt_tokens: number;
+    /**
+     * Tokens
+     */
+    tokens: number;
+    /**
+     * Type
+     */
+    type?: 'usage';
+};
+
+/**
+ * CopilotVerificationEvent
+ */
+export type CopilotVerificationEvent = {
+    /**
+     * Type
+     */
+    type?: 'verification';
+    /**
+     * Verified
+     */
+    verified: boolean;
+    /**
+     * Warning
+     */
+    warning?: 'numbers_unverified' | null;
 };
 
 /**
@@ -1224,6 +1700,34 @@ export type ErrorBody = {
 };
 
 /**
+ * FeedbackIn
+ */
+export type FeedbackIn = {
+    /**
+     * Comment
+     */
+    comment?: string | null;
+    /**
+     * Rating
+     */
+    rating: 1 | -1;
+};
+
+/**
+ * FeedbackOut
+ */
+export type FeedbackOut = {
+    /**
+     * Message Id
+     */
+    message_id: string;
+    /**
+     * Rating
+     */
+    rating: 1 | -1;
+};
+
+/**
  * Fibre
  */
 export type Fibre = 'cotton' | 'wool' | 'polyester' | 'nylon' | 'viscose' | 'linen' | 'acrylic' | 'elastane' | 'silk' | 'other' | 'unknown';
@@ -1376,6 +1880,53 @@ export type ForgotPasswordRequest = {
      * Locale
      */
     locale?: 'pt-PT' | 'en';
+};
+
+/**
+ * FrontierPoint
+ */
+export type FrontierPoint = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Pareto
+     *
+     * Não dominado em (menos €/t, mais toneladas); só cenários viáveis
+     */
+    is_pareto: boolean;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Modes
+     *
+     * Modos de recolha usados em pelo menos uma freguesia
+     */
+    modes: Array<CollectionMode>;
+    objective: ScenarioObjective;
+    /**
+     * Status
+     */
+    status: 'feasible' | 'infeasible';
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
 };
 
 /**
@@ -1787,6 +2338,144 @@ export type MarketLot = {
 };
 
 /**
+ * MentionGroup
+ */
+export type MentionGroup = {
+    /**
+     * Items
+     */
+    items: Array<MentionItem>;
+    type: MentionType;
+};
+
+/**
+ * MentionItem
+ */
+export type MentionItem = {
+    /**
+     * Icon
+     *
+     * Nome de ícone sugerido (lucide): map, truck, package, file-text...
+     */
+    icon: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Route
+     *
+     * Rota do web para abrir a entidade, se existir
+     */
+    route?: string | null;
+    /**
+     * Sublabel
+     */
+    sublabel?: string | null;
+    type: MentionType;
+};
+
+/**
+ * MentionRef
+ */
+export type MentionRef = {
+    /**
+     * Id
+     */
+    id: string;
+    type: MentionType;
+};
+
+/**
+ * MentionType
+ */
+export type MentionType = 'scenario' | 'parish' | 'circuit' | 'locality' | 'vehicle' | 'lot' | 'alert' | 'report' | 'brand' | 'fibre' | 'page' | 'data_source';
+
+/**
+ * MentionsOut
+ */
+export type MentionsOut = {
+    /**
+     * Groups
+     */
+    groups: Array<MentionGroup>;
+    /**
+     * Query
+     */
+    query: string;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * MessageOut
+ */
+export type MessageOut = {
+    /**
+     * Attachments
+     */
+    attachments: Array<AttachmentOut>;
+    /**
+     * Cards
+     */
+    cards: Array<ScenarioCard>;
+    /**
+     * Cost Usd
+     */
+    cost_usd: number | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Feedback
+     */
+    feedback: 1 | -1 | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Mentions
+     */
+    mentions: Array<MentionRef>;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
+     * Role
+     */
+    role: 'user' | 'assistant';
+    /**
+     * Status
+     */
+    status: 'complete' | 'cancelled' | 'error';
+    /**
+     * Text
+     */
+    text: string;
+    /**
+     * Tokens
+     */
+    tokens: number | null;
+    /**
+     * Tools
+     */
+    tools: Array<ToolTraceOut>;
+    /**
+     * Verified
+     */
+    verified: boolean | null;
+};
+
+/**
  * MetricsOut
  */
 export type MetricsOut = {
@@ -1869,6 +2558,437 @@ export type ModeSummary = {
      * Zones
      */
     zones: number;
+};
+
+/**
+ * Overview
+ *
+ * Tudo o que a página inicial mostra, num só pedido.
+ */
+export type Overview = {
+    /**
+     * Data Sources
+     */
+    data_sources: Array<OverviewDataSource>;
+    gap: OverviewGap;
+    /**
+     * Highlights
+     */
+    highlights: Array<OverviewHighlight>;
+    /**
+     * Pareto Ids
+     */
+    pareto_ids: Array<string>;
+    /**
+     * Parishes
+     */
+    parishes: Array<OverviewParish>;
+    /**
+     * References
+     */
+    references: Array<OverviewReference>;
+    /**
+     * Scenario Frontier
+     */
+    scenario_frontier: Array<FrontierPoint>;
+    /**
+     * Timeline
+     */
+    timeline: Array<OverviewMilestone>;
+};
+
+/**
+ * OverviewDataSource
+ */
+export type OverviewDataSource = {
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Kind
+     */
+    kind: 'operator' | 'public_statistics' | 'public_geodata' | 'other';
+    /**
+     * Methods
+     *
+     * Só no têxtil: `weighed` e/ou `percentage`
+     */
+    methods: Array<WeighingMethod>;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Period End
+     */
+    period_end: string | null;
+    /**
+     * Period Start
+     */
+    period_start: string | null;
+    /**
+     * Provider
+     */
+    provider: string;
+    /**
+     * Rows
+     *
+     * Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, ...)
+     */
+    rows: number;
+};
+
+/**
+ * OverviewDestinations
+ */
+export type OverviewDestinations = {
+    /**
+     * Recycle T
+     */
+    recycle_t: number;
+    /**
+     * Reject T
+     */
+    reject_t: number;
+    /**
+     * Reuse T
+     */
+    reuse_t: number;
+};
+
+/**
+ * OverviewGap
+ *
+ * A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.
+ */
+export type OverviewGap = {
+    /**
+     * Capture Pct
+     *
+     * collected_t / potential_t, em %
+     */
+    capture_pct: number;
+    /**
+     * Collected T
+     *
+     * Dado Vitrus: recolhido em 2025 pelas 4 entidades
+     */
+    collected_t: number;
+    /**
+     * Destino observado do recolhido
+     */
+    destinations: OverviewDestinations;
+    /**
+     * Is Estimate
+     *
+     * Capture e lacuna dependem do potencial estimado
+     */
+    is_estimate?: boolean;
+    /**
+     * Kg Per Inhab Month
+     *
+     * Observado: recolhido por habitante e mês
+     */
+    kg_per_inhab_month: number;
+    /**
+     * Kg Per Inhab Year
+     *
+     * Observado: recolhido por habitante e ano
+     */
+    kg_per_inhab_year: number;
+    /**
+     * Missing T
+     *
+     * potential_t − collected_t
+     */
+    missing_t: number;
+    /**
+     * Parishes Count
+     */
+    parishes_count: number;
+    /**
+     * Population
+     *
+     * Soma das freguesias (INE, Censos 2021)
+     */
+    population: number;
+    /**
+     * Potential Is Estimate
+     *
+     * O potencial é estimativa; o recolhido não
+     */
+    potential_is_estimate?: boolean;
+    /**
+     * Potential Kg Per Inhab Month
+     *
+     * Estimativa do plano: 0,7
+     */
+    potential_kg_per_inhab_month: number;
+    /**
+     * Potential Kg Per Inhab Year
+     *
+     * Estimativa do plano: 0,7 × 12
+     */
+    potential_kg_per_inhab_year: number;
+    /**
+     * Potential T
+     *
+     * Estimativa: população × 0,7 kg/hab/mês × 12 (plano municipal)
+     */
+    potential_t: number;
+    /**
+     * Year
+     */
+    year: number;
+};
+
+/**
+ * OverviewHighlight
+ */
+export type OverviewHighlight = {
+    /**
+     * Context
+     *
+     * Valores para interpolar no texto (nomes, totais)
+     */
+    context: {
+        [key: string]: string | number;
+    };
+    /**
+     * Is Estimate
+     */
+    is_estimate: boolean;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Source Label
+     */
+    source_label: string;
+    /**
+     * Text Key
+     *
+     * Chave i18n do texto da manchete
+     */
+    text_key: string;
+    /**
+     * Unit
+     */
+    unit: 'pct' | 't' | 'x' | 'kg_per_inhab_year';
+    /**
+     * Value
+     */
+    value: number;
+    /**
+     * Verified
+     */
+    verified: boolean;
+};
+
+/**
+ * OverviewMilestone
+ */
+export type OverviewMilestone = {
+    /**
+     * Date
+     */
+    date: string;
+    /**
+     * Days Remaining
+     *
+     * Dias até à data (relógio do servidor, UTC); vazio se já passou
+     */
+    days_remaining: number | null;
+    /**
+     * Key
+     *
+     * municipal_obligation | transposition_deadline | epr_regimes
+     */
+    key: string;
+    /**
+     * Source Label
+     */
+    source_label: string;
+    /**
+     * Source Url
+     */
+    source_url: string | null;
+    /**
+     * Status
+     */
+    status: 'done' | 'upcoming';
+    /**
+     * Verified
+     */
+    verified: boolean;
+    /**
+     * Who Pays
+     */
+    who_pays: 'municipality' | 'producers';
+};
+
+/**
+ * OverviewParish
+ */
+export type OverviewParish = {
+    /**
+     * Area Km2
+     *
+     * Da base de dados ou calculada a partir do contorno OSM
+     */
+    area_km2: number | null;
+    centroid: OverviewPoint | null;
+    /**
+     * Circuits Count
+     *
+     * Circuitos da Vitrus que passam em localidades da freguesia
+     */
+    circuits_count: number;
+    /**
+     * Code
+     *
+     * Código INE/DGT de 6 dígitos
+     */
+    code: string;
+    /**
+     * Containers Count
+     *
+     * Contentores ativos importados (0 até chegarem as localizações)
+     */
+    containers_count: number;
+    /**
+     * Localities Count
+     */
+    localities_count: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Potential Is Estimate
+     */
+    potential_is_estimate?: boolean;
+    /**
+     * Potential T
+     *
+     * Estimativa: população × 0,7 kg/hab/mês × 12 / 1000
+     */
+    potential_t: number;
+    /**
+     * Share Of Population Pct
+     */
+    share_of_population_pct: number;
+    tipau: Tipau | null;
+};
+
+/**
+ * OverviewPoint
+ */
+export type OverviewPoint = {
+    /**
+     * Lat
+     */
+    lat: number;
+    /**
+     * Lon
+     */
+    lon: number;
+};
+
+/**
+ * OverviewReference
+ */
+export type OverviewReference = {
+    /**
+     * Evidence
+     */
+    evidence: 'dado_vitrus' | 'primary' | 'secondary' | 'unverified';
+    /**
+     * Is Estimate
+     *
+     * Verdadeiro para o potencial do plano e valores aproximados
+     */
+    is_estimate: boolean;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Kg Per Inhab Year
+     */
+    kg_per_inhab_year: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Scope
+     */
+    scope: 'municipality' | 'region' | 'country' | 'eu';
+    /**
+     * Source Label
+     */
+    source_label: string;
+    /**
+     * Source Url
+     */
+    source_url: string | null;
+    /**
+     * Verified
+     *
+     * Falso: valor registado mas por verificar; não usar em público
+     */
+    verified: boolean;
+    /**
+     * Year
+     */
+    year: number;
+};
+
+/**
+ * PageContext
+ *
+ * O que o utilizador está a ver. Só estrutura: o servidor resolve as entidades, sem confiar no texto.
+ */
+export type PageContext = {
+    /**
+     * Params
+     *
+     * Parâmetros da rota, ex.: scenarioId
+     */
+    params?: {
+        [key: string]: string;
+    };
+    /**
+     * Route
+     *
+     * Rota do ecrã, ex.: /scenarios/$scenarioId
+     */
+    route: string;
+    /**
+     * Search
+     *
+     * Query string validada do ecrã
+     */
+    search?: {
+        [key: string]: string;
+    };
+    /**
+     * Selected Filters
+     */
+    selected_filters?: {
+        [key: string]: string;
+    };
+    /**
+     * Visible Entity Ids
+     */
+    visible_entity_ids?: Array<string>;
 };
 
 /**
@@ -3235,6 +4355,136 @@ export type TextileBaseline = {
 export type TextileDestination = 'reuse' | 'recycle' | 'reject';
 
 /**
+ * ThreadExport
+ */
+export type ThreadExport = {
+    /**
+     * Filename
+     */
+    filename: string;
+    /**
+     * Markdown
+     */
+    markdown: string;
+};
+
+/**
+ * ThreadOut
+ */
+export type ThreadOut = {
+    /**
+     * Archived
+     */
+    archived: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Has Summary
+     */
+    has_summary: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Message Count
+     */
+    message_count: number;
+    /**
+     * Messages
+     */
+    messages: Array<MessageOut>;
+    /**
+     * Summary
+     */
+    summary: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * Used Tokens
+     */
+    used_tokens: number;
+    /**
+     * Window Tokens
+     */
+    window_tokens: number;
+};
+
+/**
+ * ThreadPage
+ */
+export type ThreadPage = {
+    /**
+     * Items
+     */
+    items: Array<ThreadSummaryOut>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * ThreadRename
+ */
+export type ThreadRename = {
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * ThreadSummaryOut
+ */
+export type ThreadSummaryOut = {
+    /**
+     * Archived
+     */
+    archived: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Has Summary
+     */
+    has_summary: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Message Count
+     */
+    message_count: number;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
  * Tipau
  *
  * Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.
@@ -3253,6 +4503,24 @@ export type ToolTrace = {
      * Ok
      */
     ok: boolean;
+};
+
+/**
+ * ToolTraceOut
+ */
+export type ToolTraceOut = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Ok
+     */
+    ok: boolean;
+    /**
+     * Summary
+     */
+    summary: string;
 };
 
 /**
@@ -5394,6 +6662,69 @@ export type GetBrandEvidenceResponses = {
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
 
+export type UploadCopilotAttachmentsData = {
+    body: BodyUploadCopilotAttachments;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/attachments';
+};
+
+export type UploadCopilotAttachmentsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UploadCopilotAttachmentsError = UploadCopilotAttachmentsErrors[keyof UploadCopilotAttachmentsErrors];
+
+export type UploadCopilotAttachmentsResponses = {
+    /**
+     * Response Upload Copilot Attachments
+     *
+     * Successful Response
+     */
+    201: Array<AttachmentOut>;
+};
+
+export type UploadCopilotAttachmentsResponse = UploadCopilotAttachmentsResponses[keyof UploadCopilotAttachmentsResponses];
+
 export type CopilotChatData = {
     body: CopilotRequest;
     path?: never;
@@ -5454,6 +6785,808 @@ export type CopilotChatResponses = {
 };
 
 export type CopilotChatResponse = CopilotChatResponses[keyof CopilotChatResponses];
+
+export type ListCopilotCommandsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/commands';
+};
+
+export type ListCopilotCommandsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotCommandsError = ListCopilotCommandsErrors[keyof ListCopilotCommandsErrors];
+
+export type ListCopilotCommandsResponses = {
+    /**
+     * Successful Response
+     */
+    200: CommandsOut;
+};
+
+export type ListCopilotCommandsResponse = ListCopilotCommandsResponses[keyof ListCopilotCommandsResponses];
+
+export type GetCopilotEventSchemaData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/event-schema';
+};
+
+export type GetCopilotEventSchemaErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCopilotEventSchemaError = GetCopilotEventSchemaErrors[keyof GetCopilotEventSchemaErrors];
+
+export type GetCopilotEventSchemaResponses = {
+    /**
+     * Successful Response
+     */
+    200: CopilotEventCatalog;
+};
+
+export type GetCopilotEventSchemaResponse = GetCopilotEventSchemaResponses[keyof GetCopilotEventSchemaResponses];
+
+export type SearchCopilotMentionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Q
+         */
+        q?: string;
+        /**
+         * Types
+         */
+        types?: Array<MentionType> | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/mentions';
+};
+
+export type SearchCopilotMentionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SearchCopilotMentionsError = SearchCopilotMentionsErrors[keyof SearchCopilotMentionsErrors];
+
+export type SearchCopilotMentionsResponses = {
+    /**
+     * Successful Response
+     */
+    200: MentionsOut;
+};
+
+export type SearchCopilotMentionsResponse = SearchCopilotMentionsResponses[keyof SearchCopilotMentionsResponses];
+
+export type SendCopilotFeedbackData = {
+    body: FeedbackIn;
+    path: {
+        /**
+         * Message Id
+         */
+        message_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/messages/{message_id}/feedback';
+};
+
+export type SendCopilotFeedbackErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SendCopilotFeedbackError = SendCopilotFeedbackErrors[keyof SendCopilotFeedbackErrors];
+
+export type SendCopilotFeedbackResponses = {
+    /**
+     * Successful Response
+     */
+    200: FeedbackOut;
+};
+
+export type SendCopilotFeedbackResponse = SendCopilotFeedbackResponses[keyof SendCopilotFeedbackResponses];
+
+export type CopilotStreamData = {
+    body: CopilotStreamRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/stream';
+};
+
+export type CopilotStreamErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CopilotStreamError = CopilotStreamErrors[keyof CopilotStreamErrors];
+
+export type CopilotStreamResponses = {
+    /**
+     * Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`
+     */
+    200: CopilotEventMessage;
+};
+
+export type CopilotStreamResponse = CopilotStreamResponses[keyof CopilotStreamResponses];
+
+export type ListCopilotThreadsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Archived
+         */
+        archived?: boolean;
+    };
+    url: '/api/v1/copilot/threads';
+};
+
+export type ListCopilotThreadsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotThreadsError = ListCopilotThreadsErrors[keyof ListCopilotThreadsErrors];
+
+export type ListCopilotThreadsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThreadPage;
+};
+
+export type ListCopilotThreadsResponse = ListCopilotThreadsResponses[keyof ListCopilotThreadsResponses];
+
+export type DeleteCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}';
+};
+
+export type DeleteCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteCopilotThreadError = DeleteCopilotThreadErrors[keyof DeleteCopilotThreadErrors];
+
+export type DeleteCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteCopilotThreadResponse = DeleteCopilotThreadResponses[keyof DeleteCopilotThreadResponses];
+
+export type GetCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}';
+};
+
+export type GetCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCopilotThreadError = GetCopilotThreadErrors[keyof GetCopilotThreadErrors];
+
+export type GetCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThreadOut;
+};
+
+export type GetCopilotThreadResponse = GetCopilotThreadResponses[keyof GetCopilotThreadResponses];
+
+export type RenameCopilotThreadData = {
+    body: ThreadRename;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}';
+};
+
+export type RenameCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RenameCopilotThreadError = RenameCopilotThreadErrors[keyof RenameCopilotThreadErrors];
+
+export type RenameCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThreadSummaryOut;
+};
+
+export type RenameCopilotThreadResponse = RenameCopilotThreadResponses[keyof RenameCopilotThreadResponses];
+
+export type CompactCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/compact';
+};
+
+export type CompactCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CompactCopilotThreadError = CompactCopilotThreadErrors[keyof CompactCopilotThreadErrors];
+
+export type CompactCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: CompactOut;
+};
+
+export type CompactCopilotThreadResponse = CompactCopilotThreadResponses[keyof CompactCopilotThreadResponses];
+
+export type ExportCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/export';
+};
+
+export type ExportCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportCopilotThreadError = ExportCopilotThreadErrors[keyof ExportCopilotThreadErrors];
+
+export type ExportCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThreadExport;
+};
+
+export type ExportCopilotThreadResponse = ExportCopilotThreadResponses[keyof ExportCopilotThreadResponses];
+
+export type RegenerateCopilotResponseData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/threads/{thread_id}/regenerate';
+};
+
+export type RegenerateCopilotResponseErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RegenerateCopilotResponseError = RegenerateCopilotResponseErrors[keyof RegenerateCopilotResponseErrors];
+
+export type RegenerateCopilotResponseResponses = {
+    /**
+     * Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`
+     */
+    200: CopilotEventMessage;
+};
+
+export type RegenerateCopilotResponseResponse = RegenerateCopilotResponseResponses[keyof RegenerateCopilotResponseResponses];
 
 export type UpdateDataAlertData = {
     body: AlertUpdate;
@@ -7933,6 +10066,67 @@ export type GetObservedFlowsResponses = {
 };
 
 export type GetObservedFlowsResponse = GetObservedFlowsResponses[keyof GetObservedFlowsResponses];
+
+export type GetOverviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/textile/overview';
+};
+
+export type GetOverviewErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetOverviewError = GetOverviewErrors[keyof GetOverviewErrors];
+
+export type GetOverviewResponses = {
+    /**
+     * Successful Response
+     */
+    200: Overview;
+};
+
+export type GetOverviewResponse = GetOverviewResponses[keyof GetOverviewResponses];
 
 export type GetWasteCompositionData = {
     body?: never;

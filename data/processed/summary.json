@@ -4,10 +4,10 @@
     "reuse_t": 178.995,
     "recycle_t": 79.933,
     "reject_t": 42.338,
-    "kg_per_inhab_month": 0.161,
-    "estimated_demand_t": 1312.7,
+    "kg_per_inhab_month": 0.16,
+    "estimated_demand_t": 1317.4,
     "capture_of_demand_pct": 22.9,
-    "gap_t": 1011.5
+    "gap_t": 1016.1
   },
   "circuits": {
     "circuits": 40,
@@ -24,5 +24,9 @@
   "geography": {
     "parishes": 48,
     "localities_located": 71
+  },
+  "containers": {
+    "status": "awaiting_data",
+    "files": []
   }
 }

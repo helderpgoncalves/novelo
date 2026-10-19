@@ -25,9 +25,7 @@ test.describe('autenticação', () => {
 
   test('entrar, ver a app e terminar sessão', async ({ page }) => {
     await login(page);
-    await expect(
-      page.getByRole('heading', { level: 1, name: 'O ponto de partida de Guimarães' }),
-    ).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Guimarães recolhe/ })).toBeVisible();
     await page.getByRole('button', { name: 'Menu da conta' }).click();
     await page.getByRole('menuitem', { name: 'Terminar sessão' }).click();
     await expect(page).toHaveURL(/\/pt\/login/);

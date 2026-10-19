@@ -7,7 +7,7 @@ os números que a Vitrus ainda não forneceu (custos unitários), marcados como 
 from novelo.domain.vocab import CollectionMode
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams
 
-# Calibração com os dados da Vitrus: em 2025 recolheram-se 301,3 t de um potencial de 1 312,7 t (22,9%).
+# Calibração com os dados da Vitrus: em 2025 recolheram-se 301,3 t de um potencial de 1 317,4 t (22,9%).
 # O contentor de rua serve 80% da população; a taxa de captura de quem é servido que reproduz as 301 t é
 # 22,9% / 80% = 28,6%. Assim, uma rede só de rua em todo o concelho dá, no modelo, o que a Vitrus recolhe hoje.
 OBSERVED_CAPTURE_OF_DEMAND = 0.229

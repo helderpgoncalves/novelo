@@ -8,7 +8,7 @@ description: Procura de têxtil, modelo de custos, otimização de localização
 Fonte das fórmulas: `docs/engenharia/dados-e-modelo.md`. Código em `apps/api/src/novelo/domain/` (funções puras).
 
 - **Procura:** `D_z = P_z · q · 12` (q = 0,7 kg/hab/mês). **Captado:** `C_z = D_z · c_m`.
-- **Calibração com dados reais:** a captura atual é 22,9% (301,27 t / 1 312,7 t). A taxa por modo (`c_m`) nunca excede o que os dados suportam sem pressuposto escrito; níveis baixo/médio/alto visíveis no ecrã.
+- **Calibração com dados reais:** a captura atual é 22,9% (301,27 t / 1 317,4 t). A taxa por modo (`c_m`) nunca excede o que os dados suportam sem pressuposto escrito; níveis baixo/médio/alto visíveis no ecrã.
 - **Custo:** `capex/N + recolhas·c_recolha + km·c_km`; `€/t = custo anual / toneladas`. Custos unitários pedem-se à Vitrus: até chegarem, ficam em `params.yaml` marcados "pressuposto" com fonte.
 - **MIP (localização + modo):** maximizar toneladas com orçamento ou minimizar custo para uma meta. Zona servida só com ponto dentro da distância a pé do modo.
 - **Recolha a pedido:** custo marginal calculado sobre os circuitos reais (`data/processed/circuits.csv`): se a localidade já tem circuito, km extra ≈ 0.
