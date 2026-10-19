@@ -1,0 +1,29 @@
+# Segredos e ambiente
+.env
+.env.*
+!.env.example
+
+# Dependências e builds
+node_modules/
+dist/
+.venv/
+__pycache__/
+*.pyc
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+*.tsbuildinfo
+
+# Dados de runtime e sistema
+.DS_Store
+*.log
+data/runtime/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude Code: configuração pessoal fica local
+.claude/settings.local.json
+.claude/worktrees/
+CLAUDE.local.md

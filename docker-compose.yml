@@ -1,0 +1,52 @@
+# Produção (lido pelo Coolify). Domínio: https://novelo.bitsapiens.io
+# Um único domínio: o nginx do `web` serve o SPA e encaminha /api para a `api`. Nenhuma porta é
+# publicada: o Traefik do Coolify é a única entrada. Ver docs/engenharia/deploy.md.
+services:
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    environment:
+      - SERVICE_FQDN_WEB_80
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  api:
+    build:
+      context: .
+      dockerfile: apps/api/Dockerfile
+    environment:
+      - APP_ENV=production
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - DATABASE_URL=postgresql+asyncpg://novelo:${SERVICE_PASSWORD_POSTGRES}@db:5432/novelo
+      - DATA_DIR=/app/data/processed
+      - CORS_ORIGINS=["https://${DOMAIN:-novelo.bitsapiens.io}"]
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
+      - LLM_MODEL_TEXT=${LLM_MODEL_TEXT:-anthropic/claude-sonnet-4.5}
+      - LLM_MODEL_VISION=${LLM_MODEL_VISION:-anthropic/claude-sonnet-4.5}
+      - SOLVER_TIME_LIMIT_S=${SOLVER_TIME_LIMIT_S:-20}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:17-alpine
+    environment:
+      - POSTGRES_USER=novelo
+      - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
+      - POSTGRES_DB=novelo
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U novelo -d novelo"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:

@@ -1,0 +1,5 @@
+entity,total_t,reuse_t,recycle_t,reject_t,reuse_pct,recycle_pct,reject_pct,source,exact_weights
+H Sarah Trading,118.632,59.316,43.8938,15.4222,50.0,37.0,13.0,Ficheiro 'Sarah Trading Destinos' (kg exatos por mês e por destino).,True
+Nova Etapa,42.883,21.4415,17.1532,4.2883,50.0,40.0,10.0,"Percentagens do relatório 'nova etapa Recolha Têxtil' (Reutilização 50%, Reciclagem 40%, Aterro 10%) aplicadas ao total pesado (RU_2025).",False
+Ultriplo,134.1301,97.7223,16.9775,19.4303,72.9,12.7,14.5,"Relatório operacional Ultriplo 2025 (kg exatos por destino: Reutilização, Reciclagem, Aterro).",True
+Vitrus,5.62,0.515,1.909,3.197,9.2,34.0,56.9,"Percentagens do relatório 'To Be Green' (DOAR 9,16% ; outros lotes de reciclagem 33,96% ; LIXO+DESPERDÍCIOS 56,88%) aplicadas ao total pesado (RU_2025).",False

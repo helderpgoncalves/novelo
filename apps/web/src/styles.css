@@ -1,0 +1,36 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: "Inter";
+  src: url("/fonts/inter-latin-standard-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Newsreader";
+  src: url("/fonts/newsreader-latin-standard-normal.woff2") format("woff2");
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+/* Identidade Novelo: docs/marca/guia-de-marca.md */
+@theme {
+  --color-linho: #f4f1ea;
+  --color-tinta: #14211d;
+  --color-floresta: #2e6b57;
+  --color-floresta-clara: #7fb39c;
+  --color-pedra: #5e6b66;
+  --color-areia: #c4a06a;
+  --color-linha: #dcd5c8;
+  --font-titulo: "Newsreader", Georgia, serif;
+  --font-texto: "Inter", system-ui, sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-linho font-texto text-tinta antialiased;
+  }
+  h1, h2, h3 {
+    @apply font-titulo font-medium tracking-tight;
+  }
+}
