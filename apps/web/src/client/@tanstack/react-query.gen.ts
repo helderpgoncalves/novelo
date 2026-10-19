@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { changePassword, forgotPassword, getAuthConfig, getDataQuality, getFleet, getMe, getObservedFlows, getTextileBaseline, getWasteComposition, googleCallback, googleLogin, health, listCircuits, listContainers, listLocalities, listUsers, login, logout, logoutAll, type Options, ready, refresh, register, resendVerification, resetPassword, updateDataAlert, updateMe, updateUser, verifyEmail } from '../sdk.gen';
-import type { ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFleetData, GetFleetError, GetFleetResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListUsersData, ListUsersError, ListUsersResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, ReadyData, ReadyError, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
+import { addLotItem, analyseGarment, applyWhatIf, askWhatIf, changeLotState, changePassword, createScenario, deleteScenario, forgotPassword, getAuthConfig, getBrandEvidence, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getTextileBaseline, getWasteComposition, googleCallback, googleLogin, health, listCircuits, listContainers, listLocalities, listLots, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, ready, refresh, register, renameScenario, resendVerification, reserveLot, resetPassword, updateDataAlert, updateMe, updatePlanningParameters, updateUser, verifyEmail } from '../sdk.gen';
+import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, ReadyData, ReadyError, ReadyResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
 
 /**
  * Change Password
@@ -304,6 +304,26 @@ export const verifyEmailMutation = (options?: Partial<Options<VerifyEmailData>>)
     return mutationOptions;
 };
 
+export const getBrandEvidenceQueryKey = (options?: Options<GetBrandEvidenceData>) => createQueryKey('getBrandEvidence', options);
+
+/**
+ * Get Brand Evidence
+ *
+ * Quilos e composição por marca, com o tamanho da amostra (evidência para a RAP).
+ */
+export const getBrandEvidenceOptions = (options?: Options<GetBrandEvidenceData>) => queryOptions<GetBrandEvidenceResponse, GetBrandEvidenceError, GetBrandEvidenceResponse, ReturnType<typeof getBrandEvidenceQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getBrandEvidence({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getBrandEvidenceQueryKey(options)
+});
+
 /**
  * Update Data Alert
  *
@@ -362,6 +382,138 @@ export const healthOptions = (options?: Options<HealthData>) => queryOptions<Hea
     },
     queryKey: healthQueryKey(options)
 });
+
+export const listLotsQueryKey = (options?: Options<ListLotsData>) => createQueryKey('listLots', options);
+
+/**
+ * List Lots
+ */
+export const listLotsOptions = (options?: Options<ListLotsData>) => queryOptions<ListLotsResponse, ListLotsError, ListLotsResponse, ReturnType<typeof listLotsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listLots({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listLotsQueryKey(options)
+});
+
+/**
+ * Open Lot
+ *
+ * Abre um lote no ponto de recolha: gera o código que vai no QR.
+ */
+export const openLotMutation = (options?: Partial<Options<OpenLotData>>): UseMutationOptions<OpenLotResponse, OpenLotError, Options<OpenLotData>> => {
+    const mutationOptions: UseMutationOptions<OpenLotResponse, OpenLotError, Options<OpenLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await openLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getLotQueryKey = (options: Options<GetLotData>) => createQueryKey('getLot', options);
+
+/**
+ * Get Lot
+ */
+export const getLotOptions = (options: Options<GetLotData>) => queryOptions<GetLotResponse, GetLotError, GetLotResponse, ReturnType<typeof getLotQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLot({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLotQueryKey(options)
+});
+
+/**
+ * Add Lot Item
+ *
+ * Acrescenta ao lote uma peça confirmada pelo operador.
+ */
+export const addLotItemMutation = (options?: Partial<Options<AddLotItemData>>): UseMutationOptions<AddLotItemResponse, AddLotItemError, Options<AddLotItemData>> => {
+    const mutationOptions: UseMutationOptions<AddLotItemResponse, AddLotItemError, Options<AddLotItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await addLotItem({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Change Lot State
+ *
+ * Fecha o lote (triado) ou regista a entrega. O estado só avança.
+ */
+export const changeLotStateMutation = (options?: Partial<Options<ChangeLotStateData>>): UseMutationOptions<ChangeLotStateResponse, ChangeLotStateError, Options<ChangeLotStateData>> => {
+    const mutationOptions: UseMutationOptions<ChangeLotStateResponse, ChangeLotStateError, Options<ChangeLotStateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await changeLotState({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getFibreMarketQueryKey = (options?: Options<GetFibreMarketData>) => createQueryKey('getFibreMarket', options);
+
+/**
+ * Get Fibre Market
+ *
+ * Bolsa de fibra: lotes triados agregados por fibra, para os recicladores do Vale do Ave.
+ */
+export const getFibreMarketOptions = (options?: Options<GetFibreMarketData>) => queryOptions<GetFibreMarketResponse, GetFibreMarketError, GetFibreMarketResponse, ReturnType<typeof getFibreMarketQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getFibreMarket({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getFibreMarketQueryKey(options)
+});
+
+/**
+ * Reserve Lot
+ *
+ * Reserva um lote em nome de um reciclador. Sem preços nem pagamentos no MVP.
+ */
+export const reserveLotMutation = (options?: Partial<Options<ReserveLotData>>): UseMutationOptions<ReserveLotResponse, ReserveLotError, Options<ReserveLotData>> => {
+    const mutationOptions: UseMutationOptions<ReserveLotResponse, ReserveLotError, Options<ReserveLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await reserveLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const listCircuitsQueryKey = (options?: Options<ListCircuitsData>) => createQueryKey('listCircuits', options);
 
@@ -504,6 +656,214 @@ export const listLocalitiesOptions = (options?: Options<ListLocalitiesData>) => 
     queryKey: listLocalitiesQueryKey(options)
 });
 
+export const getPlanningParametersQueryKey = (options?: Options<GetPlanningParametersData>) => createQueryKey('getPlanningParameters', options);
+
+/**
+ * Get Planning Parameters
+ *
+ * Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto).
+ */
+export const getPlanningParametersOptions = (options?: Options<GetPlanningParametersData>) => queryOptions<GetPlanningParametersResponse, GetPlanningParametersError, GetPlanningParametersResponse, ReturnType<typeof getPlanningParametersQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getPlanningParameters({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getPlanningParametersQueryKey(options)
+});
+
+/**
+ * Update Planning Parameters
+ *
+ * Atualiza os pressupostos ativos (só administradores). Os cenários já gravados mantêm os seus.
+ */
+export const updatePlanningParametersMutation = (options?: Partial<Options<UpdatePlanningParametersData>>): UseMutationOptions<UpdatePlanningParametersResponse, UpdatePlanningParametersError, Options<UpdatePlanningParametersData>> => {
+    const mutationOptions: UseMutationOptions<UpdatePlanningParametersResponse, UpdatePlanningParametersError, Options<UpdatePlanningParametersData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updatePlanningParameters({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listScenariosQueryKey = (options?: Options<ListScenariosData>) => createQueryKey('listScenarios', options);
+
+/**
+ * List Scenarios
+ */
+export const listScenariosOptions = (options?: Options<ListScenariosData>) => queryOptions<ListScenariosResponse, ListScenariosError, ListScenariosResponse, ReturnType<typeof listScenariosQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listScenarios({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listScenariosQueryKey(options)
+});
+
+/**
+ * Create Scenario
+ *
+ * Corre o otimizador (localização e modo por freguesia, mais rotas) e guarda o cenário.
+ */
+export const createScenarioMutation = (options?: Partial<Options<CreateScenarioData>>): UseMutationOptions<CreateScenarioResponse, CreateScenarioError, Options<CreateScenarioData>> => {
+    const mutationOptions: UseMutationOptions<CreateScenarioResponse, CreateScenarioError, Options<CreateScenarioData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createScenario({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete Scenario
+ */
+export const deleteScenarioMutation = (options?: Partial<Options<DeleteScenarioData>>): UseMutationOptions<DeleteScenarioResponse, DeleteScenarioError, Options<DeleteScenarioData>> => {
+    const mutationOptions: UseMutationOptions<DeleteScenarioResponse, DeleteScenarioError, Options<DeleteScenarioData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteScenario({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getScenarioQueryKey = (options: Options<GetScenarioData>) => createQueryKey('getScenario', options);
+
+/**
+ * Get Scenario
+ */
+export const getScenarioOptions = (options: Options<GetScenarioData>) => queryOptions<GetScenarioResponse, GetScenarioError, GetScenarioResponse, ReturnType<typeof getScenarioQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getScenario({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getScenarioQueryKey(options)
+});
+
+/**
+ * Rename Scenario
+ */
+export const renameScenarioMutation = (options?: Partial<Options<RenameScenarioData>>): UseMutationOptions<RenameScenarioResponse, RenameScenarioError, Options<RenameScenarioData>> => {
+    const mutationOptions: UseMutationOptions<RenameScenarioResponse, RenameScenarioError, Options<RenameScenarioData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await renameScenario({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getScenarioFlowsQueryKey = (options: Options<GetScenarioFlowsData>) => createQueryKey('getScenarioFlows', options);
+
+/**
+ * Get Scenario Flows
+ *
+ * Fluxo previsto do cenário: freguesia, modo de recolha e destino, em toneladas.
+ */
+export const getScenarioFlowsOptions = (options: Options<GetScenarioFlowsData>) => queryOptions<GetScenarioFlowsResponse, GetScenarioFlowsError, GetScenarioFlowsResponse, ReturnType<typeof getScenarioFlowsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getScenarioFlows({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getScenarioFlowsQueryKey(options)
+});
+
+export const listZonesQueryKey = (options?: Options<ListZonesData>) => createQueryKey('listZones', options);
+
+/**
+ * List Zones
+ *
+ * Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus.
+ */
+export const listZonesOptions = (options?: Options<ListZonesData>) => queryOptions<ListZonesResponse, ListZonesError, ListZonesResponse, ReturnType<typeof listZonesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listZones({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listZonesQueryKey(options)
+});
+
+export const getPassportQueryKey = (options: Options<GetPassportData>) => createQueryKey('getPassport', options);
+
+/**
+ * Get Passport
+ *
+ * Passaporte público do lote: o QR aponta para aqui. Sem dados pessoais e sem sessão.
+ */
+export const getPassportOptions = (options: Options<GetPassportData>) => queryOptions<GetPassportResponse, GetPassportError, GetPassportResponse, ReturnType<typeof getPassportQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getPassport({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getPassportQueryKey(options)
+});
+
+export const getLotQrQueryKey = (options: Options<GetLotQrData>) => createQueryKey('getLotQr', options);
+
+/**
+ * Get Lot Qr
+ *
+ * QR em SVG do passaporte.
+ */
+export const getLotQrOptions = (options: Options<GetLotQrData>) => queryOptions<GetLotQrResponse, GetLotQrError, GetLotQrResponse, ReturnType<typeof getLotQrQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLotQr({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLotQrQueryKey(options)
+});
+
 export const readyQueryKey = (options?: Options<ReadyData>) => createQueryKey('ready', options);
 
 /**
@@ -584,6 +944,25 @@ export const getWasteCompositionOptions = (options?: Options<GetWasteComposition
     queryKey: getWasteCompositionQueryKey(options)
 });
 
+/**
+ * Analyse Garment
+ *
+ * Analisa as fotos com o modelo de visão. Não grava nada: o operador confirma e só então a peça entra no lote.
+ */
+export const analyseGarmentMutation = (options?: Partial<Options<AnalyseGarmentData>>): UseMutationOptions<AnalyseGarmentResponse, AnalyseGarmentError, Options<AnalyseGarmentData>> => {
+    const mutationOptions: UseMutationOptions<AnalyseGarmentResponse, AnalyseGarmentError, Options<AnalyseGarmentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await analyseGarment({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const listUsersQueryKey = (options?: Options<ListUsersData>) => createQueryKey('listUsers', options);
 
 /**
@@ -613,6 +992,64 @@ export const updateUserMutation = (options?: Partial<Options<UpdateUserData>>): 
     const mutationOptions: UseMutationOptions<UpdateUserResponse, UpdateUserError, Options<UpdateUserData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await updateUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listWhatIfsQueryKey = (options: Options<ListWhatIfsData>) => createQueryKey('listWhatIfs', options);
+
+/**
+ * List What Ifs
+ *
+ * Perguntas feitas sobre um cenário (histórico auditável).
+ */
+export const listWhatIfsOptions = (options: Options<ListWhatIfsData>) => queryOptions<ListWhatIfsResponse, ListWhatIfsError, ListWhatIfsResponse, ReturnType<typeof listWhatIfsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listWhatIfs({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listWhatIfsQueryKey(options)
+});
+
+/**
+ * Ask What If
+ *
+ * Passo 1: o modelo percebe a pergunta e descreve a alteração. Nada é calculado até o utilizador confirmar.
+ */
+export const askWhatIfMutation = (options?: Partial<Options<AskWhatIfData>>): UseMutationOptions<AskWhatIfResponse, AskWhatIfError, Options<AskWhatIfData>> => {
+    const mutationOptions: UseMutationOptions<AskWhatIfResponse, AskWhatIfError, Options<AskWhatIfData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await askWhatIf({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Apply What If
+ *
+ * Passo 2: corre o otimizador com a alteração confirmada e explica o resultado, com números verificados.
+ */
+export const applyWhatIfMutation = (options?: Partial<Options<ApplyWhatIfData>>): UseMutationOptions<ApplyWhatIfResponse, ApplyWhatIfError, Options<ApplyWhatIfData>> => {
+    const mutationOptions: UseMutationOptions<ApplyWhatIfResponse, ApplyWhatIfError, Options<ApplyWhatIfData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await applyWhatIf({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

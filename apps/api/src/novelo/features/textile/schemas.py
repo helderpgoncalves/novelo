@@ -1,6 +1,6 @@
 from pydantic import BaseModel, Field
 
-from novelo.domain.vocab import TextileDestination, WasteCategory, WasteScope, WeighingMethod
+from novelo.domain.vocab import CollectionMode, TextileDestination, WasteCategory, WasteScope, WeighingMethod
 
 
 class EntityBaseline(BaseModel):
@@ -38,7 +38,10 @@ class FlowNode(BaseModel):
     id: str
     column: int
     destination: TextileDestination | None = Field(default=None, description="Preenchido nos nós de destino")
-    label: str | None = Field(default=None, description="Nome da entidade; vazio nos nós de destino (o web traduz)")
+    mode: CollectionMode | None = Field(default=None, description="Preenchido nos nós de modo de recolha (cenários)")
+    label: str | None = Field(
+        default=None, description="Nome da entidade ou freguesia; vazio nos nós de modo e destino (o web traduz)"
+    )
 
 
 class FlowLink(BaseModel):

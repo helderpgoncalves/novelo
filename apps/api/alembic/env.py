@@ -7,8 +7,10 @@ from novelo.core.config import get_settings
 from novelo.core.database import Base
 from novelo.features.auth import models as auth_models  # noqa: F401
 from novelo.features.datasets import models as dataset_models  # noqa: F401
+from novelo.features.lots import models as lot_models  # noqa: F401
 from novelo.features.network import models as network_models  # noqa: F401
-from novelo.features.scenarios import models as scenario_models  # noqa: F401
+from novelo.features.planning import models as planning_models  # noqa: F401
+from novelo.features.planning import whatif_models  # noqa: F401
 from novelo.features.textile import models as textile_models  # noqa: F401
 from novelo.features.users import models as user_models  # noqa: F401
 

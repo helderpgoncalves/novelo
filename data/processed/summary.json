@@ -20,5 +20,9 @@
     "shifts": 101,
     "localities": 82,
     "alerts": 12
+  },
+  "geography": {
+    "parishes": 48,
+    "localities_located": 71
   }
 }

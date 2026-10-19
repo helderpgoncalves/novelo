@@ -28,6 +28,7 @@ ErrorCode = Literal[
     "user_not_found",
     "email_taken",
     "cannot_modify_self",
+    "conflict",
     "rate_limited",
     "feature_disabled",
     "upstream_error",
@@ -121,6 +122,11 @@ class EmailTakenError(AppError):
 class CannotModifySelfError(AppError):
     status_code = 409
     code = "cannot_modify_self"
+
+
+class ConflictError(AppError):
+    status_code = 409
+    code = "conflict"
 
 
 class RateLimitError(AppError):

@@ -46,6 +46,22 @@ export const zAuthConfig = z.object({
 });
 
 /**
+ * Body_analyse_garment
+ */
+export const zBodyAnalyseGarment = z.object({
+    item_photo: z.string(),
+    label_photo: z.string().nullish()
+});
+
+/**
+ * BrandCount
+ */
+export const zBrandCount = z.object({
+    brand: z.string(),
+    items: z.int()
+});
+
+/**
  * ChangePasswordRequest
  */
 export const zChangePasswordRequest = z.object({
@@ -62,6 +78,58 @@ export const zCircuitStatus = z.enum([
     'weekend_only',
     'unassigned'
 ]);
+
+/**
+ * CollectionMode
+ *
+ * Modos de recolha de têxteis que o simulador compara.
+ */
+export const zCollectionMode = z.enum([
+    'existing',
+    'street',
+    'on_demand'
+]);
+
+/**
+ * AllocationPart
+ *
+ * Contributo de um modo numa freguesia (uma freguesia pode combinar modos).
+ */
+export const zAllocationPart = z.object({
+    annual_cost_eur: z.number(),
+    capex_eur: z.number(),
+    km_year: z.number(),
+    mode: zCollectionMode,
+    points: z.int(),
+    tonnes: z.number()
+});
+
+/**
+ * Allocation
+ */
+export const zAllocation = z.object({
+    annual_cost_eur: z.number(),
+    capex_eur: z.number(),
+    covered_population: z.number(),
+    demand_t: z.number(),
+    km_year: z.number(),
+    mode: zCollectionMode.nullable(),
+    modes: z.array(zCollectionMode),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    parts: z.array(zAllocationPart),
+    points: z.int(),
+    population: z.int(),
+    tonnes: z.number()
+});
+
+/**
+ * CaptureScale
+ */
+export const zCaptureScale = z.object({
+    factor: z.number().gt(0).lte(5),
+    mode: zCollectionMode
+});
 
 /**
  * CollectionType
@@ -186,12 +254,61 @@ export const zErrorBody = z.object({
         'user_not_found',
         'email_taken',
         'cannot_modify_self',
+        'conflict',
         'rate_limited',
         'feature_disabled',
         'upstream_error',
         'internal_error'
     ]),
     message: z.string()
+});
+
+/**
+ * Fibre
+ */
+export const zFibre = z.enum([
+    'cotton',
+    'wool',
+    'polyester',
+    'nylon',
+    'viscose',
+    'linen',
+    'acrylic',
+    'elastane',
+    'silk',
+    'other',
+    'unknown'
+]);
+
+/**
+ * BrandStat
+ */
+export const zBrandStat = z.object({
+    brand: z.string(),
+    items: z.int(),
+    share_pct: z.number(),
+    top_fibre: zFibre,
+    weight_kg: z.number()
+});
+
+/**
+ * BrandsOut
+ *
+ * Evidência por marca para a RAP: quilos e composição, com o tamanho da amostra para não concluir de pouco.
+ */
+export const zBrandsOut = z.object({
+    brands: z.array(zBrandStat),
+    items_without_brand: z.int(),
+    sample_items: z.int(),
+    total_kg: z.number()
+});
+
+/**
+ * CompositionPart
+ */
+export const zCompositionPart = z.object({
+    fibre: zFibre,
+    pct: z.number().gte(0).lte(100)
 });
 
 /**
@@ -221,10 +338,42 @@ export const zForgotPasswordRequest = z.object({
 });
 
 /**
+ * GarmentType
+ */
+export const zGarmentType = z.enum([
+    'tshirt',
+    'shirt',
+    'trousers',
+    'jumper',
+    'jacket',
+    'dress',
+    'skirt',
+    'bedding',
+    'towel',
+    'other'
+]);
+
+/**
  * Health
  */
 export const zHealth = z.object({
     status: z.literal('ok').optional().default('ok')
+});
+
+/**
+ * Kpis
+ */
+export const zKpis = z.object({
+    annual_cost_eur: z.number(),
+    baseline_observed_t: z.number(),
+    capex_eur: z.number(),
+    coverage_pct: z.number(),
+    eur_per_tonne: z.number().nullable(),
+    km_year: z.number(),
+    opex_eur_year: z.number(),
+    points: z.int(),
+    potential_t: z.number(),
+    tonnes_year: z.number()
 });
 
 /**
@@ -234,6 +383,182 @@ export const zLoginRequest = z.object({
     email: z.email(),
     password: z.string().min(1).max(128),
     remember_me: z.boolean().optional().default(true)
+});
+
+/**
+ * LotEventKind
+ */
+export const zLotEventKind = z.enum([
+    'opened',
+    'item_added',
+    'sorted',
+    'reserved',
+    'delivered'
+]);
+
+/**
+ * LotEventOut
+ */
+export const zLotEventOut = z.object({
+    kind: zLotEventKind,
+    note: z.string().nullable(),
+    occurred_at: z.iso.datetime()
+});
+
+/**
+ * LotOpen
+ */
+export const zLotOpen = z.object({
+    parish_code: z.string().nullish()
+});
+
+/**
+ * LotState
+ */
+export const zLotState = z.enum([
+    'collected',
+    'sorted',
+    'reserved',
+    'delivered'
+]);
+
+/**
+ * LotStateChange
+ */
+export const zLotStateChange = z.object({
+    state: zLotState
+});
+
+/**
+ * LotSummary
+ */
+export const zLotSummary = z.object({
+    code: z.string(),
+    dominant_fibre: zFibre,
+    items: z.int(),
+    opened_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    state: zLotState,
+    weight_kg: z.number()
+});
+
+/**
+ * MarketLot
+ */
+export const zMarketLot = z.object({
+    code: z.string(),
+    composition: z.array(zCompositionPart),
+    dominant_fibre: zFibre,
+    parish_name: z.string().nullable(),
+    state: zLotState,
+    weight_kg: z.number()
+});
+
+/**
+ * MarketEntry
+ *
+ * Bolsa de fibra: lotes triados e agregados por fibra dominante.
+ */
+export const zMarketEntry = z.object({
+    fibre: zFibre,
+    items: z.array(zMarketLot),
+    lots: z.int(),
+    parishes: z.array(z.string()),
+    weight_kg: z.number()
+});
+
+/**
+ * ModeParams
+ */
+export const zModeParams = z.object({
+    capex_per_point_eur: z.number().gte(0),
+    capture_rate: z.number().gte(0).lte(1),
+    collections_per_year: z.number().gte(0),
+    coverage_factor: z.number().gte(0).lte(1),
+    lifetime_years: z.number().gt(0),
+    min_points: z.int().gte(0),
+    people_per_point: z.int().gte(1)
+});
+
+/**
+ * ModeSummary
+ */
+export const zModeSummary = z.object({
+    annual_cost_eur: z.number(),
+    mode: zCollectionMode,
+    points: z.int(),
+    tonnes: z.number(),
+    zones: z.int()
+});
+
+/**
+ * ParamSource
+ *
+ * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
+ */
+export const zParamSource = z.enum([
+    'plan',
+    'vitrus_data',
+    'assumption'
+]);
+
+/**
+ * ParamMeta
+ */
+export const zParamMeta = z.object({
+    key: z.string(),
+    source: zParamSource,
+    unit: z.string()
+});
+
+/**
+ * Passport
+ *
+ * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ */
+export const zPassport = z.object({
+    brands: z.array(zBrandCount),
+    code: z.string(),
+    composition: z.array(zCompositionPart),
+    dominant_fibre: zFibre,
+    events: z.array(zLotEventOut),
+    items: z.int(),
+    opened_at: z.iso.datetime(),
+    parish_name: z.string().nullable(),
+    recycle_pct: z.number(),
+    reject_pct: z.number(),
+    reuse_pct: z.number(),
+    state: zLotState,
+    weight_kg: z.number()
+});
+
+/**
+ * PlanningParams
+ */
+export const zPlanningParams = z.object({
+    cost_per_collection_eur: z.number().gte(0),
+    cost_per_km_eur: z.number().gte(0),
+    depot_lat: z.number().gte(-90).lte(90),
+    depot_lon: z.number().gte(-180).lte(180),
+    detour_factor: z.number().gte(1).lte(3),
+    kg_per_inhab_month: z.number().gt(0).lte(5),
+    modes: z.record(z.string(), zModeParams),
+    on_demand_kg_per_pickup: z.number().gt(0),
+    piggyback_extra_km: z.number().gte(0),
+    piggyback_min_days: z.int().gte(1).lte(7),
+    solver_time_limit_s: z.int().gte(1).lte(120),
+    vehicle_capacity_t: z.number().gt(0)
+});
+
+/**
+ * ParametersOut
+ */
+export const zParametersOut = z.object({
+    meta: z.array(zParamMeta),
+    updated_at: z.iso.datetime(),
+    values: zPlanningParams,
+    version: z.int()
 });
 
 /**
@@ -265,11 +590,151 @@ export const zRegisterRequest = z.object({
 });
 
 /**
+ * ReservationOut
+ */
+export const zReservationOut = z.object({
+    contact: z.string(),
+    created_at: z.iso.datetime(),
+    note: z.string().nullable(),
+    recycler_name: z.string()
+});
+
+/**
+ * ReserveRequest
+ */
+export const zReserveRequest = z.object({
+    contact: z.string().min(3).max(160),
+    note: z.string().max(500).nullish(),
+    recycler_name: z.string().min(2).max(120)
+});
+
+/**
  * ResetPasswordRequest
  */
 export const zResetPasswordRequest = z.object({
     password: z.string().max(128),
     token: z.string().min(20).max(200)
+});
+
+/**
+ * ResolvedChange
+ *
+ * Alteração já validada contra as listas fechadas (freguesias e modos).
+ */
+export const zResolvedChange = z.object({
+    allowed_modes: z.array(zCollectionMode),
+    parish_code: z.string(),
+    parish_name: z.string()
+});
+
+/**
+ * RouteStop
+ */
+export const zRouteStop = z.object({
+    latitude: z.number(),
+    load_t: z.number(),
+    longitude: z.number(),
+    parish_code: z.string(),
+    parish_name: z.string()
+});
+
+/**
+ * RouteOut
+ */
+export const zRouteOut = z.object({
+    km: z.number(),
+    load_t: z.number(),
+    mode: zCollectionMode,
+    path: z.array(z.array(z.number())),
+    stops: z.array(zRouteStop),
+    vehicle: z.int()
+});
+
+/**
+ * ScenarioObjective
+ */
+export const zScenarioObjective = z.enum(['max_tonnes', 'min_cost']);
+
+/**
+ * ScenarioRename
+ */
+export const zScenarioRename = z.object({
+    label: z.string().min(1).max(80)
+});
+
+/**
+ * ScenarioRequest
+ */
+export const zScenarioRequest = z.object({
+    budget_eur_year: z.number().gte(0).nullish(),
+    constraints: z.record(z.string(), z.array(zCollectionMode)).optional(),
+    label: z.string().min(1).max(80),
+    objective: zScenarioObjective,
+    params: zPlanningParams.nullish(),
+    parent_id: z.uuid().nullish(),
+    target_tonnes: z.number().gte(0).nullish()
+});
+
+/**
+ * ScenarioResult
+ */
+export const zScenarioResult = z.object({
+    allocations: z.array(zAllocation),
+    depot: z.array(z.number()),
+    kpis: zKpis,
+    modes: z.array(zModeSummary),
+    routes: z.array(zRouteOut)
+});
+
+/**
+ * ScenarioStatus
+ */
+export const zScenarioStatus = z.enum(['computed', 'infeasible']);
+
+/**
+ * ScenarioOut
+ */
+export const zScenarioOut = z.object({
+    annual_cost_eur: z.number(),
+    budget_eur_year: z.number().nullable(),
+    capex_eur: z.number(),
+    constraints: z.record(z.string(), z.array(zCollectionMode)),
+    coverage_pct: z.number(),
+    created_at: z.iso.datetime(),
+    eur_per_tonne: z.number().nullable(),
+    id: z.uuid(),
+    label: z.string(),
+    objective: zScenarioObjective,
+    params: zPlanningParams,
+    parent_id: z.uuid().nullable(),
+    result: zScenarioResult,
+    solver_status: z.enum([
+        'optimal',
+        'feasible',
+        'infeasible'
+    ]),
+    status: zScenarioStatus,
+    target_tonnes: z.number().nullable(),
+    tonnes_year: z.number()
+});
+
+/**
+ * ScenarioSummary
+ */
+export const zScenarioSummary = z.object({
+    annual_cost_eur: z.number(),
+    budget_eur_year: z.number().nullable(),
+    capex_eur: z.number(),
+    coverage_pct: z.number(),
+    created_at: z.iso.datetime(),
+    eur_per_tonne: z.number().nullable(),
+    id: z.uuid(),
+    label: z.string(),
+    objective: zScenarioObjective,
+    parent_id: z.uuid().nullable(),
+    status: zScenarioStatus,
+    target_tonnes: z.number().nullable(),
+    tonnes_year: z.number()
 });
 
 /**
@@ -307,7 +772,8 @@ export const zFlowNode = z.object({
     column: z.int(),
     destination: zTextileDestination.nullish(),
     id: z.string(),
-    label: z.string().nullish()
+    label: z.string().nullish(),
+    mode: zCollectionMode.nullish()
 });
 
 /**
@@ -317,6 +783,82 @@ export const zFlows = z.object({
     links: z.array(zFlowLink),
     nodes: z.array(zFlowNode),
     observed: z.boolean()
+});
+
+/**
+ * LotItemIn
+ *
+ * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ */
+export const zLotItemIn = z.object({
+    brand: z.string().max(80).nullish(),
+    composition: z.array(zCompositionPart).max(6),
+    condition: zTextileDestination,
+    confidence: z.number().gte(0).lte(1).optional().default(1),
+    estimated_weight_g: z.int().gt(0).lte(20000),
+    garment_type: zGarmentType,
+    prompt_version: z.string().nullish()
+});
+
+/**
+ * LotItemOut
+ */
+export const zLotItemOut = z.object({
+    brand: z.string().nullable(),
+    composition: z.array(zCompositionPart),
+    condition: zTextileDestination,
+    confidence: z.number(),
+    created_at: z.iso.datetime(),
+    dominant_fibre: zFibre,
+    estimated_weight_g: z.int(),
+    garment_type: zGarmentType,
+    id: z.uuid()
+});
+
+/**
+ * LotDetail
+ */
+export const zLotDetail = z.object({
+    code: z.string(),
+    composition: z.array(zCompositionPart),
+    dominant_fibre: zFibre,
+    events: z.array(zLotEventOut),
+    item_list: z.array(zLotItemOut),
+    items: z.int(),
+    opened_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    recycle_kg: z.number(),
+    reject_kg: z.number(),
+    reservation: zReservationOut.nullable(),
+    reuse_kg: z.number(),
+    state: zLotState,
+    weight_kg: z.number()
+});
+
+/**
+ * TriageAnalysis
+ *
+ * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ */
+export const zTriageAnalysis = z.object({
+    brand: z.string().max(80).nullish(),
+    composition: z.array(zCompositionPart).max(6),
+    condition: zTextileDestination,
+    confidence: z.number().gte(0).lte(1),
+    garment_type: zGarmentType,
+    notes: z.string().max(240)
+});
+
+/**
+ * TriageResult
+ */
+export const zTriageResult = z.object({
+    analysis: zTriageAnalysis,
+    dominant_fibre: zFibre,
+    estimated_weight_g: z.int(),
+    model: z.string(),
+    prompt_version: z.string()
 });
 
 /**
@@ -369,7 +911,10 @@ export const zLocalityOut = z.object({
     circuits: z.array(z.string()),
     collection_types: z.array(zCollectionType),
     days_per_week: z.int(),
+    latitude: z.number().nullable(),
+    longitude: z.number().nullable(),
     name: z.string(),
+    parish_code: z.string().nullable(),
     typologies: z.array(zTypology),
     weekdays: z.array(z.int())
 });
@@ -565,6 +1110,64 @@ export const zTextileBaseline = z.object({
     year: z.int()
 });
 
+/**
+ * WhatIfRequest
+ */
+export const zWhatIfRequest = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    question: z.string().min(5).max(500),
+    scenario_id: z.uuid()
+});
+
+/**
+ * WhatIfStatus
+ */
+export const zWhatIfStatus = z.enum([
+    'proposed',
+    'applied',
+    'rejected'
+]);
+
+/**
+ * WhatIfOut
+ */
+export const zWhatIfOut = z.object({
+    base_scenario_id: z.uuid(),
+    budget_eur_year: z.number().nullable(),
+    capture_scale: zCaptureScale.nullable(),
+    changes: z.array(zResolvedChange),
+    clarification: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    explanation: z.string().nullable(),
+    explanation_verified: z.boolean().nullable(),
+    id: z.uuid(),
+    new_scenario_id: z.uuid().nullable(),
+    objective: zScenarioObjective.nullable(),
+    prompt_version: z.string(),
+    question: z.string(),
+    status: zWhatIfStatus,
+    suggestions: z.array(z.string()),
+    target_pct: z.number().nullable(),
+    understood: z.string(),
+    unknown_parishes: z.array(z.string())
+});
+
+/**
+ * ZoneOut
+ */
+export const zZoneOut = z.object({
+    code: z.string(),
+    demand_t: z.number(),
+    geometry: z.record(z.string(), z.unknown()).nullable(),
+    latitude: z.number(),
+    localities: z.array(z.string()),
+    longitude: z.number(),
+    name: z.string(),
+    population: z.int(),
+    population_year: z.int().nullable(),
+    service_days: z.int()
+});
+
 export const zChangePasswordBody = zChangePasswordRequest;
 
 /**
@@ -655,6 +1258,11 @@ export const zVerifyEmailBody = zVerifyEmailRequest;
  */
 export const zVerifyEmailResponse = z.void();
 
+/**
+ * Successful Response
+ */
+export const zGetBrandEvidenceResponse = zBrandsOut;
+
 export const zUpdateDataAlertBody = zAlertUpdate;
 
 export const zUpdateDataAlertPath = z.object({
@@ -675,6 +1283,79 @@ export const zGetDataQualityResponse = zDataQuality;
  * Successful Response
  */
 export const zHealthResponse = zHealth;
+
+export const zListLotsQuery = z.object({
+    fibre: zFibre.nullish(),
+    state: zLotState.nullish(),
+    parish_code: z.string().max(6).nullish()
+});
+
+/**
+ * Response List Lots
+ *
+ * Successful Response
+ */
+export const zListLotsResponse = z.array(zLotSummary);
+
+export const zOpenLotBody = zLotOpen;
+
+/**
+ * Successful Response
+ */
+export const zOpenLotResponse = zLotSummary;
+
+export const zGetLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetLotResponse = zLotDetail;
+
+export const zAddLotItemBody = zLotItemIn;
+
+export const zAddLotItemPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddLotItemResponse = zLotItemOut;
+
+export const zChangeLotStateBody = zLotStateChange;
+
+export const zChangeLotStatePath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zChangeLotStateResponse = zLotDetail;
+
+export const zGetFibreMarketQuery = z.object({
+    fibre: zFibre.nullish()
+});
+
+/**
+ * Response Get Fibre Market
+ *
+ * Successful Response
+ */
+export const zGetFibreMarketResponse = z.array(zMarketEntry);
+
+export const zReserveLotBody = zReserveRequest;
+
+export const zReserveLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zReserveLotResponse = zLotDetail;
 
 /**
  * Successful Response
@@ -706,6 +1387,95 @@ export const zListLocalitiesResponse = z.array(zLocalityOut);
 /**
  * Successful Response
  */
+export const zGetPlanningParametersResponse = zParametersOut;
+
+export const zUpdatePlanningParametersBody = zPlanningParams;
+
+/**
+ * Successful Response
+ */
+export const zUpdatePlanningParametersResponse = zParametersOut;
+
+/**
+ * Response List Scenarios
+ *
+ * Successful Response
+ */
+export const zListScenariosResponse = z.array(zScenarioSummary);
+
+export const zCreateScenarioBody = zScenarioRequest;
+
+/**
+ * Successful Response
+ */
+export const zCreateScenarioResponse = zScenarioOut;
+
+export const zDeleteScenarioPath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteScenarioResponse = z.void();
+
+export const zGetScenarioPath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetScenarioResponse = zScenarioOut;
+
+export const zRenameScenarioBody = zScenarioRename;
+
+export const zRenameScenarioPath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRenameScenarioResponse = zScenarioSummary;
+
+export const zGetScenarioFlowsPath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetScenarioFlowsResponse = zFlows;
+
+/**
+ * Response List Zones
+ *
+ * Successful Response
+ */
+export const zListZonesResponse = z.array(zZoneOut);
+
+export const zGetPassportPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPassportResponse = zPassport;
+
+export const zGetLotQrPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetLotQrResponse = z.string();
+
+/**
+ * Successful Response
+ */
 export const zReadyResponse = zReadiness;
 
 /**
@@ -722,6 +1492,13 @@ export const zGetObservedFlowsResponse = zFlows;
  * Successful Response
  */
 export const zGetWasteCompositionResponse = zWasteComposition;
+
+export const zAnalyseGarmentBody = zBodyAnalyseGarment;
+
+/**
+ * Successful Response
+ */
+export const zAnalyseGarmentResponse = zTriageResult;
 
 /**
  * Response List Users
@@ -740,3 +1517,34 @@ export const zUpdateUserPath = z.object({
  * Successful Response
  */
 export const zUpdateUserResponse = zUserAdminOut;
+
+export const zListWhatIfsQuery = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Response List What Ifs
+ *
+ * Successful Response
+ */
+export const zListWhatIfsResponse = z.array(zWhatIfOut);
+
+export const zAskWhatIfBody = zWhatIfRequest;
+
+/**
+ * Successful Response
+ */
+export const zAskWhatIfResponse = zWhatIfOut;
+
+export const zApplyWhatIfPath = z.object({
+    run_id: z.uuid()
+});
+
+export const zApplyWhatIfQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zApplyWhatIfResponse = zWhatIfOut;

@@ -26,6 +26,93 @@ export type AlertUpdate = {
 };
 
 /**
+ * Allocation
+ */
+export type Allocation = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Covered Population
+     */
+    covered_population: number;
+    /**
+     * Demand T
+     */
+    demand_t: number;
+    /**
+     * Km Year
+     */
+    km_year: number;
+    /**
+     * Modo principal (o que mais capta); nulo = sem recolha
+     */
+    mode: CollectionMode | null;
+    /**
+     * Modes
+     */
+    modes: Array<CollectionMode>;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Parts
+     */
+    parts: Array<AllocationPart>;
+    /**
+     * Points
+     */
+    points: number;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Tonnes
+     */
+    tonnes: number;
+};
+
+/**
+ * AllocationPart
+ *
+ * Contributo de um modo numa freguesia (uma freguesia pode combinar modos).
+ */
+export type AllocationPart = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Km Year
+     */
+    km_year: number;
+    mode: CollectionMode;
+    /**
+     * Points
+     */
+    points: number;
+    /**
+     * Tonnes
+     */
+    tonnes: number;
+};
+
+/**
  * AuthConfig
  */
 export type AuthConfig = {
@@ -41,6 +128,98 @@ export type AuthConfig = {
      * Registration Open
      */
     registration_open: boolean;
+};
+
+/**
+ * Body_analyse_garment
+ */
+export type BodyAnalyseGarment = {
+    /**
+     * Item Photo
+     *
+     * Foto da peça
+     */
+    item_photo: Blob | File;
+    /**
+     * Label Photo
+     *
+     * Foto da etiqueta de composição
+     */
+    label_photo?: Blob | File | null;
+};
+
+/**
+ * BrandCount
+ */
+export type BrandCount = {
+    /**
+     * Brand
+     */
+    brand: string;
+    /**
+     * Items
+     */
+    items: number;
+};
+
+/**
+ * BrandStat
+ */
+export type BrandStat = {
+    /**
+     * Brand
+     */
+    brand: string;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Share Pct
+     */
+    share_pct: number;
+    top_fibre: Fibre;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * BrandsOut
+ *
+ * Evidência por marca para a RAP: quilos e composição, com o tamanho da amostra para não concluir de pouco.
+ */
+export type BrandsOut = {
+    /**
+     * Brands
+     */
+    brands: Array<BrandStat>;
+    /**
+     * Items Without Brand
+     */
+    items_without_brand: number;
+    /**
+     * Sample Items
+     */
+    sample_items: number;
+    /**
+     * Total Kg
+     */
+    total_kg: number;
+};
+
+/**
+ * CaptureScale
+ */
+export type CaptureScale = {
+    /**
+     * Factor
+     *
+     * 1,2 = mais 20%
+     */
+    factor: number;
+    mode: CollectionMode;
 };
 
 /**
@@ -132,9 +311,27 @@ export type CircuitsSummary = {
 };
 
 /**
+ * CollectionMode
+ *
+ * Modos de recolha de têxteis que o simulador compara.
+ */
+export type CollectionMode = 'existing' | 'street' | 'on_demand';
+
+/**
  * CollectionType
  */
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
+
+/**
+ * CompositionPart
+ */
+export type CompositionPart = {
+    fibre: Fibre;
+    /**
+     * Pct
+     */
+    pct: number;
+};
 
 /**
  * ContainerKind
@@ -362,7 +559,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'internal_error';
     /**
      * Message
      *
@@ -370,6 +567,11 @@ export type ErrorBody = {
      */
     message: string;
 };
+
+/**
+ * Fibre
+ */
+export type Fibre = 'cotton' | 'wool' | 'polyester' | 'nylon' | 'viscose' | 'linen' | 'acrylic' | 'elastane' | 'silk' | 'other' | 'unknown';
 
 /**
  * FieldError
@@ -460,9 +662,13 @@ export type FlowNode = {
     /**
      * Label
      *
-     * Nome da entidade; vazio nos nós de destino (o web traduz)
+     * Nome da entidade ou freguesia; vazio nos nós de modo e destino (o web traduz)
      */
     label?: string | null;
+    /**
+     * Preenchido nos nós de modo de recolha (cenários)
+     */
+    mode?: CollectionMode | null;
 };
 
 /**
@@ -498,6 +704,11 @@ export type ForgotPasswordRequest = {
 };
 
 /**
+ * GarmentType
+ */
+export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'other';
+
+/**
  * Health
  */
 export type Health = {
@@ -505,6 +716,58 @@ export type Health = {
      * Status
      */
     status?: 'ok';
+};
+
+/**
+ * Kpis
+ */
+export type Kpis = {
+    /**
+     * Annual Cost Eur
+     *
+     * Capex anualizado + custos de operação
+     */
+    annual_cost_eur: number;
+    /**
+     * Baseline Observed T
+     *
+     * Recolhido em 2025 (dados da Vitrus)
+     */
+    baseline_observed_t: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Coverage Pct
+     *
+     * População servida / população total
+     */
+    coverage_pct: number;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Km Year
+     */
+    km_year: number;
+    /**
+     * Opex Eur Year
+     */
+    opex_eur_year: number;
+    /**
+     * Points
+     */
+    points: number;
+    /**
+     * Potential T
+     */
+    potential_t: number;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
 };
 
 /**
@@ -526,9 +789,25 @@ export type LocalityOut = {
      */
     days_per_week: number;
     /**
+     * Latitude
+     *
+     * OpenStreetMap (Nominatim); vazio se a localidade não é um lugar
+     */
+    latitude: number | null;
+    /**
+     * Longitude
+     */
+    longitude: number | null;
+    /**
      * Name
      */
     name: string;
+    /**
+     * Parish Code
+     *
+     * Freguesia onde cai o ponto (código INE)
+     */
+    parish_code: string | null;
     /**
      * Typologies
      */
@@ -555,6 +834,479 @@ export type LoginRequest = {
      * Remember Me
      */
     remember_me?: boolean;
+};
+
+/**
+ * LotDetail
+ */
+export type LotDetail = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Composition
+     *
+     * Composição agregada, ponderada pelo peso
+     */
+    composition: Array<CompositionPart>;
+    dominant_fibre: Fibre;
+    /**
+     * Events
+     */
+    events: Array<LotEventOut>;
+    /**
+     * Item List
+     */
+    item_list: Array<LotItemOut>;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Recycle Kg
+     */
+    recycle_kg: number;
+    /**
+     * Reject Kg
+     */
+    reject_kg: number;
+    reservation: ReservationOut | null;
+    /**
+     * Reuse Kg
+     */
+    reuse_kg: number;
+    state: LotState;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * LotEventKind
+ */
+export type LotEventKind = 'opened' | 'item_added' | 'sorted' | 'reserved' | 'delivered';
+
+/**
+ * LotEventOut
+ */
+export type LotEventOut = {
+    kind: LotEventKind;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Occurred At
+     */
+    occurred_at: string;
+};
+
+/**
+ * LotItemIn
+ *
+ * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ */
+export type LotItemIn = {
+    /**
+     * Brand
+     */
+    brand?: string | null;
+    /**
+     * Composition
+     */
+    composition: Array<CompositionPart>;
+    condition: TextileDestination;
+    /**
+     * Confidence
+     */
+    confidence?: number;
+    /**
+     * Estimated Weight G
+     */
+    estimated_weight_g: number;
+    garment_type: GarmentType;
+    /**
+     * Prompt Version
+     */
+    prompt_version?: string | null;
+};
+
+/**
+ * LotItemOut
+ */
+export type LotItemOut = {
+    /**
+     * Brand
+     */
+    brand: string | null;
+    /**
+     * Composition
+     */
+    composition: Array<CompositionPart>;
+    condition: TextileDestination;
+    /**
+     * Confidence
+     */
+    confidence: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    dominant_fibre: Fibre;
+    /**
+     * Estimated Weight G
+     */
+    estimated_weight_g: number;
+    garment_type: GarmentType;
+    /**
+     * Id
+     */
+    id: string;
+};
+
+/**
+ * LotOpen
+ */
+export type LotOpen = {
+    /**
+     * Parish Code
+     *
+     * Freguesia do ponto de recolha (código INE)
+     */
+    parish_code?: string | null;
+};
+
+/**
+ * LotState
+ */
+export type LotState = 'collected' | 'sorted' | 'reserved' | 'delivered';
+
+/**
+ * LotStateChange
+ */
+export type LotStateChange = {
+    state: LotState;
+};
+
+/**
+ * LotSummary
+ */
+export type LotSummary = {
+    /**
+     * Code
+     */
+    code: string;
+    dominant_fibre: Fibre;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    state: LotState;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * MarketEntry
+ *
+ * Bolsa de fibra: lotes triados e agregados por fibra dominante.
+ */
+export type MarketEntry = {
+    fibre: Fibre;
+    /**
+     * Items
+     */
+    items: Array<MarketLot>;
+    /**
+     * Lots
+     */
+    lots: number;
+    /**
+     * Parishes
+     */
+    parishes: Array<string>;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * MarketLot
+ */
+export type MarketLot = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Composition
+     */
+    composition: Array<CompositionPart>;
+    dominant_fibre: Fibre;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    state: LotState;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * ModeParams
+ */
+export type ModeParams = {
+    /**
+     * Capex Per Point Eur
+     */
+    capex_per_point_eur: number;
+    /**
+     * Capture Rate
+     *
+     * Fração do têxtil gerado que o modo capta
+     */
+    capture_rate: number;
+    /**
+     * Collections Per Year
+     *
+     * Recolhas por ano de cada ponto
+     */
+    collections_per_year: number;
+    /**
+     * Coverage Factor
+     *
+     * Fração da população da zona servida (distância a pé)
+     */
+    coverage_factor: number;
+    /**
+     * Lifetime Years
+     */
+    lifetime_years: number;
+    /**
+     * Min Points
+     */
+    min_points: number;
+    /**
+     * People Per Point
+     *
+     * 1 ponto por cada N habitantes
+     */
+    people_per_point: number;
+};
+
+/**
+ * ModeSummary
+ */
+export type ModeSummary = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    mode: CollectionMode;
+    /**
+     * Points
+     */
+    points: number;
+    /**
+     * Tonnes
+     */
+    tonnes: number;
+    /**
+     * Zones
+     */
+    zones: number;
+};
+
+/**
+ * ParamMeta
+ */
+export type ParamMeta = {
+    /**
+     * Key
+     *
+     * Caminho do parâmetro, ex.: `modes.street.capture_rate`
+     */
+    key: string;
+    source: ParamSource;
+    /**
+     * Unit
+     */
+    unit: string;
+};
+
+/**
+ * ParamSource
+ *
+ * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
+ */
+export type ParamSource = 'plan' | 'vitrus_data' | 'assumption';
+
+/**
+ * ParametersOut
+ */
+export type ParametersOut = {
+    /**
+     * Meta
+     */
+    meta: Array<ParamMeta>;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    values: PlanningParams;
+    /**
+     * Version
+     */
+    version: number;
+};
+
+/**
+ * Passport
+ *
+ * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ */
+export type Passport = {
+    /**
+     * Brands
+     */
+    brands: Array<BrandCount>;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Composition
+     */
+    composition: Array<CompositionPart>;
+    dominant_fibre: Fibre;
+    /**
+     * Events
+     */
+    events: Array<LotEventOut>;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Opened At
+     */
+    opened_at: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Recycle Pct
+     */
+    recycle_pct: number;
+    /**
+     * Reject Pct
+     */
+    reject_pct: number;
+    /**
+     * Reuse Pct
+     */
+    reuse_pct: number;
+    state: LotState;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * PlanningParams
+ */
+export type PlanningParams = {
+    /**
+     * Cost Per Collection Eur
+     */
+    cost_per_collection_eur: number;
+    /**
+     * Cost Per Km Eur
+     */
+    cost_per_km_eur: number;
+    /**
+     * Depot Lat
+     */
+    depot_lat: number;
+    /**
+     * Depot Lon
+     */
+    depot_lon: number;
+    /**
+     * Detour Factor
+     *
+     * Estrada real / linha reta
+     */
+    detour_factor: number;
+    /**
+     * Kg Per Inhab Month
+     *
+     * Têxtil gerado por habitante e mês
+     */
+    kg_per_inhab_month: number;
+    /**
+     * Modes
+     */
+    modes: {
+        [key in CollectionMode]?: ModeParams;
+    };
+    /**
+     * On Demand Kg Per Pickup
+     */
+    on_demand_kg_per_pickup: number;
+    /**
+     * Piggyback Extra Km
+     *
+     * Desvio médio quando já passa um circuito
+     */
+    piggyback_extra_km: number;
+    /**
+     * Piggyback Min Days
+     *
+     * Dias/semana de circuito para aproveitar a rota
+     */
+    piggyback_min_days: number;
+    /**
+     * Solver Time Limit S
+     */
+    solver_time_limit_s: number;
+    /**
+     * Vehicle Capacity T
+     */
+    vehicle_capacity_t: number;
 };
 
 /**
@@ -616,6 +1368,46 @@ export type RegisterRequest = {
 };
 
 /**
+ * ReservationOut
+ */
+export type ReservationOut = {
+    /**
+     * Contact
+     */
+    contact: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * Recycler Name
+     */
+    recycler_name: string;
+};
+
+/**
+ * ReserveRequest
+ */
+export type ReserveRequest = {
+    /**
+     * Contact
+     */
+    contact: string;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Recycler Name
+     */
+    recycler_name: string;
+};
+
+/**
  * ResetPasswordRequest
  */
 export type ResetPasswordRequest = {
@@ -627,6 +1419,279 @@ export type ResetPasswordRequest = {
      * Token
      */
     token: string;
+};
+
+/**
+ * ResolvedChange
+ *
+ * Alteração já validada contra as listas fechadas (freguesias e modos).
+ */
+export type ResolvedChange = {
+    /**
+     * Allowed Modes
+     */
+    allowed_modes: Array<CollectionMode>;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+};
+
+/**
+ * RouteOut
+ */
+export type RouteOut = {
+    /**
+     * Km
+     */
+    km: number;
+    /**
+     * Load T
+     */
+    load_t: number;
+    mode: CollectionMode;
+    /**
+     * Path
+     *
+     * [latitude, longitude]: depósito, paragens, depósito
+     */
+    path: Array<Array<number>>;
+    /**
+     * Stops
+     */
+    stops: Array<RouteStop>;
+    /**
+     * Vehicle
+     */
+    vehicle: number;
+};
+
+/**
+ * RouteStop
+ */
+export type RouteStop = {
+    /**
+     * Latitude
+     */
+    latitude: number;
+    /**
+     * Load T
+     */
+    load_t: number;
+    /**
+     * Longitude
+     */
+    longitude: number;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+};
+
+/**
+ * ScenarioObjective
+ */
+export type ScenarioObjective = 'max_tonnes' | 'min_cost';
+
+/**
+ * ScenarioOut
+ */
+export type ScenarioOut = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Budget Eur Year
+     */
+    budget_eur_year: number | null;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Constraints
+     */
+    constraints: {
+        [key: string]: Array<CollectionMode>;
+    };
+    /**
+     * Coverage Pct
+     */
+    coverage_pct: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
+    objective: ScenarioObjective;
+    params: PlanningParams;
+    /**
+     * Parent Id
+     */
+    parent_id: string | null;
+    result: ScenarioResult;
+    /**
+     * Solver Status
+     */
+    solver_status: 'optimal' | 'feasible' | 'infeasible';
+    status: ScenarioStatus;
+    /**
+     * Target Tonnes
+     */
+    target_tonnes: number | null;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
+};
+
+/**
+ * ScenarioRename
+ */
+export type ScenarioRename = {
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
+ * ScenarioRequest
+ */
+export type ScenarioRequest = {
+    /**
+     * Budget Eur Year
+     *
+     * Custo anual máximo (max_tonnes)
+     */
+    budget_eur_year?: number | null;
+    /**
+     * Constraints
+     *
+     * Modos permitidos por freguesia (código INE); omitido = todos
+     */
+    constraints?: {
+        [key: string]: Array<CollectionMode>;
+    };
+    /**
+     * Label
+     */
+    label: string;
+    objective: ScenarioObjective;
+    /**
+     * Pressupostos; omitido = os do conjunto ativo
+     */
+    params?: PlanningParams | null;
+    /**
+     * Parent Id
+     */
+    parent_id?: string | null;
+    /**
+     * Target Tonnes
+     *
+     * Meta de captura (min_cost)
+     */
+    target_tonnes?: number | null;
+};
+
+/**
+ * ScenarioResult
+ */
+export type ScenarioResult = {
+    /**
+     * Allocations
+     */
+    allocations: Array<Allocation>;
+    /**
+     * Depot
+     */
+    depot: Array<number>;
+    kpis: Kpis;
+    /**
+     * Modes
+     */
+    modes: Array<ModeSummary>;
+    /**
+     * Routes
+     */
+    routes: Array<RouteOut>;
+};
+
+/**
+ * ScenarioStatus
+ */
+export type ScenarioStatus = 'computed' | 'infeasible';
+
+/**
+ * ScenarioSummary
+ */
+export type ScenarioSummary = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Budget Eur Year
+     */
+    budget_eur_year: number | null;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Coverage Pct
+     */
+    coverage_pct: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
+    objective: ScenarioObjective;
+    /**
+     * Parent Id
+     */
+    parent_id: string | null;
+    status: ScenarioStatus;
+    /**
+     * Target Tonnes
+     */
+    target_tonnes: number | null;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
 };
 
 /**
@@ -727,6 +1792,55 @@ export type TextileBaseline = {
  * TextileDestination
  */
 export type TextileDestination = 'reuse' | 'recycle' | 'reject';
+
+/**
+ * TriageAnalysis
+ *
+ * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ */
+export type TriageAnalysis = {
+    /**
+     * Brand
+     */
+    brand?: string | null;
+    /**
+     * Composition
+     */
+    composition: Array<CompositionPart>;
+    /**
+     * reuse, recycle ou reject
+     */
+    condition: TextileDestination;
+    /**
+     * Confidence
+     */
+    confidence: number;
+    garment_type: GarmentType;
+    /**
+     * Notes
+     */
+    notes: string;
+};
+
+/**
+ * TriageResult
+ */
+export type TriageResult = {
+    analysis: TriageAnalysis;
+    dominant_fibre: Fibre;
+    /**
+     * Estimated Weight G
+     */
+    estimated_weight_g: number;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+};
 
 /**
  * Typology
@@ -998,6 +2112,154 @@ export type WasteShareOut = {
  * WeighingMethod
  */
 export type WeighingMethod = 'weighed' | 'percentage';
+
+/**
+ * WhatIfOut
+ */
+export type WhatIfOut = {
+    /**
+     * Base Scenario Id
+     */
+    base_scenario_id: string;
+    /**
+     * Budget Eur Year
+     */
+    budget_eur_year: number | null;
+    capture_scale: CaptureScale | null;
+    /**
+     * Changes
+     */
+    changes: Array<ResolvedChange>;
+    /**
+     * Clarification
+     */
+    clarification: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Explanation
+     */
+    explanation: string | null;
+    /**
+     * Explanation Verified
+     *
+     * True se todos os números da explicação existem nos resultados
+     */
+    explanation_verified: boolean | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * New Scenario Id
+     */
+    new_scenario_id: string | null;
+    objective: ScenarioObjective | null;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    /**
+     * Question
+     */
+    question: string;
+    status: WhatIfStatus;
+    /**
+     * Suggestions
+     *
+     * Freguesias parecidas, para corrigir a pergunta
+     */
+    suggestions: Array<string>;
+    /**
+     * Target Pct
+     */
+    target_pct: number | null;
+    /**
+     * Understood
+     */
+    understood: string;
+    /**
+     * Unknown Parishes
+     *
+     * Freguesias que não existem na lista oficial
+     */
+    unknown_parishes: Array<string>;
+};
+
+/**
+ * WhatIfRequest
+ */
+export type WhatIfRequest = {
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Question
+     */
+    question: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+};
+
+/**
+ * WhatIfStatus
+ */
+export type WhatIfStatus = 'proposed' | 'applied' | 'rejected';
+
+/**
+ * ZoneOut
+ */
+export type ZoneOut = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Demand T
+     */
+    demand_t: number;
+    /**
+     * Geometry
+     */
+    geometry: {
+        [key: string]: unknown;
+    } | null;
+    /**
+     * Latitude
+     */
+    latitude: number;
+    /**
+     * Localities
+     */
+    localities: Array<string>;
+    /**
+     * Longitude
+     */
+    longitude: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Population Year
+     */
+    population_year: number | null;
+    /**
+     * Service Days
+     *
+     * Dias/semana com algum circuito da Vitrus a passar
+     */
+    service_days: number;
+};
 
 export type ChangePasswordData = {
     body: ChangePasswordRequest;
@@ -1922,6 +3184,67 @@ export type VerifyEmailResponses = {
 
 export type VerifyEmailResponse = VerifyEmailResponses[keyof VerifyEmailResponses];
 
+export type GetBrandEvidenceData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/brands';
+};
+
+export type GetBrandEvidenceErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetBrandEvidenceError = GetBrandEvidenceErrors[keyof GetBrandEvidenceErrors];
+
+export type GetBrandEvidenceResponses = {
+    /**
+     * Successful Response
+     */
+    200: BrandsOut;
+};
+
+export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
+
 export type UpdateDataAlertData = {
     body: AlertUpdate;
     path: {
@@ -2109,6 +3432,475 @@ export type HealthResponses = {
 };
 
 export type HealthResponse = HealthResponses[keyof HealthResponses];
+
+export type ListLotsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fibre
+         */
+        fibre?: Fibre | null;
+        /**
+         * State
+         */
+        state?: LotState | null;
+        /**
+         * Parish Code
+         */
+        parish_code?: string | null;
+    };
+    url: '/api/v1/lots';
+};
+
+export type ListLotsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLotsError = ListLotsErrors[keyof ListLotsErrors];
+
+export type ListLotsResponses = {
+    /**
+     * Response List Lots
+     *
+     * Successful Response
+     */
+    200: Array<LotSummary>;
+};
+
+export type ListLotsResponse = ListLotsResponses[keyof ListLotsResponses];
+
+export type OpenLotData = {
+    body: LotOpen;
+    path?: never;
+    query?: never;
+    url: '/api/v1/lots';
+};
+
+export type OpenLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type OpenLotError = OpenLotErrors[keyof OpenLotErrors];
+
+export type OpenLotResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotSummary;
+};
+
+export type OpenLotResponse = OpenLotResponses[keyof OpenLotResponses];
+
+export type GetLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}';
+};
+
+export type GetLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLotError = GetLotErrors[keyof GetLotErrors];
+
+export type GetLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotDetail;
+};
+
+export type GetLotResponse = GetLotResponses[keyof GetLotResponses];
+
+export type AddLotItemData = {
+    body: LotItemIn;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/items';
+};
+
+export type AddLotItemErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AddLotItemError = AddLotItemErrors[keyof AddLotItemErrors];
+
+export type AddLotItemResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotItemOut;
+};
+
+export type AddLotItemResponse = AddLotItemResponses[keyof AddLotItemResponses];
+
+export type ChangeLotStateData = {
+    body: LotStateChange;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/state';
+};
+
+export type ChangeLotStateErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ChangeLotStateError = ChangeLotStateErrors[keyof ChangeLotStateErrors];
+
+export type ChangeLotStateResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotDetail;
+};
+
+export type ChangeLotStateResponse = ChangeLotStateResponses[keyof ChangeLotStateResponses];
+
+export type GetFibreMarketData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fibre
+         */
+        fibre?: Fibre | null;
+    };
+    url: '/api/v1/market';
+};
+
+export type GetFibreMarketErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetFibreMarketError = GetFibreMarketErrors[keyof GetFibreMarketErrors];
+
+export type GetFibreMarketResponses = {
+    /**
+     * Response Get Fibre Market
+     *
+     * Successful Response
+     */
+    200: Array<MarketEntry>;
+};
+
+export type GetFibreMarketResponse = GetFibreMarketResponses[keyof GetFibreMarketResponses];
+
+export type ReserveLotData = {
+    body: ReserveRequest;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/market/{code}/reserve';
+};
+
+export type ReserveLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ReserveLotError = ReserveLotErrors[keyof ReserveLotErrors];
+
+export type ReserveLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotDetail;
+};
+
+export type ReserveLotResponse = ReserveLotResponses[keyof ReserveLotResponses];
 
 export type ListCircuitsData = {
     body?: never;
@@ -2365,6 +4157,711 @@ export type ListLocalitiesResponses = {
 
 export type ListLocalitiesResponse = ListLocalitiesResponses[keyof ListLocalitiesResponses];
 
+export type GetPlanningParametersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/parameters';
+};
+
+export type GetPlanningParametersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPlanningParametersError = GetPlanningParametersErrors[keyof GetPlanningParametersErrors];
+
+export type GetPlanningParametersResponses = {
+    /**
+     * Successful Response
+     */
+    200: ParametersOut;
+};
+
+export type GetPlanningParametersResponse = GetPlanningParametersResponses[keyof GetPlanningParametersResponses];
+
+export type UpdatePlanningParametersData = {
+    body: PlanningParams;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/parameters';
+};
+
+export type UpdatePlanningParametersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdatePlanningParametersError = UpdatePlanningParametersErrors[keyof UpdatePlanningParametersErrors];
+
+export type UpdatePlanningParametersResponses = {
+    /**
+     * Successful Response
+     */
+    200: ParametersOut;
+};
+
+export type UpdatePlanningParametersResponse = UpdatePlanningParametersResponses[keyof UpdatePlanningParametersResponses];
+
+export type ListScenariosData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/scenarios';
+};
+
+export type ListScenariosErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListScenariosError = ListScenariosErrors[keyof ListScenariosErrors];
+
+export type ListScenariosResponses = {
+    /**
+     * Response List Scenarios
+     *
+     * Successful Response
+     */
+    200: Array<ScenarioSummary>;
+};
+
+export type ListScenariosResponse = ListScenariosResponses[keyof ListScenariosResponses];
+
+export type CreateScenarioData = {
+    body: ScenarioRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/scenarios';
+};
+
+export type CreateScenarioErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateScenarioError = CreateScenarioErrors[keyof CreateScenarioErrors];
+
+export type CreateScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    201: ScenarioOut;
+};
+
+export type CreateScenarioResponse = CreateScenarioResponses[keyof CreateScenarioResponses];
+
+export type DeleteScenarioData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}';
+};
+
+export type DeleteScenarioErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteScenarioError = DeleteScenarioErrors[keyof DeleteScenarioErrors];
+
+export type DeleteScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteScenarioResponse = DeleteScenarioResponses[keyof DeleteScenarioResponses];
+
+export type GetScenarioData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}';
+};
+
+export type GetScenarioErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetScenarioError = GetScenarioErrors[keyof GetScenarioErrors];
+
+export type GetScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioOut;
+};
+
+export type GetScenarioResponse = GetScenarioResponses[keyof GetScenarioResponses];
+
+export type RenameScenarioData = {
+    body: ScenarioRename;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}';
+};
+
+export type RenameScenarioErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RenameScenarioError = RenameScenarioErrors[keyof RenameScenarioErrors];
+
+export type RenameScenarioResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioSummary;
+};
+
+export type RenameScenarioResponse = RenameScenarioResponses[keyof RenameScenarioResponses];
+
+export type GetScenarioFlowsData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}/flows';
+};
+
+export type GetScenarioFlowsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetScenarioFlowsError = GetScenarioFlowsErrors[keyof GetScenarioFlowsErrors];
+
+export type GetScenarioFlowsResponses = {
+    /**
+     * Successful Response
+     */
+    200: Flows;
+};
+
+export type GetScenarioFlowsResponse = GetScenarioFlowsResponses[keyof GetScenarioFlowsResponses];
+
+export type ListZonesData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/zones';
+};
+
+export type ListZonesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListZonesError = ListZonesErrors[keyof ListZonesErrors];
+
+export type ListZonesResponses = {
+    /**
+     * Response List Zones
+     *
+     * Successful Response
+     */
+    200: Array<ZoneOut>;
+};
+
+export type ListZonesResponse = ListZonesResponses[keyof ListZonesResponses];
+
+export type GetPassportData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/public/lots/{code}';
+};
+
+export type GetPassportErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPassportError = GetPassportErrors[keyof GetPassportErrors];
+
+export type GetPassportResponses = {
+    /**
+     * Successful Response
+     */
+    200: Passport;
+};
+
+export type GetPassportResponse = GetPassportResponses[keyof GetPassportResponses];
+
+export type GetLotQrData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/public/lots/{code}/qr';
+};
+
+export type GetLotQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLotQrError = GetLotQrErrors[keyof GetLotQrErrors];
+
+export type GetLotQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: Blob | File;
+};
+
+export type GetLotQrResponse = GetLotQrResponses[keyof GetLotQrResponses];
+
 export type ReadyData = {
     body?: never;
     path?: never;
@@ -2609,6 +5106,67 @@ export type GetWasteCompositionResponses = {
 
 export type GetWasteCompositionResponse = GetWasteCompositionResponses[keyof GetWasteCompositionResponses];
 
+export type AnalyseGarmentData = {
+    body: BodyAnalyseGarment;
+    path?: never;
+    query?: never;
+    url: '/api/v1/triage';
+};
+
+export type AnalyseGarmentErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AnalyseGarmentError = AnalyseGarmentErrors[keyof AnalyseGarmentErrors];
+
+export type AnalyseGarmentResponses = {
+    /**
+     * Successful Response
+     */
+    200: TriageResult;
+};
+
+export type AnalyseGarmentResponse = AnalyseGarmentResponses[keyof AnalyseGarmentResponses];
+
 export type ListUsersData = {
     body?: never;
     path?: never;
@@ -2737,3 +5295,203 @@ export type UpdateUserResponses = {
 };
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
+
+export type ListWhatIfsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    url: '/api/v1/whatif';
+};
+
+export type ListWhatIfsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListWhatIfsError = ListWhatIfsErrors[keyof ListWhatIfsErrors];
+
+export type ListWhatIfsResponses = {
+    /**
+     * Response List What Ifs
+     *
+     * Successful Response
+     */
+    200: Array<WhatIfOut>;
+};
+
+export type ListWhatIfsResponse = ListWhatIfsResponses[keyof ListWhatIfsResponses];
+
+export type AskWhatIfData = {
+    body: WhatIfRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/whatif';
+};
+
+export type AskWhatIfErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AskWhatIfError = AskWhatIfErrors[keyof AskWhatIfErrors];
+
+export type AskWhatIfResponses = {
+    /**
+     * Successful Response
+     */
+    201: WhatIfOut;
+};
+
+export type AskWhatIfResponse = AskWhatIfResponses[keyof AskWhatIfResponses];
+
+export type ApplyWhatIfData = {
+    body?: never;
+    path: {
+        /**
+         * Run Id
+         */
+        run_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/whatif/{run_id}/apply';
+};
+
+export type ApplyWhatIfErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ApplyWhatIfError = ApplyWhatIfErrors[keyof ApplyWhatIfErrors];
+
+export type ApplyWhatIfResponses = {
+    /**
+     * Successful Response
+     */
+    200: WhatIfOut;
+};
+
+export type ApplyWhatIfResponse = ApplyWhatIfResponses[keyof ApplyWhatIfResponses];

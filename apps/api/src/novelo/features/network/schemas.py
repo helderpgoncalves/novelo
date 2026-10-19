@@ -86,6 +86,9 @@ class FleetSummary(BaseModel):
 
 class LocalityOut(BaseModel):
     name: str
+    latitude: float | None = Field(description="OpenStreetMap (Nominatim); vazio se a localidade não é um lugar")
+    longitude: float | None
+    parish_code: str | None = Field(description="Freguesia onde cai o ponto (código INE)")
     circuits: list[str]
     typologies: list[Typology]
     collection_types: list[CollectionType]

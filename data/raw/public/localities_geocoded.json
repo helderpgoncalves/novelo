@@ -1,0 +1,576 @@
+[
+ {
+  "locality": "Abação",
+  "lat": 41.409839,
+  "lon": -8.272025,
+  "dicofre": "030875",
+  "osm_display": "Abação (São Tomé), Guimarães, Braga, 4810-675, Portugal"
+ },
+ {
+  "locality": "Airão São João",
+  "lat": 41.45541,
+  "lon": -8.42003,
+  "dicofre": "0308U1",
+  "osm_display": "Airão (São João), Guimarães, Braga, 4805, Portugal"
+ },
+ {
+  "locality": "Aldão",
+  "lat": 41.464419,
+  "lon": -8.27373,
+  "dicofre": "030801",
+  "osm_display": "Aldão, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Aldão (compactador)",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Arosa",
+  "lat": 41.550291,
+  "lon": -8.221473,
+  "dicofre": "030877",
+  "osm_display": "Arosa, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Atães",
+  "lat": 41.458516,
+  "lon": -8.251179,
+  "dicofre": "030878",
+  "osm_display": "Atães, Guimarães, Braga, 4800-245, Portugal"
+ },
+ {
+  "locality": "Azurém",
+  "lat": 41.456754,
+  "lon": -8.294505,
+  "dicofre": "030804",
+  "osm_display": "Azurém, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Azúrem",
+  "lat": 41.456754,
+  "lon": -8.294505,
+  "dicofre": "030804",
+  "osm_display": "Azurém, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Balazar",
+  "lat": 41.508729,
+  "lon": -8.381191,
+  "dicofre": "030886",
+  "osm_display": "Balazar, Guimarães, Braga, 4805-002, Portugal"
+ },
+ {
+  "locality": "Barco",
+  "lat": 41.497719,
+  "lon": -8.325448,
+  "dicofre": "030806",
+  "osm_display": "Barco, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Briteiros S. Estevão",
+  "lat": 41.528113,
+  "lon": -8.316476,
+  "dicofre": null,
+  "osm_display": "Citânia de Briteiros, EN 309, Briteiros São Salvador e Briteiros Santa Leocádia, Guimarães, Braga, 4805-450, Portugal"
+ },
+ {
+  "locality": "Brito",
+  "lat": 41.454755,
+  "lon": -8.365525,
+  "dicofre": "030807",
+  "osm_display": "Brito, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Caldelas",
+  "lat": 41.486879,
+  "lon": -8.343922,
+  "dicofre": "030808",
+  "osm_display": "Caldelas, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Campelos",
+  "lat": 41.460801,
+  "lon": -8.344675,
+  "dicofre": "030838",
+  "osm_display": "Campelos, Ponte, Guimarães, Braga, 4805-273, Portugal"
+ },
+ {
+  "locality": "Campelos ( 4ª)",
+  "lat": 41.460801,
+  "lon": -8.344675,
+  "dicofre": "030838",
+  "osm_display": "Campelos, Ponte, Guimarães, Braga, 4805-273, Portugal"
+ },
+ {
+  "locality": "Castelões",
+  "lat": 41.554692,
+  "lon": -8.202491,
+  "dicofre": "030877",
+  "osm_display": "Castelões, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Centro histórico",
+  "lat": 41.443649,
+  "lon": -8.293169,
+  "dicofre": "0308U4",
+  "osm_display": "Centro Histórico de Guimarães e Zona de Couros, Rua João XXI, Oliveira, São Paio e São Sebastião, Guimarães, Braga, 4835-073, Portugal"
+ },
+ {
+  "locality": "Cidade",
+  "lat": 41.447718,
+  "lon": -8.277696,
+  "dicofre": "030812",
+  "osm_display": "Parque da Cidade, Costa, Mesão Frio, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Conde",
+  "lat": 41.390447,
+  "lon": -8.333215,
+  "dicofre": "030882",
+  "osm_display": "Conde, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Corvite",
+  "lat": 41.473679,
+  "lon": -8.318243,
+  "dicofre": "030885",
+  "osm_display": "Corvite, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Costa",
+  "lat": 41.443144,
+  "lon": -8.276927,
+  "dicofre": "030812",
+  "osm_display": "Costa, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Creixomil",
+  "lat": 41.442846,
+  "lon": -8.311805,
+  "dicofre": "030813",
+  "osm_display": "Creixomil, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Creixomil (zona alta)",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Creixomil (zona baixa)",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Donin",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Fermentões",
+  "lat": 41.456556,
+  "lon": -8.315681,
+  "dicofre": "030815",
+  "osm_display": "Fermentões, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Figueiredo",
+  "lat": 41.470185,
+  "lon": -8.382832,
+  "dicofre": null,
+  "osm_display": "Figueiredo, Guimarães, Braga, 4805-188, Portugal"
+ },
+ {
+  "locality": "Gandarela",
+  "lat": 41.395807,
+  "lon": -8.352007,
+  "dicofre": "030882",
+  "osm_display": "Gandarela, Guimarães, Braga, 4835-587, Portugal"
+ },
+ {
+  "locality": "Gominhães",
+  "lat": 41.485346,
+  "lon": -8.281153,
+  "dicofre": "030888",
+  "osm_display": "Gominhães, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Gondar",
+  "lat": 41.419891,
+  "lon": -8.371297,
+  "dicofre": "030821",
+  "osm_display": "Gondar, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Gondomar",
+  "lat": 41.529406,
+  "lon": -8.266699,
+  "dicofre": null,
+  "osm_display": "Gondomar, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Gonça",
+  "lat": 41.509082,
+  "lon": -8.25056,
+  "dicofre": "030820",
+  "osm_display": "Gonça, Guimarães, Braga, 4800-192, Portugal"
+ },
+ {
+  "locality": "Guardizela",
+  "lat": 41.387476,
+  "lon": -8.369789,
+  "dicofre": "030823",
+  "osm_display": "Guardizela, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Longos",
+  "lat": 41.520352,
+  "lon": -8.36354,
+  "dicofre": "030827",
+  "osm_display": "Longos, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Lordelo",
+  "lat": 41.372505,
+  "lon": -8.378723,
+  "dicofre": "030828",
+  "osm_display": "Lordelo, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Mesão Frio",
+  "lat": 41.452552,
+  "lon": -8.26469,
+  "dicofre": "030830",
+  "osm_display": "Mesão Frio, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Moreira",
+  "lat": 41.381491,
+  "lon": -8.336153,
+  "dicofre": "030831",
+  "osm_display": "Moreira de Cónegos, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Moreira de Conégos",
+  "lat": 41.381491,
+  "lon": -8.336153,
+  "dicofre": "030831",
+  "osm_display": "Moreira de Cónegos, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Moreira de Cónegos",
+  "lat": 41.381491,
+  "lon": -8.336153,
+  "dicofre": "030831",
+  "osm_display": "Moreira de Cónegos, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Nacional Selho São Lourenço",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Nespereira",
+  "lat": 41.406413,
+  "lon": -8.324132,
+  "dicofre": "030832",
+  "osm_display": "Nespereira, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Oleiros",
+  "lat": 41.460609,
+  "lon": -8.40161,
+  "dicofre": null,
+  "osm_display": "Oleiros, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Pencelo",
+  "lat": 41.470844,
+  "lon": -8.298566,
+  "dicofre": "030835",
+  "osm_display": "Pencelo, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Penha",
+  "lat": 41.429751,
+  "lon": -8.268602,
+  "dicofre": "030812",
+  "osm_display": "Penha, Guimarães, Braga, 4810-148, Portugal"
+ },
+ {
+  "locality": "Pinheiro",
+  "lat": 41.414942,
+  "lon": -8.283821,
+  "dicofre": "030836",
+  "osm_display": "Pinheiro, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Polvoreira",
+  "lat": 41.409346,
+  "lon": -8.30547,
+  "dicofre": "030837",
+  "osm_display": "Polvoreira, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Ponte",
+  "lat": 41.47128,
+  "lon": -8.338436,
+  "dicofre": "030838",
+  "osm_display": "Ponte, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Prazins",
+  "lat": 41.487634,
+  "lon": -8.316864,
+  "dicofre": "030842",
+  "osm_display": "Prazins (Santa Eufémia), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Rendufe",
+  "lat": 41.478234,
+  "lon": -8.231888,
+  "dicofre": "030878",
+  "osm_display": "Rendufe, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Ronfe",
+  "lat": 41.438744,
+  "lon": -8.384759,
+  "dicofre": "030840",
+  "osm_display": "Ronfe, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Ruas Estreitas",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Salgueiral",
+  "lat": 41.432861,
+  "lon": -8.302965,
+  "dicofre": "030813",
+  "osm_display": "Salgueiral, Creixomil, Guimarães, Braga, 4810-482, Portugal"
+ },
+ {
+  "locality": "Sande S. Martinho",
+  "lat": 41.495561,
+  "lon": -8.362687,
+  "dicofre": "030858",
+  "osm_display": "Sande (São Martinho), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Sande São Lourenço",
+  "lat": 41.506267,
+  "lon": -8.360381,
+  "dicofre": "030886",
+  "osm_display": "Sande (São Lourenço), Guimarães, Braga, 4805-583, Portugal"
+ },
+ {
+  "locality": "Sande São Martinho",
+  "lat": 41.495561,
+  "lon": -8.362687,
+  "dicofre": "030858",
+  "osm_display": "Sande (São Martinho), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Santa Leocadia de Briteiros",
+  "lat": 41.528203,
+  "lon": -8.341694,
+  "dicofre": null,
+  "osm_display": "Briteiros (Santa Leocádia), Briteiros São Salvador e Briteiros Santa Leocádia, Guimarães, Braga, 4805-454, Portugal"
+ },
+ {
+  "locality": "Santa Maria Airão",
+  "lat": 41.452881,
+  "lon": -8.415108,
+  "dicofre": "0308U1",
+  "osm_display": "Airão (Santa Maria), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Santiago Candoso",
+  "lat": 41.425258,
+  "lon": -8.317996,
+  "dicofre": null,
+  "osm_display": "Candoso (Santiago) e Mascotelos, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Santo Amaro",
+  "lat": 41.421335,
+  "lon": -8.316718,
+  "dicofre": null,
+  "osm_display": "Santo Amaro, Rua de Sezim, Candoso (Santiago) e Mascotelos, Guimarães, Braga, 4835-128, Portugal"
+ },
+ {
+  "locality": "Santo Eufémia",
+  "lat": 41.484055,
+  "lon": -8.314136,
+  "dicofre": "030885",
+  "osm_display": "Avenida Santo Tirso, Sebastião & Martins SA, Prazins (Santo Tirso), Guimarães, Braga, 4800-703, Portugal"
+ },
+ {
+  "locality": "Selho",
+  "lat": 41.422904,
+  "lon": -8.347334,
+  "dicofre": "030850",
+  "osm_display": "Selho (São Cristóvão), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Selho Ruas Estreitas",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Selho São Cristovão",
+  "lat": 41.422904,
+  "lon": -8.347334,
+  "dicofre": "030850",
+  "osm_display": "Selho (São Cristóvão), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Selho São Lourenço",
+  "lat": 41.468645,
+  "lon": -8.283946,
+  "dicofre": "030888",
+  "osm_display": "Selho (São Lourenço), Guimarães, Braga, 4800, Portugal"
+ },
+ {
+  "locality": "Senhora da Conceição",
+  "lat": 41.449648,
+  "lon": -8.303412,
+  "dicofre": "030815",
+  "osm_display": "Travessa Nossa Senhora da Conceição, Azurém, Guimarães, Braga, 4800-045, Portugal"
+ },
+ {
+  "locality": "Serzedelo",
+  "lat": 41.402118,
+  "lon": -8.368334,
+  "dicofre": "030866",
+  "osm_display": "Serzedelo, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Silvares",
+  "lat": 41.444333,
+  "lon": -8.336372,
+  "dicofre": "030868",
+  "osm_display": "Silvares, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Souto",
+  "lat": 41.509244,
+  "lon": -8.28908,
+  "dicofre": null,
+  "osm_display": "Souto (Santa Maria), Guimarães, Braga, 4800-675, Portugal"
+ },
+ {
+  "locality": "Souto Santa Maria",
+  "lat": 41.509244,
+  "lon": -8.28908,
+  "dicofre": null,
+  "osm_display": "Souto (Santa Maria), Guimarães, Braga, 4800-675, Portugal"
+ },
+ {
+  "locality": "Souto São Salvador",
+  "lat": 41.499098,
+  "lon": -8.295898,
+  "dicofre": null,
+  "osm_display": "Souto (São Salvador), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "São Clemente",
+  "lat": 41.485606,
+  "lon": -8.368714,
+  "dicofre": "030887",
+  "osm_display": "Sande (São Clemente), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "São Clemente Rua Estreitas",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "São Cristovão",
+  "lat": 41.422904,
+  "lon": -8.347334,
+  "dicofre": "030850",
+  "osm_display": "Selho (São Cristóvão), Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "São Martinho Candoso",
+  "lat": 41.432903,
+  "lon": -8.332129,
+  "dicofre": "030857",
+  "osm_display": "São Martinho, Rua do Codeçal, Candoso, Candoso (São Martinho), Guimarães, Braga, 4835-393, Portugal"
+ },
+ {
+  "locality": "São Salvador de Briteiros",
+  "lat": 41.506906,
+  "lon": -8.331288,
+  "dicofre": "030806",
+  "osm_display": "LEONI PORTUGAL, Rua São Martinho, Barco, Guimarães, Braga, 4805-016, Portugal"
+ },
+ {
+  "locality": "São Torcato",
+  "lat": 41.481201,
+  "lon": -8.258954,
+  "dicofre": "030865",
+  "osm_display": "São Torcato, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "São Torcato Rua Estreitas Vermil Creixomil (5ª)",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Taipas",
+  "lat": 41.483857,
+  "lon": -8.352172,
+  "dicofre": "030808",
+  "osm_display": "Taipas (Centro de Saúde), Rua Professor Manuel José Pereira, Caldelas, Guimarães, Braga, 4805-128, Portugal"
+ },
+ {
+  "locality": "Urgezes",
+  "lat": 41.426466,
+  "lon": -8.296409,
+  "dicofre": "030871",
+  "osm_display": "Urgezes, Guimarães, Braga, Portugal"
+ },
+ {
+  "locality": "Urgezess(5ª)",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Vila Nova Ruas Estreitas",
+  "lat": null,
+  "lon": null,
+  "dicofre": null,
+  "osm_display": null
+ },
+ {
+  "locality": "Vila Nova Sande",
+  "lat": 41.468256,
+  "lon": -8.35425,
+  "dicofre": "030887",
+  "osm_display": "Cemitério de Vila Nova de Sande, Além, Sande (Vila Nova), Guimarães, Braga, Portugal"
+ }
+]

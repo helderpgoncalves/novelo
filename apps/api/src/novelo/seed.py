@@ -13,7 +13,7 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -24,13 +24,16 @@ from novelo.features.network.models import (
     CircuitLocality,
     FleetCapacity,
     Locality,
+    Parish,
     ShiftAssignment,
     Vehicle,
 )
+from novelo.features.planning.service import ensure_default_parameters
 from novelo.features.textile.models import TextileEntity, TextileFlow, WasteShare
 
 log = logging.getLogger(__name__)
 
+GEO_SOURCES = ("ine_census_2021", "osm_nominatim")
 TEXTILE_SOURCE = "vitrus_textile_2025"
 CIRCUITS_SOURCE = "vitrus_circuits_2026_09"
 NO_CIRCUIT = "SEM CIRCUITO"
@@ -196,6 +199,45 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
         for r in _read(data_dir, "fleet_capacity.csv")
     ]
     await _upsert(db, FleetCapacity, capacity, ["source_id", "typology"], ["vehicles", "crew"])
+
+    # --- Geografia (dados públicos: INE e OpenStreetMap) -------------------------------------------------------
+    if (data_dir / "parishes.csv").exists() and (GEO_SOURCES[0],) in sources:
+        parish_rows = [
+            {
+                "dicofre": r["dicofre"],
+                "name": r["name"],
+                "population": int(r["population"]),
+                "population_year": int(r["population_year"]),
+                "latitude": r["latitude"],
+                "longitude": r["longitude"],
+                "geometry": json.loads(r["geometry"]) if r["geometry"] else None,
+                "source_id": sources[(GEO_SOURCES[0],)],
+            }
+            for r in _read(data_dir, "parishes.csv")
+        ]
+        parish_ids = await _upsert(
+            db,
+            Parish,
+            parish_rows,
+            ["dicofre"],
+            ["name", "population", "population_year", "latitude", "longitude", "geometry", "source_id"],
+        )
+        counts["parishes"] = len(parish_rows)
+        for r in _read(data_dir, "localities_geo.csv"):
+            if not r["latitude"]:
+                continue
+            await db.execute(
+                update(Locality)
+                .where(Locality.name == r["locality"])
+                .values(
+                    latitude=r["latitude"],
+                    longitude=r["longitude"],
+                    parish_id=parish_ids.get((r["dicofre"],)) if r["dicofre"] else None,
+                )
+            )
+
+    # --- Pressupostos do simulador (conjunto ativo; nunca sobrescreve os editados) -------------------------------
+    await ensure_default_parameters(db)
 
     # --- Alertas de qualidade (o estado de resolução não é tocado) ----------------------------------------------
     alerts = [

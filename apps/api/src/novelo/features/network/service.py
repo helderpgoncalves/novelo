@@ -13,6 +13,7 @@ from novelo.features.network.models import (
     Container,
     FleetCapacity,
     Locality,
+    Parish,
     ShiftAssignment,
     Vehicle,
 )
@@ -177,28 +178,37 @@ async def list_localities(db: AsyncSession) -> list[LocalityOut]:
         .scalars()
         .all()
     )
-    by_locality: dict[str, dict[str, set[Any]]] = defaultdict(
-        lambda: {"circuits": set(), "typologies": set(), "kinds": set(), "days": set()}
-    )
+    parish_codes: dict[Any, str] = dict((await db.execute(select(Parish.id, Parish.dicofre))).all())
+    by_locality: dict[str, dict[str, Any]] = {}
     for c in circuits:
         for cl in c.localities:
-            entry = by_locality[cl.locality.name]
+            loc = cl.locality
+            entry = by_locality.setdefault(
+                loc.name,
+                {"circuits": set(), "typologies": set(), "kinds": set(), "days": set(), "locality": loc},
+            )
             entry["circuits"].add(c.code)
             entry["typologies"].add(c.typology)
             if c.collection_type != CollectionType.UNSPECIFIED:
                 entry["kinds"].add(c.collection_type)
             entry["days"] |= {d.weekday for d in c.days}
-    return [
-        LocalityOut(
-            name=name,
-            circuits=sorted(e["circuits"]),
-            typologies=sorted(e["typologies"]),
-            collection_types=sorted(e["kinds"]),
-            weekdays=sorted(e["days"]),
-            days_per_week=len(e["days"]),
+    out = []
+    for name, e in sorted(by_locality.items()):
+        loc = e["locality"]
+        out.append(
+            LocalityOut(
+                name=name,
+                latitude=float(loc.latitude) if loc.latitude is not None else None,
+                longitude=float(loc.longitude) if loc.longitude is not None else None,
+                parish_code=parish_codes.get(loc.parish_id) if loc.parish_id else None,
+                circuits=sorted(e["circuits"]),
+                typologies=sorted(e["typologies"]),
+                collection_types=sorted(e["kinds"]),
+                weekdays=sorted(e["days"]),
+                days_per_week=len(e["days"]),
+            )
         )
-        for name, e in sorted(by_locality.items())
-    ]
+    return out
 
 
 async def list_containers(db: AsyncSession, limit: int, offset: int) -> ContainerList:
