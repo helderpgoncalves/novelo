@@ -10,6 +10,7 @@ import {
 } from '@/components/ui/table';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { formatPercent, formatTonnes } from '@/lib/format';
+import { m } from '@/paraglide/messages';
 import { DESTINATIONS } from './destination';
 
 function DestinationBar({ entity }: { entity: EntityBaseline }) {
@@ -17,7 +18,11 @@ function DestinationBar({ entity }: { entity: EntityBaseline }) {
     <div
       className="flex h-2 w-32 overflow-hidden rounded-full bg-muted"
       role="img"
-      aria-label={`Reutilização ${formatPercent(entity.reuse_pct)}, reciclagem ${formatPercent(entity.recycle_pct)}, rejeito ${formatPercent(entity.reject_pct)}`}
+      aria-label={m.entity_destination_aria({
+        reuse: formatPercent(entity.reuse_pct),
+        recycle: formatPercent(entity.recycle_pct),
+        reject: formatPercent(entity.reject_pct),
+      })}
     >
       {DESTINATIONS.map((d) => (
         <div
@@ -36,13 +41,13 @@ export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="h-10 px-4">Entidade</TableHead>
-            <TableHead className="h-10 text-right">Recolhido</TableHead>
-            <TableHead className="h-10 w-44">Destino</TableHead>
-            <TableHead className="h-10 text-right">Reutilização</TableHead>
-            <TableHead className="h-10 text-right">Reciclagem</TableHead>
-            <TableHead className="h-10 text-right">Rejeito</TableHead>
-            <TableHead className="h-10 pr-4">Dados</TableHead>
+            <TableHead className="h-10 px-4">{m.entity_table_entity()}</TableHead>
+            <TableHead className="h-10 text-right">{m.entity_table_collected()}</TableHead>
+            <TableHead className="h-10 w-44">{m.entity_table_destination()}</TableHead>
+            <TableHead className="h-10 text-right">{m.entity_table_reuse()}</TableHead>
+            <TableHead className="h-10 text-right">{m.entity_table_recycle()}</TableHead>
+            <TableHead className="h-10 text-right">{m.entity_table_reject()}</TableHead>
+            <TableHead className="h-10 pr-4">{m.entity_table_data()}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -66,13 +71,16 @@ export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Badge
-                      variant={e.exact_weights ? 'secondary' : 'outline'}
+                      variant={e.method === 'weighed' ? 'secondary' : 'outline'}
                       className="cursor-help font-semibold text-[10px] uppercase tracking-wider"
                     >
-                      {e.exact_weights ? 'kg exatos' : 'estimativa'}
+                      {e.method === 'weighed' ? m.method_weighed() : m.method_percentage()}
                     </Badge>
                   </TooltipTrigger>
-                  <TooltipContent className="max-w-xs">{e.source}</TooltipContent>
+                  <TooltipContent className="max-w-xs">
+                    {e.provenance}
+                    <span className="mt-1 block opacity-70">{m.common_original_pt()}</span>
+                  </TooltipContent>
                 </Tooltip>
               </TableCell>
             </TableRow>

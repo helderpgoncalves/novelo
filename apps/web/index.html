@@ -11,6 +11,16 @@
     <title>Novelo</title>
   </head>
   <body>
+    <script>
+      // Aplica o tema guardado antes da primeira pintura (sem flash).
+      (function () {
+        try {
+          var stored = localStorage.getItem('novelo-theme');
+          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (dark) document.documentElement.classList.add('dark');
+        } catch (e) {}
+      })();
+    </script>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

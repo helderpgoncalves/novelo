@@ -1,3 +1,4 @@
+import { paraglideVitePlugin } from '@inlang/paraglide-js';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
 import react from '@vitejs/plugin-react';
@@ -9,6 +10,21 @@ const apiTarget = process.env.API_PROXY_TARGET ?? 'http://localhost:8190';
 
 export default defineConfig({
   plugins: [
+    // Mensagens tipadas (messages/*.json -> src/paraglide). O idioma vem do URL (/pt, /en), depois da preferência guardada.
+    paraglideVitePlugin({
+      project: './project.inlang',
+      outdir: './src/paraglide',
+      strategy: ['url', 'localStorage', 'preferredLanguage', 'baseLocale'],
+      urlPatterns: [
+        {
+          pattern: '/:path(.*)?',
+          localized: [
+            ['pt-PT', '/pt/:path(.*)?'],
+            ['en', '/en/:path(.*)?'],
+          ],
+        },
+      ],
+    }),
     tanstackRouter({ target: 'react', autoCodeSplitting: true }),
     react(),
     tailwindcss(),

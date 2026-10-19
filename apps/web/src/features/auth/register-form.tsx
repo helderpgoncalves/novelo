@@ -15,7 +15,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { getLocale } from '@/lib/i18n';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { PASSWORD_MIN, type RegisterValues, registerSchema } from './schemas';
@@ -40,7 +42,7 @@ export function RegisterForm({ next }: { next: string }) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((v) =>
-          register.mutate({ body: { ...v, name: v.name || null } }),
+          register.mutate({ body: { ...v, name: v.name || null, locale: getLocale() } }),
         )}
         className="space-y-4"
         noValidate
@@ -51,12 +53,12 @@ export function RegisterForm({ next }: { next: string }) {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nome</FormLabel>
+              <FormLabel>{m.register_name()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   autoComplete="name"
-                  placeholder="Como te chamas?"
+                  placeholder={m.register_name_placeholder()}
                   className="h-10"
                 />
               </FormControl>
@@ -69,14 +71,14 @@ export function RegisterForm({ next }: { next: string }) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{m.login_email()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="email"
                   autoComplete="email"
                   inputMode="email"
-                  placeholder="nome@organizacao.pt"
+                  placeholder={m.login_email_placeholder()}
                   className="h-10"
                 />
               </FormControl>
@@ -89,18 +91,18 @@ export function RegisterForm({ next }: { next: string }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Password</FormLabel>
+              <FormLabel>{m.login_password()}</FormLabel>
               <FormControl>
                 <PasswordInput {...field} autoComplete="new-password" className="h-10" />
               </FormControl>
-              <FormDescription>Pelo menos {PASSWORD_MIN} caracteres.</FormDescription>
+              <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
         />
         <Button type="submit" className="h-10 w-full font-semibold" disabled={register.isPending}>
           {register.isPending && <Loader2 className="animate-spin" />}
-          Criar conta
+          {m.register_submit()}
         </Button>
       </form>
     </Form>

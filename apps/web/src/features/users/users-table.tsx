@@ -12,9 +12,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { getErrorMessage } from '@/lib/api-error';
-
-const dateFormat = new Intl.DateTimeFormat('pt-PT', { dateStyle: 'medium', timeStyle: 'short' });
+import { getErrorMessage } from '@/lib/errors';
+import { formatDateTime } from '@/lib/i18n';
+import { m } from '@/paraglide/messages';
 
 export function UsersTable({
   users,
@@ -28,7 +28,7 @@ export function UsersTable({
     ...updateUserMutation(),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: listUsersQueryKey() });
-      toast.success('Conta atualizada');
+      toast.success(m.users_updated());
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -38,11 +38,11 @@ export function UsersTable({
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="h-10 px-4">Utilizador</TableHead>
-            <TableHead className="h-10">Perfil</TableHead>
-            <TableHead className="h-10">Estado</TableHead>
-            <TableHead className="h-10">Último acesso</TableHead>
-            <TableHead className="h-10 pr-4 text-right">Ações</TableHead>
+            <TableHead className="h-10 px-4">{m.users_table_user()}</TableHead>
+            <TableHead className="h-10">{m.users_table_role()}</TableHead>
+            <TableHead className="h-10">{m.users_table_status()}</TableHead>
+            <TableHead className="h-10">{m.users_table_last_login()}</TableHead>
+            <TableHead className="h-10 pr-4 text-right">{m.users_table_actions()}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -54,22 +54,22 @@ export function UsersTable({
                   <p className="font-medium">{u.name ?? u.email}</p>
                   <p className="text-muted-foreground text-xs">
                     {u.name && `${u.email} · `}
-                    {u.email_verified ? 'email confirmado' : 'email por confirmar'}
-                    {u.google_linked && ' · Google'}
+                    {u.email_verified ? m.users_email_confirmed() : m.users_email_unconfirmed()}
+                    {u.google_linked && ` · ${m.users_google()}`}
                   </p>
                 </TableCell>
                 <TableCell>
                   <Badge variant={u.role === 'admin' ? 'default' : 'secondary'}>
-                    {u.role === 'admin' ? 'Administrador' : 'Operador'}
+                    {u.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
                   </Badge>
                 </TableCell>
                 <TableCell>
                   <Badge variant={u.is_active ? 'outline' : 'destructive'}>
-                    {u.is_active ? 'Ativa' : 'Desativada'}
+                    {u.is_active ? m.users_status_active() : m.users_status_inactive()}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-muted-foreground tabular-nums">
-                  {u.last_login_at ? dateFormat.format(new Date(u.last_login_at)) : 'Nunca'}
+                  {u.last_login_at ? formatDateTime(u.last_login_at) : m.common_never()}
                 </TableCell>
                 <TableCell className="pr-4">
                   <div className="flex justify-end gap-2">
@@ -85,7 +85,7 @@ export function UsersTable({
                         })
                       }
                     >
-                      {u.role === 'admin' ? 'Tornar operador' : 'Tornar administrador'}
+                      {u.role === 'admin' ? m.users_make_operator() : m.users_make_admin()}
                     </Button>
                     <Button
                       variant="ghost"
@@ -99,7 +99,7 @@ export function UsersTable({
                         })
                       }
                     >
-                      {u.is_active ? 'Desativar' : 'Reativar'}
+                      {u.is_active ? m.users_deactivate() : m.users_reactivate()}
                     </Button>
                   </div>
                 </TableCell>

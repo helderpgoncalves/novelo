@@ -6,43 +6,43 @@ import { Separator } from '@/components/ui/separator';
 import { FormAlert } from '@/features/auth/form-alert';
 import { GoogleButton } from '@/features/auth/google-button';
 import { LoginForm } from '@/features/auth/login-form';
+import { getErrorMessage, isErrorCode } from '@/lib/errors';
+import { m } from '@/paraglide/messages';
 
-const ERRORS: Record<string, string> = {
-  google: 'Não foi possível entrar com a Google. Tenta de novo.',
-  registration_closed: 'O registo está fechado. Pede acesso à equipa.',
-  unauthorized: 'Esta conta está inativa.',
-  upstream_error: 'A Google não confirmou o teu email. Usa uma conta com email verificado.',
-};
-
-export const Route = createFileRoute('/_auth/entrar')({
+export const Route = createFileRoute('/_auth/login')({
   validateSearch: z.object({
     next: z.string().startsWith('/').optional().catch(undefined),
-    erro: z.string().optional().catch(undefined),
+    error: z.string().optional().catch(undefined),
   }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getAuthConfigOptions()),
-  head: () => ({ meta: [{ title: 'Entrar · Novelo' }] }),
+  head: () => ({ meta: [{ title: m.title_login() }] }),
   component: Login,
 });
 
+// O callback do Google volta com ?error=<código da API> ou google_failed.
+function loginError(code: string | undefined): string | null {
+  if (!code) return null;
+  if (code === 'google_failed') return m.login_error_google_failed();
+  return isErrorCode(code) ? getErrorMessage({ code }) : m.login_error_generic();
+}
+
 function Login() {
-  const { next, erro } = Route.useSearch();
+  const { next, error } = Route.useSearch();
   const { data: config } = useSuspenseQuery(getAuthConfigOptions());
 
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h1 className="text-3xl">Entrar</h1>
-        <p className="text-muted-foreground text-sm">
-          Acede à rede de recolha de têxteis de Guimarães.
-        </p>
+        <h1 className="text-3xl">{m.login_title()}</h1>
+        <p className="text-muted-foreground text-sm">{m.login_subtitle()}</p>
       </div>
-      {erro && <FormAlert message={ERRORS[erro] ?? 'Não foi possível entrar. Tenta de novo.'} />}
+      <FormAlert message={loginError(error)} />
       {config.google_enabled && (
         <>
           <GoogleButton next={next} />
           <div className="flex items-center gap-3 text-muted-foreground text-xs">
             <Separator className="flex-1" />
-            ou com email
+            {m.login_or_email()}
             <Separator className="flex-1" />
           </div>
         </>
@@ -50,13 +50,13 @@ function Login() {
       <LoginForm next={next ?? '/'} />
       {config.registration_open && (
         <p className="text-center text-muted-foreground text-sm">
-          Ainda não tens conta?{' '}
+          {m.login_no_account()}{' '}
           <Link
-            to="/criar-conta"
+            to="/register"
             search={{ next }}
             className="font-medium text-primary hover:underline"
           >
-            Criar conta
+            {m.login_create_account()}
           </Link>
         </p>
       )}

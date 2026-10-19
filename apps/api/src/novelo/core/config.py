@@ -55,6 +55,8 @@ class Settings(BaseSettings):
     resend_api_key: str = Field("", alias="RESEND_API_KEY")
     email_from: str = Field("Novelo <noreply@bitsapiens.io>", alias="EMAIL_FROM")
 
+    rate_limit_enabled: bool = Field(True, alias="RATE_LIMIT_ENABLED")  # só se desliga em dev/E2E
+
     osrm_url: str = Field("http://localhost:5000", alias="OSRM_URL")
     solver_time_limit_s: int = Field(20, alias="SOLVER_TIME_LIMIT_S")
 

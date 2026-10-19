@@ -11,10 +11,12 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true,
+    "allowJs": true,
+    "checkJs": false,
     "skipLibCheck": true,
     "noEmit": true,
     "types": ["node", "vite/client", "vitest/globals", "@testing-library/jest-dom"],
     "paths": { "@/*": ["./src/*"] }
   },
-  "include": ["src", "vite.config.ts", "openapi-ts.config.ts"]
+  "include": ["src", "e2e", "playwright.config.ts", "vite.config.ts", "openapi-ts.config.ts"]
 }

@@ -5,6 +5,7 @@ from collections import defaultdict, deque
 
 from fastapi import Request
 
+from novelo.core.config import get_settings
 from novelo.core.errors import RateLimitError
 
 
@@ -14,6 +15,8 @@ class RateLimiter:
         self._hits: dict[str, deque[float]] = defaultdict(deque)
 
     def check(self, key: str) -> None:
+        if not get_settings().rate_limit_enabled:
+            return
         now = time.monotonic()
         hits = self._hits[key]
         while hits and now - hits[0] > self.window_s:

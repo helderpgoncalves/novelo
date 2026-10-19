@@ -143,7 +143,7 @@ async def request_password_reset(db: AsyncSession, sender: EmailSender, email: s
         )
     )
     await db.commit()
-    url = f"{settings.app_url.rstrip('/')}/redefinir-password?token={token}"
+    url = f"{settings.app_url.rstrip('/')}/reset-password?token={token}"
     subject, html, text = emails.password_reset(user.locale, url, settings.password_reset_minutes)
     await _send_quietly(sender, user.email, subject, html, text)
 
@@ -237,7 +237,7 @@ async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -
         )
     )
     await db.commit()
-    url = f"{settings.app_url.rstrip('/')}/verificar-email?token={token}"
+    url = f"{settings.app_url.rstrip('/')}/verify-email?token={token}"
     subject, html, text = emails.verify_email(user.locale, url, user.name, settings.email_verify_hours)
     await _send_quietly(sender, user.email, subject, html, text)
 

@@ -1,0 +1,83 @@
+import { expect, test } from '@playwright/test';
+import { login } from './helpers';
+
+test.describe('dados reais da Vitrus', () => {
+  test.beforeEach(async ({ page }) => {
+    await login(page);
+  });
+
+  test('ponto de partida mostra os números reais', async ({ page }) => {
+    const strip = page.locator('dl').first();
+    await expect(strip).toContainText('301,3 t');
+    await expect(strip).toContainText('22,9%');
+    await expect(strip).toContainText('0,16 kg');
+    await expect(page.getByRole('img', { name: /Fluxo de têxtil/ })).toBeVisible();
+    await expect(page.getByRole('row', { name: /Ultriplo/ })).toContainText('134,1 t');
+    await expect(page.getByRole('row', { name: /Nova Etapa/ })).toContainText('estimativa');
+  });
+
+  test('circuitos: pesquisa e filtro por tipologia', async ({ page }) => {
+    await page.goto('/pt/circuits');
+    await expect(page.getByText('40 de 40 circuitos')).toBeVisible();
+    await page.getByLabel('Pesquisar circuito ou localidade').fill('Ronfe');
+    await expect(page.getByRole('row', { name: /C18/ })).toBeVisible();
+    await page.getByLabel('Pesquisar circuito ou localidade').fill('');
+    await page.getByRole('button', { name: 'Orgânicos' }).click();
+    await expect(page.getByText('7 de 40 circuitos')).toBeVisible();
+  });
+
+  test('frota: mapa de ocupação e viaturas sem circuito', async ({ page }) => {
+    await page.goto('/pt/fleet');
+    await expect(page.getByRole('heading', { name: 'Ocupação por turno' })).toBeVisible();
+    await expect(page.getByRole('row', { name: /Orgânicos/ }).first()).toBeVisible();
+    await page.getByLabel('Pesquisar matrícula ou circuito').fill('29-48-XU');
+    await expect(page.getByRole('row', { name: /29-48-XU/ })).toContainText('Sem circuito');
+  });
+
+  test('localidades: filtro por frequência', async ({ page }) => {
+    await page.goto('/pt/localities');
+    await page.getByRole('button', { name: '3+ dias' }).click();
+    const count = page.getByText(/de \d+ localidades/);
+    await expect(count).toBeVisible();
+    await page.getByLabel('Pesquisar localidade').fill('Ronfe');
+    await expect(page.getByRole('row', { name: /Ronfe/ })).toBeVisible();
+  });
+
+  test('qualidade dos dados: resolver e reabrir um alerta', async ({ page }) => {
+    await page.goto('/pt/data-quality');
+    await expect(page.getByRole('heading', { name: 'Fontes recebidas' })).toBeVisible();
+    await expect(page.getByText('Circuitos_Viaturas_Guimaraes.xlsx')).toBeVisible();
+    // O estado persiste na base de dados: se uma corrida anterior deixou o alerta resolvido, reabre-o.
+    await page.getByRole('button', { name: 'Todas', exact: true }).click();
+    const existing = page.getByRole('listitem').filter({ hasText: 'Alerta 3' });
+    if (await existing.getByRole('button', { name: 'Reabrir' }).count()) {
+      await existing.getByRole('button', { name: 'Reabrir' }).click();
+      await expect(page.getByText('Alerta atualizado').first()).toBeVisible();
+    }
+    await page.getByRole('button', { name: 'Por resolver', exact: true }).click();
+    const card = page.getByRole('listitem').filter({ hasText: 'Alerta 3' });
+    await card.getByLabel('Nota de resolução').fill('Confirmado com a Vitrus');
+    await card.getByRole('button', { name: 'Marcar como resolvida' }).click();
+    await expect(page.getByText('Alerta atualizado')).toBeVisible();
+    await page.getByRole('button', { name: 'Resolvida', exact: true }).click();
+    const resolved = page.getByRole('listitem').filter({ hasText: 'Alerta 3' });
+    await expect(resolved).toBeVisible();
+    await resolved.getByRole('button', { name: 'Reabrir' }).click();
+    await expect(page.getByText('Alerta atualizado').first()).toBeVisible();
+  });
+
+  test('utilizadores: só administradores', async ({ page }) => {
+    await page.goto('/pt/users');
+    await expect(page.getByRole('heading', { name: 'Utilizadores', level: 1 })).toBeVisible();
+    await expect(
+      page.getByRole('row', { name: /admin@bitsapiens.io|Administrador/ }).first(),
+    ).toBeVisible();
+    // O próprio administrador não pode alterar a sua conta.
+    await expect(
+      page
+        .getByRole('row', { name: /Administrador/ })
+        .first()
+        .getByRole('button', { name: 'Desativar' }),
+    ).toBeDisabled();
+  });
+});

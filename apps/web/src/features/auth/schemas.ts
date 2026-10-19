@@ -1,40 +1,48 @@
 import { z } from 'zod';
+import { m } from '@/paraglide/messages';
 
 export const PASSWORD_MIN = 10;
 
-const email = z.string().trim().min(1, 'Indica o teu email').email('Email inválido');
+// Mensagens como funções: avaliadas na validação, no idioma ativo.
+const email = z
+  .string()
+  .trim()
+  .min(1, { error: () => m.validation_email_required() })
+  .email({ error: () => m.validation_email_invalid() });
 const newPassword = z
   .string()
-  .min(PASSWORD_MIN, `Usa pelo menos ${PASSWORD_MIN} caracteres`)
-  .max(128, 'A password é demasiado longa')
-  .refine((value) => value.trim() === value, 'Sem espaços no início ou no fim');
+  .min(PASSWORD_MIN, { error: () => m.validation_password_min({ min: PASSWORD_MIN }) })
+  .max(128, { error: () => m.validation_password_max() })
+  .refine((value) => value.trim() === value, { error: () => m.validation_password_spaces() });
+const mismatch = { path: ['confirm'], error: () => m.validation_passwords_mismatch() };
 
 export const loginSchema = z.object({
   email,
-  password: z.string().min(1, 'Indica a password'),
+  password: z.string().min(1, { error: () => m.validation_password_required() }),
   remember_me: z.boolean(),
 });
 export const registerSchema = z.object({
-  name: z.string().trim().max(120).optional(),
+  name: z
+    .string()
+    .trim()
+    .max(120, { error: () => m.validation_name_max() })
+    .optional(),
   email,
   password: newPassword,
 });
 export const profileSchema = z.object({
-  name: z.string().trim().max(120, 'O nome é demasiado longo'),
+  name: z
+    .string()
+    .trim()
+    .max(120, { error: () => m.validation_name_max() }),
 });
 export const forgotSchema = z.object({ email });
 export const resetSchema = z
   .object({ password: newPassword, confirm: z.string() })
-  .refine((v) => v.password === v.confirm, {
-    path: ['confirm'],
-    message: 'As passwords não coincidem',
-  });
+  .refine((v) => v.password === v.confirm, mismatch);
 export const changePasswordSchema = z
   .object({ current: z.string(), password: newPassword, confirm: z.string() })
-  .refine((v) => v.password === v.confirm, {
-    path: ['confirm'],
-    message: 'As passwords não coincidem',
-  });
+  .refine((v) => v.password === v.confirm, mismatch);
 
 export type LoginValues = z.infer<typeof loginSchema>;
 export type RegisterValues = z.infer<typeof registerSchema>;

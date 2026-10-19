@@ -187,18 +187,18 @@ async def google_callback(
     s = get_settings()
     base = s.app_url.rstrip("/")
     if error or not code or not state:
-        return RedirectResponse(f"{base}/entrar?error=google_failed", status_code=302)
+        return RedirectResponse(f"{base}/login?error=google_failed", status_code=302)
     try:
         claims = decode_token(state, "state")
     except ValueError:
-        return RedirectResponse(f"{base}/entrar?error=google_failed", status_code=302)
+        return RedirectResponse(f"{base}/login?error=google_failed", status_code=302)
     if not oauth_state or claims.get("nonce") != oauth_state:
-        return RedirectResponse(f"{base}/entrar?error=google_failed", status_code=302)
+        return RedirectResponse(f"{base}/login?error=google_failed", status_code=302)
     try:
         profile = await google.fetch_profile(code)
         _, access, refresh_token = await service.login_with_google(db, profile, claims.get("locale", "pt-PT"))
     except AppError as exc:
-        return RedirectResponse(f"{base}/entrar?error={exc.code}", status_code=302)
+        return RedirectResponse(f"{base}/login?error={exc.code}", status_code=302)
     redirect = RedirectResponse(f"{base}{claims.get('next', '/')}", status_code=302)
     _set_session(redirect, access, refresh_token)
     redirect.delete_cookie(STATE_COOKIE, path=REFRESH_PATH)

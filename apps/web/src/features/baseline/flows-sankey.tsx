@@ -2,9 +2,11 @@ import { SankeyChart } from 'echarts/charts';
 import { TooltipComponent } from 'echarts/components';
 import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { useTheme } from 'next-themes';
 import { useEffect, useRef } from 'react';
 import type { Flows } from '@/client';
+import { useTheme } from '@/lib/theme';
+import { destinationLabel } from '@/lib/vocab';
+import { m } from '@/paraglide/messages';
 import { DESTINATIONS } from './destination';
 
 echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
@@ -17,9 +19,13 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
 
   useEffect(() => {
     if (!ref.current) return;
-    const mode = resolvedTheme === 'dark' ? 'dark' : 'light';
-    const text = mode === 'dark' ? '#f1eee6' : '#14211d';
-    const label = (id: string) => flows.nodes.find((n) => n.id === id)?.label ?? id;
+    const text = resolvedTheme === 'dark' ? '#f1eee6' : '#14211d';
+    const nodeName = (n: Flows['nodes'][number]) =>
+      n.destination ? destinationLabel[n.destination]() : (n.label ?? n.id);
+    const name = (id: string) => {
+      const node = flows.nodes.find((n) => n.id === id);
+      return node ? nodeName(node) : id;
+    };
     const entities = flows.nodes.filter((n) => n.column === 0);
 
     const chart = echarts.init(ref.current, undefined, { renderer: 'canvas' });
@@ -29,7 +35,7 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
         trigger: 'item',
         confine: true,
         valueFormatter: (v: number) =>
-          `${v.toLocaleString('pt-PT', { maximumFractionDigits: 1 })} t`,
+          `${v.toLocaleString(undefined, { maximumFractionDigits: 1 })} t`,
       },
       series: [
         {
@@ -42,16 +48,16 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
           nodeGap: 16,
           emphasis: { focus: 'adjacency' },
           data: flows.nodes.map((n) => ({
-            name: n.label,
+            name: nodeName(n),
             itemStyle: {
               color:
-                DESTINATIONS.find((d) => d.key === n.id)?.hex[mode] ??
+                DESTINATIONS.find((d) => d.key === n.destination)?.hex[resolvedTheme] ??
                 ENTITY_SHADES[entities.findIndex((e) => e.id === n.id) % ENTITY_SHADES.length],
             },
           })),
           links: flows.links.map((l) => ({
-            source: label(l.source),
-            target: label(l.target),
+            source: name(l.source),
+            target: name(l.target),
             value: l.tonnes,
           })),
           lineStyle: { color: 'target', curveness: 0.5, opacity: 0.35 },
@@ -67,12 +73,5 @@ export function FlowsSankey({ flows }: { flows: Flows }) {
     };
   }, [flows, resolvedTheme]);
 
-  return (
-    <div
-      ref={ref}
-      role="img"
-      aria-label="Fluxo de têxtil por entidade e destino, em toneladas"
-      className="h-80 w-full"
-    />
-  );
+  return <div ref={ref} role="img" aria-label={m.sankey_aria()} className="h-80 w-full" />;
 }

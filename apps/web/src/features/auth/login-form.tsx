@@ -15,7 +15,8 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type LoginValues, loginSchema } from './schemas';
@@ -49,14 +50,14 @@ export function LoginForm({ next }: { next: string }) {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email</FormLabel>
+              <FormLabel>{m.login_email()}</FormLabel>
               <FormControl>
                 <Input
                   {...field}
                   type="email"
                   autoComplete="email"
                   inputMode="email"
-                  placeholder="nome@organizacao.pt"
+                  placeholder={m.login_email_placeholder()}
                   className="h-10"
                 />
               </FormControl>
@@ -70,9 +71,9 @@ export function LoginForm({ next }: { next: string }) {
           render={({ field }) => (
             <FormItem>
               <div className="flex items-center justify-between">
-                <FormLabel>Password</FormLabel>
-                <Link to="/recuperar-password" className="text-primary text-xs hover:underline">
-                  Esqueceste-te?
+                <FormLabel>{m.login_password()}</FormLabel>
+                <Link to="/forgot-password" className="text-primary text-xs hover:underline">
+                  {m.login_forgot()}
                 </Link>
               </div>
               <FormControl>
@@ -94,14 +95,14 @@ export function LoginForm({ next }: { next: string }) {
                 />
               </FormControl>
               <FormLabel className="font-normal text-muted-foreground">
-                Manter sessão iniciada neste dispositivo
+                {m.login_remember()}
               </FormLabel>
             </FormItem>
           )}
         />
         <Button type="submit" className="h-10 w-full font-semibold" disabled={login.isPending}>
           {login.isPending && <Loader2 className="animate-spin" />}
-          Entrar
+          {m.login_submit()}
         </Button>
       </form>
     </Form>

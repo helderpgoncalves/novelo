@@ -153,7 +153,8 @@ async def get_fleet(db: AsyncSession) -> FleetSummary:
                 ],
             )
         )
-    weekday_all = [a for a in assignments if a.day_group == DayGroup.WEEKDAY]
+    # Igual ao total da folha Resumo: as viaturas sem afetação não contam como tripulantes-turno.
+    weekday_all = [a for a in assignments if a.day_group == DayGroup.WEEKDAY and a.typology != Typology.UNASSIGNED]
     return FleetSummary(
         typologies=typologies,
         vehicles=vehicle_out,

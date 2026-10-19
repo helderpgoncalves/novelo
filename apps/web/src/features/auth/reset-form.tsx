@@ -15,7 +15,8 @@ import {
   FormLabel,
   FormMessage,
 } from '@/components/ui/form';
-import { getErrorMessage } from '@/lib/api-error';
+import { getErrorMessage } from '@/lib/errors';
+import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { PASSWORD_MIN, type ResetValues, resetSchema } from './schemas';
@@ -29,8 +30,8 @@ export function ResetForm({ token }: { token: string }) {
   const reset = useMutation({
     ...resetPasswordMutation(),
     onSuccess: async () => {
-      toast.success('Password redefinida. Já podes entrar.');
-      await navigate({ to: '/entrar' });
+      toast.success(m.reset_success());
+      await navigate({ to: '/login' });
     },
   });
 
@@ -44,8 +45,8 @@ export function ResetForm({ token }: { token: string }) {
         <FormAlert message={reset.isError ? getErrorMessage(reset.error) : null} />
         {reset.isError && (
           <p className="text-sm">
-            <Link to="/recuperar-password" className="text-primary hover:underline">
-              Pedir um novo link
+            <Link to="/forgot-password" className="text-primary hover:underline">
+              {m.reset_request_new()}
             </Link>
           </p>
         )}
@@ -54,11 +55,11 @@ export function ResetForm({ token }: { token: string }) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nova password</FormLabel>
+              <FormLabel>{m.reset_password()}</FormLabel>
               <FormControl>
                 <PasswordInput {...field} autoComplete="new-password" className="h-10" />
               </FormControl>
-              <FormDescription>Pelo menos {PASSWORD_MIN} caracteres.</FormDescription>
+              <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -68,7 +69,7 @@ export function ResetForm({ token }: { token: string }) {
           name="confirm"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Repete a password</FormLabel>
+              <FormLabel>{m.reset_confirm()}</FormLabel>
               <FormControl>
                 <PasswordInput {...field} autoComplete="new-password" className="h-10" />
               </FormControl>
@@ -78,7 +79,7 @@ export function ResetForm({ token }: { token: string }) {
         />
         <Button type="submit" className="h-10 w-full font-semibold" disabled={reset.isPending}>
           {reset.isPending && <Loader2 className="animate-spin" />}
-          Redefinir password
+          {m.reset_submit()}
         </Button>
       </form>
     </Form>

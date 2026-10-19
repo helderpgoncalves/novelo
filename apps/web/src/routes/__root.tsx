@@ -7,6 +7,7 @@ import {
   Outlet,
 } from '@tanstack/react-router';
 import { Button } from '@/components/ui/button';
+import { m } from '@/paraglide/messages';
 
 interface RouterContext {
   queryClient: QueryClient;
@@ -16,13 +17,11 @@ function NotFound() {
   return (
     <div className="grid min-h-dvh place-items-center px-6">
       <div className="max-w-md space-y-4 text-center">
-        <p className="eyebrow">Erro 404</p>
-        <h1 className="text-4xl">Esta página não existe</h1>
-        <p className="text-muted-foreground">
-          O endereço pode estar errado ou a página foi movida.
-        </p>
+        <p className="eyebrow">{m.notfound_eyebrow()}</p>
+        <h1 className="text-4xl">{m.notfound_title()}</h1>
+        <p className="text-muted-foreground">{m.notfound_text()}</p>
         <Button asChild>
-          <Link to="/">Voltar ao início</Link>
+          <Link to="/">{m.common_back_home()}</Link>
         </Button>
       </div>
     </div>
@@ -33,12 +32,12 @@ function RootError({ error, reset }: ErrorComponentProps) {
   return (
     <div role="alert" className="grid min-h-dvh place-items-center px-6">
       <div className="max-w-md space-y-4 text-center">
-        <p className="eyebrow">Algo correu mal</p>
-        <h1 className="text-4xl">Não conseguimos mostrar esta página</h1>
+        <p className="eyebrow">{m.rooterror_eyebrow()}</p>
+        <h1 className="text-4xl">{m.rooterror_title()}</h1>
         <p className="text-muted-foreground text-sm">
-          {error instanceof Error ? error.message : 'Erro inesperado.'}
+          {error instanceof Error ? error.message : m.rooterror_unexpected()}
         </p>
-        <Button onClick={reset}>Tentar de novo</Button>
+        <Button onClick={reset}>{m.common_retry()}</Button>
       </div>
     </div>
   );
