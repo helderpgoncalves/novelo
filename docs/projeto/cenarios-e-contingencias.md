@@ -267,7 +267,7 @@ Doze perguntas, três por critério ou menos, que acrescem às 48 anteriores. Os
 | **Pedido de licença ou propriedade intelectual** | Baixa | Email | A propriedade dos protótipos é dos autores [F59]; escolher uma licença antes de partilhar mais (hoje o repositório é público); aconselhamento jurídico se houver interesse comercial | HF |
 | **Interesse em financiamento ou consórcio** | Baixa | Contacto de mentor | Reunir Vitrus, Fibrenamics e UMinho; identificar uma candidatura concreta (**hipótese**, nenhuma identificada) | H |
 | **Pedido de um serviço pago** | Baixa | Município ou entidade | Definir âmbito mínimo (planeamento e relatório), preço e responsabilidade; só aceitar com custos unitários reais | H |
-| **Conflito entre a equipa e a organização** (por exemplo, sobre direitos de uso) | Baixa | Contrato ou regulamento | Ler as Regras e o regulamento completo (a secção Regras ainda não a temos); perguntar à organização | HF |
+| **Conflito entre a equipa e a organização** (por exemplo, sobre direitos de uso) | Baixa | Contrato ou regulamento | Ler o separador Rules e o regulamento completo (ainda não os temos); perguntar à organização | HF |
 | **Continuação como dissertação ou projeto UMinho** | Baixa | Conversa com o Prof. Paulo Afonso | Tema e orientador por escrito; manter o código aberto | H |
 | **Fim do suporte de IA** (chave sem saldo) | Média | 503 | Orçamento mensal e alerta a 80%; desligar a IA mantém o resto a funcionar | F |
 

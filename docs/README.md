@@ -9,8 +9,9 @@ Só Markdown, em pt-PT. Nomes de ficheiros em português, minúsculas e hífens.
 | [Visão geral](projeto/visao-geral.md) | O problema, a solução e o impacto em duas páginas |
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
 | [Estratégia para ganhar](projeto/estrategia-para-ganhar.md) | Documento mestre: resumo executivo, decisores, arquitetura da prova, calendário 19 a 28 out, checklist, riscos e métricas |
+| [Critérios de avaliação](projeto/criterios-de-avaliacao.md) | Os 4 critérios e pesos do hackathon, a matriz critério → prova e o que falta ler nas Regras |
 | [Mentores](projeto/mentores.md) | Lucas Nascimento (Vitrus), Luís Miguel Oliveira (Fibrenamics) e Prof. Paulo Afonso (UMinho): perfis, abordagem e perguntas por ordem de impacto |
-| [Cenários e contingências](projeto/cenarios-e-contingencias.md) | Pitch, dados, mentoria, concorrência, 48 perguntas difíceis do júri e pós-hackathon |
+| [Cenários e contingências](projeto/cenarios-e-contingencias.md) | Pitch, dados, mentoria, concorrência, 48 perguntas difíceis do júri, 12 por critério, cenário das Regras e pós-hackathon |
 | [Narrativa do pitch](projeto/narrativa-do-pitch.md) | Storyline em 30 s, 3 min e 5 min, falas, roteiro da demo e objeções, com a fonte de cada número |
 | [Guião de slides](projeto/pitch-slides.md) | Oito slides prontos para o deck |
 | [Pitch](projeto/pitch.md) | Resumo do guião de 5 minutos |

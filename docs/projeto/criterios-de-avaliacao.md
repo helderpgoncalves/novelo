@@ -8,6 +8,8 @@ Atualizado a 19 de outubro de 2026.
 
 Fonte: página oficial do Hack4Guimarães 2035, FAQ "Como são avaliados os projetos?", consultada a 19 de outubro de 2026 (texto colado pelo utilizador) [F61]. Estado no [registo](../pesquisa/registo-de-afirmacoes.md): **E4, verificado (primária)**.
 
+O enunciado do desafio resume o que conta [F62]: "a inovação da solução, a solidez técnica do que foi construído, o impacto no território e a clareza com que a equipa o apresenta". E a FAQ diz o que se espera: "um protótipo funcional com potencial de continuidade, não um produto acabado" [F61].
+
 | Critério | Peso |
 | --- | --- |
 | Inovação e originalidade | **25%** |
@@ -15,6 +17,17 @@ Fonte: página oficial do Hack4Guimarães 2035, FAQ "Como são avaliados os proj
 | Impacto e relevância | **30%** |
 | Apresentação e potencial de continuidade | **20%** |
 | **Total** | **100%** |
+
+## As regras do jogo
+
+| Facto | Valor | Registo |
+| --- | --- | --- |
+| Submissão | Até **23 de outubro às 17h30**; depois não se edita nada | E8 |
+| Pitches | 26 de outubro a partir das 14h30, presenciais | E2, E9 |
+| Júri | Designado pela organização, especialistas nas áreas temáticas, sem votação pública, decisões finais; avalia a 26 e 27 | E7 |
+| Prémios | 7 500 €, 4 500 € e 3 000 € na classificação geral; 1 000 € por desafio; acumulam | E3, E14 |
+| IA | Permitida e encorajada, se identificada | E11 |
+| Originalidade | Trabalho feito durante o hackathon; histórico dos repositórios pode ser verificado | E12 |
 
 A nota ponderada é a soma de peso × nota. Um ponto a mais em impacto vale +0,30; em inovação ou viabilidade, +0,25; em apresentação e continuidade, +0,20.
 
@@ -34,26 +47,28 @@ A coluna "o que o júri procura" é **hipótese** até lermos as Regras. A matri
 
 ## O que ainda falta ler nas Regras
 
-O detalhe de cada critério está na secção "Regras" da página oficial, que **ainda não temos** (registo E6). Falta saber:
+O detalhe de cada critério está no separador **Rules** da página do evento na plataforma TAIKAI, que **ainda não temos** (registo E6). Falta saber:
 
 - [ ] O que conta como **inovação e originalidade** (novidade tecnológica, de aplicação ou de modelo?).
 - [ ] O que conta como **viabilidade técnica** (só técnica, ou também financeira e operacional?).
 - [ ] O que conta como **impacto e relevância** (económico, social, ambiental, para a Vitrus ou para o concelho?).
 - [ ] O que conta como **apresentação** e como **potencial de continuidade** (um plano por escrito? parceiros? equipa?).
 - [ ] **Duração do pitch**, tempo das perguntas e respostas, e se a demo ao vivo é permitida (E5, E7).
-- [ ] Se há **entrega escrita ou vídeo** além do pitch, e o prazo.
-- [ ] Quem **integra o júri** e se os mentores avaliam.
+- [ ] **O que a submissão de 23 de outubro às 17h30 tem de conter** (descrição, repositório, demo, vídeo, deck?) e se o que se mostra a 26 tem de coincidir com ela.
+- [ ] Se há **entrega escrita ou vídeo** além da submissão.
+- [ ] Os **nomes do júri** e se os mentores avaliam (sabemos que são especialistas das áreas temáticas e que não há voto público).
 - [ ] Se os pesos se aplicam a uma só ronda ou a mais do que uma.
 
 Pergunta pronta para a organização e para o Lucas: [Pergunta comum às Regras e ao formato](mentores.md#pergunta-comum-às-regras-e-ao-formato).
 
 ## Colar aqui o texto das Regras
 
-**Ação:** colar abaixo o texto da secção Regras, com a data e o endereço de onde foi copiado. Depois:
+**Ação:** colar abaixo o texto do separador Rules, com a data e o endereço de onde foi copiado. Depois:
 
 1. Passar E6 do [registo](../pesquisa/registo-de-afirmacoes.md) a verificado e acrescentar a fonte a [Fontes](../pesquisa/fontes.md).
 2. Seguir o [protocolo de uma hora](cenarios-e-contingencias.md#a4-critérios-e-regras): rever a matriz, a autoavaliação e a [repartição do tempo](narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios).
 3. Atualizar slides e frases só onde um subcritério fique sem prova.
+4. Confirmar o que a submissão tem de conter, **antes de 23 de outubro às 17h30**.
 
 > **Texto das Regras:** por colar. Data de consulta: por preencher. Endereço: por preencher.
 

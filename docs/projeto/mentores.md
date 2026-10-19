@@ -4,7 +4,9 @@ Três pessoas podem desbloquear o que mais falta ao Novelo: **dados e custos rea
 
 Os projetos são avaliados por quatro critérios ponderados: inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20% ([Critérios de avaliação](criterios-de-avaliacao.md)). Cada mentor influencia mais uns do que outros, e cada secção abaixo tem as perguntas que **sobem a nota** nos critérios dele. O detalhe de cada critério (Regras) ainda não o temos.
 
-Fontes: [Fontes](../pesquisa/fontes.md) (F41 a F61) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md#f-mentores-fibrenamics-e-hackathon) (M1 a M17). Escrito a 19 de outubro de 2026. Estados usados: **verificado** (lido numa fonte), **hipótese** (inferência nossa) e **por verificar**.
+> **Quem são os mentores deste desafio.** O enunciado [F62] indica **Lucas Nascimento (Vitrus Ambiente)** e, "para qualquer desafio", o **Prof. Paulo Afonso** (Universidade do Minho, Departamento de Produção e Sistemas). **Luís Miguel Oliveira não consta** nesse texto. O utilizador indicou-o como mentor do hackathon; o papel dele neste desafio está **por confirmar** (M18). Tratá-lo como contacto de oportunidade (Fibrenamics, fibras, parcerias), não como mentor atribuído, até haver confirmação.
+
+Fontes: [Fontes](../pesquisa/fontes.md) (F41 a F62) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md#f-mentores-fibrenamics-e-hackathon) (M1 a M17). Escrito a 19 de outubro de 2026. Estados usados: **verificado** (lido numa fonte), **hipótese** (inferência nossa) e **por verificar**.
 
 > **Regra de ouro com mentores:** chegar com o telemóvel aberto no Novelo, uma pergunta por vez, números com a palavra "estimativa" quando o forem, e **nunca** apresentar como validado o que ainda não foi ouvido. Anotar de imediato cada resposta no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md) com data e nome.
 
@@ -31,7 +33,7 @@ flowchart LR
 
 Antes de afinar qualquer critério, precisamos do texto das Regras. **Quem pergunta:** Hélder, hoje. **A quem:** à organização, e ao Lucas em paralelo.
 
-> Podem indicar-nos onde está, ou enviar, o texto completo da secção **Regras** do Hack4Guimarães 2035? Queremos perceber o detalhe de cada um dos quatro critérios de avaliação, a duração do pitch, se há perguntas e respostas do júri e quanto tempo duram, se a demo ao vivo é permitida, se há entrega escrita ou vídeo, e quem integra o júri.
+> Podem indicar-nos onde está, ou enviar, o texto completo do separador **Rules** do Hack4Guimarães 2035 (na plataforma TAIKAI)? Queremos perceber o detalhe de cada um dos quatro critérios de avaliação, a duração do pitch, se há perguntas e respostas do júri e quanto tempo duram, se a demo ao vivo é permitida, se há entrega escrita ou vídeo, **o que a submissão de 23 de outubro às 17h30 tem de conter**, e quem integra o júri.
 
 **O que fazemos com a resposta:** colar o texto em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras) e seguir o [protocolo de uma hora](cenarios-e-contingencias.md#a4-critérios-e-regras).
 
@@ -55,7 +57,7 @@ Antes de afinar qualquer critério, precisamos do texto das Regras. **Quem pergu
 | **Projetos relevantes** | **Lusitano** (2022 a 30 jun 2026): fios de fibras recicladas e naturais, com Riopele, Twintex, Calvelex, Polopiqué, UBI, IST e outros [F42]. **Fibrenamics Green**: valorização de resíduos industriais por infusão, moldação e não tecidos, mais de 100 empresas e cerca de 553 000 € [F43] [F45] |
 | **Investigação associada (UMinho)** | Misturas multicomponente e pós-consumo de calçado e denim para não tecidos e isolamento; revisão de reciclagem fibra a fibra [F49] a [F52] (via pesquisa) |
 
-**O que NÃO sabemos:** se a Fibrenamics aceita ou ensaia têxtil **pós-consumo**; que critérios de lote usa; se compra material; o seu papel exato no hackathon; se já disse algo público sobre têxteis (não encontrámos entrevistas dele).
+**O que NÃO sabemos:** se consta como mentor deste desafio (o enunciado [F62] não o lista); se a Fibrenamics aceita ou ensaia têxtil **pós-consumo**; que critérios de lote usa; se compra material; o seu papel exato no hackathon; se já disse algo público sobre têxteis (não encontrámos entrevistas dele).
 
 ### O que valoriza (hipóteses a partir do perfil)
 
@@ -215,13 +217,13 @@ Servem sobretudo o **impacto e relevância (30%)** e a **continuidade (20%)**. S
 
 ### Quem é
 
-> **Atenção à identificação.** O desafio refere "Prof. Paulo Afonso (Universidade do Minho, Departamento de Produção e Sistemas)". O perfil que encontrámos com esse departamento é o de **Paulo Sérgio Lima Pereira Afonso** (Centro ALGORITMI) [F54]. É a leitura mais provável, mas é **inferência nossa**: confirmar com a organização ou na primeira conversa. Existe outro investigador da UMinho com nome próximo e trabalho em otimização de energia hidrocinética que **não** é este; evitar a confusão.
+> **Atenção à identificação.** O desafio refere "Prof. Paulo Afonso (Universidade do Minho, Departamento de Produção e Sistemas)". O perfil que encontrámos com esse departamento é o de **Paulo Sérgio Lima Pereira Afonso** (Centro ALGORITMI) [F54]. O enunciado [F62] confirma-o como mentor "para qualquer desafio". A identificação da pessoa é a leitura mais provável, mas é **inferência nossa**: confirmar com a organização ou na primeira conversa. Existe outro investigador da UMinho com nome próximo e trabalho em otimização de energia hidrocinética que **não** é este; evitar a confusão.
 
 | | |
 | --- | --- |
 | **Verificado (F54)** | Departamento de Produção e Sistemas; grupos IEM (Engenharia e Gestão Industrial) e SLOTS (Supply Chain, Logistics and Transportation Systems), que coordena desde 2019; doutoramento em Management Accounting (Manchester Business School, 2008); linhas de investigação: gestão de desempenho e de custos na cadeia de abastecimento, modelos e sistemas de custeio para decisão, avaliação estratégica de investimentos, modelos de negócio, startups. Projetos mencionados incluem redes de transporte e Indústria 4.0; 89 publicações e h-index 17 (segundo a página) |
 | **Via pesquisa (F55)** | Coautor de "Simulating Product Costs Under Stochastic Conditions Using the ABC Matrix Model" (título); capítulo sobre TCO e AHP na seleção de fornecedores (2026) |
-| **O que NÃO sabemos** | Se é ele o mentor do desafio; se o seu foco é custos mais do que otimização matemática; o tempo que tem; opinião sobre CP-SAT ou VRP |
+| **O que NÃO sabemos** | Se o seu foco é custos mais do que otimização matemática; o tempo que tem; opinião sobre CP-SAT ou VRP |
 
 ### O que valoriza (hipóteses)
 

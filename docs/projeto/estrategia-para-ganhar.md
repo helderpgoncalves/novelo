@@ -259,7 +259,7 @@ gantt
 
 | Dia | Foco | Hélder | Flávio | Checkpoint (go/no-go) |
 | --- | --- | --- | --- | --- |
-| **Seg 19** | Arranque | Confirmar inscrição; mensagem ao Lucas com 5 pedidos; obter o texto das Regras (secção da página oficial) | Integração dos novos ecrãs; `just check` verde; chave OpenRouter e saldo verificados | **Go** se: inscrição confirmada, mensagem enviada, API e web a arrancar |
+| **Seg 19** | Arranque | Confirmar inscrição; mensagem ao Lucas com 5 pedidos; obter o texto das Regras (separador Rules na TAIKAI) | Integração dos novos ecrãs; `just check` verde; chave OpenRouter e saldo verificados | **Go** se: inscrição confirmada, mensagem enviada, API e web a arrancar |
 | **Ter 20** | Dados novos | Receber contentores e custos; mensagem ao Luís Miguel; contactos à indústria | Importar contentores, mapa e cobertura | **Go** se: contentores no mapa ou plano B definido |
 | **Qua 21** | Modelo e mentores | 10 min com o Prof. Paulo Afonso; fixar cenários A, B e francês | Sensibilidade, robustez e piloto no web | **Go** se: três cenários calculados e a frase-âncora preenchida |
 | **Qui 22** | Prova | Medir a triagem (30 a 50 peças); resposta de um reciclador; narrativa final; rascunho da submissão na plataforma | Copiloto e resolvedor de alertas; painel de IA | **No-go** de cada funcionalidade nova sem E2E verde: sai da demo |
