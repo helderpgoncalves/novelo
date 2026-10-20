@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 // Os gestores de palavras-passe preenchem o DOM sem disparar eventos: o envio tem de os ver mesmo assim.
 test('entrar com campos preenchidos automaticamente (sem eventos)', async ({ page }) => {
-  await page.goto('/pt/login');
+  await page.goto('/pt/login?method=password');
   const email = page.getByLabel('Email');
   await email.waitFor();
   await page.evaluate(() => {

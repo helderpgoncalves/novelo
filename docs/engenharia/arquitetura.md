@@ -42,10 +42,10 @@ flowchart TB
 
 ```
 apps/api/src/novelo/
-  core/        config, base de dados, erros tipados, segurança, limites de pedidos
-  features/    auth · users · textile · network · datasets · planning · lots · reports · ai_admin · copilot · health
+  core/        config, base de dados, erros tipados, segurança, limites de pedidos, limites de convidados (guest.py)
+  features/    auth · users · textile · network · datasets · municipal · planning · lots · reports · ai_admin · copilot · health · dev (só em desenvolvimento)
   domain/      procura, custos, geografia, rede: só funções puras
-  adapters/    OpenRouter e email (Resend ou log)
+  adapters/    OpenRouter e email (Resend ou log); o OSRM ainda não tem adaptador
   ai/          prompts versionados, verificador de números, catálogo de modelos, avaliações (triagem, copiloto)
 apps/web/src/
   routes/      rotas por ficheiros (_app/* exige sessão)
@@ -57,20 +57,23 @@ apps/web/src/
 
 ## API
 
-Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `main.py`. As rotas de dados são autenticadas; o passaporte do lote (`/api/v1/public/lots/{code}`) é público para o QR abrir sem sessão.
+Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `main.py`. As rotas de dados são autenticadas; são públicas só `health`, `ready`, as rotas de entrada (`auth/*`, `quick-join/info`) e o passaporte do lote (`/api/v1/public/lots/{code}` e o seu QR), para o QR abrir sem sessão. Em desenvolvimento há ainda `/api/v1/dev/emails` (fora do OpenAPI) e `/api/docs`; em produção não.
 
 | Grupo | Exemplos |
 | --- | --- |
-| `auth` | `login`, `register`, `refresh`, `logout`, `me`, `verify-email`, `forgot-password`, `reset-password`, `change-password`, Google, `config` |
-| `users` | listar e alterar papel e estado (só administradores) |
+| `auth` | `login`, `register`, `refresh`, `logout`, `logout-all`, `me`, `verify-email`, `resend-verification`, `forgot-password`, `reset-password`, `change-password`, `magic-link` e `magic-link/verify`, `quick-join` (`info`, entrada, `qr`, `guests`), Google (`login`, `callback`), `config` |
+| `users` | listar e alterar papel (`admin`, `operator`, `guest`) e estado (só administradores) |
 | `textile` | `baseline`, `flows`, `waste`, `overview` |
 | `network` | `circuits`, `fleet`, `localities`, `containers` |
 | `datasets` | `quality`, resolver e reabrir alertas |
 | `municipal` | rede **municipal** de contentores (outras frações, não é têxtil): `overview`, `parishes`, `sites`, `containers`, `producers`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
-| `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, fluxos) |
+| `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, `flows`, `sensitivity`), `compare-robustness`, `benchmarks`, `pilot` |
 | `whatif` | criar, aplicar e listar perguntas "E se...?" |
-| `lots` | lotes, itens, estado, `triage`, `market` e reservas, `brands` |
+| `lots`, `triage`, `market`, `brands` | `/lots` (abrir, listar, ler, itens, estado), `/triage` (análise de uma peça), `/market` e reservas, `/brands`; público: `/public/lots/{code}` e `/qr` |
 | `reports` | `rap` (gera o PDF), listar, `{id}/pdf` |
+| `ai` | `settings`, `models`, `usage`, `credits`, `test`, `eval/triage` (só administradores) |
+| `copilot` | `stream`, `chat`, `threads`, `history`, `actions`, `artifacts`, `attachments`, `mentions`, `memory`, `settings`, `data` (ver [Copiloto](copiloto.md#endpoints-operationid)) |
+| `health` | `health` (processo) e `ready` (base de dados) |
 
 ### `GET /api/v1/textile/overview` (`get_overview`)
 
@@ -79,7 +82,7 @@ Um só pedido de leitura para a página inicial; só dados reais da BD ou consta
 | Campo | Conteúdo |
 | --- | --- |
 | `gap` | `potential_t` (estimativa: população × 0,7 kg/hab/mês × 12), `collected_t`, `missing_t`, `capture_pct`, `destinations{reuse_t,recycle_t,reject_t}`, `kg_per_inhab_year/month` observados e do potencial, `population`, `parishes_count`, `is_estimate` |
-| `references` | `key`, `label`, `kg_per_inhab_year`, `year`, `scope`, `source_label`, `source_url`, `verified`, `evidence`, `is_estimate`. Guimarães hoje e potencial do plano (este `verified=false`, fonte por localizar), França 2024 (4,27), UE-27 2020 (4,4), Catalunha 2024 (2,7), Alemanha 2022 (`verified=false`). O web só mostra em público as `verified` |
+| `references` | `key`, `label`, `kg_per_inhab_year`, `year`, `scope`, `source_label`, `source_url`, `verified`, `evidence`, `is_estimate`. Guimarães hoje e potencial do plano (este `verified=false`: a fonte pública é o Plano URBACT, p. 30, mas falta a Vitrus confirmar o que mede o 0,7 kg/hab/mês; o texto da fonte no código ainda diz «por localizar»), França 2024 (4,27), UE-27 2020 (4,4), Catalunha 2024 (2,7), Alemanha 2022 (`verified=false`). O web só mostra em público as `verified` |
 | `timeline` | `date`, `key`, `status` (`done`/`upcoming`), `days_remaining` (relógio do servidor em UTC, `null` se já passou), `who_pays`, fonte e `verified`: obrigação municipal (1 jan 2025), transposição (17 jun 2027), regimes de RAP (17 abr 2028) |
 | `parishes` | por freguesia (ordenadas por população): `code`, `name`, `population`, `tipau`, `potential_t` (estimativa), `circuits_count`, `localities_count`, `containers_count` (ativos; 0 até 20 out), `area_km2` (BD ou calculada do contorno), `centroid{lat,lon}`, `share_of_population_pct` |
 | `scenario_frontier`, `pareto_ids` | cenários guardados (até 200) com `tonnes_year`, `eur_per_tonne`, `annual_cost_eur`, `capex_eur`, `modes`, `status` (`feasible`/`infeasible`), `objective`, `is_pareto` (não dominado em menos €/t e mais toneladas, só viáveis) |
@@ -128,19 +131,25 @@ Postgres com migrações Alembic (`apps/api/alembic`). Tabelas por domínio:
 
 | Domínio | Tabelas |
 | --- | --- |
-| Contas | `users`, `refresh_tokens`, `password_reset_tokens`, `email_verification_tokens` (tokens guardados como hash) |
+| Contas | `users` (com o consentimento RGPD dos convidados), `refresh_tokens`, `password_reset_tokens`, `email_verification_tokens`, `login_tokens` (magic link e entrada por QR); tokens guardados como hash |
 | Têxtil | `textile_entities`, `textile_flows`, `waste_shares` |
 | Rede | `parishes`, `localities`, `vehicles`, `circuits`, `circuit_days`, `circuit_localities`, `shift_assignments`, `fleet_capacity`, `containers` |
 | Dados | `data_sources`, `data_alerts` |
 | Rede municipal | `municipal_containers`, `municipal_sites`, `municipal_parish_stats` (com o contorno CAOP), `municipal_links`, `municipal_meta` |
 | Planeamento | `parameter_sets`, `scenarios`, `whatif_runs` |
+| IA | `ai_settings` (uma linha), `ai_usage` |
+| Copiloto | `copilot_threads`, `copilot_messages`, `copilot_actions`, `copilot_artifacts`, `copilot_attachments`, `copilot_memory_entries`, `copilot_memory_pending`, `copilot_user_settings`, `copilot_feedback` |
 | Operação | `lots`, `lot_items`, `lot_events`, `lot_reservations`, `reports` |
 
-`data/processed` é importado no arranque da API de forma idempotente (`just seed` também o faz). Os ficheiros de origem ficam registados com impressão digital.
+`data/processed` é importado no arranque da API de forma idempotente (`just seed` também o faz). Os ficheiros de origem ficam registados com impressão digital. Há seis migrações (`0001` a `0006`: esquema inicial, alertas e contentores, definições e uso de IA, copiloto, rede municipal, magic link e entrada por QR).
 
 ## Autenticação
 
-Palavras-passe com argon2; JWT em cookies HttpOnly com rotação do token de renovação; "manter sessão iniciada" alonga a validade (`REFRESH_TOKEN_EXPIRE_DAYS` contra `SESSION_TOKEN_HOURS`). Confirmação de email e recuperar password usam tokens de uso único guardados como hash; os emails (confirmar email, recuperar password, ligação de acesso, boas-vindas de convidado) saem pelo Resend (ou pelo log em dev). Templates em `features/auth/emails.py` (textos pt-PT/en) e `email_layout.py` (tabelas, CSS inline, dark mode, botão VML para Outlook, versão texto). Google OAuth. Limites de pedidos nas rotas sensíveis. O primeiro administrador é criado no arranque a partir de `ADMIN_EMAIL` e `ADMIN_PASSWORD`.
+Três formas de entrar: **magic link** por email (a principal; 15 minutos, uso único, cria uma sessão longa), password (argon2id) e Google OAuth. JWT em cookies HttpOnly com rotação do token de renovação; "manter sessão iniciada" alonga a validade (`REFRESH_TOKEN_EXPIRE_DAYS` contra `SESSION_TOKEN_HOURS`). **Entrada por QR** (`/join?c=<código>`): nome, email e consentimento criam um utilizador com o papel `guest`; um email que já tem conta recebe um magic link em vez de uma sessão. O `guest` é um operador sem gestão de utilizadores, sem administração de IA, sem apagar dados e sem ações de risco alto, com limites de IA e de otimizador por hora (`core/guest.py`). Confirmação de email e recuperar password usam tokens de uso único guardados como hash; os emails (confirmar email, recuperar password, ligação de acesso, boas-vindas de convidado) saem pelo Resend (ou pelo log em dev). Templates em `features/auth/emails.py` (textos pt-PT/en) e `email_layout.py` (tabelas, CSS inline, dark mode, botão VML para Outlook, versão texto). Google OAuth. Limites de pedidos nas rotas sensíveis (em memória, por processo). O primeiro administrador é criado no arranque a partir de `ADMIN_EMAIL` e `ADMIN_PASSWORD`.
+
+### Segurança contra bots
+
+Camadas, da mais barata à mais cara: (1) limites de pedidos por IP e por email (`core/ratelimit.py`); (2) corpo máximo de 16 KB em `POST /auth/*` e cabeçalhos `nosniff`, `X-Frame-Options: DENY` e `Referrer-Policy` (`core/hardening.py`); (3) honeypot `website` (campo invisível) em registo e entrada por QR, rejeitado sem pistas; (4) **Cloudflare Turnstile**, a guarda `captcha(action)` de `core/captcha.py` com o adapter `adapters/turnstile.py` (injetado por `Depends`, falso nos testes). Protege: `register`, `login`, `forgot-password`, `reset-password`, `resend-verification`, `magic-link` e `quick-join` (token no cabeçalho `X-Turnstile-Token`; ações `register`, `login`, `forgot_password`, `reset_password`, `resend_verification`, `magic_link`, `quick_join`). Não protege, por desenho: `magic-link/verify` e `verify-email` (exigem um token secreto de uso único e já têm limite), `refresh` e `logout` (cookie), `google/login` (só redireciona; o Google faz o seu próprio desafio) e as rotas autenticadas (a sessão é a barreira). O passaporte público do lote só tem GET. Se a Cloudflare falhar, só as rotas públicas respondem 503 `captcha_unavailable`; o resto da API continua. Variáveis em [Ambiente](ambiente.md#cloudflare-turnstile).
 
 ## Web
 
@@ -154,7 +163,10 @@ Palavras-passe com argon2; JWT em cookies HttpOnly com rotação do token de ren
   - **API** (retrocompatível): `Column<T>` com `id`, `header`, `cell`, `value`, `exportValue`, `type` (`text|number|date|datetime`), `filter` (`true`/`{format}` por valores, `'range'`, `'date'`, `'text'`, `false`), `sortable`, `searchable`, `hideable`, `defaultHidden`, `pinned`, `width`, `resizable`, `aggregate` (`sum|avg|min|max|count`) com `format`, e `primary`/`badge`/`full`/`desktopOnly` para o cartão. `DataTable`: `id`, `rows`, `getRowId`, `title`, `controls`, `pageSize`, `initialSort`, `loading`, `refreshing`, `error`, `onRetry`, `rowActions`, `bulkActions`, `selectable`, `views`, `renderExpanded`, `actions`, `exportName`, `urlSync`. Toda a coluna com `value` ganha filtro do tipo certo, ordenação, pesquisa e exportação sem mais código.
   - Ficheiros: `use-table-state.ts` (estado), `table-logic.ts` (filtros, ordem, URL; funções puras testadas), `export.ts` e `xlsx.ts` (exportação), `toolbar.tsx`, `filters.tsx`, `columns-panel.tsx`, `column-header.tsx`, `views-menu.tsx`, `export-menu.tsx`, `mobile-list.tsx`.
 - **Separadores** (`components/page-tabs.tsx` sobre `ui/tabs.tsx`): linha inferior animada (ou pastilha, na variante segmentada), contagens, ponto de atenção ou triângulo de erro com texto para leitores de ecrã, rolagem com setas quando não cabem, teclado (setas, Home, End) e o separador ativo na URL (`validateSearch`). Os separadores já visitados ficam montados e escondidos, por isso a pesquisa, os filtros e a rolagem de cada um mantêm-se.
-- **Layout** com `Page` e `Section`, `PageHeader`, `StatStrip`, `StickyActions` (barra de ações fixa em telemóvel) e `OfflineBanner`.
+- **Layout** com `Page` e `Section`, `PageHeader`, `StatStrip`, `StickyActions` (barra de ações fixa em telemóvel) e `OfflineBanner`. Em telemóvel há uma barra de separadores em baixo (`nav_tabbar`) e menu «Mais»; as margens respeitam o entalhe e a barra do sistema (`env(safe-area-inset-*)`).
+- **PWA:** instalável (`vite-plugin-pwa`, ícones e capturas geridos por `just brand`), com diálogo de instalação para iOS; a API nunca fica em cache.
+- **Páginas de erro** (`features/errors/`, `route-error.tsx`), todas com o mesmo desenho: não encontrado (com sugestões de secções), sem permissão, erro do servidor (com referência para suporte), sem ligação, em manutenção (quando o nginx devolve 503 durante um redeploy, com nova tentativa automática), sessão expirada e nova versão disponível.
+- **Primeira entrada:** visita guiada de 4 passos (`features/onboarding/`) com os números reais do ponto de partida; o texto de privacidade público está em `/privacy`.
 - **Telemóvel primeiro:** áreas de toque de pelo menos 40 px, campos a 16 px (sem zoom no iOS), margens de segurança, diálogos que abrem como folha inferior.
 - **Tema, língua e tipografia:** claro e escuro, pt-PT e inglês; Inter no texto e Newsreader nos títulos; tokens da marca em [Guia de marca](../marca/guia-de-marca.md).
 
@@ -170,14 +182,15 @@ Palavras-passe com argon2; JWT em cookies HttpOnly com rotação do token de ren
 
 | Área | Ferramentas |
 | --- | --- |
-| Python | Ruff (lint e formato), mypy strict, pytest (76 testes) |
-| TypeScript | Biome, `tsc --noEmit`, Vitest |
-| Contrato | `just gen` e `git diff --exit-code` em `openapi.json` e `src/client` |
-| Ponta a ponta | Playwright (`pnpm exec playwright test` em `apps/web`) contra a stack de `just dev` |
+| Python | Ruff (lint e formato), mypy strict, pytest (536 testes a 20/10/2026) |
+| TypeScript | Biome, `tsc --noEmit`, Vitest (157 testes) |
+| Contrato | `just check-contract`: `just gen` e `git diff --exit-code` em `openapi.json` e `src/client` |
+| Marca | `just check-brand` (alinhamento do logótipo em píxeis) |
+| Ponta a ponta | Playwright, 162 testes em 25 ficheiros (`pnpm exec playwright test` em `apps/web`), contra a stack de `just dev`; não fazem parte do `just check` |
 | Imagens | `just build` constrói as duas imagens de produção |
 
 Por agora não há integração contínua remota. O fluxo é: `just check` verde, commit em Conventional Commits e push direto para `main`, que o Coolify publica.
 
 ## Copiloto
 
-O copiloto (`features/copilot/`) é a feature mais complexa da API: conversa em streaming (SSE) com 42 ferramentas tipadas que chamam os mesmos services da app, threads persistentes por utilizador, memória de longo prazo, artefactos (gráficos, tabelas, mapas), ações com confirmação e auditoria, anexos, menções e histórico unificado. Desenho, contrato de eventos, segurança e operação em [Copiloto](copiloto.md); gestão de modelos, custos e orçamento em [IA](ia.md). O nginx do web tem locations próprias para o stream (sem buffering) e para os anexos (até 55 MB).
+O copiloto (`features/copilot/`) é a feature mais complexa da API: conversa em streaming (SSE) com 46 ferramentas tipadas que chamam os mesmos services da app, threads persistentes por utilizador, memória de longo prazo, artefactos (gráficos, tabelas, mapas), ações com confirmação e auditoria, anexos, menções e histórico unificado. Desenho, contrato de eventos, segurança e operação em [Copiloto](copiloto.md); gestão de modelos, custos e orçamento em [IA](ia.md). O nginx do web tem locations próprias para o stream (sem buffering) e para os anexos (até 55 MB).

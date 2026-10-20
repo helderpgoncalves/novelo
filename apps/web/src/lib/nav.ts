@@ -2,6 +2,7 @@ import {
   BarChart3,
   Bot,
   Boxes,
+  Container,
   FileText,
   FlaskConical,
   GitCompareArrows,
@@ -32,6 +33,7 @@ export interface NavItem {
     | '/data-quality'
     | '/map'
     | '/coverage'
+    | '/municipal'
     | '/chat'
     | '/triage'
     | '/lots'
@@ -63,6 +65,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
       { label: () => m.nav_map(), to: '/map', icon: MapPinned },
       { label: () => m.nav_coverage(), to: '/coverage', icon: Radar },
+      { label: () => m.nav_municipal(), to: '/municipal', icon: Container },
       { label: () => m.nav_chat(), to: '/chat', icon: MessagesSquare },
     ],
   },

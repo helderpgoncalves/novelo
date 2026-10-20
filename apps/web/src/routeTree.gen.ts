@@ -11,6 +11,9 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as JoinRouteImport } from './routes/join'
+import { Route as MagicLinkRouteImport } from './routes/magic-link'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSplatRouteImport } from './routes/_app/$'
@@ -25,6 +28,7 @@ import { Route as AppFleetRouteImport } from './routes/_app/fleet'
 import { Route as AppLocalitiesRouteImport } from './routes/_app/localities'
 import { Route as AppMapRouteImport } from './routes/_app/map'
 import { Route as AppMarketRouteImport } from './routes/_app/market'
+import { Route as AppMunicipalRouteImport } from './routes/_app/municipal'
 import { Route as AppPilotRouteImport } from './routes/_app/pilot'
 import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppSimulatorRouteImport } from './routes/_app/simulator'
@@ -49,6 +53,21 @@ const AppRoute = AppRouteImport.update({
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const JoinRoute = JoinRouteImport.update({
+  id: '/join',
+  path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MagicLinkRoute = MagicLinkRouteImport.update({
+  id: '/magic-link',
+  path: '/magic-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
@@ -119,6 +138,11 @@ const AppMapRoute = AppMapRouteImport.update({
 const AppMarketRoute = AppMarketRouteImport.update({
   id: '/market',
   path: '/market',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppMunicipalRoute = AppMunicipalRouteImport.update({
+  id: '/municipal',
+  path: '/municipal',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPilotRoute = AppPilotRouteImport.update({
@@ -209,6 +233,9 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
+  '/join': typeof JoinRoute
+  '/magic-link': typeof MagicLinkRoute
+  '/privacy': typeof PrivacyRoute
   '/verify-email': typeof VerifyEmailRoute
   '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
@@ -222,6 +249,7 @@ export interface FileRoutesByFullPath {
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/municipal': typeof AppMunicipalRoute
   '/pilot': typeof AppPilotRoute
   '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
@@ -242,6 +270,9 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
+  '/join': typeof JoinRoute
+  '/magic-link': typeof MagicLinkRoute
+  '/privacy': typeof PrivacyRoute
   '/verify-email': typeof VerifyEmailRoute
   '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
@@ -255,6 +286,7 @@ export interface FileRoutesByTo {
   '/localities': typeof AppLocalitiesRoute
   '/map': typeof AppMapRoute
   '/market': typeof AppMarketRoute
+  '/municipal': typeof AppMunicipalRoute
   '/pilot': typeof AppPilotRoute
   '/reports': typeof AppReportsRoute
   '/simulator': typeof AppSimulatorRoute
@@ -277,6 +309,9 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/join': typeof JoinRoute
+  '/magic-link': typeof MagicLinkRoute
+  '/privacy': typeof PrivacyRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_app/$': typeof AppSplatRoute
   '/_app/account': typeof AppAccountRoute
@@ -290,6 +325,7 @@ export interface FileRoutesById {
   '/_app/localities': typeof AppLocalitiesRoute
   '/_app/map': typeof AppMapRoute
   '/_app/market': typeof AppMarketRoute
+  '/_app/municipal': typeof AppMunicipalRoute
   '/_app/pilot': typeof AppPilotRoute
   '/_app/reports': typeof AppReportsRoute
   '/_app/simulator': typeof AppSimulatorRoute
@@ -313,6 +349,9 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/join'
+    | '/magic-link'
+    | '/privacy'
     | '/verify-email'
     | '/$'
     | '/account'
@@ -326,6 +365,7 @@ export interface FileRouteTypes {
     | '/localities'
     | '/map'
     | '/market'
+    | '/municipal'
     | '/pilot'
     | '/reports'
     | '/simulator'
@@ -346,6 +386,9 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/join'
+    | '/magic-link'
+    | '/privacy'
     | '/verify-email'
     | '/$'
     | '/account'
@@ -359,6 +402,7 @@ export interface FileRouteTypes {
     | '/localities'
     | '/map'
     | '/market'
+    | '/municipal'
     | '/pilot'
     | '/reports'
     | '/simulator'
@@ -380,6 +424,9 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/_auth'
+    | '/join'
+    | '/magic-link'
+    | '/privacy'
     | '/verify-email'
     | '/_app/$'
     | '/_app/account'
@@ -393,6 +440,7 @@ export interface FileRouteTypes {
     | '/_app/localities'
     | '/_app/map'
     | '/_app/market'
+    | '/_app/municipal'
     | '/_app/pilot'
     | '/_app/reports'
     | '/_app/simulator'
@@ -416,6 +464,9 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  JoinRoute: typeof JoinRoute
+  MagicLinkRoute: typeof MagicLinkRoute
+  PrivacyRoute: typeof PrivacyRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   PassportCodeRoute: typeof PassportCodeRoute
 }
@@ -434,6 +485,27 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/join': {
+      id: '/join'
+      path: '/join'
+      fullPath: '/join'
+      preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/magic-link': {
+      id: '/magic-link'
+      path: '/magic-link'
+      fullPath: '/magic-link'
+      preLoaderRoute: typeof MagicLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verify-email': {
@@ -532,6 +604,13 @@ declare module '@tanstack/react-router' {
       path: '/market'
       fullPath: '/market'
       preLoaderRoute: typeof AppMarketRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/municipal': {
+      id: '/_app/municipal'
+      path: '/municipal'
+      fullPath: '/municipal'
+      preLoaderRoute: typeof AppMunicipalRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/pilot': {
@@ -669,6 +748,7 @@ interface AppRouteChildren {
   AppLocalitiesRoute: typeof AppLocalitiesRoute
   AppMapRoute: typeof AppMapRoute
   AppMarketRoute: typeof AppMarketRoute
+  AppMunicipalRoute: typeof AppMunicipalRoute
   AppPilotRoute: typeof AppPilotRoute
   AppReportsRoute: typeof AppReportsRoute
   AppSimulatorRoute: typeof AppSimulatorRoute
@@ -697,6 +777,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLocalitiesRoute: AppLocalitiesRoute,
   AppMapRoute: AppMapRoute,
   AppMarketRoute: AppMarketRoute,
+  AppMunicipalRoute: AppMunicipalRoute,
   AppPilotRoute: AppPilotRoute,
   AppReportsRoute: AppReportsRoute,
   AppSimulatorRoute: AppSimulatorRoute,
@@ -733,6 +814,9 @@ const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  JoinRoute: JoinRoute,
+  MagicLinkRoute: MagicLinkRoute,
+  PrivacyRoute: PrivacyRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   PassportCodeRoute: PassportCodeRoute,
 }

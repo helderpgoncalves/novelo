@@ -50,7 +50,7 @@ A [Fibrenamics](https://fibrenamics.com) [F41] é o centro de inovação em mate
 | --- | --- | --- | --- |
 | Têxtil recolhido por 4 entidades em 2025 | 301,3 t | Dados da Vitrus | Dado Vitrus |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Dados da Vitrus | Dado Vitrus |
-| Só 4 de 27 operadores licenciados na zona valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** (a fonte pública não foi localizada) |
+| Só 4 de 27 operadores licenciados na zona valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** com a Vitrus; fonte pública: Plano de Ação Integrado (URBACT), p. 32 [F74] |
 | Têxtil no indiferenciado | 5,4% | Plano municipal | **Por verificar**: documentos públicos da câmara citam cerca de 5%, e uma declaração do diretor de ambiente fala em cerca de 11% da composição física, o que pode ser outra métrica |
 | Preço a que a Vitrus vende cada fração | n/d | Perguntar | Por obter |
 | Custos de recolha, quilómetro e contentor | n/d | Perguntar | Por obter |
@@ -82,7 +82,7 @@ Também vale perceber a posição das entidades de economia social, que o artigo
 | 6 | **CITEVE** | Parecer sobre o passaporte do lote e a classificação por fibra; ligação ao RegioGreenTex | Validação técnica e rede |
 | 7 | **Humana** ou outra entidade de economia social | Como se articula com um novo ponto de recolha; dados de triagem | Parceiro e dados reais |
 | 8 | **Wippytex** | Como trabalham com 30 municípios; o que pedem às câmaras | Boa prática |
-| 9 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil; localizar a fonte dos 5,4% | Fonte do plano e legitimidade |
+| 9 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil (fonte pública já localizada, [F74]); confirmar o que mede o 0,7 kg e o ano da caracterização de onde vêm os 5,4% (Q6) | Fonte do plano e legitimidade |
 | 10 | **Resinorte** | Gestão de ecopontos; articulação com a Vitrus | Rede existente |
 | 11 | **To Be Green** | Destino atual do têxtil das escolas | Caso local |
 

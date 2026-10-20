@@ -58,7 +58,7 @@ gen:
 eval-triage *ARGS:
     uv run --project apps/api python scripts/eval_triage.py {{ARGS}}
 
-# Avalia o copiloto ponta a ponta com o modelo real (60 casos pt/en): just eval-copilot [--only id] [--fresh] [--no-fail]
+# Avalia o copiloto ponta a ponta com o modelo real (78 casos pt/en): just eval-copilot [--only id] [--fresh] [--no-fail]
 eval-copilot *ARGS:
     uv run --project apps/api python scripts/eval_copilot.py {{ARGS}}
 
@@ -67,7 +67,7 @@ etl:
     uv run scripts/etl/build_processed.py
     uv run scripts/etl/municipal_containers.py
 
-# --- Qualidade: o mesmo que a CI corre ----------------------------------------
+# --- Qualidade: tudo o que tem de passar antes de cada push (sem CI remota) ----------------------------------------
 check: check-api check-web check-brand check-contract
 
 check-api: db-wait

@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_asyn
 
 from novelo.adapters.email import get_email_sender
 from novelo.adapters.openrouter import CallUsage, ChatResult, RawToolCall, RoundResult, TextPiece, ToolCallRecord
+from novelo.adapters.turnstile import TurnstileResult, TurnstileUnavailableError, get_turnstile
 from novelo.ai.cache import response_cache
 from novelo.ai.catalog import ModelCatalog, get_catalog
 from novelo.core.config import get_settings
@@ -25,6 +26,14 @@ from novelo.core.ratelimit import (
     alerts_limiter,
     auth_limiter,
     copilot_limiter,
+    guest_ai_limiter,
+    guest_solver_limiter,
+    magic_email_limiter,
+    magic_link_limiter,
+    magic_verify_limiter,
+    quick_join_code_limiter,
+    quick_join_email_limiter,
+    quick_join_limiter,
     reset_limiter,
     triage_limiter,
     whatif_limiter,
@@ -100,6 +109,38 @@ class OutboxSender:
 
     async def send(self, *, to: str, subject: str, html: str, text: str) -> None:
         self.sent.append({"to": to, "subject": subject, "html": html, "text": text})
+
+
+class FakeTurnstile:
+    """Substitui a Cloudflare: "good" passa, "down" simula falha do serviço, o resto é recusado.
+
+    `hostname`/`action` configuráveis; guarda o que recebeu para os testes verificarem o uso único.
+    """
+
+    def __init__(self) -> None:
+        self.seen: list[tuple[str, str | None]] = []
+        self.hostname = ""
+        self.action = ""
+
+    async def verify(self, token: str, remote_ip: str | None) -> TurnstileResult:
+        self.seen.append((token, remote_ip))
+        if token == "down":
+            raise TurnstileUnavailableError("simulated outage")
+        if token != "good":
+            return TurnstileResult(success=False, error_codes=["invalid-input-response"])
+        return TurnstileResult(success=True, hostname=self.hostname, action=self.action)
+
+
+@pytest.fixture
+def turnstile() -> FakeTurnstile:
+    return FakeTurnstile()
+
+
+@pytest.fixture(autouse=True)
+def _turnstile_off_by_default(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Os testes existentes não levam token: o Turnstile liga-se só nos testes dedicados (test_turnstile.py)."""
+    monkeypatch.setattr(get_settings(), "turnstile_enabled_mode", "false")
+    monkeypatch.setattr(get_settings(), "turnstile_required", False)
 
 
 @pytest.fixture(autouse=True)
@@ -289,7 +330,7 @@ def outbox() -> OutboxSender:
 
 @pytest.fixture
 async def client(
-    session: AsyncSession, outbox: OutboxSender, llm: FakeLlm, catalog: ModelCatalog
+    session: AsyncSession, outbox: OutboxSender, llm: FakeLlm, catalog: ModelCatalog, turnstile: FakeTurnstile
 ) -> AsyncGenerator[httpx.AsyncClient, None]:
     app = create_app()
     _mount_ai_routers(app, catalog)
@@ -300,6 +341,7 @@ async def client(
     app.dependency_overrides[get_db] = _db
     app.dependency_overrides[get_email_sender] = lambda: outbox
     app.dependency_overrides[get_llm] = lambda: llm
+    app.dependency_overrides[get_turnstile] = lambda: turnstile
     app.dependency_overrides[get_catalog] = lambda: catalog
     from novelo.features.copilot.router import get_stream_deps  # noqa: PLC0415
 
@@ -310,6 +352,17 @@ async def client(
     whatif_limiter.reset()
     copilot_limiter.reset()
     alerts_limiter.reset()
+    for limiter in (
+        guest_ai_limiter,
+        guest_solver_limiter,
+        magic_email_limiter,
+        magic_link_limiter,
+        magic_verify_limiter,
+        quick_join_code_limiter,
+        quick_join_email_limiter,
+        quick_join_limiter,
+    ):
+        limiter.reset()
     response_cache.clear()
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
         yield c

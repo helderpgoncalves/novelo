@@ -4,6 +4,7 @@ import * as echarts from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { useEffect, useRef } from 'react';
 import type { Flows } from '@/client';
+import { formatTonnes } from '@/lib/format';
 import { MODE_COLORS } from '@/lib/map';
 import { modeLabel } from '@/lib/scenario';
 import { useTheme } from '@/lib/theme';
@@ -42,8 +43,7 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
       tooltip: {
         trigger: 'item',
         confine: true,
-        valueFormatter: (v: number) =>
-          `${v.toLocaleString(undefined, { maximumFractionDigits: 1 })} t`,
+        valueFormatter: (v: number) => formatTonnes(v),
       },
       series: [
         {

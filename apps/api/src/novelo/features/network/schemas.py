@@ -21,7 +21,7 @@ class CircuitOut(BaseModel):
     typology: Typology
     collection_type: CollectionType
     status: CircuitStatus
-    localities: list[str]
+    localities: list[str] = Field(description="Localidades pela ordem do ficheiro da Vitrus (a ordem do percurso)")
     weekdays: list[int] = Field(description="Dias em que passa: 1 = segunda ... 7 = domingo")
     days_text: str = Field(description="Dias como escritos no planeamento da Vitrus")
     vehicles: list[str] = Field(description="Matrículas das viaturas que o servem no planeamento")
@@ -61,6 +61,8 @@ class ScheduleEntry(BaseModel):
     circuit: str
     typology: Typology
     crew: int
+    collection_type: CollectionType = Field(description="Modo de recolha desta linha do planeamento")
+    note: str | None = Field(description="Nota da linha do planeamento da Vitrus")
 
 
 class VehicleOut(BaseModel):

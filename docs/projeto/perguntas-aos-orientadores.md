@@ -215,7 +215,7 @@ O resumo do estudo diz que os dados de composição física são de **2016**, do
 
 > **Pergunta.** O que consideram êxito para este desafio, e o que levaria a Vitrus a pilotar três meses em duas freguesias (toneladas, €/t, taxa de rejeito)? Quem decide (Vitrus, Câmara, juntas, Resinorte), com que orçamento e em que prazo? O plano de ação estima cerca de 5 milhões de euros para contentores em todas as freguesias: é esse o teto de referência?
 
-**Porque perguntamos.** O pedido final do pitch é o piloto. O plano municipal (Ação 1) estima "cerca de 5 milhões de euros" e uma meta de **+30% de recolha seletiva**, que aparece como "até 2025" (p. 51) e "até 2026" (p. 67) [F74]. O recomendador sugere Gondar e a União de Arosa e Castelões (em integração). Arosa e Castelões tem 699 habitantes e 33 contentores municipais, 9 deles com coordenada suspeita.
+**Porque perguntamos.** O pedido final do pitch é o piloto. O plano municipal (Ação 1) estima "cerca de 5 milhões de euros" e uma meta de **+30% de recolha seletiva**, que aparece como "até 2025" (p. 51) e "até 2026" (p. 67) [F74]. O recomendador sugere Gondar e a União de Arosa e Castelões (recomendação do `POST /planning/pilot`). Arosa e Castelões tem 699 habitantes e 33 contentores municipais, 9 deles com coordenada suspeita.
 
 | Se a resposta for | O Novelo passa a… | Atualizar |
 | --- | --- | --- |
@@ -410,7 +410,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | C4 | V, F, P · pós | Existe uma candidatura (PRR, FEDER, LIFE, Horizon) onde o Novelo possa entrar? | O plano lista fundos mistos e NetZero Cities [F74] | Se sim: escrever o consórcio; senão "hipótese" |
 | C5 | F, P · pós | Há espaço para uma dissertação ou um projeto sucessor do Lusitano? | Mentores | Se sim: tema e orientador por escrito |
 | C6 | V · pós | Quem aloja, mantém e financia o Novelo depois de 28 de outubro? Pode manter o acesso aos dados? | Produção em Coolify | Se não: exportar e apagar |
-| C7 | V · pós | Que formato de relatório de piloto querem receber (KPIs, periodicidade)? | KPIs do piloto em integração | Se há formato: relatório RAP adaptado |
+| C7 | V · pós | Que formato de relatório de piloto querem receber (KPIs, periodicidade)? | KPIs do piloto já na app | Se há formato: relatório RAP adaptado |
 
 ### 4.11 Modelo e investimento (Prof. Paulo Afonso)
 

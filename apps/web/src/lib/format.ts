@@ -1,8 +1,9 @@
 import { intlTag } from './i18n';
 
-// Números sempre no formato do idioma atual e com unidade.
+// Números sempre no formato do idioma atual e com unidade. Uma só regra para toda a app: milhares agrupados a
+// partir de 1 000 ("1 317 t"). O pt-PT só agrupa a partir de 5 dígitos por omissão, daí `useGrouping: 'always'`.
 const number = (digits: number) =>
-  new Intl.NumberFormat(intlTag(), { maximumFractionDigits: digits });
+  new Intl.NumberFormat(intlTag(), { maximumFractionDigits: digits, useGrouping: 'always' });
 
 export const formatNumber = (value: number, digits = 0) => number(digits).format(value);
 export const formatTonnes = (value: number, digits = 1) => `${number(digits).format(value)} t`;
@@ -13,4 +14,8 @@ export const formatEur = (value: number) =>
     style: 'currency',
     currency: 'EUR',
     maximumFractionDigits: 0,
+    useGrouping: 'always',
   }).format(value);
+
+export const formatMetres = (value: number, digits = 0) => `${number(digits).format(value)} m`;
+export const formatLitres = (value: number) => `${number(0).format(value)} L`;

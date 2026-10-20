@@ -43,7 +43,8 @@ Todos os modelos passam pelo **OpenRouter** (API compatível com OpenAI), atrav�
 
 | Tarefa | Funcionalidade | Exige | Prompt |
 | --- | --- | --- | --- |
-| `copilot` | Conversa com ferramentas (`POST /copilot/chat`) | tools + structured outputs | `copilot_v1.md` |
+| `copilot` | Conversa com ferramentas em streaming (`POST /copilot/stream`; `POST /copilot/chat` é a versão sem streaming) | tools + structured outputs | `copilot_v2.md` (a `v1` fica para auditoria) |
+| `copilot_aux` | Título, sugestões de seguimento, resumo de compactação, revisão de memória e pré-visualização de persona | structured outputs | `copilot_title_v1.md`, `copilot_suggestions_v1.md`, `copilot_summary_v1.md`, `memory_review_v1.md` |
 | `whatif` | "E se...?": percebe a pergunta (`ScenarioDelta`) | structured outputs | `whatif_v1.md` |
 | `explain` | Explicação do resultado do "E se...?" | structured outputs | `explain_v1.md` |
 | `briefing` | Parágrafo executivo do relatório RAP | structured outputs | `briefing_v1.md` |
@@ -88,7 +89,7 @@ Para comparar modelos com dados reais antes de trocar: `just eval-triage --model
 ## Desempenho e custo
 
 - **Saída estruturada estrita** (`json_schema` com `strict`) e temperatura 0; uma repetição se não validar.
-- **`max_tokens` por tarefa** (copiloto 900, "E se..." 400, explicação 300, briefing 400, alertas 500, triagem 500), com `reasoning: low` por omissão.
+- **`max_tokens` por tarefa** (copiloto 900, `copilot_aux` 400, "E se..." 400, explicação 300, briefing 400, alertas 500, triagem 500), com `reasoning: low` por omissão.
 - **Timeouts curtos** (30 s por chamada, 90 s por conversa) e **repetições limitadas** com espera exponencial em timeouts, 429 e 5xx. Se o modelo principal continuar a falhar, tenta-se uma vez o **modelo de reserva** da tarefa.
 - **Fotos reduzidas** antes de seguirem para o modelo: lado maior até 1024 px, JPEG com qualidade 80, sem EXIF (também retira a localização e o modelo da câmara).
 - **Cache em memória** (1 h) das respostas idênticas do "E se...?" e das explicações: a chave é o hash do input determinístico.
@@ -98,11 +99,12 @@ Para comparar modelos com dados reais antes de trocar: `just eval-triage --model
 
 ## Copiloto
 
-O copiloto tem documento próprio: [Copiloto](copiloto.md) (streaming SSE com eventos tipados, 42 ferramentas, artefactos, ações com confirmação, memória e persona por utilizador, anexos, menções, histórico, avaliação). Aqui ficam só as regras de IA que o atravessam:
+O copiloto tem documento próprio: [Copiloto](copiloto.md) (streaming SSE com eventos tipados, 46 ferramentas, artefactos, ações com confirmação, memória e persona por utilizador, anexos, menções, histórico, avaliação). Aqui ficam só as regras de IA que o atravessam:
 
 - Os números do texto passam sempre pelo verificador (`unsupported_rounded`, com tolerância de arredondamento e sem contar rótulos como "P90" nem marcadores de listas). Se o texto já foi transmitido e falha, o servidor emite `retract` e reescreve uma vez; à segunda falha, só aviso e resultados.
 - Os gráficos e as tabelas são construídos pelo servidor a partir dos resultados das ferramentas; o modelo nunca escreve os valores.
 - Tarefas de IA do copiloto: `copilot` (conversa) e `copilot_aux` (título, sugestões, resumo de compactação, revisão de memória e pré-visualização de persona), ambas configuráveis em `/admin/ai`.
+- **Convidados do evento** (`guest`): `GUEST_AI_REQUESTS_PER_HOUR` pedidos de IA por hora (copiloto, triagem, "E se...?", sugestões de alertas, relatório RAP) e `GUEST_AI_BUDGET_USD` de gasto em 24 h; acima disso, 429 ou 503 `ai_budget_exceeded`.
 - **Saída estruturada estrita**: o adaptador converte cada esquema Pydantic para o formato que o modo `strict` aceita (objetos fechados, todos os campos obrigatórios, sem irmãos de `$ref`); o Pydantic continua a validar a resposta com o modelo original. Sem isto, o fornecedor devolve 400 "Provider returned error".
 
 ## Outras funcionalidades
@@ -124,4 +126,4 @@ O copiloto tem documento próprio: [Copiloto](copiloto.md) (streaming SSE com ev
 
 Nenhum teste chama a API real. `tests/unit/test_stream_adapter.py` (streaming), `tests/unit/test_ai_client.py` (tool calling, limite de 6 voltas, repetições, reserva, orçamento, custo, cache, logs sem segredos), `test_catalog.py` (cache, ETag, stale-while-error), `test_images.py`, `test_verify.py`, `test_briefing.py`, `test_eval_triage.py`; `tests/api/test_copilot.py`, `test_ai_admin.py`, `test_alert_suggest.py`, `test_whatif.py`, `test_lots.py` e `test_reports.py` cobrem as rotas com um adaptador falso injetado por `Depends`.
 
-Com chave real (manual): `curl` autenticado a `POST /api/v1/copilot/chat` e, no painel, "Testar modelo". Sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503.
+Com chave real (manual): `just eval-copilot` (78 casos, ver [Avaliação do copiloto](avaliacao-copiloto.md)) e, no painel, "Testar modelo". Sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503.

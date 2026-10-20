@@ -156,6 +156,13 @@ class ActionDef:
     critical: bool = False
 
 
+def forbidden_for(d: ActionDef, role: str) -> bool:
+    """Admin-only para quem não é admin; convidados também não fazem ações de risco alto ou crítico (apagar, reservar)."""
+    if d.admin_only and role != "admin":
+        return True
+    return role == "guest" and (d.critical or d.risk in {"high", "critical"})
+
+
 def _t(ctx: Ctx, pt: str, en: str) -> str:
     return en if ctx.locale == "en" else pt
 
@@ -644,7 +651,7 @@ async def propose(
 ) -> CopilotAction:
     """Valida o tipo, os parâmetros e o role. Cria a proposta (e executa-a só se for auto-aprovada)."""
     d = ACTIONS[type_]
-    if d.admin_only and ctx.user.role != "admin":
+    if forbidden_for(d, ctx.user.role):
         raise ForbiddenError("Only administrators can do this")
     try:
         params = d.params.model_validate(raw_params)
@@ -735,7 +742,7 @@ async def _run(ctx: Ctx, action_id: uuid.UUID) -> CopilotAction:
     row = await ctx.db.get(CopilotAction, action_id)
     assert row is not None
     d = ACTIONS[ActionType(row.type)]
-    if d.admin_only and ctx.user.role != "admin":  # o role pode ter mudado entre a proposta e a confirmação
+    if forbidden_for(d, ctx.user.role):  # o role pode ter mudado entre a proposta e a confirmação
         row.status, row.result, row.decided_at = (
             "failed",
             {"error": "forbidden", "message": "Insufficient permissions"},
@@ -771,7 +778,7 @@ async def undo(ctx: Ctx, action_id: uuid.UUID) -> CopilotAction:
     if row.status != "executed" or not row.reversible or not row.undo:
         raise ConflictError("This action cannot be undone")
     d = ACTIONS[ActionType(row.type)]
-    if d.admin_only and ctx.user.role != "admin":
+    if forbidden_for(d, ctx.user.role):
         raise ForbiddenError("Only administrators can undo this")
     assert d.undo is not None
     row.result = {**row.result, **await d.undo(ctx, row.undo)}

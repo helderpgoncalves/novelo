@@ -19,13 +19,13 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 **Porque pode ganhar.**
 
 1. **Dados reais em todo o lado:** 301,3 t, destino de cada tonelada, 40 circuitos, 29 viaturas, população do INE.
-2. **Honestidade sobre a incerteza:** os custos unitários ainda são pressupostos; mostramos o intervalo e o que mais pesa (em integração).
+2. **Honestidade sobre a incerteza:** os custos unitários ainda são pressupostos; mostramos o intervalo e o que mais pesa (feito: tornado e Monte Carlo).
 3. **IA com disciplina:** conduz o otimizador e **nunca faz contas**; um verificador rejeita números inventados.
 4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes" e exige cobertura do território todo.
 5. **Cadeia completa, do saco ao fio:** recolha, triagem, lote com passaporte, bolsa de fibra, relatório RAP.
-6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (em integração).
+6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (feito).
 
-**O que ainda nos falta** (por ordem): custos unitários da Vitrus; fonte do plano municipal (5,4%, 0,7 kg/hab/mês, "4 de 27"); o texto das Regras (os quatro critérios e pesos já são conhecidos, falta o detalhe de cada um); contentores (chegam a 20); uma frase de um reciclador; exatidão medida da triagem.
+**O que ainda nos falta** (por ordem): custos unitários da Vitrus; confirmação da Vitrus sobre o que os 0,7 kg/hab/mês e os 5,4% medem (a fonte pública, o Plano de Ação Integrado, já foi localizada em 20 de outubro; "4 de 27" está na p. 32); o texto das Regras (os quatro critérios e pesos já são conhecidos, falta o detalhe de cada um); localizações dos contentores de têxteis (a 20 chegou só o inventário municipal); uma frase de um reciclador; exatidão medida da triagem.
 
 **A única regra que não se pode violar:** nenhum número vai para o palco sem estar no [registo](../pesquisa/registo-de-afirmacoes.md) com o seu estado.
 
@@ -122,7 +122,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 | Critério | O que o júri provavelmente procura (**hipótese**) | Evidência Novelo | Onde se mostra | Risco | Ação para subir a nota |
 | --- | --- | --- | --- | --- | --- |
 | **Inovação e originalidade** (25%) | Uma ideia que não seja a solução óbvia (a app do cidadão, mais contentores); IA com sentido; uma ligação nova entre peças | A IA conduz o otimizador e um verificador rejeita números fora do resultado; a cadeia do saco ao fio numa só ferramenta: decisão da rede, lote com passaporte e QR, bolsa de fibra, relatório RAP ([funcionalidades](../engenharia/features.md)) | Slides 5 e 6; demo: "E se...?" (passo 6) e lote com QR (passo 8) | "Isto já existe?": cada peça existe isolada, e a nossa pesquisa de concorrência não é exaustiva | Dizer a novidade como **ligação**, não como tecnologia; mostrar o verificador a recusar um número; ter uma frase de comparação. **Não investir mais engenharia aqui** |
-| **Viabilidade técnica** (25%) | Funciona a sério; usa dados reais; os pressupostos estão à vista; sabe-se o que acontece quando falha | Em produção ([novelo.helder.si](https://novelo.helder.si)); dados da Vitrus (301,3 t, 40 circuitos, 29 viaturas) e do INE; pressupostos visíveis; domínio testado com valores calculados à mão; 12 alertas de qualidade dos dados | Slide 5; demo: ponto de partida (passo 1) e sensibilidade (passo 5); plano B | Custos unitários ainda são pressupostos; sensibilidade, piloto e copiloto em integração; exatidão da triagem por medir | E2E verde em tudo o que entra; mostrar intervalo e tornado; "estamos a medir" com protocolo; cenários pré-calculados |
+| **Viabilidade técnica** (25%) | Funciona a sério; usa dados reais; os pressupostos estão à vista; sabe-se o que acontece quando falha | Em produção ([novelo.helder.si](https://novelo.helder.si)); dados da Vitrus (301,3 t, 40 circuitos, 29 viaturas) e do INE; pressupostos visíveis; domínio testado com valores calculados à mão; 12 alertas de qualidade dos dados | Slide 5; demo: ponto de partida (passo 1) e sensibilidade (passo 5); plano B | Custos unitários ainda são pressupostos; sensibilidade, piloto e copiloto já na app (a ensaiar com o guião); exatidão da triagem por medir | E2E verde em tudo o que entra; mostrar intervalo e tornado; "estamos a medir" com protocolo; cenários pré-calculados |
 | **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); captura de 22,9% do potencial do plano municipal (cálculo; potencial **por verificar**); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP em 17 abr 2028; **cenário B: X t/ano a Y €/t (estimativa, por preencher a 22 out)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | X e Y por preencher; custos da Vitrus por chegar; 5,4% e 0,7 kg/hab/mês por verificar (fora de slide); sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
 | **Apresentação e potencial de continuidade** (20%) | História clara, tempo cumprido, demo sem falhas; um plano para depois do hackathon, parceiros, replicação, sustentabilidade | Narrativa em sete passos; demo mínima de cinco passos; plano B; pedido do piloto (duas freguesias, 3 meses, KPIs, piso de sinal de 1,71 t, estimativa); repositório público, propriedade dos autores [F59] | Slides 1 e 8; slide de apoio 9 ("critério → prova"); QR lido no telemóvel de um jurado | Deck por fazer; duração e formato por confirmar; nenhum parceiro confirmou o piloto; modelo de sustentabilidade é hipótese | Três ensaios a 25 out; mensagem à Vitrus e à Fibrenamics com o pedido; roadmap pós-26 out com datas; replicação dita com prova (dados abertos) |
 
@@ -133,7 +133,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 | Critério | Peso | Nota hoje (0 a 10) | Contributo | Porquê | Alvo a 25 out | Contributo alvo |
 | --- | --- | --- | --- | --- | --- | --- |
 | Inovação e originalidade | 25% | **7** | 1,75 | A cadeia ligada e o verificador distinguem-nos; mas as peças existem isoladas e não temos prova externa de novidade | 7 | 1,75 |
-| Viabilidade técnica | 25% | **6** | 1,50 | Produto no ar com dados reais; mas custos são pressupostos, várias funcionalidades estão em integração sem E2E e a triagem não tem exatidão medida | 8 | 2,00 |
+| Viabilidade técnica | 25% | **6** | 1,50 | Produto no ar com dados reais; mas custos são pressupostos, a triagem não tem exatidão medida e há 162 testes ponta a ponta que ainda têm de ser ensaiados com o guião da demo | 8 | 2,00 |
 | Impacto e relevância | 30% | **6** | 1,80 | Problema e prazos com fonte primária; mas X e Y não estão preenchidos, faltam custos da Vitrus e o potencial do plano municipal está por verificar | 8 | 2,40 |
 | Apresentação e continuidade | 20% | **5** | 1,00 | Narrativa e guião escritos; mas o deck não existe, a demo não foi ensaiada, o formato é desconhecido e nenhum parceiro confirmou o piloto | 8 | 1,60 |
 | **Nota ponderada** | 100% | | **6,05** | | | **7,75** |
@@ -294,7 +294,7 @@ gantt
 | # | Risco | Gravidade | Probabilidade | Resposta | Dono |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Os custos unitários da Vitrus não chegam | Alta | Alta | Intervalo e tornado; dizer "estimativa"; pedir hoje | H |
-| 2 | O júri pergunta pelos 5,4% e "4 de 27" | Alta | Média | Pedir o documento ao Lucas; até lá não vão a slide | H |
+| 2 | O júri pergunta pelos 5,4% e "4 de 27" | Alta | Média | O plano é público (URBACT): citar a p. 30 e a p. 32 e dizer que falta confirmar com a Vitrus o que o 0,7 mede (Q6); sem a ressalva não vão a slide | H |
 | 3 | Prometer demasiado ("a IA substitui a triagem", metas na diretiva) | Alta | Média | Lista "o que nunca dizer"; revisão do registo | HF |
 | 4 | Funcionalidade nova quebra na demo | Média | Média | Regra de corte; cenários pré-calculados | HF |
 | 5 | IA indisponível (saldo, chave, latência) | Média | Média | Orçamento e modelo de reserva; vídeo; sem IA o resto funciona | F |
@@ -353,6 +353,6 @@ As perguntas completas, por ordem de impacto, para o **Lucas Nascimento**, o **L
 | **Fibrenamics** | Ver [Mentores](mentores.md#luís-miguel-oliveira-fibrenamics) | Critérios do lote; destino de baixo valor |
 | **Humana** ou outra entidade de economia social | "Como articulam novos pontos municipais com os vossos? Têm dados de triagem?" | Parceria e dados reais |
 | **Wippytex** | "Como trabalham com 30 municípios e o que pedem às câmaras?" | Boas práticas |
-| **Município / Let's Go Circular** | "Pode partilhar o plano de ação de circularidade têxtil?" | A fonte dos 5,4% |
+| **Município / Let's Go Circular** | "O que mede o 0,7 kg/hab/mês do plano de ação, e de que ano é a caracterização dos 5,4%?" | O âmbito dos 5,4% e do 0,7 (Q6) |
 
 Mais contexto em [Indústria e mercado](../pesquisa/industria-e-mercado.md).

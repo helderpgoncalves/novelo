@@ -1,10 +1,10 @@
-# Features que nos distinguem
+# Funcionalidades
 
-Cinco features, uma história: **do saco ao fio**. Planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028. Cada feature usa a anterior, e todas cabem numa demo de dois minutos.
+Seis funcionalidades que nos distinguem, uma história: **do saco ao fio**. Planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028. Cada uma usa a anterior, e as cinco primeiras cabem numa demo de dois minutos. A seguir vêm o copiloto conversacional, o agente semanal (ainda por fazer) e os ecrãs de base.
 
 ![Do saco ao fio: cada passo alimenta o seguinte](../img/diagrama-do-saco-ao-fio.png)
 
-A linha tracejada à esquerda é o copiloto (feature 6): o que os lotes mostram no terreno volta a calibrar o plano.
+A linha tracejada à esquerda é o agente semanal de operações (secção 7, por fazer): o que os lotes mostram no terreno volta a calibrar o plano.
 
 ## 1. "E se...?" sobre o otimizador
 
@@ -82,7 +82,19 @@ Na triagem, a foto da etiqueta dá também a marca, quando está visível. O Nov
 - Só se guardam marca, composição e peso. As fotografias são apagadas depois de processadas e nunca há dados de quem entregou a peça.
 - No relatório RAP, esta evidência aparece agregada e com o tamanho da amostra, para não tirar conclusões de poucos lotes.
 
-## 6. Copiloto de operações (se houver tempo)
+## 6. Copiloto conversacional
+
+Uma conversa em streaming (`/chat`, ou o painel em qualquer ecrã com `⌘K` / `Ctrl+K`) que sabe o que o decisor está a ver. Pede-se em português ("compara o Base com o Ambicioso e mostra o €/t") e o copiloto responde em poucas frases, com o gráfico ou a tabela e a fonte dos dados.
+
+- **46 ferramentas tipadas** chamam os mesmos services da app: cenários, "E se...?", sensibilidade, piloto, rede, lotes, bolsa, marcas, alertas, rede municipal e custos de IA.
+- **Nunca faz contas:** gráficos e tabelas são construídos pelo servidor; o verificador retira e reescreve um texto com números sem origem.
+- **Ações com confirmação:** o copiloto só propõe (criar ou apagar um cenário, resolver um alerta, abrir ou reservar um lote, mudar um pressuposto); só o clique executa, com as permissões da pessoa. Fica auditado e, quando reversível, pode ser desfeito.
+- **Memória, anexos e menções:** duas notas pequenas por utilizador, editáveis e exportáveis; imagens, PDF, folhas de cálculo e texto como contexto; `@freguesia`, `@cenário`, `@local` e o ecrã atual.
+- **Conversas:** histórico, pastas, partilha só de leitura por ligação, exportação em Markdown e PDF, ramos ao editar uma mensagem.
+
+Desenho, contrato dos eventos, segurança e avaliação em [Copiloto](copiloto.md).
+
+## 7. Agente semanal de operações (se houver tempo)
 
 Um agente que corre todas as segundas-feiras e fecha o ciclo entre o plano e o terreno:
 
@@ -91,21 +103,53 @@ Um agente que corre todas as segundas-feiras e fecha o ciclo entre o plano e o t
 3. Volta a correr o otimizador e propõe alterações com a poupança esperada ("mover o ponto da Junta X para o supermercado Y: +0,4 t/mês").
 4. Escreve um resumo para a Vitrus. **Nada é aplicado sem aprovação humana.**
 
-No hackathon mostra-se uma execução, com dados simulados de uma semana. No pitch entra como o próximo passo natural.
+No hackathon mostra-se uma execução, com dados simulados de uma semana. No pitch entra como o próximo passo natural. **Não iniciado.**
+
+## Ecrãs de base
+
+Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
+
+| Ecrã | Rota | O que faz |
+| --- | --- | --- |
+| Ponto de partida | `/` | Números reais de 2025, lacuna para o potencial (estimativa), destino do recolhido, referências (França, UE, Catalunha), relógio regulatório, fronteira de cenários e freguesias |
+| Simulador | `/simulator` | Formulário de orçamento (60 000 € por ano por omissão), meta e restrições; corre o otimizador e mostra os passos |
+| Cenários | `/scenarios`, `/scenarios/:id`, `/scenarios/compare` | Lista, resumo, rede, incerteza (tornado e Monte Carlo), "E se...?", robustez e comparação lado a lado; cenários de referência por *benchmark* |
+| Pressupostos | `/assumptions` | Cada parâmetro com valor, unidade e origem; edição só por administradores |
+| Piloto | `/pilot` | Escolhe 2 a 4 freguesias de maior aprendizagem e o piso de sinal em toneladas |
+| Cobertura | `/coverage` | Cobertura a pé dos contentores **de têxteis**; em espera até chegarem as localizações |
+| Mapa | `/map` | Freguesias, localidades e camadas municipais (locais, contornos CAOP, produtores) |
+| Rede municipal | `/municipal` | Contentores de **outras frações** (não são de têxteis) em seis separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas (estimativa) e qualidade; exportação CSV, XLSX e GeoJSON. Nomes de produtores só para administradores |
+| Circuitos e localidades | `/circuits`, `/localities` | Os circuitos e as 82 localidades da Vitrus, por tipologia e por frequência |
+| Frota e turnos | `/fleet` | Calendário da semana tipo (semana, dia, por viatura, por circuito) com conflitos reais, mapa das localidades por circuito, visão geral com carga por turno, viaturas e tipologias; exportação `.ics` e CSV. É planeamento de semana tipo, sem datas nem horas reais |
+| Qualidade dos dados | `/data-quality` | Alertas (12 da Vitrus e 25 municipais) resolúveis, com sugestão de IA, e fontes com impressão digital |
+| Triagem, lotes, bolsa, marcas | `/triage`, `/lots`, `/market`, `/brands` | Funcionalidades 2 e 5 |
+| Relatório RAP | `/reports` | Funcionalidade 3 |
+| Copiloto | `/chat` | Funcionalidade 6 |
+| Utilizadores | `/users` | Contas, convidados do evento (entrada por QR) e cartaz do QR para imprimir. Só administradores |
+| IA | `/admin/ai` | Modelo e limites por tarefa, orçamento, custos e avaliação da triagem. Só administradores |
+| Conta | `/account` | Perfil, língua, tema, sessões, password |
+| Entrada | `/login`, `/join`, `/magic-link`, `/verify-email`, `/privacy` | Magic link (principal), password, Google, entrada de evento por QR, confirmação de email e texto de privacidade |
+| Passaporte | `/passport/:código` | Público, sem sessão: o que o QR do lote abre |
+
+**Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, visita guiada na primeira entrada, `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
 
 ## Estado de implementação
 
 | Funcionalidade | Estado |
 | --- | --- |
-| Simulador, cenários e comparação, pressupostos com origem | Feito |
+| Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
-| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; exatidão da triagem por medir |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
-| Mapa da rede, circuitos, frota, localidades, qualidade dos dados | Feito |
-| Tabelas de dados e separadores de nível profissional: filtros partilháveis por URL, vistas guardadas, colunas fixáveis e reordenáveis, exportar CSV/XLSX/JSON, seleção e ações em massa, teclado (ver [Arquitetura](arquitetura.md#web)) | Feito |
-| Rede municipal (outras frações, não é têxtil): API de dados, GeoJSON, candidatos, produtores, lacuna estimada e exportação; ferramentas do copiloto | Feito na API; ecrãs e camadas de mapa por fazer no web |
-| Camada dos contentores de **têxteis** no mapa | Falta: a lista de contentores de têxteis continua por receber |
-| Copiloto de operações | Não iniciado (fica para depois) |
+| Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
+| Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |
+| Tabelas e separadores de nível profissional (`DataTable`, `PageTabs`) | Feito; paginação em blocos, sem virtualização de linhas |
+| Rede municipal (outras frações, não é têxtil): API, ecrã de seis separadores, camadas do mapa, alertas `municipal_*`, exportação e ferramentas do copiloto | Feito |
+| Copiloto conversacional (SSE tipado, threads, memória, anexos, menções, artefactos, ações com confirmação, página `/chat`, avaliação) | Feito; estado «a correr o otimizador» sem progresso real |
+| Entrada por magic link, entrada por QR (`guest`), Google, emails transacionais | Feito |
+| Páginas de erro, PWA e interface de telemóvel, marca gerada por `just brand` | Feito |
+| Camada e cobertura dos contentores de **têxteis** | Falta: a lista de contentores de têxteis continua por receber |
+| Agente semanal de operações | Não iniciado (fica para depois) |
 
 ## O que fica de fora, de propósito
 
@@ -115,6 +159,6 @@ No hackathon mostra-se uma execução, com dados simulados de uma semana. No pit
 
 ## Ordem de corte
 
-Se o tempo apertar, corta-se por esta ordem: copiloto (6), evidência por marca (5), animação do Sankey (fica estático), bolsa de fibra (fica só o passaporte do lote). **Nunca se cortam:** a comparação de cenários, o "E se...?" e o relatório RAP.
+Se o tempo apertar, corta-se por esta ordem: agente semanal (7), copiloto conversacional (6), evidência por marca (5), animação do Sankey (fica estático), bolsa de fibra (fica só o passaporte do lote). **Nunca se cortam:** a comparação de cenários, o "E se...?" e o relatório RAP.
 
 **Fontes:** [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf) (passaporte digital, mercado de matérias-primas secundárias) · [Diretiva 2025/1892, VdA](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/) (prazo da RAP) · [EU Parliament mandates EPR for textiles, AMI](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles) (taxas mais altas para moda rápida)

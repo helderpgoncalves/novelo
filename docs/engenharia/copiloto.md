@@ -19,7 +19,7 @@ flowchart LR
     subgraph API["API (FastAPI)"]
         P[Preparar: ownership, menções,<br/>anexos, linha do ecrã]
         A[Agente em streaming]
-        T[(Ferramentas tipadas<br/>42: dados, UI, ações, memória)]
+        T[(Ferramentas tipadas<br/>46: dados, UI, ações, memória)]
         V[Verificador de números]
         P --> A
         A <--> T
@@ -336,15 +336,19 @@ Recusados: executáveis (MZ, ELF, Mach-O, `#!`), HTML/SVG/scripts, ZIP que não 
 
 Duas superfícies partilham os mesmos componentes (`apps/web/src/features/copilot/`) e o mesmo hook `useChat`:
 
-- **Página `/chat`** (no menu, ecrã inteiro): separadores *Conversa* (lista de conversas à esquerda, em folha no telemóvel), *Histórico* (cronologia com cursor, `DataTable`), *Artefactos* (galeria: fixar, atualizar, apagar), *Ações* (registo com Desfazer; auditoria `scope=all` para administradores) e *Definições* (memória editável com aprovações pendentes, personalidade com pré-visualização, comportamento e retenção, exportar/apagar dados com a palavra `APAGAR`). O estado vive no URL (`?tab=`, `?thread=`). As conversas partilhadas abrem em `/chat/shared/:token`, só de leitura.
-- **Painel lateral** (⌘K / Ctrl+K): a mesma conversa, retomada a partir do `sessionStorage`; "Ecrã inteiro" leva-a para `/chat?thread=`.
+- **Página `/chat`** (no menu, ecrã inteiro): cabeçalho compacto de uma só linha (até 52 px) com o título da conversa e um menu «⋯» (nova conversa, exportar, e em telemóvel os outros separadores). Separadores *Conversa* (lista de conversas à esquerda em ecrãs largos; em ecrãs estreitos abre numa folha inferior pelo botão do histórico), *Histórico* (cronologia com cursor, `DataTable`), *Artefactos* (galeria: fixar, atualizar, apagar), *Ações* (registo com Desfazer; auditoria `scope=all` para administradores) e *Definições* (memória editável com aprovações pendentes, personalidade com pré-visualização, comportamento e retenção, exportar/apagar dados com a palavra `APAGAR`). O estado vive no URL (`?tab=`, `?thread=`). As conversas partilhadas abrem em `/chat/shared/:token`, só de leitura.
+- **Painel lateral** (⌘K / Ctrl+K): a mesma conversa, retomada a partir do `sessionStorage`, com as conversas anteriores numa folha inferior (`history-sheet.tsx`); «Ecrã inteiro» leva-a para `/chat?thread=`.
 - **`openCopilot({ question, send, threadId })`** (`store.ts`) abre o painel (ou usa a página `/chat`, se estiver aberta) e envia a pergunta; substitui o antigo `copilot-link.ts`.
+
+**Contexto do ecrã.** Por omissão o ecrã atual segue como contexto (`page_context`, um chip visível no campo de mensagem). Remove-se, e volta a juntar-se, no menu «+» do campo.
+
+**Campo de mensagem e menu «+».** O «+» à esquerda do campo abre um menu com quatro entradas: anexar ficheiro, anexar (ou retirar) o ecrã atual, inserir `@` (menções) e inserir `/` (comandos; desativado enquanto houver texto escrito).
 
 Como funciona o streaming: `sse.ts` faz `fetch` + `ReadableStream` ao `POST /copilot/stream` (e `/regenerate`), ignora `: ping`, junta blocos incompletos e devolve cada evento da união `CopilotEventMessage`. `reducer.ts` aplica os eventos a uma volta (`retract` apaga o texto; `done`/`error` fecham), e o hook agrupa-os a cada 40 ms para não redesenhar por cada token. `AbortController` cancela (o servidor grava a resposta parcial como `cancelled`). Erros antes de abrir o stream (404, 403, 429, 503) chegam como `{code, message}` e usam as mesmas mensagens traduzidas do resto da app.
 
 Interface da resposta: o assistente ocupa a largura toda (sem bolha), o utilizador fica compacto à direita. Em vez de skeletons, `thinking.tsx` mostra frases temáticas (têxtil, recolha, otimização) escolhidas pelo `label_key` do evento `status` (17 famílias, três frases cada, em pt/en) e que rodam a cada 2,6 s; com `prefers-reduced-motion` ficam estáticas e sem animação. Os 13 tipos de gráfico são desenhados com echarts (`artifacts/chart-options.ts`), as tabelas e comparações com o `DataTable`, os mapas com MapLibre. As ações propostas aparecem como cartões Confirmar / Rejeitar / Desfazer (as críticas pedem escrever `APAGAR`); as notas de memória mostram "Guardei na memória" com Desfazer.
 
-Campo de mensagem flutuante: o texto cresce sozinho (16 px, sem zoom no iOS), Enter envia e Shift+Enter muda de linha; anexar e enviar estão dentro do campo; chips de anexos com pré-visualização, arrastar e colar ficheiros; `@` abre o auto-completar de menções (`search_copilot_mentions`) com teclado; `/` lista os comandos (`list_copilot_commands`); o botão "Anexar o ecrã atual" envia o `page_context`. O scroll segue o fim enquanto escreve, pára se a pessoa subir e mostra "Ir para o fim".
+Campo de mensagem flutuante: o texto cresce sozinho (16 px, sem zoom no iOS), Enter envia e Shift+Enter muda de linha; o «+» e o botão de enviar estão dentro do campo; chips de anexos com pré-visualização, arrastar e colar ficheiros; `@` abre o auto-completar de menções (`search_copilot_mentions`) com teclado; `/` lista os comandos (`list_copilot_commands`); o item «Anexar o ecrã atual» do menu «+» envia o `page_context`. O scroll segue o fim enquanto escreve, pára se a pessoa subir e mostra "Ir para o fim".
 
 Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos `@` e `/`, frases, Markdown) e `apps/web/e2e/copilot-v2.spec.ts` (Playwright contra a API e o modelo reais: streaming, parar, `@`, anexos, gráficos, tabelas, ação com confirmação, memória, histórico, conversas, painel, scroll, movimento reduzido, telemóvel e apagar dados).
 
@@ -353,11 +357,11 @@ Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos 
 - **nginx** (`apps/web/nginx.conf`): `/api/v1/copilot/stream` e `/regenerate` sem buffering (`proxy_buffering off`, HTTP/1.1, `gzip off`, leitura até 300 s); `/api/v1/copilot/attachments` com `client_max_body_size 55m`. A API também envia `X-Accel-Buffering: no`.
 - **Variáveis**: ver [Ambiente](ambiente.md): `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS`.
 - **Custos**: cada chamada fica em `ai_usage` (tarefas `copilot` e `copilot_aux`). Com `openai/gpt-6-luna` uma pergunta típica custa cerca de US$ 0,0004 a 0,001 (as ferramentas pesam ≈6 000 tokens, mas o prefixo estável vai em cache).
-- **Limites de pedidos**: 12 por minuto por utilizador (`copilot_limiter`).
+- **Limites de pedidos**: 12 por minuto por utilizador (`copilot_limiter`, em memória). O role `guest` (entrada por QR) tem ainda `GUEST_AI_REQUESTS_PER_HOUR` pedidos por hora e o teto de gasto `GUEST_AI_BUDGET_USD` em 24 h; não pode confirmar ações de risco alto ou crítico (ver [Ambiente](ambiente.md#magic-link-e-entrada-por-qr)).
 
 ## Avaliação
 
-`just eval-copilot` corre os casos de `apps/api/tests/evals/copilot_cases.yaml` (78, em pt-PT e en; 11 são da rede municipal e ainda não correram contra o modelo real) contra o modelo real e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
+`just eval-copilot` corre os casos de `apps/api/tests/evals/copilot_cases.yaml` (78, em pt-PT e en; 11 são da rede municipal e ainda não correram contra o modelo real, ver o estado no fim desta secção) contra o modelo real e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
 
 | Medida | Limiar |
 | --- | --- |
@@ -389,4 +393,7 @@ Quatro ferramentas leem os mesmos services da API (`features/municipal`), por is
 - A revisão automática trata de `memory` e `user`; as "competências" (skills/rotinas procedimentais do Hermes) ficam para uma fase seguinte.
 - A estimativa de tokens é aproximada; a compactação usa o limiar com margem.
 - O cancelamento só pára a faturação nos fornecedores que o suportam (lista do OpenRouter).
-- Convidar utilizadores não existe como serviço na app, por isso não é uma ação do copiloto.
+- Convidar utilizadores não é uma ação do copiloto. Os convidados do evento entram por QR (`/join`) e o administrador gere-os em `/users`.
+- O stream não tem fases reais do otimizador: o estado «A correr o otimizador...» é emitido antes de a ferramenta correr e não mostra progresso do solver.
+- O limite de pedidos (`copilot_limiter`, `guest_ai_limiter`) vive na memória de um processo: com mais de uma instância da API os limites multiplicam-se.
+- A corrida de avaliação publicada ainda não inclui os 11 casos `muni_*` (ver «Avaliação»).

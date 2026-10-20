@@ -199,7 +199,7 @@ Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perg
 | 8 | **Restrições operacionais:** turnos, motoristas, sábados, viaturas partilhadas, janelas horárias. | O otimizador não deve propor o inviável | Restrições no modelo e no "E se...?" |
 | 9 | Os **9 circuitos sem viatura, as 2 viaturas nunca atribuídas e os 12 alertas**: confirma o significado? | Resolver alertas com base certa | Fechamos alertas no ecrã com nota da Vitrus |
 | 10 | Quais são os **dois projetos europeus de circularidade** (Let's Go Circular, Circular Ecosystems?) e o Novelo pode alimentar o plano de ação têxtil? | M12 é hipótese | Posicionamento pós-hackathon e fonte para o plano de circularidade |
-| 11 | **Piloto:** a Vitrus estaria disponível para 3 meses em duas freguesias? Preferem outras que não Gondar e Arosa e Castelões? | O recomendador escolhe pela aprendizagem (em integração) | Ajustamos a recomendação ao que é operacionalmente possível |
+| 11 | **Piloto:** a Vitrus estaria disponível para 3 meses em duas freguesias? Preferem outras que não Gondar e Arosa e Castelões? | O recomendador escolhe pela aprendizagem (já na app) | Ajustamos a recomendação ao que é operacionalmente possível |
 | 12 | Sabem **quem será a entidade gestora** e em que ponto está a RAP têxtil em Portugal? | APA em dez 2025: nada aprovado (B11) | Frase do slide de 2028 e relatório RAP |
 | 13 | Que **outros dados** existem: caracterização do indiferenciado por freguesia, tarifa de aterro/incineração, reclamações, volumes por circuito? | Custo evitado e procura por zona | Novas linhas no modelo e na cobertura |
 | 14 | Que **KPI** usam hoje para o custo por tonelada de têxtil? | Falar na linguagem deles | Alinhamos definições (custo total vs marginal) |
@@ -275,7 +275,7 @@ Servem sobretudo o **impacto e relevância (30%)** e a **continuidade (20%)**. S
 
 1. **0:00 a 0:30**: simulador com um cenário: custo anual, investimento, €/t, "estimativa".
 2. **0:30 a 1:15**: "Pressupostos": cada custo com a sua origem.
-3. **1:15 a 1:45**: separador de incerteza (tornado e P10/P50/P90), em integração: "quais pressupostos mexem mais".
+3. **1:15 a 1:45**: separador de incerteza (tornado e P10/P50/P90), já na app: "quais pressupostos mexem mais".
 4. **1:45 a 2:00**: a pergunta: "Como defender estes custos perante a Vitrus e perante a futura entidade gestora?"
 
 ### Perguntas, por ordem de impacto
@@ -316,7 +316,7 @@ Servem a **viabilidade técnica (25%)**, no modelo, e o **impacto (30%)**, nas m
 
 | Caminho | Quem pode ajudar | O que dizer | Estado |
 | --- | --- | --- | --- |
-| **Piloto de 3 meses** com a Vitrus em duas freguesias | Lucas Nascimento | "Recomendado pelo Novelo (em integração), com KPIs e piso de sinal; pedimos duas freguesias" | Por pedir |
+| **Piloto de 3 meses** com a Vitrus em duas freguesias | Lucas Nascimento | "Recomendado pelo Novelo (já na app), com KPIs e piso de sinal; pedimos duas freguesias" | Por pedir |
 | **Validação de lotes** | Luís Miguel Oliveira | "Entregamos 3 a 5 fardos caracterizados, com passaporte" | Por pedir |
 | **Candidatura** (projetos europeus, PRR, COMPETE 2030 ou sucessores) | Lucas, Luís Miguel, Prof. Paulo Afonso | Consórcio Vitrus + Fibrenamics + UMinho + (Sasia/CITEVE) | **Hipótese**: nenhuma candidatura foi identificada |
 | **Dissertação ou projeto** | Prof. Paulo Afonso | Tema: custos e redes de recolha seletiva | Por perguntar |

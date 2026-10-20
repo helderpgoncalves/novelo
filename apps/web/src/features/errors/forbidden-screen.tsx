@@ -33,6 +33,8 @@ export function ForbiddenScreen({
     }),
   );
 
+  const guest = me?.role === 'guest';
+
   return (
     <ErrorScreen
       layout={layout}
@@ -41,10 +43,12 @@ export function ForbiddenScreen({
       title={m.err_403_title()}
       actions={
         <>
-          <Button asChild className="h-10">
-            <a href={mail}>{m.err_403_request()}</a>
-          </Button>
-          <Button asChild variant="outline" className="h-10">
+          {!guest && (
+            <Button asChild className="h-10">
+              <a href={mail}>{m.err_403_request()}</a>
+            </Button>
+          )}
+          <Button asChild variant={guest ? 'default' : 'outline'} className="h-10">
             <Link to="/">{m.common_back_home()}</Link>
           </Button>
           <Button variant="ghost" className="h-10" onClick={() => router.history.back()}>
@@ -54,9 +58,11 @@ export function ForbiddenScreen({
       }
     >
       <p>
-        {requiredRole && me
-          ? m.err_403_text_role({ role: plural(requiredRole), current: single(me.role) })
-          : m.err_403_text()}
+        {guest
+          ? m.err_403_text_guest()
+          : requiredRole && me
+            ? m.err_403_text_role({ role: plural(requiredRole), current: single(me.role as Role) })
+            : m.err_403_text()}
       </p>
     </ErrorScreen>
   );

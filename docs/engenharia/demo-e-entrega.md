@@ -18,6 +18,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 - Um lote de demonstração já com histórico (recolhido, triado), para o passaporte não aparecer vazio; a peça em palco junta-se a ele.
 - A peça para a triagem: uma camisola com etiqueta legível, testada antes no mesmo telemóvel e com a mesma luz.
 - Um relatório RAP pré-gerado no portátil, caso a geração demore.
+- O copiloto (`/chat`) só entra na demo com `OPENROUTER_API_KEY` e orçamento disponíveis; sem eles responde 503 e o resto da demo não depende dele.
 
 ## Checklist de entrega
 
@@ -26,6 +27,8 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 - [ ] Cenários A e B carregam em menos de 2 segundos
 - [ ] "E se...?" responde em menos de 15 segundos; perguntas de reserva em cache
 - [ ] QR impresso no saco da demo e testado com dois telemóveis diferentes
+- [ ] `QUICK_JOIN_CODE` definido no Coolify e cartaz do QR de entrada (`/users`, «Cartaz do QR») impresso e testado, se o júri entrar como convidado; verificar os limites `GUEST_*` (por omissão 20 pedidos de IA e 10 execuções do otimizador por hora, US$ 0,50 em 24 h)
+- [ ] `RESEND_API_KEY` válida em produção (sem ela não há magic link) e uma conta de reserva com password
 - [ ] Relatório RAP gera em menos de 10 segundos; cópia pré-gerada no portátil
 - [ ] Vídeo de 60 s da demo no portátil e num segundo dispositivo
 - [ ] Slides finais exportados em PDF

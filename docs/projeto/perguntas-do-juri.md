@@ -10,7 +10,7 @@ Pode, mas paga contentores e recolhas onde quase não há têxtil. O território
 
 **"Os números são reais?"**
 
-Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; os 5,4% de têxtil no indiferenciado e os 0,7 kg por habitante por mês vêm do plano municipal (a fonte pública ainda está por confirmar, ver o [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)). As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
+Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; os 5,4% de têxtil no indiferenciado e os 0,7 kg por habitante por mês vêm do Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (Município de Guimarães / URBACT, 25/11/2025, p. 30, que cita Perebynos et al. 2023). Falta confirmar com a Vitrus o que os 0,7 kg medem e de que ano são os dados ([Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)), por isso o potencial de 1 317 t é sempre apresentado como estimativa. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
 
 **"Quem paga isto?"**
 
@@ -42,7 +42,7 @@ Não guardamos nada de quem entrega a peça. As fotografias são apagadas depois
 
 **"Os recicladores querem mesmo estes lotes?"**
 
-O próprio plano municipal diz que falta têxtil limpo e homogéneo para haver mercado de matérias-primas secundárias, e, segundo o plano, só 4 dos 27 operadores licenciados da zona valorizam têxteis (número por confirmar). Lotes separados por fibra são exatamente o que falta. O piloto valida com eles.
+O próprio plano municipal diz que falta têxtil limpo e homogéneo para haver mercado de matérias-primas secundárias, e, segundo o plano, só 4 dos 27 operadores licenciados da zona valorizam têxteis (plano municipal, p. 32; número por confirmar). Lotes separados por fibra são exatamente o que falta. O piloto valida com eles.
 
 **"Porque não usam blockchain no passaporte?"**
 

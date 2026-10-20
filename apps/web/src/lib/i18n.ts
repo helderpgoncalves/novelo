@@ -18,6 +18,18 @@ export const weekdayShort = (weekday: number): string =>
     .format(new Date(Date.UTC(2024, 0, weekday)))
     .replace('.', '');
 
+/** Abreviatura de três letras do dia (Seg, Ter...), para colunas estreitas. */
+export const weekdayAbbr = (weekday: number): string => {
+  const text = weekdayShort(weekday);
+  return `${text.charAt(0).toUpperCase()}${text.slice(1, 3)}`;
+};
+
+/** Nome completo do dia (1 = segunda ... 7 = domingo) no idioma atual. */
+export const weekdayLong = (weekday: number): string =>
+  new Intl.DateTimeFormat(intlTag(), { weekday: 'long', timeZone: 'UTC' }).format(
+    new Date(Date.UTC(2024, 0, weekday)),
+  );
+
 export const formatDate = (value: string | Date, style: 'short' | 'medium' = 'medium'): string =>
   new Intl.DateTimeFormat(intlTag(), { dateStyle: style, timeZone: 'UTC' }).format(
     typeof value === 'string' ? new Date(`${value}T00:00:00Z`) : value,

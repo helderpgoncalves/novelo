@@ -24,7 +24,7 @@ interface StatCellProps {
 
 export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCellProps) {
   return (
-    <div className="flex min-w-0 flex-col gap-1.5 bg-card p-4 sm:p-5">
+    <div className="flex min-w-0 flex-col gap-1 bg-card p-3.5 sm:p-4">
       <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.14em] sm:tracking-[0.18em]">
         {label}
         {tag && (

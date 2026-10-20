@@ -12,7 +12,7 @@ O modelo tem três passos: quanto têxtil há em cada zona, quanto custa cada fo
 | Têxtil recolhido, circuitos, viaturas e caracterização do lixo | Vitrus Ambiente (ver [análise dos dados](../dados/analise-dados-recebidos.md)) | Calibração e rede de partida |
 | Localizações dos contentores **de têxteis** | Vitrus Ambiente, por receber | Pontos atuais da rede (ETL `containers.py`, tabela `containers`) |
 | Contentores **municipais** de outras frações (2 751) e CAOP 2019 | Vitrus Ambiente, pacote QGIS de 20 de outubro de 2026 (ver [análise](../dados/analise-contentores-municipais.md)) | Pontos candidatos junto de recolha existente (investimento perto de zero, **pressuposto**), produtores B2B, geometria oficial das freguesias, densidade. ETL `municipal_containers.py` → `data/processed/municipal_*`; **não entram** na rede de têxteis |
-| Têxtil no indiferenciado: 5,4%; 0,7 kg/hab/mês | Plano de Ação para a Circularidade Têxtil de Guimarães | Valor base da procura |
+| Têxtil no indiferenciado: 5,4%; 0,7 kg/hab/mês | Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025), p. 30, que cita Perebynos et al. 2023 | Valor base da procura, com a incerteza descrita na secção 1 |
 | Custos unitários (recolha, km, contentor) | Vitrus Ambiente (ainda por receber) | Modelo de custos |
 
 ## 1. Procura por zona
@@ -23,7 +23,9 @@ Têxtil gerado na zona *z* por ano, a partir da população e do valor por habit
 D_z = P_z \cdot q \cdot 12 \qquad q = 0{,}7\ \text{kg por habitante por mês}
 ```
 
-Com os 156 830 habitantes do concelho (soma das freguesias, INE), isto dá cerca de 1 317 t por ano; a Vitrus recolhe hoje 301,3 t, ou seja, 22,9%. Onde a caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona.
+Com os 156 830 habitantes do concelho (soma das freguesias, INE), isto dá cerca de 1 317 t por ano (**estimativa**); a Vitrus recolhe hoje 301,3 t, ou seja, 22,9%. Onde a caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona.
+
+**Pressuposto e incerteza (pergunta Q6).** A fonte é pública (o plano escreve «0,7 kg de têxteis nos RSU por mês per capita», p. 30), mas não sabemos o que a medida inclui: o modelo trata-a como a **procura total a captar**. Se for só o têxtil que ainda vai no indiferenciado, a geração total é pelo menos 1 317,4 + 301,3 = 1 618,6 t e a captura de 2025 é 18,6% em vez de 22,9% (cálculo, estimativa). Se incluir têxteis sanitários, ou vier de uma caracterização de 2016, o potencial recuperável é menor. Outra leitura do mesmo plano (5,4% × 315 kg de indiferenciado por habitante) dá 17,0 kg/hab/ano, o dobro dos 8,4 kg que resultam dos 0,7 kg/mês. Por isso o valor leva «estimativa» em todo o ecrã e entra na sensibilidade como o parâmetro de maior incerteza. A pergunta está em [Perguntas aos orientadores](../projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), com o que muda em cada resposta.
 
 Têxtil captado depende do modo de recolha *m* que serve a zona:
 
@@ -48,7 +50,7 @@ A taxa de captura *c* por modo não tem fonte local. Calibrámo-la com os dados 
 ## 3. Otimização
 
 1. **Localização e modo (CP-SAT, OR-Tools):** escolher que pontos candidatos abrir e que modo serve cada zona, para **maximizar toneladas captadas com o orçamento dado** ou **minimizar custo para uma meta de captura**. Uma zona só conta como servida se tiver um ponto dentro da distância a pé definida para esse modo.
-2. **Rotas (VRP, OR-Tools):** com os pontos abertos, calcular rotas por veículo com capacidade e frequência de recolha, com distâncias em linha reta e um fator de desvio de 1,3 (o OSRM é opcional, `OSRM_URL`). A recolha a pedido aproveita os circuitos que já passam pela localidade, sem quilómetros novos.
+2. **Rotas (VRP, OR-Tools):** com os pontos abertos, calcular rotas por veículo com capacidade e frequência de recolha, com distâncias em linha reta (haversine) e um fator de desvio de 1,3. Não há ainda cliente OSRM: a variável `OSRM_URL` existe mas não é usada, e distâncias por estrada ficam para quando houver dados de GPS ou um motor de rotas. A recolha a pedido aproveita os circuitos que já passam pela localidade, sem quilómetros novos.
 3. **KPIs:** investimento, custo anual, toneladas, €/t, % de população coberta.
 
 ## 4. Lotes, fluxos e calibração
@@ -85,7 +87,7 @@ Os custos unitários da Vitrus ainda não existem, por isso a incerteza é trata
 - **Tornado:** cada parâmetro de custo e de procura varia ±30% (configurável, `swing`), um de cada vez, sobre o plano do cenário. Resultado: impacto em €/t, toneladas e custo anual, ordenado por impacto em €/t. Cada barra leva a origem do parâmetro (plano, dados da Vitrus ou pressuposto).
 - **Monte Carlo:** 500 amostras (configurável), semente fixa 7, distribuição triangular `Tri(1 − s, 1 + s, moda 1)` multiplicada ao pressuposto, independente por parâmetro. Devolve P10/P50/P90 de €/t, custo anual e toneladas, e a probabilidade de o €/t ficar abaixo de um limiar.
 - **Decisão: não se resolve o CP-SAT em cada amostra.** Reavalia-se o modelo de custos sobre o plano já otimizado (mesmas freguesias e modos; os km usam as rotas reais do cenário, por isso o caso central reproduz os KPIs gravados). A pergunta é "o plano que propomos aguenta se os pressupostos estiverem errados?"; reotimizar a cada amostra responderia a "quanto custaria o melhor plano se soubéssemos a verdade?", sempre mais otimista, e custaria horas.
-- **Exemplo (cenário de 60 000 €/ano, 122,7 €/t):** P10 92,5, P50 123,8, P90 164,7 €/t. O maior fator de incerteza é o kg/hab/mês (Plano municipal); 3 dos 5 maiores fatores são pressupostos sem dado.
+- **Exemplo (cenário de 60 000 €/ano, 122,7 €/t, estimativa com os pressupostos da altura):** P10 92,5, P50 123,8, P90 164,7 €/t. O maior fator de incerteza é o kg/hab/mês (Plano municipal); 3 dos 5 maiores fatores são pressupostos sem dado.
 
 ### Robustez
 
@@ -115,7 +117,7 @@ Só entra como cenário de comparação (`GET /planning/benchmarks`, `POST /plan
 | Circuitos | 0,30 | média de min(dias/semana de circuito / 2, 1): recolha a pedido sem km novos (`piggyback_min_days`) |
 | Custo de arranque | 0,30 | 1 − (arranque − mín) / (máx − mín); arranque = investimento + 3 meses de operação |
 
-Os pesos são um **pressuposto da equipa**. A densidade usa a **área geodésica** das freguesias (WGS84, `domain/parish_area.py`), calculada no seed a partir de `data/raw/public/parishes.geojson`: somam 204,7 km² em 44 das 48 freguesias (o concelho tem cerca de 241 km²). Três freguesias não têm contorno e Briteiros S. Salvador e Santa Leocádia tem um contorno claramente errado (0,004 km²), descartado; nessas quatro a densidade fica em falta e não é inventada.
+Os pesos são um **pressuposto da equipa**. A densidade usa a **área geodésica** das freguesias (WGS84, `domain/parish_area.py`), calculada no seed a partir do contorno de cada freguesia em `data/processed/parishes.csv` (origem: `data/raw/public/parishes.geojson`): somam 204,7 km² em 44 das 48 freguesias (o concelho tem cerca de 241 km²). Três freguesias não têm contorno e Briteiros S. Salvador e Santa Leocádia tem um contorno claramente errado (0,004 km²), descartado; nessas quatro a densidade fica em falta e não é inventada.
 
 **Piso de sinal.** Um piloto que capta poucos quilos não mede a taxa de rejeito. Mínimo de toneladas = células (freguesia × modo) × peças por célula × peso médio da peça:
 
@@ -141,7 +143,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 
 | Parâmetro | Valor | Estado |
 | --- | --- | --- |
-| Têxtil por habitante (*q*) | 0,7 kg/hab/mês | Fonte: plano municipal |
+| Têxtil por habitante (*q*) | 0,7 kg/hab/mês | Fonte: Plano de Ação Integrado (URBACT), p. 30. **Significado por confirmar** (secção 1, Q6): total ou só o que fica no indiferenciado |
 | Habitantes | 156 830 | Fonte: INE, Censos 2021 (soma das freguesias) |
 | Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto, a calibrar no piloto |
 | Distância máxima a pé por modo | a definir | Pressuposto, validar com o mentor |

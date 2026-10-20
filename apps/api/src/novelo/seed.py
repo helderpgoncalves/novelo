@@ -174,9 +174,9 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
         for d in sorted({int(x) for x in c["days"].split()})
     )
     db.add_all(
-        CircuitLocality(circuit_id=circuit_ids[(c["circuit"],)], locality_id=locality_ids[(n,)])
+        CircuitLocality(circuit_id=circuit_ids[(c["circuit"],)], locality_id=locality_ids[(n,)], position=i)
         for c in circuits
-        for n in sorted({x for x in c["localities"].split("; ") if x})
+        for i, n in enumerate(dict.fromkeys(x for x in c["localities"].split("; ") if x))
     )
 
     # Retrato do planeamento: substitui os turnos desta fonte.

@@ -29,6 +29,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { useIsGuest } from '@/features/auth/use-current-user';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
@@ -124,6 +125,21 @@ function DeleteScenario({
   onConfirm: () => void;
 }) {
   const [open, setOpen] = useState(false);
+  const guest = useIsGuest();
+  if (guest) {
+    // Convidados não apagam: o botão fica visível mas desligado, com a razão à mão (título e leitores de ecrã).
+    return (
+      <Button
+        variant="ghost"
+        className="h-10 gap-2"
+        disabled
+        title={m.guest_blocked()}
+        aria-label={`${m.scenario_delete()}. ${m.guest_blocked()}`}
+      >
+        <Trash2 /> {m.scenario_delete()}
+      </Button>
+    );
+  }
   return (
     <>
       <Button

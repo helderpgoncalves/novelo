@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 _DUMMY_HASH = hash_password("novelo-dummy-password")
 
 
-async def _issue_session(db: AsyncSession, user: User, remember: bool = True) -> tuple[str, str]:
+async def issue_session(db: AsyncSession, user: User, remember: bool = True) -> tuple[str, str]:
     settings = get_settings()
     refresh = create_refresh_token(user.id, remember)
     lifetime = (
@@ -72,7 +72,7 @@ async def login(db: AsyncSession, email: str, password: str, remember: bool = Tr
         raise AccountInactiveError("Account is inactive")
     if needs_rehash(user.hashed_password):
         user.hashed_password = hash_password(password)
-    access, refresh = await _issue_session(db, user, remember)
+    access, refresh = await issue_session(db, user, remember)
     return user, access, refresh
 
 
@@ -91,7 +91,7 @@ async def register(
     if await users.get_by_email(db, email):
         raise EmailTakenError("An account with this email already exists")
     user = await users.create_user(db, email=email, password=password, name=name, locale=locale)
-    access, refresh = await _issue_session(db, user, remember)
+    access, refresh = await issue_session(db, user, remember)
     await send_verification(db, sender, user)
     return user, access, refresh
 
@@ -116,7 +116,7 @@ async def rotate_refresh(db: AsyncSession, token: str) -> tuple[str, str]:
     if row.expires_at < datetime.now(UTC) or user is None or not user.is_active or str(user.id) != payload["sub"]:
         raise SessionExpiredError("Session expired")
     row.revoked = True
-    return await _issue_session(db, user, bool(payload.get("remember", True)))
+    return await issue_session(db, user, bool(payload.get("remember", True)))
 
 
 async def logout(db: AsyncSession, refresh_token: str | None) -> None:
@@ -145,7 +145,7 @@ async def request_password_reset(db: AsyncSession, sender: EmailSender, email: s
     await db.commit()
     url = f"{settings.app_url.rstrip('/')}/reset-password?token={token}"
     subject, html, text = emails.password_reset(user.locale, url, settings.password_reset_minutes)
-    await _send_quietly(sender, user.email, subject, html, text)
+    await send_quietly(sender, user.email, subject, html, text)
 
 
 async def reset_password(db: AsyncSession, token: str, new_password: str) -> None:
@@ -184,6 +184,7 @@ async def login_with_google(db: AsyncSession, profile: dict[str, str], locale: s
         elif get_settings().allow_registration:
             user = await users.create_user(
                 db,
+                joined_via="google",
                 email=profile["email"],
                 name=profile.get("name"),
                 google_sub=profile["sub"],
@@ -195,7 +196,7 @@ async def login_with_google(db: AsyncSession, profile: dict[str, str], locale: s
             raise RegistrationClosedError("Registration is closed")
     if not user.is_active:
         raise AccountInactiveError("Account is inactive")
-    access, refresh = await _issue_session(db, user)
+    access, refresh = await issue_session(db, user)
     return user, access, refresh
 
 
@@ -215,7 +216,7 @@ async def seed_admin(db: AsyncSession) -> None:
         )
 
 
-async def _send_quietly(sender: EmailSender, to: str, subject: str, html: str, text: str) -> None:
+async def send_quietly(sender: EmailSender, to: str, subject: str, html: str, text: str) -> None:
     """Um email falhado não pode partir o registo nem revelar nada ao utilizador."""
     try:
         await sender.send(to=to, subject=subject, html=html, text=text)
@@ -239,7 +240,7 @@ async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -
     await db.commit()
     url = f"{settings.app_url.rstrip('/')}/verify-email?token={token}"
     subject, html, text = emails.verify_email(user.locale, url, user.name, settings.email_verify_hours)
-    await _send_quietly(sender, user.email, subject, html, text)
+    await send_quietly(sender, user.email, subject, html, text)
 
 
 async def verify_email(db: AsyncSession, token: str) -> None:

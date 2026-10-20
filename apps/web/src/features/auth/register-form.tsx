@@ -15,6 +15,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { markTourPending } from '@/features/onboarding/tour-store';
 import { getErrorMessage } from '@/lib/errors';
 import { applyApiFieldErrors } from '@/lib/form-errors';
 import { getLocale } from '@/lib/i18n';
@@ -38,6 +39,7 @@ export function RegisterForm({ next }: { next: string }) {
     onError: (error) => setFieldError(applyApiFieldErrors(form, error, { email_taken: 'email' })),
     onSuccess: async (user) => {
       queryClient.setQueryData(getMeQueryKey(), user);
+      markTourPending();
       await navigate({ to: next });
     },
   });

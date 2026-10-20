@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
+from novelo.core.guest import AiGuard
 from novelo.core.ratelimit import triage_limiter
 from novelo.domain.vocab import Fibre, LotState
 from novelo.features.lots import service, triage
@@ -69,7 +70,7 @@ async def change_lot_state(code: str, body: LotStateChange, user: CurrentUser, d
     return await service.change_state(db, user, code, body.state)
 
 
-@router.post("/triage", response_model=TriageResult, dependencies=[Depends(triage_limiter)])
+@router.post("/triage", response_model=TriageResult, dependencies=[Depends(triage_limiter), AiGuard])
 async def analyse_garment(
     user: CurrentUser,
     llm: Annotated[OpenRouterClient, Depends(get_llm)],

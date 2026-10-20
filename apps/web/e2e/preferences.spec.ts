@@ -24,7 +24,7 @@ test.describe('idioma e tema', () => {
   test('erros do servidor aparecem em inglês quando a interface está em inglês', async ({
     page,
   }) => {
-    await page.goto('/en/login');
+    await page.goto('/en/login?method=password');
     await page.getByLabel('Email').fill('admin@heldergoncalves.io');
     await page.getByLabel('Password', { exact: true }).fill('wrong-password-1');
     await page.getByRole('button', { name: 'Sign in' }).click();

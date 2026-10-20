@@ -45,7 +45,7 @@ export function PageTabs<T extends string>({
     <Tabs
       value={value}
       onValueChange={(v) => onValueChange(v as T)}
-      className={cn('gap-5', className)}
+      className={cn('gap-4', className)}
     >
       <TabsList variant="line" aria-label={label} className="w-full">
         {tabs.map((t) => (

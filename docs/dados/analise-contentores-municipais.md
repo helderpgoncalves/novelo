@@ -281,7 +281,7 @@ O `seed` importa estes ficheiros (`DATA_DIR`) para `municipal_containers`, `muni
 - **Nomes de produtores** (pergunta 12): a API não os devolve por omissão; só um `admin` que peça `show_names=true`. O copiloto nunca os mostra. Se a Vitrus não autorizar, basta nunca ligar o parâmetro no web.
 - Os candidatos têm uma ordem explícita (`rank_rule`): coordenada precisa; freguesia com mais lacuna estimada por candidato; enterrado; orgânico a menos de 15 m; mais contentores. É uma ordem de leitura, não uma recomendação.
 
-Ecrãs e camadas de mapa propostos (por fazer no web): camada "Rede municipal" (pontos por `kind`, agrupados a baixa escala), camada "Candidatos a têxteis" (locais), camada "Produtores" (por tipo, sem nomes por omissão), mapa de calor de `nn_distance_m`, coroplético de contentores por 1 000 hab. e de cobertura a 300 m, ranking de lacuna por freguesia com a etiqueta "estimativa", e ecrã "Qualidade dos dados" com os alertas `municipal_*`. Gráficos: barras por freguesia, histograma do vizinho mais próximo, tamanho dos locais, produtores por tipo e freguesia.
+**No web (implementado).** O ecrã `/municipal` tem seis separadores: visão geral (KPIs, cobertura e distância ao local público mais próximo), freguesias (contentores por 1 000 habitantes, cobertura a 200/300/500 m), locais (com ficha e vizinhos), candidatos a têxteis (com a regra de ordem), lacunas (estimativa, com etiqueta) e qualidade (alertas `municipal_*`); exporta CSV, XLSX e GeoJSON. No mapa (`/map`), o painel de camadas liga os locais municipais por fração (com mapa de calor da densidade de contentores), os contornos CAOP em coroplético (contentores por 1 000 habitantes ou cobertura a 300 m) e os produtores (sem nomes). Não há mapa de calor de `nn_distance_m`.
 
 ## Fontes
 

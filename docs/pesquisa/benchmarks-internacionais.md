@@ -11,14 +11,14 @@ Consultado a 19 de outubro de 2026. Fontes em [Fontes](fontes.md).
 | Têxtil recolhido em 2025 (4 entidades) | 301,3 t | Dado Vitrus |
 | População | 156 830 habitantes | INE, Censos 2021 (soma das freguesias) |
 | Recolha por habitante | **1,92 kg/hab/ano** (0,16 kg/hab/mês) | Cálculo nosso: 301 300 kg ÷ 156 830 |
-| Potencial do plano municipal (0,7 kg/hab/mês) | ≈ 1 317 t/ano = 8,4 kg/hab/ano | Plano municipal (fonte pública por localizar, ver [registo](registo-de-afirmacoes.md)) |
+| Potencial do plano municipal (0,7 kg/hab/mês) | ≈ 1 317 t/ano = 8,4 kg/hab/ano | Plano de Ação Integrado (URBACT, p. 30, [F74]); o que o 0,7 mede está por confirmar (ver [registo](registo-de-afirmacoes.md), A8) |
 | Captura atual face ao potencial | 22,9% | Cálculo nosso |
 
 ## Tabela comparativa
 
 | Território | Recolha seletiva (kg/hab/ano) | Densidade de pontos | Financiamento por tonelada | Ano | Fonte | Estado |
 | --- | --- | --- | --- | --- | --- | --- |
-| **Guimarães** | **1,92** | por obter (contentores chegam a 20 out 2026) | custos pagos pelo município e pelas entidades; sem RAP | 2025 | Vitrus, INE | Dado Vitrus + cálculo nosso |
+| **Guimarães** | **1,92** | por obter (a lista de contentores de têxteis continua por receber) | custos pagos pelo município e pelas entidades; sem RAP | 2025 | Vitrus, INE | Dado Vitrus + cálculo nosso |
 | **França** | **4,27** | **1 ponto por 1 414 habitantes** (47 948 pontos em 16 728 comunas) | Contribuição média 156,1 € por tonelada colocada no mercado em 2024; revista para cerca de 223 a 228 € em 2025 (a fonte diverge) | 2024 | Refashion via FashionNetwork [F10] [F11] | Verificado (secundária) |
 | **UE-27** | **4,4** (de cerca de 16 kg gerados) | n/d | n/d | 2020 | AEA [F7] | Verificado (primária) |
 | **Catalunha** | **cerca de 2,7** (13,6% dos cerca de 19,8 kg gerados) | n/d | Entes locais recebem até 75 € por tonelada recolhida | 2024 | ARC [F15], Govern [F14] | Verificado (secundária); o 75 € por verificar na fonte |

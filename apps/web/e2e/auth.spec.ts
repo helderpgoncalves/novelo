@@ -9,7 +9,7 @@ test.describe('autenticação', () => {
   });
 
   test('credenciais erradas mostram o erro traduzido', async ({ page }) => {
-    await page.goto('/pt/login');
+    await page.goto('/pt/login?method=password');
     await page.getByLabel('Email').fill(ADMIN.email);
     await page.getByLabel('Password', { exact: true }).fill('password-errada-1');
     await page.getByRole('button', { name: 'Entrar' }).click();
@@ -17,7 +17,7 @@ test.describe('autenticação', () => {
   });
 
   test('validação dos campos acontece no cliente, em português', async ({ page }) => {
-    await page.goto('/pt/login');
+    await page.goto('/pt/login?method=password');
     await page.getByRole('button', { name: 'Entrar' }).click();
     await expect(page.getByText('Indica o teu email')).toBeVisible();
     await expect(page.getByText('Indica a password')).toBeVisible();
@@ -56,7 +56,7 @@ test.describe('autenticação', () => {
     await page.getByLabel('Email').fill(ADMIN.email);
     await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Criar conta' }).click();
-    await expect(page.getByRole('alert')).toContainText('Já existe uma conta com este email.');
+    await expect(page.getByText('Já existe uma conta com este email.')).toBeVisible();
   });
 
   test('recuperar password de ponta a ponta', async ({ page }) => {
@@ -69,6 +69,7 @@ test.describe('autenticação', () => {
     await page.getByRole('button', { name: 'Menu da conta' }).click();
     await page.getByRole('menuitem', { name: 'Terminar sessão' }).click();
 
+    await page.getByRole('link', { name: 'Entrar com palavra-passe' }).click();
     await page.getByRole('link', { name: 'Esqueceste-te?' }).click();
     await page.getByLabel('Email da conta').fill(email);
     await page.getByRole('button', { name: 'Enviar link de recuperação' }).click();

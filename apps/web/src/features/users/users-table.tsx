@@ -9,6 +9,13 @@ import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
+const roleLabel = (role: UserAdminOut['role']) =>
+  role === 'admin'
+    ? m.account_role_admin()
+    : role === 'guest'
+      ? m.account_role_guest()
+      : m.account_role_operator();
+
 export function UsersTable({
   users,
   currentUserId,
@@ -48,13 +55,9 @@ export function UsersTable({
       id: 'role',
       header: m.users_table_role(),
       value: (u) => u.role,
-      filter: {
-        format: (v) => (v === 'admin' ? m.account_role_admin() : m.account_role_operator()),
-      },
+      filter: { format: (v) => roleLabel(v as UserAdminOut['role']) },
       cell: (u) => (
-        <Badge variant={u.role === 'admin' ? 'default' : 'secondary'}>
-          {u.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
-        </Badge>
+        <Badge variant={u.role === 'admin' ? 'default' : 'secondary'}>{roleLabel(u.role)}</Badge>
       ),
     },
     {

@@ -1,6 +1,6 @@
 # Deploy no Coolify
 
-Cada `git push` para `main` é construído e posto no ar pelo Coolify a partir de `docker-compose.yml`, em **https://novelo.helder.si**. Um só domínio: o nginx do contentor `web` serve a SPA e encaminha `/api` para a API, por isso não há CORS nem URLs da API no bundle. Por agora não há integração contínua remota; `just check` corre localmente antes de cada push.
+Cada `git push` para `main` é construído e posto no ar pelo Coolify a partir de `docker-compose.yml`, em **https://novelo.helder.si** (uma VPS com o Coolify). Um só domínio: o nginx do contentor `web` serve a SPA e encaminha `/api` para a API, por isso não há CORS nem URLs da API no bundle. Por agora não há integração contínua remota; `just check` corre localmente antes de cada push.
 
 ## Como fica na VPS
 
@@ -29,34 +29,43 @@ Nenhuma porta é publicada pelo compose: o Traefik do Coolify é a única entrad
 
 | Serviço | Imagem | Notas |
 | --- | --- | --- |
-| `web` | `apps/web/Dockerfile`: build do Vite e nginx 1.27 | Healthcheck em `/health`; limite de 8 MB por pedido (fotos da triagem) |
-| `api` | `apps/api/Dockerfile`: Python 3.12 slim, utilizador sem privilégios, Pango para o PDF | `entrypoint.sh` corre `alembic upgrade head`, o seed idempotente de `data/processed` e o `uvicorn` |
+| `web` | `apps/web/Dockerfile`: build do Vite e nginx | Healthcheck em `/health`; limite de 8 MB por pedido (fotos da triagem), 55 MB nos anexos do copiloto; stream do copiloto sem buffering e com leitura até 300 s; devolve 503 JSON `service_unavailable` quando a API reinicia |
+| `api` | `apps/api/Dockerfile`: Python 3.12 slim, utilizador sem privilégios, Pango para o PDF | `entrypoint.sh` corre `alembic upgrade head`, o seed idempotente de `data/processed` (que vai dentro da imagem) e o `uvicorn` com 2 processos por omissão (`WEB_CONCURRENCY`) |
 | `db` | `postgres:17-alpine`, volume `pgdata` | Healthcheck com `pg_isready` |
 
 O Coolify gera `SERVICE_PASSWORD_POSTGRES` e `SERVICE_PASSWORD_64_SECRETKEY`. As imagens podem testar-se localmente com `just build`.
 
 ## Variáveis
 
-Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descrição completa em [Ambiente](ambiente.md).
+Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descrição completa em [Ambiente](ambiente.md). **O compose só repassa à API as variáveis do quadro**; as outras (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `GUEST_*`, `COPILOT_*`, `EMAIL_TRANSPORT`) ficam nos valores por omissão do `config.py` até serem acrescentadas a `api.environment`.
 
 | Variável | Origem | Notas |
 | --- | --- | --- |
 | `DOMAIN` | Coolify | `novelo.helder.si`; define `APP_URL` e `CORS_ORIGINS` |
-| `SERVICE_PASSWORD_POSTGRES`, `SERVICE_PASSWORD_64_SECRETKEY` | Gerados pelo Coolify | Password da base de dados e chave de sessão |
+| `SERVICE_PASSWORD_POSTGRES`, `SERVICE_PASSWORD_64_SECRETKEY` | Gerados pelo Coolify | Password da base de dados e `SECRET_KEY` (a API recusa arrancar em produção com uma chave de dev ou com menos de 32 caracteres) |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | **Segredo** | Administrador inicial, criado no arranque |
 | `ALLOW_REGISTRATION` | Opcional | `false` para só entrarem contas existentes |
+| `QUICK_JOIN_ENABLED`, `QUICK_JOIN_CODE` | **Segredo** (o código) | A entrada por QR do evento só fica ativa em produção com `QUICK_JOIN_CODE` definido; mudar o código fecha os QR antigos |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | **Segredo** | Redirecionamento: `https://novelo.helder.si/api/v1/auth/google/callback` |
-| `RESEND_API_KEY`, `EMAIL_FROM` | **Segredo** | O domínio do `EMAIL_FROM` tem de estar verificado no Resend |
-| `OPENROUTER_API_KEY`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION` | **Segredo** e opções | Sem chave, a IA responde 503 |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_SUPPORT` | **Segredo** (a chave) | O domínio do `EMAIL_FROM` tem de estar verificado no Resend. Sem chave não há magic link por email |
+| `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION` | **Segredo** e opções | Sem chave, a IA responde 503. Depois do primeiro arranque os modelos mudam em `/admin/ai` |
 | `SOLVER_TIME_LIMIT_S`, `LOG_LEVEL` | Opcional | |
+
+Em produção `/api/docs` e `/api/openapi.json` ficam desligados; o contrato consulta-se no `openapi.json` do repositório.
+
+## Deploy manual
+
+O caminho normal é o push para `main`. Se o webhook não disparar ou for preciso repetir um deploy sem novo commit, faz-se **Redeploy** do recurso no painel do Coolify, ou, com acesso à VPS, pelo `artisan` do próprio Coolify. Este último é um procedimento operacional da equipa que **não está automatizado nem versionado** neste repositório; os comandos e os acessos ficam fora do Git, tal como os segredos.
 
 ## Operação
 
-- **Estado:** `GET /api/v1/health` (processo) e `GET /api/v1/ready` (base de dados).
-- **Logs:** no Coolify, por serviço. Sem `RESEND_API_KEY`, os emails aparecem no log da API.
+- **Estado:** `GET /api/v1/health` (processo) e `GET /api/v1/ready` (base de dados e se a IA está ligada).
+- **Primeiro arranque:** a migração cria as tabelas e o seed importa os dados da Vitrus, o pacote municipal (tabelas `municipal_*`) e o administrador. Na primeira entrada, o administrador abre `/users`, separador «Cartaz do QR», para imprimir o QR do evento.
+- **Logs:** no Coolify, por serviço; os da API são JSON com `request_id`. Sem `RESEND_API_KEY`, os emails aparecem no log da API.
+- **Retenção do copiloto:** `python -m novelo.cli purge-copilot` apaga o que passou do prazo; pode agendar-se uma vez por dia no Coolify (ver [Copiloto](copiloto.md#definições-do-utilizador-vs-definições-do-sistema)).
 - **Rollback:** `git revert` do commit em `main` e novo push. Antes da apresentação, marcar a versão da demo com uma tag (`v1.0-demo`).
 - **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. Tudo o resto reconstrói-se a partir do repositório.
-- **Novos dados:** os ficheiros de `data/processed` são importados no arranque; basta fazer push e o deploy importa-os (por exemplo, as localizações dos contentores de 20 de outubro de 2026).
+- **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem as localizações dos contentores de têxteis). A pasta `data/raw` não vai para a imagem.
 
 ## Diagnóstico rápido
 
@@ -65,7 +74,9 @@ Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descri
 | Deploy não arranca | Variáveis em falta no recurso; logs do `api` (migração ou seed) |
 | `502` em `/api` | Healthcheck do `api`; `DATABASE_URL` |
 | Google devolve erro de redirecionamento | URI de retorno igual à de produção na consola Google |
-| Emails não chegam | `RESEND_API_KEY` e domínio do `EMAIL_FROM` verificado |
+| Emails não chegam | `RESEND_API_KEY` e domínio do `EMAIL_FROM` verificado; sem chave o magic link está desligado |
+| `/join` diz que o acesso está fechado | `QUICK_JOIN_CODE` por definir em produção |
+| O copiloto "fica pendurado" ou chega de uma vez | Algo entre o browser e a API está a fazer buffering do stream (ver as locations do `nginx.conf`) |
 | IA responde 503 | `OPENROUTER_API_KEY` |
 | PDF do relatório falha | Bibliotecas Pango na imagem da API |
 

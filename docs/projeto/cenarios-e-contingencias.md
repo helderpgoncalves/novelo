@@ -4,7 +4,7 @@ Tudo o que pode correr bem ou mal entre 19 e 28 de outubro, com **o sinal de avi
 
 Escrito a 19 de outubro de 2026. Dono: **H** = Hélder Gonçalves, **F** = Flávio Fernandes, **HF** = ambos. Probabilidade (qualitativa, da nossa experiência e do contexto, **não calculada**): **Alta**, **Média**, **Baixa**.
 
-Estado das funcionalidades novas (copiloto de IA, painel de IA, cobertura de contentores, sensibilidade e robustez, cenário francês, recomendador de piloto, resolvedor de alertas, avaliação da triagem): **em integração**. Só entram na demo as que estiverem testadas e ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
+Estado das funcionalidades novas a 20 de outubro: copiloto de IA, painel de IA, sensibilidade e robustez, cenário francês, recomendador de piloto e resolvedor de alertas **estão feitos e testados**; a cobertura de contentores espera as localizações dos contentores de têxteis; a ferramenta de avaliação da triagem existe mas **ainda não correu** (sem imagens com verdade-terreno). Só entram na demo as que estiverem ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
 
 O prazo de submissão na plataforma é **23 de outubro às 17h30**; depois, nada se edita. O júri é designado pela organização, com especialistas nas áreas temáticas e sem votação pública. Os projetos são avaliados por quatro critérios ponderados (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%); ver [Critérios de avaliação](criterios-de-avaliacao.md).
 
@@ -152,7 +152,7 @@ Outras equipas vão resolver este desafio ou os outros quatro. Os temas prováve
 | **Sensores IoT de enchimento** | Média | Dashboard de ocupação | Custa por contentor, e o desafio pede o **menor investimento**; sensores só onde os dados o justificarem | "Sensores são o passo dez; o passo um é saber onde pôr os contentores." |
 | **Marketplace de roupa usada** (revenda) | Média | Troca ou venda entre pessoas | Atua no consumo, não na recolha municipal; a reutilização já é 59,4% do que a Vitrus recolhe | "O marketplace trata da roupa que alguém quer vender; nós, da que o município tem de recolher." |
 | **Blockchain / passaporte digital** | Média | Rastreabilidade imutável | O valor está **nos dados do passaporte**, não na tecnologia; um registo com histórico chega | "Preferimos um passaporte útil a uma tecnologia vistosa." |
-| **Visão por computador só com fotografia** | Média | Classificação com "95%" | Nós **medimos** a exatidão com matriz de confusão (em integração), a foto não lê a fibra, e o operador confirma | "Não prometemos 95%; medimos o nosso e dizemo-lo." |
+| **Visão por computador só com fotografia** | Média | Classificação com "95%" | Nós **medimos** a exatidão com matriz de confusão (ferramenta feita, ainda sem corrida), a foto não lê a fibra, e o operador confirma | "Não prometemos 95%; medimos o nosso e dizemo-lo." |
 | **Robot de triagem** (NIR) | Baixa | Equipamento caro | Investimento incompatível com o pedido; fica para a indústria (Fibrenamics, Sasia) | "A triagem ótica fica no reciclador; nós garantimos que o lote chega com composição." |
 | **Veículo elétrico ou rotas só de logística** | Baixa | Otimização de rotas genérica | Nós ligamos rotas, pontos, procura e **custo por tonelada**; usamos as rotas atuais da Vitrus | "Rotas sozinhas não respondem; o custo por tonelada, sim." |
 | **Chatbot sem números** | Média | Assistente que "responde" a tudo | O nosso copiloto chama o otimizador e um verificador rejeita números inventados | "A IA conduz, o otimizador calcula." |
@@ -171,7 +171,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | # | Pergunta | Resposta (20 s) | Evidência a abrir |
 | --- | --- | --- | --- |
 | 1 | Porque não pôr contentores em todo o lado? | Custa em contentores e recolhas onde há pouco têxtil; Sintra está a retirar centenas e há sinais de saturação. Pomos o investimento onde a densidade o justifica e usamos o a pedido nas zonas dispersas | Simulador, cenário B; slide de 2028 |
-| 2 | Qual é a vossa estimativa mais frágil? | Os custos unitários: a Vitrus ainda não os enviou. Mostramos o intervalo e os pressupostos que mais mexem | "Pressupostos" e separador de incerteza (em integração) |
+| 2 | Qual é a vossa estimativa mais frágil? | Os custos unitários: a Vitrus ainda não os enviou. Mostramos o intervalo e os pressupostos que mais mexem | "Pressupostos" e separador de incerteza (feito) |
 | 3 | Os números são reais? | Os de partida, sim: 301,3 t, destino de cada tonelada, 40 circuitos e 29 viaturas são da Vitrus; a população é do INE. As toneladas por cenário são estimativas e dizemo-lo no ecrã | Ponto de partida; Qualidade dos dados |
 | 4 | Quem paga isto? | Hoje o município, sozinho. A partir de 17 de abril de 2028, os produtores, mas só custos "economicamente eficientes". Alguém tem de calcular esse custo; é o que fazemos | Relatório RAP; slide de 2028 |
 | 5 | Porque é que 2028 interessa a Guimarães agora? | O município tem de provar custo eficiente por tonelada para o reclamar; quem tiver os dados negoceia melhor | Relatório RAP com custo por tipo de território |
@@ -188,15 +188,15 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | # | Pergunta | Resposta (20 s) | Evidência a abrir |
 | --- | --- | --- | --- |
 | 13 | E se a IA se enganar nos números? | A IA não faz contas. Traduz a pergunta em alteração ao cenário, mostra "Entendi: ..." para confirmar, e o otimizador calcula; um verificador rejeita números fora do resultado | "E se...?" ao vivo |
-| 14 | A triagem por foto é fiável? | Serve de primeira triagem e gera dados; o operador confirma. A composição vem da etiqueta. Estamos a medir a exatidão com matriz de confusão (em integração); só afirmamos o número depois | Triagem; avaliação (em integração) |
+| 14 | A triagem por foto é fiável? | Serve de primeira triagem e gera dados; o operador confirma. A composição vem da etiqueta. Estamos a medir a exatidão com matriz de confusão (ferramenta feita, ainda sem corrida); só afirmamos o número depois | Triagem; avaliação (`just eval-triage`) |
 | 15 | Que percentagem acertam? | Ainda não afirmamos um número: mede-se em 30 a 50 peças reais; mostramos o resultado quando existir | Avaliação da triagem |
 | 16 | Porque não usam NIR? | É a tecnologia certa para a indústria, mas custa e não cabe no "menor investimento"; fica no reciclador. O Novelo garante o lote e a composição declarada | Tecnologia de triagem |
-| 17 | Que modelo de IA usam e quanto custa? | `openai/gpt-6-luna` por defeito, via OpenRouter, com orçamento mensal e custo real por chamada visíveis no painel de administração (em integração) | Painel de IA |
-| 18 | E se o modelo mudar ou ficar caro? | Trocamos de modelo no painel por funcionalidade, com custo estimado por operação e modelo de reserva | Painel de IA (em integração) |
+| 17 | Que modelo de IA usam e quanto custa? | `openai/gpt-6-luna` por defeito, via OpenRouter, com orçamento mensal e custo real por chamada visíveis no painel de administração (feito) | Painel de IA |
+| 18 | E se o modelo mudar ou ficar caro? | Trocamos de modelo no painel por funcionalidade, com custo estimado por operação e modelo de reserva | Painel de IA (feito) |
 | 19 | Os dados saem do país? | As fotos são processadas pelo fornecedor de IA e apagadas; não guardamos fotos nem dados de quem entrega. Dados da Vitrus ficam na nossa base de dados | Documento de IA |
 | 20 | Porque OpenRouter? | Um único ponto para vários modelos, com custo por chamada e modelo de reserva | Painel de IA |
-| 21 | Como evitam alucinações? | Saída estruturada, validação com esquema, verificador de números e recusa fora do âmbito | "E se...?" e copiloto (em integração) |
-| 22 | O copiloto pode apagar dados? | Não: só cria cenários marcados como do copiloto, com limite por pedido | Copiloto (em integração) |
+| 21 | Como evitam alucinações? | Saída estruturada, validação com esquema, verificador de números e recusa fora do âmbito | "E se...?" e copiloto (feito) |
+| 22 | O copiloto pode apagar dados? | Não: só cria cenários marcados como do copiloto, com limite por pedido | Copiloto (feito) |
 | 23 | Porque não blockchain no passaporte? | Um registo com histórico na base de dados chega; o valor está nos dados do lote | Passaporte do lote |
 | 24 | E se a rede falhar na demo? | PWA e stack local; vídeo de 60 s e relatório pré-gerado como plano B | Plano B |
 | 25 | É seguro? | Autenticação com cookies HttpOnly, palavras-passe com argon2, limites de pedidos, erros tipados; a IA responde 503 sem chave em vez de falhar | Documentação de engenharia |
@@ -205,17 +205,17 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 
 | # | Pergunta | Resposta (20 s) | Evidência a abrir |
 | --- | --- | --- | --- |
-| 26 | De onde vêm os 5,4% e os 0,7 kg por habitante? | Do plano municipal que recebemos com o desafio; ainda **não** encontrámos a fonte pública e por isso não os pomos em slide; pedimos o documento à Vitrus | Registo A8 e A10 |
-| 27 | Como sabem o custo por quilómetro? | Pressuposto assinalado; vamos substituí-lo pelo da Vitrus; mostramos a sensibilidade para ver quanto importa | Pressupostos; tornado (em integração) |
+| 26 | De onde vêm os 5,4% e os 0,7 kg por habitante? | Do Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025, p. 30), que é público. O que ainda não sabemos é o que os 0,7 kg medem (têxtil que fica no indiferenciado ou geração total) nem o ano dos dados; por isso o potencial de 1 317 t leva sempre "estimativa" e perguntámos à Vitrus (Q6) | Registo A8 e A10 |
+| 27 | Como sabem o custo por quilómetro? | Pressuposto assinalado; vamos substituí-lo pelo da Vitrus; mostramos a sensibilidade para ver quanto importa | Pressupostos; tornado (feito) |
 | 28 | Como validam o modelo? | Valores calculados à mão nos testes, semente fixa, comparação com dados observados e revisão por um mentor da UMinho (a pedir) | Testes e documento de dados e modelo |
 | 29 | Porque assumem 1,3 de desvio nas rotas? | É um pressuposto de distância por estrada; podemos usar rotas reais (OSRM) quando houver tempo | Pressupostos |
-| 30 | A meta francesa é alcançável? | Não com os pressupostos atuais: o teto do modelo é 562,6 t contra 669,7 t. Usamo-la como referência e mostramos a distância | Cenários de referência (em integração) |
+| 30 | A meta francesa é alcançável? | Não com os pressupostos atuais: o teto do modelo é 562,6 t contra 669,7 t. Usamo-la como referência e mostramos a distância | Cenários de referência (feito) |
 | 31 | Porque a França é o benchmark? | É o sistema mais maduro e com dados públicos; os números vêm de imprensa e estão marcados por verificar; usamo-los como referência, não como promessa | Benchmarks internacionais |
-| 32 | O que acontece se os custos forem 30% mais altos? | Mostramos no tornado e no intervalo: a recomendação aguenta ou muda; é para isso que serve | Incerteza (em integração) |
-| 33 | O piloto tem tamanho para medir alguma coisa? | Sim: o piso de sinal é 1,71 t em 3 meses (cerca de 1 032 peças por célula e freguesia, efeito de desenho 2), e a recomendação respeita-o; os pressupostos são nossos | Piloto (em integração) |
-| 34 | Porque Gondar e Arosa e Castelões? | Misturam urbano e rural, têm circuitos existentes e densidade contrastante; é a recomendação do modelo, não uma decisão final | Piloto (em integração) |
-| 35 | Os 12 alertas dos dados: o que fizeram? | Mostramos cada um com o motivo e uma sugestão de resolução da IA que **só um humano aplica** | Qualidade dos dados; resolvedor (em integração) |
-| 36 | Têm dados de contentores? | Chegam a 20 de outubro; o importador está testado e a cobertura calcula-se quando chegarem | Mapa e cobertura (em integração) |
+| 32 | O que acontece se os custos forem 30% mais altos? | Mostramos no tornado e no intervalo: a recomendação aguenta ou muda; é para isso que serve | Incerteza (feito) |
+| 33 | O piloto tem tamanho para medir alguma coisa? | Sim: o piso de sinal é 1,71 t em 3 meses (cerca de 1 032 peças por célula e freguesia, efeito de desenho 2), e a recomendação respeita-o; os pressupostos são nossos | Piloto (feito) |
+| 34 | Porque Gondar e Arosa e Castelões? | Misturam urbano e rural, têm circuitos existentes e densidade contrastante; é a recomendação do modelo, não uma decisão final | Piloto (feito) |
+| 35 | Os 12 alertas dos dados: o que fizeram? | Mostramos cada um com o motivo e uma sugestão de resolução da IA que **só um humano aplica** | Qualidade dos dados; resolvedor (feito) |
+| 36 | Têm dados de contentores? | A 20 de outubro chegou o inventário **municipal** (2 751 contentores de outras frações, 2 026 locais), já na app e no mapa, como candidatos e produtores B2B. A lista de contentores **de têxteis** continua por receber; o importador está testado e a cobertura calcula-se quando chegar | Mapa e cobertura (feito) |
 | 37 | Ignoram os ecopontos de Guimarães? | Os ecopontos (296 novos) não mencionam têxteis nas fontes que vimos; falta confirmar | Fontes (F16) |
 
 ### E.4 Indústria, mercado e impacto
@@ -231,7 +231,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | 44 | Qual é o modelo de negócio? | O município (hoje) e as entidades gestoras (2028) pagam pelo planeamento, pelo relatório e pela rastreabilidade; o modelo exato depende do piloto | Estratégia |
 | 45 | A economia social não é concorrente? | A diretiva protege-a; deve ser parceira: pode ser um modo adicional na rede | Enquadramento regulatório |
 | 46 | Porque é que o cidadão haveria de separar? | Não é o foco do Novelo, mas o passaporte e a evidência por marca permitem fechar o ciclo e mostrar o resultado a quem entrega | Passaporte público |
-| 47 | Quanto custa por tonelada? | Depende do cenário: estimamos um intervalo (P10 a P90) e mostramos "estimativa"; o exemplo de 60 000 €/ano dá cerca de 123 €/t no caso central (intervalo de cerca de 93 a 165), que **muda** com os custos da Vitrus | Incerteza (em integração) |
+| 47 | Quanto custa por tonelada? | Depende do cenário: estimamos um intervalo (P10 a P90) e mostramos "estimativa"; o exemplo de 60 000 €/ano dá cerca de 123 €/t no caso central (intervalo de cerca de 93 a 165), que **muda** com os custos da Vitrus | Incerteza (feito) |
 | 48 | A França paga 156 €/t aos municípios? | Os produtores franceses pagam em média 156 € por tonelada colocada no mercado (secundária); o custo real de triagem é discutido (por verificar); não é comparável diretamente com o nosso €/t | Benchmarks (C4) |
 
 ### E.5 Perguntas por critério de avaliação
@@ -242,8 +242,8 @@ Doze perguntas, três por critério ou menos, que acrescem às 48 anteriores. Os
 | --- | --- | --- | --- |
 | **I1** | Isto já existe? | Existem peças soltas: otimizadores de rotas, apps de contentores, classificadores por foto. Na pesquisa que fizemos não encontrámos quem ligue, com dados reais do concelho, a decisão da rede, o lote até ao reciclador e o dossiê de 2028. A pesquisa não é exaustiva: se conhecerem um caso, dizem-nos e comparamos | "E se...?" e lote com QR; [Indústria e mercado](../pesquisa/industria-e-mercado.md) |
 | **I2** | A novidade é só pôr IA em cima de um otimizador? | Não: a IA é a interface. A novidade é a cadeia ligada e a regra de que a IA nunca faz contas, porque um verificador rejeita números que não saíram do cálculo | Verificador a recusar um número; Sankey e relatório RAP |
-| **V1** | E se a IA falhar? | O simulador, o otimizador e o relatório funcionam sem IA; sem chave a API responde 503 nas funcionalidades de IA em vez de falhar. Na demo há modelo de reserva, cinco perguntas em cache e vídeo | Painel de IA (em integração); plano B |
-| **V2** | E se os custos estiverem errados? | São pressupostos visíveis, com a origem de cada um. Mostramos o intervalo e o tornado (em integração). Quando a Vitrus enviar os custos, substituem-se e recalcula-se; se a recomendação mudar, dizemo-lo | "Pressupostos"; incerteza (em integração) |
+| **V1** | E se a IA falhar? | O simulador, o otimizador e o relatório funcionam sem IA; sem chave a API responde 503 nas funcionalidades de IA em vez de falhar. Na demo há modelo de reserva, cinco perguntas em cache e vídeo | Painel de IA (feito); plano B |
+| **V2** | E se os custos estiverem errados? | São pressupostos visíveis, com a origem de cada um. Mostramos o intervalo e o tornado (feito). Quando a Vitrus enviar os custos, substituem-se e recalcula-se; se a recomendação mudar, dizemo-lo | "Pressupostos"; incerteza (feito) |
 | **V3** | Isto é mais do que um protótipo de hackathon? | Está em produção em novelo.helder.si com dados reais; só entra na demo o que tem E2E verde, e o que não está ensaiado a 25 de outubro sai | Produção; [regra de corte](estrategia-para-ganhar.md#regras-de-corte-em-função-dos-pesos) |
 | **P1** | Quantas toneladas, quanto custa, para quem? | Hoje, 301,3 t por ano (dados da Vitrus). Com o cenário B, X t por ano a Y € por tonelada, **estimativa** com intervalo. Hoje paga o município; desde 17 de abril de 2028, os produtores, só o custo eficiente | Comparação A/B; relatório RAP |
 | **P2** | E o impacto ambiental, não só o custo? | Medimos toneladas que saem do indiferenciado e o destino: 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito (dados da Vitrus; duas entidades estimadas). Não calculamos emissões de CO₂: não estão no modelo e não as afirmamos | Ponto de partida; Sankey |

@@ -117,6 +117,8 @@ class CircuitLocality(Base):
     locality_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), ForeignKey("localities.id", ondelete="CASCADE"), primary_key=True
     )
+    # Ordem das localidades no ficheiro da Vitrus (0 = primeira); é a ordem em que o circuito as percorre.
+    position: Mapped[int] = mapped_column(SmallInteger, default=0, server_default="0")
 
     locality: Mapped[Locality] = relationship()
 

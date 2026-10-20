@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +15,7 @@ def to_out(user: User) -> UserOut:
         name=user.name,
         avatar_url=user.avatar_url,
         role=user.role,
+        joined_via=user.joined_via,
         has_password=user.hashed_password is not None,
         google_linked=user.google_sub is not None,
         email_verified=user.email_verified,
@@ -39,6 +42,9 @@ async def create_user(
     avatar_url: str | None = None,
     email_verified: bool = False,
     locale: str = "pt-PT",
+    joined_via: str = "password",
+    consent_at: datetime | None = None,
+    consent_version: str | None = None,
 ) -> User:
     user = User(
         email=email.lower(),
@@ -49,6 +55,9 @@ async def create_user(
         avatar_url=avatar_url,
         email_verified=email_verified,
         locale=locale,
+        joined_via=joined_via,
+        consent_at=consent_at,
+        consent_version=consent_version,
     )
     db.add(user)
     await db.commit()
@@ -61,6 +70,7 @@ def to_admin_out(user: User) -> UserAdminOut:
         email=user.email,
         name=user.name,
         role=user.role,
+        joined_via=user.joined_via,
         is_active=user.is_active,
         email_verified=user.email_verified,
         google_linked=user.google_sub is not None,

@@ -1,4 +1,6 @@
-import type { ErrorBody, ValidationErrorBody } from '@/client';
+import type { ErrorBody, UserOut, ValidationErrorBody } from '@/client';
+import { getMeQueryKey } from '@/client/@tanstack/react-query.gen';
+import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
 
 type ErrorCode = ErrorBody['code'];
@@ -16,6 +18,7 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   invalid_token: () => m.error_invalid_token(),
   forbidden: () => m.error_forbidden(),
   registration_closed: () => m.error_registration_closed(),
+  invalid_event_code: () => m.error_invalid_event_code(),
   not_found: () => m.error_not_found(),
   user_not_found: () => m.error_user_not_found(),
   email_taken: () => m.error_email_taken(),
@@ -47,9 +50,20 @@ const isClientCode = (value: unknown): value is ClientCode =>
 export const isErrorCode = (value: unknown): value is ErrorCode =>
   typeof value === 'string' && value in MESSAGES;
 
+// Convidados (QR do evento) têm limites próprios: a mensagem diz-lhes o que se passa em vez de um "sem permissão" seco.
+const GUEST_MESSAGES: Partial<Record<ErrorCode, () => string>> = {
+  forbidden: () => m.error_forbidden_guest(),
+  rate_limited: () => m.error_rate_limited_guest(),
+  ai_budget_exceeded: () => m.error_ai_budget_guest(),
+};
+
+const isGuestSession = (): boolean =>
+  queryClient.getQueryData<UserOut>(getMeQueryKey())?.role === 'guest';
+
 /** Mensagem traduzida para qualquer erro devolvido pelo cliente gerado. */
 export function getErrorMessage(error: unknown): string {
   const code: unknown = isApiError(error) ? error.code : undefined;
+  if (isErrorCode(code) && GUEST_MESSAGES[code] && isGuestSession()) return GUEST_MESSAGES[code]();
   if (isErrorCode(code)) return MESSAGES[code]();
   if (isClientCode(code)) return CLIENT_MESSAGES[code]();
   if (isNetworkError(error)) return m.error_network();

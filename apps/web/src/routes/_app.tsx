@@ -9,6 +9,7 @@ import { Topbar } from '@/components/layout/topbar';
 import { OfflineBanner } from '@/components/offline-banner';
 import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
+import { OnboardingTour } from '@/features/onboarding/onboarding-tour';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
 import { classifyError, isTransient } from '@/lib/errors';
 import { getLocale, switchLocale } from '@/lib/i18n';
@@ -91,6 +92,7 @@ function AppLayout() {
           )}
         </main>
         {showTabBar && <TabBar onMore={() => setMenuOpen(true)} />}
+        <OnboardingTour user={user} />
       </div>
     </div>
   );

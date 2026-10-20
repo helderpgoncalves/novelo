@@ -301,3 +301,43 @@ html[data-tabbar] {
     opacity: 0.6;
   }
 }
+
+/* Frota: uma cor por tipologia (sempre acompanhada de forma e texto, nunca só cor). Derivadas da paleta da marca. */
+:root {
+  --ty-undifferentiated: #5e6b66;
+  --ty-organic: #2e6b57;
+  --ty-recyclable: #35688a;
+  --ty-payt: #8d6a1f;
+  --ty-bulky: #a4553a;
+  --ty-support: #6b5a8c;
+  --ty-to_confirm: #7d7766;
+  --ty-unassigned: #8a8577;
+  --fleet-warn: #a4553a;
+}
+.dark {
+  --ty-undifferentiated: #9fb0a9;
+  --ty-organic: #7fb39c;
+  --ty-recyclable: #7fb0d4;
+  --ty-payt: #d4b068;
+  --ty-bulky: #e0906f;
+  --ty-support: #b4a4d6;
+  --ty-to_confirm: #a39d8c;
+  --ty-unassigned: #8f8a7c;
+  --fleet-warn: #e0906f;
+}
+
+/* Impressão: só o conteúdo da página (sem barras laterais nem navegação). */
+@media print {
+  aside,
+  header,
+  body nav {
+    display: none !important;
+  }
+  .h-dvh {
+    height: auto !important;
+    overflow: visible !important;
+  }
+  #content {
+    overflow: visible !important;
+  }
+}

@@ -49,9 +49,17 @@ test.describe('dados reais da Vitrus', () => {
     await expect(table.getByRole('columnheader', { name: /Viaturas/ })).toHaveCount(0);
   });
 
-  test('frota: mapa de ocupação e viaturas sem circuito', async ({ page }) => {
+  test('frota: calendário da semana tipo, visão geral e viaturas sem circuito', async ({
+    page,
+  }) => {
     await page.goto('/pt/fleet');
-    await expect(page.getByRole('tab', { name: 'Ocupação por turno' })).toBeVisible();
+    await expect(page.getByRole('tab', { name: /^Calendário/ })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+    await expect(page.getByRole('table', { name: /Semana tipo: dias em colunas/ })).toBeVisible();
+    await page.getByRole('tab', { name: 'Visão geral' }).click();
+    await expect(page).toHaveURL(/tab=overview/);
     await expect(page.getByRole('row', { name: /Orgânicos/ }).first()).toBeVisible();
     await page.getByRole('tab', { name: /^Viaturas/ }).click();
     await page.getByLabel('Pesquisar matrícula ou circuito').fill('29-48-XU');

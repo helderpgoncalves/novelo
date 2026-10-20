@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
+from novelo.core.guest import AiGuard, SolverGuard
 from novelo.core.ratelimit import whatif_limiter
 from novelo.features.lots.router import get_llm
 from novelo.features.planning import whatif_service as service
@@ -18,7 +19,9 @@ Db = Annotated[AsyncSession, Depends(get_db)]
 Llm = Annotated[OpenRouterClient, Depends(get_llm)]
 
 
-@router.post("", response_model=WhatIfOut, status_code=201, dependencies=[Depends(whatif_limiter)])
+@router.post(
+    "", response_model=WhatIfOut, status_code=201, dependencies=[Depends(whatif_limiter), AiGuard, SolverGuard]
+)
 async def ask_what_if(body: WhatIfRequest, user: CurrentUser, db: Db, llm: Llm) -> WhatIfOut:
     """Passo 1: o modelo percebe a pergunta e descreve a alteração. Nada é calculado até o utilizador confirmar."""
     try:
@@ -27,7 +30,7 @@ async def ask_what_if(body: WhatIfRequest, user: CurrentUser, db: Db, llm: Llm) 
         await llm.aclose()
 
 
-@router.post("/{run_id}/apply", response_model=WhatIfOut, dependencies=[Depends(whatif_limiter)])
+@router.post("/{run_id}/apply", response_model=WhatIfOut, dependencies=[Depends(whatif_limiter), AiGuard, SolverGuard])
 async def apply_what_if(run_id: uuid.UUID, user: CurrentUser, db: Db, llm: Llm, locale: Locale = "pt-PT") -> WhatIfOut:
     """Passo 2: corre o otimizador com a alteração confirmada e explica o resultado, com números verificados."""
     try:

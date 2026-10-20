@@ -1309,19 +1309,50 @@
             "title": "Google Enabled",
             "type": "boolean"
           },
+          "magic_link_enabled": {
+            "description": "Há transporte de email utilizável: o link por email é a entrada principal",
+            "title": "Magic Link Enabled",
+            "type": "boolean"
+          },
           "password_min_length": {
             "default": 10,
             "title": "Password Min Length",
             "type": "integer"
           },
+          "quick_join_enabled": {
+            "description": "A entrada por QR do evento está ligada",
+            "title": "Quick Join Enabled",
+            "type": "boolean"
+          },
           "registration_open": {
             "title": "Registration Open",
             "type": "boolean"
+          },
+          "turnstile_enabled": {
+            "description": "As rotas públicas exigem o cabeçalho `X-Turnstile-Token` (Cloudflare Turnstile)",
+            "title": "Turnstile Enabled",
+            "type": "boolean"
+          },
+          "turnstile_site_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Chave pública do widget; null se o Turnstile não estiver ativo",
+            "title": "Turnstile Site Key"
           }
         },
         "required": [
           "google_enabled",
-          "registration_open"
+          "registration_open",
+          "magic_link_enabled",
+          "quick_join_enabled",
+          "turnstile_enabled",
+          "turnstile_site_key"
         ],
         "title": "AuthConfig",
         "type": "object"
@@ -2106,6 +2137,7 @@
             "type": "string"
           },
           "localities": {
+            "description": "Localidades pela ordem do ficheiro da Vitrus (a ordem do percurso)",
             "items": {
               "type": "string"
             },
@@ -2869,6 +2901,7 @@
               "invalid_token",
               "forbidden",
               "registration_closed",
+              "invalid_event_code",
               "not_found",
               "user_not_found",
               "email_taken",
@@ -2878,6 +2911,9 @@
               "feature_disabled",
               "upstream_error",
               "ai_budget_exceeded",
+              "captcha_required",
+              "captcha_failed",
+              "captcha_unavailable",
               "internal_error"
             ],
             "title": "Code",
@@ -4622,6 +4658,7 @@
               "invalid_token",
               "forbidden",
               "registration_closed",
+              "invalid_event_code",
               "not_found",
               "user_not_found",
               "email_taken",
@@ -4631,6 +4668,9 @@
               "feature_disabled",
               "upstream_error",
               "ai_budget_exceeded",
+              "captcha_required",
+              "captcha_failed",
+              "captcha_unavailable",
               "internal_error"
             ],
             "title": "Code",
@@ -5335,6 +5375,128 @@
           }
         },
         "title": "GlobalDefaults",
+        "type": "object"
+      },
+      "GuestOut": {
+        "properties": {
+          "actions_count": {
+            "description": "Mensagens ao copiloto mais ações propostas",
+            "title": "Actions Count",
+            "type": "integer"
+          },
+          "consent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent At"
+          },
+          "consent_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Consent Version"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "joined_at": {
+            "format": "date-time",
+            "title": "Joined At",
+            "type": "string"
+          },
+          "last_login_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Login At"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "email",
+          "email_verified",
+          "is_active",
+          "joined_at",
+          "last_login_at",
+          "actions_count",
+          "consent_at",
+          "consent_version"
+        ],
+        "title": "GuestOut",
+        "type": "object"
+      },
+      "GuestPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/GuestOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "GuestPage",
         "type": "object"
       },
       "Health": {
@@ -6232,6 +6394,57 @@
           "opened_at"
         ],
         "title": "LotSummary",
+        "type": "object"
+      },
+      "MagicLinkRequest": {
+        "properties": {
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "next": {
+            "anyOf": [
+              {
+                "maxLength": 255,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Caminho relativo para onde voltar depois de entrar; outra coisa é ignorada (vai para `/`)",
+            "title": "Next"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "MagicLinkRequest",
+        "type": "object"
+      },
+      "MagicLinkVerifyRequest": {
+        "properties": {
+          "token": {
+            "maxLength": 200,
+            "minLength": 20,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "MagicLinkVerifyRequest",
         "type": "object"
       },
       "MapArtifact": {
@@ -11147,6 +11360,138 @@
         "title": "QuantilesOut",
         "type": "object"
       },
+      "QuickJoinInfo": {
+        "properties": {
+          "consent_version": {
+            "description": "Versão do texto de consentimento que fica registada",
+            "title": "Consent Version",
+            "type": "string"
+          },
+          "enabled": {
+            "title": "Enabled",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "enabled",
+          "consent_version"
+        ],
+        "title": "QuickJoinInfo",
+        "type": "object"
+      },
+      "QuickJoinPoster": {
+        "properties": {
+          "code": {
+            "description": "Código do evento",
+            "title": "Code",
+            "type": "string"
+          },
+          "svg": {
+            "description": "QR em SVG para o URL",
+            "title": "Svg",
+            "type": "string"
+          },
+          "url": {
+            "description": "URL de entrada do evento: `${APP_URL}/join?c=<código>`",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "code",
+          "svg"
+        ],
+        "title": "QuickJoinPoster",
+        "type": "object"
+      },
+      "QuickJoinRequest": {
+        "properties": {
+          "code": {
+            "description": "Código do evento (vem no QR)",
+            "maxLength": 128,
+            "minLength": 1,
+            "title": "Code",
+            "type": "string"
+          },
+          "consent": {
+            "const": true,
+            "description": "Aceitação do tratamento de dados; tem de ser true",
+            "title": "Consent",
+            "type": "boolean"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot",
+            "title": "Website"
+          }
+        },
+        "required": [
+          "name",
+          "email",
+          "code",
+          "consent"
+        ],
+        "title": "QuickJoinRequest",
+        "type": "object"
+      },
+      "QuickJoinResult": {
+        "description": "`signed_in`: conta nova, sessão iniciada. `check_email`: o email já tem conta e recebeu um link de entrada.",
+        "properties": {
+          "status": {
+            "enum": [
+              "signed_in",
+              "check_email"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "user": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só quando `status` é `signed_in`"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "QuickJoinResult",
+        "type": "object"
+      },
       "RangeChart": {
         "additionalProperties": false,
         "properties": {
@@ -11339,6 +11684,19 @@
             "default": true,
             "title": "Remember Me",
             "type": "boolean"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot",
+            "title": "Website"
           }
         },
         "required": [
@@ -12388,12 +12746,28 @@
             "title": "Circuit",
             "type": "string"
           },
+          "collection_type": {
+            "$ref": "#/components/schemas/CollectionType",
+            "description": "Modo de recolha desta linha do planeamento"
+          },
           "crew": {
             "title": "Crew",
             "type": "integer"
           },
           "day_group": {
             "$ref": "#/components/schemas/DayGroup"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nota da linha do planeamento da Vitrus",
+            "title": "Note"
           },
           "shift": {
             "$ref": "#/components/schemas/Shift"
@@ -12407,7 +12781,9 @@
           "shift",
           "circuit",
           "typology",
-          "crew"
+          "crew",
+          "collection_type",
+          "note"
         ],
         "title": "ScheduleEntry",
         "type": "object"
@@ -12732,6 +13108,25 @@
           "explanation"
         ],
         "title": "SignalFloorOut",
+        "type": "object"
+      },
+      "SignedIn": {
+        "description": "Sessão iniciada (cookies definidos). `next` é o caminho relativo guardado quando o link foi pedido.",
+        "properties": {
+          "next": {
+            "description": "Caminho relativo seguro para onde navegar a seguir",
+            "title": "Next",
+            "type": "string"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut"
+          }
+        },
+        "required": [
+          "user",
+          "next"
+        ],
+        "title": "SignedIn",
         "type": "object"
       },
       "SiteClass": {
@@ -14637,6 +15032,16 @@
             "title": "Is Active",
             "type": "boolean"
           },
+          "joined_via": {
+            "enum": [
+              "password",
+              "google",
+              "quick_join",
+              "magic_link"
+            ],
+            "title": "Joined Via",
+            "type": "string"
+          },
           "last_login_at": {
             "anyOf": [
               {
@@ -14663,7 +15068,8 @@
           "role": {
             "enum": [
               "admin",
-              "operator"
+              "operator",
+              "guest"
             ],
             "title": "Role",
             "type": "string"
@@ -14674,6 +15080,7 @@
           "email",
           "name",
           "role",
+          "joined_via",
           "is_active",
           "email_verified",
           "google_linked",
@@ -14701,7 +15108,8 @@
               {
                 "enum": [
                   "admin",
-                  "operator"
+                  "operator",
+                  "guest"
                 ],
                 "type": "string"
               },
@@ -14749,6 +15157,16 @@
             "title": "Id",
             "type": "string"
           },
+          "joined_via": {
+            "enum": [
+              "password",
+              "google",
+              "quick_join",
+              "magic_link"
+            ],
+            "title": "Joined Via",
+            "type": "string"
+          },
           "locale": {
             "enum": [
               "pt-PT",
@@ -14771,7 +15189,8 @@
           "role": {
             "enum": [
               "admin",
-              "operator"
+              "operator",
+              "guest"
             ],
             "title": "Role",
             "type": "string"
@@ -14783,6 +15202,7 @@
           "name",
           "avatar_url",
           "role",
+          "joined_via",
           "has_password",
           "google_linked",
           "email_verified",
@@ -16751,6 +17171,26 @@
       "post": {
         "description": "Responde 204 exista ou não a conta: não revela que emails estão registados.",
         "operationId": "forgot_password",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -17199,6 +17639,26 @@
     "/api/v1/auth/login": {
       "post": {
         "operationId": "login",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -17592,6 +18052,283 @@
         ]
       }
     },
+    "/api/v1/auth/magic-link": {
+      "post": {
+        "description": "Envia um link de entrada válido 15 min e de uso único. Responde 204 exista ou não a conta.",
+        "operationId": "request_magic_link",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MagicLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Request Magic Link",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/magic-link/verify": {
+      "post": {
+        "description": "Troca o link por uma sessão de 30 dias e confirma o email. O token só funciona uma vez.",
+        "operationId": "verify_magic_link",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MagicLinkVerifyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedIn"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Verify Magic Link",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/me": {
       "get": {
         "operationId": "get_me",
@@ -17878,6 +18615,602 @@
         ]
       }
     },
+    "/api/v1/auth/quick-join": {
+      "post": {
+        "description": "Entrada do evento com nome, email e código do QR. Email novo: convidado com sessão iniciada.\nEmail que já tem conta: não inicia sessão; envia um link de entrada e responde `check_email`.",
+        "operationId": "quick_join",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QuickJoinRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickJoinResult"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Quick Join",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/quick-join/guests": {
+      "get": {
+        "description": "Convidados que entraram pelo QR, do mais recente para o mais antigo.",
+        "operationId": "list_guests",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Procura no nome ou email",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Procura no nome ou email",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Guests",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/quick-join/info": {
+      "get": {
+        "description": "Público: o web mostra ou esconde a entrada por QR.",
+        "operationId": "get_quick_join_info",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickJoinInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Quick Join Info",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/quick-join/qr": {
+      "get": {
+        "description": "URL, código e QR (SVG) de entrada do evento (`/join?c=<código>`). Só administradores.",
+        "operationId": "get_quick_join_qr",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QuickJoinPoster"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Quick Join Qr",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/refresh": {
       "post": {
         "operationId": "refresh",
@@ -18013,6 +19346,26 @@
     "/api/v1/auth/register": {
       "post": {
         "operationId": "register",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -18146,6 +19499,24 @@
         "operationId": "resend_verification",
         "parameters": [
           {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          },
+          {
             "in": "cookie",
             "name": "access_token",
             "required": false,
@@ -18276,6 +19647,26 @@
     "/api/v1/auth/reset-password": {
       "post": {
         "operationId": "reset_password",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {

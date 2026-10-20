@@ -77,7 +77,8 @@ test.describe('403', () => {
     await login(page, operator);
     await page.goto('/pt/users');
     await expect(heading(page, 'Não tens permissão para ver esta página')).toBeVisible();
-    await expect(page).toHaveURL(/\/pt\/users$/);
+    // O caminho mantém-se; o router só acrescenta o separador por omissão (`?tab=accounts`).
+    await expect(page).toHaveURL(/\/pt\/users(\?tab=accounts)?$/);
     await expect(page.getByText(/só para administradores/)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Pedir acesso' })).toHaveAttribute(
       'href',
@@ -222,11 +223,18 @@ test.describe('sessão', () => {
     await expect(page.getByText('A tua sessão terminou.')).toBeVisible();
     await shot(page, 'session');
 
+    // O login por defeito é o link por email; a password está um clique à frente e mantém o `next`.
+    // Clica-se com a sessão ainda recusada, senão o guarda do login reencaminhava para a app.
+    await page.getByRole('link', { name: 'Entrar com palavra-passe' }).click();
+    await expect(page).toHaveURL(/method=password/);
+    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+    await page.getByLabel('Email').fill(ADMIN.email);
+    await page.getByLabel('Password', { exact: true }).fill(ADMIN.password);
+    await expect(page.getByLabel('Email')).toHaveValue(ADMIN.email);
+    // Só agora a sessão volta a existir (senão o guarda do login reencaminhava antes de escrever).
     await page.unroute(FLEET_API);
     await page.unroute('**/api/v1/auth/refresh');
     await page.unroute('**/api/v1/auth/me');
-    await page.getByLabel('Email').fill(ADMIN.email);
-    await page.getByLabel('Password', { exact: true }).fill(ADMIN.password);
     await page.getByRole('button', { name: 'Entrar' }).click();
     await expect(page).toHaveURL(/\/pt\/fleet/);
   });

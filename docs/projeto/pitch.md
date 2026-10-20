@@ -13,7 +13,7 @@ Os projetos são avaliados por quatro critérios ponderados: **inovação e orig
 | # | Tempo | Slide | Critério | O que se diz |
 | --- | --- | --- | --- | --- |
 | 1 | 0:00 a 0:20 | Capa Novelo | Apresentação | "Na Europa, cerca de 72% dos têxteis descartados vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro, ao menor custo." |
-| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar. (O 5,4% de têxtil no indiferenciado só se usa depois de confirmada a fonte.) |
+| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar. (O 5,4% de têxtil no indiferenciado só se diz com a fonte, o Plano URBACT p. 30, e a ressalva de que falta a Vitrus confirmar o âmbito: A10, Q6.) |
 | 3 | 0:45 a 1:00 | A referência | Impacto | Guimarães recolhe 1,9 kg por habitante, a França 4,27. "Respondemos com números, não com contentores." |
 | 4 | 1:00 a 3:00 | **Demo ao vivo** | Viabilidade, impacto e inovação (40 s cada) | Cenários A e B; um jurado faz uma pergunta "E se...?"; uma peça real vai do saco ao lote com QR; relatório RAP num clique. Guião detalhado em [Demo e entrega](../engenharia/demo-e-entrega.md) e [roteiro](narrativa-do-pitch.md#roteiro-da-demo). |
 | 5 | 3:00 a 3:30 | Como funciona | Viabilidade | O diagrama do saco ao fio, e a regra de ouro: a IA conduz o otimizador, nunca inventa números. Sem IA, o resto funciona. |

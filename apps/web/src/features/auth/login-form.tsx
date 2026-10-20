@@ -24,12 +24,12 @@ import { useAutofillSync } from './use-autofill-sync';
 
 const AUTOFILL_FIELDS = ['email', 'password'] as const;
 
-export function LoginForm({ next }: { next: string }) {
+export function LoginForm({ next, initialEmail = '' }: { next: string; initialEmail?: string }) {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
-    defaultValues: { email: '', password: '', remember_me: true },
+    defaultValues: { email: initialEmail, password: '', remember_me: true },
   });
 
   const formRef = useRef<HTMLFormElement>(null);

@@ -56,7 +56,7 @@ Os projetos são avaliados por quatro critérios ponderados ([Critérios de aval
 | Tempo | O que se diz | Estado |
 | --- | --- | --- |
 | 4:20 a 4:30 | A frase-âncora com X e Y, "estimativa" | Preencher a 22 out |
-| 4:30 a 4:45 | **O pedido:** piloto de três meses em duas freguesias, com três KPIs (toneladas, € por tonelada, taxa de rejeito) e um piso de sinal para que a medição valha | Piloto recomendado em integração |
+| 4:30 a 4:45 | **O pedido:** piloto de três meses em duas freguesias, com três KPIs (toneladas, € por tonelada, taxa de rejeito) e um piso de sinal para que a medição valha | Piloto recomendado (já na app) |
 | 4:45 a 4:55 | **Replicabilidade e roadmap depois de 26 de outubro:** "A base são dados abertos e os dados do operador; outro município precisa dos seus. Depois de hoje: feedback, plano de três meses em 48 horas, piloto, e pressupostos trocados por dados medidos." | Roadmap é **proposta nossa**, não aprovada por ninguém; replicabilidade **não testada** noutro município |
 | 4:55 a 5:00 | Agradecer à Vitrus, ao município e à organização, e parar | — |
 

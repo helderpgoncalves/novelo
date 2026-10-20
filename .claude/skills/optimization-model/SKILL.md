@@ -12,6 +12,6 @@ Fonte das fórmulas: `docs/engenharia/dados-e-modelo.md`. Código em `apps/api/s
 - **Custo:** `capex/N + recolhas·c_recolha + km·c_km`; `€/t = custo anual / toneladas`. Custos unitários pedem-se à Vitrus: até chegarem, ficam em `params.yaml` marcados "pressuposto" com fonte.
 - **MIP (localização + modo):** maximizar toneladas com orçamento ou minimizar custo para uma meta. Zona servida só com ponto dentro da distância a pé do modo.
 - **Recolha a pedido:** custo marginal calculado sobre os circuitos reais (`data/processed/circuits.csv`): se a localidade já tem circuito, km extra ≈ 0.
-- **VRP:** matriz do OSRM; plano B em linha reta se o OSRM não estiver disponível. Limite de tempo `SOLVER_TIME_LIMIT_S`, sementes fixas, resultado em cache pela hash dos parâmetros.
+- **VRP:** hoje a matriz usa distâncias em linha reta (haversine) com fator de desvio 1,3; o OSRM ainda não está integrado (`OSRM_URL` existe mas não é usado). Limite de tempo `SOLVER_TIME_LIMIT_S`, sementes fixas, resultado em cache pela hash dos parâmetros.
 - **Testes:** fixture pequeno (3 freguesias, 6 candidatos) com resultado fixo; fórmulas com valores à mão. Mesma entrada ⇒ mesmo cenário.
 - **KPIs:** `capex_eur`, `opex_eur_year`, `tonnes_year`, `eur_per_tonne`, `coverage_pct`. Receita de reutilização/reciclagem usa a repartição 59,4/26,5/14,1 observada.

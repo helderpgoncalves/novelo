@@ -16,6 +16,8 @@ export const Route = createFileRoute('/_app/data-quality')({
   staticData: { skeleton: 'table' },
   validateSearch: z.object({
     tab: z.enum(['alerts', 'sources']).optional().catch(undefined),
+    /** Origem dos alertas: rede de têxteis ou contentores municipais. */
+    origin: z.enum(['textile', 'municipal']).optional().catch(undefined),
   }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getDataQualityOptions()),
   head: () => ({ meta: [{ title: m.title_data_quality() }] }),
@@ -23,7 +25,7 @@ export const Route = createFileRoute('/_app/data-quality')({
 });
 
 function DataQuality() {
-  const { tab = 'alerts' } = Route.useSearch();
+  const { tab = 'alerts', origin } = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
   const { data, isPending, error, refetch } = useQuery(getDataQualityOptions());
 
@@ -67,7 +69,7 @@ function DataQuality() {
         value={tab}
         onValueChange={(next) =>
           void navigate({
-            search: { tab: next === 'sources' ? 'sources' : undefined },
+            search: (prev) => ({ ...prev, tab: next === 'sources' ? 'sources' : undefined }),
             replace: true,
           })
         }
@@ -83,7 +85,13 @@ function DataQuality() {
                 title={m.quality_alerts_title()}
                 description={m.quality_alerts_description()}
               >
-                <AlertsPanel alerts={data.alerts} />
+                <AlertsPanel
+                  alerts={data.alerts}
+                  origin={origin}
+                  onOriginChange={(next) =>
+                    void navigate({ search: (prev) => ({ ...prev, origin: next }), replace: true })
+                  }
+                />
               </Section>
             ),
           },

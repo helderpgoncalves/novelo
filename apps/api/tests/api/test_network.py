@@ -16,6 +16,8 @@ async def test_circuits_summary_matches_vitrus_file(logged_in: httpx.AsyncClient
     c7 = next(c for c in body["circuits"] if c["code"] == "C7")
     assert c7["weekdays"] == [2, 4, 6]  # "3ª, 5ª & SAB"
     assert c7["typology"] == "undifferentiated" and c7["collection_type"] == "door_to_door"
+    c1 = next(c for c in body["circuits"] if c["code"] == "C1")  # ordem do ficheiro, não alfabética
+    assert c1["localities"] == ["Costa", "Azurém", "Moreira de Cónegos", "Mesão Frio", "São Torcato"]
 
 
 async def test_fleet_matches_summary_sheet(logged_in: httpx.AsyncClient) -> None:
@@ -31,6 +33,9 @@ async def test_fleet_matches_summary_sheet(logged_in: httpx.AsyncClient) -> None
     never = {v["plate"] for v in body["vehicles"] if v["never_assigned"]}
     assert never == {"29-48-XU", "74-HN-36"}
     assert next(v for v in body["vehicles"] if v["plate"] == "60-93-ZG")["multi_typology"] is True
+    entries = [e for v in body["vehicles"] for e in v["schedule"]]
+    assert all("note" in e and e["collection_type"] for e in entries)
+    assert any(e["collection_type"] == "moloks" for e in entries)
 
 
 async def test_localities_expose_service_frequency(logged_in: httpx.AsyncClient) -> None:

@@ -19,6 +19,12 @@ def _find_repo_root() -> Path:
 _REPO_ROOT = _find_repo_root()
 
 
+# Chaves de teste da Cloudflare (https://developers.cloudflare.com/turnstile/troubleshooting/testing/).
+TURNSTILE_TEST_SITE_KEY_PASS = "1x00000000000000000000AA"
+TURNSTILE_TEST_SECRET_PASS = "1x0000000000000000000000000000000AA"
+TURNSTILE_TEST_SECRET_FAIL = "2x0000000000000000000000000000000AA"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=_REPO_ROOT / ".env", extra="ignore")
 
@@ -63,6 +69,18 @@ class Settings(BaseSettings):
     password_reset_minutes: int = Field(60, alias="PASSWORD_RESET_EXPIRE_MINUTES")
     app_url: str = Field("http://localhost:3190", alias="APP_URL")
     allow_registration: bool = Field(True, alias="ALLOW_REGISTRATION")
+    magic_link_minutes: int = Field(15, ge=5, le=60, alias="MAGIC_LINK_EXPIRE_MINUTES")
+    # Entrada por QR (evento): o convidado só dá nome e email. Em dev liga-se com um código de dev;
+    # em produção só fica ativa se QUICK_JOIN_CODE estiver definido.
+    quick_join_enabled: bool = Field(True, alias="QUICK_JOIN_ENABLED")
+    quick_join_code: str = Field("", alias="QUICK_JOIN_CODE")
+    quick_join_consent_version: str = Field("2026-10-20", alias="QUICK_JOIN_CONSENT_VERSION")
+    # Limites por convidado (role `guest`), para o IA e o solver não saírem do controlo num evento aberto.
+    guest_ai_per_hour: int = Field(20, ge=1, alias="GUEST_AI_REQUESTS_PER_HOUR")
+    guest_solver_per_hour: int = Field(10, ge=1, alias="GUEST_SOLVER_RUNS_PER_HOUR")
+    guest_ai_budget_usd: float = Field(
+        0.5, ge=0, alias="GUEST_AI_BUDGET_USD"
+    )  # por convidado, últimas 24 h; 0 = sem limite
     admin_email: str = Field("", alias="ADMIN_EMAIL")
     admin_password: str = Field("", alias="ADMIN_PASSWORD")
 
@@ -76,6 +94,15 @@ class Settings(BaseSettings):
     email_from: str = Field("Novelo <novelo@heldergoncalves.io>", alias="EMAIL_FROM")
     email_support: str = Field("novelo@heldergoncalves.io", alias="EMAIL_SUPPORT")  # ajuda no rodapé dos emails
 
+    # Cloudflare Turnstile (anti-bots nas rotas públicas de escrita). Ver docs/engenharia/ambiente.md.
+    turnstile_site_key: str = Field("", alias="TURNSTILE_SITE_KEY")
+    turnstile_secret_key: str = Field("", alias="TURNSTILE_SECRET_KEY")
+    # "auto": ativo se houver secret (em dev, chaves de teste da Cloudflare); "true"/"false" forçam.
+    turnstile_enabled_mode: Literal["auto", "true", "false"] = Field("auto", alias="TURNSTILE_ENABLED")
+    # true: as rotas protegidas NUNCA passam sem verificação (sem secret respondem 503 captcha_unavailable).
+    turnstile_required: bool = Field(False, alias="TURNSTILE_REQUIRED")
+    turnstile_timeout_s: float = Field(5.0, gt=0, le=30, alias="TURNSTILE_TIMEOUT_S")
+
     rate_limit_enabled: bool = Field(True, alias="RATE_LIMIT_ENABLED")  # só se desliga em dev/E2E
 
     osrm_url: str = Field("http://localhost:5000", alias="OSRM_URL")
@@ -86,6 +113,54 @@ class Settings(BaseSettings):
         if self.environment == "production" and (self.secret_key.startswith("dev-only") or len(self.secret_key) < 32):
             raise ValueError("SECRET_KEY forte (32+ caracteres) é obrigatória em produção")
         return self
+
+    @property
+    def turnstile_secret(self) -> str:
+        """Secret em vigor. Só em desenvolvimento há um por omissão (chave de teste da Cloudflare: passa sempre)."""
+        if self.turnstile_secret_key:
+            return self.turnstile_secret_key
+        return TURNSTILE_TEST_SECRET_PASS if self.environment == "development" else ""
+
+    @property
+    def turnstile_site(self) -> str | None:
+        if self.turnstile_site_key:
+            return self.turnstile_site_key
+        return TURNSTILE_TEST_SITE_KEY_PASS if self.environment == "development" else None
+
+    @property
+    def turnstile_enabled(self) -> bool:
+        """As rotas públicas de escrita exigem Turnstile?
+
+        `TURNSTILE_ENABLED=false` desliga (exceto com `TURNSTILE_REQUIRED=true`, que manda); `true` liga; `auto`
+        liga se houver secret. Ativo sem secret (só possível em produção) é fail-closed: ver `core/captcha.py`.
+        """
+        if self.turnstile_required:
+            return True
+        if self.turnstile_enabled_mode == "false":
+            return False
+        if self.turnstile_enabled_mode == "true":
+            return True
+        return bool(self.turnstile_secret)
+
+    @property
+    def quick_join_secret(self) -> str:
+        """Código do evento em vigor. Em dev há um por omissão; em produção tem de ser definido."""
+        if self.quick_join_code:
+            return self.quick_join_code
+        return "novelo-dev" if self.environment == "development" else ""
+
+    @property
+    def quick_join_active(self) -> bool:
+        return self.quick_join_enabled and bool(self.quick_join_secret)
+
+    @property
+    def magic_link_enabled(self) -> bool:
+        """Há transporte de email utilizável: Resend com chave, ou o log de dev."""
+        if self.email_transport == "log":
+            return True
+        if self.email_transport == "resend":
+            return bool(self.resend_api_key)
+        return bool(self.resend_api_key) or self.environment == "development"
 
     @property
     def secure_cookies(self) -> bool:
