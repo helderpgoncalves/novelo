@@ -12,7 +12,7 @@ export function navItems(): { id: string; label: string; xl?: boolean }[] {
   ];
 }
 
-/** Secções numeradas da página, pela ordem em que aparecem. A numeração sai daqui (índice do menu, «Nesta página» e cabeçalhos). */
+/** Secções da página, pela ordem em que aparecem. A numeração só serve a etiqueta mono dos cabeçalhos; a navegação não a mostra. */
 const NUMBERED = [
   'problema',
   'metodo',
@@ -27,7 +27,7 @@ const NUMBERED = [
 
 export type NumberedSection = (typeof NUMBERED)[number];
 
-/** Número editorial contínuo («01», «02»…) de uma secção, gerado a partir da lista real. */
+/** Número editorial («01», «02»…) de uma secção, só para a etiqueta do cabeçalho dela. */
 export function sectionNumber(id: NumberedSection): string {
   return String(NUMBERED.indexOf(id) + 1).padStart(2, '0');
 }
@@ -44,9 +44,9 @@ const TOC_LABEL: Record<NumberedSection, () => string> = {
   perguntas: () => m.landing_nav_faq(),
 };
 
-/** Índice completo (menu móvel e «Nesta página»), pela ordem da página, com o número editorial de cada secção. */
-export function tocItems(): { id: NumberedSection; n: string; label: string }[] {
-  return NUMBERED.map((id) => ({ id, n: sectionNumber(id), label: TOC_LABEL[id]() }));
+/** Índice completo (menu móvel e «Nesta página»), pela ordem da página, sem numeração. */
+export function tocItems(): { id: NumberedSection; label: string }[] {
+  return NUMBERED.map((id) => ({ id, label: TOC_LABEL[id]() }));
 }
 
 /** Cada secção observada e o item do topo a que pertence (a pílula fica no grupo). */
