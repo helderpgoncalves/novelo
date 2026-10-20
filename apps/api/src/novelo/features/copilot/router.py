@@ -244,10 +244,27 @@ async def get_copilot_event_schema() -> CopilotEventCatalog:
         ),
         s.CopilotPlanEvent(steps=["Ler o cenário base", "Correr a variante", "Comparar"]),
         s.CopilotClarifyEvent(question="Com que orçamento anual?", options=["40 000 €", "60 000 €", "Outro valor"]),
+        s.CopilotWebSearchEvent(
+            state="searching", query="Diretiva-Quadro dos Resíduos responsabilidade alargada têxteis prazo"
+        ),
+        s.CopilotWebSearchEvent(
+            state="done",
+            query="Diretiva-Quadro dos Resíduos responsabilidade alargada têxteis prazo",
+            results=3,
+            requests=1,
+        ),
         s.CopilotSourcesEvent(
             items=[
                 s.CopilotSource(kind="tool", label="what_if"),
                 s.CopilotSource(kind="scenario", label="Contido", ref="/scenarios/1"),
+                s.CopilotSource(
+                    kind="web",
+                    label="Diretiva (UE) 2025/1892",
+                    ref="https://eur-lex.europa.eu/eli/dir/2025/1892/oj",
+                    domain="eur-lex.europa.eu",
+                    excerpt="Os Estados-Membros estabelecem regimes de responsabilidade alargada do produtor para os têxteis...",
+                    external=True,
+                ),
             ]
         ),
         s.CopilotArtifactEvent(
@@ -567,6 +584,13 @@ COMMANDS = [
         label_key="command.export",
         description_key="command.export.description",
         kind="client",
+        admin_only=False,
+    ),
+    CopilotCommand(
+        name="/websearch",
+        label_key="command.websearch",
+        description_key="command.websearch.description",
+        kind="server",
         admin_only=False,
     ),
     CopilotCommand(

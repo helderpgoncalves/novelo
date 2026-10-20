@@ -197,6 +197,7 @@ async def show_chart(box: "CopilotTools", a: ShowChartArgs) -> dict[str, Any]:
     refresh = {
         "tool": found["tool"],
         "args": found["args"],
+        "post": found.get("post", []),
         "builder": "chart",
         "builder_args": a.model_dump(mode="json"),
     }
@@ -224,6 +225,7 @@ async def show_table(box: "CopilotTools", a: ShowTableArgs) -> dict[str, Any]:
     refresh = {
         "tool": found["tool"],
         "args": found["args"],
+        "post": found.get("post", []),
         "builder": "table",
         "builder_args": a.model_dump(mode="json"),
     }
@@ -267,6 +269,7 @@ async def show_kpis(box: "CopilotTools", a: ShowKpisArgs) -> dict[str, Any]:
     refresh = {
         "tool": found["tool"],
         "args": found["args"],
+        "post": found.get("post", []),
         "builder": "kpis",
         "builder_args": a.model_dump(mode="json"),
     }
@@ -294,6 +297,7 @@ async def show_comparison(box: "CopilotTools", a: ShowComparisonArgs) -> dict[st
     refresh = {
         "tool": found["tool"],
         "args": found["args"],
+        "post": found.get("post", []),
         "builder": "comparison",
         "builder_args": a.model_dump(mode="json"),
     }
@@ -319,6 +323,7 @@ async def show_timeline(box: "CopilotTools", a: ShowTimelineArgs) -> dict[str, A
     refresh = {
         "tool": found["tool"],
         "args": found["args"],
+        "post": found.get("post", []),
         "builder": "timeline",
         "builder_args": a.model_dump(mode="json"),
     }

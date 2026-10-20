@@ -17,7 +17,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Anti-bots | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_ENABLED`, `TURNSTILE_REQUIRED`, `TURNSTILE_TIMEOUT_S` | Ver «Cloudflare Turnstile» abaixo |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Ver abaixo |
 | Email | `RESEND_API_KEY`, `EMAIL_TRANSPORT`, `EMAIL_FROM`, `EMAIL_SUPPORT` | Ver abaixo |
-| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S`, `LLM_AUX_PROVIDER_SORT` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
+| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S`, `LLM_AUX_PROVIDER_SORT`, `WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
 | Copiloto | `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS` | Limites do sistema; o resto cada utilizador gere nas suas definições. Ver [Copiloto](copiloto.md) |
 | Otimização | `SOLVER_TIME_LIMIT_S`, `OSRM_URL` | `OSRM_URL` está reservada: a API lê-a, mas ainda não há cliente OSRM (as distâncias são em linha reta com fator de desvio 1,3) e o compose não tem serviço OSRM |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
@@ -28,7 +28,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 2. Verificar o domínio do `EMAIL_FROM` (por omissão `Novelo <novelo@heldergoncalves.io>`) no Resend.
 3. Sem chave, **em desenvolvimento** os emails (magic link, confirmar email, recuperar password, boas-vindas de convidado) não saem: aparecem no log da API (`just logs api`) e, em desenvolvimento, em `GET /api/v1/dev/emails` (caixa de saída de desenvolvimento, fora do OpenAPI e nunca montada em produção). **Em produção** o log nunca recebe o corpo nem os links de um email (seriam credenciais): sem `RESEND_API_KEY` (ou com `EMAIL_TRANSPORT=log`) o envio responde 503 `feature_disabled` e o arranque regista um aviso.
 4. `EMAIL_TRANSPORT` escolhe o modo: `auto` (por omissão: Resend se houver chave), `log` (nunca envia; é o que o `docker-compose.dev.yml` assume, para os testes ponta a ponta não enviarem emails a sério) ou `resend` (força o envio real, útil em `.env.local` para testar o Resend em dev).
-5. `EMAIL_SUPPORT` (por omissão `novelo@heldergoncalves.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); os logótipos são `apps/web/public/email/novelo-logotipo.png` (fundo claro) e `novelo-logotipo-negativo.png` (modo escuro), servidos em `https://<DOMAIN>/email/` e gerados por `just brand`.
+5. `EMAIL_SUPPORT` (por omissão `novelo@heldergoncalves.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); os logótipos são `apps/web/public/email/novelo-logotipo.png` (fundo claro) e `novelo-logotipo-negativo.png` (modo escuro), servidos em `https://<DOMAIN>/email/` e gerados por `just brand`. As imagens de partilha (`apps/web/public/og/`, `og-image.png`) e os fundos dither da landing (`apps/web/public/landing/`) também saem de `just brand` (ver [linguagem dither](../marca/linguagem-dither.md)).
 
 ### Testar emails
 
@@ -92,6 +92,30 @@ Os modelos por omissão são `openai/gpt-6-luna` para texto e para visão (US$ 0
 | `LLM_MAX_RETRIES` / `LLM_RETRY_BACKOFF_S` | `2` / `0.5` | Repetições de falhas transitórias, com espera exponencial |
 | `LLM_AUX_PROVIDER_SORT` | `latency` | Tarefas auxiliares (`copilot_aux`): o OpenRouter prefere o fornecedor mais rápido (`latency`, `throughput`, `price`; vazio = padrão) |
 
+### Pesquisa na web do copiloto
+
+O copiloto pode consultar fontes públicas (server tools do OpenRouter, em beta) para contexto externo ao Novelo: legislação, benchmarks de outras cidades, preços, notícias, definições. Cada pesquisa tem custo próprio no OpenRouter (Exa cerca de US$ 0,007 por pedido; Parallel e Perplexity menos ou parecido) e conta no orçamento de IA. Todas as variáveis estão no `docker-compose.yml` e têm valor por omissão: sem fazer nada fica ligada para utilizadores, desligada para convidados. Funcionamento, privacidade e limites em [IA](ia.md#pesquisa-na-web).
+
+| Variável | Por omissão | Para que serve |
+| --- | --- | --- |
+| `WEB_SEARCH_ENABLED` | `true` | `false` desliga a pesquisa na web para todos (o copiloto avisa e responde só com dados do Novelo) |
+| `WEB_SEARCH_MODE` | `tool` | `tool`: ferramenta `web_search` da casa, com a consulta sanitizada antes de sair (recomendado). `inline`: o server tool `openrouter:web_search` vai no mesmo pedido e o modelo pesquisa sozinho (sem sanitização da consulta) |
+| `WEB_SEARCH_ENGINE` | `auto` | `auto`, `native`, `exa`, `parallel`, `perplexity` ou `firecrawl` (o Firecrawl é rejeitado com ZDR forçado) |
+| `WEB_SEARCH_MAX_RESULTS` | `5` | Fontes por pesquisa (1 a 10) |
+| `WEB_SEARCH_MAX_CALLS` | `3` | Pesquisas por pergunta do utilizador |
+| `WEB_SEARCH_MAX_COST_USD` | `0.05` | Teto de gasto por pedido (condição `max_cost` do ciclo de server tools); `0` = sem teto |
+| `WEB_SEARCH_CONTEXT_SIZE` | `low` | `low`, `medium` ou `high`: quanto texto de cada página (mais contexto custa mais tokens) |
+| `WEB_SEARCH_TIMEOUT_S` | `25` | Limite de tempo de uma pesquisa |
+| `WEB_SEARCH_ALLOWED_DOMAINS` / `WEB_SEARCH_EXCLUDED_DOMAINS` | vazio | Listas separadas por vírgulas; não se combinam (a de permitidos ganha) |
+| `GUEST_WEB_SEARCH_ENABLED` | `false` | Convidados do evento podem pesquisar na web |
+| `WEB_FETCH_ENABLED` | `true` | Ler um link `https` que o utilizador cole na mensagem (só desse domínio) |
+| `WEB_FETCH_ALLOWED_DOMAINS` / `WEB_FETCH_BLOCKED_DOMAINS` | vazio | Restringem os domínios que se podem ler |
+| `WEB_FETCH_MAX_CONTENT_TOKENS` | `12000` | Tamanho máximo de uma página lida |
+| `SERVER_TOOLS_DATETIME_ENABLED` / `SERVER_TOOLS_TIMEZONE` | `true` / `Europe/Lisbon` | Ferramenta de data e hora no modo `inline`; a data de hoje vai sempre no contexto, neste fuso |
+| `OPENROUTER_ZDR_ENFORCED` | `false` | Declara que a conta OpenRouter força ZDR: o motor Firecrawl é trocado por `auto` |
+
+**Região e privacidade.** O OpenRouter não tem motor de pesquisa residente na UE: num endpoint regional da UE (`eu.openrouter.ai`) a pesquisa fica desligada por si (o servidor devolve 403). As consultas saem da UE para o motor de pesquisa; por isso o modo `tool` recusa consultas com emails, nomes de utilizadores, identificadores ou números internos do Novelo.
+
 ## Magic link e entrada por QR
 
 O magic link é a forma principal de entrar (password e Google continuam como alternativas). `POST /auth/magic-link` responde sempre 204; o link vale `MAGIC_LINK_EXPIRE_MINUTES` (15), é de uso único, só o hash fica na base de dados e cria uma sessão de 30 dias. `magic_link_enabled` em `GET /auth/config` é verdadeiro com Resend configurado ou com `EMAIL_TRANSPORT=log` / ambiente de desenvolvimento. Em produção sem `RESEND_API_KEY` é falso: o pedido responde 503 e o ecrã de entrada deixa só a password e o Google.
@@ -136,7 +160,7 @@ O admin de dev é `admin@heldergoncalves.io` / `admin-novelo-dev-1` (entra-se em
 
 ## O que o compose de produção passa à API
 
-O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. Também repassa `LLM_MONTHLY_BUDGET_USD` (30 por omissão; o teto mensal global de IA, editável depois no painel `/admin/ai`), `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD`, `INVITATION_EXPIRE_DAYS`, `INVITATIONS_PER_HOUR`, `IMPERSONATION_MINUTES`, `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `WEB_CONCURRENCY`, `SOLVER_RUNS_PER_MINUTE` e `SOLVER_MAX_CONCURRENCY`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*` por convidado, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
+O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. Também repassa as variáveis de pesquisa na web (`WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED`), `LLM_MONTHLY_BUDGET_USD` (30 por omissão; o teto mensal global de IA, editável depois no painel `/admin/ai`), `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD`, `INVITATION_EXPIRE_DAYS`, `INVITATIONS_PER_HOUR`, `IMPERSONATION_MINUTES`, `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `WEB_CONCURRENCY`, `SOLVER_RUNS_PER_MINUTE` e `SOLVER_MAX_CONCURRENCY`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*` por convidado, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
 
 ## Copiloto
 

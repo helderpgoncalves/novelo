@@ -18,7 +18,15 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from novelo.adapters.email import get_email_sender
-from novelo.adapters.openrouter import CallUsage, ChatResult, RawToolCall, RoundResult, TextPiece, ToolCallRecord
+from novelo.adapters.openrouter import (
+    CallUsage,
+    ChatResult,
+    RawToolCall,
+    RoundResult,
+    ServerToolsDroppedPiece,
+    TextPiece,
+    ToolCallRecord,
+)
 from novelo.adapters.turnstile import TurnstileResult, TurnstileUnavailableError, get_turnstile
 from novelo.ai.cache import response_cache
 from novelo.ai.catalog import ModelCatalog, get_catalog
@@ -331,6 +339,8 @@ class FakeLlm:
         self.usage: list[object] = []
         self.account_data: dict[str, object] = {}
         self.ping_error: Exception | None = None
+        self.web_script: list[object] = []
+        self.web_queries: list[str] = []
 
     def queue_rounds(self, *rounds: object) -> None:
         """Voltas do streaming: dict {text: [pedaços], tools: [(nome, args)], delay: s} ou uma exceção."""
@@ -339,9 +349,18 @@ class FakeLlm:
     async def stream_round(
         self, *, system: str, messages: list[dict[str, object]], tools: list[object], task: object = None,
         model: str | None = None, tools_enabled: bool = True,
-    force_tool: str | None = None,
+    force_tool: str | None = None, server_tools: object = None,
     ) -> AsyncIterator[object]:  # fmt: skip
-        self.calls.append({"schema": "stream", "system": system, "user": messages, "tools_enabled": tools_enabled})
+        self.calls.append(
+            {
+                "schema": "stream",
+                "system": system,
+                "user": messages,
+                "tools_enabled": tools_enabled,
+                "tools": tools,
+                "server_tools": server_tools,
+            }
+        )
         if not self.stream_script:
             raise AssertionError("Sem voltas preparadas para o streaming")
         step = self.stream_script.pop(0)
@@ -357,9 +376,28 @@ class FakeLlm:
             RawToolCall(id=f"call_{i}", name=n, arguments=json.dumps(a))
             for i, (n, a) in enumerate(spec.get("tools", []))
         ]
-        usage = CallUsage("fake/model", 0.2, 1000, 50, 0.0004)
+        usage = CallUsage("fake/model", 0.2, 1000, 50, 0.0004, spec.get("web_requests", 0))
         self.usage.append(usage)
-        yield RoundResult("".join(chunks), calls, "tool_calls" if calls else "stop", "fake/model", usage)
+        for dropped in spec.get("dropped", []):
+            yield ServerToolsDroppedPiece(dropped)
+        yield RoundResult(
+            "".join(chunks), calls, "tool_calls" if calls else "stop", "fake/model", usage,
+            citations=spec.get("citations", []), web_search_requests=spec.get("web_requests", 0),
+        )  # fmt: skip
+
+    def queue_web(self, *results: object) -> None:
+        """Resultados de `web_search`: um WebSearchResult, ou uma exceção para simular falha."""
+        self.web_script.extend(results)
+
+    async def web_search(self, query: str, tools: object) -> object:
+        self.web_queries.append(query)
+        if not self.web_script:
+            raise AssertionError("Sem resultados de pesquisa web preparados")
+        item = self.web_script.pop(0)
+        if isinstance(item, Exception):
+            raise item
+        self.usage.append(CallUsage("fake/model", 0.1, 400, 8, 0.0075, 1))
+        return item
 
     def queue_chat(self, *steps: object) -> None:
         """Passos do copiloto: uma lista [(ferramenta, argumentos)] corre ferramentas; uma str é a resposta final."""

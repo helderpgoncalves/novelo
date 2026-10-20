@@ -33,6 +33,7 @@ from novelo.features.copilot.schemas import (
     ArtifactEnvelope,
     AttachmentOut,
     CompactOut,
+    CopilotSource,
     CopilotStreamRequest,
     FeedbackIn,
     FeedbackOut,
@@ -196,6 +197,18 @@ def _message_out(
             if i in arts
         ],
         actions=[action_service.to_out(acts[i]) for i in _part_ids(m, "action") if i in acts],
+        web_sources=[
+            CopilotSource(
+                kind="web",
+                label=p["label"],
+                ref=p["url"],
+                domain=p.get("domain"),
+                excerpt=p.get("excerpt"),
+                external=True,
+            )
+            for p in m.parts
+            if p.get("type") == "web_source"
+        ],
         verified=m.verified,
         status=m.status,
         model=m.model,

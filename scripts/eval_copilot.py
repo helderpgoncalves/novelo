@@ -1,7 +1,11 @@
 # ruff: noqa: E501, PLR0915, PLC0415
 """Avalia o copiloto ponta a ponta com o modelo REAL (precisa de OPENROUTER_API_KEY no .env).
 
-Uso (via just):  just eval-copilot [--only id1,id2] [--keep-db] [--concurrency 3] [--no-fail]
+Uso (via just):  just eval-copilot [--suite core|extended|all] [--only id1,id2] [--keep-db] [--concurrency 3] [--no-fail]
+
+Suites: `core` (copilot_cases.yaml: dados, simulações, artefactos, ações, memória), `extended` (copilot_cases_extended.yaml:
+cenários em linguagem natural, gráficos de qualquer tabela, lacunas de dados, pesquisa web com páginas SIMULADAS, injeção,
+números impossíveis, ambiguidade) ou `all` (por omissão). A pesquisa web da avaliação nunca vai à rede.
 
 Corre os casos de apps/api/tests/evals/copilot_cases.yaml contra uma base de dados própria (novelo_eval, criada e
 semeada com os dados reais da Vitrus), pelo mesmo caminho do produto (/copilot/stream). Escreve
@@ -15,17 +19,23 @@ import sys
 from dataclasses import asdict
 from pathlib import Path
 
-from novelo.ai.eval_copilot import Harness, aggregate, failures, load_cases, render_markdown
+from novelo.ai.eval_copilot import Harness, aggregate, failures, load_suite, render_markdown
 from novelo.ai.prompts import load
 from novelo.core.config import get_settings
 
 ROOT = Path(__file__).resolve().parent.parent
-CASES = ROOT / "apps" / "api" / "tests" / "evals" / "copilot_cases.yaml"
+CASES_DIR = ROOT / "apps" / "api" / "tests" / "evals"
+SUITES = {
+    "core": [CASES_DIR / "copilot_cases.yaml"],
+    "extended": [CASES_DIR / "copilot_cases_extended.yaml"],
+    "all": [CASES_DIR / "copilot_cases.yaml", CASES_DIR / "copilot_cases_extended.yaml"],
+}
 
 
 async def main() -> int:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    p.add_argument("--cases", type=Path, default=CASES)
+    p.add_argument("--suite", choices=sorted(SUITES), default="all", help="que conjunto de casos correr")
+    p.add_argument("--cases", type=Path, nargs="+", default=None, help="ficheiros de casos (substitui --suite)")
     p.add_argument("--only", default="", help="ids (ou partes de ids) separados por vírgula")
     p.add_argument("--db", default="novelo_eval")
     p.add_argument("--model", default="openai/gpt-6-luna", help="modelo do copiloto na avaliação")
@@ -49,7 +59,7 @@ async def main() -> int:
     if not get_settings().llm_enabled:
         print("OPENROUTER_API_KEY não está definida no .env.", file=sys.stderr)
         return 2
-    cases = load_cases(args.cases)
+    cases = load_suite(args.cases or SUITES[args.suite])
     only = [s for s in args.only.split(",") if s]
     if only:
         cases = [c for c in cases if any(s in c["id"] for s in only)]

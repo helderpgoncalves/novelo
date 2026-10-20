@@ -200,7 +200,14 @@ async def test_open_page_ask_user_and_plan_events(logged_in: httpx.AsyncClient, 
 async def test_sources_event_lists_what_was_used(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
     ev = await chat(logged_in, llm, "Quanto?", {"tools": [("get_baseline", {})]}, {"text": ["Recolheram-se 301,3 t."]})
     sources = next(e for e in ev if e["type"] == "sources")["items"]
-    assert {"kind": "tool", "label": "get_baseline", "ref": None} in sources
+    assert next(s for s in sources if s["label"] == "get_baseline") == {
+        "kind": "tool",
+        "label": "get_baseline",
+        "ref": None,
+        "domain": None,
+        "excerpt": None,
+        "external": False,
+    }
 
 
 async def test_settings_hide_tool_steps_and_suggestions(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:

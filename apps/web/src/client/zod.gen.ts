@@ -125,7 +125,8 @@ export const zAiTask = z.enum([
     'alert_resolution',
     'copilot_aux',
     'triage',
-    'test'
+    'test',
+    'web_search'
 ]);
 
 /**
@@ -821,6 +822,7 @@ export const zCopilotSettings = z.object({
         'balanced',
         'detailed'
     ]).optional().default('balanced'),
+    web_search: z.enum(['auto', 'off']).optional().default('auto'),
     write_approval: z.enum(['auto', 'ask']).optional().default('auto')
 });
 
@@ -828,13 +830,17 @@ export const zCopilotSettings = z.object({
  * CopilotSource
  */
 export const zCopilotSource = z.object({
+    domain: z.string().nullish(),
+    excerpt: z.string().nullish(),
+    external: z.boolean().optional().default(false),
     kind: z.enum([
         'tool',
         'scenario',
         'file',
         'entity',
         'memory',
-        'page'
+        'page',
+        'web'
     ]),
     label: z.string(),
     ref: z.string().nullish()
@@ -934,16 +940,50 @@ export const zCopilotUsageEvent = z.object({
     cost_usd: z.number().nullable(),
     prompt_tokens: z.int(),
     tokens: z.int(),
-    type: z.literal('usage').optional().default('usage')
+    type: z.literal('usage').optional().default('usage'),
+    web_search_requests: z.int().optional().default(0)
 });
 
 /**
  * CopilotVerificationEvent
  */
 export const zCopilotVerificationEvent = z.object({
+    external_numbers: z.array(z.number()).optional(),
     type: z.literal('verification').optional().default('verification'),
     verified: z.boolean(),
     warning: z.literal('numbers_unverified').nullish()
+});
+
+/**
+ * CopilotWebSearchEvent
+ *
+ * Pesquisa na web deste pedido. `searching` abre (a consulta já foi sanitizada), `done` fecha com o número de fontes;
+ * `unavailable`, `blocked` e `skipped` explicam porque se respondeu sem web (o texto da resposta também avisa).
+ */
+export const zCopilotWebSearchEvent = z.object({
+    query: z.string().nullish(),
+    reason: z.enum([
+        'disabled_by_user',
+        'disabled_by_system',
+        'guest',
+        'region',
+        'provider_rejected',
+        'failed',
+        'query_blocked',
+        'limit_reached',
+        'no_results',
+        'budget'
+    ]).nullish(),
+    requests: z.int().optional().default(0),
+    results: z.int().optional().default(0),
+    state: z.enum([
+        'searching',
+        'done',
+        'unavailable',
+        'blocked',
+        'skipped'
+    ]),
+    type: z.literal('web_search').optional().default('web_search')
 });
 
 /**
@@ -2610,6 +2650,13 @@ export const zCopilotSettingsOut = z.object({
         'balanced',
         'detailed'
     ]).optional().default('balanced'),
+    web_search: z.enum(['auto', 'off']).optional().default('auto'),
+    web_search_available: z.boolean(),
+    web_search_unavailable_reason: z.enum([
+        'disabled_by_system',
+        'region',
+        'guest'
+    ]).nullish(),
     write_approval: z.enum(['auto', 'ask']).optional().default('auto')
 });
 
@@ -3368,7 +3415,9 @@ export const zSeries = z.object({
 /**
  * CartesianChart
  *
- * bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número).
+ * bar, stacked_bar, line, area, scatter, pareto, pie: séries de pontos (x categoria ou número).
+ *
+ * `pie` (circular/donut): uma só série; cada ponto é uma fatia (x = nome, y = valor, só positivos).
  */
 export const zCartesianChart = z.object({
     estimate: z.boolean().optional().default(false),
@@ -3379,7 +3428,8 @@ export const zCartesianChart = z.object({
         'line',
         'area',
         'scatter',
-        'pareto'
+        'pareto',
+        'pie'
     ]),
     series: z.array(zSeries),
     source: z.string(),
@@ -4250,7 +4300,8 @@ export const zUsageGroup = z.object({
     errors: z.int(),
     model: z.string().nullable(),
     prompt_tokens: z.int(),
-    task: z.string().nullable()
+    task: z.string().nullable(),
+    web_search_requests: z.int().optional().default(0)
 });
 
 /**
@@ -4262,7 +4313,8 @@ export const zUsageTotals = z.object({
     completion_tokens: z.int(),
     cost_usd: z.number(),
     errors: z.int(),
-    prompt_tokens: z.int()
+    prompt_tokens: z.int(),
+    web_search_requests: z.int().optional().default(0)
 });
 
 /**
@@ -4515,6 +4567,7 @@ export const zChartArtifact = z.object({
         zCartesianChart.extend({ kind: z.literal('bar') }),
         zCartesianChart.extend({ kind: z.literal('line') }),
         zCartesianChart.extend({ kind: z.literal('pareto') }),
+        zCartesianChart.extend({ kind: z.literal('pie') }),
         zCartesianChart.extend({ kind: z.literal('scatter') }),
         zCartesianChart.extend({ kind: z.literal('stacked_bar') }),
         zWaterfallChart,
@@ -4628,6 +4681,7 @@ export const zCopilotEventMessage = z.discriminatedUnion('type', [
     zCopilotPlanEvent,
     zCopilotClarifyEvent,
     zCopilotSourcesEvent,
+    zCopilotWebSearchEvent,
     zCopilotArtifactEvent,
     zCopilotConfirmEvent,
     zCopilotActionResultEvent,
@@ -4667,7 +4721,8 @@ export const zMessageOut = z.object({
     text: z.string(),
     tokens: z.int().nullable(),
     tools: z.array(zToolTraceOut),
-    verified: z.boolean().nullable()
+    verified: z.boolean().nullable(),
+    web_sources: z.array(zCopilotSource).optional()
 });
 
 /**

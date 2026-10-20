@@ -23,6 +23,7 @@ ChartKind = Literal[
     "tornado",
     "range",
     "gauge",
+    "pie",
 ]
 ColumnType = Literal["text", "number", "percent", "currency", "date", "category"]
 
@@ -52,9 +53,12 @@ class Series(_Spec):
 
 
 class CartesianChart(ChartBase):
-    """bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número)."""
+    """bar, stacked_bar, line, area, scatter, pareto, pie: séries de pontos (x categoria ou número).
 
-    kind: Literal["bar", "stacked_bar", "line", "area", "scatter", "pareto"]
+    `pie` (circular/donut): uma só série; cada ponto é uma fatia (x = nome, y = valor, só positivos).
+    """
+
+    kind: Literal["bar", "stacked_bar", "line", "area", "scatter", "pareto", "pie"]
     x_label: str
     y_label: str
     x_unit: str | None = None

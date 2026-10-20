@@ -17,7 +17,7 @@ import re
 import uuid
 from collections.abc import AsyncGenerator, Awaitable, Callable
 from contextlib import AbstractAsyncContextManager, aclosing
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from datetime import UTC, datetime
 from typing import Any
 
@@ -25,13 +25,23 @@ import anyio
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from novelo.adapters.openrouter import OpenRouterClient, ReasoningPiece, RoundResult, TextPiece
+from novelo.adapters.openrouter import (
+    OpenRouterClient,
+    ReasoningPiece,
+    RoundResult,
+    ServerToolsDroppedPiece,
+    TextPiece,
+    WebSignalPiece,
+)
 from novelo.ai.catalog import ModelCatalog
 from novelo.ai.prompts import load
 from novelo.ai.tasks import AiTask
-from novelo.ai.verify import unsupported_rounded
+from novelo.ai.verify import check_numbers
+from novelo.ai.web import ServerTools, domain_of, server_tools_from, short_excerpt, user_urls
+from novelo.core.config import get_settings
 from novelo.core.errors import AiBudgetExceededError, AppError, ErrorCode, FeatureDisabledError
 from novelo.features.copilot import aux, memory, memory_store, persona, review, user_settings
+from novelo.features.copilot import web as web_service
 from novelo.features.copilot.attachments import image_store
 from novelo.features.copilot.mentions import ResolvedMention
 from novelo.features.copilot.models import CopilotAction, CopilotAttachment, CopilotMessage, CopilotThread
@@ -85,7 +95,8 @@ NOTHING_TO_COMPACT = {
 REWRITE = (
     "Your last answer used numbers that are not in the tool results or the verified context of this turn: {numbers}. "
     "Rewrite it using only numbers copied exactly from those sources (call a tool if you need one), "
-    "in the same language, without mentioning this correction."
+    "in the same language, without mentioning this correction. A figure that comes from a web source is only allowed "
+    "if it appears in that source's excerpt AND you label it «fonte externa» (or 'external source') with its citation."
 )
 
 
@@ -148,12 +159,16 @@ class _Run:
         self.trace: list[dict[str, Any]] = []
         self.extra_facts: list[Any] = [*turn.page_facts, *(m.facts for m in turn.mentions)]
         self.usage0 = len(getattr(llm, "usage", []))
-        self.prompt_version = "v2"
+        self.prompt_version = "v3"
         self.model = ""
         self.emitted_cards: set[uuid.UUID] = set()
         self.recalled = False
         self.title_task: asyncio.Task[str | None] | None = None  # título criativo, em paralelo com a resposta
         self.provisional_title = ""
+        self.web = web_service.WebSession(web_service.WebPolicy(False, "disabled_by_system"), 0)
+        self.external_numbers: set[float] = set()
+        self.server_dropped = False  # o fornecedor recusou os server tools neste pedido
+        self.notice_sent = False
 
     # --- persistência ----------------------------------------------------------------------------
 
@@ -260,6 +275,16 @@ class _Run:
         self.persisted = True
         parts: list[dict[str, Any]] = [{"type": "text", "text": self.text}]
         parts += [{"type": "artifact", "id": str(a)} for a in self.tools.artifact_ids]
+        parts += [
+            {
+                "type": "web_source",
+                "label": c.title,
+                "url": c.url,
+                "domain": c.domain,
+                "excerpt": short_excerpt(c.content),
+            }
+            for c in self.web.citations
+        ]
         action_ids = [str(e.action.id) for e in self.sent_actions]
         parts += [{"type": "action", "id": a} for a in action_ids]
         self.db.add(
@@ -348,7 +373,9 @@ class _Run:
         costs = [c.cost_usd for c in calls if getattr(c, "cost_usd", None) is not None]
         prompt = sum(getattr(c, "prompt_tokens", 0) or 0 for c in calls)
         completion = sum(getattr(c, "completion_tokens", 0) or 0 for c in calls)
+        searches = sum(getattr(c, "web_search_requests", 0) or 0 for c in calls)
         return {
+            "web_search_requests": searches,
             "prompt_tokens": prompt,
             "completion_tokens": completion,
             "tokens": prompt + completion,
@@ -402,6 +429,9 @@ class _Run:
     async def _body(self) -> AsyncGenerator[CopilotEvent, None]:
         t = self.turn
         self.settings = await user_settings.load(self.db, self.user_id)
+        self.web = web_service.WebSession(
+            web_service.policy_for(self.user, self.settings), get_settings().web_search_max_calls
+        )
         self.thread = await self._open_thread()
         attachments = await self._attachments()
         if not t.regenerate:
@@ -413,7 +443,7 @@ class _Run:
                     prior_results[tr["result_id"]] = tr["result"]
         self.tools = CopilotTools(
             self.db, self.user, self.llm, t.locale, settings=self.settings, thread_id=self.thread_id, message_id=self.message_id,
-            confirmed=t.confirm, prior_results=prior_results,
+            confirmed=t.confirm, prior_results=prior_results, web=self.web,
         )  # fmt: skip
         self.model = self.llm.model_for(AiTask.COPILOT)
         yield CopilotStartEvent(
@@ -423,7 +453,7 @@ class _Run:
             self.thread.search_text = fold(self.thread.title)
             await self.db.commit()
             yield CopilotTitleEvent(title=self.thread.title)
-            if t.user_text.strip() != "/compact":
+            if t.user_text.strip() != "/compact" and not web_service.parse_command(t.user_text)[0]:
                 self.provisional_title = self.thread.title
                 self.title_task = asyncio.create_task(aux.make_title(self.llm, t.user_text))
         yield _status("thinking", "status.thinking")
@@ -432,6 +462,12 @@ class _Run:
         snap = self.thread.snapshot or {}
         system = "\n\n".join([base, *[snap[k] for k in ("persona", "memory", "user") if snap.get(k)]])
         window = await memory.window_for(self.deps.catalog, self.model)
+
+        is_websearch, wanted = web_service.parse_command(t.user_text)
+        if is_websearch:
+            async for ev in self._websearch_command(wanted, system, window):
+                yield ev
+            return
 
         if t.user_text.strip() == "/compact":
             yield _status("compacting", "status.compacting")
@@ -473,7 +509,9 @@ class _Run:
             history = memory.history_messages(prior, self.thread.summarized_messages)
             used = memory.count_tokens(system, memory_text(self.thread, prior), history, str(content))
         yield CopilotContextEvent(used_tokens=used, window_tokens=window, compacted=compacted)
+        _, today_facts = web_service.today_line()
         self.extra_facts += [
+            today_facts,
             *memory.recent_digests(prior),
             {"attachments": [a.preview for a in attachments], "meta": [a.meta for a in attachments]},
         ]
@@ -482,6 +520,18 @@ class _Run:
         async with aclosing(self._converse(system, messages, MAX_ROUNDS, self._forced_tool())) as converse:
             async for ev in converse:
                 yield ev
+        if self.server_dropped and self.text and not self.notice_sent:
+            self.notice_sent = (
+                True  # a pesquisa foi recusada a meio: avisa já, o utilizador não fica a supor que houve web
+            )
+            note = (
+                "\n\n"
+                + web_service.WEB_UNAVAILABLE_TEXT[
+                    t.locale if t.locale in web_service.WEB_UNAVAILABLE_TEXT else "pt-PT"
+                ]
+            )
+            self.text += note
+            yield CopilotTextDeltaEvent(delta=note)
         if self.tools.end_turn_text is None:
             async with aclosing(self._verify(system, messages)) as verify:
                 async for ev in verify:
@@ -514,7 +564,9 @@ class _Run:
             yield ev
         usage = self._usage_dict()
         await self._persist("complete", usage)
-        yield CopilotUsageEvent(**{k: usage[k] for k in ("prompt_tokens", "completion_tokens", "tokens", "cost_usd")})
+        yield CopilotUsageEvent(
+            **{k: usage[k] for k in ("prompt_tokens", "completion_tokens", "tokens", "cost_usd", "web_search_requests")}
+        )
         yield CopilotContextEvent(
             used_tokens=used + memory.estimate_tokens(self.text), window_tokens=window, compacted=compacted
         )
@@ -549,6 +601,7 @@ class _Run:
             add("page", self.turn.page_line.removeprefix("screen: ")[:80])
         if self.recalled:
             add("memory", "Memória")
+        out += self.web.sources()
         return out
 
     def _current_content(
@@ -560,7 +613,8 @@ class _Run:
         recent_actions: list[str],
     ) -> tuple[str | list[dict[str, Any]], list[CopilotStatusEvent]]:
         t = self.turn
-        lines = ["[context]", f"interface_language: {t.locale}"]
+        today, _ = web_service.today_line()
+        lines = ["[context]", f"interface_language: {t.locale}", today, self._web_line()]
         if t.page_line:
             lines.append(t.page_line)
         memo = memory_text(thread, prior)
@@ -609,6 +663,7 @@ class _Run:
         self, system: str, messages: list[dict[str, Any]], rounds: int, first_tool: str | None = None
     ) -> AsyncGenerator[CopilotEvent, None]:
         specs = self.tools.specs()
+        server_tools = self._server_tools()
         for number in range(1, rounds + 1):
             last = number == rounds
             wrote = announced = False
@@ -620,6 +675,7 @@ class _Run:
                 task=AiTask.COPILOT,
                 tools_enabled=not last,
                 force_tool=first_tool if number == 1 else None,
+                server_tools=server_tools if not last else None,
             )
             async with aclosing(stream) as pieces:
                 async for piece in pieces:
@@ -636,11 +692,24 @@ class _Run:
                         if not announced and not wrote:
                             announced = True
                             yield _status("thinking", "status.thinking")
+                    elif isinstance(piece, WebSignalPiece):
+                        if piece.tool.startswith("web_"):
+                            yield _status("tool", "status.searching_web")
+                            yield web_service.event("searching")
+                    elif isinstance(piece, ServerToolsDroppedPiece):
+                        self.server_dropped = self.web.unavailable = True
+                        yield web_service.event(
+                            "unavailable", reason="region" if piece.reason.endswith("403") else "provider_rejected"
+                        )
                     else:
                         result = piece
             if result is None:
                 return
             self.model = result.model
+            if result.citations or result.web_search_requests:
+                self.web.add(result.citations)
+                self.web.requests += result.web_search_requests
+                yield web_service.event("done", results=len(result.citations), requests=result.web_search_requests)
             if not result.tool_calls or last:
                 messages.append({"role": "assistant", "content": result.text})
                 return
@@ -724,12 +793,73 @@ class _Run:
             yield CopilotVerificationEvent(verified=False, warning="numbers_unverified")
             return
         self.verified = True
-        yield CopilotVerificationEvent(verified=True, warning=None)
+        yield CopilotVerificationEvent(verified=True, warning=None, external_numbers=sorted(self.external_numbers))
 
     def _unsupported(self, facts: list[Any]) -> set[float]:
         if not self.text.strip():
             return {-1.0}
-        return unsupported_rounded(self.text, facts, also_allowed=self.turn.user_text)
+        check = check_numbers(self.text, facts, self.web.excerpts, also_allowed=self.turn.user_text)
+        self.external_numbers = check.external
+        return check.unsupported
+
+    def _web_line(self) -> str:
+        p = self.web.policy
+        if p.search:
+            how = "tool web_search" if get_settings().web_search_mode == "tool" else "server tool"
+            return f"web_search: on ({how}; only for external context, never for Novelo data; web figures are 'fonte externa')"
+        return f"web_search: off ({p.reason}); do not claim to have searched the web"
+
+    def _server_tools(self) -> ServerTools | None:
+        """Server tools do OpenRouter deste pedido: pesquisa (modo inline) e leitura de links que o utilizador escreveu."""
+        cfg = get_settings()
+        if not self.web.policy.search:
+            return None
+        inline = cfg.web_search_mode == "inline"
+        tools = server_tools_from(cfg, search=inline, fetch=True)
+        allowed = self._fetch_domains(cfg.domains(cfg.web_fetch_allowed_domains)) if tools.web_fetch else ()
+        tools = replace(
+            tools,
+            web_fetch=bool(allowed),
+            fetch_allowed=allowed,
+            datetime=tools.datetime and inline,
+            web_search=tools.web_search and inline,
+        )
+        return tools if tools.any else None
+
+    def _fetch_domains(self, configured: list[str]) -> tuple[str, ...]:
+        """Só se lê o que o utilizador colou (https) e, se houver lista configurada, só dos domínios permitidos."""
+        domains = {domain_of(u) for u in user_urls(self.turn.user_text)}
+        if configured:
+            domains = {d for d in domains if any(d == c or d.endswith("." + c) for c in configured)}
+        return tuple(sorted(d for d in domains if d))
+
+    async def _websearch_command(
+        self, wanted: str | None, system: str, window: int
+    ) -> AsyncGenerator[CopilotEvent, None]:
+        """`/websearch on|off`: muda a preferência do utilizador sem chamar o modelo."""
+        locale = self.turn.locale if self.turn.locale in web_service.WEBSEARCH_REPLY else "pt-PT"
+        texts = web_service.WEBSEARCH_REPLY[locale]
+        reason = web_service.policy_for(self.user, CopilotSettings()).reason
+        if wanted is None:
+            current = web_service.policy_for(self.user, self.settings)
+            text = (
+                texts["usage"]
+                if self.turn.user_text.strip().lower() != "/websearch"
+                else (texts[reason] if reason else texts["status_on" if current.search else "status_off"])
+            )
+        elif reason:
+            text = texts[reason]
+        else:
+            await user_settings.save(self.db, self.user_id, self.settings.model_copy(update={"web_search": wanted}))
+            text = texts["on" if wanted == "auto" else "off"]
+        self.text = text
+        yield CopilotTextDeltaEvent(delta=text)
+        yield CopilotContextEvent(
+            used_tokens=memory.count_tokens(system, "", [], ""), window_tokens=window, compacted=False
+        )
+        self.verified = True
+        await self._persist("complete", self._usage_dict())
+        yield CopilotDoneEvent()
 
 
 def _attachment_summary(a: CopilotAttachment) -> str:

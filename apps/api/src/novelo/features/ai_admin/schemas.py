@@ -122,6 +122,7 @@ class UsageTotals(BaseModel):
     completion_tokens: int
     cost_usd: float
     avg_latency_ms: float
+    web_search_requests: int = Field(default=0, description="Pesquisas web faturadas (já contam em cost_usd)")
 
 
 class UsageDay(BaseModel):
@@ -139,6 +140,7 @@ class UsageGroup(BaseModel):
     completion_tokens: int
     cost_usd: float
     avg_latency_ms: float
+    web_search_requests: int = Field(default=0, description="Pesquisas web faturadas (já contam em cost_usd)")
 
 
 class AiUsageOut(BaseModel):

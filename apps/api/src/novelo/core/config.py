@@ -70,6 +70,35 @@ class Settings(BaseSettings):
         "latency", alias="LLM_AUX_PROVIDER_SORT"
     )
 
+    # Pesquisa na web do copiloto (server tools do OpenRouter, em beta). Tudo atrás de flags: desligado, ou se o
+    # fornecedor rejeitar (região sem motor, ZDR), o copiloto responde sem web e avisa. Ver docs/engenharia/ia.md.
+    web_search_enabled: bool = Field(True, alias="WEB_SEARCH_ENABLED")
+    # tool: ferramenta `web_search` da casa (a consulta passa pelo sanitizador e conta-se por pedido; recomendado);
+    # inline: o server tool `openrouter:web_search` vai no mesmo pedido do copiloto e o modelo pesquisa sozinho.
+    web_search_mode: Literal["tool", "inline"] = Field("tool", alias="WEB_SEARCH_MODE")
+    web_search_engine: Literal["auto", "native", "exa", "parallel", "perplexity", "firecrawl"] = Field(
+        "auto", alias="WEB_SEARCH_ENGINE"
+    )
+    web_search_max_results: int = Field(5, ge=1, le=10, alias="WEB_SEARCH_MAX_RESULTS")
+    web_search_max_calls: int = Field(
+        3, ge=1, le=10, alias="WEB_SEARCH_MAX_CALLS"
+    )  # pesquisas por pedido do utilizador
+    web_search_max_cost_usd: float = Field(0.05, ge=0, alias="WEB_SEARCH_MAX_COST_USD")  # teto por pedido (inline)
+    web_search_context_size: Literal["low", "medium", "high"] = Field("low", alias="WEB_SEARCH_CONTEXT_SIZE")
+    web_search_timeout_s: float = Field(25.0, ge=3, le=120, alias="WEB_SEARCH_TIMEOUT_S")
+    web_search_allowed_domains: str = Field("", alias="WEB_SEARCH_ALLOWED_DOMAINS")  # csv; vazio = qualquer
+    web_search_excluded_domains: str = Field("", alias="WEB_SEARCH_EXCLUDED_DOMAINS")  # csv; não se combina com allowed
+    web_search_guests: bool = Field(False, alias="GUEST_WEB_SEARCH_ENABLED")  # convidados do evento: desligada
+    web_fetch_enabled: bool = Field(True, alias="WEB_FETCH_ENABLED")  # só quando a mensagem traz um link https
+    web_fetch_allowed_domains: str = Field("", alias="WEB_FETCH_ALLOWED_DOMAINS")
+    web_fetch_blocked_domains: str = Field("", alias="WEB_FETCH_BLOCKED_DOMAINS")
+    web_fetch_max_content_tokens: int = Field(12000, ge=500, le=100000, alias="WEB_FETCH_MAX_CONTENT_TOKENS")
+    server_tools_datetime_enabled: bool = Field(True, alias="SERVER_TOOLS_DATETIME_ENABLED")
+    server_tools_timezone: str = Field("Europe/Lisbon", alias="SERVER_TOOLS_TIMEZONE")
+    # Declaram o que está ligado na conta do OpenRouter (o código não o consegue ler): com ZDR forçado o motor
+    # Firecrawl é rejeitado; um endpoint regional da UE não tem motor de pesquisa (a pesquisa fica indisponível).
+    openrouter_zdr_enforced: bool = Field(False, alias="OPENROUTER_ZDR_ENFORCED")
+
     # --- Sessão e autenticação -------------------------------------------------------
     secret_key: str = Field("dev-only-change-me-dev-only-change-me", alias="SECRET_KEY")
     access_token_minutes: int = Field(15, alias="ACCESS_TOKEN_EXPIRE_MINUTES")
@@ -203,6 +232,27 @@ class Settings(BaseSettings):
     @property
     def llm_enabled(self) -> bool:
         return bool(self.openrouter_api_key)
+
+    @property
+    def web_region_supported(self) -> bool:
+        """Sem motor de pesquisa residente na UE (eu.openrouter.ai): nesse endpoint a pesquisa fica desligada."""
+        return "eu.openrouter.ai" not in self.openrouter_base_url
+
+    @property
+    def web_search_available(self) -> bool:
+        """A pesquisa na web pode ser oferecida (flag e região); a chave de IA já é exigida por quem chama o modelo."""
+        return self.web_search_enabled and self.web_region_supported
+
+    @property
+    def web_search_engine_effective(self) -> str:
+        """Com ZDR forçado o Firecrawl é rejeitado pelo OpenRouter: troca-se por `auto` em vez de partir a pesquisa."""
+        return (
+            "auto" if self.openrouter_zdr_enforced and self.web_search_engine == "firecrawl" else self.web_search_engine
+        )
+
+    @staticmethod
+    def domains(raw: str) -> list[str]:
+        return [d.strip().lower() for d in raw.split(",") if d.strip()]
 
 
 @lru_cache

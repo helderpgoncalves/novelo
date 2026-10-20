@@ -44,6 +44,7 @@ class UsageEvent:
     success: bool
     error_code: str | None
     input_hash: str | None
+    web_search_requests: int = 0  # `usage.server_tool_use.web_search_requests` (custo extra por pesquisa)
 
 
 UsageSink = Callable[[UsageEvent], Awaitable[None]]

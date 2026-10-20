@@ -12,6 +12,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.errors import AppError, ConflictError, NotFoundError
 from novelo.features.copilot import actions, charts, sessions
+from novelo.features.copilot.derive import DeriveArgs, DeriveError, derive_table
 from novelo.features.copilot.memory import message_text
 from novelo.features.copilot.models import (
     CopilotAction,
@@ -442,7 +443,13 @@ async def refresh_artifact(db: AsyncSession, user: User, artifact_id: uuid.UUID,
     outcome = await box.run(row.refresh["tool"], json.dumps(row.refresh["args"]))
     if not outcome.ok or outcome.table is None:
         raise ConflictError("The data could not be refreshed: " + outcome.summary)
-    spec = _rebuild(row.refresh, outcome.table, row.artifact_type, row.title)
+    table = outcome.table
+    for step in row.refresh.get("post") or []:  # artefacto derivado (analyze_result): reaplica os passos à origem
+        try:
+            table = derive_table(table, DeriveArgs.model_validate(step))
+        except (DeriveError, ValueError) as exc:
+            raise ConflictError("The refreshed data no longer fits this artifact: " + str(exc)) from exc
+    spec = _rebuild(row.refresh, table, row.artifact_type, row.title)
     row.spec = spec
     row.refreshed_at = datetime.now(UTC)
     await db.commit()

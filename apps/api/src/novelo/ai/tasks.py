@@ -17,6 +17,7 @@ class AiTask(StrEnum):
     COPILOT_AUX = "copilot_aux"  # título, sugestões e resumos do copiloto (modelo barato)
     TRIAGE = "triage"  # visão
     TEST = "test"  # ping do painel (modelo explícito; não é configurável)
+    WEB_SEARCH = "web_search"  # pesquisa na web do copiloto (usa o modelo de `copilot_aux`; só para a contabilidade)
 
 
 # As tarefas que o painel mostra e deixa configurar.
@@ -39,6 +40,7 @@ TASK_REQUIREMENTS: dict[AiTask, frozenset[str]] = {
     AiTask.COPILOT_AUX: frozenset({STRUCTURED}),
     AiTask.TRIAGE: frozenset({IMAGE, STRUCTURED}),
     AiTask.TEST: frozenset(),
+    AiTask.WEB_SEARCH: frozenset(),
 }
 
 # Modelo recomendado por tarefa (verificado no catálogo público do OpenRouter).
@@ -55,6 +57,7 @@ TASK_MAX_TOKENS: dict[AiTask, int] = {
     AiTask.COPILOT_AUX: 400,
     AiTask.TRIAGE: 500,
     AiTask.TEST: 16,
+    AiTask.WEB_SEARCH: 256,
 }
 
 # Respostas em cache: entrada determinística e saída sem estado do utilizador.

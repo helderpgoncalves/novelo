@@ -80,6 +80,12 @@ def scan(text: str, *, allow_volatile: bool = False, where: str = "memory") -> N
             raise Blocked(reason)
 
 
+def looks_like_injection(text: str) -> bool:
+    """Texto que parece uma instrução dirigida ao assistente (para filtrar páginas web, sem levantar nem registar)."""
+    folded = unicodedata.normalize("NFKC", text)
+    return any(p.search(folded) for p in _COMPILED["injection"])
+
+
 EXPLANATION = {
     "invisible_unicode": "contains invisible or control characters",
     "injection": "looks like an instruction aimed at the assistant (not allowed)",

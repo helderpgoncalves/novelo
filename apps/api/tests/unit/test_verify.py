@@ -1,4 +1,4 @@
-from novelo.ai.verify import numbers_in, unsupported_numbers
+from novelo.ai.verify import check_numbers, numbers_in, unsupported_numbers
 from novelo.features.planning.whatif_service import resolve_parishes
 
 FACTS = {"new": {"tonnes": "301,3", "cost": "12 400", "points": "7"}, "diff": {"t": "+4,5"}}
@@ -69,3 +69,23 @@ def test_a_negative_difference_can_be_written_as_less_by_the_absolute_value() ->
 
     assert unsupported_rounded("Menos 1,92 t por ano.", {"difference_tonnes_per_year": -1.92}) == set()
     assert unsupported_rounded("Menos 2,5 t por ano.", {"difference_tonnes_per_year": -1.92}) == {2.5}
+
+
+# --- números de fontes web ------------------------------------------------------------------------------------
+
+
+def test_external_numbers_need_a_source_excerpt_and_a_label() -> None:
+    facts = [{"collected_t": 301.27}]
+    excerpt = ["Em Espanha recolheram-se 12,5 kg de têxteis por habitante em 2023."]
+    ok = "Em Espanha, 12,5 kg por habitante em 2023 (fonte externa, https://exemplo.es). Cá recolhemos 301,3 t."
+    out = check_numbers(ok, facts, excerpt)
+    assert out.unsupported == set() and out.external == {12.5, 2023.0}
+    unlabeled = check_numbers("Em Espanha recolhem-se 12,5 kg por habitante.", facts, excerpt)
+    assert unlabeled.unsupported == {12.5} and unlabeled.external == set()  # sem rótulo de fonte não passa
+    invented = check_numbers("Em Espanha são 99 kg (fonte externa).", facts, excerpt)
+    assert invented.unsupported == {99.0}  # não está nos dados nem em nenhum excerto
+
+
+def test_novelo_numbers_are_never_reclassified_as_external() -> None:
+    out = check_numbers("Recolhemos 301,3 t.", [{"t": 301.27}], ["301,3 t noutro país"])
+    assert out.unsupported == set() and out.external == set()

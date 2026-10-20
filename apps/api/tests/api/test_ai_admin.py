@@ -217,3 +217,20 @@ async def test_runtime_resolves_budget_and_records_usage_without_content(
         {"prompt", "response", "image", "content", "messages"}
     )
     assert len(stored) == 2 and stored[0].user_id == user.id
+
+
+async def test_web_searches_are_recorded_and_counted_in_the_usage_report(
+    admin: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    from novelo.features.users.models import User  # noqa: PLC0415
+
+    user = (await session.execute(select(User).where(User.email == "admin@x.pt"))).scalar_one()
+    runtime = await service.build_runtime(session, user)
+    assert runtime.sink is not None
+    event = UsageEvent("web_search", "openai/gpt-6-luna", 900, 3, 0.0078, "provider", 1500, True, None, None, 2)
+    await runtime.sink(event)
+    usage = (await admin.get(f"{AI}/usage", params={"days": 7})).json()
+    assert usage["totals"]["web_search_requests"] == 2 and usage["totals"]["cost_usd"] == pytest.approx(0.0078)
+    by_task = {g["task"]: g for g in usage["by_task"]}
+    assert by_task["web_search"]["web_search_requests"] == 2 and by_task["web_search"]["calls"] == 1
+    assert (await session.execute(select(AiUsage.web_search_requests))).scalar_one() == 2
