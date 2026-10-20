@@ -57,6 +57,7 @@ src = ["src", "tests"]
 "src/novelo/features/copilot/*" = ["E501"]  # prompts, textos e tabelas de dados em linhas longas
 "tests/api/test_copilot*" = ["E501"]
 "tests/api/test_memory*" = ["E501"]
+"tests/api/test_municipal*" = ["E501"]  # tabelas de valores calculados à mão
 "tests/sse.py" = ["E501"]
 "tests/unit/test_charts.py" = ["E501"]
 "tests/unit/test_stream_adapter.py" = ["E501"]

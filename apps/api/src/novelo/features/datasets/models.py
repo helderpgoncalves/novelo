@@ -41,7 +41,7 @@ class DataAlert(Base, UuidPkMixin, TimestampMixin):
         UUID(as_uuid=True), ForeignKey("data_sources.id", ondelete="CASCADE"), index=True
     )
     number: Mapped[int] = mapped_column(SmallInteger)
-    kind: Mapped[AlertKind] = mapped_column(enum_column(AlertKind))
+    kind: Mapped[AlertKind] = mapped_column(enum_column(AlertKind, length=48))
     detail: Mapped[str] = mapped_column(Text)
     suggestion: Mapped[str] = mapped_column(Text, default="")
     status: Mapped[AlertStatus] = mapped_column(

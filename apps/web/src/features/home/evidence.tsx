@@ -176,7 +176,7 @@ export function ParishesTable({ parishes }: { parishes: OverviewParish[] }) {
       id="home-parishes"
       columns={columns}
       rows={parishes}
-      getKey={(p) => p.code}
+      getRowId={(p) => p.code}
       caption={m.home_col_parish()}
       initialSort={{ id: 'potential', desc: true }}
     />

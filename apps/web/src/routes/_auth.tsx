@@ -34,7 +34,7 @@ function AuthLayout() {
           tone="negative"
           className="-right-40 -bottom-40 pointer-events-none absolute size-[640px] opacity-30"
         />
-        <BrandLogo tone="negative" />
+        <BrandLogo tone="negative" className="h-9 self-start" />
         <div className="relative max-w-lg space-y-6">
           <p className="font-semibold text-[#7fb39c] text-[11px] uppercase tracking-[0.18em]">
             {m.auth_aside_eyebrow()}
@@ -54,7 +54,7 @@ function AuthLayout() {
       <main className="flex flex-col pt-[max(1.5rem,env(safe-area-inset-top))] pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))]">
         <div className="flex items-center justify-between">
           <div className="lg:hidden">
-            <BrandLogo />
+            <BrandLogo className="h-8" />
           </div>
           <div className="ml-auto flex items-center gap-1">
             <LanguageSwitcher />

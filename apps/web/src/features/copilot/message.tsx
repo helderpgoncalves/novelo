@@ -35,6 +35,7 @@ import { m } from '@/paraglide/messages';
 import { ActionCard } from './action-card';
 import { ArtifactView } from './artifacts/artifact-view';
 import { invalidateCopilot } from './cache';
+import { CopilotError } from './copilot-error';
 import { SafeMarkdown } from './markdown';
 import { CopilotScenarioCard, fromCard } from './scenario-card';
 import { ThinkingLine } from './thinking';
@@ -400,23 +401,11 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
       )}
 
       {message.state === 'error' && message.error && (
-        <div
-          role="alert"
-          className="flex flex-col items-start gap-2 rounded-xl border border-destructive/30 bg-destructive/5 p-3.5"
-        >
-          <p className="flex items-center gap-2 font-medium text-sm">
-            <AlertTriangle className="size-4 text-destructive" aria-hidden="true" />
-            {m.copilot_error_title()}
-          </p>
-          <p className="text-muted-foreground text-sm">
-            {getErrorMessage({ code: message.error.code, message: message.error.message })}
-          </p>
-          {last && chat && (
-            <Button variant="outline" size="sm" className="h-10" onClick={() => void chat.retry()}>
-              {m.common_retry()}
-            </Button>
-          )}
-        </div>
+        <CopilotError
+          code={message.error.code}
+          partial={message.text.length > 0}
+          onRetry={last && chat ? () => void chat.retry() : null}
+        />
       )}
       {message.state === 'cancelled' && (
         <p className="text-muted-foreground text-xs italic">{m.chat_cancelled()}</p>

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { UserOut } from '@/client';
@@ -16,6 +17,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { getErrorMessage } from '@/lib/errors';
+import { applyApiFieldErrors } from '@/lib/form-errors';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
@@ -28,8 +30,12 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
     resolver: zodResolver(changePasswordSchema),
     defaultValues: { current: '', password: '', confirm: '' },
   });
+  const [fieldError, setFieldError] = useState(false);
   const change = useMutation({
     ...changePasswordMutation(),
+    onMutate: () => setFieldError(false),
+    onError: (error) =>
+      setFieldError(applyApiFieldErrors(form, error, { current_password_incorrect: 'current' })),
     onSuccess: async () => {
       // O servidor termina todas as sessões ao mudar a password.
       toast.success(m.account_password_changed());
@@ -51,7 +57,7 @@ export function ChangePasswordForm({ user }: { user: UserOut }) {
         className="max-w-md space-y-4"
         noValidate
       >
-        <FormAlert message={change.isError ? getErrorMessage(change.error) : null} />
+        <FormAlert message={change.isError && !fieldError ? getErrorMessage(change.error) : null} />
         {user.has_password && (
           <FormField
             control={form.control}

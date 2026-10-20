@@ -5,6 +5,8 @@ import json
 import os
 from collections.abc import AsyncGenerator, AsyncIterator, Iterator
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
+from pathlib import Path
 from typing import Any
 
 import httpx
@@ -33,6 +35,7 @@ from novelo.features.copilot import models as _copilot_models  # noqa: F401
 from novelo.features.datasets import models as _dataset_models  # noqa: F401
 from novelo.features.lots import models as _lot_models  # noqa: F401
 from novelo.features.lots.router import get_llm
+from novelo.features.municipal import models as _municipal_models  # noqa: F401
 from novelo.features.network import models as _network_models  # noqa: F401
 from novelo.features.planning import models as _planning_models  # noqa: F401
 from novelo.features.planning import whatif_models as _whatif_models  # noqa: F401
@@ -342,3 +345,36 @@ async def logged_in(client: httpx.AsyncClient) -> httpx.AsyncClient:
     )
     assert resp.status_code == 201
     return client
+
+
+MUNICIPAL_FIXTURE = Path(__file__).parent / "fixtures" / "municipal"
+
+
+async def load_municipal(session: AsyncSession, data_dir: Path = MUNICIPAL_FIXTURE, *, empty: bool = False) -> None:
+    """Troca a rede municipal real (já importada no início da sessão) por uma amostra pequena e feita à mão.
+
+    Tudo corre na transação do teste, que é desfeita no fim. Com `empty=True` deixa a rede municipal por importar.
+    """
+    from sqlalchemy import delete, select  # noqa: PLC0415
+
+    from novelo.features.datasets.models import DataSource  # noqa: PLC0415
+    from novelo.features.municipal import models as m  # noqa: PLC0415
+    from novelo.features.municipal.importer import MUNICIPAL_SOURCE, import_municipal  # noqa: PLC0415
+
+    for model in (m.MunicipalLink, m.MunicipalContainer, m.MunicipalSite, m.MunicipalParishStat, m.MunicipalMeta):
+        await session.execute(delete(model))
+    source = (await session.execute(select(DataSource).where(DataSource.key == MUNICIPAL_SOURCE))).scalar_one()
+    if empty:
+        await session.execute(delete(DataSource).where(DataSource.id == source.id))
+        await session.flush()
+        return
+    source.file_sha256 = "f" * 64
+    source.imported_at = datetime(2026, 10, 20, 12, 0, tzinfo=UTC)
+    await session.flush()
+    await import_municipal(session, data_dir, source.id)
+    await session.flush()
+
+
+@pytest.fixture
+async def municipal(session: AsyncSession) -> None:
+    await load_municipal(session)

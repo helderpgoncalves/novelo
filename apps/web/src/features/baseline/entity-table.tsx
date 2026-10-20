@@ -48,6 +48,8 @@ export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
     },
     {
       id: 'collected',
+      aggregate: 'sum',
+      format: (n) => formatTonnes(n),
       header: m.entity_table_collected(),
       align: 'right',
       value: (e) => e.total_t,
@@ -86,10 +88,11 @@ export function EntityTable({ entities }: { entities: EntityBaseline[] }) {
   return (
     <DataTable
       id="entities"
+      exportName="entidades"
       controls="never"
       columns={columns}
       rows={entities}
-      getKey={(e) => e.entity}
+      getRowId={(e) => e.entity}
       caption={m.entity_table_entity()}
     />
   );

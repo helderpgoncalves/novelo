@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import type { UserOut } from '@/client';
@@ -16,6 +17,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
+import { applyApiFieldErrors } from '@/lib/form-errors';
 import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { type ProfileValues, profileSchema } from './schemas';
@@ -27,8 +29,11 @@ export function ProfileForm({ user }: { user: UserOut }) {
     resolver: zodResolver(profileSchema),
     defaultValues: { name: user.name ?? '' },
   });
+  const [fieldError, setFieldError] = useState(false);
   const update = useMutation({
     ...updateMeMutation(),
+    onMutate: () => setFieldError(false),
+    onError: (error) => setFieldError(applyApiFieldErrors(form, error, {})),
     onSuccess: async (updated) => {
       queryClient.setQueryData(getMeQueryKey(), updated);
       form.reset({ name: updated.name ?? '' });
@@ -44,7 +49,7 @@ export function ProfileForm({ user }: { user: UserOut }) {
         className="max-w-md space-y-4"
         noValidate
       >
-        <FormAlert message={update.isError ? getErrorMessage(update.error) : null} />
+        <FormAlert message={update.isError && !fieldError ? getErrorMessage(update.error) : null} />
         <FormField
           control={form.control}
           name="name"

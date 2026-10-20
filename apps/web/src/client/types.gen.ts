@@ -335,7 +335,7 @@ export type AiUsageOut = {
 /**
  * AlertKind
  */
-export type AlertKind = 'circuit_without_vehicle' | 'vehicle_code' | 'unknown_circuit' | 'incomplete_circuit' | 'duplicate_vehicle' | 'possible_plate_error' | 'multi_typology_vehicle' | 'vehicle_without_circuit' | 'undocumented_circuits' | 'different_dates' | 'normalized_spelling' | 'container_rows_rejected' | 'container_pending_location' | 'container_assumed_values';
+export type AlertKind = 'circuit_without_vehicle' | 'vehicle_code' | 'unknown_circuit' | 'incomplete_circuit' | 'duplicate_vehicle' | 'possible_plate_error' | 'multi_typology_vehicle' | 'vehicle_without_circuit' | 'undocumented_circuits' | 'different_dates' | 'normalized_spelling' | 'container_rows_rejected' | 'container_pending_location' | 'container_assumed_values' | 'municipal_blank_rows' | 'municipal_boundary_tolerance' | 'municipal_caop_version' | 'municipal_caop_vs_osm' | 'municipal_capacity_outlier' | 'municipal_capacity_unit_assumed' | 'municipal_capacity_unknown' | 'municipal_coord_suspect' | 'municipal_coords_artifact' | 'municipal_coords_low_precision' | 'municipal_coords_missing' | 'municipal_coords_swapped' | 'municipal_cross_file_overlap' | 'municipal_empty_row' | 'municipal_not_textile' | 'municipal_osm_contours_incomplete' | 'municipal_outside_municipality' | 'municipal_parish_mismatch' | 'municipal_parish_names_inconsistent' | 'municipal_parish_unmapped' | 'municipal_quantity_semantics' | 'municipal_stacked_units' | 'municipal_stream_unknown';
 
 /**
  * AlertStatus
@@ -947,6 +947,124 @@ export type BudgetOut = {
 };
 
 /**
+ * CaopFeature
+ */
+export type CaopFeature = {
+    /**
+     * Geometry
+     *
+     * Polygon/MultiPolygon GeoJSON (WGS84, simplificado a 5 m)
+     */
+    geometry: {
+        [key: string]: unknown;
+    };
+    /**
+     * Id
+     */
+    id: string;
+    properties: CaopProps;
+    /**
+     * Type
+     */
+    type?: 'Feature';
+};
+
+/**
+ * CaopFeatureCollection
+ */
+export type CaopFeatureCollection = {
+    /**
+     * Features
+     */
+    features: Array<CaopFeature>;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Type
+     */
+    type?: 'FeatureCollection';
+};
+
+/**
+ * CaopProps
+ */
+export type CaopProps = {
+    /**
+     * Area Ha
+     */
+    area_ha: number | null;
+    /**
+     * Area Km2
+     */
+    area_km2: number;
+    /**
+     * Candidate Sites
+     */
+    candidate_sites: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Containers Per 1000 Hab
+     */
+    containers_per_1000_hab: number;
+    /**
+     * Cover Pct 300M
+     */
+    cover_pct_300m: number;
+    /**
+     * Dicofre
+     */
+    dicofre: string;
+    /**
+     * Dicofre Caop
+     */
+    dicofre_caop: string;
+    /**
+     * Gap Rank
+     */
+    gap_rank: number;
+    /**
+     * Gap T Per Candidate Site
+     *
+     * Estimativa
+     */
+    gap_t_per_candidate_site: number;
+    /**
+     * Lat
+     */
+    lat: number | null;
+    /**
+     * Lon
+     */
+    lon: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Public Sites Per 1000 Hab
+     */
+    public_sites_per_1000_hab: number;
+};
+
+/**
+ * CapacityStatus
+ */
+export type CapacityStatus = 'ok' | 'assumed_litres' | 'unknown';
+
+/**
  * CaptureScale
  */
 export type CaptureScale = {
@@ -1375,6 +1493,16 @@ export type ContainerOut = {
  * ContainerStatus
  */
 export type ContainerStatus = 'active' | 'inactive' | 'planned';
+
+/**
+ * CoordPrecision
+ */
+export type CoordPrecision = 'precise' | 'approximate';
+
+/**
+ * CoordStatus
+ */
+export type CoordStatus = 'ok' | 'pending';
 
 /**
  * CopilotActionResultEvent
@@ -2605,6 +2733,16 @@ export type ErrorBody = {
 };
 
 /**
+ * ExportFormat
+ */
+export type ExportFormat = 'csv' | 'xlsx' | 'geojson';
+
+/**
+ * ExportScope
+ */
+export type ExportScope = 'sites' | 'containers';
+
+/**
  * FeedbackIn
  */
 export type FeedbackIn = {
@@ -3787,7 +3925,7 @@ export type MentionRef = {
 /**
  * MentionType
  */
-export type MentionType = 'scenario' | 'parish' | 'circuit' | 'locality' | 'vehicle' | 'lot' | 'alert' | 'report' | 'brand' | 'fibre' | 'page' | 'data_source';
+export type MentionType = 'scenario' | 'parish' | 'circuit' | 'locality' | 'vehicle' | 'lot' | 'alert' | 'report' | 'brand' | 'fibre' | 'page' | 'data_source' | 'municipal_site';
 
 /**
  * MentionsOut
@@ -3960,6 +4098,1472 @@ export type ModeSummary = {
      * Zones
      */
     zones: number;
+};
+
+/**
+ * MunicipalCandidateOut
+ */
+export type MunicipalCandidateOut = {
+    /**
+     * Parish Gap Rank
+     */
+    parish_gap_rank: number;
+    /**
+     * Parish Gap T Per Candidate
+     *
+     * Estimativa da freguesia, usada na ordem
+     */
+    parish_gap_t_per_candidate: number;
+    /**
+     * Rank
+     */
+    rank: number;
+    /**
+     * Reason Text
+     *
+     * Justificação do ETL, em português
+     */
+    reason_text: string | null;
+    /**
+     * Reasons
+     *
+     * Chaves: underground, organic_collective_nearby, three_or_more_containers, approximate_coordinates
+     */
+    reasons: Array<string>;
+    site: MunicipalSiteOut;
+};
+
+/**
+ * MunicipalCandidatesOut
+ */
+export type MunicipalCandidatesOut = {
+    /**
+     * Is Estimate
+     */
+    is_estimate?: true;
+    /**
+     * Items
+     */
+    items: Array<MunicipalCandidateOut>;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+    /**
+     * Note
+     */
+    note: string;
+    /**
+     * Rank Rule
+     */
+    rank_rule: string;
+    /**
+     * Total
+     */
+    total: number;
+    /**
+     * Total Precise
+     */
+    total_precise: number;
+};
+
+/**
+ * MunicipalContainerOut
+ */
+export type MunicipalContainerOut = {
+    /**
+     * Boundary Note
+     */
+    boundary_note: string | null;
+    /**
+     * Brand
+     */
+    brand: string | null;
+    /**
+     * Capacity Litres
+     */
+    capacity_litres: number | null;
+    /**
+     * Capacity Raw
+     */
+    capacity_raw: string | null;
+    capacity_status: CapacityStatus;
+    /**
+     * Container Uid
+     */
+    container_uid: string;
+    /**
+     * Coord Cleaned
+     */
+    coord_cleaned: boolean;
+    coord_precision: CoordPrecision | null;
+    coord_status: CoordStatus;
+    /**
+     * Coord Suspect
+     */
+    coord_suspect: boolean;
+    /**
+     * Coord Swapped
+     */
+    coord_swapped: boolean;
+    /**
+     * Declared Parish
+     *
+     * Como escrito no ficheiro; nunca é usado para contar
+     */
+    declared_parish: string | null;
+    /**
+     * External Id
+     */
+    external_id: string;
+    kind: MunicipalKind;
+    /**
+     * Latitude
+     */
+    latitude: number | null;
+    /**
+     * Longitude
+     */
+    longitude: number | null;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Parish Dicofre
+     */
+    parish_dicofre: string | null;
+    parish_match: ParishMatch;
+    parish_match_level: ParishMatchLevel | null;
+    /**
+     * Parish Mismatch Distance M
+     */
+    parish_mismatch_distance_m: number | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Producer Name
+     *
+     * SENSÍVEL: só para admins com show_names=true; caso contrário null
+     */
+    producer_name: string | null;
+    producer_type: ProducerType | null;
+    /**
+     * Quantity
+     */
+    quantity: number | null;
+    /**
+     * Site Id
+     */
+    site_id: string | null;
+    source_file: MunicipalSourceFile;
+    /**
+     * Source Line
+     *
+     * Linha física no ficheiro de origem (1 = cabeçalho)
+     */
+    source_line: number;
+    stream: MunicipalStream;
+    /**
+     * Street
+     */
+    street: string | null;
+};
+
+/**
+ * MunicipalContainerPage
+ */
+export type MunicipalContainerPage = {
+    /**
+     * Items
+     */
+    items: Array<MunicipalContainerOut>;
+    /**
+     * Names Visible
+     */
+    names_visible: boolean;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * MunicipalContainerTotals
+ */
+export type MunicipalContainerTotals = {
+    /**
+     * Accepted
+     */
+    accepted: number;
+    /**
+     * Brands
+     *
+     * Enterrados por marca (molok, bluebee, greenbee)
+     */
+    brands: {
+        [key: string]: number;
+    };
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Capacity Unknown
+     *
+     * Contentores sem capacidade conhecida
+     */
+    capacity_unknown: number;
+    /**
+     * Located
+     */
+    located: number;
+    /**
+     * Pending
+     *
+     * Sem coordenadas: contam como contentores, não entram no mapa nem por freguesia
+     */
+    pending: number;
+    /**
+     * Rejected
+     *
+     * Linhas rejeitadas pelo ETL (fora do concelho, linha vazia)
+     */
+    rejected: number | null;
+};
+
+/**
+ * MunicipalCoverageKpis
+ */
+export type MunicipalCoverageKpis = {
+    /**
+     * Basis
+     *
+     * Cobertura da ÁREA do concelho, não da população
+     */
+    basis?: 'area';
+    /**
+     * Is Estimate
+     */
+    is_estimate?: true;
+    /**
+     * Vizinho mais próximo entre locais públicos
+     */
+    nn_distance: MunicipalNnDistance | null;
+    /**
+     * Parishes Half Covered 300M
+     *
+     * Freguesias com 50% ou mais da área a ≤ 300 m de um local
+     */
+    parishes_half_covered_300m: number;
+    /**
+     * Parishes Under Quarter 300M
+     *
+     * Freguesias com menos de 25% da área a ≤ 300 m de um local
+     */
+    parishes_under_quarter_300m: number;
+    /**
+     * Pct 200M
+     */
+    pct_200m: number | null;
+    /**
+     * Pct 300M
+     */
+    pct_300m: number | null;
+    /**
+     * Pct 500M
+     */
+    pct_500m: number | null;
+};
+
+/**
+ * MunicipalDensityBenchmarkOut
+ */
+export type MunicipalDensityBenchmarkOut = {
+    /**
+     * Note
+     */
+    note: string;
+    /**
+     * Parishes
+     */
+    parishes: Array<MunicipalParishDensity>;
+    /**
+     * People Per Public Site
+     */
+    people_per_public_site: number | null;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Stats
+     */
+    stats: Array<MunicipalDensityStat>;
+    textile_reference: MunicipalTextileReference;
+};
+
+/**
+ * MunicipalDensityKpis
+ */
+export type MunicipalDensityKpis = {
+    /**
+     * Area Km2
+     *
+     * Área CAOP 2019 das 48 freguesias
+     */
+    area_km2: number;
+    /**
+     * Containers Per 1000 Hab
+     */
+    containers_per_1000_hab: number;
+    /**
+     * Containers Per Km2
+     */
+    containers_per_km2: number;
+    /**
+     * Population
+     *
+     * Soma das freguesias (INE, Censos 2021)
+     */
+    population: number;
+    /**
+     * Public Sites Per 1000 Hab
+     */
+    public_sites_per_1000_hab: number;
+    /**
+     * Public Sites Per Km2
+     */
+    public_sites_per_km2: number;
+};
+
+/**
+ * MunicipalDensityStat
+ */
+export type MunicipalDensityStat = {
+    /**
+     * Concelho
+     *
+     * Valor do concelho inteiro
+     */
+    concelho: number;
+    /**
+     * Distribuição entre as 48 freguesias
+     */
+    distribution: MunicipalDistributionOut;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Unit
+     */
+    unit: string;
+};
+
+/**
+ * MunicipalDistributionOut
+ */
+export type MunicipalDistributionOut = {
+    /**
+     * Maximum
+     */
+    maximum: number;
+    /**
+     * Median
+     */
+    median: number;
+    /**
+     * Minimum
+     */
+    minimum: number;
+    /**
+     * P25
+     */
+    p25: number;
+    /**
+     * P75
+     */
+    p75: number;
+};
+
+/**
+ * MunicipalEstimateNote
+ *
+ * Campos desta resposta que são estimativa e porquê.
+ */
+export type MunicipalEstimateNote = {
+    /**
+     * Fields
+     *
+     * Nomes dos campos que são estimativa
+     */
+    fields: Array<string>;
+    /**
+     * Note
+     */
+    note: string;
+};
+
+/**
+ * MunicipalGapParameters
+ */
+export type MunicipalGapParameters = {
+    /**
+     * Capture Pct
+     *
+     * Captura média atual do concelho (301,3 t ÷ 1 317 t), igual em todas
+     */
+    capture_pct: number;
+    /**
+     * Kg Per Inhab Month
+     */
+    kg_per_inhab_month: number;
+    /**
+     * Months Per Year
+     */
+    months_per_year?: number;
+};
+
+/**
+ * MunicipalGapRankingOut
+ */
+export type MunicipalGapRankingOut = {
+    /**
+     * Caveat
+     */
+    caveat: string;
+    /**
+     * Is Estimate
+     */
+    is_estimate?: true;
+    /**
+     * Items
+     */
+    items: Array<MunicipalGapRow>;
+    parameters: MunicipalGapParameters;
+    /**
+     * Rule
+     */
+    rule: string;
+};
+
+/**
+ * MunicipalGapRow
+ */
+export type MunicipalGapRow = {
+    /**
+     * Candidate Sites
+     */
+    candidate_sites: number;
+    /**
+     * Candidate Sites Precise
+     */
+    candidate_sites_precise: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Containers Per 1000 Hab
+     */
+    containers_per_1000_hab: number;
+    /**
+     * Dicofre
+     */
+    dicofre: string;
+    /**
+     * Gap T Per Candidate Site
+     */
+    gap_t_per_candidate_site: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Rank
+     */
+    rank: number;
+    /**
+     * Textile Gap T
+     */
+    textile_gap_t: number;
+    /**
+     * Textile Potential T
+     */
+    textile_potential_t: number;
+};
+
+/**
+ * MunicipalKind
+ *
+ * Tipo de contentor municipal (ficheiro de origem + equipamento).
+ */
+export type MunicipalKind = 'underground' | 'platform' | 'surface' | 'organic_collective' | 'organic_producer' | 'green_waste';
+
+/**
+ * MunicipalKindCount
+ */
+export type MunicipalKindCount = {
+    /**
+     * Capacity Litres Total
+     *
+     * Soma da capacidade declarada, em litros (desconhecidas ficam fora)
+     */
+    capacity_litres_total: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    kind: MunicipalKind;
+    /**
+     * Located
+     *
+     * Com coordenadas válidas dentro do concelho
+     */
+    located: number;
+};
+
+/**
+ * MunicipalKindCounts
+ */
+export type MunicipalKindCounts = {
+    /**
+     * Green Waste
+     */
+    green_waste: number;
+    /**
+     * Organic Collective
+     */
+    organic_collective: number;
+    /**
+     * Organic Producer
+     */
+    organic_producer: number;
+    /**
+     * Platform
+     */
+    platform: number;
+    /**
+     * Surface
+     */
+    surface: number;
+    /**
+     * Underground
+     */
+    underground: number;
+};
+
+/**
+ * MunicipalLinkOut
+ */
+export type MunicipalLinkOut = {
+    /**
+     * Distance M
+     */
+    distance_m: number | null;
+    /**
+     * Nearest Street Kind
+     */
+    nearest_street_kind: string | null;
+    /**
+     * Nearest Street Uid
+     */
+    nearest_street_uid: string | null;
+    /**
+     * Organic Uid
+     */
+    organic_uid: string;
+    /**
+     * Same Number Distance M
+     */
+    same_number_distance_m: number | null;
+    /**
+     * Same Number Same Street
+     */
+    same_number_same_street: boolean | null;
+    /**
+     * Same Number Uid
+     */
+    same_number_uid: string | null;
+    /**
+     * Within Link Radius
+     *
+     * Contentor de rua a ≤ 15 m do orgânico coletivo
+     */
+    within_link_radius: boolean;
+};
+
+/**
+ * MunicipalNeighbourOut
+ */
+export type MunicipalNeighbourOut = {
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Distance M
+     */
+    distance_m: number;
+    /**
+     * Kinds
+     */
+    kinds: Array<MunicipalKind>;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    site_class: SiteClass;
+    /**
+     * Site Id
+     */
+    site_id: string;
+    /**
+     * Textile Candidate
+     */
+    textile_candidate: boolean;
+};
+
+/**
+ * MunicipalNnDistance
+ */
+export type MunicipalNnDistance = {
+    /**
+     * Max M
+     */
+    max_m: number;
+    /**
+     * Mean M
+     */
+    mean_m: number;
+    /**
+     * Median M
+     */
+    median_m: number;
+    /**
+     * N
+     */
+    n: number;
+    /**
+     * P25 M
+     */
+    p25_m: number;
+    /**
+     * P5 M
+     */
+    p5_m: number;
+    /**
+     * P75 M
+     */
+    p75_m: number;
+    /**
+     * P95 M
+     */
+    p95_m: number;
+};
+
+/**
+ * MunicipalOverview
+ */
+export type MunicipalOverview = {
+    /**
+     * By Kind
+     */
+    by_kind: Array<MunicipalKindCount>;
+    /**
+     * By Producer Type
+     */
+    by_producer_type: Array<MunicipalProducerTypeCount>;
+    /**
+     * By Stream
+     */
+    by_stream: Array<MunicipalStreamCount>;
+    containers: MunicipalContainerTotals;
+    coverage: MunicipalCoverageKpis;
+    density: MunicipalDensityKpis;
+    estimates: MunicipalEstimateNote;
+    quality: MunicipalQualityKpis;
+    sites: MunicipalSiteTotals;
+    source: MunicipalSourceInfo;
+};
+
+/**
+ * MunicipalParishCount
+ */
+export type MunicipalParishCount = {
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Dicofre
+     */
+    dicofre: string | null;
+    /**
+     * Name
+     */
+    name: string;
+};
+
+/**
+ * MunicipalParishDensity
+ */
+export type MunicipalParishDensity = {
+    /**
+     * Below P25
+     *
+     * Abaixo do 1.º quartil das freguesias em contentores por 1 000 hab.
+     */
+    below_p25: boolean;
+    /**
+     * Containers Per 1000 Hab
+     */
+    containers_per_1000_hab: number;
+    /**
+     * Dicofre
+     */
+    dicofre: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Public Sites Per 1000 Hab
+     */
+    public_sites_per_1000_hab: number;
+};
+
+/**
+ * MunicipalParishList
+ */
+export type MunicipalParishList = {
+    estimates: MunicipalEstimateNote;
+    /**
+     * Items
+     */
+    items: Array<MunicipalParishOut>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * MunicipalParishOut
+ */
+export type MunicipalParishOut = {
+    /**
+     * Area Km2
+     */
+    area_km2: number;
+    by_kind: MunicipalKindCounts;
+    /**
+     * Candidate Sites
+     */
+    candidate_sites: number;
+    /**
+     * Candidate Sites Precise
+     */
+    candidate_sites_precise: number;
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Centroid Lat
+     */
+    centroid_lat: number | null;
+    /**
+     * Centroid Lon
+     */
+    centroid_lon: number | null;
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Containers Coord Suspect
+     */
+    containers_coord_suspect: number;
+    /**
+     * Containers Pending
+     */
+    containers_pending: number;
+    /**
+     * Containers Per 1000 Hab
+     */
+    containers_per_1000_hab: number;
+    /**
+     * Containers Per Km2
+     */
+    containers_per_km2: number;
+    /**
+     * Cover Pct 200M
+     *
+     * % da área a ≤ 200 m de um local público (área, não população)
+     */
+    cover_pct_200m: number;
+    /**
+     * Cover Pct 300M
+     */
+    cover_pct_300m: number;
+    /**
+     * Cover Pct 500M
+     */
+    cover_pct_500m: number;
+    /**
+     * Dicofre
+     *
+     * Código da app/INE (uniões: 0308U1..5); liga a `parishes` e ao simulador
+     */
+    dicofre: string;
+    /**
+     * Dicofre Caop
+     *
+     * Código CAOP 2019 (uniões: 030876, 030881, 030883, 030884, 030890)
+     */
+    dicofre_caop: string;
+    /**
+     * Gap Rank
+     *
+     * 1 = mais toneladas de lacuna por local candidato (estimativa)
+     */
+    gap_rank: number;
+    /**
+     * Gap T Per Candidate Site
+     *
+     * Estimativa: lacuna ÷ max(1, locais candidatos)
+     */
+    gap_t_per_candidate_site: number;
+    /**
+     * Mean Nn Distance M
+     */
+    mean_nn_distance_m: number | null;
+    /**
+     * Median Nn Distance M
+     */
+    median_nn_distance_m: number | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Contentores de produtores por tipo
+     */
+    producers: MunicipalProducersByType;
+    /**
+     * Public Sites
+     */
+    public_sites: number;
+    /**
+     * Public Sites Per 1000 Hab
+     */
+    public_sites_per_1000_hab: number;
+    /**
+     * Public Sites Per Km2
+     */
+    public_sites_per_km2: number;
+    /**
+     * Sites
+     */
+    sites: number;
+    /**
+     * Textile Gap T
+     *
+     * Estimativa: potencial × (1 − captura média do concelho)
+     */
+    textile_gap_t: number;
+    /**
+     * Textile Potential T
+     *
+     * Estimativa: 0,7 kg/hab/mês × população × 12
+     */
+    textile_potential_t: number;
+};
+
+/**
+ * MunicipalParishSort
+ */
+export type MunicipalParishSort = 'name' | 'population' | 'containers' | 'containers_per_1000_hab' | 'public_sites_per_1000_hab' | 'containers_per_km2' | 'mean_nn_distance_m' | 'cover_pct_300m' | 'candidate_sites' | 'gap_rank' | 'producers';
+
+/**
+ * MunicipalProducerSite
+ */
+export type MunicipalProducerSite = {
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    coord_precision: CoordPrecision;
+    /**
+     * Latitude
+     */
+    latitude: number;
+    /**
+     * Longitude
+     */
+    longitude: number;
+    /**
+     * Parish Dicofre
+     */
+    parish_dicofre: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Producer Names
+     *
+     * SENSÍVEL: só admins com show_names=true
+     */
+    producer_names: Array<string> | null;
+    /**
+     * Producer Types
+     */
+    producer_types: Array<ProducerType>;
+    /**
+     * Site Id
+     */
+    site_id: string;
+};
+
+/**
+ * MunicipalProducerTypeCount
+ */
+export type MunicipalProducerTypeCount = {
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Located
+     */
+    located: number;
+    /**
+     * Producers Distinct
+     *
+     * Estabelecimentos distintos (contagem; não revela nomes)
+     */
+    producers_distinct: number;
+    type: ProducerType;
+};
+
+/**
+ * MunicipalProducerTypeSummary
+ */
+export type MunicipalProducerTypeSummary = {
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Located
+     */
+    located: number;
+    /**
+     * Producers Distinct
+     */
+    producers_distinct: number;
+    /**
+     * Sites
+     */
+    sites: number;
+    /**
+     * Textile Hypothesis
+     *
+     * Hipótese nossa de interesse para têxteis; a validar com a Vitrus
+     */
+    textile_hypothesis: string;
+    /**
+     * Top Parishes
+     */
+    top_parishes: Array<MunicipalParishCount>;
+    type: ProducerType;
+};
+
+/**
+ * MunicipalProducersByType
+ */
+export type MunicipalProducersByType = {
+    /**
+     * Care Home
+     */
+    care_home: number;
+    /**
+     * Establishment
+     */
+    establishment: number;
+    /**
+     * Hospitality
+     */
+    hospitality: number;
+    /**
+     * Large Producer
+     */
+    large_producer: number;
+    /**
+     * Restaurant
+     */
+    restaurant: number;
+    /**
+     * School
+     */
+    school: number;
+};
+
+/**
+ * MunicipalProducersOut
+ */
+export type MunicipalProducersOut = {
+    /**
+     * By Type
+     */
+    by_type: Array<MunicipalProducerTypeSummary>;
+    /**
+     * Items
+     */
+    items: Array<MunicipalProducerSite>;
+    /**
+     * Names Visible
+     */
+    names_visible: boolean;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * MunicipalQualityKpis
+ */
+export type MunicipalQualityKpis = {
+    /**
+     * Alerts Total
+     */
+    alerts_total: number;
+    /**
+     * Capacity Assumed Containers
+     *
+     * Capacidade sem unidade, lida como litros (assumido)
+     */
+    capacity_assumed_containers: number;
+    /**
+     * Containers Coord Suspect
+     *
+     * Declarados a mais de 1 km da freguesia do polígono
+     */
+    containers_coord_suspect: number;
+    /**
+     * Open Alerts
+     */
+    open_alerts: number;
+    /**
+     * Parish Compared
+     */
+    parish_compared: number;
+    /**
+     * Parish Equal
+     */
+    parish_equal: number;
+    /**
+     * Parish Equal Pct
+     */
+    parish_equal_pct: number | null;
+    /**
+     * Sites Approximate
+     *
+     * Coordenadas com 3 casas decimais ou menos (~100 m): confirmar no terreno
+     */
+    sites_approximate: number;
+    /**
+     * Sites Precise
+     */
+    sites_precise: number;
+    /**
+     * Stream Unknown Containers
+     *
+     * Fração desconhecida (enterrados e superfície)
+     */
+    stream_unknown_containers: number;
+};
+
+/**
+ * MunicipalSiteDetail
+ */
+export type MunicipalSiteDetail = {
+    /**
+     * Containers
+     */
+    containers: Array<MunicipalContainerOut>;
+    /**
+     * Links
+     *
+     * Relações espaciais dos orgânicos coletivos deste local
+     */
+    links: Array<MunicipalLinkOut>;
+    /**
+     * Names Visible
+     */
+    names_visible: boolean;
+    /**
+     * Neighbours
+     *
+     * Outros locais a ≤ radius_m, do mais perto para o mais longe
+     */
+    neighbours: Array<MunicipalNeighbourOut>;
+    parish: MunicipalParishOut | null;
+    /**
+     * Radius M
+     */
+    radius_m: number;
+    site: MunicipalSiteOut;
+};
+
+/**
+ * MunicipalSiteOut
+ */
+export type MunicipalSiteOut = {
+    by_kind: MunicipalKindCounts;
+    by_stream: MunicipalStreamCounts;
+    /**
+     * Candidate Reason
+     */
+    candidate_reason: string | null;
+    /**
+     * Capacity Litres Total
+     */
+    capacity_litres_total: number;
+    /**
+     * Capacity Unknown
+     */
+    capacity_unknown: number;
+    /**
+     * Containers
+     */
+    containers: number;
+    coord_precision: CoordPrecision;
+    /**
+     * Coord Suspect Containers
+     */
+    coord_suspect_containers: number;
+    /**
+     * Kinds
+     */
+    kinds: Array<MunicipalKind>;
+    /**
+     * Latitude
+     */
+    latitude: number;
+    /**
+     * Longitude
+     */
+    longitude: number;
+    /**
+     * Nn Distance M
+     *
+     * Distância ao local público mais próximo (só locais públicos)
+     */
+    nn_distance_m: number | null;
+    /**
+     * Organic Collective Within 15M
+     */
+    organic_collective_within_15m: number;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Parish Dicofre
+     */
+    parish_dicofre: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Producer Names
+     *
+     * SENSÍVEL: só para admins com show_names=true; caso contrário null
+     */
+    producer_names: Array<string> | null;
+    /**
+     * Producer Types
+     */
+    producer_types: Array<ProducerType>;
+    site_class: SiteClass;
+    /**
+     * Site Id
+     *
+     * S + 8 hexadecimais; estável entre importações
+     */
+    site_id: string;
+    /**
+     * Source Files
+     */
+    source_files: Array<MunicipalSourceFile>;
+    /**
+     * Streets
+     */
+    streets: Array<string>;
+    /**
+     * Textile Candidate
+     *
+     * Local público com contentor de rua: lugar possível, não recomendado
+     */
+    textile_candidate: boolean;
+    /**
+     * Units Declared
+     *
+     * Nos resíduos verdes usa `Quantidade` (semântica por esclarecer)
+     */
+    units_declared: number;
+};
+
+/**
+ * MunicipalSitePage
+ */
+export type MunicipalSitePage = {
+    /**
+     * Items
+     */
+    items: Array<MunicipalSiteOut>;
+    /**
+     * Names Visible
+     */
+    names_visible: boolean;
+    /**
+     * Next Cursor
+     *
+     * Passar em `cursor` para a página seguinte; null no fim
+     */
+    next_cursor: string | null;
+    /**
+     * Total
+     *
+     * Total com os filtros aplicados
+     */
+    total: number;
+};
+
+/**
+ * MunicipalSiteTotals
+ */
+export type MunicipalSiteTotals = {
+    /**
+     * Max Containers
+     */
+    max_containers: number;
+    /**
+     * Mixed
+     */
+    mixed: number;
+    /**
+     * Producer
+     */
+    producer: number;
+    /**
+     * Public
+     */
+    public: number;
+    /**
+     * Single Container
+     */
+    single_container: number;
+    /**
+     * Textile Candidates
+     *
+     * Locais públicos com contentor de rua: lugares possíveis, não recomendados
+     */
+    textile_candidates: number;
+    /**
+     * Textile Candidates Precise
+     */
+    textile_candidates_precise: number;
+    /**
+     * Textile Candidates Underground
+     */
+    textile_candidates_underground: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * MunicipalSortOrder
+ */
+export type MunicipalSortOrder = 'asc' | 'desc';
+
+/**
+ * MunicipalSourceFile
+ */
+export type MunicipalSourceFile = 'profundidade' | 'superficie' | 'organico_coletivo' | 'organico_tipologia' | 'residuos_verdes';
+
+/**
+ * MunicipalSourceInfo
+ */
+export type MunicipalSourceInfo = {
+    /**
+     * Caop Version
+     *
+     * Versão da CAOP usada para as freguesias e para atribuir cada local
+     */
+    caop_version: string;
+    /**
+     * File Sha256
+     *
+     * SHA-256 do pacote recebido; muda quando os dados mudam
+     */
+    file_sha256: string;
+    /**
+     * Imported At
+     */
+    imported_at: string;
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Not Textile
+     */
+    not_textile?: true;
+    /**
+     * Note
+     */
+    note?: string;
+    /**
+     * Provider
+     */
+    provider: string;
+    /**
+     * Received On
+     */
+    received_on: string | null;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * MunicipalStream
+ *
+ * Fração. Só se afirma o que os ficheiros dizem: enterrados e superfície ficam `unknown`.
+ */
+export type MunicipalStream = 'organico' | 'verdes' | 'desconhecido';
+
+/**
+ * MunicipalStreamCount
+ */
+export type MunicipalStreamCount = {
+    /**
+     * Containers
+     */
+    containers: number;
+    stream: MunicipalStream;
+};
+
+/**
+ * MunicipalStreamCounts
+ */
+export type MunicipalStreamCounts = {
+    /**
+     * Desconhecido
+     */
+    desconhecido: number;
+    /**
+     * Organico
+     */
+    organico: number;
+    /**
+     * Verdes
+     */
+    verdes: number;
+};
+
+/**
+ * MunicipalTextileReference
+ */
+export type MunicipalTextileReference = {
+    /**
+     * Candidate Sites
+     */
+    candidate_sites: number;
+    /**
+     * Candidates Per Reference Point
+     */
+    candidates_per_reference_point: number | null;
+    /**
+     * Is Estimate
+     */
+    is_estimate?: true;
+    /**
+     * Note
+     */
+    note: string;
+    /**
+     * People Per Point
+     */
+    people_per_point: number;
+    /**
+     * Reference Points
+     *
+     * Pontos que a referência daria ao concelho (população ÷ habitantes por ponto)
+     */
+    reference_points: number;
+    /**
+     * Verified
+     *
+     * false = referência por verificar com a fonte
+     */
+    verified: boolean;
 };
 
 /**
@@ -4503,6 +6107,18 @@ export type ParishCoverage = {
 };
 
 /**
+ * ParishMatch
+ *
+ * Freguesia declarada no ficheiro contra o polígono CAOP que contém o ponto.
+ */
+export type ParishMatch = 'igual' | 'diferente' | 'sem_coord' | 'nao_mapeada';
+
+/**
+ * ParishMatchLevel
+ */
+export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'partial' | 'none';
+
+/**
  * Passport
  *
  * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
@@ -4974,6 +6590,30 @@ export type Point = {
      */
     y: number | null;
 };
+
+/**
+ * PointGeometry
+ */
+export type PointGeometry = {
+    /**
+     * Coordinates
+     *
+     * [longitude, latitude]
+     */
+    coordinates: [
+        number,
+        number
+    ];
+    /**
+     * Type
+     */
+    type?: 'Point';
+};
+
+/**
+ * ProducerType
+ */
+export type ProducerType = 'restaurant' | 'school' | 'establishment' | 'large_producer' | 'care_home' | 'hospitality';
 
 /**
  * ProfileUpdate
@@ -6040,6 +7680,103 @@ export type SignalFloorOut = {
      * t previstas no piloto escolhido
      */
     tonnes_pilot: number;
+};
+
+/**
+ * SiteClass
+ */
+export type SiteClass = 'public' | 'producer' | 'mixed';
+
+/**
+ * SiteFeature
+ */
+export type SiteFeature = {
+    geometry: PointGeometry;
+    /**
+     * Id
+     */
+    id?: string | null;
+    properties: SiteFeatureProps;
+    /**
+     * Type
+     */
+    type?: 'Feature';
+};
+
+/**
+ * SiteFeatureCollection
+ */
+export type SiteFeatureCollection = {
+    /**
+     * Clustered
+     */
+    clustered: boolean;
+    /**
+     * Features
+     */
+    features: Array<SiteFeature>;
+    /**
+     * Total Sites
+     *
+     * Locais que cumprem os filtros e a bbox
+     */
+    total_sites: number;
+    /**
+     * Type
+     */
+    type?: 'FeatureCollection';
+    /**
+     * Zoom
+     */
+    zoom: number | null;
+};
+
+/**
+ * SiteFeatureProps
+ */
+export type SiteFeatureProps = {
+    /**
+     * Cluster
+     *
+     * true = grupo de locais (não tem site_id); false = um local
+     */
+    cluster: boolean;
+    /**
+     * Containers
+     */
+    containers: number;
+    coord_precision?: CoordPrecision | null;
+    /**
+     * Tipo principal para colorir o ponto
+     */
+    kind?: MunicipalKind | null;
+    /**
+     * Kinds
+     */
+    kinds?: Array<MunicipalKind> | null;
+    /**
+     * Nn Distance M
+     */
+    nn_distance_m?: number | null;
+    /**
+     * Parish Name
+     */
+    parish_name?: string | null;
+    /**
+     * Point Count
+     *
+     * Locais no grupo (1 se for um local)
+     */
+    point_count: number;
+    site_class?: SiteClass | null;
+    /**
+     * Site Id
+     */
+    site_id?: string | null;
+    /**
+     * Textile Candidate
+     */
+    textile_candidate?: boolean | null;
 };
 
 /**
@@ -12646,6 +14383,1297 @@ export type ReserveLotResponses = {
 };
 
 export type ReserveLotResponse = ReserveLotResponses[keyof ReserveLotResponses];
+
+export type ListMunicipalContainersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         *
+         * Itens por página
+         */
+        limit?: number;
+        /**
+         * Cursor
+         *
+         * `next_cursor` da página anterior
+         */
+        cursor?: string | null;
+        /**
+         * Kind
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * O local do contentor é candidato a têxteis
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Located
+         *
+         * true = com coordenadas; false = pendentes
+         */
+        located?: boolean | null;
+        /**
+         * Parish Match
+         */
+        parish_match?: Array<ParishMatch> | null;
+        /**
+         * Brand
+         *
+         * molok, bluebee, greenbee
+         */
+        brand?: string | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, rua, freguesia, marca
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/containers';
+};
+
+export type ListMunicipalContainersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListMunicipalContainersError = ListMunicipalContainersErrors[keyof ListMunicipalContainersErrors];
+
+export type ListMunicipalContainersResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalContainerPage;
+};
+
+export type ListMunicipalContainersResponse = ListMunicipalContainersResponses[keyof ListMunicipalContainersResponses];
+
+export type GetMunicipalDensityBenchmarkData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/municipal/density-benchmark';
+};
+
+export type GetMunicipalDensityBenchmarkErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalDensityBenchmarkError = GetMunicipalDensityBenchmarkErrors[keyof GetMunicipalDensityBenchmarkErrors];
+
+export type GetMunicipalDensityBenchmarkResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalDensityBenchmarkOut;
+};
+
+export type GetMunicipalDensityBenchmarkResponse = GetMunicipalDensityBenchmarkResponses[keyof GetMunicipalDensityBenchmarkResponses];
+
+export type ExportMunicipalSitesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        format?: ExportFormat;
+        /**
+         * Uma linha por local ou por contentor
+         */
+        scope?: ExportScope;
+        /**
+         * Kind
+         *
+         * Tipos de contentor presentes no local
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         *
+         * Frações presentes no local
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * Só candidatos (true) ou só não candidatos (false)
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         *
+         * Local com contentores a mais de 1 km da freguesia declarada
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, freguesia, ruas
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/export';
+};
+
+export type ExportMunicipalSitesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportMunicipalSitesError = ExportMunicipalSitesErrors[keyof ExportMunicipalSitesErrors];
+
+export type ExportMunicipalSitesResponses = {
+    /**
+     * Ficheiro CSV (UTF-8 com BOM), XLSX ou GeoJSON
+     */
+    200: unknown;
+};
+
+export type GetMunicipalGapRankingData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number | null;
+    };
+    url: '/api/v1/municipal/gap-ranking';
+};
+
+export type GetMunicipalGapRankingErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalGapRankingError = GetMunicipalGapRankingErrors[keyof GetMunicipalGapRankingErrors];
+
+export type GetMunicipalGapRankingResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalGapRankingOut;
+};
+
+export type GetMunicipalGapRankingResponse = GetMunicipalGapRankingResponses[keyof GetMunicipalGapRankingResponses];
+
+export type GetMunicipalOverviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/municipal/overview';
+};
+
+export type GetMunicipalOverviewErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalOverviewError = GetMunicipalOverviewErrors[keyof GetMunicipalOverviewErrors];
+
+export type GetMunicipalOverviewResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalOverview;
+};
+
+export type GetMunicipalOverviewResponse = GetMunicipalOverviewResponses[keyof GetMunicipalOverviewResponses];
+
+export type ListMunicipalParishesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        sort?: MunicipalParishSort;
+        order?: MunicipalSortOrder;
+        /**
+         * Q
+         *
+         * Nome (sem acentos) ou código
+         */
+        q?: string | null;
+        /**
+         * Min Population
+         */
+        min_population?: number | null;
+        /**
+         * Max Containers Per 1000 Hab
+         */
+        max_containers_per_1000_hab?: number | null;
+        /**
+         * Max Cover Pct 300M
+         */
+        max_cover_pct_300m?: number | null;
+        /**
+         * Has Candidates
+         */
+        has_candidates?: boolean | null;
+    };
+    url: '/api/v1/municipal/parishes';
+};
+
+export type ListMunicipalParishesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListMunicipalParishesError = ListMunicipalParishesErrors[keyof ListMunicipalParishesErrors];
+
+export type ListMunicipalParishesResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalParishList;
+};
+
+export type ListMunicipalParishesResponse = ListMunicipalParishesResponses[keyof ListMunicipalParishesResponses];
+
+export type GetCaopParishesGeojsonData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/municipal/parishes/caop.geojson';
+};
+
+export type GetCaopParishesGeojsonErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCaopParishesGeojsonError = GetCaopParishesGeojsonErrors[keyof GetCaopParishesGeojsonErrors];
+
+export type GetCaopParishesGeojsonResponses = {
+    /**
+     * Successful Response
+     */
+    200: CaopFeatureCollection;
+};
+
+export type GetCaopParishesGeojsonResponse = GetCaopParishesGeojsonResponses[keyof GetCaopParishesGeojsonResponses];
+
+export type GetMunicipalParishData = {
+    body?: never;
+    path: {
+        /**
+         * Dicofre
+         */
+        dicofre: string;
+    };
+    query?: never;
+    url: '/api/v1/municipal/parishes/{dicofre}';
+};
+
+export type GetMunicipalParishErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalParishError = GetMunicipalParishErrors[keyof GetMunicipalParishErrors];
+
+export type GetMunicipalParishResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalParishOut;
+};
+
+export type GetMunicipalParishResponse = GetMunicipalParishResponses[keyof GetMunicipalParishResponses];
+
+export type ListMunicipalProducersData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         *
+         * Itens por página
+         */
+        limit?: number;
+        /**
+         * Cursor
+         *
+         * `next_cursor` da página anterior
+         */
+        cursor?: string | null;
+        /**
+         * Kind
+         *
+         * Tipos de contentor presentes no local
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         *
+         * Frações presentes no local
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * Só candidatos (true) ou só não candidatos (false)
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         *
+         * Local com contentores a mais de 1 km da freguesia declarada
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, freguesia, ruas
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/producers';
+};
+
+export type ListMunicipalProducersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListMunicipalProducersError = ListMunicipalProducersErrors[keyof ListMunicipalProducersErrors];
+
+export type ListMunicipalProducersResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalProducersOut;
+};
+
+export type ListMunicipalProducersResponse = ListMunicipalProducersResponses[keyof ListMunicipalProducersResponses];
+
+export type ListMunicipalSitesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         *
+         * Itens por página
+         */
+        limit?: number;
+        /**
+         * Cursor
+         *
+         * `next_cursor` da página anterior
+         */
+        cursor?: string | null;
+        /**
+         * Kind
+         *
+         * Tipos de contentor presentes no local
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         *
+         * Frações presentes no local
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * Só candidatos (true) ou só não candidatos (false)
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         *
+         * Local com contentores a mais de 1 km da freguesia declarada
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, freguesia, ruas
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/sites';
+};
+
+export type ListMunicipalSitesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListMunicipalSitesError = ListMunicipalSitesErrors[keyof ListMunicipalSitesErrors];
+
+export type ListMunicipalSitesResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalSitePage;
+};
+
+export type ListMunicipalSitesResponse = ListMunicipalSitesResponses[keyof ListMunicipalSitesResponses];
+
+export type GetMunicipalSitesGeojsonData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Zoom
+         *
+         * Zoom do mapa; com `cluster` agrupa abaixo do 16
+         */
+        zoom?: number | null;
+        /**
+         * Cluster
+         *
+         * Agrupar no servidor (grelha por zoom)
+         */
+        cluster?: boolean;
+        /**
+         * Kind
+         *
+         * Tipos de contentor presentes no local
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         *
+         * Frações presentes no local
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * Só candidatos (true) ou só não candidatos (false)
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         *
+         * Local com contentores a mais de 1 km da freguesia declarada
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, freguesia, ruas
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/sites/geojson';
+};
+
+export type GetMunicipalSitesGeojsonErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalSitesGeojsonError = GetMunicipalSitesGeojsonErrors[keyof GetMunicipalSitesGeojsonErrors];
+
+export type GetMunicipalSitesGeojsonResponses = {
+    /**
+     * Successful Response
+     */
+    200: SiteFeatureCollection;
+};
+
+export type GetMunicipalSitesGeojsonResponse = GetMunicipalSitesGeojsonResponses[keyof GetMunicipalSitesGeojsonResponses];
+
+export type GetMunicipalSiteData = {
+    body?: never;
+    path: {
+        /**
+         * Site Id
+         */
+        site_id: string;
+    };
+    query?: {
+        /**
+         * Radius M
+         *
+         * Raio dos vizinhos
+         */
+        radius_m?: number;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/sites/{site_id}';
+};
+
+export type GetMunicipalSiteErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetMunicipalSiteError = GetMunicipalSiteErrors[keyof GetMunicipalSiteErrors];
+
+export type GetMunicipalSiteResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalSiteDetail;
+};
+
+export type GetMunicipalSiteResponse = GetMunicipalSiteResponses[keyof GetMunicipalSiteResponses];
+
+export type GetTextileCandidateSitesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Precise Only
+         *
+         * Só com coordenada precisa (4 ou mais casas)
+         */
+        precise_only?: boolean;
+        /**
+         * Limit
+         *
+         * Itens por página
+         */
+        limit?: number;
+        /**
+         * Cursor
+         *
+         * `next_cursor` da página anterior
+         */
+        cursor?: string | null;
+        /**
+         * Kind
+         *
+         * Tipos de contentor presentes no local
+         */
+        kind?: Array<MunicipalKind> | null;
+        /**
+         * Stream
+         *
+         * Frações presentes no local
+         */
+        stream?: Array<MunicipalStream> | null;
+        /**
+         * Parish
+         *
+         * Códigos de freguesia (app/INE ou CAOP)
+         */
+        parish?: Array<string> | null;
+        /**
+         * Producer Type
+         */
+        producer_type?: Array<ProducerType> | null;
+        /**
+         * Site Class
+         */
+        site_class?: Array<SiteClass> | null;
+        /**
+         * Textile Candidate
+         *
+         * Só candidatos (true) ou só não candidatos (false)
+         */
+        textile_candidate?: boolean | null;
+        /**
+         * Coord Suspect
+         *
+         * Local com contentores a mais de 1 km da freguesia declarada
+         */
+        coord_suspect?: boolean | null;
+        /**
+         * Coord Precision
+         */
+        coord_precision?: CoordPrecision | null;
+        /**
+         * Q
+         *
+         * Pesquisa sem acentos: id, freguesia, ruas
+         */
+        q?: string | null;
+        /**
+         * Bbox
+         *
+         * min_lon,min_lat,max_lon,max_lat
+         */
+        bbox?: string | null;
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/textile-candidates';
+};
+
+export type GetTextileCandidateSitesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetTextileCandidateSitesError = GetTextileCandidateSitesErrors[keyof GetTextileCandidateSitesErrors];
+
+export type GetTextileCandidateSitesResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalCandidatesOut;
+};
+
+export type GetTextileCandidateSitesResponse = GetTextileCandidateSitesResponses[keyof GetTextileCandidateSitesResponses];
 
 export type ListCircuitsData = {
     body?: never;

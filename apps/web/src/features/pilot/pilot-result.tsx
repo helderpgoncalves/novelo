@@ -223,7 +223,7 @@ function FloorPanel({ floor }: { floor: PilotOut['signal_floor'] }) {
             id="pilot-floor-calc"
             columns={columns}
             rows={floor.calculation}
-            getKey={(f) => f.key}
+            getRowId={(f) => f.key}
             controls="never"
             pageSize={20}
             caption={m.pilot_floor_calc()}

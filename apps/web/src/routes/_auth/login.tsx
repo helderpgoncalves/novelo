@@ -13,6 +13,8 @@ export const Route = createFileRoute('/_auth/login')({
   validateSearch: z.object({
     next: z.string().startsWith('/').optional().catch(undefined),
     error: z.string().optional().catch(undefined),
+    // 'expired': chegámos aqui porque a sessão terminou (ver main.tsx e o ecrã de sessão terminada).
+    reason: z.enum(['expired']).optional().catch(undefined),
   }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getAuthConfigOptions()),
   head: () => ({ meta: [{ title: m.title_login() }] }),
@@ -27,7 +29,7 @@ function loginError(code: string | undefined): string | null {
 }
 
 function Login() {
-  const { next, error } = Route.useSearch();
+  const { next, error, reason } = Route.useSearch();
   const { data: config } = useSuspenseQuery(getAuthConfigOptions());
 
   return (
@@ -37,6 +39,7 @@ function Login() {
         <p className="text-muted-foreground text-sm">{m.login_subtitle()}</p>
       </div>
       <FormAlert message={loginError(error)} />
+      <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
       {config.google_enabled && (
         <>
           <GoogleButton next={next} />

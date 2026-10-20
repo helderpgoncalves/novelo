@@ -148,7 +148,30 @@ export const zAlertKind = z.enum([
     'normalized_spelling',
     'container_rows_rejected',
     'container_pending_location',
-    'container_assumed_values'
+    'container_assumed_values',
+    'municipal_blank_rows',
+    'municipal_boundary_tolerance',
+    'municipal_caop_version',
+    'municipal_caop_vs_osm',
+    'municipal_capacity_outlier',
+    'municipal_capacity_unit_assumed',
+    'municipal_capacity_unknown',
+    'municipal_coord_suspect',
+    'municipal_coords_artifact',
+    'municipal_coords_low_precision',
+    'municipal_coords_missing',
+    'municipal_coords_swapped',
+    'municipal_cross_file_overlap',
+    'municipal_empty_row',
+    'municipal_not_textile',
+    'municipal_osm_contours_incomplete',
+    'municipal_outside_municipality',
+    'municipal_parish_mismatch',
+    'municipal_parish_names_inconsistent',
+    'municipal_parish_unmapped',
+    'municipal_quantity_semantics',
+    'municipal_stacked_units',
+    'municipal_stream_unknown'
 ]);
 
 /**
@@ -243,6 +266,56 @@ export const zBudgetOut = z.object({
     used_pct: z.number().nullable(),
     warn_pct: z.number()
 });
+
+/**
+ * CaopProps
+ */
+export const zCaopProps = z.object({
+    area_ha: z.number().nullable(),
+    area_km2: z.number(),
+    candidate_sites: z.int(),
+    containers: z.int(),
+    containers_per_1000_hab: z.number(),
+    cover_pct_300m: z.number(),
+    dicofre: z.string(),
+    dicofre_caop: z.string(),
+    gap_rank: z.int(),
+    gap_t_per_candidate_site: z.number(),
+    lat: z.number().nullable(),
+    lon: z.number().nullable(),
+    name: z.string(),
+    population: z.int(),
+    public_sites_per_1000_hab: z.number()
+});
+
+/**
+ * CaopFeature
+ */
+export const zCaopFeature = z.object({
+    geometry: z.record(z.string(), z.unknown()),
+    id: z.string(),
+    properties: zCaopProps,
+    type: z.literal('Feature').optional().default('Feature')
+});
+
+/**
+ * CaopFeatureCollection
+ */
+export const zCaopFeatureCollection = z.object({
+    features: z.array(zCaopFeature),
+    name: z.string(),
+    source: z.string(),
+    type: z.literal('FeatureCollection').optional().default('FeatureCollection')
+});
+
+/**
+ * CapacityStatus
+ */
+export const zCapacityStatus = z.enum([
+    'ok',
+    'assumed_litres',
+    'unknown'
+]);
 
 /**
  * CardKpis
@@ -427,6 +500,16 @@ export const zContainerList = z.object({
     items: z.array(zContainerOut),
     total: z.int()
 });
+
+/**
+ * CoordPrecision
+ */
+export const zCoordPrecision = z.enum(['precise', 'approximate']);
+
+/**
+ * CoordStatus
+ */
+export const zCoordStatus = z.enum(['ok', 'pending']);
 
 /**
  * CopilotActionResultEvent
@@ -898,6 +981,20 @@ export const zErrorBody = z.object({
     ]),
     message: z.string()
 });
+
+/**
+ * ExportFormat
+ */
+export const zExportFormat = z.enum([
+    'csv',
+    'xlsx',
+    'geojson'
+]);
+
+/**
+ * ExportScope
+ */
+export const zExportScope = z.enum(['sites', 'containers']);
 
 /**
  * FeedbackIn
@@ -1425,7 +1522,8 @@ export const zMentionType = z.enum([
     'brand',
     'fibre',
     'page',
-    'data_source'
+    'data_source',
+    'municipal_site'
 ]);
 
 /**
@@ -1496,6 +1594,388 @@ export const zModeSummary = z.object({
     points: z.int(),
     tonnes: z.number(),
     zones: z.int()
+});
+
+/**
+ * MunicipalContainerTotals
+ */
+export const zMunicipalContainerTotals = z.object({
+    accepted: z.int(),
+    brands: z.record(z.string(), z.int()),
+    capacity_litres_total: z.int(),
+    capacity_unknown: z.int(),
+    located: z.int(),
+    pending: z.int(),
+    rejected: z.int().nullable()
+});
+
+/**
+ * MunicipalDensityKpis
+ */
+export const zMunicipalDensityKpis = z.object({
+    area_km2: z.number(),
+    containers_per_1000_hab: z.number(),
+    containers_per_km2: z.number(),
+    population: z.int(),
+    public_sites_per_1000_hab: z.number(),
+    public_sites_per_km2: z.number()
+});
+
+/**
+ * MunicipalDistributionOut
+ */
+export const zMunicipalDistributionOut = z.object({
+    maximum: z.number(),
+    median: z.number(),
+    minimum: z.number(),
+    p25: z.number(),
+    p75: z.number()
+});
+
+/**
+ * MunicipalDensityStat
+ */
+export const zMunicipalDensityStat = z.object({
+    concelho: z.number(),
+    distribution: zMunicipalDistributionOut,
+    key: z.string(),
+    label: z.string(),
+    unit: z.string()
+});
+
+/**
+ * MunicipalEstimateNote
+ *
+ * Campos desta resposta que são estimativa e porquê.
+ */
+export const zMunicipalEstimateNote = z.object({
+    fields: z.array(z.string()),
+    note: z.string()
+});
+
+/**
+ * MunicipalGapParameters
+ */
+export const zMunicipalGapParameters = z.object({
+    capture_pct: z.number(),
+    kg_per_inhab_month: z.number(),
+    months_per_year: z.int().optional().default(12)
+});
+
+/**
+ * MunicipalGapRow
+ */
+export const zMunicipalGapRow = z.object({
+    candidate_sites: z.int(),
+    candidate_sites_precise: z.int(),
+    containers: z.int(),
+    containers_per_1000_hab: z.number(),
+    dicofre: z.string(),
+    gap_t_per_candidate_site: z.number(),
+    name: z.string(),
+    population: z.int(),
+    rank: z.int(),
+    textile_gap_t: z.number(),
+    textile_potential_t: z.number()
+});
+
+/**
+ * MunicipalGapRankingOut
+ */
+export const zMunicipalGapRankingOut = z.object({
+    caveat: z.string(),
+    is_estimate: z.literal(true).optional().default(true),
+    items: z.array(zMunicipalGapRow),
+    parameters: zMunicipalGapParameters,
+    rule: z.string()
+});
+
+/**
+ * MunicipalKind
+ *
+ * Tipo de contentor municipal (ficheiro de origem + equipamento).
+ */
+export const zMunicipalKind = z.enum([
+    'underground',
+    'platform',
+    'surface',
+    'organic_collective',
+    'organic_producer',
+    'green_waste'
+]);
+
+/**
+ * MunicipalKindCount
+ */
+export const zMunicipalKindCount = z.object({
+    capacity_litres_total: z.int(),
+    containers: z.int(),
+    kind: zMunicipalKind,
+    located: z.int()
+});
+
+/**
+ * MunicipalKindCounts
+ */
+export const zMunicipalKindCounts = z.object({
+    green_waste: z.int(),
+    organic_collective: z.int(),
+    organic_producer: z.int(),
+    platform: z.int(),
+    surface: z.int(),
+    underground: z.int()
+});
+
+/**
+ * MunicipalLinkOut
+ */
+export const zMunicipalLinkOut = z.object({
+    distance_m: z.number().nullable(),
+    nearest_street_kind: z.string().nullable(),
+    nearest_street_uid: z.string().nullable(),
+    organic_uid: z.string(),
+    same_number_distance_m: z.number().nullable(),
+    same_number_same_street: z.boolean().nullable(),
+    same_number_uid: z.string().nullable(),
+    within_link_radius: z.boolean()
+});
+
+/**
+ * MunicipalNnDistance
+ */
+export const zMunicipalNnDistance = z.object({
+    max_m: z.number(),
+    mean_m: z.number(),
+    median_m: z.number(),
+    n: z.int(),
+    p25_m: z.number(),
+    p5_m: z.number(),
+    p75_m: z.number(),
+    p95_m: z.number()
+});
+
+/**
+ * MunicipalCoverageKpis
+ */
+export const zMunicipalCoverageKpis = z.object({
+    basis: z.literal('area').optional().default('area'),
+    is_estimate: z.literal(true).optional().default(true),
+    nn_distance: zMunicipalNnDistance.nullable(),
+    parishes_half_covered_300m: z.int(),
+    parishes_under_quarter_300m: z.int(),
+    pct_200m: z.number().nullable(),
+    pct_300m: z.number().nullable(),
+    pct_500m: z.number().nullable()
+});
+
+/**
+ * MunicipalParishCount
+ */
+export const zMunicipalParishCount = z.object({
+    containers: z.int(),
+    dicofre: z.string().nullable(),
+    name: z.string()
+});
+
+/**
+ * MunicipalParishDensity
+ */
+export const zMunicipalParishDensity = z.object({
+    below_p25: z.boolean(),
+    containers_per_1000_hab: z.number(),
+    dicofre: z.string(),
+    name: z.string(),
+    population: z.int(),
+    public_sites_per_1000_hab: z.number()
+});
+
+/**
+ * MunicipalParishSort
+ */
+export const zMunicipalParishSort = z.enum([
+    'name',
+    'population',
+    'containers',
+    'containers_per_1000_hab',
+    'public_sites_per_1000_hab',
+    'containers_per_km2',
+    'mean_nn_distance_m',
+    'cover_pct_300m',
+    'candidate_sites',
+    'gap_rank',
+    'producers'
+]);
+
+/**
+ * MunicipalProducersByType
+ */
+export const zMunicipalProducersByType = z.object({
+    care_home: z.int(),
+    establishment: z.int(),
+    hospitality: z.int(),
+    large_producer: z.int(),
+    restaurant: z.int(),
+    school: z.int()
+});
+
+/**
+ * MunicipalParishOut
+ */
+export const zMunicipalParishOut = z.object({
+    area_km2: z.number(),
+    by_kind: zMunicipalKindCounts,
+    candidate_sites: z.int(),
+    candidate_sites_precise: z.int(),
+    capacity_litres_total: z.int(),
+    centroid_lat: z.number().nullable(),
+    centroid_lon: z.number().nullable(),
+    containers: z.int(),
+    containers_coord_suspect: z.int(),
+    containers_pending: z.int(),
+    containers_per_1000_hab: z.number(),
+    containers_per_km2: z.number(),
+    cover_pct_200m: z.number(),
+    cover_pct_300m: z.number(),
+    cover_pct_500m: z.number(),
+    dicofre: z.string(),
+    dicofre_caop: z.string(),
+    gap_rank: z.int(),
+    gap_t_per_candidate_site: z.number(),
+    mean_nn_distance_m: z.number().nullable(),
+    median_nn_distance_m: z.number().nullable(),
+    name: z.string(),
+    population: z.int(),
+    producers: zMunicipalProducersByType,
+    public_sites: z.int(),
+    public_sites_per_1000_hab: z.number(),
+    public_sites_per_km2: z.number(),
+    sites: z.int(),
+    textile_gap_t: z.number(),
+    textile_potential_t: z.number()
+});
+
+/**
+ * MunicipalParishList
+ */
+export const zMunicipalParishList = z.object({
+    estimates: zMunicipalEstimateNote,
+    items: z.array(zMunicipalParishOut),
+    total: z.int()
+});
+
+/**
+ * MunicipalQualityKpis
+ */
+export const zMunicipalQualityKpis = z.object({
+    alerts_total: z.int(),
+    capacity_assumed_containers: z.int(),
+    containers_coord_suspect: z.int(),
+    open_alerts: z.int(),
+    parish_compared: z.int(),
+    parish_equal: z.int(),
+    parish_equal_pct: z.number().nullable(),
+    sites_approximate: z.int(),
+    sites_precise: z.int(),
+    stream_unknown_containers: z.int()
+});
+
+/**
+ * MunicipalSiteTotals
+ */
+export const zMunicipalSiteTotals = z.object({
+    max_containers: z.int(),
+    mixed: z.int(),
+    producer: z.int(),
+    public: z.int(),
+    single_container: z.int(),
+    textile_candidates: z.int(),
+    textile_candidates_precise: z.int(),
+    textile_candidates_underground: z.int(),
+    total: z.int()
+});
+
+/**
+ * MunicipalSortOrder
+ */
+export const zMunicipalSortOrder = z.enum(['asc', 'desc']);
+
+/**
+ * MunicipalSourceFile
+ */
+export const zMunicipalSourceFile = z.enum([
+    'profundidade',
+    'superficie',
+    'organico_coletivo',
+    'organico_tipologia',
+    'residuos_verdes'
+]);
+
+/**
+ * MunicipalSourceInfo
+ */
+export const zMunicipalSourceInfo = z.object({
+    caop_version: z.string(),
+    file_sha256: z.string(),
+    imported_at: z.iso.datetime(),
+    key: z.string(),
+    not_textile: z.literal(true).optional().default(true),
+    note: z.string().optional().default('Contentores municipais de outras frações (profundidade, superfície, orgânico, resíduos verdes). Não são contentores de têxteis; servem para escolher lugares possíveis, não para medir recolha de têxteis.'),
+    provider: z.string(),
+    received_on: z.iso.date().nullable(),
+    title: z.string()
+});
+
+/**
+ * MunicipalStream
+ *
+ * Fração. Só se afirma o que os ficheiros dizem: enterrados e superfície ficam `unknown`.
+ */
+export const zMunicipalStream = z.enum([
+    'organico',
+    'verdes',
+    'desconhecido'
+]);
+
+/**
+ * MunicipalStreamCount
+ */
+export const zMunicipalStreamCount = z.object({
+    containers: z.int(),
+    stream: zMunicipalStream
+});
+
+/**
+ * MunicipalStreamCounts
+ */
+export const zMunicipalStreamCounts = z.object({
+    desconhecido: z.int(),
+    organico: z.int(),
+    verdes: z.int()
+});
+
+/**
+ * MunicipalTextileReference
+ */
+export const zMunicipalTextileReference = z.object({
+    candidate_sites: z.int(),
+    candidates_per_reference_point: z.number().nullable(),
+    is_estimate: z.literal(true).optional().default(true),
+    note: z.string(),
+    people_per_point: z.int(),
+    reference_points: z.int(),
+    verified: z.boolean()
+});
+
+/**
+ * MunicipalDensityBenchmarkOut
+ */
+export const zMunicipalDensityBenchmarkOut = z.object({
+    note: z.string(),
+    parishes: z.array(zMunicipalParishDensity),
+    people_per_public_site: z.number().nullable(),
+    population: z.int(),
+    stats: z.array(zMunicipalDensityStat),
+    textile_reference: zMunicipalTextileReference
 });
 
 /**
@@ -1664,6 +2144,29 @@ export const zParishCoverage = z.object({
     population: z.int(),
     reference_points: z.int()
 });
+
+/**
+ * ParishMatch
+ *
+ * Freguesia declarada no ficheiro contra o polígono CAOP que contém o ponto.
+ */
+export const zParishMatch = z.enum([
+    'igual',
+    'diferente',
+    'sem_coord',
+    'nao_mapeada'
+]);
+
+/**
+ * ParishMatchLevel
+ */
+export const zParishMatchLevel = z.enum([
+    'exact',
+    'same_words',
+    'contains_name',
+    'partial',
+    'none'
+]);
 
 /**
  * Passport
@@ -1933,6 +2436,142 @@ export const zPoint = z.object({
         z.string()
     ]),
     y: z.number().nullable()
+});
+
+/**
+ * PointGeometry
+ */
+export const zPointGeometry = z.object({
+    coordinates: z.tuple([z.number(), z.number()]),
+    type: z.literal('Point').optional().default('Point')
+});
+
+/**
+ * ProducerType
+ */
+export const zProducerType = z.enum([
+    'restaurant',
+    'school',
+    'establishment',
+    'large_producer',
+    'care_home',
+    'hospitality'
+]);
+
+/**
+ * MunicipalContainerOut
+ */
+export const zMunicipalContainerOut = z.object({
+    boundary_note: z.string().nullable(),
+    brand: z.string().nullable(),
+    capacity_litres: z.int().nullable(),
+    capacity_raw: z.string().nullable(),
+    capacity_status: zCapacityStatus,
+    container_uid: z.string(),
+    coord_cleaned: z.boolean(),
+    coord_precision: zCoordPrecision.nullable(),
+    coord_status: zCoordStatus,
+    coord_suspect: z.boolean(),
+    coord_swapped: z.boolean(),
+    declared_parish: z.string().nullable(),
+    external_id: z.string(),
+    kind: zMunicipalKind,
+    latitude: z.number().nullable(),
+    longitude: z.number().nullable(),
+    parish_code: z.string().nullable(),
+    parish_dicofre: z.string().nullable(),
+    parish_match: zParishMatch,
+    parish_match_level: zParishMatchLevel.nullable(),
+    parish_mismatch_distance_m: z.number().nullable(),
+    parish_name: z.string().nullable(),
+    producer_name: z.string().nullable(),
+    producer_type: zProducerType.nullable(),
+    quantity: z.int().nullable(),
+    site_id: z.string().nullable(),
+    source_file: zMunicipalSourceFile,
+    source_line: z.int(),
+    stream: zMunicipalStream,
+    street: z.string().nullable()
+});
+
+/**
+ * MunicipalContainerPage
+ */
+export const zMunicipalContainerPage = z.object({
+    items: z.array(zMunicipalContainerOut),
+    names_visible: z.boolean(),
+    next_cursor: z.string().nullable(),
+    total: z.int()
+});
+
+/**
+ * MunicipalProducerSite
+ */
+export const zMunicipalProducerSite = z.object({
+    capacity_litres_total: z.int(),
+    containers: z.int(),
+    coord_precision: zCoordPrecision,
+    latitude: z.number(),
+    longitude: z.number(),
+    parish_dicofre: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    producer_names: z.array(z.string()).nullable(),
+    producer_types: z.array(zProducerType),
+    site_id: z.string()
+});
+
+/**
+ * MunicipalProducerTypeCount
+ */
+export const zMunicipalProducerTypeCount = z.object({
+    capacity_litres_total: z.int(),
+    containers: z.int(),
+    label: z.string(),
+    located: z.int(),
+    producers_distinct: z.int(),
+    type: zProducerType
+});
+
+/**
+ * MunicipalOverview
+ */
+export const zMunicipalOverview = z.object({
+    by_kind: z.array(zMunicipalKindCount),
+    by_producer_type: z.array(zMunicipalProducerTypeCount),
+    by_stream: z.array(zMunicipalStreamCount),
+    containers: zMunicipalContainerTotals,
+    coverage: zMunicipalCoverageKpis,
+    density: zMunicipalDensityKpis,
+    estimates: zMunicipalEstimateNote,
+    quality: zMunicipalQualityKpis,
+    sites: zMunicipalSiteTotals,
+    source: zMunicipalSourceInfo
+});
+
+/**
+ * MunicipalProducerTypeSummary
+ */
+export const zMunicipalProducerTypeSummary = z.object({
+    capacity_litres_total: z.int(),
+    containers: z.int(),
+    label: z.string(),
+    located: z.int(),
+    producers_distinct: z.int(),
+    sites: z.int(),
+    textile_hypothesis: z.string(),
+    top_parishes: z.array(zMunicipalParishCount),
+    type: zProducerType
+});
+
+/**
+ * MunicipalProducersOut
+ */
+export const zMunicipalProducersOut = z.object({
+    by_type: z.array(zMunicipalProducerTypeSummary),
+    items: z.array(zMunicipalProducerSite),
+    names_visible: z.boolean(),
+    next_cursor: z.string().nullable(),
+    total: z.int()
 });
 
 /**
@@ -2451,6 +3090,144 @@ export const zSignalFloorOut = z.object({
     floor_met: z.boolean(),
     min_tonnes_pilot: z.number(),
     tonnes_pilot: z.number()
+});
+
+/**
+ * SiteClass
+ */
+export const zSiteClass = z.enum([
+    'public',
+    'producer',
+    'mixed'
+]);
+
+/**
+ * MunicipalNeighbourOut
+ */
+export const zMunicipalNeighbourOut = z.object({
+    containers: z.int(),
+    distance_m: z.number(),
+    kinds: z.array(zMunicipalKind),
+    parish_name: z.string().nullable(),
+    site_class: zSiteClass,
+    site_id: z.string(),
+    textile_candidate: z.boolean()
+});
+
+/**
+ * MunicipalSiteOut
+ */
+export const zMunicipalSiteOut = z.object({
+    by_kind: zMunicipalKindCounts,
+    by_stream: zMunicipalStreamCounts,
+    candidate_reason: z.string().nullable(),
+    capacity_litres_total: z.int(),
+    capacity_unknown: z.int(),
+    containers: z.int(),
+    coord_precision: zCoordPrecision,
+    coord_suspect_containers: z.int(),
+    kinds: z.array(zMunicipalKind),
+    latitude: z.number(),
+    longitude: z.number(),
+    nn_distance_m: z.number().nullable(),
+    organic_collective_within_15m: z.int(),
+    parish_code: z.string().nullable(),
+    parish_dicofre: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    producer_names: z.array(z.string()).nullable(),
+    producer_types: z.array(zProducerType),
+    site_class: zSiteClass,
+    site_id: z.string(),
+    source_files: z.array(zMunicipalSourceFile),
+    streets: z.array(z.string()),
+    textile_candidate: z.boolean(),
+    units_declared: z.int()
+});
+
+/**
+ * MunicipalCandidateOut
+ */
+export const zMunicipalCandidateOut = z.object({
+    parish_gap_rank: z.int(),
+    parish_gap_t_per_candidate: z.number(),
+    rank: z.int(),
+    reason_text: z.string().nullable(),
+    reasons: z.array(z.string()),
+    site: zMunicipalSiteOut
+});
+
+/**
+ * MunicipalCandidatesOut
+ */
+export const zMunicipalCandidatesOut = z.object({
+    is_estimate: z.literal(true).optional().default(true),
+    items: z.array(zMunicipalCandidateOut),
+    next_cursor: z.string().nullable(),
+    note: z.string(),
+    rank_rule: z.string(),
+    total: z.int(),
+    total_precise: z.int()
+});
+
+/**
+ * MunicipalSiteDetail
+ */
+export const zMunicipalSiteDetail = z.object({
+    containers: z.array(zMunicipalContainerOut),
+    links: z.array(zMunicipalLinkOut),
+    names_visible: z.boolean(),
+    neighbours: z.array(zMunicipalNeighbourOut),
+    parish: zMunicipalParishOut.nullable(),
+    radius_m: z.int(),
+    site: zMunicipalSiteOut
+});
+
+/**
+ * MunicipalSitePage
+ */
+export const zMunicipalSitePage = z.object({
+    items: z.array(zMunicipalSiteOut),
+    names_visible: z.boolean(),
+    next_cursor: z.string().nullable(),
+    total: z.int()
+});
+
+/**
+ * SiteFeatureProps
+ */
+export const zSiteFeatureProps = z.object({
+    cluster: z.boolean(),
+    containers: z.int(),
+    coord_precision: zCoordPrecision.nullish(),
+    kind: zMunicipalKind.nullish(),
+    kinds: z.array(zMunicipalKind).nullish(),
+    nn_distance_m: z.number().nullish(),
+    parish_name: z.string().nullish(),
+    point_count: z.int(),
+    site_class: zSiteClass.nullish(),
+    site_id: z.string().nullish(),
+    textile_candidate: z.boolean().nullish()
+});
+
+/**
+ * SiteFeature
+ */
+export const zSiteFeature = z.object({
+    geometry: zPointGeometry,
+    id: z.string().nullish(),
+    properties: zSiteFeatureProps,
+    type: z.literal('Feature').optional().default('Feature')
+});
+
+/**
+ * SiteFeatureCollection
+ */
+export const zSiteFeatureCollection = z.object({
+    clustered: z.boolean(),
+    features: z.array(zSiteFeature),
+    total_sites: z.int(),
+    type: z.literal('FeatureCollection').optional().default('FeatureCollection'),
+    zoom: z.int().nullable()
 });
 
 /**
@@ -4317,6 +5094,193 @@ export const zReserveLotPath = z.object({
  * Successful Response
  */
 export const zReserveLotResponse = zLotDetail;
+
+export const zListMunicipalContainersQuery = z.object({
+    limit: z.int().gte(1).lte(500).optional().default(100),
+    cursor: z.string().max(200).nullish(),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    located: z.boolean().nullish(),
+    parish_match: z.array(zParishMatch).nullish(),
+    brand: z.string().max(24).nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zListMunicipalContainersResponse = zMunicipalContainerPage;
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalDensityBenchmarkResponse = zMunicipalDensityBenchmarkOut;
+
+export const zExportMunicipalSitesQuery = z.object({
+    format: zExportFormat.optional().default('csv'),
+    scope: zExportScope.optional().default('sites'),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+export const zGetMunicipalGapRankingQuery = z.object({
+    limit: z.int().gte(1).lte(48).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalGapRankingResponse = zMunicipalGapRankingOut;
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalOverviewResponse = zMunicipalOverview;
+
+export const zListMunicipalParishesQuery = z.object({
+    sort: zMunicipalParishSort.optional().default('name'),
+    order: zMunicipalSortOrder.optional().default('asc'),
+    q: z.string().max(80).nullish(),
+    min_population: z.int().gte(0).nullish(),
+    max_containers_per_1000_hab: z.number().gte(0).nullish(),
+    max_cover_pct_300m: z.number().gte(0).lte(100).nullish(),
+    has_candidates: z.boolean().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListMunicipalParishesResponse = zMunicipalParishList;
+
+/**
+ * Successful Response
+ */
+export const zGetCaopParishesGeojsonResponse = zCaopFeatureCollection;
+
+export const zGetMunicipalParishPath = z.object({
+    dicofre: z.string().max(8)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalParishResponse = zMunicipalParishOut;
+
+export const zListMunicipalProducersQuery = z.object({
+    limit: z.int().gte(1).lte(500).optional().default(100),
+    cursor: z.string().max(200).nullish(),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zListMunicipalProducersResponse = zMunicipalProducersOut;
+
+export const zListMunicipalSitesQuery = z.object({
+    limit: z.int().gte(1).lte(500).optional().default(100),
+    cursor: z.string().max(200).nullish(),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zListMunicipalSitesResponse = zMunicipalSitePage;
+
+export const zGetMunicipalSitesGeojsonQuery = z.object({
+    zoom: z.int().gte(0).lte(22).nullish(),
+    cluster: z.boolean().optional().default(true),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalSitesGeojsonResponse = zSiteFeatureCollection;
+
+export const zGetMunicipalSitePath = z.object({
+    site_id: z.string().max(12)
+});
+
+export const zGetMunicipalSiteQuery = z.object({
+    radius_m: z.int().gte(10).lte(1000).optional().default(200),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetMunicipalSiteResponse = zMunicipalSiteDetail;
+
+export const zGetTextileCandidateSitesQuery = z.object({
+    precise_only: z.boolean().optional().default(false),
+    limit: z.int().gte(1).lte(500).optional().default(100),
+    cursor: z.string().max(200).nullish(),
+    kind: z.array(zMunicipalKind).nullish(),
+    stream: z.array(zMunicipalStream).nullish(),
+    parish: z.array(z.string()).nullish(),
+    producer_type: z.array(zProducerType).nullish(),
+    site_class: z.array(zSiteClass).nullish(),
+    textile_candidate: z.boolean().nullish(),
+    coord_suspect: z.boolean().nullish(),
+    coord_precision: zCoordPrecision.nullish(),
+    q: z.string().max(80).nullish(),
+    bbox: z.string().nullish(),
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetTextileCandidateSitesResponse = zMunicipalCandidatesOut;
 
 /**
  * Successful Response

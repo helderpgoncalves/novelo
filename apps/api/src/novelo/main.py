@@ -21,6 +21,7 @@ from novelo.features.dev.router import router as dev_router
 from novelo.features.health.router import router as health_router
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
+from novelo.features.municipal.router import router as municipal_router
 from novelo.features.network.router import router as network_router
 from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
@@ -74,6 +75,7 @@ def create_app() -> FastAPI:
     for router, name in (
         (textile_router, "textile"),
         (network_router, "network"),
+        (municipal_router, "municipal"),
         (datasets_router, "datasets"),
         (planning_router, "planning"),
         (reports_router, "reports"),

@@ -25,6 +25,8 @@ from novelo.features.copilot.tables import fold
 from novelo.features.datasets.models import DataAlert, DataSource
 from novelo.features.lots import service as lots
 from novelo.features.lots.models import Lot
+from novelo.features.municipal import service as municipal
+from novelo.features.municipal.filters import SiteFilters
 from novelo.features.network import service as network
 from novelo.features.network.models import Circuit, Locality, Parish, Vehicle
 from novelo.features.planning import service as planning
@@ -92,7 +94,7 @@ def _num(value: float | None, digits: int, pt: bool) -> str:
     return text.replace(",", " ").replace(".", ",") if pt else text
 
 
-async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: str) -> list[_Candidate]:
+async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: str, q: str = "") -> list[_Candidate]:
     pt = locale != "en"
     out: list[_Candidate] = []
 
@@ -148,6 +150,23 @@ async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: s
                 "/market",
                 f.value,
             )
+    elif kind == MentionType.MUNICIPAL_SITE:
+        # 2 026 locais: pesquisa-se na base de dados (id, ruas, freguesia; nunca nomes de produtores)
+        page = await municipal.list_sites(db, SiteFilters(q=q or None), limit=CANDIDATES, cursor=None, names=False)
+        for site in page.items:
+            street = site.streets[0] if site.streets else ("produtor" if pt else "producer")
+            where = site.parish_name or ""
+            n = f"{site.containers} {'contentores' if pt else 'containers'}"
+            add(
+                site.site_id,
+                f"{street} ({site.site_id})",
+                f"{where} · {n}",
+                "map-pin",
+                None,
+                site.site_id,
+                *site.streets,
+                where,
+            )
     elif kind == MentionType.PAGE:
         for pg in pages.PAGES:
             if (pg.admin_only and user.role != "admin") or "$" in pg.route:
@@ -168,7 +187,7 @@ async def search(
     total = 0
     for kind in wanted:
         scored: list[tuple[float, int, MentionItem]] = []
-        for pos, cand in enumerate(await _candidates(db, user, kind, locale)):
+        for pos, cand in enumerate(await _candidates(db, user, kind, locale, q)):
             s = max((score(q, h) for h in cand.haystack), default=0.0) if q.strip() else 1.0
             if s > 0:
                 scored.append((s, -pos, cand.item))  # empate: ordem original (recentes primeiro nas listas por data)
@@ -203,8 +222,17 @@ async def resolve(db: AsyncSession, user: User, ref: MentionRef, locale: str = "
         p = (await db.execute(select(Parish).where(Parish.dicofre == ref.id))).scalar_one_or_none()
         if p is None:
             raise _missing(ref)
-        return ResolvedMention(ref, p.name, {"code": p.dicofre, "population": p.population, "population_year": p.population_year,
-                                             "tipau": p.tipau.value if p.tipau else None, "area_km2": float(p.area_km2) if p.area_km2 else None})  # fmt: skip
+        pfacts: dict[str, Any] = {"code": p.dicofre, "population": p.population, "population_year": p.population_year,
+                                 "tipau": p.tipau.value if p.tipau else None, "area_km2": float(p.area_km2) if p.area_km2 else None}  # fmt: skip
+        try:  # rede municipal (outras frações): só se já foi importada
+            m = await municipal.get_parish(db, p.dicofre)
+        except NotFoundError:
+            m = None
+        if m is not None:
+            pfacts["municipal_network"] = {"containers": m.containers, "containers_per_1000_hab": m.containers_per_1000_hab,
+                                          "public_sites": m.public_sites, "candidate_sites": m.candidate_sites,
+                                          "textile_gap_t_estimate": m.textile_gap_t, "gap_rank_estimate": m.gap_rank}  # fmt: skip
+        return ResolvedMention(ref, p.name, pfacts)
     if kind == MentionType.CIRCUIT:
         c = next((x for x in (await network.list_circuits(db)).circuits if x.code == ref.id), None)
         if c is None:
@@ -237,6 +265,17 @@ async def resolve(db: AsyncSession, user: User, ref: MentionRef, locale: str = "
 
 async def _resolve_other(db: AsyncSession, user: User, ref: MentionRef, locale: str) -> ResolvedMention:
     kind = ref.type
+    if kind == MentionType.MUNICIPAL_SITE:
+        try:
+            d = await municipal.get_site(db, ref.id, radius_m=municipal.DEFAULT_NEIGHBOUR_RADIUS_M, names=False)
+        except NotFoundError as exc:
+            raise _missing(ref) from exc
+        s = d.site
+        label = s.streets[0] if s.streets else s.site_id
+        return ResolvedMention(ref, label, {"network": "municipal (not textile)", "site_id": s.site_id, "parish": s.parish_name, "site_class": s.site_class.value,
+                                            "containers": s.containers, "kinds": [k.value for k in s.kinds], "textile_candidate": s.textile_candidate,
+                                            "candidate_reason": s.candidate_reason, "coord_precision": s.coord_precision.value, "nn_distance_m": s.nn_distance_m,
+                                            "neighbours_within_200m": len(d.neighbours)})  # fmt: skip
     if kind in {MentionType.ALERT, MentionType.REPORT}:
         try:
             key = uuid.UUID(ref.id)

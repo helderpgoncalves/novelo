@@ -33,6 +33,8 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
     },
     {
       id: 'load',
+      aggregate: 'sum',
+      format: (n) => formatTonnes(n, 2),
       header: m.route_load(),
       align: 'right',
       value: (r) => r.load_t,
@@ -41,6 +43,8 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
     },
     {
       id: 'km',
+      aggregate: 'sum',
+      format: (n) => `${formatNumber(n, 1)} km`,
       header: m.route_km_round(),
       align: 'right',
       value: (r) => r.km,
@@ -51,9 +55,10 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
   return (
     <DataTable
       id="routes"
+      exportName="cenario-rotas"
       columns={columns}
       rows={routes}
-      getKey={(r) => `${r.mode}-${r.vehicle}`}
+      getRowId={(r) => `${r.mode}-${r.vehicle}`}
       caption={m.route_vehicle()}
       empty={
         <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">

@@ -28,8 +28,12 @@ test.describe('dados reais da Vitrus', () => {
     await expect(table.getByRole('row', { name: /C18/ })).toBeVisible();
     await page.getByRole('button', { name: 'Limpar tudo' }).click();
 
-    await page.getByRole('button', { name: /^Tipologia/ }).click();
-    await page.getByRole('menuitemcheckbox', { name: /Orgânicos/ }).click();
+    await page.getByRole('button', { name: /^Filtros/ }).click();
+    await page.getByRole('button', { name: 'Tipologia', exact: true }).click();
+    await page
+      .getByRole('dialog')
+      .getByRole('checkbox', { name: /Orgânicos/ })
+      .click();
     await page.keyboard.press('Escape');
     await expect(page.getByText('1–7 de 7 · filtrado de 40')).toBeVisible();
 
@@ -40,7 +44,7 @@ test.describe('dados reais da Vitrus', () => {
     );
 
     await page.getByRole('button', { name: 'Colunas' }).click();
-    await page.getByRole('menuitemcheckbox', { name: 'Viaturas' }).click();
+    await page.getByRole('checkbox', { name: 'Viaturas' }).click();
     await page.keyboard.press('Escape');
     await expect(table.getByRole('columnheader', { name: /Viaturas/ })).toHaveCount(0);
   });
@@ -56,8 +60,9 @@ test.describe('dados reais da Vitrus', () => {
 
   test('localidades: filtro por frequência', async ({ page }) => {
     await page.goto('/pt/localities');
+    await page.getByRole('button', { name: /^Filtros/ }).click();
     await page.getByRole('button', { name: /^Dias\/semana/ }).click();
-    await page.getByRole('menuitemcheckbox').first().click();
+    await page.getByRole('dialog').getByRole('checkbox').first().click();
     await page.keyboard.press('Escape');
     await expect(page.getByText(/filtrado de \d+/)).toBeVisible();
     await page.getByRole('button', { name: 'Limpar tudo' }).click();

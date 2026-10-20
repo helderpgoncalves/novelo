@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as AppIndexRouteImport } from './routes/_app/index'
+import { Route as AppSplatRouteImport } from './routes/_app/$'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
 import { Route as AppBrandsRouteImport } from './routes/_app/brands'
@@ -58,6 +59,11 @@ const VerifyEmailRoute = VerifyEmailRouteImport.update({
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSplatRoute = AppSplatRouteImport.update({
+  id: '/$',
+  path: '/$',
   getParentRoute: () => AppRoute,
 } as any)
 const AppAccountRoute = AppAccountRouteImport.update({
@@ -204,6 +210,7 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
@@ -236,6 +243,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
   '/verify-email': typeof VerifyEmailRoute
+  '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
@@ -270,6 +278,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/verify-email': typeof VerifyEmailRoute
+  '/_app/$': typeof AppSplatRoute
   '/_app/account': typeof AppAccountRoute
   '/_app/assumptions': typeof AppAssumptionsRoute
   '/_app/brands': typeof AppBrandsRoute
@@ -305,6 +314,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/verify-email'
+    | '/$'
     | '/account'
     | '/assumptions'
     | '/brands'
@@ -337,6 +347,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/verify-email'
+    | '/$'
     | '/account'
     | '/assumptions'
     | '/brands'
@@ -370,6 +381,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/verify-email'
+    | '/_app/$'
     | '/_app/account'
     | '/_app/assumptions'
     | '/_app/brands'
@@ -436,6 +448,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/$': {
+      id: '/_app/$'
+      path: '/$'
+      fullPath: '/$'
+      preLoaderRoute: typeof AppSplatRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/account': {
@@ -638,6 +657,7 @@ declare module '@tanstack/react-router' {
 }
 
 interface AppRouteChildren {
+  AppSplatRoute: typeof AppSplatRoute
   AppAccountRoute: typeof AppAccountRoute
   AppAssumptionsRoute: typeof AppAssumptionsRoute
   AppBrandsRoute: typeof AppBrandsRoute
@@ -665,6 +685,7 @@ interface AppRouteChildren {
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppSplatRoute: AppSplatRoute,
   AppAccountRoute: AppAccountRoute,
   AppAssumptionsRoute: AppAssumptionsRoute,
   AppBrandsRoute: AppBrandsRoute,

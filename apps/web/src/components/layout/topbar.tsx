@@ -40,7 +40,7 @@ export function Topbar({
           </Button>
         )}
         <Link to="/" aria-label={m.nav_home_aria()} className="flex items-center rounded-md">
-          <BrandLogo className="[&>span]:text-2xl [&_svg]:size-7" />
+          <BrandLogo className="h-6" />
         </Link>
       </div>
       <div className="hidden lg:block" />

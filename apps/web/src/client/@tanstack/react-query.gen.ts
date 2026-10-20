@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteScenario, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getAuthConfig, getBrandEvidence, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getOverview, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTriageEval, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listLocalities, listLots, listPendingMemory, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, proposeCopilotAction, ready, recommendPilot, refresh, refreshCopilotArtifact, register, rejectCopilotAction, rejectPendingMemory, renameScenario, resendVerification, reserveLot, resetPassword, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, shareCopilotThread, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail } from '../sdk.gen';
-import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, ReadyData, ReadyError, ReadyResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
+import { addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteScenario, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, exportMunicipalSites, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getAuthConfig, getBrandEvidence, getCaopParishesGeojson, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getMunicipalDensityBenchmark, getMunicipalGapRanking, getMunicipalOverview, getMunicipalParish, getMunicipalSite, getMunicipalSitesGeojson, getObservedFlows, getOverview, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTextileCandidateSites, getTriageEval, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listLocalities, listLots, listMunicipalContainers, listMunicipalParishes, listMunicipalProducers, listMunicipalSites, listPendingMemory, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, proposeCopilotAction, ready, recommendPilot, refresh, refreshCopilotArtifact, register, rejectCopilotAction, rejectPendingMemory, renameScenario, resendVerification, reserveLot, resetPassword, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, shareCopilotThread, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail } from '../sdk.gen';
+import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ExportMunicipalSitesData, ExportMunicipalSitesError, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCaopParishesGeojsonData, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, GetMunicipalGapRankingData, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, GetMunicipalOverviewData, GetMunicipalOverviewError, GetMunicipalOverviewResponse, GetMunicipalParishData, GetMunicipalParishError, GetMunicipalParishResponse, GetMunicipalSiteData, GetMunicipalSiteError, GetMunicipalSiteResponse, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTextileCandidateSitesData, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListMunicipalContainersData, ListMunicipalContainersError, ListMunicipalContainersResponse, ListMunicipalParishesData, ListMunicipalParishesError, ListMunicipalParishesResponse, ListMunicipalProducersData, ListMunicipalProducersError, ListMunicipalProducersResponse, ListMunicipalSitesData, ListMunicipalSitesError, ListMunicipalSitesResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, ReadyData, ReadyError, ReadyResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -1622,6 +1622,394 @@ export const reserveLotMutation = (options?: Partial<Options<ReserveLotData>>): 
         }
     };
     return mutationOptions;
+};
+
+export const listMunicipalContainersQueryKey = (options?: Options<ListMunicipalContainersData>) => createQueryKey('listMunicipalContainers', options);
+
+/**
+ * List Municipal Containers
+ *
+ * Tabela completa dos contentores (com os pendentes sem coordenadas), por cursor e ordenada por `container_uid`.
+ */
+export const listMunicipalContainersOptions = (options?: Options<ListMunicipalContainersData>) => queryOptions<ListMunicipalContainersResponse, ListMunicipalContainersError, ListMunicipalContainersResponse, ReturnType<typeof listMunicipalContainersQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listMunicipalContainers({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listMunicipalContainersQueryKey(options)
+});
+
+export const listMunicipalContainersInfiniteQueryKey = (options?: Options<ListMunicipalContainersData>): QueryKey<Options<ListMunicipalContainersData>> => createQueryKey('listMunicipalContainers', options, true);
+
+/**
+ * List Municipal Containers
+ *
+ * Tabela completa dos contentores (com os pendentes sem coordenadas), por cursor e ordenada por `container_uid`.
+ */
+export const listMunicipalContainersInfiniteOptions = (options?: Options<ListMunicipalContainersData>) => {
+    const opts = infiniteQueryOptions<ListMunicipalContainersResponse, ListMunicipalContainersError, InfiniteData<ListMunicipalContainersResponse>, QueryKey<Options<ListMunicipalContainersData>>, string | null | Pick<QueryKey<Options<ListMunicipalContainersData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListMunicipalContainersData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listMunicipalContainers({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listMunicipalContainersInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getMunicipalDensityBenchmarkQueryKey = (options?: Options<GetMunicipalDensityBenchmarkData>) => createQueryKey('getMunicipalDensityBenchmark', options);
+
+/**
+ * Get Municipal Density Benchmark
+ *
+ * Densidade do concelho e distribuição entre freguesias; compara com a referência francesa (por verificar).
+ */
+export const getMunicipalDensityBenchmarkOptions = (options?: Options<GetMunicipalDensityBenchmarkData>) => queryOptions<GetMunicipalDensityBenchmarkResponse, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, ReturnType<typeof getMunicipalDensityBenchmarkQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalDensityBenchmark({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalDensityBenchmarkQueryKey(options)
+});
+
+export const exportMunicipalSitesQueryKey = (options?: Options<ExportMunicipalSitesData>) => createQueryKey('exportMunicipalSites', options);
+
+/**
+ * Export Municipal Sites
+ *
+ * Exporta locais ou contentores filtrados em CSV, XLSX ou GeoJSON. Sem nomes de produtores, salvo admin.
+ */
+export const exportMunicipalSitesOptions = (options?: Options<ExportMunicipalSitesData>) => queryOptions<unknown, ExportMunicipalSitesError, unknown, ReturnType<typeof exportMunicipalSitesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportMunicipalSites({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportMunicipalSitesQueryKey(options)
+});
+
+export const getMunicipalGapRankingQueryKey = (options?: Options<GetMunicipalGapRankingData>) => createQueryKey('getMunicipalGapRanking', options);
+
+/**
+ * Get Municipal Gap Ranking
+ *
+ * Lacuna de têxtil por freguesia (ESTIMATIVA, captura média igual em todas), com a regra explícita.
+ */
+export const getMunicipalGapRankingOptions = (options?: Options<GetMunicipalGapRankingData>) => queryOptions<GetMunicipalGapRankingResponse, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, ReturnType<typeof getMunicipalGapRankingQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalGapRanking({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalGapRankingQueryKey(options)
+});
+
+export const getMunicipalOverviewQueryKey = (options?: Options<GetMunicipalOverviewData>) => createQueryKey('getMunicipalOverview', options);
+
+/**
+ * Get Municipal Overview
+ *
+ * KPIs da rede municipal: contentores, locais, densidade, cobertura e qualidade (estimativas etiquetadas).
+ */
+export const getMunicipalOverviewOptions = (options?: Options<GetMunicipalOverviewData>) => queryOptions<GetMunicipalOverviewResponse, GetMunicipalOverviewError, GetMunicipalOverviewResponse, ReturnType<typeof getMunicipalOverviewQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalOverview({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalOverviewQueryKey(options)
+});
+
+export const listMunicipalParishesQueryKey = (options?: Options<ListMunicipalParishesData>) => createQueryKey('listMunicipalParishes', options);
+
+/**
+ * List Municipal Parishes
+ *
+ * As 48 freguesias com população, contentores por 1 000 hab., por km², vizinho mais próximo e produtores.
+ */
+export const listMunicipalParishesOptions = (options?: Options<ListMunicipalParishesData>) => queryOptions<ListMunicipalParishesResponse, ListMunicipalParishesError, ListMunicipalParishesResponse, ReturnType<typeof listMunicipalParishesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listMunicipalParishes({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listMunicipalParishesQueryKey(options)
+});
+
+export const getCaopParishesGeojsonQueryKey = (options?: Options<GetCaopParishesGeojsonData>) => createQueryKey('getCaopParishesGeojson', options);
+
+/**
+ * Get Caop Parishes Geojson
+ *
+ * Contornos CAOP 2019 das 48 freguesias (substitui o OSM, que falha 3 uniões) com métricas para coroplético.
+ */
+export const getCaopParishesGeojsonOptions = (options?: Options<GetCaopParishesGeojsonData>) => queryOptions<GetCaopParishesGeojsonResponse, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, ReturnType<typeof getCaopParishesGeojsonQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCaopParishesGeojson({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCaopParishesGeojsonQueryKey(options)
+});
+
+export const getMunicipalParishQueryKey = (options: Options<GetMunicipalParishData>) => createQueryKey('getMunicipalParish', options);
+
+/**
+ * Get Municipal Parish
+ *
+ * Uma freguesia pelo código da app/INE (ou CAOP).
+ */
+export const getMunicipalParishOptions = (options: Options<GetMunicipalParishData>) => queryOptions<GetMunicipalParishResponse, GetMunicipalParishError, GetMunicipalParishResponse, ReturnType<typeof getMunicipalParishQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalParish({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalParishQueryKey(options)
+});
+
+export const listMunicipalProducersQueryKey = (options?: Options<ListMunicipalProducersData>) => createQueryKey('listMunicipalProducers', options);
+
+/**
+ * List Municipal Producers
+ *
+ * Produtores (hotelaria, lares, escolas, restauração, grandes) por tipo e local. Sem nomes por omissão.
+ */
+export const listMunicipalProducersOptions = (options?: Options<ListMunicipalProducersData>) => queryOptions<ListMunicipalProducersResponse, ListMunicipalProducersError, ListMunicipalProducersResponse, ReturnType<typeof listMunicipalProducersQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listMunicipalProducers({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listMunicipalProducersQueryKey(options)
+});
+
+export const listMunicipalProducersInfiniteQueryKey = (options?: Options<ListMunicipalProducersData>): QueryKey<Options<ListMunicipalProducersData>> => createQueryKey('listMunicipalProducers', options, true);
+
+/**
+ * List Municipal Producers
+ *
+ * Produtores (hotelaria, lares, escolas, restauração, grandes) por tipo e local. Sem nomes por omissão.
+ */
+export const listMunicipalProducersInfiniteOptions = (options?: Options<ListMunicipalProducersData>) => {
+    const opts = infiniteQueryOptions<ListMunicipalProducersResponse, ListMunicipalProducersError, InfiniteData<ListMunicipalProducersResponse>, QueryKey<Options<ListMunicipalProducersData>>, string | null | Pick<QueryKey<Options<ListMunicipalProducersData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListMunicipalProducersData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listMunicipalProducers({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listMunicipalProducersInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const listMunicipalSitesQueryKey = (options?: Options<ListMunicipalSitesData>) => createQueryKey('listMunicipalSites', options);
+
+/**
+ * List Municipal Sites
+ *
+ * Locais (contentores no mesmo ponto) com filtros e paginação por cursor, ordenados por `site_id`.
+ */
+export const listMunicipalSitesOptions = (options?: Options<ListMunicipalSitesData>) => queryOptions<ListMunicipalSitesResponse, ListMunicipalSitesError, ListMunicipalSitesResponse, ReturnType<typeof listMunicipalSitesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listMunicipalSites({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listMunicipalSitesQueryKey(options)
+});
+
+export const listMunicipalSitesInfiniteQueryKey = (options?: Options<ListMunicipalSitesData>): QueryKey<Options<ListMunicipalSitesData>> => createQueryKey('listMunicipalSites', options, true);
+
+/**
+ * List Municipal Sites
+ *
+ * Locais (contentores no mesmo ponto) com filtros e paginação por cursor, ordenados por `site_id`.
+ */
+export const listMunicipalSitesInfiniteOptions = (options?: Options<ListMunicipalSitesData>) => {
+    const opts = infiniteQueryOptions<ListMunicipalSitesResponse, ListMunicipalSitesError, InfiniteData<ListMunicipalSitesResponse>, QueryKey<Options<ListMunicipalSitesData>>, string | null | Pick<QueryKey<Options<ListMunicipalSitesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListMunicipalSitesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listMunicipalSites({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listMunicipalSitesInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getMunicipalSitesGeojsonQueryKey = (options?: Options<GetMunicipalSitesGeojsonData>) => createQueryKey('getMunicipalSitesGeojson', options);
+
+/**
+ * Get Municipal Sites Geojson
+ *
+ * GeoJSON leve dos locais por bbox/zoom, com agrupamento opcional no servidor. Comprimido (gzip).
+ */
+export const getMunicipalSitesGeojsonOptions = (options?: Options<GetMunicipalSitesGeojsonData>) => queryOptions<GetMunicipalSitesGeojsonResponse, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, ReturnType<typeof getMunicipalSitesGeojsonQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalSitesGeojson({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalSitesGeojsonQueryKey(options)
+});
+
+export const getMunicipalSiteQueryKey = (options: Options<GetMunicipalSiteData>) => createQueryKey('getMunicipalSite', options);
+
+/**
+ * Get Municipal Site
+ *
+ * Um local com os seus contentores, as relações com orgânicos coletivos e os locais vizinhos.
+ */
+export const getMunicipalSiteOptions = (options: Options<GetMunicipalSiteData>) => queryOptions<GetMunicipalSiteResponse, GetMunicipalSiteError, GetMunicipalSiteResponse, ReturnType<typeof getMunicipalSiteQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getMunicipalSite({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getMunicipalSiteQueryKey(options)
+});
+
+export const getTextileCandidateSitesQueryKey = (options?: Options<GetTextileCandidateSitesData>) => createQueryKey('getTextileCandidateSites', options);
+
+/**
+ * Get Textile Candidate Sites
+ *
+ * Locais candidatos a têxteis do ETL, com justificação e ordem explícita. Lugares possíveis, não recomendados.
+ */
+export const getTextileCandidateSitesOptions = (options?: Options<GetTextileCandidateSitesData>) => queryOptions<GetTextileCandidateSitesResponse, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, ReturnType<typeof getTextileCandidateSitesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getTextileCandidateSites({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getTextileCandidateSitesQueryKey(options)
+});
+
+export const getTextileCandidateSitesInfiniteQueryKey = (options?: Options<GetTextileCandidateSitesData>): QueryKey<Options<GetTextileCandidateSitesData>> => createQueryKey('getTextileCandidateSites', options, true);
+
+/**
+ * Get Textile Candidate Sites
+ *
+ * Locais candidatos a têxteis do ETL, com justificação e ordem explícita. Lugares possíveis, não recomendados.
+ */
+export const getTextileCandidateSitesInfiniteOptions = (options?: Options<GetTextileCandidateSitesData>) => {
+    const opts = infiniteQueryOptions<GetTextileCandidateSitesResponse, GetTextileCandidateSitesError, InfiniteData<GetTextileCandidateSitesResponse>, QueryKey<Options<GetTextileCandidateSitesData>>, string | null | Pick<QueryKey<Options<GetTextileCandidateSitesData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<GetTextileCandidateSitesData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await getTextileCandidateSites({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: getTextileCandidateSitesInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
 };
 
 export const listCircuitsQueryKey = (options?: Options<ListCircuitsData>) => createQueryKey('listCircuits', options);

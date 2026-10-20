@@ -193,7 +193,7 @@ Cada ferramenta emite um `status` com `phase: tool` e o `label_key` do seu ramo 
 | Definições e memória | `get_copilot_settings`, `update_copilot_settings`, `preview_copilot_persona`, `list_copilot_memory_entries`, `create_copilot_memory_entry`, `update_copilot_memory_entry`, `delete_copilot_memory_entry`, `clear_copilot_memory`, `list_pending_memory`, `approve_pending_memory`, `reject_pending_memory`, `search_copilot_sessions` | `/copilot/settings`, `/copilot/persona/preview`, `/copilot/memory/...`, `/copilot/sessions/search` |
 | RGPD | `export_copilot_data`, `delete_copilot_data` | `GET /copilot/data/export`, `DELETE /copilot/data?confirmation=APAGAR` |
 
-## Ferramentas (42)
+## Ferramentas (46)
 
 Todas com esquema estrito (campos extra recusados), tempo limite (45 s; 90 s o relatório) e um resumo curto para o ecrã; o resultado completo vai só para o modelo. Os resultados de dados trazem um `result_id` e uma `table`, a base dos artefactos.
 
@@ -201,6 +201,7 @@ Todas com esquema estrito (campos extra recusados), tempo limite (45 s; 90 s o r
 | --- | --- | --- |
 | Dados do concelho | `get_baseline`, `get_flows`, `list_parishes`, `get_circuits`, `get_fleet`, `get_localities`, `get_quality_alerts` | Todos |
 | Cenários e análise | `list_scenarios`, `get_scenario_detail`, `compare_scenarios`, `get_pareto_frontier`, `get_sensitivity`, `get_robustness`, `get_pilot_recommendation`, `get_container_coverage`, `list_benchmarks`, `explain_assumption`, `search_data` | Todos |
+| Rede municipal (outras frações, não é têxtil) | `get_municipal_overview`, `get_parish_municipal` (sem freguesia devolve o ranking da lacuna estimada), `find_municipal_sites`, `get_textile_candidates` | Todos; **sem nomes de produtores, nem para administradores** |
 | Lotes e bolsa | `get_lots`, `get_fibre_market`, `get_brands`, `get_lot_history` | Todos |
 | IA e custos | `get_ai_usage` | Administradores |
 | Criação direta | `run_scenario`, `what_if`, `run_benchmark_scenario` (máx. 2 por pedido, nome com prefixo "Copilot · "), `generate_rap_report` (máx. 1) | Todos; com "pedir confirmação" ligado passam por `propose_action` |
@@ -320,7 +321,8 @@ Recusados: executáveis (MZ, ELF, Mach-O, `#!`), HTML/SVG/scripts, ZIP que não 
 
 ## Menções, comandos e contexto do ecrã
 
-- `GET /copilot/mentions?q=&types=&limit=`: entidades pesquisáveis (cenários, freguesias, circuitos, localidades, viaturas, lotes, alertas, relatórios, marcas, fibras, páginas, fontes de dados), agrupadas por tipo; prefixo, depois palavra, depois contém, depois aproximado, tudo sem acentos; sem `q`, os mais recentes. Páginas de administrador só aparecem a administradores.
+- `GET /copilot/mentions?q=&types=&limit=`: entidades pesquisáveis (cenários, freguesias, circuitos, localidades, viaturas, lotes, alertas, relatórios, marcas, fibras, páginas, fontes de dados e locais da rede municipal `municipal_site`), agrupadas por tipo; prefixo, depois palavra, depois contém, depois aproximado, tudo sem acentos; sem `q`, os mais recentes. Páginas de administrador só aparecem a administradores.
+- `@freguesia` (`parish`) traz também os números municipais (`municipal_network`: contentores, por 1 000 hab., locais públicos, candidatos, lacuna estimada e ordem) quando o pacote está importado. `@local` (`municipal_site`) pesquisa na base de dados por id, rua ou freguesia (sem acentos; nunca por nomes de produtores) e resolve para os factos do local, sem nomes.
 - `/copilot/stream` aceita `mentions: [{type, id}]` e `page_context`. **O servidor resolve cada menção** para um bloco curto com dados reais (nunca usa o texto do cliente). Menção inexistente: 404 `not_found`; sem permissão: 403 `forbidden`.
 - O ecrã vira uma linha do tipo `screen: Cenário — «Base» (scenario_id=...) with 122,7 €/t, 361,1 t/ano, 44 288 €/ano`, construída no servidor a partir de ids validados. Só rotas conhecidas; filtros só de uma lista e com valores seguros; nomes de utilizador numa só linha.
 - `GET /copilot/commands`: `/compact` (servidor), `/novo`, `/limpar`, `/exportar` (cliente) e `/modelo` (só administradores).
@@ -355,7 +357,7 @@ Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos 
 
 ## Avaliação
 
-`just eval-copilot` corre os casos de `apps/api/tests/evals/copilot_cases.yaml` (67, em pt-PT e en) contra o modelo real e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
+`just eval-copilot` corre os casos de `apps/api/tests/evals/copilot_cases.yaml` (78, em pt-PT e en; 11 são da rede municipal e ainda não correram contra o modelo real) contra o modelo real e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
 
 | Medida | Limiar |
 | --- | --- |
@@ -371,11 +373,15 @@ Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos 
 | P95 da latência total | ≤ 75 s |
 | Custo médio por caso | ≤ US$ 0,03 |
 
-Última corrida (modelo `openai/gpt-6-luna`): 67 de 67 casos aprovados, todas as medidas a 100%, latência total P95 de 22 s, tempo até ao primeiro texto médio de 5 s, custo médio de US$ 0,0003 por caso (US$ 0,02 no total). O detalhe por caso está em [avaliacao-copiloto.md](avaliacao-copiloto.md). Um caso isolado pode variar de corrida para corrida (o modelo não é determinístico); por isso só os limiares reprovam a avaliação. O que a avaliação encontrou e corrigiu: o modo `strict` do OpenRouter rejeitava todos os esquemas JSON do projeto (faltava `additionalProperties: false`, todos os campos obrigatórios e `$ref` sem irmãos), o que também afetava a triagem, o "E se...?" e os alertas; o modelo dizia que guardara memória sem chamar a ferramenta; respondia com dados de Guimarães a perguntas sobre outra cidade; e rótulos como "P90" eram contados como números.
+Última corrida (modelo `openai/gpt-6-luna`, antes dos casos municipais): 67 de 67 casos aprovados, todas as medidas a 100%, latência total P95 de 22 s, tempo até ao primeiro texto médio de 5 s, custo médio de US$ 0,0003 por caso (US$ 0,02 no total). O detalhe por caso está em [avaliacao-copiloto.md](avaliacao-copiloto.md). Um caso isolado pode variar de corrida para corrida (o modelo não é determinístico); por isso só os limiares reprovam a avaliação. O que a avaliação encontrou e corrigiu: o modo `strict` do OpenRouter rejeitava todos os esquemas JSON do projeto (faltava `additionalProperties: false`, todos os campos obrigatórios e `$ref` sem irmãos), o que também afetava a triagem, o "E se...?" e os alertas; o modelo dizia que guardara memória sem chamar a ferramenta; respondia com dados de Guimarães a perguntas sobre outra cidade; e rótulos como "P90" eram contados como números.
 
 ## Testes
 
 Todos sem rede, com um modelo falso em streaming (`tests/conftest.py`): `tests/unit/test_stream_adapter.py` (deltas, fragmentos de tool calls, `usage`, comentários SSE, erro a meio, repetições, reserva, cancelamento e uso parcial), `test_charts.py`, `test_verify.py`; `tests/api/test_copilot_stream.py` (sequência de eventos, chamadas em paralelo, `retract`, aviso final, cancelamento, compactação, orçamento, limite de pedidos, esquema OpenAPI), `test_copilot_threads.py` (ownership, pesquisa, partilha, ramos, exportação, apagar), `test_copilot_attachments.py` (cada tipo, 18 ficheiros maliciosos, limites, privacidade, `analyze_attachment`), `test_copilot_mentions.py`, `test_copilot_memory.py` (add/patch/remove, limite e lote, varrimento, snapshot congelado, isolamento, desligada, aprovação, revisão, `session_search`, persona, RGPD, retenção), `test_copilot_actions.py` (propor/confirmar, concorrência, expiração, roles, crítico, auto-aprovação, desfazer, injeção, auditoria), `test_copilot_artifacts.py` (artefactos, galeria, histórico com cursor estável, filtros e isolamento).
+
+## Rede municipal no copiloto
+
+Quatro ferramentas leem os mesmos services da API (`features/municipal`), por isso o que o modelo cita é o que o web mostra. Regras: (1) cada resultado traz `is_textile_network: false` e uma nota: são contentores de **outras frações**; o prompt proíbe dizer que recolhem têxteis; (2) a lacuna por freguesia e a cobertura de área vêm como `*_estimate` e as tabelas com `estimate: true`, e a ordem dos candidatos traz a regra por extenso (`rank_rule`); (3) as ferramentas **nunca** devolvem nomes de produtores, não aceitam `show_names` (argumentos extra são recusados) e a pesquisa de texto não os cobre; (4) as percentagens e totais vêm calculados (`parish_equal_pct`, `per_inhabitants: 1000` para "por 1 000 habitantes"), por isso o verificador de números aceita-os sem reescrever. Testes em `tests/api/test_copilot_municipal.py` (modelo falso) e 11 casos `muni_*` em `copilot_cases.yaml`.
 
 ## Limitações conhecidas
 

@@ -118,7 +118,7 @@ export function CoverageTable({ rows, ready }: CoverageTableProps) {
       id={ready ? 'coverage-ready' : 'coverage-waiting'}
       columns={columns}
       rows={rows}
-      getKey={(r) => r.code}
+      getRowId={(r) => r.code}
       pageSize={10}
       initialSort={ready ? { id: 'covered', desc: false } : { id: 'population', desc: true }}
       searchLabel={m.cov_table_search()}

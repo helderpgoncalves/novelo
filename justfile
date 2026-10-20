@@ -4,6 +4,8 @@ set shell := ["bash", "-cu"]
 # WeasyPrint (PDF do relatório RAP) precisa das bibliotecas Pango; no macOS vêm do Homebrew (`brew install pango`).
 export DYLD_FALLBACK_LIBRARY_PATH := env_var_or_default("DYLD_FALLBACK_LIBRARY_PATH", "/opt/homebrew/lib")
 
+BRAND_RUN := "cd scripts/brand && uv run --no-project --with fonttools --with brotli --with uharfbuzz --with numpy --with pillow --with pytest python"
+
 default:
     @just --list
 
@@ -66,13 +68,25 @@ etl:
     uv run scripts/etl/municipal_containers.py
 
 # --- Qualidade: o mesmo que a CI corre ----------------------------------------
-check: check-api check-web check-contract
+check: check-api check-web check-brand check-contract
 
 check-api: db-wait
     cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest -q
 
 check-web:
     pnpm lint && pnpm typecheck && pnpm test
+
+# Marca: regenera TODOS os assets (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) de uma só fonte
+brand:
+    {{BRAND_RUN}} build_assets.py
+
+# Regenera as capturas do manifesto PWA (precisa da stack `just dev` a correr)
+brand-shots:
+    cd apps/web && BRAND_SHOTS=1 pnpm exec playwright test e2e/brand-assets.spec.ts
+
+# Alinhamento do logótipo medido em píxeis (tolerância 0,5 px a 512 px); precisa de rsvg-convert
+check-brand:
+    {{BRAND_RUN}} -m pytest -q test_brand.py
 
 # Falha se o contrato ou o cliente gerado estiverem desatualizados
 check-contract: gen

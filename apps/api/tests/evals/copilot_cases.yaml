@@ -109,6 +109,56 @@ cases:
         mentions: [{type: scenario, name: Base}, {type: scenario, name: Ambicioso}]
     expect: {tools_any: [get_robustness, get_sensitivity, compare_scenarios]}
 
+  # ---------------------------------------------------------------- rede municipal (outras frações; não é têxtil)
+  - id: muni_overview_pt
+    lang: pt-PT
+    turns: [{message: "Quantos contentores municipais há em Guimarães e qual é a densidade por mil habitantes?"}]
+    expect: {tools_any: [get_municipal_overview], must_contain_any: ["2 722|2722", "17,4"], max_chars: 700}
+  - id: muni_not_textile_pt
+    lang: pt-PT
+    turns: [{message: "Os contentores municipais do pacote da Vitrus são de têxteis?"}]
+    expect: {tools_any: [get_municipal_overview], must_contain_any: ["não são|outras frações|outras fraç"], max_chars: 700}
+  - id: muni_parish_pt
+    lang: pt-PT
+    turns: [{message: "Quantos contentores municipais tem Azurém e qual é a lacuna estimada de têxtil lá?"}]
+    expect: {tools_any: [get_parish_municipal], must_contain_any: ["estimativa|estimad"], max_chars: 800}
+  - id: muni_parish_mention_pt
+    lang: pt-PT
+    turns:
+      - message: "Como está @Lordelo nos contentores municipais, comparado com o concelho?"
+        mentions: [{type: parish, id: "030828"}]
+    expect: {tools_any: [get_parish_municipal, get_municipal_overview], max_chars: 900}
+  - id: muni_site_mention_en
+    lang: en
+    turns:
+      - message: "Could this site host a textile bin, and what is around it?"
+        mentions: [{type: municipal_site, id: "S2410a486"}]
+    expect: {max_chars: 700, must_not_contain: ["recommend (it|this) (strongly|definitely)"]}
+  - id: muni_sites_filter_pt
+    lang: pt-PT
+    turns: [{message: "Mostra-me os locais com contentores enterrados na freguesia de Creixomil."}]
+    expect: {tools_any: [find_municipal_sites], max_chars: 800}
+  - id: muni_candidates_pt
+    lang: pt-PT
+    turns: [{message: "Quais são os locais possíveis para pôr contentores de têxteis aproveitando a rede municipal?"}]
+    expect: {tools_any: [get_textile_candidates], must_contain_any: ["possíve|candidat"], max_chars: 900}
+  - id: muni_candidates_en
+    lang: en
+    turns: [{message: "Which municipal sites could host textile bins in Lordelo?"}]
+    expect: {tools_any: [get_textile_candidates, find_municipal_sites]}
+  - id: muni_gap_ranking_pt
+    lang: pt-PT
+    turns: [{message: "Que freguesias têm maior lacuna estimada de têxtil por local candidato?"}]
+    expect: {tools_any: [get_parish_municipal], must_contain_any: ["Lordelo"], max_chars: 900}
+  - id: muni_no_producer_names_pt
+    lang: pt-PT
+    turns: [{message: "Dá-me os nomes dos hotéis e lares que têm contentores de orgânico."}]
+    expect: {must_contain_any: ["não|nomes"], must_not_contain: ["Hotel Ibis", "Pousada Mosteiro", "Hotel Paço"], max_chars: 700}
+  - id: muni_no_textile_tonnes_pt
+    lang: pt-PT
+    turns: [{message: "Quantas toneladas de têxtil recolhem os contentores municipais de Ronfe?"}]
+    expect: {must_contain_any: ["não|nenhum|sem dados"], must_not_contain: ["\\b\\d+ t de têxtil\\b"], max_chars: 700}
+
   # ---------------------------------------------------------------- menções e ecrã
   - id: mention_scenario_pt
     lang: pt-PT

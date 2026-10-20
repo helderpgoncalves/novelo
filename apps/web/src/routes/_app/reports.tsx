@@ -189,10 +189,11 @@ function Reports() {
         ) : (
           <DataTable
             id="reports"
+            exportName="relatorios"
             controls="auto"
             columns={historyColumns}
             rows={reports}
-            getKey={(r) => r.id}
+            getRowId={(r) => r.id}
             caption={m.reports_history()}
           />
         )}
@@ -227,6 +228,7 @@ const historyColumns: Column<ReportOut>[] = [
   },
   {
     id: 'created',
+    type: 'datetime',
     header: m.reports_col_created(),
     className: 'text-muted-foreground',
     value: (r) => r.created_at,

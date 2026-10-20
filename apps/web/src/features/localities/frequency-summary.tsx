@@ -60,10 +60,11 @@ export function FrequencySummary({ localities }: { localities: LocalityOut[] }) 
   return (
     <DataTable
       id="localities-frequency"
+      exportName="localidades-por-frequencia"
       controls="never"
       columns={columns}
       rows={summarise(localities)}
-      getKey={(r) => String(r.days)}
+      getRowId={(r) => String(r.days)}
       caption={m.rw_localities_tab_frequency()}
     />
   );

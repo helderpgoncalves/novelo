@@ -75,10 +75,11 @@ export function TypologySummary({ circuits }: { circuits: CircuitOut[] }) {
   return (
     <DataTable
       id="circuits-typology"
+      exportName="circuitos-por-tipologia"
       controls="never"
       columns={columns}
       rows={summarise(circuits)}
-      getKey={(r) => r.typology}
+      getRowId={(r) => r.typology}
       caption={m.rw_circuits_tab_typology()}
     />
   );

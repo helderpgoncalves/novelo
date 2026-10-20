@@ -9,6 +9,14 @@ const shouldRetry = (count: number, error: unknown) => {
 
 export const queryClient = new QueryClient({
   defaultOptions: {
-    queries: { staleTime: 60_000, retry: shouldRetry, refetchOnWindowFocus: false },
+    // `networkMode: 'always'`: sem rede o React Query, por omissão, *pausa* o pedido e o ecrã fica em "a carregar"
+    // para sempre. Assim o pedido falha logo e aparece o ecrã de "sem ligação", que reintenta sozinho.
+    queries: {
+      staleTime: 60_000,
+      retry: shouldRetry,
+      refetchOnWindowFocus: false,
+      networkMode: 'always',
+    },
+    mutations: { networkMode: 'always' },
   },
 });

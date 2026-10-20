@@ -355,7 +355,7 @@ function FrontierTable({ points }: { points: FrontierPoint[] }) {
           id="home-frontier"
           columns={columns}
           rows={rows}
-          getKey={(p) => p.id}
+          getRowId={(p) => p.id}
           caption={m.home_col_scenario()}
           initialSort={{ id: 'eur_t', desc: false }}
         />

@@ -3,6 +3,7 @@ import { m } from '@/paraglide/messages';
 
 const MENTION_TYPES: Record<MentionType, () => string> = {
   scenario: () => m.chat_mention_scenario(),
+  municipal_site: () => m.chat_mention_municipal_site(),
   parish: () => m.chat_mention_parish(),
   circuit: () => m.chat_mention_circuit(),
   locality: () => m.chat_mention_locality(),

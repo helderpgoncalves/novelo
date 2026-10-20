@@ -62,10 +62,11 @@ export function TypologyTable({ typologies }: { typologies: TypologyFleet[] }) {
   return (
     <DataTable
       id="typologies"
+      exportName="frota-por-tipologia"
       controls="never"
       columns={columns}
       rows={typologies}
-      getKey={(t) => t.typology}
+      getRowId={(t) => t.typology}
       caption={m.fleet_summary_title()}
     />
   );

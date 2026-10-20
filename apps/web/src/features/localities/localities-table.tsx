@@ -51,9 +51,10 @@ export function LocalitiesTable({ localities }: { localities: LocalityOut[] }) {
   return (
     <DataTable
       id="localities"
+      exportName="localidades"
       columns={columns}
       rows={localities}
-      getKey={(l) => l.name}
+      getRowId={(l) => l.name}
       caption={m.localities_title()}
       searchLabel={m.localities_search()}
       pageSize={25}

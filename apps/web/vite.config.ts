@@ -19,7 +19,7 @@ export default defineConfig({
     VitePWA({
       // Prompt: a versão nova espera pelo toque em "Atualizar" (ver lib/pwa.ts) em vez de trocar a app a meio de uma tarefa.
       registerType: 'prompt',
-      includeAssets: ['favicon.svg', 'fonts/*.woff2', 'icons/apple-touch-icon.png'],
+      includeAssets: ['favicon.svg', 'favicon.ico', 'fonts/*.woff2', 'icons/apple-touch-icon.png'],
       manifest: {
         id: '/',
         name: 'Novelo',

@@ -13,9 +13,21 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from novelo.core.errors import ForbiddenError
 from novelo.domain.overview import pareto_ids
-from novelo.domain.vocab import Fibre, LotState, ScenarioObjective, Tipau, Typology
+from novelo.domain.vocab import (
+    Fibre,
+    LotState,
+    MunicipalKind,
+    MunicipalStream,
+    ProducerType,
+    ScenarioObjective,
+    Tipau,
+    Typology,
+)
 from novelo.features.datasets import service as datasets
 from novelo.features.lots import service as lots
+from novelo.features.municipal import analytics as municipal_analytics
+from novelo.features.municipal import service as municipal
+from novelo.features.municipal.filters import SiteFilters
 from novelo.features.network import service as network
 from novelo.features.planning import service as planning
 from novelo.features.planning.schemas import ScenarioRequest
@@ -89,6 +101,33 @@ class AiUsageArgs(_A):
 class RobustnessArgs(_A):
     recommended_id: uuid.UUID
     alternative_id: uuid.UUID
+
+
+class ParishMunicipalArgs(_A):
+    parish: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=80,
+        description="Parish name (any accents/case) or its code. Omit to get the ranking of parishes by estimated textile gap.",
+    )
+    limit: int = Field(default=10, ge=1, le=48, description="Rows of the ranking when no parish is given")
+
+
+class FindSitesArgs(_A):
+    kind: MunicipalKind | None = None
+    stream: MunicipalStream | None = None
+    parish: str | None = Field(default=None, max_length=80, description="Parish name or code")
+    producer_type: ProducerType | None = None
+    textile_candidate: bool | None = None
+    coord_suspect: bool | None = None
+    query: str | None = Field(default=None, max_length=60, description="Street, parish or site id, no accents needed")
+    limit: int = Field(default=15, ge=1, le=30)
+
+
+class CandidatesArgs(_A):
+    parish: str | None = Field(default=None, max_length=80, description="Parish name or code")
+    precise_only: bool = False
+    limit: int = Field(default=10, ge=1, le=30)
 
 
 # --- ferramentas -----------------------------------------------------------------------------------
@@ -414,6 +453,162 @@ async def get_ai_usage(box: "CopilotTools", args: AiUsageArgs) -> dict[str, Any]
     }
 
 
+# --- rede MUNICIPAL (outras frações; nunca é a rede de têxteis; sem nomes de produtores, nem para admins) -----------
+
+MUNICIPAL_NOTE = (
+    "Municipal containers of OTHER fractions (not textile): useful only as possible places for textile points."
+)
+
+
+async def get_municipal_overview(box: "CopilotTools", _: Empty) -> dict[str, Any]:
+    o = await municipal_analytics.get_overview(box.db)
+    rows = [{"kind": k.kind.value, "containers": k.containers, "located": k.located, "capacity_litres": k.capacity_litres_total} for k in o.by_kind]  # fmt: skip
+    cols: list[Col] = [("kind", "Tipo", "category", None), ("containers", "Contentores", "number", None), ("located", "Com coordenadas", "number", None), ("capacity_litres", "Capacidade", "number", "L")]  # fmt: skip
+    return {
+        "network": "municipal",
+        "is_textile_network": False,
+        "note": MUNICIPAL_NOTE,
+        "per_inhabitants": 1000,  # "por 1 000 habitantes" é uma unidade: o verificador tem de a conhecer
+        "containers": o.containers.model_dump(exclude={"brands"}),
+        "sites": o.sites.model_dump(),
+        "density": o.density.model_dump(),
+        "coverage_of_area_estimate": o.coverage.model_dump(),
+        "quality": o.quality.model_dump(),
+        "estimate_note": o.estimates.note,
+        "table": make_table("Contentores municipais por tipo", "Pacote QGIS da Vitrus (outras frações)", cols, rows),
+        "_summary": f"{o.containers.located} contentores, {o.sites.total} locais",
+    }
+
+
+async def _resolve_parish(box: "CopilotTools", text: str) -> tuple[str | None, dict[str, Any] | None]:
+    found, suggestions = await municipal.find_parish(box.db, text)
+    if found is None:
+        return None, {"error": "unknown_parish", "unknown": [text], "suggestions": suggestions}
+    return found.dicofre, None
+
+
+async def _gap_ranking(box: "CopilotTools", limit: int) -> dict[str, Any]:
+    out = await municipal_analytics.gap_ranking(box.db, limit=limit)
+    rows = [{"rank": r.rank, "name": r.name, "population": r.population, "containers": r.containers, "candidate_sites": r.candidate_sites,
+             "textile_gap_t": r.textile_gap_t, "gap_t_per_candidate_site": r.gap_t_per_candidate_site} for r in out.items]  # fmt: skip
+    cols: list[Col] = [("rank", "Ordem", "number", None), ("name", "Freguesia", "text", None), ("population", "Habitantes", "number", "hab."), ("containers", "Contentores municipais", "number", None),
+                       ("candidate_sites", "Locais candidatos", "number", None), ("textile_gap_t", "Lacuna estimada", "number", "t/ano"), ("gap_t_per_candidate_site", "Lacuna por candidato", "number", "t/ano")]  # fmt: skip
+    return {
+        "network": "municipal",
+        "is_textile_network": False,
+        "is_estimate": True,
+        "rule": out.rule,
+        "capture_pct_assumed_for_every_parish": out.parameters.capture_pct,
+        "kg_per_inhab_month": out.parameters.kg_per_inhab_month,
+        "caveat": out.caveat,
+        "table": make_table("Freguesias por lacuna estimada de têxtil", "Estimativa: captura média do concelho igual em todas", cols, rows, estimate=True),
+        "_summary": f"{len(rows)} freguesias",
+    }  # fmt: skip
+
+
+async def get_parish_municipal(box: "CopilotTools", args: ParishMunicipalArgs) -> dict[str, Any]:
+    if args.parish is None:
+        return await _gap_ranking(box, args.limit)
+    found, suggestions = await municipal.find_parish(box.db, args.parish)
+    if found is None:
+        return {"error": "unknown_parish", "unknown": [args.parish], "suggestions": suggestions}
+    p = found
+    rows = [{"kind": k, "containers": n} for k, n in p.by_kind.model_dump().items()]
+    cols: list[Col] = [("kind", "Tipo", "category", None), ("containers", "Contentores", "number", None)]
+    return {
+        "network": "municipal",
+        "is_textile_network": False,
+        "per_inhabitants": 1000,
+        "name": p.name,
+        "population": p.population,
+        "area_km2": p.area_km2,
+        "containers": p.containers,
+        "containers_pending": p.containers_pending,
+        "sites": p.sites,
+        "public_sites": p.public_sites,
+        "containers_per_1000_hab": p.containers_per_1000_hab,
+        "public_sites_per_1000_hab": p.public_sites_per_1000_hab,
+        "containers_per_km2": p.containers_per_km2,
+        "mean_nn_distance_m": p.mean_nn_distance_m,
+        "cover_pct_300m_of_area_estimate": p.cover_pct_300m,
+        "producer_containers": p.producers.model_dump(),
+        "candidate_sites": p.candidate_sites,
+        "candidate_sites_precise": p.candidate_sites_precise,
+        "textile_potential_t_estimate": p.textile_potential_t,
+        "textile_gap_t_estimate": p.textile_gap_t,
+        "gap_t_per_candidate_site_estimate": p.gap_t_per_candidate_site,
+        "gap_rank_estimate": p.gap_rank,
+        "estimate_note": municipal.PARISH_ESTIMATES.note,
+        "table": make_table(f"{p.name}: contentores municipais por tipo", "Pacote QGIS da Vitrus (outras frações)", cols, rows),
+        "_summary": f"{p.name}: {p.containers} contentores",
+    }  # fmt: skip
+
+
+async def find_municipal_sites(box: "CopilotTools", args: FindSitesArgs) -> dict[str, Any]:
+    parish: list[str] = []
+    if args.parish:
+        code, error = await _resolve_parish(box, args.parish)
+        if error:
+            return error
+        parish = [code] if code else []
+    filters = SiteFilters(
+        kind=[args.kind] if args.kind else [],
+        stream=[args.stream] if args.stream else [],
+        parish=parish,
+        producer_type=[args.producer_type] if args.producer_type else [],
+        textile_candidate=args.textile_candidate,
+        coord_suspect=args.coord_suspect,
+        q=args.query,
+        search_names=False,
+    )
+    page = await municipal.list_sites(box.db, filters, limit=args.limit, cursor=None, names=False)
+    rows = [{"site_id": s.site_id, "parish": s.parish_name, "site_class": s.site_class.value, "containers": s.containers,
+             "kinds": ", ".join(k.value for k in s.kinds), "streets": "; ".join(s.streets[:2]), "textile_candidate": "sim" if s.textile_candidate else "não",
+             "coord_precision": s.coord_precision.value, "nn_distance_m": s.nn_distance_m, "lat": s.latitude, "lon": s.longitude} for s in page.items]  # fmt: skip
+    cols: list[Col] = [("site_id", "Local", "text", None), ("parish", "Freguesia", "text", None), ("site_class", "Classe", "category", None), ("containers", "Contentores", "number", None),
+                       ("kinds", "Tipos", "text", None), ("streets", "Ruas", "text", None), ("textile_candidate", "Candidato a têxteis", "category", None),
+                       ("coord_precision", "Coordenada", "category", None), ("nn_distance_m", "Vizinho mais próximo", "number", "m"), ("lat", "Latitude", "number", None), ("lon", "Longitude", "number", None)]  # fmt: skip
+    return {
+        "network": "municipal",
+        "is_textile_network": False,
+        "total": page.total,
+        "returned": len(rows),
+        "producer_names": "not shown",
+        "table": make_table("Locais da rede municipal", "Pacote QGIS da Vitrus (outras frações)", cols, rows),
+        "_summary": f"{page.total} locais",
+    }
+
+
+async def get_textile_candidates(box: "CopilotTools", args: CandidatesArgs) -> dict[str, Any]:
+    parish: list[str] = []
+    if args.parish:
+        code, error = await _resolve_parish(box, args.parish)
+        if error:
+            return error
+        parish = [code] if code else []
+    out = await municipal.textile_candidates(
+        box.db, SiteFilters(parish=parish), precise_only=args.precise_only, limit=args.limit, cursor=None, names=False
+    )
+    rows = [{"rank": c.rank, "site_id": c.site.site_id, "parish": c.site.parish_name, "containers": c.site.containers,
+             "reasons": "; ".join(c.reasons), "coord_precision": c.site.coord_precision.value,
+             "parish_gap_t_per_candidate": c.parish_gap_t_per_candidate, "lat": c.site.latitude, "lon": c.site.longitude} for c in out.items]  # fmt: skip
+    cols: list[Col] = [("rank", "Ordem", "number", None), ("site_id", "Local", "text", None), ("parish", "Freguesia", "text", None), ("containers", "Contentores", "number", None),
+                       ("reasons", "Razões", "text", None), ("coord_precision", "Coordenada", "category", None), ("parish_gap_t_per_candidate", "Lacuna da freguesia por candidato", "number", "t/ano"),
+                       ("lat", "Latitude", "number", None), ("lon", "Longitude", "number", None)]  # fmt: skip
+    return {
+        "network": "municipal",
+        "is_textile_network": False,
+        "is_estimate": True,
+        "total": out.total,
+        "total_precise": out.total_precise,
+        "returned": len(rows),
+        "rank_rule": out.rank_rule,
+        "note": "Possible places, not recommendations: the choice depends on space, traffic and the textile points Vitrus already has.",
+        "table": make_table("Locais candidatos a pontos de têxteis", "Rede municipal da Vitrus; ordem por regra explícita (estimativa)", cols, rows, estimate=True),
+        "_summary": f"{out.total} candidatos",
+    }  # fmt: skip
+
+
 DATA_TOOLS: dict[str, tuple[type[BaseModel], str, Callable[[Any, Any], Awaitable[dict[str, Any]]]]] = {
     "get_flows": (
         Empty,
@@ -449,4 +644,24 @@ DATA_TOOLS: dict[str, tuple[type[BaseModel], str, Callable[[Any, Any], Awaitable
     "get_lot_history": (LotHistoryArgs, "Event history (timeline) of one lot.", get_lot_history),
     "get_quality_alerts": (Empty, "Data-quality alerts found in the Vitrus files, with status.", get_quality_alerts),
     "get_ai_usage": (AiUsageArgs, "AI usage and cost (administrators only).", get_ai_usage),
+    "get_municipal_overview": (
+        Empty,
+        "Municipal container network (OTHER fractions, NOT textile): containers, sites, density per 1000 inhabitants, area coverage (estimate) and data quality.",
+        get_municipal_overview,
+    ),
+    "get_parish_municipal": (
+        ParishMunicipalArgs,
+        "Municipal containers of ONE parish (not textile): density, nearest-neighbour distance, producers by type, candidate sites and the estimated textile gap with its rank. Without a parish: ranking of parishes by estimated textile gap.",
+        get_parish_municipal,
+    ),
+    "find_municipal_sites": (
+        FindSitesArgs,
+        "Find municipal sites (not textile) by container kind, fraction, parish, producer type, textile-candidate flag, suspect coordinates or text. Never returns producer names.",
+        find_municipal_sites,
+    ),
+    "get_textile_candidates": (
+        CandidatesArgs,
+        "Municipal sites that could host textile points (streets with a municipal container), ranked by an explicit rule, with reasons. Possible places, not recommendations.",
+        get_textile_candidates,
+    ),
 }

@@ -4,9 +4,9 @@ import { z } from 'zod';
 import { getDataQualityOptions } from '@/client/@tanstack/react-query.gen';
 import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { ErrorState, PageSkeleton } from '@/components/states';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AlertsPanel } from '@/features/quality/alerts-panel';
 import { SourcesTable } from '@/features/quality/sources-table';
 import { formatNumber } from '@/lib/format';
@@ -62,32 +62,46 @@ function DataQuality() {
           hint={m.quality_stat_wont_fix_hint()}
         />
       </StatStrip>
-      <Tabs
+      <PageTabs
+        label={m.rw_tabs_label()}
         value={tab}
-        onValueChange={(v) =>
-          void navigate({ search: { tab: v === 'sources' ? 'sources' : undefined }, replace: true })
+        onValueChange={(next) =>
+          void navigate({
+            search: { tab: next === 'sources' ? 'sources' : undefined },
+            replace: true,
+          })
         }
-        className="gap-6"
-      >
-        <TabsList className="h-10 w-full sm:w-fit">
-          <TabsTrigger value="alerts" className="h-9 sm:min-w-36">
-            {m.quality_tab_alerts()} ({formatNumber(data.alerts.length)})
-          </TabsTrigger>
-          <TabsTrigger value="sources" className="h-9 sm:min-w-36">
-            {m.quality_tab_sources()} ({formatNumber(data.sources.length)})
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="alerts">
-          <Section title={m.quality_alerts_title()} description={m.quality_alerts_description()}>
-            <AlertsPanel alerts={data.alerts} />
-          </Section>
-        </TabsContent>
-        <TabsContent value="sources">
-          <Section title={m.quality_sources_title()} description={m.quality_sources_description()}>
-            <SourcesTable sources={data.sources} />
-          </Section>
-        </TabsContent>
-      </Tabs>
+        tabs={[
+          {
+            id: 'alerts',
+            label: m.quality_tab_alerts(),
+            count: data.alerts.length,
+            status: data.open_alerts > 0 ? 'attention' : undefined,
+            statusLabel: `${formatNumber(data.open_alerts)} ${m.quality_stat_open()}`,
+            content: (
+              <Section
+                title={m.quality_alerts_title()}
+                description={m.quality_alerts_description()}
+              >
+                <AlertsPanel alerts={data.alerts} />
+              </Section>
+            ),
+          },
+          {
+            id: 'sources',
+            label: m.quality_tab_sources(),
+            count: data.sources.length,
+            content: (
+              <Section
+                title={m.quality_sources_title()}
+                description={m.quality_sources_description()}
+              >
+                <SourcesTable sources={data.sources} />
+              </Section>
+            ),
+          },
+        ]}
+      />
     </Page>
   );
 }

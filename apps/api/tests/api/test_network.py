@@ -46,13 +46,16 @@ async def test_containers_empty_until_locations_arrive(logged_in: httpx.AsyncCli
 
 async def test_data_quality_alerts_workflow(logged_in: httpx.AsyncClient) -> None:
     quality = (await logged_in.get("/api/v1/datasets/quality")).json()
-    assert len(quality["alerts"]) == 12 and quality["open_alerts"] == 12
+    # 12 alertas dos circuitos + 25 do pacote municipal; os mais antigos primeiro (por fonte e número)
+    assert len(quality["alerts"]) == 37 and quality["open_alerts"] == 37
+    assert [a["source_key"] for a in quality["alerts"]].count("vitrus_municipal_containers_2026_10") == 25
+    assert quality["alerts"][0]["source_key"] != "vitrus_municipal_containers_2026_10"
     assert {s["key"] for s in quality["sources"]} == {
         "vitrus_textile_2025",
         "vitrus_circuits_2026_09",
         "ine_census_2021",
         "osm_nominatim",
-        "vitrus_municipal_containers_2026_10",  # pacote QGIS municipal (20 out); alertas ainda não importados
+        "vitrus_municipal_containers_2026_10",  # pacote QGIS municipal (20 out)
     }
     alert = quality["alerts"][0]
 

@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { getMeQueryKey, registerMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
+import { applyApiFieldErrors } from '@/lib/form-errors';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
@@ -29,8 +31,11 @@ export function RegisterForm({ next }: { next: string }) {
     defaultValues: { name: '', email: '', password: '' },
   });
 
+  const [fieldError, setFieldError] = useState(false);
   const register = useMutation({
     ...registerMutation(),
+    onMutate: () => setFieldError(false),
+    onError: (error) => setFieldError(applyApiFieldErrors(form, error, { email_taken: 'email' })),
     onSuccess: async (user) => {
       queryClient.setQueryData(getMeQueryKey(), user);
       await navigate({ to: next });
@@ -46,7 +51,9 @@ export function RegisterForm({ next }: { next: string }) {
         className="space-y-4"
         noValidate
       >
-        <FormAlert message={register.isError ? getErrorMessage(register.error) : null} />
+        <FormAlert
+          message={register.isError && !fieldError ? getErrorMessage(register.error) : null}
+        />
         <FormField
           control={form.control}
           name="name"

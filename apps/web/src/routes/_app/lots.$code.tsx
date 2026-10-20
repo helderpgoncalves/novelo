@@ -188,9 +188,10 @@ function LotPage() {
                   ) : (
                     <DataTable
                       id="lot-items"
+                      exportName="itens-do-lote"
                       columns={itemColumns}
                       rows={lot.item_list}
-                      getKey={(i) => i.id}
+                      getRowId={(i) => i.id}
                       caption={m.lot_items_title()}
                     />
                   ),

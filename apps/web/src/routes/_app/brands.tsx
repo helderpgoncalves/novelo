@@ -129,9 +129,10 @@ function Brands() {
       ) : (
         <DataTable
           id="brands"
+          exportName="marcas"
           columns={columns}
           rows={data.brands}
-          getKey={(b) => b.brand}
+          getRowId={(b) => b.brand}
           caption={m.brands_title()}
         />
       )}

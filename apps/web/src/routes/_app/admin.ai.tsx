@@ -1,14 +1,15 @@
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { getAiSettingsOptions } from '@/client/@tanstack/react-query.gen';
 import { AI_TABS, AiAdminPage } from '@/features/ai-admin/ai-admin-page';
+import { ForbiddenError } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/admin/ai')({
   staticData: { skeleton: 'dashboard' },
   // Só administradores: a API também o impõe (403).
   beforeLoad: ({ context: { user } }) => {
-    if (user.role !== 'admin') throw redirect({ to: '/' });
+    if (user.role !== 'admin') throw new ForbiddenError('admin');
   },
   validateSearch: z.object({
     tab: z.enum(AI_TABS).catch('overview'),
