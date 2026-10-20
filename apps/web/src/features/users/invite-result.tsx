@@ -6,6 +6,7 @@ import type { InvitationOut } from '@/client';
 import { resendInvitationMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UserChip } from '@/components/user-chip';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
@@ -65,7 +66,7 @@ export function InviteResult({
           aria-hidden="true"
         />
         <div className="min-w-0 space-y-2">
-          <p className="break-words font-medium text-sm">{current.email}</p>
+          <UserChip person={current} />
           <DeliveryBadge
             status={current.delivery_status}
             at={current.last_email_at}

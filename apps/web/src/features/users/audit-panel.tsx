@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { X } from 'lucide-react';
-import { useId, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import type { AuditEntryOut, UserAdminOut } from '@/client';
 import { listAuditOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
@@ -18,6 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserChip } from '@/components/user-chip';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
@@ -27,6 +28,7 @@ import {
   auditActorText,
   auditDetailRows,
   auditSummary,
+  auditTargetPerson,
   auditTargetText,
 } from './audit-format';
 import { auditActionGroup, auditQuery, displayName } from './logic';
@@ -60,7 +62,7 @@ function UserSelect({
           <SelectItem value={ANY}>{m.audit_filter_any()}</SelectItem>
           {users.map((u) => (
             <SelectItem key={u.id} value={u.id}>
-              {displayName(u)}
+              <UserChip person={u} size="xs" variant="inline" />
             </SelectItem>
           ))}
         </SelectContent>
@@ -87,6 +89,7 @@ export function AuditPanel({ users }: { users: UserAdminOut[] }) {
   });
   const rows = query.data?.items ?? [];
   const filtered = Boolean(action || actorId || targetId || from || to);
+  const byId = useMemo(() => new Map(users.map((u) => [u.id, u] as const)), [users]);
   const sortedUsers = [...users].sort((a, b) => displayName(a).localeCompare(displayName(b)));
 
   const reset = () => {
@@ -139,13 +142,18 @@ export function AuditPanel({ users }: { users: UserAdminOut[] }) {
       filter: true,
       cell: (e) => {
         const a = auditActorText(e);
+        if (!e.actor_id && !e.actor_name && !e.actor_email) return <span>{a.name}</span>;
         return (
-          <div className="min-w-0">
-            <p className="break-words">{a.name}</p>
+          <UserChip
+            person={byId.get(e.actor_id ?? '') ?? { name: e.actor_name, email: e.actor_email }}
+            size="sm"
+          >
             {a.onBehalf && (
-              <p className="break-words text-muted-foreground text-xs">{a.onBehalf}</p>
+              <p className="truncate text-muted-foreground text-xs" title={a.onBehalf}>
+                {a.onBehalf}
+              </p>
             )}
-          </div>
+          </UserChip>
         );
       },
     },
@@ -154,7 +162,14 @@ export function AuditPanel({ users }: { users: UserAdminOut[] }) {
       header: m.audit_col_target(),
       value: (e) => auditTargetText(e),
       filter: false,
-      cell: (e) => <span className="break-words">{auditTargetText(e)}</span>,
+      cell: (e) => {
+        const person = auditTargetPerson(e, byId);
+        return person ? (
+          <UserChip person={person} size="sm" />
+        ) : (
+          <span className="break-words">{auditTargetText(e)}</span>
+        );
+      },
     },
     {
       id: 'summary',

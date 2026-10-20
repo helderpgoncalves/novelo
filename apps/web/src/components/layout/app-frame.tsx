@@ -13,6 +13,7 @@ import { OnboardingTour } from '@/features/onboarding/onboarding-tour';
 import { StarterChecklist } from '@/features/onboarding/starter-checklist';
 import { EmailAlertsBanner } from '@/features/users/email-alerts-banner';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
+import { displayName } from '@/lib/person';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
@@ -45,7 +46,7 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
       >
         {m.common_skip_to_content()}
       </a>
-      <ImpersonationBanner viewedName={user.name ?? user.email} />
+      <ImpersonationBanner viewedName={displayName(user)} viewed={user} />
       <div className="flex min-h-0 flex-1">
         <AppSidebar role={user.role} mobileOpen={menuOpen} onMobileOpenChange={setMenuOpen} />
         <div className="flex min-w-0 flex-1 flex-col overflow-hidden">

@@ -16,6 +16,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
+import { UserChip } from '@/components/user-chip';
 import { useCountdown } from '@/features/auth/use-countdown';
 import { markTourPending } from '@/features/onboarding/tour-store';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
@@ -322,6 +323,15 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
                 ? m.pa_rejected_text()
                 : m.pa_text({ email: user.email })}
           </p>
+        </div>
+
+        <div className="mx-auto w-fit max-w-full rounded-2xl bg-card px-4 py-3 ring-1 ring-foreground/10">
+          <UserChip
+            person={user}
+            size="md"
+            status={approved ? 'active' : rejected ? 'rejected' : 'pending'}
+            statusLabel={rejected ? m.users_approval_rejected() : m.users_approval_pending()}
+          />
         </div>
 
         <div className="sr-only" role="status" aria-live="polite">

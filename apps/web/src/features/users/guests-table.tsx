@@ -4,6 +4,7 @@ import { listGuestsOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
 import { EmptyState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
+import { UserChip } from '@/components/user-chip';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
@@ -24,12 +25,11 @@ export function GuestsTable() {
       value: (g) => `${g.name ?? ''} ${g.email}`,
       exportValue: (g) => g.email,
       cell: (g) => (
-        <div className="min-w-0">
-          <p className="break-words font-medium">{g.name ?? g.email}</p>
-          {g.name && (
-            <p className="break-words font-normal text-muted-foreground text-xs">{g.email}</p>
-          )}
-        </div>
+        <UserChip
+          person={g}
+          status={g.is_active ? 'active' : 'inactive'}
+          statusLabel={m.users_status_inactive()}
+        />
       ),
     },
     {

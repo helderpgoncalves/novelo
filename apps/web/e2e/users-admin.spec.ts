@@ -96,6 +96,17 @@ test.describe('acesso', () => {
     await shot(page, 'users-audit');
   });
 
+  test('cada conta mostra avatar com iniciais e o nome ao lado', async ({ page }) => {
+    const email = uniqueEmail('avatar');
+    created.push(email);
+    await createApprovedUser(email, { name: 'Bruno Avatar' });
+    await login(page);
+    const row = await searchAccount(page, email);
+    await expect(row.getByText('Bruno Avatar')).toBeVisible();
+    await expect(row.getByText('BA', { exact: true })).toBeVisible();
+    await expect(row.getByText(email)).toBeVisible();
+  });
+
   test('os emails são uma vista da Auditoria (não um quarto separador)', async ({ page }) => {
     await login(page);
     // O endereço antigo `tab=emails` abre a vista certa.

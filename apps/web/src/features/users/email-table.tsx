@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { UserChip } from '@/components/user-chip';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
@@ -104,7 +105,7 @@ export function EmailTable({ q, onQChange }: { q: string; onQChange: (q: string)
       label: m.email_table_recipient(),
       primary: true,
       value: (e) => e.to_email,
-      cell: (e) => <span className="[overflow-wrap:anywhere] font-medium">{e.to_email}</span>,
+      cell: (e) => <UserChip person={{ email: e.to_email }} />,
     },
     {
       id: 'template',

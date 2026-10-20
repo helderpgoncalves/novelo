@@ -11,9 +11,11 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { UserAvatarStack } from '@/components/user-chip';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { blockerText } from './blocker-text';
 import { invalidateAdminQueries } from './cache';
 import { displayName, updateBlocker } from './logic';
@@ -70,6 +72,11 @@ export function DeactivateDialog({ open, onOpenChange, targets, users, selfId }:
                 : m.users_deactivate_text()}
           </AlertDialogDescription>
         </AlertDialogHeader>
+        {many ? (
+          <UserAvatarStack people={targets} />
+        ) : (
+          targets[0] && <AccountChip user={targets[0]} size="md" />
+        )}
         <FormAlert message={update.isError ? getErrorMessage(update.error) : null} />
         <AlertDialogFooter>
           <AlertDialogCancel className="h-10">
