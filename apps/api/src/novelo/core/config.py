@@ -71,8 +71,8 @@ class Settings(BaseSettings):
 
     # Email transacional via Resend. Sem chave, os emails são escritos no log (dev).
     resend_api_key: str = Field("", alias="RESEND_API_KEY")
-    email_from: str = Field("Novelo <noreply@bitsapiens.io>", alias="EMAIL_FROM")
-    email_support: str = Field("suporte@bitsapiens.io", alias="EMAIL_SUPPORT")  # ajuda no rodapé dos emails
+    email_from: str = Field("Novelo <novelo@heldergoncalves.io>", alias="EMAIL_FROM")
+    email_support: str = Field("novelo@heldergoncalves.io", alias="EMAIL_SUPPORT")  # ajuda no rodapé dos emails
 
     rate_limit_enabled: bool = Field(True, alias="RATE_LIMIT_ENABLED")  # só se desliga em dev/E2E
 

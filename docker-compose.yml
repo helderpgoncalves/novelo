@@ -30,8 +30,8 @@ services:
       - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID:-}
       - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET:-}
       - RESEND_API_KEY=${RESEND_API_KEY:-}
-      - EMAIL_FROM=${EMAIL_FROM:-Novelo <noreply@bitsapiens.io>}
-      - EMAIL_SUPPORT=${EMAIL_SUPPORT:-suporte@bitsapiens.io}
+      - EMAIL_FROM=${EMAIL_FROM:-Novelo <novelo@heldergoncalves.io>}
+      - EMAIL_SUPPORT=${EMAIL_SUPPORT:-novelo@heldergoncalves.io}
       - CORS_ORIGINS=["https://${DOMAIN:-novelo.bitsapiens.io}"]
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}

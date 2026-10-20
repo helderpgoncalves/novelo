@@ -26,6 +26,8 @@ services:
     env_file:
       - path: .env
         required: false
+      - path: .env.local  # segredos locais (Resend), fora do Git
+        required: false
     environment:
       APP_ENV: development
       RATE_LIMIT_ENABLED: "false"  # os testes E2E partilham o mesmo IP; a lógica tem testes de API próprios
