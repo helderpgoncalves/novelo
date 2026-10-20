@@ -30,15 +30,38 @@ export const weekdayLong = (weekday: number): string =>
     new Date(Date.UTC(2024, 0, weekday)),
   );
 
-export const formatDate = (value: string | Date, style: 'short' | 'medium' = 'medium'): string =>
-  new Intl.DateTimeFormat(intlTag(), { dateStyle: style, timeZone: 'UTC' }).format(
-    typeof value === 'string' ? new Date(`${value}T00:00:00Z`) : value,
-  );
+/** Data sem hora (`2026-10-20`): é um dia do calendário, não um instante; lê-se em UTC para nunca mudar de dia. */
+const DATE_ONLY = /^\d{4}-\d{2}-\d{2}$/;
 
-export const formatDateTime = (value: string | Date): string =>
-  new Intl.DateTimeFormat(intlTag(), { dateStyle: 'medium', timeStyle: 'short' }).format(
-    typeof value === 'string' ? new Date(value) : value,
+/** Sem data válida mostra um traço em vez de rebentar a página (`Intl` levanta `RangeError: Invalid time value`). */
+const NO_DATE = '—';
+
+/**
+ * Formata uma data. Aceita uma data simples (`2026-10-20`), um carimbo ISO completo (`2026-10-20T16:28:35+00:00`,
+ * como `created_at`) ou um `Date`. Valores vazios ou inválidos dão «—».
+ */
+export const formatDate = (
+  value: string | Date | null | undefined,
+  style: 'short' | 'medium' = 'medium',
+): string => {
+  if (value == null || value === '') return NO_DATE;
+  const dayOnly = typeof value === 'string' && DATE_ONLY.test(value);
+  const date = typeof value === 'string' ? new Date(dayOnly ? `${value}T00:00:00Z` : value) : value;
+  if (Number.isNaN(date.getTime())) return NO_DATE;
+  return new Intl.DateTimeFormat(intlTag(), {
+    dateStyle: style,
+    ...(dayOnly ? { timeZone: 'UTC' } : {}),
+  }).format(date);
+};
+
+export const formatDateTime = (value: string | Date | null | undefined): string => {
+  if (value == null || value === '') return NO_DATE;
+  const date = typeof value === 'string' ? new Date(value) : value;
+  if (Number.isNaN(date.getTime())) return NO_DATE;
+  return new Intl.DateTimeFormat(intlTag(), { dateStyle: 'medium', timeStyle: 'short' }).format(
+    date,
   );
+};
 
 /** Muda o idioma da interface; recarrega no URL do novo idioma (/pt/..., /en/...). */
 export const switchLocale = (locale: Locale): void => {
