@@ -17,8 +17,8 @@ export const QUIET_MENU =
   'w-44 rounded-[8px] border-border p-1 shadow-none [&_[data-slot=dropdown-menu-radio-item]]:min-h-10 [&_[data-slot=dropdown-menu-radio-item]]:rounded-[6px] [&_[data-slot=dropdown-menu-radio-item]]:pr-2 [&_[data-slot=dropdown-menu-radio-item]]:pl-2.5 [&_[data-slot=dropdown-menu-radio-item]]:focus:bg-foreground/5 [&_[data-slot=dropdown-menu-radio-item]>span:first-child]:hidden';
 
 /**
- * Seletor de idioma. `menu` (por omissão): código curto («PT») que abre um menu; `inline`: as opções em texto, em linha,
- * a ativa em tinta com um traço de 2 px por baixo (para folhas e painéis onde um menu suspenso não cabe).
+ * Seletor de idioma. `menu` (por omissão): código curto («PT») que abre um menu; `inline`: os códigos («PT · EN») como segmentos de
+ * texto, o ativo em tinta com um traço de 2 px por baixo (para folhas e painéis onde um menu suspenso não cabe).
  */
 export function LanguageSwitcher({
   signedIn = false,
@@ -34,19 +34,29 @@ export function LanguageSwitcher({
 
   if (variant === 'inline') {
     return (
-      <fieldset className="m-0 min-w-0 border-0 p-0 flex items-center gap-6">
+      <fieldset className="m-0 flex min-w-0 items-center border-0 p-0">
         <legend className="sr-only">{m.language_switch()}</legend>
-        {locales.map((locale) => (
-          <button
-            key={locale}
-            type="button"
-            lang={locale}
-            aria-pressed={current === locale}
-            onClick={() => void switchLanguage(locale)}
-            className="relative inline-flex min-h-11 items-center rounded-sm text-[1.0625rem] text-muted-foreground outline-none transition-colors after:absolute after:inset-x-0 after:bottom-1.5 after:h-0.5 after:scale-x-0 after:bg-foreground after:transition-transform after:content-[''] hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 aria-pressed:font-semibold aria-pressed:text-foreground aria-pressed:after:scale-x-100"
-          >
-            {LOCALE_LABELS[locale]}
-          </button>
+        {locales.map((locale, i) => (
+          <span key={locale} className="inline-flex items-center">
+            {i > 0 && (
+              <span
+                aria-hidden="true"
+                className="pointer-events-none -ml-[0.8125rem] mr-[0.8125rem] h-3 w-px bg-border"
+              />
+            )}
+            <button
+              type="button"
+              lang={locale}
+              aria-label={LOCALE_LABELS[locale]}
+              aria-pressed={current === locale}
+              onClick={() => void switchLanguage(locale)}
+              className="group inline-flex h-11 min-w-11 items-center rounded-sm font-medium font-mono text-[0.8125rem] text-muted-foreground uppercase tracking-[0.14em] outline-none transition-colors hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 aria-pressed:text-foreground"
+            >
+              <span className="relative inline-flex h-full items-center after:absolute after:inset-x-0 after:bottom-1.5 after:h-0.5 after:origin-left after:scale-x-0 after:bg-foreground after:transition-transform after:duration-200 after:content-[''] group-aria-pressed:after:scale-x-100">
+                {locale.slice(0, 2)}
+              </span>
+            </button>
+          </span>
         ))}
       </fieldset>
     );

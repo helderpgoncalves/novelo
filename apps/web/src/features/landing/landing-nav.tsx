@@ -1,5 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import {
+  type CSSProperties,
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
   useCallback,
@@ -165,27 +166,39 @@ function MenuGlyph({ open }: { open: boolean }) {
   );
 }
 
-/** Idioma e tema na folha: texto e ícones em linha, sem caixas (os menus suspensos ficariam atrás de um <dialog>). */
-function SheetPreferences() {
-  const label = 'font-mono text-[11px] text-muted-foreground uppercase tracking-[0.14em]';
+/** Seta fina ↗ (a tinta toca as bordas da caixa, para alinhar pela margem direita). */
+function ArrowGlyph() {
   return (
-    <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
-      <div className="flex flex-col gap-0.5">
-        <p className={label}>{m.landing_menu_language()}</p>
-        <LanguageSwitcher variant="inline" />
-      </div>
-      <div className="flex flex-col gap-0.5">
-        <p className={label}>{m.landing_menu_theme()}</p>
-        <ThemeToggle variant="inline" />
-      </div>
+    <svg
+      aria-hidden="true"
+      viewBox="3 3 10 10"
+      className="lp-sheet-arrow"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3.5 12.5 12.5 3.5M5 3.5h7.5V11" />
+    </svg>
+  );
+}
+
+/** Barra de ferramentas da folha: idioma («PT · EN») à esquerda e tema (três ícones) à direita, na mesma linha. */
+function SheetTools() {
+  return (
+    <div className="lp-sheet-tools">
+      <LanguageSwitcher variant="inline" />
+      <ThemeToggle variant="inline" />
     </div>
   );
 }
 
 /**
- * Menu móvel: <dialog> modal de ecrã inteiro (o resto fica inerte, o foco fica preso, Esc fecha). A folha desce do topo;
- * arrastar o cabeçalho para cima fecha-a (a folha segue o dedo e decide pela distância ou velocidade). O scroll da página
- * trava com `overflow: hidden` (sem saltos no iOS); os links grandes (≥ 48 px) respeitam as zonas seguras.
+ * Menu móvel: <dialog> modal de ecrã inteiro (o resto fica inerte, o foco fica preso, Esc fecha). A cortina desce do topo;
+ * arrastar o painel para cima fecha-a (segue o dedo e decide pela distância ou velocidade). O scroll da página trava com
+ * `overflow: hidden` (sem saltos no iOS). A lista cabe sem scroll nos telemóveis correntes (escala ligada a `dvh`) e rola
+ * com desvanecimento nos extremos quando não cabe; o rodapé fica sempre fixo, dentro das zonas seguras.
  */
 function MobileMenu({
   open,
@@ -200,7 +213,8 @@ function MobileMenu({
 }) {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
-  const drag = useRef<{ y: number; t: number } | null>(null);
+  const navRef = useRef<HTMLElement>(null);
+  const drag = useRef<{ y: number; t: number; live: boolean } | null>(null);
   const items = tocItems();
 
   const finishClose = useCallback(() => {
@@ -221,7 +235,7 @@ function MobileMenu({
       };
       if (!motionAllowed()) return run();
       d.dataset.state = 'closing';
-      window.setTimeout(run, 220);
+      window.setTimeout(run, 240);
     },
     [finishClose],
   );
@@ -237,6 +251,17 @@ function MobileMenu({
     requestAnimationFrame(() => requestAnimationFrame(() => (d.dataset.state = 'open')));
   }, [open]);
 
+  // Ao crescer para o layout largo o menu deixa de existir: fecha-o e liberta o scroll.
+  useEffect(() => {
+    if (!open) return;
+    const wide = window.matchMedia('(min-width: 1024px)');
+    const onChange = () => {
+      if (wide.matches) finishClose();
+    };
+    wide.addEventListener('change', onChange);
+    return () => wide.removeEventListener('change', onChange);
+  }, [open, finishClose]);
+
   useEffect(
     () => () => {
       document.documentElement.style.overflow = '';
@@ -244,36 +269,81 @@ function MobileMenu({
     [],
   );
 
+  // Máscara de desvanecimento só nos extremos onde ainda há lista por ver (sem barra de scroll visível).
+  const syncFade = useCallback(() => {
+    const el = navRef.current;
+    if (!el) return;
+    el.dataset.top = String(el.scrollTop > 2);
+    el.dataset.bottom = String(el.scrollTop + el.clientHeight < el.scrollHeight - 2);
+  }, []);
+  useEffect(() => {
+    const el = navRef.current;
+    if (!open || !el) return;
+    syncFade();
+    if (typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(syncFade);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [open, syncFade]);
+
   const onPointerDown = (e: ReactPointerEvent<HTMLDivElement>) => {
-    drag.current = { y: e.clientY, t: performance.now() };
-    e.currentTarget.setPointerCapture(e.pointerId);
-    if (dialogRef.current) dialogRef.current.dataset.dragging = 'true';
+    if ((e.target as Element).closest('nav')) return;
+    drag.current = { y: e.clientY, t: performance.now(), live: false };
   };
   const onPointerMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = dialogRef.current;
-    if (!drag.current || !d) return;
-    const dy = Math.min(0, e.clientY - drag.current.y);
+    const start = drag.current;
+    if (!start || !d) return;
+    const dy = Math.min(0, e.clientY - start.y);
+    // Só captura o ponteiro depois de 8 px para cima: um toque simples continua a ser um clique nos botões.
+    if (!start.live) {
+      if (dy > -8) return;
+      start.live = true;
+      e.currentTarget.setPointerCapture(e.pointerId);
+      d.dataset.dragging = 'true';
+    }
     d.style.transform = `translateY(${dy}px)`;
-    d.style.opacity = String(1 + dy / 420);
+    d.style.opacity = String(Math.max(0.2, 1 + dy / 420));
   };
   const onPointerUp = (e: ReactPointerEvent<HTMLDivElement>) => {
     const d = dialogRef.current;
     const start = drag.current;
     drag.current = null;
-    if (!d || !start) return;
+    if (!d || !start?.live) return;
     delete d.dataset.dragging;
     const dy = e.clientY - start.y;
     const v = dy / Math.max(1, performance.now() - start.t);
     d.style.transform = '';
     d.style.opacity = '';
-    if (dy < -80 || v < -0.5) requestClose();
+    if (dy < -72 || v < -0.45) requestClose();
+  };
+
+  // Setas, Home e End percorrem a lista como num menu.
+  const onListKeyDown = (e: KeyboardEvent<HTMLUListElement>) => {
+    const links = [...e.currentTarget.querySelectorAll<HTMLAnchorElement>('a')];
+    const i = links.indexOf(document.activeElement as HTMLAnchorElement);
+    const next =
+      e.key === 'ArrowDown'
+        ? links[(i + 1) % links.length]
+        : e.key === 'ArrowUp'
+          ? links[(i - 1 + links.length) % links.length]
+          : e.key === 'Home'
+            ? links[0]
+            : e.key === 'End'
+              ? links[links.length - 1]
+              : null;
+    if (next) {
+      e.preventDefault();
+      next.focus();
+    }
   };
 
   return (
     // biome-ignore lint/a11y/useKeyWithClickEvents: o fecho por teclado é o Esc nativo do <dialog>
     <dialog
       ref={dialogRef}
-      aria-label={m.landing_menu_title()}
+      aria-labelledby="lp-sheet-title"
+      aria-modal="true"
       className="lp-sheet lg:hidden"
       onCancel={(e) => {
         e.preventDefault();
@@ -286,19 +356,16 @@ function MobileMenu({
       <div
         ref={panelRef}
         tabIndex={-1}
-        className="flex h-full flex-col pr-[env(safe-area-inset-right)] pb-[max(1rem,env(safe-area-inset-bottom))] pl-[env(safe-area-inset-left)] outline-none"
+        className="lp-sheet-panel"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerUp}
       >
-        <div
-          className={cn(
-            'flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-center justify-between gap-3 pt-[env(safe-area-inset-top)]',
-            PUBLIC_GUTTER,
-          )}
-          style={{ touchAction: 'none' }}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onPointerCancel={onPointerUp}
-        >
+        <h2 id="lp-sheet-title" className="sr-only">
+          {m.landing_menu_title()}
+        </h2>
+        <div className="lp-sheet-head">
           <Link
             to="/"
             aria-label="Novelo"
@@ -313,14 +380,17 @@ function MobileMenu({
           </button>
         </div>
         <nav
+          ref={navRef}
           aria-label={m.landing_nav_label()}
-          className={cn('min-h-0 flex-1 overflow-y-auto overscroll-contain py-2', PUBLIC_GUTTER)}
+          data-top="false"
+          data-bottom="false"
+          className="lp-sheet-nav"
         >
-          <ul className="divide-y divide-border/60">
-            {items.map((s) => {
+          <ul className="lp-sheet-list" onKeyDown={onListKeyDown}>
+            {items.map((s, i) => {
               const on = active !== null && (TOC_ALIAS[active] ?? active) === s.id;
               return (
-                <li key={s.id}>
+                <li key={s.id} style={{ '--i': i } as CSSProperties}>
                   <a
                     href={`#${s.id}`}
                     aria-current={on ? 'location' : undefined}
@@ -328,24 +398,20 @@ function MobileMenu({
                       e.preventDefault();
                       requestClose(() => goTo(s.id));
                     }}
-                    className="lp-press group flex min-h-14 items-baseline gap-4 py-3 outline-none focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-[-2px]"
+                    className="lp-sheet-link font-serif"
                   >
-                    <span className="w-6 font-mono text-[11px] text-muted-foreground tabular-nums">
-                      {s.n}
-                    </span>
-                    <span className="font-medium font-serif text-[1.75rem] tracking-tight group-aria-[current=location]:text-primary">
-                      {s.label}
-                    </span>
+                    <span>{s.label}</span>
+                    <ArrowGlyph />
                   </a>
                 </li>
               );
             })}
           </ul>
         </nav>
-        <div className={cn('flex shrink-0 flex-col gap-4 pt-4', PUBLIC_GUTTER)}>
-          <SheetPreferences />
-          <div className="flex gap-3">
-            <Button asChild className="h-12 flex-1 rounded-[10px] font-semibold text-base">
+        <div className="lp-sheet-foot">
+          <SheetTools />
+          <div className="lp-sheet-cta">
+            <Button asChild className="h-12 rounded-[10px] font-semibold text-base">
               <Link to="/login" onClick={() => requestClose()}>
                 {m.landing_sign_in()}
               </Link>
@@ -353,7 +419,7 @@ function MobileMenu({
             <Button
               asChild
               variant="outline"
-              className="h-12 flex-1 rounded-[10px] border-foreground/20 bg-transparent font-medium text-base shadow-none hover:bg-foreground/5"
+              className="h-12 rounded-[10px] border-foreground/20 bg-transparent font-medium text-base shadow-none hover:bg-foreground/5"
             >
               <Link to="/register" onClick={() => requestClose()}>
                 {m.landing_register()}
@@ -453,7 +519,7 @@ export function LandingHeader() {
 
 /**
  * «Nesta página»: coluna fixa à esquerda a partir de 1536 px (por baixo disso a barra do topo já tem âncoras). Só aparece depois
- * do hero, alinhada com a margem do conteúdo; marcador de progresso de leitura, número mono e item ativo em destaque.
+ * do hero, alinhada com a margem do conteúdo; marcador de progresso de leitura e item ativo em destaque (sem numeração).
  */
 export function LandingToc() {
   const items = tocItems();
@@ -500,7 +566,6 @@ export function LandingToc() {
                     goTo(s.id);
                   }}
                 >
-                  <span aria-hidden="true">{s.n}</span>
                   {s.label}
                 </a>
               </li>

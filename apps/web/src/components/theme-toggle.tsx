@@ -26,7 +26,7 @@ export function ThemeToggle({ variant = 'menu' }: { variant?: 'menu' | 'inline' 
 
   if (variant === 'inline') {
     return (
-      <fieldset className="m-0 min-w-0 border-0 p-0 flex items-center gap-2">
+      <fieldset className="m-0 -mr-[0.6875rem] flex min-w-0 items-center border-0 p-0">
         <legend className="sr-only">{m.theme_toggle()}</legend>
         {OPTIONS.map(({ value, Icon, label }) => (
           <button
@@ -36,7 +36,7 @@ export function ThemeToggle({ variant = 'menu' }: { variant?: 'menu' | 'inline' 
             title={label()}
             aria-pressed={theme === value}
             onClick={() => setTheme(value)}
-            className="relative inline-flex size-11 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors after:absolute after:bottom-1.5 after:h-0.5 after:w-5 after:scale-x-0 after:bg-foreground after:transition-transform after:content-[''] hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 aria-pressed:text-foreground aria-pressed:after:scale-x-100"
+            className="relative inline-flex size-11 items-center justify-center rounded-sm text-muted-foreground outline-none transition-colors after:absolute after:bottom-1.5 after:h-0.5 after:w-5 after:scale-x-0 after:duration-200 after:bg-foreground after:transition-transform after:content-[''] hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring focus-visible:outline-offset-2 aria-pressed:text-foreground aria-pressed:after:scale-x-100"
           >
             <Icon className="size-[1.375rem]" strokeWidth={1.5} aria-hidden="true" />
           </button>
