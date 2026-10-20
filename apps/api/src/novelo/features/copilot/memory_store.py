@@ -22,7 +22,6 @@ from novelo.features.copilot.tables import fold
 
 log = logging.getLogger("novelo.copilot.memory")
 
-Target = Literal["memory", "user"]
 SEP = "\n§\n"
 MAX_ENTRY_CHARS = 600
 

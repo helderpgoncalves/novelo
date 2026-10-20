@@ -41,9 +41,6 @@ class CatalogModel(BaseModel):
             caps.add(STRUCTURED)
         return frozenset(caps)
 
-    def supports(self, required: frozenset[str]) -> bool:
-        return required <= self.capabilities()
-
 
 def _per_million(raw: Any) -> float | None:
     try:

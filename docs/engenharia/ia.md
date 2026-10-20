@@ -45,7 +45,7 @@ Todos os modelos passam pelo **OpenRouter** (API compatível com OpenAI), atrav�
 | --- | --- | --- | --- |
 | `copilot` | Conversa com ferramentas em streaming (`POST /copilot/stream`; `POST /copilot/chat` é a versão sem streaming) | tools + structured outputs | `copilot_v3.md` (a `v1` e a `v2` ficam para auditoria) |
 | `web_search` | Uma pesquisa na web pedida pelo copiloto (modelo barato de `copilot_aux` que só chama o server tool `openrouter:web_search`; só serve para a contabilidade do uso) | server tool | `WEB_RELAY_SYSTEM` no adaptador |
-| `copilot_aux` | Título, sugestões de seguimento, resumo de compactação, revisão de memória e pré-visualização de persona | structured outputs | `copilot_title_v1.md`, `copilot_suggestions_v1.md`, `copilot_summary_v1.md`, `memory_review_v1.md` |
+| `copilot_aux` | Título, sugestões de seguimento, resumo de compactação, revisão de memória e pré-visualização de persona | structured outputs | `copilot_title_v2.md`, `copilot_suggestions_v1.md`, `copilot_summary_v1.md`, `memory_review_v1.md` |
 | `whatif` | "E se...?": percebe a pergunta (`ScenarioDelta`) | structured outputs | `whatif_v1.md` |
 | `explain` | Explicação do resultado do "E se...?" | structured outputs | `explain_v1.md` |
 | `briefing` | Parágrafo executivo do relatório RAP | structured outputs | `briefing_v1.md` |

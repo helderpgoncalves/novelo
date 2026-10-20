@@ -38,8 +38,6 @@ from novelo.features.network.schemas import (
     VehicleOut,
 )
 
-_WEEKDAY_SHIFTS = (DayGroup.WEEKDAY,)
-
 
 async def _assignments(db: AsyncSession) -> list[ShiftAssignment]:
     result = await db.execute(select(ShiftAssignment).options(selectinload(ShiftAssignment.vehicle)))

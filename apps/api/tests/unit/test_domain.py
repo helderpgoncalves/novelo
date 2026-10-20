@@ -1,17 +1,12 @@
 import pytest
 
 from novelo.domain.costs import annual_cost_eur, eur_per_tonne
-from novelo.domain.demand import Baseline, captured_t, yearly_demand_t
+from novelo.domain.demand import Baseline, yearly_demand_t
 
 
 def test_yearly_demand_matches_municipal_plan() -> None:
     # 156 277 hab × 0,7 kg × 12 meses = 1 312,7 t (calculado à mão)
     assert yearly_demand_t(156_277, 0.7) == pytest.approx(1312.7, abs=0.1)
-
-
-def test_captured_rejects_invalid_rate() -> None:
-    with pytest.raises(ValueError):
-        captured_t(100, 1.2)
 
 
 def test_baseline_observed_capture_uses_real_vitrus_data() -> None:

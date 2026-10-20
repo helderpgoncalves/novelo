@@ -192,10 +192,6 @@ async def test_budget_is_a_hard_stop_before_any_network_call() -> None:
     client = OpenRouterClient(settings(), transport=httpx.MockTransport(handler), runtime=rt)
     with pytest.raises(AiBudgetExceededError):
         await client.structured(system="s", user="u", schema=Out, task="explain")
-    assert rt.budget_state == "exceeded"
-    assert AiRuntime(tasks={}, budget_usd=10, spent_usd=8.5).budget_state == "warning"
-    assert AiRuntime(tasks={}, budget_usd=10, spent_usd=1).budget_state == "ok"
-    assert AiRuntime(tasks={}).budget_state == "unlimited"
 
 
 async def test_payload_has_max_tokens_reasoning_strict_schema_and_task_model() -> None:

@@ -639,9 +639,6 @@ class CopilotTools:
         out, self.memory_events = self.memory_events, []
         return out
 
-    def make_card(self, s: ScenarioOut | ScenarioSummary, created_now: bool = False) -> ScenarioCard:
-        return _card(s, created_now)
-
     async def emit_artifact(
         self, artifact_type: str, spec: Any, title: str, sources: list[ArtifactSource], refresh: dict[str, Any] | None
     ) -> CopilotArtifactEvent:

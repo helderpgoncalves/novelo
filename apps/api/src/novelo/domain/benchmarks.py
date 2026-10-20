@@ -7,7 +7,6 @@ que o simulador responde é se a rede de Guimarães, com os pressupostos atuais,
 from __future__ import annotations
 
 from collections.abc import Sequence
-from dataclasses import replace
 
 from novelo.domain.demand import MONTHS_PER_YEAR
 from novelo.domain.network import Params, Zone, build_option
@@ -26,14 +25,6 @@ def implied_capture_of_demand(kg_per_inhab_year: float, kg_per_inhab_month: floa
     if kg_per_inhab_month <= 0:
         raise ValueError("kg/hab/mês tem de ser positivo")
     return kg_per_inhab_year / (kg_per_inhab_month * MONTHS_PER_YEAR)
-
-
-def with_points_density(params: Params, mode: Mode, people_per_point: int) -> Params:
-    """Fixa a densidade de pontos de um modo (1 ponto por `people_per_point` habitantes)."""
-    if people_per_point < 1:
-        raise ValueError("people_per_point tem de ser pelo menos 1")
-    modes = {**params.modes, mode: replace(params.modes[mode], people_per_point=people_per_point)}
-    return replace(params, modes=modes)
 
 
 def max_capturable_t(zones: Sequence[Zone], params: Params) -> float:

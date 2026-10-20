@@ -8,7 +8,6 @@ from novelo.domain.benchmarks import (
     implied_capture_of_demand,
     max_capturable_t,
     target_tonnes,
-    with_points_density,
 )
 from novelo.domain.network import Mode, Zone
 from novelo.domain.pilot import (
@@ -41,14 +40,6 @@ def test_max_capturable_uses_all_modes_independently() -> None:
     # 1 − (1 − 0,05)(1 − 0,5)(1 − 0,5) = 0,7625 de 12 t = 9,15 t por freguesia
     zones = [Zone("a", "A", 1000, 41.0, -8.0, 0), Zone("b", "B", 1000, 41.0, -8.0, 7)]
     assert max_capturable_t(zones, params()) == pytest.approx(18.3)
-
-
-def test_points_density_changes_only_that_mode() -> None:
-    p = with_points_density(params(), Mode.STREET, 1414)
-    assert p.modes[Mode.STREET].people_per_point == 1414
-    assert p.modes[Mode.EXISTING] == params().modes[Mode.EXISTING]
-    with pytest.raises(ValueError, match="pelo menos 1"):
-        with_points_density(params(), Mode.STREET, 0)
 
 
 # Quatro candidatos no depósito (0 km), só contentores de rua, piloto de 3 meses:
