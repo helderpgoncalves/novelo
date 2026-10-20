@@ -8,6 +8,7 @@ import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
   AUTH_BLOCKS,
+  AUTH_STACK,
   AuthConsent,
   AuthDivider,
   AuthHeading,
@@ -54,13 +55,15 @@ function Register() {
           <AlertDescription>{m.register_approval_notice()}</AlertDescription>
         </Alert>
       )}
-      <RegisterForm next={next ?? '/'} />
-      {config.google_enabled && (
-        <div className={AUTH_BLOCKS}>
-          <AuthDivider>{m.login_or_other()}</AuthDivider>
-          <GoogleButton next={next} mode="signup" />
-        </div>
-      )}
+      <div className={AUTH_STACK}>
+        <RegisterForm next={next ?? '/'} />
+        {config.google_enabled && (
+          <>
+            <AuthDivider>{m.login_or_other()}</AuthDivider>
+            <GoogleButton next={next} mode="signup" />
+          </>
+        )}
+      </div>
       <AuthSwitch>
         {m.register_have_account()}
         <Link to="/login" search={{ next }} className={authLinkClass}>

@@ -9,7 +9,7 @@ import {
   AUTH_BLOCKS,
   AUTH_BUTTON,
   AUTH_BUTTONS,
-  AuthConsent,
+  AUTH_STACK,
   AuthDivider,
   AuthHeading,
   AuthSwitch,
@@ -61,25 +61,31 @@ function Login() {
     </AuthSwitch>
   );
 
-  // Alternativas ao método principal: Google e o outro método formam um par de botões secundários iguais.
-  const alternative = (to: 'password' | 'link') => (
-    <div className={AUTH_BLOCKS}>
-      <AuthDivider>{m.login_or_other()}</AuthDivider>
-      <div className={AUTH_BUTTONS}>
-        {config.google_enabled && <GoogleButton next={next} />}
-        {(to === 'password' || config.magic_link_enabled) && (
-          <Button asChild variant="outline" className={cn(AUTH_BUTTON, 'gap-3')}>
-            <Link to="/login" search={to === 'password' ? { next, method: 'password' } : { next }}>
-              {to === 'password' ? <KeyRound aria-hidden="true" /> : <Mail aria-hidden="true" />}
-              {to === 'password' ? m.login_use_password() : m.login_use_link()}
-            </Link>
-          </Button>
-        )}
-      </div>
-      {createAccount}
-      <AuthConsent />
-    </div>
-  );
+  // Alternativas ao método principal. `methods` (divisor, Google e o outro método) entra no mesmo grupo de ação do
+  // formulário, com o mesmo passo de 16 px; `footer` (criar conta) fica num bloco à parte. Os termos e a política
+  // estão no rodapé da página, por isso não se repetem aqui.
+  const alternative = (to: 'password' | 'link') => ({
+    methods: (
+      <>
+        <AuthDivider>{m.login_or_other()}</AuthDivider>
+        <div className={AUTH_BUTTONS}>
+          {config.google_enabled && <GoogleButton next={next} />}
+          {(to === 'password' || config.magic_link_enabled) && (
+            <Button asChild variant="outline" className={cn(AUTH_BUTTON, 'gap-3')}>
+              <Link
+                to="/login"
+                search={to === 'password' ? { next, method: 'password' } : { next }}
+              >
+                {to === 'password' ? <KeyRound aria-hidden="true" /> : <Mail aria-hidden="true" />}
+                {to === 'password' ? m.login_use_password() : m.login_use_link()}
+              </Link>
+            </Button>
+          )}
+        </div>
+      </>
+    ),
+    footer: createAccount,
+  });
 
   if (!usePassword) {
     return (
@@ -91,13 +97,18 @@ function Login() {
     );
   }
 
+  const alternatives = alternative('link');
+
   return (
     <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.login_title()} subtitle={m.login_subtitle()} />
       <FormAlert message={loginError(error)} />
       <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
-      <LoginForm next={next ?? '/'} initialEmail={readLastEmail()} />
-      {alternative('link')}
+      <div className={AUTH_STACK}>
+        <LoginForm next={next ?? '/'} initialEmail={readLastEmail()} />
+        {alternatives.methods}
+      </div>
+      {alternatives.footer}
     </div>
   );
 }
