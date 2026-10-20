@@ -38,7 +38,7 @@ function AuthLayout() {
       {/* O formulário vem primeiro no DOM (teclado e leitores de ecrã); a imagem decorativa fica à esquerda por `order`. */}
       <main className="lg:order-2 flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between">
-          <BrandLogo className="h-8" />
+          <BrandLogo className="h-8 lg:hidden" />
           <div className="ml-auto flex items-center gap-1">
             <LanguageSwitcher />
             <ThemeToggle />
