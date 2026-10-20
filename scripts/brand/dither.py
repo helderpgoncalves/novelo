@@ -5,14 +5,14 @@ cada ponto tem a cor da densidade no centro da sua célula e o tamanho dado pela
 Os pontos são desenhados com anti-aliasing analítico (distância ao contorno), por isso saem nítidos em
 qualquer escala e comprimem muito bem sem perdas (WebP lossless).
 
-Uso: ver `landing_hero.py` (ativos da landing) e `docs/marca/linguagem-dither.md` (princípios).
+Uso: ver `dither_assets.py` (partilha, banners, capa) e `docs/marca/linguagem-dither.md` (princípios).
 """
 
 from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Callable, Literal, Sequence
+from typing import Literal, Sequence
 
 import numpy as np
 from PIL import Image, ImageFilter
@@ -240,3 +240,53 @@ def save_lossless(img: Image.Image, path: str) -> int:
     import os
 
     return os.path.getsize(path)
+
+
+# ---------------------------------------------------------------- grelha de pontos alinhada ao píxel (landing)
+
+def box_mean(a: np.ndarray, size: int) -> np.ndarray:
+    """Média numa janela quadrada (imagem integral), bordas replicadas."""
+    r = size // 2
+    p = np.pad(a, r, mode="edge").astype(np.float64)
+    c = np.pad(p.cumsum(0).cumsum(1), ((1, 0), (1, 0)))
+    out = c[size:, size:] - c[:-size, size:] - c[size:, :-size] + c[:-size, :-size]
+    return (out / (size * size))[: a.shape[0], : a.shape[1]].astype(np.float32)
+
+
+def lattice_halftone(
+    density: np.ndarray,
+    palette: Palette,
+    step: int,
+    softness: float = 1.0,
+    ink_map: np.ndarray | None = None,
+) -> Image.Image:
+    """Meio-tom redondo a 45º com os centros dos pontos em coordenadas inteiras (grelha de base `step` px).
+
+    Os centros ficam em (step*m, step*n) com m+n par: célula = step*sqrt(2) px, e cada ponto cai sempre da mesma forma
+    sobre a grelha de píxeis (sem batimento nem moiré de rasterização). Gera-se diretamente ao tamanho final, por isso nada
+    é reamostrado. A densidade de cada ponto é a média da sua célula (janela de ~1 célula), não uma amostra pontual, e os
+    pontos mais pequenos que 1 px degradam em área (cobertura = área) em vez de oscilarem. `d = 1` enche a célula.
+    """
+    h, w = density.shape
+    cell = step * math.sqrt(2.0)
+    win = max(1, int(round(cell))) | 1
+    dens = box_mean(density.astype(np.float32), win)
+    yy, xx = np.mgrid[0:h, 0:w].astype(np.float32)
+    xx += 0.5
+    yy += 0.5
+    p = (xx + yy) / (2.0 * step)
+    q = (xx - yy) / (2.0 * step)
+    ip, iq = np.round(p), np.round(q)
+    dist = np.hypot(p - ip, q - iq) * cell  # px até ao centro do ponto
+    cx = np.clip((step * (ip + iq)).astype(np.int32), 0, w - 1)
+    cy = np.clip((step * (ip - iq)).astype(np.int32), 0, h - 1)
+    d = np.clip(dens[cy, cx], 0.0, 1.0)
+    rad = cell * 0.7072 * np.sqrt(d)
+    cov = np.clip(0.5 - (dist - rad) / softness, 0.0, 1.0)
+    # ponto sub-píxel: a área do círculo reparte-se pelos 4 píxeis à volta do centro
+    tiny = np.where(dist < 1.0, np.pi * rad * rad / 4.0, 0.0)
+    cov = np.where(rad < 0.7, np.minimum(cov, tiny), cov)
+    ink = ink_map[cy, cx].astype(np.float32) if ink_map is not None else palette.ink(d)
+    paper = np.array(palette.paper, dtype=np.float32)
+    out = paper * (1 - cov[..., None]) + ink * cov[..., None]
+    return Image.fromarray(np.clip(out + 0.5, 0, 255).astype(np.uint8), "RGB")

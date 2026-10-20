@@ -270,12 +270,6 @@ html[data-tabbar] {
 }
 
 /* Escala tipográfica fluida da landing (docs/marca/landing-direcao.md, secção 3). */
-@utility lp-hero {
-  font-size: clamp(2.75rem, 1.55rem + 5.4vw, 6.25rem);
-  line-height: 1;
-  letter-spacing: -0.028em;
-  text-wrap: balance;
-}
 @utility lp-headline {
   font-size: clamp(2rem, 1.3rem + 3vw, 3.75rem);
   line-height: 1.06;
@@ -684,7 +678,7 @@ html[data-tab-hidden] :is(.brand-arc, .brand-dot, .ptr-arc, .ptr-svg, .brand-dri
   }
 }
 
-/* ---------- Landing: navegação, dither e microinterações ---------- */
+/* ---------- Landing: navegação e microinterações ---------- */
 
 /* Altura estável do topo da landing (sem CLS): barra + zona segura (notch, Dynamic Island). Âncoras e rolagem usam-na. */
 html:has([data-landing]) {
@@ -929,60 +923,391 @@ body:has([data-landing]) {
   overflow-x: clip;
 }
 
-/* Texturas dither (AVIF, claro e escuro): fundos de cartões e separadores. O ficheiro só se pede quando o elemento existe. */
-.tx {
+/* ---------- Fotografias de Guimarães da landing, em meio-tom Novelo (ver components/photos.tsx e docs/marca/linguagem-dither.md) ---------- */
+
+/* Fundos de secção (paço, fábrica, couros, plataforma): a fotografia branca mistura-se com o papel (multiply; no escuro, a versão sobre
+   preto com screen), por isso só ficam os pontos. O ficheiro, com hash, vem de landing-assets.generated.css e só se pede
+   quando o elemento existe. A máscara dissolve as arestas no papel; `--photo-mask` e `--photo-pos` ajustam cada uso. */
+.photo-bg {
+  position: relative;
+  isolation: isolate;
+}
+.photo-bg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
   background-repeat: no-repeat;
-  background-size: cover;
+  background-size: var(--photo-size, cover);
+  background-position: var(--photo-pos, right bottom);
+  mix-blend-mode: multiply;
+  opacity: var(--photo-o, 1);
+  -webkit-mask-image: var(--photo-mask, none);
+  mask-image: var(--photo-mask, none);
 }
-.tx-campo {
-  background-image: url("/landing/textura-campo-light-1280.avif");
-  background-position: right bottom;
+.dark .photo-bg::before,
+.photo-dark.photo-bg::before {
+  mix-blend-mode: screen;
 }
-.tx-dunas {
-  background-image: url("/landing/textura-dunas-light-1280.avif");
-  background-position: center bottom;
+/* Cartões em destaque (fábrica têxtil, Couros): a fotografia só aparece num canto, por baixo do texto, a dissolver-se no cartão. Ancorada no canto superior direito, onde o cartão tem menos texto. */
+.photo-fabrica,
+.photo-couros {
+  --photo-mask: radial-gradient(120% 110% at 100% 0%, #000 18%, transparent 68%);
+  --photo-o: 0.5;
 }
-.tx-fio {
-  background-image: url("/landing/textura-fio-light-1280.avif");
-  background-position: right center;
+.photo-fabrica {
+  --photo-pos: center 30%;
 }
-.dark .tx-campo,
-.tx-dark.tx-campo {
-  background-image: url("/landing/textura-campo-dark-1280.avif");
+/* CTA final (Plataforma das Artes, só em escuro): à direita; em telemóvel por baixo do texto. */
+.photo-plataforma {
+  --photo-mask: linear-gradient(to left, #000 22%, transparent 88%);
+  --photo-o: 0.85;
+  --photo-pos: right center;
 }
-.dark .tx-dunas {
-  background-image: url("/landing/textura-dunas-dark-1280.avif");
+@media (max-width: 639px) {
+  .photo-plataforma {
+    --photo-o: 0.8;
+    --photo-mask: linear-gradient(to top, #000 0, transparent 60%);
+  }
 }
-.dark .tx-fio,
-.tx-dark.tx-fio {
-  background-image: url("/landing/textura-fio-dark-1280.avif");
+/* Faixa entre secções (Paço dos Duques): uma fatia dissolvida nas quatro arestas. */
+.photo-band {
+  --photo-o: 0.55;
+  --photo-pos: 50% 40%;
+  --photo-size: max(100%, 1200px) auto;
+  --photo-mask:
+    linear-gradient(to right, transparent, #000 16%, #000 84%, transparent),
+    linear-gradient(to bottom, transparent, #000 38%, #000 62%, transparent);
+}
+.photo-band::before {
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
 }
 
-/* Hero: imagem dither com parallax de 24 px só em CSS (compositor, sem JS) e véu de pontos que se dissolve uma vez. */
+/* Entrada de uma fotografia que chega depois do primeiro desenho: fade curto e um zoom quase impercetível. Quando já está
+   em cache (ou chega com o HTML) não há animação nenhuma. */
+.lp-photo[data-fade='wait'] {
+  opacity: 0;
+  transform: scale(1.015);
+}
+.lp-photo[data-fade='in'] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 280ms ease-out,
+    transform 900ms var(--ease-out);
+}
+
+/* ---------- Hero: a Penha ao fim do dia ----------
+   Dois arranjos, com as mesmas condições de media que as fontes do <picture> (landing-assets.generated.ts):
+   - empilhado (telemóvel e tablet de pé): a fotografia 4:5 (pico em foco) enche o primeiro ecrã e o texto fica na metade de
+     baixo, ao alcance do polegar. O véu (`.lp-hs-copy::before`) nasce 5,5 rem acima da primeira linha e só cobre o texto, por
+     isso o pico e as encostas por cima ficam vivos e o encontro com o papel é um degradé curto, sem lavar a imagem;
+   - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura, texto à esquerda sobre o céu. */
+.lp-hs {
+  --hs-sky: var(--hero-sky-light, #f4ead9);
+  position: relative;
+  isolation: isolate;
+  overflow: clip;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-height: 100vh;
+  min-height: 100svh;
+  background-color: var(--hs-sky);
+  padding-top: calc(var(--nav-h) + 9rem);
+  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+}
+.dark .lp-hs {
+  --hs-sky: var(--hero-sky-dark, #2a2c21);
+}
+/* Empilhado: a fotografia 4:5 vai à largura do ecrã e sobe/desce para o pico (29 % da altura) ficar logo abaixo da barra. */
+.lp-hs-media {
+  position: absolute;
+  z-index: -1;
+  left: 0;
+  right: 0;
+  top: calc(var(--nav-h) + 1.75rem - 0.29 * 125vw);
+  aspect-ratio: 4 / 5;
+}
+.lp-hs-media img {
+  object-position: 50% 0%;
+}
+.lp-hs-proof-card,
+.lp-hs-hint {
+  display: none;
+}
+.lp-hs-inner {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.lp-hs-copy {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.lp-hs-copy > * {
+  max-width: 36rem;
+}
+.lp-hs-eyebrow {
+  letter-spacing: 0.1em;
+  font-size: 10px;
+}
+@media (min-width: 900px) {
+  .lp-hs-eyebrow {
+    letter-spacing: 0.18em;
+    font-size: 11px;
+  }
+}
+.lp-hs-copy::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: -5.5rem auto -2rem 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent 0,
+    color-mix(in oklab, var(--background) 55%, transparent) 2.5rem,
+    color-mix(in oklab, var(--background) 92%, transparent) 4.5rem,
+    var(--background) 5.5rem
+  );
+}
+.lp-hs-title {
+  font-size: clamp(2.25rem, 0.8rem + 6.2vw, 3.5rem);
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+  text-wrap: balance;
+}
+.lp-hs-lead {
+  font-size: clamp(0.9375rem, 0.85rem + 0.5vw, 1.125rem);
+  line-height: 1.45;
+  text-wrap: pretty;
+}
+.lp-hs-ctas {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.375rem;
+}
+.lp-hs-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 1.5rem;
+}
+.lp-hs-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding-inline: 0.25rem;
+  font-weight: 500;
+  font-size: 0.9375rem;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--foreground) 30%, transparent);
+  text-underline-offset: 0.3em;
+  border-radius: 0.25rem;
+}
+.lp-hs-links a:hover {
+  text-decoration-color: currentColor;
+}
+.lp-hs-proof-line {
+  margin-top: 0.125rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+/* Chegada escalonada do que está por baixo do título (só opacidade e transform; o título e o subtítulo não animam: LCP). */
 @media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: scroll()) {
-    @keyframes hero-drift {
-      to {
-        transform: translate3d(0, 24px, 0) scale(1.04);
-      }
-    }
-    .hero-drift {
-      animation: hero-drift linear both;
-      animation-timeline: scroll(root);
-      animation-range: 0 100svh;
-    }
+  .lp-hs-stagger {
+    animation: lp-rise 700ms var(--ease-out) calc(120ms + var(--i, 0) * 90ms) both;
   }
-  @keyframes hero-veil {
-    to {
-      opacity: 0;
-    }
+}
+@media (min-width: 640px) {
+  .lp-hs {
+    padding-top: calc(var(--nav-h) + 12rem);
   }
-  .hero-veil {
-    background: var(--background);
-    -webkit-mask-image: url("/landing/tile-cruz-light.svg");
-    mask-image: url("/landing/tile-cruz-light.svg");
-    -webkit-mask-size: 16px 16px;
-    mask-size: 16px 16px;
-    animation: hero-veil 700ms ease-out 150ms both;
+  .lp-hs-title {
+    font-size: clamp(3.25rem, 1.8rem + 3.8vw, 4.75rem);
   }
+  .lp-hs-lead {
+    font-size: 1.25rem;
+  }
+  .lp-hs-ctas {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.25rem;
+  }
+}
+@media (min-width: 640px) and (min-aspect-ratio: 6/5) {
+  .lp-hs {
+    justify-content: center;
+    min-height: clamp(30rem, 100svh, 60rem);
+    padding-top: calc(var(--nav-h) + clamp(1.25rem, 5svh, 3.5rem));
+    padding-bottom: clamp(2rem, 7svh, 4.5rem);
+  }
+  /* Névoa final: a base da fotografia dissolve-se no papel da secção seguinte. */
+  .lp-hs::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: clamp(3rem, 12svh, 7rem);
+    background: linear-gradient(to bottom, transparent, var(--background));
+    pointer-events: none;
+  }
+  .lp-hs-media {
+    inset: 0;
+    aspect-ratio: auto;
+  }
+  .lp-hs-media img {
+    object-position: 62% 0%;
+  }
+  .lp-hs-copy {
+    max-width: min(44%, 33rem);
+    gap: clamp(0.75rem, 2.2svh, 1.5rem);
+  }
+  .lp-hs-copy > * {
+    max-width: none;
+  }
+  .lp-hs-copy::before {
+    display: none;
+  }
+  .lp-hs-title {
+    font-size: clamp(2rem, min(3.4vw + 0.6rem, 6.6svh + 0.6rem), 4.25rem);
+  }
+  .lp-hs-lead {
+    font-size: clamp(1rem, min(1.2vw + 0.35rem, 2.6svh + 0.35rem), 1.25rem);
+  }
+  .lp-hs-note {
+    display: none;
+  }
+  .lp-hs-links {
+    justify-content: flex-start;
+  }
+  .lp-hs-inner {
+    justify-content: flex-start;
+  }
+}
+/* Ecrã largo e alto: cartão com o número, no céu do canto superior direito (deixa o campanário da Penha e a floresta livres), e dica de rolagem. */
+@media (min-width: 1024px) and (min-aspect-ratio: 6/5) {
+  .lp-hs-inner {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+  .lp-hs-copy {
+    align-self: flex-start;
+  }
+  .lp-hs-proof-card {
+    display: block;
+    align-self: flex-start;
+  }
+  .lp-hs-proof-line {
+    display: none;
+  }
+  .lp-hs-hint {
+    display: flex;
+  }
+}
+/* Véu à esquerda, onde está o texto: sempre no escuro (texto claro sobre o flanco dourado) e, no claro, só quando o ecrã é
+   menos largo que 17:10 (tablet na horizontal), porque aí o texto chega ao flanco. Em 16:9 ou mais largo o céu chega. */
+@media (min-width: 640px) and (min-aspect-ratio: 6/5) {
+  .dark .lp-hs-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgb(15 24 21 / 0.88) 0,
+      rgb(15 24 21 / 0.62) 38%,
+      rgb(15 24 21 / 0) 64%
+    );
+  }
+}
+@media (min-width: 640px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 17/10) {
+  html:not(.dark) .lp-hs-media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to right,
+      rgb(244 241 234 / 0.82) 0,
+      rgb(244 241 234 / 0.5) 40%,
+      rgb(244 241 234 / 0) 66%
+    );
+  }
+}
+/* Ultra-largo (2:1 ou mais): o cartão cairia sobre o campanário; a prova passa a linha, como em telemóvel. */
+@media (min-aspect-ratio: 2/1) {
+  .lp-hs-proof-card {
+    display: none !important;
+  }
+  .lp-hs-proof-line {
+    display: block !important;
+  }
+}
+
+/* Faixas horizontais em telemóvel: encaixam cartão a cartão (o seguinte espreita à direita); sem barra de rolagem visível. */
+.lp-snap {
+  scrollbar-width: none;
+  overscroll-behavior-x: contain;
+  scroll-padding-inline: 1rem;
+}
+.lp-snap::-webkit-scrollbar {
+  display: none;
+}
+
+/* Slider do mini-simulador: alça de 28 px (a caixa de toque continua a ter 44 px de altura) e trilho com o troço preenchido. */
+.lp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  touch-action: pan-y;
+}
+.lp-range:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+  border-radius: 999px;
+}
+.lp-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--primary) var(--fill, 0%), var(--secondary) var(--fill, 0%));
+  box-shadow: inset 0 0 0 1px color-mix(in oklab, var(--border) 80%, transparent);
+}
+.lp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 28px;
+  height: 28px;
+  margin-top: -11px;
+  border-radius: 999px;
+  background: var(--primary);
+  border: 4px solid var(--background);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
+  transition: transform 160ms var(--ease-out);
+}
+.lp-range:active::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+.lp-range::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: linear-gradient(to right, var(--primary) var(--fill, 0%), var(--secondary) var(--fill, 0%));
+}
+.lp-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--primary);
+  border: 4px solid var(--background);
+  box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
 }

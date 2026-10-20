@@ -420,16 +420,6 @@ def build_preview(g: Geometry, r_sym: float) -> None:
     landing = "".join(
         f'<figure><img src="../apps/web/public/landing/{f}" width="{w}"><figcaption>{f}</figcaption></figure>'
         for f, w in (
-            ("hero-16x9-light-640.avif", 300),
-            ("hero-16x9-dark-640.avif", 300),
-            ("textura-fio-light-1280.avif", 300),
-            ("textura-campo-light-1280.avif", 300),
-            ("textura-dunas-light-1280.avif", 300),
-            ("login-painel-light-960.avif", 160),
-            ("login-painel-dark-960.avif", 160),
-            ("login-faixa-light-1200.avif", 300),
-            ("login-faixa-dark-1200.avif", 300),
-            ("hero-mobile-light-432.avif", 160),
         )
     )
     html = f"""<!doctype html>

@@ -33,6 +33,9 @@ function landingChunks() {
   return hrefs.filter((h) => !loaded.has(h));
 }
 const chunks = landingChunks();
+/** `<link rel="preload" as="image">` do hero: vêm do manifesto das fotografias (nomes com hash), nunca escritos à mão. */
+const heroLinks = JSON.parse(readFileSync(join(root, 'public', 'landing', 'manifest.json'), 'utf8')).preload ?? [];
+if (!heroLinks.length) throw new Error('prerender: public/landing/manifest.json sem `preload` (corre `just brand-landing`)');
 rmSync(join(dist, '.vite'), { recursive: true, force: true });
 
 const failures = [];
@@ -54,7 +57,7 @@ for (const locale of LOCALE_IDS) {
   for (const route of ROUTES) {
     const dir = join(dist, LOCALES[locale].prefix, route.path);
     mkdirSync(dir, { recursive: true });
-    const html = renderRoute(base, route, locale, messages, chunks);
+    const html = renderRoute(base, route, locale, messages, chunks, heroLinks);
     const problems = auditHtml(html, { publicPage: true });
     if (problems.length) failures.push(`${LOCALES[locale].prefix}/${route.path}: ${problems.join('; ')}`);
     writeFileSync(join(dir, 'index.html'), html);

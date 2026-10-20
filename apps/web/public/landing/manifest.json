@@ -1,135 +1,245 @@
 {
-  "generated_by": "scripts/brand/landing_hero.py",
+  "generated_by": "scripts/brand/hero_derivatives.py",
   "files": {
-    "hero-16x9-dark-1280.avif": {
-      "bytes": 268106,
-      "w": 1280,
-      "h": 720
+    "fundo-couros-dark-1440.55c7e0e9.avif": {
+      "bytes": 51392,
+      "w": 1440,
+      "h": 960
     },
-    "hero-16x9-dark-1920.avif": {
-      "bytes": 656287,
+    "fundo-couros-dark-960.a4ef4041.avif": {
+      "bytes": 31303,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-couros-light-1440.8724feb9.avif": {
+      "bytes": 55008,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-couros-light-960.8e1ebafd.avif": {
+      "bytes": 37198,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-fabrica-dark-1440.f44e0d9d.avif": {
+      "bytes": 59416,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-fabrica-dark-960.b91e10e7.avif": {
+      "bytes": 47060,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-fabrica-light-1440.267be35d.avif": {
+      "bytes": 60606,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-fabrica-light-960.c7aebca9.avif": {
+      "bytes": 48606,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-paco-dark-1440.ad444f7b.avif": {
+      "bytes": 59260,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-paco-dark-960.4c8f452c.avif": {
+      "bytes": 39640,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-paco-light-1440.01b46f05.avif": {
+      "bytes": 59809,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-paco-light-960.f5ba885b.avif": {
+      "bytes": 46370,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-plataforma-dark-1440.6e2a33a8.avif": {
+      "bytes": 60008,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-plataforma-dark-960.4cc026f2.avif": {
+      "bytes": 33342,
+      "w": 960,
+      "h": 640
+    },
+    "fundo-plataforma-light-1440.fe17b7af.avif": {
+      "bytes": 58514,
+      "w": 1440,
+      "h": 960
+    },
+    "fundo-plataforma-light-960.8dddf6f9.avif": {
+      "bytes": 35939,
+      "w": 960,
+      "h": 640
+    },
+    "hero-tall-dark-1088.4fb68d9c.webp": {
+      "bytes": 245912,
+      "w": 1088,
+      "h": 1360
+    },
+    "hero-tall-dark-1088.97b152c8.avif": {
+      "bytes": 59160,
+      "w": 1088,
+      "h": 1360
+    },
+    "hero-tall-dark-1360.a500d0c6.webp": {
+      "bytes": 395926,
+      "w": 1360,
+      "h": 1700
+    },
+    "hero-tall-dark-1360.f7d971b3.avif": {
+      "bytes": 130670,
+      "w": 1360,
+      "h": 1700
+    },
+    "hero-tall-dark-544.2eea3c9c.avif": {
+      "bytes": 18195,
+      "w": 544,
+      "h": 680
+    },
+    "hero-tall-dark-544.a0f20180.webp": {
+      "bytes": 31124,
+      "w": 544,
+      "h": 680
+    },
+    "hero-tall-dark-816.0742d644.avif": {
+      "bytes": 49153,
+      "w": 816,
+      "h": 1020
+    },
+    "hero-tall-dark-816.9850b85b.webp": {
+      "bytes": 184360,
+      "w": 816,
+      "h": 1020
+    },
+    "hero-tall-light-1088.243f5b69.webp": {
+      "bytes": 269124,
+      "w": 1088,
+      "h": 1360
+    },
+    "hero-tall-light-1088.244ea27a.avif": {
+      "bytes": 75832,
+      "w": 1088,
+      "h": 1360
+    },
+    "hero-tall-light-1360.2089b2fa.avif": {
+      "bytes": 200034,
+      "w": 1360,
+      "h": 1700
+    },
+    "hero-tall-light-1360.3662dea1.webp": {
+      "bytes": 441332,
+      "w": 1360,
+      "h": 1700
+    },
+    "hero-tall-light-544.774777eb.webp": {
+      "bytes": 34694,
+      "w": 544,
+      "h": 680
+    },
+    "hero-tall-light-544.eccc635e.avif": {
+      "bytes": 24869,
+      "w": 544,
+      "h": 680
+    },
+    "hero-tall-light-816.ac03377b.webp": {
+      "bytes": 185150,
+      "w": 816,
+      "h": 1020
+    },
+    "hero-tall-light-816.f85bc935.avif": {
+      "bytes": 72449,
+      "w": 816,
+      "h": 1020
+    },
+    "hero-wide-dark-1440.3615641d.avif": {
+      "bytes": 57385,
+      "w": 1440,
+      "h": 900
+    },
+    "hero-wide-dark-1440.4a4b8dad.webp": {
+      "bytes": 290666,
+      "w": 1440,
+      "h": 900
+    },
+    "hero-wide-dark-1920.40a3f9d2.avif": {
+      "bytes": 66882,
       "w": 1920,
-      "h": 1080
+      "h": 1200
     },
-    "hero-16x9-dark-640.avif": {
-      "bytes": 51429,
-      "w": 640,
-      "h": 360
-    },
-    "hero-16x9-dark-640.webp": {
-      "bytes": 70350,
-      "w": 640,
-      "h": 360
-    },
-    "hero-16x9-light-1280.avif": {
-      "bytes": 283566,
-      "w": 1280,
-      "h": 720
-    },
-    "hero-16x9-light-1920.avif": {
-      "bytes": 484288,
+    "hero-wide-dark-1920.d9a8d5fb.webp": {
+      "bytes": 415848,
       "w": 1920,
-      "h": 1080
+      "h": 1200
     },
-    "hero-16x9-light-640.avif": {
-      "bytes": 50075,
-      "w": 640,
-      "h": 360
-    },
-    "hero-16x9-light-640.webp": {
-      "bytes": 69860,
-      "w": 640,
-      "h": 360
-    },
-    "hero-4x3-dark-1536.avif": {
-      "bytes": 554384,
-      "w": 1536,
-      "h": 1152
-    },
-    "hero-4x3-dark-768.avif": {
-      "bytes": 99236,
-      "w": 768,
-      "h": 576
-    },
-    "hero-4x3-dark-768.webp": {
-      "bytes": 137730,
-      "w": 768,
-      "h": 576
-    },
-    "hero-4x3-light-1536.avif": {
-      "bytes": 423903,
-      "w": 1536,
-      "h": 1152
-    },
-    "hero-4x3-light-768.avif": {
-      "bytes": 102422,
-      "w": 768,
-      "h": 576
-    },
-    "hero-4x3-light-768.webp": {
-      "bytes": 141262,
-      "w": 768,
-      "h": 576
-    },
-    "hero-mobile-dark-1296.avif": {
-      "bytes": 511246,
-      "w": 1296,
-      "h": 1620
-    },
-    "hero-mobile-dark-432.avif": {
-      "bytes": 50949,
-      "w": 432,
-      "h": 540
-    },
-    "hero-mobile-dark-432.webp": {
-      "bytes": 67666,
-      "w": 432,
-      "h": 540
-    },
-    "hero-mobile-dark-864.avif": {
-      "bytes": 286221,
-      "w": 864,
-      "h": 1080
-    },
-    "hero-mobile-light-1296.avif": {
-      "bytes": 435719,
-      "w": 1296,
-      "h": 1620
-    },
-    "hero-mobile-light-432.avif": {
-      "bytes": 53060,
-      "w": 432,
-      "h": 540
-    },
-    "hero-mobile-light-432.webp": {
-      "bytes": 68818,
-      "w": 432,
-      "h": 540
-    },
-    "hero-mobile-light-864.avif": {
-      "bytes": 254196,
-      "w": 864,
-      "h": 1080
-    },
-    "login-faixa-dark-1200.avif": {
-      "bytes": 97153,
-      "w": 1200,
-      "h": 360
-    },
-    "login-faixa-dark-2400.avif": {
-      "bytes": 213193,
+    "hero-wide-dark-2400.5e267de3.avif": {
+      "bytes": 158943,
       "w": 2400,
-      "h": 720
+      "h": 1500
     },
-    "login-faixa-light-1200.avif": {
-      "bytes": 60809,
-      "w": 1200,
-      "h": 360
-    },
-    "login-faixa-light-2400.avif": {
-      "bytes": 173425,
+    "hero-wide-dark-2400.84fc1d53.webp": {
+      "bytes": 733284,
       "w": 2400,
-      "h": 720
+      "h": 1500
+    },
+    "hero-wide-dark-960.34d6da75.webp": {
+      "bytes": 39514,
+      "w": 960,
+      "h": 600
+    },
+    "hero-wide-dark-960.feab0cea.avif": {
+      "bytes": 16829,
+      "w": 960,
+      "h": 600
+    },
+    "hero-wide-light-1440.1d9426a5.avif": {
+      "bytes": 73410,
+      "w": 1440,
+      "h": 900
+    },
+    "hero-wide-light-1440.416c53e8.webp": {
+      "bytes": 264156,
+      "w": 1440,
+      "h": 900
+    },
+    "hero-wide-light-1920.0f68a5a9.webp": {
+      "bytes": 392092,
+      "w": 1920,
+      "h": 1200
+    },
+    "hero-wide-light-1920.50418952.avif": {
+      "bytes": 74616,
+      "w": 1920,
+      "h": 1200
+    },
+    "hero-wide-light-2400.3dc52f9f.avif": {
+      "bytes": 185498,
+      "w": 2400,
+      "h": 1500
+    },
+    "hero-wide-light-2400.fcc892d2.webp": {
+      "bytes": 653414,
+      "w": 2400,
+      "h": 1500
+    },
+    "hero-wide-light-960.3c917fa4.avif": {
+      "bytes": 22443,
+      "w": 960,
+      "h": 600
+    },
+    "hero-wide-light-960.677b8191.webp": {
+      "bytes": 45740,
+      "w": 960,
+      "h": 600
     },
     "login-painel-dark-1440.avif": {
       "bytes": 634861,
@@ -150,42 +260,52 @@
       "bytes": 328245,
       "w": 960,
       "h": 1280
-    },
-    "textura-campo-dark-1280.avif": {
-      "bytes": 177365,
-      "w": 1280,
-      "h": 720
-    },
-    "textura-campo-light-1280.avif": {
-      "bytes": 178147,
-      "w": 1280,
-      "h": 720
-    },
-    "textura-dunas-dark-1280.avif": {
-      "bytes": 63643,
-      "w": 1280,
-      "h": 720
-    },
-    "textura-dunas-light-1280.avif": {
-      "bytes": 73169,
-      "w": 1280,
-      "h": 720
-    },
-    "textura-fio-dark-1280.avif": {
-      "bytes": 236045,
-      "w": 1280,
-      "h": 720
-    },
-    "textura-fio-light-1280.avif": {
-      "bytes": 175630,
-      "w": 1280,
-      "h": 720
-    },
-    "tile-cruz-dark.svg": {
-      "bytes": 217
-    },
-    "tile-cruz-light.svg": {
-      "bytes": 217
     }
+  },
+  "preload": [
+    {
+      "rel": "preload",
+      "as": "image",
+      "type": "image/avif",
+      "media": "(min-width: 640px) and (min-aspect-ratio: 6/5) and (prefers-color-scheme: light)",
+      "imagesrcset": "/landing/hero-wide-light-960.3c917fa4.avif 960w, /landing/hero-wide-light-1440.1d9426a5.avif 1440w, /landing/hero-wide-light-1920.50418952.avif 1920w, /landing/hero-wide-light-2400.3dc52f9f.avif 2400w",
+      "imagesizes": "max(100vw, min(160vh, 1536px))",
+      "fetchpriority": "high"
+    },
+    {
+      "rel": "preload",
+      "as": "image",
+      "type": "image/avif",
+      "media": "(max-width: 639px) and (prefers-color-scheme: light), (max-aspect-ratio: 119/100) and (prefers-color-scheme: light)",
+      "imagesrcset": "/landing/hero-tall-light-544.eccc635e.avif 544w, /landing/hero-tall-light-816.f85bc935.avif 816w, /landing/hero-tall-light-1088.244ea27a.avif 1088w, /landing/hero-tall-light-1360.2089b2fa.avif 1360w",
+      "imagesizes": "100vw",
+      "fetchpriority": "high"
+    },
+    {
+      "rel": "preload",
+      "as": "image",
+      "type": "image/avif",
+      "media": "(min-width: 640px) and (min-aspect-ratio: 6/5) and (prefers-color-scheme: dark)",
+      "imagesrcset": "/landing/hero-wide-dark-960.feab0cea.avif 960w, /landing/hero-wide-dark-1440.3615641d.avif 1440w, /landing/hero-wide-dark-1920.40a3f9d2.avif 1920w, /landing/hero-wide-dark-2400.5e267de3.avif 2400w",
+      "imagesizes": "max(100vw, min(160vh, 1536px))",
+      "fetchpriority": "high"
+    },
+    {
+      "rel": "preload",
+      "as": "image",
+      "type": "image/avif",
+      "media": "(max-width: 639px) and (prefers-color-scheme: dark), (max-aspect-ratio: 119/100) and (prefers-color-scheme: dark)",
+      "imagesrcset": "/landing/hero-tall-dark-544.2eea3c9c.avif 544w, /landing/hero-tall-dark-816.0742d644.avif 816w, /landing/hero-tall-dark-1088.97b152c8.avif 1088w, /landing/hero-tall-dark-1360.f7d971b3.avif 1360w",
+      "imagesizes": "100vw",
+      "fetchpriority": "high"
+    }
+  ],
+  "sky": {
+    "light": "#EFE8DC",
+    "dark": "#2E382C"
+  },
+  "contrast": {
+    "light": 13.51,
+    "dark": 5.78
   }
 }

@@ -1,7 +1,7 @@
-import { PanelPicture, StripPicture } from '@/components/dither';
 import { useMediaQuery } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { PanelPicture } from './panel-picture';
 
 /**
  * Painel de marca do ecrã de entrada (a partir de 1024 px, à esquerda, fixo enquanto o formulário rola): a fotografia
@@ -63,21 +63,5 @@ export function AuthPanel({ className }: { className?: string }) {
         </>
       )}
     </aside>
-  );
-}
-
-/**
- * Faixa dither fina no topo do ecrã de entrada em telemóvel e tablet (< 1024 px): 140 px mais a zona segura. Vai no
- * fluxo (não é fixa), por isso o teclado nunca a deixa tapar o formulário; some em ecrãs muito baixos (paisagem,
- * teclado aberto com `resizes-content`).
- */
-export function AuthStrip() {
-  return (
-    <div
-      aria-hidden="true"
-      className="relative h-[calc(140px+env(safe-area-inset-top))] shrink-0 overflow-hidden border-border border-b bg-[var(--dither-ground)] lg:hidden [@media(max-height:520px)]:hidden"
-    >
-      <StripPicture />
-    </div>
   );
 }

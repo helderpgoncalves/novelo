@@ -135,11 +135,18 @@ e2e-full *ARGS: db-wait
 # Marca: regenera TODOS os assets (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) de uma só fonte
 brand:
     {{BRAND_RUN}} build_assets.py
-    {{BRAND_RUN}} landing_hero.py
+    {{BRAND_RUN}} hero_derivatives.py
+    {{BRAND_RUN}} login_panel.py
 
-# Só os ativos dither da landing e do painel de entrada (apps/web/public/landing/)
+# Só as fotografias da landing: Guimarães em meio-tom (hero_derivatives.py), AVIF/WebP com hash do conteúdo, manifest e tipos gerados
 brand-landing:
-    {{BRAND_RUN}} landing_hero.py
+    {{BRAND_RUN}} hero_derivatives.py
+
+brand-hero: brand-landing
+
+# Só o painel do ecrã de entrada (fotografia da Penha em meio-tom; precisa de rsvg-convert)
+brand-login:
+    {{BRAND_RUN}} login_panel.py
 
 # Subsets WOFF2 das fontes da landing (descarrega os TTF de google/fonts; precisa de rede)
 brand-fonts:
