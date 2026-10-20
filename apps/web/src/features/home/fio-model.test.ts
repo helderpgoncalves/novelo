@@ -1,46 +1,39 @@
 import { describe, expect, it } from 'vitest';
-import { type FioOptions, fioLayout } from './fio-model';
+import { fioBars } from './fio-model';
 
-const opts: FioOptions = {
-  width: 900,
-  band: 200,
-  nodeW: 10,
-  columns: [0, 300, 700],
-  gap: 12,
-  minNode: 8,
-};
 const input = { potentialT: 1000, collectedT: 250, reuseT: 150, recycleT: 70, rejectT: 30 };
 
-describe('fioLayout', () => {
-  const l = fioLayout(input, opts);
-  const node = (id: string) => {
-    const n = l.nodes.find((x) => x.id === id);
-    if (!n) throw new Error(id);
-    return n;
-  };
-  it('as alturas são proporcionais às toneladas', () => {
-    expect(node('potential').h).toBe(200);
-    expect(node('collected').h).toBeCloseTo(50, 9);
-    expect(node('missing').h).toBeCloseTo(150, 9);
-    expect(node('collected').h + node('missing').h).toBeCloseTo(node('potential').h, 9);
+describe('fioBars', () => {
+  const b = fioBars(input);
+  it('o potencial parte-se no recolhido e no que falta', () => {
+    expect(b.top.map((s) => s.id)).toEqual(['collected', 'missing']);
+    expect(b.top[0]?.pct).toBeCloseTo(25, 9);
+    expect(b.top[1]?.tonnes).toBeCloseTo(750, 9);
+    expect(b.top.reduce((s, x) => s + x.pct, 0)).toBeCloseTo(100, 9);
+    expect(b.collectedPct).toBeCloseTo(25, 9);
   });
-  it('os destinos somam as percentagens do recolhido', () => {
-    const pct = ['reuse', 'recycle', 'reject'].map((id) => node(id).pct);
-    expect(pct[0]).toBeCloseTo(60, 9);
-    expect(pct.reduce((a, b) => a + b, 0)).toBeCloseTo(100, 9);
-  });
-  it('um destino muito fino ganha altura mínima', () => {
-    expect(node('reject').h).toBeGreaterThanOrEqual(8);
-  });
-  it('há uma fita por nó de chegada e o fio solto fica sob o recolhido', () => {
-    expect(l.ribbons.map((r) => r.to).sort()).toEqual(
-      ['collected', 'missing', 'recycle', 'reject', 'reuse'].sort(),
-    );
-    expect(l.loose.y0).toBeGreaterThan(node('collected').h);
-    expect(l.height).toBeGreaterThan(node('potential').h * 0.99);
+  it('o recolhido parte-se pelos destinos, em % do total dos destinos', () => {
+    expect(b.bottom.map((s) => s.id)).toEqual(['reuse', 'recycle', 'reject']);
+    expect(b.bottom[0]?.pct).toBeCloseTo(60, 9);
+    expect(b.bottom[2]?.pct).toBeCloseTo(12, 9);
+    expect(b.bottom.reduce((s, x) => s + x.pct, 0)).toBeCloseTo(100, 9);
   });
   it('o recolhido nunca passa do potencial', () => {
-    const over = fioLayout({ ...input, collectedT: 5000 }, opts);
-    expect(over.nodes.find((n) => n.id === 'missing')?.h).toBe(0);
+    const over = fioBars({ ...input, collectedT: 1500 });
+    expect(over.top[0]?.tonnes).toBe(1000);
+    expect(over.top[1]?.tonnes).toBe(0);
+  });
+  it('valores em falta ou inválidos contam como zero e não rebentam', () => {
+    const bad = fioBars({
+      potentialT: Number.NaN,
+      collectedT: Number.NaN,
+      reuseT: Number.NaN,
+      recycleT: -3,
+      rejectT: 0,
+    });
+    expect(bad.potentialT).toBe(0);
+    expect(bad.top.every((s) => s.pct === 0 && s.tonnes === 0)).toBe(true);
+    expect(bad.bottom).toEqual([]);
+    expect(bad.collectedPct).toBe(0);
   });
 });

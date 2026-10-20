@@ -2,19 +2,19 @@ import { MessageCircle, SendHorizontal } from 'lucide-react';
 import { useId, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { openCopilot } from '@/features/copilot/store';
-import { formatEur, formatNumber } from '@/lib/format';
 import { formatList } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import type { QuestionInputs } from './derive';
+import { eur, num } from './safe';
 
 /** As três perguntas sugeridas, geradas a partir dos dados atuais (nunca fixas no texto). */
 export function suggestedQuestions(q: QuestionInputs): string[] {
   const out: string[] = [];
   if (q.topParishes.length > 0) out.push(m.home_ask_q1({ parishes: formatList(q.topParishes) }));
-  out.push(m.home_ask_q2({ t: formatNumber(q.targetT) }));
+  out.push(m.home_ask_q2({ t: num(q.targetT) }));
   out.push(
     q.budgetEur
-      ? m.home_ask_q3_budget({ from: formatEur(q.budgetEur), to: formatEur(q.budgetEur * 0.8) })
+      ? m.home_ask_q3_budget({ from: eur(q.budgetEur), to: eur(q.budgetEur * 0.8) })
       : m.home_ask_q3(),
   );
   return out;
@@ -33,7 +33,7 @@ export function CopilotAsk({ inputs }: { inputs: QuestionInputs }) {
             <button
               type="button"
               onClick={() => openCopilot({ question: q })}
-              className="inline-flex min-h-11 w-full items-center gap-2.5 rounded-xl px-4 py-2 text-left text-sm outline-none ring-1 ring-foreground/15 transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/60"
+              className="inline-flex min-h-11 w-full items-center gap-3 rounded-xl px-4 py-2.5 text-left text-[15px] leading-snug outline-none ring-1 ring-foreground/15 transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/60"
             >
               <MessageCircle className="size-4 shrink-0 text-primary" aria-hidden="true" />
               {q}
@@ -67,7 +67,7 @@ export function CopilotAsk({ inputs }: { inputs: QuestionInputs }) {
           <span className="max-sm:sr-only">{m.home_ask_send()}</span>
         </Button>
       </form>
-      <p className="text-muted-foreground text-xs">{m.home_ask_hint()}</p>
+      <p className="text-[13px] text-muted-foreground">{m.home_ask_hint()}</p>
     </div>
   );
 }

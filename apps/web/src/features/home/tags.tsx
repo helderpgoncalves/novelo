@@ -12,8 +12,11 @@ export function SourceLine({ children, className }: { children: ReactNode; class
   );
 }
 
+/** Etiqueta pequena de secção: 12 px, maiúsculas, em cor de texto secundário (AA sobre cartão). */
+export const EYEBROW = 'font-semibold text-muted-foreground text-xs uppercase tracking-[0.1em]';
+
 const PILL =
-  'inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-0.5 font-semibold text-[10px] uppercase leading-none tracking-wider';
+  'inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2 py-1 font-semibold text-xs leading-none';
 
 /** Selo «estimativa»: areia só como preenchimento, com contorno e texto em tinta. */
 export function EstimateTag({ className }: { className?: string }) {
@@ -28,7 +31,7 @@ export function EstimateTag({ className }: { className?: string }) {
 export function MeasuredTag({ className }: { className?: string }) {
   return (
     <span className={cn(PILL, 'bg-primary/10 text-primary ring-1 ring-primary/30', className)}>
-      <BadgeCheck className="size-3" aria-hidden="true" />
+      <BadgeCheck className="size-3.5" aria-hidden="true" />
       {m.home_measured()}
     </span>
   );
@@ -40,7 +43,7 @@ export function UnverifiedTag({ className }: { className?: string }) {
     <span
       className={cn(PILL, 'border border-foreground/50 border-dashed text-foreground', className)}
     >
-      <CircleHelp className="size-3" aria-hidden="true" />
+      <CircleHelp className="size-3.5" aria-hidden="true" />
       {m.home_unverified()}
     </span>
   );

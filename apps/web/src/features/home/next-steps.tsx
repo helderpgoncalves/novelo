@@ -24,10 +24,11 @@ import {
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { openCopilot } from '@/features/copilot/store';
-import { formatEur, formatTonnes } from '@/lib/format';
 import { formatDate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { newestFirst } from './recent';
+import { eur, tonnes } from './safe';
 
 type Role = 'admin' | 'operator' | 'guest';
 
@@ -53,8 +54,8 @@ function Step({ icon, title, hint, count, tone = 'action', actions }: StepProps)
         {count !== undefined ? count : icon}
       </span>
       <div className="min-w-0 flex-1 basis-48">
-        <p className="font-medium text-sm leading-snug">{title}</p>
-        {hint && <p className="text-muted-foreground text-xs leading-snug">{hint}</p>}
+        <p className="font-medium text-[15px] leading-snug">{title}</p>
+        {hint && <p className="text-[13px] text-muted-foreground leading-snug">{hint}</p>}
       </div>
       {actions && <div className="flex shrink-0 flex-wrap gap-2">{actions}</div>}
     </li>
@@ -199,7 +200,7 @@ function ScenariosStep() {
   return (
     <Query query={q}>
       {(list) => {
-        const sorted = [...list].sort((a, b) => b.created_at.localeCompare(a.created_at));
+        const sorted = newestFirst(list, (s) => s.created_at);
         const [last, previous] = sorted;
         if (!last)
           return (
@@ -219,7 +220,7 @@ function ScenariosStep() {
             count={sorted.length}
             icon={null}
             title={m.home_steps_scenarios_last({ label: last.label })}
-            hint={`${formatTonnes(last.tonnes_year, 0)} · ${formatEur(last.annual_cost_eur)} · ${formatDate(last.created_at, 'medium')}`}
+            hint={`${tonnes(last.tonnes_year, 0)} · ${eur(last.annual_cost_eur)} · ${formatDate(last.created_at, 'medium')}`}
             actions={
               <>
                 <Button asChild variant="outline" {...BTN}>
@@ -248,7 +249,7 @@ function ReportStep() {
   return (
     <Query query={q}>
       {(list) => {
-        const last = [...list].sort((a, b) => b.created_at.localeCompare(a.created_at))[0];
+        const last = newestFirst(list, (r) => r.created_at)[0];
         return (
           <Step
             icon={<FileText className="size-4" aria-hidden="true" />}

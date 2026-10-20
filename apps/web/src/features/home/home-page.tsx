@@ -7,7 +7,6 @@ import { AsyncBoundary } from '@/components/async-boundary';
 import { Page, Panel, Section } from '@/components/page';
 import { CardSkeleton, ChartSkeleton, MapSkeleton } from '@/components/skeletons';
 import { Button } from '@/components/ui/button';
-import { formatNumber, formatPercent } from '@/lib/format';
 import { useInViewOnce } from '@/lib/motion';
 import { m } from '@/paraglide/messages';
 import { type BudgetEstimate, budgetCurve, budgetRange, estimateAt, initialBudget } from './budget';
@@ -17,8 +16,10 @@ import { questionInputs, trustItems } from './derive';
 import { EvidenceTabs } from './evidence-tabs';
 import { Fio } from './fio';
 import { NextSteps } from './next-steps';
+import { num, pct } from './safe';
 import { SituationStrip } from './situation-strip';
 import type { HomeTab, LayerId } from './tabs';
+import { EYEBROW } from './tags';
 import { Territory } from './territory';
 import { TrustBar } from './trust-bar';
 
@@ -106,11 +107,11 @@ export function HomePage({ role, search, onSearch }: HomePageProps) {
     <Page className="space-y-6 sm:space-y-8">
       <header className="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div className="min-w-0 space-y-1.5">
-          <p className="eyebrow">{m.home_eyebrow({ year: gap.year })}</p>
+          <p className={EYEBROW}>{m.home_eyebrow({ year: gap.year })}</p>
           <h1 className="max-w-3xl text-balance font-medium text-[1.7rem] leading-[1.12] tracking-tight sm:text-4xl">
             {m.home_headline({
-              pct: formatPercent(gap.capture_pct, 0),
-              missing: formatNumber(gap.missing_t, 0),
+              pct: pct(gap.capture_pct, 0),
+              missing: num(gap.missing_t, 0),
             })}
           </h1>
         </div>
@@ -192,7 +193,7 @@ export function HomePage({ role, search, onSearch }: HomePageProps) {
       <div id="fio" className="scroll-mt-20">
         <Section
           title={m.home_fio_title()}
-          description={m.home_fio_description({ pct: formatNumber(Math.round(gap.capture_pct)) })}
+          description={m.home_fio_description({ pct: num(Math.round(gap.capture_pct)) })}
         >
           <AsyncBoundary fallback={<ChartSkeleton className="h-72" />}>
             <Fio gap={gap} />

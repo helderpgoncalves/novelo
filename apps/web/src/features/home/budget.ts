@@ -42,7 +42,8 @@ export interface BudgetEstimate {
 export function estimateAt(curve: CurvePoint[], budget: number): BudgetEstimate | null {
   const first = curve[0];
   const last = curve[curve.length - 1];
-  if (!first || !last || budget < first.costEur - 1e-6 || budget > last.costEur + 1e-6) return null;
+  if (!first || !last || !Number.isFinite(budget)) return null;
+  if (budget < first.costEur - 1e-6 || budget > last.costEur + 1e-6) return null;
   let lower = first;
   let upper = last;
   for (let i = 0; i < curve.length; i++) {
@@ -73,7 +74,8 @@ export function budgetRange(curve: CurvePoint[], step = 500) {
 
 /** Valor inicial: o pedido na URL (limitado ao intervalo) ou o ponto médio do intervalo. */
 export function initialBudget(range: { min: number; max: number; step: number }, wanted?: number) {
-  const raw = wanted ?? (range.min + range.max) / 2;
+  const raw =
+    wanted !== undefined && Number.isFinite(wanted) ? wanted : (range.min + range.max) / 2;
   const clamped = Math.min(range.max, Math.max(range.min, raw));
   return Math.round(clamped / range.step) * range.step;
 }

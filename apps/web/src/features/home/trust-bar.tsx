@@ -12,8 +12,8 @@ const STATUS_STYLE: Record<TrustStatus, { bar: string; dot: string; label: () =>
     label: () => m.home_trust_estimate(),
   },
   missing: {
-    bar: 'bg-[repeating-linear-gradient(135deg,var(--color-muted-foreground)_0_2px,transparent_2px_6px)]',
-    dot: 'border border-dashed border-foreground/60',
+    bar: 'border-2 border-foreground/50 border-dashed bg-card',
+    dot: 'border-2 border-foreground/60 border-dashed',
     label: () => m.home_trust_missing(),
   },
 };
@@ -48,22 +48,22 @@ export function TrustBar({ items }: { items: TrustItem[] }) {
           estimate: counts.estimate,
           missing: counts.missing,
         })}
-        className="flex h-3 overflow-hidden rounded-full bg-muted ring-1 ring-foreground/10"
+        className="flex h-4 gap-0.5 overflow-hidden rounded-full"
       >
-        {ORDER.map((s) => (
+        {ORDER.filter((s) => counts[s] > 0).map((s) => (
           <span
             key={s}
-            className={cn(STATUS_STYLE[s].bar, 'h-full')}
-            style={{ width: `${(counts[s] / items.length) * 100}%` }}
+            className={cn(STATUS_STYLE[s].bar, 'h-full basis-0')}
+            style={{ flexGrow: counts[s] }}
           />
         ))}
       </div>
-      <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+      <ul className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
         {ORDER.map((s) => (
           <li key={s} className="inline-flex items-center gap-2">
-            <span className={cn('size-3 rounded-full', STATUS_STYLE[s].dot)} aria-hidden="true" />
+            <span className={cn('size-3.5 rounded-full', STATUS_STYLE[s].dot)} aria-hidden="true" />
             <span className="font-semibold tabular-nums">{counts[s]}</span>
-            {STATUS_STYLE[s].label()}
+            <span>{STATUS_STYLE[s].label()}</span>
           </li>
         ))}
       </ul>
@@ -89,7 +89,7 @@ export function TrustBar({ items }: { items: TrustItem[] }) {
           {items.map((i) => (
             <li key={i.key} className="flex items-start gap-2 text-sm leading-snug">
               <span
-                className={cn('mt-1 size-3 shrink-0 rounded-full', STATUS_STYLE[i.status].dot)}
+                className={cn('mt-0.5 size-3.5 shrink-0 rounded-full', STATUS_STYLE[i.status].dot)}
                 aria-hidden="true"
               />
               <span>

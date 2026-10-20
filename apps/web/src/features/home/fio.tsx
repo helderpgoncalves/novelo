@@ -1,31 +1,20 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useMemo } from 'react';
 import type { OverviewGap } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
-import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
-import { motionAllowed, useInViewOnce } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
-import { type FioNodeId, fioLayout } from './fio-model';
-import { EstimateTag, SourceLine } from './tags';
+import { type FioNodeId, type FioSegment, fioBars } from './fio-model';
+import { num, pct, tonnes } from './safe';
+import { EstimateTag, EYEBROW, SourceLine } from './tags';
 
-const NODE_FILL: Record<FioNodeId, string> = {
-  potential: 'fill-foreground/80',
-  collected: 'fill-primary',
-  missing: 'fill-areia',
-  reuse: 'fill-primary',
-  recycle: 'fill-chart-2',
-  reject: 'fill-muted-foreground',
+const FILL: Record<FioNodeId, string> = {
+  collected: 'bg-primary',
+  missing: 'bg-areia/45 ring-1 ring-areia ring-inset',
+  reuse: 'bg-primary',
+  recycle: 'bg-chart-2',
+  reject: 'bg-muted-foreground',
 };
-const RIBBON_FILL: Record<FioNodeId, string> = {
-  potential: 'fill-foreground/15',
-  collected: 'fill-primary/30',
-  missing: 'fill-areia/25',
-  reuse: 'fill-primary/30',
-  recycle: 'fill-chart-2/30',
-  reject: 'fill-muted-foreground/30',
-};
-const NODE_LABEL: Record<FioNodeId, () => string> = {
-  potential: () => m.home_fio_potential(),
+const LABEL: Record<FioNodeId, () => string> = {
   collected: () => m.home_fio_collected(),
   missing: () => m.home_fio_missing(),
   reuse: () => m.home_fio_reuse(),
@@ -33,214 +22,174 @@ const NODE_LABEL: Record<FioNodeId, () => string> = {
   reject: () => m.home_fio_reject(),
 };
 
-function useWidth() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-    setWidth(el.clientWidth);
-    const observer = new ResizeObserver(() => setWidth(el.clientWidth));
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, []);
-  return [ref, width] as const;
+function Bar({ segments, label }: { segments: FioSegment[]; label: string }) {
+  return (
+    <div role="img" aria-label={label} className="flex h-10 gap-0.5 overflow-hidden rounded-md">
+      {segments.map((s) => (
+        <div
+          key={s.id}
+          className={cn('h-full min-w-1', FILL[s.id])}
+          style={{ flexBasis: `${s.pct}%`, flexGrow: 0, flexShrink: 1 }}
+        />
+      ))}
+    </div>
+  );
 }
 
-interface Row {
-  id: FioNodeId;
-  tonnes: number;
-  pct: number;
+function Legend({ segments, showPct }: { segments: FioSegment[]; showPct?: boolean }) {
+  return (
+    <ul className="grid grid-cols-1 gap-x-8 gap-y-2 sm:flex sm:flex-wrap">
+      {segments.map((s) => (
+        <li key={s.id} className="flex items-center gap-2.5 text-sm">
+          <span className={cn('size-3.5 shrink-0 rounded-sm', FILL[s.id])} aria-hidden="true" />
+          <span className="font-medium">{LABEL[s.id]()}</span>
+          <span className="text-muted-foreground tabular-nums">
+            {tonnes(s.tonnes, s.id === 'missing' ? 0 : 1)}
+            {showPct !== false && ` · ${pct(s.pct)}`}
+          </span>
+        </li>
+      ))}
+    </ul>
+  );
 }
 
 /**
- * «O fio»: do potencial (estimativa) ao recolhido (medido) e ao seu destino. O troço que falta é o fio solto:
- * desfia-se à direita do recolhido. Desenha-se uma vez ao entrar no ecrã (sem movimento se o sistema o pede).
+ * «O fio»: duas barras de largura total ligadas por um fio. Em cima o potencial (estimativa) partido no recolhido
+ * (medido) e no que falta; em baixo o recolhido partido pelo destino. Formas sólidas, números à vista, sem medir o
+ * ecrã (a proporção é CSS) nem animação.
  */
 export function Fio({ gap }: { gap: OverviewGap }) {
-  const [wrap, width] = useWidth();
-  const seenRef = useRef<HTMLDivElement>(null);
-  const seen = useInViewOnce(seenRef);
-  const narrow = width < 560;
-  const inner = Math.max(width - (narrow ? 24 : 40), 240);
-  const { destinations: d } = gap;
-  const total = d.reuse_t + d.recycle_t + d.reject_t || 1;
-
-  const layout = useMemo(() => {
-    const nodeW = narrow ? 8 : 12;
-    const labelRight = narrow ? 118 : 190;
-    const w = Math.max(width - (narrow ? 24 : 40), 240);
-    return fioLayout(
-      {
+  const d = gap.destinations;
+  const bars = useMemo(
+    () =>
+      fioBars({
         potentialT: gap.potential_t,
         collectedT: gap.collected_t,
         reuseT: d.reuse_t,
         recycleT: d.recycle_t,
         rejectT: d.reject_t,
-      },
-      {
-        width: w,
-        band: narrow ? 190 : 230,
-        nodeW,
-        columns: [0, w * (narrow ? 0.34 : 0.3), w - labelRight - nodeW],
-        gap: narrow ? 14 : 18,
-        minNode: narrow ? 6 : 8,
-      },
-    );
-  }, [gap, d, width, narrow]);
+      }),
+    [gap.potential_t, gap.collected_t, d.reuse_t, d.recycle_t, d.reject_t],
+  );
+  const missing = bars.top.find((s) => s.id === 'missing');
+  const collected = bars.top.find((s) => s.id === 'collected');
 
-  const rows: Row[] = [
-    { id: 'potential', tonnes: gap.potential_t, pct: 100 },
-    { id: 'collected', tonnes: gap.collected_t, pct: (gap.collected_t / gap.potential_t) * 100 },
-    { id: 'missing', tonnes: gap.missing_t, pct: (gap.missing_t / gap.potential_t) * 100 },
-    { id: 'reuse', tonnes: d.reuse_t, pct: (d.reuse_t / total) * 100 },
-    { id: 'recycle', tonnes: d.recycle_t, pct: (d.recycle_t / total) * 100 },
-    { id: 'reject', tonnes: d.reject_t, pct: (d.reject_t / total) * 100 },
-  ];
-  const columns: Column<Row>[] = [
+  const rows = [...bars.top, ...bars.bottom];
+  const columns: Column<FioSegment>[] = [
     {
       id: 'step',
       header: m.home_fio_col_step(),
       primary: true,
-      cell: (r) => NODE_LABEL[r.id](),
-      value: (r) => NODE_LABEL[r.id](),
+      cell: (r) => LABEL[r.id](),
+      value: (r) => LABEL[r.id](),
     },
     {
       id: 'tonnes',
       header: m.home_fio_col_tonnes(),
       align: 'right',
       value: (r) => r.tonnes,
-      cell: (r) => formatTonnes(r.tonnes),
+      cell: (r) => tonnes(r.tonnes),
     },
     {
       id: 'pct',
       header: m.home_fio_col_pct(),
       align: 'right',
       value: (r) => r.pct,
-      cell: (r) => formatPercent(r.pct),
+      cell: (r) => pct(r.pct),
     },
   ];
 
-  const node = (id: FioNodeId) => layout.nodes.find((n) => n.id === id);
-  const drawn = seen || !motionAllowed();
-  const missing = node('missing');
-  const collected = node('collected');
-  const height = Math.max(layout.height, narrow ? 190 : 230) + 24;
-  const ariaLabel = m.home_fio_aria({
-    potential: formatTonnes(gap.potential_t, 0),
-    collected: formatTonnes(gap.collected_t),
-    missing: formatTonnes(gap.missing_t, 0),
-    reuse: formatPercent(rows[3]?.pct ?? 0),
-    recycle: formatPercent(rows[4]?.pct ?? 0),
-    reject: formatPercent(rows[5]?.pct ?? 0),
+  const ariaTop = m.home_fio_aria_top({
+    potential: tonnes(bars.potentialT, 0),
+    collected: tonnes(collected?.tonnes, 1),
+    missing: tonnes(missing?.tonnes, 0),
+  });
+  const ariaBottom = m.home_fio_aria_bottom({
+    reuse: pct(bars.bottom.find((s) => s.id === 'reuse')?.pct),
+    recycle: pct(bars.bottom.find((s) => s.id === 'recycle')?.pct),
+    reject: pct(bars.bottom.find((s) => s.id === 'reject')?.pct),
   });
 
   return (
-    <div className="space-y-3" ref={seenRef}>
-      <div
-        ref={wrap}
-        className={cn(
-          'relative w-full overflow-hidden rounded-xl bg-card p-3 ring-1 ring-foreground/10 sm:p-5',
-          'transition-[clip-path] duration-[1400ms] ease-out motion-reduce:transition-none',
-        )}
-        style={{ clipPath: drawn ? 'inset(0 0 0 0)' : 'inset(0 100% 0 0)' }}
-      >
-        {width > 0 && (
-          <svg
-            role="img"
-            aria-label={ariaLabel}
-            width={inner}
-            height={height}
-            viewBox={`0 0 ${inner} ${height}`}
-            className="block"
-          >
-            <title>{ariaLabel}</title>
-            <g transform="translate(0 20)">
-              {layout.ribbons.map((r) => (
-                <path key={r.id} d={r.d} className={RIBBON_FILL[r.to]} />
-              ))}
-              {/* O fio solto: o que falta desfia-se e não chega a lado nenhum. */}
-              {missing && missing.h > 0 && (
-                <g>
-                  {Array.from({ length: 9 }, (_, i) => {
-                    const t = (i + 0.5) / 9;
-                    const y = missing.y + missing.h * t;
-                    const x0 = missing.x + missing.w;
-                    const len = (narrow ? 0.9 : 1.6) * 60 * (1 - 0.35 * Math.abs(t - 0.5) * 2);
-                    return (
-                      <path
-                        // biome-ignore lint/suspicious/noArrayIndexKey: fios decorativos fixos
-                        key={i}
-                        d={`M${x0} ${y}C${x0 + len * 0.5} ${y} ${x0 + len * 0.7} ${y + 10 + i * 2} ${x0 + len} ${y + 14 + i * 3}`}
-                        className="fill-none stroke-areia"
-                        strokeWidth={Math.max(1.2, missing.h / 14)}
-                        strokeDasharray="5 5"
-                        strokeLinecap="round"
-                        opacity={0.9 - Math.abs(t - 0.5) * 0.8}
-                      />
-                    );
-                  })}
-                </g>
-              )}
-              {layout.nodes.map((n) => (
-                <rect
-                  key={n.id}
-                  x={n.x}
-                  y={n.y}
-                  width={n.w}
-                  height={Math.max(n.h, 1.5)}
-                  rx={2}
-                  className={NODE_FILL[n.id]}
-                />
-              ))}
-              {layout.nodes
-                .filter((n) => n.id !== 'missing')
-                .map((n) => {
-                  const top = n.id === 'potential' || n.id === 'collected';
-                  const x = n.id === 'potential' ? n.x : n.x + n.w + 8;
-                  return (
-                    <text
-                      key={`l-${n.id}`}
-                      x={x}
-                      y={top ? -6 : n.y + n.h / 2 - 2}
-                      className="fill-foreground text-[12px]"
-                    >
-                      <tspan className="font-semibold">{NODE_LABEL[n.id]()}</tspan>
-                      <tspan
-                        {...(top ? { dx: 6 } : { x, dy: 14 })}
-                        className="fill-muted-foreground tabular-nums"
-                      >
-                        {top
-                          ? formatTonnes(n.value, n.id === 'potential' ? 0 : 1)
-                          : `${formatPercent(n.pct)} · ${formatTonnes(n.value)}`}
-                      </tspan>
-                    </text>
-                  );
-                })}
-              {missing && collected && (
-                <text
-                  x={missing.x + missing.w + (narrow ? 70 : 150)}
-                  y={missing.y + missing.h / 2 - 4}
-                  className="fill-foreground text-[13px]"
-                >
-                  <tspan className="font-semibold">{m.home_fio_missing()}</tspan>
-                  <tspan
-                    x={missing.x + missing.w + (narrow ? 70 : 150)}
-                    dy="17"
-                    className="font-serif text-[22px] tabular-nums"
-                  >
-                    {`≈ ${formatNumber(missing.value, 0)} t`}
-                  </tspan>
-                </text>
-              )}
-            </g>
-          </svg>
-        )}
+    <div className="space-y-3">
+      <div className="space-y-4 rounded-xl bg-card p-4 ring-1 ring-foreground/10 sm:p-6">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+            <div className="space-y-1">
+              <p className={EYEBROW}>{m.home_fio_top_title()}</p>
+              <p className="font-medium font-serif text-3xl tabular-nums leading-none">
+                {tonnes(bars.potentialT, 0)}
+                <span className="ml-1.5 font-sans text-base text-muted-foreground">
+                  {m.home_fio_per_year()}
+                </span>
+              </p>
+            </div>
+            <p className="text-right">
+              <span className="block text-[13px] text-muted-foreground">
+                {m.home_fio_missing()}
+              </span>
+              <span className="font-medium font-serif text-3xl text-primary tabular-nums leading-none">
+                ≈ {num(missing?.tonnes, 0)} t
+              </span>
+            </p>
+          </div>
+          <Bar segments={bars.top} label={ariaTop} />
+          <Legend segments={bars.top} />
+        </div>
+
+        {/* O fio: do recolhido (medido) abre-se até ao destino. */}
+        <svg
+          viewBox="0 0 100 24"
+          preserveAspectRatio="none"
+          className="my-1 block h-8 w-full text-primary"
+          aria-hidden="true"
+        >
+          <path
+            d={`M0 0H${bars.collectedPct.toFixed(2)}L100 24H0Z`}
+            fill="currentColor"
+            fillOpacity="0.16"
+          />
+          <path
+            d={`M${bars.collectedPct.toFixed(2)} 0L100 24`}
+            stroke="currentColor"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+            fill="none"
+          />
+          <path
+            d="M0 0V24"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            vectorEffect="non-scaling-stroke"
+            fill="none"
+          />
+        </svg>
+
+        <div className="space-y-3">
+          <div className="space-y-1">
+            <p className={EYEBROW}>{m.home_fio_bottom_title()}</p>
+            <p className="font-medium font-serif text-2xl tabular-nums leading-none">
+              {tonnes(collected?.tonnes, 1)}
+              <span className="ml-1.5 font-sans text-base text-muted-foreground">
+                {m.home_fio_collected_in({ year: gap.year })}
+              </span>
+            </p>
+          </div>
+          {bars.bottom.length > 0 ? (
+            <>
+              <Bar segments={bars.bottom} label={ariaBottom} />
+              <Legend segments={bars.bottom} />
+            </>
+          ) : (
+            <p className="text-muted-foreground text-sm">{m.home_fio_no_destination()}</p>
+          )}
+        </div>
       </div>
+
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <EstimateTag />
         <SourceLine className="min-w-0 flex-1">
-          {m.home_fio_source({ rate: formatNumber(gap.potential_kg_per_inhab_month, 1) })}
+          {m.home_fio_source({ rate: num(gap.potential_kg_per_inhab_month, 1) })}
         </SourceLine>
       </div>
       <details className="group rounded-lg ring-1 ring-foreground/10">

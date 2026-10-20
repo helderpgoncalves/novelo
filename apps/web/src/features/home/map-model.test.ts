@@ -1,13 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { CaopFeature, OverviewParish } from '@/client';
-import {
-  buildMapModel,
-  dotsPath,
-  layerValues,
-  neighbourInDirection,
-  parishGapT,
-  radiusFor,
-} from './map-model';
+import { buildMapModel, layerValues, neighbourInDirection, parishGapT } from './map-model';
 
 const square = (lon: number, lat: number, size: number) => ({
   type: 'Polygon',
@@ -21,11 +14,11 @@ const square = (lon: number, lat: number, size: number) => ({
     ],
   ],
 });
-const zone = (code: string, lon: number, lat: number, size: number) =>
+const zone = (code: string, lon: number, lat: number, size: number, name = code) =>
   ({
     properties: {
       dicofre: code,
-      name: code,
+      name,
       area_km2: 2,
       lon: lon + size / 2,
       lat: lat + size / 2,
@@ -44,57 +37,40 @@ const parish = (code: string, extra: Partial<OverviewParish>) =>
   }) as OverviewParish;
 
 describe('buildMapModel', () => {
-  const zones = [
+  const model = buildMapModel([
     zone('a', -8.3, 41.4, 0.1),
-    zone('b', -8.2, 41.4, 0.1),
-    zone('tiny', -8.1, 41.4, 0.0002),
-  ];
-  const model = buildMapModel(zones, 400);
-  it('preenche as freguesias numa grelha a 45º e dá um ponto à mais pequena', () => {
-    const a = model.parishes.find((p) => p.code === 'a');
-    const tiny = model.parishes.find((p) => p.code === 'tiny');
-    expect(a?.dots.length).toBeGreaterThan(50);
-    expect(tiny?.dots.length).toBe(1);
-    const step = model.step;
-    for (const [x, y] of a?.dots ?? []) {
-      expect((Math.round(x / step) + Math.round(y / step)) % 2).toBe(0);
-    }
+    zone('b', -8.2, 41.4, 0.1, 'União das freguesias de Alfa e Beta'),
+    zone('empty', -8.1, 41.4, 0.0),
+  ]);
+  it('uma forma por freguesia, com todos os contornos num só caminho', () => {
+    expect(model.parishes.map((p) => p.code)).toEqual(['a', 'b', 'empty']);
+    expect((model.borders.match(/M/g) ?? []).length).toBeGreaterThanOrEqual(3);
+    expect(model.width).toBe(1000);
+    expect(model.height).toBeGreaterThan(0);
   });
-  it('fica perto do número de pontos pedido', () => {
-    const n = model.parishes.reduce((s, p) => s + p.dots.length, 0);
-    expect(n).toBeGreaterThan(250);
-    expect(n).toBeLessThan(600);
+  it('põe a etiqueta no interior, com a corda e o raio inscrito', () => {
+    const a = model.parishes.find((p) => p.code === 'a');
+    expect(a?.chord).toBeGreaterThan(100);
+    expect(a?.radius).toBeGreaterThan(50);
+    expect(a?.radius).toBeLessThanOrEqual((a?.chord ?? 0) / 2 + 1);
+  });
+  it('tira «União das freguesias de» ao nome do mapa', () => {
+    expect(model.parishes.find((p) => p.code === 'b')?.label).toBe('Alfa e Beta');
   });
   it('usa a área do CAOP', () => {
     expect(model.parishes[0]?.areaKm2).toBe(2);
   });
-});
-
-describe('dotsPath e radiusFor', () => {
-  it('um círculo por ponto e nada com raio 0', () => {
-    expect(dotsPath([[10, 10]], 0)).toBe('');
-    expect(
-      (
-        dotsPath(
-          [
-            [10, 10],
-            [20, 20],
-          ],
-          2,
-        ).match(/M/g) ?? []
-      ).length,
-    ).toBe(2);
-  });
-  it('raio ∝ raiz do valor com mínimo', () => {
-    expect(radiusFor(4, 4, 10)).toBeCloseTo(6.8, 9);
-    expect(radiusFor(1, 4, 10)).toBeCloseTo(3.4, 9);
-    expect(radiusFor(0, 4, 10)).toBeCloseTo(1.2, 9);
-    expect(radiusFor(undefined, 4, 10)).toBeCloseTo(1.2, 9);
+  it('sem contornos não rebenta', () => {
+    expect(buildMapModel([]).parishes).toEqual([]);
   });
 });
 
 describe('layerValues', () => {
-  const ps = [parish('a', { population: 4000, area_km2: 2, circuits_count: 0 }), parish('b', {})];
+  const ps = [
+    parish('a', { population: 4000, circuits_count: 0 }),
+    parish('b', {}),
+    parish('c', { potential_t: Number.NaN }),
+  ];
   const ctx = {
     parishes: ps,
     capturePct: 25,
@@ -104,18 +80,23 @@ describe('layerValues', () => {
     ]),
     municipalContainers: new Map([['b', 8]]),
   };
-  it('potencial por captar = potencial × (1 − captura), por km²', () => {
+  it('potencial por captar = potencial × (1 − captura), em t/ano', () => {
     expect(parishGapT(ps[1] as OverviewParish, 25)).toBeCloseTo(7.5, 9);
-    expect(layerValues('gap', ctx).get('b')).toBeCloseTo(7.5 / 4, 9);
+    expect(layerValues('gap', ctx).get('b')).toBeCloseTo(7.5, 9);
   });
-  it('população por km² e lacunas de circuitos', () => {
-    expect(layerValues('population', ctx).get('a')).toBe(2000);
+  it('freguesia sem valor válido fica fora (sem dados)', () => {
+    expect(layerValues('gap', ctx).has('c')).toBe(false);
+    expect(layerValues('density', ctx).has('c')).toBe(false);
+    expect(layerValues('containers', ctx).has('a')).toBe(false);
+  });
+  it('população total, densidade por km² e lacunas de circuitos', () => {
+    expect(layerValues('population', ctx).get('a')).toBe(4000);
+    expect(layerValues('density', ctx).get('a')).toBe(2000);
     expect(layerValues('data_gaps', ctx).get('a')).toBe(1);
     expect(layerValues('data_gaps', ctx).get('b')).toBe(0);
   });
-  it('contentores municipais por km², sem contar como têxteis', () => {
-    expect(layerValues('containers', ctx).get('b')).toBe(2);
-    expect(layerValues('containers', ctx).get('a')).toBe(0);
+  it('contentores municipais em número absoluto, sem contar como têxteis', () => {
+    expect(layerValues('containers', ctx).get('b')).toBe(8);
   });
 });
 

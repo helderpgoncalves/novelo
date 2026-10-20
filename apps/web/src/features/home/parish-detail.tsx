@@ -3,18 +3,19 @@ import { Map as MapIcon, MessageCircle, SlidersHorizontal, X } from 'lucide-reac
 import type { OverviewParish } from '@/client';
 import { Button } from '@/components/ui/button';
 import { openCopilot } from '@/features/copilot/store';
-import { formatNumber, formatTonnes } from '@/lib/format';
 import { tipauLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
-import { parishGapT } from './map-model';
-import { EstimateTag, MeasuredTag, SourceLine } from './tags';
+import { stripUnion } from './choropleth';
+import { num, tonnes } from './safe';
+import { EstimateTag, EYEBROW, MeasuredTag, SourceLine } from './tags';
 
 interface ParishDetailProps {
   parish: OverviewParish;
-  areaKm2: number;
-  capturePct: number;
-  /** Contentores municipais na freguesia (não são de têxteis). */
-  municipalContainers: number;
+  /** Potencial por captar (t/ano, estimativa). */
+  gapT: number;
+  areaKm2: number | null;
+  /** Contentores municipais na freguesia (não são de têxteis); `null` enquanto os contornos carregam. */
+  municipalContainers: number | null;
   /** `true` / `false` quando há cenário de referência para o orçamento; `null` sem ele. */
   covered: boolean | null;
   onClose: () => void;
@@ -32,36 +33,38 @@ function Fact({
   hint?: string;
 }) {
   return (
-    <div className="min-w-0 space-y-0.5">
-      <dt className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-muted-foreground text-xs">
+    <div className="min-w-0 space-y-1">
+      <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[13px] text-muted-foreground">
         {label}
         {tag}
       </dt>
-      <dd className="font-medium font-serif text-xl tabular-nums leading-tight">{value}</dd>
-      {hint && <p className="text-[11px] text-muted-foreground leading-snug">{hint}</p>}
+      <dd className="font-medium font-serif text-2xl tabular-nums leading-none">{value}</dd>
+      {hint && <p className="text-muted-foreground text-xs leading-snug">{hint}</p>}
     </div>
   );
 }
 
-/** Detalhe de uma freguesia: números, fonte e as três ações (simular, perguntar, ver no mapa). */
+/** Detalhe de uma freguesia: quatro números com fonte e as três ações (simular, perguntar, ver no mapa completo). */
 export function ParishDetail({
   parish,
+  gapT,
   areaKm2,
-  capturePct,
   municipalContainers,
   covered,
   onClose,
 }: ParishDetailProps) {
-  const gapT = parishGapT(parish, capturePct);
   const question = m.home_detail_question({ name: parish.name });
+  const density = areaKm2 && areaKm2 > 0 ? parish.population / areaKm2 : null;
   return (
     <div className="space-y-4">
       <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <p className="eyebrow">
+        <div className="min-w-0 space-y-1">
+          <p className={EYEBROW}>
             {parish.tipau ? tipauLabel[parish.tipau]() : m.home_detail_no_tipau()}
           </p>
-          <h3 className="text-balance font-serif text-2xl leading-tight">{parish.name}</h3>
+          <h3 className="text-balance font-serif text-2xl leading-tight" title={parish.name}>
+            {stripUnion(parish.name)}
+          </h3>
         </div>
         <Button
           variant="ghost"
@@ -74,41 +77,38 @@ export function ParishDetail({
         </Button>
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-3">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-4">
         <Fact
           label={m.home_detail_gap()}
           tag={<EstimateTag />}
-          value={`${formatNumber(gapT, 1)} t/ano`}
-          hint={m.home_detail_potential_of({ potential: formatTonnes(parish.potential_t, 1) })}
+          value={`${tonnes(gapT, 1)}/ano`}
+          hint={m.home_detail_potential_of({ potential: tonnes(parish.potential_t, 1) })}
         />
         <Fact
           label={m.home_detail_population()}
           tag={<MeasuredTag />}
-          value={formatNumber(parish.population)}
-          hint={m.home_detail_density({
-            density: formatNumber(parish.population / Math.max(0.01, areaKm2)),
-            area: formatNumber(areaKm2, 1),
-          })}
+          value={num(parish.population)}
+          hint={m.home_detail_density({ density: num(density), area: num(areaKm2, 1) })}
         />
         <Fact
           label={m.home_detail_circuits()}
-          value={formatNumber(parish.circuits_count)}
+          value={num(parish.circuits_count)}
           hint={m.home_detail_circuits_hint({ n: parish.localities_count })}
         />
         <Fact
           label={m.home_detail_municipal()}
-          value={formatNumber(municipalContainers)}
+          value={num(municipalContainers)}
           hint={m.home_detail_municipal_hint()}
         />
       </dl>
 
-      <p className="rounded-lg bg-muted/60 p-3 text-xs leading-relaxed">
+      <p className="rounded-lg bg-muted/60 p-3 text-[13px] leading-relaxed">
         {parish.containers_count > 0
           ? m.home_detail_textile_containers({ n: parish.containers_count })
           : m.home_detail_textile_missing()}
       </p>
       {covered !== null && (
-        <p className="text-xs leading-relaxed">
+        <p className="text-[13px] leading-relaxed">
           {covered ? m.home_detail_covered() : m.home_detail_not_covered()}
         </p>
       )}

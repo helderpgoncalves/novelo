@@ -65,3 +65,26 @@ describe('questionInputs', () => {
     expect(q.budgetEur).toBe(40000);
   });
 });
+
+describe('datas inválidas', () => {
+  const now = new Date(2026, 9, 20, 12);
+  it('daysUntil aceita carimbos ISO e dá null a vazios e inválidos', () => {
+    expect(daysUntil('2028-04-17T00:00:00+00:00', now)).toBe(545);
+    expect(daysUntil('', now)).toBeNull();
+    expect(daysUntil(undefined, now)).toBeNull();
+    expect(daysUntil('não é data', now)).toBeNull();
+    expect(daysUntil('2028-13-40', now)).toBeNull();
+  });
+  it('eprDeadline recai no prazo conhecido quando a data do marco é inválida', () => {
+    const bad = {
+      who_pays: 'producers',
+      date: 'xx',
+      source_label: '',
+      verified: true,
+    } as OverviewMilestone;
+    const d = eprDeadline([bad], now);
+    expect(d.date).toBe('2028-04-17');
+    expect(d.days).toBe(545);
+    expect(d.sourceLabel).toBe('Diretiva (UE) 2025/1892');
+  });
+});
