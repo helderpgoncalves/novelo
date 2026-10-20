@@ -14,7 +14,7 @@ import { m } from '@/paraglide/messages';
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
     const user = await queryClient
-      .fetchQuery({ ...getMeOptions(), staleTime: 30_000 })
+      .fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false })
       .catch(() => null);
     if (!user) throw redirect({ to: '/login', search: { next: location.href } });
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
