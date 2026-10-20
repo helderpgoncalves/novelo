@@ -2859,5 +2859,8 @@
   "fl_alert_grouped_hint": "agrupamento confirmado pela nota do planeamento, não é conflito",
   "fl_detail_collection": "Tipo de recolha",
   "fl_detail_collection_of": "{circuit}: {kinds}",
-  "fl_map_order_route": "Localidades pela ordem do percurso da Vitrus."
+  "fl_map_order_route": "Localidades pela ordem do percurso da Vitrus.",
+  "error_captcha_required": "Confirma que não és um robô e tenta de novo.",
+  "error_captcha_failed": "Não foi possível confirmar que és uma pessoa. Atualiza a página e tenta de novo.",
+  "error_captcha_unavailable": "A verificação de segurança está indisponível. Tenta novamente dentro de instantes."
 }

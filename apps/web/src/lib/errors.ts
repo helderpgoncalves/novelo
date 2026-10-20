@@ -28,6 +28,9 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   feature_disabled: () => m.error_feature_disabled(),
   upstream_error: () => m.error_upstream_error(),
   ai_budget_exceeded: () => m.error_ai_budget_exceeded(),
+  captcha_required: () => m.error_captcha_required(),
+  captcha_failed: () => m.error_captcha_failed(),
+  captcha_unavailable: () => m.error_captcha_unavailable(),
   internal_error: () => m.error_internal_error(),
 };
 
