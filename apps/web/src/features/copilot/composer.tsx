@@ -1,5 +1,16 @@
 import { keepPreviousData, useMutation, useQuery } from '@tanstack/react-query';
-import { ArrowUp, FileText, LoaderCircle, Monitor, Paperclip, Square, X } from 'lucide-react';
+import {
+  ArrowUp,
+  AtSign,
+  FileText,
+  LoaderCircle,
+  Monitor,
+  Paperclip,
+  Plus,
+  Slash,
+  Square,
+  X,
+} from 'lucide-react';
 import {
   forwardRef,
   type KeyboardEvent,
@@ -21,6 +32,12 @@ import {
   uploadCopilotAttachmentsMutation,
 } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { getErrorMessage } from '@/lib/errors';
 import { getLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -65,7 +82,11 @@ interface Props {
   /** Comando `/...`: devolve `true` se foi tratado. */
   onCommand: (name: string) => void;
   getPageContext: () => PageContext | null;
-  canAttachScreen: boolean;
+  /** Nome legível do ecrã atual; `null` se não há ecrã para partilhar (a página /chat). */
+  pageLabel: string | null;
+  /** O copiloto está a ver o ecrã atual (vai com a pergunta). */
+  contextOn: boolean;
+  onContextChange: (on: boolean) => void;
   compact?: boolean;
   autoFocus?: boolean;
 }
@@ -74,20 +95,30 @@ let uid = 0;
 
 /** Campo de mensagem flutuante: texto que cresce, anexos, `@` menções, `/` comandos e o ecrã atual, tudo dentro do campo. */
 export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
-  { busy, onSend, onStop, onCommand, getPageContext, canAttachScreen, compact, autoFocus },
+  {
+    busy,
+    onSend,
+    onStop,
+    onCommand,
+    getPageContext,
+    pageLabel,
+    contextOn,
+    onContextChange,
+    autoFocus,
+  },
   ref,
 ) {
   const [text, setText] = useState('');
   const [caret, setCaret] = useState(0);
   const [files, setFiles] = useState<Pending[]>([]);
   const [mentions, setMentions] = useState<{ ref: MentionRef; label: string }[]>([]);
-  const [screen, setScreen] = useState(false);
   const [dismissed, setDismissed] = useState<string | null>(null);
   const [active, setActive] = useState(0);
   const area = useRef<HTMLTextAreaElement>(null);
   const picker = useRef<HTMLInputElement>(null);
   const pendingCaret = useRef<number | null>(null);
   const listId = useId();
+  const screen = contextOn && pageLabel !== null;
   const upload = useMutation(uploadCopilotAttachmentsMutation());
 
   const trigger: Trigger | null = useMemo(() => findTrigger(text, caret), [text, caret]);
@@ -256,7 +287,6 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     setCaret(0);
     setFiles([]);
     setMentions([]);
-    setScreen(false);
   };
 
   const onKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -294,6 +324,16 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
       }
       submit();
     }
+  };
+
+  const insertTrigger = (char: '@' | '/') => {
+    const before = char === '/' ? '' : text.slice(0, caret);
+    const rest = char === '/' ? '' : text.slice(caret);
+    const pad = char === '@' && before && !/\s$/.test(before) ? ' ' : '';
+    const next = `${before}${pad}${char}${rest}`;
+    setTextAndCaret(next, before.length + pad.length + 1);
+    setDismissed(null);
+    requestAnimationFrame(() => area.current?.focus());
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -357,27 +397,26 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
           </p>
         )}
 
-      <div
-        className={cn(
-          'flex flex-col rounded-2xl border bg-card shadow-lg ring-offset-background transition-shadow focus-within:ring-2 focus-within:ring-ring/50',
-          compact ? 'gap-0.5' : 'gap-1',
-        )}
-      >
+      <div className="flex flex-col rounded-[1.375rem] border bg-card transition-colors focus-within:border-ring/60 focus-within:ring-2 focus-within:ring-ring/25">
         {(files.length > 0 || screen) && (
-          <ul className="flex flex-wrap gap-2 px-3 pt-3" aria-label={m.chat_attachments()}>
+          <ul className="flex flex-wrap gap-1.5 px-3 pt-2.5" aria-label={m.chat_attachments()}>
             {screen && (
-              <li className="inline-flex h-11 items-center gap-2 rounded-xl border bg-background pr-1 pl-3 text-xs">
-                <Monitor className="size-4 text-primary" aria-hidden="true" />
-                {m.chat_screen_chip()}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="size-9"
-                  onClick={() => setScreen(false)}
-                  aria-label={m.chat_remove_screen()}
+              <li
+                data-testid="copilot-context-chip"
+                className="inline-flex h-8 max-w-full items-center gap-1.5 rounded-full border bg-background pr-0.5 pl-2.5 text-muted-foreground text-xs"
+              >
+                <Monitor className="size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+                <span className="min-w-0 truncate">
+                  {m.cp_ctx_label({ page: pageLabel ?? '' })}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => onContextChange(false)}
+                  aria-label={m.cp_ctx_remove()}
+                  className="-my-2 -mr-1 flex size-11 shrink-0 items-center justify-center rounded-full hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
                 >
-                  <X className="size-4" aria-hidden="true" />
-                </Button>
+                  <X className="size-3.5" aria-hidden="true" />
+                </button>
               </li>
             )}
             {files.map((f) => (
@@ -420,29 +459,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
             ))}
           </ul>
         )}
-        <textarea
-          ref={area}
-          value={text}
-          rows={1}
-          maxLength={4000}
-          onChange={(e) => {
-            setText(e.target.value);
-            setCaret(e.target.selectionStart);
-            setDismissed(null);
-          }}
-          onSelect={(e) => setCaret(e.currentTarget.selectionStart)}
-          onKeyDown={onKeyDown}
-          onPaste={onPaste}
-          role="combobox"
-          aria-expanded={open && options.length > 0}
-          aria-controls={open && options.length > 0 ? listId : undefined}
-          aria-activedescendant={open && options.length > 0 ? `${listId}-${active}` : undefined}
-          aria-autocomplete="list"
-          aria-label={m.copilot_input_label()}
-          placeholder={m.chat_placeholder()}
-          className="max-h-52 min-h-11 w-full resize-none bg-transparent px-4 pt-3 pb-1 text-base leading-relaxed outline-none placeholder:text-muted-foreground"
-        />
-        <div className="flex items-center gap-1 px-2 pb-2">
+        <div className="flex items-end gap-0.5 p-1">
           <input
             ref={picker}
             type="file"
@@ -455,60 +472,99 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
               e.target.value = '';
             }}
           />
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="size-10"
-            aria-label={m.chat_attach_file()}
-            title={m.chat_attach_file()}
-            onClick={() => picker.current?.click()}
-          >
-            <Paperclip className="size-5" aria-hidden="true" />
-          </Button>
-          {canAttachScreen && (
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className={cn('size-10', screen && 'bg-primary/10 text-primary')}
-              aria-label={m.chat_attach_screen()}
-              aria-pressed={screen}
-              title={m.chat_attach_screen()}
-              onClick={() => setScreen((s) => !s)}
-            >
-              <Monitor className="size-5" aria-hidden="true" />
-            </Button>
-          )}
-          <span className="ml-auto" />
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-11 shrink-0 rounded-full text-muted-foreground"
+                aria-label={m.cp_plus_label()}
+              >
+                <Plus className="size-5" strokeWidth={1.75} aria-hidden="true" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent side="top" align="start" className="min-w-60 rounded-xl p-1.5">
+              <DropdownMenuItem className="min-h-11" onSelect={() => picker.current?.click()}>
+                <Paperclip />
+                {m.chat_attach_file()}
+              </DropdownMenuItem>
+              {pageLabel !== null && (
+                <DropdownMenuItem className="min-h-11" onSelect={() => onContextChange(!screen)}>
+                  <Monitor />
+                  {screen ? m.cp_ctx_remove() : m.chat_attach_screen()}
+                </DropdownMenuItem>
+              )}
+              <DropdownMenuItem
+                className="min-h-11"
+                onSelect={(e) => {
+                  e.preventDefault();
+                  insertTrigger('@');
+                }}
+              >
+                <AtSign />
+                {m.cp_plus_mention()}
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="min-h-11"
+                disabled={text.trim().length > 0}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  insertTrigger('/');
+                }}
+              >
+                <Slash />
+                {m.cp_plus_commands()}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <textarea
+            ref={area}
+            value={text}
+            rows={1}
+            maxLength={4000}
+            onChange={(e) => {
+              setText(e.target.value);
+              setCaret(e.target.selectionStart);
+              setDismissed(null);
+            }}
+            onSelect={(e) => setCaret(e.currentTarget.selectionStart)}
+            onKeyDown={onKeyDown}
+            onPaste={onPaste}
+            role="combobox"
+            aria-expanded={open && options.length > 0}
+            aria-controls={open && options.length > 0 ? listId : undefined}
+            aria-activedescendant={open && options.length > 0 ? `${listId}-${active}` : undefined}
+            aria-autocomplete="list"
+            aria-label={m.copilot_input_label()}
+            placeholder={m.cp_placeholder()}
+            className="max-h-48 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-1.5 py-[0.6875rem] text-base leading-[1.375rem] outline-none placeholder:text-muted-foreground"
+          />
           {busy ? (
             <Button
               type="button"
               size="icon"
               variant="outline"
-              className="size-10 rounded-full"
+              className="size-11 shrink-0 rounded-full"
               aria-label={m.chat_stop()}
               onClick={onStop}
             >
-              <Square className="size-4 fill-current" aria-hidden="true" />
+              <Square className="size-3.5 fill-current" aria-hidden="true" />
             </Button>
           ) : (
             <Button
               type="button"
               size="icon"
-              className="size-10 rounded-full"
+              className="size-11 shrink-0 rounded-full transition-opacity disabled:opacity-35"
               aria-label={m.copilot_send()}
               disabled={!canSend}
               onClick={submit}
             >
-              <ArrowUp className="size-5" aria-hidden="true" />
+              <ArrowUp className="size-5" strokeWidth={2} aria-hidden="true" />
             </Button>
           )}
         </div>
       </div>
-      <p className="mt-1.5 hidden px-2 text-muted-foreground text-xs sm:block">
-        {m.chat_composer_hint()}
-      </p>
     </div>
   );
 });

@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { Check, FlaskConical, Image as ImageIcon, Loader2, Sparkles } from 'lucide-react';
+import { BadgeCheck, Check, FlaskConical, Image as ImageIcon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type {
@@ -370,7 +370,7 @@ function ModelRow({
             <span className="break-words font-medium text-sm">{model.name}</span>
             {model.recommended && (
               <Badge variant="secondary" className="gap-1">
-                <Sparkles className="size-3" aria-hidden="true" />
+                <BadgeCheck className="size-3" aria-hidden="true" />
                 {m.aiadm_recommended()}
               </Badge>
             )}

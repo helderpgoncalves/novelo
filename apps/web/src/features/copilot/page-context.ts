@@ -1,6 +1,9 @@
-import { useRouter } from '@tanstack/react-router';
+import { useQuery } from '@tanstack/react-query';
+import { useRouter, useRouterState } from '@tanstack/react-router';
 import { useCallback } from 'react';
 import type { PageContext } from '@/client';
+import { getScenarioOptions } from '@/client/@tanstack/react-query.gen';
+import { m } from '@/paraglide/messages';
 
 const toStrings = (value: unknown): Record<string, string> => {
   const out: Record<string, string> = {};
@@ -25,4 +28,111 @@ export function usePageContext() {
     return { route, params: toStrings(leaf.params), search: toStrings(leaf.search) };
   }, [router]);
   return get;
+}
+
+const ROUTE_LABEL: Record<string, () => string> = {
+  '/': () => m.nav_baseline(),
+  '/map': () => m.nav_map(),
+  '/coverage': () => m.nav_coverage(),
+  '/circuits': () => m.nav_circuits(),
+  '/fleet': () => m.nav_fleet(),
+  '/localities': () => m.nav_localities(),
+  '/data-quality': () => m.nav_data_quality(),
+  '/simulator': () => m.nav_simulator(),
+  '/scenarios': () => m.nav_scenarios(),
+  '/scenarios/compare': () => m.cp_page_compare(),
+  '/triage': () => m.nav_triage(),
+  '/lots': () => m.nav_lots(),
+  '/market': () => m.nav_market(),
+  '/brands': () => m.nav_brands(),
+  '/reports': () => m.nav_rap(),
+  '/pilot': () => m.nav_pilot(),
+  '/assumptions': () => m.nav_assumptions(),
+  '/admin/ai': () => m.nav_ai_admin(),
+  '/users': () => m.nav_users(),
+};
+
+export type SuggestionFamily =
+  | 'home'
+  | 'sim'
+  | 'scn'
+  | 'cov'
+  | 'ops'
+  | 'trace'
+  | 'data'
+  | 'generic';
+
+const FAMILY: Record<string, SuggestionFamily> = {
+  '/': 'home',
+  '/simulator': 'sim',
+  '/scenarios': 'scn',
+  '/scenarios/compare': 'scn',
+  '/scenarios/$scenarioId': 'scn',
+  '/coverage': 'cov',
+  '/map': 'cov',
+  '/localities': 'cov',
+  '/circuits': 'ops',
+  '/fleet': 'ops',
+  '/lots': 'trace',
+  '/lots/$code': 'trace',
+  '/triage': 'trace',
+  '/market': 'trace',
+  '/brands': 'trace',
+  '/data-quality': 'data',
+  '/assumptions': 'data',
+};
+
+export const familyOfRoute = (route: string | null): SuggestionFamily =>
+  (route && FAMILY[route]) || 'generic';
+
+/** Três perguntas que fazem sentido no ecrã onde estás (as genéricas servem para o resto). */
+export function suggestionsFor(route: string | null): string[] {
+  switch (familyOfRoute(route)) {
+    case 'home':
+      return [m.cp_sug_home_1(), m.cp_sug_home_2(), m.cp_sug_home_3()];
+    case 'sim':
+      return [m.cp_sug_sim_1(), m.cp_sug_sim_2(), m.cp_sug_sim_3()];
+    case 'scn':
+      return [m.cp_sug_scn_1(), m.cp_sug_scn_2(), m.cp_sug_scn_3()];
+    case 'cov':
+      return [m.cp_sug_cov_1(), m.cp_sug_cov_2(), m.cp_sug_cov_3()];
+    case 'ops':
+      return [m.cp_sug_ops_1(), m.cp_sug_ops_2(), m.cp_sug_ops_3()];
+    case 'trace':
+      return [m.cp_sug_trace_1(), m.cp_sug_trace_2(), m.cp_sug_trace_3()];
+    case 'data':
+      return [m.cp_sug_data_1(), m.cp_sug_data_2(), m.cp_sug_data_3()];
+    default:
+      return [
+        m.copilot_suggestion_simulate(),
+        m.copilot_suggestion_compare(),
+        m.copilot_suggestion_coverage(),
+      ];
+  }
+}
+
+export interface PageInfo {
+  context: PageContext | null;
+  /** "Simulador da rede", "Cenário Base"… ou `null` se não há ecrã a partilhar (a página /chat). */
+  label: string | null;
+}
+
+/** O ecrã atual e um nome legível; atualiza quando se navega. */
+export function usePageInfo(): PageInfo {
+  const get = usePageContext();
+  useRouterState({ select: (s) => s.location.href });
+  const context = get();
+  const scenarioId =
+    context?.route === '/scenarios/$scenarioId' ? (context.params?.scenarioId ?? null) : null;
+  const scenario = useQuery({
+    ...getScenarioOptions({ path: { scenario_id: scenarioId ?? '' } }),
+    enabled: !!scenarioId,
+    staleTime: 60_000,
+  });
+  if (!context) return { context: null, label: null };
+  if (scenarioId) {
+    const name = scenario.data?.label;
+    return { context, label: name ? m.cp_page_scenario({ name }) : m.cp_page_scenario_plain() };
+  }
+  return { context, label: ROUTE_LABEL[context.route]?.() ?? m.cp_page_unknown() };
 }

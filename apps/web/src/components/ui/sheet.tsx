@@ -36,11 +36,36 @@ function SheetOverlay({
   );
 }
 
+/** Folgas das zonas do sistema (entalhe, barra inicial) nos lados em que a folha toca no ecrã. */
+const SAFE_PADDING: Record<'top' | 'right' | 'bottom' | 'left', React.CSSProperties> = {
+  top: {
+    paddingTop: 'env(safe-area-inset-top)',
+    paddingLeft: 'env(safe-area-inset-left)',
+    paddingRight: 'env(safe-area-inset-right)',
+  },
+  right: {
+    paddingTop: 'env(safe-area-inset-top)',
+    paddingBottom: 'env(safe-area-inset-bottom)',
+    paddingRight: 'env(safe-area-inset-right)',
+  },
+  bottom: {
+    paddingBottom: 'env(safe-area-inset-bottom)',
+    paddingLeft: 'env(safe-area-inset-left)',
+    paddingRight: 'env(safe-area-inset-right)',
+  },
+  left: {
+    paddingTop: 'env(safe-area-inset-top)',
+    paddingBottom: 'env(safe-area-inset-bottom)',
+    paddingLeft: 'env(safe-area-inset-left)',
+  },
+};
+
 function SheetContent({
   className,
   children,
   side = 'right',
   showCloseButton = true,
+  style,
   ...props
 }: React.ComponentProps<typeof SheetPrimitive.Content> & {
   side?: 'top' | 'right' | 'bottom' | 'left';
@@ -63,11 +88,12 @@ function SheetContent({
             'inset-x-0 bottom-0 h-auto border-t data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom',
           className,
         )}
+        style={{ ...SAFE_PADDING[side], ...style }}
         {...props}
       >
         {children}
         {showCloseButton && (
-          <SheetPrimitive.Close className="absolute top-4 right-4 rounded-xs opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary">
+          <SheetPrimitive.Close className="absolute top-[calc(env(safe-area-inset-top)+0.25rem)] right-[calc(env(safe-area-inset-right)+0.25rem)] flex size-10 items-center justify-center rounded-md opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:outline-hidden disabled:pointer-events-none data-[state=open]:bg-secondary">
             <XIcon className="size-4" />
             <span className="sr-only">{m.common_close()}</span>
           </SheetPrimitive.Close>

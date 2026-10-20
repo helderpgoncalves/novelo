@@ -115,16 +115,14 @@ export function ThinkingLine({ status }: { status: StatusInfo | null }) {
   const detail = status?.detail;
 
   return (
-    <div data-testid="copilot-thinking" className="flex min-w-0 items-center gap-2.5 py-1 text-sm">
-      <span className="flex shrink-0 items-center gap-1" aria-hidden="true">
-        {[0, 1, 2].map((d) => (
-          <span
-            key={d}
-            className="size-1.5 rounded-full bg-primary motion-safe:animate-bounce"
-            style={{ animationDelay: `${d * 140}ms` }}
-          />
-        ))}
-      </span>
+    <div
+      data-testid="copilot-thinking"
+      className="flex min-w-0 items-center gap-2.5 py-1 text-[0.9375rem]"
+    >
+      <span
+        className="size-1.5 shrink-0 rounded-full bg-primary motion-safe:animate-pulse"
+        aria-hidden="true"
+      />
       {/* O leitor de ecrã ouve só a fase (a primeira frase da família), não cada frase que roda. */}
       <span className="sr-only" role="status">
         {phrases[0]}

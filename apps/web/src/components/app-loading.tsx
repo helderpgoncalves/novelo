@@ -33,8 +33,12 @@ export function BootSplash() {
  */
 export function AppShellSkeleton() {
   return (
-    <div className="flex h-dvh overflow-hidden bg-background" role="status" aria-live="polite">
-      <aside className="hidden w-64 shrink-0 border-sidebar-border border-r bg-sidebar lg:block">
+    <div
+      className="flex h-dvh overflow-hidden bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]"
+      role="status"
+      aria-live="polite"
+    >
+      <aside className="hidden w-64 shrink-0 border-sidebar-border border-r bg-sidebar pt-[env(safe-area-inset-top)] lg:block">
         <div className="flex h-16 items-center border-sidebar-border border-b px-5">
           <BrandSymbol className="size-8" />
         </div>
@@ -50,8 +54,8 @@ export function AppShellSkeleton() {
         </div>
       </aside>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <div className="flex h-16 shrink-0 items-center justify-between gap-3 border-border/60 border-b px-4 sm:px-6 lg:px-8">
-          <Skeleton className="h-9 w-9 rounded-lg lg:hidden" />
+        <div className="flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-center justify-between gap-3 border-border/60 border-b px-4 pt-[env(safe-area-inset-top)] sm:px-6 lg:h-[calc(4rem+env(safe-area-inset-top))] lg:px-8">
+          <BrandSymbol className="size-7 lg:hidden" />
           <Skeleton className="hidden h-9 w-72 rounded-lg lg:block" />
           <div className="flex items-center gap-2">
             <Skeleton className="size-9 rounded-lg" />
@@ -63,6 +67,13 @@ export function AppShellSkeleton() {
             <RouteSkeleton />
           </div>
         </main>
+        <div className="shrink-0 border-border/60 border-t pb-[env(safe-area-inset-bottom)] lg:hidden">
+          <div className="flex h-14 items-center justify-around px-2">
+            {['a', 'b', 'c', 'd', 'e'].map((id) => (
+              <Skeleton key={id} className="h-9 w-12 rounded-lg" />
+            ))}
+          </div>
+        </div>
       </div>
       <span className="sr-only">{m.common_loading()}</span>
     </div>

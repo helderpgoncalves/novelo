@@ -1,0 +1,84 @@
+import { registerSW } from 'virtual:pwa-register';
+import { toast } from 'sonner';
+import { m } from '@/paraglide/messages';
+
+const UPDATE_CHECK_MS = 60 * 60 * 1000;
+const UPDATE_TOAST_ID = 'pwa-update';
+
+/**
+ * Regista o service worker. Quando há versão nova mostra um aviso fixo com "Atualizar"
+ * (a app só recarrega por vontade da pessoa) e volta a procurar versões de hora a hora
+ * e sempre que a app instalada regressa ao primeiro plano.
+ */
+export function registerPwa() {
+  const updateSW = registerSW({
+    immediate: true,
+    onNeedRefresh() {
+      toast(m.pwa_update_title(), {
+        id: UPDATE_TOAST_ID,
+        description: m.pwa_update_text(),
+        duration: Number.POSITIVE_INFINITY,
+        action: { label: m.pwa_update_action(), onClick: () => void updateSW(true) },
+      });
+    },
+    onRegisteredSW(_url, registration) {
+      if (!registration) return;
+      const check = () => {
+        if (navigator.onLine) void registration.update().catch(() => undefined);
+      };
+      window.setInterval(check, UPDATE_CHECK_MS);
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') check();
+      });
+    },
+  });
+}
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
+}
+
+let deferred: BeforeInstallPromptEvent | null = null;
+const listeners = new Set<() => void>();
+const emit = () => {
+  for (const l of listeners) l();
+};
+
+/** Guarda o `beforeinstallprompt` logo no arranque: o evento dispara cedo, antes de o menu existir. */
+export function captureInstallPrompt() {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferred = e as BeforeInstallPromptEvent;
+    emit();
+  });
+  window.addEventListener('appinstalled', () => {
+    deferred = null;
+    emit();
+  });
+}
+
+export const subscribeInstall = (listener: () => void) => {
+  listeners.add(listener);
+  return () => listeners.delete(listener);
+};
+export const getInstallEvent = () => deferred;
+
+export async function promptInstall() {
+  const event = deferred;
+  if (!event) return;
+  deferred = null;
+  emit();
+  await event.prompt();
+}
+
+/** Já está a correr como app instalada (Android/desktop `display-mode`, iOS `navigator.standalone`). */
+export const isStandalone = (): boolean =>
+  window.matchMedia('(display-mode: standalone)').matches ||
+  window.matchMedia('(display-mode: minimal-ui)').matches ||
+  (navigator as Navigator & { standalone?: boolean }).standalone === true;
+
+/** iPhone/iPad (incluindo iPadOS, que se apresenta como Mac com ecrã tátil). */
+export const isIosDevice = (): boolean =>
+  /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

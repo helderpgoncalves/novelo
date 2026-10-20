@@ -22,6 +22,16 @@ const Toaster = ({ ...props }: ToasterProps) => {
         error: <OctagonXIcon className="size-4" />,
         loading: <Loader2Icon className="size-4 animate-spin" />,
       }}
+      // Fora das zonas do sistema: acima da barra de separadores (--tabbar-h inclui a barra inicial; sem barra, só esta) e do entalhe.
+      offset={{
+        bottom: 'calc(var(--tabbar-h, env(safe-area-inset-bottom)) + 24px)',
+        right: 'calc(env(safe-area-inset-right) + 24px)',
+      }}
+      mobileOffset={{
+        bottom: 'calc(var(--tabbar-h, env(safe-area-inset-bottom)) + 12px)',
+        left: 'calc(env(safe-area-inset-left) + 12px)',
+        right: 'calc(env(safe-area-inset-right) + 12px)',
+      }}
       style={
         {
           '--normal-bg': 'var(--popover)',

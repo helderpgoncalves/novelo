@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowRight, Pause, Play, Sparkles } from 'lucide-react';
+import { ArrowRight, MessageCircle, Pause, Play } from 'lucide-react';
 import type { Overview } from '@/client';
 import { Button } from '@/components/ui/button';
 import { openCopilot } from '@/features/copilot/store';
@@ -89,7 +89,7 @@ export function Hero({ overview }: { overview: Overview }) {
             className="h-12 px-6 text-base"
             onClick={() => openCopilot()}
           >
-            <Sparkles className="text-primary" aria-hidden="true" />
+            <MessageCircle className="text-primary" aria-hidden="true" />
             {m.home_cta_copilot()}
           </Button>
         </div>

@@ -79,7 +79,7 @@ function SidebarBody({ role, onNavigate }: { role: string; onNavigate?: () => vo
         </Link>
       </div>
       <NavList role={role} onNavigate={onNavigate} />
-      <div className="border-sidebar-border border-t p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="border-sidebar-border border-t p-4">
         <p className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
           {m.sidebar_event()}
         </p>
@@ -102,13 +102,13 @@ export function AppSidebar({
 }) {
   return (
     <>
-      <aside className="hidden w-64 shrink-0 border-sidebar-border border-r bg-sidebar lg:block">
+      <aside className="hidden w-64 shrink-0 select-none border-sidebar-border border-r bg-sidebar pt-[env(safe-area-inset-top)] lg:block">
         <SidebarBody role={role} />
       </aside>
       <Sheet open={mobileOpen} onOpenChange={onMobileOpenChange}>
         <SheetContent
           side="left"
-          className="w-[18rem] max-w-[85vw] gap-0 bg-sidebar p-0"
+          className="w-[18rem] max-w-[85vw] select-none gap-0 bg-sidebar p-0"
           onOpenAutoFocus={(e) => e.preventDefault()}
         >
           <SheetTitle className="sr-only">{m.nav_sheet_title()}</SheetTitle>

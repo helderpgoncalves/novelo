@@ -2,14 +2,21 @@
 <html lang="pt-PT">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <!-- viewport-fit=cover + env(safe-area-inset-*) no CSS; interactive-widget faz o teclado encolher o layout (Android). -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
-    <meta name="theme-color" content="#2E6B57" media="(prefers-color-scheme: light)" />
+    <!-- Cor da barra do sistema = fundo do topo da app (linho / tinta). lib/theme.tsx atualiza ao trocar de tema. -->
+    <meta name="theme-color" content="#F4F1EA" media="(prefers-color-scheme: light)" />
     <meta name="theme-color" content="#0F1815" media="(prefers-color-scheme: dark)" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Novelo" />
+    <!-- "default": barra de estado opaca que o iOS pinta (texto escuro/claro) segundo o modo do sistema, por isso
+         nunca fica ilegível. black-translucent sobreporia a app à barra com texto SEMPRE branco, ilegível no tema claro. -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="description" content="Novelo: recolha seletiva de têxteis de Guimarães, desenhada ao menor custo." />
     <title>Novelo</title>
@@ -30,6 +37,10 @@
           var stored = localStorage.getItem('novelo-theme');
           var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
           if (dark) document.documentElement.classList.add('dark');
+          if (stored) {
+            var metas = document.querySelectorAll('meta[name="theme-color"]');
+            for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', dark ? '#0F1815' : '#F4F1EA');
+          }
         } catch (e) {}
       })();
     </script>

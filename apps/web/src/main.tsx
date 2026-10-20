@@ -1,4 +1,3 @@
-import { registerSW } from 'virtual:pwa-register';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
@@ -8,6 +7,7 @@ import { RouteSkeleton } from '@/components/skeletons';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { SESSION_EXPIRED_EVENT } from '@/lib/api-config';
+import { captureInstallPrompt, registerPwa } from '@/lib/pwa';
 import { queryClient } from '@/lib/query-client';
 import { ThemeProvider } from '@/lib/theme';
 import { deLocalizeUrl, getLocale, localizeUrl } from '@/paraglide/runtime';
@@ -58,8 +58,9 @@ window.addEventListener(SESSION_EXPIRED_EVENT, () => {
   }
 });
 
-// PWA: atualiza sozinha em segundo plano.
-registerSW({ immediate: true });
+// PWA: aviso de versão nova e captura do pedido de instalação (dispara antes de o menu existir).
+captureInstallPrompt();
+registerPwa();
 
 const root = document.getElementById('root');
 if (!root) throw new Error('#root não existe');
