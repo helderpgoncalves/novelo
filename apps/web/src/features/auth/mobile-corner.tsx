@@ -20,7 +20,7 @@ function useNarrow(): boolean {
 /**
  * Fundo muito subtil da Penha no canto inferior direito do ecrã de entrada em telemóvel (em desktop já existe o painel
  * de imagem). `absolute` (não `fixed`) para não se mexer com o teclado; dissolve-se por máscara radial a partir do
- * canto; decorativo; só monta (e só pede a imagem) abaixo de 1024 px. Opacidade: 22 % no escuro, 40 % no claro.
+ * canto; decorativo; só monta (e só pede a imagem) abaixo de 1024 px. Opacidade: 62 % no escuro, 66 % no claro.
  */
 export function MobileCorner() {
   const tone = useTheme().resolvedTheme;
@@ -33,18 +33,19 @@ export function MobileCorner() {
       <div
         className={cn(
           'absolute right-0 bottom-0 h-[min(110vw,480px)] w-[min(125vw,560px)] overflow-hidden',
-          dark ? 'opacity-[0.22]' : 'opacity-[0.4] mix-blend-multiply',
+          dark ? 'opacity-[0.62]' : 'opacity-[0.66] mix-blend-multiply',
         )}
         style={{ maskImage: mask, WebkitMaskImage: mask }}
       >
         <img
-          src={`/landing/login-painel-${tone}-960.avif`}
+          src={`/landing/login-painel-${tone}-960.avif?v=penha2`}
           alt=""
           width={960}
           height={1280}
           loading="lazy"
           decoding="async"
-          className="absolute right-0 bottom-0 h-auto w-full max-w-none"
+          // A imagem desce um pouco: o campanário da Penha (a ~55–70 % da altura) cai entre o formulário e o rodapé.
+          className="absolute right-0 -bottom-[min(28vw,120px)] h-auto w-full max-w-none"
         />
       </div>
     </div>

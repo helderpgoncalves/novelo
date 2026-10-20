@@ -323,7 +323,7 @@ LOGIN_PANEL = ((960, 1280), (1440, 1920))
 def build_login(ctx: Ctx, out: Out, photo: Image.Image) -> None:
     for mode in MODES:
         for w, h in LOGIN_PANEL:
-            d = photo_field(photo, (w, h), mode, (0.58, 0.60), 1.0, fade=fade_top(h, w, 0.20, 0.52, 0.08))
+            d = photo_field(photo, (w, h), mode, (1.0, 0.60), 1.0, fade=fade_top(h, w, 0.20, 0.52, 0.08))
             im = make_ht(w / 240).render(d, PAL[mode]["ouro"])
             out.put(f"login-painel-{mode}-{w}.avif", avif_bytes(im), (w, h))
 
