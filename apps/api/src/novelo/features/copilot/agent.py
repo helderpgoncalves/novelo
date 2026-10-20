@@ -186,8 +186,8 @@ class _Run:
                     await self.db.commit()
             return thread
         thread = CopilotThread(
-            user_id=self.user_id, title="", summary="", summarized_messages=0, snapshot=await self._snapshot(),
-            ephemeral=not self.settings.save_history,
+            user_id=self.user_id, title=aux.first_message_title(t.user_text), summary="", summarized_messages=0,
+            snapshot=await self._snapshot(), ephemeral=not self.settings.save_history,
         )  # fmt: skip
         self.db.add(thread)
         await self.db.commit()
@@ -380,6 +380,10 @@ class _Run:
         yield CopilotStartEvent(
             thread_id=self.thread.id, message_id=self.message_id, model=self.model, prompt_version=self.prompt_version
         )
+        if self.thread.title and not t.thread_id:
+            self.thread.search_text = fold(self.thread.title)
+            await self.db.commit()
+            yield CopilotTitleEvent(title=self.thread.title)
         yield _status("thinking", "status.thinking")
         base, version = load("copilot")
         self.prompt_version = version
@@ -455,11 +459,6 @@ class _Run:
                     self.llm, t.locale, t.user_text, self.text, [x["name"] for x in self.trace]
                 )
             )
-        if not self.thread.title and ok:
-            self.thread.title = await aux.make_title(self.llm, t.user_text, self.text)
-            self.thread.search_text = fold(self.thread.title)
-            await self.db.commit()
-            yield CopilotTitleEvent(title=self.thread.title)
         # revisão de memória em segundo plano (barata, só de vez em quando; nunca em conversas efémeras)
         if ok and self.text:
             stored = await self._stored_messages()
