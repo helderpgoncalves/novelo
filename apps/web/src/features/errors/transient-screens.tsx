@@ -9,17 +9,27 @@ interface Props {
   layout?: 'page' | 'panel';
 }
 
-function RecoveryStatus({ r }: { r: ReturnType<typeof useRecovery> }) {
+function RecoveryStatus({
+  r,
+  showAttempt = false,
+}: {
+  r: ReturnType<typeof useRecovery>;
+  showAttempt?: boolean;
+}) {
   return (
     <>
-      <p className="text-xs tabular-nums">
-        {/* A contagem muda todos os segundos: fica fora do leitor de ecrã, que só ouve as tentativas. */}
-        <span aria-hidden="true">
-          {r.checking ? m.err_retrying() : m.err_next_try({ seconds: String(r.secondsLeft) })}
-        </span>
+      {/* A contagem muda todos os segundos: fica fora do leitor de ecrã, que só ouve as tentativas. */}
+      <p aria-hidden="true" className="text-xs tabular-nums">
+        {r.checking ? m.err_retrying() : m.err_next_try({ seconds: String(r.secondsLeft) })}
+        {showAttempt && r.attempt > 0 && (
+          <span className="lowercase"> · {m.err_maint_attempt({ n: String(r.attempt + 1) })}</span>
+        )}
       </p>
       <p role="status" className="sr-only">
         {r.checking ? m.err_retrying() : ''}
+        {showAttempt && r.attempt > 0
+          ? ` ${m.err_maint_attempt({ n: String(r.attempt + 1) })}`
+          : ''}
       </p>
     </>
   );
@@ -27,7 +37,7 @@ function RecoveryStatus({ r }: { r: ReturnType<typeof useRecovery> }) {
 
 function Actions({ r }: { r: ReturnType<typeof useRecovery> }) {
   return (
-    <Button className="h-10" onClick={r.retryNow} disabled={r.checking} loading={r.checking}>
+    <Button className="h-11" onClick={r.retryNow} disabled={r.checking} loading={r.checking}>
       {m.err_try_now()}
     </Button>
   );
@@ -62,10 +72,7 @@ export function MaintenanceScreen({ onRecover, layout = 'panel' }: Props) {
       actions={<Actions r={r} />}
     >
       <p>{m.err_maint_text()}</p>
-      <RecoveryStatus r={r} />
-      {r.attempt > 0 && (
-        <p className="text-xs">{m.err_maint_attempt({ n: String(r.attempt + 1) })}</p>
-      )}
+      <RecoveryStatus r={r} showAttempt />
     </ErrorScreen>
   );
 }

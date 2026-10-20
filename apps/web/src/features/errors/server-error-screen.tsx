@@ -56,17 +56,17 @@ export function ServerErrorScreen({
       actions={
         <>
           <Button
-            className="h-10"
+            className="h-11"
             onClick={() => void retry()}
             disabled={retrying}
             loading={retrying}
           >
             {m.common_retry()}
           </Button>
-          <Button asChild variant="outline" className="h-10">
+          <Button asChild variant="outline" className="h-11">
             <a href={report}>{m.err_report()}</a>
           </Button>
-          <Button asChild variant="ghost" className="h-10">
+          <Button asChild variant="ghost" className="h-11">
             <Link to="/">{m.common_back_home()}</Link>
           </Button>
         </>

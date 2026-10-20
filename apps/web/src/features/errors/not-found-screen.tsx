@@ -70,10 +70,10 @@ export function NotFoundScreen({ layout = 'panel' }: { layout?: 'page' | 'panel'
       title={m.notfound_title()}
       actions={
         <>
-          <Button asChild className="h-10">
+          <Button asChild className="h-11">
             <Link to="/">{m.common_back_home()}</Link>
           </Button>
-          <Button variant="outline" className="h-10" onClick={() => router.history.back()}>
+          <Button variant="outline" className="h-11" onClick={() => router.history.back()}>
             {m.err_back()}
           </Button>
         </>
@@ -119,7 +119,7 @@ export function NotFoundScreen({ layout = 'panel' }: { layout?: 'page' | 'panel'
               <ul className="flex flex-wrap gap-2">
                 {shown.slice(0, 8).map((item) => (
                   <li key={item.to}>
-                    <Button asChild variant="secondary" className="h-10">
+                    <Button asChild variant="secondary" className="h-11">
                       <Link to={item.to}>
                         <item.icon className="size-4" aria-hidden="true" />
                         {item.label()}

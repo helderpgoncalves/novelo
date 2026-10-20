@@ -44,14 +44,14 @@ export function ForbiddenScreen({
       actions={
         <>
           {!guest && (
-            <Button asChild className="h-10">
+            <Button asChild className="h-11">
               <a href={mail}>{m.err_403_request()}</a>
             </Button>
           )}
-          <Button asChild variant={guest ? 'default' : 'outline'} className="h-10">
+          <Button asChild variant={guest ? 'default' : 'outline'} className="h-11">
             <Link to="/">{m.common_back_home()}</Link>
           </Button>
-          <Button variant="ghost" className="h-10" onClick={() => router.history.back()}>
+          <Button variant="ghost" className="h-11" onClick={() => router.history.back()}>
             {m.err_back()}
           </Button>
         </>
