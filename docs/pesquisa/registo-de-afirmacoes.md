@@ -23,7 +23,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A11 | 4 de 27 operadores licenciados valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** | 6 |
 | A12 | Total de têxtil no indiferenciado por ano | 1 300 a 2 650 t | Cálculo nosso (315 kg/hab de indiferenciado × 5,4%, ver [proposta](../projeto/proposta.md)) | Cálculo (depende de A10) | não usar até A10 |
 | A13 | Doze alertas de qualidade nos dados dos circuitos | 12 | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 7 |
-| A14 | Localizações dos contentores | por receber a 20 out 2026 | Vitrus | Por obter | 4 |
+| A14 | Localizações dos contentores **de têxteis** | por receber (a 20 out chegou só o pacote municipal, ver G1) | Vitrus | Por obter | 4 |
 | A15 | Custos por recolha, quilómetro e contentor | por receber | Vitrus | Por obter (pressuposto até lá) | 4 |
 
 ## B. Regulação
@@ -131,9 +131,30 @@ Referências F41 a F60 em [Fontes](fontes.md#mentores-fibrenamics-e-hackathon). 
 | M17 | Hack4Guimarães: formato híbrido; os participantes mantêm a titularidade da propriedade intelectual dos projetos (os desafios e tecnologias de empresas e parceiros podem ter condições próprias, comunicadas com cada desafio) | — | [F59], [F61] | Primária | Cenários pós-hackathon |
 | M18 | O enunciado do nosso desafio indica como mentores **Lucas Nascimento (Vitrus Ambiente)** e, "para qualquer desafio", o **Prof. Paulo Afonso** (Universidade do Minho, Departamento de Produção e Sistemas). **Luís Miguel Oliveira não consta** no texto que temos | — | [F62] | **Primária**; o papel do Luís Miguel (indicado pelo utilizador como mentor) fica **por confirmar** | Mentores |
 
+## G. Contentores municipais (pacote QGIS, 20 out 2026)
+
+Nada deste bloco é de têxteis. Ver [Análise dos contentores municipais](../dados/analise-contentores-municipais.md). Os números vêm de `data/processed/municipal_summary.json`.
+
+| # | Afirmação | Valor | Fonte | Estado | Slide |
+| --- | --- | --- | --- | --- | --- |
+| G1 | A Vitrus enviou os contentores municipais de outras frações; a lista de contentores de têxteis continua por chegar | 5 ficheiros, 2 754 linhas | `data/raw/vitrus-mapa-qgis/` | Dado Vitrus | demo |
+| G2 | Contentores aceites e localizados | 2 751 aceites, 2 722 localizados, 29 sem coordenadas, 3 rejeitados | ETL `municipal_containers.py` | Dado Vitrus (contagem nossa) | |
+| G3 | Contentores enterrados por marca | 591: molok 488, bluebee 66, greenbee 37 (e 2 plataformas) | idem | Dado Vitrus | |
+| G4 | Capacidade dos enterrados | 17 de 3 m³ e 574 de 5 m³ (mais 2 plataformas de 5 m³) | idem; compatível com [F63] | Dado Vitrus | |
+| G5 | Locais (coordenadas iguais a 5 casas) e candidatos a têxteis | 2 026 locais; 1 187 com contentor de rua, 837 com coordenada precisa | idem | Cálculo (critério nosso) | |
+| G6 | Densidade | 17,4 contentores e 10,0 locais públicos por 1 000 hab. | 2 722 e 1 574 ÷ 156 830 | Cálculo | |
+| G7 | Cobertura da área a 200, 300 e 500 m de um local público | 31,4%, 47,8%, 70,9% | idem, CAOP 2019 | Cálculo (cobertura de área, não de população) | |
+| G8 | Freguesia declarada igual à do polígono | 2 354 de 2 670 (88,2%); 79 a mais de 1 km | idem | Cálculo | |
+| G9 | Área das 48 freguesias | 24 099,97 ha (241,0 km²) | CAOP 2019 (`AREA_T_Ha`) | Dado Vitrus (CAOP) | |
+| G10 | Contornos OSM da app falham 3 uniões e têm 1 minúscula | 44 utilizáveis de 48 | comparação com CAOP 2019 | Cálculo | |
+| G11 | Lacuna de têxtil por freguesia | Lordelo 25,8 t/ano; ordenação por t por candidato | 0,7 kg/hab/mês, captura média 22,9% | **Estimativa** (sem têxtil por freguesia) | |
+| G12 | Blue Bee, Green Bee e Red Bee são contentores enterrados da Lasso, de 3 e 5 m³ | | [F63] [F64] | Primária do fabricante | |
+| G13 | Molok é semienterrado com 1,3, 3 e 5 m³ | | [F65] | Secundária (excertos) | |
+| G14 | CAOP2025 aprovada a 28 jan 2026 | | [F66] | Primária | |
+
 ## Como atualizar este registo
 
 1. Ao verificar algo numa fonte primária, muda o estado e acrescenta a ligação.
 2. Se um número no slide mudar, muda a linha **antes** do slide.
-3. Quando a Vitrus enviar contentores e custos (A14, A15), acrescenta linhas **A16 em diante** com os valores e a data de receção.
+3. Quando a Vitrus enviar contentores de têxteis e custos (A14, A15), acrescenta linhas **A16 em diante** com os valores e a data de receção.
 4. No dia 25 de outubro, imprime esta tabela e confirma cada linha com "slide" preenchido.

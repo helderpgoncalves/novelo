@@ -42,5 +42,16 @@
     "period_start": null,
     "period_end": null,
     "notes": "Geocodificação Nominatim. Algumas localidades dos circuitos (ex.: 'Ruas Estreitas') não são lugares e ficam sem coordenadas."
+  },
+  {
+    "key": "vitrus_municipal_containers_2026_10",
+    "title": "Contentores municipais (pacote QGIS) e CAOP 2019",
+    "provider": "Vitrus Ambiente",
+    "file_name": "data/raw/vitrus-mapa-qgis/",
+    "file_sha256": "2bb1447500384dd108cfe958836ed86c6f65acf572f170dfa58c6d3eee343b05",
+    "received_on": "2026-10-20",
+    "period_start": null,
+    "period_end": null,
+    "notes": "Contentores municipais de outras frações (NÃO são de têxteis). Ver municipal_alerts.csv e docs/dados/analise-contentores-municipais.md."
   }
 ]

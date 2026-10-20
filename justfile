@@ -60,9 +60,10 @@ eval-triage *ARGS:
 eval-copilot *ARGS:
     uv run --project apps/api python scripts/eval_copilot.py {{ARGS}}
 
-# Converte os Excel de data/raw em data/processed
+# Converte os Excel e o pacote QGIS (contentores municipais + CAOP) de data/raw em data/processed
 etl:
     uv run scripts/etl/build_processed.py
+    uv run scripts/etl/municipal_containers.py
 
 # --- Qualidade: o mesmo que a CI corre ----------------------------------------
 check: check-api check-web check-contract

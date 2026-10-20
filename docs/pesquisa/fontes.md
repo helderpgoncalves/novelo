@@ -91,6 +91,19 @@ Consultas a **19 de outubro de 2026**. "Lida" quer dizer que a página foi abert
 | F61 | Hack4Guimarães 2035, página oficial, perguntas frequentes (FAQ) na plataforma TAIKAI (ligação exata por confirmar; a página da organização que lemos antes é [F59]) | Primária (organização); texto **colado pelo utilizador** a 19 out 2026 | Quatro critérios e pesos (inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20%); o detalhe está no separador Rules, **que ainda não temos**. Datas (submissão até 23 out às 17h30; pitches a 26 out a partir das 14h30; júri 26 e 27; vencedores 28), prémios (7 500, 4 500, 3 000 e 5 × 1 000 €), regras de originalidade e de uso de IA, júri de especialistas sem voto público |
 | F62 | Enunciado do desafio 5, TexVitrus (Sustentabilidade), na plataforma TAIKAI (ligação exata por confirmar) | Primária (organização e Vitrus); texto **colado pelo utilizador** a 19 out 2026 | Pergunta do desafio, "por onde começar", dados disponíveis, mentoria (Lucas Nascimento; Prof. Paulo Afonso para qualquer desafio), "73% a 80%" em aterro ou incineração, o que conta na avaliação (inovação da solução, solidez técnica do que foi construído, impacto no território, clareza da apresentação) e o prémio atribuído pela Vitrus |
 
+## Contentores municipais e cartografia
+
+Consultas a **20 de outubro de 2026**, para o pacote QGIS da Vitrus ([análise](../dados/analise-contentores-municipais.md)).
+
+| N.º | Fonte | Tipo | Notas |
+| --- | --- | --- | --- |
+| F63 | [Lasso, brochura de contentores enterrados (Blue Bee, Green Bee, Red Bee)](https://lasso.pt/wp-content/uploads/2023/07/Brochura_Enterrados_WEB.pdf) | Primária do fabricante, lida (extração de texto) | Gama Blue Bee, Green Bee, Red Bee; capacidades de 3 m³ e 5 m³; estrutura monobloco em betão armado pré-fabricado |
+| F64 | [Lasso, Green Bee](https://lasso.pt/contentor-enterrado-green-bee/) | Primária do fabricante, lida | Dimensões do Green Bee de 3 e 5 m³ (altura total enterrada 2 020 e 2 760 mm; cuba de cerca de 3 e 4 t). Marca da Sopsa segundo [AEM](https://www.aem.pt/sopsa/) (excerto de pesquisa) |
+| F65 | [Molok Classic, Resopre](https://resopre.pt/produto/molok-classic/), [Ficha técnica Molok Domino, Resopre](https://resopre.pt/wp-content/uploads/2025/01/Ficha_Tecnica_Molok_Domino.pdf), [SULO, Molok Classic](https://sulo.es/semisoterrado-classic/) | Fabricante e distribuidores, **só excertos de pesquisa** | Semienterrado, cerca de 60% no subsolo, polietileno de alta densidade, capacidades 1,3, 3 e 5 m³; recolha reduzida até 90% face à superfície (alegação do distribuidor) |
+| F66 | [DGT, Carta Administrativa Oficial de Portugal](https://www.dgterritorio.gov.pt/cartografia/cartografia-tematica/caop) | Primária, lida | CAOP2025 aprovada por despacho de 28 jan 2026 (Aviso n.º 3502/2026/2, DR 2.ª série, n.º 34, de 18 fev 2026); descarregamento em shapefile e geopackage por versão; sistema PT-TM06/ETRS89 |
+| F67 | [DGT, Catálogo de entidades da CAOP 2023](https://www.dgterritorio.gov.pt/sites/default/files/ficheiros-cartografia/catalogo_entidades_CAOP2023.pdf) | Primária, lida (extração de texto) | `DICOFRE`: identificador único de freguesia; `TAA`: área principal (1), secundária (3), especial (4), costeira (5), águas interiores (7). A versão 2019 do pacote não foi confirmada com o catálogo de 2019 |
+| F68 | [ISO 19157-1:2023, Qualidade dos dados geográficos](https://www.iso.org/standard/78900.html) | Primária, **só a página do catálogo** | Princípios de descrição da qualidade; a lista de elementos (completude, consistência lógica, exatidão posicional, temporal e temática) é conhecimento geral por confirmar no texto da norma |
+
 ## Dados do projeto
 
 | Fonte | Ficheiro | Notas |
@@ -98,4 +111,5 @@ Consultas a **19 de outubro de 2026**. "Lida" quer dizer que a página foi abert
 | Dados da Vitrus | `data/raw/dados_textil.xlsx`, `data/raw/Circuitos_Viaturas_Guimaraes.xlsx` | Ver [Análise dos dados recebidos](../dados/analise-dados-recebidos.md) |
 | INE | `data/raw/public/population_ine.json`, `tipau.json` | Censos 2021 e TIPAU |
 | CAOP e OpenStreetMap | `data/raw/public/parishes.geojson`, `localities_geocoded.json` | |
+| Vitrus Ambiente (pacote QGIS, 20 out 2026) | `data/raw/vitrus-mapa-qgis/` | Contentores **municipais** (não são de têxteis) e CAOP 2019 de Guimarães. Ver [Análise dos contentores municipais](../dados/analise-contentores-municipais.md) |
 | Plano municipal de circularidade têxtil | Documento recebido com o desafio (5,4%; 0,7 kg/hab/mês; 4 de 27 operadores) | **Fonte pública não localizada**; pedir à Vitrus ou à câmara |

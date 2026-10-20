@@ -1,0 +1,796 @@
+ID	Capacidade	Nome	Freguesia	Coord_Y	Coord_X
+C001	1100L	Rua dos Moinhos 	São Estevão de Briteiros	41.512191	-8.324727
+C002	1100L	Rua Nossa Sra. Sameiro	Sande São Martinho	41.488	-8.358
+C003	1100L	Av. Domingos de freitas	Sande São Martinho	41.4938886	-8.361158
+C004	1100L		Sande São Martinho	41.495	-8.363
+C005	1100L	N101	Sande São Martinho	41.498	-8.365
+C006	1100L	N101	Sande São Martinho	41.499	-8.365
+C007	1100L	N101	Sande São Martinho	41.503	-8.378
+C008	1100L	N101	Sande São Martinho	41.503	-8.365
+C009	1100L	N101	Sande São Martinho	41.503	-8.365
+C010	1100L	N101	Sande São Martinho	41.503	-8.364
+C011	1100L	Rua 4 irmãos	Sande São Martinho	41.5	-8.361
+C012	1100L	Rua 4 irmãos	Sande São Martinho	41.502	-8.362
+C013	1100L	Rua Moreiras	Sande São Martinho	41.507	-8.361
+C014	1100L	Rua Moreiras	Sande São Martinho	41.508	-8.357
+C015	1100L	Rua Moreiras	Sande São Martinho	41.508	-8.357
+C017	1100L		Sande São Martinho	41.502	-8.375
+C018	1100L	Rua do barreiro	Sande São Martinho	41.508	-8.374
+C019	1100L	Rua do barreiro	Sande São Martinho	41.508	-8.374
+C020	1100L	Rua corredoura	Sande São Martinho	41.509	-8.378
+C021	1100L	Rua Igreja Velha	Balazar	41.504	-8.388
+C022	1100L	Rua Igreja Velha	Balazar	41.506	-8.386
+C023	1100L	Rua Igreja Velha	Balazar	41.509	-8.382
+C024	1100L	Rua Outeirinho	Balazar	41.509	-8.381
+C025	1100L		Balazar	41.511	-8.38
+C026	1100L	Rua da Fontainha	Balazar	41.512	-8.378
+C027	1100L	Rua de Entre as Águas	Balazar	41.514	-8.378
+C028	1100L	Rua de Entre as Águas	Balazar	41.514	-8.378
+C029	1100L		Longos	41.521	-8.388
+C030	1100L		Longos	41.521	-8.388
+C031	1100L		Longos	41.521	-8.388
+C032	1100L	Rua da reguenga	Longos	41.514	-8.365
+C033	1100L	rua da boavista	Longos	41.514	-8.365
+C034	1100L	rua de santa marta	Longos	41.52	-8.364
+C035	1100L	rua de santa marta	Longos	41.518	-8.371
+C036	1100L	rua de santa marta	Longos	41.52	-8.363
+C037	1100L	rua de santa marta	Longos	41.521	-8.363
+C038	1100L	rua de santa marta	Longos	41.521	-8.363
+C039	1100L	rua de santa marta	Longos	41.521	-8.361
+C040	1100L	Rua do Covinho	Sande São Martinho	41.519	-8.356
+C041	1100L	Travessa de St. António	Sande São Martinho	41.519	-8.355
+C042	1100L	Rua da Fonte	Sande São Martinho	41.52	-8.355
+C043	1100L	Rua do Covinho	Sande São Martinho	41.518	-8.356
+C044	1100L	Rua do Covinho	Sande São Martinho	41.518	-8.356
+C045	1100L	Rua Murteira	Sande São Martinho	41.518	-8.356
+C046	1100L	Rua Murteira	Sande São Martinho	41.518	-8.356
+C047	1100L	Rua de Santa Marta	Sande São Martinho	41.515	-8.356
+C048	1100L	Rua de Santa Marta	Sande São Martinho	41.515	-8.356
+C049	1100L	Rua de Travessa	Sande São Lourenço	41.511	-8.347
+C050	1100L	Rua de Agrela	Briteiros São Salvador	41.515	-8.33
+C051	1100L	Rua Molares	Briteiros São Salvador	41.519	-8.335
+C052	1100L	Rua Molares	Briteiros São Salvador	41.519	-8.337
+C053	1100L	M5822	Briteiros São Salvador	41.521	-8.349
+C054	1100L	Rua Aredes	Briteiros São Leocádia	41.529	-8.342
+C055	1100L	Rua Aredes	Briteiros São Leocádia	41.531	-8.341
+C056	1100L	Rua Centro Recreativo	Briteiros São Leocádia	41.519	-8.328
+C057	1100L	Rua Francisco Martins Sarmento	Briteiros São Leocádia	41.52	-8.329
+C058	1100L	Rua São Salvador	Briteiros São Salvador	41.522	-8.328
+C059	1100L	Rua Prof. Felix Marques	Briteiros São Salvador	41.525	-8.329
+C060	1100L	Rua Souto da Torre	Briteiros São Salvador	41.528139	-8.328084
+C061	1100L	Rua Souto da Torre	Briteiros São Salvador	41.528	-8.326
+C062	1100L	Rua Dr. Lindoso	Briteiros São Salvador	41.528	-8.325
+C063	1100L	Rua Dr. Lindoso	Briteiros São Salvador	41.526	-8.327
+C064	1100L	Rua Prof. Felix Marques	Briteiros São Salvador	41.523	-8.326
+C065	1100L	Rua Francisco Martins Sarmento	Briteiros São Leocádia	41.523	-8.326
+C066	1100L	Rua Francisco Martins Sarmento	Briteiros São Leocádia	41.523	-8.324
+C067	1100L	N309	Briteiros São Salvador	41.527	-8.314
+C068	1100L	Rua Francisco Martins Sarmento	Briteiros São Leocádia	41.523	-8.324
+C069	1100L	Rua da Escola	Briteiros São Salvador	41.523	-8.324
+C070	1100L	Cemitério 	Briteiros São Salvador	41.523	-8.325
+C071	1100L	Rua bouça da lage	Briteiros São Salvador	41.515	-8.313
+C072	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.518	-8.32
+C073	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.518	-8.32
+C074	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.518	-8.32
+C075	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.518	-8.32
+C076	1100L	Rua dos Moinhos 	São Cláudio de Barco	41.511	-8.328
+C077	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.515	-8.322
+C078	1100L	Rua João Antunes Guimarães	Briteiros São Salvador	41.516	-8.321
+C079	1100L	Zona Industrial da Gandra	São Cláudio de Barco	41.505	-8.331
+C080	1100L	Zona Industrial da Gandra	São Cláudio de Barco	41.505	-8.331
+C081	1100L	Rua Fio	São Cláudio de Barco	41.505	-8.33
+C082	1100L	Rua da Rabata	Caldelas	41.499	-8.335
+C083	1100L	Rua da Rabata	Caldelas	41.497	-8.336
+C084	1100L	Rua da Rabata	Caldelas	41.497	-8.336
+C085	1100L	Rua da Rabata	Caldelas	41.496	-8.336
+C086	1100L	Rua da Rabata	Caldelas	41.499	-8.335
+C087	1100L	Rua da Rabata	Caldelas	41.497	-8.336
+C088	1100L	Rua da Rabata	Caldelas	41.497	-8.336
+C089	1100L	Rua da Rabata	Caldelas	41.496	-8.336
+C090	1100L	Rua Azemel	Caldelas	41.498	-8.338
+C091	1100L	Rua Azemel	Caldelas	41.498	-8.338
+C092	1100L	Rua Nossa Senhora de Fátima	Caldelas	41.491	-8.339
+C093	1100L	Rua Nossa Senhora de Fátima	Caldelas	41.49	-8.339
+C094	1100L	Rua Nossa Senhora de Fátima	Caldelas	41.492	-8.339
+C095	1100L	Rua da Charneca	Caldelas	41.489	-8.343
+C096	1100L	Rua da Charneca	Caldelas	41.489	-8.343
+C097	1100L	Rua São Tomé	Caldelas	41.492	-8.345
+C098	1100L	Travessa do Souto	Caldelas	41.494	-8.348
+C099	1100L	Rua do Penedo	Caldelas	41.496	-8.343
+C100	1100L	Rua do Penedo	Caldelas	41.498	-8.34
+C101	1100L	Rua do Burgão	Caldelas	41.488	-8.363
+C102	1100L	Rua do Burgão	Caldelas	41.491	-8.364
+C103	1100L	Rua São Martinho	Sande São Martinho	41.493	-8.365
+C104	1100L	Rua Maria Helena Caldas	Sande São Martinho	41.494	-8.369
+C105	1100L	Rua Maria Helena Caldas	Sande São Martinho	41.493	-8.368
+C106	1100L	Rua Antigas	Sande São Martinho	41.493	-8.368
+C107	1100L	Rua Rocha	Sande São Martinho	41.499	-8.367
+C108	1100L	Rua Rocha	Sande São Martinho	41.495	-8.369
+C109	1100L	Rua Rocha	Sande São Martinho	41.495	-8.369
+C110	1100L	Rua Rocha	Sande São Martinho	41.5	-8.365
+C111	1100L	Av. Domingos de freitas	Sande São Martinho	41.495	-8.362
+C112	1100L	Rua Padre António Francisco Ribeiro	Sande São Martinho	41.496	-8.361
+C113	1100L	Rua Vinhais	Sande São Martinho	41.494	-8.36
+C114	1100L	Rua Lameiros	Sande São Martinho	41.498	-8.357
+C115	1100L	Rua Lameiros	Sande São Martinho	41.499	-8.354
+C116	1100L	Rua Lamas	Sande São Martinho	41.501	-8.354
+C117	1100L	EB Agrolongo	Sande São Lourenço	41.508	-8.35
+C118	1100L	Feiras das Taipas	Caldelas	41.487	-8.345
+C119	1100L	Feiras das Taipas	Caldelas	41.487	-8.345
+C120	1100L	Feiras das Taipas	Caldelas	41.487	-8.345
+C121	1100L	Rua 1º de maio	Caldelas	41.488	-8.348
+C122	1100L	Rua 1º de maio	Caldelas	41.488	-8.348
+C123	1100L	Rua 1º de maio	Caldelas	41.488	-8.348
+C124	1100L	Rua Joaquim Pereira Monteiro	Caldelas	41.483	-8.343
+C125	1100L	Rua Joaquim Pereira Monteiro	Caldelas	41.483	-8.343
+C126	1100L	Parque de campismo	Caldelas	41.484	-8.342
+C127	1100L	Rua Banda de musica	Caldelas	41.487	-8.35
+C128	1100L	Intermache	Caldelas	41.487	-8.351
+C129	1100L	Intermache	Caldelas	41.487	-8.351
+C130	1100L	Intermache	Caldelas	41.487	-8.351
+C131	1100L	Intermache	Caldelas	41.487	-8.351
+C132	1100L	Pingo Doce	Caldelas	41.488	-8.355
+C133	1100L	Pingo Doce	Caldelas	41.488	-8.355
+C134	1100L	Pingo Doce	Caldelas	41.488	-8.355
+C135	1100L	Pingo Doce	Caldelas	41.488	-8.355
+C136	1100L	Pingo Doce	Caldelas	41.488	-8.355
+C137	1100L	EB 2.3 Caldas das Taipas	Caldelas	41.485	-8.353
+C138	1100L	EB 2.3 Caldas das Taipas	Caldelas	41.485	-8.353
+C139	1100L	EB 2.3 Caldas das Taipas	Caldelas	41.485	-8.353
+C140	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C141	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C142	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C143	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C144	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C145	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C146	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C147	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C148	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C149	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C150	1100L	Escola Secundária	Caldelas	41.484	-8.351
+C151	1100L	Continente	Caldelas	41.483	-8.351
+C152	1100L	Continente	Caldelas	41.483	-8.351
+C153	1100L	Continente	Caldelas	41.483	-8.351
+C154	1100L	Continente	Caldelas	41.483	-8.351
+C155	1100L	Continente	Caldelas	41.483	-8.351
+C156	1100L	Rua 5 de outubro	Brito	41.458	-8.364
+C157	1100L	Ru S. João Batista	Brito	41.453	-8.367
+C158	1100L	Ru S. João Batista	Brito	41.448	-8.364
+C159	1100L	Escola de Brito	Brito	41.451	-8.366
+C160	1100L	Rua da Mata	Ponte	41.461	-8.342
+C161	1100L	Tv. Pouve	Ponte	41.466	-8.342
+C162	1100L	Rua Pouve	Ponte	41.465	-8.343
+C163	1100L	Rua Reitor Joaquim Torres	Ponte	41.47	-8.339
+C164	1100L	Rua Reitor Joaquim Torres	Ponte	41.471	-8.338
+C165	1100L	Rua Reitor Joaquim Torres	Ponte	41.472	-8.338
+C166	1100L	Monte da Insua	Ponte	41.477	-8.341
+C167	1100L	Monte da Insua	Ponte	41.477	-8.341
+C168	1100L	Monte da Insua	Ponte	41.477	-8.341
+C169	1100L	Tv. Campo Novo	Ponte	41.479	-8.328
+C170	1100L	Rua da Borralha	Ponte	41.474	-8.327
+C171	1100L	Rua do Tojais	Ponte	41.473	-8.326
+C172	1100L	Rua do Tojais	Ponte	41.475	-8.329
+C173	1100L	Rua da Industria 	Ponte	41.475	-8.33
+C174	1100L	Rua Industrial do Monte da Carreira	Ponte	41.476	-8.33
+C175	1100L	Rua dos Moinhos 	Ponte	41.475	-8.345
+C176	1100L	Rua dos Moinhos 	Ponte	41.475	-8.345
+C177	1100L	Rua dos Moinhos 	Ponte	41.475	-8.345
+C178	1100L	Rua da Industria 	Ponte	41.475	-8.333
+C179	1100L	Rua da Industria 	Ponte	41.475	-8.333
+C180	1100L	Rua da Industria 	Ponte	41.475	-8.333
+C181	1100L	Rua de Santa Eulália	Fermentões	41.454	-8.31
+C182	1100L	Rua de Santa Eulália	Fermentões	41.454	-8.31
+C183	1100L	Rua João Paulo II	Fermentões	41.462	-8.313
+C184	1100L	Rua João Paulo II	Fermentões	41.462	-8.313
+C185	1100L	Rua Paço de Toriz	Fermentões	41.463	-8.32
+C186	1100L	Av. Verramundanes	Fermentões	41.46	-8.324
+C187	1100L	Rua Vila Marita	Ponte	41.467	-8.325
+C188	1100L	N101	Ponte	41.47	-8.329
+C189	1100L	N101	Ponte	41.469	-8.328
+C190	1100L	N101	Ponte	41.469	-8.328
+C191	1100L	N101	Ponte	41.475	-8.335
+C192	1100L	Parque Santa Maria de Souto	Souto Santa Maria	41.52	-8.292
+C193	1100L	Rua D. Josefa Amaral Freitas	Souto Santa Maria	41.52	-8.288
+C194	1100L	Rua D. Josefa Amaral Freitas	Souto Santa Maria	41.52	-8.288
+C195	1100L	Av. Dom Afonso Henriques 	Gondomar	41.527	-8.272
+C196	1100L	Av. Dom Afonso Henriques 	Gondomar	41.528	-8.269
+C197	1100L	Av. Dom Afonso Henriques 	Gondomar	41.528	-8.269
+C198	1100L	Rua da boavista	Gondomar	41.527	-8.266
+C199	1100L	Rua da boavista	Gondomar	41.527	-8.266
+C200	1100L	Rua das Nações	Gondomar	41.526	-8.271
+C201	1100L	Av. Condessa Mumadona Dias	Gondomar	41.529	-8.268
+C202	1100L	Av. Condessa Mumadona Dias	Gondomar	41.529	-8.268
+C203	1100L	Av. Condessa Mumadona Dias	Gondomar	41.529	-8.27
+C204	1100L	Av. Condessa Mumadona Dias	Gondomar	41.529	-8.27
+C205	1100L	Rua Choriz	Gondomar	41.527	-8.262
+C206	1100L	Av. Dom Afonso Henriques 	Gondomar	41.532	-8.262
+C207	1100L	Av. Dom Afonso Henriques 	Gondomar	41.532	-8.262
+C208	1100L		Gondomar	41.535	-8.26
+C209	1100L		Gondomar	41.546	-8.224
+C210	1100L	Av. Dom Afonso Henriques 	Gondomar	41.547	-8.222
+C211	1100L	Rua da Saudade	Gondomar	41.548	-8.222
+C212	1100L	Travessa da Boucinha	Gondomar	41.548	-8.221
+C213	1100L	EN 207	Gondomar	41.545	-8.217
+C214	1100L	EN 207	Gondomar	41.549	-8.218
+C215	1100L	EN 207	Gondomar	41.548	-8.218
+C216	1100L	Rua de Santa Marta	Gondomar	41.55	-8.214
+C217	1100L		Gondomar	41.552	-8.212
+C218	1100L	Rua das Escolas	Castelões	41.553	-8.209
+C219	1100L	Rua das Escolas	Castelões	41.553	-8.209
+C220	1100L	M608	Castelões	41.55	-8.208
+C221	1100L	M608	Castelões	41.555	-8.204
+C222	1100L	M608	Castelões	41.555	-8.204
+C223	1100L		Castelões	41.551	-8.205
+C224	1100L		Castelões	41.559	-8.203
+C225	1100L	M608	Castelões	41.563	-8.2
+C226	1100L	M609	Castelões	41.565	-8.198
+C227	1100L	N207	Castelões	41.555	-8.218
+C228	1100L	N208	Castelões	41.555	-8.217
+C229	1100L	Rua Armando da Silva	Castelões	41.553	-8.219
+C230	1100L	Rua Santa M.nha	Castelões	41.551	-8.217
+C231	1100L	Rua do Emigrante	Castelões	41.552	-8.22
+C232	1100L	Rua do Emigrante	Castelões	41.552	-8.222
+C233	1100L	N207	Castelões	41.553	-8.223
+C234	1100L	Rua Dr. Vaz Vieira	Castelões	41.551	-8.226
+C235	1100L	Rua Dr. Vaz Vieira	Castelões	41.551	-8.226
+C236	1100L	N207	Castelões	41.551	-8.224
+C237	1100L	N207	Castelões	41.55	-8.221
+C238	1100L	N207	Castelões	41.55	-8.221
+C239	1100L	Tv. Venda	Souto Santa Maria	41.514	-8.298
+C240	1100L	Tv. Venda	Souto Santa Maria	41.514	-8.298
+C241	1100L	Rua Manual Alves Matos 	Souto São Salvador	41.499	-8.296
+C242	1100L	Rua Nossa Senhora de Fátima	Souto Santa Maria	41.508	-8.29
+C243	1100L		Souto Santa Maria	41.515	-8.29
+C244	1100L	Rua Dona Elvira Cruz Fernandes	Souto Santa Maria	41.514	-8.296
+C245	1100L	Rua António Pereira de Macedo	São Estevão de Briteiros	41.503	-8.308
+C246	1100L		Prazins Santo Tirso	41.491	-8.298
+C247	1100L	Rua da Azenha	Souto São Salvador	41.501	-8.316
+C248	1100L	Rua do Outeiro	São Cláudio de Barco	41.5	-8.324
+C249	1100L	Rua de São Cáudio	São Cláudio de Barco	41.5	-8.327
+C250	1100L	Rua de São Cáudio	São Cláudio de Barco	41.5	-8.327
+C251	1100L	Rua Cruzes	São Cláudio de Barco	41.498	-8.326
+C252	1100L	Rua do Muro	São Cláudio de Barco	41.497	-8.334
+C253	1100L	Rua Torre	São Cláudio de Barco	41.496	-8.329
+C254	1100L	Rua Santa Maria	Briteiros São Estevão	41.507	-8.317
+C255	1100L	Rua Santa Maria	Briteiros São Estevão	41.507	-8.317
+C256	1100L	Rua António Pereira de Macedo	Briteiros São Estevão	41.503	-8.308
+C257	1100L	Rua dos Moinhos 	Briteiros São Estevão	41.508	-8.329
+C258	1100L	Rua Vila Chã	Briteiros São Estevão	41.513	-8.32
+C259	1100L	Rua da Agrela	Briteiros São Estevão	41.514	-8.322
+C260	1100L	Rua dos Moinhos 	Briteiros São Estevão	41.513	-8.323
+C261	1100L	Rua dos Moinhos 	Briteiros São Estevão	41.508	-8.329
+C262	1100L	N310	Briteiros São Estevão	41.507	-8.321
+C263	1100L	N310	Briteiros São Estevão	41.507	-8.321
+C264	1100L	Cemitério 	Briteiros São Estevão	41.503	-8.312
+C265	1100L	Rua Camões	Briteiros São Estevão	41.51	-8.311
+C266	1100L	Rua Camões	Briteiros São Estevão	41.51	-8.311
+C267	1100L	Parque Industrial	Briteiros São Estevão	41.513	-8.306
+C268	1100L	Parque Industrial	Briteiros São Estevão	41.502	-8.306
+C269	1100L		Briteiros São Estevão	41.512	-8.306
+C270	1100L	Rua bouça da lage	Briteiros São Estevão	41.517	-8.309
+C271	1100L	Rua da Boavista	Briteiros São Estevão	41.515	-8.312
+C272	1100L	Tv. Citania	Briteiros São Estevão	41.526	-8.307
+C273	1100L	Rua Santo Amaro	Donim	41.531	-8.303
+C274	1100L	Rua Santo Amaro	Donim	41.531	-8.303
+C275	1100L	N310	Donim	41.526	-8.299
+C276	1100L	N310	Donim	41.526	-8.299
+C277	1100L	N310	Donim	41.526	-8.299
+C278	1100L	Rua Alto da Pedreira	Donim	41.532	-8.3
+C279	1100L	Rua Alto da Pedreira	Donim	41.532	-8.297
+C280	1100L	Rua Manuel Lopes	Donim	41.531	-8.297
+C281	1100L	Rua Manuel Lopes	Donim	41.531	-8.297
+C282	1100L	Rua Paço	Donim	41.53	-8.299
+C283	1100L	Rua da Ponte	Donim	41.525	-8.296
+C284	1100L	CTT	Donim	41.527	-8.298
+C285	1100L	CTT	Donim	41.527	-8.298
+C286	1100L	Rua das Vessadas	Donim	41.525	-8.3
+C287	1100L	Rua das Vessadas	Donim	41.524	-8.301
+C288	1100L	Rua Bouça da Lage	Donim	41.523	-8.304
+C289	1100L		São Cláudio de Barco	41.499	-8.333
+C290	1100L	N310	São Cláudio de Barco	41.498	-8.335
+C291	1100L	Rua S. Claúdio	São Cláudio de Barco	41.5	-8.329
+C292	1100L		Costa	41.452	-8.272
+C293	1100L		Costa	41.452	-8.272
+C294	1100L	Cemitério de Monchique	Costa	41.446	-8.268
+C295	1100L	Cemitério de Monchique	Costa	41.446	-8.268
+C296	1100L	Agrupamento João de Meira	Costa	41.445	-8.283
+C297	1100L	Agrupamento João de Meira	Costa	41.445	-8.284
+C298	1100L	Rua Dr. Carlos Malheiro Dias	Costa	41.446	-8.288
+C299	1100L	Universidade do Minho	Azurém	41.451	-8.292
+C300	1100L		Azurém	41.452	-8.29
+C301	1100L		Azurém	41.451	-8.292
+C302	1100L	Universidade do Minho	Azurém	41.452	-8.29
+C303	1100L	Universidade do Minho	Azurém	41.452	-8.29
+C304	1100L	Universidade do Minho	Azurém	41.452	-8.29
+C305	1100L	Universidade do Minho	Azurém	41.453	-8.291
+C306	1100L	Universidade do Minho	Azurém	41.453	-8.291
+C307	1100L	Universidade do Minho	Azurém	41.454	-8.289
+C308	1100L	Universidade do Minho	Azurém	41.454	-8.289
+C309	1100L	CVR	Azurém	41.455	-8.29
+C310	1100L		Azurém	41.453	-8.287
+C311	1100L		Azurém	41.455	-8.292
+C312	1100L	Rua 24 de junho	Azurém	41.456	-8.295
+C313	1100L	Rua 24 de junho	Azurém	41.456	-8.295
+C314	1100L		Azurém	41.477	-8.298
+C315	1100L		Azurém	41.477	-8.298
+C316	1100L	Rua José Pinto Rodrigues	Azurém	41.448	-8.301
+C317	1100L	Rua Francisco Agra	UF Oliveira. S. Paio e S. Sebastião	41.446	-8.298
+C318	1100L	Rua Francisco Agra	UF Oliveira. S. Paio e S. Sebastião	41.446	-8.298
+C319	1100L	Rua do Pombal	Azurém	41.448	-8.3
+C320	1100L	Rua do Pombal	Azurém	41.448	-8.3
+C321	1100L	Rua Nossa Senhora de Conceição	Azurém	41.448	-8.305
+C322	1100L	Rua Dom João I	Creixomil	41.442	-8.3
+C323	1100L	Rua Dom João I	Creixomil	41.442	-8.3
+C324	1100L	Av. Conde Margaride	UF Oliveira. S. Paio e S. Sebastião	41.443	-8.298
+C325	1100L	Av. Conde Margaride	UF Oliveira. S. Paio e S. Sebastião	41.443	-8.298
+C326	1100L	Av. Conde Margaride	UF Oliveira. S. Paio e S. Sebastião	41.443	-8.298
+C327	1100L	Rua dos Cutileiros	Creixomil	41.439	-8.309
+C328	1100L	Rua dos Cutileiros	Creixomil	41.439	-8.309
+C329	1100L	Rua dos Cutileiros	Creixomil	41.439	-8.309
+C330	1100L	Rua das Eiras	Creixomil	41.437	-8.312
+C331	1100L	Rua das Eiras	Creixomil	41.437	-8.312
+C332	1100L	Rua Cruz de Pedra	Creixomil	41.437	-8.305
+C333	1100L	Rua Abel Salazar	Creixomil	41.441	-8.301
+C334	1100L	Rua da Liberdade / Mercado	Creixomil	41.439	-8.3
+C335	1100L	Rua da Liberdade / Mercado	Creixomil	41.439	-8.3
+C336	1100L	Rua da Liberdade / Mercado	Creixomil	41.439	-8.3
+C337	1100L	Rua da Liberdade / Mercado	Creixomil	41.439	-8.3
+C338	1100L	Rua da Liberdade / Mercado	Creixomil	41.439	-8.3
+C339	1100L	Rua da Liberdade / Mercado	Creixomil	41.44	-8.299
+C340	1100L	Feira	Creixomil	41.441	-8.312
+C341	1100L	Feira	Creixomil	41.441	-8.312
+C342	1100L	Hortas Pedagógicas	Creixomil	41.437	-8.308
+C343	1100L	Hortas Pedagógicas	Creixomil	41.437	-8.308
+C344	1100L	Rua António Costa Guimarães	Creixomil	41.429	-8.299
+C345	1100L	Rua António Costa Guimarães	Creixomil	41.429	-8.299
+C346	1100L	Intermache	Urgezes	41.425	-8.3
+C347	1100L	Intermache	Urgezes	41.425	-8.3
+C348	1100L	Intermache	Urgezes	41.425	-8.299
+C349	1100L	Intermache	Urgezes	41.425	-8.299
+C350	1100L	Bomba Intermache	Urgezes	41.424	-8.299
+C351	1100L	Bomba Intermache	Urgezes	41.425	-8.299
+C352	1100L	Bomba Intermache	Urgezes	41.424	-8.299
+C353	1100L	Rua Dom João I	UF Oliveira. S. Paio e S. Sebastião	41.442	-8.297
+C354	1100L	Rua Aristides de Sousa Mendes	UF Oliveira. S. Paio e S. Sebastião	41.441	-8.285
+C355	1100L	Rua de Vilar	Costa	41.439	-8.279
+C356	1100L	Rua Padre António 	Costa	41.435	-8.279
+C357	1100L	Rua das Fontes	Costa	41.433	-8.283
+C358	1100L	Rua do Bom Viver	Costa	41.433	-8.287
+C359	1100L	Tv. de Santa Ana	Costa	41.444	-8.279
+C360	1100L	Rua das Tumbas	Costa	41.444	-8.278
+C361	1100L	Rua das Tumbas	Costa	41.444	-8.278
+C362	1100L	Pousada da Juventude	Costa	41.443	-8.277
+C363	1100L	Pousada da Juventude	Costa	41.443	-8.277
+C364	1100L	N101-2	Costa	41.445	-8.281
+C365	1100L		Costa	41.442	-8.285
+C366	1100L	Rua Antero Henriques da Silva	Costa	41.449	-8.279
+C367	1100L	águas da Penha	Costa	41.426	-8.268
+C368	1100L	águas da Penha	Costa	41.426	-8.268
+C369	1100L	águas da Penha	Costa	41.426	-8.268
+C370	1100L	Escuteiros - Penha	Costa	41.423	-8.279
+C371	1100L	Escuteiros - Penha	Costa	41.423	-8.279
+C372	1100L	Rua Manuel Caetano Martins	Costa	41.441	-8.287
+C373	1100L	Rua Manuel Caetano Martins	Costa	41.441	-8.287
+C374	1100L	Rua Dom Domingos Silva Gonçalves	UF Oliveira. S. Paio e S. Sebastião	41.44	-8.289
+C375	1100L	Rua da Ramada	UF Oliveira. S. Paio e S. Sebastião	41.441	-8.292
+C376	1100L	Rua da Ramada	UF Oliveira. S. Paio e S. Sebastião	41.441	-8.292
+C377	1100L	Rua da Ramada	UF Oliveira. S. Paio e S. Sebastião	41.44	-8.291
+C378	1100L	Rua de S. Tiago	UF Santiago e Mascotelos	41.42	-8.319
+C379	1100L	Rodovia de Covas	Creixomil	41.432	-8.302
+C380	1100L	Rua de S. Tiago	São Torcato	41.42	-8.319
+C381	1100L	Rua da Caldeiroa	UF Oliveira. S. Paio e S. Sebastião	41.439	-8.297
+C382	1100L		UF Oliveira. S. Paio e S. Sebastião	41.448	-8.295
+C383	1100L		UF Oliveira. S. Paio e S. Sebastião	41.448	-8.295
+C384	1100L	Rua Parque Industrial de Ponte	Ponte	41.466	-8.331
+C385	1100L	Rua da Pôvoa	Ponte	41.471	-8.334
+C386	1100L	Rua da Boucinha	Ponte	41.469	-8.338
+C387	1100L		Ponte	41.466	-8.338
+C388	1100L		Ponte	41.466	-8.338
+C389	1100L	José Neves	Ponte	41.463	-8.337
+C390	1100L		Ponte	41.466	-8.335
+C391	1100L	Rua Parque Industrial de Ponte	Ponte	41.465	-8.333
+C392	1100L	Rua do Estremadouro	Ponte	41.465	-8.331
+C393	1100L	Rua do Estremadouro	Ponte	41.465	-8.331
+C394	1100L	Rua do Isqueiro	Ponte	41.471	-8.32
+C395	1100L	Rua do Isqueiro	Ponte	41.471	-8.32
+C396	1100L	Rua Padre António Matos	Ponte	41.474	-8.32
+C397	1100L	Rua Nossa Senhora da Conceição	Ponte	41.477	-8.322
+C398	1100L	Rua Nossa Senhora da Conceição	Ponte	41.479	-8.323
+C399	1100L	Rua Nossa Senhora da Conceição	Ponte	41.477	-8.322
+C400	1100L	Rua Nossa Senhora da Conceição	Ponte	41.479	-8.323
+C401	1100L	M583	Prazins Santo Tirso	41.486	-8.318
+C402	1100L	M583	Prazins Santo Tirso	41.486	-8.317
+C403	1100L	M583	Prazins Santo Tirso	41.488	-8.317
+C404	1100L	M583	Prazins Santo Tirso	41.488	-8.317
+C405	1100L	Rua Padre Francisco Rodrigues	Prazins Santo Tirso	41.487	-8.319
+C406	1100L	Rua Padre Francisco Rodrigues	Prazins Santo Tirso	41.487	-8.319
+C407	1100L	Rua António Silva 	Prazins Santa Eufémia	41.496	-8.321
+C408	1100L	Rua do Rio Ave	Prazins Santa Eufémia	41.493	-8.318
+C409	1100L	Rua do Rio Ave	Prazins Santa Eufémia	41.492	-8.318
+C410	1100L	M583	Prazins Santa Eufémia	41.492	-8.313
+C411	1100L	M583	Prazins Santa Eufémia	41.493	-8.313
+C412	1100L	Rua Manuel Ribeiro	Prazins Santa Eufémia	41.495	-8.316
+C413	1100L	Rua Azenha	Souto São Salvador	41.501	-8.316
+C414	1100L	Rua Azenha	Prazins Santa Eufémia	41.488	-8.326
+C415	1100L	Rua João Pereira Lobo	Prazins Santa Eufémia	41.484	-8.327
+C416	1100L	M583	Prazins Santa Eufémia	41.484	-8.318
+C417	1100L	M583	Prazins Santa Eufémia	41.484	-8.316
+C418	1100L	M583	Prazins Santa Eufémia	41.484	-8.314
+C419	1100L	Rua Central	Prazins Santa Eufémia	41.484	-8.312
+C420	1100L	Rua Central	Prazins Santa Eufémia	41.484	-8.312
+C421	1100L	Cemitério	Prazins Santo Tirso	41.489	-8.305
+C422	1100L	N309	Selho São Lourenço	41.48	-8.291
+C423	1100L	N309	Selho São Lourenço	41.475	-8.288
+C424	1100L	N309	Selho São Lourenço	41.473	-8.286
+C425	1100L	N309	Selho São Lourenço	41.472	-8.286
+C426	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.471	-8.284
+C427	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.47	-8.284
+C428	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.469	-8.284
+C429	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.468	-8.283
+C430	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.468	-8.281
+C431	1100L	Rua Antonio Gomes Marinho	Selho São Lourenço	41.468	-8.279
+C432	1100L	Parque Industrial	Ponte	41.466	-8.332
+C433	1100L	Parque Industrial	Ponte	41.466	-8.332
+C434	1100L	Rua de Trandes	Fermentões	41.451	-8.31
+C435	1100L	Rua do Grisel	Fermentões	41.455	-8.317
+C436	1100L	Rua do Grisel	Fermentões	41.455	-8.317
+C437	1100L	Rua do Grisel	Fermentões	41.455	-8.317
+C438	1100L	Rua Lameirão	Fermentões	41.457	-8.316
+C439	1100L		Fermentões	41.458	-8.319
+C440	1100L		Fermentões	41.458	-8.32
+C441	1100L		Fermentões	41.455	-8.314
+C442	1100L		Fermentões	41.455	-8.314
+C443	1100L	Rua da Covilhã	Fermentões	41.449	-8.313
+C444	1100L	Rua da Covilhã	Fermentões	41.449	-8.313
+C445	1100L	Rua da Chamusca	Fermentões	41.455	-8.308
+C446	1100L	Rua da Chamusca	Fermentões	41.456	-8.308
+C447	1100L	Rua da Chamusca	Fermentões	41.456	-8.308
+C448	1100L	Rua da Chamusca	Fermentões	41.458	-8.306
+C449	1100L	Rua 24 de junho	Penselo	41.468	-8.307
+C450	1100L	Rua João Paulo II	Fermentões	41.464	-8.311
+C451	1100L	Rua Eng. Duarte do Amaral	Penselo	41.472	-8.299
+C452	1100L	Rua Eng. Duarte do Amaral	Penselo	41.472	-8.299
+C453	1100L	Rua Eng. Duarte do Amaral	Penselo	41.471	-8.299
+C454	1100L	Rua Eng. Duarte do Amaral	Penselo	41.471	-8.299
+C455	1100L	Rua Eng. Duarte do Amaral	Penselo	41.471	-8.298
+C456	1100L	Rua da Vinha	Penselo	41.468	-8.294
+C457	1100L	Rua da Vinha	Penselo	41.468	-8.294
+C458	1100L	Rua de Louredo	Selho São Lourenço	41.472	-8.293
+C459	1100L	Rua de Louredo	Selho São Lourenço	41.472	-8.293
+C460	1100L	Rua de Louredo	Selho São Lourenço	41.472	-8.293
+C461	1100L	Rua Belmiro de Oliveira	Selho São Lourenço	41.471	-8.287
+C462	1100L	Rua Belmiro de Oliveira	Selho São Lourenço	41.471	-8.287
+C463	1100L	Rua Vinha do Cabo	Selho São Lourenço	41.469	-8.292
+C464	1100L	Rua de Fontela	Gominhães	41.478	-8.284
+C465	1100L		Gominhães	41.483	-8.285
+C466	1100L	Rua Alto	Gominhães	41.488	-8.28
+C467	1100L	Rua Largo	Gominhães	41.483	-8.278
+C468	1100L	Rua Bouça Velha	Gominhães	41.486	-8.281
+C469	1100L	Rua Alto	Gominhães	41.488	-8.28
+C470	1100L	Rua Bouça Velha	Gominhães	41.486	-8.281
+C471	1100L	CM1563	Gominhães	41.478	-8.273
+C472	1100L	CM1564	Gominhães	41.478	-8.271
+C473	1100L	Rua da Fontela	Gominhães	41.476	-8.282
+C474	1100L		Selho São Lourenço	41.471	-8.278
+C475	1100L	Rua do Boiro	Selho São Lourenço	41.472	-8.28
+C476	1100L	Rua do Boiro	Selho São Lourenço	41.472	-8.28
+C477	1100L	Rua António Gomes Marinho	São Torcato	41.469	-8.278
+C478	1100L		Selho São Lourenço	41.471	-8.281
+C479	1100L		Selho São Lourenço	41.467	-8.284
+C480	1100L		Selho São Lourenço	41.467	-8.284
+C481	1100L		Selho São Lourenço	41.465	-8.291
+C482	1100L		Selho São Lourenço	41.465	-8.289
+C483	1100L		São Torcato	41.486	-8.27
+C484	1100L	Rua dos Estoleiros	Polvoreira	41.418	-8.31
+C485	1100L	Rua Ribeiro de Baixo	Polvoreira	41.412	-8.312
+C486	1100L	Rua da Escola	Polvoreira	41.407	-8.299
+C487	1100L	Parque das Hortas/ Bowling	Costa	41.442	-8.285
+C488	1100L	Rua da Bouça	Costa	41.44	-8.276
+C489	1100L	Rua Candido José de Carvalho	Urgezes	41.43	-8.292
+C490	1100L	Rua Candido José de Carvalho	Urgezes	41.43	-8.291
+C491	1100L		Urgezes	41.43	-8.291
+C492	1100L		Urgezes	41.424	-8.296
+C493	1100L		Urgezes	41.424	-8.296
+C494	1100L	Rua dos Fertuinhos	Abação	41.414	-8.277
+C495	1100L	Rua dos Fertuinhos	Abação	41.414	-8.277
+C496	1100L	EB1 	Azurém	41.448	-8.298
+C497	1100L	EB1 	Azurém	41.448	-8.298
+C498	1100L	Rua Prof Arnaldo Sampaio	UF Oliveira. S. Paio e S. Sebastião	41.445	-8.303
+C499	1100L	Rua Prof Arnaldo Sampaio	UF Oliveira. S. Paio e S. Sebastião	41.445	-8.303
+C500	1100L	Rua do Muro	São Cláudio de Barco	41.496	-8.334
+C501	1100L	Rua de Linhares	São Estevão de Briteiros	41.515	-8.305
+C502	1100L	Hotel de Guimarães	Creixomil	41.437	-8.297
+C503	1100L	Hotel de Guimarães	Creixomil	41.437	-8.297
+C504	1100L	Rua Dr. Lindoso	Briteiros São Salvador 	41.528	-8.322
+C505	1100L	Piscinas Scorpio	Candoso S. Tiago	41.431743	-8.319078
+C506	1100L	Piscinas Scorpio	Candoso S. Tiago	41.431743	-8.319078
+C507	1100L	águas da Penha	Costa	41.426	-8.268
+C508	1100L	Rua do Tugido	São Torcado	41.467	-8.264
+C509	1100L	Rua da Borralhada	Ponte	41.473	-8.326
+C510	1100L	Rua da Vessadas	Donim	41.528	-8.297
+C511	1100L	Rua de Trandes	Fermentões	41.448836	-8.310748
+C512	1100L	Rua Padre Firmino	Penselo	41.464799	-8.310939
+C513	1100L	Rua da Veiga	Sande São Lourenço 	41.500702	-8.338449
+C514	1100L	Rua Castro de Sabroso	Sande São Lourenço 	41.508656	-8.35076
+C515	1100L	Rua José Francisco Ribeiro	Costa	41.436076	-8.2847708
+C516	1100L	Centro Grossista das Taipas	Caldelas	41.49705	-8.336652
+C517	1100L	Centro Grossista das Taipas	Caldelas	41.49705	-8.336652
+C518	1100L	Centro Grossista das Taipas	Caldelas	41.49705	-8.336652
+C519	1100L	Feira de S. Torcato 	S. Torcato	41.481041	-8.258797
+C520	1100L	Feira de S. Torcato 	S. Torcato	41.481041	-8.258797
+C521	1100L	Rua do Souto Novo	Corvite	41.47	-8.317
+C522	1100L	Rua José Alves	Souto S. Salvador	41.499115	-8.295282
+C523	1100L	Rua Santa Maria	Briteiros São Estevão 	41.506709	-8.317042
+C524	1100L	Travessa de Real	Briteiros São Estevão 	41.507432	-8.317182
+C525	1100L	Termas Taipas	Caldelas	41.487837	-8.34198
+C526	1100L	Travessa da Poça 	Briteiros São Salvador	41.526687	-8.328084
+C527	1100L	Urbanização de real	Briteiros São Estevão 	41.50487	-8.319671
+C528	1100L	Rua Fernando Pessoa	Briteiros São Estevão 	41.505428	-8.31724
+C529	1100L	N309	Briteiros São Estevão 	41.511833	-8.310963
+C530	1100L	Rua do Tojais	Ponte	41.470939	-8.329735
+C531	1100L	Rua 5 de outubro	Serzedelo	41.397731	-8.376933
+C532	1100L	Rua Eça de Queiroz 	Serzedelo	41.397269	-8.378621
+C533	1100L	Rua Plácido Pinto Teixeira Costa	Serzedelo	41.400779	-8.376473
+C534	1100L	Rua Plácido Pinto Teixeira Costa	Serzedelo	41.400807	-8.374986
+C535	1100L	Rua Zeca Afonso	Serzedelo	41.401366	-8.374203
+C536	1100L	Rua de São Bartolomeu	Serzedelo	41.399934	-8.384306
+C537	1100L	Rua António Aleixo	Serzedelo	41.40474	-8.375962
+C538	1100L	Rua Alfredo Pimenta	Serzedelo	41.405601	-8.379804
+C539	1100L	Rua da Fraternidade	Serzedelo	41.396196	-8.36269
+C540	1100L	Rua do Areal	Serzedelo	41.40296	-8.358549
+C541	1100L	Rua do Areal	Serzedelo	41.404325	-8.358608
+C542	1100L	Rua Passos de Cima	Serzedelo	41.406322	-8.354217
+C543	1100L	Rua Senhora dos Montes	Serzedelo	41.405038	-8.343962
+C544	1100L	Rua de São Pedro	Serzedelo	41.407333	-8.356421
+C545	1100L	Rua Grupo Desportivo	Serzedelo	41.406266	-8.363875
+C546	1100L	Rua Vinha Portela	Serzedelo	41.407094	-8.364404
+C547	1100L	Rua da Tapada	Serzedelo	41.403527	-8.377053
+C548	1100L	Rua José Francisco Ribeiro	Costa	41.436076	-8.2847708
+C549	1100L	Calçada de Santo António	Penselo	41.464829	-8.291882
+C550	1100L	Rua do Tarrujo	Briteiros S. Salvador	41.526757	-8.326214
+C551	1100L	Rua da Gandra	Barco	41.500926	-8.33412
+C552	1100L	Rua da Torre	Barco	41.496509	-8.331288
+C553	1100L	Rua Falcão	Souto São Salvador	41.496289	-8.315126
+C554	1100L	Rua de Trás do Casal	Souto Santa Maria	41.511058	-8.286699
+C555	1100L	Rua Padre António Pereira Silva	Gandarela	41.396174	-8.346389
+C556	1100L	Rua Boucinha	Gandarela	41.398325	-8.35211
+C557	1100L	Rua Mondim	Gandarela	41.39119	-8.342198
+C558	1100L	Rua Igreja Nova	Gandarela	41.390882	-8.344301
+C559	1100L	Rua Aula	Conde	41.392631	-8.334302
+C560	1100L	EB1 	Conde	41.39271	-8.333798
+C561	1100L	Rua do Outeirinho	Conde	41.393257	-8.332316
+C562	1100L	Rua Carreira	Conde	41.395228	-8.334383
+C563	1100L	Rua Santa Maria	Conde	41.394951	-8.331594
+C564	1100L	Rua Santa Luzia	Conde	41.391065	-8.331587
+C565	1100L	Rua Nossa Sra. Conceição	Corvite	41.481449	-8.324337
+C566	1100L	Rua dos Descobrimentos	Serzedelo	41.395817	-8.366269
+C567	1100L	Rua dos Surribes	Serzedelo	41.396365	-8.379573
+C568	1100L	Rua 25 de Abril	Guardizela	41.394717	-8.377604
+C569	1100L	Rua do Barroco	Guardizela	41.390704	-8.373735
+C570	1100L	Fábrica de embalagens KIWIS	Moreira de Cónegos	41.373409	-8.34916
+C572	1100L	Rua de Camões	UF Oliveira. S. Paio e S. Sebastião	41.441271	-8.296132
+C573	1100L	Rua Bento Cardoso	UF Oliveira. S. Paio e S. Sebastião	41.441786	-8.297689
+C574	1100L	Rua Jaime Martins	Mesão Frio	41.448724	-8.272347
+C575	1100L	Rua João de Oliveira Salgado	Costa	41.442899	-8.280716
+C576	1100L	Rua de Francos	Azurém	41.451698	-8.286568
+C577	1100L	Largo do Trovador	UF Oliveira. S. Paio e S. Sebastião	41.440493	-8.293584
+C578	1100L	Rua da Portelinha	Selho São Lourenço	41.472315	-8.285422
+C579	1100L	Vimagua	Aldão	41.459848	-8.25868
+C580	1100L	Vimagua	Aldão	41.459848	-8.25868
+C581	1100L	Infantário Nuno Simões	S. Paio	41.445393	-8.289294
+C582	1100L	Infantário Nuno Simões	S. Paio	41.445393	-8.289294
+C583	1100L	Infantário Nuno Simões	S. Paio	41.445393	-8.289294
+C584	1100L	Rua da Estrada Nova	Gomilhães	41.480187	-8.284899
+C585	1100L	Rua Central	Prazins Santo Tirso	41.48557	-8.307615
+C586	1100L	Rua do Mercado 	Pinheiro	41.416547	-8.280726
+C587	1100L	Rua Veiga	Fermentões	41.462303	-8.309476
+C589	1100L	Rua das Aldeias	Gominhães	41.48224	-8.277652
+C590	1100L	Tv da quinta	Sande São Lourenço 	41.51322	-8.349196
+C591	1100L	Rua das Cruzes	Barco	41.497623	-8.323841
+C592	1100L	Rua de Santarém	Vila Nova de Sande	41.474687	-8.357416
+C593	1100L	Rua Portelinha dos remédios	Polvoreira	41.41792	-8.296991
+C594	1100L	Rua das Aldeias	Gominhães	41.482081	-8.27741
+C595	1100L	Rua Jerónimo de freitas	Penselo	41.468978	-8.295211
+C596	1100L	Rua João Paulo II	Fermentões	41.462763	-8.311696
+C597	1100L	Rua do Outeiro	Figueiredo	41.467047	-8.388956
+C598	1100L	Rua 1º de maio	Figueiredo	41.471348	-8.390102
+C599	1100L	Rua da Granja	Brito	41.44307	-8.344967
+C600	1100L	Rua da Granja	Brito	41.44307	-8.344967
+C601	1100L	Tv. Paço	Brito	41.451159	-8.35835
+C602	1100L	Rua da Regatinhas	Airão	41.460935	-8.415707
+C603	1100L	Rua Arcebispo António Monteiro	Airão	41.460161	-8.412449
+C604	1100L	Rua São João Batista	Airão	41.456279	-8.42136
+C605	1100L	Rua Monte de São João	Airão	41.454271	-8.423824
+C606	1100L	Rua da Revessa	Figueiredo	41.469392	-8.380155
+C607	1100L	Rua da Revessa	Figueiredo	41.469392	-8.380155
+C608	1100L	Rua Venda Nova	Leitões	41.472654	-8.389079
+C609	1100L	Rua Venda Nova	Leitões	41.472654	-8.389079
+C610	1100L	Av. São Vicente	Oleiros	41.461485	-8.399885
+C611	1100L	Rua Arcebispo António Monteiro	Airão	41.460556	-8.426666
+C612	1100L	Rua de Menaco	Airão	41.454435	-8.411784
+C613	1100L	Rua da Boavista	Airão	41.450695	-8.414262
+C614	1100L	Rua da Anta	Leitões	41.469923	-8.388203
+C615	1100L	Rua Além	Brito	41.466869	-8.381197
+C616	1100L	Rua 1º de maio	Figueiredo	41.471348	-8.390102
+C617	1100L	Tv de entre latas	Figueiredo	41.417217	-8.383757
+C618	1100L	Tv de entre latas	Figueiredo	41.417217	-8.383757
+C619	1100L	Rua das Cruzinhas	Figueiredo	41.4707	-8.393122
+C620	1100L	Rua das Cruzinhas	Figueiredo	41.4707	-8.393122
+C621	1100L	Rua trapeira	Leitões	41.469131	-8.40115
+C622	1100L	Rua trapeira	Leitões	41.469131	-8.40115
+C623	1100L	Rua de seide	Oleiros	41.460832	-8.398476
+C624	1100L	Rua Gila	Airão	41.455313	-8.404778
+C625	1100L	Rua das Regatinhas	Airão	41.460199	-8.418251
+C626	1100L	Rua das Regatinhas	Airão	41.460199	-8.418251
+C627	1100L	Rua São João Batista	Airão	41.456279	-8.42136
+C628	1100L	Rua de Menaco	Airão	41.454435	-8.411784
+C629	1100L	Rua de Menaco	Airão	41.454435	-8.411784
+C630	1100L	Rua de Menaco	Airão	41.454435	-8.411784
+C631	1100L	Rua da boucinhas	Airão	41.451802	-8.410565
+C632	1100L	Rua das Balias	Airão	41.445369	-8.405362
+C633	1100L	Rua dos pardieiros	Airão	41.445713	-8.409452
+C634	1100L	Rua do Boucinho	Airão	41.446842	-8.397763
+C635	1100L	Rua do Boucinho	Airão	41.446842	-8.397763
+C636	1100L	Rua do Boucinho	Airão	41.446842	-8.397763
+C637	1100L	Rua do Boucinho	Airão	41.446842	-8.397763
+C638	1100L	Rua das Figueiras	Airão	41.457698	-8.395274
+C639	1100L	Rua das Figueiras	Airão	41.457698	-8.395274
+C640	1100L	Rua Artur Ribeiro	Sande Vila Nova	41.469723	-8.351111
+C641	1100L	Rua Artur Ribeiro	Sande Vila Nova	41.469723	-8.351111
+C642	1100L	Rua do Souto 	Sande Vila Nova	41.464639	-8.351651
+C643	1100L	Rua do Souto 	Sande Vila Nova	41.464639	-8.351651
+C644	1100L	Rua do Souto 	Sande Vila Nova	41.464639	-8.351651
+C645	1100L	Rua Seixidos	Sande São Clemente	41.479097	-8.368498
+C646	1100L		Sande São Clemente	41.492779	-8.3875
+C647	1100L		Sande São Clemente	41.492779	-8.3875
+C648	1100L	Rua Carvalho	Sande São Clemente	41.483137	-8.37332
+C649	1100L	Rua Carvalho	Sande São Clemente	41.483137	-8.37332
+C650	1100L	Rua Trás do Rio	Sande São Clemente	41.483278	-8.363403
+C651	1100L	Igreja de Sande Vila Nova	Sande Vila Nova	41.469639	-8.353721
+C652	1100L	Rua Marnel 	Sande São Clemente	41.487603	-8.372678
+C653	1100L	Rua Emilio Castelar	Ponte	41.458889	-8.343889
+C654	1100L	Rua Emilio Castelar	Ponte	41.458889	-8.343889
+C655	1100L	Rua Emilio Castelar	Ponte	41.458889	-8.343889
+C656	1100L	Rua da Ponte	Ponte	41.460556	-8.345
+C657	1100L	Rua da Escola 	Sande Vila Nova	41.464688	-8.345715
+C658	1100L	Rua do Souto	Sande Vila Nova	41.464472	-8.351492
+C659	1100L	Rua Dom Afonso Henriques	Brito	41.461291	-8.350195
+C660	1100L	Rua dos pardieiros	Sande Vila Nova	41.445478	-8.410295
+C661	1100L	Rua do Outeiro de Oleiros	Longos	41.510921	-8.365142
+C662	1100L	Rua do Outeiro de Oleiros	Longos	41.510921	-8.365142
+C663	1100L	Lugar da Fonte	Longos	41.519942	-8.35529
+C664	1100L	Rua Avelino Gomes	Sande São Martinho	41.496855	-8.354005
+C665	1100L	Rua da Reguengas 	Sande São Martinho	41.488232	-8.358525
+C666	1100L	Cemitério 	Longos	41.519993	-8.363023
+C667	1100L	Cemitério 	Longos	41.519993	-8.363023
+C668	1100L	Campo de jogos de Fraga 	Briteiros Santo Estevão	41.504286	-8.317331
+C669	1100L	Rua Padre Antonio Francisco Ribeiro 	Sande São Martinho	41.497069	-8.356265
+C670	1100L	Rua Pinheiro	Sande São Clemente	41.487541	-8.368276
+C671	1100L	Rua da Mata	Ponte	41.46205	-8.342636
+C672	1100L	Travessa do Souto	São Torcato	41.471715	-8.275668
+C673	1100L	Rua do Pulo	Fermentões	41.460228	-8.316552
+C674	1100L	Rua do Pulo	Fermentões	41.459104	-8.314753
+C675	1100L	Rua Santa Maria	Corvite	41.474732	-8.319288
+C676	1100L	Rua do Isqueiro	Corvite	41.471549	-8.320865
+C677	1100L	Rua João Paulo II	Prazins Santo Tirso	41.488677	-8.304844
+C678	1100L	Rua de Aredes	Briteiros Sta. Leocádia	41.532233	-8.339876
+C679	1100L	Rua Mata de Milho	Briteiros Sta. Leocádia	41.522609	-8.343456
+C680	1100L	Rua Sta. Leocádia	Briteiros Sta. Leocádia	41.521278	-8.340254
+C681	1100L	Rua da Barroca	Briteiros Sta. Leocádia	41.528921	-8.346411
+C682	1100L	Rua do Boucinho	Vermil	41.446852	-8.398229
+C683	1100L	Rua António de Barbosa	Vermil	41.445202	-8.399033
+C684	1100L	Rua São João Batista	Airão São João	41.460599	-8.426802
+C685	1100L	Rua Arcebispo António Monteiro	Airão São João	41.460543	-8.420464
+C686	1100L	Rua de Pereira	Fermentões	41.465511	-8.318731
+C687	1100L	Rua Vila Seca	Airão Santa Maria	41.446575	-8.405965
+C688	1100L	Rua da Bouça do Pinheiro 	São Clemente 		
+C689	1100L	EN Fafe/Rua Dr. Castro Ferreira	Mesão Frio	41.442258	-8.246406
+C690	1100L	Rua Dr. Joaquim de Meira	Azurém	41.44752	-8.29196
+C691	1100L	Rua Padre António Caldas	UF Oliveira. S. Paio e S. Sebastião	41.4493	-8.28461
+C692	1100L	Rua da Arcela	Azurém	41.45396	-8.27752
+C693	1100L	Rua de Francos	Azurém	41.4541	-8.29226
+C694	1100L	Tv. Da cruz da argola	Mesão Frio	41.45503	-8.27265
+C695	1100L	Tv. Da cruz da argola	Mesão Frio	41.45505	-8.27305
+C696	1100L	Tv. Da cruz da argola	Mesão Frio	41.45505	-8.27305
+C697	1100L	Rua de Belo Ares	Mesão Frio	41.44874	-8.25917
+C698	1100L	Rua dos Encados	Mesão Frio	41.4411	-8.24993
+C699	1100L	N101	Mesão Frio	41.44034	-8.24921
+C700	1100L	N101	Mesão Frio	41.43863	-8.24846
+C701	1100L	Parque Merendas Capela St. António	Mesão Frio	41.44275	-8.23919
+C702	1100L	EN Fafe/Rua Dr. Castro Ferreira	Mesão Frio	41.443	-8.24624
+C703	1100L	Rua Dr. Castro Ferreira	Mesão Frio	41.44202	-8.24494
+C704	1100L	N101	Mesão Frio	41.44105	-8.2489
+C705	1100L	Tv. Da ribeira	Mesão Frio	41.44318	-8.25093
+C706	1100L	Rua da Raposeira	Mesão Frio	41.44439	-8.25419
+C707	1100L	Campo São Romão	Mesão Frio	41.45023	-8.26321
+C708	1100L	Rua de Fervenças	Fermentões	41.4471	-8.30705
+C709	1100L	Rua de Fervenças	Fermentões	41.4471	-8.30705
+C710	1100L	Rua de São Miguel	Creixomil	41.4389	-8.30779
+C711	1100L	Rua do Salgueiral	Creixomil	41.43316	-8.30497
+C712	1100L	Av. da Igreja	Urgezes	41.4246	-8.29732
+C713	1100L	Rua do Olival	Urgezes	41.4266	-8.29638
+C714	1100L	Grupo Recreativo e Desportivo	Urgezes	41.42638	-8.2919
+C715	1100L	Rua da Costa Nova	Urgezes	41.42725	-8.28815
+C716	1100L	Rua de São Gualter	Urgezes	41.43334	-8.28374
+C717	1100L	Rua de São Gualter	Urgezes	41.43	-8.29113
+C718	1100L	Rua de Fundevila	Urgezes	41.4238	-8.30178
+C719	1100L	Rua da Arcela	Azurém	41.450855	-8.286483
+C720	1100L	Rua da Arcela	Azurém	41.451543	-8.284112
+C721	1100L	Rua da Arcela	Azurém	41.452211	-8.28223
+C722	1100L	Rua da Arcela	Azurém	41.45282	-8.280461
+C723	1100L	Rua de Eira	Mesão Frio	41.455201	-8.276761
+C724	1100L	Rua Padre João de Oliveira	Mesão Frio	41.454421	-8.26643
+C725	1100L	Rua da Pereira	Fermentões	41.464565	-8.31588
+C726	1100L	Rua da Pereira	Fermentões	41.465614	-8.316027
+C727	1100L	Rua são romão  	Mesão Frio	41.442023	-8.263033
+C728	1100L	Rua do Moutinho	Mesão Frio	41.434311	-8.282171
+C729	1100L	Centro de Saúde de Ponte	Ponte	41.463524	-8.340534
+C730	1100L	Rua da Montanha	Mesão Frio	41.4509540088261	-8.26143337877246
+C731	1100L	Rua 24 de junho	Azurém	41.4561191446032	-8.29105572859218
+C732	1100L	Rua da Liberdade 	Briteiros Santo Estevão	41.5078265165575	-8.32007521001038
+C733	1100L	Rua da Saudade 	Cemitério de Arosa	41.547879	-8.219728
+C734	1100L	Rua António de Barbosa	Vermil	41.445202	-8.399033
+C735	1100L	Rua de São Romão	Mesão Frio	41.4464834	-8.2634653
+C736	1100L	Rua de São Romão	Mesão Frio	41.4457601	-8.2614248
+C737	1100L	Rua de São Romão	Mesão Frio	41.4457611	-8.2614261
+C738	1100L	Rua do Montinho	Mesão Frio	41.441321843209	-8.2566382516863
+C739	1100L	Rua Rodrigo Ribeiro	Vermil	41.4459082872914	-8.39282543539343
+C740	1100L	Rua 25 de Abril	Guardizela	41.3948598940057	-8.37727734451105
+C741	1100L	Rua 25 de Abril	Guardizela	41.3948609063912	-8.37726189927367
+C742	1100L	Rua do Barroco	Guardizela	41.3871747628507	-8.37215090647666
+C743	1100L	Rua das Escolas	Guardizela	41.3928470320287	-8.36758870350072
+C744	1100L	Rua do Soutinho	Guardizela	41.3867991271171	-8.36772955518692
+C745	1100L	Rua 10 de Junho	Guardizela	41.3909457685032	-8.36936223315462
+C746	1100L	Rua da Boavista 	Airão Santa Maria 	41.4505920321242	-8.4149194475949
+C747	1100L	Rua de Sendelo	Ponte 	41.4569651368362	-8.33158876869863
+C748	1100L	Tv. Da cruz da argola	Mesão Frio	41.4550582249554	-8.26911400575238
+C749	1100L	Rua Nossa Senhora de Fátima	Mesão Frio	41.4556423762892	-8.2608432897015
+C750	1100L	Rua das Escolas	Guardizela	41.3826247443527	-8.35942525723371
+C751	1100L	Travessa da Cruz da Argola 	Mesão Frio	41.4548141432893	-8.27245832657777
+C752	1100L	Rua do Barreiro	São Martinho de Sande 	41.4885988818976	-8.36150892281003
+C753	1100L	Rua de São Mamede	Aldão	41.4650984778437	-8.27308366000695
+C754	1100L	Rua da Formiga 	São Torcato	41.4807343176428	-8.26731005113305
+C755	1100L	Cachada	São Torcato	41.4775665442001	-8.26935053055687
+C756	1100L	Cachada	São Torcato	41.4765021974133	-8.26868671155146
+C757	1100L	Cachada	São Torcato	41.4758108037909	-8.26913417955761
+C758	1100L	Cachada	São Torcato	41.4751982033201	-8.26938334465702
+C759	1100L	Cachada	São Torcato	41.4725509051228	-8.27145241821909
+C760	1100L	Rua Arquiteto Marques da Silva 	São Torcato	41.4810876305766	-8.26215795391633
+C761	1100L	Rua José Vaz 	Atães	41.4768113815965	-8.25142235470384
+C762	1100L	Rua Dr. Francisco Fernandes 	São Torcato	41.4814307184307	-8.25828959943415
+C763	1100L	Rua 24 de Junho	São Torcato	41.4865343598595	-8.26156386852028
+C764	1100L	Rua Camilo Castelo Branco 	São Torcato	41.4872205798561	-8.25745241559406
+C765	1100L	Rua do Chorio 	São Torcato	41.4790181356141	-8.25995375625144
+C766	1100L	Rua do Chorio 	São Torcato	41.4795021456644	-8.2595060685874
+C767	1100L	Rua 24 de junho	São Torcato	41.4865083012487	-8.26153742846867
+C768	1100L	Rua Camilo Castelo Branco 	São Torcato	41.4891500104786	-8.25695989079012
+C769	1100L	Rua Girassol 	Mesão Frio	41.4513656432939	-8.26250499896793
+C770	1100L	Rua Leiras	São Torcato	41.4931348105963	-8.24963490016532
+C771	1100L	Rua Leiras	São Torcato	41.4942701636032	-8.24906170186712
+C772	1100L	CM1565	São Torcato	41.5022706842808	-8.24686861168158
+C773	1100L	Rua Xisto 	São Torcato	41.501319079027	-8.25143909623721
+C774	1100L	Rua Francisco Ferreira	Gonça	41.5066835821738	-8.2565338684008
+C775	1100L	Rua Francisco Ferreira	Gonça	41.5079734792407	-8.25379283260492
+C776	1100L	N207-4	Gonça	41.5040958112346	-8.25123178909896
+C777	1100L	Rua da Igreja	Gonça	41.5086656323767	-8.25255965567592
+C778	1100L	Rua da Igreja 	Gonça 	41.5091601912834	-8.25349535441562
+C779	1100L	Rua da Igreja 	Gonça 	41.508794634218	-8.25468241591589
+C780	1100L	Rua Primeiro de Maio	Gonça	41.5111462265795	-8.25177114642853
+C781	1100L	Rua Primeiro de Maio 	Gonça	41.5103049638793	-8.25009197004937
+C782	1100L	Rua Primeiro de Maio 	Gonça	41.5097243513499	-8.2505241107615
+C783	1100L	Rua Primeiro de Maio 	Gonça	41.5111818926665	-8.25283935168333
+C784	1100L	Rua 10 de Junho	Gonça	41.5122488433307	-8.2469560222688
+C785	1100L	Rua 10 de Junho	Gonça	41.510970318193	-8.2473146404112
+C786	1100L	Rua Xisto 	São Torcato	41.5010952267805	-8.25086212334523
+C787	1100L	Rua Xisto 	São Torcato	41.5009458844604	-8.25028582423158
+C788	1100L	Sobredo de Cima 	São Torcato	41.4984274179626	-8.25311117939578
+C789	1100L	Rua Campo da Ataca 	Aldão	41.4665815250652	-8.27060666419993
+C790	1100L	Rua 24 de junho	Aldão	41.4672764894083	-8.27374743579364
+C791	1100L	Travessa da Pousada 	Aldão	41.4618504982234	-8.2623115458939
+C792	1100L				
+C793	1100L	Rua de Miguel	Rendufe	41.4697541445693	-8.2300779181844
+C794	1100L				
+C795	1100L	Rua de Santa Maria	Atães	41.473139750064	-8.24294016837715
+C796	1100L	Rua Nova da Igreja	Aldão	41.4646412337553	-8.27162997989582
+C797	1100L	Rua Padre Arieira	São Torcato	41.4819689283011	-8.26268637273193
+C798	1100L	Rua de São Mateus 	Gonça	41.5067136616696	-8.26772561582871

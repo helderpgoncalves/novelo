@@ -1,0 +1,398 @@
+ID	tipologia	cap.	Material	Freguesia	Rua	Coord. Y	Coord. X	
+BC1	superficie	1100l	Orgânico	Azurém	Rua Pousada de Dentro	-8.2963777778	41.4563722222	
+BC2	superficie	1100l	Orgânico	Azurém	Rua Hermes Inácio	-8.289456	41.460186	
+BC3	superficie	1100l	Orgânico	Azurém	Rua Moura Machado	-8.295739	41.457997	
+BC4	superficie	1100l	Orgânico	Azurém	Rua Moura Machado	-8.296271	41.457095	
+BC5	superficie	1100l	Orgânico	Azurém	Rua da Pousada	-8.296995	41.455932	
+BC6	superficie	1100l	Orgânico	Azurém	Rua 24 de Junho	-8.287545	41.457387	
+BC7	superficie	1100l	Orgânico	Azurém	R. Dr. Augusto Ferreira Cunha	-8.2812120621	41.4537652204	
+BC8	superficie	1100l	Orgânico	Azurém	Rua Cónego Dr. Manuel Faria	-8.294779	41.449587	
+BC9	superficie	1100l	Orgânico	Azurém	Rua Dr. Mário Dias	-8.296128	41.447864	
+BC10	superficie	1100l	Orgânico	Azurém	Rua Dr. João Afonso de Almeida	-8.299386	41.448778	
+BC11	superficie	1100l	Orgânico	Azurém	Rua Dr. João Afonso de Almeida	-8.30164	41.44914	
+BC12	superficie	1100l	Orgânico	Azurém	Rua Francisco Ribeiro de Castro	-8.300436	41.448569	
+BC13	superficie	1100l	Orgânico	Azurém	Rua da Espinhosa	-8.300514	41.447578	
+BC14	superficie	1100l	Orgânico	Azurém	Rua José Pinto Rodrigues	-8.301173	41.447783	
+BC15	superficie	1100l	Orgânico	Azurém	Rua  Pdr. Abílio Dos Santos Barbas	-8.301537	41.44805	
+BC16	superficie	1100l	Orgânico	Azurém	R. da Amorosa	-8.302181	41.448421	
+BC17	superficie	1100l	Orgânico	Azurém	Rua Sá de Miranda	-8.303761	41.453377	
+BC18	superficie	1100l	Orgânico	Fermentões	Rua Jorge Amado	-8.3045555556	41.4565861111	
+BC19	superficie	1100l	Orgânico	Fermentões	Rua Fernando Pessoa	-8.304113	41.451452	
+BC20	superficie	1100l	Orgânico	Fermentões	Rua José Ribeiro de Freitas	-8.3080555556	41.4540138889	
+BC21	superficie	1100l	Orgânico	Fermentões	Rua Cidade da Praia	-8.311554	41.460216	
+BC22	superficie	1100l	Orgânico	Fermentões	Rua Colina do Sol	-8.305083	41.451345	
+BC23	superficie	1100l	Orgânico	Fermentões	Rua de Sta. Eulália	-8.3046968604	41.4501454359	
+BC24	superficie	1100l	Orgânico	Fermentões	Rua João Paulo II	-8.312996	41.460391	
+BC25	superficie	1100l	Orgânico	Fermentões	Rua Arqueólogo Mário Cardoso 	-8.3061886742	41.4470948235	
+BC26	superficie	1100l	Orgânico	Fermentões	Rua Arqueólogo Mário Cardoso	-8.306476889	41.4466937517	
+BC27	superficie	1100l	Orgânico	Creixomil	Rua Arqueólogo Mário Cardoso	-8.3070763135	41.4459058873	
+BC28	superficie	1100l	Orgânico	Creixomil	Rua Arqueólogo Mário Cardoso 	-8.307548728	41.4452276805	
+BC29	superficie	1100l	Orgânico	Fermentões	Bairro da Atouguia	-8.303902	41.446786	
+BC30	superficie	1100l	Orgânico	Fermentões	Bairro da Atouguia	-8.30504	41.446718	
+BC31	superficie	1100l	Orgânico	Creixomil	Rua da Ass. Artística Vimaranense	-8.3060761111	41.4450831507	
+BC32	superficie	1100l	Orgânico	Creixomil	Travessa Oneca Mendes	-8.3102111111	41.445375	
+BC33	superficie	1100l	Orgânico	Creixomil	Rua António Lino	-8.313250087	41.4446423471	
+BC34	superficie	1100l	Orgânico	Creixomil	Travessa da Igreja	-8.3108035906	41.4380384956	
+BC35	superficie	1100l	Orgânico	Creixomil	Rua Cruz de Pedra	-8.3025943103	41.4355923251	
+BC36	superficie	1100l	Orgânico	Creixomil	Rua Mouzinho de Albuquerque	-8.3028833333	41.4349805556	
+BC37	superficie	1100l	Orgânico	Creixomil	Rua Miguel Torga	-8.304389	41.43414	
+BC38	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Largo das Hortas	-8.287694	41.442074	
+BC39	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Rei de Pegu	-8.286066	41.441926	
+BC40	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua D. Cristóvão Boaventura	-8.285948	41.44742	
+BC41	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua D. Cristóvão Boaventura	-8.287982	41.446957	
+BC42	superficie	1100l	Orgânico	Creixomil	Rua da Índia	-8.3049358179	41.4293038268	
+BC43	superficie	1100l	Orgânico	Costa	Rua Antero de Quental	-8.283251	41.448856	
+BC44	superficie	1100l	Orgânico	Costa	Rua Dr. Carlos Saraiva	-8.2837083333	41.4476305556	
+BC45	superficie	1100l	Orgânico	Costa	Rua Antero Henriques da Silva	-8.279555	41.44964	
+BC46	superficie	1100l	Orgânico	Costa	Rua Unidade Vimaranense	-8.279975	41.450089	
+BC47	superficie	1100l	Orgânico	Costa	Rua Eça de Queirós	-8.278995	41.450514	
+BC48	superficie	1100l	Orgânico	Costa	Rua Dr. Francisco Sá Carneiro	-8.2796224657	41.4510333392	
+BC49	superficie	1100l	Orgânico	Mesão Frio	Av. Rio de Janeiro	-8.276972	41.451814	
+BC50	superficie	1100l	Orgânico	Mesão Frio	Rua Virgínia Moura	-8.2712687257	41.4542670485	
+BC51	superficie	1100l	Orgânico	Mesão Frio	E.N.101	-8.2690878028	41.4539334133	
+BC52	superficie	1100l	Orgânico	Mesão Frio	Rua Mira sol	-8.268449	41.457772	
+BC53	superficie	1100l	Orgânico	Costa	Rua Dr. João Oliveira Salgado	-8.2821432535	41.4432032501	
+BC54	superficie	1100l	Orgânico	Costa	Rua Bernardino Jordão	-8.286696	41.43899	
+BC55	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Av. Londres	-8.302857	41.443892	
+BC56	superficie	1100l	Orgânico	Urgezes	Rua do Centro	-8.2908277778	41.4370027778	
+BC57	superficie	1100l	Orgânico	Urgezes	Loteamento do Castanheiro	-8.298425	41.433636	
+BC58	superficie	1100l	Orgânico	Urgezes	Rua José Cardoso Pires	-8.2992444469	41.4255224319	
+BC59	superficie	1100l	Orgânico	Ponte	E.M. 835	-8.343745	41.458984	
+BC60	superficie	1100l	Orgânico	Azurém	Travessa Teixeira Pascoais 	-8.297095	41.448558	
+BC61	superficie	1100l	Orgânico	Azurém	Rua Frei Diogo de Murça	-8.2852839126	41.44435642	
+BC62	superficie	1100l	Orgânico	Urgezes	Rua 1º de Maio	-8.2991805556	41.4206194444	
+BC63	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua João A. M. P. de Faria	-8.284516	41.448852	
+BC64	superficie	1100l	Orgânico	Ponte	Rua Campo Novo	-8.33462	41.468214	
+BC65	superficie	1100l	Orgânico	Ponte	Travessa do Rio	-8.3442829824	41.4805343952	
+BC66	superficie	1100l	Orgânico	Creixomil	Rua da Índia	-8.302873906	41.4293247631	
+BC67	superficie	1100l	Orgânico	Costa	Rua José Faria Martins	-8.283196	41.440492	
+BC68	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Antero Henriques da Silva	-8.28491	41.447878	
+BC69	superficie	1100l	Orgânico	Ponte	Rua S. João Batista - EN101	-8.3380803333	41.4779818747	
+BC70	superficie	1100l	Orgânico	Ponte	Rua S. João Batista - EN101	-8.3380803333	41.4779818747	
+BC71	superficie	1100l	Orgânico	Ponte	Rua S. João Batista - EN101	-8.338179	41.478588	
+BC72	superficie	1100l	Orgânico	Ponte	Rua S. João Batista - EN101	-8.339124	41.479618	
+BC73	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua de S. Dâmaso	-8.2856554096	41.4492849991	
+BC74	superficie	1100l	Orgânico	Fermentões	Travessa Fernando Pessoa	-8.3042083333	41.4505555556	
+BC75	superficie	1100l	Orgânico	Azurém	Rua da Pegada	-8.29463	41.452259	
+BC76	superficie	1100l	Orgânico	Urgezes	Rua Covas de Cima	-8.3031770419	41.4259541502	
+BC77	superficie	1100l	Orgânico	Creixomil	Travessa da Igreja	-8.3122044451	41.4373086229	
+BC78	superficie	1100l	Orgânico	Fermentões	Travessa Fernando Pessoa	-8.303037	41.45005	
+BC79	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Av. D. João IV	-8.2908666667	41.4387444444	
+BC80	superficie	1100l	Orgânico	Caldelas	Rua da Taipa	-8.3490682286	41.4844085467	
+BC81	superficie	1100l	Orgânico	Caldelas	Rua da Taipa	-8.3484255858	41.4834260923	
+BC82	superficie	1100l	Orgânico	Caldelas	Rua 19 de Junho	-8.347458	41.484297	
+BC83	superficie	1100l	Orgânico	Caldelas	Praceta Ramalho Ortigão	-8.346484	41.483847	
+BC84	superficie	1100l	Orgânico	Creixomil	Rua de Moçambique	-8.302739	41.431958	
+BC85	superficie	1100l	Orgânico	Creixomil	Rua André Manuel Dias Ferreira	-8.314646	41.440242	
+BC86	superficie	1100l	Orgânico	Mesão Frio	Rua da Cruz D'Argola	-8.2619910396	41.4521592368	
+BC87	superficie	1100l	Orgânico	Azurém	Rua 24 de Junho	-8.284635	41.458689	
+BC88	superficie	1100l	Orgânico	Caldelas	Rua Comandante Carvalho Crato	-8.348816	41.49189	
+BC89	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Camilo  Castelo Branco	-8.3516224985	41.4863320131	
+BC90	superficie	1100l	Orgânico	Azurém	Rua Alexandre Herculano	-8.2781737722	41.4521565287	
+BC91	superficie	1100l	Orgânico	Azurém	Rua Alexandre Herculano	-8.2949901191	41.4485765854	
+BC92	superficie	1100l	Orgânico	Creixomil	Rua da Guiné	-8.294118	41.44822	
+BC93	superficie	1100l	Orgânico	Creixomil	Rua Pedro Alvares Cabral	-8.3027600383	41.4330722252	
+BC94	superficie	1100l	Orgânico	Caldelas	Rua Professor Manuel José Pereira	-8.3622622866	41.4503439933	
+BC95	superficie	1100l	Orgânico	Caldelas	Rua Professor Manuel José Pereira	-8.349914	41.485192	
+BC96	superficie	1100l	Orgânico	Caldelas	Viela do Trigal	-8.350502	41.484624	
+BC97	superficie	1100l	Orgânico	Creixomil	Rua da Saudade	-8.352632	41.489168	
+BC98	superficie	1100l	Orgânico	Creixomil	Rua da Cruz de Pedra	-8.308496	41.443746	
+BC99	superficie	360l	Orgânico	UF Oliveira, São Paio, São Sebastião	Largo Da República Do Brasil	-8.30132	41.435963	
+BC100	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Alameda São Dâmaso	-8.2913959634	41.4422898218	
+BC101	superficie	1100l	Orgânico	Creixomil	Rua da Silveira	-8.2910496716	41.4400287615	
+BC102	superficie	1100l	Orgânico	Creixomil	Av. São Gonçalo	-8.3572835285	41.4304102163	
+BC103	superficie	1100l	Orgânico	Creixomil	Av. São Gonçalo	-8.3030888889	41.4447138889	
+BC104	superficie	1100l	Orgânico	Creixomil	Av. São Gonçalo	-8.3048472222	41.4444638889	
+BC105	superficie	1100l	Orgânico	Creixomil	Av. São Gonçalo	-8.3061027778	41.4442611111	
+BC106	superficie	1100l	Orgânico	Azurém	Rua Teixeira de Pascoais	-8.3091027778	41.4435305556	
+BC107	superficie	1100l	Orgânico	Azurém	Rua Teixeira de Pascoais	-8.2989694444	41.4474361111	
+BC108	superficie	1100l	Orgânico	Azurém	Rua Ferreira de Castro	-8.2978666667	41.4483916667	
+BC109	superficie	1100l	Orgânico	Azurém	Alameda da Universidade	-8.2963166667	41.4493111111	
+BC110	superficie	1100l	Orgânico	Azurém	Alameda da Universidade	-8.2940194444	41.4502555556	
+BC111	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua de Pegu	-8.2961361097	41.4514926438	
+BC112	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Dr. Domingos da silva Gonçalves	-8.2889611111	41.4414222222	
+BC113	superficie	1100l	Orgânico	Urgezes	Av. D. João IV	-8.2914861111	41.4377444444	
+BC114	superficie	1100l	Orgânico	Urgezes	Rua Paulo VI	-8.2924888889	41.4352222222	
+BC115	superficie	1100l	Orgânico	Urgezes	Rua Comandante Luís de Pina	-8.2934388889	41.4361055556	
+BC116	superficie	1100l	Orgânico	Urgezes	Rua Comandante Luís de Pina	-8.2925972222	41.4368027778	
+BC117	superficie	1100l	Orgânico	Creixomil	Rua Santo André	-8.2933305556	41.436525	
+BC118	superficie	1100l	Orgânico	Creixomil	Rua Colégio Militar	-8.300125	41.4382666667	
+BC119	superficie	1100l	Orgânico	Urgezes	Rua Comandante F.L. Brandão	-8.3017194444	41.4398805556	
+BC120	superficie	1100l	Orgânico	Urgezes	Rua Francisco Silva Areias	-8.3005694444	41.4204444444	
+BC121	superficie	1100l	Orgânico	Urgezes	Rua António Da Costa Guimarães	-8.2983	41.4210277778	
+BC122	superficie	1100l	Orgânico	Creixomil	Rua Da Boucinha	-8.3001352493	41.4219796269	
+BC123	superficie	1100l	Orgânico	Creixomil	Rua Alto da Bandeira	-8.3138018715	41.4437009201	
+BC124	superficie	1100l	Orgânico	Creixomil	Rua Alto da Bandeira	-8.3124055556	41.4410916667	
+BC125	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Av. Londres	-8.3027277778	41.4444	
+BC126	superficie	1100l	Orgânico	Creixomil	Av. Conde Margaride	-8.302695	41.442989	
+BC127	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Praça Heróis da Fundação	-8.3016611111	41.4433861111	
+BC128	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Conde Arnoso	-8.3001027778	41.4434083333	
+BC129	superficie	1100l	Orgânico	Caldelas	Rua do Assento	-8.3515777778	41.427675	
+BC130	superficie	1100l	Orgânico	Caldelas	Avenida 25 deAbril	-8.3416166667	41.4878277778	
+BC131	superficie	1100l	Orgânico	Caldelas	Rua Padre José Maria Felgueiras	-8.3462444444	41.4886416667	
+BC132	superficie	1100l	Orgânico	Caldelas	Rua Nova dos Bombeiros	-8.3486416667	41.4871194444	
+BC133	superficie	1100l	Orgânico	Caldelas	Largo José de Sousa	-8.3457694444	41.4870361111	
+BC134	superficie	1100l	Orgânico	Caldelas	Travesa da Alameda	-8.3456138889	41.4844833333	
+BC135	superficie	1100l	Orgânico	Caldelas	Beco das Fontainhas	-8.3440111111	41.4844277778	
+BC136	superficie	1100l	Orgânico	Caldelas	EM 585	-8.3495166667	41.4875638889	
+BC137	superficie	1100l	Orgânico	Caldelas	Rua Comandante Carvalho Crato	-8.3528555556	41.4863527778	
+BC138	superficie	1100l	Orgânico	Caldelas	Rua Banda da Musica	-8.3499	41.48615	
+BC139	superficie	1100l	Orgânico	Mesão Frio	Rua Belos Ares	-8.3536166667	41.4867944444	
+BC140	superficie	1100l	Orgânico	Ponte	E.M. 835	-8.2610555556	41.4506888889	
+BC141	superficie	1100l	Orgânico	Mesão Frio	Rua da Cruz da Argola	-8.341987	41.457629	
+BC142	superficie	1100l	Orgânico	Mesão Frio	Rua Cruz D´Argola	-8.267826644	41.45397007	
+BC143	superficie	1100l	Orgânico	Creixomil	Rua Cerca de Selho	-8.3219305556	41.4407805556	
+BC144	superficie	1100l	Orgânico	Creixomil	Rua Amadeu de Carvalho	-8.3189555556	41.4432111111	
+BC145	superficie	1100l	Orgânico	Azurém	Rua Professor Mário Menezes	-8.3211083333	41.4417638889	
+BC146	superficie	1100l	Orgânico	Azurém	Rua de Damão	-8.2838666667	41.4559555556	
+BC147	superficie	1100l	Orgânico	Azurém	Rua de Damão	-8.2824083333	41.4554638889	
+BC148	superficie	1100l	Orgânico	Azurém	Rua Pêro Esteves	-8.2831305556	41.4543555556	
+BC149	superficie	1100l	Orgânico	Azurém	Rua Ambrósio Coelho	-8.2821527778	41.4570138889	
+BC150	superficie	1100l	Orgânico	Azurém	Travessa São Mamede	-8.2810555556	41.4569777778	
+BC151	superficie	1100l	Orgânico	Azurém	Rua do Emigrante	-8.2796972222	41.4580055556	
+BC152	superficie	1100l	Orgânico	Azurém	Rua dos Mártires	-8.2772777778	41.4566388889	
+BC153	superficie	1100l	Orgânico	Azurém	Rua 24 de Junho	-8.2834	41.4570166667	
+BC154	superficie	1100l	Orgânico	Azurém	Rua Com alberto pimenta machado	-8.2859545488	41.4579808544	
+BC155	superficie	1100l	Orgânico	Fermentões	Vereda Guimarães Coop	-8.3143055556	41.4383916667	
+BC156	superficie	1100l	Orgânico	Fermentões	Vereda da NorteCoop (baixo)	-8.3168305556	41.4520694444	
+BC157	superficie	1100l	Orgânico	Mesão Frio	Rua A	-8.2923166667	41.4601972222	
+BC158	superficie	1100l	Orgânico	Mesão Frio	Rua C	-8.2734111111	41.4522277778	
+BC159	superficie	1100l	Orgânico	Mesão Frio	Rua da Boavista	-8.2755083333	41.4525611111	
+BC160	superficie	1100l	Orgânico	Ponte	R. do Ave	-8.2626823908	41.4523676539	
+BC161	superficie	1100l	Orgânico	Ponte	R. N. da Boavista	-8.3345611111	41.4768305556	
+BC162	superficie	80l	Orgânico	Ponte	R. 1 de Maio	-8.3404472222	41.4781833333	
+BC163	superficie	1100l	Orgânico	Azurém	R. Comd. Alberto Pimenta Machado	-8.3366194444	41.4784388889	
+BC164	superficie	1100l	Orgânico	Urgezes	R. Alfageme de Santarém	-8.3003897215	41.4273423408	
+BC165	superficie	1100l	Orgânico	Urgezes	R. Mesteres de Guimarães	-8.3010476544	41.4268187132	
+BC166	superficie	1100l	Orgânico	Costa	R. Almirante Gago Coutinho	-8.2631295249	41.481286699	
+BC167	superficie	1100l	Orgânico	Urgezes	R. Quinta das Aldeias	-8.3463258549	41.4212551215	
+BC168	superficie	1100l	Orgânico	Costa	Rua de Calouste Gulbenkian	-8.2550330692	41.4754920584	
+BC169	superficie	1100l	Orgânico	Azurém	Travessa do Picoto	-8.268644	41.428767	
+BC170	superficie	1100l	Orgânico	Ponte	Rua Monte do Rio	-8.334874	41.46842	
+BC171	superficie	1100l	Orgânico	Caldelas	Rua de Sousa Costa	-8.320432	41.427095	
+BC172	superficie	1100l	Orgânico	Caldelas	Rua do Pinhel	-8.348427	41.490506	
+BC173	superficie	1100l	Orgânico	Caldelas	Rua 3 	-8.342644	41.48999	
+BC174	superficie	1100l	Orgânico	Creixomil	Rua Cruz de Pedra	-8.341116	41.490903	
+BC175	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua da Caldeiroa	-8.302529	41.437662	
+BC176	superficie	1100l	Orgânico	Caldelas	Travessa do Souto	-8.349184	41.493952	
+BC177	superficie	1100l	Orgânico	Urgezes	Av. D. João IV	-8.295463	41.435624	
+BC178	superficie	1100l	Orgânico	Azurém	Rua da Dourada	-8.285826	41.452787	
+BC179	superficie	1100l	Orgânico	Ponte	Rua do Pouve	-8.342195	41.465885	
+BC180	superficie	1100l	Orgânico	Mesão Frio	Rua João Paulo II	-8.263234	41.454859	
+BC181	superficie	1100l	Orgânico	Caldelas	Rua Custódio da Costa Ferreira Pinto	-8.349999	41.490955	
+BC182	superficie	360l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua D. Afonso Henriques/Caldeiroa	-8.295236	41.440299	
+BC183	superficie	1100l	Orgânico	Azurém	Rua D. Teresa	-8.3001393383	41.4317246677	
+BC184	superficie	1100l	Orgânico	Mesão Frio	Rua Nossa Sra. da Penha	-8.280363	41.451754	
+BC185	superficie	1100l	Orgânico	Ponte	Urbanização do Rio	-8.346196	41.479525	
+BC186	superficie	1100l	Orgânico	Sande São Martinho	Rua de Pereiras (EN 101)	-8.3525666667	41.4827638889	
+BC187	superficie	1100l	Orgânico	Barco	Rua São Cláudio	-8.337941	41.479416	
+BC188	superficie	1100l	Orgânico	Caldelas	Viela do Alvite	-8.351773	41.4876	
+BC189	superficie	1100l	Orgânico	Urgezes	António Costa Guimarães	-8.2989777778	41.4296055556	
+BC190	superficie	1100l	Orgânico	Urgezes	R. Mesteres de Guimarães	-8.2989277778	41.426675	
+BC191	superficie	1100l	Orgânico	Fermentões	Rua da Carreira			
+BC192	superficie	1100l	Orgânico	Costa	Rua Antero Henrique da Silva	-8.282189	41.448717	
+BC193	superficie	1100l	Orgânico	Costa	Antero Henrique da Silva	-8.284652	41.447838	
+BC194	superficie	1100l	Orgânico	Costa	Rua Dom Cristóvão de s.boaventura	-8.286617	41.447265	
+BC195	superficie	1100l	Orgânico	Costa	Rua Raul Brandão	-8.28584	41.445201	
+BC196	superficie	1100l	Orgânico	Costa	Rua Padre Antônio Caldas	-8.287104	41.44659	
+BC197	superficie	1100l	Orgânico	Costa	Rua Padre Antônio Caldas	-8.281143	41.4498832	
+BC198	superficie	1100l	Orgânico	Costa	Rua Nossa Senhora da penha 	-8.279785	41.452038	
+BC199	superficie	1100l	Orgânico	Costa	Rua Nossa Senhora da penha 	-8.279576	41.45216	
+BC200	superficie	1100l	Orgânico	Costa	Praça Colônia de sacramento 	-8.277914	41.451628	
+BC201	superficie	1100l	Orgânico	Fermentões	Travessa a seguir a antiga fabrica do Pastor/Lidl	-8.316127	41.463068	
+BC202	superficie	1100l	Orgânico	Mesão Frio	EN Fafe	-8.246406	41.442258	
+BC203	superficie	1100l	Orgânico	Mesão Frio	Rua A	-8.272352	41.452736	
+BC204	superficie	1100l	Orgânico	Azurém	Rua Alto do Monte Largo	-8.2800879843	41.4546960273	
+BC205	superficie	1100l	Orgânico	Caldelas	Rua da Quintã	-8.348823	41.499209	
+BC206	superficie	1100l	Orgânico	Mesão Frio	rua B na urbanização Cruz D`argola 	-8.273167	41.452393	
+BC207	superficie	80l	Orgânico	Urgezes	Rua da Maina	-8.292882	41.427121	
+BC208	superficie	80l	Orgânico	Urgezes	Rua os amigos	-8.291612	41.426748	
+BC209	superficie	80l	Orgânico	Urgezes	Rua da Arrifana 	-8.288423	41.420568	
+BC210	superficie	80l	Orgânico	Urgezes	Travessa Cândido José de Carvalho	-8.28744	41.427431	
+BC211	superficie	80l	Orgânico	Urgezes	Rua de São Gualter	-8.286884	41.431677	
+BC212	superficie	80l	Orgânico	Urgezes	Rua comendador Manuel Pereira basto	-8.296248	41.428179	
+BC213	superficie	80l	Orgânico	Urgezes	Rua Francisco Fernandes Guimarães	-8.29477	41.427023	
+BC214	superficie	80l	Orgânico	Urgezes	Rua da maina	-8.296086	41.42664	
+BC215	superficie	80l	Orgânico	Costa	Junta freguesia da costa	-8.281369	41.445162	
+BC216	superficie	80l	Orgânico	Costa	Rua da Bouça	-8.27651	41.439445	
+BC217	superficie	80l	Orgânico	Costa	Rua de São Gualter 	-8.284577	41.432524	
+BC218	superficie	80l	Orgânico	Costa	Rua de São Gualter 	-8.290425	41.430537	
+BC219	superficie	80l	Orgânico	Costa	Rua das Fontes	-8.282501	41.433247	
+BC220	superficie	80l	Orgânico	Costa	Rua do escrivão	-8.277603	41.435047	
+BC221	superficie	80l	Orgânico	Costa	Rua de Vilar 	-8.277231	41.437612	
+BC222	superficie	80l	Orgânico	Costa	Rua de Vilar 	-8.277552	41.439092	
+BC223	superficie	80l	Orgânico	Costa	Rua José Francisco Ribeiro	-8.287243	41.437088	
+BC224	superficie	80l	Orgânico	Costa	Rua Manuel Caetano Martins 	-8.287003	41.440608	
+BC225	superficie	80l	Orgânico	Costa	Parque auto caravanas	-8.285188	41.440535	
+BC226	superficie	80l	Orgânico	Costa	Rua Aristides de Sousa Mendes	-8.28438	41.44104	
+BC227	superficie	80l	Orgânico	Costa	Rua da casa nova 	-8.282856	41.441627	
+BC228	superficie	80l	Orgânico	Mesão Frio	Rua de São Romão 	-8.26394	41.446729	
+BC229	superficie	80l	Orgânico	Mesão Frio	Rua de São Romão 	-8.262438	41.44622	
+BC230	superficie	80l	Orgânico	Mesão Frio	Nacional 101 restaurante das oliveiras 	-8.246223	41.443713	
+BC231	superficie	80l	Orgânico	Mesão Frio	Rua de São Romão	-8.264094	41.44835	
+BC232	superficie	80l	Orgânico	Mesão Frio	Rua de Belos Ares 	-8.258736	41.4484	
+BC233	superficie	80l	Orgânico	Mesão Frio	Rua 15 de maio	-8.277921	41.453658	
+BC234	superficie	80l	Orgânico	Mesão Frio	EN Fafe	-8.274494	41.440717	
+BC235	superficie	1100l	Orgânico	Ponte	Urbanização do Rio	-8.346196	41.479525	
+BC236	superficie	80l	Orgânico	Ponte	Rua 24 de Junho	-8.3398888889	41.4809888889	
+BC237	superficie	80l	Orgânico	Fermentões	Rua de Roldes	-8.3551888889	41.4841638889	
+BC238	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua S. Dâmaso	-8.284382	41.450598	
+BC239	superficie	80l	Orgânico	Costa	Rua Unidade Vimaranense	-8.280748	41.450475	
+BC240	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Padre Antônio Caldas	-8.2844536	41.44933	
+BC241	superficie	1100l	Orgânico	Costa	Rua Padre Antônio Caldas	-8.280514	41.451098	
+BC242	superficie	1100l	Orgânico	Costa	Rua Padre Antônio Caldas	-8.280378	41.451744	
+BC243	superficie	1100l	Orgânico	Costa	Rua Padre Antônio Caldas	-8.279662	41.451191	
+BC244	superficie	80l	Orgânico	Creixomil	Rua Manuel Tómas	-8.301697	41.4365	
+BC245	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua S. Dâmaso 	-8.281963	41.451231	
+BC246	superficie	1100l	Orgânico	Creixomil	Rua de São Miguel	-8.3152610	41.437217	
+BC247	superficie	80l	Orgânico	Creixomil	Rua Santa Teresinha	-8.3143056	41.438392	
+BC248	superficie	80l	Orgânico	Creixomil	Rua Gilberto Pereira	-8.309947	41.439649	
+BC249	superficie	80l	Orgânico	Creixomil	Rua Alto da Bandeira	-8.313234	41.440322	
+BC250	superficie	80l	Orgânico	Creixomil	Rua Miradouro de Baixo	-8.313351	41.437528	
+BC251	superficie	80l	Orgânico	Creixomil	Rua Bouça do Pinheiro	-8.313598	41.443837	
+BC252	superficie	80l	Orgânico	Creixomil	Rua Bouça do Pinheiro	-8.311763	41.444277	
+BC253	superficie	80l	Orgânico	Creixomil	Rua dos Moinhos	-8.315721	41.444478	
+BC254	superficie	80l	Orgânico	Creixomil	Rua Oneca Mendes	-8.314073	41.444932	
+BC255	superficie	80l	Orgânico	Creixomil	Tv. Da Pisca	-8.318803	41.438781	
+BC256	superficie	80l	Orgânico	Fermentões	Rua de Roldes	-8.3551888889	41.4841638889	
+BC257	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Em frente da EB1 Oliveira	-8.286496	41.443882	
+BC258	superficie	80l	Orgânico	Mesão Frio	Rua da Montanha	-8.261782	41.451235	
+BC259	superficie	1100l	Orgânico	Ponte	Rua Reitor Joaquim Augusto Torres	-8.341585	41.463453	
+BC260	superficie	80l	Orgânico	Ponte	Rua Reitor Joaquim Augusto Torres	-8.337343	41.472154	
+BC261	superficie	80l	Orgânico	Ponte	Rua Da Boucinha	-8.336279	41.469502	
+BC262	superficie	80l	Orgânico	Ponte	Urb. Da Senra de Baixo	-8.331292	41.481599	
+BC263	superficie	80l	Orgânico	Ponte 	Urb. São Germil	-8.336999	41.481305	
+BC264	superficie	80l	Orgânico	Ponte	Urb. São Germil	-8.336372	41.479409	
+BC265	superficie	80l	Orgânico	Ponte	Rua da Fonte	-8.335186	41.477151	
+BC266	superficie	80l	Orgânico	Costa	Rua José Faria Martins	-8.282973	41.440754	
+BC267	superficie	80l	Orgânico	Caldelas	Rua Custódio da Costa Ferreira Pinto 	-8.348825	41.491863	
+BC268	superficie	80l	Orgânico	Fermentões	Rua Bela Vista	-8.306408	41.453817	
+BC269	superficie	80l	Orgânico	Fermentões	Rua Bela Vista	-8.306738	41.452039	
+BC270	superficie	80l	Orgânico	Fermentões	Rua Fernando Pessoa	-8.304776	41.452961	
+BC271	superficie	80l	Orgânico	Fermentões	Rua Fernando Pessoa	-8.304471	41.454348	
+BC272	superficie	80l	Orgânico	Fermentões	Tv. Fernando Pessoa	-8.304471	41.454348	
+BC273	superficie	80l	Orgânico	Creixomil	Rua de Moçambique	-8.30365	41.450296	
+BC274	superficie	80l	Orgânico	Ponte	Rotunda do Rio	-8.343896	41.481283	
+BC275	superficie	80l	Orgânico	Ponte	Rua da Boavista	-8.340085	41.478407	
+BC276	superficie	80l	Orgânico	Caldelas	Av. dos bombeiros voluntários	-8.347582	41.486858	
+BC277	superficie	1100l	Orgânico	Caldelas	Rua Franscisco Pereira Silvério	-8.349526	41.487587	
+BC278	superficie	80l	Orgânico	Azurém	Rua da Arcela	-8.28174	41.523372	
+BC317	superficie	80l	Orgânico	Azurém	Rua da Arcela	-8.281614	41.452335	
+BC318	superficie	80l	Orgânico	Costa	Rua das Tumbas	-8.277095	41.444645	
+BC319	superficie	80l	Orgânico	UF Oliveira São Paio e São Sebastião	Av. São Gonçalo 	-8.306524	41.4441118	
+BC320	superficie	80l	Orgânico	UF Oliveira São Paio e São Sebastião	Av. São Gonçalo 	-8.301679	41.444619	
+BC321	superficie	80l	Orgânico	Fermentões	Bairro da Atouguia	-8.301731	41.447768	
+BC322	superficie	80l	Orgânico	Creixomil	Rua da Ass. Artística Vimaranense	-8.365494	41.446314	
+BC323	superficie	80l	Orgânico	Creixomil	Rua da Ass. Artística Vimaranense	-8.306754	41.4451	
+BC324	superficie	80l	Orgânico	Creixomil	Rua da Caldeiroa	-8.295286	41.440343	
+BC325	superficie	80l	Orgânico	Azurém	Rua de São Pedro	-8.292618	41.456467	
+BC327	superficie	80l	Orgânico	Azurém	Rua da Arcela	-8.27915	41.453531	
+BC328	superficie	80l	Orgânico	Ponte	Rua 1 de dezembro			
+BC329	superficie	1100l	Orgânico	Mesão Frio	Rua de São Romão	-8.263033	41.442023	
+BC330	superficie	1100l	Orgânico	Mesão Frio	Rua do Moutinho	-8.282171	41.434311	
+BC331	superficie	80l	Orgânico	Azurém	Rua Doutor Augusto Ferreira da Cunha 	-8.28173816170985	41.4534558894509	
+BC332	superficie	80l	Orgânico	Azurém	Rua do Pombal	-8.29853078398077	41.4493309879659	
+BC333	superficie	80l	Orgânico	Urgezes	Rua do Olival	-8.29683421249983	41.4263884722029	
+BC334	superficie	80l	Orgânico	Urgezes	Rua do Olival 	-8.29683421249983	41.4263884722029	
+BC335	superficie	1100l	Orgânico	Ponte	 Tv. Monte de Insua 353, 4805-288 	-8.34175169827352	41.4767264430056	
+BC336	superficie	1100l	Orgânico	Azurém	Rua 24 de Junho	-8.29105572859218	41.4561191446032	
+BC337	superficie	1100l	Orgânico	Mesão Frio	Rua Padre João de Oliveira	-8.26646375098022	41.4546713262878	
+BC338	superficie	1100l	Orgânico	Creixomil	CEMITÉRIO DA AUTOGUIA	-8.31083361283914	41.4437804944298	
+BC339	superficie	1100l	Orgânico	Creixomil	CEMITÉRIO DA AUTOGUIA	-8.31083361283914	41.4437804944298	
+BC340	superficie	1100l	Orgânico	Creixomil	CEMITÉRIO DA AUTOGUIA	-8.31083361283914	41.4437804944298	
+BC341	superficie	1100l	Orgânico	Creixomil	CEMITÉRIO DA AUTOGUIA	-8.31083361283914	41.4437804944298	
+BC342	superficie	1100l	Orgânico	Creixomil	CEMITÉRIO DA AUTOGUIA	-8.31083361283914	41.4437804944298	
+BC343	superficie	1100l	Orgânico	Selho São Jorge	CEMITÉRIO SELHO SÃO JORGE	-8.35900511704961	41.4312343010849	
+BC344	superficie	1100l	Orgânico	Ronfe	CEMITÉRIO DE RONFE	-8.38245033979909	41.4399373693187	
+BC348	superficie	1100l	Orgânico	UF Oliveira São Paio e São Sebastião	Avenida Conde Margaride	-8.29727446210667	41.443507845654	
+BC349	superficie	1100l	Orgânico	Azurém	Rua Professor Mário Menezes	-8.28387028277512	41.4559635840276	
+BC350	superficie	1100l	Orgânico	Azurém	Rua Professor Mário Menezes	-8.28387028277512	41.4559635840276	
+BC351	superficie	80l	Orgânico	UF Oliveira São Paio e São Sebastião	R. Manuel Saraiva Brandão	-8.30159224009546	41.4434568133384	
+BC352	superficie	80l	Orgânico	UF Oliveira São Paio e São Sebastião	R. Manuel Saraiva Brandão	-8.30159224009546	41.4434568133384	
+BC357	superficie	1100l	Orgânico	Aldão	Cemitério de Aldão	-8.27441489239606	41.4649532364145	
+BC358	superficie	1100l	Orgânico	Brito	Cemitério de Brito	-8.36283560172532	41.4546686659637	
+BC359	superficie	1100l	Orgânico	Gondar	Cemitério de Gondar	-8.37165274776654	41.4197069506112	
+BC360	superficie	1100l	Orgânico	Infantas	Cemitério de Infantas 	-8.24209478032022	41.4237863662782	
+BC361	superficie	1100l	Orgânico	Infantas	Cemitério de Matamá	-8.25112938884143	41.4271290413772	
+BC362	superficie	1100l	Orgânico	Lordelo	Cemitério de Lordelo	-8.3785314480497	41.3729138056659	
+BC363	superficie	1100l	Orgânico	Nespereira 	Cemitério de Nespereira 	-8.32352255775112	41.4062005299782	
+BC364	superficie	1100l	Orgânico	Polvoreira	Cemitério de Polvoreira	-8.3025000467059	41.4115269099741	
+BC365	superficie	1100l	Orgânico	São Torcato	Cemitério de São Torcato	-8.25675540040424	41.486357833676	
+BC366	superficie	1100l	Orgânico	Selho São Cristóvão	Cemitério de Selho São Cristóvão	-8.35137298515351	41.4189844015251	
+BC367	superficie	1100l	Orgânico	Silvares	Cemitério de Silvares	-8.33463943082834	41.4415245565305	
+BC368	superficie	1100l	Orgânico	Abação 	Cemitério de Abação São Cristóvão	-8.26843519357977	41.4019029071368	
+BC369	superficie	1100l	Orgânico	Abação 	Cemitério de Abação São Tomé	-8.2727233826632	41.4109504194463	
+BC370	superficie	1100l	Orgânico	Gémeos	Cemitério de Gémeos	-8.25785303259195	41.4005182022438	
+BC371	superficie	1100l	Orgânico	Atães	Cemitério de Atães	-8.24868585333969	41.476436983613	
+BC372	superficie	1100l	Orgânico	Mascotelos	Cemitério de Mascotelos	-8.31369785114541	41.4220498262127	
+BC373	superficie	1100l	Orgânico	Serzedo	Cemitério de Serzedo	-8.23308317447539	41.4046049185506	
+BC374	superficie	1100l	Orgânico	Calvos	Cemitério de Calvos	-8.24646457366452	41.4059763167242	
+BC375	superficie	1100l	Orgânico	Tabuadelo	Cemitério de Tabuadelo	-8.29064726553327	41.4006602879952	
+BC376	superficie	1100l	Orgânico	São Faustino	Cemitério de São Faustino	-8.2738528999898	41.3888021460247	
+BC377	superficie	1100l	Orgânico	São Martinho Candoso	Cemitério de São Martinho Candoso	-8.33395299739088	41.425624367897	
+BC378	superficie	1100l	Orgânico	São Clemente de Sande	Rua da Bouça	-8.36948827831879	41.4829454238005	
+BC379	superficie	1100l	Orgânico	São Clemente de Sande	Rua da Cabreira	-8.37603556963943	41.4799418559362	
+BC380	superficie	1100l	Orgânico	Briteiros Santo Estevão	Rua de Linhares	-8.30537356649843	41.5141328780089	
+BC381	superficie	1100l	Orgânico	Caldelas 	Travessa da Lameira 	-8.33988532054703	41.4885285214173	
+BC382	superficie	80l	Orgânico	Caldelas 	Travessa da Lameira 	-8.34181170225115	41.4896574164735	
+BC383	superficie	80l	Orgânico	Caldelas 	Travessa da Lameira 	-8.34181170225115	41.4896574164735	
+BC384	superficie	1100l	Orgânico	Gondomar	Cemitério de Gondomar	-8.262119	41.532509	
+BC385	superficie	1100l	Orgânico	Urgezes	Rua da Indústria 	-8.29710716282465	41.4370758338977	
+BC386	superficie	1100l	Orgânico	Rendufe 	Cemitério de Rendufe 	-8.23309501356759	41.4780951954882	
+BC387	superficie	1100l	Orgânico	Rendufe 	Cemitério de Rendufe 	-8.23309501356759	41.4780951954882	
+BC388	superficie	1100l	Orgânico	Gonça 	Cemitério de Gonça 	-8.25352049840352	41.5081911848013	
+BC389	superficie	1100l	Orgânico	Atães	Cemitério S.Cosme 	-8.24875458140483	41.4764384610029	
+BC390	superficie	1100l	Orgânico	Atães	Cemitério S.Cosme 	-8.24875458140483	41.4764384610029	
+BC391	superficie	1100l	Orgânico	Atães	Cemitério Ronfe	-8.3824430029908	41.4399973286084	
+BC392	superficie	1100l	Orgânico	Ronfe 	Cemitério de Ronfe 	-8.3824430029908	41.4399973286084	
+BC393	superficie	1100l	Orgânico	Caldelas 	Rua da Lama 	-8.34543460267602	41.4945466385857	
+BC394	superficie	1100l	Orgânico	Mesão Frio	Tv. Da cruz da argola	-8.2691024898598	41.4550739816531	
+BC395	superficie	1100l	Orgânico	Mesão Frio	Rua Cruz da Argola	-8.27259011565171	41.4543664508967	
+BC396	superficie	1100l	Orgânico	Ponte 	Rua do Campo Novo 	-8.33186031711451	41.4657111879406	
+BC397	superficie	1100l	Orgânico	Ponte 	Rua da Indústria 	-8.32848844088895	41.4754798946412	
+BC398	superficie	1100l	Orgânico	Ponte 	Travessa Monte da Carreira	-8.33021920306782	41.477598624441	
+BC399	superficie	1100l	Orgânico	Ponte 	Rua Monte da Carreira	-8.3292221916982	41.4783427934383	
+BC400	superficie	1100l	Orgânico	Ponte 	Travessa da Carreira de Cima	-8.32765569914038	41.4784783063506	
+BC401	superficie	80l	Orgânico	Costa	Rua Doutor José Augusto da Silva 	-8.2763517946754	41.4474436929846	
+BC402	superficie	80l	Orgânico	Costa 	Rua Doutor José Augusto da Silva 	-8.2763517946754	41.4474436929846	
+BC403	superficie	80l	Orgânico	Costa 	Rua Dom Domingues Silva Gonçalves 	-8.28669670139871	41.4389976926951	
+BC404	superficie	80l	Orgânico	Costa 	Rua Dom Domingues Silva Gonçalves 	-8.28669670139871	41.4389976926951	
+BC405	superficie	80l	Orgânico	Cidade 	Rua do Rei Pegu			
+BC406	superficie	80l	Orgânico	Cidade 	Rua dos Combatentes da Grande Guerra 	-8.28994649844827	41.4426892080682	
+BC407	superficie	80l	Orgânico	Cidade 	Largo do Trovador	-8.29361529158174	41.4404897724914	
+BC408	superficie	80l	Orgânico	Cidade 	Largo do Trovador	-8.29361529158174	41.4404897724914	
+BC409	superficie	80l	Orgânico	Fermentões	Largo da Carvalha	-8.31294378649166	41.4493575522529	
+BC410	superficie	80l	Orgânico	Fermentões	Largo da Carvalha	-8.31294378649166	41.4493575522529	
+BC411	superficie	80l	Orgânico	Mesão Frio	Rua Nossa Senhora de Fátima 	-8.26911400575238	41.4550582249554	
+BC412	superficie	80l	Orgânico	Mesão Frio	Rua Nossa Senhora de Fátima 	-8.26911400575238	41.4550582249554	
+BC413	superficie	80l	Orgânico	Ponte	Rua dos Moinhos	-8.34340339615557	41.475310560823	
+BC414	superficie	80l	Orgânico	Ponte 	Rua dos Moinhos	-8.34340339615557	41.475310560823	
+BC415	superficie	80l	Orgânico	Ponte	Urbanização do Rio	-8.34624309049311	41.4794522703438	
+BC416	superficie	80l	Orgânico	Ponte	Urbanização do Rio	-8.34624309049311	41.4794522703438	
+BC417	superficie	80l	Orgânico	Cidade 	Avenida D.João IV	-8.29246718162734	41.4352413254653	
+BC418	superficie	80l	Orgânico	Cidade 	Avenida D.João IV	-8.29246718162734	41.4352413254653	
+BC419	superficie	80l	Orgânico	Azurém	Rua de Francos 	-8.28834087687654	41.4548156811908	
+BC420	superficie	80l	Orgânico	Azurém	Rua de Francos 	-8.28698246879788	41.4542295496266	
+BC421	superficie	1100l	Orgânico	Cidade 	Avenida de Londres 	-8.30267639551571	41.4429735552908	
+BC422	superficie	1100l	Orgânico	Urgezes	Rua Comendador Manuel Pereira Basto	-8.29562528315054	41.4289509402567	
+BC423	superficie	1100l	Orgânico	Mesão Frio	N-101	-8.26057123317998	41.4490029243678	
+BC424	superficie	1100l	Orgânico	Urgezes	Rua de São Gualter 	-8.29089646230549	41.4300816238586	
+BC425	superficie	1100l	Orgânico	Costa 	Rua Dr. José Augusto da Silva 	-8.27773187151884	41.445291753584	
+BC426	superficie	1100l	Orgânico	Ponte	Rua da Indústria 	-8.33332419075913	41.4746828379694	
+BC427	superficie	1100l	Orgânico	Fermentões	Rua da Pereira	-8.31590008697933	41.4645837019027	
+BC428	superficie	1100l	Orgânico	Creixomil	Bairro da Atouguia	-8.3063423	41.4458225	
+BC429	superficie	360l	Orgânico	UF Oliveira, São Paio, São Sebastião	Largo Da República Do Brasil	-8.2905875	41.4418091	
+BC430	superficie	360l	Orgânico	UF Oliveira, São Paio, São Sebastião	Alameda de São Dâmaso	-8.2916702	41.4418034	
+BC431	superficie	360l	Orgânico	UF Oliveira, São Paio, São Sebastião	Alameda de São Dâmaso	-8.2946038	41.4407339	
+BC432	superficie	80l	Orgânico	Azurém	Rua da Pegada	-8.29487327938194	41.4533974355535	
+BC433	superficie	1100l	Orgânico	Azurém	Rua Comandante Alberto Pimenta Machado	-8.2967571	41.4547845	
+BC434	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Camilo  Castelo Branco	-8.2920335	41.4387498	
+BC435	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Camilo  Castelo Branco	-8.2927014	41.4384325	
+BC436	superficie	1100l	Orgânico	Azurém	Rua do Picoto	-8.2950754	41.4464925	
+BC437	superficie	80l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua dos Bombeiros Voluntários/Francisco Agra	-8.2981488	41.4468852	
+BC438	superficie	1100l	Orgânico	Creixomil	Rua Arqueólogo Mário Cardoso	-8.3073964	41.4442155	
+BC439	superficie	80l	Orgânico	Fermentões	Bairro da Atouguia	-8.3051547	41.445879	
+BC440	superficie	80l	Orgânico	Azurém	Rua Rómulo de Carvalho	-8.2956513	41.4518242	
+BC441	superficie	1100l	Orgânico	Azurém	Alameda da Universidade	-8.2946271	41.4508546	
+BC442	superficie	1100l	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua Prof. Egas Moniz 	-8.28475828243489	41.4465014033529	
+BC443	superficie	80l 	Orgânico	UF Oliveira, São Paio, São Sebastião	Rua de Camões 	-8.29609583999469	41.4412695145821	

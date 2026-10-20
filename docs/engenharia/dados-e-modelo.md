@@ -10,7 +10,8 @@ O modelo tem três passos: quanto têxtil há em cada zona, quanto custa cada fo
 | Limites de freguesia | CAOP, Direção-Geral do Território | Agregar e mostrar no mapa |
 | Estradas e locais candidatos (escolas, supermercados, juntas) | OpenStreetMap, extrato de Portugal | Rotas e pontos de recolha em locais existentes |
 | Têxtil recolhido, circuitos, viaturas e caracterização do lixo | Vitrus Ambiente (ver [análise dos dados](../dados/analise-dados-recebidos.md)) | Calibração e rede de partida |
-| Localizações dos contentores | Vitrus Ambiente, a chegar a 20 de outubro de 2026 | Pontos atuais da rede (ETL, tabela `containers`) |
+| Localizações dos contentores **de têxteis** | Vitrus Ambiente, por receber | Pontos atuais da rede (ETL `containers.py`, tabela `containers`) |
+| Contentores **municipais** de outras frações (2 751) e CAOP 2019 | Vitrus Ambiente, pacote QGIS de 20 de outubro de 2026 (ver [análise](../dados/analise-contentores-municipais.md)) | Pontos candidatos junto de recolha existente (investimento perto de zero, **pressuposto**), produtores B2B, geometria oficial das freguesias, densidade. ETL `municipal_containers.py` → `data/processed/municipal_*`; **não entram** na rede de têxteis |
 | Têxtil no indiferenciado: 5,4%; 0,7 kg/hab/mês | Plano de Ação para a Circularidade Têxtil de Guimarães | Valor base da procura |
 | Custos unitários (recolha, km, contentor) | Vitrus Ambiente (ainda por receber) | Modelo de custos |
 
@@ -126,6 +127,15 @@ n = \left\lceil \frac{z^2\, p(1-p)}{h^2} \cdot \mathrm{deff} \right\rceil, \qqua
 
 **KPIs a medir** (valor previsto e P10-P90, todos "estimativa"): toneladas no piloto, €/t em regime e taxa de rejeito (parte dos 14,1% observados com a mesma incerteza triangular).
 
+## 6. Infraestrutura municipal (pacote QGIS)
+
+O inventário municipal de 20 de outubro (**não é de têxteis**) entra no modelo só como **apoio**, nunca como rede de têxteis. Detalhe, regras e números em [Análise dos contentores municipais](../dados/analise-contentores-municipais.md).
+
+- **Locais candidatos** (modo `existing`): os 1 187 locais com contentor de rua (`municipal_sites.csv`, `textile_candidate = true`). O investimento perto de zero é pressuposto nosso; falta confirmar com a Vitrus se pode haver têxtil nesses locais e a que custo.
+- **Cobertura**: parte da área a 200/300/500 m de um local público (31,4%, 47,8%, 70,9%), em CAOP 2019 e EPSG:3763. É cobertura de **área**; a de população precisa de BGRI.
+- **Lacuna por freguesia** (`municipal_by_parish.csv`): `potencial = pop × 0,7 kg × 12`, `lacuna = potencial × (1 − 22,9%)`, igual captura média em todas as freguesias porque não há têxtil recolhido por freguesia; **estimativa**. Ordena-se por tonelada de lacuna por local candidato.
+- **Freguesias**: a atribuição de uma coordenada à freguesia usa o polígono CAOP 2019, nunca o nome escrito.
+
 ## Pressupostos
 
 | Parâmetro | Valor | Estado |
@@ -141,5 +151,7 @@ n = \left\lceil \frac{z^2\, p(1-p)}{h^2} \cdot \mathrm{deff} \right\rceil, \qqua
 | Pesos do piloto (0,25 / 0,15 / 0,30 / 0,30) | valor de aprendizagem | Pressuposto da equipa (secção 5) |
 | Efeito de desenho do ensaio (deff) e peso médio da peça | 2; 0,415 kg | Pressuposto, a validar no piloto (secção 5) |
 | Vida útil do equipamento (*N*) | a pedir | Vitrus, dia 1 |
+| Têxtil em locais municipais existentes sem investimento | a confirmar | Pressuposto (secção 6); perguntar à Vitrus |
+| Captura média igual em todas as freguesias (lacuna por freguesia) | 22,9% | Pressuposto: sem têxtil recolhido por freguesia (secção 6) |
 
 Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` sem uma linha nesta tabela. Os custos e as taxas por modo estão lá marcados como `assumption` e aparecem com a sua origem no ecrã "Pressupostos".

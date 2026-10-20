@@ -1,0 +1,594 @@
+ID	tipologia	cap.	Freguesia	Rua	Coord. Y	Coord. X2
+1	bluebee	5 m³	Azurém	Rua Pousada de Dentro	-8.296393	41.456363
+2	molok	5 m³	Azurém	Rua Hermes Inácio	-8.289516	41.460101
+3	molok	5 m³	Azurém	Rua Moura Machado	-8.295718	41.458039
+4	molok	5 m³	Azurém	Rua Moura Machado	-8.296217	41.4570795
+5	Greenbee	5 m³	Azurém	Rua da Pousada	-8.2968973	41.4561201
+6	molok	5 m³	Azurém	Rua 24 de Junho	-8.287490	41.457373
+8	molok	5 m³	Azurém	R. Dr. Augusto Ferreira Cunha	-8.2808379	41.4539884
+9	molok	5 m³	Azurém	R. Dr. Augusto Ferreira Cunha	-8.2817347	41.453456
+10	molok	5 m³	Azurém	Rua Cónego Dr. Manuel Faria	-8.294731	41.449552
+11	molok	5 m³	Azurém	Rua Dr. Mário Dias	-8.296138	41.447836
+12	Greenbee	5 m³	Azurém	Rua Dr. João Afonso de Almeida	-8.299565	41.448855
+13	Greenbee	5 m³	Azurém	Rua Dr. João Afonso de Almeida	-8.301517	41.449113
+14	molok	5 m³	Azurém	Rua Francisco Ribeiro de Castro	-8.300361	41.448556
+15	molok	5 m³	Azurém	Rua da Espinhosa	-8.300446	41.447656
+16	molok	5 m³	Azurém	Rua José Pinto Rodrigues	-8.301092	41.447862
+17	molok	5 m³	Azurém	Rua  Pdr. Abílio Dos Santos Barbas	-8.301616	41.448063
+18	molok	5 m³	Azurém	R. da Amorosa	-8.302164	41.448273
+19	molok	5 m³	Azurém	Rua Sá de Miranda	-8.303734	41.453369
+20	molok	5 m³	Fermentões	Rua Jorge Amado	-8.304556	41.45659
+21	molok	5 m³	Fermentões	Rua Fernando Pessoa	-8.304078	41.451448
+22	molok	5 m³	Fermentões 	Rua Francisco Manuel Melo	-8.305509	41.452811
+23	molok	5 m³	Fermentões	Rua Guerra Junqueiro	-8.304412	41.454442
+24	molok	5 m³	Fermentões	Rua José Ribeiro de Freitas	-8.308056	41.454014
+25	molok	5 m³	Fermentões	Rua Cidade da Praia	-8.311399	41.460043
+26	molok	5 m³	Fermentões	Rua de Almansor	-8.313962	41.457469
+27	molok	5 m³	Fermentões	Rua Colina do Sol	-8.305127	41.451262
+28	molok	5 m³	Fermentões	Rua de Sta. Eulália	-8.304733	41.450118
+29	molok	5 m³	Fermentões	Rua Arqueólogo Mário Cardoso 	-8.306487	41.449469
+30	molok	5 m³	Fermentões	Rua Arqueólogo Mário Cardoso	-8.306259	41.448494
+31	molok	5 m³	Fermentões	Rua Arqueólogo Mário Cardoso	-8.306094	41.447635
+32	molok	5 m³	Fermentões	Rua Arqueólogo Mário Cardoso 	-8.306408	41.446742
+33	molok	5 m³	Creixomil	Rua Arqueólogo Mário Cardoso	-8.306877	41.446178
+34	molok	5 m³	Creixomil	Rua Arqueólogo Mário Cardoso	-8.307055	41.445922
+35	molok	5 m³	Creixomil	Rua Arqueólogo Mário Cardoso	-8.307230	41.445682
+36	molok	5 m³	Creixomil	Rua Arqueólogo Mário Cardoso 	-8.307407	41.445425
+37	molok	5 m³	Ronfe	Alameda Prof. Abel Salazar	-8.3805896	41.4426441
+38	molok	5 m³	Fermentões	Bairro da Atouguia	-8.305152	41.445882
+39	molok	5 m³	Fermentões	Bairro da Atouguia	-8.303902	41.446786
+40	molok	5 m³	Fermentões	Bairro da Atouguia	-8.305005	41.446768
+41	molok	5 m³	Creixomil	Bairro da Atouguia	-8.306343	41.445827
+42	molok	5 m³	Creixomil	Rua da Ass. Artística Vimaranense	-8.306775	41.445019
+43	molok	5 m³	Creixomil	Rua da Ass. Artística Vimaranense	-8.305831	41.445317
+44	molok	5 m³	Creixomil	Travessa Oneca Mendes	-8.310195	41.445368
+45	molok	5 m³	Creixomil	Travessa Oneca Mendes	-8.309043	41.445778
+46	molok	5 m³	Creixomil	Rua António Lino	-8.313243	41.444631
+47	molok	5 m³	Creixomil	Travessa do Paço	-8.317162	41.437813
+48	molok	5 m³	Creixomil	Travessa da Igreja	-8.310197	41.438479
+49	molok	5 m³	Creixomil	Rua Cruz de Pedra	-8.302594	41.435592
+50	molok	5 m³	Creixomil	Rua Mouzinho de Albuquerque	-8.302905	41.434972
+51	molok	5 m³	Creixomil	Rua Miguel Torga	-8.304238	41.435401
+52	molok	5 m³	Creixomil	Rua Miguel Torga	-8.304312	41.434156
+53	molok	5 m³	Creixomil	Pavilhão Multiusos	-8.305762	41.434665
+54	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Largo das Hortas	-8.287549	41.442106
+55	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Rei de Pegu	-8.286	41.441827
+56	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua D. Cristóvão Boaventura	-8.285901	41.447374
+57	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua D. Cristóvão Boaventura	-8.288012	41.446965
+59	bluebee	5 m³	Costa	Rua Antero Henriques da Silva	-8.281600	41.448927
+60	molok	5 m³	Creixomil	Rua da Índia	-8.304948	41.429294
+61	bluebee	5 m³	Costa	Rua Antero de Quental	-8.282814	41.448177
+62	molok	5 m³	Costa	Rua Dr. Carlos Saraiva	-8.283720	41.447754
+63	molok	5 m³	Costa	Rua Dr. Carlos Saraiva	-8.283713	41.447740
+64	bluebee	5 m³	Costa	Rua Antero Henriques da Silva	-8.279481	41.449607
+65	bluebee	5 m³	Costa	Rua Dr. Francisco Sá Carneiro	-8.2801859	41.450843
+66	bluebee	5 m³	Costa	Rua Unidade Vimaranense	-8.279914	41.450010
+67	bluebee	5 m³	Costa	Rua Nossa Sr.ª da Penha	-8.279724	41.451934
+68	bluebee	5 m³	Costa	Rua Eça de Queirós	-8.278931	41.450437
+69	molok	5 m³	Costa 	Rua Eça de Queirós	-8.278108	41.450852
+71	molok	5 m³	Costa	Rua da Unidade Vimaranense	-8.2805076	41.4509591
+72	molok	5 m³	Mesão Frio	Av. Rio de Janeiro	-8.276930	41.451771
+73	molok	5 m³	Mesão Frio	Av. Rio de Janeiro	-8.2781628	41.4522369
+75	bluebee	5 m³	Costa	Rua Padre António Caldas	-8.281241	41.449775
+76	molok	5 m³	Costa	Travessa Padre António Caldas	-8.2813463	41.4507352
+77	molok	5 m³	Mesão Frio	Rua Virgínia Moura	-8.271352	41.454195
+78	molok	5 m³	Mesão Frio	E.N.101	-8.268980	41.453958
+79	molok	5 m³	Mesão Frio	Rua Mira sol	-8.268298	41.457786
+80	bluebee	5 m³	Costa	Rua Dr. João Oliveira Salgado	-8.2817903	41.4432846
+81	molok	5 m³	Costa	Rua Bernardino Jordão	-8.286701	41.439002
+82	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Av. Londres	-8.302848	41.443876
+83	bluebee	5 m³	Creixomil	Av. Londres	-8.302680	41.442548
+84	molok	5 m³	Urgezes	Rua do Centro	-8.290833	41.437006
+85	molok	5 m³	Urgezes	R. António Costa Guimarães	-8.299028	41.429597
+86	molok	5 m³	Nespereira	Av. da Igreja	-8.323728	41.405402
+87	molok	5 m³	Nespereira	Rua das Casolas 	-8.319772	41.404753
+88	molok	5 m³	Urgezes	Loteamento do Castanheiro	-8.298407	41.433602
+89	molok	5 m³	Urgezes	Rua José Cardoso Pires	-8.299174	41.425537
+90	molok	5 m³	UF Candoso Santiago e Mascotelos	Largo João Gomes Oliveira	-8.314190	41.427099
+91	molok	5 m³	UF Candoso Santiago e Mascotelos	Largo João Gomes Oliveira	-8.313750	41.427216
+92	molok	5 m³	UF Candoso Santiago e Mascotelos	Rua de S. Tiago	-8.315920	41.421044
+93	molok	5 m³	UF Candoso Santiago e Mascotelos	Rua Dom Afonso Henriques 	-8.316540	41.420839
+94	molok	5 m³	UF Candoso Santiago e Mascotelos	Cidade Desportiva	-8.3181676	41.4297209
+95	molok	5 m³	UF Candoso Santiago e Mascotelos	Cidade Desportiva	-8.322080	41.430635
+96	molok	5 m³	Selho São Jorge	Rua de Belmenso	-8.3573232	41.429306
+97	molok	5 m³	Selho São Jorge	Rua do Peixoto	-8.356326	41.430029
+98	molok	5 m³	Selho São Jorge	Rua do Peixoto	-8.355120	41.429676
+99	molok	5 m³	Selho São Jorge	Rua Padre José Gonçalves	-8.357842	41.427178
+100	molok	5 m³	Selho São Jorge	Rua Central	-8.352975	41.428085
+101	molok	5 m³	Selho São Jorge	Rua da Cabreira	-8.3644932	41.427029
+102	molok	5 m³	Selho São Jorge	Travessa Monte do Santo B	-8.3668569	41.428903
+104	bluebee	5 m³	Ponte	E.M. 835	-8.343598	41.458972
+105	molok	5 m³	Ronfe	Rua 13 de Maio	-8.3831316	41.442149
+106	molok	5 m³	Gondar	Travessa da Liberdade	-8.3757802	41.421599
+107	molok	5 m³	Gondar	Bairro da Emboladoura	-8.3747652	41.421912
+108	molok	5 m³	Gondar	Bairro da Emboladoura	-8.3742719	41.421964
+109	molok	5 m³	Gondar	Bairro da Emboladoura	-8.3740095	41.42218
+110	molok	5 m³	Gondar	Bairro da Emboladoura	-8.3733085	41.422256
+111	molok	5 m³	Candoso S. Martinho	Praceta Dona Rosinha	-8.334219	41.426614
+112	molok	5 m³	Moreira de Cónegos	Avenida 1º de Agosto	-8.3576089	41.372792
+113	molok	5 m³	Moreira de Cónegos	Rua Alto de Pereirinhas	-8.3229026	41.379937
+114	molok	5 m³	Sande São Martinho	Praceta de Lamelas	-8.352139	41.493904
+115	molok	5 m³	UF Selho São Lourenço e Gomilhães	E.N. 207-4	-8.276772	41.467516
+116	molok	5 m³	Azurém	Travessa Ferreira de Castro	-8.2971731	41.448507
+117	molok	5 m³	São Torcato	Rua Dr. Francisco Fernandes	-8.258549	41.480815
+118	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Raul Brandão	-8.286869	41.446788
+119	molok	3 m³	Azurém	Rua Frei Diogo de Murça	-8.296117	41.453501
+120	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Padre António Caldas	-8.281543	41.44963
+121	molok	5 m³	Urgezes	Rua 1º de Maio	-8.299181	41.420619
+122	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua João A. M. P. de Faria	-8.283521	41.448818
+123	molok	5 m³	Fermentões	Rua Cidade Brasília	-8.3116827	41.4604045
+124	molok	5 m³	Ponte	Travessa do Rio	-8.34424	41.480489
+125	molok	5 m³	Ponte	Rua do Rio	-8.343951	41.481103
+126	molok	5 m³	Polvoreira	Rua das Emproas	-8.296467	41.411103
+127	molok	5 m³	Creixomil	Rua da Índia	-8.302864	41.429304
+128	bluebee	5 m³	Costa	Rua José Faria Martins	-8.283280	41.440451
+129	molok	5 m³	Moreira de Cónegos	Rua Vila Moura	-8.356438	41.375185
+130	molok	5 m³	Moreira de Cónegos	Rua S. Paio o Padroeiro	-8.348529	41.3741561
+131	molok	5 m³	Brito	Avenida do Parque Desportivo	-8.3623983	41.452078
+132	molok	5 m³	Brito	Rua do Cruzeiro	-8.3663717	41.4551074
+133	molok	5 m³	Selho São Cristóvão	Rua do Penegacho	-8.3505697	41.4166211
+134	molok	5 m³	Selho São Cristóvão	Rua S. João	-8.3456908	41.4225391
+135	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Antero Henriques da Silva	-8.284734	41.447869
+136	molok	5 m³	Guardizela	Rua Abílio José da Silva	-8.3693653	41.3875002
+137	molok	5 m³	Ponte	Rua S. João Batista - EN101	-8.3377056	41.4773675
+138	molok	5 m³	Ponte	Rua S. João Batista - EN101	-8.338065	41.477934
+139	molok	5 m³	Ponte	Rua S. João Batista - EN101	-8.338162	41.478530
+140	molok	5 m³	Ponte	Rua S. João Batista - EN101	-8.339111	41.479571
+141	molok	5 m³	Selho São Jorge	Trav. Nossa Sr.ª dos Perigos	-8.349575	41.426608
+142	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua de S. Dâmaso	-8.285832 	41.449261
+143	molok	5 m³	Fermentões	Rua Fernando Pessoa	-8.304183	41.450414
+144	molok	5 m³	Azurém	Rua da Pegada	-8.294631	41.452194
+145	molok	5 m³	Creixomil	Hospital Sra. da Oliveira	-8.3053014	41.4428584
+146	molok	5 m³	Creixomil	Hospital Sra. da Oliveira	-8.3053175	41.4428784
+147	molok	5 m³	Creixomil	Hospital Sra. da Oliveira	-8.3053261	41.4429
+148	molok	5 m³	Azurém	Rua do Monte Largo	-8.280059	41.454676
+149	molok	5 m³	Creixomil	Rua Prof. Abel Salazar	-8.301093	41.440892
+150	molok	5 m³	Selho São Jorge	Rua da Saudade	-8.3593552	41.430927
+151	molok	5 m³	Fermentões	Rua Cidade Bissau	-8.310269	41.459969
+152	molok	5 m³	Costa	Rua Antero Henriques da Silva	-8.283929	41.448434
+153	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Bentos Santos Costa	-8.286101	41.439588
+155	molok	5 m³	Creixomil	Hospital Sra. da Oliveira	-8.3044177	41.4428026
+157	molok	5 m³	Costa	Rua das Tumbas	-8.273490	41.445790
+158	molok	5 m³	Costa	Rua Das Vessadas	-8.275277	41.446088
+159	molok	5 m³	Brito	Rua do Assento	-8.364255	41.455382
+160	molok	5 m³	Brito	Rua do Assento	-8.3621963	41.453181
+161	molok	5 m³	Brito	Travessa do Moinho	-8.3654623	41.449339
+162	molok	5 m³	Barco	Rua da Gandra	-8.335833	41.509203
+163	molok	5 m³	Barco	Rua da Gandra	-8.333663	41.510456
+164	molok	5 m³	Barco	Rua da Gandra	-8.336640	41.507380
+165	molok	5 m³	Caldelas	Rua Da Quinta de Cima	-8.3509915	41.5010021
+166	molok	5 m³	Caldelas	Rua João Cândido Lamosa	-8.3488015	41.4991969
+167	molok	5 m³	Ronfe	Rua do Olival 	-8.3830473	41.4400631
+168	molok	5 m³	Ronfe	Rua de S. Tiago	-8.381028	41.441430
+169	molok	5 m³	Ronfe	Rua de S. Tiago	-8.380648	41.441841
+170	molok	5 m³	Urgezes	Rua Covas de Cima	-8.3026087	41.425432
+171	molok	5 m³	Polvoreira	Rua das Lameiras	-8.300494	41.418696
+173	molok	5 m³	Creixomil	Travessa da Igreja	-8.3121296	41.4374035
+174	molok	5 m³	Fermentões	Travessa Fernando Pessoa	-8.3031825	41.4502214
+175	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. D. João IV	-8.2908489	41.4387374
+176	molok	5 m³	UF Souto Stª Maria, Souto S. Salvador e Gondomar	Rua da Azenha	-8.3145923 	41.501179
+181	molok	3 m³	Polvoreira	Rua Dona Maria Adelaide Vilas	-8.3050774	41.4064369
+182	molok	5 m³	Costa	Travessa Rio de Janeiro	-8.2715547	41.4490655
+183	molok	5 m³	Creixomil	Rua do Miradouro de Baixo	-8.3133447	41.4376088
+184	molok	5 m³	Serzedelo	Rua Vila Meã	-8.3664769	41.4066429
+185	molok	5 m³	Caldelas	Rua da Taipa	-8.3491127	41.4844541
+186	molok	5 m³	Caldelas	Rua da Taipa	-8.3490588	41.4843845
+187	molok	5 m³	Caldelas	Rua da Taipa	-8.3484247	41.483425
+188	molok	5 m³	Caldelas	Rua 19 de Junho	-8.347451	41.484167
+189	molok	5 m³	Polvoreira	Rua das Emproas	-8.296494	41.411118
+190	molok	5 m³	Caldelas	Praceta Ramalho Ortigão	-8.346484	41.483847
+191	molok	5 m³	Caldelas	Rua João Ribeiro de Castro	-8.346566	41.489892
+192	molok	5 m³	Sande São Martinho	R. Padre António Francisco Ribeiro	-8.360645	41.496608
+193	molok	5 m³	Creixomil	Rua de Moçambique	-8.302708	41.431947
+194	molok	5 m³	Creixomil	Rua de Moçambique	-8.303384	41.431687
+195	molok	5 m³	Gondar	Rua do Outeiro	-8.3698537	41.4176484
+196	molok	5 m³	Brito	Rua General Humberto Delgado	-8.3630806	41.455718
+197	molok	5 m³	Creixomil	Rua André Manuel Dias Ferreira	-8.314669	41.440234
+198	molok	5 m³	Azurém	Rua da Arcela	-8.276655	41.453733
+199	molok	5 m³	Caldelas	Rua Custódio da Costa Ferreira Pinto	-8.348825	41.491873
+200	molok	5 m³	Mesão Frio	Rua da Cruz D'Argola	-8.2619747	41.451917
+201	plataforma	5 m³	UF Conde e Gandarela	Rua de Tresmonde	-8.3385625	41.3889406
+203	molok	5 m³	Azurém	Rua 24 de Junho	-8.284524	41.458620
+204	molok	5 m³	Azurém	Rua do Pombal	-8.298549	41.449332
+205	molok	5 m³	Selho São Jorge	Rua do Gomes	-8.355153	41.431937
+208	molok	5 m³	Caldelas	Rua Custódio da Costa Ferreira Pinto	-8.3487994	41.4918808
+207	molok	3 m³	Selho São Jorge	Rua da Devesa Longa	-8.3458905	41.434347
+209	molok	5 m³	Caldelas	Rua Comandante Carvalho Crato	-8.3516176	41.4863065
+210	plataforma	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Camilo  Castelo Branco	-8.2920402 	41.4387508
+211	molok	5 m³	Polvoreira	Rua da Igreja	-8.3052466	41.4089627
+212	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Camilo Castelo Branco	-8.3145923	41.501179
+213	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Alameda São Dâmaso	-8.2945924	41.4407334
+214	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Alameda Dr. Alfredo Pimenta	-8.2975748	41.4446429
+215	molok	5 m³	Azurém	Rua Nossa Sr.ª da Madre Deus	-8.2851082	41.4601592
+216	molok	5 m³	Santa Eufémia de Prazins		-8.3198667	41.487581
+217	molok	5 m³	Santa Eufémia de Prazins		-8.3198359	41.4875629
+219	molok	5 m³	Azurém	Rua Alexandre Herculano	-8.2942283	41.4481975
+220	bluebee	5 m³	Azurém	Rua Alexandre Herculano	-8.294998	41.4485725
+221	molok	5 m³	Creixomil	Rua da Guiné	-8.3027855	41.433065
+222	molok	5 m³	Creixomil	Rua Pedro Alvares Cabral	-8.3037694	41.433629
+223	molok	5 m³	Brito	Travessa das Casas 	-8.3622271	41.4503209
+224	molok	5 m³	Caldelas	Viela do Carregal	-8.3498376	41.4851116
+225	molok	5 m³	Caldelas	Rua Professor Manuel José Pereira	-8.3505047	41.4847305
+226	molok	5 m³	Caldelas	Viela do Trigal	-8.3514488	41.4840333
+227	molok	5 m³	Caldelas	Rua do Alvite 	-8.3526333	41.4891158
+228	molok	5 m³	Creixomil	Rua da Saudade	-8.308492	41.44375
+229	molok	5 m³	Creixomil	Rua da Cruz de Pedra	-8.302789	41.4362209
+230	molok	5 m³	Creixomil	Rua Manuel Tomas	-8.3013985	41.4359434
+231	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Largo Da República Do Brasil	-8.2913725	41.4422905
+232	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Alameda São Dâmaso	-8.2916689	41.4418034
+233	molok	3 m³	Fermentões		-8.3161056	41.4630444
+234	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Alameda Professor Abel Salazar	-8.2877977	41.4455403
+236	molok	3 m³	Creixomil	Rua da Silveira	-8.3057964	41.4474214
+237	molok	5 m³	Silvares	Nacional 206	-8.3410755	41.4467026
+238	molok	5 m³	Brito	Rua da Sapeira	-8.359402	41.4565657
+239	molok	3 m³	Selho São Jorge	Trv. da Saudade	-8.357782	41.4305568
+240	molok	3 m³	Selho São Jorge	R. Circunvalação	-8.3572545	41.4303999
+241	bluebee	5 m³	Creixomil	Av. São Gonçalo	-8.3031085	41.444709
+242	molok	5 m³	Creixomil	Av. São Gonçalo	-8.3048584	41.4444459
+243	molok	5 m³	Creixomil	Av. São Gonçalo	-8.3061137	41.444254
+244	molok	5 m³	Creixomil	Rua Arqueólogo Mário Cardoso	-8.3073944	41.4442155
+245	molok	5 m³	Creixomil	Rua do Pinheiro	-8.3091017	41.443527
+246	bluebee	5 m³	Azurém	Rua Teixeira de Pascoais	-8.2989496	41.447438
+247	bluebee	5 m³	Azurém	Rua Teixeira de Pascoais	-8.2977865	41.4484277
+248	bluebee	5 m³	Azurém	Rua Ferreira de Castro	-8.296433	41.4493497
+249	molok	5 m³	Azurém	Alameda da Universidade	-8.2940612	41.4502233
+250	molok	5 m³	Azurém	Alameda da Universidade	-8.2953903	41.451302
+251	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua de Pegu	-8.2889221	41.4416728
+252	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Largo de São Brás 	-8.2900696	41.4403247
+253	molok	3 m³	UF Oliveira, São Paio, São Sebastião	Av. D. João IV	-8.2924884	41.4352126
+254	Greenbee	5 m³	Urgezes	Rua João Paulo II	-8.2920666	41.4363427
+255	molok	5 m³	Urgezes	Av. D. João IV	-8.2915081	41.4377108
+256	molok	5 m³	Urgezes	Av. D. João IV	-8.291586	41.436858
+257	molok	5 m³	Urgezes	Rua Paulo VI	-8.2934385	41.4360726
+258	molok	5 m³	Urgezes	Rua Comandante Luís de Pina	-8.2933512	41.4364881
+259	molok	5 m³	Urgezes	Rua Comandante Luís de Pina	-8.2926077	41.436797
+260	molok	5 m³	Creixomil	Rua Santo André	-8.2995658	41.4367331
+261	molok	5 m³	Creixomil	Rua da Caldeirôa	-8.2988717	41.4383904
+262	molok	5 m³	Creixomil	Rua Colégio Militar	-8.3001196	41.4382539
+263	molok	5 m³	Creixomil	Rua Abel Salazar	-8.3017601	41.4398648
+264	molok	5 m³	Urgezes	Rua Comandante F.L. Brandão	-8.3005643	41.4204133
+265	molok	5 m³	Urgezes	Rua Francisco Silva Areias	-8.2983067	41.421026
+266	molok	5 m³	Urgezes	Rua António Da Costa Guimarães	-8.3001402	41.4219834
+267	molok	5 m³	Fermentões	Av. Padre João Fernandes Machado	-8.3133209	41.4583593
+268	molok	5 m³	Creixomil	Rua Da Boucinha	-8.3109598	41.4444876
+269	molok	5 m³	Creixomil	Rua Da Boucinha	-8.3137913	41.4436945
+270	molok	5 m³	Creixomil	Rua Alto da Bandeira	-8.3123993	41.441085
+271	molok	5 m³	Creixomil	Rua Alto da Bandeira	-8.311244	41.4418536
+272	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Alameda Professor Abel Salazar	-8.2884937	41.4448668
+273	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. São Gonçalo	-8.2979734	41.4439529
+274	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. São Gonçalo	-8.3001432 	41.4443375
+275	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. Londres	-8.3027334	41.4443995
+276	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. Londres	-8.3026823	41.4430026
+277	bluebee	5 m³	Creixomil	Av. Conde Margaride	-8.301749	41.4420594
+278	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Manuel Saraiva Brandão	-8.3016811 	41.443383
+279	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Praça Heróis da Fundação	-8.3001747	41.4434286
+280	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Conde Arnoso	-8.287542	41.4438049
+281	bluebee	5 m³	Urgezes	Rua Paulo VI	-8.2950688	41.4362917
+282	molok	5 m³	Gondar	Urbanização do Calvário	-8.3678723	41.4209413
+283	molok	5 m³	Gondar	Urbanização do Calvario	-8.3684651	41.4214431
+284	molok	5 m³	Selho São Jorge	Rua João Pereira Fernandes	-8.3519875	41.4249239
+285	molok	5 m³	Selho São Jorge	Rua do Burgo	-8.3593522	41.424001
+286	molok	5 m³	Selho São Jorge	Travessa do Agouro	-8.3518179	41.4233707
+287	molok	5 m³	Selho São Jorge	Travessa da Pontijela 	-8.3511458	41.4242538
+288	molok	5 m³	Selho São Jorge	Rua João Pereira Fernandes	-8.3499631	41.4259857
+289	molok	5 m³	Selho São Jorge	Rua da Pontijela	-8.3496	41.4254936
+290	molok	5 m³	Selho São Jorge	Rua João Pereira Fernandes	-8.3485673	41.4265428
+291	molok	5 m³	Selho São Jorge	Rua Dom Guilherme Augusto	-8.3463399	41.4308701
+292	molok	5 m³	Selho São Jorge	Rua do Souto	-8.3596698	41.4338529
+293	molok	5 m³	Selho São Jorge	Rua do Souto	-8.3607808	41.4315
+294	molok	5 m³	Selho São Jorge	Rua Central	-8.3515418	41.4276569
+295	molok	5 m³	Caldelas	Estrada Municipal 101	-8.3450136	41.4872515
+296	molok	5 m³	Caldelas	Rua Professor Ìlidio Lopes de Matos	-8.3416224	41.4877748
+297	molok	5 m³	Caldelas	Avenida 25 deAbril	-8.3462373	41.4886259
+298	molok	5 m³	Caldelas	Rua Padre José Maria Felgueiras	-8.3486299	41.4871079
+299	molok	5 m³	Caldelas	Rua Nova dos Bombeiros	-8.347794	41.4867478
+300	molok	5 m³	Caldelas	Rua Nova dos Bombeiros	-8.346572	41.4869629
+301	molok	5 m³	Caldelas	Rua Nova dos Bombeiros	-8.3457221	41.487028
+302	molok	5 m³	Caldelas	Largo José de Sousa	-8.3456234	41.4845051
+303	molok	5 m³	Caldelas	Travesa da Alameda	-8.3440566	41.4844139
+304	molok	5 m³	Caldelas	Beco das Fontainhas	-8.3371062	41.491576
+305	molok	5 m³	Caldelas	EN 101	-8.3483967	41.485814
+306	molok	5 m³	Caldelas	Rua Francisco Pereira Silverio	-8.3497452	41.4877682
+307	molok	5 m³	Caldelas	rua padre silva gonçalves	-8.3461538	41.4907579
+308	molok	5 m³	Caldelas	Rua Dr. Alfredo Fernandes 	-8.3420087	41.4872657
+309	molok	5 m³	Caldelas	Rua dos Calheiros	-8.3528426	41.486359
+310	molok	5 m³	Caldelas	Rua Comandante Carvalho Crato	-8.3500435	41.4861179
+311	molok	5 m³	Caldelas	Rua Banda da Musica	-8.3499238	41.4868249
+312	molok	5 m³	UF Sande Vila Nova e Sande S. Clemente	Rua do Pinheiral	-8.3524919	41.4828183
+313	molok	5 m³	Sande São Martinho	Rua de Pereiras (EN 101)	-8.3536264	41.4867829
+314	molok	5 m³	Mesão Frio	Rua Belos Ares	-8.2610909	41.4507131
+315	molok	5 m³	Ponte	E.M. 835	-8.3419494	41.457624
+316	molok	5 m³	Mesão Frio	Rua da Cruz da Argola	-8.2677841	41.4539459
+317	molok	5 m³	Mesão Frio	Rua Cruz D´Argola	-8.261975	41.4515594
+318	molok	5 m³	Aldão	Rua D. Afonso Henriques	-8.2691245	41.4616517
+319	molok	5 m³	Creixomil	Rua Amadeu de Carvalho	-8.3219659	41.4407579
+320	molok	5 m³	Creixomil	Rua Cerca de Selho	-8.3207576	41.4430785
+321	molok	5 m³	Creixomil	Rua da Ponte do Seguro	-8.3188541	41.4431793
+322	molok	5 m³	Creixomil	Rua Amadeu de Carvalho	-8.3210939	41.441758
+323	molok	5 m³	Azurém	Rua Professor Mário Menezes	-8.2838388	41.455951
+324	molok	5 m³	Azurém	Rua de Damão	-8.282406	41.4554916
+325	molok	5 m³	Azurém	Rua de Damão	-8.283194	41.4543344
+326	molok	5 m³	Azurém	Rua Pêro Esteves	-8.2821456	41.4570135
+327	molok	5 m³	Azurém	Rua Ambrósio Coelho	-8.2810231	41.4569649
+328	molok	5 m³	Azurém	Travessa São Mamede	-8.2797352	41.458005
+329	molok	5 m³	Azurém	Rua do Emigrante	-8.2772981	41.4566048
+330	molok	5 m³	Azurém	Rua dos Mártires	-8.2785231	41.4561889
+331	molok	5 m³	Azurém	EN 207	-8.2833799	41.4570195
+332	molok	5 m³	Azurém	Rua 24 de Junho	-8.2859751	41.4579735
+333	molok	5 m³	Azurém	Rua Com alberto pimenta machado	-8.2967577	41.4547845
+334	molok	5 m³	UF Sande Vila Nova e Sande S. Clemente	Travessa do Pedraido	-8.3523677	41.4765488
+335	molok	5 m³	Polvoreira	EN 105	-8.3048024	41.4180968
+336	molok	5 m³	Nespereira	Rua da Calçada	-8.3197013	41.4104654
+337	molok	5 m³	Creixomil	Rua Oneca Mendes	-8.3165274	41.4424895
+338	molok	5 m³	Creixomil	Rua dos Moinhos 	-8.3156204	41.4444969
+339	molok	5 m³	Creixomil	Rua santa Teresinha	-8.314249	41.4383945
+340	molok	5 m³	Fermentões	Vereda Guimarães Coop	-8.3153	41.451919
+341	molok	5 m³	Fermentões	Vereda da NorteCoop (cima)	-8.3168116	41.4520705
+342	molok	5 m³	Fermentões	Vereda da NorteCoop (baixo)	-8.3162819	41.4518699
+343	bluebee	5 m³	Creixomil	Rua Sra da Luz	-8.3155262	41.4391449
+344	molok	5 m³	Selho São Jorge	Rua Albano Martins Coelho Lima	-8.3530813	41.4268327
+345	molok	5 m³	Selho São Jorge	Rua do Monte Negro	-8.354638	41.4288766
+346	molok	5 m³	Selho São Jorge	Rua do Barreiro	-8.3536957	41.4336038
+347	Greenbee	5 m³	Selho São Jorge	Rua da Circunvalação	-8.351372	41.4343705
+348	molok	5 m³	Penselo	Rua Nossa Senhora de Fátima	-8.2977321	41.4614685
+349	molok	5 m³	Penselo	Rua da Esperança	-8.2922955	41.4601699
+350	molok	5 m³	Mesão Frio	Rua A	-8.272219	41.452744
+351	molok	5 m³	Mesão Frio	Rua B	-8.2733935	41.4522481
+352	molok	5 m³	Mesão Frio	Rua C	-8.2755429	41.4525193
+353	molok	5 m³	Mesão Frio	Rua de S.Romão	-8.2628295	41.4523464
+354	molok	5 m³	Ponte	R. do Ave	-8.339881	41.4809468
+355	molok	5 m³	Ponte	R. 24 de Junho	-8.3345436	41.4767978
+356	molok	5 m³	Ponte	R. N. da Boavista	-8.3404651	41.478191
+357	molok	5 m³	Ponte	R. 1 de Maio	-8.3366351	41.4784269
+358	molok	5 m³	Azurém	R. Comd. Alberto Pimenta Machado	-8.3014566	41.4521589
+359	molok	5 m³	São Torcato	Rua Camilo Castelo Branco	-8.2558758	41.4859764
+360	molok	5 m³	Urgezes	R. Alfageme de Santarém	-8.3017224	41.4257608
+361	molok	5 m³	Urgezes	R. Alfageme de Santarém	-8.3002646	41.4273521
+362	molok	5 m³	Urgezes	R. Alfageme de Santarém	-8.3011647	41.4267934
+363	molok	5 m³	Urgezes	R. Mesteres de Guimarães	-8.2987128	41.4266328
+364	molok	5 m³	Urgezes	R. Mesteres de Guimarães	-8.3030861	41.4266315
+365	molok	5 m³	UF Sande Vila Nova e Sande S. Clemente	R. Além de Cima	-8.3520155	41.4822788
+366	molok	5 m³	UF Sande Vila Nova e Sande S. Clemente	R. das Pereiras	-8.3552359	41.4842735
+367	molok	5 m³	Fermentões	Rua de Roldes	-8.3114568	41.4580237
+368	molok	5 m³	Gondar	Trv. do Prédio Verde	-8.370497	41.4226965
+369	molok	5 m³	Ponte		-8.329733	41.4644725
+370	molok	5 m³	Ponte		-8.3297397	41.4644906
+371	molok	3 m³	Creixomil	Hortas Pedagógicas	-8.3074255	41.4361066
+372	molok	5 m³	São Torcato	R. Arquiteto Marques da Silva	-8.2620122	41.4810599
+373	molok	5 m³	São Torcato	R. Arquiteto Marques da Silva	-8.2630777	41.4812277
+374	molok	5 m³	Costa	R. Almirante Gago Coutinho	-8.282166	41.4464127
+375	molok	5 m³	São Torcato	Av. S. Torcato Mártir	-8.2617892	41.4842491
+376	molok	5 m³	Selho São Cristóvão	Rua Caramulo	-8.3464695	41.4219147
+377	molok	5 m³	Urgezes	R. Quinta das Aldeias	-8.3000532	41.4316757
+378	bluebee	5 m³	Azurém	Rua D. Teresa	-8.2880701	41.4500521
+379	molok	5 m³	Ronfe	R. da Meditação	-8.3823098	41.4397567
+380	molok	5 m³	Pinheiro	R. de Altares	-8.2896586	41.4113373
+381	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. Combatentes Grande Guerra	-8.2899442Â 	41.4427733
+382	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Lg. Republica do Brasil	-8.2905888 	41.4418171
+383	molok	5 m³	Ponte	Urbanização da fonte	-8.3344105	41.4792149
+384	molok	5 m³	Nespereira	Travessa da Alegria	-8.3187981	41.4115837
+385	molok	5 m³	São Torcato	Rua da Corredoura	-8.2550209	41.4754609
+386	bluebee	5 m³	Costa	Rua Rómulo de Carvalho	-8.2956513	41.4518242
+387	molok	5 m³	Ponte	Rua Monte do Carreiro	-8.3292076	41.4783019
+388	molok	5 m³	Ponte	Urbanização da Senra de Baixo	-8.3311013	41.4813814
+389	molok	5 m³	Ponte	Rua Monte do Rio	-8.3413806	41.4669954
+390	molok	5 m³	Ponte	Rua 1º de Dezembro	-8.3307628	41.4766246
+391	Greenbee	5 m³	Ponte	Urbanização São Germil	-8.3363603	41.479314
+392	molok	5 m³	Ponte	Rua Monte da Insua	-8.3417296	41.4767046
+393	molok	5 m³	Ponte	Rua S. Germil	-8.3377868	41.4792562
+394	molok	5 m³	Barco	Rua São Cláudio	-8.3361578	41.4953689
+395	molok	5 m³	Barco	Rua Nossa Senhora dos Remédios 	-8.3224555	41.4963515
+396	molok	5 m³	Serzedelo	Rua Torres Carneiro	-8.3795437	41.403992
+398	molok	5 m³	Ronfe	Rua do Covelo	-8.3958635	41.4346325
+399	molok	5 m³	Sande São Martinho	Nacional 101	-8.362320	41.494953
+400	molok	5 m³	Sande São Martinho	Rua da Escola	-8.3546443	41.4957577
+401	molok	5 m³	Sande São Martinho	Travessa dos Lameiros	-8.3525329	41.4997258
+402	molok	5 m³	Selho São Cristóvão	Rua de São João	-8.3477339	41.4233722
+403	molok	5 m³	Selho São Cristóvão	Rua da Muda	-8.347416	41.4246241
+404	molok	5 m³	Nespereira	Rua da Cruz	-8.320706	41.4085042
+405	molok	5 m³	Nespereira	Rua da Cruz	-8.3210476	41.4098298
+406	molok	5 m³	São Torcato	Rua Luís de Camões	-8.2575019	41.4910233
+407	molok	5 m³	UF Selho São Lourenço e Gomilhães	Rua António Gomes Marinho	-8.2788906	41.4680183
+408	molok	5 m³	Caldelas	rua nossa sr de fatima	-8.3392264	41.489713
+409	molok	5 m³	Selho São Cristóvão	Travessa de São João	-8.3482975	41.4233687
+410	molok	5 m³	Selho São Cristóvão	Rua do Pontido	-8.3449305	41.4217123
+411	molok	5 m³	Moreira de Cónegos	Rua Dona Laurinda Ferreir Magalhães	-8.3320402	41.3818981
+412	molok	5 m³	Moreira de Cónegos	Rua Dona Laurinda Ferreir Magalhães	-8.3315165	41.379866
+413	molok	5 m³	Moreira de Cónegos	Rua Dona Laurinda Ferreir Magalhães	-8.3296408	41.379622
+414	molok	5 m³	Moreira de Cónegos	Rua Padre Ezequiel	-8.3355745	41.3830868
+415	molok	5 m³	Moreira de Cónegos	Avenida Santa Marta	-8.3384409	41.3813419
+416	molok	5 m³	Azurém	Rua de São Pedro	-8.2937612	41.4566449
+417	molok	5 m³	Aldão	Rua Monte de Aldão	-8.2700311	41.4618003
+418	molok	5 m³	Ronfe	Travessa da Lourinha	-8.3816833	41.4298821
+419	molok	5 m³	Urgezes	Rua Francisco Santos Guimarães	-8.2955723	41.4305176
+420	molok	5 m³	Ponte	Rua Reitor Joaquim Augusto Maciel Ribeiro Torres	-8.3367946	41.4745371
+422	molok	5 m³	Creixomil	Rua de São Miguel	-8.3152369	41.4372597
+423	molok	5 m³	Creixomil	Rua Gilberto Pereira	-8.2961308	41.4207923
+424	molok	5 m³	Pinheiro	Rua 4 de Outubro	-8.3468427	41.4267259
+425	molok	5 m³	Selho São Jorge 	Rua Outeiro Levado	-8.2674498	41.4318594
+426	molok	5 m³	Penha		-8.2680904	41.4318051
+427	molok	5 m³	Penha	Rua cidade Guimarães	-8.2696451	41.4323088
+428	molok	5 m³	Penha		-8.2912647	41.4273723
+429	bluebee	5 m³	Urgezes	Rua da Maina	-8.2883071	41.4548297
+430	bluebee	5 m³	Azurém	Travessa do Seminário 	-8.2870049	41.4542588
+431	bluebee	5 m³	Azurém	Rua de Francos	-8.2677432	41.4306615
+432	molok	5 m³	Penha	Rua dos carvalhos	-8.2827202	41.4352453
+433	molok	5 m³	Costa	Rua S. Roque	-8.281306	41.4377161
+434	molok	5 m³	Costa	Rua S. Roque	-8.281306	41.4377161
+435	molok	5 m³	Costa	Rua da Ponte	-8.2810671	41.4389539
+436	molok	3 m³	Penha	Parque de Campismo	-8.2688749	41.4282817
+437	Greenbee	5 m³	Gandarela	Rua da Boucinha	-8.351365	41.3963558
+438	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Dr. João de Meira	-8.299855	41.4428429
+439	molok	5 m³	Penha		-8.2671634	41.4312848
+440	bluebee	5 m³	Azurém	Rua do Picoto	-8.2950794	41.4464955
+441	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Comendador Joaquim Sousa Oliveira	-8.2863066	41.4438069
+442	molok	5 m³	Ponte	Rua Insdustrial do Monte Carreira	-8.3299248	41.4759696
+443	molok	5 m³	Penha	Parque de Campismo	-8.2689752	41.4282791
+444	molok	5 m³	Costa	Rua de Vilar	-8.2780368	41.4369556
+446	molok	3 m³	Azurém	Rua da Arcela	-8.2788834	41.4536452
+447	molok	5 m³	Selho São Jorge	Rua Central	-8.3479451	41.4277949
+448	molok	5 m³	Selho São Jorge	Rua da Circunvalação	-8.3459702	41.433247
+449	molok	3 m³	Selho São Jorge	Rua Barreiro de cima	-8.3561811	41.4343998
+450	molok	5 m³	Selho São Jorge	Av. sociedade musical Pevidém	-8.35315	41.4232393
+451	molok	5 m³	Candoso S. Tiago	Rua S. Tiago	-8.3212084	41.4141473
+452	molok	5 m³	Candoso S. Tiago	Rua S. Tiago	-8.3208503	41.4161296
+453	molok	5 m³	Candoso S. Tiago	Rua S. Tiago	-8.3174855	41.4182151
+454	molok	5 m³	Candoso S. Tiago	Rua 25 de abril	-8.3171586	41.4195642
+455	molok	5 m³	Candoso S. Tiago	Rua Vista alegre	-8.3232736	41.4279682
+456	molok	5 m³	São Torcato	Urbanização Quinta do Peixoto	-8.2566887	41.473843
+457	molok	5 m³	SãoTorcato	Rua Dr. Francisco Fernandes	-8.2588037	41.4825287
+458	molok	5 m³	Polvoreira	Rua do Agueiro	-8.3059654	41.4162854
+459	molok	5 m³	Polvoreira	Rua Ribeiro da Ponte	-8.3084292	41.4125462
+460	molok	5 m³	Polvoreira	Rua Comandante João de Paiva Faria Leite Brandão	-8.2930428	41.4079154
+461	molok	5 m³	Guardizela	Rua Abílio José da Silva	-8.3698661	41.386317
+462	molok	5 m³	Ponte	Tv. Monte Insua	-8.3389474	41.4772405
+463	molok	5 m³	Ponte	Rua Castelões de baixo	-8.3299406	41.4666239
+464	molok	5 m³	Ponte	Rua do Campo Novo	-8.3332556	41.466998
+465	molok	5 m³	Ponte	Rua do Campo Novo	-8.3348143	41.4683763
+466	molok	5 m³	Ponte	Rua Monte do Rio	-8.341530	41.466989
+467	molok	5 m³	Candoso S. Martinho	Rua do Outeiro Levado	-8.3458328	41.425717
+468	molok	5 m³	Sande São Martinho	Rua dos Escalheiros	-8.354231	41.4847865
+469	molok	5 m³	Costa	Rua de Espariz	-8.2860767	41.4356195
+470	molok	5 m³	Costa	Rua de Santa Marinha da Costa	-8.2810941	41.4440656
+471	molok	5 m³	Abação	Rua de S. Tomé	-8.2670667	41.405745
+472	molok	5 m³	Abação	Rua do Cruzeiro	-8.2703976	41.4017689
+473	molok	5 m³	Serzedelo	Rua do Padrão	-8.3702825	41.4067087
+474	molok	5 m³	Serzedelo	Urb. do Carvalhal	-8.3801969	41.3973841
+476	molok	5 m³	Candoso S. Tiago	Rua Luís Loureiro	-8.3203985	41.4271051
+477	molok	5 m³	Caldelas	Rua de Sousa Costa	-8.3484458	41.490499
+478	molok	5 m³	Caldelas	Rua do Pinhel	-8.3425716	41.4899679
+479	molok	5 m³	Caldelas	Rua Eduardo Leite Faria Machado	-8.3410516	41.490903
+480	bluebee	5 m³	Creixomil	Rua Cruz de Pedra	-8.3025397	41.4376962
+481	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua da Caldeiroa	-8.2964375	41.4394929
+482	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Av. Conde Margaride	-8.2973977	41.4434579
+483	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua dos Bombeiros Voluntários/Francisco Agra	-8.2981434	41.4468892
+485	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua da Marcha Gualteriana	-8.2850679	41.4453219
+486	molok	5 m³	Polvoreira	Rua do Pedral	-8.3172826	41.4152737
+487	molok	5 m³	Caldelas	Travessa do Souto	-8.3491933	41.4939289
+488	molok	5 m³	Caldelas	Rua do Bacelo	-8.3462475	41.4917229
+489	molok	5 m³	Mesão Frio	Rua do Souto	-8.2655502	41.4512045
+490	molok	5 m³	Ronfe	Rua de São Miguel	-8.3918358	41.4301508
+491	molok	5 m³	Gondar	Urbanização da Igreja Matriz	-8.3703931	41.4200819
+492	Greenbee	5 m³	Urgezes	Av. D. João IV	-8.2946221	41.4354405
+493	Greenbee	5 m³	Silvares	Bairro da Santa Maria B	-8.3388364	41.4477547
+494	Greenbee	5 m³	Silvares	Bairro da Santa Maria B	-8.3400159	41.4477291
+495	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua D. Afonso Henriques/Caldeiroa	-8.2951944	41.440305
+496	Greenbee	5 m³	Aldão	Travessa de S. Mamede	-8.2730657	41.4654139
+497	Greenbee	5 m³	Aldão	Rua  Monte de Aldão	-8.2690102	41.4606265
+498	bluebee	5 m³	Costa	Rua das Tumbas	-8.2786516	41.4435533
+499	bluebee	5 m³	Costa	Rua Dom Cristovão Boaventura	-8.2852761	41.4474114
+500	Greenbee	5 m³	Ponte	Rua Reitor Joaquim Augusto Maciel Ribeiro Torres	-8.3373473	41.4723037
+501	molok	5 m³	Brito	Rua 10 de Junho	-8.3535324	41.453188
+502	molok	5 m³	Nespereira	Rua da Devezinha	-8.3215432	41.4114019
+503	molok	5 m³	Nespereira	Rua Padre José Ferreira Leite 	-8.321391	41.4129628
+504	molok	5 m³	Ponte	Urbanização são germil	-8.3371448	41.4813386
+505	molok	5 m³	Fermentões	Rua de Matadussos	-8.3066674	41.4545783
+506	molok	5 m³	Pinheiro	Rua Dom Nunes Alvares Pereira	-8.2847271	41.4207788
+507	molok	5 m³	Pinheiro	Rua Divino Salvador	-8.2841556	41.4138517
+508	molok	5 m³	Pinheiro	Rua do Bairro do Sol	-8.2907056	41.4157752
+509	molok	3 m³	Caldelas	Parque de Campismo	-8.3423954	41.483098
+510	molok	5 m³	Ponte	Rua da Boucinha 	-8.3375974	41.4692624
+511	molok	5 m³	Ponte	Rua dr. Carvalho ribeiro	-8.3394103	41.4562871
+512	molok	5 m³	Azurém	Barão Pimenta Machado	-8.2983849	41.4549616
+513	molok	5 m³	Polvoreira	Rua das Janelas	-8.3040603	41.4157445
+514	molok	5 m³	Brito	Rua Santa Helena	-8.3656289	41.4529053
+515	molok	5 m³	Azurém	Avenida da Universidade	-8.2946271	41.4508546
+516	molok	5 m³	Azurém	Rua da Dourada	-8.2858408	41.4528001
+517	molok	5 m³	Ponte	Rua do Pouve	-8.342195	41.465885
+518	molok	5 m³	Fermentões	Rua de Trandes	-8.3113396	41.4488229
+519	molok	5 m³	Lordelo	Avenida Professor Luís Machado	-8.3853701	41.3721457
+520	molok	5 m³	Guardizela	N310	-8.3700021	41.3943962
+521	molok	5 m³	UF Sande Vila Nova e Sande S. Clemente	Rua do Rio Ave	-8.3525842	41.4808568
+522	molok	5 m³	Sande São Martinho	Rua da Jafonsa	-8.3521391	41.4922979
+523	molok	5 m³	Silvares	Rua Santa Apolónia	-8.3278374	41.4415263
+524	Greenbee	5 m³	Silvares	Urb. Sta. Apolónia	-8.3262577	41.4417996
+525	molok	5 m³	Silvares	Rua Sta. Apolónia	-8.3257459	41.4463708
+526	molok	5 m³	Polvoreira	Rua Nossa Sra. do Rosário	-8.2981057	41.410078
+527	molok	5 m³	Polvoreira	Rua da Alegria	-8.2993081	41.4094515
+528	molok	5 m³	Mesão Frio	Rua João Paulo II	-8.2635183	41.4553505
+529	molok	5 m³	Mesão Frio	Rua Nossa Sra. de Fátima	-8.2626157	41.4544795
+530	molok	5 m³	Ronfe	Rua das Ermidas	-8.3869977	41.4418614
+531	molok	5 m³	Nespereira	Rua Narciso Pereira Mendes	-8.3108619	41.4180284
+532	molok	5 m³	Polvoreira	A seguir à rua das Emproas	-8.3090652	41.4097109
+533	molok	5 m³	UF Oliveira, São Paio, São Sebastião	Rua S. Dâmaso 	-8.2819556	41.4512325
+534	molok	5 m³	Caldelas	Rua do Pinhel	-8.3446988	41.4914968
+535	molok	5 m³	Caldelas	Viela do Alvite	-8.351478	41.4877527
+536	Greenbee	5 m³	Ponte	Rua do Campo Novo	-8.3317938	41.4656499
+537	molok	5 m³	Sande São Clemente	Rua Souto Novo	-8.3545102	41.4782071
+538	molok	5 m³	Nespereira	Rua visco. Paço	-8.325326	41.4077849
+539	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua S. Dâmaso 	-8.2842687	41.4506096
+540	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua S. Dâmaso 	-8.2859878	41.4500661
+541	bluebee	5 m³	Selho São Lourenço	Rua da Ponte	-8.27686	41.4681541
+542	molok	5 m³	São Torcato	Av. São Torcato Mártir	-8.2608137	41.484379
+543	molok	5 m³	Caldelas	Rua Custódio da Costa Ferreira Pinto	-8.3500191	41.4910344
+544	molok	5 m³	Azurém	Rua Barão de Pimenta Machado	-8.2988317	41.4555311
+545	molok	5 m³	Azurém	Rua Barão de Pimenta Machado	-8.2988357	41.4555115
+546	molok	5 m³	São Torcato	Rua Arquitecto Marques da Silva	-8.2603598	41.4801761
+547	molok	5 m³	Penselo	Rua Eng. Duarte Amaral 	-8.3049137	41.4700878
+548	molok	5 m³	Gandarela	Av. Santa Marta	-8.339284	41.386622
+549	molok	5 m³	Moreira de Cónegos	Rua Talegre	-8.3450516	41.374157
+550	molok	5 m³	Moreira de Cónegos	Rua Pereira	-8.344292	41.380254
+551	molok	5 m³	Moreira de Cónegos	Rua Comandante José Luís Almeida	-8.316173	41.3754383
+552	molok	5 m³	Polvoreira	Av. Padre Isac Araújo e Silva 	-8.305159	41.4079626
+553	molok	5 m³	Prazins Sto. Tirso	Rua da Liberdade	-8.3030925	41.487627
+554	Greenbee	5 m³	Penselo	Rua Nossa Sra. de Fátima	-8.2973398	41.4609053
+555	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Cães de Pedra	-8.29635	41.4378504
+556	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Cães de Pedra	-8.2975549	41.4379559
+557	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Cães de Pedra	-8.2987422	41.4376951
+558	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Mercadona	-8.2959561	41.4369769
+559	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Mercadona	-8.297045	41.4370651
+560	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Mercadona	-8.2981567	41.4370547
+561	bluebee	5 m³	Mesão Frio	Praça Polónia de Sacramento	-8.2784309	41.451413
+562	bluebee	5 m³	UF Oliveira, São Paio, São Sebastião	Rua Padre António Caldas	-8.2863453	41.4477159
+563	molok	5 m³	Prazins Sto. Tirso	Urbanização dos Novais 	-8.318707	41.483789
+564	molok	5 m³	Prazins Sto. Tirso	Rua São José	-8.3200077	41.4814752
+565	molok	5 m³	Prazins Sto. Tirso	Rua Arnaldo Borges 	-8.320996	41.482809
+566	molok	5 m³	Prazins Sto Tirso	Rua Nossa senhora do Rosário 	-8.3165559	41.4815051
+567	molok	5 m³	Corvite	Travessa Carreira de Baixo	-8.3281894	41.4771821
+568	molok	5 m³	Selho S. Jorge	Rua Bela Vista	-8.3541744	41.4342417
+569	molok	3 m³	Nespereira	N105	-8.3236176	41.4042642
+570	molok	5 m³	Pinheiro	Urbanização Quinta de Entre Vinhas	-8.2865837	41.426438
+571	molok	5 m³	Sande São Martinho	Rua da Ribeira	-8.3534415	41.489312
+572	bluebee	5 m³	Mesão Frio	Rua Nossa Sra. da Penha	-8.2804475	41.4517178
+573	molok	5 m³	Ponte	Urbanização do Rio	-8.3461933	41.4794466
+574	molok	5 m³	Ponte	Urbanização do Rio	-8.3455816	41.4799596
+575	bluebee	5 m³	Penselo	Rua Nossa Senhora de Fátima	-8.2967853	41.4606439
+576	Greenbee	5 m³	Atães	Rua Nossa Sra. da Guia	-8.250454	41.454252
+577	Greenbee	5 m³	Atães	Rua Nossa Sra. da Guia	-8.251834	41.45759
+578	molok	3 m³	Gondar	Rua da Liberdade	-8.3705142	41.4228922
+579	molok	5 m³	Serzedelo	Rua do Calvário	-8.3686228	41.399688
+580	Greenbee	5 m³	UF Oliveira, São Paio, São Sebastião	Bairro Leão XIII	-8.283005	41.450263
+581	Greenbee	5 m³	Azurém	Rua 24 de Junho	-8.287982	41.4570355
+582	Greenbee	5 m³	Azurém	Tv do Seminário	-8.2874914	41.4555861
+583	Greenbee	5 m³	Azurém	Rua Prof. Mário Menezes	-8.2869936	41.4558853
+584	molok 	5 m³	Briteiros 	Rua Nossa Senhora de Fátima	-8.331746961	41.5105018
+585	molok	5 m³	Penselo	Rua Engenheiro Duarte Amaral	-8.299309678	41.47132198
+586	molok	5 m³	Caldas das Taipas	Rua do Rio Ave	-8.350528137	41.48063748
+587	molok	5 m³	Mesão Frio	Rua Cruz da Argola 	-8.272628541	41.45434253
+588	molok	5 m³	Prazins Santo Tirso	Rua de S.José 	-8.3206398	41.4822376
+589	Greenbee	5 m³	Urgezes	Rua de S.Gualter	-8.2911534	41.4300463
+590	molok	5 m³	Costa 	Rua Dr. José Augusto Silva 	-8.2768302	41.4473534
+591	molok	5 m³	Serzedelo	Rua do Grupo Desportivo	-8.363886745	41.40628306
+592	bluebee	5 m³	Caldelas	Avenida da República	-8.344874991	41.48601192
+593	bluebee	5 m³	Caldelas	Avenida da República	-8.346938771	41.48582899
+594	bluebee	5 m³	Caldelas	Rua Dr. Alfredo Fernandes 	-8.342515	41.487526
+595	Greenbee	5 m³	Aldão	Rua 24 de Junho	-8.264822	41.462723
+596	Greenbee	5 m³	Aldão	Rua Nova da igreja	-8.2689843	41.4651218
+597	molok	5 m³	Barco	Rua do Reconco	-8.326458253	41.50052712
+598	molok	5 m³	Barco	Rua da Liberdade	-8.325321333	41.49674999
+599	bluebee	5 m³	Prazins Santa Eufémia 	Rua Engenheiro Duarte Amaral	-8.3151014	41.4883216
+600	bluebee	5 m³	Serzedelo	Rua Vinha da Portela	-8.361453581	41.40791141
+601	molok	5 m³	Serzedelo	Urbanização da Carvalheira 	-8.3673202	41.3956507
+602	bluebee	5 m³	Serzedelo	Rua Padre Manuel Dias Salgado	-8.3692538	41.4021031
+603	molok	5 m³	Selho São Jorge	Rua do Monte de Cima	-8.366569886	41.4279607
+604	bluebee	5 m³	Urgezes	Rua São Gualter	-8.290896462	41.43008162
+605	molok	5 m³	Souto Santa Maria	Rua de Santa Maria	-8.294706619	41.51743799
+606	molok	3 m³	Polvoreira	Rua de São João	-8.2992433	41.4189384
+607	molok	5 m³	Polvoreira 	Rua de S.Pedro	-8.297064648	41.4093134
+608	Greenbee	5 m³	Costa 	Rua Dr. José Augusto da Silva	-8.277731872	41.44529175
+609	Greenbee	5 m³	Sande Vila Nova 	Rua de Quebradas 	-8.35513722	41.47249869
+610	molok	5 m³	S.Torcato	Rua Pedro Homem de Melo	-8.26753135582152	41.47959594916582
+611	molok	5 m³	Selho S.Jorge	Rua do Carvalho do Moinho	 -8.35556417274362	41.42019783184269
+612	bluebee	5 m³	Urgezes	Rua António Da Costa Guimarães	 -8.299589812908442	41.43237763212662
+613	molok	3 m³	São Martinho de Candoso	Rua de São Martinho	-8.333973009535292	41.42545250971427
+614	bluebee	5 m³	Caldelas 	Avenida da República	-8.3450798	41.4859838

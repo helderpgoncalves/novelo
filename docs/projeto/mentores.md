@@ -186,7 +186,7 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 | 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
 | 2 | **Plano municipal:** qual o documento e a página de onde vêm 5,4% de têxtil no indiferenciado, 0,7 kg/hab/mês e "4 de 27 operadores"? | A fonte pública não foi encontrada (A8, A10, A11) | Passam de "por verificar" a "verificado"; entram (ou não) em slide |
 | 3 | **Texto das Regras**: detalhe de cada um dos quatro critérios, duração do pitch, formato da demo e das perguntas, e quem avalia. Ver a [pergunta comum](#pergunta-comum-às-regras-e-ao-formato). | Os pesos são públicos (E4); o detalhe não (E6, M16) | Afinamos o guião e o tempo |
-| 4 | **Contentores:** formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | Chegam amanhã; formato desconhecido | ETL tolerante e cobertura prontas; decidimos o tratamento de "sem tipo" |
+| 4 | **Contentores de têxteis:** onde está a lista, formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | A 20 de outubro chegou só o inventário **municipal** (outras frações), não o de têxteis | ETL de têxteis (`containers.py`) pronto; decidimos o tratamento de "sem tipo" |
 | 5 | **Depósito:** de onde saem os circuitos e onde se descarrega? | O VRP assume o centro de Guimarães | Parametrizamos o ponto de partida |
 | 6 | **Preço por fração** e contratos (Ultriplo, H Sarah, Nova Etapa): quanto recebem por reutilização, reciclagem e quanto custa o rejeito? | A receita é pressuposto | Receita real no €/t e na sensibilidade |
 | 7 | **Rejeito:** como foi medida a amostra de 5,6 t e os 56,9% de rejeito da Vitrus? | Distorce o destino observado | Etiqueta metodológica e eventual calibração |
@@ -199,6 +199,18 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 | 14 | Que **KPI** usam hoje para o custo por tonelada de têxtil? | Falar na linguagem deles | Alinhamos definições (custo total vs marginal) |
 | 15 | Podemos **usar o nome da Vitrus e os dados** em slides, demo e relatório? Há algo confidencial? | Evitar problemas no dia 26 | Marcamos o que se pode mostrar |
 | 16 | O que considerariam **sucesso** deste desafio, e o que levaria a Vitrus a pilotar? | Perceber o pedido final | Ajustamos o "pedido" do pitch |
+
+**Perguntas sobre o pacote QGIS municipal de 20 de outubro** (não é de têxteis; detalhe em [Análise dos contentores municipais](../dados/analise-contentores-municipais.md)):
+
+| # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
+| --- | --- | --- | --- |
+| 17 | **Lista de contentores de têxteis:** quando chega e em que formato? | O pacote só traz as outras frações | Ligamos a rede de têxteis e comparamos com os locais municipais |
+| 18 | **Que fração é cada ficheiro?** Profundidade e Superfície são indiferenciado, recicláveis ou misto? **Quais são os ecopontos de recicláveis** (vidro, papel, embalagens)? | Os ficheiros não dizem; `stream = desconhecido` em 1 386 contentores | Escolhemos candidatos a têxteis junto de ecopontos reais |
+| 19 | **Frequência de recolha** e custo por esvaziamento (enterrado vs superfície) | Estimar o ganho de pôr têxtil nos mesmos locais | Custo de recolha por modo no simulador |
+| 20 | O que é uma **"plataforma"** e o que quer dizer a `Quantidade` dos resíduos verdes? | 2 e 46 linhas ambíguas | Corrigimos a contagem de unidades |
+| 21 | As freguesias **Lordelo, Infantas, Tabuadelo e São Faustino, Serzedo e Calvos** estão completas no inventário? | Têm 2,0 a 4,0 contentores por 1 000 hab., contra 17,4 no concelho | Distinguimos "sem dados" de "sem contentores" |
+| 22 | **Capacidade da Tipologia** em litros? Os 10 L são 110 L? **Data** do inventário e versão da **CAOP** a usar? | Unidade assumida; projeto QGIS de maio de 2025 | Confirmamos as capacidades e o código das 5 uniões |
+| 23 | Podemos usar o **nome dos produtores** (hotelaria, lares, grandes produtores) no mapa? Há contacto B2B? | São estabelecimentos privados | Camada de produtores só com agregados por omissão |
 
 ### Lucas: perguntas que sobem a nota
 
