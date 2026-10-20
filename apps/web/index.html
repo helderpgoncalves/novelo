@@ -13,6 +13,14 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="description" content="Novelo: recolha seletiva de têxteis de Guimarães, desenhada ao menor custo." />
     <title>Novelo</title>
+    <style>
+      html { background: #f4f1ea; }
+      html.dark { background: #0f1815; }
+      .boot-splash { display: flex; min-height: 100dvh; align-items: center; justify-content: center; }
+      .boot-splash-mark { animation: boot-pulse 1.6s ease-in-out infinite; }
+      @keyframes boot-pulse { 0%,100% { opacity: .55; transform: scale(.96); } 50% { opacity: 1; transform: scale(1); } }
+      @media (prefers-reduced-motion: reduce) { .boot-splash-mark { animation: none; } }
+    </style>
   </head>
   <body>
     <script>
@@ -25,7 +33,7 @@
         } catch (e) {}
       })();
     </script>
-    <div id="root"></div>
+    <div id="root"><div class="boot-splash" role="status" aria-label="A carregar"><svg class="boot-splash-mark" viewBox="-512 -512 1024 1024" width="56" height="56" aria-hidden="true"><path d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10" fill="none" stroke="#A9C2B7" stroke-width="56" stroke-linecap="round"/><path d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71" fill="none" stroke="#2E6B57" stroke-width="56" stroke-linecap="round"/><path d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32" fill="none" stroke="#C4A06A" stroke-width="56" stroke-linecap="round"/><circle r="92" fill="#14211D"/><circle r="38" fill="#F4F1EA"/></svg></div></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

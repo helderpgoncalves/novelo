@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
+import { BootSplash } from '@/components/app-loading';
 import { BrandLogo, BrandSymbol } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -13,6 +14,9 @@ export const Route = createFileRoute('/_auth')({
       .catch(() => null);
     if (user) throw redirect({ to: '/' });
   },
+  pendingComponent: BootSplash,
+  pendingMs: 0,
+  pendingMinMs: 0,
   component: AuthLayout,
 });
 
