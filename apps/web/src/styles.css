@@ -678,11 +678,11 @@ html[data-tab-hidden] :is(.brand-arc, .brand-dot, .ptr-arc, .ptr-svg, .brand-dri
   }
 }
 
-/* ---------- Landing: navegação e microinterações ---------- */
+/* ---------- Landing: navegação, tipografia e microinterações ---------- */
 
-/* Altura estável do topo da landing (sem CLS): barra + zona segura (notch, Dynamic Island). Âncoras e rolagem usam-na. */
 html:has([data-landing]) {
   --nav-h: calc(3.5rem + env(safe-area-inset-top));
+  --lp-mono: 'Geist Mono Landing', ui-monospace, 'SF Mono', Menlo, monospace;
   scroll-padding-top: calc(var(--nav-h) + 0.5rem);
 }
 @media (min-width: 1024px) {
@@ -719,33 +719,37 @@ html:has([data-landing]) {
   }
 }
 
-/* Topo: transparente sobre o hero; ao rolar ganha fundo, desfoque e um fio. Esconde ao descer (< lg) e volta ao subir. */
+/* Topo: vidro translúcido desde o início (as ligações leem-se sobre a fotografia) e mais denso ao rolar, com um fio.
+   Esconde ao descer (< lg) e volta ao subir. */
 .lp-header {
-  background: transparent;
+  background: color-mix(in oklab, var(--background) 86%, transparent);
   border-bottom: 1px solid transparent;
   transition:
     transform 320ms var(--ease-out),
     background-color 240ms ease,
-    border-color 240ms ease,
-    box-shadow 240ms ease;
+    border-color 240ms ease;
 }
 .lp-header[data-scrolled='true'] {
   background: color-mix(in oklab, var(--background) 94%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--border) 80%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--border) 85%, transparent);
 }
-@supports (backdrop-filter: blur(1px)) {
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .lp-header {
+    background: color-mix(in oklab, var(--background) 58%, transparent);
+    -webkit-backdrop-filter: saturate(1.5) blur(10px);
+    backdrop-filter: saturate(1.5) blur(10px);
+  }
   .lp-header[data-scrolled='true'] {
-    background: color-mix(in oklab, var(--background) 72%, transparent);
-    -webkit-backdrop-filter: saturate(1.6) blur(14px);
-    backdrop-filter: saturate(1.6) blur(14px);
+    background: color-mix(in oklab, var(--background) 80%, transparent);
   }
 }
 .lp-header[data-hidden='true'] {
   transform: translateY(-101%);
 }
 
-/* Pílula deslizante do separador ativo. */
+/* Pílula deslizante da secção ativa: fundo suave e um traço de 2 px na base. */
 .lp-pill {
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
   transform: translateX(var(--pill-x, 0)) scale(var(--pill-s, 1));
   width: var(--pill-w, 0);
   opacity: var(--pill-o, 0);
@@ -753,6 +757,14 @@ html:has([data-landing]) {
     transform 380ms var(--ease-spring),
     width 380ms var(--ease-spring),
     opacity 200ms ease;
+}
+.lp-pill::after {
+  content: '';
+  position: absolute;
+  inset: auto 1rem 0.2rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--primary);
 }
 
 /* Logótipo: os arcos rodam suavemente ao passar o rato ou focar (nunca em ciclo). */
@@ -824,6 +836,103 @@ html:has([data-landing]) {
   transition: none;
 }
 
+/* «Nesta página» (≥ 1536 px): coluna fixa alinhada com a margem do conteúdo, só depois do hero, com progresso de leitura. */
+.lp-toc {
+  display: none;
+  position: fixed;
+  z-index: 30;
+  top: 50%;
+  left: max(1rem, calc((100vw - 72rem) / 2 - 8.5rem));
+  width: 9.5rem;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 320ms ease;
+}
+@media (min-width: 1536px) {
+  .lp-toc {
+    display: block;
+  }
+}
+.lp-toc[data-shown='true'] {
+  opacity: 1;
+  pointer-events: auto;
+}
+.lp-toc-title {
+  margin-bottom: 0.875rem;
+  font: 500 11px/1 var(--lp-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.lp-toc-rail {
+  position: relative;
+  border-left: 1px solid var(--border);
+  padding-left: 1rem;
+}
+.lp-toc-fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -1px;
+  width: 1px;
+  background: var(--primary);
+  transform-origin: top;
+  transform: scaleY(var(--read, 0));
+}
+.lp-toc ol {
+  display: flex;
+  flex-direction: column;
+}
+.lp-toc li {
+  position: relative;
+}
+.lp-toc a {
+  display: flex;
+  align-items: baseline;
+  gap: 0.625rem;
+  min-height: 2.25rem;
+  padding-block: 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.8125rem;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+  outline: none;
+  transition: color 200ms ease;
+}
+.lp-toc a span {
+  font: 500 10px/1 var(--lp-mono);
+  letter-spacing: 0.06em;
+  opacity: 0.8;
+}
+.lp-toc a:hover,
+.lp-toc a:focus-visible {
+  color: var(--foreground);
+}
+.lp-toc a:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
+}
+.lp-toc a[aria-current='location'] {
+  color: var(--foreground);
+  font-weight: 500;
+}
+.lp-toc a[aria-current='location'] span {
+  color: var(--primary);
+  opacity: 1;
+}
+.lp-toc a[aria-current='location']::before {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 50%;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--background);
+  transform: translate(-50%, -50%);
+}
+
 /* Cartões da landing: sobem 2 px ao passar o rato (só com rato) e afundam ao premir. */
 .lp-card {
   transition:
@@ -833,9 +942,9 @@ html:has([data-landing]) {
 }
 @media (hover: hover) {
   .lp-card:hover {
-    transform: translateY(-2px);
-    border-color: color-mix(in oklab, var(--primary) 38%, var(--border));
-    box-shadow: 0 10px 28px -16px color-mix(in oklab, var(--foreground) 35%, transparent);
+    transform: translateY(-3px);
+    border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+    box-shadow: 0 18px 40px -24px color-mix(in oklab, var(--foreground) 45%, transparent);
   }
 }
 .lp-card:active {
@@ -856,16 +965,305 @@ html:has([data-landing]) {
   contain-intrinsic-size: auto 720px;
 }
 
-/* Entrada do visual do hero (só opacidade e transform; o texto nunca anima, por causa do LCP). */
+/* Tipografia de secção: número editorial, etiqueta mono e três tamanhos de título. */
+.lp-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font: 500 11.5px/1 var(--lp-mono);
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.lp-eyebrow-n {
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--border);
+  color: var(--muted-foreground);
+}
+.lp-kicker,
+html:has([data-lp-fonts]) .lp-kicker {
+  font: 500 11.5px/1.3 var(--lp-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.lp-h-xl {
+  font-size: clamp(2.5rem, 1.4rem + 4.4vw, 4.75rem);
+  line-height: 1.02;
+  letter-spacing: -0.028em;
+}
+.lp-h-md {
+  font-size: clamp(1.875rem, 1.3rem + 2.2vw, 3rem);
+  line-height: 1.08;
+}
+.lp-bignum {
+  font-size: clamp(4.75rem, 2.5rem + 11vw, 9rem);
+  letter-spacing: -0.04em;
+}
+
+/* Barras de leitura: cheia = medido; ponteado (meio-tom) = estimativa; o traço da marca em meio-tom. */
+.lp-dotbar {
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 12%, transparent);
+}
+.lp-dotbar > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--primary);
+}
+.lp-dotbar-lg {
+  height: 1.125rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+  background:
+    repeating-linear-gradient(
+      90deg,
+      transparent 0 calc(10% - 1px),
+      color-mix(in oklab, var(--foreground) 16%, transparent) calc(10% - 1px) 10%
+    ),
+    transparent;
+}
+.lp-dotbar-lg > span,
+.lp-dotfill {
+  background:
+    radial-gradient(circle, var(--primary) 1.35px, transparent 1.9px) 0 0 / 5px 5px,
+    color-mix(in oklab, var(--primary) 20%, transparent);
+}
+.lp-dotbar-lg > span {
+  border-right: 2px solid var(--primary);
+  border-radius: 0;
+}
+
+/* Instrumento: LED, cursor da meta (losango e fio em Areia). */
+.lp-led {
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 50%, transparent);
+  animation: lp-pulse 2.4s ease-out infinite;
+}
+@keyframes lp-pulse {
+  70%,
+  100% {
+    box-shadow: 0 0 0 7px transparent;
+  }
+}
+.lp-cursor {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  background: var(--areia, #c4a06a);
+  pointer-events: none;
+}
+.lp-cursor::before {
+  content: '';
+  position: absolute;
+  top: -5px;
+  left: 50%;
+  width: 9px;
+  height: 9px;
+  background: inherit;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+/* Método: fio SVG entre os cinco passos (horizontal, ≥ lg) e fio por segmentos em telemóvel. */
+.lp-dotgrid {
+  position: relative;
+  isolation: isolate;
+}
+.lp-dotgrid::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(color-mix(in oklab, var(--foreground) 16%, transparent) 1px, transparent 1.5px) 0 0 / 22px 22px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 55% at 50% 22%, #000, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 55% at 50% 22%, #000, transparent 75%);
+}
+.lp-thread {
+  display: none;
+  position: absolute;
+  pointer-events: none;
+}
+.lp-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  column-gap: 1.25rem;
+}
+.lp-node-tile {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  background: var(--card);
+  color: var(--primary);
+}
+.lp-node-tile-on {
+  border-color: var(--primary);
+  background: color-mix(in oklab, var(--primary) 10%, var(--card));
+}
+.lp-node-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+  padding-top: 0.125rem;
+}
+.lp-node:not(:last-child)::before,
+.lp-node:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(2rem - 1px);
+  top: 4rem;
+  bottom: -2.25rem;
+  width: 2px;
+  background: var(--border);
+}
+.lp-node:not(:last-child)::after {
+  background: var(--primary);
+  transform-origin: top;
+}
+@media (min-width: 1024px) {
+  .lp-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .lp-node:not(:last-child)::before,
+  .lp-node:not(:last-child)::after {
+    display: none;
+  }
+  .lp-node-text {
+    align-items: center;
+    padding-top: 1.25rem;
+    text-align: center;
+  }
+  .lp-thread-h {
+    display: block;
+    left: calc((100% - 6rem) / 10);
+    width: calc(100% - (100% - 6rem) / 5);
+    top: calc(2rem - 1px);
+    height: 2px;
+  }
+}
+
+/* Linha do tempo (próximos passos): um segmento por passo, que se desenha em sequência. */
+.lp-timeline > li:not(:last-child)::before,
+.lp-timeline > li:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: calc(1.125rem - 1px);
+  top: 2.25rem;
+  bottom: -2rem;
+  width: 2px;
+  background: var(--border);
+}
+.lp-timeline > li:not(:last-child)::after {
+  background: var(--primary);
+  transform-origin: top;
+}
+.lp-aud {
+  transition: border-color 200ms ease;
+}
+
+.lp-rule::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 1px;
+  background: var(--border);
+  transform-origin: left;
+}
+
+/* Entrada ao rolar (só opacidade e transform; ver features/landing/reveal.ts). Cada bloco `[data-reveal]` abaixo da dobra
+   começa escondido e «assenta» ao entrar; `data-fx` escolhe o gesto: (nenhum) sobe o bloco, `scale` assenta um painel, `stagger`
+   deixa o bloco quieto e entram os filhos `[data-s]` em escada (`--i`). Dentro de qualquer bloco: traços SVG `[data-draw]` que se
+   desenham, `.lp-grow` (barras), `.lp-rule` (fios) e linhas do tempo. Depois da entrada passa a `done` e o CSS larga tudo. */
 @media (prefers-reduced-motion: no-preference) {
+  [data-reveal='hidden'][data-fx='scale'] {
+    opacity: 0;
+    transform: translateY(26px) scale(0.975);
+  }
+  [data-reveal='shown'][data-fx='scale'] {
+    transition:
+      opacity 700ms var(--ease-out),
+      transform 900ms var(--ease-out);
+  }
+  [data-reveal][data-fx='stagger'] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  [data-reveal='hidden'][data-fx='stagger'] [data-s] {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  [data-reveal='shown'][data-fx='stagger'] [data-s] {
+    transition:
+      opacity 600ms var(--ease-out) calc(var(--i, 0) * 80ms),
+      transform 760ms var(--ease-out) calc(var(--i, 0) * 80ms);
+  }
+  [data-reveal='hidden'] [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+  }
+  [data-reveal='shown'] [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 1600ms var(--ease-out) 250ms;
+  }
+  [data-reveal='hidden'] .lp-grow {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  [data-reveal='shown'] .lp-grow {
+    transform-origin: left;
+    transition: transform 1100ms var(--ease-out) calc(300ms + var(--i, 0) * 120ms);
+  }
+  [data-reveal='hidden'] .lp-dotbar > span {
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+  [data-reveal='shown'] .lp-dotbar > span {
+    transform-origin: left;
+    transition: transform 1300ms var(--ease-out) 250ms;
+  }
+  [data-reveal='hidden'] .lp-rule::before {
+    transform: scaleX(0);
+  }
+  [data-reveal='shown'] .lp-rule::before {
+    transition: transform 1000ms var(--ease-out) calc(150ms + var(--i, 0) * 100ms);
+  }
+  [data-reveal='hidden'] .lp-node:not(:last-child)::after {
+    transform: scaleY(0);
+  }
+  [data-reveal='shown'] .lp-node:not(:last-child)::after {
+    transition: transform 700ms var(--ease-out) calc(300ms + var(--i, 0) * 450ms);
+  }
+  [data-reveal='hidden'] .lp-timeline > li:not(:last-child)::after {
+    transform: scaleY(0);
+  }
+  [data-reveal='shown'] .lp-timeline > li:not(:last-child)::after {
+    transition: transform 800ms var(--ease-out) calc(400ms + var(--i, 0) * 500ms);
+  }
+  /* Entrada do visual do hero (só opacidade e transform; o texto nunca anima, por causa do LCP). */
   @keyframes lp-rise {
     from {
       opacity: 0;
       transform: translateY(14px);
     }
-  }
-  .lp-rise {
-    animation: lp-rise 800ms var(--ease-out) 120ms both;
   }
   @keyframes lp-hint {
     0%,
@@ -897,10 +1295,7 @@ html:has([data-landing]) {
   .lp-draw[data-in='true'] [data-fade] {
     opacity: 1;
   }
-}
-
-/* Cursor de escrita do Copiloto. */
-@media (prefers-reduced-motion: no-preference) {
+  /* Cursor de escrita do Copiloto. */
   @keyframes lp-caret {
     50% {
       opacity: 0;
@@ -950,13 +1345,10 @@ body:has([data-landing]) {
 .photo-dark.photo-bg::before {
   mix-blend-mode: screen;
 }
-/* Cartões em destaque (fábrica têxtil, Couros): a fotografia só aparece num canto, por baixo do texto, a dissolver-se no cartão. Ancorada no canto superior direito, onde o cartão tem menos texto. */
-.photo-fabrica,
-.photo-couros {
+/* Cartão em destaque (fábrica têxtil): a fotografia só aparece num canto, por baixo do texto, a dissolver-se no cartão. */
+.photo-fabrica {
   --photo-mask: radial-gradient(120% 110% at 100% 0%, #000 18%, transparent 68%);
   --photo-o: 0.5;
-}
-.photo-fabrica {
   --photo-pos: center 30%;
 }
 /* CTA final (Plataforma das Artes, só em escuro): à direita; em telemóvel por baixo do texto. */
@@ -1002,9 +1394,11 @@ body:has([data-landing]) {
 /* ---------- Hero: a Penha ao fim do dia ----------
    Dois arranjos, com as mesmas condições de media que as fontes do <picture> (landing-assets.generated.ts):
    - empilhado (telemóvel e tablet de pé): a fotografia 4:5 (pico em foco) enche o primeiro ecrã e o texto fica na metade de
-     baixo, ao alcance do polegar. O véu (`.lp-hs-copy::before`) nasce 5,5 rem acima da primeira linha e só cobre o texto, por
-     isso o pico e as encostas por cima ficam vivos e o encontro com o papel é um degradé curto, sem lavar a imagem;
-   - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura, texto à esquerda sobre o céu. */
+     baixo, ao alcance do polegar. O véu (`.lp-hs-inner::before`) nasce 5,5 rem acima da primeira linha e só cobre o texto e a
+     prova, por isso o pico e as encostas por cima ficam vivos e o encontro com o papel é um degradé curto;
+   - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura e grelha de 12 colunas: título (7 colunas, três
+     linhas), prova em faixa fina por baixo e, a partir de 1024 px, o cartão de leitura no canto do céu (o campanário fica livre).
+     O véu passa a uma mancha suave só atrás do texto. */
 .lp-hs {
   --hs-sky: var(--hero-sky-light, #f4ead9);
   position: relative;
@@ -1022,7 +1416,6 @@ body:has([data-landing]) {
 .dark .lp-hs {
   --hs-sky: var(--hero-sky-dark, #2a2c21);
 }
-/* Empilhado: a fotografia 4:5 vai à largura do ecrã e sobe/desce para o pico (29 % da altura) ficar logo abaixo da barra. */
 .lp-hs-media {
   position: absolute;
   z-index: -1;
@@ -1034,40 +1427,23 @@ body:has([data-landing]) {
 .lp-hs-media img {
   object-position: 50% 0%;
 }
-.lp-hs-proof-card,
+.lp-hs-card,
 .lp-hs-hint {
   display: none;
 }
 .lp-hs-inner {
+  position: relative;
   display: flex;
   flex: 1;
   flex-direction: column;
   justify-content: flex-end;
+  gap: 1.25rem;
 }
-.lp-hs-copy {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: 0.875rem;
-}
-.lp-hs-copy > * {
-  max-width: 36rem;
-}
-.lp-hs-eyebrow {
-  letter-spacing: 0.1em;
-  font-size: 10px;
-}
-@media (min-width: 900px) {
-  .lp-hs-eyebrow {
-    letter-spacing: 0.18em;
-    font-size: 11px;
-  }
-}
-.lp-hs-copy::before {
+.lp-hs-inner::before {
   content: '';
   position: absolute;
   z-index: -1;
-  inset: -5.5rem auto -2rem 50%;
+  inset: -5.5rem auto -3rem 50%;
   width: 100vw;
   transform: translateX(-50%);
   pointer-events: none;
@@ -1079,50 +1455,144 @@ body:has([data-landing]) {
     var(--background) 5.5rem
   );
 }
+.lp-hs-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.lp-hs-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font: 500 10px/1.3 var(--lp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+.lp-hs-eyebrow::before {
+  content: '';
+  flex: none;
+  width: 1.5rem;
+  height: 1px;
+  background: currentColor;
+}
+@media (min-width: 900px) {
+  .lp-hs-eyebrow {
+    font-size: 11.5px;
+    letter-spacing: 0.16em;
+  }
+}
 .lp-hs-title {
   font-size: clamp(2.25rem, 0.8rem + 6.2vw, 3.5rem);
   line-height: 1.02;
-  letter-spacing: -0.028em;
+  letter-spacing: -0.032em;
   text-wrap: balance;
 }
 .lp-hs-lead {
-  font-size: clamp(0.9375rem, 0.85rem + 0.5vw, 1.125rem);
-  line-height: 1.45;
+  max-width: 34rem;
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.1875rem);
+  line-height: 1.5;
   text-wrap: pretty;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
 }
 .lp-hs-ctas {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
   gap: 0.25rem;
   padding-top: 0.375rem;
 }
-.lp-hs-links {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  column-gap: 1.5rem;
-}
-.lp-hs-links a {
+.lp-hs-link {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   min-height: 2.75rem;
-  padding-inline: 0.25rem;
+  padding-inline: 0.5rem;
+  border-radius: 0.375rem;
   font-weight: 500;
   font-size: 0.9375rem;
   color: var(--foreground);
   text-decoration: underline;
   text-decoration-color: color-mix(in oklab, var(--foreground) 30%, transparent);
   text-underline-offset: 0.3em;
-  border-radius: 0.25rem;
 }
-.lp-hs-links a:hover {
+.lp-hs-link:hover {
   text-decoration-color: currentColor;
 }
-.lp-hs-proof-line {
-  margin-top: 0.125rem;
-  padding-top: 0.75rem;
-  border-top: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+/* Prova: três números reais em faixa fina, cada um com a fonte. */
+.lp-hs-strip {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border-top: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent);
+  padding-top: 0.875rem;
+}
+.lp-hs-fact {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  padding-inline: 0.75rem;
+  border-left: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+}
+.lp-hs-fact:first-child {
+  padding-left: 0;
+  border-left: 0;
+}
+.lp-hs-fact-v {
+  order: 1;
+  font-family: 'Newsreader Display', 'Newsreader', Georgia, serif;
+  font-size: clamp(1.25rem, 1rem + 1.2vw, 1.5rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+.lp-hs-fact-l {
+  order: 2;
+  font: 400 10px/1.35 var(--lp-mono);
+  letter-spacing: 0.02em;
+  color: color-mix(in oklab, var(--foreground) 86%, transparent);
+}
+.lp-hs-est {
+  display: table;
+  margin: 0.25rem 0 0;
+}
+.lp-hs-fact-s {
+  display: none;
+  order: 3;
+  font: 400 10px/1.3 var(--lp-mono);
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+}
+/* Cartão de leitura: só o número e a barra. */
+.lp-hs-card {
+  padding: 1.5rem;
+  border: 1px solid color-mix(in oklab, var(--border) 90%, transparent);
+  border-radius: 1.375rem;
+  background: color-mix(in oklab, var(--card) 88%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+}
+.lp-hs-hint {
+  position: absolute;
+  z-index: 10;
+  left: 50%;
+  bottom: 1.5rem;
+  transform: translateX(-50%);
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.5rem 0.875rem;
+  min-height: 2.25rem;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--background) 80%, transparent);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font: 400 11px/1 var(--lp-mono);
+  color: var(--foreground);
+  outline: none;
+}
+.lp-hs-hint:focus-visible {
+  box-shadow: 0 0 0 2px var(--ring);
 }
 /* Chegada escalonada do que está por baixo do título (só opacidade e transform; o título e o subtítulo não animam: LCP). */
 @media (prefers-reduced-motion: no-preference) {
@@ -1132,27 +1602,44 @@ body:has([data-landing]) {
 }
 @media (min-width: 640px) {
   .lp-hs {
+    min-height: min(100svh, 46rem);
     padding-top: calc(var(--nav-h) + 12rem);
   }
   .lp-hs-title {
-    font-size: clamp(3.25rem, 1.8rem + 3.8vw, 4.75rem);
+    font-size: clamp(3.25rem, 1.8rem + 3.8vw, 4.5rem);
   }
   .lp-hs-lead {
-    font-size: 1.25rem;
+    font-size: 1.1875rem;
   }
   .lp-hs-ctas {
     flex-direction: row;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0.5rem 1.25rem;
+    gap: 0.5rem 1.5rem;
+  }
+  .lp-hs-fact-v {
+    font-size: 2rem;
+  }
+  .lp-hs-fact-l {
+    font-size: 11px;
+  }
+  .lp-hs-fact-s {
+    display: block;
+  }
+  .lp-hs-est {
+    display: inline-flex;
+    margin: 0 0 0 0.5rem;
+  }
+  .lp-hs-fact {
+    padding-inline: 1.5rem;
   }
 }
 @media (min-width: 640px) and (min-aspect-ratio: 6/5) {
   .lp-hs {
-    justify-content: center;
-    min-height: clamp(30rem, 100svh, 60rem);
-    padding-top: calc(var(--nav-h) + clamp(1.25rem, 5svh, 3.5rem));
-    padding-bottom: clamp(2rem, 7svh, 4.5rem);
+    justify-content: flex-start;
+    min-height: clamp(32rem, 100svh, 60rem);
+    padding-top: calc(var(--nav-h) + clamp(1.5rem, 12svh, 7rem));
+    padding-bottom: clamp(2rem, 6svh, 4rem);
   }
   /* Névoa final: a base da fotografia dissolve-se no papel da secção seguinte. */
   .lp-hs::after {
@@ -1170,102 +1657,85 @@ body:has([data-landing]) {
   .lp-hs-media img {
     object-position: 62% 0%;
   }
+  .lp-hs-inner {
+    display: grid;
+    flex: none;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: 1.5rem;
+    row-gap: clamp(1.5rem, 5svh, 3.25rem);
+    align-content: start;
+  }
+  /* Véu: uma mancha suave só atrás do texto (nunca uma faixa), com o tom do papel do tema. */
+  .lp-hs-inner::before {
+    inset: -5rem auto -5rem calc(50% - 50vw);
+    width: min(86vw, 72rem);
+    transform: none;
+    background: radial-gradient(
+      ellipse 66% 72% at 36% 52%,
+      color-mix(in oklab, var(--background) 82%, transparent) 0,
+      color-mix(in oklab, var(--background) 66%, transparent) 55%,
+      transparent 100%
+    );
+  }
   .lp-hs-copy {
-    max-width: min(44%, 33rem);
+    grid-column: 1 / 9;
     gap: clamp(0.75rem, 2.2svh, 1.5rem);
   }
-  .lp-hs-copy > * {
-    max-width: none;
-  }
-  .lp-hs-copy::before {
-    display: none;
-  }
   .lp-hs-title {
-    font-size: clamp(2rem, min(3.4vw + 0.6rem, 6.6svh + 0.6rem), 4.25rem);
+    font-size: clamp(2rem, min(4.3vw, 8.2svh), 4.5rem);
   }
   .lp-hs-lead {
-    font-size: clamp(1rem, min(1.2vw + 0.35rem, 2.6svh + 0.35rem), 1.25rem);
+    font-size: clamp(1rem, min(1.3vw, 2.6svh), 1.25rem);
   }
-  .lp-hs-note {
-    display: none;
-  }
-  .lp-hs-links {
+  .lp-hs-ctas {
     justify-content: flex-start;
   }
-  .lp-hs-inner {
+  .lp-hs-link {
     justify-content: flex-start;
+  }
+  .lp-hs-strip {
+    grid-column: 1 / 8;
+    grid-row: 2;
+    padding: 1rem 1.25rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+    border-radius: 1.125rem;
+    background: color-mix(in oklab, var(--background) 62%, transparent);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
+  .lp-hs-fact {
+    padding-inline: 1.25rem;
+  }
+  .lp-hs-fact:first-child {
+    padding-left: 0;
   }
 }
-/* Ecrã largo e alto: cartão com o número, no céu do canto superior direito (deixa o campanário da Penha e a floresta livres), e dica de rolagem. */
+/* Ecrã largo e alto: cartão de leitura no céu do canto superior direito (deixa o campanário da Penha e a floresta livres) e dica de rolagem. */
 @media (min-width: 1024px) and (min-aspect-ratio: 6/5) {
-  .lp-hs-inner {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-  }
   .lp-hs-copy {
-    align-self: flex-start;
+    grid-column: 1 / 8;
   }
-  .lp-hs-proof-card {
+  .lp-hs-card {
     display: block;
-    align-self: flex-start;
-  }
-  .lp-hs-proof-line {
-    display: none;
+    grid-column: 9 / 13;
+    grid-row: 1;
+    align-self: start;
+    justify-self: end;
+    width: 100%;
+    max-width: 17.5rem;
   }
   .lp-hs-hint {
     display: flex;
   }
 }
-/* Véu à esquerda, onde está o texto: sempre no escuro (texto claro sobre o flanco dourado) e, no claro, só quando o ecrã é
-   menos largo que 17:10 (tablet na horizontal), porque aí o texto chega ao flanco. Em 16:9 ou mais largo o céu chega. */
-@media (min-width: 640px) and (min-aspect-ratio: 6/5) {
-  .dark .lp-hs-media::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to right,
-      rgb(15 24 21 / 0.88) 0,
-      rgb(15 24 21 / 0.62) 38%,
-      rgb(15 24 21 / 0) 64%
-    );
-  }
-}
-@media (min-width: 640px) and (min-aspect-ratio: 6/5) and (max-aspect-ratio: 17/10) {
-  html:not(.dark) .lp-hs-media::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-      to right,
-      rgb(244 241 234 / 0.82) 0,
-      rgb(244 241 234 / 0.5) 40%,
-      rgb(244 241 234 / 0) 66%
-    );
-  }
-}
-/* Ultra-largo (2:1 ou mais): o cartão cairia sobre o campanário; a prova passa a linha, como em telemóvel. */
+/* Ultra-largo (2:1 ou mais): o cartão cairia sobre o campanário; fica só a faixa de prova. */
 @media (min-aspect-ratio: 2/1) {
-  .lp-hs-proof-card {
+  .lp-hs-card {
     display: none !important;
   }
-  .lp-hs-proof-line {
-    display: block !important;
-  }
 }
 
-/* Faixas horizontais em telemóvel: encaixam cartão a cartão (o seguinte espreita à direita); sem barra de rolagem visível. */
-.lp-snap {
-  scrollbar-width: none;
-  overscroll-behavior-x: contain;
-  scroll-padding-inline: 1rem;
-}
-.lp-snap::-webkit-scrollbar {
-  display: none;
-}
-
-/* Slider do mini-simulador: alça de 28 px (a caixa de toque continua a ter 44 px de altura) e trilho com o troço preenchido. */
+/* Slider do instrumento: alça de 28 px (a caixa de toque continua a ter 44 px de altura) e trilho com o troço preenchido. */
 .lp-range {
   -webkit-appearance: none;
   appearance: none;
