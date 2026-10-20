@@ -1,12 +1,13 @@
 import { Link } from '@tanstack/react-router';
 import { ChevronDown, Factory, Landmark, Truck } from 'lucide-react';
+import { GithubMark } from '@/components/github-mark';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
+import { REPO_URL } from './facts';
 import {
   BODY,
-  CARD,
-  CARD_SURFACE,
+  CARD_LIFT,
   CARD_TITLE,
   CONTAINER,
   CTA_PRIMARY,
@@ -15,7 +16,6 @@ import {
   IconTile,
   LandingSection,
   SECTION_Y,
-  SymbolWatermark,
 } from './layout';
 
 /** Para quem é: três perfis, cartões iguais. */
@@ -37,7 +37,7 @@ export function Audience() {
     >
       <ul className={`grid md:grid-cols-3 ${GRID_GAP}`}>
         {people.map((p) => (
-          <li key={p.title} className={`${CARD} flex flex-col gap-4`}>
+          <li key={p.title} className={`${CARD_LIFT} flex flex-col gap-4`}>
             <IconTile icon={p.icon} />
             <h3 className={CARD_TITLE}>{p.title}</h3>
             <p className={BODY}>{p.text}</p>
@@ -84,24 +84,44 @@ export function Faq() {
   );
 }
 
-/** Convite final: o mesmo cartão, com o símbolo da marca como marca de água. */
+/** Convite final: cartão de tinta com o degradé de pontos dither e os três botões (demo, conta, código). */
 export function FinalCta() {
   return (
-    <section id="comecar" aria-labelledby="comecar-title" className={`scroll-mt-16 ${SECTION_Y}`}>
+    <section
+      id="comecar"
+      aria-labelledby="comecar-title"
+      className={`lp-defer scroll-mt-[calc(var(--nav-h)+0.5rem)] ${SECTION_Y}`}
+    >
       <div data-reveal="" className={CONTAINER}>
-        <div className={`${CARD_SURFACE} relative overflow-hidden p-8 lg:p-14`}>
-          <SymbolWatermark className="-right-16 -bottom-20 hidden sm:block" />
+        <div className="tx tx-fio tx-dark relative isolate overflow-hidden rounded-2xl bg-[#14211d] p-8 text-[#f4f1ea] lg:p-16">
           <div className="relative flex max-w-2xl flex-col gap-6">
             <h2 id="comecar-title" className="lp-headline">
               {m.landing_cta_title()}
             </h2>
-            <p className="lp-lead text-muted-foreground">{m.landing_cta_lead()}</p>
-            <div className="flex flex-col gap-3 pt-2 sm:flex-row">
-              <Button asChild className={CTA_PRIMARY}>
-                <Link to="/login">{m.landing_sign_in()}</Link>
+            <p className="lp-lead text-[#f4f1ea]/75">{m.landing_cta_lead()}</p>
+            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
+              <Button
+                asChild
+                className={`${CTA_PRIMARY} lp-press h-12 bg-[#f4f1ea] text-[#14211d] text-base hover:bg-[#f4f1ea]/90`}
+              >
+                <Link to="/login">{m.landing_cta_demo()}</Link>
               </Button>
-              <Button asChild variant="outline" className={CTA_SECONDARY}>
+              <Button
+                asChild
+                variant="outline"
+                className={`${CTA_SECONDARY} lp-press h-12 border-[#f4f1ea]/40 bg-transparent text-[#f4f1ea] text-base hover:bg-[#f4f1ea]/10 hover:text-[#f4f1ea]`}
+              >
                 <Link to="/register">{m.landing_register()}</Link>
+              </Button>
+              <Button
+                asChild
+                variant="ghost"
+                className={`${CTA_SECONDARY} lp-press h-12 gap-2 text-[#f4f1ea] text-base hover:bg-[#f4f1ea]/10 hover:text-[#f4f1ea]`}
+              >
+                <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
+                  <GithubMark className="size-4" />
+                  {m.landing_cta_code()}
+                </a>
               </Button>
             </div>
           </div>

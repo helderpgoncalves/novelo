@@ -14,6 +14,8 @@ export const Route = createFileRoute('/_app')({
     if (user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
   },
+  // A app autenticada nunca se indexa (também o impõe o X-Robots-Tag do nginx).
+  head: () => ({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] }),
   pendingComponent: AppShellSkeleton,
   pendingMs: 0,
   pendingMinMs: 0,

@@ -12,6 +12,7 @@ import { BootSplash } from '@/components/app-loading';
 import { AppFrame } from '@/components/layout/app-frame';
 import { HOME_TABS, HomePage } from '@/features/home/home-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
+import { ogImage, SITE_URL } from '@/lib/seo';
 import { resolveSessionUser } from '@/lib/session';
 import { m } from '@/paraglide/messages';
 
@@ -49,7 +50,13 @@ export const Route = createFileRoute('/')({
           { name: 'description', content: m.landing_description() },
           { property: 'og:title', content: m.title_landing() },
           { property: 'og:description', content: m.landing_description() },
+          { property: 'og:image', content: ogImage('landing') },
+          { property: 'og:image:alt', content: m.seo_og_alt_landing() },
+          { name: 'twitter:image', content: ogImage('landing') },
         ],
+    links: match.context.user
+      ? []
+      : [{ rel: 'canonical', href: `${SITE_URL}/${getLocale() === 'en' ? 'en' : 'pt'}/` }],
   }),
   pendingComponent: BootSplash,
   pendingMs: 0,

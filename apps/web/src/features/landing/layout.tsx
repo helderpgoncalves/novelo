@@ -13,11 +13,15 @@ import { m } from '@/paraglide/messages';
  */
 export const SECTION_Y = 'py-20 lg:py-28';
 /** Topo da página: o cabeçalho fixo já dá ar por cima, por isso só o início é mais curto. */
-export const HERO_Y = 'pt-12 pb-20 lg:pt-20 lg:pb-28';
+export const HERO_Y = 'pt-[calc(var(--nav-h)+2rem)] pb-16 lg:pt-[calc(var(--nav-h)+3rem)] lg:pb-24';
 export const CONTAINER = `mx-auto w-full ${PUBLIC_WIDE} ${PUBLIC_GUTTER}`;
 export const GRID_GAP = 'gap-4 lg:gap-6';
 export const CARD_SURFACE = 'rounded-lg border border-border bg-card shadow-xs';
 export const CARD = `${CARD_SURFACE} p-6`;
+/** Cartão que reage ao rato e ao toque (sobe 2 px, afunda ao premir). */
+export const CARD_LIFT = `${CARD} lp-card`;
+/** Legenda de figura e etiquetas técnicas: mono, pequeno, Pedra. */
+export const MONO = 'font-mono text-[12px] text-muted-foreground leading-relaxed tracking-tight';
 export const CARD_TITLE = 'text-xl leading-snug';
 export const BODY = 'text-pretty text-muted-foreground leading-relaxed';
 /** Número de destaque (serif, algarismos alinhados). */
@@ -37,7 +41,7 @@ export function SectionHeading({
   id: string;
   eyebrow: string;
   title: string;
-  lead?: string;
+  lead?: ReactNode;
 }) {
   return (
     <div className="max-w-3xl space-y-4">
@@ -57,13 +61,16 @@ export function LandingSection({
   title,
   lead,
   tone = 'plain',
+  defer = true,
   children,
 }: {
   id: string;
   eyebrow: string;
   title: string;
-  lead?: string;
+  lead?: ReactNode;
   tone?: 'plain' | 'band';
+  /** `content-visibility: auto`: só pinta quando se aproxima do ecrã (todas as secções abaixo da dobra). */
+  defer?: boolean;
   children: ReactNode;
 }) {
   const headingId = `${id}-title`;
@@ -72,7 +79,8 @@ export function LandingSection({
       id={id}
       aria-labelledby={headingId}
       className={cn(
-        'scroll-mt-16',
+        'scroll-mt-[calc(var(--nav-h)+0.5rem)]',
+        defer && 'lp-defer',
         SECTION_Y,
         tone === 'band' && 'border-border border-y bg-card/40',
       )}
@@ -98,6 +106,87 @@ export function IconTile({ icon: Icon }: { icon: LucideIcon }) {
 export function SymbolWatermark({ className }: { className?: string }) {
   return (
     <BrandSymbol className={cn('pointer-events-none absolute size-72 opacity-25', className)} />
+  );
+}
+
+/** Remissão numerada para a lista de Referências (estilo artigo): `[1]` ligado a `#ref-1`. */
+export function Cite({ n }: { n: number }) {
+  return (
+    <sup className="ml-0.5 font-mono text-[11px]">
+      <a
+        href={`#ref-${n}`}
+        aria-label={`${m.landing_refs_title()} ${n}`}
+        className="rounded-sm px-0.5 text-primary outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
+      >
+        [{n}]
+      </a>
+    </sup>
+  );
+}
+
+/** Legenda de figura ou tabela: «Fig. 1» em mono, depois o texto. */
+export function FigCaption({
+  label,
+  children,
+  className,
+}: {
+  label: string;
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <figcaption className={cn(MONO, 'max-w-prose text-pretty', className)}>
+      <strong className="mr-2 font-semibold text-foreground">{label}</strong>
+      {children}
+    </figcaption>
+  );
+}
+
+/** Estado de um valor: medido, estimativa, pressuposto, calibrado, por verificar ou em validação. */
+export type Status =
+  | 'measured'
+  | 'estimate'
+  | 'assumption'
+  | 'calibrated'
+  | 'unverified'
+  | 'validating';
+
+const STATUS_STYLE: Record<Status, string> = {
+  measured: 'border-primary/40 bg-primary/10 text-primary',
+  calibrated: 'border-primary/40 bg-primary/10 text-primary',
+  estimate: 'border-border bg-secondary text-foreground',
+  assumption: 'border-border bg-secondary text-foreground',
+  unverified: 'border-dashed border-foreground/40 text-muted-foreground',
+  validating: 'border-dashed border-foreground/40 text-muted-foreground',
+};
+
+export function statusLabel(status: Status): string {
+  switch (status) {
+    case 'measured':
+      return m.landing_status_measured();
+    case 'estimate':
+      return m.landing_status_estimate();
+    case 'assumption':
+      return m.landing_status_assumption();
+    case 'calibrated':
+      return m.landing_status_calibrated();
+    case 'unverified':
+      return m.landing_status_unverified();
+    case 'validating':
+      return m.landing_validating();
+  }
+}
+
+export function StatusBadge({ status }: { status: Status }) {
+  return (
+    <span
+      className={cn(
+        'inline-flex items-center whitespace-nowrap rounded-full border px-2 py-0.5 font-mono text-[11px] leading-none',
+        STATUS_STYLE[status],
+      )}
+    >
+      {statusLabel(status)}
+    </span>
   );
 }
 

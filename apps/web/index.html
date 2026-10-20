@@ -23,21 +23,22 @@
       name="description"
       content="Novelo desenha a rede de recolha seletiva de têxteis de Guimarães ao menor custo: orçamento e meta entram, saem cenários comparáveis em euros, toneladas e €/t."
     />
-    <link rel="canonical" href="https://novelo.helder.si/" />
-    <link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/" />
-    <link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/" />
-    <link rel="alternate" hreflang="x-default" href="https://novelo.helder.si/" />
-    <meta property="og:url" content="https://novelo.helder.si/" />
+    <!-- Esta casca serve a app e o desenvolvimento: sem canonical, hreflang nem og:url (diriam "/" para todas as rotas).
+         As páginas públicas têm o seu <head> próprio, escrito no build por scripts/prerender.mjs (dist/{pt,en}/...). -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Novelo" />
-    <meta property="og:title" content="Novelo: recolha seletiva de têxteis, desenhada ao menor custo" />
+    <meta property="og:title" content="Novelo: recolha de têxteis de Guimarães ao menor custo" />
     <meta property="og:description" content="Novelo mostra onde e como recolher têxteis em Guimarães, e quanto custa cada tonelada desviada do aterro." />
-    <meta property="og:image" content="https://novelo.helder.si/og-image.png" />
+    <meta property="og:image" content="https://novelo.helder.si/og/novelo-partilha-landing-pt.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:alt" content="Novelo: recolha de têxteis, desenhada ao menor custo. Pôr do sol sobre Guimarães em pontos dourados e verdes." />
+    <meta property="og:locale" content="pt_PT" />
+    <meta property="og:locale:alternate" content="en_GB" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content="https://novelo.helder.si/og-image.png" />
-    <title>Novelo: recolha seletiva de têxteis, desenhada ao menor custo</title>
+    <meta name="twitter:image" content="https://novelo.helder.si/og/novelo-partilha-landing-pt.png" />
+    <title>Novelo: recolha de têxteis de Guimarães ao menor custo</title>
     <style>
       html { background: #f4f1ea; }
       html.dark { background: #0f1815; }
