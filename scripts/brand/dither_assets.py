@@ -4,7 +4,7 @@ Tudo determinístico (sementes fixas), sem rede: a fotografia de origem está em
 (Wikimedia Commons, CC BY-SA 4.0, ver `apps/web/public/landing/CREDITS.md`). O wordmark e o símbolo vêm da
 geometria única (`geometry.py`); os títulos são desenhados em curvas a partir da Newsreader real (sem fontes instaladas).
 
-Chamado por `build_assets.py` (partilha, banners, capa) e por `landing_hero.py` (landing, painel de entrada).
+Chamado por `build_assets.py` (partilha, banners, capa).
 Documentação da linguagem: docs/marca/linguagem-dither.md
 """
 
@@ -27,12 +27,9 @@ from dither import (
     DUNAS_ESCURO,
     FIO_ESCURO,
     FLORESTA,
-    FLORESTA_CLARA,
     FUNDO_ESCURO,
     LINHO,
-    PEDRA,
     TINTA,
-    VERDE_CLARO,
     Halftone,
     Palette,
     cover_crop,
@@ -47,7 +44,7 @@ from fontTools.pens.transformPen import TransformPen
 from fontTools.ttLib import TTFont
 from fontTools.varLib import instancer
 from geometry import PALETTES, ROOT, Geometry, lockup_body, symbol_group
-from PIL import Image, ImageFilter
+from PIL import Image
 
 HERE = Path(__file__).parent
 PHOTO = HERE / "base/penha-fonte.jpg"
@@ -317,63 +314,10 @@ def symbol_field(ctx: Ctx, size: tuple[int, int], center: tuple[float, float], u
 
 
 # =========================================================================================================
-# LANDING: hero, texturas, painel de entrada
+# PAINEL DO ECRÃ DE ENTRADA
 # =========================================================================================================
-HERO_FORMATS = {
-    # nome: (proporção w:h, larguras, células por largura, focus, zoom, fade)
-    "16x9": ((16, 9), (640, 1280, 1920), 320, (0.5, 0.62), 1.0, "left"),
-    "4x3": ((4, 3), (768, 1536), 256, (0.6, 0.62), 1.0, "left"),
-    "mobile": ((4, 5), (432, 864, 1296), 216, (0.78, 0.55), 1.25, "top"),
-}
-
-
-def _fade(kind: str, h: int, w: int) -> np.ndarray:
-    if kind == "left":
-        return fade_left(h, w, 0.10, 0.62, 0.10, skew=0.25)
-    if kind == "top":
-        return fade_top(h, w, 0.16, 0.58, 0.10)
-    return np.ones((h, w), np.float32)
-
-
-def build_landing(ctx: Ctx, out: Out) -> None:
-    photo = Image.open(PHOTO).convert("RGB")
-    # --- hero (foto Penha): claro e escuro, três formatos
-    for name, ((rw, rh), widths, cells, focus, zoom, fk) in HERO_FORMATS.items():
-        small = widths[0]
-        for mode in MODES:
-            for w in widths:
-                h = round(w * rh / rw)
-                d = photo_field(photo, (w, h), mode, focus, zoom, fade=_fade(fk, h, w))
-                im = make_ht(w / cells).render(d, PAL[mode]["ouro"])
-                out.put(f"hero-{name}-{mode}-{w}.avif", avif_bytes(im), (w, h), max_kb=int(0.4 * w * h / 1024))
-                if w == small:
-                    out.put(f"hero-{name}-{mode}-{w}.webp", webp_fallback_bytes(im), (w, h))
-    # --- texturas de secção 16:9 (1280x720, célula 4): campo, dunas, fio
-    W, H = 1280, 720
-    for mode in MODES:
-        dc = field_density(H, W)
-        im = make_ht(4).render(dc, PAL[mode]["campo"])
-        out.put(f"textura-campo-{mode}-1280.avif", avif_bytes(im), (W, H))
-        dd = dunes_density(H, W)
-        im = make_ht(6, "cross", 0).render(np.clip(dd, 0, 0.86), PAL[mode]["dunas"])
-        out.put(f"textura-dunas-{mode}-1280.avif", avif_bytes(im), (W, H))
-        d, ink = symbol_field(ctx, (W, H), (W * 0.80, H * 0.62), 0.78, mode, glow=1.0)
-        d = np.clip(np.maximum(d * 0.96 * fade_left(H, W, 0.05, 0.55, 0.12), 0.05), 0, 1)
-        im = make_ht(4, "round", 45, softness=1.0).render(d, PAL[mode]["ouro"], ink_map=ink)
-        out.put(f"textura-fio-{mode}-1280.avif", avif_bytes(im), (W, H))
-    # --- tile repetível (SVG, vetorial): cruzes em grelha de 8 px
-    for mode, col in (("light", "#C4A06A"), ("dark", "#3E6658")):
-        svg = (
-            '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">'
-            f'<path d="M4 2.6v2.8M2.6 4h2.8M12 10.6v2.8M10.6 12h2.8" stroke="{col}" stroke-width="1.1" stroke-linecap="square" fill="none"/></svg>'
-        )
-        out.put(f"tile-cruz-{mode}.svg", svg.encode())
-    build_login(ctx, out, photo)
-
-
-# Painel de entrada: desktop (3:4, texto em cima) e faixa móvel (10:3, símbolo em pontos)
+# Painel de entrada (desktop, 3:4, texto em cima): fotografia da Penha em meio-tom. Em telemóvel o ecrã de entrada não tem imagem.
 LOGIN_PANEL = ((960, 1280), (1440, 1920))
-LOGIN_STRIP = ((1200, 360), (2400, 720))
 
 
 def build_login(ctx: Ctx, out: Out, photo: Image.Image) -> None:
@@ -382,11 +326,13 @@ def build_login(ctx: Ctx, out: Out, photo: Image.Image) -> None:
             d = photo_field(photo, (w, h), mode, (0.58, 0.60), 1.0, fade=fade_top(h, w, 0.20, 0.52, 0.08))
             im = make_ht(w / 240).render(d, PAL[mode]["ouro"])
             out.put(f"login-painel-{mode}-{w}.avif", avif_bytes(im), (w, h))
-        for w, h in LOGIN_STRIP:
-            d, ink = symbol_field(ctx, (w, h), (w * 0.86, h * 0.50), h / 640 * 1.0, mode, glow=1.1)
-            d = np.clip(np.maximum(d * fade_left(h, w, 0.10, 0.62, 0.10), 0.05), 0, 1)
-            im = make_ht(w / 400).render(d, PAL[mode]["ouro"], ink_map=ink)
-            out.put(f"login-faixa-{mode}-{w}.avif", avif_bytes(im), (w, h))
+
+
+def place_login(ctx: Ctx) -> None:
+    LANDING.mkdir(parents=True, exist_ok=True)
+    out = Out(LANDING)
+    build_login(ctx, out, Image.open(PHOTO).convert("RGB"))
+    print(f"painel de entrada: {len(out.items)} ficheiros em apps/web/public/landing/")
 
 
 # =========================================================================================================
@@ -485,7 +431,7 @@ def build_banners(ctx: Ctx, out: Out) -> dict[str, float]:
 
 
 def write_manifest(out: Out, path: Path, extra: dict | None = None) -> None:
-    data = {"generated_by": "scripts/brand/landing_hero.py", "files": dict(sorted(out.items.items())), **(extra or {})}
+    data = {"generated_by": "scripts/brand/dither_assets.py", "files": dict(sorted(out.items.items())), **(extra or {})}
     path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
 
 
@@ -520,15 +466,3 @@ def place_social(ctx: Ctx) -> dict[str, float]:
         final.put(f"docs/img/{n}", banner, (2400, 450), max_kb=300)
     final.put("docs/img/banner-escuro.png", (tmp.root / "banner/novelo-banner-2400x450-escuro.png").read_bytes(), (2400, 450), max_kb=320)
     return contrasts
-
-
-def place_landing(ctx: Ctx) -> None:
-    LANDING.mkdir(parents=True, exist_ok=True)
-    for old in LANDING.iterdir():  # sem ficheiros órfãos de execuções anteriores
-        if old.suffix in {".avif", ".webp", ".svg", ".json"}:
-            old.unlink()
-    out = Out(LANDING)
-    build_landing(ctx, out)
-    write_manifest(out, LANDING / "manifest.json")
-    total = sum(v["bytes"] for v in out.items.values())
-    print(f"landing: {len(out.items)} ficheiros, {total / 1024:.0f} KB em apps/web/public/landing/")

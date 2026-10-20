@@ -97,7 +97,7 @@ function SimulatorMock() {
             </ol>
           </div>
         </div>
-        <div className="tx tx-campo relative overflow-hidden rounded-lg border border-border bg-card p-5">
+        <div className="photo-bg photo-fabrica relative overflow-hidden rounded-lg border border-border bg-card p-5">
           <p className="eyebrow relative">{m.landing_mock_start()}</p>
           <dl className="relative mt-4 grid grid-cols-2 gap-x-4 gap-y-5">
             <div>
@@ -515,7 +515,7 @@ export function Impact() {
           <FigCaption label={m.landing_fig_4()}>{m.landing_fig_4_caption()}</FigCaption>
         </figure>
         <dl
-          className={`${CARD} tx tx-campo relative grid grid-cols-3 content-center gap-4 overflow-hidden`}
+          className={`${CARD} photo-bg photo-couros relative grid grid-cols-3 content-center gap-4 overflow-hidden`}
         >
           {network.map((n) => (
             <div key={n.id} className="relative flex flex-col gap-2">

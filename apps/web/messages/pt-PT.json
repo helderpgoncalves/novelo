@@ -2872,6 +2872,7 @@
   "landing_menu_open": "Abrir menu",
   "landing_menu_title": "Menu",
   "landing_lead": "Orçamento e meta entram; saem cenários comparáveis em euros, toneladas e €/t para a rede de recolha de Guimarães.",
+  "landing_lead_short": "Orçamento e meta entram; saem cenários comparáveis em euros, toneladas e €/t.",
   "landing_register_note": "As contas novas precisam de ser aprovadas por um administrador. Recebes um email quando o pedido for aceite.",
   "landing_hero_caption": "Três fios quase fechados à volta de um ponto. A abertura em cima diz que o ciclo ainda não está fechado, e é aí que o Novelo trabalha.",
   "landing_hero_tags": "Planear · Decidir · Seguir",
@@ -3559,8 +3560,8 @@
   "seo_og_alt_entrar": "Novelo: entra para desenhar a rede de recolha de têxteis de Guimarães.",
   "seo_og_alt_passaporte": "Passaporte do lote Novelo: origem, triagem e destino de cada saco de têxteis.",
   "auth_panel_quote": "Desenha a rede de recolha com os números reais.",
-  "landing_photo_credit": "Fotografia:",
-  "landing_photo_credit_adapted": "adaptada pela equipa Novelo.",
+  "landing_photo_credit": "Fotografias:",
+  "landing_photo_credit_adapted": "Adaptadas em meio-tom pela equipa Novelo; os derivados partilham-se nos mesmos termos das licenças originais.",
   "chat_cmd_websearch": "Pesquisa na web",
   "chat_cmd_websearch_desc": "Liga ou desliga a pesquisa na web: /websearch on ou /websearch off",
   "chat_think_web_1": "A pesquisar na web…",
@@ -3606,5 +3607,10 @@
   "chat_chart_table": "Dados do gráfico em tabela",
   "chat_set_web_toggle": "Pesquisar na web quando for preciso",
   "chat_cmd_websearch_on": "Liga a pesquisa na web",
-  "chat_cmd_websearch_off": "Desliga a pesquisa na web"
+  "chat_cmd_websearch_off": "Desliga a pesquisa na web",
+  "landing_photo_penha": "Penha",
+  "landing_photo_paco": "Paço dos Duques",
+  "landing_photo_fabrica": "Antiga fábrica têxtil",
+  "landing_photo_couros": "Couros",
+  "landing_photo_plataforma": "Plataforma das Artes"
 }

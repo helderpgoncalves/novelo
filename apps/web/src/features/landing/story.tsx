@@ -35,7 +35,9 @@ export function Problem() {
       }
     >
       <div className={`grid lg:grid-cols-2 ${GRID_GAP}`}>
-        <div className={`${CARD} tx tx-campo relative flex flex-col gap-5 overflow-hidden`}>
+        <div
+          className={`${CARD} photo-bg photo-fabrica relative flex flex-col gap-5 overflow-hidden`}
+        >
           <h3 className={`${CARD_TITLE} relative`}>{m.landing_gap_title()}</h3>
           <div className="relative space-y-2">
             <p className={STAT}>

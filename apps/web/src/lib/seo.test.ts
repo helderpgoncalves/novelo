@@ -5,6 +5,7 @@ import {
   auditHtml,
   buildHead,
   buildJsonLd,
+  buildPreloads,
   buildSitemap,
   buildSummary,
   LOCALE_IDS,
@@ -111,7 +112,32 @@ describe('pré-render', () => {
     expect(html.match(/<h1>/g)).toHaveLength(1);
     expect(html).toContain('<div id="root"><div data-prerender=""');
     expect(html).toContain(en.landing_faq_q1);
-    expect(html).toContain('rel="preload" as="image"');
+  });
+
+  it('landing: preload do hero vem dos links do manifesto, com atributos escapados; outras rotas não os emitem', () => {
+    const heroLinks = [
+      {
+        rel: 'preload',
+        as: 'image',
+        type: 'image/avif',
+        media: '(min-width: 640px) and (prefers-color-scheme: light)',
+        imagesrcset:
+          '/landing/hero-wide-light-960.aaaa1111.avif 960w, /landing/hero-wide-light-1440.bbbb2222.avif 1440w',
+        imagesizes: 'max(100vw, min(160vh, 1536px))',
+        fetchpriority: 'high',
+      },
+      { rel: 'preload', as: 'image', media: '"><script>', imagesrcset: '/landing/x.avif 1w' },
+    ];
+    const html = renderRoute(BASE, ROUTES[0], 'pt-PT', pt as Record<string, string>, [], heroLinks);
+    expect(html).toContain(
+      '<link rel="preload" as="image" type="image/avif" media="(min-width: 640px) and (prefers-color-scheme: light)" imagesrcset="/landing/hero-wide-light-960.aaaa1111.avif 960w, /landing/hero-wide-light-1440.bbbb2222.avif 1440w" imagesizes="max(100vw, min(160vh, 1536px))" fetchpriority="high" />',
+    );
+    expect(html).not.toContain('<script>');
+    expect(html).not.toMatch(/hero-(16x9|4x3|mobile)/);
+    expect(buildPreloads(ROUTES[0], [])).not.toContain('as="image"');
+    const other = ROUTES.find((r) => r.id !== 'landing');
+    if (!other) throw new Error('sem rota além da landing');
+    expect(buildPreloads(other, heroLinks)).not.toContain('as="image"');
   });
 
   it('o resumo usa números reais formatados no idioma', () => {

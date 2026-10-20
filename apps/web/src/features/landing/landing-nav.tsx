@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Menu, X } from 'lucide-react';
+import { X } from 'lucide-react';
 import {
   type KeyboardEvent,
   type PointerEvent as ReactPointerEvent,
@@ -137,7 +137,7 @@ function DesktopNav({ activeGroup }: { activeGroup: string | null }) {
         <span
           ref={pillRef}
           aria-hidden="true"
-          className="lp-pill absolute inset-y-1 left-0 rounded-full bg-foreground/[0.07] dark:bg-foreground/10"
+          className="lp-pill absolute inset-y-0 left-0 rounded-full bg-foreground/[0.07] dark:bg-foreground/10"
         />
         {items.map((s, i) => (
           <li key={s.id} className={cn(s.xl && 'hidden xl:block')}>
@@ -154,7 +154,7 @@ function DesktopNav({ activeGroup }: { activeGroup: string | null }) {
               onFocus={() => setHover(s.id)}
               onBlur={() => setHover(null)}
               className={cn(
-                'relative inline-flex h-10 items-center rounded-full px-3.5 font-medium text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                'relative inline-flex h-11 items-center rounded-full px-3.5 font-medium text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                 activeGroup === s.id
                   ? 'text-foreground'
                   : 'text-muted-foreground hover:text-foreground',
@@ -467,18 +467,18 @@ export function LandingHeader() {
             <DesktopNav activeGroup={activeGroup} />
           </div>
           <div className="ml-auto flex items-center gap-1.5 lg:ml-0">
-            <div className="hidden items-center md:flex [&_button]:size-10">
+            <div className="hidden items-center md:flex [&_button]:size-11">
               <LanguageSwitcher />
               <ThemeToggle />
             </div>
             <Button
               asChild
               variant="outline"
-              className="lp-press hidden h-10 bg-transparent px-4 font-medium md:inline-flex"
+              className="lp-press hidden h-11 bg-transparent px-4 font-medium md:inline-flex"
             >
               <Link to="/register">{m.landing_register()}</Link>
             </Button>
-            <Button asChild className="lp-press h-10 px-5 font-semibold">
+            <Button asChild className="lp-press h-11 px-4 font-semibold sm:px-5">
               <Link to="/login">{m.landing_sign_in()}</Link>
             </Button>
             <Button
@@ -491,7 +491,17 @@ export function LandingHeader() {
               className="size-11 lg:hidden"
               onClick={() => setMenuOpen(true)}
             >
-              <Menu className="size-6" strokeWidth={1.75} aria-hidden="true" />
+              <svg
+                viewBox="0 0 24 24"
+                className="size-6"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                strokeLinecap="round"
+                aria-hidden="true"
+              >
+                <path d="M4 8.5h16M10 15.5h10" />
+              </svg>
               <span className="sr-only">{m.landing_menu_open()}</span>
             </Button>
           </div>

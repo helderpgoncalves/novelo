@@ -10,11 +10,11 @@ ponta a ponta, com a lista ficheiro a ficheiro do que implementar. A linguagem v
 | Tema | Decisão |
 | --- | --- |
 | Conceito | **«O fio que liga a cidade.»** Rede, novelo, fibra: o território visto de cima, feito de pontos, e os três fios do símbolo como fio condutor da página. |
-| Imagem | Pôr do sol da Penha sobre Guimarães em **dither dourado e verde** (fotografia CC BY-SA 4.0 adaptada), claro e escuro; o símbolo em pontos como segunda imagem (CTA final, painel de entrada). |
+| Imagem | **Fotografia de Guimarães com dither próprio**: a Penha no hero e no painel de entrada; Paço dos Duques (faixas), antiga fábrica têxtil e Couros (cartões), Plataforma das Artes (CTA final); claro e escuro, mesma série e mesmo motor, sem texturas geradas. Licenças livres e créditos no rodapé. |
 | Tipografia | **Newsreader** (títulos, número), **Inter** (texto), **Geist Mono** (etiquetas e dados), em subsets pt-PT de **110,7 KB** no total. Mantém a voz da marca; não se troca de serifa. |
 | Navbar | Transparente sobre o hero; ao rolar, Linho a 80% com desfoque e linha de 1 px; indicador ativo por *scroll-spy*; em telemóvel, folha a ecrã inteiro com ligações grandes e CTA fixo em baixo. |
 | Movimento | Pouco e barato: revelação por opacidade e 12 px de deslocamento, parallax da imagem só por CSS, sem bibliotecas. Canvas só como opção (secção «Efeito»). |
-| Regra | Nada pesado. JS da landing sem dependências novas; imagem do hero ≤ 300 KB em 1280 px e ≤ 60 KB em 640 px (AVIF). |
+| Regra | Nada pesado. JS da landing sem dependências novas; hero AVIF ≤ 120 KB em telemóvel, ≤ 180 KB em tablet, ≤ 250 KB em desktop 1× e ≤ 450 KB em retina; fundos ≤ 60 KB. |
 
 ---
 
@@ -77,7 +77,7 @@ desce no lado esquerdo e se liga ao símbolo de cada secção (opcional, só se 
 | CTA | **Criar conta** (primário) e **Entrar** (secundário); nota «sem cartão, acesso por aprovação» só se for verdade (usar `landing_register_note`) |
 | Prova em linha (mono) | `301,3 t recolhidas em 2025 · 0,16 kg/hab/mês · 156 830 habitantes` (números da Regra Zero, com a fonte no hover/`title`) |
 | Imagem | Hero dither (Penha), claro/escuro; a zona esquerda quase só papel (texto), a direita com o santuário e o vale |
-| Crédito | «Fotografia: RaquelRosa7, Wikimedia Commons, CC BY-SA 4.0, adaptada» no rodapé |
+| Crédito | Rodapé: «Fotografias: Penha: RaquelRosa7, CC BY-SA 4.0 · Paço dos Duques: Luis Miguel Jorge Duarte, CC BY-SA 4.0 · …» (`photo-credits.ts`, `PhotoCredits`) |
 
 ### Sistema de secções (ritmo)
 
@@ -88,15 +88,15 @@ Fundo alterna Linho (claro) → faixa dither suave → Linho; **uma** secção e
 | 1 | Hero | Linho + hero dither | Narrativa acima | Altura `min-height: 100svh`, texto à esquerda |
 | 2 | Números | Linho | Quatro números em Newsreader 500 tabulares, etiqueta mono, fonte | Os mesmos de hoje (`Proof`) |
 | 3 | Problema | Linho | Parágrafo-manifesto de 3 frases, número grande «22,9%» (captura atual) | `text-wrap: balance` |
-| 4 | Como funciona | `textura-campo` | 3 passos numerados 01, 02, 03 (mono): orçamento e meta; cenários; decisão | Símbolo em pontos como marcador |
+| 4 | Como funciona | foto «fábrica» (cartão) | 3 passos numerados 01, 02, 03 (mono): orçamento e meta; cenários; decisão | Símbolo em pontos como marcador |
 | 5 | Produto | Linho | Captura real do simulador (claro e escuro, WebP/AVIF) em moldura simples | Sem *mockup* de aparelho |
 | 6 | Funcionalidades | Linho | Grelha 2×3, título serif curto + uma linha | Sem ícones genéricos |
 | 7 | Copiloto («E se…?») | Tinta (escura) | Pergunta e resposta com o verificador de números | A secção escura única |
 | 8 | Dados e fontes | Linho | Lista de fontes com contagem; honestidade sobre limites | |
-| 9 | Impacto | `textura-dunas` | Sankey observado (59,4% / 26,5% / 14,1%) | Números da Regra Zero |
+| 9 | Impacto | foto «couros» (cartão da rede) | Sankey observado (59,4% / 26,5% / 14,1%) | Números da Regra Zero |
 | 10 | Para quem | Linho | Decisores, operadores, mentores | |
 | 11 | FAQ | Linho | Perguntas com `<details>` | Alimenta o JSON-LD FAQPage |
-| 12 | CTA final | `textura-fio` | Título, Criar conta, Entrar | Símbolo em pontos à direita |
+| 12 | CTA final | foto «plataforma» (escuro) | Título, Criar conta, Entrar | Símbolo em pontos à direita |
 
 ### Navbar (comportamento)
 
@@ -119,7 +119,7 @@ iOS: a cor da barra do sistema acompanha a secção (ver checklist). Android: a 
 | Parallax do hero | `animation-timeline: scroll(root)` a mover a imagem 24 px e `scale(1.04)`; sem suporte fica estático | Compositor, ~0 |
 | Números a contar | Só os 4 números do bloco 2, 700 ms, uma vez; sem `prefers-reduced-motion` | ~0 |
 | Indicador da navbar | `transform: translateX` com transição de 250 ms | ~0 |
-| Hero «a formar-se» | O hero aparece como pontos que crescem: camada Linho sobre a imagem com máscara `tile-cruz` que perde opacidade em 700 ms | 1 animação de opacidade |
+| Entrada da fotografia | Fade de 280 ms e zoom de 1,5% só quando a imagem chega depois do primeiro desenho | 1 transição |
 
 ### O que NÃO fazer
 
@@ -231,64 +231,29 @@ Nota: as fontes da app (`newsreader-latin-*.woff2`, `inter-latin-*.woff2`, 650 K
 
 ---
 
-## 4. Hero: imagem e efeito
+## 4. Hero: a Penha ao fim do dia
 
-Ficheiros e pesos: tabela em [`linguagem-dither.md`](linguagem-dither.md#ativos). Uso recomendado:
+Fotografia «Costa, Penha, Guimarães» de RaquelRosa7 (CC BY-SA 4.0, a mesma do painel de entrada); ficheiros, pesos e decisões em [`linguagem-dither.md`](linguagem-dither.md).
+Componente: `apps/web/src/components/photos.tsx` (`HeroPicture`); CSS: bloco «Hero» de `styles.css` (`.lp-hs*`).
 
-```html
-<picture>
-  <source type="image/avif" media="(max-width: 767px)"
-          srcset="/landing/hero-mobile-light-432.avif 432w, /landing/hero-mobile-light-864.avif 864w, /landing/hero-mobile-light-1296.avif 1296w" sizes="100vw" />
-  <source type="image/avif"
-          srcset="/landing/hero-16x9-light-640.avif 640w, /landing/hero-16x9-light-1280.avif 1280w, /landing/hero-16x9-light-1920.avif 1920w" sizes="100vw" />
-  <img src="/landing/hero-16x9-light-640.webp" alt="" width="1280" height="720"
-       fetchpriority="high" decoding="async" class="hero-img" />
-</picture>
-```
-
-- `width`/`height` reservam o espaço (CLS 0); `object-fit: cover; object-position: 70% 60%`. A `<img>` leva `fetchpriority="high"` e **não** `loading="lazy"`.
-- Tema: o `<picture>` não segue o interruptor da app (`.dark` na raiz). O componente lê `document.documentElement.classList.contains('dark')` ao renderizar (o `theme-init.js` já correu) e escolhe `light` ou `dark`; ao trocar de tema muda o `src`/`srcset`. Em `index.html`, pré-carrega só a versão clara: `<link rel="preload" as="image" type="image/avif" imagesrcset="…light-640.avif 640w, …light-1280.avif 1280w" imagesizes="100vw" media="(prefers-color-scheme: light)" fetchpriority="high">`.
-- `Save-Data`/`prefers-reduced-data`: usar sempre a largura 640 (ou 432 no móvel), sem parallax.
-- Contraste: a zona esquerda é papel com 7 a 10% de pontos; texto Tinta sobre ela mede ≥ 6,6:1 (ver gerador).
-
-### Efeito: três níveis, do mais barato ao mais rico
-
-| Nível | O que faz | Como | Custo | Fallback |
-| --- | --- | --- | --- | --- |
-| A (recomendado) | Parallax de 24 px e `scale(1.04)` ao rolar | CSS `animation-timeline: scroll(root)` com `@keyframes` de `transform`; `@supports (animation-timeline: scroll())` | Compositor, sem JS, ~0 ms de *main thread* | Imagem estática |
-| B | Hero «a formar-se» no primeiro carregamento | Camada Linho sobre a imagem com `mask-image: url(/landing/tile-cruz-light.svg)` e `opacity 1→0` em 700 ms (uma vez) | 1 animação de opacidade | Sem animação |
-| C (opcional) | Ondulação suave dos pontos | `<canvas>` 2D pequeno (≈ 160×90 células, pontos desenhados com `fillRect`/`arc`) sobre a imagem, campo de ruído que modula o raio; 30 fps com `requestAnimationFrame` | ~1 a 2 ms por frame num telemóvel médio (14 400 pontos); 0 quando parado | Canvas não é criado |
-
-Regras do nível C: criar o canvas só depois do LCP (`requestIdleCallback`), pausar com `IntersectionObserver` fora do viewport e
-`visibilitychange`; **não** correr com `prefers-reduced-motion`, `navigator.connection.saveData`, `deviceMemory <= 2`,
-`hardwareConcurrency <= 2` ou bateria baixa (`getBattery().level < 0.2`, quando existir). Sem dependências. Recomendo A + B e
-deixar C como melhoria só se sobrar tempo e se medir 60 fps em Android médio.
+- **Dois arranjos, mesmas condições de media no `<picture>` e no CSS** (`landing-assets.generated.ts`): *largo* (`min-width: 640px` e `min-aspect-ratio: 6/5`):
+  fotografia 16:10 a toda a largura, texto à esquerda sobre o céu, cartão com o número no canto da floresta (só ≥ 1024 px e até 2:1);
+  *empilhado* (telemóvel e tablet de pé): fotografia 4:5 com o campanário da Penha logo abaixo da barra, texto na metade de baixo (polegar), véu curto (5,5 rem)
+  só atrás do texto, pico e encostas vivos.
+- Primeiro ecrã em telemóvel: barra, pico, eyebrow, título (≤ 4 linhas, itálico verde), subtítulo curto (`landing_lead_short`), um botão primário («Ver a demo ao vivo»), ligações discretas («Criar conta», «Ver o código») e a linha de prova (301,3 t, 22,9% estimativa). Cabe em 375 × 667.
+- LCP: `fetchpriority="high"`, sem lazy, cor do céu como fundo, `preload` por `prefers-color-scheme` e media (campo `preload` do `manifest.json`).
+- Escuro: véu à esquerda no ecrã largo (texto claro sobre o flanco dourado); claro: só em ecrãs menos largos que 17:10.
+- Sem parallax, sem véu de pontos, sem canvas: a fotografia só tem o fade de chegada e o texto só o escalonamento do que está sob o título.
 
 ---
 
 ## 5. Painel de entrada (login e registo)
 
-Rotas: `apps/web/src/routes/_auth.tsx` e `_auth/*.tsx`; layout comum em `PublicShell`/`features/auth`.
+Rotas: `apps/web/src/routes/_auth.tsx` e `_auth/*.tsx`; painel em `features/auth/auth-panel.tsx`.
 
-**Desktop (≥ 1024 px): *split-screen*.** Coluna esquerda 46% (mín. 480 px) com o formulário, centrado verticalmente, largura útil 400 px;
-coluna direita 54% com a imagem `login-painel-{light|dark}-{960|1440}.avif` em `object-fit: cover; object-position: 58% 60%`,
-altura `100dvh`. O tema da imagem segue o tema da app.
-
-| Elemento | Posição e especificação |
-| --- | --- |
-| Logótipo | Topo da coluna do formulário, `BrandLogo` `h-8`, `padding-top: max(32px, env(safe-area-inset-top))` |
-| Imagem | `aria-hidden`, `alt=""`; `width=960 height=1280`, `fetchpriority="high"` (é o LCP do ecrã) |
-| Frase de valor (sobre a imagem, parte de cima, que é papel) | Newsreader 500, `clamp(1.75rem, 1.2rem + 1.6vw, 2.5rem)`, `text-wrap: balance`, cor Tinta (claro) ou Linho (escuro), margem 48 px; «Desenha a rede de recolha com os números reais.» (`auth_panel_quote`) |
-| Etiqueta (mono) | Por cima da frase: `HACK4GUIMARÃES 2035 · DESAFIO TEXVITRUS` |
-| Crédito | Canto inferior direito, 11 px mono, Linho a 80% sobre faixa Tinta a 55% (só se a fotografia estiver visível): «Foto: RaquelRosa7, CC BY-SA 4.0» |
-| Zona do texto | Os 38% de cima da imagem têm densidade ≤ 10%: texto Tinta ≥ 6,5:1 (claro); no escuro texto Linho sobre fundo `#0F1815` com pontos ≤ 10% |
-| Sobreposições | Sem gradiente CSS nem `backdrop-filter` sobre a imagem; a máscara de densidade já faz o trabalho |
-
-**Telemóvel (< 1024 px): faixa.** Cabeçalho de 140 px (+ `env(safe-area-inset-top)`) com `login-faixa-{light|dark}-{1200|2400}.avif`
-(10:3, `object-fit: cover; object-position: right`), logótipo por cima à esquerda (a faixa é papel na esquerda), formulário por baixo.
-Sem texto na faixa. Em landscape < 500 px de altura a faixa desaparece.
-
-Contraste e estados: erro, a carregar, sucesso do formulário não se alteram; o foco visível mantém-se.
+**Desktop (≥ 1024 px): *split-screen*.** Coluna esquerda 54% com `login-painel-{light|dark}-{960|1440}.avif` (3:4, fotografia da Penha em meio-tom, a imagem
+de produção, mantida), a etiqueta, a frase de valor (Newsreader) e três factos sobre a zona clara; coluna do formulário 46% (mín. 480 px).
+**Telemóvel: sem imagem nem logótipo**, só o formulário.
 
 ---
 

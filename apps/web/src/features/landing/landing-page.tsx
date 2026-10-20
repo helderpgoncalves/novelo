@@ -1,6 +1,6 @@
-import { DitherBand } from '@/components/dither';
+import { PhotoBand, PhotoCredits } from '@/components/photos';
 import { PublicShell } from '@/components/public-shell';
-import { m } from '@/paraglide/messages';
+import './landing-assets.generated.css';
 import { Audience, Faq, FinalCta } from './closing';
 import { Features } from './features';
 import { Hero, Proof } from './hero';
@@ -11,29 +11,6 @@ import { useRevealOnScroll } from './reveal';
 import { References, Rigor, Team } from './rigor';
 import { HowItWorks, Problem } from './story';
 
-const COMMONS_URL =
-  'https://commons.wikimedia.org/wiki/File:Costa_-_Penha,_Guimar%C3%A3es_-_20210501194326.jpg';
-const LICENSE_URL = 'https://creativecommons.org/licenses/by-sa/4.0/';
-
-/** Atribuição obrigatória da fotografia do hero (CC BY-SA 4.0; ver public/landing/CREDITS.md). */
-function PhotoCredit() {
-  const link =
-    'rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
-  return (
-    <p className="font-mono text-[11px] text-muted-foreground">
-      {m.landing_photo_credit()}{' '}
-      <a href={COMMONS_URL} target="_blank" rel="noopener noreferrer" className={link}>
-        RaquelRosa7, Wikimedia Commons
-      </a>
-      ,{' '}
-      <a href={LICENSE_URL} target="_blank" rel="noopener noreferrer" className={link}>
-        CC BY-SA 4.0
-      </a>
-      , {m.landing_photo_credit_adapted()}
-    </p>
-  );
-}
-
 /**
  * Página inicial pública (sem sessão): é a "Application home page" do ecrã de consentimento da Google, por isso
  * diz o que o Novelo faz, mostra números reais com fonte, tem Entrar/Criar conta e, no rodapé, Privacidade, Termos
@@ -43,11 +20,11 @@ function PhotoCredit() {
 export function LandingPage() {
   useRevealOnScroll();
   return (
-    <PublicShell width="max-w-6xl" header={<LandingHeader />} footerExtra={<PhotoCredit />}>
+    <PublicShell width="max-w-6xl" header={<LandingHeader />} footerExtra={<PhotoCredits />}>
       <LandingToc />
       <main id="content" data-landing="" data-lp-fonts="" tabIndex={-1} className="outline-none">
         <Hero />
-        <DitherBand />
+        <PhotoBand />
         <Proof />
         <Problem />
         <Impact />
@@ -63,7 +40,7 @@ export function LandingPage() {
         <References />
         <Faq />
         <FinalCta />
-        <DitherBand flip />
+        <PhotoBand flip />
       </main>
     </PublicShell>
   );

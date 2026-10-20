@@ -11,9 +11,7 @@ import { m } from '@/paraglide/messages';
  * - ritmo: eyebrow → título (`space-y-4`), cabeçalho → conteúdo (`gap-10 lg:gap-14`), grelhas (`GRID_GAP`);
  * - `CARD` é o único cartão; `IconTile` o único ícone de cartão; `BODY` o único texto corrente.
  */
-export const SECTION_Y = 'py-20 lg:py-28';
-/** Topo da página: o cabeçalho fixo já dá ar por cima, por isso só o início é mais curto. */
-export const HERO_Y = 'pt-[calc(var(--nav-h)+2rem)] pb-16 lg:pt-[calc(var(--nav-h)+3rem)] lg:pb-24';
+export const SECTION_Y = 'py-16 sm:py-20 lg:py-28';
 export const CONTAINER = `mx-auto w-full ${PUBLIC_WIDE} ${PUBLIC_GUTTER}`;
 export const GRID_GAP = 'gap-4 lg:gap-6';
 export const CARD_SURFACE = 'rounded-lg border border-border bg-card shadow-xs';

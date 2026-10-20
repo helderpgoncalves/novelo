@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { type CSSProperties, useId, useRef, useState } from 'react';
 import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { useInViewOnce } from '@/lib/motion';
 import { cn } from '@/lib/utils';
@@ -82,7 +82,8 @@ function MiniSimulator() {
             value={target}
             onChange={(e) => setTarget(Number(e.target.value))}
             aria-valuetext={`${formatTonnes(target)}`}
-            className="h-11 w-full cursor-pointer accent-primary"
+            className="lp-range h-11 w-full cursor-pointer"
+            style={{ '--fill': `${pct(target)}%` } as CSSProperties}
           />
         </div>
         <ul className="grid gap-x-4 gap-y-1 sm:grid-cols-2">

@@ -154,22 +154,20 @@ export function buildHead(route, locale, messages) {
 }
 
 /**
- * Preloads só do que é crítico no primeiro ecrã: as duas fontes e, na landing, a fotografia do hero (versão clara, uma
- * por direção de arte; o navegador só pede a que corresponde à media query).
+ * Preloads só do que é crítico no primeiro ecrã: as duas fontes e, na landing, a fotografia do hero. `heroLinks` vem do campo
+ * `preload` de public/landing/manifest.json (gerado por scripts/brand/hero_derivatives.py): um `<link>` por direção de arte e
+ * tema, com `media`, `imagesrcset` e `imagesizes`, por isso o navegador só pede o que corresponde ao ecrã e ao tema.
  */
-export function buildPreloads(route) {
+export function buildPreloads(route, heroLinks = []) {
   const fonts = ['newsreader-display-roman', 'inter-landing'].map(
     (f) => `<link rel="preload" href="/fonts/${f}.woff2" as="font" type="font/woff2" crossorigin />`,
   );
   if (route.id !== 'landing') return fonts.join('\n    ');
-  const img = (media, name, widths) =>
-    `<link rel="preload" as="image" type="image/avif" media="${media}" imagesrcset="${widths.map((w) => `/landing/${name}-${w}.avif ${w}w`).join(', ')}" imagesizes="100vw" fetchpriority="high" />`;
-  return [
-    ...fonts,
-    img('(max-width: 767px) and (prefers-color-scheme: light)', 'hero-mobile-light', [432, 864, 1296]),
-    img('(min-width: 768px) and (max-width: 1023px) and (prefers-color-scheme: light)', 'hero-4x3-light', [768, 1536]),
-    img('(min-width: 1024px) and (prefers-color-scheme: light)', 'hero-16x9-light', [640, 1280, 1920]),
-  ].join('\n    ');
+  const attrs = ['rel', 'as', 'type', 'media', 'imagesrcset', 'imagesizes', 'fetchpriority'];
+  const images = heroLinks.map(
+    (l) => `<link ${attrs.filter((k) => l[k] != null).map((k) => `${k}="${escapeHtml(String(l[k]))}"`).join(' ')} />`,
+  );
+  return [...fonts, ...images].join('\n    ');
 }
 
 const nf = (locale, value, digits = 0) =>
@@ -236,14 +234,14 @@ const BOOT_SPLASH = /<div class="boot-splash"[^>]*>[\s\S]*?(?:<!-- brand:splash:
  * Sem splash no `#root`: a página pública mostra o fundo do tema (html) até o React montar, nunca um spinner.
  * `landingChunks`: hrefs do pacote da landing, pré-carregados com modulepreload (só na landing).
  */
-export function renderRoute(baseHtml, route, locale, messages, landingChunks = []) {
+export function renderRoute(baseHtml, route, locale, messages, landingChunks = [], heroLinks = []) {
   const lang = LOCALES[locale].lang;
   let html = stripSeoTags(baseHtml).replace(/<html lang="[^"]*"/, `<html lang="${lang}"`);
   html = html.replace(BOOT_SPLASH, '');
   const chunks = route.id === 'landing' && landingChunks.length ? `\n    ${buildModulePreloads(landingChunks)}` : '';
   html = html.replace(
     '</head>',
-    `    ${buildHead(route, locale, messages)}\n    ${buildPreloads(route)}${chunks}\n  </head>`,
+    `    ${buildHead(route, locale, messages)}\n    ${buildPreloads(route, heroLinks)}${chunks}\n  </head>`,
   );
   if (route.id === 'landing') {
     html = html.replace('<div id="root">', `<div id="root">${buildSummary(locale, messages)}`);

@@ -1,32 +1,35 @@
-# Créditos dos ativos da landing
+# Ativos da landing
 
-## Fotografia de origem
+Todas as imagens desta pasta são **fotografias de Guimarães com licença livre**, adaptadas em meio-tom Novelo (duotone ouro, floresta e tinta) por
+`scripts/brand/hero_derivatives.py` (`just brand-landing`) e `scripts/brand/login_panel.py` (`just brand-login`). Os originais reduzidos (2400 px)
+estão em `scripts/brand/base/*-fonte.jpg`. Não há texturas geradas nem imagens fornecidas pelo utilizador.
+As três fotografias de referência em `docs/marca/referencias/` são só referência de estilo e **não se usam** na app.
 
-| Campo | Valor |
-| --- | --- |
-| Título | «Costa, Penha, Guimarães» (ficheiro `Costa - Penha, Guimarães - 20210501194326.jpg`) |
-| Autor | RaquelRosa7 (Wikimedia Commons, «obra própria») |
-| Página | https://commons.wikimedia.org/wiki/File:Costa_-_Penha,_Guimar%C3%A3es_-_20210501194326.jpg |
-| Licença | Creative Commons Atribuição-CompartilhaIgual 4.0 Internacional (CC BY-SA 4.0): https://creativecommons.org/licenses/by-sa/4.0/ |
-| Data da fotografia | 1 de maio de 2021 (pôr do sol visto do Monte da Penha) |
-| Uso comercial e modificação | Permitidos pela licença, com atribuição e partilha nos mesmos termos |
+A atribuição é mostrada no rodapé da landing (`apps/web/src/features/landing/photo-credits.ts`) e, para o painel de entrada, junto ao painel.
 
-A fotografia está guardada reduzida a 2400 px em `scripts/brand/base/penha-fonte.jpg` para o gerador ser reprodutível sem rede.
+**Partilha nos mesmos termos (CC BY-SA).** As imagens adaptadas de fotografias CC BY-SA (Penha, Paço dos Duques, Couros, Plataforma das Artes)
+são obras derivadas e partilham-se sob a mesma licença (CC BY-SA, versão da fotografia de origem). A da fábrica têxtil é CC BY 4.0 (basta o crédito).
+O código e o restante repositório não mudam de licença por isso: só estes ficheiros de imagem.
 
-## Obras derivadas
+## Fotografias
 
-Os ficheiros `hero-*`, `login-painel-*` e as texturas de fotografia em `apps/web/public/landing/` são **adaptações**
-da fotografia acima (recorte, níveis, conversão em pontos de meio-tom a duas cores, desvanecido de densidade).
-Mantêm a licença **CC BY-SA 4.0** e a atribuição «Fotografia: RaquelRosa7 / Wikimedia Commons (CC BY-SA 4.0), adaptada pela equipa Novelo».
-Os ficheiros `textura-fio-*`, `textura-campo-*`, `textura-dunas-*`, `login-faixa-*` e `tile-cruz-*` são gerados proceduralmente
-(símbolo da marca, ruído) e não dependem da fotografia.
+| Ficheiros | Fotografia | Autor | Licença | Página | Data |
+| --- | --- | --- | --- | --- | --- |
+| `hero-*`, `login-painel-*` | «Costa, Penha, Guimarães» (`Costa_-_Penha,_Guimarães_-_20210501194326.jpg`) | RaquelRosa7 | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Costa_-_Penha,_Guimar%C3%A3es_-_20210501194326.jpg | 2021-05-01 |
+| `fundo-paco-*` | «DJI 0145.paço duques bragançaJPG» (Paço dos Duques de Bragança e Castelo, vista aérea) | Luis Miguel Jorge Duarte | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:DJI_0145.pa%C3%A7o_duques_bragan%C3%A7aJPG.jpg | 2019-02-06 |
+| `fundo-fabrica-*` | «Antiga fábrica têxtil na rua da Liberdade 1» | V.B.Speranza | CC BY 4.0 | https://commons.wikimedia.org/wiki/File:Antiga_f%C3%A1brica_t%C3%AAxtil_na_rua_da_Liberdade_1.jpg | 2024-01-05 |
+| `fundo-couros-*` | «Couros zone» (roda do antigo curtume, zona dos Couros) | V.B.Speranza | CC BY-SA 4.0 | https://commons.wikimedia.org/wiki/File:Couros_zone.jpg | 2025-02-08 |
+| `fundo-plataforma-*` | «Plataforma das Artes - Guimarães - Portugal (8244353917)» | Vitor Oliveira (Portuguese eyes) | CC BY-SA 2.0 | https://commons.wikimedia.org/wiki/File:Plataforma_das_Artes_-_Guimar%C3%A3es_-_Portugal_(8244353917).jpg | 2012-08-29 |
 
-A partilha nos mesmos termos aplica-se a estas adaptações da imagem, não ao código nem aos textos do Novelo.
+Licenças: CC BY 4.0 https://creativecommons.org/licenses/by/4.0/ · CC BY-SA 4.0 https://creativecommons.org/licenses/by-sa/4.0/ · CC BY-SA 2.0 https://creativecommons.org/licenses/by-sa/2.0/.
+Licenças confirmadas nos metadados da Wikimedia Commons (`LicenseShortName`) a 2026-10-20.
 
-## Onde mostrar a atribuição
+## Alterações feitas
 
-Rodapé da landing (linha pequena): «Fotografia: RaquelRosa7, Wikimedia Commons, CC BY-SA 4.0, adaptada.» com ligação para a página do ficheiro.
+Recorte, redução, conversão para meio-tom (grelha de pontos a 45º, cobertura por luminância, rampa de cor da marca; no escuro, densidade invertida),
+codificação AVIF e WebP. Na Plataforma das Artes cortou-se a marca de água do autor (rodapé da imagem original). Nada mais foi retocado.
 
 ## Reproduzir
 
-`just brand-landing` (ver `scripts/brand/landing_hero.py` e `docs/marca/linguagem-dither.md`).
+`just brand-landing` regenera `hero-*`, `fundo-*`, `manifest.json` e `src/features/landing/landing-assets.generated.{ts,css}`; os nomes levam o hash do conteúdo.
+Ver `docs/marca/linguagem-dither.md`.

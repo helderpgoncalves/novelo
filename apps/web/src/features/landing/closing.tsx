@@ -84,7 +84,7 @@ export function Faq() {
   );
 }
 
-/** Convite final: cartão de tinta com o degradé de pontos dither e os três botões (demo, conta, código). */
+/** Convite final: cartão de tinta com a fotografia das dunas a dissolver-se e os três botões (demo, conta, código). */
 export function FinalCta() {
   return (
     <section
@@ -93,7 +93,7 @@ export function FinalCta() {
       className={`lp-defer scroll-mt-[calc(var(--nav-h)+0.5rem)] ${SECTION_Y}`}
     >
       <div data-reveal="" className={CONTAINER}>
-        <div className="tx tx-fio tx-dark relative isolate overflow-hidden rounded-2xl bg-[#14211d] p-8 text-[#f4f1ea] lg:p-16">
+        <div className="photo-bg photo-plataforma photo-dark relative isolate overflow-hidden rounded-2xl bg-[#14211d] p-8 text-[#f4f1ea] lg:p-16">
           <div className="relative flex max-w-2xl flex-col gap-6">
             <h2 id="comecar-title" className="lp-headline">
               {m.landing_cta_title()}

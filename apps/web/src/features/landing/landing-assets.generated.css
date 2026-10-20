@@ -1,0 +1,74 @@
+/* GERADO por scripts/brand/hero_derivatives.py (`just brand-landing`). Não editar à mão. */
+/* Fundos de secção (só AVIF, decorativos): 960 px até 768 px de largura, 1440 px acima. Claro = multiply; escuro = screen (ver .photo-bg em styles.css). */
+.photo-paco::before {
+  background-image: url("/landing/fundo-paco-light-960.f5ba885b.avif");
+}
+@media (min-width: 769px) {
+  .photo-paco::before {
+    background-image: url("/landing/fundo-paco-light-1440.01b46f05.avif");
+  }
+}
+.dark .photo-paco::before,
+.photo-dark.photo-paco::before {
+  background-image: url("/landing/fundo-paco-dark-960.4c8f452c.avif");
+}
+@media (min-width: 769px) {
+  .dark .photo-paco::before,
+  .photo-dark.photo-paco::before {
+    background-image: url("/landing/fundo-paco-dark-1440.ad444f7b.avif");
+  }
+}
+.photo-fabrica::before {
+  background-image: url("/landing/fundo-fabrica-light-960.c7aebca9.avif");
+}
+@media (min-width: 769px) {
+  .photo-fabrica::before {
+    background-image: url("/landing/fundo-fabrica-light-1440.267be35d.avif");
+  }
+}
+.dark .photo-fabrica::before,
+.photo-dark.photo-fabrica::before {
+  background-image: url("/landing/fundo-fabrica-dark-960.b91e10e7.avif");
+}
+@media (min-width: 769px) {
+  .dark .photo-fabrica::before,
+  .photo-dark.photo-fabrica::before {
+    background-image: url("/landing/fundo-fabrica-dark-1440.f44e0d9d.avif");
+  }
+}
+.photo-couros::before {
+  background-image: url("/landing/fundo-couros-light-960.8e1ebafd.avif");
+}
+@media (min-width: 769px) {
+  .photo-couros::before {
+    background-image: url("/landing/fundo-couros-light-1440.8724feb9.avif");
+  }
+}
+.dark .photo-couros::before,
+.photo-dark.photo-couros::before {
+  background-image: url("/landing/fundo-couros-dark-960.a4ef4041.avif");
+}
+@media (min-width: 769px) {
+  .dark .photo-couros::before,
+  .photo-dark.photo-couros::before {
+    background-image: url("/landing/fundo-couros-dark-1440.55c7e0e9.avif");
+  }
+}
+.photo-plataforma::before {
+  background-image: url("/landing/fundo-plataforma-light-960.8dddf6f9.avif");
+}
+@media (min-width: 769px) {
+  .photo-plataforma::before {
+    background-image: url("/landing/fundo-plataforma-light-1440.fe17b7af.avif");
+  }
+}
+.dark .photo-plataforma::before,
+.photo-dark.photo-plataforma::before {
+  background-image: url("/landing/fundo-plataforma-dark-960.4cc026f2.avif");
+}
+@media (min-width: 769px) {
+  .dark .photo-plataforma::before,
+  .photo-dark.photo-plataforma::before {
+    background-image: url("/landing/fundo-plataforma-dark-1440.6e2a33a8.avif");
+  }
+}

@@ -47,7 +47,7 @@ Não rodar, esticar nem contornar; não pôr sombra, brilho ou gradiente; não r
 
 ### Regenerar e verificar
 
-`just brand` regenera tudo a partir de `scripts/brand/geometry.py` (única fonte de verdade): SVG e PNG de símbolo e logotipos, `favicon.svg` e `favicon.ico` (16/32/48), `apple-touch-icon` 180, ícones PWA 192/512 e `maskable-512` (tinta dentro do círculo de zona segura de 40%), avatares (quadrado e `circulo`), imagens de partilha OG 1200×630 por página e idioma (`apps/web/public/og/`, `og-image.png`, `og-image@2x.png`), capa e banner em dither (claro e escuro; `scripts/brand/dither_assets.py`), os ativos da landing e do painel de entrada (`just brand-landing`, `scripts/brand/landing_hero.py`), imagens do email (logótipo para fundo claro e negativo para o modo escuro), o splash de `index.html`, o cabeçalho do relatório RAP e `brand-geometry.gen.ts`. Precisa de `rsvg-convert` (`brew install librsvg`). As bases das imagens de partilha (sem logótipo) estão em `scripts/brand/base/`.
+`just brand` regenera tudo a partir de `scripts/brand/geometry.py` (única fonte de verdade): SVG e PNG de símbolo e logotipos, `favicon.svg` e `favicon.ico` (16/32/48), `apple-touch-icon` 180, ícones PWA 192/512 e `maskable-512` (tinta dentro do círculo de zona segura de 40%), avatares (quadrado e `circulo`), imagens de partilha OG 1200×630 por página e idioma (`apps/web/public/og/`, `og-image.png`, `og-image@2x.png`), capa e banner em dither (claro e escuro; `scripts/brand/dither_assets.py`), os derivados das fotografias de Guimarães da landing (`just brand-landing`, `scripts/brand/hero_derivatives.py`) e o painel do ecrã de entrada (`just brand-login`, `scripts/brand/login_panel.py`), imagens do email (logótipo para fundo claro e negativo para o modo escuro), o splash de `index.html`, o cabeçalho do relatório RAP e `brand-geometry.gen.ts`. Precisa de `rsvg-convert` (`brew install librsvg`). As bases das imagens de partilha (sem logótipo) estão em `scripts/brand/base/`.
 
 `just check-brand` mede o alinhamento em píxeis a 512 px (base e altura de maiúscula do "N", altura e centro do símbolo, distância `U`, centragem do empilhado, ícones e zona segura, contrastes) e falha acima de 0,5 px. `brand/preview.html` mostra tudo sobre linho, branco e tinta a 16, 32, 64, 128 e 512 px, com as guias de construção. `just brand-shots` regenera as capturas do manifesto PWA com a stack em `just dev`.
 
@@ -99,9 +99,9 @@ Princípios, rampas, parâmetros e acessibilidade em [Linguagem dither](linguage
 
 | Ativo | Ficheiros | Uso |
 | --- | --- | --- |
-| Hero (16:9, 4:3, móvel), claro e escuro | `apps/web/public/landing/hero-*.avif` | Landing |
+| Hero (`wide` 16:10, `tall` 4:5), claro e escuro | `apps/web/public/landing/hero-*.{avif,webp}` | Landing |
 | Painel e faixa de entrada | `apps/web/public/landing/login-*.avif` | Login e registo |
-| Texturas e tile | `apps/web/public/landing/textura-*.avif`, `tile-cruz-*.svg` | Faixas de secção, CTA final |
+| Fundos de secção (paço, fábrica, couros, plataforma) | `apps/web/public/landing/fundo-*.{avif,webp}` | Faixas de secção, cartões, CTA final |
 | Partilha (OG) por página e idioma | `apps/web/public/og/novelo-partilha-*.png`, `og-image.png` | `og:image`, `twitter:image` |
 | Banner, capa (claro e escuro) | `redes/novelo-banner-2400x450*.png`, `redes/novelo-capa-1920x1080*.png`, `docs/img/banner-*.png` | README, docs, redes |
 

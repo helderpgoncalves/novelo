@@ -2872,6 +2872,7 @@
   "landing_menu_open": "Open menu",
   "landing_menu_title": "Menu",
   "landing_lead": "Budget and target go in; comparable scenarios come out in euros, tonnes and €/t for Guimarães' collection network.",
+  "landing_lead_short": "Budget and target go in; comparable scenarios come out in euros, tonnes and €/t.",
   "landing_register_note": "New accounts must be approved by an administrator. You get an email when your request is accepted.",
   "landing_hero_caption": "Three threads almost closed around a point. The gap at the top says the cycle is not closed yet, and that is where Novelo works.",
   "landing_hero_tags": "Plan · Decide · Follow",
@@ -3559,8 +3560,8 @@
   "seo_og_alt_entrar": "Novelo: sign in to design Guimarães's textile collection network.",
   "seo_og_alt_passaporte": "Novelo lot passport: origin, sorting and destination of each bag of textiles.",
   "auth_panel_quote": "Design the collection network with the real numbers.",
-  "landing_photo_credit": "Photograph:",
-  "landing_photo_credit_adapted": "adapted by the Novelo team.",
+  "landing_photo_credit": "Photographs:",
+  "landing_photo_credit_adapted": "Adapted into halftone by the Novelo team; the derivatives are shared under the same terms as the original licences.",
   "chat_cmd_websearch": "Web search",
   "chat_cmd_websearch_desc": "Turns web search on or off: /websearch on or /websearch off",
   "chat_think_web_1": "Searching the web…",
@@ -3606,5 +3607,10 @@
   "chat_chart_table": "Chart data as a table",
   "chat_set_web_toggle": "Search the web when needed",
   "chat_cmd_websearch_on": "Turn web search on",
-  "chat_cmd_websearch_off": "Turn web search off"
+  "chat_cmd_websearch_off": "Turn web search off",
+  "landing_photo_penha": "Penha",
+  "landing_photo_paco": "Ducal Palace",
+  "landing_photo_fabrica": "Former textile factory",
+  "landing_photo_couros": "Couros",
+  "landing_photo_plataforma": "Plataforma das Artes"
 }
