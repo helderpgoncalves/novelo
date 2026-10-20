@@ -1,308 +1,97 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import type {
-  ActionOut,
-  AttachmentOut,
-  CopilotEventMessage,
-  CopilotStreamRequest,
-  MentionRef,
-  PageContext,
-} from '@/client';
-import { getCopilotThreadOptions } from '@/client/@tanstack/react-query.gen';
-import { getLocale } from '@/lib/i18n';
-import { m } from '@/paraglide/messages';
-import { invalidateCopilot } from './cache';
-import { applyEvent, closingEvents, emptyMessage, fromServer, newTurn } from './reducer';
-import { regeneratePath, STREAM_PATH, StreamHttpError, streamEvents } from './sse';
-import type { ChatMessage, ContextInfo, EventOf, StatusInfo, Turn } from './types';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import type { ActionOut } from '@/client';
+import { isDraftKey } from './generation';
+import { useCopilotUi } from './store';
+import {
+  acknowledgeIfVisible,
+  bindQueryClient,
+  getConversation,
+  loadConversation,
+  newDraftKey,
+  regenerateConversation,
+  registerView,
+  resolveKey,
+  retryConversation,
+  type SendInput,
+  sendMessage,
+  stopConversation,
+  subscribeConversations,
+  updateMessages,
+} from './stream-manager';
+import type { ChatMessage } from './types';
 
-export interface SendInput {
-  text: string;
-  mentions: { ref: MentionRef; label?: string }[];
-  attachments: AttachmentOut[];
-  pageContext: PageContext | null;
-}
+export type { SendInput } from './stream-manager';
 
 interface Options {
   threadId: string | null;
   onThreadId: (id: string | null) => void;
-}
-
-let counter = 0;
-const tempId = () => `tmp-${Date.now()}-${counter++}`;
-
-function errorFrom(e: unknown): { code: string; message: string } {
-  if (e instanceof StreamHttpError) {
-    const body = e.body as { code?: unknown; message?: unknown } | null;
-    return {
-      code: typeof body?.code === 'string' ? body.code : 'internal_error',
-      message: typeof body?.message === 'string' ? body.message : `HTTP ${e.status}`,
-    };
-  }
-  return { code: 'connection', message: m.chat_error_connection() };
+  /** Onde esta vista aparece: o painel ⌘K ou a página /chat (decide se a resposta "está à vista"). */
+  surface?: 'sheet' | 'page';
 }
 
 /**
- * Uma conversa com o copiloto: carrega a conversa pedida, envia perguntas em streaming, cancela e regenera.
- * O mesmo hook serve o painel (⌘K) e a página /chat.
+ * Vista sobre uma conversa do gestor de streams (`stream-manager.ts`): o stream não pertence a este hook,
+ * por isso continua ao desmontar, trocar de conversa ou mudar de painel para página. Mesma API de sempre.
  */
-export function useChat({ threadId, onThreadId }: Options) {
+export function useChat({ threadId, onThreadId, surface = 'page' }: Options) {
   const qc = useQueryClient();
-  const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [status, setStatus] = useState<StatusInfo | null>(null);
-  const [context, setContext] = useState<ContextInfo | null>(null);
-  const [title, setTitle] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [load, setLoad] = useState<{ state: 'idle' | 'loading' | 'error'; error?: unknown }>({
-    state: 'idle',
-  });
+  bindQueryClient(qc);
+  // Conversa nova (sem id): chave provisória, que o gestor resolve para o id real quando chega o `start`.
+  const [draft, setDraft] = useState(newDraftKey);
+  const rawKey = threadId ?? draft;
+  const key = resolveKey(rawKey);
+  const keyRef = useRef(key);
+  keyRef.current = key;
+  const rawKeyRef = useRef(rawKey);
+  rawKeyRef.current = rawKey;
 
-  const held = useRef<string | null>(null);
-  const gen = useRef(0);
-  const abort = useRef<AbortController | null>(null);
-  const busyRef = useRef(false);
-  const messagesRef = useRef<ChatMessage[]>([]);
-  messagesRef.current = messages;
+  const conv = useSyncExternalStore(
+    subscribeConversations,
+    () => getConversation(rawKey),
+    () => getConversation(rawKey),
+  );
+  const ui = useCopilotUi();
+
   const onThreadIdRef = useRef(onThreadId);
   onThreadIdRef.current = onThreadId;
 
-  const loadThread = useCallback(
-    async (id: string) => {
-      const mine = gen.current;
-      setLoad({ state: 'loading' });
-      try {
-        const thread = await qc.fetchQuery({
-          ...getCopilotThreadOptions({ path: { thread_id: id } }),
-          staleTime: 0,
-        });
-        if (mine !== gen.current) return;
-        setMessages(thread.messages.map(fromServer));
-        setTitle(thread.title);
-        setContext({
-          usedTokens: thread.used_tokens,
-          windowTokens: thread.window_tokens,
-          compacted: thread.has_summary,
-        });
-        setLoad({ state: 'idle' });
-      } catch (error) {
-        if (mine === gen.current) setLoad({ state: 'error', error });
-      }
-    },
-    [qc],
-  );
-
-  // A conversa pedida (URL ou painel) mudou: abandona a atual e carrega a nova.
+  // O stream desta conversa nova recebeu o id: sobe-o ao dono (URL ou painel).
   useEffect(() => {
-    if (threadId === held.current) return;
-    gen.current += 1;
-    abort.current?.abort();
-    held.current = threadId;
-    busyRef.current = false;
-    setBusy(false);
-    setStatus(null);
-    setContext(null);
-    setTitle(null);
-    if (!threadId) {
-      setMessages([]);
-      setLoad({ state: 'idle' });
-      return;
-    }
-    setMessages([]);
-    void loadThread(threadId);
-  }, [threadId, loadThread]);
+    if (threadId === null && !isDraftKey(key)) onThreadIdRef.current(key);
+  }, [threadId, key]);
 
-  const reconcile = useCallback(
-    async (id: string, localAssistantId: string) => {
-      const mine = gen.current;
-      try {
-        const thread = await qc.fetchQuery({
-          ...getCopilotThreadOptions({ path: { thread_id: id } }),
-          staleTime: 0,
-        });
-        if (mine !== gen.current || busyRef.current) return;
-        const local = messagesRef.current;
-        const merged = thread.messages.map((sm, i) => {
-          const fresh = fromServer(sm);
-          const mine = local.find((l) => l.id === sm.id);
-          if (mine) {
-            return {
-              ...fresh,
-              suggestions: mine.suggestions,
-              sources: mine.sources,
-              memory: mine.memory,
-              clarify: mine.clarify,
-              navigate: mine.navigate,
-              plan: mine.plan,
-              retracted: mine.retracted,
-              error: mine.error ?? fresh.error,
-              tools: mine.tools.length ? mine.tools : fresh.tools,
-            };
-          }
-          const sameSlot = local[i];
-          if (sameSlot && sameSlot.role === 'user' && sm.role === 'user') {
-            return { ...fresh, mentions: sameSlot.mentions };
-          }
-          return fresh;
-        });
-        // Se a resposta local ainda não existe no servidor (falha antes de gravar), mantém o que há.
-        if (!thread.messages.some((x) => x.id === localAssistantId)) return;
-        setMessages(merged);
-        setTitle(thread.title);
-      } catch {
-        // Os ids provisórios continuam a servir; a conversa recarrega ao reabrir.
-      }
-    },
-    [qc],
-  );
+  // Abre a conversa pedida: mostra o que há e atualiza do servidor (salvo se estiver a gerar).
+  useEffect(() => {
+    if (!isDraftKey(key)) void loadConversation(key, { silent: true });
+  }, [key]);
 
-  const run = useCallback(
-    async (path: string, body: unknown, first: Turn) => {
-      const mine = gen.current;
-      const ctrl = new AbortController();
-      abort.current = ctrl;
-      busyRef.current = true;
-      setBusy(true);
-      setStatus({ phase: 'thinking', labelKey: 'status.thinking', detail: null });
+  useEffect(() => registerView(surface, () => keyRef.current), [surface]);
 
-      let turn = first;
-      let currentId = first.message.id;
-      let queue: CopilotEventMessage[] = [];
-      let timer: ReturnType<typeof setTimeout> | null = null;
+  // À vista (painel aberto, página montada): a resposta pronta deixa de estar "por ler".
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `ui.sheetOpen` e `key` mudam o que está à vista.
+  useEffect(() => {
+    acknowledgeIfVisible(key);
+  }, [key, ui.sheetOpen]);
 
-      const flush = () => {
-        timer = null;
-        if (mine !== gen.current || queue.length === 0) return;
-        const batch = queue;
-        queue = [];
-        const before = currentId;
-        for (const ev of batch) {
-          turn = applyEvent(turn, ev);
-        }
-        currentId = turn.message.id;
-        const next = turn.message;
-        setMessages((prev) => prev.map((x) => (x.id === before ? next : x)));
-        setStatus(turn.status);
-        if (turn.context) setContext(turn.context);
-        if (turn.title) setTitle(turn.title);
-        if (turn.threadId && held.current !== turn.threadId) {
-          held.current = turn.threadId;
-          onThreadIdRef.current(turn.threadId);
-        }
-      };
+  const send = useCallback((input: SendInput) => sendMessage(rawKeyRef.current, input), []);
+  const regenerate = useCallback(() => regenerateConversation(rawKeyRef.current), []);
+  const retry = useCallback(() => retryConversation(rawKeyRef.current), []);
+  const stop = useCallback(() => stopConversation(rawKeyRef.current), []);
 
-      try {
-        await streamEvents(path, body, ctrl.signal, (ev) => {
-          queue.push(ev);
-          if (timer === null) timer = setTimeout(flush, 40);
-        });
-      } catch (e) {
-        if (!ctrl.signal.aborted && mine === gen.current) {
-          const err = errorFrom(e);
-          queue.push({
-            type: 'error',
-            code: err.code as EventOf<'error'>['code'],
-            message: err.message,
-          });
-        }
-      }
-      if (timer !== null) clearTimeout(timer);
-      if (mine !== gen.current) return;
-      queue.push(...closingEvents(queue, turn, ctrl.signal.aborted, m.chat_error_connection()));
-      flush();
-      // Sem `done` (erro antes de acabar), a mensagem não pode ficar a "escrever" para sempre.
-      setMessages((prev) =>
-        prev.map((x) =>
-          x.id === currentId && x.state === 'streaming'
-            ? { ...x, state: x.error ? 'error' : ctrl.signal.aborted ? 'cancelled' : 'complete' }
-            : x,
-        ),
-      );
-      busyRef.current = false;
-      setBusy(false);
-      setStatus(null);
-      abort.current = null;
-      void invalidateCopilot(qc);
-      if (turn.threadId ?? held.current)
-        void reconcile((turn.threadId ?? held.current) as string, currentId);
-    },
-    [qc, reconcile],
-  );
-
-  const send = useCallback(
-    async (input: SendInput) => {
-      const text = input.text.trim();
-      if (!text || busyRef.current) return;
-      const user: ChatMessage = {
-        ...emptyMessage('user', tempId(), text),
-        attachments: input.attachments,
-        mentions: input.mentions,
-      };
-      const turn = newTurn(tempId());
-      setMessages((prev) => [...prev, user, turn.message]);
-      const body: CopilotStreamRequest = {
-        message: text,
-        locale: getLocale(),
-        thread_id: held.current,
-        mentions: input.mentions.map((x) => x.ref),
-        attachment_ids: input.attachments.map((a) => a.id),
-        page_context: input.pageContext,
-      };
-      await run(STREAM_PATH, body, turn);
-    },
-    [run],
-  );
-
-  const regenerate = useCallback(async () => {
-    const id = held.current;
-    if (!id || busyRef.current) return;
-    const list = messagesRef.current;
-    const last = list[list.length - 1];
-    const base = last?.role === 'assistant' ? list.slice(0, -1) : list;
-    const turn = newTurn(tempId());
-    setMessages([...base, turn.message]);
-    await run(regeneratePath(id, getLocale()), undefined, turn);
-  }, [run]);
-
-  const retry = useCallback(async () => {
-    const list = messagesRef.current;
-    if (held.current) {
-      await regenerate();
-      return;
-    }
-    const lastUser = [...list].reverse().find((x) => x.role === 'user');
-    if (!lastUser) return;
-    setMessages([]);
-    await send({
-      text: lastUser.text,
-      mentions: lastUser.mentions,
-      attachments: lastUser.attachments,
-      pageContext: null,
-    });
-  }, [regenerate, send]);
-
-  const stop = useCallback(() => abort.current?.abort(), []);
-
+  // "Nova conversa" larga esta vista; a resposta que estiver a gerar continua em segundo plano.
   const newChat = useCallback(() => {
-    gen.current += 1;
-    abort.current?.abort();
-    held.current = null;
-    busyRef.current = false;
-    setBusy(false);
-    setStatus(null);
-    setContext(null);
-    setTitle(null);
-    setMessages([]);
-    setLoad({ state: 'idle' });
+    setDraft(newDraftKey());
     onThreadIdRef.current(null);
   }, []);
 
   const patchMessage = useCallback((id: string, patch: (m: ChatMessage) => ChatMessage) => {
-    setMessages((prev) => prev.map((x) => (x.id === id ? patch(x) : x)));
+    updateMessages(rawKeyRef.current, (list) => list.map((x) => (x.id === id ? patch(x) : x)));
   }, []);
 
   const updateAction = useCallback((action: ActionOut) => {
-    setMessages((prev) =>
-      prev.map((x) =>
+    updateMessages(rawKeyRef.current, (list) =>
+      list.map((x) =>
         x.actions.some((a) => a.id === action.id)
           ? { ...x, actions: x.actions.map((a) => (a.id === action.id ? action : a)) }
           : x,
@@ -311,17 +100,18 @@ export function useChat({ threadId, onThreadId }: Options) {
   }, []);
 
   const reload = useCallback(() => {
-    if (held.current) void loadThread(held.current);
-  }, [loadThread]);
+    const k = keyRef.current;
+    if (!isDraftKey(k)) void loadConversation(k);
+  }, []);
 
   return {
-    messages,
-    busy,
-    status,
-    context,
-    title,
-    load,
-    threadId: held.current,
+    messages: conv.messages,
+    busy: conv.busy,
+    status: conv.status,
+    context: conv.context,
+    title: conv.title,
+    load: conv.load,
+    threadId: isDraftKey(key) ? null : key,
     send,
     stop,
     regenerate,

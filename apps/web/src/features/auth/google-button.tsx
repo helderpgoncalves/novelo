@@ -1,7 +1,6 @@
-import { Link } from '@tanstack/react-router';
 import type { GoogleLoginData } from '@/client';
 import { client } from '@/client/client.gen';
-import { rich, slot } from '@/features/home/rich';
+import { Button } from '@/components/ui/button';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
@@ -30,10 +29,9 @@ function GoogleMark() {
 }
 
 /**
- * Botão "Entrar com o Google" segundo as diretrizes de marca da Google: altura 40 px, "G" de 20 px com 12 px de
- * margem e 10 px até ao texto, cantos de 4 px, Roboto/Inter 500 a 14 px; claro (#FFFFFF, contorno #747775, texto
- * #1F1F1F) e escuro (#131314, contorno #8E918F, texto #E3E3E3). As cores NÃO seguem os tokens da marca de propósito.
- * Fluxo completo no servidor: /auth/google/login redireciona para a Google e o callback volta com a sessão.
+ * Botão "Entrar com o Google": mesmo estilo secundário (outline), altura, raio e peso dos restantes botões; só o "G"
+ * leva as cores oficiais da Google (kit de marca). Fluxo completo no servidor: /auth/google/login redireciona para
+ * a Google e o callback volta com a sessão. O aviso de termos fica numa linha comum no fim do cartão (`AuthConsent`).
  */
 export function GoogleButton({
   next,
@@ -47,30 +45,12 @@ export function GoogleButton({
     url: '/api/v1/auth/google/login',
     query: { next, locale: getLocale() },
   });
-  const link = 'font-medium text-primary underline underline-offset-2 hover:no-underline';
   return (
-    <div className="space-y-2 pb-2">
-      <a
-        href={href}
-        className="relative flex h-10 w-full items-center justify-center gap-2.5 overflow-hidden rounded-[4px] border border-[#747775] bg-white px-3 font-medium text-[#1f1f1f] text-sm outline-none transition-colors after:absolute after:inset-0 after:bg-[#303030] after:opacity-0 after:transition-opacity hover:after:opacity-[0.08] focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background active:after:opacity-[0.12] dark:border-[#8e918f] dark:bg-[#131314] dark:text-[#e3e3e3] dark:after:bg-[#e3e3e3]"
-      >
+    <Button asChild variant="outline" className="h-11 w-full gap-3 font-medium">
+      <a href={href}>
         <GoogleMark />
         <span>{mode === 'signup' ? m.google_signup() : m.google_signin()}</span>
       </a>
-      <p className="text-pretty text-center text-muted-foreground text-xs leading-relaxed">
-        {rich(m.google_consent({ terms: slot('terms'), privacy: slot('privacy') }), {
-          terms: (
-            <Link to="/terms" className={link}>
-              {m.google_consent_terms()}
-            </Link>
-          ),
-          privacy: (
-            <Link to="/privacy" className={link}>
-              {m.google_consent_privacy()}
-            </Link>
-          ),
-        })}
-      </p>
-    </div>
+    </Button>
   );
 }

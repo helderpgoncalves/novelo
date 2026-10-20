@@ -86,7 +86,7 @@ export function RegisterForm({ next }: { next: string }) {
                   {...field}
                   autoComplete="name"
                   placeholder={m.register_name_placeholder()}
-                  className="h-10"
+                  className="h-11"
                 />
               </FormControl>
               <FormMessage />
@@ -106,7 +106,7 @@ export function RegisterForm({ next }: { next: string }) {
                   autoComplete="email"
                   inputMode="email"
                   placeholder={m.login_email_placeholder()}
-                  className="h-10"
+                  className="h-11"
                 />
               </FormControl>
               <FormMessage />
@@ -120,7 +120,7 @@ export function RegisterForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>{m.login_password()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-10" />
+                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
               </FormControl>
               <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
@@ -130,7 +130,7 @@ export function RegisterForm({ next }: { next: string }) {
         {gate.field}
         <Button
           type="submit"
-          className="h-10 w-full font-semibold"
+          className="h-11 w-full font-semibold"
           disabled={register.isPending || gate.blocked}
           loading={register.isPending}
         >

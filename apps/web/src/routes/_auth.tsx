@@ -63,11 +63,11 @@ function AuthLayout() {
             <ThemeToggle />
           </div>
         </div>
-        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
+        <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-8">
           <Outlet />
         </div>
-        <div className="flex flex-col items-center gap-2">
-          <LegalLinks className="text-sm [&_ul]:justify-center" />
+        <div className="flex flex-col items-center gap-1">
+          <LegalLinks className="text-xs [&_ul]:justify-center" />
           <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
         </div>
       </main>

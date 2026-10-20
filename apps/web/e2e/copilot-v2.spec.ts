@@ -62,7 +62,8 @@ test.describe('conversa em streaming', () => {
     await expect(page.getByText('Quanto têxtil se recolheu em 2025?').first()).toBeVisible();
 
     const reply = await waitForAnswer(page);
-    await expect(reply.getByText(/Números verificados|Números por verificar/)).toBeVisible();
+    // O selo «verificado» já não existe: só o aviso «Números por verificar» aparece, e só quando é o caso.
+    await expect(reply.getByText('Números verificados')).toHaveCount(0);
     await expect(sendButton(page)).toBeVisible();
     // A conversa ganha URL e aparece na lista (com o título gerado).
     await expect(page).toHaveURL(/thread=/);
@@ -105,6 +106,52 @@ test.describe('conversa em streaming', () => {
       page.getByTestId('copilot-user-message').getByText(typed.slice(1), { exact: false }).first(),
     ).toBeVisible();
     await waitForAnswer(page);
+  });
+
+  test('menu + por teclado: primeiro item ativo, setas com volta, Esc devolve o foco ao campo', async ({
+    page,
+  }) => {
+    await openChat(page);
+    const box = composer(page);
+    await field(page).getByRole('button', { name: 'Anexar ou mencionar' }).click();
+    const items = page.getByRole('menuitem');
+    await expect(items.first()).toBeFocused();
+    await page.keyboard.press('ArrowUp');
+    await expect(items.last()).toBeFocused(); // volta ao fim
+    await page.keyboard.press('ArrowDown');
+    await expect(items.first()).toBeFocused(); // e ao princípio
+    await page.keyboard.press('End');
+    await expect(items.last()).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(box).toBeFocused();
+
+    // «Comandos com /» fecha o menu e abre só a lista de comandos (sem sobreposição).
+    await field(page).getByRole('button', { name: 'Anexar ou mencionar' }).click();
+    await page.getByRole('menuitem', { name: 'Comandos com /' }).click();
+    await expect(page.getByRole('menu')).toBeHidden();
+    await expect(page.getByRole('listbox', { name: 'Comandos' })).toBeVisible();
+    await expect(box).toBeFocused();
+  });
+
+  test('menção escolhida fica marcada no campo e apaga-se como unidade', async ({ page }) => {
+    await openChat(page);
+    const box = composer(page);
+    await box.click();
+    await box.pressSequentially('@Barc');
+    await expect(
+      page.getByRole('listbox', { name: 'Menções' }).getByRole('option').first(),
+    ).toBeVisible();
+    await box.press('Enter');
+    await expect(page.getByTestId('copilot-mention-mark')).toBeVisible();
+    await box.press('Backspace'); // apaga o espaço
+    await expect(page.getByTestId('copilot-mention-mark')).toBeVisible();
+    await box.press('Backspace'); // apaga a menção toda
+    await expect(page.getByTestId('copilot-mention-mark')).toHaveCount(0);
+    await expect(box).toHaveValue('');
+    // Texto «@xyz» sem escolher não parece menção.
+    await box.pressSequentially('@xyz ');
+    await expect(page.getByTestId('copilot-mention-mark')).toHaveCount(0);
   });
 
   test('anexa um CSV pelo botão, vê o chip e a mensagem leva o anexo', async ({ page }) => {

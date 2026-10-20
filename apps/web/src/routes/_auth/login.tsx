@@ -4,7 +4,13 @@ import { KeyRound, Mail } from 'lucide-react';
 import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
+import {
+  AuthConsent,
+  AuthDivider,
+  AuthHeading,
+  AuthSwitch,
+  authLinkClass,
+} from '@/features/auth/auth-ui';
 import { FormAlert } from '@/features/auth/form-alert';
 import { GoogleButton } from '@/features/auth/google-button';
 import { LoginForm } from '@/features/auth/login-form';
@@ -40,12 +46,12 @@ function Login() {
   const usePassword = method === 'password' || !config.magic_link_enabled;
 
   const createAccount = config.registration_open && (
-    <p className="text-center text-muted-foreground text-sm">
-      {m.login_no_account()}{' '}
-      <Link to="/register" search={{ next }} className="font-medium text-primary hover:underline">
+    <AuthSwitch>
+      {m.login_no_account()}
+      <Link to="/register" search={{ next }} className={authLinkClass}>
         {m.login_create_account()}
       </Link>
-    </p>
+    </AuthSwitch>
   );
 
   if (!usePassword) {
@@ -57,21 +63,22 @@ function Login() {
           next={next}
           alternatives={
             <div className="space-y-4">
-              <div className="flex items-center gap-3 text-muted-foreground text-xs">
-                <Separator className="flex-1" />
-                {m.login_or_other()}
-                <Separator className="flex-1" />
-              </div>
-              <div className="space-y-2">
-                {config.google_enabled && <GoogleButton next={next} />}
-                <Button asChild variant="outline" className="h-10 w-full gap-2.5 font-medium">
+              <AuthDivider>{m.login_or_other()}</AuthDivider>
+              {config.google_enabled && <GoogleButton next={next} />}
+              <div className="space-y-1 pt-1">
+                <Button
+                  asChild
+                  variant="ghost"
+                  className="h-11 w-full gap-2 font-medium text-muted-foreground hover:text-foreground"
+                >
                   <Link to="/login" search={{ next, method: 'password' }}>
                     <KeyRound aria-hidden="true" />
                     {m.login_use_password()}
                   </Link>
                 </Button>
+                {createAccount}
               </div>
-              {createAccount}
+              <AuthConsent />
             </div>
           }
         />
@@ -81,32 +88,32 @@ function Login() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl">{m.login_title()}</h1>
-        <p className="text-muted-foreground text-sm">{m.login_subtitle()}</p>
-      </div>
+      <AuthHeading title={m.login_title()} subtitle={m.login_subtitle()} />
       <FormAlert message={loginError(error)} />
       <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
-      {config.google_enabled && (
-        <>
-          <GoogleButton next={next} />
-          <div className="flex items-center gap-3 text-muted-foreground text-xs">
-            <Separator className="flex-1" />
-            {m.login_or_email()}
-            <Separator className="flex-1" />
-          </div>
-        </>
-      )}
       <LoginForm next={next ?? '/'} initialEmail={readLastEmail()} />
-      {config.magic_link_enabled && (
-        <Button asChild variant="ghost" className="h-10 w-full gap-2.5 font-medium">
-          <Link to="/login" search={{ next }}>
-            <Mail aria-hidden="true" />
-            {m.login_use_link()}
-          </Link>
-        </Button>
+      {config.google_enabled && (
+        <div className="space-y-4">
+          <AuthDivider>{m.login_or_other()}</AuthDivider>
+          <GoogleButton next={next} />
+        </div>
       )}
-      {createAccount}
+      <div className="space-y-1">
+        {config.magic_link_enabled && (
+          <Button
+            asChild
+            variant="ghost"
+            className="h-11 w-full gap-2 font-medium text-muted-foreground hover:text-foreground"
+          >
+            <Link to="/login" search={{ next }}>
+              <Mail aria-hidden="true" />
+              {m.login_use_link()}
+            </Link>
+          </Button>
+        )}
+        {createAccount}
+      </div>
+      <AuthConsent />
     </div>
   );
 }

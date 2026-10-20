@@ -63,7 +63,7 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>{m.reset_password()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-10" />
+                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
               </FormControl>
               <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
@@ -77,7 +77,7 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>{m.reset_confirm()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-10" />
+                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +86,7 @@ export function ResetForm({ token }: { token: string }) {
         {gate.field}
         <Button
           type="submit"
-          className="h-10 w-full font-semibold"
+          className="h-11 w-full font-semibold"
           disabled={reset.isPending || gate.blocked}
           loading={reset.isPending}
         >

@@ -7,13 +7,13 @@ import { CONTACT_EMAIL } from '@/features/legal/content';
 import { m } from '@/paraglide/messages';
 
 const linkClass =
-  'inline-flex min-h-10 items-center font-medium text-foreground underline underline-offset-4 hover:text-primary';
+  'inline-flex min-h-11 items-center rounded-sm text-muted-foreground underline-offset-4 outline-none transition-colors hover:text-foreground hover:underline focus-visible:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
 
 /** Ligações legais e de contacto: visíveis em todas as páginas públicas (a Google exige-as na página inicial). */
 export function LegalLinks({ className }: { className?: string }) {
   return (
     <nav aria-label={m.public_nav_label()} className={className}>
-      <ul className="flex flex-wrap items-center gap-x-5 gap-y-1">
+      <ul className="flex flex-wrap items-center gap-x-5 gap-y-0">
         <li>
           <Link to="/privacy" className={linkClass}>
             {m.public_nav_privacy()}
@@ -26,7 +26,8 @@ export function LegalLinks({ className }: { className?: string }) {
         </li>
         <li>
           <a href={`mailto:${CONTACT_EMAIL}`} className={linkClass}>
-            {m.public_nav_contact()}: {CONTACT_EMAIL}
+            {m.public_nav_contact()}
+            <span className="sr-only">: {CONTACT_EMAIL}</span>
           </a>
         </li>
       </ul>
@@ -62,7 +63,7 @@ export function PublicShell({
       <div className="flex-1">{children}</div>
       <footer className="border-border border-t bg-card/40 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <div className={`mx-auto flex w-full flex-col gap-3 px-4 py-5 sm:px-6 ${width}`}>
-          <LegalLinks className="text-sm" />
+          <LegalLinks className="text-xs" />
           <p className="text-muted-foreground text-xs">{m.landing_footer_note()}</p>
         </div>
       </footer>

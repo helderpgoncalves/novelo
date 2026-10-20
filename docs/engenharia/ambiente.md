@@ -17,7 +17,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Anti-bots | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_ENABLED`, `TURNSTILE_REQUIRED`, `TURNSTILE_TIMEOUT_S` | Ver «Cloudflare Turnstile» abaixo |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Ver abaixo |
 | Email | `RESEND_API_KEY`, `EMAIL_TRANSPORT`, `EMAIL_FROM`, `EMAIL_SUPPORT` | Ver abaixo |
-| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
+| IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S`, `LLM_AUX_PROVIDER_SORT` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
 | Copiloto | `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS` | Limites do sistema; o resto cada utilizador gere nas suas definições. Ver [Copiloto](copiloto.md) |
 | Otimização | `SOLVER_TIME_LIMIT_S`, `OSRM_URL` | `OSRM_URL` está reservada: a API lê-a, mas ainda não há cliente OSRM (as distâncias são em linha reta com fator de desvio 1,3) e o compose não tem serviço OSRM |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
@@ -74,6 +74,7 @@ Os modelos por omissão são `openai/gpt-6-luna` para texto e para visão (US$ 0
 | `LLM_MAX_CONCURRENCY` | `4` | Chamadas simultâneas ao fornecedor |
 | `LLM_TIMEOUT_S` / `LLM_CHAT_TIMEOUT_S` | `30` / `90` | Limite por chamada e limite total de uma conversa com ferramentas |
 | `LLM_MAX_RETRIES` / `LLM_RETRY_BACKOFF_S` | `2` / `0.5` | Repetições de falhas transitórias, com espera exponencial |
+| `LLM_AUX_PROVIDER_SORT` | `latency` | Tarefas auxiliares (`copilot_aux`): o OpenRouter prefere o fornecedor mais rápido (`latency`, `throughput`, `price`; vazio = padrão) |
 
 ## Magic link e entrada por QR
 

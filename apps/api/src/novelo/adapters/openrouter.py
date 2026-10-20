@@ -80,6 +80,51 @@ def _semaphore(limit: int) -> asyncio.Semaphore:
     return sem
 
 
+class _SharedTransport(httpx.AsyncBaseTransport):
+    """Transporte HTTP partilhado entre clientes: reaproveita ligações TLS (keep-alive) entre pedidos.
+
+    Cada pedido cria o seu `OpenRouterClient` (chave e orçamento por utilizador); sem isto cada um abria uma
+    ligação nova (DNS + TLS). `aclose` não fecha nada: a ligação sobrevive ao cliente.
+    """
+
+    def __init__(self) -> None:
+        self._inner = httpx.AsyncHTTPTransport(
+            limits=httpx.Limits(max_connections=32, max_keepalive_connections=8, keepalive_expiry=60.0)
+        )
+
+    async def handle_async_request(self, request: httpx.Request) -> httpx.Response:
+        return await self._inner.handle_async_request(request)
+
+    async def aclose(self) -> None:
+        return None
+
+
+_TRANSPORTS: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, _SharedTransport]" = weakref.WeakKeyDictionary()
+
+
+def _shared_transport() -> _SharedTransport:
+    try:
+        loop = asyncio.get_running_loop()  # as ligações pertencem a um event loop
+    except RuntimeError:
+        return _SharedTransport()
+    transport = _TRANSPORTS.get(loop)
+    if transport is None:
+        transport = _TRANSPORTS[loop] = _SharedTransport()
+    return transport
+
+
+# Só a Anthropic precisa de marcadores explícitos; OpenAI e Gemini fazem cache automática de prefixos estáveis.
+_EXPLICIT_CACHE_PREFIXES = ("anthropic/",)
+
+
+def system_message(model: str, system: str) -> dict[str, Any]:
+    """Mensagem de sistema; nos modelos com cache explícita marca o prompt estável com `cache_control`."""
+    if model.startswith(_EXPLICIT_CACHE_PREFIXES):
+        block = {"type": "text", "text": system, "cache_control": {"type": "ephemeral"}}
+        return {"role": "system", "content": [block]}
+    return {"role": "system", "content": system}
+
+
 class ToolSpec(BaseModel):
     """Ferramenta no formato OpenAI `tools`. `parameters` é o JSON Schema (normalmente de um modelo Pydantic)."""
 
@@ -166,7 +211,7 @@ class OpenRouterClient:
         self._http = httpx.AsyncClient(
             base_url=self._s.openrouter_base_url,
             timeout=self._s.llm_timeout_s,
-            transport=transport,
+            transport=transport or _shared_transport(),
             headers={
                 "Authorization": f"Bearer {self._s.openrouter_api_key}",
                 "HTTP-Referer": "https://novelo.helder.si",
@@ -210,6 +255,8 @@ class OpenRouterClient:
         payload["max_tokens"] = max_tokens
         if effort and task != AiTask.TEST:
             payload["reasoning"] = {"effort": effort}
+        if task == AiTask.COPILOT_AUX and self._s.llm_aux_provider_sort:
+            payload["provider"] = {"sort": self._s.llm_aux_provider_sort}  # fornecedor mais rápido para tarefas baratas
         return payload
 
     async def _complete(self, task: AiTask, payload: dict[str, Any], *, allow_fallback: bool = True) -> dict[str, Any]:
@@ -346,7 +393,7 @@ class OpenRouterClient:
                 return schema.model_validate_json(hit)
         # O prompt de sistema vai primeiro e é estável: favorece o prompt caching do fornecedor.
         payload = self._base_payload(
-            the_task, chosen, [{"role": "system", "content": system}, {"role": "user", "content": user}]
+            the_task, chosen, [system_message(chosen, system), {"role": "user", "content": user}]
         )
         payload["response_format"] = {
             "type": "json_schema",
@@ -405,7 +452,9 @@ class OpenRouterClient:
                 for iteration in range(1, limit + 1):
                     last_round = iteration == limit or not allow_tools
                     payload = self._base_payload(
-                        the_task, model or self.model_for(the_task), [{"role": "system", "content": system}, *history]
+                        the_task,
+                        model or self.model_for(the_task),
+                        [system_message(model or self.model_for(the_task), system), *history],
                     )
                     if tools:
                         payload["tools"] = [t.as_openai() for t in tools]
@@ -464,7 +513,7 @@ class OpenRouterClient:
         self._require_enabled()
         the_task = AiTask(task)
         chosen = model or self.model_for(the_task)
-        payload = self._base_payload(the_task, chosen, [{"role": "system", "content": system}, *messages])
+        payload = self._base_payload(the_task, chosen, [system_message(chosen, system), *messages])
         payload["stream"] = True
         payload["stream_options"] = {"include_usage": True}
         if tools:
@@ -480,6 +529,7 @@ class OpenRouterClient:
             candidates.append(fallback)
         for index, candidate in enumerate(candidates):
             payload["model"] = candidate
+            payload["messages"][0] = system_message(candidate, system)
             emitted = False
             try:
                 async with aclosing(self._stream_once(the_task, payload)) as pieces:

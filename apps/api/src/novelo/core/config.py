@@ -65,6 +65,10 @@ class Settings(BaseSettings):
     llm_chat_timeout_s: float = Field(90.0, alias="LLM_CHAT_TIMEOUT_S")  # limite total de uma conversa com ferramentas
     llm_max_retries: int = Field(2, ge=0, le=5, alias="LLM_MAX_RETRIES")  # falhas transitórias (timeout, 429, 5xx)
     llm_retry_backoff_s: float = Field(0.5, ge=0, alias="LLM_RETRY_BACKOFF_S")
+    # Tarefas auxiliares (título, sugestões, resumos): o OpenRouter escolhe o fornecedor mais rápido. Vazio = padrão.
+    llm_aux_provider_sort: Literal["", "latency", "throughput", "price"] = Field(
+        "latency", alias="LLM_AUX_PROVIDER_SORT"
+    )
 
     # --- Sessão e autenticação -------------------------------------------------------
     secret_key: str = Field("dev-only-change-me-dev-only-change-me", alias="SECRET_KEY")

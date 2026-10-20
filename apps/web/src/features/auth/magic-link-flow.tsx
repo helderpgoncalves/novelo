@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AuthHeading } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { MagicLinkSent, magicLinkBody, useRequestMagicLink } from './magic-link-sent';
 import { looksLikeEmail, readLastEmail } from './passwordless';
@@ -50,11 +51,8 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl">{m.login_title()}</h1>
-        <p className="text-muted-foreground text-sm leading-relaxed">{m.login_magic_subtitle()}</p>
-      </div>
-      <form onSubmit={onSubmit} className="space-y-2" noValidate>
+      <AuthHeading title={m.login_title()} subtitle={m.login_magic_subtitle()} />
+      <form onSubmit={onSubmit} className="space-y-4" noValidate>
         <FormAlert message={request.isError ? getErrorMessage(request.error) : null} />
         <div className="space-y-2">
           <label htmlFor="magic-email" className="font-medium text-sm leading-none">
@@ -77,7 +75,11 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
             onChange={() => problem && setProblem(null)}
             className="h-11"
           />
-          <p id="magic-email-problem" role="alert" className="min-h-5 text-destructive text-sm">
+          <p
+            id="magic-email-problem"
+            role="alert"
+            className="text-destructive text-sm empty:hidden"
+          >
             {problem}
           </p>
         </div>

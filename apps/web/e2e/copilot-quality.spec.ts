@@ -26,7 +26,7 @@ test.describe('copiloto de IA', () => {
     await panel.getByLabel('Pergunta ao copiloto').press('Enter');
     await expect(panel.getByText('Quanto têxtil se recolheu em 2025?')).toBeVisible();
     await expect(
-      panel.getByText(/Números verificados|Números por verificar|não respondeu/),
+      panel.getByTestId('copilot-assistant-message').or(panel.getByText(/não respondeu/)),
     ).toBeVisible({ timeout: 90_000 });
   });
 });

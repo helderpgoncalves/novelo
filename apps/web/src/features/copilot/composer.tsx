@@ -12,6 +12,7 @@ import {
   X,
 } from 'lucide-react';
 import {
+  type ComponentRef,
   forwardRef,
   type KeyboardEvent,
   useCallback,
@@ -25,7 +26,7 @@ import {
   useState,
 } from 'react';
 import { toast } from 'sonner';
-import type { AttachmentOut, MentionRef, MentionType, PageContext } from '@/client';
+import type { AttachmentOut, MentionType, PageContext } from '@/client';
 import {
   listCopilotCommandsOptions,
   searchCopilotMentionsOptions,
@@ -43,6 +44,16 @@ import { getLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { commandDescription, commandLabel, mentionTypeLabel } from './labels';
+import { MentionIcon } from './mention-chip';
+import {
+  findMentionSpans,
+  mentionDeletion,
+  pruneMentions,
+  type ResolvedMention,
+  segmentText,
+  snapSelection,
+  stepIndex,
+} from './mentions';
 import {
   ACCEPTED_FILES,
   applyTrigger,
@@ -72,7 +83,31 @@ interface Option {
   label: string;
   hint?: string;
   group?: string;
+  /** Tipo da entidade (menções); sem tipo é um comando. */
+  type?: MentionType;
   onPick: () => void;
+}
+
+/** O item ativo (teclado ou rato) leva fundo suave e uma barra de marca: nunca só uma mudança de cor. */
+const ACTIVE_ROW =
+  'relative before:absolute before:inset-y-1.5 before:left-0 before:w-0.5 before:rounded-full before:bg-primary before:opacity-0 aria-selected:bg-primary/10 aria-selected:before:opacity-100 focus:bg-primary/10 focus:before:opacity-100';
+
+/** Apaga um intervalo pelo caminho nativo (mantém o desfazer do browser); sem `execCommand`, muda o estado. */
+function deleteRange(
+  el: HTMLTextAreaElement,
+  start: number,
+  end: number,
+  fallback: (next: string, caret: number) => void,
+) {
+  el.focus();
+  el.setSelectionRange(start, end);
+  let done = false;
+  try {
+    done = typeof document.execCommand === 'function' && document.execCommand('delete');
+  } catch {
+    done = false;
+  }
+  if (!done) fallback(el.value.slice(0, start) + el.value.slice(end), start);
 }
 
 interface Props {
@@ -111,18 +146,31 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
   const [text, setText] = useState('');
   const [caret, setCaret] = useState(0);
   const [files, setFiles] = useState<Pending[]>([]);
-  const [mentions, setMentions] = useState<{ ref: MentionRef; label: string }[]>([]);
+  const [mentions, setMentions] = useState<ResolvedMention[]>([]);
   const [dismissed, setDismissed] = useState<string | null>(null);
   const [active, setActive] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
   const area = useRef<HTMLTextAreaElement>(null);
+  const overlay = useRef<HTMLDivElement>(null);
+  const menuContent = useRef<ComponentRef<typeof DropdownMenuContent>>(null);
+  const composing = useRef(false);
+  const prevCaret = useRef<number | null>(null);
   const picker = useRef<HTMLInputElement>(null);
   const pendingCaret = useRef<number | null>(null);
   const listId = useId();
   const screen = contextOn && pageLabel !== null;
   const upload = useMutation(uploadCopilotAttachmentsMutation());
 
-  const trigger: Trigger | null = useMemo(() => findTrigger(text, caret), [text, caret]);
-  const open = trigger !== null && dismissed !== text;
+  const spans = useMemo(() => findMentionSpans(text, mentions), [text, mentions]);
+  const segments = useMemo(() => segmentText(text, mentions), [text, mentions]);
+  const hasChips = spans.length > 0;
+  const trigger: Trigger | null = useMemo(() => {
+    const found = findTrigger(text, caret);
+    // `@Azurém` já escolhida é uma unidade: com o cursor a seguir não volta a abrir a lista.
+    if (found?.kind === 'mention' && spans.some((x) => x.start === found.start)) return null;
+    return found;
+  }, [text, caret, spans]);
+  const open = trigger !== null && dismissed !== text && !menuOpen;
   const mentionQuery = useDeferredValue(trigger?.kind === 'mention' ? trigger.query : '');
 
   const mentionResults = useQuery({
@@ -163,6 +211,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
         label: it.label,
         hint: it.sublabel ?? undefined,
         group: mentionTypeLabel(g.type as MentionType),
+        type: it.type,
         onPick: () => {
           const label = it.label.replace(/\s+/g, ' ').trim();
           const next = applyTrigger(text, caret, trigger, `@${label}`);
@@ -179,6 +228,23 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: volta ao primeiro resultado quando a lista muda
   useEffect(() => setActive(0), [options.length, trigger?.query]);
+
+  // O menu "+" abre com o primeiro item ativo, também quando se abre com o rato.
+  useEffect(() => {
+    if (!menuOpen) return;
+    const frame = requestAnimationFrame(() =>
+      menuContent.current
+        ?.querySelector<HTMLElement>('[role="menuitem"]:not([data-disabled])')
+        ?.focus(),
+    );
+    return () => cancelAnimationFrame(frame);
+  }, [menuOpen]);
+
+  // O item ativo está sempre à vista, também quando a lista rola.
+  useEffect(() => {
+    if (!open) return;
+    document.getElementById(`${listId}-${active}`)?.scrollIntoView?.({ block: 'nearest' });
+  }, [open, active, listId]);
 
   // Cresce com o texto (máx. ~8 linhas) e repõe o cursor depois de escolher uma sugestão.
   // biome-ignore lint/correctness/useExhaustiveDependencies: mede de novo sempre que o texto muda
@@ -278,7 +344,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     const clean = text.trim();
     onSend({
       text: clean,
-      mentions: mentions.filter((x) => clean.includes(`@${x.label}`)),
+      mentions: pruneMentions(clean, mentions),
       attachments: ready.flatMap((f) => (f.result ? [f.result] : [])),
       pageContext: screen ? getPageContext() : null,
     });
@@ -294,12 +360,12 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     if (open && options.length > 0) {
       if (e.key === 'ArrowDown') {
         e.preventDefault();
-        setActive((a) => (a + 1) % options.length);
+        setActive((a) => stepIndex(a, options.length, 1));
         return;
       }
       if (e.key === 'ArrowUp') {
         e.preventDefault();
-        setActive((a) => (a - 1 + options.length) % options.length);
+        setActive((a) => stepIndex(a, options.length, -1));
         return;
       }
       if (e.key === 'Enter' || e.key === 'Tab') {
@@ -312,6 +378,21 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
       e.preventDefault();
       setDismissed(text);
       return;
+    }
+    // Backspace/Delete junto a uma menção apaga-a inteira, como uma unidade.
+    if ((e.key === 'Backspace' || e.key === 'Delete') && !composing.current) {
+      const el = e.currentTarget;
+      const found = mentionDeletion(
+        findMentionSpans(el.value, mentions),
+        el.selectionStart,
+        el.selectionEnd,
+        e.key,
+      );
+      if (found) {
+        e.preventDefault();
+        deleteRange(el, found.start, found.end, setTextAndCaret);
+        return;
+      }
     }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
@@ -333,7 +414,22 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     const next = `${before}${pad}${char}${rest}`;
     setTextAndCaret(next, before.length + pad.length + 1);
     setDismissed(null);
-    requestAnimationFrame(() => area.current?.focus());
+  };
+
+  // Cursor fora do interior das menções; a posição anterior diz para que margem saltar.
+  const onSelectField = (e: React.SyntheticEvent<HTMLTextAreaElement>) => {
+    const el = e.currentTarget;
+    if (composing.current) return;
+    const [from, to] = snapSelection(
+      findMentionSpans(el.value, mentions),
+      el.selectionStart,
+      el.selectionEnd,
+      prevCaret.current,
+    );
+    if (from !== el.selectionStart || to !== el.selectionEnd)
+      el.setSelectionRange(from, to, el.selectionDirection ?? 'none');
+    prevCaret.current = el.selectionDirection === 'backward' ? from : to;
+    setCaret(from);
   };
 
   const onPaste = (e: React.ClipboardEvent) => {
@@ -344,7 +440,16 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     }
   };
 
-  const grouped = options.some((o) => o.group);
+  // Agrupa por tipo mantendo o índice global, para o teclado correr a lista toda.
+  const rows = options.reduce<{ group?: string; items: { o: Option; i: number }[] }[]>(
+    (acc, o, i) => {
+      const last = acc[acc.length - 1];
+      if (last && last.group === o.group) last.items.push({ o, i });
+      else acc.push({ group: o.group, items: [{ o, i }] });
+      return acc;
+    },
+    [],
+  );
 
   return (
     <div className="relative" data-testid="copilot-composer">
@@ -353,34 +458,62 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
           id={listId}
           role="listbox"
           aria-label={trigger?.kind === 'command' ? m.chat_commands() : m.chat_mentions()}
-          className="absolute right-0 bottom-full left-0 z-20 mb-2 max-h-64 overflow-y-auto rounded-xl border bg-popover p-1 shadow-lg"
+          className="absolute right-0 bottom-full left-0 z-20 mb-2 max-h-64 overflow-y-auto overscroll-contain rounded-xl border bg-popover p-1 shadow-lg"
         >
-          {options.map((o, i) => (
+          {rows.map((row, r) => (
+            // biome-ignore lint/a11y/useSemanticElements: um grupo de opções dentro do listbox não é um fieldset
             <div
-              key={o.id}
-              id={`${listId}-${i}`}
-              role="option"
-              tabIndex={-1}
-              aria-selected={i === active}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                o.onPick();
-              }}
-              onMouseMove={() => setActive(i)}
-              className={cn(
-                'flex min-h-11 cursor-pointer flex-col justify-center rounded-lg px-3 py-1.5 text-sm',
-                i === active && 'bg-accent',
-              )}
+              key={row.items[0]?.o.id}
+              role="group"
+              aria-label={row.group}
+              className={cn(r > 0 && 'mt-1 border-border/60 border-t pt-1')}
             >
-              <span className="flex items-baseline gap-2">
-                <span className="truncate font-medium">{o.label}</span>
-                {grouped && o.group && (
-                  <span className="shrink-0 text-[10px] text-muted-foreground uppercase tracking-wider">
-                    {o.group}
+              {row.group && (
+                <p
+                  aria-hidden="true"
+                  className="px-3 pt-1.5 pb-0.5 font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.14em]"
+                >
+                  {row.group}
+                </p>
+              )}
+              {row.items.map(({ o, i }) => (
+                <div
+                  key={o.id}
+                  id={`${listId}-${i}`}
+                  role="option"
+                  tabIndex={-1}
+                  aria-selected={i === active}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    o.onPick();
+                  }}
+                  onMouseMove={() => active !== i && setActive(i)}
+                  className={cn(
+                    'flex min-h-11 cursor-pointer items-center gap-3 rounded-lg px-3 py-1.5 text-sm',
+                    ACTIVE_ROW,
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
+                    className={cn(
+                      'flex size-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground',
+                      i === active && 'bg-primary/15 text-primary',
+                    )}
+                  >
+                    {o.type ? (
+                      <MentionIcon type={o.type} className="size-4" />
+                    ) : (
+                      <Slash className="size-4" strokeWidth={1.75} />
+                    )}
                   </span>
-                )}
-              </span>
-              {o.hint && <span className="truncate text-muted-foreground text-xs">{o.hint}</span>}
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate font-medium">{o.label}</span>
+                    {o.hint && (
+                      <span className="truncate text-muted-foreground text-xs">{o.hint}</span>
+                    )}
+                  </span>
+                </div>
+              ))}
             </div>
           ))}
         </div>
@@ -472,7 +605,7 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
               e.target.value = '';
             }}
           />
-          <DropdownMenu>
+          <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
@@ -484,62 +617,120 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
                 <Plus className="size-5" strokeWidth={1.75} aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent side="top" align="start" className="min-w-60 rounded-xl p-1.5">
-              <DropdownMenuItem className="min-h-11" onSelect={() => picker.current?.click()}>
+            <DropdownMenuContent
+              ref={menuContent}
+              side="top"
+              align="start"
+              loop
+              className="min-w-60 rounded-xl p-1.5"
+              // Ao fechar (Esc, escolha) o foco volta ao campo de texto.
+              onCloseAutoFocus={(e) => {
+                e.preventDefault();
+                area.current?.focus();
+              }}
+            >
+              <DropdownMenuItem
+                className={cn('min-h-11', ACTIVE_ROW)}
+                onSelect={() => picker.current?.click()}
+              >
                 <Paperclip />
                 {m.chat_attach_file()}
               </DropdownMenuItem>
               {pageLabel !== null && (
-                <DropdownMenuItem className="min-h-11" onSelect={() => onContextChange(!screen)}>
+                <DropdownMenuItem
+                  className={cn('min-h-11', ACTIVE_ROW)}
+                  onSelect={() => onContextChange(!screen)}
+                >
                   <Monitor />
                   {screen ? m.cp_ctx_remove() : m.chat_attach_screen()}
                 </DropdownMenuItem>
               )}
               <DropdownMenuItem
-                className="min-h-11"
-                onSelect={(e) => {
-                  e.preventDefault();
-                  insertTrigger('@');
-                }}
+                className={cn('min-h-11', ACTIVE_ROW)}
+                onSelect={() => insertTrigger('@')}
               >
                 <AtSign />
                 {m.cp_plus_mention()}
               </DropdownMenuItem>
               <DropdownMenuItem
-                className="min-h-11"
+                className={cn('min-h-11', ACTIVE_ROW)}
                 disabled={text.trim().length > 0}
-                onSelect={(e) => {
-                  e.preventDefault();
-                  insertTrigger('/');
-                }}
+                onSelect={() => insertTrigger('/')}
               >
                 <Slash />
                 {m.cp_plus_commands()}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-          <textarea
-            ref={area}
-            value={text}
-            rows={1}
-            maxLength={4000}
-            onChange={(e) => {
-              setText(e.target.value);
-              setCaret(e.target.selectionStart);
-              setDismissed(null);
-            }}
-            onSelect={(e) => setCaret(e.currentTarget.selectionStart)}
-            onKeyDown={onKeyDown}
-            onPaste={onPaste}
-            role="combobox"
-            aria-expanded={open && options.length > 0}
-            aria-controls={open && options.length > 0 ? listId : undefined}
-            aria-activedescendant={open && options.length > 0 ? `${listId}-${active}` : undefined}
-            aria-autocomplete="list"
-            aria-label={m.copilot_input_label()}
-            placeholder={m.cp_placeholder()}
-            className="max-h-48 min-h-11 min-w-0 flex-1 resize-none bg-transparent px-1.5 py-[0.6875rem] text-base leading-[1.375rem] outline-none placeholder:text-muted-foreground"
-          />
+          <div className="relative min-w-0 flex-1">
+            {hasChips && (
+              <div
+                ref={overlay}
+                aria-hidden="true"
+                data-testid="copilot-composer-overlay"
+                className="pointer-events-none absolute inset-0 overflow-hidden whitespace-pre-wrap break-words px-1.5 py-[0.6875rem] text-base text-foreground leading-[1.375rem]"
+              >
+                {segments.map((seg, i) =>
+                  seg.mention ? (
+                    <mark
+                      // biome-ignore lint/suspicious/noArrayIndexKey: os troços seguem o texto
+                      key={i}
+                      data-testid="copilot-mention-mark"
+                      className="rounded-[0.3rem] bg-primary/12 text-primary box-decoration-clone"
+                    >
+                      {/* O "@" mantém a largura mas dá lugar ao ícone do tipo: o texto não se desalinha. */}
+                      <span className="relative">
+                        <span className="text-transparent">@</span>
+                        <span className="absolute inset-0 flex items-center justify-center">
+                          <MentionIcon type={seg.mention.ref.type} className="size-[0.8125em]" />
+                        </span>
+                      </span>
+                      {seg.text.slice(1)}
+                    </mark>
+                  ) : (
+                    // biome-ignore lint/suspicious/noArrayIndexKey: os troços seguem o texto
+                    <span key={i}>{seg.text}</span>
+                  ),
+                )}
+                {'​'}
+              </div>
+            )}
+            <textarea
+              ref={area}
+              value={text}
+              rows={1}
+              maxLength={4000}
+              onChange={(e) => {
+                setText(e.target.value);
+                setCaret(e.target.selectionStart);
+                setDismissed(null);
+              }}
+              onSelect={onSelectField}
+              onScroll={(e) => {
+                if (overlay.current) overlay.current.scrollTop = e.currentTarget.scrollTop;
+              }}
+              onCompositionStart={() => {
+                composing.current = true;
+              }}
+              onCompositionEnd={() => {
+                composing.current = false;
+              }}
+              onKeyDown={onKeyDown}
+              onPaste={onPaste}
+              role="combobox"
+              aria-expanded={open && options.length > 0}
+              aria-controls={open && options.length > 0 ? listId : undefined}
+              aria-activedescendant={open && options.length > 0 ? `${listId}-${active}` : undefined}
+              aria-autocomplete="list"
+              aria-label={m.copilot_input_label()}
+              placeholder={m.cp_placeholder()}
+              className={cn(
+                'relative block max-h-48 min-h-11 w-full resize-none bg-transparent px-1.5 py-[0.6875rem] text-base leading-[1.375rem] caret-foreground outline-none selection:bg-primary/20 placeholder:text-muted-foreground',
+                // Com menções, o texto desenha-se na camada de baixo; sem barra de rolagem para as larguras coincidirem.
+                hasChips && 'text-transparent [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+              )}
+            />
+          </div>
           {busy ? (
             <Button
               type="button"
