@@ -28,7 +28,7 @@ async def test_run_scenario_creates_a_copilot_scenario_and_a_card(logged_in: htt
     resp = await logged_in.post(C, json=ask("Simula um cenário com 60 mil euros por ano"))
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v1"
+    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v2"
     assert [t["name"] for t in body["tools_used"]] == ["run_scenario"] and body["tools_used"][0]["ok"] is True
     card = body["cards"][0]
     assert card["created_now"] is True and card["label"].startswith("Copilot · ")
@@ -109,10 +109,10 @@ async def test_unconnected_analyses_fail_gracefully_and_providers_can_be_registe
     async def missing(*_: Any) -> Any:
         raise ImportError("not there yet")
 
-    monkeypatch.setitem(copilot_tools.PROVIDERS, "get_coverage", missing)
-    llm.queue_chat([("get_coverage", {})], "Essa análise ainda está indisponível.")
+    monkeypatch.setitem(copilot_tools.PROVIDERS, "get_container_coverage", missing)
+    llm.queue_chat([("get_container_coverage", {})], "Essa análise ainda está indisponível.")
     body = (await logged_in.post(C, json=ask("Qual é a cobertura?"))).json()
-    assert body["verified"] is True and body["tools_used"] == [{"name": "get_coverage", "ok": True}]
+    assert body["verified"] is True and body["tools_used"] == [{"name": "get_container_coverage", "ok": True}]
 
     async def fake_sensitivity(_: Any, args: dict[str, Any]) -> dict[str, Any]:
         return {"p50_eur_per_tonne": 410.5, "scenario": str(args["scenario_id"])}
@@ -133,10 +133,11 @@ async def test_tool_arguments_are_validated_and_no_destructive_tools_exist(
     from novelo.features.copilot.tools import CopilotTools  # noqa: PLC0415
 
     names = {s.name for s in CopilotTools(None, None).specs()}  # type: ignore[arg-type]
-    assert names == {"get_baseline", "list_scenarios", "run_scenario", "compare_scenarios", "what_if"} | {
-        "get_coverage",
-        "get_sensitivity",
-    }
+    assert {"get_baseline", "list_scenarios", "run_scenario", "compare_scenarios", "what_if"} <= names
+    assert {"get_container_coverage", "get_sensitivity", "get_pilot_recommendation", "list_benchmarks"} <= names
+    assert {"run_benchmark_scenario", "search_data", "explain_assumption", "generate_rap_report"} <= names
+    assert {"analyze_attachment", "propose_action", "memory", "session_search", "show_chart"} <= names
+    assert not any(w in n for n in names for w in ("delete", "remove", "rename", "update"))  # nada destrutivo
 
 
 async def test_compare_scenarios_precomputes_differences(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
@@ -161,8 +162,8 @@ async def test_unconnected_provider_says_unavailable(monkeypatch: pytest.MonkeyP
     async def missing(*_: Any) -> Any:
         raise ImportError("not there yet")
 
-    monkeypatch.setitem(copilot_tools.PROVIDERS, "get_coverage", missing)
-    out = await copilot_tools.CopilotTools(None, None).execute("get_coverage", "{}")  # type: ignore[arg-type]
+    monkeypatch.setitem(copilot_tools.PROVIDERS, "get_container_coverage", missing)
+    out = await copilot_tools.CopilotTools(None, None).execute("get_container_coverage", "{}")  # type: ignore[arg-type]
     assert out["available"] is False and "indisponível" in out["message"]
     monkeypatch.delitem(copilot_tools.PROVIDERS, "get_sensitivity")
     gone = await copilot_tools.CopilotTools(None, None).execute(  # type: ignore[arg-type]

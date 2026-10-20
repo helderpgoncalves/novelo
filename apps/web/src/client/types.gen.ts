@@ -5,6 +5,112 @@ export type ClientOptions = {
 };
 
 /**
+ * ActionOut
+ */
+export type ActionOut = {
+    /**
+     * Auto Approved
+     */
+    auto_approved: boolean;
+    /**
+     * Can Undo
+     */
+    can_undo: boolean;
+    /**
+     * Confirm Word
+     */
+    confirm_word?: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Decided At
+     */
+    decided_at: string | null;
+    /**
+     * Expires At
+     */
+    expires_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Impact
+     */
+    impact: string;
+    /**
+     * Params
+     */
+    params: {
+        [key: string]: unknown;
+    };
+    /**
+     * Requires Text
+     *
+     * Ação crítica: o utilizador tem de escrever a palavra de confirmação
+     */
+    requires_text: boolean;
+    /**
+     * Result
+     */
+    result: {
+        [key: string]: unknown;
+    };
+    /**
+     * Reversible
+     */
+    reversible: boolean;
+    /**
+     * Risk
+     */
+    risk: 'low' | 'medium' | 'high' | 'critical';
+    /**
+     * Status
+     */
+    status: 'proposed' | 'executed' | 'failed' | 'rejected' | 'expired' | 'undone';
+    /**
+     * Summary
+     */
+    summary: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string | null;
+    type: ActionType;
+    /**
+     * User Email
+     *
+     * Só na vista de auditoria dos administradores
+     */
+    user_email?: string | null;
+    /**
+     * User Id
+     */
+    user_id: string;
+};
+
+/**
+ * ActionPage
+ */
+export type ActionPage = {
+    /**
+     * Items
+     */
+    items: Array<ActionOut>;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * ActionType
+ */
+export type ActionType = 'create_scenario' | 'duplicate_scenario' | 'delete_scenario' | 'run_benchmark' | 'generate_report' | 'resolve_alert' | 'ignore_alert' | 'reopen_alert' | 'open_lot' | 'set_lot_state' | 'reserve_lot' | 'update_parameter' | 'set_user_active' | 'set_user_role' | 'change_ai_task_model' | 'export_my_data' | 'delete_my_copilot_data';
+
+/**
  * AiCreditsOut
  */
 export type AiCreditsOut = {
@@ -402,6 +508,148 @@ export type AllocationPart = {
 };
 
 /**
+ * ArtifactEnvelope
+ */
+export type ArtifactEnvelope = {
+    /**
+     * Artifact
+     */
+    artifact: ({
+        artifact_type: 'chart';
+    } & ChartArtifact) | ({
+        artifact_type: 'table';
+    } & TableArtifact) | ({
+        artifact_type: 'map';
+    } & MapArtifact) | ({
+        artifact_type: 'kpis';
+    } & KpisArtifact) | ({
+        artifact_type: 'comparison';
+    } & ComparisonArtifact) | ({
+        artifact_type: 'timeline';
+    } & TimelineArtifact) | ({
+        artifact_type: 'scenario_card';
+    } & ScenarioCardArtifact) | ({
+        artifact_type: 'report';
+    } & ReportArtifact) | ({
+        artifact_type: 'form';
+    } & FormArtifact);
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Sources
+     */
+    sources: Array<ArtifactSource>;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * ArtifactOut
+ */
+export type ArtifactOut = {
+    /**
+     * Artifact
+     */
+    artifact: ({
+        artifact_type: 'chart';
+    } & ChartArtifact) | ({
+        artifact_type: 'table';
+    } & TableArtifact) | ({
+        artifact_type: 'map';
+    } & MapArtifact) | ({
+        artifact_type: 'kpis';
+    } & KpisArtifact) | ({
+        artifact_type: 'comparison';
+    } & ComparisonArtifact) | ({
+        artifact_type: 'timeline';
+    } & TimelineArtifact) | ({
+        artifact_type: 'scenario_card';
+    } & ScenarioCardArtifact) | ({
+        artifact_type: 'report';
+    } & ReportArtifact) | ({
+        artifact_type: 'form';
+    } & FormArtifact);
+    /**
+     * Artifact Type
+     */
+    artifact_type: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Message Id
+     */
+    message_id: string | null;
+    /**
+     * Pinned
+     */
+    pinned: boolean;
+    /**
+     * Refreshable
+     */
+    refreshable: boolean;
+    /**
+     * Refreshed At
+     */
+    refreshed_at: string | null;
+    /**
+     * Sources
+     */
+    sources: Array<{
+        [key: string]: string | null;
+    }>;
+    /**
+     * Thread Id
+     */
+    thread_id: string | null;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * ArtifactPage
+ */
+export type ArtifactPage = {
+    /**
+     * Items
+     */
+    items: Array<ArtifactOut>;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * ArtifactSource
+ */
+export type ArtifactSource = {
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Result Id
+     */
+    result_id?: string | null;
+    /**
+     * Tool
+     */
+    tool: string;
+};
+
+/**
  * AttachmentOut
  */
 export type AttachmentOut = {
@@ -738,6 +986,66 @@ export type CardKpis = {
 };
 
 /**
+ * CartesianChart
+ *
+ * bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número).
+ */
+export type CartesianChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Highlight
+     *
+     * Pontos a destacar (fronteira de Pareto, recomendado)
+     */
+    highlight?: Array<string>;
+    /**
+     * Kind
+     */
+    kind: 'bar' | 'stacked_bar' | 'line' | 'area' | 'scatter' | 'pareto';
+    /**
+     * Series
+     */
+    series: Array<Series>;
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * X Label
+     */
+    x_label: string;
+    /**
+     * X Unit
+     */
+    x_unit?: string | null;
+    /**
+     * Y Label
+     */
+    y_label: string;
+    /**
+     * Y Unit
+     */
+    y_unit?: string | null;
+};
+
+/**
  * ChangePasswordRequest
  */
 export type ChangePasswordRequest = {
@@ -749,6 +1057,36 @@ export type ChangePasswordRequest = {
      * New Password
      */
     new_password: string;
+};
+
+/**
+ * ChartArtifact
+ */
+export type ChartArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'chart';
+    /**
+     * Spec
+     */
+    spec: ({
+        kind: 'area' | 'bar' | 'line' | 'pareto' | 'scatter' | 'stacked_bar';
+    } & CartesianChart) | ({
+        kind: 'waterfall';
+    } & WaterfallChart) | ({
+        kind: 'sankey';
+    } & SankeyChart) | ({
+        kind: 'treemap';
+    } & TreemapChart) | ({
+        kind: 'heatmap';
+    } & HeatmapChart) | ({
+        kind: 'tornado';
+    } & TornadoChart) | ({
+        kind: 'range';
+    } & RangeChart) | ({
+        kind: 'gauge';
+    } & GaugeChart);
 };
 
 /**
@@ -891,6 +1229,63 @@ export type CompactOut = {
 };
 
 /**
+ * ComparisonArtifact
+ */
+export type ComparisonArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'comparison';
+    spec: ComparisonSpec;
+};
+
+/**
+ * ComparisonColumn
+ */
+export type ComparisonColumn = {
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Values
+     */
+    values: {
+        [key: string]: number | string | null;
+    };
+};
+
+/**
+ * ComparisonSpec
+ */
+export type ComparisonSpec = {
+    /**
+     * Columns
+     */
+    columns: Array<ComparisonColumn>;
+    /**
+     * Estimate
+     */
+    estimate?: boolean;
+    /**
+     * Metrics
+     */
+    metrics: Array<TableColumn>;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
  * CompositionPart
  */
 export type CompositionPart = {
@@ -899,6 +1294,20 @@ export type CompositionPart = {
      * Pct
      */
     pct: number;
+};
+
+/**
+ * ConfirmActionIn
+ */
+export type ConfirmActionIn = {
+    /**
+     * Confirmation Text
+     */
+    confirmation_text?: string | null;
+    /**
+     * Idempotency Key
+     */
+    idempotency_key?: string | null;
 };
 
 /**
@@ -968,6 +1377,65 @@ export type ContainerOut = {
 export type ContainerStatus = 'active' | 'inactive' | 'planned';
 
 /**
+ * CopilotActionResultEvent
+ *
+ * Resultado de uma ação executada (auto-aprovada neste pedido).
+ */
+export type CopilotActionResultEvent = {
+    action: ActionOut;
+    /**
+     * Type
+     */
+    type?: 'action_result';
+};
+
+/**
+ * CopilotArtifactEvent
+ *
+ * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
+ */
+export type CopilotArtifactEvent = {
+    /**
+     * Artifact
+     */
+    artifact: ({
+        artifact_type: 'chart';
+    } & ChartArtifact) | ({
+        artifact_type: 'table';
+    } & TableArtifact) | ({
+        artifact_type: 'map';
+    } & MapArtifact) | ({
+        artifact_type: 'kpis';
+    } & KpisArtifact) | ({
+        artifact_type: 'comparison';
+    } & ComparisonArtifact) | ({
+        artifact_type: 'timeline';
+    } & TimelineArtifact) | ({
+        artifact_type: 'scenario_card';
+    } & ScenarioCardArtifact) | ({
+        artifact_type: 'report';
+    } & ReportArtifact) | ({
+        artifact_type: 'form';
+    } & FormArtifact);
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Sources
+     */
+    sources: Array<ArtifactSource>;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Type
+     */
+    type?: 'artifact';
+};
+
+/**
  * CopilotCardEvent
  */
 export type CopilotCardEvent = {
@@ -976,6 +1444,26 @@ export type CopilotCardEvent = {
      * Type
      */
     type?: 'card';
+};
+
+/**
+ * CopilotClarifyEvent
+ *
+ * Falta um parâmetro crítico: pergunta com opções clicáveis. Termina a volta; a resposta é a mensagem seguinte.
+ */
+export type CopilotClarifyEvent = {
+    /**
+     * Options
+     */
+    options: Array<string>;
+    /**
+     * Question
+     */
+    question: string;
+    /**
+     * Type
+     */
+    type?: 'clarify';
 };
 
 /**
@@ -1010,6 +1498,19 @@ export type CopilotCommand = {
      * Route
      */
     route?: string | null;
+};
+
+/**
+ * CopilotConfirmEvent
+ *
+ * O copiloto propôs uma ação de escrita. Só `POST /copilot/actions/{id}/confirm` a executa.
+ */
+export type CopilotConfirmEvent = {
+    action: ActionOut;
+    /**
+     * Type
+     */
+    type?: 'confirm';
 };
 
 /**
@@ -1110,8 +1611,114 @@ export type CopilotEventMessage = ({
 } & CopilotTitleEvent) | ({
     type: 'error';
 } & CopilotErrorEvent) | ({
+    type: 'memory';
+} & CopilotMemoryEvent) | ({
+    type: 'plan';
+} & CopilotPlanEvent) | ({
+    type: 'clarify';
+} & CopilotClarifyEvent) | ({
+    type: 'sources';
+} & CopilotSourcesEvent) | ({
+    type: 'artifact';
+} & CopilotArtifactEvent) | ({
+    type: 'confirm';
+} & CopilotConfirmEvent) | ({
+    type: 'action_result';
+} & CopilotActionResultEvent) | ({
+    type: 'navigate';
+} & CopilotNavigateEvent) | ({
     type: 'done';
 } & CopilotDoneEvent);
+
+/**
+ * CopilotMemoryEvent
+ *
+ * Uma escrita de memória (ou o seu bloqueio). O web mostra «Guardei na memória: …» com Desfazer.
+ */
+export type CopilotMemoryEvent = {
+    /**
+     * Action
+     */
+    action: 'added' | 'patched' | 'removed' | 'staged' | 'blocked';
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Entry Id
+     */
+    entry_id?: string | null;
+    /**
+     * Previous
+     *
+     * Texto anterior (patch/remove), para desfazer
+     */
+    previous?: string | null;
+    /**
+     * Reason
+     */
+    reason?: string | null;
+    /**
+     * Status
+     */
+    status: 'applied' | 'pending' | 'blocked';
+    /**
+     * Target
+     */
+    target: 'memory' | 'user';
+    /**
+     * Type
+     */
+    type?: 'memory';
+};
+
+/**
+ * CopilotNavigateEvent
+ *
+ * Sugestão de navegação: o web mostra «Abrir» e só então navega.
+ */
+export type CopilotNavigateEvent = {
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Params
+     */
+    params?: {
+        [key: string]: string;
+    };
+    /**
+     * Route
+     */
+    route: string;
+    /**
+     * Search
+     */
+    search?: {
+        [key: string]: string;
+    };
+    /**
+     * Type
+     */
+    type?: 'navigate';
+};
+
+/**
+ * CopilotPlanEvent
+ *
+ * Plano curto de um pedido composto, antes de executar os passos.
+ */
+export type CopilotPlanEvent = {
+    /**
+     * Steps
+     */
+    steps: Array<string>;
+    /**
+     * Type
+     */
+    type?: 'plan';
+};
 
 /**
  * CopilotReply
@@ -1194,6 +1801,262 @@ export type CopilotRetractEvent = {
 };
 
 /**
+ * CopilotSettings
+ *
+ * O que cada utilizador controla. Modelos, orçamento e retenção máxima são do sistema (/admin/ai e .env).
+ */
+export type CopilotSettings = {
+    /**
+     * Auto Approve Low Risk
+     *
+     * Executar sozinhas as ações reversíveis de baixo risco
+     */
+    auto_approve_low_risk?: boolean;
+    /**
+     * Auto Compact Pct
+     */
+    auto_compact_pct?: number;
+    /**
+     * Background Review
+     *
+     * Revisão automática da memória depois de algumas voltas
+     */
+    background_review?: boolean;
+    /**
+     * Confirm Writes
+     *
+     * Pedir confirmação antes de criar cenários ou relatórios
+     */
+    confirm_writes?: boolean;
+    /**
+     * Emoji
+     */
+    emoji?: boolean;
+    /**
+     * Follow Up Suggestions
+     */
+    follow_up_suggestions?: boolean;
+    /**
+     * Formality
+     */
+    formality?: 'informal' | 'neutral' | 'formal';
+    /**
+     * Memory Enabled
+     *
+     * Notas do copiloto (memory) ligadas
+     */
+    memory_enabled?: boolean;
+    /**
+     * Memory Notifications
+     */
+    memory_notifications?: 'off' | 'on' | 'verbose';
+    /**
+     * Persona
+     */
+    persona?: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Persona Text
+     *
+     * Texto da personalidade personalizada
+     */
+    persona_text?: string;
+    /**
+     * Preferred Language
+     */
+    preferred_language?: 'auto' | 'pt-PT' | 'en';
+    /**
+     * Retention Days
+     *
+     * Nulo = sem limite (até ao máximo do sistema)
+     */
+    retention_days?: 30 | 90 | 365 | null;
+    /**
+     * Save History
+     *
+     * Falso: conversas efémeras, apagadas ao fim de 24 h
+     */
+    save_history?: boolean;
+    /**
+     * Show Tool Steps
+     */
+    show_tool_steps?: boolean;
+    /**
+     * User Profile Enabled
+     *
+     * Perfil do utilizador (user) ligado
+     */
+    user_profile_enabled?: boolean;
+    /**
+     * Verbosity
+     */
+    verbosity?: 'short' | 'balanced' | 'detailed';
+    /**
+     * Write Approval
+     *
+     * ask: as escritas de memória ficam em fila
+     */
+    write_approval?: 'auto' | 'ask';
+};
+
+/**
+ * CopilotSettingsOut
+ */
+export type CopilotSettingsOut = {
+    /**
+     * Auto Approve Low Risk
+     *
+     * Executar sozinhas as ações reversíveis de baixo risco
+     */
+    auto_approve_low_risk?: boolean;
+    /**
+     * Auto Compact Pct
+     */
+    auto_compact_pct?: number;
+    /**
+     * Background Review
+     *
+     * Revisão automática da memória depois de algumas voltas
+     */
+    background_review?: boolean;
+    /**
+     * Confirm Writes
+     *
+     * Pedir confirmação antes de criar cenários ou relatórios
+     */
+    confirm_writes?: boolean;
+    /**
+     * Default Persona
+     */
+    default_persona: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Effective Retention Days
+     */
+    effective_retention_days: number | null;
+    /**
+     * Emoji
+     */
+    emoji?: boolean;
+    /**
+     * Follow Up Suggestions
+     */
+    follow_up_suggestions?: boolean;
+    /**
+     * Formality
+     */
+    formality?: 'informal' | 'neutral' | 'formal';
+    /**
+     * Max Retention Days
+     *
+     * Máximo imposto pelo sistema; nulo = sem máximo
+     */
+    max_retention_days: number | null;
+    /**
+     * Memory Enabled
+     *
+     * Notas do copiloto (memory) ligadas
+     */
+    memory_enabled?: boolean;
+    /**
+     * Memory Notifications
+     */
+    memory_notifications?: 'off' | 'on' | 'verbose';
+    /**
+     * Memory Usage
+     *
+     * Uso da memória por alvo: memory e user
+     */
+    memory_usage: {
+        [key: string]: MemoryMeter;
+    };
+    /**
+     * Persona
+     */
+    persona?: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Persona Text
+     *
+     * Texto da personalidade personalizada
+     */
+    persona_text?: string;
+    /**
+     * Personas
+     */
+    personas: Array<PersonaInfo>;
+    /**
+     * Preferred Language
+     */
+    preferred_language?: 'auto' | 'pt-PT' | 'en';
+    /**
+     * Retention Days
+     *
+     * Nulo = sem limite (até ao máximo do sistema)
+     */
+    retention_days?: 30 | 90 | 365 | null;
+    /**
+     * Save History
+     *
+     * Falso: conversas efémeras, apagadas ao fim de 24 h
+     */
+    save_history?: boolean;
+    /**
+     * Show Tool Steps
+     */
+    show_tool_steps?: boolean;
+    /**
+     * User Profile Enabled
+     *
+     * Perfil do utilizador (user) ligado
+     */
+    user_profile_enabled?: boolean;
+    /**
+     * Verbosity
+     */
+    verbosity?: 'short' | 'balanced' | 'detailed';
+    /**
+     * Write Approval
+     *
+     * ask: as escritas de memória ficam em fila
+     */
+    write_approval?: 'auto' | 'ask';
+};
+
+/**
+ * CopilotSource
+ */
+export type CopilotSource = {
+    /**
+     * Kind
+     */
+    kind: 'tool' | 'scenario' | 'file' | 'entity' | 'memory' | 'page';
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Ref
+     *
+     * Rota ou id para abrir a fonte, se existir
+     */
+    ref?: string | null;
+};
+
+/**
+ * CopilotSourcesEvent
+ *
+ * O que foi usado para responder: ferramentas, cenários, ficheiros, menções, memórias e o ecrã.
+ */
+export type CopilotSourcesEvent = {
+    /**
+     * Items
+     */
+    items: Array<CopilotSource>;
+    /**
+     * Type
+     */
+    type?: 'sources';
+};
+
+/**
  * CopilotStartEvent
  */
 export type CopilotStartEvent = {
@@ -1253,6 +2116,18 @@ export type CopilotStreamRequest = {
      * Attachment Ids
      */
     attachment_ids?: Array<string>;
+    /**
+     * Confirm
+     *
+     * O utilizador confirmou as escritas pedidas (se tiver activado a confirmação)
+     */
+    confirm?: boolean;
+    /**
+     * Edit Message Id
+     *
+     * Editar esta mensagem do utilizador: cria um ramo da conversa a partir dela
+     */
+    edit_message_id?: string | null;
     /**
      * Locale
      */
@@ -1522,6 +2397,36 @@ export type DataAlertOut = {
      * Suggestion
      */
     suggestion: string;
+};
+
+/**
+ * DataExport
+ */
+export type DataExport = {
+    /**
+     * Actions
+     */
+    actions: Array<ActionOut>;
+    /**
+     * Exported At
+     */
+    exported_at: string;
+    /**
+     * Memory
+     */
+    memory: Array<{
+        [key: string]: unknown;
+    }>;
+    /**
+     * Settings
+     */
+    settings: {
+        [key: string]: unknown;
+    };
+    /**
+     * Threads
+     */
+    threads: Array<ThreadOut>;
 };
 
 /**
@@ -1883,6 +2788,67 @@ export type ForgotPasswordRequest = {
 };
 
 /**
+ * FormArtifact
+ */
+export type FormArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'form';
+    spec: FormSpec;
+};
+
+/**
+ * FormField
+ */
+export type FormField = {
+    /**
+     * Default
+     */
+    default?: string | number | boolean | null;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Options
+     */
+    options?: Array<string>;
+    /**
+     * Required
+     */
+    required?: boolean;
+    /**
+     * Type
+     */
+    type: 'text' | 'number' | 'select' | 'boolean' | 'scenario' | 'textarea';
+};
+
+/**
+ * FormSpec
+ *
+ * Formulário para completar os parâmetros de uma ação; ao enviar, o web chama `propose_copilot_action`.
+ */
+export type FormSpec = {
+    /**
+     * Action Type
+     */
+    action_type: string;
+    /**
+     * Fields
+     */
+    fields: Array<FormField>;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
  * FrontierPoint
  */
 export type FrontierPoint = {
@@ -1935,6 +2901,58 @@ export type FrontierPoint = {
 export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'other';
 
 /**
+ * GaugeChart
+ */
+export type GaugeChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Kind
+     */
+    kind: 'gauge';
+    /**
+     * Max
+     */
+    max: number;
+    /**
+     * Min
+     */
+    min: number;
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Target
+     */
+    target?: number | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+    /**
+     * Value
+     */
+    value: number;
+};
+
+/**
  * GlobalDefaults
  *
  * Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.
@@ -1970,6 +2988,150 @@ export type Health = {
      * Status
      */
     status?: 'ok';
+};
+
+/**
+ * HeatCell
+ */
+export type HeatCell = {
+    /**
+     * Value
+     */
+    value: number;
+    /**
+     * X
+     */
+    x: string;
+    /**
+     * Y
+     */
+    y: string;
+};
+
+/**
+ * HeatmapChart
+ */
+export type HeatmapChart = {
+    /**
+     * Cells
+     */
+    cells: Array<HeatCell>;
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Kind
+     */
+    kind: 'heatmap';
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+    /**
+     * X Categories
+     */
+    x_categories: Array<string>;
+    /**
+     * Y Categories
+     */
+    y_categories: Array<string>;
+};
+
+/**
+ * HistoryItem
+ */
+export type HistoryItem = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Kind
+     */
+    kind: 'conversation' | 'action' | 'artifact' | 'memory' | 'attachment';
+    /**
+     * Occurred At
+     */
+    occurred_at: string;
+    /**
+     * Ref Id
+     */
+    ref_id: string;
+    /**
+     * Route
+     */
+    route?: string | null;
+    /**
+     * Snippet
+     */
+    snippet: string | null;
+    /**
+     * Status
+     */
+    status: string | null;
+    /**
+     * Thread Id
+     */
+    thread_id: string | null;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
+ * HistoryPage
+ */
+export type HistoryPage = {
+    /**
+     * Items
+     */
+    items: Array<HistoryItem>;
+    /**
+     * Next Cursor
+     */
+    next_cursor: string | null;
+};
+
+/**
+ * KpiItem
+ */
+export type KpiItem = {
+    /**
+     * Hint
+     */
+    hint?: string | null;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+    /**
+     * Value
+     */
+    value: number | string | null;
 };
 
 /**
@@ -2022,6 +3184,39 @@ export type Kpis = {
      * Tonnes Year
      */
     tonnes_year: number;
+};
+
+/**
+ * KpisArtifact
+ */
+export type KpisArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'kpis';
+    spec: KpisSpec;
+};
+
+/**
+ * KpisSpec
+ */
+export type KpisSpec = {
+    /**
+     * Estimate
+     */
+    estimate?: boolean;
+    /**
+     * Items
+     */
+    items: Array<KpiItem>;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Title
+     */
+    title: string;
 };
 
 /**
@@ -2289,6 +3484,101 @@ export type LotSummary = {
 };
 
 /**
+ * MapArtifact
+ */
+export type MapArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'map';
+    spec: MapSpec;
+};
+
+/**
+ * MapItem
+ */
+export type MapItem = {
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Lat
+     */
+    lat?: number | null;
+    /**
+     * Lon
+     */
+    lon?: number | null;
+    /**
+     * Value
+     */
+    value?: number | null;
+};
+
+/**
+ * MapLayer
+ */
+export type MapLayer = {
+    /**
+     * Items
+     */
+    items: Array<MapItem>;
+    /**
+     * Kind
+     */
+    kind: 'parishes' | 'containers' | 'localities';
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Metric
+     */
+    metric?: string | null;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * MapSpec
+ */
+export type MapSpec = {
+    /**
+     * Center
+     *
+     * [lat, lon]
+     */
+    center?: Array<number>;
+    /**
+     * Estimate
+     */
+    estimate?: boolean;
+    /**
+     * Layers
+     */
+    layers: Array<MapLayer>;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
  * MarketEntry
  *
  * Bolsa de fibra: lotes triados e agregados por fibra dominante.
@@ -2335,6 +3625,110 @@ export type MarketLot = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * MemoryEntryCreate
+ */
+export type MemoryEntryCreate = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Pinned
+     */
+    pinned?: boolean;
+    /**
+     * Target
+     */
+    target: 'memory' | 'user';
+};
+
+/**
+ * MemoryEntryList
+ */
+export type MemoryEntryList = {
+    /**
+     * Items
+     */
+    items: Array<MemoryEntryOut>;
+    /**
+     * Usage
+     */
+    usage: {
+        [key: string]: MemoryMeter;
+    };
+};
+
+/**
+ * MemoryEntryOut
+ */
+export type MemoryEntryOut = {
+    /**
+     * Content
+     */
+    content: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Origin
+     */
+    origin: 'auto' | 'manual' | 'tool';
+    /**
+     * Pinned
+     */
+    pinned: boolean;
+    /**
+     * Source Thread Id
+     */
+    source_thread_id: string | null;
+    /**
+     * Target
+     */
+    target: 'memory' | 'user';
+    /**
+     * Updated At
+     */
+    updated_at: string;
+};
+
+/**
+ * MemoryEntryUpdate
+ */
+export type MemoryEntryUpdate = {
+    /**
+     * Content
+     */
+    content?: string | null;
+    /**
+     * Pinned
+     */
+    pinned?: boolean | null;
+};
+
+/**
+ * MemoryMeter
+ */
+export type MemoryMeter = {
+    /**
+     * Chars
+     */
+    chars: number;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Pct
+     */
+    pct: number;
 };
 
 /**
@@ -2417,6 +3811,14 @@ export type MentionsOut = {
  * MessageOut
  */
 export type MessageOut = {
+    /**
+     * Actions
+     */
+    actions: Array<ActionOut>;
+    /**
+     * Artifacts
+     */
+    artifacts: Array<ArtifactEnvelope>;
     /**
      * Attachments
      */
@@ -3155,6 +4557,128 @@ export type Passport = {
 };
 
 /**
+ * PendingApprove
+ */
+export type PendingApprove = {
+    /**
+     * Content
+     *
+     * Editar o texto antes de aprovar um `add`
+     */
+    content?: string | null;
+};
+
+/**
+ * PendingMemoryOut
+ */
+export type PendingMemoryOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Ops
+     */
+    ops: Array<{
+        [key: string]: string;
+    }>;
+    /**
+     * Origin
+     */
+    origin: 'auto' | 'manual' | 'tool';
+    /**
+     * Source Thread Id
+     */
+    source_thread_id: string | null;
+    /**
+     * Status
+     */
+    status: 'pending' | 'approved' | 'rejected';
+    /**
+     * Summary
+     */
+    summary: string;
+    /**
+     * Target
+     */
+    target: 'memory' | 'user';
+};
+
+/**
+ * PersonaInfo
+ */
+export type PersonaInfo = {
+    /**
+     * Description
+     */
+    description: string;
+    /**
+     * Key
+     */
+    key: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Label En
+     */
+    label_en: string;
+    /**
+     * Label Pt
+     */
+    label_pt: string;
+};
+
+/**
+ * PersonaPreviewIn
+ */
+export type PersonaPreviewIn = {
+    /**
+     * Emoji
+     */
+    emoji?: boolean;
+    /**
+     * Formality
+     */
+    formality?: 'informal' | 'neutral' | 'formal';
+    /**
+     * Language
+     */
+    language?: 'pt-PT' | 'en';
+    /**
+     * Persona
+     */
+    persona: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Persona Text
+     */
+    persona_text?: string;
+    /**
+     * Sample
+     */
+    sample?: string;
+    /**
+     * Verbosity
+     */
+    verbosity?: 'short' | 'balanced' | 'detailed';
+};
+
+/**
+ * PersonaPreviewOut
+ */
+export type PersonaPreviewOut = {
+    /**
+     * Persona
+     */
+    persona: 'default' | 'analyst' | 'mentor' | 'executive' | 'storyteller' | 'custom';
+    /**
+     * Text
+     */
+    text: string;
+};
+
+/**
  * PilotFact
  *
  * Um número que justifica a escolha, com a sua origem.
@@ -3430,6 +4954,28 @@ export type PlanningParams = {
 };
 
 /**
+ * Point
+ */
+export type Point = {
+    /**
+     * Label
+     */
+    label?: string | null;
+    /**
+     * Size
+     */
+    size?: number | null;
+    /**
+     * X
+     */
+    x: number | string;
+    /**
+     * Y
+     */
+    y: number | null;
+};
+
+/**
  * ProfileUpdate
  */
 export type ProfileUpdate = {
@@ -3444,9 +4990,106 @@ export type ProfileUpdate = {
 };
 
 /**
+ * ProjectOut
+ */
+export type ProjectOut = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Threads
+     */
+    threads: number;
+};
+
+/**
+ * ProposeActionIn
+ */
+export type ProposeActionIn = {
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Params
+     */
+    params?: {
+        [key: string]: unknown;
+    };
+    /**
+     * Thread Id
+     */
+    thread_id?: string | null;
+    type: ActionType;
+};
+
+/**
  * QuantilesOut
  */
 export type QuantilesOut = {
+    /**
+     * P10
+     */
+    p10: number;
+    /**
+     * P50
+     */
+    p50: number;
+    /**
+     * P90
+     */
+    p90: number;
+};
+
+/**
+ * RangeChart
+ */
+export type RangeChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Items
+     */
+    items: Array<RangeItem>;
+    /**
+     * Kind
+     */
+    kind: 'range';
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * RangeItem
+ */
+export type RangeItem = {
+    /**
+     * Label
+     */
+    label: string;
     /**
      * P10
      */
@@ -3538,6 +5181,17 @@ export type RegisterRequest = {
 };
 
 /**
+ * ReportArtifact
+ */
+export type ReportArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'report';
+    spec: ReportSpec;
+};
+
+/**
  * ReportOut
  */
 export type ReportOut = {
@@ -3585,6 +5239,28 @@ export type ReportRequest = {
      * 1 a 3 cenários a incluir
      */
     scenario_ids: Array<string>;
+};
+
+/**
+ * ReportSpec
+ */
+export type ReportSpec = {
+    /**
+     * Download Path
+     */
+    download_path: string;
+    /**
+     * Report Id
+     */
+    report_id: string;
+    /**
+     * Size Kb
+     */
+    size_kb: number;
+    /**
+     * Title
+     */
+    title: string;
 };
 
 /**
@@ -3771,6 +5447,82 @@ export type RouteStop = {
 };
 
 /**
+ * SankeyChart
+ */
+export type SankeyChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Kind
+     */
+    kind: 'sankey';
+    /**
+     * Links
+     */
+    links: Array<SankeyLink>;
+    /**
+     * Nodes
+     */
+    nodes: Array<SankeyNode>;
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * SankeyLink
+ */
+export type SankeyLink = {
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Target
+     */
+    target: string;
+    /**
+     * Value
+     */
+    value: number;
+};
+
+/**
+ * SankeyNode
+ */
+export type SankeyNode = {
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
  * ScenarioCard
  *
  * Resultado de uma ferramenta para o web desenhar. Os números vêm do otimizador, nunca do texto do modelo.
@@ -3796,6 +5548,59 @@ export type ScenarioCard = {
      * Scenario Id
      */
     scenario_id: string;
+};
+
+/**
+ * ScenarioCardArtifact
+ */
+export type ScenarioCardArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'scenario_card';
+    spec: ScenarioCardSpec;
+};
+
+/**
+ * ScenarioCardSpec
+ */
+export type ScenarioCardSpec = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Coverage Pct
+     */
+    coverage_pct: number;
+    /**
+     * Created Now
+     */
+    created_now?: boolean;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Objective
+     */
+    objective: string;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
 };
 
 /**
@@ -4099,6 +5904,88 @@ export type SensitivityRequest = {
 };
 
 /**
+ * Series
+ */
+export type Series = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Points
+     */
+    points: Array<Point>;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * SessionHit
+ */
+export type SessionHit = {
+    /**
+     * Message Id
+     */
+    message_id: string;
+    /**
+     * Occurred At
+     */
+    occurred_at: string;
+    /**
+     * Role
+     */
+    role: 'user' | 'assistant';
+    /**
+     * Snippet
+     */
+    snippet: string;
+    /**
+     * Thread Id
+     */
+    thread_id: string;
+    /**
+     * Thread Title
+     */
+    thread_title: string;
+};
+
+/**
+ * SessionSearchOut
+ */
+export type SessionSearchOut = {
+    /**
+     * Hits
+     */
+    hits: Array<SessionHit>;
+    /**
+     * Query
+     */
+    query: string;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * ShareOut
+ */
+export type ShareOut = {
+    /**
+     * Path
+     *
+     * Caminho do web para abrir a conversa em só leitura
+     */
+    path: string;
+    /**
+     * Token
+     */
+    token: string;
+};
+
+/**
  * Shift
  */
 export type Shift = 'morning' | 'afternoon' | 'night';
@@ -4171,6 +6058,79 @@ export type SlotCount = {
     crew: number;
     day_group: DayGroup;
     shift: Shift;
+};
+
+/**
+ * TableArtifact
+ */
+export type TableArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'table';
+    spec: TableSpec;
+};
+
+/**
+ * TableColumn
+ */
+export type TableColumn = {
+    /**
+     * Key
+     */
+    key: string;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Type
+     */
+    type?: 'text' | 'number' | 'percent' | 'currency' | 'date' | 'category';
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * TableSpec
+ */
+export type TableSpec = {
+    /**
+     * Columns
+     */
+    columns: Array<TableColumn>;
+    /**
+     * Estimate
+     */
+    estimate?: boolean;
+    /**
+     * Rows
+     */
+    rows: Array<{
+        [key: string]: string | number | null;
+    }>;
+    /**
+     * Sort By
+     */
+    sort_by?: string | null;
+    /**
+     * Sort Dir
+     */
+    sort_dir?: 'asc' | 'desc';
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Title
+     */
+    title: string;
+    /**
+     * Total Rows
+     */
+    total_rows: number;
 };
 
 /**
@@ -4381,6 +6341,10 @@ export type ThreadOut = {
      */
     created_at: string;
     /**
+     * Ephemeral
+     */
+    ephemeral: boolean;
+    /**
      * Has Summary
      */
     has_summary: boolean;
@@ -4396,6 +6360,26 @@ export type ThreadOut = {
      * Messages
      */
     messages: Array<MessageOut>;
+    /**
+     * Parent Thread Id
+     */
+    parent_thread_id: string | null;
+    /**
+     * Pinned
+     */
+    pinned: boolean;
+    /**
+     * Project
+     */
+    project: string;
+    /**
+     * Shared
+     */
+    shared: boolean;
+    /**
+     * Snippet
+     */
+    snippet?: string | null;
     /**
      * Summary
      */
@@ -4441,16 +6425,6 @@ export type ThreadPage = {
 };
 
 /**
- * ThreadRename
- */
-export type ThreadRename = {
-    /**
-     * Title
-     */
-    title: string;
-};
-
-/**
  * ThreadSummaryOut
  */
 export type ThreadSummaryOut = {
@@ -4462,6 +6436,10 @@ export type ThreadSummaryOut = {
      * Created At
      */
     created_at: string;
+    /**
+     * Ephemeral
+     */
+    ephemeral: boolean;
     /**
      * Has Summary
      */
@@ -4475,6 +6453,26 @@ export type ThreadSummaryOut = {
      */
     message_count: number;
     /**
+     * Parent Thread Id
+     */
+    parent_thread_id: string | null;
+    /**
+     * Pinned
+     */
+    pinned: boolean;
+    /**
+     * Project
+     */
+    project: string;
+    /**
+     * Shared
+     */
+    shared: boolean;
+    /**
+     * Snippet
+     */
+    snippet?: string | null;
+    /**
      * Title
      */
     title: string;
@@ -4482,6 +6480,103 @@ export type ThreadSummaryOut = {
      * Updated At
      */
     updated_at: string;
+};
+
+/**
+ * ThreadUpdate
+ *
+ * Qualquer subconjunto: renomear, fixar, arquivar ou mover para uma pasta (`project`; vazio = sem pasta).
+ */
+export type ThreadUpdate = {
+    /**
+     * Archived
+     */
+    archived?: boolean | null;
+    /**
+     * Pinned
+     */
+    pinned?: boolean | null;
+    /**
+     * Project
+     */
+    project?: string | null;
+    /**
+     * Title
+     */
+    title?: string | null;
+};
+
+/**
+ * TimelineArtifact
+ */
+export type TimelineArtifact = {
+    /**
+     * Artifact Type
+     */
+    artifact_type?: 'timeline';
+    spec: TimelineSpec;
+};
+
+/**
+ * TimelineEvent
+ */
+export type TimelineEvent = {
+    /**
+     * At
+     */
+    at: string;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Kind
+     */
+    kind: 'thread' | 'message' | 'tool' | 'memory' | 'attachment' | 'action' | 'artifact';
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Ref Id
+     */
+    ref_id?: string | null;
+};
+
+/**
+ * TimelineItem
+ */
+export type TimelineItem = {
+    /**
+     * At
+     */
+    at: string;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
+ * TimelineSpec
+ */
+export type TimelineSpec = {
+    /**
+     * Items
+     */
+    items: Array<TimelineItem>;
+    /**
+     * Source
+     */
+    source: string;
+    /**
+     * Title
+     */
+    title: string;
 };
 
 /**
@@ -4521,6 +6616,28 @@ export type ToolTraceOut = {
      * Summary
      */
     summary: string;
+};
+
+/**
+ * TornadoBar
+ */
+export type TornadoBar = {
+    /**
+     * Base
+     */
+    base: number;
+    /**
+     * High
+     */
+    high: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Low
+     */
+    low: number;
 };
 
 /**
@@ -4573,6 +6690,104 @@ export type TornadoBarOut = {
      * Unit
      */
     unit: string;
+};
+
+/**
+ * TornadoChart
+ */
+export type TornadoChart = {
+    /**
+     * Bars
+     */
+    bars: Array<TornadoBar>;
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Kind
+     */
+    kind: 'tornado';
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * TreemapChart
+ */
+export type TreemapChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Items
+     */
+    items: Array<TreemapItem>;
+    /**
+     * Kind
+     */
+    kind: 'treemap';
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * TreemapItem
+ */
+export type TreemapItem = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Parent
+     */
+    parent?: string | null;
+    /**
+     * Value
+     */
+    value: number;
 };
 
 /**
@@ -5060,6 +7275,64 @@ export type WasteShareOut = {
      * Share Pct
      */
     share_pct: number;
+};
+
+/**
+ * WaterfallChart
+ */
+export type WaterfallChart = {
+    /**
+     * Estimate
+     *
+     * Valores previstos (estimativa)
+     */
+    estimate?: boolean;
+    /**
+     * Kind
+     */
+    kind: 'waterfall';
+    /**
+     * Source
+     *
+     * Ferramenta e dados de origem
+     */
+    source: string;
+    /**
+     * Steps
+     */
+    steps: Array<WaterfallStep>;
+    /**
+     * Subtitle
+     */
+    subtitle?: string | null;
+    /**
+     * Title
+     *
+     * Título-conclusão (sem números inventados)
+     */
+    title: string;
+    /**
+     * Unit
+     */
+    unit?: string | null;
+};
+
+/**
+ * WaterfallStep
+ */
+export type WaterfallStep = {
+    /**
+     * Kind
+     */
+    kind?: 'start' | 'delta' | 'total';
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Value
+     */
+    value: number;
 };
 
 /**
@@ -6662,6 +8935,664 @@ export type GetBrandEvidenceResponses = {
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
 
+export type ListCopilotActionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Scope
+         */
+        scope?: 'mine' | 'all';
+        /**
+         * Cursor
+         */
+        cursor?: string | null;
+        /**
+         * Status
+         */
+        status?: string | null;
+        /**
+         * Type
+         */
+        type?: ActionType | null;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/actions';
+};
+
+export type ListCopilotActionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotActionsError = ListCopilotActionsErrors[keyof ListCopilotActionsErrors];
+
+export type ListCopilotActionsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ActionPage;
+};
+
+export type ListCopilotActionsResponse = ListCopilotActionsResponses[keyof ListCopilotActionsResponses];
+
+export type ProposeCopilotActionData = {
+    body: ProposeActionIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/actions';
+};
+
+export type ProposeCopilotActionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ProposeCopilotActionError = ProposeCopilotActionErrors[keyof ProposeCopilotActionErrors];
+
+export type ProposeCopilotActionResponses = {
+    /**
+     * Successful Response
+     */
+    201: ActionOut;
+};
+
+export type ProposeCopilotActionResponse = ProposeCopilotActionResponses[keyof ProposeCopilotActionResponses];
+
+export type ConfirmCopilotActionData = {
+    body: ConfirmActionIn;
+    path: {
+        /**
+         * Action Id
+         */
+        action_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/actions/{action_id}/confirm';
+};
+
+export type ConfirmCopilotActionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ConfirmCopilotActionError = ConfirmCopilotActionErrors[keyof ConfirmCopilotActionErrors];
+
+export type ConfirmCopilotActionResponses = {
+    /**
+     * Successful Response
+     */
+    200: ActionOut;
+};
+
+export type ConfirmCopilotActionResponse = ConfirmCopilotActionResponses[keyof ConfirmCopilotActionResponses];
+
+export type RejectCopilotActionData = {
+    body?: never;
+    path: {
+        /**
+         * Action Id
+         */
+        action_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/actions/{action_id}/reject';
+};
+
+export type RejectCopilotActionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RejectCopilotActionError = RejectCopilotActionErrors[keyof RejectCopilotActionErrors];
+
+export type RejectCopilotActionResponses = {
+    /**
+     * Successful Response
+     */
+    200: ActionOut;
+};
+
+export type RejectCopilotActionResponse = RejectCopilotActionResponses[keyof RejectCopilotActionResponses];
+
+export type UndoCopilotActionData = {
+    body?: never;
+    path: {
+        /**
+         * Action Id
+         */
+        action_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/actions/{action_id}/undo';
+};
+
+export type UndoCopilotActionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UndoCopilotActionError = UndoCopilotActionErrors[keyof UndoCopilotActionErrors];
+
+export type UndoCopilotActionResponses = {
+    /**
+     * Successful Response
+     */
+    200: ActionOut;
+};
+
+export type UndoCopilotActionResponse = UndoCopilotActionResponses[keyof UndoCopilotActionResponses];
+
+export type ListCopilotArtifactsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Cursor
+         */
+        cursor?: string | null;
+        /**
+         * Artifact Type
+         */
+        artifact_type?: string | null;
+        /**
+         * Pinned
+         */
+        pinned?: boolean | null;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Thread Id
+         */
+        thread_id?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/copilot/artifacts';
+};
+
+export type ListCopilotArtifactsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotArtifactsError = ListCopilotArtifactsErrors[keyof ListCopilotArtifactsErrors];
+
+export type ListCopilotArtifactsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ArtifactPage;
+};
+
+export type ListCopilotArtifactsResponse = ListCopilotArtifactsResponses[keyof ListCopilotArtifactsResponses];
+
+export type DeleteCopilotArtifactData = {
+    body?: never;
+    path: {
+        /**
+         * Artifact Id
+         */
+        artifact_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/artifacts/{artifact_id}';
+};
+
+export type DeleteCopilotArtifactErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteCopilotArtifactError = DeleteCopilotArtifactErrors[keyof DeleteCopilotArtifactErrors];
+
+export type DeleteCopilotArtifactResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteCopilotArtifactResponse = DeleteCopilotArtifactResponses[keyof DeleteCopilotArtifactResponses];
+
+export type PinCopilotArtifactData = {
+    body?: never;
+    path: {
+        /**
+         * Artifact Id
+         */
+        artifact_id: string;
+    };
+    query?: {
+        /**
+         * Pinned
+         */
+        pinned?: boolean;
+    };
+    url: '/api/v1/copilot/artifacts/{artifact_id}/pin';
+};
+
+export type PinCopilotArtifactErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type PinCopilotArtifactError = PinCopilotArtifactErrors[keyof PinCopilotArtifactErrors];
+
+export type PinCopilotArtifactResponses = {
+    /**
+     * Successful Response
+     */
+    200: ArtifactOut;
+};
+
+export type PinCopilotArtifactResponse = PinCopilotArtifactResponses[keyof PinCopilotArtifactResponses];
+
+export type RefreshCopilotArtifactData = {
+    body?: never;
+    path: {
+        /**
+         * Artifact Id
+         */
+        artifact_id: string;
+    };
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/copilot/artifacts/{artifact_id}/refresh';
+};
+
+export type RefreshCopilotArtifactErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RefreshCopilotArtifactError = RefreshCopilotArtifactErrors[keyof RefreshCopilotArtifactErrors];
+
+export type RefreshCopilotArtifactResponses = {
+    /**
+     * Successful Response
+     */
+    200: ArtifactOut;
+};
+
+export type RefreshCopilotArtifactResponse = RefreshCopilotArtifactResponses[keyof RefreshCopilotArtifactResponses];
+
 export type UploadCopilotAttachmentsData = {
     body: BodyUploadCopilotAttachments;
     path?: never;
@@ -6847,6 +9778,133 @@ export type ListCopilotCommandsResponses = {
 
 export type ListCopilotCommandsResponse = ListCopilotCommandsResponses[keyof ListCopilotCommandsResponses];
 
+export type DeleteCopilotDataData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Confirmation
+         *
+         * APAGAR ou DELETE
+         */
+        confirmation: string;
+    };
+    url: '/api/v1/copilot/data';
+};
+
+export type DeleteCopilotDataErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteCopilotDataError = DeleteCopilotDataErrors[keyof DeleteCopilotDataErrors];
+
+export type DeleteCopilotDataResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type ExportCopilotDataData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/data/export';
+};
+
+export type ExportCopilotDataErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportCopilotDataError = ExportCopilotDataErrors[keyof ExportCopilotDataErrors];
+
+export type ExportCopilotDataResponses = {
+    /**
+     * Successful Response
+     */
+    200: DataExport;
+};
+
+export type ExportCopilotDataResponse = ExportCopilotDataResponses[keyof ExportCopilotDataResponses];
+
 export type GetCopilotEventSchemaData = {
     body?: never;
     path?: never;
@@ -6907,6 +9965,616 @@ export type GetCopilotEventSchemaResponses = {
 };
 
 export type GetCopilotEventSchemaResponse = GetCopilotEventSchemaResponses[keyof GetCopilotEventSchemaResponses];
+
+export type ListCopilotHistoryData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Cursor
+         */
+        cursor?: string | null;
+        /**
+         * Kinds
+         */
+        kinds?: Array<'conversation' | 'action' | 'artifact' | 'memory' | 'attachment'> | null;
+        /**
+         * Since
+         */
+        since?: string | null;
+        /**
+         * Until
+         */
+        until?: string | null;
+        /**
+         * Status
+         */
+        status?: string | null;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/copilot/history';
+};
+
+export type ListCopilotHistoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotHistoryError = ListCopilotHistoryErrors[keyof ListCopilotHistoryErrors];
+
+export type ListCopilotHistoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: HistoryPage;
+};
+
+export type ListCopilotHistoryResponse = ListCopilotHistoryResponses[keyof ListCopilotHistoryResponses];
+
+export type ClearCopilotMemoryData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Target
+         */
+        target: 'memory' | 'user';
+    };
+    url: '/api/v1/copilot/memory/entries';
+};
+
+export type ClearCopilotMemoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ClearCopilotMemoryError = ClearCopilotMemoryErrors[keyof ClearCopilotMemoryErrors];
+
+export type ClearCopilotMemoryResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ClearCopilotMemoryResponse = ClearCopilotMemoryResponses[keyof ClearCopilotMemoryResponses];
+
+export type ListCopilotMemoryEntriesData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Target
+         */
+        target?: 'memory' | 'user' | null;
+    };
+    url: '/api/v1/copilot/memory/entries';
+};
+
+export type ListCopilotMemoryEntriesErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotMemoryEntriesError = ListCopilotMemoryEntriesErrors[keyof ListCopilotMemoryEntriesErrors];
+
+export type ListCopilotMemoryEntriesResponses = {
+    /**
+     * Successful Response
+     */
+    200: MemoryEntryList;
+};
+
+export type ListCopilotMemoryEntriesResponse = ListCopilotMemoryEntriesResponses[keyof ListCopilotMemoryEntriesResponses];
+
+export type CreateCopilotMemoryEntryData = {
+    body: MemoryEntryCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/memory/entries';
+};
+
+export type CreateCopilotMemoryEntryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCopilotMemoryEntryError = CreateCopilotMemoryEntryErrors[keyof CreateCopilotMemoryEntryErrors];
+
+export type CreateCopilotMemoryEntryResponses = {
+    /**
+     * Successful Response
+     */
+    201: MemoryEntryOut;
+};
+
+export type CreateCopilotMemoryEntryResponse = CreateCopilotMemoryEntryResponses[keyof CreateCopilotMemoryEntryResponses];
+
+export type DeleteCopilotMemoryEntryData = {
+    body?: never;
+    path: {
+        /**
+         * Entry Id
+         */
+        entry_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/memory/entries/{entry_id}';
+};
+
+export type DeleteCopilotMemoryEntryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteCopilotMemoryEntryError = DeleteCopilotMemoryEntryErrors[keyof DeleteCopilotMemoryEntryErrors];
+
+export type DeleteCopilotMemoryEntryResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteCopilotMemoryEntryResponse = DeleteCopilotMemoryEntryResponses[keyof DeleteCopilotMemoryEntryResponses];
+
+export type UpdateCopilotMemoryEntryData = {
+    body: MemoryEntryUpdate;
+    path: {
+        /**
+         * Entry Id
+         */
+        entry_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/memory/entries/{entry_id}';
+};
+
+export type UpdateCopilotMemoryEntryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCopilotMemoryEntryError = UpdateCopilotMemoryEntryErrors[keyof UpdateCopilotMemoryEntryErrors];
+
+export type UpdateCopilotMemoryEntryResponses = {
+    /**
+     * Successful Response
+     */
+    200: MemoryEntryOut;
+};
+
+export type UpdateCopilotMemoryEntryResponse = UpdateCopilotMemoryEntryResponses[keyof UpdateCopilotMemoryEntryResponses];
+
+export type ListPendingMemoryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/memory/pending';
+};
+
+export type ListPendingMemoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListPendingMemoryError = ListPendingMemoryErrors[keyof ListPendingMemoryErrors];
+
+export type ListPendingMemoryResponses = {
+    /**
+     * Response List Pending Memory
+     *
+     * Successful Response
+     */
+    200: Array<PendingMemoryOut>;
+};
+
+export type ListPendingMemoryResponse = ListPendingMemoryResponses[keyof ListPendingMemoryResponses];
+
+export type ApprovePendingMemoryData = {
+    body: PendingApprove;
+    path: {
+        /**
+         * Pending Id
+         */
+        pending_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/memory/pending/{pending_id}/approve';
+};
+
+export type ApprovePendingMemoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ApprovePendingMemoryError = ApprovePendingMemoryErrors[keyof ApprovePendingMemoryErrors];
+
+export type ApprovePendingMemoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: PendingMemoryOut;
+};
+
+export type ApprovePendingMemoryResponse = ApprovePendingMemoryResponses[keyof ApprovePendingMemoryResponses];
+
+export type RejectPendingMemoryData = {
+    body?: never;
+    path: {
+        /**
+         * Pending Id
+         */
+        pending_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/memory/pending/{pending_id}/reject';
+};
+
+export type RejectPendingMemoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RejectPendingMemoryError = RejectPendingMemoryErrors[keyof RejectPendingMemoryErrors];
+
+export type RejectPendingMemoryResponses = {
+    /**
+     * Successful Response
+     */
+    200: PendingMemoryOut;
+};
+
+export type RejectPendingMemoryResponse = RejectPendingMemoryResponses[keyof RejectPendingMemoryResponses];
 
 export type SearchCopilotMentionsData = {
     body?: never;
@@ -7052,6 +10720,396 @@ export type SendCopilotFeedbackResponses = {
 
 export type SendCopilotFeedbackResponse = SendCopilotFeedbackResponses[keyof SendCopilotFeedbackResponses];
 
+export type PreviewCopilotPersonaData = {
+    body: PersonaPreviewIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/persona/preview';
+};
+
+export type PreviewCopilotPersonaErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type PreviewCopilotPersonaError = PreviewCopilotPersonaErrors[keyof PreviewCopilotPersonaErrors];
+
+export type PreviewCopilotPersonaResponses = {
+    /**
+     * Successful Response
+     */
+    200: PersonaPreviewOut;
+};
+
+export type PreviewCopilotPersonaResponse = PreviewCopilotPersonaResponses[keyof PreviewCopilotPersonaResponses];
+
+export type ListCopilotProjectsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/projects';
+};
+
+export type ListCopilotProjectsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCopilotProjectsError = ListCopilotProjectsErrors[keyof ListCopilotProjectsErrors];
+
+export type ListCopilotProjectsResponses = {
+    /**
+     * Response List Copilot Projects
+     *
+     * Successful Response
+     */
+    200: Array<ProjectOut>;
+};
+
+export type ListCopilotProjectsResponse = ListCopilotProjectsResponses[keyof ListCopilotProjectsResponses];
+
+export type SearchCopilotSessionsData = {
+    body?: never;
+    path?: never;
+    query: {
+        /**
+         * Q
+         */
+        q: string;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Since
+         */
+        since?: string | null;
+        /**
+         * Until
+         */
+        until?: string | null;
+    };
+    url: '/api/v1/copilot/sessions/search';
+};
+
+export type SearchCopilotSessionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SearchCopilotSessionsError = SearchCopilotSessionsErrors[keyof SearchCopilotSessionsErrors];
+
+export type SearchCopilotSessionsResponses = {
+    /**
+     * Successful Response
+     */
+    200: SessionSearchOut;
+};
+
+export type SearchCopilotSessionsResponse = SearchCopilotSessionsResponses[keyof SearchCopilotSessionsResponses];
+
+export type GetCopilotSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/settings';
+};
+
+export type GetCopilotSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCopilotSettingsError = GetCopilotSettingsErrors[keyof GetCopilotSettingsErrors];
+
+export type GetCopilotSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: CopilotSettingsOut;
+};
+
+export type GetCopilotSettingsResponse = GetCopilotSettingsResponses[keyof GetCopilotSettingsResponses];
+
+export type UpdateCopilotSettingsData = {
+    body: CopilotSettings;
+    path?: never;
+    query?: never;
+    url: '/api/v1/copilot/settings';
+};
+
+export type UpdateCopilotSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCopilotSettingsError = UpdateCopilotSettingsErrors[keyof UpdateCopilotSettingsErrors];
+
+export type UpdateCopilotSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: CopilotSettingsOut;
+};
+
+export type UpdateCopilotSettingsResponse = UpdateCopilotSettingsResponses[keyof UpdateCopilotSettingsResponses];
+
+export type GetSharedCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Token
+         */
+        token: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/shared/{token}';
+};
+
+export type GetSharedCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetSharedCopilotThreadError = GetSharedCopilotThreadErrors[keyof GetSharedCopilotThreadErrors];
+
+export type GetSharedCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: ThreadOut;
+};
+
+export type GetSharedCopilotThreadResponse = GetSharedCopilotThreadResponses[keyof GetSharedCopilotThreadResponses];
+
 export type CopilotStreamData = {
     body: CopilotStreamRequest;
     path?: never;
@@ -7129,6 +11187,18 @@ export type ListCopilotThreadsData = {
          * Archived
          */
         archived?: boolean;
+        /**
+         * Q
+         */
+        q?: string | null;
+        /**
+         * Pinned
+         */
+        pinned?: boolean | null;
+        /**
+         * Project
+         */
+        project?: string | null;
     };
     url: '/api/v1/copilot/threads';
 };
@@ -7319,8 +11389,8 @@ export type GetCopilotThreadResponses = {
 
 export type GetCopilotThreadResponse = GetCopilotThreadResponses[keyof GetCopilotThreadResponses];
 
-export type RenameCopilotThreadData = {
-    body: ThreadRename;
+export type UpdateCopilotThreadData = {
+    body: ThreadUpdate;
     path: {
         /**
          * Thread Id
@@ -7331,7 +11401,7 @@ export type RenameCopilotThreadData = {
     url: '/api/v1/copilot/threads/{thread_id}';
 };
 
-export type RenameCopilotThreadErrors = {
+export type UpdateCopilotThreadErrors = {
     /**
      * Pedido inválido
      */
@@ -7374,16 +11444,16 @@ export type RenameCopilotThreadErrors = {
     503: ErrorBody;
 };
 
-export type RenameCopilotThreadError = RenameCopilotThreadErrors[keyof RenameCopilotThreadErrors];
+export type UpdateCopilotThreadError = UpdateCopilotThreadErrors[keyof UpdateCopilotThreadErrors];
 
-export type RenameCopilotThreadResponses = {
+export type UpdateCopilotThreadResponses = {
     /**
      * Successful Response
      */
     200: ThreadSummaryOut;
 };
 
-export type RenameCopilotThreadResponse = RenameCopilotThreadResponses[keyof RenameCopilotThreadResponses];
+export type UpdateCopilotThreadResponse = UpdateCopilotThreadResponses[keyof UpdateCopilotThreadResponses];
 
 export type CompactCopilotThreadData = {
     body?: never;
@@ -7517,6 +11587,72 @@ export type ExportCopilotThreadResponses = {
 
 export type ExportCopilotThreadResponse = ExportCopilotThreadResponses[keyof ExportCopilotThreadResponses];
 
+export type ExportCopilotThreadPdfData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/export.pdf';
+};
+
+export type ExportCopilotThreadPdfErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportCopilotThreadPdfError = ExportCopilotThreadPdfErrors[keyof ExportCopilotThreadPdfErrors];
+
+export type ExportCopilotThreadPdfResponses = {
+    /**
+     * Successful Response
+     */
+    200: Blob | File;
+};
+
+export type ExportCopilotThreadPdfResponse = ExportCopilotThreadPdfResponses[keyof ExportCopilotThreadPdfResponses];
+
 export type RegenerateCopilotResponseData = {
     body?: never;
     path: {
@@ -7587,6 +11723,206 @@ export type RegenerateCopilotResponseResponses = {
 };
 
 export type RegenerateCopilotResponseResponse = RegenerateCopilotResponseResponses[keyof RegenerateCopilotResponseResponses];
+
+export type UnshareCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/share';
+};
+
+export type UnshareCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UnshareCopilotThreadError = UnshareCopilotThreadErrors[keyof UnshareCopilotThreadErrors];
+
+export type UnshareCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type UnshareCopilotThreadResponse = UnshareCopilotThreadResponses[keyof UnshareCopilotThreadResponses];
+
+export type ShareCopilotThreadData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/share';
+};
+
+export type ShareCopilotThreadErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ShareCopilotThreadError = ShareCopilotThreadErrors[keyof ShareCopilotThreadErrors];
+
+export type ShareCopilotThreadResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShareOut;
+};
+
+export type ShareCopilotThreadResponse = ShareCopilotThreadResponses[keyof ShareCopilotThreadResponses];
+
+export type GetCopilotThreadTimelineData = {
+    body?: never;
+    path: {
+        /**
+         * Thread Id
+         */
+        thread_id: string;
+    };
+    query?: never;
+    url: '/api/v1/copilot/threads/{thread_id}/timeline';
+};
+
+export type GetCopilotThreadTimelineErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCopilotThreadTimelineError = GetCopilotThreadTimelineErrors[keyof GetCopilotThreadTimelineErrors];
+
+export type GetCopilotThreadTimelineResponses = {
+    /**
+     * Response Get Copilot Thread Timeline
+     *
+     * Successful Response
+     */
+    200: Array<TimelineEvent>;
+};
+
+export type GetCopilotThreadTimelineResponse = GetCopilotThreadTimelineResponses[keyof GetCopilotThreadTimelineResponses];
 
 export type UpdateDataAlertData = {
     body: AlertUpdate;

@@ -34,7 +34,9 @@ def _args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     p.add_argument("--dir", type=Path, default=ROOT / "data" / "eval" / "triage", help="pasta com imagens e truth.csv")
     p.add_argument("--csv", type=Path, default=None, help="CSV de verdade-terreno (por omissão <dir>/truth.csv)")
-    p.add_argument("--models", default="", help="slugs separados por vírgula; por omissão, o modelo de visão configurado")
+    p.add_argument(
+        "--models", default="", help="slugs separados por vírgula; por omissão, o modelo de visão configurado"
+    )
     p.add_argument("--limit", type=int, default=0, help="só as primeiras N peças (0 = todas)")
     p.add_argument("--out", type=Path, default=ROOT / "docs" / "engenharia" / "avaliacao-triagem.md")
     p.add_argument("--json", type=Path, default=ROOT / "data" / "eval" / "triage-last.json")

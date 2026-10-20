@@ -43,10 +43,10 @@ flowchart TB
 ```
 apps/api/src/novelo/
   core/        config, base de dados, erros tipados, segurança, limites de pedidos
-  features/    auth · users · textile · network · datasets · planning · lots · reports · health
+  features/    auth · users · textile · network · datasets · planning · lots · reports · ai_admin · copilot · health
   domain/      procura, custos, geografia, rede: só funções puras
   adapters/    OpenRouter e email (Resend ou log)
-  ai/          prompts versionados e verificador de números
+  ai/          prompts versionados, verificador de números, catálogo de modelos, avaliações (triagem, copiloto)
 apps/web/src/
   routes/      rotas por ficheiros (_app/* exige sessão)
   features/    ecrãs por funcionalidade
@@ -144,3 +144,7 @@ Palavras-passe com argon2; JWT em cookies HttpOnly com rotação do token de ren
 | Imagens | `just build` constrói as duas imagens de produção |
 
 Por agora não há integração contínua remota. O fluxo é: `just check` verde, commit em Conventional Commits e push direto para `main`, que o Coolify publica.
+
+## Copiloto
+
+O copiloto (`features/copilot/`) é a feature mais complexa da API: conversa em streaming (SSE) com 42 ferramentas tipadas que chamam os mesmos services da app, threads persistentes por utilizador, memória de longo prazo, artefactos (gráficos, tabelas, mapas), ações com confirmação e auditoria, anexos, menções e histórico unificado. Desenho, contrato de eventos, segurança e operação em [Copiloto](copiloto.md); gestão de modelos, custos e orçamento em [IA](ia.md). O nginx do web tem locations próprias para o stream (sem buffering) e para os anexos (até 55 MB).

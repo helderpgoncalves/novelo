@@ -13,10 +13,12 @@ import json
 import logging
 import time
 import weakref
-from collections.abc import Awaitable, Callable
+from collections.abc import AsyncGenerator, Awaitable, Callable
+from contextlib import aclosing
 from dataclasses import dataclass, field
 from typing import Any, Literal, TypeVar
 
+import anyio
 import httpx
 from pydantic import BaseModel, ValidationError
 
@@ -34,6 +36,39 @@ MAX_TOOL_ITERATIONS = 6  # limite duro de voltas modelo -> ferramentas -> modelo
 _ACCOUNT_FIELDS = frozenset({"limit", "limit_remaining", "usage", "is_free_tier", "total_credits", "total_usage"})
 _RETRY_STATUS = frozenset({408, 429, 500, 502, 503, 504})
 _SEMAPHORES: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, asyncio.Semaphore]" = weakref.WeakKeyDictionary()
+
+
+def strict_json_schema(schema: type[BaseModel]) -> dict[str, Any]:
+    """JSON Schema aceite pelo modo `strict` (OpenAI): objetos fechados e todos os campos obrigatórios.
+
+    O Pydantic continua a validar a resposta com o modelo original (defaults e limites incluídos).
+    """
+
+    def fix(node: Any) -> Any:
+        if isinstance(node, list):
+            return [fix(x) for x in node]
+        if not isinstance(node, dict):
+            return node
+        if "$ref" in node:
+            return {"$ref": node["$ref"]}  # irmãos de $ref (description...) fazem o modo strict rejeitar o esquema
+        out = {k: fix(v) for k, v in node.items() if k not in {"default", "title"} or isinstance(v, dict)}
+        if out.get("type") == "object" or "properties" in out:
+            props = out.get("properties", {})
+            out["additionalProperties"] = False
+            out["required"] = list(props)
+        return out
+
+    fixed: dict[str, Any] = fix(schema.model_json_schema())
+    return fixed
+
+
+def _error_detail(resp: httpx.Response) -> str:
+    """Mensagem de erro do fornecedor (curta; nunca inclui cabeçalhos nem a chave)."""
+    try:
+        err = resp.json().get("error", {})
+        return str(err.get("message", ""))[:200] if isinstance(err, dict) else str(err)[:200]
+    except (ValueError, AttributeError):
+        return ""
 
 
 def _semaphore(limit: int) -> asyncio.Semaphore:
@@ -84,6 +119,36 @@ class ChatResult:
     tool_calls: list[ToolCallRecord] = field(default_factory=list)
     iterations: int = 0
 
+
+@dataclass(frozen=True)
+class RawToolCall:
+    id: str
+    name: str
+    arguments: str
+
+
+@dataclass(frozen=True)
+class TextPiece:
+    text: str
+
+
+@dataclass(frozen=True)
+class ReasoningPiece:
+    """O modelo está a raciocinar (o texto do raciocínio não é reencaminhado para o utilizador)."""
+
+
+@dataclass(frozen=True)
+class RoundResult:
+    """Fim de uma volta em streaming: texto completo, chamadas a ferramentas e uso real."""
+
+    text: str
+    tool_calls: list[RawToolCall]
+    finish_reason: str | None
+    model: str
+    usage: CallUsage | None
+
+
+StreamPiece = TextPiece | ReasoningPiece | RoundResult
 
 # (nome, argumentos em JSON bruto) -> resultado serializável em JSON. Não deve levantar: devolve {"error": ...}.
 ToolExecutor = Callable[[str, str], Awaitable[Any]]
@@ -183,7 +248,8 @@ class OpenRouterClient:
                 if resp.status_code in _RETRY_STATUS:
                     last = f"HTTP {resp.status_code}"
                 elif resp.status_code >= 400:
-                    log.warning("llm call rejected model=%s status=%s", model, resp.status_code)
+                    detail = _error_detail(resp)
+                    log.warning("llm call rejected model=%s status=%s detail=%s", model, resp.status_code, detail)
                     last = f"HTTP {resp.status_code}"
                     await self._emit(
                         task,
@@ -194,7 +260,7 @@ class OpenRouterClient:
                         f"http_{resp.status_code}",
                         input_hash,
                     )
-                    raise UpstreamError(f"The model provider rejected the request (HTTP {resp.status_code})")
+                    raise UpstreamError(f"The model provider rejected the request (HTTP {resp.status_code}): {detail}")
                 else:
                     try:
                         data: dict[str, Any] = resp.json()
@@ -284,7 +350,7 @@ class OpenRouterClient:
         )
         payload["response_format"] = {
             "type": "json_schema",
-            "json_schema": {"name": schema.__name__, "strict": True, "schema": schema.model_json_schema()},
+            "json_schema": {"name": schema.__name__, "strict": True, "schema": strict_json_schema(schema)},
         }
         last_error: Exception | None = None
         for _ in range(retries + 1):
@@ -376,6 +442,119 @@ class OpenRouterClient:
             raise UpstreamError("The model conversation timed out") from exc
         raise UpstreamError("The model did not finish")  # inalcançável: a última volta devolve ou levanta
 
+    async def stream_round(
+        self,
+        *,
+        system: str,
+        messages: list[dict[str, Any]],
+        tools: list[ToolSpec],
+        task: AiTask | str = AiTask.COPILOT,
+        model: str | None = None,
+        tools_enabled: bool = True,
+        force_tool: str | None = None,
+    ) -> AsyncGenerator[StreamPiece, None]:
+        """Uma volta do modelo em streaming (SSE): texto em tempo real e, no fim, as chamadas a ferramentas.
+
+        Acumula os `tool_calls` por índice (o nome vem no 1.º fragmento, os argumentos em pedaços), pede o `usage`
+        final (`stream_options.include_usage`) e ignora os comentários `: OPENROUTER PROCESSING`. Fechar o gerador
+        (cliente desligou) fecha a ligação ao fornecedor, que pára o modelo; o uso parcial fica registado.
+        Repete falhas transitórias e tenta o modelo de reserva só antes de ter saído qualquer texto.
+        """
+        self._require_enabled()
+        the_task = AiTask(task)
+        chosen = model or self.model_for(the_task)
+        payload = self._base_payload(the_task, chosen, [{"role": "system", "content": system}, *messages])
+        payload["stream"] = True
+        payload["stream_options"] = {"include_usage": True}
+        if tools:
+            payload["tools"] = [t.as_openai() for t in tools]
+            payload["tool_choice"] = "auto" if tools_enabled else "none"
+            if force_tool and tools_enabled:
+                payload["tool_choice"] = {"type": "function", "function": {"name": force_tool}}
+        if self._rt:
+            self._rt.check_budget()
+        candidates = [chosen]
+        fallback = self._fallback_for(the_task) if model is None else None
+        if fallback and fallback != chosen:
+            candidates.append(fallback)
+        for index, candidate in enumerate(candidates):
+            payload["model"] = candidate
+            emitted = False
+            try:
+                async with aclosing(self._stream_once(the_task, payload)) as pieces:
+                    async for piece in pieces:
+                        emitted = emitted or isinstance(piece, TextPiece)
+                        yield piece
+                return
+            except UpstreamError:
+                if emitted or index == len(candidates) - 1:
+                    raise
+                log.warning(
+                    "llm stream fallback task=%s from=%s to=%s", the_task.value, candidate, candidates[index + 1]
+                )
+
+    async def _stream_once(self, task: AiTask, payload: dict[str, Any]) -> AsyncGenerator[StreamPiece, None]:
+        model = str(payload["model"])
+        input_hash = hashlib.sha256(json.dumps(payload.get("messages"), default=str).encode()).hexdigest()
+        started = time.perf_counter()
+        state = _RoundState()
+        try:
+            async with (
+                _semaphore(self._s.llm_max_concurrency),
+                aclosing(self._read_with_retries(payload, state)) as pieces,
+            ):
+                async for piece in pieces:
+                    yield piece
+        except UpstreamError:
+            with anyio.CancelScope(shield=True):
+                await self._emit(task, model, None, time.perf_counter() - started, False, "upstream_error", input_hash)
+            raise
+        except (asyncio.CancelledError, GeneratorExit):
+            # Cliente desligou: regista o que se gastou até aqui (limite inferior) e deixa o cancelamento seguir.
+            with anyio.CancelScope(shield=True):
+                partial = {"usage": {"completion_tokens": max(1, len(state.text) // 4)}}
+                await self._emit(task, model, partial, time.perf_counter() - started, False, "cancelled", input_hash)
+            raise
+        elapsed = time.perf_counter() - started
+        await self._emit(task, model, {"usage": state.usage} if state.usage else None, elapsed, True, None, input_hash)
+        recorded = self.usage[-1] if self.usage else None
+        yield RoundResult(state.text, state.tool_calls(), state.finish, model, recorded)
+
+    async def _read_with_retries(
+        self, payload: dict[str, Any], state: "_RoundState"
+    ) -> AsyncGenerator[StreamPiece, None]:
+        last = "unknown error"
+        for attempt in range(self._s.llm_max_retries + 1):
+            try:
+                async with self._http.stream("POST", "/chat/completions", json=payload) as resp:
+                    if resp.status_code in _RETRY_STATUS:
+                        last = f"HTTP {resp.status_code}"
+                    elif resp.status_code >= 400:
+                        await resp.aread()
+                        detail = _error_detail(resp)
+                        log.warning("llm stream rejected status=%s detail=%s", resp.status_code, detail)
+                        raise UpstreamError(
+                            f"The model provider rejected the request (HTTP {resp.status_code}): {detail}"
+                        )
+                    else:
+                        async for line in resp.aiter_lines():
+                            if not line.startswith("data:"):
+                                continue  # linhas vazias e comentários SSE (keep-alive)
+                            body = line[5:].strip()
+                            if body == "[DONE]":
+                                break
+                            for piece in state.feed(body):
+                                yield piece
+                        return
+            except (httpx.TimeoutException, httpx.TransportError) as exc:
+                if state.got_output:
+                    raise UpstreamError("The model stream was interrupted") from exc
+                last = "timeout" if isinstance(exc, httpx.TimeoutException) else "transport error"
+            log.warning("llm stream failed attempt=%s reason=%s", attempt + 1, last)
+            if attempt < self._s.llm_max_retries:
+                await asyncio.sleep(self._s.llm_retry_backoff_s * 2**attempt)
+        raise UpstreamError(f"The model provider is unavailable: {last}")
+
     async def account(self) -> dict[str, Any]:
         """Saldo e limite da chave (`/credits` e `/key`). Falha com graça: devolve só o que conseguir."""
         out: dict[str, Any] = {}
@@ -402,3 +581,53 @@ def _read_call(call: Any) -> tuple[str, str]:
         return str(fn["name"]), str(fn.get("arguments") or "{}")
     except (KeyError, TypeError) as exc:
         raise UpstreamError("The model returned a malformed tool call") from exc
+
+
+class _RoundState:
+    """Estado de uma volta em streaming: junta os fragmentos de texto e de `tool_calls` (por índice)."""
+
+    def __init__(self) -> None:
+        self.parts: list[str] = []
+        self.calls: dict[int, dict[str, str]] = {}
+        self.finish: str | None = None
+        self.usage: dict[str, Any] | None = None
+        self.got_output = False
+
+    @property
+    def text(self) -> str:
+        return "".join(self.parts)
+
+    def feed(self, body: str) -> list[StreamPiece]:
+        try:
+            chunk = json.loads(body)
+        except json.JSONDecodeError:
+            return []
+        if chunk.get("error"):  # erro a meio da geração: o estado HTTP já era 200
+            raise UpstreamError("The model stream failed mid-generation")
+        if isinstance(chunk.get("usage"), dict):
+            self.usage = chunk["usage"]
+        choice = (chunk.get("choices") or [{}])[0]
+        delta = choice.get("delta") or {}
+        self.finish = choice.get("finish_reason") or self.finish
+        out: list[StreamPiece] = []
+        if delta.get("content"):
+            self.got_output = True
+            self.parts.append(delta["content"])
+            out.append(TextPiece(delta["content"]))
+        elif delta.get("reasoning"):
+            out.append(ReasoningPiece())
+        for tc in delta.get("tool_calls") or []:
+            self.got_output = True
+            slot = self.calls.setdefault(int(tc.get("index", 0)), {"id": "", "name": "", "args": ""})
+            fn = tc.get("function") or {}
+            slot["id"] = tc.get("id") or slot["id"]
+            slot["name"] = fn.get("name") or slot["name"]
+            slot["args"] += fn.get("arguments") or ""
+        return out
+
+    def tool_calls(self) -> list[RawToolCall]:
+        return [
+            RawToolCall(id=c["id"] or f"call_{i}", name=c["name"], arguments=c["args"] or "{}")
+            for i, c in sorted(self.calls.items())
+            if c["name"]
+        ]

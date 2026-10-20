@@ -40,6 +40,7 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 | [Funcionalidades](engenharia/features.md) | O que cada funcionalidade faz e como se comporta |
 | [Dados e modelo](engenharia/dados-e-modelo.md) | Fórmulas, pressupostos e calibração |
 | [IA](engenharia/ia.md) | OpenRouter, prompts versionados, verificador, triagem |
+| [Copiloto](engenharia/copiloto.md) | Conversa em streaming, ferramentas, artefactos, ações, memória, persona, avaliação |
 | [Ambiente](engenharia/ambiente.md) | Variáveis `.env`, Resend, Google OAuth, OpenRouter |
 | [Deploy](engenharia/deploy.md) | Coolify, domínio, variáveis, operação |
 | [Workflow com agentes](engenharia/workflow-ia.md) | Claude Code e GLM/Z.ai/ZCode a partilhar o mesmo contexto |

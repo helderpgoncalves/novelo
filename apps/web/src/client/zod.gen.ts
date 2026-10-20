@@ -3,6 +3,74 @@
 import * as z from 'zod';
 
 /**
+ * ActionType
+ */
+export const zActionType = z.enum([
+    'create_scenario',
+    'duplicate_scenario',
+    'delete_scenario',
+    'run_benchmark',
+    'generate_report',
+    'resolve_alert',
+    'ignore_alert',
+    'reopen_alert',
+    'open_lot',
+    'set_lot_state',
+    'reserve_lot',
+    'update_parameter',
+    'set_user_active',
+    'set_user_role',
+    'change_ai_task_model',
+    'export_my_data',
+    'delete_my_copilot_data'
+]);
+
+/**
+ * ActionOut
+ */
+export const zActionOut = z.object({
+    auto_approved: z.boolean(),
+    can_undo: z.boolean(),
+    confirm_word: z.string().nullish(),
+    created_at: z.iso.datetime(),
+    decided_at: z.iso.datetime().nullable(),
+    expires_at: z.iso.datetime(),
+    id: z.uuid(),
+    impact: z.string(),
+    params: z.record(z.string(), z.unknown()),
+    requires_text: z.boolean(),
+    result: z.record(z.string(), z.unknown()),
+    reversible: z.boolean(),
+    risk: z.enum([
+        'low',
+        'medium',
+        'high',
+        'critical'
+    ]),
+    status: z.enum([
+        'proposed',
+        'executed',
+        'failed',
+        'rejected',
+        'expired',
+        'undone'
+    ]),
+    summary: z.string(),
+    thread_id: z.uuid().nullable(),
+    type: zActionType,
+    user_email: z.string().nullish(),
+    user_id: z.uuid()
+});
+
+/**
+ * ActionPage
+ */
+export const zActionPage = z.object({
+    items: z.array(zActionOut),
+    next_cursor: z.string().nullable()
+});
+
+/**
  * AiCreditsOut
  */
 export const zAiCreditsOut = z.object({
@@ -98,6 +166,15 @@ export const zAlertStatus = z.enum([
 export const zAlertUpdate = z.object({
     resolution_note: z.string().max(1000).nullish(),
     status: zAlertStatus
+});
+
+/**
+ * ArtifactSource
+ */
+export const zArtifactSource = z.object({
+    label: z.string(),
+    result_id: z.string().nullish(),
+    tool: z.string()
 });
 
 /**
@@ -288,6 +365,26 @@ export const zCollectionType = z.enum([
 ]);
 
 /**
+ * ComparisonColumn
+ */
+export const zComparisonColumn = z.object({
+    label: z.string(),
+    scenario_id: z.uuid(),
+    values: z.record(z.string(), z.union([
+        z.number(),
+        z.string()
+    ]).nullable())
+});
+
+/**
+ * ConfirmActionIn
+ */
+export const zConfirmActionIn = z.object({
+    confirmation_text: z.string().max(40).nullish(),
+    idempotency_key: z.string().max(64).nullish()
+});
+
+/**
  * ContainerKind
  */
 export const zContainerKind = z.enum([
@@ -332,6 +429,27 @@ export const zContainerList = z.object({
 });
 
 /**
+ * CopilotActionResultEvent
+ *
+ * Resultado de uma ação executada (auto-aprovada neste pedido).
+ */
+export const zCopilotActionResultEvent = z.object({
+    action: zActionOut,
+    type: z.literal('action_result').optional().default('action_result')
+});
+
+/**
+ * CopilotClarifyEvent
+ *
+ * Falta um parâmetro crítico: pergunta com opções clicáveis. Termina a volta; a resposta é a mensagem seguinte.
+ */
+export const zCopilotClarifyEvent = z.object({
+    options: z.array(z.string()).max(4),
+    question: z.string(),
+    type: z.literal('clarify').optional().default('clarify')
+});
+
+/**
  * CopilotCommand
  */
 export const zCopilotCommand = z.object({
@@ -349,6 +467,16 @@ export const zCopilotCommand = z.object({
 export const zCommandsOut = z.object({
     commands: z.array(zCopilotCommand),
     composer_actions: z.array(z.string())
+});
+
+/**
+ * CopilotConfirmEvent
+ *
+ * O copiloto propôs uma ação de escrita. Só `POST /copilot/actions/{id}/confirm` a executa.
+ */
+export const zCopilotConfirmEvent = z.object({
+    action: zActionOut,
+    type: z.literal('confirm').optional().default('confirm')
 });
 
 /**
@@ -404,6 +532,55 @@ export const zCopilotErrorEvent = z.object({
 });
 
 /**
+ * CopilotMemoryEvent
+ *
+ * Uma escrita de memória (ou o seu bloqueio). O web mostra «Guardei na memória: …» com Desfazer.
+ */
+export const zCopilotMemoryEvent = z.object({
+    action: z.enum([
+        'added',
+        'patched',
+        'removed',
+        'staged',
+        'blocked'
+    ]),
+    content: z.string(),
+    entry_id: z.uuid().nullish(),
+    previous: z.string().nullish(),
+    reason: z.string().nullish(),
+    status: z.enum([
+        'applied',
+        'pending',
+        'blocked'
+    ]),
+    target: z.enum(['memory', 'user']),
+    type: z.literal('memory').optional().default('memory')
+});
+
+/**
+ * CopilotNavigateEvent
+ *
+ * Sugestão de navegação: o web mostra «Abrir» e só então navega.
+ */
+export const zCopilotNavigateEvent = z.object({
+    label: z.string(),
+    params: z.record(z.string(), z.string()).optional(),
+    route: z.string(),
+    search: z.record(z.string(), z.string()).optional(),
+    type: z.literal('navigate').optional().default('navigate')
+});
+
+/**
+ * CopilotPlanEvent
+ *
+ * Plano curto de um pedido composto, antes de executar os passos.
+ */
+export const zCopilotPlanEvent = z.object({
+    steps: z.array(z.string()).max(6),
+    type: z.literal('plan').optional().default('plan')
+});
+
+/**
  * CopilotRequest
  *
  * O servidor não guarda conversas: o web envia o histórico (máx. 20 mensagens) em cada pedido.
@@ -422,6 +599,85 @@ export const zCopilotRequest = z.object({
 export const zCopilotRetractEvent = z.object({
     reason: z.literal('numbers_unverified').optional().default('numbers_unverified'),
     type: z.literal('retract').optional().default('retract')
+});
+
+/**
+ * CopilotSettings
+ *
+ * O que cada utilizador controla. Modelos, orçamento e retenção máxima são do sistema (/admin/ai e .env).
+ */
+export const zCopilotSettings = z.object({
+    auto_approve_low_risk: z.boolean().optional().default(false),
+    auto_compact_pct: z.int().gte(50).lte(90).optional().default(65),
+    background_review: z.boolean().optional().default(true),
+    confirm_writes: z.boolean().optional().default(false),
+    emoji: z.boolean().optional().default(false),
+    follow_up_suggestions: z.boolean().optional().default(true),
+    formality: z.enum([
+        'informal',
+        'neutral',
+        'formal'
+    ]).optional().default('neutral'),
+    memory_enabled: z.boolean().optional().default(true),
+    memory_notifications: z.enum([
+        'off',
+        'on',
+        'verbose'
+    ]).optional().default('on'),
+    persona: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]).optional().default('default'),
+    persona_text: z.string().max(1500).optional().default(''),
+    preferred_language: z.enum([
+        'auto',
+        'pt-PT',
+        'en'
+    ]).optional().default('auto'),
+    retention_days: z.union([
+        z.literal(30),
+        z.literal(90),
+        z.literal(365)
+    ]).nullish(),
+    save_history: z.boolean().optional().default(true),
+    show_tool_steps: z.boolean().optional().default(true),
+    user_profile_enabled: z.boolean().optional().default(true),
+    verbosity: z.enum([
+        'short',
+        'balanced',
+        'detailed'
+    ]).optional().default('balanced'),
+    write_approval: z.enum(['auto', 'ask']).optional().default('auto')
+});
+
+/**
+ * CopilotSource
+ */
+export const zCopilotSource = z.object({
+    kind: z.enum([
+        'tool',
+        'scenario',
+        'file',
+        'entity',
+        'memory',
+        'page'
+    ]),
+    label: z.string(),
+    ref: z.string().nullish()
+});
+
+/**
+ * CopilotSourcesEvent
+ *
+ * O que foi usado para responder: ferramentas, cenários, ficheiros, menções, memórias e o ecrã.
+ */
+export const zCopilotSourcesEvent = z.object({
+    items: z.array(zCopilotSource),
+    type: z.literal('sources').optional().default('sources')
 });
 
 /**
@@ -767,6 +1023,48 @@ export const zForgotPasswordRequest = z.object({
 });
 
 /**
+ * FormField
+ */
+export const zFormField = z.object({
+    default: z.union([
+        z.string(),
+        z.number(),
+        z.boolean()
+    ]).nullish(),
+    label: z.string(),
+    name: z.string(),
+    options: z.array(z.string()).optional(),
+    required: z.boolean().optional().default(true),
+    type: z.enum([
+        'text',
+        'number',
+        'select',
+        'boolean',
+        'scenario',
+        'textarea'
+    ])
+});
+
+/**
+ * FormSpec
+ *
+ * Formulário para completar os parâmetros de uma ação; ao enviar, o web chama `propose_copilot_action`.
+ */
+export const zFormSpec = z.object({
+    action_type: z.string(),
+    fields: z.array(zFormField),
+    title: z.string()
+});
+
+/**
+ * FormArtifact
+ */
+export const zFormArtifact = z.object({
+    artifact_type: z.literal('form').optional().default('form'),
+    spec: zFormSpec
+});
+
+/**
  * GarmentType
  */
 export const zGarmentType = z.enum([
@@ -781,6 +1079,22 @@ export const zGarmentType = z.enum([
     'towel',
     'other'
 ]);
+
+/**
+ * GaugeChart
+ */
+export const zGaugeChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    kind: z.literal('gauge'),
+    max: z.number(),
+    min: z.number(),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    target: z.number().nullish(),
+    title: z.string(),
+    unit: z.string().nullish(),
+    value: z.number()
+});
 
 /**
  * GlobalDefaults
@@ -807,6 +1121,72 @@ export const zHealth = z.object({
 });
 
 /**
+ * HeatCell
+ */
+export const zHeatCell = z.object({
+    value: z.number(),
+    x: z.string(),
+    y: z.string()
+});
+
+/**
+ * HeatmapChart
+ */
+export const zHeatmapChart = z.object({
+    cells: z.array(zHeatCell),
+    estimate: z.boolean().optional().default(false),
+    kind: z.literal('heatmap'),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish(),
+    x_categories: z.array(z.string()),
+    y_categories: z.array(z.string())
+});
+
+/**
+ * HistoryItem
+ */
+export const zHistoryItem = z.object({
+    id: z.string(),
+    kind: z.enum([
+        'conversation',
+        'action',
+        'artifact',
+        'memory',
+        'attachment'
+    ]),
+    occurred_at: z.iso.datetime(),
+    ref_id: z.uuid(),
+    route: z.string().nullish(),
+    snippet: z.string().nullable(),
+    status: z.string().nullable(),
+    thread_id: z.uuid().nullable(),
+    title: z.string()
+});
+
+/**
+ * HistoryPage
+ */
+export const zHistoryPage = z.object({
+    items: z.array(zHistoryItem),
+    next_cursor: z.string().nullable()
+});
+
+/**
+ * KpiItem
+ */
+export const zKpiItem = z.object({
+    hint: z.string().nullish(),
+    label: z.string(),
+    unit: z.string().nullish(),
+    value: z.union([
+        z.number(),
+        z.string()
+    ]).nullable()
+});
+
+/**
  * Kpis
  */
 export const zKpis = z.object({
@@ -820,6 +1200,24 @@ export const zKpis = z.object({
     points: z.int(),
     potential_t: z.number(),
     tonnes_year: z.number()
+});
+
+/**
+ * KpisSpec
+ */
+export const zKpisSpec = z.object({
+    estimate: z.boolean().optional().default(false),
+    items: z.array(zKpiItem),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * KpisArtifact
+ */
+export const zKpisArtifact = z.object({
+    artifact_type: z.literal('kpis').optional().default('kpis'),
+    spec: zKpisSpec
 });
 
 /**
@@ -890,6 +1288,52 @@ export const zLotSummary = z.object({
 });
 
 /**
+ * MapItem
+ */
+export const zMapItem = z.object({
+    code: z.string(),
+    detail: z.string().nullish(),
+    label: z.string(),
+    lat: z.number().nullish(),
+    lon: z.number().nullish(),
+    value: z.number().nullish()
+});
+
+/**
+ * MapLayer
+ */
+export const zMapLayer = z.object({
+    items: z.array(zMapItem),
+    kind: z.enum([
+        'parishes',
+        'containers',
+        'localities'
+    ]),
+    label: z.string(),
+    metric: z.string().nullish(),
+    unit: z.string().nullish()
+});
+
+/**
+ * MapSpec
+ */
+export const zMapSpec = z.object({
+    center: z.array(z.number()).optional(),
+    estimate: z.boolean().optional().default(false),
+    layers: z.array(zMapLayer),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * MapArtifact
+ */
+export const zMapArtifact = z.object({
+    artifact_type: z.literal('map').optional().default('map'),
+    spec: zMapSpec
+});
+
+/**
  * MarketLot
  */
 export const zMarketLot = z.object({
@@ -912,6 +1356,58 @@ export const zMarketEntry = z.object({
     lots: z.int(),
     parishes: z.array(z.string()),
     weight_kg: z.number()
+});
+
+/**
+ * MemoryEntryCreate
+ */
+export const zMemoryEntryCreate = z.object({
+    content: z.string().min(3).max(600),
+    pinned: z.boolean().optional().default(false),
+    target: z.enum(['memory', 'user'])
+});
+
+/**
+ * MemoryEntryOut
+ */
+export const zMemoryEntryOut = z.object({
+    content: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    origin: z.enum([
+        'auto',
+        'manual',
+        'tool'
+    ]),
+    pinned: z.boolean(),
+    source_thread_id: z.uuid().nullable(),
+    target: z.enum(['memory', 'user']),
+    updated_at: z.iso.datetime()
+});
+
+/**
+ * MemoryEntryUpdate
+ */
+export const zMemoryEntryUpdate = z.object({
+    content: z.string().min(3).max(600).nullish(),
+    pinned: z.boolean().nullish()
+});
+
+/**
+ * MemoryMeter
+ */
+export const zMemoryMeter = z.object({
+    chars: z.int(),
+    limit: z.int(),
+    pct: z.int()
+});
+
+/**
+ * MemoryEntryList
+ */
+export const zMemoryEntryList = z.object({
+    items: z.array(zMemoryEntryOut),
+    usage: z.record(z.string(), zMemoryMeter)
 });
 
 /**
@@ -1123,6 +1619,8 @@ export const zPageContext = z.object({
  */
 export const zCopilotStreamRequest = z.object({
     attachment_ids: z.array(z.uuid()).max(5).optional(),
+    confirm: z.boolean().optional().default(false),
+    edit_message_id: z.uuid().nullish(),
     locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
     mentions: z.array(zMentionRef).max(10).optional(),
     message: z.string().min(1).max(4000),
@@ -1186,6 +1684,158 @@ export const zPassport = z.object({
     reuse_pct: z.number(),
     state: zLotState,
     weight_kg: z.number()
+});
+
+/**
+ * PendingApprove
+ */
+export const zPendingApprove = z.object({
+    content: z.string().min(3).max(600).nullish()
+});
+
+/**
+ * PendingMemoryOut
+ */
+export const zPendingMemoryOut = z.object({
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    ops: z.array(z.record(z.string(), z.string())),
+    origin: z.enum([
+        'auto',
+        'manual',
+        'tool'
+    ]),
+    source_thread_id: z.uuid().nullable(),
+    status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
+    summary: z.string(),
+    target: z.enum(['memory', 'user'])
+});
+
+/**
+ * PersonaInfo
+ */
+export const zPersonaInfo = z.object({
+    description: z.string(),
+    key: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]),
+    label_en: z.string(),
+    label_pt: z.string()
+});
+
+/**
+ * CopilotSettingsOut
+ */
+export const zCopilotSettingsOut = z.object({
+    auto_approve_low_risk: z.boolean().optional().default(false),
+    auto_compact_pct: z.int().gte(50).lte(90).optional().default(65),
+    background_review: z.boolean().optional().default(true),
+    confirm_writes: z.boolean().optional().default(false),
+    default_persona: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]),
+    effective_retention_days: z.int().nullable(),
+    emoji: z.boolean().optional().default(false),
+    follow_up_suggestions: z.boolean().optional().default(true),
+    formality: z.enum([
+        'informal',
+        'neutral',
+        'formal'
+    ]).optional().default('neutral'),
+    max_retention_days: z.int().nullable(),
+    memory_enabled: z.boolean().optional().default(true),
+    memory_notifications: z.enum([
+        'off',
+        'on',
+        'verbose'
+    ]).optional().default('on'),
+    memory_usage: z.record(z.string(), zMemoryMeter),
+    persona: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]).optional().default('default'),
+    persona_text: z.string().max(1500).optional().default(''),
+    personas: z.array(zPersonaInfo),
+    preferred_language: z.enum([
+        'auto',
+        'pt-PT',
+        'en'
+    ]).optional().default('auto'),
+    retention_days: z.union([
+        z.literal(30),
+        z.literal(90),
+        z.literal(365)
+    ]).nullish(),
+    save_history: z.boolean().optional().default(true),
+    show_tool_steps: z.boolean().optional().default(true),
+    user_profile_enabled: z.boolean().optional().default(true),
+    verbosity: z.enum([
+        'short',
+        'balanced',
+        'detailed'
+    ]).optional().default('balanced'),
+    write_approval: z.enum(['auto', 'ask']).optional().default('auto')
+});
+
+/**
+ * PersonaPreviewIn
+ */
+export const zPersonaPreviewIn = z.object({
+    emoji: z.boolean().optional().default(false),
+    formality: z.enum([
+        'informal',
+        'neutral',
+        'formal'
+    ]).optional().default('neutral'),
+    language: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    persona: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]),
+    persona_text: z.string().max(1500).optional().default(''),
+    sample: z.string().min(3).max(200).optional().default('Explica-me o que é a captura de têxtil.'),
+    verbosity: z.enum([
+        'short',
+        'balanced',
+        'detailed'
+    ]).optional().default('balanced')
+});
+
+/**
+ * PersonaPreviewOut
+ */
+export const zPersonaPreviewOut = z.object({
+    persona: z.enum([
+        'default',
+        'analyst',
+        'mentor',
+        'executive',
+        'storyteller',
+        'custom'
+    ]),
+    text: z.string()
 });
 
 /**
@@ -1273,11 +1923,42 @@ export const zParametersOut = z.object({
 });
 
 /**
+ * Point
+ */
+export const zPoint = z.object({
+    label: z.string().nullish(),
+    size: z.number().nullish(),
+    x: z.union([
+        z.number(),
+        z.string()
+    ]),
+    y: z.number().nullable()
+});
+
+/**
  * ProfileUpdate
  */
 export const zProfileUpdate = z.object({
     locale: z.enum(['pt-PT', 'en']).nullish(),
     name: z.string().max(120).nullish()
+});
+
+/**
+ * ProjectOut
+ */
+export const zProjectOut = z.object({
+    name: z.string(),
+    threads: z.int()
+});
+
+/**
+ * ProposeActionIn
+ */
+export const zProposeActionIn = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    params: z.record(z.string(), z.unknown()).optional(),
+    thread_id: z.uuid().nullish(),
+    type: zActionType
 });
 
 /**
@@ -1287,6 +1968,29 @@ export const zQuantilesOut = z.object({
     p10: z.number(),
     p50: z.number(),
     p90: z.number()
+});
+
+/**
+ * RangeItem
+ */
+export const zRangeItem = z.object({
+    label: z.string(),
+    p10: z.number(),
+    p50: z.number(),
+    p90: z.number()
+});
+
+/**
+ * RangeChart
+ */
+export const zRangeChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    items: z.array(zRangeItem),
+    kind: z.literal('range'),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish()
 });
 
 /**
@@ -1359,6 +2063,24 @@ export const zReportOut = z.object({
 export const zReportRequest = z.object({
     locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
     scenario_ids: z.array(z.uuid()).min(1).max(3)
+});
+
+/**
+ * ReportSpec
+ */
+export const zReportSpec = z.object({
+    download_path: z.string(),
+    report_id: z.uuid(),
+    size_kb: z.int(),
+    title: z.string()
+});
+
+/**
+ * ReportArtifact
+ */
+export const zReportArtifact = z.object({
+    artifact_type: z.literal('report').optional().default('report'),
+    spec: zReportSpec
 });
 
 /**
@@ -1445,6 +2167,60 @@ export const zRouteOut = z.object({
 });
 
 /**
+ * SankeyLink
+ */
+export const zSankeyLink = z.object({
+    source: z.string(),
+    target: z.string(),
+    value: z.number()
+});
+
+/**
+ * SankeyNode
+ */
+export const zSankeyNode = z.object({
+    id: z.string(),
+    label: z.string()
+});
+
+/**
+ * SankeyChart
+ */
+export const zSankeyChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    kind: z.literal('sankey'),
+    links: z.array(zSankeyLink),
+    nodes: z.array(zSankeyNode),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish()
+});
+
+/**
+ * ScenarioCardSpec
+ */
+export const zScenarioCardSpec = z.object({
+    annual_cost_eur: z.number(),
+    capex_eur: z.number(),
+    coverage_pct: z.number(),
+    created_now: z.boolean().optional().default(false),
+    eur_per_tonne: z.number().nullable(),
+    label: z.string(),
+    objective: z.string(),
+    scenario_id: z.uuid(),
+    tonnes_year: z.number()
+});
+
+/**
+ * ScenarioCardArtifact
+ */
+export const zScenarioCardArtifact = z.object({
+    artifact_type: z.literal('scenario_card').optional().default('scenario_card'),
+    spec: zScenarioCardSpec
+});
+
+/**
  * ScenarioObjective
  */
 export const zScenarioObjective = z.enum(['max_tonnes', 'min_cost']);
@@ -1494,37 +2270,6 @@ export const zScenarioCard = z.object({
 export const zCopilotCardEvent = z.object({
     card: zScenarioCard,
     type: z.literal('card').optional().default('card')
-});
-
-/**
- * CopilotEventMessage
- *
- * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
- */
-export const zCopilotEventMessage = z.discriminatedUnion('type', [
-    zCopilotStartEvent,
-    zCopilotStatusEvent,
-    zCopilotToolStartEvent,
-    zCopilotToolResultEvent,
-    zCopilotTextDeltaEvent,
-    zCopilotCardEvent,
-    zCopilotRetractEvent,
-    zCopilotVerificationEvent,
-    zCopilotSuggestionsEvent,
-    zCopilotContextEvent,
-    zCopilotUsageEvent,
-    zCopilotTitleEvent,
-    zCopilotErrorEvent,
-    zCopilotDoneEvent
-]);
-
-/**
- * CopilotEventCatalog
- *
- * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
- */
-export const zCopilotEventCatalog = z.object({
-    events: z.array(zCopilotEventMessage)
 });
 
 /**
@@ -1620,6 +2365,70 @@ export const zSensitivityRequest = z.object({
 });
 
 /**
+ * Series
+ */
+export const zSeries = z.object({
+    name: z.string(),
+    points: z.array(zPoint),
+    unit: z.string().nullish()
+});
+
+/**
+ * CartesianChart
+ *
+ * bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número).
+ */
+export const zCartesianChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    highlight: z.array(z.string()).optional(),
+    kind: z.enum([
+        'bar',
+        'stacked_bar',
+        'line',
+        'area',
+        'scatter',
+        'pareto'
+    ]),
+    series: z.array(zSeries),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    x_label: z.string(),
+    x_unit: z.string().nullish(),
+    y_label: z.string(),
+    y_unit: z.string().nullish()
+});
+
+/**
+ * SessionHit
+ */
+export const zSessionHit = z.object({
+    message_id: z.uuid(),
+    occurred_at: z.iso.datetime(),
+    role: z.enum(['user', 'assistant']),
+    snippet: z.string(),
+    thread_id: z.uuid(),
+    thread_title: z.string()
+});
+
+/**
+ * SessionSearchOut
+ */
+export const zSessionSearchOut = z.object({
+    hits: z.array(zSessionHit),
+    query: z.string(),
+    total: z.int()
+});
+
+/**
+ * ShareOut
+ */
+export const zShareOut = z.object({
+    path: z.string(),
+    token: z.string()
+});
+
+/**
  * Shift
  */
 export const zShift = z.enum([
@@ -1652,6 +2461,67 @@ export const zSlotCount = z.object({
     crew: z.int(),
     day_group: zDayGroup,
     shift: zShift
+});
+
+/**
+ * TableColumn
+ */
+export const zTableColumn = z.object({
+    key: z.string(),
+    label: z.string(),
+    type: z.enum([
+        'text',
+        'number',
+        'percent',
+        'currency',
+        'date',
+        'category'
+    ]).optional().default('text'),
+    unit: z.string().nullish()
+});
+
+/**
+ * ComparisonSpec
+ */
+export const zComparisonSpec = z.object({
+    columns: z.array(zComparisonColumn),
+    estimate: z.boolean().optional().default(true),
+    metrics: z.array(zTableColumn),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * ComparisonArtifact
+ */
+export const zComparisonArtifact = z.object({
+    artifact_type: z.literal('comparison').optional().default('comparison'),
+    spec: zComparisonSpec
+});
+
+/**
+ * TableSpec
+ */
+export const zTableSpec = z.object({
+    columns: z.array(zTableColumn),
+    estimate: z.boolean().optional().default(false),
+    rows: z.array(z.record(z.string(), z.union([
+        z.string(),
+        z.number()
+    ]).nullable())),
+    sort_by: z.string().nullish(),
+    sort_dir: z.enum(['asc', 'desc']).optional().default('desc'),
+    source: z.string(),
+    title: z.string(),
+    total_rows: z.int()
+});
+
+/**
+ * TableArtifact
+ */
+export const zTableArtifact = z.object({
+    artifact_type: z.literal('table').optional().default('table'),
+    spec: zTableSpec
 });
 
 /**
@@ -1830,21 +2700,20 @@ export const zThreadExport = z.object({
 });
 
 /**
- * ThreadRename
- */
-export const zThreadRename = z.object({
-    title: z.string().min(1).max(120)
-});
-
-/**
  * ThreadSummaryOut
  */
 export const zThreadSummaryOut = z.object({
     archived: z.boolean(),
     created_at: z.iso.datetime(),
+    ephemeral: z.boolean(),
     has_summary: z.boolean(),
     id: z.uuid(),
     message_count: z.int(),
+    parent_thread_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    project: z.string(),
+    shared: z.boolean(),
+    snippet: z.string().nullish(),
     title: z.string(),
     updated_at: z.iso.datetime()
 });
@@ -1868,6 +2737,63 @@ export const zThreadPage = z.object({
     limit: z.int(),
     offset: z.int(),
     total: z.int()
+});
+
+/**
+ * ThreadUpdate
+ *
+ * Qualquer subconjunto: renomear, fixar, arquivar ou mover para uma pasta (`project`; vazio = sem pasta).
+ */
+export const zThreadUpdate = z.object({
+    archived: z.boolean().nullish(),
+    pinned: z.boolean().nullish(),
+    project: z.string().max(60).nullish(),
+    title: z.string().min(1).max(120).nullish()
+});
+
+/**
+ * TimelineEvent
+ */
+export const zTimelineEvent = z.object({
+    at: z.iso.datetime(),
+    detail: z.string().nullish(),
+    kind: z.enum([
+        'thread',
+        'message',
+        'tool',
+        'memory',
+        'attachment',
+        'action',
+        'artifact'
+    ]),
+    label: z.string(),
+    ref_id: z.uuid().nullish()
+});
+
+/**
+ * TimelineItem
+ */
+export const zTimelineItem = z.object({
+    at: z.string(),
+    detail: z.string().nullish(),
+    label: z.string()
+});
+
+/**
+ * TimelineSpec
+ */
+export const zTimelineSpec = z.object({
+    items: z.array(zTimelineItem),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * TimelineArtifact
+ */
+export const zTimelineArtifact = z.object({
+    artifact_type: z.literal('timeline').optional().default('timeline'),
+    spec: zTimelineSpec
 });
 
 /**
@@ -1957,44 +2883,13 @@ export const zToolTraceOut = z.object({
 });
 
 /**
- * MessageOut
+ * TornadoBar
  */
-export const zMessageOut = z.object({
-    attachments: z.array(zAttachmentOut),
-    cards: z.array(zScenarioCard),
-    cost_usd: z.number().nullable(),
-    created_at: z.iso.datetime(),
-    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
-    id: z.uuid(),
-    mentions: z.array(zMentionRef),
-    model: z.string().nullable(),
-    role: z.enum(['user', 'assistant']),
-    status: z.enum([
-        'complete',
-        'cancelled',
-        'error'
-    ]),
-    text: z.string(),
-    tokens: z.int().nullable(),
-    tools: z.array(zToolTraceOut),
-    verified: z.boolean().nullable()
-});
-
-/**
- * ThreadOut
- */
-export const zThreadOut = z.object({
-    archived: z.boolean(),
-    created_at: z.iso.datetime(),
-    has_summary: z.boolean(),
-    id: z.uuid(),
-    message_count: z.int(),
-    messages: z.array(zMessageOut),
-    summary: z.string(),
-    title: z.string(),
-    updated_at: z.iso.datetime(),
-    used_tokens: z.int(),
-    window_tokens: z.int()
+export const zTornadoBar = z.object({
+    base: z.number(),
+    high: z.number(),
+    label: z.string(),
+    low: z.number()
 });
 
 /**
@@ -2031,6 +2926,41 @@ export const zSensitivityOut = z.object({
     threshold_eur_per_tonne: z.number().nullable(),
     tonnes: zQuantilesOut,
     tornado: z.array(zTornadoBarOut)
+});
+
+/**
+ * TornadoChart
+ */
+export const zTornadoChart = z.object({
+    bars: z.array(zTornadoBar),
+    estimate: z.boolean().optional().default(false),
+    kind: z.literal('tornado'),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish()
+});
+
+/**
+ * TreemapItem
+ */
+export const zTreemapItem = z.object({
+    name: z.string(),
+    parent: z.string().nullish(),
+    value: z.number()
+});
+
+/**
+ * TreemapChart
+ */
+export const zTreemapChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    items: z.array(zTreemapItem),
+    kind: z.literal('treemap'),
+    source: z.string(),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish()
 });
 
 /**
@@ -2343,6 +3273,231 @@ export const zWasteComposition = z.object({
 });
 
 /**
+ * WaterfallStep
+ */
+export const zWaterfallStep = z.object({
+    kind: z.enum([
+        'start',
+        'delta',
+        'total'
+    ]).optional().default('delta'),
+    label: z.string(),
+    value: z.number()
+});
+
+/**
+ * WaterfallChart
+ */
+export const zWaterfallChart = z.object({
+    estimate: z.boolean().optional().default(false),
+    kind: z.literal('waterfall'),
+    source: z.string(),
+    steps: z.array(zWaterfallStep),
+    subtitle: z.string().nullish(),
+    title: z.string(),
+    unit: z.string().nullish()
+});
+
+/**
+ * ChartArtifact
+ */
+export const zChartArtifact = z.object({
+    artifact_type: z.literal('chart').optional().default('chart'),
+    spec: z.discriminatedUnion('kind', [
+        zCartesianChart.extend({ kind: z.literal('area') }),
+        zCartesianChart.extend({ kind: z.literal('bar') }),
+        zCartesianChart.extend({ kind: z.literal('line') }),
+        zCartesianChart.extend({ kind: z.literal('pareto') }),
+        zCartesianChart.extend({ kind: z.literal('scatter') }),
+        zCartesianChart.extend({ kind: z.literal('stacked_bar') }),
+        zWaterfallChart,
+        zSankeyChart,
+        zTreemapChart,
+        zHeatmapChart,
+        zTornadoChart,
+        zRangeChart,
+        zGaugeChart
+    ])
+});
+
+/**
+ * ArtifactEnvelope
+ */
+export const zArtifactEnvelope = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string()
+});
+
+/**
+ * ArtifactOut
+ */
+export const zArtifactOut = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    artifact_type: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    message_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    refreshable: z.boolean(),
+    refreshed_at: z.iso.datetime().nullable(),
+    sources: z.array(z.record(z.string(), z.string().nullable())),
+    thread_id: z.uuid().nullable(),
+    title: z.string()
+});
+
+/**
+ * ArtifactPage
+ */
+export const zArtifactPage = z.object({
+    items: z.array(zArtifactOut),
+    next_cursor: z.string().nullable()
+});
+
+/**
+ * CopilotArtifactEvent
+ *
+ * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
+ */
+export const zCopilotArtifactEvent = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string(),
+    type: z.literal('artifact').optional().default('artifact')
+});
+
+/**
+ * CopilotEventMessage
+ *
+ * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
+ */
+export const zCopilotEventMessage = z.discriminatedUnion('type', [
+    zCopilotStartEvent,
+    zCopilotStatusEvent,
+    zCopilotToolStartEvent,
+    zCopilotToolResultEvent,
+    zCopilotTextDeltaEvent,
+    zCopilotCardEvent,
+    zCopilotRetractEvent,
+    zCopilotVerificationEvent,
+    zCopilotSuggestionsEvent,
+    zCopilotContextEvent,
+    zCopilotUsageEvent,
+    zCopilotTitleEvent,
+    zCopilotErrorEvent,
+    zCopilotMemoryEvent,
+    zCopilotPlanEvent,
+    zCopilotClarifyEvent,
+    zCopilotSourcesEvent,
+    zCopilotArtifactEvent,
+    zCopilotConfirmEvent,
+    zCopilotActionResultEvent,
+    zCopilotNavigateEvent,
+    zCopilotDoneEvent
+]);
+
+/**
+ * CopilotEventCatalog
+ *
+ * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
+ */
+export const zCopilotEventCatalog = z.object({
+    events: z.array(zCopilotEventMessage)
+});
+
+/**
+ * MessageOut
+ */
+export const zMessageOut = z.object({
+    actions: z.array(zActionOut),
+    artifacts: z.array(zArtifactEnvelope),
+    attachments: z.array(zAttachmentOut),
+    cards: z.array(zScenarioCard),
+    cost_usd: z.number().nullable(),
+    created_at: z.iso.datetime(),
+    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
+    id: z.uuid(),
+    mentions: z.array(zMentionRef),
+    model: z.string().nullable(),
+    role: z.enum(['user', 'assistant']),
+    status: z.enum([
+        'complete',
+        'cancelled',
+        'error'
+    ]),
+    text: z.string(),
+    tokens: z.int().nullable(),
+    tools: z.array(zToolTraceOut),
+    verified: z.boolean().nullable()
+});
+
+/**
+ * ThreadOut
+ */
+export const zThreadOut = z.object({
+    archived: z.boolean(),
+    created_at: z.iso.datetime(),
+    ephemeral: z.boolean(),
+    has_summary: z.boolean(),
+    id: z.uuid(),
+    message_count: z.int(),
+    messages: z.array(zMessageOut),
+    parent_thread_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    project: z.string(),
+    shared: z.boolean(),
+    snippet: z.string().nullish(),
+    summary: z.string(),
+    title: z.string(),
+    updated_at: z.iso.datetime(),
+    used_tokens: z.int(),
+    window_tokens: z.int()
+});
+
+/**
+ * DataExport
+ */
+export const zDataExport = z.object({
+    actions: z.array(zActionOut),
+    exported_at: z.iso.datetime(),
+    memory: z.array(z.record(z.string(), z.unknown())),
+    settings: z.record(z.string(), z.unknown()),
+    threads: z.array(zThreadOut)
+});
+
+/**
  * WeighingMethod
  */
 export const zWeighingMethod = z.enum(['weighed', 'percentage']);
@@ -2631,6 +3786,118 @@ export const zVerifyEmailResponse = z.void();
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
 
+export const zListCopilotActionsQuery = z.object({
+    scope: z.enum(['mine', 'all']).optional().default('mine'),
+    cursor: z.string().nullish(),
+    status: z.string().max(20).nullish(),
+    type: zActionType.nullish(),
+    q: z.string().max(80).nullish(),
+    limit: z.int().gte(1).lte(100).optional().default(30),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zListCopilotActionsResponse = zActionPage;
+
+export const zProposeCopilotActionBody = zProposeActionIn;
+
+/**
+ * Successful Response
+ */
+export const zProposeCopilotActionResponse = zActionOut;
+
+export const zConfirmCopilotActionBody = zConfirmActionIn;
+
+export const zConfirmCopilotActionPath = z.object({
+    action_id: z.uuid()
+});
+
+export const zConfirmCopilotActionQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zConfirmCopilotActionResponse = zActionOut;
+
+export const zRejectCopilotActionPath = z.object({
+    action_id: z.uuid()
+});
+
+export const zRejectCopilotActionQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zRejectCopilotActionResponse = zActionOut;
+
+export const zUndoCopilotActionPath = z.object({
+    action_id: z.uuid()
+});
+
+export const zUndoCopilotActionQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zUndoCopilotActionResponse = zActionOut;
+
+export const zListCopilotArtifactsQuery = z.object({
+    cursor: z.string().nullish(),
+    artifact_type: z.string().max(16).nullish(),
+    pinned: z.boolean().nullish(),
+    q: z.string().max(80).nullish(),
+    thread_id: z.uuid().nullish(),
+    limit: z.int().gte(1).lte(100).optional().default(30)
+});
+
+/**
+ * Successful Response
+ */
+export const zListCopilotArtifactsResponse = zArtifactPage;
+
+export const zDeleteCopilotArtifactPath = z.object({
+    artifact_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteCopilotArtifactResponse = z.void();
+
+export const zPinCopilotArtifactPath = z.object({
+    artifact_id: z.uuid()
+});
+
+export const zPinCopilotArtifactQuery = z.object({
+    pinned: z.boolean().optional().default(true)
+});
+
+/**
+ * Successful Response
+ */
+export const zPinCopilotArtifactResponse = zArtifactOut;
+
+export const zRefreshCopilotArtifactPath = z.object({
+    artifact_id: z.uuid()
+});
+
+export const zRefreshCopilotArtifactQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zRefreshCopilotArtifactResponse = zArtifactOut;
+
 export const zUploadCopilotAttachmentsBody = zBodyUploadCopilotAttachments;
 
 /**
@@ -2652,10 +3919,112 @@ export const zCopilotChatResponse = zCopilotReply;
  */
 export const zListCopilotCommandsResponse = zCommandsOut;
 
+export const zDeleteCopilotDataQuery = z.object({
+    confirmation: z.string().min(6).max(10)
+});
+
+/**
+ * Successful Response
+ */
+export const zExportCopilotDataResponse = zDataExport;
+
 /**
  * Successful Response
  */
 export const zGetCopilotEventSchemaResponse = zCopilotEventCatalog;
+
+export const zListCopilotHistoryQuery = z.object({
+    cursor: z.string().nullish(),
+    kinds: z.array(z.enum([
+        'conversation',
+        'action',
+        'artifact',
+        'memory',
+        'attachment'
+    ])).nullish(),
+    since: z.iso.datetime().nullish(),
+    until: z.iso.datetime().nullish(),
+    status: z.string().max(20).nullish(),
+    q: z.string().max(80).nullish(),
+    limit: z.int().gte(1).lte(100).optional().default(30)
+});
+
+/**
+ * Successful Response
+ */
+export const zListCopilotHistoryResponse = zHistoryPage;
+
+export const zClearCopilotMemoryQuery = z.object({
+    target: z.enum(['memory', 'user'])
+});
+
+/**
+ * Successful Response
+ */
+export const zClearCopilotMemoryResponse = z.void();
+
+export const zListCopilotMemoryEntriesQuery = z.object({
+    target: z.enum(['memory', 'user']).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListCopilotMemoryEntriesResponse = zMemoryEntryList;
+
+export const zCreateCopilotMemoryEntryBody = zMemoryEntryCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCopilotMemoryEntryResponse = zMemoryEntryOut;
+
+export const zDeleteCopilotMemoryEntryPath = z.object({
+    entry_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteCopilotMemoryEntryResponse = z.void();
+
+export const zUpdateCopilotMemoryEntryBody = zMemoryEntryUpdate;
+
+export const zUpdateCopilotMemoryEntryPath = z.object({
+    entry_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCopilotMemoryEntryResponse = zMemoryEntryOut;
+
+/**
+ * Response List Pending Memory
+ *
+ * Successful Response
+ */
+export const zListPendingMemoryResponse = z.array(zPendingMemoryOut);
+
+export const zApprovePendingMemoryBody = zPendingApprove;
+
+export const zApprovePendingMemoryPath = z.object({
+    pending_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zApprovePendingMemoryResponse = zPendingMemoryOut;
+
+export const zRejectPendingMemoryPath = z.object({
+    pending_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRejectPendingMemoryResponse = zPendingMemoryOut;
 
 export const zSearchCopilotMentionsQuery = z.object({
     q: z.string().max(80).optional().default(''),
@@ -2680,6 +4049,53 @@ export const zSendCopilotFeedbackPath = z.object({
  */
 export const zSendCopilotFeedbackResponse = zFeedbackOut;
 
+export const zPreviewCopilotPersonaBody = zPersonaPreviewIn;
+
+/**
+ * Successful Response
+ */
+export const zPreviewCopilotPersonaResponse = zPersonaPreviewOut;
+
+/**
+ * Response List Copilot Projects
+ *
+ * Successful Response
+ */
+export const zListCopilotProjectsResponse = z.array(zProjectOut);
+
+export const zSearchCopilotSessionsQuery = z.object({
+    q: z.string().min(2).max(120),
+    limit: z.int().gte(1).lte(30).optional().default(10),
+    since: z.iso.datetime().nullish(),
+    until: z.iso.datetime().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zSearchCopilotSessionsResponse = zSessionSearchOut;
+
+/**
+ * Successful Response
+ */
+export const zGetCopilotSettingsResponse = zCopilotSettingsOut;
+
+export const zUpdateCopilotSettingsBody = zCopilotSettings;
+
+/**
+ * Successful Response
+ */
+export const zUpdateCopilotSettingsResponse = zCopilotSettingsOut;
+
+export const zGetSharedCopilotThreadPath = z.object({
+    token: z.string().max(64)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetSharedCopilotThreadResponse = zThreadOut;
+
 export const zCopilotStreamBody = zCopilotStreamRequest;
 
 /**
@@ -2690,7 +4106,10 @@ export const zCopilotStreamResponse = zCopilotEventMessage;
 export const zListCopilotThreadsQuery = z.object({
     offset: z.int().gte(0).optional().default(0),
     limit: z.int().gte(1).lte(100).optional().default(30),
-    archived: z.boolean().optional().default(false)
+    archived: z.boolean().optional().default(false),
+    q: z.string().max(80).nullish(),
+    pinned: z.boolean().nullish(),
+    project: z.string().max(60).nullish()
 });
 
 /**
@@ -2716,16 +4135,16 @@ export const zGetCopilotThreadPath = z.object({
  */
 export const zGetCopilotThreadResponse = zThreadOut;
 
-export const zRenameCopilotThreadBody = zThreadRename;
+export const zUpdateCopilotThreadBody = zThreadUpdate;
 
-export const zRenameCopilotThreadPath = z.object({
+export const zUpdateCopilotThreadPath = z.object({
     thread_id: z.uuid()
 });
 
 /**
  * Successful Response
  */
-export const zRenameCopilotThreadResponse = zThreadSummaryOut;
+export const zUpdateCopilotThreadResponse = zThreadSummaryOut;
 
 export const zCompactCopilotThreadPath = z.object({
     thread_id: z.uuid()
@@ -2745,6 +4164,15 @@ export const zExportCopilotThreadPath = z.object({
  */
 export const zExportCopilotThreadResponse = zThreadExport;
 
+export const zExportCopilotThreadPdfPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zExportCopilotThreadPdfResponse = z.string();
+
 export const zRegenerateCopilotResponsePath = z.object({
     thread_id: z.uuid()
 });
@@ -2757,6 +4185,35 @@ export const zRegenerateCopilotResponseQuery = z.object({
  * Stream de eventos `CopilotEventMessage` (text/event-stream): cada mensagem SSE tem `event: <type>` e `data: <JSON>`
  */
 export const zRegenerateCopilotResponseResponse = zCopilotEventMessage;
+
+export const zUnshareCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUnshareCopilotThreadResponse = z.void();
+
+export const zShareCopilotThreadPath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zShareCopilotThreadResponse = zShareOut;
+
+export const zGetCopilotThreadTimelinePath = z.object({
+    thread_id: z.uuid()
+});
+
+/**
+ * Response Get Copilot Thread Timeline
+ *
+ * Successful Response
+ */
+export const zGetCopilotThreadTimelineResponse = z.array(zTimelineEvent);
 
 export const zUpdateDataAlertBody = zAlertUpdate;
 

@@ -141,7 +141,9 @@ def textile_flows() -> dict:
     _write_csv("textile_flows.csv", rows)
     total = sum(r["tonnes"] for r in rows)
     demand_t = POPULATION * KG_PER_INHAB_MONTH * MONTHS / 1000
-    by_dest = {d: round(sum(r["tonnes"] for r in rows if r["destination"] == d), 3) for d in ("reuse", "recycle", "reject")}
+    by_dest = {
+        d: round(sum(r["tonnes"] for r in rows if r["destination"] == d), 3) for d in ("reuse", "recycle", "reject")
+    }
     return {
         "total_t": round(total, 3),
         **{f"{d}_t": v for d, v in by_dest.items()},
@@ -253,7 +255,9 @@ def circuits() -> dict:
 
     # Viaturas: a lista completa da folha Viaturas (inclui as que nunca têm circuito).
     vehicle_rows = [
-        {"plate": row[0], "note": _clean(row[8])} for row in wb["Viaturas"].iter_rows(min_row=5, values_only=True) if row[0]
+        {"plate": row[0], "note": _clean(row[8])}
+        for row in wb["Viaturas"].iter_rows(min_row=5, values_only=True)
+        if row[0]
     ]
     _write_csv("vehicles.csv", vehicle_rows)
 
@@ -321,7 +325,12 @@ def geography() -> dict:
     _write_csv("parishes.csv", sorted(parish_rows, key=lambda r: r["dicofre"]))
     located = json.loads((public / "localities_geocoded.json").read_text(encoding="utf-8"))
     locality_rows = [
-        {"locality": x["locality"], "latitude": x["lat"] or "", "longitude": x["lon"] or "", "dicofre": x["dicofre"] or ""}
+        {
+            "locality": x["locality"],
+            "latitude": x["lat"] or "",
+            "longitude": x["lon"] or "",
+            "dicofre": x["dicofre"] or "",
+        }
         for x in located
     ]
     _write_csv("localities_geo.csv", locality_rows)
@@ -360,7 +369,9 @@ def sources() -> None:
     ]
     public = RAW / "public"
     if (public / "parishes.geojson").exists():
-        digest = hashlib.sha256((public / "parishes.geojson").read_bytes() + (public / "localities_geocoded.json").read_bytes()).hexdigest()
+        digest = hashlib.sha256(
+            (public / "parishes.geojson").read_bytes() + (public / "localities_geocoded.json").read_bytes()
+        ).hexdigest()
         manifest += [
             {
                 "key": "ine_census_2021",

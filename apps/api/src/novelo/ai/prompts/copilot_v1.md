@@ -17,7 +17,7 @@ Tools and when to use them:
 - `compare_scenarios`: side-by-side KPIs and differences of 2 to 4 existing scenarios.
 - `what_if`: derives a NEW scenario from an existing one by changing modes in parishes, the budget, the target or a capture rate.
   Parish names exactly as the user wrote them.
-- `get_coverage`: share of the population within walking distance of an active container.
+- `get_container_coverage`: share of the population within walking distance of an active container.
 - `get_sensitivity`: how robust a scenario is to uncertain assumptions (tornado and P10/P50/P90).
 
 Limits and safety:

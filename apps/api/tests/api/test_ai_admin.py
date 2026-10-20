@@ -45,7 +45,7 @@ async def test_only_admins_reach_the_panel(logged_in: httpx.AsyncClient) -> None
 async def test_settings_show_effective_model_and_its_origin_per_task(admin: httpx.AsyncClient) -> None:
     first = (await admin.get(f"{AI}/settings")).json()
     tasks = {t["task"]: t for t in first["tasks"]}
-    assert set(tasks) == {"copilot", "whatif", "explain", "briefing", "alert_resolution", "triage"}
+    assert set(tasks) == {"copilot", "whatif", "explain", "briefing", "alert_resolution", "copilot_aux", "triage"}
     assert tasks["triage"]["effective"]["model"] == get_settings().llm_model_vision
     assert tasks["triage"]["effective"]["model_source"] == "env" and tasks["triage"]["requirements"] == [
         "image",

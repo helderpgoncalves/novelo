@@ -22,6 +22,9 @@ dependencies = [
   "weasyprint>=70.0",
   "jinja2>=3.1.6",
   "pillow>=11.0",
+  "pypdf>=6.2",
+  "openpyxl>=3.1.5",
+  "pyyaml>=6.0",
 ]
 
 [dependency-groups]
@@ -49,13 +52,20 @@ src = ["src", "tests"]
 
 [tool.ruff.lint.per-file-ignores]
 "alembic/versions/*" = ["E501", "PLR0915"]
+"src/novelo/features/copilot/*" = ["E501"]  # prompts, textos e tabelas de dados em linhas longas
+"tests/api/test_copilot*" = ["E501"]
+"tests/api/test_memory*" = ["E501"]
+"tests/sse.py" = ["E501"]
+"tests/unit/test_charts.py" = ["E501"]
+"tests/unit/test_stream_adapter.py" = ["E501"]
+"src/novelo/ai/eval_*.py" = ["E501"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "SIM", "ASYNC", "RUF", "PL"]
 ignore = ["PLR0913", "PLR0917", "PLR2004", "RUF001", "RUF002", "RUF003"]
 
 [[tool.mypy.overrides]]
-module = ["ortools.*", "weasyprint.*"]
+module = ["ortools.*", "weasyprint.*", "openpyxl.*", "yaml.*"]
 ignore_missing_imports = true
 
 [tool.mypy]

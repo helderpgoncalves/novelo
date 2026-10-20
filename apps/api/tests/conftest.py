@@ -3,7 +3,9 @@
 import asyncio
 import json
 import os
-from collections.abc import AsyncGenerator, Iterator
+from collections.abc import AsyncGenerator, AsyncIterator, Iterator
+from contextlib import asynccontextmanager
+from typing import Any
 
 import httpx
 import pytest
@@ -12,7 +14,7 @@ from sqlalchemy import create_engine, text
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from novelo.adapters.email import get_email_sender
-from novelo.adapters.openrouter import CallUsage, ChatResult, ToolCallRecord
+from novelo.adapters.openrouter import CallUsage, ChatResult, RawToolCall, RoundResult, TextPiece, ToolCallRecord
 from novelo.ai.cache import response_cache
 from novelo.ai.catalog import ModelCatalog, get_catalog
 from novelo.core.config import get_settings
@@ -27,6 +29,7 @@ from novelo.core.ratelimit import (
 )
 from novelo.features.ai_admin import models as _ai_models  # noqa: F401
 from novelo.features.auth import models as _auth_models  # noqa: F401
+from novelo.features.copilot import models as _copilot_models  # noqa: F401
 from novelo.features.datasets import models as _dataset_models  # noqa: F401
 from novelo.features.lots import models as _lot_models  # noqa: F401
 from novelo.features.lots.router import get_llm
@@ -139,9 +142,39 @@ class FakeLlm:
         self.responses: dict[str, list[object]] = {}
         self.calls: list[dict[str, object]] = []
         self.chat_script: list[object] = []
+        self.stream_script: list[object] = []
         self.usage: list[object] = []
         self.account_data: dict[str, object] = {}
         self.ping_error: Exception | None = None
+
+    def queue_rounds(self, *rounds: object) -> None:
+        """Voltas do streaming: dict {text: [pedaços], tools: [(nome, args)], delay: s} ou uma exceção."""
+        self.stream_script.extend(rounds)
+
+    async def stream_round(
+        self, *, system: str, messages: list[dict[str, object]], tools: list[object], task: object = None,
+        model: str | None = None, tools_enabled: bool = True,
+    force_tool: str | None = None,
+    ) -> AsyncIterator[object]:  # fmt: skip
+        self.calls.append({"schema": "stream", "system": system, "user": messages, "tools_enabled": tools_enabled})
+        if not self.stream_script:
+            raise AssertionError("Sem voltas preparadas para o streaming")
+        step = self.stream_script.pop(0)
+        if isinstance(step, Exception):
+            raise step
+        spec: dict[str, Any] = step  # type: ignore[assignment]
+        chunks: list[str] = spec.get("text", [])
+        for chunk in chunks:
+            if spec.get("delay"):
+                await asyncio.sleep(spec["delay"])
+            yield TextPiece(chunk)
+        calls = [
+            RawToolCall(id=f"call_{i}", name=n, arguments=json.dumps(a))
+            for i, (n, a) in enumerate(spec.get("tools", []))
+        ]
+        usage = CallUsage("fake/model", 0.2, 1000, 50, 0.0004)
+        self.usage.append(usage)
+        yield RoundResult("".join(chunks), calls, "tool_calls" if calls else "stop", "fake/model", usage)
 
     def queue_chat(self, *steps: object) -> None:
         """Passos do copiloto: uma lista [(ferramenta, argumentos)] corre ferramentas; uma str é a resposta final."""
@@ -201,6 +234,23 @@ class FakeLlm:
         return None
 
 
+def stream_deps_for(session: AsyncSession, llm: FakeLlm, catalog: ModelCatalog) -> Any:
+    """Dependências do stream para testes: a sessão do teste (sem a fechar) e o modelo falso."""
+    from novelo.features.copilot.agent import StreamDeps  # noqa: PLC0415
+
+    @asynccontextmanager
+    async def factory() -> AsyncIterator[AsyncSession]:
+        yield session
+
+    async def make_llm(_db: AsyncSession, _user: object) -> Any:
+        return llm
+
+    async def precheck(_db: AsyncSession, _user: object) -> None:
+        return None
+
+    return StreamDeps(session_factory=factory, make_llm=make_llm, catalog=catalog, precheck=precheck)
+
+
 def _mount_ai_routers(app: FastAPI, _: ModelCatalog) -> None:
     """Monta o copiloto e o painel de IA se o `main.py` ainda não o fez (as mesmas linhas que lá devem existir)."""
     from novelo.core.deps import get_current_user  # noqa: PLC0415
@@ -248,6 +298,9 @@ async def client(
     app.dependency_overrides[get_email_sender] = lambda: outbox
     app.dependency_overrides[get_llm] = lambda: llm
     app.dependency_overrides[get_catalog] = lambda: catalog
+    from novelo.features.copilot.router import get_stream_deps  # noqa: PLC0415
+
+    app.dependency_overrides[get_stream_deps] = lambda: stream_deps_for(session, llm, catalog)
     auth_limiter.reset()
     reset_limiter.reset()
     triage_limiter.reset()
@@ -260,6 +313,26 @@ async def client(
 
 
 PASSWORD = "uma-password-segura-123"
+
+
+@pytest.fixture
+async def make_user(client: httpx.AsyncClient, session: AsyncSession) -> Any:
+    """Cria um utilizador e devolve um cliente HTTP novo (cookies próprios) com a sessão dele, sobre a mesma app."""
+    from novelo.features.users import service as user_service  # noqa: PLC0415
+
+    opened: list[httpx.AsyncClient] = []
+
+    async def build(email: str, role: str = "operator") -> httpx.AsyncClient:
+        await user_service.create_user(session, email=email, password=PASSWORD, role=role, email_verified=True)
+        c = httpx.AsyncClient(transport=client._transport, base_url="http://test")
+        resp = await c.post("/api/v1/auth/login", json={"email": email, "password": PASSWORD})
+        assert resp.status_code == 200, resp.text
+        opened.append(c)
+        return c
+
+    yield build
+    for c in opened:
+        await c.aclose()
 
 
 @pytest.fixture

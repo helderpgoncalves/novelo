@@ -32,7 +32,11 @@ def unsupported_numbers(explanation: str, facts: Any) -> set[float]:
     return numbers_in(explanation) - allowed
 
 
-_DECIMALS = re.compile(r"\d+(?:[.,](\d+))?")
+# "1,234.56" (inglês), "1.234,56" (português antigo), "1.234", "1,5"; "P90", "Q3" ou "v2" não são números de dados
+_NUMBER_TOKEN = re.compile(
+    r"(?<![A-Za-z_\d])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?)"
+)
+_LIST_MARKER = re.compile(r"^[ \t]*\d{1,2}[.)](?=\s)", re.MULTILINE)  # "1. item" de uma lista numerada
 _UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE)
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -67,11 +71,29 @@ def unsupported_rounded(text: str, facts: Any, also_allowed: str = "") -> set[fl
     ("301,3" vem de 301,27; "23" vem de 22,9). `also_allowed` são textos cujos números o utilizador já escreveu.
     """
     allowed = fact_numbers(facts) | numbers_in(also_allowed)
+    allowed |= {abs(x) for x in allowed}  # "1,92 t a menos" vem de uma diferença de -1,92 calculada pela ferramenta
     bad: set[float] = set()
-    for match in _DECIMALS.finditer(_normalise(text)):
-        digits = len(match.group(1) or "")
-        value = float(match.group(0).replace(",", "."))
-        half_step = 0.5 * 10**-digits + 1e-9
-        if not any(abs(f - value) <= half_step for f in allowed):
-            bad.add(round(value, 4))
+    for match in _NUMBER_TOKEN.finditer(_LIST_MARKER.sub("", _normalise(text))):
+        options = _readings(match.group(0))
+        if not any(abs(f - value) <= half for f in allowed for value, half in options):
+            bad.add(round(options[0][0], 4))
     return bad
+
+
+def _readings(token: str) -> list[tuple[float, float]]:
+    """Leituras possíveis de um número escrito: (valor, tolerância). Vírgula e ponto podem ser decimais ou milhares."""
+    if "," in token and "." in token:  # o último separador é o decimal
+        decimal = "," if token.rfind(",") > token.rfind(".") else "."
+        thousands = "." if decimal == "," else ","
+        clean = token.replace(thousands, "").replace(decimal, ".")
+        return [(float(clean), 0.5 * 10 ** -len(token.rsplit(decimal, 1)[1]) + 1e-9)]
+    groups = re.fullmatch(r"\d{1,3}(?:[.,]\d{3})+", token)
+    decimals = len(re.split(r"[.,]", token)[1]) if re.search(r"[.,]", token) else 0
+    as_decimal = (
+        float(token.replace(",", ".")) if not groups or token.count(",") + token.count(".") == 1 else float("nan"),
+        0.5 * 10**-decimals + 1e-9,
+    )
+    if groups:  # "37.198" ou "37,198": também se lê como 37 198 (arredondado ou truncado)
+        integer = (float(re.sub(r"[.,]", "", token)), 1.0 + 1e-9)
+        return [integer] if as_decimal[0] != as_decimal[0] else [as_decimal, integer]
+    return [as_decimal]

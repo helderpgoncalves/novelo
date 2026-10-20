@@ -40,6 +40,15 @@ class Settings(BaseSettings):
     llm_max_output_tokens: int = Field(0, ge=0, le=8000, alias="LLM_MAX_OUTPUT_TOKENS")  # 0 = limite de cada tarefa
     llm_reasoning_effort: Literal["low", "medium", "high"] = Field("low", alias="LLM_REASONING_EFFORT")
     llm_monthly_budget_usd: float = Field(0.0, ge=0, alias="LLM_MONTHLY_BUDGET_USD")  # 0 = sem limite
+    copilot_context_cap_tokens: int = Field(64000, ge=4000, le=1_000_000, alias="COPILOT_CONTEXT_CAP_TOKENS")
+    # Copilot: limites de sistema (cada utilizador gere o resto nas suas definições).
+    copilot_memory_char_limit: int = Field(2200, ge=200, le=20000, alias="COPILOT_MEMORY_CHAR_LIMIT")
+    copilot_user_char_limit: int = Field(1375, ge=200, le=20000, alias="COPILOT_USER_CHAR_LIMIT")
+    copilot_default_persona: Literal["default", "analyst", "mentor", "executive", "storyteller"] = Field(
+        "default", alias="COPILOT_DEFAULT_PERSONA"
+    )
+    copilot_max_retention_days: int = Field(0, ge=0, alias="COPILOT_MAX_RETENTION_DAYS")  # 0 = sem máximo
+    copilot_review_every_turns: int = Field(3, ge=1, le=50, alias="COPILOT_REVIEW_EVERY_TURNS")
     llm_max_concurrency: int = Field(4, ge=1, le=32, alias="LLM_MAX_CONCURRENCY")
     llm_chat_timeout_s: float = Field(90.0, alias="LLM_CHAT_TIMEOUT_S")  # limite total de uma conversa com ferramentas
     llm_max_retries: int = Field(2, ge=0, le=5, alias="LLM_MAX_RETRIES")  # falhas transitórias (timeout, 429, 5xx)
