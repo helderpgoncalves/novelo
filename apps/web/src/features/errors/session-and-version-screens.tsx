@@ -32,7 +32,7 @@ export function NewVersionScreen({ layout = 'panel' }: { layout?: 'page' | 'pane
       eyebrow={m.err_chunk_eyebrow()}
       title={m.err_chunk_title()}
       actions={
-        <Button className="h-10" onClick={reloadForNewVersion}>
+        <Button className="h-11" onClick={reloadForNewVersion}>
           {m.err_chunk_reload()}
         </Button>
       }
@@ -61,7 +61,7 @@ export function SessionExpiredScreen({ layout = 'panel' }: { layout?: 'page' | '
       eyebrow={m.err_session_eyebrow()}
       title={m.err_session_title()}
       actions={
-        <Button className="h-10" onClick={login}>
+        <Button className="h-11" onClick={login}>
           {m.err_session_login()}
         </Button>
       }

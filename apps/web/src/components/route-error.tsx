@@ -1,4 +1,4 @@
-import { useRouter, useRouterState } from '@tanstack/react-router';
+import { useRouter } from '@tanstack/react-router';
 import { ForbiddenScreen } from '@/features/errors/forbidden-screen';
 import { NotFoundScreen } from '@/features/errors/not-found-screen';
 import { ServerErrorScreen } from '@/features/errors/server-error-screen';
@@ -12,7 +12,7 @@ import { classifyError, ForbiddenError } from '@/lib/errors';
 /**
  * Erro de uma rota (loader ou render): escolhe o ecrã pela família do erro (rede, API a reiniciar, permissão,
  * sessão, versão nova, não encontrado, genérico). "Tentar de novo" repete o carregamento sem recarregar a página.
- * Dentro da app mantém o menu; fora (a rota de arranque falhou) ocupa o ecrã.
+ * Só o erro da raiz ocupa o ecrã; nos restantes mantém-se o layout à volta.
  */
 export function RouteError({
   error,
@@ -24,10 +24,9 @@ export function RouteError({
   fullPage?: boolean;
 }) {
   const router = useRouter();
-  const inShell = useRouterState({
-    select: (s) => s.matches.some((x) => x.routeId === '/_app' && x.status !== 'error'),
-  });
-  const layout = fullPage || !inShell ? 'page' : 'panel';
+  // Só o erro da raiz (nada mais desenhado à volta) ocupa o ecrã. Qualquer outro erro de rota aparece dentro do
+  // layout que já existe (app, entrada, páginas públicas), que traz o seu cabeçalho, rodapé e altura.
+  const layout = fullPage ? 'page' : 'panel';
   const retry = async () => {
     reset?.();
     await router.invalidate();
