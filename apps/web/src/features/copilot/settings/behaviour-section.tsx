@@ -3,6 +3,7 @@ import { Slider } from '@/components/ui/slider';
 import { m } from '@/paraglide/messages';
 import { SELECT_CLASS, SettingRow, ToggleRow } from './setting-row';
 import { useCopilotSettings } from './use-settings';
+import { webSearchUnavailableText } from './web-search';
 
 /** Comportamento: confirmações, passos, sugestões, resumo automático e retenção do histórico. */
 export function BehaviourSection() {
@@ -62,6 +63,22 @@ export function BehaviourSection() {
             />
             <p className="text-muted-foreground text-xs">{m.chat_set_compact_hint()}</p>
           </div>
+        </div>
+      </Panel>
+      <Panel title={m.chat_set_web()} description={m.chat_set_web_privacy()}>
+        <div className="divide-y">
+          <ToggleRow
+            id="set-web-search"
+            label={m.chat_set_web_toggle()}
+            hint={
+              s.web_search_available
+                ? m.chat_set_web_hint()
+                : `${webSearchUnavailableText(s.web_search_unavailable_reason)} ${m.chat_set_web_hint()}`
+            }
+            checked={s.web_search_available && (s.web_search ?? 'auto') === 'auto'}
+            disabled={!s.web_search_available}
+            onChange={(v) => save({ web_search: v ? 'auto' : 'off' })}
+          />
         </div>
       </Panel>
       <Panel title={m.chat_retention_title()} description={m.chat_retention_description()}>

@@ -195,15 +195,36 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
     if (trigger.kind === 'command') {
       return (commands.data?.commands ?? [])
         .filter((c) => c.name.slice(1).startsWith(trigger.query.toLowerCase()))
-        .map((c) => ({
-          id: `cmd-${c.name}`,
-          label: c.name,
-          hint: `${commandLabel(c.label_key)} · ${commandDescription(c.description_key)}`,
-          onPick: () => {
-            setTextAndCaret('', 0);
-            onCommand(c.name);
-          },
-        }));
+        .flatMap((c): Option[] =>
+          // `/websearch` tem argumento: oferece já `on` e `off`, que seguem como mensagem de servidor.
+          c.name === '/websearch'
+            ? (['on', 'off'] as const).map((arg) => ({
+                id: `cmd-${c.name}-${arg}`,
+                label: `${c.name} ${arg}`,
+                hint: arg === 'on' ? m.chat_cmd_websearch_on() : m.chat_cmd_websearch_off(),
+                onPick: () => {
+                  setTextAndCaret('', 0);
+                  if (busy) return;
+                  onSend({
+                    text: `${c.name} ${arg}`,
+                    mentions: [],
+                    attachments: [],
+                    pageContext: null,
+                  });
+                },
+              }))
+            : [
+                {
+                  id: `cmd-${c.name}`,
+                  label: c.name,
+                  hint: `${commandLabel(c.label_key)} · ${commandDescription(c.description_key)}`,
+                  onPick: () => {
+                    setTextAndCaret('', 0);
+                    onCommand(c.name);
+                  },
+                },
+              ],
+        );
     }
     return (mentionResults.data?.groups ?? []).flatMap((g) =>
       g.items.map((it) => ({
@@ -224,7 +245,18 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
         },
       })),
     );
-  }, [open, trigger, commands.data, mentionResults.data, text, caret, onCommand, setTextAndCaret]);
+  }, [
+    open,
+    trigger,
+    commands.data,
+    mentionResults.data,
+    text,
+    caret,
+    onCommand,
+    onSend,
+    busy,
+    setTextAndCaret,
+  ]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: volta ao primeiro resultado quando a lista muda
   useEffect(() => setActive(0), [options.length, trigger?.query]);

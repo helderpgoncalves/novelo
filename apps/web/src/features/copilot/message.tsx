@@ -9,6 +9,7 @@ import {
   ChevronDown,
   Copy,
   FileText,
+  Globe,
   ListChecks,
   RefreshCw,
   ThumbsDown,
@@ -33,13 +34,16 @@ import { ActionCard } from './action-card';
 import { ArtifactView } from './artifacts/artifact-view';
 import { invalidateCopilot } from './cache';
 import { CopilotError } from './copilot-error';
+import { toolLabel } from './labels';
 import { SafeMarkdown } from './markdown';
 import { MentionChip } from './mention-chip';
 import { segmentText } from './mentions';
 import { CopilotScenarioCard, fromCard } from './scenario-card';
+import { SourcesPanel, WebSearchNotes, WebSearchSteps } from './sources';
 import { ThinkingLine } from './thinking';
 import type { ChatMessage, MemoryNote, StatusInfo } from './types';
 import type { Chat } from './use-chat';
+import { formatExternalNumbers, stepCount } from './web';
 
 const formatSize = (bytes: number) =>
   bytes < 1024 * 1024
@@ -176,47 +180,29 @@ function StepsPanel({ message }: { message: ChatMessage }) {
         </ol>
       )}
       <ul className="space-y-1">
-        {message.tools.map((t) => (
-          <li
-            key={t.id}
-            className="flex flex-wrap items-baseline gap-x-2 rounded-md bg-muted/50 px-2 py-1"
-          >
-            <code className="font-mono text-[11px]">{t.name}</code>
-            <span className={cn('text-muted-foreground', t.ok === false && 'text-destructive')}>
-              {t.summary ?? t.args}
-            </span>
-            {t.durationMs !== null && (
-              <span className="ml-auto text-muted-foreground tabular-nums">{t.durationMs} ms</span>
-            )}
-          </li>
-        ))}
+        {message.tools
+          .filter((t) => t.name !== 'web_search')
+          .map((t) => (
+            <li
+              key={t.id}
+              className="flex flex-wrap items-baseline gap-x-2 rounded-md bg-muted/50 px-2 py-1"
+            >
+              <span className="font-medium" title={t.name}>
+                {toolLabel(t.name)}
+              </span>
+              <span className={cn('text-muted-foreground', t.ok === false && 'text-destructive')}>
+                {t.summary ?? t.args}
+              </span>
+              {t.durationMs !== null && (
+                <span className="ml-auto text-muted-foreground tabular-nums">
+                  {t.durationMs} ms
+                </span>
+              )}
+            </li>
+          ))}
+        <WebSearchSteps message={message} />
       </ul>
     </div>
-  );
-}
-
-function SourcesPanel({ message }: { message: ChatMessage }) {
-  return (
-    <ul className="flex flex-wrap gap-1.5">
-      {message.sources.map((s, i) => (
-        // biome-ignore lint/suspicious/noArrayIndexKey: fontes podem repetir o rótulo
-        <li key={i}>
-          {s.ref?.startsWith('/') ? (
-            <Link
-              to={s.ref as never}
-              className="inline-flex min-h-8 items-center gap-1 rounded-full border px-2.5 py-0.5 hover:bg-muted"
-            >
-              {s.label}
-              <ArrowUpRight className="size-3" aria-hidden="true" />
-            </Link>
-          ) : (
-            <span className="inline-flex min-h-8 items-center rounded-full border px-2.5 py-0.5 text-muted-foreground">
-              {s.label}
-            </span>
-          )}
-        </li>
-      ))}
-    </ul>
   );
 }
 
@@ -339,7 +325,8 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
   const verification = message.verification;
   const unverified =
     !!verification && (!verification.verified || verification.warning === 'numbers_unverified');
-  const hasSteps = message.tools.length > 0 || message.plan.length > 0;
+  const hasSteps = stepCount(message) > 0 || message.plan.length > 0;
+  const externalNumbers = verification?.externalNumbers ?? [];
   const hasSources = message.sources.length > 0;
   const canRate = !streaming && !message.id.startsWith('tmp-') && message.state !== 'error';
 
@@ -367,6 +354,17 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
           {m.copilot_unverified()}
         </p>
       )}
+      {!streaming && externalNumbers.length > 0 && (
+        <p
+          role="note"
+          data-testid="copilot-external-numbers"
+          className="flex items-start gap-1.5 text-muted-foreground text-xs leading-snug"
+        >
+          <Globe className="mt-px size-3.5 shrink-0" strokeWidth={1.75} aria-hidden="true" />
+          {m.chat_external_numbers({ numbers: formatExternalNumbers(externalNumbers) })}
+        </p>
+      )}
+      <WebSearchNotes message={message} />
       {message.retracted && streaming && !message.text && (
         <p className="text-muted-foreground text-sm italic">{m.chat_retracted()}</p>
       )}
@@ -480,7 +478,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
             {hasSteps && (
               <DisclosureButton
                 icon={Wrench}
-                label={m.chat_steps({ count: message.tools.length })}
+                label={m.chat_steps({ count: stepCount(message) })}
                 open={panel === 'steps'}
                 controls={`${panelId}-steps`}
                 onToggle={() => setPanel(panel === 'steps' ? null : 'steps')}

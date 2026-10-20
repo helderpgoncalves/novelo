@@ -29,6 +29,7 @@ export function toBody(s: CopilotSettingsOut): CopilotSettings {
     show_tool_steps: s.show_tool_steps,
     user_profile_enabled: s.user_profile_enabled,
     verbosity: s.verbosity,
+    web_search: s.web_search,
     write_approval: s.write_approval,
   };
 }

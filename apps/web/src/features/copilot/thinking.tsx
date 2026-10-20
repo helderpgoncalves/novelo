@@ -13,6 +13,7 @@ type Family =
   | 'compare'
   | 'coverage'
   | 'search'
+  | 'web'
   | 'attachment'
   | 'memory'
   | 'draw'
@@ -36,6 +37,7 @@ const PHRASES: Record<Family, () => string[]> = {
   compare: () => [m.chat_think_compare_1(), m.chat_think_compare_2(), m.chat_think_compare_3()],
   coverage: () => [m.chat_think_coverage_1(), m.chat_think_coverage_2(), m.chat_think_coverage_3()],
   search: () => [m.chat_think_search_1(), m.chat_think_search_2(), m.chat_think_search_3()],
+  web: () => [m.chat_think_web_1(), m.chat_think_web_2(), m.chat_think_web_3()],
   attachment: () => [
     m.chat_think_attachment_1(),
     m.chat_think_attachment_2(),
@@ -73,6 +75,11 @@ const FAMILY_OF: Record<string, Family> = {
   computing_coverage: 'coverage',
   searching_data: 'search',
   searching_history: 'search',
+  searching_web: 'web',
+  finding_gaps: 'coverage',
+  reading_reports: 'report',
+  reading_admin: 'data',
+  analyzing_data: 'compare',
   reading_attachment: 'attachment',
   image_unsupported: 'attachment',
   recalling_memory: 'memory',
@@ -101,9 +108,10 @@ export function familyOf(labelKey: string): Family {
  * não desaparece enquanto a mensagem está a fazer streaming.
  */
 export function indicatorLabelKey(
-  message: Pick<ChatMessage, 'text' | 'tools'>,
+  message: Pick<ChatMessage, 'text' | 'tools'> & { webSearches?: ChatMessage['webSearches'] },
   status: StatusInfo | null,
 ): string {
+  if (message.webSearches?.some((w) => w.state === 'searching')) return 'status.searching_web';
   if (status?.labelKey) return status.labelKey;
   if (message.tools.some((t) => t.ok === null)) return 'status.working';
   if (message.text.length > 0) return 'status.writing';
@@ -118,7 +126,7 @@ export function ThinkingLine({
   message,
 }: {
   status: StatusInfo | null;
-  message?: Pick<ChatMessage, 'text' | 'tools'>;
+  message?: Pick<ChatMessage, 'text' | 'tools'> & { webSearches?: ChatMessage['webSearches'] };
 }) {
   const reduced = useReducedMotion();
   const family = familyOf(indicatorLabelKey(message ?? { text: '', tools: [] }, status));
@@ -134,7 +142,14 @@ export function ThinkingLine({
   }, [family, reduced]);
 
   const phrase = phrases[step % phrases.length] ?? phrases[0] ?? '';
-  const detail = status?.detail;
+  // Consulta da pesquisa na web em curso (já sanitizada pelo servidor).
+  const searching = message?.webSearches?.findLast((w) => w.state === 'searching');
+  const lastWeb = message?.webSearches?.at(-1);
+  const found =
+    lastWeb?.state === 'done' && lastWeb.results > 0 && !message?.text
+      ? m.chat_web_found({ count: lastWeb.results })
+      : null;
+  const detail = searching?.query ?? status?.detail ?? found;
 
   return (
     <div

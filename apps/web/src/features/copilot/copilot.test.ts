@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest';
 import type { CopilotEventMessage } from '@/client';
+import { pieSlices } from './artifacts/chart-options';
 import { parseBlocks } from './markdown';
-import { applyEvent, closingEvents, newTurn } from './reducer';
+import { applyEvent, closingEvents, fromServer, newTurn } from './reducer';
 import { parseSseBlock, splitSse } from './sse';
 import { familyOf, indicatorLabelKey } from './thinking';
 import { applyTrigger, findTrigger } from './triggers';
+import {
+  applyWebSearch,
+  domainInitial,
+  safeWebUrl,
+  sourceDomain,
+  splitSources,
+  stepCount,
+  webSearchNotes,
+} from './web';
 
 const run = (events: CopilotEventMessage[]) =>
   events.reduce((turn, ev) => applyEvent(turn, ev), newTurn('tmp'));
@@ -187,5 +197,148 @@ describe('indicador de trabalho (logo a girar)', () => {
       false,
     );
     expect(streaming(fold([{ type: 'done', finish: 'cancelled' }]))).toBe(false);
+  });
+});
+
+describe('pesquisa na web', () => {
+  const web = {
+    kind: 'web' as const,
+    label: 'Diretiva (UE) 2025/1892',
+    ref: 'https://www.eur-lex.europa.eu/x',
+    domain: 'eur-lex.europa.eu',
+    excerpt: 'Responsabilidade alargada do produtor.',
+    external: true,
+  };
+
+  it('abre a pesquisa e fecha-a com done, mantendo a consulta', () => {
+    const turn = run([
+      { type: 'web_search', state: 'searching', query: 'rap têxtil portugal' },
+      { type: 'web_search', state: 'done', results: 5, requests: 1 },
+    ]);
+    expect(turn.message.webSearches).toEqual([
+      { state: 'done', query: 'rap têxtil portugal', results: 5, requests: 1, reason: null },
+    ]);
+  });
+
+  it('um estado final sem pesquisa aberta cria uma entrada (indisponível, bloqueada, saltada)', () => {
+    const turn = run([
+      { type: 'web_search', state: 'unavailable', reason: 'region' },
+      { type: 'web_search', state: 'blocked', reason: 'query_blocked', query: null },
+      { type: 'web_search', state: 'skipped', reason: 'disabled_by_user' },
+    ]);
+    expect(turn.message.webSearches.map((w) => w.reason)).toEqual([
+      'region',
+      'query_blocked',
+      'disabled_by_user',
+    ]);
+    expect(webSearchNotes(turn.message.webSearches)).toHaveLength(3);
+    expect(
+      webSearchNotes(
+        applyWebSearch(
+          turn.message.webSearches,
+          turn.message.webSearches[0] ?? {
+            state: 'unavailable',
+            query: null,
+            results: 0,
+            requests: 0,
+            reason: 'region',
+          },
+        ),
+      ),
+    ).toHaveLength(3);
+  });
+
+  it('só uma pesquisa concluída não gera aviso e conta como passo', () => {
+    const turn = run([
+      { type: 'tool_start', id: 't', name: 'web_search', args_summary: 'x' },
+      { type: 'web_search', state: 'searching', query: 'x' },
+      { type: 'tool_result', id: 't', name: 'web_search', ok: true, summary: 's', duration_ms: 5 },
+      { type: 'web_search', state: 'done', results: 2 },
+    ]);
+    expect(webSearchNotes(turn.message.webSearches)).toEqual([]);
+    expect(stepCount(turn.message)).toBe(1);
+  });
+
+  it('separa fontes internas e web, e só aceita URLs http(s)', () => {
+    const internal = { kind: 'tool' as const, label: 'Cenário' };
+    const { internal: i, web: w } = splitSources([internal, web]);
+    expect(i).toEqual([internal]);
+    expect(w).toEqual([web]);
+    expect(safeWebUrl('https://a.pt/x')).toBe('https://a.pt/x');
+    expect(safeWebUrl('javascript:alert(1)')).toBeNull();
+    expect(safeWebUrl(null)).toBeNull();
+    expect(sourceDomain({ ...web, domain: null, ref: 'https://www.ine.pt/a' })).toBe('ine.pt');
+    expect(domainInitial('eur-lex.europa.eu')).toBe('E');
+  });
+
+  it('guarda os números externos da verificação', () => {
+    const turn = run([{ type: 'verification', verified: true, external_numbers: [30, 4.5] }]);
+    expect(turn.message.verification?.externalNumbers).toEqual([30, 4.5]);
+    expect(
+      run([{ type: 'verification', verified: true }]).message.verification?.externalNumbers,
+    ).toEqual([]);
+  });
+
+  it('ao recarregar a conversa mostra as fontes web guardadas', () => {
+    const msg = fromServer({
+      id: 'm1',
+      role: 'assistant',
+      text: 'x',
+      status: 'complete',
+      created_at: '2026-10-20T10:00:00Z',
+      attachments: [],
+      mentions: [],
+      cards: [],
+      artifacts: [],
+      actions: [],
+      tools: [],
+      verified: true,
+      feedback: null,
+      model: null,
+      web_sources: [{ ...web, kind: 'web', external: undefined }],
+    } as unknown as Parameters<typeof fromServer>[0]);
+    expect(msg.sources).toHaveLength(1);
+    expect(msg.sources[0]?.external).toBe(true);
+  });
+
+  it('família de frases para os novos estados', () => {
+    expect(familyOf('status.searching_web')).toBe('web');
+    expect(familyOf('status.finding_gaps')).toBe('coverage');
+    expect(
+      indicatorLabelKey(
+        {
+          text: '',
+          tools: [],
+          webSearches: [{ state: 'searching', query: 'x', results: 0, requests: 0, reason: null }],
+        },
+        null,
+      ),
+    ).toBe('status.searching_web');
+  });
+});
+
+describe('gráfico circular', () => {
+  it('ignora valores não positivos e calcula as quotas', () => {
+    const slices = pieSlices({
+      kind: 'pie',
+      title: 't',
+      source: 's',
+      x_label: 'x',
+      y_label: 'y',
+      series: [
+        {
+          name: 'a',
+          points: [
+            { x: 'A', y: 30 },
+            { x: 'B', y: 10 },
+            { x: 'C', y: 0 },
+            { x: 'D', y: null },
+            { x: 'E', y: -5 },
+          ],
+        },
+      ],
+    } as never);
+    expect(slices.map((s) => s.name)).toEqual(['A', 'B']);
+    expect(slices[0]?.share).toBeCloseTo(0.75);
   });
 });
