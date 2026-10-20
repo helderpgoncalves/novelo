@@ -150,6 +150,12 @@ html[data-tabbar] {
     touch-action: manipulation;
     overscroll-behavior: none;
   }
+  /* A casca da app (AppFrame) ocupa exatamente o ecrã (h-dvh) e rola por dentro (main, barra lateral): o
+     documento nunca precisa de rolar. Sem isto, qualquer elemento injetado fora da casca (extensões do
+     browser, portais) cria uma zona em branco deslizável por baixo da app. */
+  html:has([data-app-frame]) {
+    overflow: hidden;
+  }
   /* Cromado da app (barras, separadores, menus): não se seleciona texto nem abre o menu de pressão longa. */
   .select-none {
     -webkit-touch-callout: none;
@@ -195,7 +201,7 @@ html[data-tabbar] {
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    *,
+    *:not(.brand-spin, .brand-spin *),
     *::before,
     *::after {
       animation-duration: 0.01ms !important;
@@ -236,35 +242,48 @@ html[data-tabbar] {
   }
 }
 
-/* Ecrã de arranque: o mesmo símbolo no index.html (antes do JS) e em <BootSplash /> (depois). */
-.boot-splash-mark {
-  animation: boot-pulse 1.6s ease-in-out infinite;
+/* Spinner da marca (BrandSpinner e splash do index.html, que repete estas regras: manter iguais).
+   Cada arco roda sobre o centro do ponto (origem 0 0 do viewBox -420 -420 840 840, por omissão em SVG):
+   exterior lento em sentido horário, médio mais rápido ao contrário, interior o mais rápido. Só transform.
+   --spin-t = tempo já decorrido, para o React continuar a fase do splash sem salto. */
+.brand-arc {
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  animation-iteration-count: infinite;
+  animation-delay: calc(var(--spin-t, 0ms) * -1);
 }
-@keyframes boot-pulse {
-  0%,
-  100% {
-    opacity: 0.55;
-    transform: scale(0.96);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1);
-  }
+.brand-arc-1 {
+  animation-name: brand-arc-cw;
+  animation-duration: 1.7s;
 }
-@media (prefers-reduced-motion: reduce) {
-  .boot-splash-mark {
-    animation: none;
-  }
+.brand-arc-2 {
+  animation-name: brand-arc-ccw;
+  animation-duration: 2.6s;
 }
-
-/* Símbolo a girar (BrandSpinner): uma volta suave; com movimento reduzido, pulso de opacidade. */
-.brand-spin {
-  animation: brand-spin 1.4s linear infinite;
-  transform-origin: 50% 50%;
+.brand-arc-3 {
+  animation-name: brand-arc-cw;
+  animation-duration: 4.2s;
 }
-@keyframes brand-spin {
+.brand-dot {
+  animation: brand-dot 1.8s ease-in-out infinite;
+  animation-delay: calc(var(--spin-t, 0ms) * -1);
+}
+@keyframes brand-arc-cw {
   to {
     transform: rotate(360deg);
+  }
+}
+@keyframes brand-arc-ccw {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes brand-dot {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.88);
   }
 }
 @keyframes brand-spin-pulse {
@@ -276,9 +295,21 @@ html[data-tabbar] {
     opacity: 1;
   }
 }
+/* Movimento reduzido: arcos parados, o conjunto pulsa em opacidade. */
 @media (prefers-reduced-motion: reduce) {
+  .brand-arc,
+  .brand-dot {
+    animation: none;
+  }
   .brand-spin {
     animation: brand-spin-pulse 1.6s ease-in-out infinite;
+  }
+}
+
+/* Rotação lenta do símbolo inteiro (.brand-drift, fundo da entrada por QR). */
+@keyframes brand-spin {
+  to {
+    transform: rotate(360deg);
   }
 }
 

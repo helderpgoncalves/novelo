@@ -1,15 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { LinkIcon, Loader2 } from 'lucide-react';
+import { LinkIcon } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getMeQueryKey, verifyMagicLinkMutation } from '@/client/@tanstack/react-query.gen';
-import { BrandLogo } from '@/components/brand-logo';
+import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AUTH_BUTTONS, AUTH_CTA } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { MagicLinkSent, magicLinkBody, useRequestMagicLink } from './magic-link-sent';
 import { MAGIC_LINK_MINUTES, readLastEmail, safeNext } from './passwordless';
@@ -88,19 +89,16 @@ export function MagicLinkPage({
             }}
           />
         ) : state === 'loading' ? (
-          <div role="status" aria-live="polite" className="space-y-4 text-center">
-            <Loader2
-              className="mx-auto size-8 animate-spin text-primary motion-reduce:animate-none"
-              aria-hidden="true"
-            />
+          <div role="status" aria-live="polite" className="flex flex-col gap-4 text-center">
+            <BrandSpinner className="mx-auto size-8" />
             <h1 className="text-2xl">
               {verify.isSuccess ? m.magic_verify_done() : m.magic_verify_title()}
             </h1>
             <p className="text-muted-foreground text-sm">{m.magic_verify_text()}</p>
           </div>
         ) : (
-          <div className="motion-safe:fade-in-0 motion-safe:animate-in space-y-6 duration-300">
-            <div className="space-y-3">
+          <div className="motion-safe:fade-in-0 motion-safe:animate-in duration-300 flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
               <span className="flex size-12 items-center justify-center rounded-full bg-areia/25 text-foreground">
                 <LinkIcon className="size-6" aria-hidden="true" />
               </span>
@@ -115,43 +113,41 @@ export function MagicLinkPage({
                   : getErrorMessage(verify.error)}
               </p>
             </div>
-            <FormAlert message={renew.isError ? getErrorMessage(renew.error) : null} />
-            {state === 'bad' && lastEmail.current && renew.gate.field}
-            {state === 'failed' && (
+            <div className={AUTH_BUTTONS}>
+              <FormAlert message={renew.isError ? getErrorMessage(renew.error) : null} />
+              {state === 'bad' && lastEmail.current && renew.gate.field}
+              {state === 'failed' && (
+                <Button className={AUTH_CTA} loading={verify.isPending} onClick={run}>
+                  {m.common_retry()}
+                </Button>
+              )}
+              {state === 'bad' && lastEmail.current && (
+                <Button
+                  className={AUTH_CTA}
+                  loading={renew.isPending}
+                  disabled={renew.gate.blocked}
+                  onClick={() => {
+                    const email = lastEmail.current;
+                    renew.send(magicLinkBody(email), { onSuccess: () => setRequested(email) });
+                  }}
+                >
+                  {renew.gate.verifying
+                    ? m.turnstile_verifying()
+                    : m.magic_request_new_to({ email: lastEmail.current })}
+                </Button>
+              )}
               <Button
-                className="h-11 w-full font-semibold"
-                loading={verify.isPending}
-                onClick={run}
+                asChild
+                variant={state === 'bad' && lastEmail.current ? 'ghost' : 'default'}
+                className={AUTH_CTA}
               >
-                {m.common_retry()}
+                <Link to="/login">
+                  {state === 'bad' && lastEmail.current
+                    ? m.magic_other_email()
+                    : m.magic_request_new()}
+                </Link>
               </Button>
-            )}
-            {state === 'bad' && lastEmail.current && (
-              <Button
-                className="h-11 w-full font-semibold"
-                loading={renew.isPending}
-                disabled={renew.gate.blocked}
-                onClick={() => {
-                  const email = lastEmail.current;
-                  renew.send(magicLinkBody(email), { onSuccess: () => setRequested(email) });
-                }}
-              >
-                {renew.gate.verifying
-                  ? m.turnstile_verifying()
-                  : m.magic_request_new_to({ email: lastEmail.current })}
-              </Button>
-            )}
-            <Button
-              asChild
-              variant={state === 'bad' && lastEmail.current ? 'ghost' : 'default'}
-              className="h-11 w-full font-semibold"
-            >
-              <Link to="/login">
-                {state === 'bad' && lastEmail.current
-                  ? m.magic_other_email()
-                  : m.magic_request_new()}
-              </Link>
-            </Button>
+            </div>
           </div>
         )}
       </main>

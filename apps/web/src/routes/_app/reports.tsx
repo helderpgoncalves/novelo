@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { FileText, Loader2 } from 'lucide-react';
+import { FileText } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { DownloadReportData, ReportOut } from '@/client';
@@ -11,6 +11,7 @@ import {
   listScenariosOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
+import { BrandSpinner } from '@/components/brand-logo';
 import { type Column, DataTable } from '@/components/data-table';
 import { Page, Panel, Section, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
@@ -175,7 +176,7 @@ function Reports() {
                 disabled={selected.length === 0 || generate.isPending}
                 onClick={() => generate.mutate({ body: { scenario_ids: selected, locale } })}
               >
-                {generate.isPending ? <Loader2 className="animate-spin" /> : <FileText />}
+                {generate.isPending ? <BrandSpinner tone="mono" /> : <FileText />}
                 {generate.isPending ? m.reports_generating() : m.reports_generate()}
               </Button>
             </Panel>

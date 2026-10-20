@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import { LOCKUP, STACKED, SYMBOL } from '@/components/brand-geometry.gen';
 import { cn } from '@/lib/utils';
 
@@ -42,7 +43,22 @@ const TONES: Record<Tone, ToneClasses> = {
   },
 };
 
-function SymbolMarks({ tone, transform }: { tone: Tone; transform?: string }) {
+/** Classes de movimento dos arcos (interior, médio, exterior) e do ponto: ver `.brand-arc-*` em styles.css. */
+const ARC_MOTION = [
+  'brand-arc brand-arc-1',
+  'brand-arc brand-arc-2',
+  'brand-arc brand-arc-3',
+] as const;
+
+function SymbolMarks({
+  tone,
+  transform,
+  animated = false,
+}: {
+  tone: Tone;
+  transform?: string;
+  animated?: boolean;
+}) {
   const c = TONES[tone];
   const strokes = [c.inner, c.mid, c.outer] as const;
   return (
@@ -54,10 +70,10 @@ function SymbolMarks({ tone, transform }: { tone: Tone; transform?: string }) {
           fill="none"
           strokeWidth={SYMBOL.strokeWidth}
           strokeLinecap="round"
-          className={strokes[i]}
+          className={cn(strokes[i], animated && ARC_MOTION[i])}
         />
       ))}
-      <path d={SYMBOL.dot} fillRule="evenodd" className={c.dot} />
+      <path d={SYMBOL.dot} fillRule="evenodd" className={cn(c.dot, animated && 'brand-dot')} />
     </g>
   );
 }
@@ -77,29 +93,33 @@ export function BrandSymbol({ tone = 'auto', className }: { tone?: Tone; classNa
 }
 
 /**
- * Símbolo a girar (estados de "a trabalhar"). Caixa quadrada centrada no ponto do símbolo, para rodar sobre o
- * seu centro sem oscilar. A volta (~1,4 s) está em `.brand-spin` (styles.css); com movimento reduzido vira um
- * pulso de opacidade subtil. Decorativo: quem o usa anuncia o estado por texto.
+ * Símbolo a girar (estados de "a trabalhar"). Caixa quadrada centrada no ponto do símbolo: cada arco roda sobre
+ * esse centro (exterior lento num sentido, médio mais rápido ao contrário, interior o mais rápido) e o ponto
+ * pulsa de leve. O movimento está em `.brand-arc-*` (styles.css, só transform) e é o mesmo do ecrã de arranque
+ * do `index.html`; com movimento reduzido vira um pulso de opacidade. Decorativo: quem o usa anuncia o estado por texto.
  */
 export function BrandSpinner({
   tone = 'auto',
   className,
+  style,
   spin = true,
 }: {
   tone?: Tone;
   className?: string;
+  style?: CSSProperties;
   /** `false`: só a geometria centrada (para animações próprias, ex.: `.brand-drift`). */
   spin?: boolean;
 }) {
   return (
     <svg
       viewBox="-420 -420 840 840"
+      style={style}
       className={cn(spin && 'brand-spin', 'size-[18px] shrink-0', className)}
       aria-hidden="true"
       focusable="false"
       data-testid="brand-spinner"
     >
-      <SymbolMarks tone={tone} />
+      <SymbolMarks tone={tone} animated={spin} />
     </svg>
   );
 }

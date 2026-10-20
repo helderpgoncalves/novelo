@@ -8,16 +8,13 @@ import { getLocale } from '@/lib/i18n';
 import { useTheme } from '@/lib/theme';
 import { m } from '@/paraglide/messages';
 
-/** Ações aceites pela API (cabeçalho `X-Turnstile-Token`). */
+/** Ações com captcha na API (cabeçalho `X-Turnstile-Token`). Convite, repor password e reenviar verificação não têm. */
 export type TurnstileAction =
   | 'register'
   | 'login'
   | 'forgot_password'
-  | 'reset_password'
-  | 'resend_verification'
   | 'magic_link'
-  | 'quick_join'
-  | 'accept_invitation';
+  | 'quick_join';
 
 type Phase = 'verifying' | 'ready' | 'error';
 
@@ -107,7 +104,7 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
   const field = useMemo(
     () =>
       enabled && siteKey ? (
-        <div className="space-y-2" data-testid="turnstile-field">
+        <div className="contents" data-testid="turnstile-field">
           <TurnstileWidget
             ref={widget}
             siteKey={siteKey}

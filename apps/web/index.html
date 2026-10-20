@@ -42,7 +42,20 @@
       html { background: #f4f1ea; }
       html.dark { background: #0f1815; }
       .boot-splash { display: flex; min-height: 100dvh; align-items: center; justify-content: center; }
-      .boot-splash-mark { animation: boot-pulse 1.6s ease-in-out infinite; }
+      /* Spinner (repete as regras de .brand-arc em src/styles.css: manter iguais). */
+      .brand-arc { animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95); animation-iteration-count: infinite; animation-delay: calc(var(--spin-t, 0ms) * -1); }
+      .brand-arc-1 { animation-name: brand-arc-cw; animation-duration: 1.7s; }
+      .brand-arc-2 { animation-name: brand-arc-ccw; animation-duration: 2.6s; }
+      .brand-arc-3 { animation-name: brand-arc-cw; animation-duration: 4.2s; }
+      .brand-dot { animation: brand-dot 1.8s ease-in-out infinite; animation-delay: calc(var(--spin-t, 0ms) * -1); }
+      @keyframes brand-arc-cw { to { transform: rotate(360deg); } }
+      @keyframes brand-arc-ccw { to { transform: rotate(-360deg); } }
+      @keyframes brand-dot { 0%,100% { transform: scale(1); } 50% { transform: scale(0.88); } }
+      @keyframes brand-spin-pulse { 0%,100% { opacity: .55; } 50% { opacity: 1; } }
+      @media (prefers-reduced-motion: reduce) {
+        .brand-arc, .brand-dot { animation: none; }
+        .brand-spin { animation: brand-spin-pulse 1.6s ease-in-out infinite; }
+      }
       /* cores do símbolo (geradas por scripts/brand/build_assets.py) */
       /* brand:splash-css:start */
       .boot-splash-mark .a1 { stroke: #A9C2B7; } .boot-splash-mark .a2 { stroke: #2E6B57; } .boot-splash-mark .a3 { stroke: #C4A06A; } .boot-splash-mark .dot { fill: #14211D; }
@@ -54,7 +67,8 @@
   </head>
   <body>
     <script src="/theme-init.js"></script>
-    <div id="root"><div class="boot-splash" role="status" aria-label="A carregar"><!-- brand:splash:start --><svg class="boot-splash-mark" viewBox="-418 -351.32 836 769.32" width="56" height="51.533" aria-hidden="true"><path class="a1" d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a2" d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a3" d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32" fill="none" stroke-width="56" stroke-linecap="round"/><path class="dot" d="M0 -92.0A92.0 92.0 0 1 1 0 92.0A92.0 92.0 0 1 1 0 -92.0ZM0 -38.0A38.0 38.0 0 1 0 0 38.0A38.0 38.0 0 1 0 0 -38.0Z" fill-rule="evenodd"/></svg><!-- brand:splash:end --></div></div>
+    <div id="root"><div class="boot-splash" role="status" aria-label="A carregar"><!-- brand:splash:start --><svg class="boot-splash-mark brand-spin" viewBox="-420 -420 840 840" width="56" height="56" aria-hidden="true"><path class="a1 brand-arc brand-arc-1" d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a2 brand-arc brand-arc-2" d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a3 brand-arc brand-arc-3" d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32" fill="none" stroke-width="56" stroke-linecap="round"/><path class="dot brand-dot" d="M0 -92.0A92.0 92.0 0 1 1 0 92.0A92.0 92.0 0 1 1 0 -92.0ZM0 -38.0A38.0 38.0 0 1 0 0 38.0A38.0 38.0 0 1 0 0 -38.0Z" fill-rule="evenodd"/></svg><!-- brand:splash:end --></div></div>
+    <script>window.__splashT0 = performance.now();</script>
     <!-- Sem JavaScript (e para quem só lê o HTML, como verificadores): nome, descrição e ligações legais. -->
     <noscript>
       <main style="max-width: 40rem; margin: 0 auto; padding: 2rem 1rem; font-family: system-ui, sans-serif; line-height: 1.5">

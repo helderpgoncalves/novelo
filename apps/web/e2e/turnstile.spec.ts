@@ -2,7 +2,8 @@ import { expect, type Page, type Route, test } from '@playwright/test';
 
 // O Turnstile é simulado: o script da Cloudflare e `auth/config` são interceptados. Prova o contrato com a API:
 // cabeçalho X-Turnstile-Token com a ação certa, token novo (uso único) a cada tentativa, botão bloqueado até
-// haver token, erros de captcha com "Repetir verificação" e honeypot `website` vazio.
+// haver token, erros de captcha com "Repetir verificação" e honeypot `website` vazio. Só login, registo, link de
+// entrada, recuperar password e /join levam captcha; repor password, convite e reenviar verificação não.
 
 const SCRIPT = /challenges\.cloudflare\.com\/turnstile\/v0\/api\.js/;
 
@@ -151,6 +152,35 @@ test('/join: sem fricção, token já resolvido quando o formulário é preenchi
     .first()
     .click();
   await expect.poll(() => header).toMatch(/^token-/);
+});
+
+test('repor password: sem widget nem cabeçalho de captcha, o botão não espera por token', async ({
+  page,
+}) => {
+  await mockTurnstile(page, 600);
+  let header: string | undefined = 'por-definir';
+  await page.route('**/api/v1/auth/reset-password', (route) => {
+    header = route.request().headers()['x-turnstile-token'];
+    return route.fulfill({
+      status: 400,
+      json: { code: 'invalid_token', message: 'x', details: null },
+    });
+  });
+  await page.goto('/pt/reset-password?token=token-invalido-token-invalido-1234');
+  await expect(page.getByTestId('turnstile-field')).toHaveCount(0);
+  await page.getByLabel('Nova password').fill('uma-password-segura-123');
+  await page.getByLabel('Repete a password').fill('uma-password-segura-123');
+  const submit = page.getByRole('button', { name: 'Redefinir password' });
+  await expect(submit).toBeEnabled();
+  await submit.click();
+  await expect.poll(() => header).toBeUndefined();
+});
+
+test('aceitar convite: sem widget de captcha', async ({ page }) => {
+  await mockTurnstile(page);
+  await page.goto('/pt/accept-invite?token=isto-nao-e-um-convite-valido-1234567890');
+  await expect(page.getByTestId('turnstile-field')).toHaveCount(0);
+  await expect(page.locator('input[name="website"]')).toHaveCount(0);
 });
 
 test('sem Turnstile (config desligada) nada aparece', async ({ page }) => {

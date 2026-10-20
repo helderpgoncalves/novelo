@@ -16,7 +16,6 @@ import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { useCountdown } from '@/features/auth/use-countdown';
-import { useTurnstile } from '@/features/auth/use-turnstile';
 import { markTourPending } from '@/features/onboarding/tour-store';
 import { getErrorMessage } from '@/lib/errors';
 import { intlTag } from '@/lib/i18n';
@@ -170,7 +169,6 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
     },
   });
 
-  const gate = useTurnstile('resend_verification');
   const [sentAt, setSentAt] = useState<number>(0);
   const wait = useCountdown(sentAt, 30);
   const resend = useMutation({
@@ -180,7 +178,6 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
       toast.success(m.verify_resend_toast({ email: user.email }));
     },
     onError: (error) => {
-      gate.onApiError(error);
       toast.error(getErrorMessage(error));
     },
   });
@@ -206,7 +203,7 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
         </div>
       </header>
 
-      <main className="relative mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-7 px-5 py-8 sm:px-6 sm:py-12">
+      <main className="relative mx-auto flex w-full max-w-xl flex-1 flex-col justify-center gap-6 px-5 py-8 sm:px-6 sm:py-12">
         <ApprovalMark state={state} />
 
         <div
@@ -276,13 +273,12 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
                 </p>
               </div>
             </div>
-            {gate.field}
             <Button
               variant="outline"
               className="h-11 w-full font-semibold"
               loading={resend.isPending}
-              disabled={cooling || gate.blocked}
-              onClick={() => resend.mutate({ headers: gate.consume() })}
+              disabled={cooling}
+              onClick={() => resend.mutate({})}
             >
               {cooling ? m.pa_resend_wait({ seconds: wait }) : m.pa_verify_resend()}
             </Button>
@@ -323,7 +319,7 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
         )}
 
         {!approved && (
-          <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col items-center gap-3">
             <Button
               variant="outline"
               className="h-11 w-full font-semibold sm:w-auto sm:min-w-56"

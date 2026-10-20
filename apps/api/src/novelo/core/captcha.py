@@ -3,6 +3,10 @@
 O token vem no cabeçalho `X-Turnstile-Token` (uma só convenção, não polui os schemas). Cada token é de uso
 único: a Cloudflare recusa a segunda utilização, por isso o web pede um token novo a cada tentativa.
 
+Onde se aplica (só onde faz sentido de segurança, sem fricção desnecessária): `magic_link`, `login`, `register`,
+`forgot_password` (envia email) e `quick_join`. Fica de fora quem já tem um segredo ou sessão: aceitar convite e
+repor password (token de uso único) e reenviar verificação (sessão iniciada); essas só têm limitador.
+
 Estado do serviço (ver `Settings.turnstile_enabled`):
 - desligado: passa (só em dev/testes, ou produção sem secret e sem `TURNSTILE_REQUIRED`; o arranque avisa);
 - ativo sem secret (só produção): fail-closed, 503 `captcha_unavailable`;
@@ -31,9 +35,12 @@ def warn_if_unprotected() -> None:
     """No arranque: avisa quando as rotas públicas ficam sem Turnstile."""
     s = get_settings()
     if not s.turnstile_enabled:
-        log.warning("Turnstile DESLIGADO: registo, login e restantes rotas públicas ficam sem proteção anti-bots")
+        log.warning(
+            "Turnstile DESLIGADO: link de entrada, login, registo, recuperação de password e entrada por QR "
+            "ficam sem proteção anti-bots"
+        )
     elif not s.turnstile_secret:
-        log.warning("Turnstile obrigatório mas sem TURNSTILE_SECRET_KEY: as rotas públicas respondem 503")
+        log.warning("Turnstile obrigatório mas sem TURNSTILE_SECRET_KEY: as rotas com captcha respondem 503")
 
 
 def captcha(action: str) -> Callable[..., Awaitable[None]]:

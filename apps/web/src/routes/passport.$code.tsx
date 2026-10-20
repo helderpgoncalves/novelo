@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Loader2, SearchX } from 'lucide-react';
+import { SearchX } from 'lucide-react';
 import type { GetLotQrData } from '@/client';
 import { getPassportOptions } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
-import { BrandLogo } from '@/components/brand-logo';
+import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline, LotStateBadge } from '@/features/lots/lot-parts';
@@ -38,7 +38,8 @@ function PassportPage() {
       <main className="mx-auto max-w-3xl space-y-8 px-4 pb-16">
         {isPending && (
           <div className="grid place-items-center py-24" aria-busy="true">
-            <Loader2 className="size-7 animate-spin text-primary" aria-label={m.common_loading()} />
+            <BrandSpinner className="size-7" />
+            <span className="sr-only">{m.common_loading()}</span>
           </div>
         )}
         {isError && (

@@ -438,7 +438,7 @@ export function JoinPage({
   return (
     <div
       data-leaving={leaving}
-      className="relative isolate min-h-dvh overflow-x-clip transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none data-[leaving=true]:translate-y-1 data-[leaving=true]:opacity-0"
+      className="relative isolate min-h-dvh overflow-clip transition-[opacity,transform] duration-300 ease-out motion-reduce:transition-none data-[leaving=true]:translate-y-1 data-[leaving=true]:opacity-0"
     >
       {/* O símbolo chega a rodar, assenta e deriva devagar atrás do conteúdo. */}
       <div

@@ -1,7 +1,7 @@
 import { cva, type VariantProps } from 'class-variance-authority';
-import { Loader2 } from 'lucide-react';
 import { Slot } from 'radix-ui';
 import type * as React from 'react';
+import { BrandSpinner } from '@/components/brand-logo';
 import { cn } from '@/lib/utils';
 
 const buttonVariants = cva(
@@ -67,7 +67,12 @@ function Button({
         children
       ) : (
         <>
-          {loading && <Loader2 className="animate-spin" aria-hidden="true" />}
+          {loading && (
+            <BrandSpinner
+              tone={variant === 'default' || variant === 'destructive' ? 'mono' : 'auto'}
+              className="size-4"
+            />
+          )}
           {children}
         </>
       )}

@@ -82,16 +82,12 @@ test.describe('acesso', () => {
 
     await login(page);
     await page.goto('/pt/users');
-    for (const name of [
-      'Contas',
-      'Pendentes',
-      'Convites',
-      'Convidados',
-      'Cartaz do QR',
-      'Auditoria',
-    ]) {
+    for (const name of ['Contas', 'Convites', 'Auditoria']) {
       await expect(page.getByRole('tab', { name: new RegExp(name) })).toBeVisible();
     }
+    await expect(page.getByRole('tab')).toHaveCount(3);
+    // Sem cartões de resumo: o conteúdo começa logo nos separadores.
+    await expect(page.getByText('Por aprovar', { exact: true })).toHaveCount(0);
     // O separador ativo vive no URL.
     await page.getByRole('tab', { name: /Auditoria/ }).click();
     await expect(page).toHaveURL(/tab=audit/);

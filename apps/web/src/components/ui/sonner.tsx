@@ -1,11 +1,6 @@
-import {
-  CircleCheckIcon,
-  InfoIcon,
-  Loader2Icon,
-  OctagonXIcon,
-  TriangleAlertIcon,
-} from 'lucide-react';
+import { CircleCheckIcon, InfoIcon, OctagonXIcon, TriangleAlertIcon } from 'lucide-react';
 import { Toaster as Sonner, type ToasterProps } from 'sonner';
+import { BrandSpinner } from '@/components/brand-logo';
 import { useTheme } from '@/lib/theme';
 
 const Toaster = ({ ...props }: ToasterProps) => {
@@ -20,7 +15,7 @@ const Toaster = ({ ...props }: ToasterProps) => {
         info: <InfoIcon className="size-4" />,
         warning: <TriangleAlertIcon className="size-4" />,
         error: <OctagonXIcon className="size-4" />,
-        loading: <Loader2Icon className="size-4 animate-spin" />,
+        loading: <BrandSpinner className="size-4" />,
       }}
       // Fora das zonas do sistema: acima da barra de separadores (--tabbar-h inclui a barra inicial; sem barra, só esta) e do entalhe.
       offset={{

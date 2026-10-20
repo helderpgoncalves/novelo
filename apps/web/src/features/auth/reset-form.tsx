@@ -16,10 +16,10 @@ import {
 } from '@/components/ui/form';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS, authLinkClass } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { PASSWORD_MIN, type ResetValues, resetSchema } from './schemas';
-import { useTurnstile } from './use-turnstile';
 
 export function ResetForm({ token }: { token: string }) {
   const navigate = useNavigate();
@@ -27,7 +27,6 @@ export function ResetForm({ token }: { token: string }) {
     resolver: zodResolver(resetSchema),
     defaultValues: { password: '', confirm: '' },
   });
-  const gate = useTurnstile('reset_password');
   const reset = useMutation({
     ...resetPasswordMutation(),
     onSuccess: async () => {
@@ -39,19 +38,14 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) =>
-          reset.mutate(
-            { body: { token, password: v.password }, headers: gate.consume() },
-            { onError: gate.onApiError },
-          ),
-        )}
-        className="space-y-4"
+        onSubmit={form.handleSubmit((v) => reset.mutate({ body: { token, password: v.password } }))}
+        className={AUTH_FIELDS}
         noValidate
       >
         <FormAlert message={reset.isError ? getErrorMessage(reset.error) : null} />
         {reset.isError && (
-          <p className="text-sm">
-            <Link to="/forgot-password" className="text-primary hover:underline">
+          <p className="-mt-3 text-sm">
+            <Link to="/forgot-password" className={authLinkClass}>
               {m.reset_request_new()}
             </Link>
           </p>
@@ -63,7 +57,7 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>{m.reset_password()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
+                <PasswordInput {...field} autoComplete="new-password" className={AUTH_CONTROL} />
               </FormControl>
               <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
               <FormMessage />
@@ -77,20 +71,19 @@ export function ResetForm({ token }: { token: string }) {
             <FormItem>
               <FormLabel>{m.reset_confirm()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
+                <PasswordInput {...field} autoComplete="new-password" className={AUTH_CONTROL} />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        {gate.field}
         <Button
           type="submit"
-          className="h-11 w-full font-semibold"
-          disabled={reset.isPending || gate.blocked}
+          className={AUTH_CTA}
+          disabled={reset.isPending}
           loading={reset.isPending}
         >
-          {gate.verifying ? m.turnstile_verifying() : m.reset_submit()}
+          {m.reset_submit()}
         </Button>
       </form>
     </Form>

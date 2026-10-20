@@ -61,7 +61,7 @@ from novelo.features.auth.schemas import (
     SignedIn,
     VerifyEmailRequest,
 )
-from novelo.features.users import impersonation, invitations
+from novelo.features.users import impersonation, invitations, onboarding
 from novelo.features.users import service as users_service
 from novelo.features.users.models import ApprovalStatus, User
 from novelo.features.users.schemas import (
@@ -70,6 +70,8 @@ from novelo.features.users.schemas import (
     InvitationPreview,
     Locale,
     MeOut,
+    OnboardingOut,
+    OnboardingUpdate,
     ProfileUpdate,
     UserOut,
 )
@@ -263,7 +265,18 @@ async def get_me(user: SessionUser, db: Db) -> MeOut:
     """O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado
     e `impersonation` traz o administrador real. Para administradores traz `pending_approvals`."""
     pending = await users_service.count_pending(db) if user.role == "admin" else None
-    return MeOut(**to_out(user).model_dump(), impersonation=_impersonation_out(user), pending_approvals=pending)
+    return MeOut(
+        **to_out(user).model_dump(),
+        impersonation=_impersonation_out(user),
+        onboarding=await onboarding.build(db, user),
+        pending_approvals=pending,
+    )
+
+
+@router.put("/me/onboarding", response_model=OnboardingOut, dependencies=[NotImpersonating])
+async def update_onboarding(body: OnboardingUpdate, user: CurrentUser, db: Db) -> OnboardingOut:
+    """Guarda o progresso da introdução guiada (vista/saltada/repetir, primeiros passos). Não vale em impersonação."""
+    return await onboarding.update(db, user, body)
 
 
 @router.get("/approval-status", response_model=ApprovalStatusOut)
@@ -294,11 +307,12 @@ async def preview_invitation(body: InvitationTokenRequest, db: Db) -> Invitation
 @router.post(
     "/invitations/accept",
     response_model=SignedIn,
-    dependencies=[Depends(invite_accept_limiter), Depends(captcha("accept_invitation"))],
+    dependencies=[Depends(invite_accept_limiter)],
 )
 async def accept_invitation(body: AcceptInvitationRequest, response: Response, db: Db, meta: Meta) -> SignedIn:
     """Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.
-    O token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email."""
+    O token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email.
+    Sem captcha: o token de uso único já é o segredo; o limitador por IP trava tentativas."""
     user, access, refresh = await invitations.accept(db, body.token, body.name, body.password, meta)
     _set_session(response, access, refresh, True)
     return SignedIn(user=to_out(user), next="/")
@@ -325,9 +339,10 @@ async def verify_email(body: VerifyEmailRequest, db: Db) -> None:
 @router.post(
     "/resend-verification",
     status_code=204,
-    dependencies=[Depends(reset_limiter), Depends(captcha("resend_verification")), NotImpersonating],
+    dependencies=[Depends(reset_limiter), NotImpersonating],
 )
 async def resend_verification(user: SessionUser, db: Db, sender: Sender) -> None:
+    """Reenvia o email de verificação. Sem captcha: exige sessão iniciada; o limitador trava abusos."""
     await service.send_verification(db, sender, user)
 
 
@@ -339,10 +354,9 @@ async def forgot_password(body: ForgotPasswordRequest, db: Db, sender: Sender) -
     await service.request_password_reset(db, sender, body.email, body.locale)
 
 
-@router.post(
-    "/reset-password", status_code=204, dependencies=[Depends(reset_limiter), Depends(captcha("reset_password"))]
-)
+@router.post("/reset-password", status_code=204, dependencies=[Depends(reset_limiter)])
 async def reset_password(body: ResetPasswordRequest, response: Response, db: Db) -> None:
+    """Define a nova password com o token do email (uso único). Sem captcha: o token já é o segredo."""
     await service.reset_password(db, body.token, body.password)
     _clear_session(response)
 

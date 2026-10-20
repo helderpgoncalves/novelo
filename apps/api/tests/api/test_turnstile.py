@@ -28,7 +28,6 @@ PUBLIC_POSTS: list[tuple[str, dict[str, object]]] = [
     ("/register", {"email": "a@x.pt", "password": PASSWORD}),
     ("/login", {"email": "a@x.pt", "password": PASSWORD}),
     ("/forgot-password", {"email": "a@x.pt"}),
-    ("/reset-password", {"token": "x" * 30, "password": PASSWORD}),
     ("/magic-link", {"email": "a@x.pt"}),
     ("/quick-join", {"name": "Rui", "email": "a@x.pt", "code": CODE, "consent": True}),
 ]
@@ -69,12 +68,27 @@ async def test_register_and_login_work_end_to_end(client: httpx.AsyncClient) -> 
     assert (await client.post(f"{AUTH}/login", json=PUBLIC_POSTS[1][1], headers=ok)).status_code == 200
 
 
-async def test_resend_verification_needs_a_token(client: httpx.AsyncClient) -> None:
-    logged_in = client
+async def test_resend_verification_needs_no_token(client: httpx.AsyncClient, turnstile: FakeTurnstile) -> None:
     await client.post(f"{AUTH}/register", json=PUBLIC_POSTS[0][1], headers={HEADER: "good"})
-    resp = await logged_in.post(f"{AUTH}/resend-verification")
-    assert resp.status_code == 400 and resp.json()["code"] == "captcha_required"
-    assert (await logged_in.post(f"{AUTH}/resend-verification", headers={HEADER: "good"})).status_code == 204
+    turnstile.seen.clear()
+    assert (await client.post(f"{AUTH}/resend-verification")).status_code == 204
+    assert turnstile.seen == []
+
+
+async def test_reset_password_and_accept_invitation_need_no_token(
+    client: httpx.AsyncClient, turnstile: FakeTurnstile
+) -> None:
+    reset = await client.post(f"{AUTH}/reset-password", json={"token": "x" * 30, "password": PASSWORD})
+    assert reset.json()["code"] == "invalid_token"
+    accept = await client.post(f"{AUTH}/invitations/accept", json={"token": "x" * 30, "name": "Rui"})
+    assert not str(accept.json().get("code", "")).startswith("captcha_")
+    assert turnstile.seen == []
+
+
+async def test_reset_password_stays_rate_limited_without_captcha(client: httpx.AsyncClient) -> None:
+    body = {"token": "x" * 30, "password": PASSWORD}
+    codes = [(await client.post(f"{AUTH}/reset-password", json=body)).status_code for _ in range(6)]
+    assert codes[-1] == 429
 
 
 async def test_token_is_checked_on_every_request(client: httpx.AsyncClient, turnstile: FakeTurnstile) -> None:
@@ -163,7 +177,7 @@ async def test_honeypot_register_is_rejected(client: httpx.AsyncClient) -> None:
 
 
 async def test_honeypot_quick_join_pretends_success(client: httpx.AsyncClient) -> None:
-    body = {**PUBLIC_POSTS[5][1], "website": "x"}
+    body = {**PUBLIC_POSTS[4][1], "website": "x"}
     resp = await client.post(f"{AUTH}/quick-join", json=body, headers={HEADER: "good"})
     assert resp.status_code == 200 and resp.json()["status"] == "check_email"
     assert "set-cookie" not in resp.headers

@@ -7,17 +7,14 @@ import { Button } from '@/components/ui/button';
 import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
-import { useTurnstile } from './use-turnstile';
 
 /** Lembra o utilizador de confirmar o email e permite reenviar o link. */
 export function VerifyEmailBanner({ user }: { user: UserOut }) {
-  const gate = useTurnstile('resend_verification');
   const imp = useImpersonation();
   const resend = useMutation({
     ...resendVerificationMutation(),
     onSuccess: () => toast.success(m.verify_resend_toast({ email: user.email })),
     onError: (error) => {
-      gate.onApiError(error);
       toast.error(getErrorMessage(error));
     },
   });
@@ -37,13 +34,12 @@ export function VerifyEmailBanner({ user }: { user: UserOut }) {
         variant="outline"
         size="sm"
         className="h-8"
-        onClick={() => resend.mutate({ headers: gate.consume() })}
-        disabled={resend.isPending || gate.blocked}
+        onClick={() => resend.mutate({})}
+        disabled={resend.isPending}
         loading={resend.isPending}
       >
         {m.verify_banner_resend()}
       </Button>
-      {gate.field}
     </div>
   );
 }

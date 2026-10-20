@@ -30,7 +30,7 @@ function Harness() {
           statusLabel: '12 por resolver',
           content: <input aria-label="campo-a" />,
         },
-        { id: 'b', label: 'Fontes', content: <p>Conteúdo B</p> },
+        { id: 'b', label: 'Fontes', count: 0, content: <p>Conteúdo B</p> },
       ]}
     />
   );
@@ -43,6 +43,11 @@ describe('PageTabs', () => {
     expect(tab).toHaveAttribute('aria-selected', 'true');
     expect(tab).toHaveTextContent('12');
     expect(screen.getByRole('img', { name: '12 por resolver' })).toBeInTheDocument();
+  });
+
+  it('não mostra a contagem quando é zero', () => {
+    render(<Harness />);
+    expect(screen.getByRole('tab', { name: 'Fontes' })).toHaveTextContent(/^Fontes$/);
   });
 
   it('só monta o conteúdo depois da primeira visita e preserva o estado ao voltar', () => {

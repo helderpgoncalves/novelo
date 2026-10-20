@@ -80,6 +80,7 @@ export function CopilotLauncher() {
           generating && !reduced && 'copilot-launcher-busy',
         )}
         onClick={toggleCopilotSheet}
+        data-tour="copilot"
         aria-busy={generating}
         aria-label={
           generating

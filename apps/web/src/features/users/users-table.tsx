@@ -7,7 +7,14 @@ import { Badge } from '@/components/ui/badge';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
-import { ApprovalBadge, approvalLabel, originLabel, RoleBadge } from './badges';
+import {
+  type AccountState,
+  accountState,
+  originLabel,
+  RoleBadge,
+  StateBadge,
+  stateLabel,
+} from './badges';
 import { invalidateAdminQueries } from './cache';
 import { updateBlocker } from './logic';
 import { roleLabel } from './role-picker';
@@ -83,25 +90,14 @@ export function UsersTable({ users, currentUserId, impersonating, refreshing }: 
       cell: (u) => <RoleBadge role={u.role} />,
     },
     {
-      id: 'approval',
-      header: m.users_table_approval(),
-      value: (u) => u.approval_status,
-      exportValue: (u) => approvalLabel(u.approval_status),
-      filter: { format: (v) => approvalLabel(v as UserAdminOut['approval_status']) },
-      cell: (u) => <ApprovalBadge status={u.approval_status} />,
-    },
-    {
+      // Aprovação e atividade num só estado: o que pede atenção (por aprovar, rejeitada) sobrepõe-se.
       id: 'status',
       header: m.users_table_status(),
-      value: (u) => (u.is_active ? 'active' : 'inactive'),
-      filter: {
-        format: (v) => (v === 'active' ? m.users_status_active() : m.users_status_inactive()),
-      },
-      cell: (u) => (
-        <Badge variant={u.is_active ? 'outline' : 'destructive'}>
-          {u.is_active ? m.users_status_active() : m.users_status_inactive()}
-        </Badge>
-      ),
+      badge: true,
+      value: (u) => accountState(u),
+      exportValue: (u) => stateLabel(accountState(u)),
+      filter: { format: (v) => stateLabel(v as AccountState) },
+      cell: (u) => <StateBadge state={accountState(u)} />,
     },
     {
       id: 'origin',

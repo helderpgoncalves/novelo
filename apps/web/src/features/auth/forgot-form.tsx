@@ -16,6 +16,7 @@ import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { type ForgotValues, forgotSchema } from './schemas';
 import { useTurnstile } from './use-turnstile';
@@ -49,7 +50,7 @@ export function ForgotForm() {
             { onError: gate.onApiError },
           ),
         )}
-        className="space-y-4"
+        className={AUTH_FIELDS}
         noValidate
       >
         <FormAlert message={forgot.isError ? getErrorMessage(forgot.error) : null} />
@@ -65,7 +66,7 @@ export function ForgotForm() {
                   type="email"
                   autoComplete="email"
                   inputMode="email"
-                  className="h-11"
+                  className={AUTH_CONTROL}
                 />
               </FormControl>
               <FormMessage />
@@ -75,7 +76,7 @@ export function ForgotForm() {
         {gate.field}
         <Button
           type="submit"
-          className="h-11 w-full font-semibold"
+          className={AUTH_CTA}
           disabled={forgot.isPending || gate.blocked}
           loading={forgot.isPending}
         >

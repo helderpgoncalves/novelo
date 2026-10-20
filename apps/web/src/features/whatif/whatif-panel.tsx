@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Check, Loader2, MessageSquareQuote, ShieldCheck, TriangleAlert } from 'lucide-react';
+import { Check, MessageSquareQuote, ShieldCheck, TriangleAlert } from 'lucide-react';
 import { useState } from 'react';
 import type { ScenarioOut, WhatIfOut } from '@/client';
 import {
@@ -10,6 +10,7 @@ import {
   listWhatIfsOptions,
   listWhatIfsQueryKey,
 } from '@/client/@tanstack/react-query.gen';
+import { BrandSpinner } from '@/components/brand-logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -220,7 +221,7 @@ function Proposal({ run, busy, onApply }: { run: WhatIfOut; busy: boolean; onApp
       </ul>
       {run.status === 'proposed' ? (
         <Button className="h-9 gap-2 font-semibold" disabled={busy} onClick={onApply}>
-          {busy ? <Loader2 className="animate-spin" /> : <Check />}
+          {busy ? <BrandSpinner tone="mono" /> : <Check />}
           {busy ? m.whatif_running() : m.whatif_confirm()}
         </Button>
       ) : (

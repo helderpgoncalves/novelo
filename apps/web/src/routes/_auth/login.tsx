@@ -5,6 +5,9 @@ import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import {
+  AUTH_BLOCKS,
+  AUTH_BUTTON,
+  AUTH_BUTTONS,
   AuthConsent,
   AuthDivider,
   AuthHeading,
@@ -17,6 +20,7 @@ import { LoginForm } from '@/features/auth/login-form';
 import { MagicLinkFlow } from '@/features/auth/magic-link-flow';
 import { readLastEmail } from '@/features/auth/passwordless';
 import { getErrorMessage, isErrorCode } from '@/lib/errors';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_auth/login')({
@@ -54,66 +58,43 @@ function Login() {
     </AuthSwitch>
   );
 
+  // Alternativas ao método principal: Google e o outro método formam um par de botões secundários iguais.
+  const alternative = (to: 'password' | 'link') => (
+    <div className={AUTH_BLOCKS}>
+      <AuthDivider>{m.login_or_other()}</AuthDivider>
+      <div className={AUTH_BUTTONS}>
+        {config.google_enabled && <GoogleButton next={next} />}
+        {(to === 'password' || config.magic_link_enabled) && (
+          <Button asChild variant="outline" className={cn(AUTH_BUTTON, 'gap-3')}>
+            <Link to="/login" search={to === 'password' ? { next, method: 'password' } : { next }}>
+              {to === 'password' ? <KeyRound aria-hidden="true" /> : <Mail aria-hidden="true" />}
+              {to === 'password' ? m.login_use_password() : m.login_use_link()}
+            </Link>
+          </Button>
+        )}
+      </div>
+      {createAccount}
+      <AuthConsent />
+    </div>
+  );
+
   if (!usePassword) {
     return (
-      <div className="space-y-6">
+      <div className={AUTH_BLOCKS}>
         <FormAlert message={loginError(error)} />
         <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
-        <MagicLinkFlow
-          next={next}
-          alternatives={
-            <div className="space-y-4">
-              <AuthDivider>{m.login_or_other()}</AuthDivider>
-              {config.google_enabled && <GoogleButton next={next} />}
-              <div className="space-y-1 pt-1">
-                <Button
-                  asChild
-                  variant="ghost"
-                  className="h-11 w-full gap-2 font-medium text-muted-foreground hover:text-foreground"
-                >
-                  <Link to="/login" search={{ next, method: 'password' }}>
-                    <KeyRound aria-hidden="true" />
-                    {m.login_use_password()}
-                  </Link>
-                </Button>
-                {createAccount}
-              </div>
-              <AuthConsent />
-            </div>
-          }
-        />
+        <MagicLinkFlow next={next} alternatives={alternative('password')} />
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.login_title()} subtitle={m.login_subtitle()} />
       <FormAlert message={loginError(error)} />
       <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
       <LoginForm next={next ?? '/'} initialEmail={readLastEmail()} />
-      {config.google_enabled && (
-        <div className="space-y-4">
-          <AuthDivider>{m.login_or_other()}</AuthDivider>
-          <GoogleButton next={next} />
-        </div>
-      )}
-      <div className="space-y-1">
-        {config.magic_link_enabled && (
-          <Button
-            asChild
-            variant="ghost"
-            className="h-11 w-full gap-2 font-medium text-muted-foreground hover:text-foreground"
-          >
-            <Link to="/login" search={{ next }}>
-              <Mail aria-hidden="true" />
-              {m.login_use_link()}
-            </Link>
-          </Button>
-        )}
-        {createAccount}
-      </div>
-      <AuthConsent />
+      {alternative('link')}
     </div>
   );
 }

@@ -20,6 +20,7 @@ import { getErrorMessage } from '@/lib/errors';
 import { applyApiFieldErrors } from '@/lib/form-errors';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS, PasswordStrength } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { PASSWORD_MIN, type RegisterValues, registerSchema } from './schemas';
@@ -68,7 +69,7 @@ export function RegisterForm({ next }: { next: string }) {
             headers: gate.consume(),
           }),
         )}
-        className="space-y-4"
+        className={AUTH_FIELDS}
         noValidate
       >
         <HoneypotField />
@@ -85,8 +86,9 @@ export function RegisterForm({ next }: { next: string }) {
                 <Input
                   {...field}
                   autoComplete="name"
+                  autoCapitalize="words"
                   placeholder={m.register_name_placeholder()}
-                  className="h-11"
+                  className={AUTH_CONTROL}
                 />
               </FormControl>
               <FormMessage />
@@ -105,8 +107,11 @@ export function RegisterForm({ next }: { next: string }) {
                   type="email"
                   autoComplete="email"
                   inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder={m.login_email_placeholder()}
-                  className="h-11"
+                  className={AUTH_CONTROL}
                 />
               </FormControl>
               <FormMessage />
@@ -120,9 +125,18 @@ export function RegisterForm({ next }: { next: string }) {
             <FormItem>
               <FormLabel>{m.login_password()}</FormLabel>
               <FormControl>
-                <PasswordInput {...field} autoComplete="new-password" className="h-11" />
+                <PasswordInput
+                  {...field}
+                  autoComplete="new-password"
+                  placeholder={m.register_password_placeholder({ min: PASSWORD_MIN })}
+                  aria-describedby="register-password-hint"
+                  className={AUTH_CONTROL}
+                />
               </FormControl>
-              <FormDescription>{m.register_password_hint({ min: PASSWORD_MIN })}</FormDescription>
+              <PasswordStrength value={field.value} min={PASSWORD_MIN} />
+              <FormDescription id="register-password-hint">
+                {m.register_password_hint({ min: PASSWORD_MIN })}
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -130,7 +144,7 @@ export function RegisterForm({ next }: { next: string }) {
         {gate.field}
         <Button
           type="submit"
-          className="h-11 w-full font-semibold"
+          className={AUTH_CTA}
           disabled={register.isPending || gate.blocked}
           loading={register.isPending}
         >

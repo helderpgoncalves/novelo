@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { z } from 'zod';
 import { EmptyState } from '@/components/states';
-import { AuthHeading, authLinkClass } from '@/features/auth/auth-ui';
+import { AUTH_BLOCKS, AuthHeading, authLinkClass } from '@/features/auth/auth-ui';
 import { ResetForm } from '@/features/auth/reset-form';
 import { m } from '@/paraglide/messages';
 
@@ -27,7 +27,7 @@ function ResetPage() {
     );
   }
   return (
-    <div className="space-y-6">
+    <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.reset_title()} subtitle={m.reset_subtitle()} />
       <ResetForm token={token} />
     </div>

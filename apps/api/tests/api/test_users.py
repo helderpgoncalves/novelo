@@ -35,3 +35,23 @@ async def test_admin_cannot_change_own_account(client: httpx.AsyncClient, sessio
     me = (await client.get(f"{AUTH}/me")).json()
     resp = await client.patch(f"/api/v1/users/{me['id']}", json={"is_active": False})
     assert resp.status_code == 409
+
+
+async def test_onboarding_state_is_per_account_and_idempotent(logged_in: httpx.AsyncClient) -> None:
+    me = (await logged_in.get(f"{AUTH}/me")).json()
+    assert me["onboarding"] == {"tour_seen_at": None, "checklist_done": [], "checklist_dismissed": False}
+
+    first = await logged_in.put(f"{AUTH}/me/onboarding", json={"tour": "seen", "mark": "map"})
+    assert first.status_code == 200
+    seen_at = first.json()["tour_seen_at"]
+    assert seen_at and first.json()["checklist_done"] == ["map"]
+
+    again = await logged_in.put(
+        f"{AUTH}/me/onboarding", json={"tour": "seen", "mark": "map", "checklist_dismissed": True}
+    )
+    assert again.json()["tour_seen_at"] == seen_at and again.json()["checklist_done"] == ["map"]
+    assert again.json()["checklist_dismissed"] is True
+
+    reset = await logged_in.put(f"{AUTH}/me/onboarding", json={"tour": "reset"})
+    assert reset.json()["tour_seen_at"] is None
+    assert (await logged_in.put(f"{AUTH}/me/onboarding", json={"mark": "nope"})).status_code == 422

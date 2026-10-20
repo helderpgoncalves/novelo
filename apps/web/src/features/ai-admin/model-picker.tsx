@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { BadgeCheck, Check, FlaskConical, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { BadgeCheck, Check, FlaskConical, Image as ImageIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import type {
@@ -15,6 +15,7 @@ import {
   testAiModelMutation,
   updateAiSettingsMutation,
 } from '@/client/@tanstack/react-query.gen';
+import { BrandSpinner } from '@/components/brand-logo';
 import { EmptyState, ErrorState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -275,7 +276,7 @@ export function ModelPicker({ settings, config, open, onOpenChange }: ModelPicke
             onClick={() => test.mutate({ body: { model: effective, task } })}
           >
             {test.isPending ? (
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+              <BrandSpinner className="size-4" />
             ) : (
               <FlaskConical className="size-4" aria-hidden="true" />
             )}
