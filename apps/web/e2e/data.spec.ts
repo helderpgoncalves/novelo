@@ -94,8 +94,10 @@ test.describe('dados reais da Vitrus', () => {
   test('utilizadores: só administradores', async ({ page }) => {
     await page.goto('/pt/users');
     await expect(page.getByRole('heading', { name: 'Utilizadores', level: 1 })).toBeVisible();
+    // Os testes criam muitas contas: procura o administrador em vez de depender da página.
+    await page.getByLabel('Pesquisar por nome ou email').fill('admin@heldergoncalves.io');
     await expect(
-      page.getByRole('row', { name: /admin@bitsapiens.io|Administrador/ }).first(),
+      page.getByRole('row', { name: /admin@heldergoncalves.io|Administrador/ }).first(),
     ).toBeVisible();
     // O próprio administrador não pode alterar a sua conta.
     await expect(

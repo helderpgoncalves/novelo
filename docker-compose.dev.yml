@@ -30,6 +30,7 @@ services:
         required: false
     environment:
       APP_ENV: development
+      EMAIL_TRANSPORT: ${EMAIL_TRANSPORT:-log}  # os testes E2E não enviam emails a sério; `resend` em .env.local testa o envio real
       RATE_LIMIT_ENABLED: "false"  # os testes E2E partilham o mesmo IP; a lógica tem testes de API próprios
       DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-novelo}:${POSTGRES_PASSWORD:-novelo}@db:5432/${POSTGRES_DB:-novelo}
       DATA_DIR: /data/processed

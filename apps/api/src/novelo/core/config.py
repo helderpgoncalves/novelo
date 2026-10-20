@@ -71,6 +71,8 @@ class Settings(BaseSettings):
 
     # Email transacional via Resend. Sem chave, os emails são escritos no log (dev).
     resend_api_key: str = Field("", alias="RESEND_API_KEY")
+    # "auto": Resend se houver chave; "log": nunca envia (caixa de saída de dev); "resend": força o envio real.
+    email_transport: str = Field("auto", alias="EMAIL_TRANSPORT")
     email_from: str = Field("Novelo <novelo@heldergoncalves.io>", alias="EMAIL_FROM")
     email_support: str = Field("novelo@heldergoncalves.io", alias="EMAIL_SUPPORT")  # ajuda no rodapé dos emails
 

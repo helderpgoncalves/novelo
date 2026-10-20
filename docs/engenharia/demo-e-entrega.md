@@ -21,7 +21,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 ## Checklist de entrega
 
-- [ ] https://novelo.bitsapiens.io a funcionar fora da rede do evento
+- [ ] https://novelo.helder.si a funcionar fora da rede do evento
 - [ ] `just check` verde e a stack de produção testada com `just build`
 - [ ] Cenários A e B carregam em menos de 2 segundos
 - [ ] "E se...?" responde em menos de 15 segundos; perguntas de reserva em cache

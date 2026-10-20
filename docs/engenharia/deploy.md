@@ -1,6 +1,6 @@
 # Deploy no Coolify
 
-Cada `git push` para `main` é construído e posto no ar pelo Coolify a partir de `docker-compose.yml`, em **https://novelo.bitsapiens.io**. Um só domínio: o nginx do contentor `web` serve a SPA e encaminha `/api` para a API, por isso não há CORS nem URLs da API no bundle. Por agora não há integração contínua remota; `just check` corre localmente antes de cada push.
+Cada `git push` para `main` é construído e posto no ar pelo Coolify a partir de `docker-compose.yml`, em **https://novelo.helder.si**. Um só domínio: o nginx do contentor `web` serve a SPA e encaminha `/api` para a API, por isso não há CORS nem URLs da API no bundle. Por agora não há integração contínua remota; `just check` corre localmente antes de cada push.
 
 ## Como fica na VPS
 
@@ -17,9 +17,9 @@ Nenhuma porta é publicada pelo compose: o Traefik do Coolify é a única entrad
 
 ## Preparar o Coolify (uma vez)
 
-1. **DNS:** registo A de `novelo.bitsapiens.io` para o IP da VPS.
+1. **DNS:** registo A de `novelo.helder.si` para o IP da VPS.
 2. **Projeto:** no Coolify, criar o recurso "Docker Compose" a partir do repositório (GitHub App), branch `main`, ficheiro `docker-compose.yml`.
-3. **Domínio:** atribuir `https://novelo.bitsapiens.io` ao serviço `web` (o compose declara `SERVICE_FQDN_WEB_80`).
+3. **Domínio:** atribuir `https://novelo.helder.si` ao serviço `web` (o compose declara `SERVICE_FQDN_WEB_80`).
 4. **Variáveis:** preencher as do quadro abaixo no recurso (Environment Variables).
 5. **Deploy automático por push:** ligado; o Coolify constrói as duas imagens e arranca.
 
@@ -41,11 +41,11 @@ Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descri
 
 | Variável | Origem | Notas |
 | --- | --- | --- |
-| `DOMAIN` | Coolify | `novelo.bitsapiens.io`; define `APP_URL` e `CORS_ORIGINS` |
+| `DOMAIN` | Coolify | `novelo.helder.si`; define `APP_URL` e `CORS_ORIGINS` |
 | `SERVICE_PASSWORD_POSTGRES`, `SERVICE_PASSWORD_64_SECRETKEY` | Gerados pelo Coolify | Password da base de dados e chave de sessão |
 | `ADMIN_EMAIL`, `ADMIN_PASSWORD` | **Segredo** | Administrador inicial, criado no arranque |
 | `ALLOW_REGISTRATION` | Opcional | `false` para só entrarem contas existentes |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | **Segredo** | Redirecionamento: `https://novelo.bitsapiens.io/api/v1/auth/google/callback` |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | **Segredo** | Redirecionamento: `https://novelo.helder.si/api/v1/auth/google/callback` |
 | `RESEND_API_KEY`, `EMAIL_FROM` | **Segredo** | O domínio do `EMAIL_FROM` tem de estar verificado no Resend |
 | `OPENROUTER_API_KEY`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION` | **Segredo** e opções | Sem chave, a IA responde 503 |
 | `SOLVER_TIME_LIMIT_S`, `LOG_LEVEL` | Opcional | |

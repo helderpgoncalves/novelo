@@ -1,6 +1,6 @@
 import { expect, type Page, request } from '@playwright/test';
 
-export const ADMIN = { email: 'admin@bitsapiens.io', password: 'admin-novelo-dev-1' };
+export const ADMIN = { email: 'admin@heldergoncalves.io', password: 'admin-novelo-dev-1' };
 export const PASSWORD = 'uma-password-segura-123';
 
 export const uniqueEmail = (prefix: string) =>

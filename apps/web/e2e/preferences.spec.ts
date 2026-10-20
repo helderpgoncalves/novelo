@@ -25,7 +25,7 @@ test.describe('idioma e tema', () => {
     page,
   }) => {
     await page.goto('/en/login');
-    await page.getByLabel('Email').fill('admin@bitsapiens.io');
+    await page.getByLabel('Email').fill('admin@heldergoncalves.io');
     await page.getByLabel('Password', { exact: true }).fill('wrong-password-1');
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page.getByRole('alert')).toContainText('Wrong email or password.');

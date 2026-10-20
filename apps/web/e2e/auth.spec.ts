@@ -75,7 +75,7 @@ test.describe('autenticação', () => {
     await expect(page.getByText('Verifica o teu email')).toBeVisible();
 
     const mail = await lastEmail(email);
-    expect(mail.subject).toBe('Recuperar a password do Novelo');
+    expect(mail.subject).toBe('Redefine a tua password do Novelo');
     await page.goto(linkFrom(mail.text));
     await page.getByLabel('Nova password').fill('outra-password-segura-9');
     await page.getByLabel('Repete a password').fill('outra-password-segura-9');

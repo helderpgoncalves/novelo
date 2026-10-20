@@ -8,7 +8,7 @@ import pytest
 from novelo.features.auth import emails
 from novelo.features.auth.email_layout import Brand
 
-BASE = "https://novelo.bitsapiens.io"
+BASE = "https://novelo.helder.si"
 VOID = {"meta", "img", "br", "hr", "input", "link"}
 EVIL = '<script>alert("x")</script> & "Ana"'
 
@@ -43,7 +43,7 @@ class _Collector(HTMLParser):
 
 @pytest.fixture(autouse=True)
 def _brand(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(emails, "_brand", lambda: Brand(app_url=BASE, support_email="suporte@bitsapiens.io"))
+    monkeypatch.setattr(emails, "_brand", lambda: Brand(app_url=BASE, support_email="novelo@heldergoncalves.io"))
 
 
 NAMES = ["verify-email", "password-reset", "magic-link", "guest-welcome"]

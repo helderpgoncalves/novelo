@@ -1,4 +1,4 @@
-# Produção (lido pelo Coolify). Domínio: https://novelo.bitsapiens.io
+# Produção (lido pelo Coolify). Domínio: https://novelo.helder.si
 # Um único domínio: o nginx do `web` serve o SPA e encaminha /api para a `api`. Nenhuma porta é
 # publicada: o Traefik do Coolify é a única entrada. Ver docs/engenharia/deploy.md.
 services:
@@ -23,7 +23,7 @@ services:
       - DATABASE_URL=postgresql+asyncpg://novelo:${SERVICE_PASSWORD_POSTGRES}@db:5432/novelo
       - DATA_DIR=/app/data/processed
       - SECRET_KEY=${SERVICE_PASSWORD_64_SECRETKEY}
-      - APP_URL=https://${DOMAIN:-novelo.bitsapiens.io}
+      - APP_URL=https://${DOMAIN:-novelo.helder.si}
       - ALLOW_REGISTRATION=${ALLOW_REGISTRATION:-true}
       - ADMIN_EMAIL=${ADMIN_EMAIL:-}
       - ADMIN_PASSWORD=${ADMIN_PASSWORD:-}
@@ -32,7 +32,7 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY:-}
       - EMAIL_FROM=${EMAIL_FROM:-Novelo <novelo@heldergoncalves.io>}
       - EMAIL_SUPPORT=${EMAIL_SUPPORT:-novelo@heldergoncalves.io}
-      - CORS_ORIGINS=["https://${DOMAIN:-novelo.bitsapiens.io}"]
+      - CORS_ORIGINS=["https://${DOMAIN:-novelo.helder.si}"]
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}
       - LLM_MODEL_TEXT=${LLM_MODEL_TEXT:-openai/gpt-6-luna}
