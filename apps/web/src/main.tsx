@@ -15,6 +15,7 @@ import {
   SESSION_EXPIRED_EVENT,
 } from '@/lib/api-config';
 import { getErrorMessage } from '@/lib/errors';
+import { installPauseWhenHidden } from '@/lib/pause-when-hidden';
 import { captureInstallPrompt, registerPwa } from '@/lib/pwa';
 import { queryClient } from '@/lib/query-client';
 import { ThemeProvider } from '@/lib/theme';
@@ -27,6 +28,7 @@ const current = window.location.href;
 const localized = localizeUrl(current).href;
 if (localized !== current) window.history.replaceState(null, '', localized);
 document.documentElement.lang = getLocale();
+installPauseWhenHidden();
 
 const router = createRouter({
   routeTree,

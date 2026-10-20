@@ -10,11 +10,11 @@ import {
   listWhatIfsOptions,
   listWhatIfsQueryKey,
 } from '@/client/@tanstack/react-query.gen';
-import { BrandSpinner } from '@/components/brand-logo';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { WorkingState } from '@/components/working-state';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatEur } from '@/lib/format';
@@ -220,10 +220,21 @@ function Proposal({ run, busy, onApply }: { run: WhatIfOut; busy: boolean; onApp
         )}
       </ul>
       {run.status === 'proposed' ? (
-        <Button className="h-9 gap-2 font-semibold" disabled={busy} onClick={onApply}>
-          {busy ? <BrandSpinner tone="mono" /> : <Check />}
-          {busy ? m.whatif_running() : m.whatif_confirm()}
-        </Button>
+        <div className="space-y-3">
+          {busy && (
+            <WorkingState
+              size="sm"
+              title={m.working_whatif_title()}
+              subtitle={m.working_whatif_hint()}
+              trackElapsed
+              className="justify-start"
+            />
+          )}
+          <Button className="h-9 gap-2 font-semibold" disabled={busy} onClick={onApply}>
+            <Check />
+            {busy ? m.whatif_running() : m.whatif_confirm()}
+          </Button>
+        </div>
       ) : (
         <div className="space-y-2">
           {run.explanation && <p className="leading-relaxed">{run.explanation}</p>}

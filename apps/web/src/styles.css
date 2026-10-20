@@ -214,6 +214,40 @@ html[data-tabbar] {
   @apply font-semibold text-[11px] text-primary uppercase tracking-[0.18em];
 }
 
+/* Escala tipográfica da landing pública (fluida, uma só): título principal, título de secção e subtítulo. */
+@utility lp-display {
+  font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.5rem);
+  line-height: 1.04;
+  text-wrap: balance;
+}
+@utility lp-headline {
+  font-size: clamp(1.875rem, 1.45rem + 1.7vw, 2.75rem);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+@utility lp-lead {
+  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+
+/* Landing: salto suave entre secções e entrada ao rolar (só opacidade e transform; ver features/landing/reveal.ts).
+   O estado escondido só existe depois de o JS o marcar, por isso sem JS ou com movimento reduzido tudo se vê. */
+@media (prefers-reduced-motion: no-preference) {
+  html:has([data-landing]) {
+    scroll-behavior: smooth;
+  }
+  [data-reveal='hidden'] {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  [data-reveal='shown'] {
+    transition:
+      opacity 520ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      transform 520ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+}
+
 /* Esqueletos: brilho que percorre o bloco; sem movimento para quem pede menos animação. */
 .skeleton {
   background-color: var(--accent);
@@ -311,6 +345,143 @@ html[data-tabbar] {
   to {
     transform: rotate(360deg);
   }
+}
+
+/* Puxar para atualizar (components/pull-to-refresh.tsx). O gesto escreve só --ptr-y/--ptr-s/--ptr-o e --pr no DOM
+   (transform e opacity, sem React por movimento). --pr = px puxados; cada arco roda --pr x graus, em sentidos
+   e velocidades diferentes. A rodar, os arcos continuam do ângulo em que o dedo os deixou (sem salto). */
+.ptr-clip {
+  position: fixed;
+  right: 0;
+  left: 0;
+  top: var(--ptr-top, 0px);
+  z-index: 40;
+  display: none;
+  height: 140px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.ptr-clip[data-state]:not([data-state='idle']) {
+  display: block;
+}
+.ptr {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-left: -22px;
+  border: 1px solid var(--border);
+  border-radius: 9999px;
+  background: var(--card);
+  box-shadow: 0 6px 18px -8px rgb(20 33 29 / 0.35);
+  opacity: var(--ptr-o, 0);
+  transform: translate3d(0, calc(var(--ptr-y, 0) * 1px - 52px), 0) scale(var(--ptr-s, 0.4));
+  will-change: transform, opacity;
+}
+.ptr-clip[data-state='refreshing'] .ptr {
+  transition:
+    transform 420ms cubic-bezier(0.34, 1.35, 0.64, 1),
+    opacity 160ms ease-out;
+}
+.ptr-clip[data-state='done'] .ptr,
+.ptr-clip[data-state='leaving'] .ptr {
+  transition:
+    transform 280ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    opacity 220ms ease-out;
+}
+.ptr-arc {
+  transform: rotate(var(--a, 0deg));
+}
+.ptr-arc-1 {
+  --a: calc(var(--pr, 0) * 5deg);
+}
+.ptr-arc-2 {
+  --a: calc(var(--pr, 0) * -3.4deg);
+}
+.ptr-arc-3 {
+  --a: calc(var(--pr, 0) * 2deg);
+}
+.ptr .brand-dot {
+  animation: none;
+}
+.ptr-clip[data-state='refreshing'] .ptr-arc {
+  animation-timing-function: cubic-bezier(0.45, 0.05, 0.55, 0.95);
+  animation-iteration-count: infinite;
+}
+.ptr-clip[data-state='refreshing'] .ptr-arc-1 {
+  animation-name: ptr-spin-cw;
+  animation-duration: 1.7s;
+}
+.ptr-clip[data-state='refreshing'] .ptr-arc-2 {
+  animation-name: ptr-spin-ccw;
+  animation-duration: 2.6s;
+}
+.ptr-clip[data-state='refreshing'] .ptr-arc-3 {
+  animation-name: ptr-spin-cw;
+  animation-duration: 4.2s;
+}
+.ptr-clip[data-state='refreshing'] .brand-dot {
+  animation: brand-dot 1.8s ease-in-out infinite;
+}
+/* "Ok": cada arco acaba o que estava a fazer e pára alinhado (JS escreve --ok-from/--ok-to a partir do ângulo real). */
+.ptr-clip[data-state='done'] .ptr-arc {
+  animation: ptr-align 360ms cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+.ptr-clip[data-state='done'] .ptr-svg {
+  animation: ptr-pop 360ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.ptr-clip[data-armed] .ptr-svg {
+  animation: ptr-pop 240ms ease-out;
+}
+@keyframes ptr-spin-cw {
+  from {
+    transform: rotate(var(--a, 0deg));
+  }
+  to {
+    transform: rotate(calc(var(--a, 0deg) + 360deg));
+  }
+}
+@keyframes ptr-spin-ccw {
+  from {
+    transform: rotate(var(--a, 0deg));
+  }
+  to {
+    transform: rotate(calc(var(--a, 0deg) - 360deg));
+  }
+}
+@keyframes ptr-align {
+  from {
+    transform: rotate(var(--ok-from, 0deg));
+  }
+  to {
+    transform: rotate(var(--ok-to, 0deg));
+  }
+}
+@keyframes ptr-pop {
+  50% {
+    transform: scale(1.14);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ptr-clip .ptr,
+  .ptr-clip .ptr-svg {
+    transition: none !important;
+  }
+  .ptr-clip .ptr-arc,
+  .ptr-clip .brand-dot {
+    animation: none !important;
+  }
+  .ptr-clip[data-state='refreshing'] .ptr-svg {
+    animation: brand-spin-pulse 1.6s ease-in-out infinite !important;
+  }
+}
+
+/* Separador oculto: animações infinitas em pausa (classe posta por lib/pause-when-hidden.ts). */
+html[data-tab-hidden] :is(.brand-arc, .brand-dot, .ptr-arc, .ptr-svg, .brand-drift, .brand-spin, .skeleton) {
+  animation-play-state: paused;
 }
 
 /* Entrada escalonada (--i = posição): sobe 10 px e aparece em ~380 ms; com movimento reduzido não anima. */

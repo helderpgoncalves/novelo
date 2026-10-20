@@ -214,13 +214,13 @@ export function ChatView({
           const el = scroller.current;
           if (el && el.scrollHeight - el.scrollTop - el.clientHeight > 120) releaseOnUpward(true);
         }}
-        className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
+        className="min-h-0 flex-1 overflow-y-auto overscroll-contain [mask-image:linear-gradient(to_bottom,transparent_0,#000_20px,#000_calc(100%-20px),transparent_100%)]"
         data-testid="copilot-scroller"
       >
         <div
           ref={content}
           className={cn(
-            'mx-auto w-full max-w-3xl px-4 pt-4 pb-6 sm:px-6',
+            'mx-auto w-full max-w-[46rem] px-4 pt-6 pb-8 sm:px-6',
             empty && 'flex min-h-full flex-col',
           )}
         >
@@ -274,7 +274,7 @@ export function ChatView({
         </div>
       </div>
 
-      <div className="relative z-10 shrink-0 bg-background px-3 pt-1.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
+      <div className="relative z-10 shrink-0 bg-background px-4 pt-1 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
         {!stick && messages.length > 0 && (
           <Button
             variant="outline"
@@ -290,7 +290,7 @@ export function ChatView({
             {m.chat_to_end()}
           </Button>
         )}
-        <div className="mx-auto w-full max-w-3xl">
+        <div className="mx-auto w-full max-w-[46rem]">
           <Composer
             ref={composer}
             busy={busy}

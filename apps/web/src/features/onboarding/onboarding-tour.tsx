@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { ArrowLeft, ArrowRight, ShieldAlert } from 'lucide-react';
+import { ArrowLeft, ArrowRight, ShieldAlert, Star } from 'lucide-react';
 import {
   type CSSProperties,
   useCallback,
@@ -11,9 +11,11 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import type { MeOut } from '@/client';
+import { GithubMark } from '@/components/github-mark';
 import { Button } from '@/components/ui/button';
 import { useReducedMotion } from '@/features/copilot/use-reduced-motion';
 import { useMediaQuery } from '@/hooks/use-media-query';
+import { REPO_URL } from '@/lib/links';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import {
@@ -146,7 +148,7 @@ export function OnboardingTour({ user }: { user: MeOut }) {
   );
 
   // ---- alvo, posição e medidas ----------------------------------------------------------------------------
-  const target = useTargetRect(step?.targets ?? [], open && step?.kind === 'spot');
+  const target = useTargetRect(step?.targets ?? [], open && step?.kind === 'spot', reduced);
   const box = target?.box ?? null;
   const dialogRef = useRef<HTMLDivElement>(null);
   const primaryRef = useRef<HTMLButtonElement>(null);
@@ -233,7 +235,13 @@ export function OnboardingTour({ user }: { user: MeOut }) {
   let sheetOffset = 0;
   let arrowLeft: number | null = null;
 
-  if (mobile) {
+  const width = centred ? 448 : 360;
+  const size: Size = { width, height: card?.height ?? 320 };
+  if (!mobile && spot && box) placement = computePlacement(box, size, viewport);
+  // Janela estreita: se o cartão ao lado tapasse o alvo, vira folha inferior (como no telemóvel).
+  const sheet = mobile || placement?.overlaps === true;
+  if (sheet) {
+    placement = null;
     sheetOffset = spot ? sheetBottomOffset(box, viewport) : 0;
     if (spot && sheetOffset > 0 && box) {
       arrowLeft = Math.min(Math.max(box.x + box.width / 2 - 12, 28), viewport.width - 28 - 12);
@@ -243,11 +251,10 @@ export function OnboardingTour({ user }: { user: MeOut }) {
       right: 'max(0.75rem, env(safe-area-inset-right))',
       bottom: `calc(${sheetOffset > 0 ? `${sheetOffset}px` : 'env(safe-area-inset-bottom)'} + 0.75rem)`,
       maxHeight: `calc(100dvh - ${sheetOffset}px - env(safe-area-inset-top) - 1.5rem)`,
+      maxWidth: '28rem',
+      marginInline: 'auto',
     };
   } else {
-    const width = centred ? 448 : 360;
-    const size: Size = card ?? { width, height: 320 };
-    if (spot && box) placement = computePlacement(box, size, viewport);
     const x = placement ? placement.x : (viewport.width - size.width) / 2;
     const y = placement ? placement.y : (viewport.height - size.height) / 2;
     cardStyle = { width, left: x, top: y, maxHeight: viewport.height - 24 };
@@ -306,16 +313,16 @@ export function OnboardingTour({ user }: { user: MeOut }) {
         aria-describedby="tour-text"
         className={cn(
           'absolute flex touch-pan-y flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground shadow-2xl',
-          !mobile && !card && 'opacity-0',
+          !sheet && !card && 'opacity-0',
         )}
         style={{
           ...cardStyle,
           transition:
-            reduced || mobile ? 'none' : `left ${motion}, top ${motion}, opacity 200ms ease-out`,
+            reduced || sheet ? 'none' : `left ${motion}, top ${motion}, opacity 200ms ease-out`,
         }}
       >
         {placement && <Arrow side={placement.side} offset={placement.arrow} />}
-        {mobile && arrowLeft !== null && (
+        {sheet && arrowLeft !== null && (
           <span
             aria-hidden="true"
             className="absolute -bottom-1.5 size-3 rotate-45 border-border border-r border-b bg-card"
@@ -386,6 +393,28 @@ export function OnboardingTour({ user }: { user: MeOut }) {
                         {m.tour_guest_note()}
                       </p>
                     )}
+                    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-border/60 border-t pt-3">
+                      <p className="text-muted-foreground text-xs leading-snug">
+                        {m.tour_star_text()}
+                      </p>
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="sm"
+                        className="-mr-2 h-11 gap-1.5 px-3 text-muted-foreground text-xs hover:text-foreground"
+                      >
+                        <a
+                          href={REPO_URL}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label={m.tour_star_aria()}
+                        >
+                          <GithubMark className="size-4" />
+                          <Star aria-hidden="true" />
+                          {m.tour_star_cta()}
+                        </a>
+                      </Button>
+                    </div>
                   </>
                 )}
               </div>
@@ -399,7 +428,7 @@ export function OnboardingTour({ user }: { user: MeOut }) {
         <div
           className={cn(
             'border-border/70 border-t bg-card px-5 py-3 sm:px-6',
-            mobile && sheetOffset === 0 && 'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
+            sheet && sheetOffset === 0 && 'pb-[max(0.75rem,env(safe-area-inset-bottom))]',
           )}
         >
           {last ? (

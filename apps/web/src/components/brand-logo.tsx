@@ -50,14 +50,19 @@ const ARC_MOTION = [
   'brand-arc brand-arc-3',
 ] as const;
 
+/** Arcos guiados pelo dedo (puxar para atualizar): ver `.ptr-arc-*` em styles.css. */
+const PULL_MOTION = ['ptr-arc ptr-arc-1', 'ptr-arc ptr-arc-2', 'ptr-arc ptr-arc-3'] as const;
+
 function SymbolMarks({
   tone,
   transform,
   animated = false,
+  motion = ARC_MOTION,
 }: {
   tone: Tone;
   transform?: string;
   animated?: boolean;
+  motion?: readonly [string, string, string];
 }) {
   const c = TONES[tone];
   const strokes = [c.inner, c.mid, c.outer] as const;
@@ -70,7 +75,7 @@ function SymbolMarks({
           fill="none"
           strokeWidth={SYMBOL.strokeWidth}
           strokeLinecap="round"
-          className={cn(strokes[i], animated && ARC_MOTION[i])}
+          className={cn(strokes[i], animated && motion[i])}
         />
       ))}
       <path d={SYMBOL.dot} fillRule="evenodd" className={cn(c.dot, animated && 'brand-dot')} />
@@ -120,6 +125,23 @@ export function BrandSpinner({
       data-testid="brand-spinner"
     >
       <SymbolMarks tone={tone} animated={spin} />
+    </svg>
+  );
+}
+
+/**
+ * Símbolo para o "puxar para atualizar". Os arcos rodam com `--pr` (px puxados, escrito no DOM pelo gesto, sem
+ * React) e, com `data-state="refreshing"` num ascendente `.ptr`, passam a girar como o `BrandSpinner`.
+ */
+export function BrandPullSymbol({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="-420 -420 840 840"
+      className={cn('size-6 shrink-0', className)}
+      aria-hidden="true"
+      focusable="false"
+    >
+      <SymbolMarks tone="auto" animated motion={PULL_MOTION} />
     </svg>
   );
 }

@@ -11,7 +11,6 @@ import {
   listScenariosOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
-import { BrandSpinner } from '@/components/brand-logo';
 import { type Column, DataTable } from '@/components/data-table';
 import { Page, Panel, Section, SectionTitle } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
@@ -21,6 +20,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { WorkingState } from '@/components/working-state';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
@@ -171,12 +171,19 @@ function Reports() {
                   ))}
                 </RadioGroup>
               </fieldset>
+              {generate.isPending && (
+                <WorkingState
+                  title={m.working_reports_title()}
+                  subtitle={m.working_reports_hint()}
+                  trackElapsed
+                />
+              )}
               <Button
                 className="h-11 w-full gap-2 font-semibold"
                 disabled={selected.length === 0 || generate.isPending}
                 onClick={() => generate.mutate({ body: { scenario_ids: selected, locale } })}
               >
-                {generate.isPending ? <BrandSpinner tone="mono" /> : <FileText />}
+                <FileText />
                 {generate.isPending ? m.reports_generating() : m.reports_generate()}
               </Button>
             </Panel>

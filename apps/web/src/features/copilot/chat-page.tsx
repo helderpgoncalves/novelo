@@ -1,12 +1,16 @@
 import { useNavigate } from '@tanstack/react-router';
-import { ChevronLeft, Download, History, SquarePen } from 'lucide-react';
+import { Download, Ellipsis, History, SquarePen } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { m } from '@/paraglide/messages';
 import { ActionsTab } from './actions-tab';
-import { ChatHeader } from './chat-header';
 import { ChatView } from './chat-view';
 import { exportThreadMarkdown } from './export-thread';
 import { GalleryTab } from './gallery-tab';
@@ -14,10 +18,13 @@ import { HistorySheet } from './history-sheet';
 import { type ChatTab, HistoryTab } from './history-tab';
 import { SettingsTab } from './settings/settings-tab';
 import { registerChatPage, useCopilotUi } from './store';
+import { ThreadBar } from './thread-bar';
 import { ThreadList } from './thread-list';
 import { useChat } from './use-chat';
 
 export type { ChatTab } from './history-tab';
+
+const LIST_KEY = 'novelo.copilot.list';
 
 /** Página /chat: conversas à esquerda, a conversa ao centro e, noutros separadores, histórico, artefactos, ações e definições. */
 export function ChatPage({
@@ -32,6 +39,14 @@ export function ChatPage({
   const navigate = useNavigate({ from: '/chat' });
   const ui = useCopilotUi();
   const [listOpen, setListOpen] = useState(false);
+  // Coluna de conversas (a partir de `md`): recolhível, lembra a escolha.
+  const [listVisible, setListVisible] = useState(() => localStorage.getItem(LIST_KEY) !== 'closed');
+  const toggleList = useCallback(() => {
+    setListVisible((v) => {
+      localStorage.setItem(LIST_KEY, v ? 'closed' : 'open');
+      return !v;
+    });
+  }, []);
 
   const go = useCallback(
     (patch: { tab?: ChatTab; thread?: string | null }, replace = false) =>
@@ -64,6 +79,7 @@ export function ChatPage({
 
   const list = (
     <ThreadList
+      heading
       selectedId={thread}
       onSelect={openThread}
       onNew={() => {
@@ -84,65 +100,62 @@ export function ChatPage({
     { id: 'actions', label: m.chat_tab_actions() },
     { id: 'settings', label: m.chat_tab_settings() },
   ];
+  const mobileTitle = tab === 'chat' && chat.title ? chat.title : m.chat_page_title();
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-testid="copilot-page">
-      <ChatHeader
-        level="h1"
-        className="sm:px-6 lg:px-8"
-        wideTitle={m.chat_page_title()}
-        nav={
+      {/* Barra única da página: marca e secções à esquerda, ações à direita. Em telemóvel as secções passam
+          para uma segunda linha deslizante, dentro da mesma barra (um só fio por baixo). */}
+      <header className="flex shrink-0 flex-wrap items-center gap-x-2 border-b bg-background px-2 sm:flex-nowrap sm:gap-x-4 sm:px-4 lg:px-6">
+        <div className="flex h-14 min-w-0 flex-1 items-center gap-0.5 sm:flex-none">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="size-11 shrink-0 text-muted-foreground md:hidden"
+            aria-label={m.chat_threads()}
+            onClick={() => setListOpen(true)}
+          >
+            <History className="size-5" strokeWidth={1.75} aria-hidden="true" />
+          </Button>
+          <h1 className="min-w-0 truncate px-1.5 font-medium font-serif text-[1.25rem] tracking-tight md:px-0">
+            <span className="md:hidden">{mobileTitle}</span>
+            <span className="hidden md:inline">{m.chat_page_title()}</span>
+          </h1>
+        </div>
+        <div className="order-last w-full min-w-0 px-1 pb-2 sm:order-none sm:w-auto sm:flex-1 sm:px-0 sm:pb-0">
           <Tabs
             value={tab}
             onValueChange={(v) => go({ tab: v as ChatTab })}
-            className="h-full min-w-0 gap-0"
+            className="min-w-0 gap-0"
           >
             <TabsList
-              variant="line"
               aria-label={m.chat_page_title()}
-              className="h-full w-max min-w-0 gap-1 border-b-0 pb-0"
+              className="group-data-[orientation=horizontal]/tabs:h-12 sm:group-data-[orientation=horizontal]/tabs:h-10"
             >
               {tabs.map((t) => (
-                <TabsTrigger key={t.id} value={t.id} className="h-full px-3.5 sm:px-4">
+                <TabsTrigger
+                  key={t.id}
+                  value={t.id}
+                  className="group-data-[variant=default]/tabs-list:h-full group-data-[variant=default]/tabs-list:px-3.5"
+                >
                   {t.label}
                 </TabsTrigger>
               ))}
             </TabsList>
           </Tabs>
-        }
-        title={
-          tab === 'chat'
-            ? (chat.title ?? m.chat_page_title())
-            : (tabs.find((t) => t.id === tab)?.label ?? m.chat_page_title())
-        }
-        leading={
-          tab !== 'chat' ? (
+        </div>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
               size="icon"
-              className="size-11 text-muted-foreground sm:hidden"
-              aria-label={m.chat_tab_chat()}
-              onClick={() => go({ tab: 'chat' })}
+              className="size-11 shrink-0 text-muted-foreground sm:size-10"
+              aria-label={m.cp_menu_label()}
             >
-              <ChevronLeft className="size-5" strokeWidth={1.75} aria-hidden="true" />
+              <Ellipsis className="size-5" strokeWidth={1.75} aria-hidden="true" />
             </Button>
-          ) : undefined
-        }
-        actions={
-          tab === 'chat' ? (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="size-11 text-muted-foreground lg:hidden"
-              aria-label={m.chat_threads()}
-              onClick={() => setListOpen(true)}
-            >
-              <History className="size-5" strokeWidth={1.75} aria-hidden="true" />
-            </Button>
-          ) : undefined
-        }
-        menu={
-          <>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="min-w-56 rounded-xl p-1.5">
             <DropdownMenuItem
               className="min-h-11"
               onSelect={() => {
@@ -161,40 +174,22 @@ export function ChatPage({
               <Download />
               {m.cp_menu_export()}
             </DropdownMenuItem>
-            <DropdownMenuSeparator className="sm:hidden" />
-            {tabs
-              .filter((t) => t.id !== tab)
-              .map((t) => (
-                <DropdownMenuItem
-                  key={t.id}
-                  className="min-h-11 sm:hidden"
-                  onSelect={() => go({ tab: t.id })}
-                >
-                  {t.label}
-                </DropdownMenuItem>
-              ))}
-          </>
-        }
-      />
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </header>
+
       {tab === 'chat' ? (
         <div className="flex min-h-0 flex-1">
-          <aside
-            className="hidden w-80 shrink-0 border-r bg-card/40 lg:block"
-            aria-label={m.chat_threads()}
-          >
-            {list}
-          </aside>
+          {listVisible && (
+            <aside
+              className="hidden w-72 shrink-0 border-r bg-muted/30 md:block lg:w-80 xl:w-88"
+              aria-label={m.chat_threads()}
+            >
+              {list}
+            </aside>
+          )}
           <div className="flex min-h-0 min-w-0 flex-1 flex-col">
-            {chat.title && (
-              <div className="hidden h-11 shrink-0 items-center border-b px-6 sm:flex lg:px-8">
-                <h2
-                  className="truncate font-medium font-serif text-base tracking-tight"
-                  data-testid="copilot-thread-title"
-                >
-                  {chat.title}
-                </h2>
-              </div>
-            )}
+            <ThreadBar chat={chat} listVisible={listVisible} onToggleList={toggleList} />
             <ChatView chat={chat} layout="page" handlesRequests onOpenThread={openThread} />
           </div>
         </div>

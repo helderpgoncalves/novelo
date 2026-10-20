@@ -33,7 +33,7 @@ for (const vp of VIEWPORTS) {
         await page.screenshot({ path: `${dir}-2-assumptions.png` });
 
         await page.getByRole('button', { name: 'Calcular cenário' }).click();
-        await expect(page.getByRole('progressbar').first()).toBeVisible();
+        await expect(page.getByTestId('working-state').first()).toBeVisible();
         await page.screenshot({ path: `${dir}-3-running.png` });
 
         await expect(page).toHaveURL(/[?&]r=[0-9a-f-]{36}/, { timeout: 90_000 });

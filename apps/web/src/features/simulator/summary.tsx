@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { ScenarioOut } from '@/client';
 import { EstimateTag, Panel } from '@/components/panel';
 import { Button } from '@/components/ui/button';
+import { WorkingState } from '@/components/working-state';
 import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -46,22 +47,13 @@ export function RunButton({
 }) {
   if (run.pending && compact) {
     return (
-      <div className={cn('flex items-center gap-3', className)} role="status" aria-live="polite">
-        <div className="min-w-0 flex-1 space-y-1.5">
-          <p className="flex items-baseline justify-between gap-3 text-sm">
-            <span className="truncate font-medium">{m.simx_running_label()}</span>
-            <span className="shrink-0 text-muted-foreground tabular-nums">
-              {m.simx_elapsed({ s: formatNumber(run.elapsed) })}
-            </span>
-          </p>
-          <div
-            className="h-1.5 overflow-hidden rounded-full bg-muted"
-            role="progressbar"
-            aria-label={m.simx_running_label()}
-          >
-            <div className="h-full w-full rounded-full bg-primary/60 motion-safe:animate-pulse" />
-          </div>
-        </div>
+      <div className={cn('flex items-center gap-3', className)}>
+        <WorkingState
+          size="sm"
+          title={m.simx_running_label()}
+          elapsed={run.elapsed}
+          className="min-w-0 flex-1 justify-start"
+        />
         <Button type="button" variant="outline" className="h-11 shrink-0" onClick={run.onCancel}>
           {m.simx_cancel()}
         </Button>
@@ -70,20 +62,13 @@ export function RunButton({
   }
   if (run.pending) {
     return (
-      <div className={cn('space-y-2', className)} role="status" aria-live="polite">
-        <div className="flex items-center justify-between gap-3 text-sm">
-          <span className="font-medium">{m.simx_running_label()}</span>
-          <span className="text-muted-foreground tabular-nums">
-            {m.simx_elapsed({ s: formatNumber(run.elapsed) })}
-          </span>
-        </div>
-        <div
-          className="h-1.5 overflow-hidden rounded-full bg-muted"
-          role="progressbar"
-          aria-label={m.simx_running_label()}
-        >
-          <div className="h-full w-full rounded-full bg-primary/60 motion-safe:animate-pulse" />
-        </div>
+      <div className={cn('space-y-3', className)}>
+        <WorkingState
+          size="sm"
+          title={m.simx_running_label()}
+          elapsed={run.elapsed}
+          className="justify-start"
+        />
         <Button type="button" variant="outline" className="h-11 w-full" onClick={run.onCancel}>
           {m.simx_cancel()}
         </Button>

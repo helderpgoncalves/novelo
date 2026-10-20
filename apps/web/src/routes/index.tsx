@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { lazy, Suspense } from 'react';
 import { z } from 'zod';
 import {
   getObservedFlowsOptions,
@@ -10,10 +11,14 @@ import {
 import { BootSplash } from '@/components/app-loading';
 import { AppFrame } from '@/components/layout/app-frame';
 import { HOME_TABS, HomePage } from '@/features/home/home-page';
-import { LandingPage } from '@/features/landing/landing-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { resolveSessionUser } from '@/lib/session';
 import { m } from '@/paraglide/messages';
+
+// A landing é um pacote à parte (não pesa na app).
+const LandingPage = lazy(() =>
+  import('@/features/landing/landing-page').then((mod) => ({ default: mod.LandingPage })),
+);
 
 // "/" é a página inicial pública para quem não tem sessão (é o "Application home page" da Google: sem login, com
 // Privacidade e Termos à vista) e a página inicial da app para quem tem. Por isso não vive dentro de `_app`.
@@ -56,7 +61,12 @@ function Home() {
   const { user } = Route.useRouteContext();
   const { tab = 'entities' } = Route.useSearch();
   const navigate = Route.useNavigate();
-  if (!user) return <LandingPage />;
+  if (!user)
+    return (
+      <Suspense fallback={<BootSplash />}>
+        <LandingPage />
+      </Suspense>
+    );
   return (
     <AppFrame user={user}>
       <HomePage

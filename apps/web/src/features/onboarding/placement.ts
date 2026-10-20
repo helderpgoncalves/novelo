@@ -16,6 +16,18 @@ export interface Placement {
   side: Side;
   /** Posição da seta ao longo da aresta do cartão que toca o alvo (px desde o canto do cartão). */
   arrow: number;
+  /** O cartão tapa parte do alvo (janela estreita): quem chama deve passar a folha inferior. */
+  overlaps: boolean;
+}
+
+/** Os retângulos cruzam-se (com uma folga mínima)? */
+export function boxesOverlap(a: Box, b: Box, tolerance = 1): boolean {
+  return (
+    a.x < b.x + b.width - tolerance &&
+    a.x + a.width > b.x + tolerance &&
+    a.y < b.y + b.height - tolerance &&
+    a.y + a.height > b.y + tolerance
+  );
 }
 
 const ORDER: Record<Side, Side[]> = {
@@ -86,7 +98,13 @@ export function computePlacement(
       ? target.y + target.height / 2 - y
       : target.x + target.width / 2 - x;
   const length = side === 'left' || side === 'right' ? card.height : card.width;
-  return { x, y, side, arrow: clamp(along, arrowInset, length - arrowInset) };
+  return {
+    x,
+    y,
+    side,
+    arrow: clamp(along, arrowInset, length - arrowInset),
+    overlaps: boxesOverlap({ x, y, width: card.width, height: card.height }, target),
+  };
 }
 
 /** Folha inferior (telemóvel): se o alvo está na metade de baixo, a folha sobe para o deixar à vista. */

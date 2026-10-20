@@ -1,9 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Download, Eye, LogOut, Route as RouteIcon, UserRound } from 'lucide-react';
+import { Download, Eye, LogOut, Route as RouteIcon, Star, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import type { MeOut } from '@/client';
 import { logoutMutation } from '@/client/@tanstack/react-query.gen';
+import { GithubMark } from '@/components/github-mark';
 import { InstallIosDialog } from '@/components/install-ios-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
@@ -21,6 +22,7 @@ import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { stepsFor } from '@/features/onboarding/steps';
 import { canResumeTour, openTour, readTourProgress } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
+import { REPO_URL } from '@/lib/links';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
 
@@ -128,6 +130,27 @@ export function UserMenu({ user }: { user: MeOut }) {
               <Download /> {m.user_menu_install()}
             </DropdownMenuItem>
           )}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={m.user_menu_source_aria()}
+            >
+              <GithubMark /> {m.user_menu_source()}
+            </a>
+          </DropdownMenuItem>
+          <DropdownMenuItem asChild>
+            <a
+              href={REPO_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={m.user_menu_star_aria()}
+            >
+              <Star /> {m.user_menu_star()}
+            </a>
+          </DropdownMenuItem>
           <DropdownMenuSeparator />
           {imp.active ? (
             <DropdownMenuItem
