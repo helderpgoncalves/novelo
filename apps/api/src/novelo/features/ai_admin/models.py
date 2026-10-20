@@ -46,4 +46,5 @@ class AiUsage(Base, UuidPkMixin, TimestampMixin):
     error_code: Mapped[str | None] = mapped_column(String(40))
     request_id: Mapped[str | None] = mapped_column(String(64), index=True)
     input_hash: Mapped[str | None] = mapped_column(String(64))
+    web_search_requests: Mapped[int] = mapped_column(Integer, default=0, server_default="0")  # pesquisas web faturadas
     user_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))

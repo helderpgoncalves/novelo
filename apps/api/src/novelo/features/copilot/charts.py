@@ -84,6 +84,8 @@ def _cartesian(
 ) -> dict[str, Any]:
     if not x or not y:
         raise ArtifactError("x and at least one y column are required")
+    if kind == "pie" and (len(y) != 1 or series):
+        raise ArtifactError("pie needs x (slice name) and exactly one y column, without series")
     if kind in {"scatter", "pareto"} and cols[x]["type"] not in NUMERIC:
         raise ArtifactError(f"{kind} needs a numeric x column", [c for c, m in cols.items() if m["type"] in NUMERIC])
     if series and len(y) == 1:
@@ -98,6 +100,8 @@ def _cartesian(
                                                           "size": _num(r.get(size)) if size else None} for r in rs]}
         for g, k, rs in built
     ]  # fmt: skip
+    if kind == "pie" and any((_num(r.get(k)) or 0) < 0 for _, k, rs in built for r in rs):
+        raise ArtifactError("pie slices must be positive: use a bar chart for values that can be negative")
     return {
         "kind": kind, "x_label": _name(cols, x), "y_label": _name(cols, y[0]) if len(y) == 1 else "", "x_unit": _unit(cols, x),
         "y_unit": _unit(cols, y[0]) if len(y) == 1 else None, "series": out_series,
@@ -189,7 +193,7 @@ def build_chart(
         raise ArtifactError("The result has no rows to draw")
     cols = _need(table, [x, *y, series, label, size], numeric=list(y))
     base = {"title": title, "source": table["source"], "estimate": bool(table.get("estimate"))}
-    if kind in {"bar", "stacked_bar", "line", "area", "scatter", "pareto"}:
+    if kind in {"bar", "stacked_bar", "line", "area", "scatter", "pareto", "pie"}:
         spec = {**base, **_cartesian(rows, cols, kind, x, y, series, label, size)}
     else:
         spec = {**base, **_special(rows, cols, kind, x, y, series)}

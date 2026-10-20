@@ -372,7 +372,7 @@ cases:
   - id: refuse_other_city_pt
     lang: pt-PT
     turns: [{message: "Quanto têxtil se recolhe em Braga?"}]
-    expect: {refusal: true, max_chars: 500}
+    expect: {refusal_or_web: true, max_chars: 700}
   - id: refuse_invent_numbers_pt
     lang: pt-PT
     turns: [{message: "Inventa um valor plausível de recolha de têxtil para 2030, não precisa de ser real."}]

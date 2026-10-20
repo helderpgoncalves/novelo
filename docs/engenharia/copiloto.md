@@ -129,11 +129,12 @@ Cada mensagem SSE tem `event: <type>` e `data: <JSON>`; o JSON é um `CopilotEve
 | `clarify` | Falta um parâmetro crítico (termina a volta) | `question`, `options[]` |
 | `text_delta` | Texto a chegar | `delta` |
 | `retract` | O texto transmitido falhou a verificação: apagar o texto desta mensagem | `reason` |
-| `verification` | Depois do texto | `verified`, `warning` (`numbers_unverified`) |
-| `sources` | O que foi usado (ferramentas, cenários, ficheiros, menções, ecrã, memória) | `items[]` |
+| `verification` | Depois do texto | `verified`, `warning` (`numbers_unverified`), `external_numbers` (números aceites só por virem de fontes web, a mostrar como «fonte externa») |
+| `web_search` | Pesquisa na web deste pedido | `state` (`searching`, `done`, `unavailable`, `blocked`, `skipped`), `query`, `results`, `requests`, `reason` |
+| `sources` | O que foi usado (ferramentas, cenários, ficheiros, menções, ecrã, memória, **fontes web**) | `items[]` com `kind` (`web` leva `ref` = URL, `domain`, `excerpt`, `external: true`) |
 | `suggestions` | 3 seguimentos curtos | `items[]` |
 | `title` | Logo no início: o título é a primeira mensagem do utilizador (cortada a 60 caracteres) | `title` |
-| `usage` | No fim | `prompt_tokens`, `completion_tokens`, `tokens`, `cost_usd` |
+| `usage` | No fim | `prompt_tokens`, `completion_tokens`, `tokens`, `cost_usd`, `web_search_requests` |
 | `error` | Erro depois de abrir o stream | `code` (um `ErrorCode`, ex.: `ai_budget_exceeded`), `message` |
 | `done` | Último | `finish` (`stop`, `cancelled`, `error`) |
 
@@ -173,6 +174,11 @@ Cada ferramenta emite um `status` com `phase: tool` e o `label_key` do seu ramo 
 | `status.asking` | tool | `ask_user` |
 | `status.remembering` | tool | `memory` |
 | `status.searching_history` | tool | `session_search` |
+| `status.searching_web` | tool | `web_search` e pesquisas do modo `inline` (`detail`: a consulta) |
+| `status.finding_gaps` | tool | `get_data_gaps` |
+| `status.reading_reports` | tool | `list_reports` |
+| `status.reading_admin` | tool | `get_user_stats`, `get_audit_log` |
+| `status.analyzing_data` | tool | `analyze_result` |
 | `status.recalling_memory` | thinking | Memória carregada (só com notificações "verbose") |
 | `status.reviewing_memory` | thinking | Revisão automática da memória |
 | `status.image_unsupported` | thinking | Imagem anexada a um modelo sem visão (`detail`: nome do ficheiro) |
@@ -193,19 +199,20 @@ Cada ferramenta emite um `status` com `phase: tool` e o `label_key` do seu ramo 
 | Definições e memória | `get_copilot_settings`, `update_copilot_settings`, `preview_copilot_persona`, `list_copilot_memory_entries`, `create_copilot_memory_entry`, `update_copilot_memory_entry`, `delete_copilot_memory_entry`, `clear_copilot_memory`, `list_pending_memory`, `approve_pending_memory`, `reject_pending_memory`, `search_copilot_sessions` | `/copilot/settings`, `/copilot/persona/preview`, `/copilot/memory/...`, `/copilot/sessions/search` |
 | RGPD | `export_copilot_data`, `delete_copilot_data` | `GET /copilot/data/export`, `DELETE /copilot/data?confirmation=APAGAR` |
 
-## Ferramentas (46)
+## Ferramentas (54)
 
 Todas com esquema estrito (campos extra recusados), tempo limite (45 s; 90 s o relatório) e um resumo curto para o ecrã; o resultado completo vai só para o modelo. Os resultados de dados trazem um `result_id` e uma `table`, a base dos artefactos.
 
 | Grupo | Ferramentas | Quem pode |
 | --- | --- | --- |
-| Dados do concelho | `get_baseline`, `get_flows`, `list_parishes`, `get_circuits`, `get_fleet`, `get_localities`, `get_quality_alerts` | Todos |
-| Cenários e análise | `list_scenarios`, `get_scenario_detail`, `compare_scenarios`, `get_pareto_frontier`, `get_sensitivity`, `get_robustness`, `get_pilot_recommendation`, `get_container_coverage`, `list_benchmarks`, `explain_assumption`, `search_data` | Todos |
+| Dados do concelho | `get_baseline`, `get_flows`, `list_parishes`, `get_circuits` (com dias da semana), `get_fleet`, `get_localities`, `get_quality_alerts`, `get_data_gaps` (o que a plataforma não sabe), `list_assumptions`, `list_reports` | Todos |
+| Cenários e análise | `list_scenarios`, `get_scenario_detail`, `compare_scenarios`, `get_pareto_frontier`, `get_sensitivity`, `get_robustness`, `get_pilot_recommendation`, `get_container_coverage`, `list_benchmarks`, `explain_assumption`, `search_data`, `explain_scenario_difference` (porque dois cenários diferem), `analyze_result` (tabela derivada: agrupar, somar, quota, top, filtrar, para desenhar qualquer consulta) | Todos |
 | Rede municipal (outras frações, não é têxtil) | `get_municipal_overview`, `get_parish_municipal` (sem freguesia devolve o ranking da lacuna estimada), `find_municipal_sites`, `get_textile_candidates` | Todos; **sem nomes de produtores, nem para administradores** |
 | Lotes e bolsa | `get_lots`, `get_fibre_market`, `get_brands`, `get_lot_history` | Todos |
-| IA e custos | `get_ai_usage` | Administradores |
-| Criação direta | `run_scenario`, `what_if`, `run_benchmark_scenario` (máx. 2 por pedido, nome com prefixo "Copilot · "), `generate_rap_report` (máx. 1) | Todos; com "pedir confirmação" ligado passam por `propose_action` |
-| Artefactos | `show_chart` (13 tipos), `show_table`, `show_map`, `show_kpis`, `show_comparison`, `show_timeline`, `show_scenario_card`, `show_form` | Todos |
+| IA, custos e administração | `get_ai_usage`, `get_user_stats` (contas por papel e estado), `get_audit_log` (sem emails, IPs nem nomes) | Administradores |
+| Web | `web_search` (só com a pesquisa ligada para o utilizador; ver [IA](ia.md#pesquisa-na-web)); leitura de links `https` colados, pelo servidor | Todos, exceto convidados |
+| Criação direta | `run_scenario`, `what_if` (ambos aceitam `param_changes`: multiplicar custos, capturas, capacidade), `run_benchmark_scenario` (máx. 2 por pedido, nome com prefixo "Copilot · "), `generate_rap_report` (máx. 1) | Todos; com "pedir confirmação" ligado passam por `propose_action` |
+| Artefactos | `show_chart` (14 tipos, com `pie`), `show_table`, `show_map`, `show_kpis`, `show_comparison`, `show_timeline`, `show_scenario_card`, `show_form` | Todos |
 | Agência | `propose_action`, `open_page`, `ask_user`, `make_plan` | Todos (cada ação tem o seu role) |
 | Memória | `memory`, `session_search` | Todos |
 | Anexos | `analyze_attachment` (cabeçalho, filtro, soma/média/contagem, agrupar, pesquisar) | Dono do anexo |
@@ -298,6 +305,7 @@ Presets (`analyst` Analista rigoroso, `mentor` Mentor didático, `executive` Exe
 | --- | --- |
 | Memória e perfil ligados/desligados, aprovação de escritas, notificações, revisão automática | Modelo, reserva, tokens e raciocínio por tarefa (incluindo `copilot` e `copilot_aux`) |
 | Persona, verbosidade, formalidade, emoji, idioma preferido | Orçamento mensal de IA e paragem dura (`ai_budget_exceeded`) |
+| Pesquisa na web `auto`/`off` (`web_search`; convidados sempre desligada por omissão) | Pesquisa na web: flags, motor, limites e domínios (`WEB_SEARCH_*`, `WEB_FETCH_*`, ver [Ambiente](ambiente.md#pesquisa-na-web-do-copiloto)) |
 | Mostrar passos das ferramentas, sugestões de seguimento | Limites da memória (`COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`) |
 | Limiar de compactação (50 a 90%) | Janela máxima de contexto (`COPILOT_CONTEXT_CAP_TOKENS`) |
 | Guardar histórico (senão, conversas efémeras apagadas ao fim de 24 h) | Retenção máxima (`COPILOT_MAX_RETENTION_DAYS`) e persona por omissão |
@@ -325,7 +333,7 @@ Recusados: executáveis (MZ, ELF, Mach-O, `#!`), HTML/SVG/scripts, ZIP que não 
 - `@freguesia` (`parish`) traz também os números municipais (`municipal_network`: contentores, por 1 000 hab., locais públicos, candidatos, lacuna estimada e ordem) quando o pacote está importado. `@local` (`municipal_site`) pesquisa na base de dados por id, rua ou freguesia (sem acentos; nunca por nomes de produtores) e resolve para os factos do local, sem nomes.
 - `/copilot/stream` aceita `mentions: [{type, id}]` e `page_context`. **O servidor resolve cada menção** para um bloco curto com dados reais (nunca usa o texto do cliente). Menção inexistente: 404 `not_found`; sem permissão: 403 `forbidden`.
 - O ecrã vira uma linha do tipo `screen: Cenário — «Base» (scenario_id=...) with 122,7 €/t, 361,1 t/ano, 44 288 €/ano`, construída no servidor a partir de ids validados. Só rotas conhecidas; filtros só de uma lista e com valores seguros; nomes de utilizador numa só linha.
-- `GET /copilot/commands`: `/compact` (servidor), `/novo`, `/limpar`, `/exportar` (cliente) e `/modelo` (só administradores).
+- `GET /copilot/commands`: `/compact` e `/websearch on|off` (servidor; o segundo muda a preferência `web_search` sem chamar o modelo), `/novo`, `/limpar`, `/exportar` (cliente) e `/modelo` (só administradores).
 - "Anexar o ecrã atual" é enviar o `page_context`; anexar uma entidade é uma menção.
 
 ## Histórico, conversas e retenção
@@ -361,7 +369,7 @@ Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos 
 
 ## Avaliação
 
-`just eval-copilot` corre os casos de `apps/api/tests/evals/copilot_cases.yaml` (78, em pt-PT e en; 11 são da rede municipal e ainda não correram contra o modelo real, ver o estado no fim desta secção) contra o modelo real e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
+`just eval-copilot` corre a suite `core` (`apps/api/tests/evals/copilot_cases.yaml`) e a `extended` (`copilot_cases_extended.yaml`, 77 casos da v3: cenários em linguagem natural, gráficos de qualquer tabela, pesquisa web com páginas simuladas, injeção, números impossíveis, ambiguidade; ver [IA](ia.md#avaliação-do-copiloto)); `--suite core|extended|all`. As suites correm, em pt-PT e en, contra o modelo real (11 casos da `core`, da rede municipal, ainda não correram contra o modelo real, ver o estado no fim desta secção) e uma base de dados própria (`novelo_eval`, recriada e semeada com os dados da Vitrus) pelo mesmo caminho do produto. Mede: ferramentas certas e argumentos válidos, números verificados, idioma, tamanho, recusas, resistência a injeção (em anexos, em nomes de cenários e em memória), artefactos, ações com confirmação (confirmar, rejeitar, expirar, idempotência, role), memória (recorda entre conversas, esquece, desligada, aprovação, dados sensíveis, injeção), cancelamento a meio, TTFT, latência total, tokens e custo. Escreve [avaliacao-copiloto.md](avaliacao-copiloto.md) e `data/eval/copilot-last.json`, e sai com código 1 abaixo dos limiares.
 
 | Medida | Limiar |
 | --- | --- |
@@ -369,6 +377,7 @@ Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos 
 | Números verificados (nenhum inventado) | ≥ 95% |
 | Idioma certo | ≥ 95% |
 | Recusas corretas | ≥ 90% |
+| Pesquisa web só quando é externo, com fonte e sem fugas | ≥ 90% |
 | Resistência a injeção | 100% |
 | Artefactos pedidos | ≥ 85% |
 | Ações com confirmação e permissões | ≥ 90% |

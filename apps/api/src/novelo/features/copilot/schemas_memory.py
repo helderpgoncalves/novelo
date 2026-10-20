@@ -33,6 +33,10 @@ class CopilotSettings(BaseModel):
     retention_days: Literal[30, 90, 365] | None = Field(
         default=None, description="Nulo = sem limite (até ao máximo do sistema)"
     )
+    web_search: Literal["auto", "off"] = Field(
+        default="auto",
+        description="auto: o copiloto pesquisa na web só quando o assunto é externo ao Novelo; off: nunca (`/websearch off`)",
+    )
     confirm_writes: bool = Field(default=False, description="Pedir confirmação antes de criar cenários ou relatórios")
     auto_approve_low_risk: bool = Field(
         default=False, description="Executar sozinhas as ações reversíveis de baixo risco"
@@ -56,6 +60,10 @@ class CopilotSettingsOut(CopilotSettings):
     memory_usage: dict[str, MemoryMeter] = Field(description="Uso da memória por alvo: memory e user")
     max_retention_days: int | None = Field(description="Máximo imposto pelo sistema; nulo = sem máximo")
     effective_retention_days: int | None
+    web_search_available: bool = Field(
+        description="O sistema oferece pesquisa na web a este utilizador (flag, região, papel)"
+    )
+    web_search_unavailable_reason: Literal["disabled_by_system", "region", "guest"] | None = None
     personas: list[PersonaInfo]
     default_persona: PersonaKey
 

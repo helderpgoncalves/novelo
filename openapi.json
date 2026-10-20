@@ -627,7 +627,8 @@
           "alert_resolution",
           "copilot_aux",
           "triage",
-          "test"
+          "test",
+          "web_search"
         ],
         "title": "AiTask",
         "type": "string"
@@ -2232,7 +2233,7 @@
       },
       "CartesianChart": {
         "additionalProperties": false,
-        "description": "bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número).",
+        "description": "bar, stacked_bar, line, area, scatter, pareto, pie: séries de pontos (x categoria ou número).\n\n`pie` (circular/donut): uma só série; cada ponto é uma fatia (x = nome, y = valor, só positivos).",
         "properties": {
           "estimate": {
             "default": false,
@@ -2255,7 +2256,8 @@
               "line",
               "area",
               "scatter",
-              "pareto"
+              "pareto",
+              "pie"
             ],
             "title": "Kind",
             "type": "string"
@@ -2374,6 +2376,7 @@
                 "heatmap": "#/components/schemas/HeatmapChart",
                 "line": "#/components/schemas/CartesianChart",
                 "pareto": "#/components/schemas/CartesianChart",
+                "pie": "#/components/schemas/CartesianChart",
                 "range": "#/components/schemas/RangeChart",
                 "sankey": "#/components/schemas/SankeyChart",
                 "scatter": "#/components/schemas/CartesianChart",
@@ -3309,7 +3312,8 @@
             "tool_result": "#/components/schemas/CopilotToolResultEvent",
             "tool_start": "#/components/schemas/CopilotToolStartEvent",
             "usage": "#/components/schemas/CopilotUsageEvent",
-            "verification": "#/components/schemas/CopilotVerificationEvent"
+            "verification": "#/components/schemas/CopilotVerificationEvent",
+            "web_search": "#/components/schemas/CopilotWebSearchEvent"
           },
           "propertyName": "type"
         },
@@ -3364,6 +3368,9 @@
           },
           {
             "$ref": "#/components/schemas/CopilotSourcesEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CopilotWebSearchEvent"
           },
           {
             "$ref": "#/components/schemas/CopilotArtifactEvent"
@@ -3802,6 +3809,16 @@
             "title": "Verbosity",
             "type": "string"
           },
+          "web_search": {
+            "default": "auto",
+            "description": "auto: o copiloto pesquisa na web só quando o assunto é externo ao Novelo; off: nunca (`/websearch off`)",
+            "enum": [
+              "auto",
+              "off"
+            ],
+            "title": "Web Search",
+            "type": "string"
+          },
           "write_approval": {
             "default": "auto",
             "description": "ask: as escritas de memória ficam em fila",
@@ -4003,6 +4020,37 @@
             "title": "Verbosity",
             "type": "string"
           },
+          "web_search": {
+            "default": "auto",
+            "description": "auto: o copiloto pesquisa na web só quando o assunto é externo ao Novelo; off: nunca (`/websearch off`)",
+            "enum": [
+              "auto",
+              "off"
+            ],
+            "title": "Web Search",
+            "type": "string"
+          },
+          "web_search_available": {
+            "description": "O sistema oferece pesquisa na web a este utilizador (flag, região, papel)",
+            "title": "Web Search Available",
+            "type": "boolean"
+          },
+          "web_search_unavailable_reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "disabled_by_system",
+                  "region",
+                  "guest"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Web Search Unavailable Reason"
+          },
           "write_approval": {
             "default": "auto",
             "description": "ask: as escritas de memória ficam em fila",
@@ -4018,6 +4066,7 @@
           "memory_usage",
           "max_retention_days",
           "effective_retention_days",
+          "web_search_available",
           "personas",
           "default_persona"
         ],
@@ -4026,6 +4075,36 @@
       },
       "CopilotSource": {
         "properties": {
+          "domain": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só `web`: domínio da página, sem «www.»",
+            "title": "Domain"
+          },
+          "excerpt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só `web`: excerto curto da página (dado não confiável, texto simples)",
+            "title": "Excerpt"
+          },
+          "external": {
+            "default": false,
+            "description": "Verdadeiro nas fontes web: «fonte externa», não é um dado do Novelo",
+            "title": "External",
+            "type": "boolean"
+          },
           "kind": {
             "enum": [
               "tool",
@@ -4033,12 +4112,14 @@
               "file",
               "entity",
               "memory",
-              "page"
+              "page",
+              "web"
             ],
             "title": "Kind",
             "type": "string"
           },
           "label": {
+            "description": "Para `web`: o título da página",
             "title": "Label",
             "type": "string"
           },
@@ -4051,7 +4132,7 @@
                 "type": "null"
               }
             ],
-            "description": "Rota ou id para abrir a fonte, se existir",
+            "description": "Rota ou id para abrir a fonte; para `web`, o URL (https)",
             "title": "Ref"
           }
         },
@@ -4416,6 +4497,12 @@
             "default": "usage",
             "title": "Type",
             "type": "string"
+          },
+          "web_search_requests": {
+            "default": 0,
+            "description": "Pesquisas web faturadas neste pedido (já contam no custo)",
+            "title": "Web Search Requests",
+            "type": "integer"
           }
         },
         "required": [
@@ -4430,6 +4517,14 @@
       "CopilotVerificationEvent": {
         "additionalProperties": false,
         "properties": {
+          "external_numbers": {
+            "description": "Números aceites só por existirem em excertos de fontes web (fonte externa): não são dados do Novelo",
+            "items": {
+              "type": "number"
+            },
+            "title": "External Numbers",
+            "type": "array"
+          },
           "type": {
             "const": "verification",
             "default": "verification",
@@ -4457,6 +4552,81 @@
           "verified"
         ],
         "title": "CopilotVerificationEvent",
+        "type": "object"
+      },
+      "CopilotWebSearchEvent": {
+        "additionalProperties": false,
+        "description": "Pesquisa na web deste pedido. `searching` abre (a consulta já foi sanitizada), `done` fecha com o número de fontes;\n`unavailable`, `blocked` e `skipped` explicam porque se respondeu sem web (o texto da resposta também avisa).",
+        "properties": {
+          "query": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Consulta enviada à web (genérica, sem dados pessoais)",
+            "title": "Query"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "enum": [
+                  "disabled_by_user",
+                  "disabled_by_system",
+                  "guest",
+                  "region",
+                  "provider_rejected",
+                  "failed",
+                  "query_blocked",
+                  "limit_reached",
+                  "no_results",
+                  "budget"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          },
+          "requests": {
+            "default": 0,
+            "description": "Pesquisas faturadas pelo OpenRouter (`server_tool_use.web_search_requests`)",
+            "title": "Requests",
+            "type": "integer"
+          },
+          "results": {
+            "default": 0,
+            "description": "Fontes devolvidas (state=done)",
+            "title": "Results",
+            "type": "integer"
+          },
+          "state": {
+            "enum": [
+              "searching",
+              "done",
+              "unavailable",
+              "blocked",
+              "skipped"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "type": {
+            "const": "web_search",
+            "default": "web_search",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "state"
+        ],
+        "title": "CopilotWebSearchEvent",
         "type": "object"
       },
       "CoverageState": {
@@ -8052,6 +8222,14 @@
               }
             ],
             "title": "Verified"
+          },
+          "web_sources": {
+            "description": "Fontes web citadas nesta resposta (kind=web), para recarregar a conversa",
+            "items": {
+              "$ref": "#/components/schemas/CopilotSource"
+            },
+            "title": "Web Sources",
+            "type": "array"
           }
         },
         "required": [
@@ -15966,6 +16144,12 @@
               }
             ],
             "title": "Task"
+          },
+          "web_search_requests": {
+            "default": 0,
+            "description": "Pesquisas web faturadas (já contam em cost_usd)",
+            "title": "Web Search Requests",
+            "type": "integer"
           }
         },
         "required": [
@@ -16005,6 +16189,12 @@
           },
           "prompt_tokens": {
             "title": "Prompt Tokens",
+            "type": "integer"
+          },
+          "web_search_requests": {
+            "default": 0,
+            "description": "Pesquisas web faturadas (já contam em cost_usd)",
+            "title": "Web Search Requests",
             "type": "integer"
           }
         },

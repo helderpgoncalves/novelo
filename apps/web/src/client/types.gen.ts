@@ -322,7 +322,7 @@ export type AiSettingsUpdate = {
 /**
  * AiTask
  */
-export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'copilot_aux' | 'triage' | 'test';
+export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'copilot_aux' | 'triage' | 'test' | 'web_search';
 
 /**
  * AiUsageOut
@@ -1306,7 +1306,9 @@ export type CardKpis = {
 /**
  * CartesianChart
  *
- * bar, stacked_bar, line, area, scatter, pareto: séries de pontos (x categoria ou número).
+ * bar, stacked_bar, line, area, scatter, pareto, pie: séries de pontos (x categoria ou número).
+ *
+ * `pie` (circular/donut): uma só série; cada ponto é uma fatia (x = nome, y = valor, só positivos).
  */
 export type CartesianChart = {
     /**
@@ -1324,7 +1326,7 @@ export type CartesianChart = {
     /**
      * Kind
      */
-    kind: 'bar' | 'stacked_bar' | 'line' | 'area' | 'scatter' | 'pareto';
+    kind: 'bar' | 'stacked_bar' | 'line' | 'area' | 'scatter' | 'pareto' | 'pie';
     /**
      * Series
      */
@@ -1389,7 +1391,7 @@ export type ChartArtifact = {
      * Spec
      */
     spec: ({
-        kind: 'area' | 'bar' | 'line' | 'pareto' | 'scatter' | 'stacked_bar';
+        kind: 'area' | 'bar' | 'line' | 'pareto' | 'pie' | 'scatter' | 'stacked_bar';
     } & CartesianChart) | ({
         kind: 'waterfall';
     } & WaterfallChart) | ({
@@ -1949,6 +1951,8 @@ export type CopilotEventMessage = ({
 } & CopilotClarifyEvent) | ({
     type: 'sources';
 } & CopilotSourcesEvent) | ({
+    type: 'web_search';
+} & CopilotWebSearchEvent) | ({
     type: 'artifact';
 } & CopilotArtifactEvent) | ({
     type: 'confirm';
@@ -2221,6 +2225,12 @@ export type CopilotSettings = {
      */
     verbosity?: 'short' | 'balanced' | 'detailed';
     /**
+     * Web Search
+     *
+     * auto: o copiloto pesquisa na web só quando o assunto é externo ao Novelo; off: nunca (`/websearch off`)
+     */
+    web_search?: 'auto' | 'off';
+    /**
      * Write Approval
      *
      * ask: as escritas de memória ficam em fila
@@ -2343,6 +2353,22 @@ export type CopilotSettingsOut = {
      */
     verbosity?: 'short' | 'balanced' | 'detailed';
     /**
+     * Web Search
+     *
+     * auto: o copiloto pesquisa na web só quando o assunto é externo ao Novelo; off: nunca (`/websearch off`)
+     */
+    web_search?: 'auto' | 'off';
+    /**
+     * Web Search Available
+     *
+     * O sistema oferece pesquisa na web a este utilizador (flag, região, papel)
+     */
+    web_search_available: boolean;
+    /**
+     * Web Search Unavailable Reason
+     */
+    web_search_unavailable_reason?: 'disabled_by_system' | 'region' | 'guest' | null;
+    /**
      * Write Approval
      *
      * ask: as escritas de memória ficam em fila
@@ -2355,17 +2381,37 @@ export type CopilotSettingsOut = {
  */
 export type CopilotSource = {
     /**
+     * Domain
+     *
+     * Só `web`: domínio da página, sem «www.»
+     */
+    domain?: string | null;
+    /**
+     * Excerpt
+     *
+     * Só `web`: excerto curto da página (dado não confiável, texto simples)
+     */
+    excerpt?: string | null;
+    /**
+     * External
+     *
+     * Verdadeiro nas fontes web: «fonte externa», não é um dado do Novelo
+     */
+    external?: boolean;
+    /**
      * Kind
      */
-    kind: 'tool' | 'scenario' | 'file' | 'entity' | 'memory' | 'page';
+    kind: 'tool' | 'scenario' | 'file' | 'entity' | 'memory' | 'page' | 'web';
     /**
      * Label
+     *
+     * Para `web`: o título da página
      */
     label: string;
     /**
      * Ref
      *
-     * Rota ou id para abrir a fonte, se existir
+     * Rota ou id para abrir a fonte; para `web`, o URL (https)
      */
     ref?: string | null;
 };
@@ -2595,12 +2641,24 @@ export type CopilotUsageEvent = {
      * Type
      */
     type?: 'usage';
+    /**
+     * Web Search Requests
+     *
+     * Pesquisas web faturadas neste pedido (já contam no custo)
+     */
+    web_search_requests?: number;
 };
 
 /**
  * CopilotVerificationEvent
  */
 export type CopilotVerificationEvent = {
+    /**
+     * External Numbers
+     *
+     * Números aceites só por existirem em excertos de fontes web (fonte externa): não são dados do Novelo
+     */
+    external_numbers?: Array<number>;
     /**
      * Type
      */
@@ -2613,6 +2671,45 @@ export type CopilotVerificationEvent = {
      * Warning
      */
     warning?: 'numbers_unverified' | null;
+};
+
+/**
+ * CopilotWebSearchEvent
+ *
+ * Pesquisa na web deste pedido. `searching` abre (a consulta já foi sanitizada), `done` fecha com o número de fontes;
+ * `unavailable`, `blocked` e `skipped` explicam porque se respondeu sem web (o texto da resposta também avisa).
+ */
+export type CopilotWebSearchEvent = {
+    /**
+     * Query
+     *
+     * Consulta enviada à web (genérica, sem dados pessoais)
+     */
+    query?: string | null;
+    /**
+     * Reason
+     */
+    reason?: 'disabled_by_user' | 'disabled_by_system' | 'guest' | 'region' | 'provider_rejected' | 'failed' | 'query_blocked' | 'limit_reached' | 'no_results' | 'budget' | null;
+    /**
+     * Requests
+     *
+     * Pesquisas faturadas pelo OpenRouter (`server_tool_use.web_search_requests`)
+     */
+    requests?: number;
+    /**
+     * Results
+     *
+     * Fontes devolvidas (state=done)
+     */
+    results?: number;
+    /**
+     * State
+     */
+    state: 'searching' | 'done' | 'unavailable' | 'blocked' | 'skipped';
+    /**
+     * Type
+     */
+    type?: 'web_search';
 };
 
 /**
@@ -4616,6 +4713,12 @@ export type MessageOut = {
      * Verified
      */
     verified: boolean | null;
+    /**
+     * Web Sources
+     *
+     * Fontes web citadas nesta resposta (kind=web), para recarregar a conversa
+     */
+    web_sources?: Array<CopilotSource>;
 };
 
 /**
@@ -9556,6 +9659,12 @@ export type UsageGroup = {
      * Task
      */
     task: string | null;
+    /**
+     * Web Search Requests
+     *
+     * Pesquisas web faturadas (já contam em cost_usd)
+     */
+    web_search_requests?: number;
 };
 
 /**
@@ -9586,6 +9695,12 @@ export type UsageTotals = {
      * Prompt Tokens
      */
     prompt_tokens: number;
+    /**
+     * Web Search Requests
+     *
+     * Pesquisas web faturadas (já contam em cost_usd)
+     */
+    web_search_requests?: number;
 };
 
 /**

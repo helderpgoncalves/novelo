@@ -162,6 +162,7 @@ async def build_runtime(db: AsyncSession, user: User | None, settings: Settings 
                 error_code=event.error_code,
                 request_id=None if request_id == "-" else request_id,
                 input_hash=event.input_hash,
+                web_search_requests=event.web_search_requests,
                 user_id=user_id,
             )
         )
@@ -367,6 +368,7 @@ def _group(rows: Any, with_task: bool, with_model: bool) -> list[UsageGroup]:
                 completion_tokens=int(r.ct or 0),
                 cost_usd=round(float(r.cost or 0), 6),
                 avg_latency_ms=round(float(r.lat or 0), 1),
+                web_search_requests=int(r.web or 0),
             )
         )
     return out
@@ -381,6 +383,7 @@ async def usage_report(db: AsyncSession, days: int) -> AiUsageOut:
         func.sum(AiUsage.completion_tokens).label("ct"),
         func.sum(AiUsage.cost_usd).label("cost"),
         func.avg(AiUsage.latency_ms).label("lat"),
+        func.sum(AiUsage.web_search_requests).label("web"),
     ]
     where = AiUsage.created_at >= since
 
@@ -415,6 +418,7 @@ async def usage_report(db: AsyncSession, days: int) -> AiUsageOut:
             completion_tokens=int(total.ct or 0),
             cost_usd=round(float(total.cost or 0), 6),
             avg_latency_ms=round(float(total.lat or 0), 1),
+            web_search_requests=int(total.web or 0),
         ),
         month=_budget_out(_budget_value(row, s), await month_spent(db)),
         by_day=[UsageDay(day=r.day.date(), calls=r.calls, cost_usd=round(float(r.cost), 6)) for r in days_rows],

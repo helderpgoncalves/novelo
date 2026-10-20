@@ -210,7 +210,7 @@ async def test_page_context_label_cannot_smuggle_instructions_across_lines(
 
 async def test_commands_depend_on_the_role(logged_in: httpx.AsyncClient, make_user: Any) -> None:
     mine = (await logged_in.get(f"{C}/commands")).json()
-    assert [c["name"] for c in mine["commands"]] == ["/compact", "/novo", "/limpar", "/exportar"]
+    assert [c["name"] for c in mine["commands"]] == ["/compact", "/novo", "/limpar", "/exportar", "/websearch"]
     assert mine["commands"][0]["kind"] == "server" and set(mine["composer_actions"]) == {
         "attach_file",
         "attach_current_screen",
@@ -218,7 +218,12 @@ async def test_commands_depend_on_the_role(logged_in: httpx.AsyncClient, make_us
     }
     admin = await make_user("admin@x.pt", "admin")
     cmds = (await admin.get(f"{C}/commands")).json()["commands"]
-    assert cmds[-1]["name"] == "/modelo" and cmds[-1]["admin_only"] is True and cmds[-1]["route"] == "/admin/ai"
+    assert (
+        [c["name"] for c in cmds][-2:] == ["/websearch", "/modelo"]
+        and cmds[-1]["name"] == "/modelo"
+        and cmds[-1]["admin_only"] is True
+        and cmds[-1]["route"] == "/admin/ai"
+    )
 
 
 async def test_parish_search_hits_the_database_only_once_per_type(

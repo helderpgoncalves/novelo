@@ -1,6 +1,7 @@
 """Verificador de números: o modelo escreve a explicação, mas só pode usar números que o otimizador produziu."""
 
 import re
+from dataclasses import dataclass
 from typing import Any
 
 _NUMBER = re.compile(r"\d+(?:[.,]\d+)?")
@@ -37,6 +38,7 @@ _NUMBER_TOKEN = re.compile(
     r"(?<![A-Za-z_\d])(?:\d{1,3}(?:,\d{3})+(?:\.\d+)?|\d{1,3}(?:\.\d{3})+(?:,\d+)?|\d+(?:[.,]\d+)?)"
 )
 _LIST_MARKER = re.compile(r"^[ \t]*\d{1,2}[.)](?=\s)", re.MULTILINE)  # "1. item" de uma lista numerada
+_URL = re.compile(r"https?://[^\s)\]>]+", re.IGNORECASE)  # os dígitos de um endereço não são afirmações
 _UUID = re.compile(r"^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$", re.IGNORECASE)
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -73,7 +75,7 @@ def unsupported_rounded(text: str, facts: Any, also_allowed: str = "") -> set[fl
     allowed = fact_numbers(facts) | numbers_in(also_allowed)
     allowed |= {abs(x) for x in allowed}  # "1,92 t a menos" vem de uma diferença de -1,92 calculada pela ferramenta
     bad: set[float] = set()
-    for match in _NUMBER_TOKEN.finditer(_LIST_MARKER.sub("", _normalise(text))):
+    for match in _NUMBER_TOKEN.finditer(_LIST_MARKER.sub("", _URL.sub(" ", _normalise(text)))):
         options = _readings(match.group(0))
         if not any(abs(f - value) <= half for f in allowed for value, half in options):
             bad.add(round(options[0][0], 4))
@@ -97,3 +99,39 @@ def _readings(token: str) -> list[tuple[float, float]]:
         integer = (float(re.sub(r"[.,]", "", token)), 1.0 + 1e-9)
         return [integer] if as_decimal[0] != as_decimal[0] else [as_decimal, integer]
     return [as_decimal]
+
+
+# --- Números de fontes web ------------------------------------------------------------------------------------
+# Um número que só existe num excerto de uma página web (e não nos dados do Novelo) pode ser citado, mas tem de vir
+# rotulado como «fonte externa» e nunca entra em contas nem KPIs. Um número inventado não está em lado nenhum.
+
+_EXTERNAL_LABEL = re.compile(
+    r"fontes? externas?|external sources?|source:\s|fonte:\s|segundo\s|de acordo com|according to|\]\(https?://|https?://",
+    re.IGNORECASE,
+)
+
+
+@dataclass(frozen=True)
+class NumberCheck:
+    unsupported: set[float]  # sem origem nos dados do Novelo nem nos excertos web
+    external: set[float]  # só existem em excertos web desta volta (aceites se o texto os rotular)
+
+
+def has_external_label(text: str) -> bool:
+    return bool(_EXTERNAL_LABEL.search(text))
+
+
+def check_numbers(text: str, facts: Any, external: list[str], also_allowed: str = "") -> NumberCheck:
+    """Separa os números sem origem dos que só vêm de excertos web.
+
+    `facts` são os dados do Novelo (ferramentas, ecrã, menções); `external` são os excertos das citações web do turno.
+    Os números externos só se aceitam se o texto os rotular («fonte externa», ligação); senão ficam não suportados.
+    """
+    internal_bad = unsupported_rounded(text, facts, also_allowed)
+    if not internal_bad or not external:
+        return NumberCheck(internal_bad, set())
+    still_bad = unsupported_rounded(text, [facts, external], also_allowed)
+    found = internal_bad - still_bad
+    if found and not has_external_label(text):
+        return NumberCheck(internal_bad, set())
+    return NumberCheck(still_bad, found)

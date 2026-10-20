@@ -1,6 +1,7 @@
 """Definições do copiloto por utilizador (valores por omissão + diferenças gravadas)."""
 
 import uuid
+from typing import Literal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +11,7 @@ from novelo.core.errors import AppError
 from novelo.features.copilot import memory_store, persona, security
 from novelo.features.copilot.models import CopilotUserSettings
 from novelo.features.copilot.schemas_memory import CopilotSettings, CopilotSettingsOut, MemoryMeter
+from novelo.features.users.models import User
 
 
 class InvalidSettingError(AppError):
@@ -32,14 +34,30 @@ def effective_retention(settings: CopilotSettings) -> int | None:
     return own or system
 
 
+def web_availability(role: str) -> tuple[bool, Literal["disabled_by_system", "region", "guest"] | None]:
+    """A pesquisa web pode ser oferecida a este papel? (a escolha `auto`/`off` do utilizador vem depois)."""
+    cfg = get_settings()
+    if not cfg.web_search_enabled:
+        return False, "disabled_by_system"
+    if not cfg.web_region_supported:
+        return False, "region"
+    if role == "guest" and not cfg.web_search_guests:
+        return False, "guest"
+    return True, None
+
+
 async def out(db: AsyncSession, user_id: uuid.UUID, settings: CopilotSettings | None = None) -> CopilotSettingsOut:
     s = settings or await load(db, user_id)
+    owner = await db.get(User, user_id)
+    available, reason = web_availability(owner.role if owner else "guest")
     meters = {k: MemoryMeter(**v) for k, v in (await memory_store.usage_meters(db, user_id)).items()}
     return CopilotSettingsOut(
         **s.model_dump(),
         memory_usage=meters,
         max_retention_days=get_settings().copilot_max_retention_days or None,
         effective_retention_days=effective_retention(s),
+        web_search_available=available,
+        web_search_unavailable_reason=reason,
         personas=persona.catalog(),
         default_persona=get_settings().copilot_default_persona,
     )

@@ -183,6 +183,10 @@ class CopilotVerificationEvent(_Event):
     type: Literal["verification"] = "verification"
     verified: bool
     warning: Literal["numbers_unverified"] | None = None
+    external_numbers: list[float] = Field(
+        default_factory=list,
+        description="Números aceites só por existirem em excertos de fontes web (fonte externa): não são dados do Novelo",
+    )
 
 
 class CopilotSuggestionsEvent(_Event):
@@ -203,6 +207,7 @@ class CopilotUsageEvent(_Event):
     completion_tokens: int
     tokens: int
     cost_usd: float | None
+    web_search_requests: int = Field(default=0, description="Pesquisas web faturadas neste pedido (já contam no custo)")
 
 
 class CopilotTitleEvent(_Event):
@@ -245,9 +250,37 @@ class CopilotClarifyEvent(_Event):
 
 
 class CopilotSource(BaseModel):
-    kind: Literal["tool", "scenario", "file", "entity", "memory", "page"]
-    label: str
-    ref: str | None = Field(default=None, description="Rota ou id para abrir a fonte, se existir")
+    kind: Literal["tool", "scenario", "file", "entity", "memory", "page", "web"]
+    label: str = Field(description="Para `web`: o título da página")
+    ref: str | None = Field(default=None, description="Rota ou id para abrir a fonte; para `web`, o URL (https)")
+    domain: str | None = Field(default=None, description="Só `web`: domínio da página, sem «www.»")
+    excerpt: str | None = Field(
+        default=None, description="Só `web`: excerto curto da página (dado não confiável, texto simples)"
+    )
+    external: bool = Field(
+        default=False, description="Verdadeiro nas fontes web: «fonte externa», não é um dado do Novelo"
+    )
+
+
+WebSearchState = Literal["searching", "done", "unavailable", "blocked", "skipped"]
+WebSearchReason = Literal[
+    "disabled_by_user", "disabled_by_system", "guest", "region", "provider_rejected", "failed", "query_blocked",
+    "limit_reached", "no_results", "budget",
+]  # fmt: skip
+
+
+class CopilotWebSearchEvent(_Event):
+    """Pesquisa na web deste pedido. `searching` abre (a consulta já foi sanitizada), `done` fecha com o número de fontes;
+    `unavailable`, `blocked` e `skipped` explicam porque se respondeu sem web (o texto da resposta também avisa)."""
+
+    type: Literal["web_search"] = "web_search"
+    state: WebSearchState
+    query: str | None = Field(default=None, description="Consulta enviada à web (genérica, sem dados pessoais)")
+    results: int = Field(default=0, description="Fontes devolvidas (state=done)")
+    requests: int = Field(
+        default=0, description="Pesquisas faturadas pelo OpenRouter (`server_tool_use.web_search_requests`)"
+    )
+    reason: WebSearchReason | None = None
 
 
 class CopilotSourcesEvent(_Event):
@@ -314,6 +347,7 @@ CopilotEvent = Annotated[
     | CopilotPlanEvent
     | CopilotClarifyEvent
     | CopilotSourcesEvent
+    | CopilotWebSearchEvent
     | CopilotArtifactEvent
     | CopilotConfirmEvent
     | CopilotActionResultEvent
@@ -352,6 +386,9 @@ class MessageOut(BaseModel):
     cards: list[ScenarioCard]
     artifacts: list["ArtifactEnvelope"]
     actions: list[ActionOut]
+    web_sources: list[CopilotSource] = Field(
+        default_factory=list, description="Fontes web citadas nesta resposta (kind=web), para recarregar a conversa"
+    )
     verified: bool | None
     status: Literal["complete", "cancelled", "error"]
     model: str | None

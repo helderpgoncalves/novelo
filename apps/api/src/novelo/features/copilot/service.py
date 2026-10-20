@@ -9,6 +9,7 @@ from novelo.adapters.openrouter import OpenRouterClient
 from novelo.ai.prompts import load
 from novelo.ai.tasks import AiTask
 from novelo.ai.verify import unsupported_rounded
+from novelo.features.copilot import web as web_service
 from novelo.features.copilot.schemas import CopilotReply, CopilotRequest
 from novelo.features.copilot.tools import CopilotTools
 from novelo.features.users.models import User
@@ -29,7 +30,9 @@ REWRITE = (
 async def chat(db: AsyncSession, llm: OpenRouterClient, user: User, req: CopilotRequest) -> CopilotReply:
     system, version = load("copilot")  # prompt de sistema estável e primeiro: favorece o prompt caching
     tools = CopilotTools(db, user)
-    context = f"[context] interface_language={req.locale}; active_scenario_id={req.scenario_id or 'none'}"
+    today, today_facts = web_service.today_line()
+    tools.facts.append(today_facts)  # «este ano» / «2026»: a data de hoje é um facto verificado
+    context = f"[context] interface_language={req.locale}; active_scenario_id={req.scenario_id or 'none'}; {today}"
     messages: list[dict[str, Any]] = [{"role": "user", "content": context}]
     messages += [{"role": t.role, "content": t.content} for t in req.messages]
     last_user = req.messages[-1].content

@@ -37,6 +37,7 @@ if TYPE_CHECKING:
     from novelo.features.copilot.tools import CopilotTools
 
 Col = tuple[str, str, str, str | None]  # key, label, type, unit
+WEEKDAY_NAMES = ("seg", "ter", "qua", "qui", "sex", "sáb", "dom")  # 1 = segunda ... 7 = domingo
 
 
 class _A(BaseModel):
@@ -225,9 +226,11 @@ async def get_circuits(box: "CopilotTools", args: CircuitsArgs) -> dict[str, Any
     data = await network.list_circuits(box.db)
     items = [c for c in data.circuits if args.typology is None or c.typology == args.typology]
     rows = [{"code": c.code, "typology": c.typology.value, "collection_type": c.collection_type.value, "status": c.status.value,
-             "localities": len(c.localities), "vehicles": len(c.vehicles), "days": len(c.weekdays)} for c in items[: args.limit]]  # fmt: skip
+             "localities": len(c.localities), "vehicles": len(c.vehicles), "days": len(c.weekdays),
+             "weekdays": ", ".join(WEEKDAY_NAMES[d - 1] for d in sorted(c.weekdays) if 1 <= d <= 7)} for c in items[: args.limit]]  # fmt: skip
     cols: list[Col] = [("code", "Circuito", "text", None), ("typology", "Tipologia", "category", None), ("collection_type", "Tipo de recolha", "category", None),
-                       ("status", "Estado", "category", None), ("localities", "Localidades", "number", None), ("vehicles", "Viaturas", "number", None), ("days", "Dias/semana", "number", None)]  # fmt: skip
+                       ("status", "Estado", "category", None), ("localities", "Localidades", "number", None), ("vehicles", "Viaturas", "number", None), ("days", "Dias/semana", "number", None),
+                       ("weekdays", "Dias em que passa", "text", None)]  # fmt: skip
     return {
         "total": data.total,
         "without_vehicle": data.without_vehicle,

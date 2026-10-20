@@ -58,7 +58,7 @@ async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: h
         kinds.index("tool_start") < kinds.index("tool_result") < kinds.index("text_delta") < kinds.index("verification")
     )
     start = events[0]
-    assert start["model"] == "fake/model" and start["prompt_version"] == "v2"
+    assert start["model"] == "fake/model" and start["prompt_version"] == "v3"
     status = [e for e in events if e["type"] == "status"]
     assert {"thinking", "tool", "writing", "verifying"} <= {e["phase"] for e in status}
     assert any(e["label_key"] == "status.reading_baseline" for e in status)
@@ -68,6 +68,7 @@ async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: h
         "type": "verification",
         "verified": True,
         "warning": None,
+        "external_numbers": [],
     }
     assert text_of(events) == "Recolheram-se 301,3 t em 2025, cerca de 23% do potencial."
     usage = next(e for e in events if e["type"] == "usage")
@@ -304,11 +305,11 @@ async def test_event_schema_documents_every_event_and_the_openapi_has_the_union(
     assert {e["type"] for e in catalog["events"]} == {
         "start", "status", "tool_start", "tool_result", "text_delta", "card", "retract", "verification",
         "suggestions", "context", "usage", "title", "error", "done", "memory", "plan", "clarify", "sources", "artifact",
-        "confirm", "action_result", "navigate",
+        "confirm", "action_result", "navigate", "web_search",
     }  # fmt: skip
     spec = logged_in._transport.app.openapi()  # type: ignore[attr-defined]
     union = spec["components"]["schemas"]["CopilotEventMessage"]
-    assert union["discriminator"]["propertyName"] == "type" and len(union["discriminator"]["mapping"]) == 22
+    assert union["discriminator"]["propertyName"] == "type" and len(union["discriminator"]["mapping"]) == 23
     ok = spec["paths"]["/api/v1/copilot/stream"]["post"]["responses"]["200"]["content"]
     assert ok["text/event-stream"]["schema"]["$ref"].endswith("/CopilotEventMessage")
     assert spec["paths"]["/api/v1/copilot/stream"]["post"]["operationId"] == "copilot_stream"
