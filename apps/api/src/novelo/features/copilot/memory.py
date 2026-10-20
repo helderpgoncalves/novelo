@@ -18,7 +18,6 @@ from novelo.features.copilot.models import CopilotMessage, CopilotThread
 
 log = logging.getLogger("novelo.copilot")
 
-COMPACT_AT = 0.65  # fração da janela útil a partir da qual se compacta
 KEEP_RECENT_MESSAGES = 8  # últimas 4 voltas (utilizador + assistente) ficam intactas
 DEFAULT_WINDOW = 128_000
 IMAGE_TOKENS = 1500
@@ -100,10 +99,6 @@ def count_tokens(system: str, memo: str, history: list[dict[str, Any]], current:
         + estimate_tokens(current)
         + images * IMAGE_TOKENS
     )
-
-
-def needs_compaction(used: int, window: int) -> bool:
-    return used >= int(window * COMPACT_AT)
 
 
 def _fallback_summary(previous: str, old: list[CopilotMessage]) -> str:

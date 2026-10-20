@@ -15,13 +15,6 @@ def yearly_demand_t(population: int, kg_per_inhab_month: float) -> float:
     return population * kg_per_inhab_month * MONTHS_PER_YEAR / 1000
 
 
-def captured_t(demand_t: float, capture_rate: float) -> float:
-    """Têxtil captado por ano com a taxa de captura do modo de recolha (0 a 1)."""
-    if not 0 <= capture_rate <= 1:
-        raise ValueError("a taxa de captura tem de estar entre 0 e 1")
-    return demand_t * capture_rate
-
-
 @dataclass(frozen=True)
 class Baseline:
     """Ponto de partida observado: o que o sistema atual já recolhe."""

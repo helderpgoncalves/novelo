@@ -145,10 +145,6 @@ def server_tools_from(s: Settings, *, search: bool, fetch: bool) -> ServerTools:
 # ruff: noqa: PLR0911
 
 
-def numbers_of(text: str) -> set[str]:
-    return {n.replace(",", ".") for n in _NUMBER.findall(text)}
-
-
 def sanitize_query(
     query: str, *, forbidden_terms: tuple[str, ...] = (), internal_numbers: frozenset[float] = frozenset()
 ) -> tuple[str | None, str | None]:
@@ -221,14 +217,6 @@ def parse_citations(annotations: Any) -> list[WebCitation]:
         if len(out) >= MAX_CITATIONS:
             break
     return out
-
-
-def merge_citations(*groups: list[WebCitation]) -> list[WebCitation]:
-    seen: dict[str, WebCitation] = {}
-    for g in groups:
-        for c in g:
-            seen.setdefault(c.url, c)
-    return list(seen.values())[: MAX_CITATIONS * 3]
 
 
 def short_excerpt(text: str) -> str:

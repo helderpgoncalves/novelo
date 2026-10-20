@@ -273,7 +273,7 @@ Inspirada no Hermes Agent, adaptada a vários utilizadores em Postgres. Camadas:
 
 ```mermaid
 flowchart TB
-    R["Regras (copilot_v2.md)<br/>iguais para todos, em cache"]
+    R["Regras (copilot_v3.md)<br/>iguais para todos, em cache"]
     P["Persona (estilo)<br/>por utilizador"]
     M["MEMORY — notas do copiloto<br/>≤ 2 200 caracteres"]
     U["USER — perfil da pessoa<br/>≤ 1 375 caracteres"]

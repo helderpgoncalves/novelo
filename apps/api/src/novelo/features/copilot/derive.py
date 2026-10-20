@@ -13,7 +13,6 @@ from pydantic import BaseModel, ConfigDict, Field
 from novelo.features.copilot.tables import Agg, Condition, _matches, fold, parse_number
 
 NUMERIC = {"number", "percent", "currency"}
-Operation = Literal["group", "top", "filter", "share"]
 
 
 class DeriveArgs(BaseModel):

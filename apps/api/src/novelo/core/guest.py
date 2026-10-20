@@ -72,10 +72,6 @@ class Slots:
         with self._lock:
             self._busy = max(self._busy - 1, 0)
 
-    @property
-    def busy(self) -> int:
-        return self._busy
-
 
 solver_slots = Slots(lambda: get_settings().solver_max_concurrency)
 pdf_slots = Slots(lambda: get_settings().pdf_max_concurrency)

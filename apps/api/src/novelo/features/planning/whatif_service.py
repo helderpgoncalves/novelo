@@ -60,7 +60,7 @@ def resolve_parishes(names: list[str], zones: dict[str, str]) -> tuple[dict[str,
     return resolved, unknown, list(dict.fromkeys(suggestions))
 
 
-def _to_out(run: WhatIfRun, zones: dict[str, str]) -> WhatIfOut:
+def _to_out(run: WhatIfRun) -> WhatIfOut:
     d = run.delta
     return WhatIfOut(
         id=run.id,
@@ -147,7 +147,7 @@ async def propose(db: AsyncSession, llm: OpenRouterClient, user: User, req: What
     )
     db.add(run)
     await db.commit()
-    return _to_out(run, zones)
+    return _to_out(run)
 
 
 def _facts(
@@ -256,8 +256,7 @@ async def apply(db: AsyncSession, llm: OpenRouterClient, user: User, run_id: uui
     run.explanation = explanation
     run.explanation_verified = verified
     await db.commit()
-    zones = {z.code: z.name for z in await planning.list_zones(db)}
-    return _to_out(run, zones)
+    return _to_out(run)
 
 
 async def list_runs(db: AsyncSession, scenario_id: uuid.UUID) -> list[WhatIfOut]:
@@ -270,5 +269,4 @@ async def list_runs(db: AsyncSession, scenario_id: uuid.UUID) -> list[WhatIfOut]
         .scalars()
         .all()
     )
-    zones = {z.code: z.name for z in await planning.list_zones(db)}
-    return [_to_out(r, zones) for r in runs]
+    return [_to_out(r) for r in runs]

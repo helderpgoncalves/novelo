@@ -349,7 +349,3 @@ async def import_containers(db: AsyncSession, data_dir: Path, source_id: uuid.UU
         )
     )
     return {"containers": len(values), "container_alerts": len(alerts)}
-
-
-async def is_seeded(db: AsyncSession) -> bool:
-    return (await db.execute(select(DataSource.id).limit(1))).first() is not None

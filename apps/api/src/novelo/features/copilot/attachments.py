@@ -196,10 +196,10 @@ def _extract_pdf(data: bytes) -> Extracted:
         return Extracted(
             "pdf", "application/pdf", "PDF without extractable text (probably scanned).", meta, {"text": ""}
         )
-    return Extracted("pdf", "application/pdf", _text_preview(stored, meta), meta, {"text": stored})
+    return Extracted("pdf", "application/pdf", _text_preview(stored), meta, {"text": stored})
 
 
-def _text_preview(text: str, meta: dict[str, Any]) -> str:
+def _text_preview(text: str) -> str:
     if len(text) <= PREVIEW_CHARS * 2:
         return text
     head, tail = text[:PREVIEW_CHARS], text[-PREVIEW_CHARS // 2 :]
@@ -221,7 +221,7 @@ def _extract_text(text: str, mime: str) -> Extracted:
             meta["items"] = len(parsed)
     stored = text[:TEXT_STORE_CHARS]
     meta["truncated"] = len(text) > len(stored)
-    return Extracted("text", mime, _text_preview(stored, meta), meta, {"text": stored})
+    return Extracted("text", mime, _text_preview(stored), meta, {"text": stored})
 
 
 # --- tabelas ---------------------------------------------------------------------------------------

@@ -71,10 +71,3 @@ class AiRuntime:
         """Paragem dura: com o orçamento do mês esgotado nenhuma chamada sai."""
         if self.budget_usd and self.spent_usd >= self.budget_usd:
             raise AiBudgetExceededError("The monthly AI budget has been reached")
-
-    @property
-    def budget_state(self) -> Literal["ok", "warning", "exceeded", "unlimited"]:
-        if not self.budget_usd:
-            return "unlimited"
-        pct = self.spent_usd / self.budget_usd * 100
-        return "exceeded" if pct >= 100 else "warning" if pct >= BUDGET_WARN_PCT else "ok"
