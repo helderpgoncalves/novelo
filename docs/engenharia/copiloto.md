@@ -132,7 +132,7 @@ Cada mensagem SSE tem `event: <type>` e `data: <JSON>`; o JSON é um `CopilotEve
 | `verification` | Depois do texto | `verified`, `warning` (`numbers_unverified`) |
 | `sources` | O que foi usado (ferramentas, cenários, ficheiros, menções, ecrã, memória) | `items[]` |
 | `suggestions` | 3 seguimentos curtos | `items[]` |
-| `title` | Primeira resposta de uma conversa | `title` |
+| `title` | Logo no início: o título é a primeira mensagem do utilizador (cortada a 60 caracteres) | `title` |
 | `usage` | No fim | `prompt_tokens`, `completion_tokens`, `tokens`, `cost_usd` |
 | `error` | Erro depois de abrir o stream | `code` (um `ErrorCode`, ex.: `ai_budget_exceeded`), `message` |
 | `done` | Último | `finish` (`stop`, `cancelled`, `error`) |

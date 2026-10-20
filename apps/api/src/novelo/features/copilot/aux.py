@@ -38,6 +38,14 @@ FALLBACK_SUGGESTIONS = {
 }
 
 
+def first_message_title(user_text: str) -> str:
+    """O título da conversa é a primeira mensagem do utilizador (sem chamar o modelo), cortada em fronteira de palavra."""
+    text = re.sub(r"\s+", " ", user_text).strip()
+    if len(text) <= 60:
+        return text or "Conversa"
+    return text[:60].rsplit(" ", 1)[0].rstrip(".,;:!?") + "…"
+
+
 def fallback_title(user_text: str) -> str:
     words = re.sub(r"\s+", " ", user_text).strip().split(" ")
     return (" ".join(words[:7]).rstrip(".,;:!?") or "Conversa")[:80]
