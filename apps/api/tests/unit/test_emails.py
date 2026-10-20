@@ -55,6 +55,14 @@ NAMES = [
     "approval-granted",
     "approval-rejected",
     "approval-requested",
+    "registration-received",
+    "account-inactive",
+    "account-rejected",
+    "account-not-found",
+    "account-not-found-closed",
+    "pending-reminder",
+    "email-alert",
+    "test-email",
 ]
 
 

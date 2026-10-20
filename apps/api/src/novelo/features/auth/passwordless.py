@@ -6,7 +6,6 @@ Não revela se um email tem conta: quem chama responde sempre da mesma forma.
 
 import hmac
 import logging
-import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Literal
@@ -16,29 +15,22 @@ from sqlalchemy import func, select, update
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.adapters.email import EmailSender
 from novelo.core.config import get_settings
 from novelo.core.errors import FeatureDisabledError, InvalidEventCodeError, InvalidTokenError, RateLimitError
+from novelo.core.request_meta import RequestMeta
 from novelo.core.security import hash_token, new_opaque_token
 from novelo.features.auth import emails, service
 from novelo.features.auth.models import LoginToken
 from novelo.features.auth.schemas import GuestOut, GuestPage
 from novelo.features.copilot.models import CopilotAction, CopilotMessage, CopilotThread
+from novelo.features.email_log import service as email_log
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
 log = logging.getLogger(__name__)
 
 Purpose = Literal["magic_link", "quick_join"]
-
-
-@dataclass(frozen=True)
-class Outgoing:
-    """Email já composto, para enviar depois de responder (o tempo de resposta não revela se a conta existe)."""
-
-    to: str
-    subject: str
-    html: str
-    text: str
 
 
 def safe_next(value: str | None) -> str:
@@ -50,7 +42,7 @@ def safe_next(value: str | None) -> str:
     return value
 
 
-def _device(user_agent: str | None) -> str | None:
+def device_of(user_agent: str | None) -> str | None:
     if not user_agent:
         return None
     ua = user_agent.lower()
@@ -82,7 +74,7 @@ def _device(user_agent: str | None) -> str | None:
     return browser or system
 
 
-async def _create_token(
+async def create_token(
     db: AsyncSession, user: User, purpose: Purpose, next_path: str, ip: str | None, user_agent: str | None
 ) -> str:
     token = new_opaque_token()
@@ -99,38 +91,6 @@ async def _create_token(
     )
     await db.commit()
     return token
-
-
-async def _decoy_token(db: AsyncSession) -> None:
-    """Conta inexistente: faz o mesmo trabalho (token, hash, escrita e commit) para o tempo não revelar nada."""
-    hash_token(new_opaque_token())
-    await db.execute(update(LoginToken).where(LoginToken.id == uuid.uuid4()).values(used_at=None))
-    await db.commit()
-
-
-def _magic_email(user: User, token: str, ip: str | None, user_agent: str | None) -> Outgoing:
-    s = get_settings()
-    url = f"{s.app_url.rstrip('/')}/magic-link?token={token}"
-    subject, html, text = emails.magic_link(user.locale, url, s.magic_link_minutes, ip=ip, device=_device(user_agent))
-    return Outgoing(user.email, subject, html, text)
-
-
-async def request_magic_link(
-    db: AsyncSession,
-    email: str,
-    next_path: str | None,
-    *,
-    ip: str | None,
-    user_agent: str | None,
-    purpose: Purpose = "magic_link",
-) -> Outgoing | None:
-    """Cria o token e compõe o email. Devolve `None` (sem erro) se não há conta ativa: o chamador responde igual."""
-    user = await users.get_by_email(db, email)
-    if user is None or not user.is_active:
-        await _decoy_token(db)
-        return None
-    token = await _create_token(db, user, purpose, safe_next(next_path), ip, user_agent)
-    return _magic_email(user, token, ip, user_agent)
 
 
 async def verify_magic_link(db: AsyncSession, token: str) -> tuple[User, str, str, str]:
@@ -180,7 +140,6 @@ class QuickJoinOutcome:
     user: User | None  # só se a sessão foi iniciada
     access: str | None
     refresh: str | None
-    emails: list[Outgoing]
 
 
 async def _enforce_signup_cap(db: AsyncSession) -> None:
@@ -198,7 +157,15 @@ async def _enforce_signup_cap(db: AsyncSession) -> None:
 
 
 async def quick_join(
-    db: AsyncSession, *, name: str, email: str, locale: str, ip: str | None, user_agent: str | None
+    db: AsyncSession,
+    sender: EmailSender,
+    *,
+    name: str,
+    email: str,
+    locale: str,
+    ip: str | None,
+    user_agent: str | None,
+    meta: RequestMeta | None = None,
 ) -> QuickJoinOutcome:
     """Email novo: cria um convidado e inicia sessão. Email com conta: NUNCA inicia sessão (anti-tomada de conta),
     só envia um link de entrada para a caixa de correio do dono. O código do evento já foi validado."""
@@ -224,9 +191,16 @@ async def quick_join(
         else:
             access, refresh = await service.issue_session(db, user, remember=True)
             subject, html, text = emails.guest_welcome(locale, name, f"{s.app_url.rstrip('/')}/login")
-            return QuickJoinOutcome(user, access, refresh, [Outgoing(user.email, subject, html, text)])
-    mail = await request_magic_link(db, email, "/", ip=ip, user_agent=user_agent, purpose="quick_join")
-    return QuickJoinOutcome(None, None, None, [mail] if mail else [])
+            # O convidado já tem sessão: se o email falhar fica registado, mas não o impede de entrar.
+            await email_log.deliver(db, sender, "guest_welcome", user.email, subject, html, text, user.id)
+            return QuickJoinOutcome(user, access, refresh)
+    from novelo.features.auth import entry  # noqa: PLC0415  (entry importa este módulo)
+
+    await entry.request_entry(
+        db, sender, email, flow="magic_link", locale=locale, next_path="/", ip=ip, user_agent=user_agent,
+        meta=meta, purpose="quick_join",
+    )  # fmt: skip
+    return QuickJoinOutcome(None, None, None)
 
 
 async def list_guests(db: AsyncSession, offset: int, limit: int, q: str | None) -> GuestPage:

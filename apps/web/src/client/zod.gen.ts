@@ -202,11 +202,59 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * ApprovalEmailOut
+ *
+ * O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).
+ */
+export const zApprovalEmailOut = z.object({
+    at: z.iso.datetime().nullable(),
+    error_code: z.string().nullable(),
+    status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped',
+        'none'
+    ]),
+    template: z.enum([
+        'magic_link',
+        'invitation',
+        'registration_received',
+        'approval_requested',
+        'approval_granted',
+        'approval_rejected',
+        'verify_email',
+        'guest_welcome',
+        'password_reset',
+        'account_unavailable',
+        'account_not_found',
+        'pending_reminder',
+        'email_alert',
+        'test_email'
+    ]).nullable()
+});
+
+/**
  * ApprovalStatusOut
  *
  * Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).
  */
 export const zApprovalStatusOut = z.object({
+    confirmation_email: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped',
+        'none'
+    ]).optional().default('none'),
     decided_at: z.iso.datetime().nullable(),
     email_verified: z.boolean(),
     rejected_reason: z.string().nullable(),
@@ -691,6 +739,8 @@ export const zCopilotErrorEvent = z.object({
         'admin_confirmation_required',
         'rate_limited',
         'feature_disabled',
+        'email_unavailable',
+        'email_suppressed',
         'upstream_error',
         'ai_budget_exceeded',
         'captcha_required',
@@ -1048,6 +1098,26 @@ export const zDeleteUserRequest = z.object({
 });
 
 /**
+ * DnsCheck
+ */
+export const zDnsCheck = z.object({
+    detail: z.string(),
+    hint: z.string(),
+    key: z.enum([
+        'dkim',
+        'spf',
+        'return_path',
+        'dmarc'
+    ]),
+    status: z.enum([
+        'ok',
+        'warn',
+        'fail',
+        'unknown'
+    ])
+});
+
+/**
  * EffectiveTask
  */
 export const zEffectiveTask = z.object({
@@ -1086,6 +1156,116 @@ export const zEffectiveTask = z.object({
 });
 
 /**
+ * EmailDeliveryOut
+ *
+ * Um envio. Só metadados: o assunto, o corpo e os links nunca são guardados.
+ */
+export const zEmailDeliveryOut = z.object({
+    attempts: z.int(),
+    created_at: z.iso.datetime(),
+    delivered_at: z.iso.datetime().nullable(),
+    error_code: z.string().nullable(),
+    id: z.uuid(),
+    invitation_id: z.uuid().nullable(),
+    provider_message_id: z.string().nullable(),
+    sent_at: z.iso.datetime().nullable(),
+    status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped'
+    ]),
+    template: z.enum([
+        'magic_link',
+        'invitation',
+        'registration_received',
+        'approval_requested',
+        'approval_granted',
+        'approval_rejected',
+        'verify_email',
+        'guest_welcome',
+        'password_reset',
+        'account_unavailable',
+        'account_not_found',
+        'pending_reminder',
+        'email_alert',
+        'test_email'
+    ]),
+    to_email: z.string(),
+    updated_at: z.iso.datetime(),
+    user_id: z.uuid().nullable()
+});
+
+/**
+ * EmailDeliveryPage
+ */
+export const zEmailDeliveryPage = z.object({
+    items: z.array(zEmailDeliveryOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
+ * EmailDnsHealth
+ */
+export const zEmailDnsHealth = z.object({
+    checked_at: z.iso.datetime(),
+    checks: z.array(zDnsCheck),
+    domain: z.string(),
+    overall: z.enum([
+        'ok',
+        'warn',
+        'fail',
+        'unknown'
+    ])
+});
+
+/**
+ * EmailRefreshOut
+ */
+export const zEmailRefreshOut = z.object({
+    checked: z.int(),
+    delivery_tracking: z.enum([
+        'api+webhook',
+        'webhook',
+        'api',
+        'provider_accepted_only'
+    ]),
+    updated: z.int()
+});
+
+/**
+ * EmailWarning
+ *
+ * O email da ação não saiu: a ação foi feita, mas a pessoa pode não ter sido avisada.
+ */
+export const zEmailWarning = z.object({
+    code: z.enum(['email_failed', 'email_skipped']),
+    error_code: z.string().nullable(),
+    template: z.enum([
+        'magic_link',
+        'invitation',
+        'registration_received',
+        'approval_requested',
+        'approval_granted',
+        'approval_rejected',
+        'verify_email',
+        'guest_welcome',
+        'password_reset',
+        'account_unavailable',
+        'account_not_found',
+        'pending_reminder',
+        'email_alert',
+        'test_email'
+    ])
+});
+
+/**
  * ErrorBody
  *
  * Corpo de qualquer erro da API (exceto validação, que tem `fields`).
@@ -1119,6 +1299,8 @@ export const zErrorBody = z.object({
         'admin_confirmation_required',
         'rate_limited',
         'feature_disabled',
+        'email_unavailable',
+        'email_suppressed',
         'upstream_error',
         'ai_budget_exceeded',
         'captcha_required',
@@ -1142,6 +1324,14 @@ export const zExportFormat = z.enum([
  * ExportScope
  */
 export const zExportScope = z.enum(['sites', 'containers']);
+
+/**
+ * FailureCount
+ */
+export const zFailureCount = z.object({
+    count: z.int(),
+    error_code: z.string()
+});
 
 /**
  * FeedbackIn
@@ -1484,12 +1674,25 @@ export const zInvitationCreate = z.object({
 export const zInvitationOut = z.object({
     accepted_at: z.iso.datetime().nullable(),
     created_at: z.iso.datetime(),
+    delivery_error: z.string().nullable(),
+    delivery_status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped',
+        'none'
+    ]),
     email: z.string(),
     email_delivered: z.boolean(),
     expires_at: z.iso.datetime(),
     id: z.uuid(),
     invited_by_id: z.uuid().nullable(),
     invited_by_name: z.string().nullable(),
+    last_email_at: z.iso.datetime().nullable(),
     last_sent_at: z.iso.datetime().nullable(),
     locale: z.enum(['pt-PT', 'en']),
     message: z.string().nullable(),
@@ -1507,6 +1710,17 @@ export const zInvitationOut = z.object({
         'expired',
         'revoked'
     ])
+});
+
+/**
+ * InvitationLinkOut
+ *
+ * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
+ */
+export const zInvitationLinkOut = z.object({
+    expires_at: z.iso.datetime(),
+    invitation: zInvitationOut,
+    url: z.string()
 });
 
 /**
@@ -2297,6 +2511,7 @@ export const zMeOut = z.object({
     ]),
     avatar_url: z.string().nullable(),
     email: z.string(),
+    email_alerts: z.int().nullish(),
     email_verified: z.boolean(),
     google_linked: z.boolean(),
     has_password: z.boolean(),
@@ -3028,6 +3243,11 @@ export const zRangeChart = z.object({
  */
 export const zReadiness = z.object({
     database: z.boolean(),
+    email: z.enum([
+        'ok',
+        'not_configured',
+        'failing'
+    ]),
     llm_enabled: z.boolean(),
     status: z.enum(['ok', 'degraded'])
 });
@@ -3641,6 +3861,83 @@ export const zSlotCount = z.object({
     crew: z.int(),
     day_group: zDayGroup,
     shift: zShift
+});
+
+/**
+ * StatusCounts
+ */
+export const zStatusCounts = z.object({
+    bounced: z.int().optional().default(0),
+    complained: z.int().optional().default(0),
+    delayed: z.int().optional().default(0),
+    delivered: z.int().optional().default(0),
+    failed: z.int().optional().default(0),
+    queued: z.int().optional().default(0),
+    sent: z.int().optional().default(0),
+    skipped: z.int().optional().default(0),
+    total: z.int().optional().default(0)
+});
+
+/**
+ * EmailSummary
+ */
+export const zEmailSummary = z.object({
+    alerts: z.array(z.enum([
+        'provider_not_configured',
+        'provider_auth_invalid',
+        'domain_not_verified',
+        'failures_last_hour',
+        'high_failure_rate',
+        'webhook_silent',
+        'no_admin_recipients'
+    ])),
+    avg_delivery_delay_s: z.number().nullable(),
+    delivery_tracking: z.enum([
+        'api+webhook',
+        'webhook',
+        'api',
+        'provider_accepted_only'
+    ]),
+    failures_by_error_code: z.array(zFailureCount),
+    failures_last_hour: z.int(),
+    last_24h: zStatusCounts,
+    last_7d: zStatusCounts,
+    last_failure_at: z.iso.datetime().nullable(),
+    provider_configured: z.boolean(),
+    read_key_configured: z.boolean(),
+    success_rate_24h_pct: z.number().nullable(),
+    unconfirmed: z.int(),
+    webhook_configured: z.boolean()
+});
+
+/**
+ * SuppressionCreate
+ */
+export const zSuppressionCreate = z.object({
+    email: z.string().min(3).max(255)
+});
+
+/**
+ * SuppressionOut
+ */
+export const zSuppressionOut = z.object({
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    reason: z.enum([
+        'bounced',
+        'complained',
+        'manual'
+    ]),
+    source_delivery_id: z.uuid().nullable(),
+    to_email: z.string()
+});
+
+/**
+ * SuppressionPage
+ */
+export const zSuppressionPage = z.object({
+    items: z.array(zSuppressionOut),
+    total: z.int()
 });
 
 /**
@@ -4336,6 +4633,7 @@ export const zAiUsageOut = z.object({
  * Visão de administração: inclui estado da conta e último acesso.
  */
 export const zUserAdminOut = z.object({
+    approval_email: zApprovalEmailOut.nullish(),
     approval_status: z.enum([
         'pending',
         'approved',
@@ -4345,6 +4643,7 @@ export const zUserAdminOut = z.object({
     created_at: z.iso.datetime(),
     email: z.string(),
     email_verified: z.boolean(),
+    email_warning: zEmailWarning.nullish(),
     google_linked: z.boolean(),
     id: z.uuid(),
     is_active: z.boolean(),
@@ -4760,6 +5059,13 @@ export const zDataExport = z.object({
 });
 
 /**
+ * WebhookAck
+ */
+export const zWebhookAck = z.object({
+    status: z.enum(['updated', 'ignored'])
+});
+
+/**
  * WeighingMethod
  */
 export const zWeighingMethod = z.enum(['weighed', 'percentage']);
@@ -5116,6 +5422,11 @@ export const zRegisterHeaders = z.object({
  * Successful Response
  */
 export const zRegisterResponse = zUserOut;
+
+/**
+ * Successful Response
+ */
+export const zResendRegistrationEmailResponse = z.void();
 
 /**
  * Successful Response
@@ -6128,6 +6439,97 @@ export const zListAuditQuery = z.object({
  */
 export const zListAuditResponse = zAuditPage;
 
+export const zListEmailsQuery = z.object({
+    offset: z.int().gte(0).optional().default(0),
+    limit: z.int().gte(1).lte(200).optional().default(50),
+    status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped'
+    ]).nullish(),
+    template: z.enum([
+        'magic_link',
+        'invitation',
+        'registration_received',
+        'approval_requested',
+        'approval_granted',
+        'approval_rejected',
+        'verify_email',
+        'guest_welcome',
+        'password_reset',
+        'account_unavailable',
+        'account_not_found',
+        'pending_reminder',
+        'email_alert',
+        'test_email'
+    ]).nullish(),
+    q: z.string().max(100).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListEmailsResponse = zEmailDeliveryPage;
+
+/**
+ * Successful Response
+ */
+export const zGetEmailDnsHealthResponse = zEmailDnsHealth;
+
+/**
+ * Successful Response
+ */
+export const zRefreshEmailStatusResponse = zEmailRefreshOut;
+
+/**
+ * Successful Response
+ */
+export const zGetEmailSummaryResponse = zEmailSummary;
+
+export const zListEmailSuppressionsQuery = z.object({
+    q: z.string().max(100).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListEmailSuppressionsResponse = zSuppressionPage;
+
+export const zCreateEmailSuppressionBody = zSuppressionCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateEmailSuppressionResponse = zSuppressionOut;
+
+export const zDeleteEmailSuppressionPath = z.object({
+    suppression_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteEmailSuppressionResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zSendTestEmailResponse = zEmailDeliveryOut;
+
+export const zGetEmailPath = z.object({
+    delivery_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetEmailResponse = zEmailDeliveryOut;
+
 export const zListInvitationsQuery = z.object({
     offset: z.int().gte(0).optional().default(0),
     limit: z.int().gte(1).lte(200).optional().default(50),
@@ -6151,6 +6553,15 @@ export const zCreateInvitationBody = zInvitationCreate;
  * Successful Response
  */
 export const zCreateInvitationResponse = zInvitationOut;
+
+export const zCreateInvitationLinkPath = z.object({
+    invitation_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zCreateInvitationLinkResponse = zInvitationLinkOut;
 
 export const zResendInvitationPath = z.object({
     invitation_id: z.uuid()
@@ -6229,6 +6640,20 @@ export const zRejectUserPath = z.object({
  * Successful Response
  */
 export const zRejectUserResponse = zUserAdminOut;
+
+export const zResendUserEmailPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zResendUserEmailResponse = zUserAdminOut;
+
+/**
+ * Successful Response
+ */
+export const zReceiveResendWebhookResponse = zWebhookAck;
 
 export const zListWhatIfsQuery = z.object({
     scenario_id: z.uuid()

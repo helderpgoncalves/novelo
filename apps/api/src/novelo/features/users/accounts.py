@@ -24,6 +24,7 @@ from novelo.core.errors import (
 from novelo.core.request_meta import RequestMeta
 from novelo.features.audit import service as audit
 from novelo.features.auth import service as auth_service
+from novelo.features.email_log.models import EmailDelivery
 from novelo.features.users import impersonation
 from novelo.features.users.models import ImpersonationSession, Invitation, User
 from novelo.features.users.schemas import UserAdminUpdate
@@ -125,6 +126,7 @@ async def delete_user(db: AsyncSession, admin: User, user_id: uuid.UUID, confirm
     # A pessoa deixa de ser identificável na auditoria e nos convites; depois o DELETE faz o resto em cascata.
     await audit.scrub_user(db, target_id, email)
     await db.execute(delete(Invitation).where(Invitation.email == email))
+    await db.execute(delete(EmailDelivery).where(EmailDelivery.to_email == email))  # só metadados, mas é o email
     await db.execute(
         delete(ImpersonationSession).where(
             (ImpersonationSession.target_id == target_id) | (ImpersonationSession.admin_id == target_id)

@@ -40,6 +40,8 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   captcha_required: () => m.error_captcha_required(),
   captcha_failed: () => m.error_captcha_failed(),
   captcha_unavailable: () => m.error_captcha_unavailable(),
+  email_unavailable: () => m.error_email_unavailable(),
+  email_suppressed: () => m.error_email_suppressed(),
   internal_error: () => m.error_internal_error(),
 };
 

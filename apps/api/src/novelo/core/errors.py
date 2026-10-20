@@ -41,6 +41,8 @@ ErrorCode = Literal[
     "admin_confirmation_required",
     "rate_limited",
     "feature_disabled",
+    "email_unavailable",
+    "email_suppressed",
     "upstream_error",
     "ai_budget_exceeded",
     "captcha_required",
@@ -218,7 +220,21 @@ class RateLimitError(AppError):
 
 class FeatureDisabledError(AppError):
     status_code = 503
-    code = "feature_disabled"
+    code: ClassVar[ErrorCode] = "feature_disabled"
+
+
+class EmailUnavailableError(FeatureDisabledError):
+    """O fornecedor de email falhou ou não está configurado: o pedido não pode ser cumprido (nada foi enviado)."""
+
+    status_code = 503
+    code = "email_unavailable"
+
+
+class EmailSuppressedError(AppError):
+    """O destinatário não recebe emails: o endereço foi devolvido, marcado como spam ou bloqueado por um admin."""
+
+    status_code = 409
+    code = "email_suppressed"
 
 
 class AiBudgetExceededError(AppError):

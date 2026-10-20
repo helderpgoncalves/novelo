@@ -62,9 +62,10 @@ async def test_password_reset_flow(client: httpx.AsyncClient, outbox: OutboxSend
     await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
     outbox.sent.clear()
 
-    # Conta inexistente: mesma resposta, nenhum email.
+    # Conta inexistente: mesma resposta; sai o email neutro, sem link de recuperação.
     assert (await client.post(f"{AUTH}/forgot-password", json={"email": "nao@existe.pt"})).status_code == 204
-    assert outbox.sent == []
+    assert len(outbox.sent) == 1 and "reset-password" not in outbox.sent[0]["text"]
+    outbox.sent.clear()
 
     assert (await client.post(f"{AUTH}/forgot-password", json={"email": "a@b.pt"})).status_code == 204
     assert len(outbox.sent) == 1
@@ -143,8 +144,9 @@ async def test_remember_me_controls_cookie_lifetime(client: httpx.AsyncClient) -
 async def test_email_verification_flow(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
     await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD})
     assert (await client.get(f"{AUTH}/me")).json()["email_verified"] is False
-    assert len(outbox.sent) == 1 and "verify-email?token=" in outbox.sent[0]["text"]
-    token = re.search(r"token=([\w-]+)", outbox.sent[0]["text"]).group(1)  # type: ignore[union-attr]
+    verify = [m for m in outbox.sent if "verify-email?token=" in m["text"]]
+    assert len(outbox.sent) == 2 and len(verify) == 1  # «recebemos o teu pedido» + confirmação do email
+    token = re.search(r"token=([\w-]+)", verify[0]["text"]).group(1)  # type: ignore[union-attr]
 
     assert (await client.post(f"{AUTH}/verify-email", json={"token": token})).status_code == 204
     assert (await client.get(f"{AUTH}/me")).json()["email_verified"] is True
@@ -186,7 +188,7 @@ async def test_emails_follow_the_account_language(
     client: httpx.AsyncClient, outbox: OutboxSender, session: AsyncSession
 ) -> None:
     await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD, "locale": "en"})
-    assert outbox.sent[0]["subject"] == "Confirm your email · Novelo"
+    assert [m["subject"] for m in outbox.sent] == ["We received your request · Novelo", "Confirm your email · Novelo"]
     assert (await client.get(f"{AUTH}/me")).json()["locale"] == "en"
     await session.execute(update(User).where(User.email == "a@b.pt").values(approval_status="approved"))
     await session.commit()  # o registo público fica pendente: aprovar para poder editar o perfil

@@ -1,10 +1,13 @@
 from datetime import datetime
-from typing import cast
+from typing import Literal, cast
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.security import hash_password_async
+from novelo.features.email_log import service as email_log
+from novelo.features.email_log.models import DeliveryStatus, EmailDelivery, EmailTemplate
+from novelo.features.email_log.schemas import ApprovalEmailOut, EmailWarning
 from novelo.features.users.models import ApprovalStatus, User
 from novelo.features.users.schemas import UserAdminOut, UserOut
 
@@ -68,7 +71,9 @@ async def create_user(
     return user
 
 
-def to_admin_out(user: User) -> UserAdminOut:
+def to_admin_out(
+    user: User, approval_email: ApprovalEmailOut | None = None, email_warning: EmailWarning | None = None
+) -> UserAdminOut:
     return UserAdminOut(
         id=user.id,
         email=user.email,
@@ -83,7 +88,41 @@ def to_admin_out(user: User) -> UserAdminOut:
         approval_status=cast(ApprovalStatus, user.approval_status),
         approved_at=user.approved_at,
         rejected_reason=user.rejected_reason,
+        approval_email=approval_email,
+        email_warning=email_warning,
     )
+
+
+DECISION_TEMPLATES = ("approval_granted", "approval_rejected")
+
+
+def approval_email_of(user: User, row: EmailDelivery | None) -> ApprovalEmailOut:
+    """O email que interessa ao estado da conta: pedido recebido (pendente) ou decisão (aprovada/recusada)."""
+    wanted = ("registration_received",) if user.approval_status == "pending" else DECISION_TEMPLATES
+    if row is None or row.template not in wanted:
+        return ApprovalEmailOut(status="none", template=None, at=None, error_code=None)
+    return ApprovalEmailOut(
+        status=cast(DeliveryStatus, row.status),
+        template=cast(EmailTemplate, row.template),
+        at=row.created_at,
+        error_code=row.error_code,
+    )
+
+
+def warning_of(row: EmailDelivery | None) -> EmailWarning | None:
+    found = email_log.warning_of(row)
+    if row is None or found is None:
+        return None
+    return EmailWarning(
+        code=cast(Literal["email_failed", "email_skipped"], found[0]),
+        template=cast(EmailTemplate, row.template),
+        error_code=found[1],
+    )
+
+
+async def admin_outs(db: AsyncSession, users: list[User]) -> list[UserAdminOut]:
+    latest = await email_log.latest_for_user(db, [u.id for u in users], ("registration_received", *DECISION_TEMPLATES))
+    return [to_admin_out(u, approval_email_of(u, latest.get(u.id))) for u in users]
 
 
 async def list_users(db: AsyncSession, approval_status: str | None = None) -> list[User]:

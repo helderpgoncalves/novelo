@@ -2915,8 +2915,8 @@
   "landing_feat_triage_text": "A photo of the label gives the item's composition and state. The operator confirms.",
   "landing_feat_lots_title": "Batches with QR and passport",
   "landing_feat_lots_text": "Every batch has a public page with origin, composition, weight and history.",
-  "landing_feat_exchange_title": "Fibre exchange and brands",
-  "landing_feat_exchange_text": "Batches grouped by fibre for recyclers, and brand evidence for the EPR discussion.",
+  "landing_feat_exchange_title": "Fibre exchange",
+  "landing_feat_exchange_text": "Batches grouped by fibre for recyclers: composition and weight at a glance, reserved in one click.",
   "landing_feat_report_title": "EPR report in PDF",
   "landing_feat_report_text": "One click generates the dossier with costs by territory, collected material, method and sources.",
   "landing_copilot_eyebrow": "Copilot",
@@ -3612,5 +3612,10 @@
   "landing_photo_paco": "Ducal Palace",
   "landing_photo_fabrica": "Former textile factory",
   "landing_photo_couros": "Couros",
-  "landing_photo_plataforma": "Plataforma das Artes"
+  "landing_photo_plataforma": "Plataforma das Artes",
+  "landing_feat_brands_title": "Brand evidence",
+  "landing_feat_brands_text": "Kilos by brand and by composition over time: the factual basis for the EPR discussion.",
+  "landing_rigor_yes_title": "What we guarantee",
+  "error_email_unavailable": "We couldn't send the email right now. Try again in a moment, sign in with Google or your password, or contact support.",
+  "error_email_suppressed": "This address can't receive messages (it bounced or was marked as spam). Please contact an administrator."
 }

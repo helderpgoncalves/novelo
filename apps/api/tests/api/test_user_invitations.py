@@ -248,7 +248,9 @@ async def test_email_failure_keeps_the_invitation_for_resending(
     client: httpx.AsyncClient, make_user: Maker, outbox: OutboxSender
 ) -> None:
     class Failing:
-        async def send(self, *, to: str, subject: str, html: str, text: str) -> None:
+        async def send(
+            self, *, to: str, subject: str, html: str, text: str, idempotency_key: str | None = None
+        ) -> None:
             raise UpstreamError("down")
 
     admin = await make_user("boss@x.pt", "admin")

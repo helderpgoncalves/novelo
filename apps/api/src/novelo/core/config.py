@@ -148,6 +148,18 @@ class Settings(BaseSettings):
     email_transport: str = Field("auto", alias="EMAIL_TRANSPORT")
     email_from: str = Field("Novelo <novelo@heldergoncalves.io>", alias="EMAIL_FROM")
     email_support: str = Field("novelo@heldergoncalves.io", alias="EMAIL_SUPPORT")  # ajuda no rodapé dos emails
+    # Reply-To dos emails (vazio = EMAIL_SUPPORT): quem responde chega a uma pessoa.
+    email_reply_to: str = Field("", alias="EMAIL_REPLY_TO")
+    # Segredo do webhook do Resend (formato `whsec_...`, painel do Resend > Webhooks). Sem ele o endpoint responde 503.
+    resend_webhook_secret: str = Field("", alias="RESEND_WEBHOOK_SECRET")
+    # Chave do Resend com acesso total, SÓ para consultar o estado dos envios (a de envio não consegue). Opcional.
+    resend_read_api_key: str = Field("", alias="RESEND_READ_API_KEY")
+    email_send_timeout_s: float = Field(
+        4.0, gt=0, le=4.0, alias="EMAIL_SEND_TIMEOUT_S"
+    )  # envio em linha: no máximo 4 s
+    email_retry_backoff_s: float = Field(0.4, ge=0, le=5, alias="EMAIL_RETRY_BACKOFF_S")
+    # Teto GLOBAL de emails «não encontrámos uma conta» por hora (impede usar o login para spam a terceiros).
+    email_not_found_per_hour: int = Field(30, ge=0, alias="EMAIL_NOT_FOUND_PER_HOUR")
 
     # Cloudflare Turnstile (anti-bots nas rotas públicas de escrita). Ver docs/engenharia/ambiente.md.
     turnstile_site_key: str = Field("", alias="TURNSTILE_SITE_KEY")
@@ -216,6 +228,19 @@ class Settings(BaseSettings):
         if self.email_transport == "resend":
             return bool(self.resend_api_key)
         return bool(self.resend_api_key) or self.environment == "development"
+
+    @property
+    def email_provider_configured(self) -> bool:
+        """Há um fornecedor real (Resend com chave) para enviar emails?"""
+        return self.email_transport != "log" and bool(self.resend_api_key)
+
+    @property
+    def email_reply_to_effective(self) -> str:
+        return self.email_reply_to or self.email_support
+
+    @property
+    def webhook_configured(self) -> bool:
+        return bool(self.resend_webhook_secret)
 
     @property
     def secure_cookies(self) -> bool:

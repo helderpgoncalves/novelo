@@ -13,9 +13,9 @@ from novelo.adapters.email import EmailSender
 from novelo.core.config import get_settings
 from novelo.core.errors import (
     AccountInactiveError,
-    AppError,
     CurrentPasswordIncorrectError,
     EmailTakenError,
+    EmailUnavailableError,
     InvalidCredentialsError,
     InvalidTokenError,
     RegistrationClosedError,
@@ -35,6 +35,8 @@ from novelo.core.security import (
 from novelo.features.auth import emails
 from novelo.features.auth.models import EmailVerificationToken, PasswordResetToken, RefreshToken
 from novelo.features.auth.schemas import password_problem
+from novelo.features.email_log import service as email_log
+from novelo.features.email_log.models import EmailDelivery
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
@@ -101,15 +103,34 @@ async def register(
         raise RegistrationClosedError("Registration is closed")
     if await users.get_by_email(db, email):
         raise EmailTakenError("An account with this email already exists")
+    if not settings.magic_link_enabled:
+        # Sem como avisar a pessoa (nem os administradores) o registo ficaria à espera para sempre: recusa já.
+        raise EmailUnavailableError("Email delivery is not configured")
     user = await users.create_user(
         db, email=email, password=password, name=name, locale=locale, approval_status="pending"
     )
     access, refresh = await issue_session(db, user, remember)
+    await announce_registration(db, sender, user)
+    await send_verification(db, sender, user)
+    return user, access, refresh
+
+
+async def announce_registration(db: AsyncSession, sender: EmailSender, user: User, *, strict: bool = False) -> None:
+    """Conta nova por aprovar: a pessoa recebe «recebemos o teu pedido» e os administradores o aviso."""
     from novelo.features.users import approvals  # noqa: PLC0415
 
-    await send_verification(db, sender, user)
+    await send_registration_received(db, sender, user, strict=strict)
     await approvals.notify_admins(db, sender, user)
-    return user, access, refresh
+
+
+async def send_registration_received(
+    db: AsyncSession, sender: EmailSender, user: User, *, strict: bool = False
+) -> EmailDelivery:
+    url = f"{get_settings().app_url.rstrip('/')}/pending-approval"
+    subject, html, text = emails.registration_received(user.locale, user.name, url)
+    return await email_log.deliver(
+        db, sender, "registration_received", user.email, subject, html, text, user.id, strict=strict
+    )
 
 
 async def rotate_refresh(db: AsyncSession, token: str) -> tuple[str, str]:
@@ -155,26 +176,6 @@ async def logout(db: AsyncSession, refresh_token: str | None) -> None:
         update(RefreshToken).where(RefreshToken.token_hash == hash_token(refresh_token)).values(revoked=True)
     )
     await db.commit()
-
-
-async def request_password_reset(db: AsyncSession, sender: EmailSender, email: str, locale: str = "pt-PT") -> None:
-    """Responde sempre da mesma forma, exista ou não a conta (sem enumeração de emails)."""
-    settings = get_settings()
-    user = await users.get_by_email(db, email)
-    if user is None or not user.is_active:
-        return
-    token = new_opaque_token()
-    db.add(
-        PasswordResetToken(
-            user_id=user.id,
-            token_hash=hash_token(token),
-            expires_at=datetime.now(UTC) + timedelta(minutes=settings.password_reset_minutes),
-        )
-    )
-    await db.commit()
-    url = f"{settings.app_url.rstrip('/')}/reset-password?token={token}"
-    subject, html, text = emails.password_reset(user.locale, url, settings.password_reset_minutes)
-    await send_quietly(sender, user.email, subject, html, text)
 
 
 async def reset_password(db: AsyncSession, token: str, new_password: str) -> None:
@@ -244,9 +245,7 @@ async def login_with_google(
         raise AccountInactiveError("Account is inactive")
     access, refresh = await issue_session(db, user)
     if created and sender is not None:
-        from novelo.features.users import approvals  # noqa: PLC0415
-
-        await approvals.notify_admins(db, sender, user)
+        await announce_registration(db, sender, user)
     return user, access, refresh
 
 
@@ -270,15 +269,7 @@ async def seed_admin(db: AsyncSession) -> None:
         )
 
 
-async def send_quietly(sender: EmailSender, to: str, subject: str, html: str, text: str) -> None:
-    """Um email falhado não pode partir o registo nem revelar nada ao utilizador."""
-    try:
-        await sender.send(to=to, subject=subject, html=html, text=text)
-    except AppError as exc:
-        log.warning("email not sent (%s): %s", exc.code, exc.message)  # nunca o corpo nem o destinatário
-
-
-async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -> None:
+async def send_verification(db: AsyncSession, sender: EmailSender, user: User, *, strict: bool = False) -> None:
     """Gera um link de confirmação de email e envia-o. Não faz nada se o email já está confirmado."""
     if user.email_verified:
         return
@@ -294,7 +285,7 @@ async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -
     await db.commit()
     url = f"{settings.app_url.rstrip('/')}/verify-email?token={token}"
     subject, html, text = emails.verify_email(user.locale, url, user.name, settings.email_verify_hours)
-    await send_quietly(sender, user.email, subject, html, text)
+    await email_log.deliver(db, sender, "verify_email", user.email, subject, html, text, user.id, strict=strict)
 
 
 async def verify_email(db: AsyncSession, token: str) -> None:

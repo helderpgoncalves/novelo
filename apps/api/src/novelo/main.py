@@ -21,6 +21,8 @@ from novelo.features.auth.router import router as auth_router
 from novelo.features.copilot.router import router as copilot_router
 from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
+from novelo.features.email_log.router import admin_router as email_admin_router
+from novelo.features.email_log.router import webhook_router
 from novelo.features.health.router import router as health_router
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
@@ -75,7 +77,13 @@ def create_app() -> FastAPI:
 
     app.include_router(health_router, prefix=API_PREFIX, tags=["health"], responses=COMMON_ERRORS)
     app.include_router(auth_router, prefix=f"{API_PREFIX}/auth", tags=["auth"], responses=COMMON_ERRORS)
+    # `/users/emails/*` antes do router de utilizadores (o caminho literal vem primeiro).
+    app.include_router(
+        email_admin_router, prefix=f"{API_PREFIX}/users/emails", tags=["emails"], responses=COMMON_ERRORS
+    )
     app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"], responses=COMMON_ERRORS)
+    # Webhooks: sem sessão; a autenticação é a assinatura do fornecedor.
+    app.include_router(webhook_router, prefix=f"{API_PREFIX}/webhooks", tags=["webhooks"], responses=COMMON_ERRORS)
     # Dados da Vitrus: só para utilizadores autenticados.
     protected = [Depends(get_current_user)]
     for router, name in (

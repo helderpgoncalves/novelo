@@ -2,7 +2,7 @@ import io
 from typing import Annotated, cast
 
 import segno
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
+from fastapi import APIRouter, Depends, Query, Request, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -13,6 +13,7 @@ from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, NotImpersonating, SessionUser, require_role
 from novelo.core.errors import (
     AppError,
+    ConflictError,
     FeatureDisabledError,
     InvalidCredentialsError,
     RateLimitError,
@@ -31,7 +32,9 @@ from novelo.core.ratelimit import (
     quick_join_email_limiter,
     quick_join_limiter,
     register_limiter,
+    registration_resend_limiter,
     reset_limiter,
+    verify_cooldown_limiter,
 )
 from novelo.core.request_meta import Meta
 from novelo.core.security import (
@@ -41,7 +44,7 @@ from novelo.core.security import (
     hash_token,
     new_opaque_token,
 )
-from novelo.features.auth import cookies, google, passwordless, service
+from novelo.features.auth import cookies, entry, google, passwordless, service
 from novelo.features.auth.schemas import (
     AcceptInvitationRequest,
     AuthConfig,
@@ -61,7 +64,10 @@ from novelo.features.auth.schemas import (
     SignedIn,
     VerifyEmailRequest,
 )
-from novelo.features.users import impersonation, invitations, onboarding
+from novelo.features.email_log import monitor
+from novelo.features.email_log import service as email_log
+from novelo.features.email_log.schemas import DeliveryStatusOrNone
+from novelo.features.users import approvals, impersonation, invitations, onboarding
 from novelo.features.users import service as users_service
 from novelo.features.users.models import ApprovalStatus, User
 from novelo.features.users.schemas import (
@@ -108,16 +114,11 @@ def _user_agent(request: Request) -> str | None:
     return request.headers.get("user-agent")
 
 
-def _queue(background: BackgroundTasks, sender: EmailSender, mails: list[passwordless.Outgoing]) -> None:
-    for m in mails:
-        background.add_task(service.send_quietly, sender, m.to, m.subject, m.html, m.text)
-
-
 @router.post("/magic-link", status_code=204, dependencies=[Depends(magic_link_limiter), Depends(captcha("magic_link"))])
-async def request_magic_link(
-    body: MagicLinkRequest, request: Request, db: Db, sender: Sender, background: BackgroundTasks
-) -> None:
-    """Envia um link de entrada válido 15 min e de uso único. Responde 204 exista ou não a conta."""
+async def request_magic_link(body: MagicLinkRequest, request: Request, db: Db, sender: Sender, meta: Meta) -> None:
+    """Envia um email, SEMPRE, e responde 204 exista ou não a conta: link de entrada (15 min, uso único) para contas
+    ativas; aviso sem link para contas desativadas/recusadas; o convite de novo para quem só tem convite; e um
+    email neutro para o resto. Se o email não puder sair responde 503 `email_unavailable` (igual para todos)."""
     s = get_settings()
     if not s.magic_link_enabled:
         raise FeatureDisabledError("Email sign-in is not available")
@@ -125,10 +126,17 @@ async def request_magic_link(
         magic_email_limiter.check(f"magic-email:{hash_token(body.email.lower())}")
     except RateLimitError:
         return  # em silêncio: não permite encher a caixa de alguém nem sondar contas
-    mail = await passwordless.request_magic_link(
-        db, body.email, body.next, ip=client_ip(request), user_agent=_user_agent(request)
+    await entry.request_entry(
+        db,
+        sender,
+        body.email,
+        flow="magic_link",
+        locale=body.locale,
+        next_path=body.next,
+        ip=client_ip(request),
+        user_agent=_user_agent(request),
+        meta=meta,
     )
-    _queue(background, sender, [mail] if mail else [])
 
 
 @router.post("/magic-link/verify", response_model=SignedIn, dependencies=[Depends(magic_verify_limiter)])
@@ -152,7 +160,7 @@ def get_quick_join_info() -> QuickJoinInfo:
     dependencies=[Depends(quick_join_limiter), Depends(captcha("quick_join"))],
 )
 async def quick_join(
-    body: QuickJoinRequest, request: Request, response: Response, db: Db, sender: Sender, background: BackgroundTasks
+    body: QuickJoinRequest, request: Request, response: Response, db: Db, sender: Sender, meta: Meta
 ) -> QuickJoinResult:
     """Entrada do evento com nome, email e código do QR. Email novo: convidado com sessão iniciada.
     Email que já tem conta: não inicia sessão; envia um link de entrada e responde `check_email`."""
@@ -170,9 +178,9 @@ async def quick_join(
         raise
     quick_join_email_limiter.check(f"quick-join-email:{hash_token(body.email.lower())}")
     outcome = await passwordless.quick_join(
-        db, name=body.name, email=body.email, locale=body.locale, ip=ip, user_agent=_user_agent(request)
-    )
-    _queue(background, sender, outcome.emails)
+        db, sender, name=body.name, email=body.email, locale=body.locale, ip=ip, user_agent=_user_agent(request),
+        meta=meta,
+    )  # fmt: skip
     if outcome.user is None or outcome.access is None or outcome.refresh is None:
         return QuickJoinResult(status="check_email")
     _set_session(response, outcome.access, outcome.refresh, True)
@@ -261,15 +269,22 @@ def _impersonation_out(user: User) -> ImpersonationOut:
 
 
 @router.get("/me", response_model=MeOut)
-async def get_me(user: SessionUser, db: Db) -> MeOut:
+async def get_me(user: SessionUser, db: Db, sender: Sender) -> MeOut:
     """O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado
-    e `impersonation` traz o administrador real. Para administradores traz `pending_approvals`."""
-    pending = await users_service.count_pending(db) if user.role == "admin" else None
+    e `impersonation` traz o administrador real. Para administradores traz `pending_approvals` e `email_alerts`
+    (e dispara, no máximo 1x por dia, o lembrete de contas por aprovar há mais de 24 h)."""
+    pending = alerts = None
+    if user.role == "admin" and user.impersonation is None and user.approval_status == "approved":
+        await approvals.remind_if_overdue(db, sender)
+        alerts = len(await monitor.admin_tick(db, sender))
+        await db.refresh(user)  # um erro de monitorização pode ter feito rollback e expirado o objeto
+        pending = await users_service.count_pending(db)
     return MeOut(
         **to_out(user).model_dump(),
         impersonation=_impersonation_out(user),
         onboarding=await onboarding.build(db, user),
         pending_approvals=pending,
+        email_alerts=alerts,
     )
 
 
@@ -280,14 +295,26 @@ async def update_onboarding(body: OnboardingUpdate, user: CurrentUser, db: Db) -
 
 
 @router.get("/approval-status", response_model=ApprovalStatusOut)
-async def get_approval_status(user: SessionUser) -> ApprovalStatusOut:
-    """Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`."""
+async def get_approval_status(user: SessionUser, db: Db) -> ApprovalStatusOut:
+    """Leve, para o ecrã de espera fazer polling (e redirecionar quando `status` passa a `approved`).
+    Funciona com a conta `pending` ou `rejected`; `confirmation_email` diz se o aviso «recebemos o teu pedido» saiu."""
+    mail = (await email_log.latest_for_user(db, [user.id], ("registration_received",))).get(user.id)
     return ApprovalStatusOut(
+        confirmation_email=cast(DeliveryStatusOrNone, mail.status) if mail else "none",
         status=cast(ApprovalStatus, user.approval_status),
         email_verified=user.email_verified,
         rejected_reason=user.rejected_reason if user.approval_status == "rejected" else None,
         decided_at=user.approved_at,
     )
+
+
+@router.post("/resend-registration-email", status_code=204, dependencies=[NotImpersonating])
+async def resend_registration_email(user: SessionUser, db: Db, sender: Sender) -> None:
+    """Para quem aguarda aprovação: reenvia «recebemos o teu pedido» (2 por hora). 503 se não sair."""
+    if user.approval_status != "pending":
+        raise ConflictError("Only accounts waiting for approval can request this email")
+    registration_resend_limiter.check(f"registration-resend:{user.id}")
+    await service.send_registration_received(db, sender, user, strict=True)
 
 
 @router.post("/impersonation/stop", response_model=UserOut)
@@ -342,16 +369,28 @@ async def verify_email(body: VerifyEmailRequest, db: Db) -> None:
     dependencies=[Depends(reset_limiter), NotImpersonating],
 )
 async def resend_verification(user: SessionUser, db: Db, sender: Sender) -> None:
-    """Reenvia o email de verificação. Sem captcha: exige sessão iniciada; o limitador trava abusos."""
-    await service.send_verification(db, sender, user)
+    """Reenvia o email de verificação (uma vez por minuto). Sem captcha: exige sessão iniciada.
+    503 `email_unavailable` se o email não puder sair."""
+    verify_cooldown_limiter.check(f"verify-cooldown:{user.id}")
+    await service.send_verification(db, sender, user, strict=True)
 
 
 @router.post(
     "/forgot-password", status_code=204, dependencies=[Depends(reset_limiter), Depends(captcha("forgot_password"))]
 )
-async def forgot_password(body: ForgotPasswordRequest, db: Db, sender: Sender) -> None:
-    """Responde 204 exista ou não a conta: não revela que emails estão registados."""
-    await service.request_password_reset(db, sender, body.email, body.locale)
+async def forgot_password(body: ForgotPasswordRequest, request: Request, db: Db, sender: Sender, meta: Meta) -> None:
+    """Responde 204 exista ou não a conta e envia SEMPRE um email (link de recuperação, aviso de conta inativa,
+    o convite de novo ou o email neutro «não encontrámos uma conta»). 503 `email_unavailable` se não puder sair."""
+    await entry.request_entry(
+        db,
+        sender,
+        body.email,
+        flow="password_reset",
+        locale=body.locale,
+        ip=client_ip(request),
+        user_agent=_user_agent(request),
+        meta=meta,
+    )
 
 
 @router.post("/reset-password", status_code=204, dependencies=[Depends(reset_limiter)])

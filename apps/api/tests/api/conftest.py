@@ -32,9 +32,6 @@ def _reset_admin_limiters() -> None:
 
 @pytest.fixture(autouse=True)
 def _reset_approval_throttle() -> None:
-    from novelo.features.users import approvals  # noqa: PLC0415
-
-    approvals.reset_notice_throttle()
     admin_approval_limiter.reset()
 
 
@@ -42,3 +39,17 @@ def _reset_approval_throttle() -> None:
 def _reset_all_limiters() -> None:
     """Todos os limiters (em memória, por processo) começam vazios em cada teste."""
     RateLimiter.reset_all()
+
+
+@pytest.fixture(autouse=True)
+def _email_state(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Disjuntor, caches de monitorização e DNS começam limpos; os repetidores não esperam de verdade."""
+    from novelo.features.email_log import dns_health, monitor, service  # noqa: PLC0415
+
+    async def _no_sleep(_: float) -> None:
+        return None
+
+    monkeypatch.setattr(service, "sleep", _no_sleep)
+    service.breaker.reset()
+    monitor.reset_caches()
+    dns_health.reset_cache()

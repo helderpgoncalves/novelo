@@ -132,6 +132,9 @@ describe('convites', () => {
     last_sent_at: null,
     send_count: 1,
     email_delivered: true,
+    delivery_status: 'sent',
+    last_email_at: null,
+    delivery_error: null,
     ...over,
   });
 
