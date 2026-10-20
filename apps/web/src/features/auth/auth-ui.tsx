@@ -6,12 +6,15 @@ import { m } from '@/paraglide/messages';
 
 /**
  * Escala de espaçamento ÚNICA do fluxo de autenticação (mobile e desktop iguais):
- * `AUTH_BLOCKS` entre blocos (cabeçalho, formulário, alternativas), `AUTH_FIELDS` entre campos de um formulário,
- * `AUTH_BUTTONS` entre botões empilhados. Dentro de um campo (rótulo, controlo, ajuda) usa-se sempre `gap-2`.
+ * `AUTH_BLOCKS` entre blocos (cabeçalho, grupo de ação, ligações de rodapé). Dentro do grupo de ação TUDO
+ * (campos, botão principal, divisor «ou», botões secundários) usa o mesmo passo de 16 px: `AUTH_STACK`,
+ * `AUTH_FIELDS` e `AUTH_BUTTONS` são o mesmo valor, para a distância input → botão ser igual à de botão → botão.
+ * Dentro de um campo (rótulo, controlo, ajuda) usa-se sempre `gap-2`.
  */
-export const AUTH_BLOCKS = 'flex flex-col gap-6';
-export const AUTH_FIELDS = 'flex flex-col gap-5';
-export const AUTH_BUTTONS = 'flex flex-col gap-3';
+export const AUTH_BLOCKS = 'flex flex-col gap-8';
+export const AUTH_STACK = 'flex flex-col gap-4';
+export const AUTH_FIELDS = AUTH_STACK;
+export const AUTH_BUTTONS = AUTH_STACK;
 
 /** Altura e peso comuns a todos os botões e campos (alvo de toque de 44 px). */
 export const AUTH_CONTROL = 'h-11';

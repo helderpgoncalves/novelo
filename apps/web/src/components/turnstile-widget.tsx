@@ -100,9 +100,13 @@ export function TurnstileWidget({
       ref={box}
       data-testid="turnstile-widget"
       data-interactive={interactive || undefined}
+      // Invisível: FORA do fluxo (1 px, sem `display: none`, que o Turnstile não aceita), para não somar um espaço
+      // extra entre o campo e o botão. Só ocupa lugar (65 px) quando a Cloudflare pede mesmo um clique.
       className={cn(
         'flex w-full justify-center [&_iframe]:max-w-full',
-        interactive ? 'min-h-[65px]' : 'empty:hidden',
+        interactive
+          ? 'min-h-[65px]'
+          : 'pointer-events-none absolute h-px w-px overflow-hidden opacity-0',
       )}
     />
   );
