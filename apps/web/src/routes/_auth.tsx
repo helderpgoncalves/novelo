@@ -47,8 +47,8 @@ function AuthLayout() {
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-8">
           <Outlet />
         </div>
-        {/* Véu de papel atrás do rodapé em telemóvel: mantém o contraste AA do texto sobre a Penha do canto. */}
-        <div className="relative flex flex-col items-center gap-1 rounded-lg bg-[color-mix(in_srgb,var(--background)_86%,transparent)] shadow-[0_0_14px_12px_color-mix(in_srgb,var(--background)_86%,transparent)] lg:bg-transparent lg:shadow-none">
+        {/* Sem caixa nem véu: o contraste do rodapé sobre a Penha vem de um contorno de texto na cor do fundo. */}
+        <div className="relative flex flex-col items-center gap-1 [text-shadow:0_0_3px_var(--background),0_0_8px_var(--background),0_0_14px_var(--background)] lg:[text-shadow:none]">
           <LegalLinks className="text-xs [&_ul]:justify-center" />
           <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
         </div>
