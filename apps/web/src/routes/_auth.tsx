@@ -10,7 +10,7 @@ export const Route = createFileRoute('/_auth')({
   // Quem já tem sessão não precisa de ver o ecrã de entrada.
   beforeLoad: async ({ context: { queryClient } }) => {
     const user = await queryClient
-      .fetchQuery({ ...getMeOptions(), staleTime: 30_000 })
+      .fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false })
       .catch(() => null);
     if (user) throw redirect({ to: '/' });
   },
