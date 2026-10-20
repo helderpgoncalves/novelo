@@ -15,7 +15,8 @@ export function VerifyEmailBanner({ user }: { user: UserOut }) {
     onError: (error) => toast.error(getErrorMessage(error)),
   });
 
-  if (user.email_verified) return null;
+  // Convidados entram por QR com o email que escreveram: pedir-lhes confirmação só seria ruído.
+  if (user.email_verified || user.role === 'guest') return null;
 
   return (
     <div

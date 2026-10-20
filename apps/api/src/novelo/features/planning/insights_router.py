@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
+from novelo.core.guest import SolverGuard
 from novelo.domain.sensitivity import Criterion
 from novelo.features.planning import benchmark_service, pilot_service, sensitivity_service
 from novelo.features.planning.benchmark_schemas import BenchmarkOut, BenchmarkScenarioRequest
@@ -17,7 +18,7 @@ router = APIRouter()
 Db = Annotated[AsyncSession, Depends(get_db)]
 
 
-@router.post("/scenarios/{scenario_id}/sensitivity", response_model=SensitivityOut)
+@router.post("/scenarios/{scenario_id}/sensitivity", response_model=SensitivityOut, dependencies=[SolverGuard])
 async def run_scenario_sensitivity(scenario_id: uuid.UUID, body: SensitivityRequest, db: Db) -> SensitivityOut:
     """Tornado (±30% de cada parâmetro) e Monte Carlo (P10/P50/P90 de €/t e custo) sobre o plano do cenário."""
     return await sensitivity_service.scenario_sensitivity(db, scenario_id, body)
@@ -53,7 +54,7 @@ async def list_benchmarks(db: Db) -> list[BenchmarkOut]:
     return await benchmark_service.list_benchmarks(db)
 
 
-@router.post("/benchmarks/{key}/scenario", response_model=ScenarioOut, status_code=201)
+@router.post("/benchmarks/{key}/scenario", response_model=ScenarioOut, status_code=201, dependencies=[SolverGuard])
 async def create_benchmark_scenario(key: str, body: BenchmarkScenarioRequest, user: CurrentUser, db: Db) -> ScenarioOut:
     """Cria um cenário (como `create_scenario`) com a meta e a densidade do benchmark."""
     return await benchmark_service.create_benchmark_scenario(db, key, body, user)

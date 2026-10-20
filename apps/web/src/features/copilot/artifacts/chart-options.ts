@@ -32,7 +32,10 @@ const lineColor = (c: ChartContext) => (c.dark ? '#26362f' : '#dcd5c8');
 
 export const fmt = (value: number | null | undefined, unit?: string | null): string => {
   if (value === null || value === undefined || Number.isNaN(value)) return '—';
-  const text = new Intl.NumberFormat(intlTag(), { maximumFractionDigits: 2 }).format(value);
+  const text = new Intl.NumberFormat(intlTag(), {
+    maximumFractionDigits: 2,
+    useGrouping: 'always',
+  }).format(value);
   if (!unit) return text;
   return unit === '%' ? `${text}%` : `${text} ${unit}`;
 };

@@ -37,7 +37,7 @@ export function StatStripSkeleton({ cells = 4 }: { cells?: number }) {
     <div className="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border lg:grid-cols-4">
       {Array.from({ length: cells }, (_, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: lista estática de blocos
-        <div key={i} className="space-y-3 bg-card p-4 sm:p-5">
+        <div key={i} className="space-y-3 bg-card p-3.5 sm:p-4">
           <Skeleton className="h-2.5 w-20" />
           <Skeleton className="h-8 w-24 sm:h-9" />
           <Skeleton className="h-3 w-full max-w-[10rem]" />
@@ -157,7 +157,7 @@ export function FormSkeleton({ fields = 5 }: { fields?: number }) {
 /** Página inicial: gancho (frase + anel), indicadores e capítulos com título à esquerda e visual à direita. */
 function HomeSkeleton() {
   return (
-    <div className="space-y-10 sm:space-y-14">
+    <div className="space-y-8 sm:space-y-10">
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
         <div className="space-y-6 lg:col-span-8 lg:py-4">
           <Skeleton className="h-3 w-40" />
@@ -273,7 +273,7 @@ export function PageSkeleton({
   actions?: boolean;
 }) {
   return (
-    <div className="space-y-8 sm:space-y-12" aria-busy="true" aria-live="polite">
+    <div className="space-y-5 sm:space-y-7" aria-busy="true" aria-live="polite">
       <span className="sr-only">{m.common_loading()}</span>
       {variant !== 'home' && <HeaderSkeleton actions={actions} />}
       {VARIANTS[variant]()}

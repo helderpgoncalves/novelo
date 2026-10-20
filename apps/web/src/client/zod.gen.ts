@@ -224,8 +224,12 @@ export const zAttachmentOut = z.object({
  */
 export const zAuthConfig = z.object({
     google_enabled: z.boolean(),
+    magic_link_enabled: z.boolean(),
     password_min_length: z.int().optional().default(10),
-    registration_open: z.boolean()
+    quick_join_enabled: z.boolean(),
+    registration_open: z.boolean(),
+    turnstile_enabled: z.boolean(),
+    turnstile_site_key: z.string().nullable()
 });
 
 /**
@@ -599,6 +603,7 @@ export const zCopilotErrorEvent = z.object({
         'invalid_token',
         'forbidden',
         'registration_closed',
+        'invalid_event_code',
         'not_found',
         'user_not_found',
         'email_taken',
@@ -608,6 +613,9 @@ export const zCopilotErrorEvent = z.object({
         'feature_disabled',
         'upstream_error',
         'ai_budget_exceeded',
+        'captcha_required',
+        'captcha_failed',
+        'captcha_unavailable',
         'internal_error'
     ]),
     message: z.string(),
@@ -968,6 +976,7 @@ export const zErrorBody = z.object({
         'invalid_token',
         'forbidden',
         'registration_closed',
+        'invalid_event_code',
         'not_found',
         'user_not_found',
         'email_taken',
@@ -977,6 +986,9 @@ export const zErrorBody = z.object({
         'feature_disabled',
         'upstream_error',
         'ai_budget_exceeded',
+        'captcha_required',
+        'captcha_failed',
+        'captcha_unavailable',
         'internal_error'
     ]),
     message: z.string()
@@ -1211,6 +1223,32 @@ export const zGlobalDefaults = z.object({
 });
 
 /**
+ * GuestOut
+ */
+export const zGuestOut = z.object({
+    actions_count: z.int(),
+    consent_at: z.iso.datetime().nullable(),
+    consent_version: z.string().nullable(),
+    email: z.string(),
+    email_verified: z.boolean(),
+    id: z.uuid(),
+    is_active: z.boolean(),
+    joined_at: z.iso.datetime(),
+    last_login_at: z.iso.datetime().nullable(),
+    name: z.string().nullable()
+});
+
+/**
+ * GuestPage
+ */
+export const zGuestPage = z.object({
+    items: z.array(zGuestOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
  * Health
  */
 export const zHealth = z.object({
@@ -1382,6 +1420,22 @@ export const zLotSummary = z.object({
     parish_name: z.string().nullable(),
     state: zLotState,
     weight_kg: z.number()
+});
+
+/**
+ * MagicLinkRequest
+ */
+export const zMagicLinkRequest = z.object({
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    next: z.string().max(255).nullish()
+});
+
+/**
+ * MagicLinkVerifyRequest
+ */
+export const zMagicLinkVerifyRequest = z.object({
+    token: z.string().min(20).max(200)
 });
 
 /**
@@ -2610,6 +2664,35 @@ export const zQuantilesOut = z.object({
 });
 
 /**
+ * QuickJoinInfo
+ */
+export const zQuickJoinInfo = z.object({
+    consent_version: z.string(),
+    enabled: z.boolean()
+});
+
+/**
+ * QuickJoinPoster
+ */
+export const zQuickJoinPoster = z.object({
+    code: z.string(),
+    svg: z.string(),
+    url: z.string()
+});
+
+/**
+ * QuickJoinRequest
+ */
+export const zQuickJoinRequest = z.object({
+    code: z.string().min(1).max(128),
+    consent: z.literal(true),
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    name: z.string().min(1).max(120),
+    website: z.string().max(200).nullish()
+});
+
+/**
  * RangeItem
  */
 export const zRangeItem = z.object({
@@ -2680,7 +2763,8 @@ export const zRegisterRequest = z.object({
     locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
     name: z.string().max(120).nullish(),
     password: z.string().max(128),
-    remember_me: z.boolean().optional().default(true)
+    remember_me: z.boolean().optional().default(true),
+    website: z.string().max(200).nullish()
 });
 
 /**
@@ -3855,8 +3939,10 @@ export const zLocalityOut = z.object({
  */
 export const zScheduleEntry = z.object({
     circuit: z.string(),
+    collection_type: zCollectionType,
     crew: z.int(),
     day_group: zDayGroup,
+    note: z.string().nullable(),
     shift: zShift,
     typology: zTypology
 });
@@ -3935,9 +4021,19 @@ export const zUserAdminOut = z.object({
     google_linked: z.boolean(),
     id: z.uuid(),
     is_active: z.boolean(),
+    joined_via: z.enum([
+        'password',
+        'google',
+        'quick_join',
+        'magic_link'
+    ]),
     last_login_at: z.iso.datetime().nullable(),
     name: z.string().nullable(),
-    role: z.enum(['admin', 'operator'])
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ])
 });
 
 /**
@@ -3945,7 +4041,11 @@ export const zUserAdminOut = z.object({
  */
 export const zUserAdminUpdate = z.object({
     is_active: z.boolean().nullish(),
-    role: z.enum(['admin', 'operator']).nullish()
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ]).nullish()
 });
 
 /**
@@ -3958,9 +4058,39 @@ export const zUserOut = z.object({
     google_linked: z.boolean(),
     has_password: z.boolean(),
     id: z.uuid(),
+    joined_via: z.enum([
+        'password',
+        'google',
+        'quick_join',
+        'magic_link'
+    ]),
     locale: z.enum(['pt-PT', 'en']),
     name: z.string().nullable(),
-    role: z.enum(['admin', 'operator'])
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ])
+});
+
+/**
+ * QuickJoinResult
+ *
+ * `signed_in`: conta nova, sessão iniciada. `check_email`: o email já tem conta e recebeu um link de entrada.
+ */
+export const zQuickJoinResult = z.object({
+    status: z.enum(['signed_in', 'check_email']),
+    user: zUserOut.nullish()
+});
+
+/**
+ * SignedIn
+ *
+ * Sessão iniciada (cookies definidos). `next` é o caminho relativo guardado quando o link foi pedido.
+ */
+export const zSignedIn = z.object({
+    next: z.string(),
+    user: zUserOut
 });
 
 /**
@@ -4482,6 +4612,10 @@ export const zGetAuthConfigResponse = zAuthConfig;
 
 export const zForgotPasswordBody = zForgotPasswordRequest;
 
+export const zForgotPasswordHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
 /**
  * Successful Response
  */
@@ -4500,6 +4634,10 @@ export const zGoogleLoginQuery = z.object({
 
 export const zLoginBody = zLoginRequest;
 
+export const zLoginHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
 /**
  * Successful Response
  */
@@ -4515,6 +4653,24 @@ export const zLogoutResponse = z.void();
  */
 export const zLogoutAllResponse = z.void();
 
+export const zRequestMagicLinkBody = zMagicLinkRequest;
+
+export const zRequestMagicLinkHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zRequestMagicLinkResponse = z.void();
+
+export const zVerifyMagicLinkBody = zMagicLinkVerifyRequest;
+
+/**
+ * Successful Response
+ */
+export const zVerifyMagicLinkResponse = zSignedIn;
+
 /**
  * Successful Response
  */
@@ -4527,6 +4683,38 @@ export const zUpdateMeBody = zProfileUpdate;
  */
 export const zUpdateMeResponse = zUserOut;
 
+export const zQuickJoinBody = zQuickJoinRequest;
+
+export const zQuickJoinHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zQuickJoinResponse = zQuickJoinResult;
+
+export const zListGuestsQuery = z.object({
+    offset: z.int().gte(0).optional().default(0),
+    limit: z.int().gte(1).lte(200).optional().default(50),
+    q: z.string().max(100).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListGuestsResponse = zGuestPage;
+
+/**
+ * Successful Response
+ */
+export const zGetQuickJoinInfoResponse = zQuickJoinInfo;
+
+/**
+ * Successful Response
+ */
+export const zGetQuickJoinQrResponse = zQuickJoinPoster;
+
 /**
  * Successful Response
  */
@@ -4534,10 +4722,18 @@ export const zRefreshResponse = z.void();
 
 export const zRegisterBody = zRegisterRequest;
 
+export const zRegisterHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
 /**
  * Successful Response
  */
 export const zRegisterResponse = zUserOut;
+
+export const zResendVerificationHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
 
 /**
  * Successful Response
@@ -4545,6 +4741,10 @@ export const zRegisterResponse = zUserOut;
 export const zResendVerificationResponse = z.void();
 
 export const zResetPasswordBody = zResetPasswordRequest;
+
+export const zResetPasswordHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
 
 /**
  * Successful Response

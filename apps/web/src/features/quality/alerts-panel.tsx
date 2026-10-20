@@ -17,22 +17,52 @@ import { m } from '@/paraglide/messages';
 const PAGE = 8;
 const ALL = '__all__';
 
-export function AlertsPanel({ alerts }: { alerts: DataAlertOut[] }) {
+export type AlertOrigin = 'textile' | 'municipal';
+
+const originOf = (a: DataAlertOut): AlertOrigin =>
+  a.kind.startsWith('municipal_') ? 'municipal' : 'textile';
+
+interface AlertsPanelProps {
+  alerts: DataAlertOut[];
+  /** Origem escolhida (vive no URL): `undefined` mostra todas. */
+  origin?: AlertOrigin;
+  onOriginChange?: (origin: AlertOrigin | undefined) => void;
+}
+
+export function AlertsPanel({ alerts, origin, onOriginChange }: AlertsPanelProps) {
   const [status, setStatus] = useState<AlertStatus | null>('open');
   const [kind, setKind] = useState<AlertKind | null>(null);
   const [limit, setLimit] = useState(PAGE);
-  const kinds = [...new Set(alerts.map((a) => a.kind))];
-  const filtered = alerts.filter(
-    (a) => (!status || a.status === status) && (!kind || a.kind === kind),
+  const inOrigin = alerts.filter((a) => !origin || originOf(a) === origin);
+  const kinds = [...new Set(inOrigin.map((a) => a.kind))];
+  const activeKind = kind && kinds.includes(kind) ? kind : null;
+  const filtered = inOrigin.filter(
+    (a) => (!status || a.status === status) && (!activeKind || a.kind === activeKind),
   );
   const shown = filtered.slice(0, limit);
   const clear = () => {
     setStatus(null);
     setKind(null);
+    onOriginChange?.(undefined);
   };
 
   return (
     <div className="space-y-4">
+      {onOriginChange && (
+        <FilterChips<AlertOrigin>
+          legend={m.quality_filter_origin()}
+          value={origin ?? null}
+          onChange={(v) => {
+            onOriginChange(v ?? undefined);
+            setLimit(PAGE);
+          }}
+          options={[
+            { value: null, label: m.quality_origin_all() },
+            { value: 'textile', label: m.quality_origin_textile() },
+            { value: 'municipal', label: m.quality_origin_municipal() },
+          ]}
+        />
+      )}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <FilterChips<AlertStatus>
           legend={m.quality_filter_status()}
@@ -54,7 +84,7 @@ export function AlertsPanel({ alerts }: { alerts: DataAlertOut[] }) {
             {m.quality_alerts_count({ shown: shown.length, total: filtered.length })}
           </p>
           <Select
-            value={kind ?? ALL}
+            value={activeKind ?? ALL}
             onValueChange={(v) => {
               setKind(v === ALL ? null : (v as AlertKind));
               setLimit(PAGE);

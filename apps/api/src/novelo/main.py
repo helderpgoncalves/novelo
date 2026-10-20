@@ -7,10 +7,12 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 
+from novelo.core.captcha import warn_if_unprotected
 from novelo.core.config import get_settings
 from novelo.core.database import SessionLocal
 from novelo.core.deps import get_current_user
 from novelo.core.errors import COMMON_ERRORS, register_error_handlers
+from novelo.core.hardening import HardeningMiddleware
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging
 from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.auth import service as auth_service
@@ -40,6 +42,7 @@ def _operation_id(route: APIRoute) -> str:
 
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
+    warn_if_unprotected()
     async with SessionLocal() as db:
         await auth_service.seed_admin(db)
     yield
@@ -64,6 +67,7 @@ def create_app() -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_middleware(HardeningMiddleware)
     app.add_middleware(RequestLoggingMiddleware)
     register_error_handlers(app)
 

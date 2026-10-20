@@ -68,7 +68,7 @@ export function HomePage({
 
   return (
     <MotionProvider>
-      <Page className="space-y-10 sm:space-y-14">
+      <Page className="space-y-8 sm:space-y-10">
         <Hero overview={overview} />
 
         <StatStrip>

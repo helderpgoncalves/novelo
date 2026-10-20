@@ -4,7 +4,7 @@ Como transformar o Novelo, hoje correto mas "aborrecido e confuso", num produto 
 
 Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; código congelado às 15h00 ([estratégia](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro)). Os critérios e pesos estão em [Critérios de avaliação](criterios-de-avaliacao.md): inovação 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20% (fonte oficial [F61], registo E4).
 
-**Estado deste documento: proposta de design.** Nada aqui está implementado, exceto onde a coluna "Estado" diz "Existe". O diagnóstico parte do código e da estrutura da app, sem testes com utilizadores; valida-se com três pessoas fora da equipa antes de congelar (hipótese).
+**Estado deste documento: proposta de design.** Nada aqui está implementado, exceto onde a coluna "Estado" diz "Existe". Atualização de 20 de outubro de 2026: o ponto de partida (`/`) já conta a história com `get_overview`, mas **exige sessão**; a home pública e a rota `/baseline` desta proposta não existem (a rota `/` é a home autenticada). O diagnóstico parte do código e da estrutura da app, sem testes com utilizadores; valida-se com três pessoas fora da equipa antes de congelar (hipótese).
 
 ## Resumo em dois minutos
 
@@ -188,7 +188,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 - **Momento "uau":** puxar o cursor e ver as freguesias mudarem de cor: onde o Cenário B apanha toneladas que hoje se perdem.
 - **Interações:** passar o rato numa freguesia mostra o painel; clicar fixa-a e liga as restantes páginas (`?parish=`); *brush* de seleção por área; o filtro de variável vive na URL.
-- **Estado vazio:** "Contentores a chegar a 20 de outubro" com os pontos como fantasmas (contorno tracejado) e a contagem dos 71 locais já geocodificados de 82.
+- **Estado vazio:** "Contentores de têxteis por receber" (o inventário municipal de 20 de outubro é outra rede e tem camadas próprias) com os pontos como fantasmas (contorno tracejado) e a contagem dos 71 locais já geocodificados de 82.
 - **Microcópia:** "11 localidades sem coordenadas: não aparecem no mapa" (82 − 71, cálculo).
 - **Não pôr:** mais de duas camadas ligadas por defeito; paleta arco-íris; legenda com mais de cinco classes.
 
@@ -615,7 +615,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 ### 3.1 Decisão
 
-A rota `/` passa a ser uma **home pública e de leitura**, que conta a história com números reais agregados (sem dados pessoais). O painel atual passa a `/baseline` (redirecionamento a partir de `/` para quem está autenticado e já viu a história, opcional). Hoje todas as rotas de dados exigem sessão (`get_current_user` aplicado no `main.py`), por isso a home precisa de um **endpoint público agregado** (D01).
+A rota `/` passa a ser uma **home pública e de leitura**, que conta a história com números reais agregados (sem dados pessoais). O painel atual passa a `/baseline` (redirecionamento a partir de `/` para quem está autenticado e já viu a história, opcional). Hoje todas as rotas de dados exigem sessão (a dependência `protected`, que exige sessão, aplicada no `main.py`), por isso a home precisa de um **endpoint público agregado** (D01).
 
 **Quem a vê:** o jurado que abre a ligação de produção a 26 de outubro, a Vitrus, a câmara. Tem de funcionar sem login, a 390 px e a 1440 px, e carregar o primeiro número em menos de 2,5 s numa ligação 4G (meta interna, por medir).
 
@@ -833,7 +833,7 @@ Cada linha diz o que falta, onde, e se **bloqueia um P0**. Os campos já existen
 | **D03** | Simulador (fronteira) | Curva orçamento → toneladas: grelha pré-calculada de orçamentos com sementes fixas, ou endpoint | API, `POST /planning/frontier` | Não (P1) | L |
 | **D04** | Simulador (cascata de custos) | Separar o custo anual em investimento anualizado, recolhas e quilómetros. Hoje há `capex_eur`, `opex_eur_year` e `km_year` | `Kpis` / `domain/costs.py` | Não | S |
 | **D05** | Detalhe do cenário (cascata de toneladas) | Confirmar se `tonnes_year` **inclui** as 301,3 t atuais; sem isso a cascata engana. Contribuição incremental por modo | `ScenarioResult.modes` | **Sim** | S |
-| **D06** | Mapa, Cobertura | Contentores atuais (chegam a 20 de outubro): ETL, `containers`, camada | `data/raw/`, `just etl` | Não (plano B: estado "a chegar") | M |
+| **D06** | Mapa, Cobertura | Contentores atuais de têxteis (por receber da Vitrus): ETL, `containers`, camada | `data/raw/`, `just etl` | Não (plano B: estado "a chegar") | M |
 | **D07** | Cobertura | Já existe `radius_m` em `GET /network/coverage`; falta só o controlo no ecrã | Web | Não | S |
 | **D08** | Cobertura (Pareto) | Percentagem acumulada: calcula-se no cliente a partir de `gap_points` | Web | Não | S |
 | **D09** | Evidência por marca | Matriz marca × fibra (hoje só `top_fibre`) | API, `GET /brands` | Não | S |

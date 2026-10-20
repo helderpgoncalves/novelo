@@ -1,11 +1,12 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Download, LogOut, UserRound } from 'lucide-react';
+import { Download, LogOut, Route as RouteIcon, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import type { UserOut } from '@/client';
 import { logoutMutation } from '@/client/@tanstack/react-query.gen';
 import { InstallIosDialog } from '@/components/install-ios-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -15,6 +16,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { openTour } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
@@ -56,6 +58,14 @@ export function UserMenu({ user }: { user: UserOut }) {
                 {initials(user)}
               </AvatarFallback>
             </Avatar>
+            {user.role === 'guest' && (
+              <span
+                title={m.guest_account_hint()}
+                className="hidden rounded-full bg-muted px-2 py-0.5 font-semibold text-[10px] text-muted-foreground uppercase tracking-wide sm:inline"
+              >
+                {m.guest_badge()}
+              </span>
+            )}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
@@ -64,10 +74,23 @@ export function UserMenu({ user }: { user: UserOut }) {
               {user.name ?? m.user_menu_default_name()}
             </p>
             <p className="truncate font-normal text-muted-foreground text-xs">{user.email}</p>
+            {user.role === 'guest' && (
+              <>
+                <Badge variant="secondary" className="mt-1 text-[10px] uppercase">
+                  {m.guest_badge()}
+                </Badge>
+                <p className="whitespace-normal pt-1 font-normal text-muted-foreground text-xs leading-relaxed">
+                  {m.guest_account_hint()}
+                </p>
+              </>
+            )}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem onSelect={() => navigate({ to: '/account' })}>
             <UserRound /> {m.user_menu_account()}
+          </DropdownMenuItem>
+          <DropdownMenuItem onSelect={openTour}>
+            <RouteIcon /> {m.user_menu_tour()}
           </DropdownMenuItem>
           {(canInstall || needsIosSteps) && (
             <DropdownMenuItem onSelect={canInstall ? () => void install() : () => setIosHelp(true)}>

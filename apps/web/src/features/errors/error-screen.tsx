@@ -15,7 +15,9 @@ interface ErrorScreenProps {
 
 /**
  * Esqueleto de todos os ecrãs de erro: eyebrow, título serifado, texto e ações. O foco vai para o título ao
- * montar (quem usa leitor de ecrã ouve-o, quem usa teclado começa aqui), por isso não leva `role="alert"`.
+ * montar (quem usa leitor de ecrã ouve-o, quem usa teclado começa aqui), por isso o contentor não leva `role="alert"`:
+ * só as falhas inesperadas (500) anunciam a mensagem como alerta, no texto, e os estados esperados (404, 403,
+ * offline) não gritam.
  */
 export function ErrorScreen({
   eyebrow,

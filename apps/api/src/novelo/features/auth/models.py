@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, String
+from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, String
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -43,3 +43,24 @@ class EmailVerificationToken(Base, UuidPkMixin, TimestampMixin):
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+
+
+class LoginToken(Base, UuidPkMixin, TimestampMixin):
+    """Link de entrada sem password (magic link ou convite por QR). Só o SHA-256 fica na base de dados.
+
+    Uso único: consome-se com `UPDATE ... WHERE used_at IS NULL RETURNING`.
+    """
+
+    __tablename__ = "login_tokens"
+    __table_args__ = (CheckConstraint("purpose IN ('magic_link', 'quick_join')", name="purpose_valid"),)
+
+    user_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), index=True
+    )
+    token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
+    purpose: Mapped[str] = mapped_column(String(20))
+    next_path: Mapped[str] = mapped_column(String(255), default="/", server_default="/")
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    ip: Mapped[str | None] = mapped_column(String(45))
+    user_agent: Mapped[str | None] = mapped_column(String(255))

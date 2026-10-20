@@ -57,7 +57,8 @@ test('com o teclado (foco num campo) a barra de separadores esconde-se', async (
 });
 
 test('o ecrã de entrada funciona em telemóvel', async ({ page }) => {
-  await page.goto('/pt/login');
+  // Por defeito o login é por link no email; a password está em ?method=password.
+  await page.goto('/pt/login?method=password');
   await expect(page.getByRole('button', { name: 'Entrar' })).toBeVisible();
   expect(await noOverflow(page)).toBe(true);
 });

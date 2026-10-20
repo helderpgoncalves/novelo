@@ -127,7 +127,7 @@ function Coverage() {
       )}
 
       <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12 lg:gap-6">
-        <div className="min-w-0 space-y-8 sm:space-y-12 lg:col-span-7">
+        <div className="min-w-0 space-y-5 sm:space-y-7 lg:col-span-7">
           {!ready && <AwaitingPanel />}
           <Section
             title={m.cov_table_title()}

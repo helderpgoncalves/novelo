@@ -1,7 +1,16 @@
 import type { Map as MaplibreMap } from 'maplibre-gl';
 import { useMemo, useState } from 'react';
 import { Layer, type MapLayerMouseEvent, Source } from 'react-map-gl/maplibre';
-import type { ContainerKind, ContainerOut, ContainerStatus, LocalityOut, ZoneOut } from '@/client';
+import type {
+  CaopFeatureCollection,
+  ContainerKind,
+  ContainerOut,
+  ContainerStatus,
+  LocalityOut,
+  ZoneOut,
+} from '@/client';
+import type { LayerState, ProducerPoint, SitePoint } from '@/features/municipal/derive';
+import { kindLabel, producerLabel } from '@/features/municipal/vocab';
 import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { zonesToGeoJson } from '@/lib/map';
 import { cn } from '@/lib/utils';
@@ -15,6 +24,14 @@ import {
   containerStatusLabel,
   containersToGeoJson,
 } from './containers';
+import {
+  CAOP_FILL,
+  MUN_CLUSTERS,
+  MUN_PRODUCERS,
+  MUNICIPAL_POINT_LAYERS,
+  MunicipalFill,
+  MunicipalPoints,
+} from './municipal-layers';
 
 export type MapMetric = 'demand_t' | 'population' | 'service_days' | 'covered_pct';
 
@@ -32,6 +49,25 @@ interface HoveredContainer {
   count: number | null;
 }
 
+/** Camadas da rede municipal (não é de têxteis); o mapa só as desenha, quem usa decide o que mostrar. */
+export interface MunicipalMapProps {
+  layers: LayerState;
+  /** Locais que o modo atual desenha, já filtrados e com o marcador certo. */
+  sites: SitePoint[];
+  producers: ProducerPoint[];
+  caop: CaopFeatureCollection | undefined;
+  densityMax: number;
+  selectedSite: string | null;
+  selectedPoint: [number, number] | null;
+  flyTo: [number, number] | null;
+  onSelectSite: (id: string | null) => void;
+}
+
+interface HoveredMunicipal {
+  title: string;
+  detail: string | null;
+}
+
 interface NetworkMapProps {
   zones: ZoneOut[];
   localities: LocalityOut[];
@@ -41,6 +77,7 @@ interface NetworkMapProps {
   containers?: ContainerOut[] | null;
   /** Cobertura (%) por código de freguesia, para a métrica `covered_pct`. */
   coverage?: Record<string, number>;
+  municipal?: MunicipalMapProps;
   className?: string;
   onSelect?: (code: string | null) => void;
   selected?: string | null;
@@ -62,12 +99,17 @@ export function NetworkMap({
   showLocalities,
   containers,
   coverage,
+  municipal,
   className,
   onSelect,
   selected,
 }: NetworkMapProps) {
   const [hovered, setHovered] = useState<Hovered | null>(null);
   const [hoveredContainer, setHoveredContainer] = useState<HoveredContainer | null>(null);
+  const [hoveredMun, setHoveredMun] = useState<HoveredMunicipal | null>(null);
+  const showZones = !municipal || municipal.layers.fill === 'textile';
+  const caopFill =
+    municipal && (municipal.layers.fill === 'density' || municipal.layers.fill === 'cover');
   const extra = useMemo(
     () =>
       Object.fromEntries(Object.entries(coverage ?? {}).map(([k, v]) => [k, { covered_pct: v }])),
@@ -104,6 +146,48 @@ export function NetworkMap({
 
   const onMove = (event: MapLayerMouseEvent) => {
     const features = event.features ?? [];
+    const mun = features.find((f) => MUNICIPAL_POINT_LAYERS.includes(f.layer.id));
+    if (mun) {
+      const p = mun.properties ?? {};
+      setHoveredContainer(null);
+      setHovered(null);
+      if (mun.layer.id === MUN_CLUSTERS) {
+        setHoveredMun({
+          title: m.mapm_tip_cluster({ count: formatNumber(Number(p.point_count)) }),
+          detail: null,
+        });
+      } else if (mun.layer.id === MUN_PRODUCERS) {
+        const type = String(p.type);
+        setHoveredMun({
+          title: m.mapm_tip_producer({ id: String(p.site_id) }),
+          detail:
+            type === 'multiple'
+              ? m.mapm_producer_multiple()
+              : (producerLabel[type as keyof typeof producerLabel]?.() ?? null),
+        });
+      } else {
+        const kind = String(p.kind) as keyof typeof kindLabel;
+        setHoveredMun({
+          title: m.mapm_tip_site({ id: String(p.site_id) }),
+          detail: [kindLabel[kind]?.(), p.parish ? String(p.parish) : null]
+            .filter(Boolean)
+            .join(' · '),
+        });
+      }
+      return;
+    }
+    const caopHit = features.find((f) => f.layer.id === CAOP_FILL);
+    if (caopHit && !features.some((f) => CONTAINER_LAYERS.includes(f.layer.id))) {
+      const p = caopHit.properties ?? {};
+      setHoveredContainer(null);
+      setHovered(null);
+      setHoveredMun({
+        title: String(p.name),
+        detail: `${m.mapm_tip_per_1000({ value: formatNumber(Number(p.containers_per_1000_hab), 1) })} · ${m.mapm_tip_cover({ value: formatPercent(Number(p.cover_pct_300m), 0) })}`,
+      });
+      return;
+    }
+    setHoveredMun(null);
     const c = features.find((f) => CONTAINER_LAYERS.includes(f.layer.id));
     if (c) {
       const p = c.properties ?? {};
@@ -125,6 +209,25 @@ export function NetworkMap({
 
   const onClick = (event: MapLayerMouseEvent) => {
     const features = event.features ?? [];
+    const munCluster = features.find((f) => f.layer.id === MUN_CLUSTERS);
+    if (munCluster) {
+      const map: MaplibreMap = event.target;
+      map.easeTo({ center: event.lngLat, zoom: map.getZoom() + 2 });
+      return;
+    }
+    const munPoint = features.find(
+      (f) => MUNICIPAL_POINT_LAYERS.includes(f.layer.id) && f.properties?.site_id,
+    );
+    if (munPoint) {
+      municipal?.onSelectSite(String(munPoint.properties?.site_id));
+      return;
+    }
+    const caopFeature = features.find((f) => f.layer.id === CAOP_FILL);
+    if (caopFeature && !features.some((f) => f.layer.id === 'zones-fill')) {
+      municipal?.onSelectSite(null);
+      onSelect?.(String(caopFeature.properties?.dicofre));
+      return;
+    }
     const cluster = features.find((f) => f.layer.id === 'containers-clusters');
     if (cluster) {
       const map: MaplibreMap = event.target;
@@ -143,11 +246,17 @@ export function NetworkMap({
       <BaseMap
         className="size-full"
         label={m.map_aria()}
-        interactiveLayerIds={['zones-fill', ...(showContainers ? CONTAINER_LAYERS : [])]}
+        interactiveLayerIds={[
+          ...(showZones ? ['zones-fill'] : []),
+          ...(caopFill ? [CAOP_FILL] : []),
+          ...(municipal ? MUNICIPAL_POINT_LAYERS : []),
+          ...(showContainers ? CONTAINER_LAYERS : []),
+        ]}
         onMouseMove={onMove}
         onMouseLeave={() => {
           setHovered(null);
           setHoveredContainer(null);
+          setHoveredMun(null);
         }}
         onClick={onClick}
       >
@@ -155,20 +264,40 @@ export function NetworkMap({
           <Layer
             id="zones-fill"
             type="fill"
+            layout={{ visibility: showZones ? 'visible' : 'none' }}
             paint={{ 'fill-color': rampExpression(metric, max), 'fill-opacity': 0.78 }}
           />
           <Layer
             id="zones-line"
             type="line"
+            layout={{ visibility: showZones ? 'visible' : 'none' }}
             paint={{ 'line-color': '#14211d', 'line-opacity': 0.35, 'line-width': 0.8 }}
           />
           <Layer
             id="zones-selected"
             type="line"
+            layout={{ visibility: showZones ? 'visible' : 'none' }}
             filter={['==', ['get', 'code'], selected ?? '']}
             paint={{ 'line-color': '#14211d', 'line-width': 2.5 }}
           />
         </Source>
+        {municipal && (
+          <>
+            <MunicipalFill
+              caop={municipal.caop}
+              fill={municipal.layers.fill}
+              densityMax={municipal.densityMax}
+              selected={selected ?? null}
+            />
+            <MunicipalPoints
+              layers={municipal.layers}
+              sites={municipal.sites}
+              producers={municipal.producers}
+              selectedPoint={municipal.selectedPoint}
+              flyTo={municipal.flyTo}
+            />
+          </>
+        )}
         {showLocalities && (
           <Source id="localities" type="geojson" data={points}>
             <Layer
@@ -221,7 +350,15 @@ export function NetworkMap({
         )}
       </BaseMap>
 
-      {hoveredContainer ? (
+      {hoveredMun ? (
+        <div className="pointer-events-none absolute top-3 left-3 max-w-60 space-y-1 rounded-lg bg-card/95 p-3 text-sm shadow-sm ring-1 ring-foreground/10 backdrop-blur">
+          <p className="font-medium font-serif text-lg leading-tight">{hoveredMun.title}</p>
+          {hoveredMun.detail && (
+            <p className="text-muted-foreground text-xs tabular-nums">{hoveredMun.detail}</p>
+          )}
+          <p className="text-muted-foreground text-[11px]">{m.mapm_tip_not_textile()}</p>
+        </div>
+      ) : hoveredContainer ? (
         <div className="pointer-events-none absolute top-3 left-3 max-w-60 space-y-1 rounded-lg bg-card/95 p-3 text-sm shadow-sm ring-1 ring-foreground/10 backdrop-blur">
           {hoveredContainer.count != null ? (
             <p className="font-medium font-serif text-lg leading-tight">
@@ -282,16 +419,33 @@ export function NetworkMap({
             </ul>
           </div>
         )}
-        <RampLegend
-          title={metric === 'covered_pct' ? m.cov_map_legend_coverage() : undefined}
-          maxLabel={
-            metric === 'demand_t'
-              ? formatTonnes(max, 0)
-              : metric === 'covered_pct'
-                ? formatPercent(max, 0)
-                : formatNumber(max)
-          }
-        />
+        {municipal && caopFill ? (
+          <RampLegend
+            title={
+              municipal.layers.fill === 'cover'
+                ? m.mapm_legend_cover()
+                : m.mapm_legend_density_fill()
+            }
+            maxLabel={
+              municipal.layers.fill === 'cover'
+                ? formatPercent(100, 0)
+                : m.mapm_legend_at_least({ value: formatNumber(municipal.densityMax) })
+            }
+          />
+        ) : (
+          showZones && (
+            <RampLegend
+              title={metric === 'covered_pct' ? m.cov_map_legend_coverage() : undefined}
+              maxLabel={
+                metric === 'demand_t'
+                  ? formatTonnes(max, 0)
+                  : metric === 'covered_pct'
+                    ? formatPercent(max, 0)
+                    : formatNumber(max)
+              }
+            />
+          )
+        )}
       </div>
     </div>
   );

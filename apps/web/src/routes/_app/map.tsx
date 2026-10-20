@@ -1,6 +1,8 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { Layers } from 'lucide-react';
+import { useMemo, useRef, useState } from 'react';
+import { z } from 'zod';
 import {
   getCoverageOptions,
   listContainersOptions,
@@ -13,15 +15,49 @@ import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
+import { LayersPanel } from '@/features/map/layers-panel';
 import { type MapMetric, NetworkMap } from '@/features/map/network-map';
 import { ParishPanel } from '@/features/map/parish-panel';
+import { useMunicipalMap } from '@/features/map/use-municipal-map';
+import {
+  FILL_MODES,
+  type LayerState,
+  layersFromSearch,
+  matchPreset,
+  PRESET_IDS,
+  type Preset,
+  SITES_MODES,
+  searchFromLayers,
+} from '@/features/municipal/derive';
+import { SiteSheet } from '@/features/municipal/site-sheet';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { getErrorMessage } from '@/lib/errors';
 import { formatNumber, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/map')({
   staticData: { skeleton: 'map' },
+  // Camadas da rede municipal: o preset e só o que o utilizador mudou em relação a ele.
+  validateSearch: z.object({
+    preset: z.enum(PRESET_IDS).optional().catch(undefined),
+    loc: z.boolean().optional().catch(undefined),
+    fill: z.enum(FILL_MODES).optional().catch(undefined),
+    sites: z.enum(SITES_MODES).optional().catch(undefined),
+    kinds: z.string().optional().catch(undefined),
+    producers: z.boolean().optional().catch(undefined),
+    /** Local municipal aberto na folha de detalhe. */
+    site: z.string().optional().catch(undefined),
+    /** Freguesia selecionada (código INE/app). */
+    parish: z.string().optional().catch(undefined),
+  }),
   loader: ({ context: { queryClient } }) =>
     Promise.all([
       queryClient.ensureQueryData(listZonesOptions()),
@@ -31,13 +67,56 @@ export const Route = createFileRoute('/_app/map')({
   component: NetworkMapPage,
 });
 
+const presetLabel: Record<Preset, () => string> = {
+  textile: () => m.mapm_preset_textile(),
+  municipal: () => m.mapm_preset_municipal(),
+  gaps: () => m.mapm_preset_gaps(),
+};
+
 function NetworkMapPage() {
+  const search = Route.useSearch();
+  const navigate = Route.useNavigate();
   const { data: zones } = useSuspenseQuery(listZonesOptions());
   const { data: localities } = useSuspenseQuery(listLocalitiesOptions());
   const [metric, setMetric] = useState<MapMetric>('demand_t');
-  const [showLocalities, setShowLocalities] = useState(true);
   const [showContainers, setShowContainers] = useState(true);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(search.parish ?? null);
+  const [layersOpen, setLayersOpen] = useState(false);
+  const desktop = useMediaQuery('(min-width: 1024px)');
+
+  const preset = search.preset ?? 'textile';
+  const layers = layersFromSearch(search);
+  const showLocalities = layers.localities;
+  const activePreset = matchPreset(layers);
+  // Só centra o mapa no local que veio no URL ao abrir; cliques posteriores não deslocam a vista.
+  const initialSite = useRef(search.site);
+  const selectSite = (id: string | null) =>
+    void navigate({ search: (prev) => ({ ...prev, site: id ?? undefined }), replace: true });
+  const { map: municipal, panel } = useMunicipalMap(
+    layers,
+    search.site ?? null,
+    search.site !== undefined && search.site === initialSite.current,
+    selectSite,
+  );
+  const changeLayers = (patch: Partial<LayerState>) =>
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        ...searchFromLayers(preset, { ...layers, ...patch }),
+      }),
+      replace: true,
+    });
+  const choosePreset = (next: Preset) =>
+    void navigate({
+      search: (prev) => ({
+        preset: next === 'textile' ? undefined : next,
+        site: prev.site,
+        parish: prev.parish,
+      }),
+      replace: true,
+    });
+  const layersPanel = <LayersPanel state={layers} onChange={changeLayers} {...panel} />;
+
   const containersQuery = useQuery(listContainersOptions({ query: { limit: 1000 } }));
   const coverageQuery = useQuery(getCoverageOptions({ query: { radius_m: 300 } }));
   const containers = containersQuery.data?.items ?? [];
@@ -90,22 +169,49 @@ function NetworkMapPage() {
       </StatStrip>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <FilterChips<MapMetric>
-          legend={m.map_layer()}
-          value={metric}
-          onChange={(v) => setMetric(v ?? 'demand_t')}
-          options={[
-            { value: 'demand_t', label: m.map_layer_demand() },
-            { value: 'population', label: m.map_layer_population() },
-            { value: 'service_days', label: m.map_layer_service() },
-            ...(coverageReady
-              ? [{ value: 'covered_pct' as const, label: m.mapc_metric_coverage() }]
-              : []),
-          ]}
+        <FilterChips<Preset>
+          legend={m.mapm_presets()}
+          value={activePreset}
+          onChange={(v) => v && choosePreset(v)}
+          options={PRESET_IDS.map((id) => ({ value: id, label: presetLabel[id]() }))}
         />
+        {!desktop && (
+          <Button
+            variant="outline"
+            className="h-10 gap-2"
+            onClick={() => setLayersOpen(true)}
+            aria-haspopup="dialog"
+          >
+            <Layers aria-hidden="true" />
+            {m.mapm_open_layers()}
+          </Button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        {layers.fill === 'textile' ? (
+          <FilterChips<MapMetric>
+            legend={m.map_layer()}
+            value={metric}
+            onChange={(v) => setMetric(v ?? 'demand_t')}
+            options={[
+              { value: 'demand_t', label: m.map_layer_demand() },
+              { value: 'population', label: m.map_layer_population() },
+              { value: 'service_days', label: m.map_layer_service() },
+              ...(coverageReady
+                ? [{ value: 'covered_pct' as const, label: m.mapc_metric_coverage() }]
+                : []),
+            ]}
+          />
+        ) : (
+          <p className="text-muted-foreground text-xs">{m.mapm_fill_active()}</p>
+        )}
         <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
           <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
-            <Switch checked={showLocalities} onCheckedChange={setShowLocalities} />
+            <Switch
+              checked={showLocalities}
+              onCheckedChange={(v) => changeLayers({ localities: v })}
+            />
             {m.map_show_localities()}
           </Label>
           <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
@@ -134,14 +240,43 @@ function NetworkMapPage() {
           showLocalities={showLocalities}
           containers={showContainers ? containers : null}
           coverage={coverage}
+          municipal={municipal}
           selected={selected}
           onSelect={setSelected}
           className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:h-[34rem] lg:col-span-9 lg:h-[42rem]"
         />
-        <div className="lg:col-span-3">
+        <div className="space-y-4 lg:col-span-3">
+          {desktop && (
+            <section
+              aria-label={m.mapm_panel_title()}
+              className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
+            >
+              <h2 className="mb-3 font-serif text-lg">{m.mapm_panel_title()}</h2>
+              {layersPanel}
+            </section>
+          )}
           <ParishPanel zone={zones.find((z) => z.code === selected) ?? null} />
         </div>
       </div>
+      {!desktop && (
+        <Sheet open={layersOpen} onOpenChange={setLayersOpen}>
+          <SheetContent
+            side="bottom"
+            className="max-h-[88dvh] gap-0 overflow-y-auto overscroll-contain rounded-t-2xl"
+          >
+            <SheetHeader className="pr-14">
+              <SheetTitle className="font-serif text-xl">{m.mapm_panel_title()}</SheetTitle>
+              <SheetDescription>{m.mapm_panel_desc()}</SheetDescription>
+            </SheetHeader>
+            <div className="px-4 pb-6">{layersPanel}</div>
+          </SheetContent>
+        </Sheet>
+      )}
+      <SiteSheet
+        siteId={search.site ?? null}
+        onClose={() => selectSite(null)}
+        showMapLink={false}
+      />
       {containersQuery.isError ? (
         <div role="alert" className="flex flex-wrap items-center gap-3 text-sm">
           <span className="text-destructive">

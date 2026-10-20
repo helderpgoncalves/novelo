@@ -1,6 +1,6 @@
 # Documentação do Novelo
 
-Só Markdown, em pt-PT. Nomes de ficheiros em português, minúsculas e hífens. Se o comportamento, os números ou os comandos mudarem, o doc muda no mesmo commit.
+O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-PT. Nomes de ficheiros em português, minúsculas e hífens. Se o comportamento, os números ou os comandos mudarem, o doc muda no mesmo commit.
 
 ## Projeto
 
@@ -38,12 +38,14 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 | Documento | Para quê |
 | --- | --- |
 | [Arquitetura](engenharia/arquitetura.md) | Camadas, contrato OpenAPI, base de dados, autenticação, qualidade |
-| [Funcionalidades](engenharia/features.md) | O que cada funcionalidade faz e como se comporta |
+| [Funcionalidades](engenharia/features.md) | O que cada funcionalidade e cada ecrã faz, e o estado de implementação |
 | [Dados e modelo](engenharia/dados-e-modelo.md) | Fórmulas, pressupostos e calibração |
 | [IA](engenharia/ia.md) | OpenRouter, prompts versionados, verificador, triagem |
-| [Copiloto](engenharia/copiloto.md) | Conversa em streaming, ferramentas, artefactos, ações, memória, persona, avaliação |
-| [Ambiente](engenharia/ambiente.md) | Variáveis `.env`, Resend, Google OAuth, OpenRouter |
-| [Deploy](engenharia/deploy.md) | Coolify, domínio, variáveis, operação |
+| [Copiloto](engenharia/copiloto.md) | Conversa em streaming, ferramentas, artefactos, ações, memória, persona, interface web, avaliação e limitações |
+| [Avaliação do copiloto](engenharia/avaliacao-copiloto.md) | Resultado gerado por `just eval-copilot` (última corrida: 67 casos) |
+| [Avaliação da triagem](engenharia/avaliacao-triagem.md) | Como medir a triagem por foto; ainda sem corrida |
+| [Ambiente](engenharia/ambiente.md) | Variáveis `.env`, Resend e `EMAIL_TRANSPORT`, Google OAuth, OpenRouter, magic link, entrada por QR e limites de convidados |
+| [Deploy](engenharia/deploy.md) | Coolify na VPS, domínio, variáveis que o compose repassa, deploy manual, operação |
 | [Workflow com agentes](engenharia/workflow-ia.md) | Claude Code e GLM/Z.ai/ZCode a partilhar o mesmo contexto |
 | [Backlog](engenharia/backlog.md) | O que está feito e o que falta, por dia |
 | [Demo e entrega](engenharia/demo-e-entrega.md) | Guião da demo e checklist |
@@ -59,7 +61,7 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 
 | Documento | Para quê |
 | --- | --- |
-| [Guia de marca](marca/guia-de-marca.md) | Cores, tipografia, símbolo |
+| [Guia de marca](marca/guia-de-marca.md) | Cores, tipografia, símbolo, construção do logótipo, `just brand` e `just check-brand` |
 | [Descrição](marca/descricao.md) | Textos da página do projeto |
 
 Para agentes de código: [AGENTS.md](../AGENTS.md) (fonte única) e [CLAUDE.md](../CLAUDE.md).

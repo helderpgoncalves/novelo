@@ -24,6 +24,7 @@ ErrorCode = Literal[
     "invalid_token",
     "forbidden",
     "registration_closed",
+    "invalid_event_code",
     "not_found",
     "user_not_found",
     "email_taken",
@@ -33,6 +34,9 @@ ErrorCode = Literal[
     "feature_disabled",
     "upstream_error",
     "ai_budget_exceeded",
+    "captcha_required",
+    "captcha_failed",
+    "captcha_unavailable",
     "internal_error",
 ]
 
@@ -105,6 +109,11 @@ class RegistrationClosedError(AppError):
     code = "registration_closed"
 
 
+class InvalidEventCodeError(AppError):
+    status_code = 403
+    code = "invalid_event_code"
+
+
 class NotFoundError(AppError):
     status_code = 404
     code = "not_found"
@@ -145,6 +154,23 @@ class AiBudgetExceededError(AppError):
 
     status_code = 503
     code = "ai_budget_exceeded"
+
+
+class CaptchaRequiredError(AppError):
+    status_code = 400
+    code = "captcha_required"
+
+
+class CaptchaFailedError(AppError):
+    status_code = 403
+    code = "captcha_failed"
+
+
+class CaptchaUnavailableError(AppError):
+    """A Cloudflare não respondeu (ou o Turnstile não está configurado e é obrigatório). Fail-closed."""
+
+    status_code = 503
+    code = "captcha_unavailable"
 
 
 class UpstreamError(AppError):

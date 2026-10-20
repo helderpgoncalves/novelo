@@ -8,7 +8,7 @@ export const uniqueEmail = (prefix: string) =>
   `${prefix}.${Date.now()}.${Math.floor(Math.random() * 1e4)}@example.pt`;
 
 export async function login(page: Page, credentials = ADMIN) {
-  await page.goto('/pt/login');
+  await page.goto('/pt/login?method=password');
   await page.getByLabel('Email').fill(credentials.email);
   await page.getByLabel('Password', { exact: true }).fill(credentials.password);
   await page.getByRole('button', { name: 'Entrar' }).click();

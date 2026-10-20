@@ -119,7 +119,9 @@ async def test_login_is_rate_limited(client: httpx.AsyncClient) -> None:
 
 async def test_auth_config(client: httpx.AsyncClient) -> None:
     body = (await client.get(f"{AUTH}/config")).json()
-    assert body == {"google_enabled": False, "registration_open": True, "password_min_length": 10}
+    assert body["google_enabled"] is False and body["registration_open"] is True
+    assert body["password_min_length"] == 10
+    assert isinstance(body["magic_link_enabled"], bool) and isinstance(body["quick_join_enabled"], bool)
 
 
 async def test_remember_me_controls_cookie_lifetime(client: httpx.AsyncClient) -> None:

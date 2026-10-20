@@ -11,7 +11,8 @@ Novelo é a ferramenta de decisão que desenha a rede de recolha de têxteis de 
 triagem por foto, lotes com QR e passaporte público, bolsa de fibra, evidência por marca, relatório RAP em PDF e mapa. Domínio completo: `docs/engenharia/features.md`.
 
 - **Equipa:** Hélder Gonçalves e Flávio Fernandes. Hackathon de 5 dias: velocidade e perfeição, sem desperdício.
-- **Produção:** https://novelo.helder.si (Coolify, `docker-compose.yml`). Dev: `just dev`.
+- **Produção:** https://novelo.helder.si (Coolify numa VPS, `docker-compose.yml`). Repositório privado. Dev: `just dev`.
+- **Domínios:** produção `novelo.helder.si`; emails e administrador de dev em `heldergoncalves.io`.
 - **Ambiente:** `docs/engenharia/ambiente.md` (variáveis), `docs/engenharia/ia.md` (OpenRouter), `docs/engenharia/workflow-ia.md` (agentes).
 
 ## Regra zero: usar os dados reais da Vitrus
@@ -36,9 +37,12 @@ com fonte, ou leva a etiqueta "estimativa" no ecrã.
 | Comando | O que faz |
 | --- | --- |
 | `just dev` | Stack completa com hot reload (Docker): web :3190, api :8190, postgres :5590 |
-| `just check` | Lint + tipos + testes + contrato. Corre localmente (não há CI remota por agora). **Tem de passar antes de cada push** |
+| `just check` | API (Ruff, mypy, pytest) + web (Biome, tsc, Vitest) + marca + contrato. Corre localmente (não há CI remota por agora). **Tem de passar antes de cada push** |
 | `just gen` | Regenera `openapi.json` e o cliente TypeScript. Correr sempre que a API mudar |
-| `just etl` | Excel de `data/raw/` para `data/processed/` |
+| `just etl` | Excel e pacote QGIS (contentores municipais, CAOP) de `data/raw/` para `data/processed/` |
+| `just seed` | Importa `data/processed/` para a base de dados (idempotente; a API já o faz ao arrancar) |
+| `just brand` / `just check-brand` | Regenera os assets da marca de uma só fonte / mede o alinhamento do logótipo (precisa de `rsvg-convert`) |
+| `just eval-copilot` / `just eval-triage` | Avaliações com o modelo real (precisam de `OPENROUTER_API_KEY`) |
 | `just fix` | Formata e corrige o que o lint conseguir |
 | `just migration "msg"` / `just migrate` | Alembic |
 
@@ -51,8 +55,8 @@ apps/api/            FastAPI (Python 3.12, uv). src/novelo/{core,features,domain
 apps/web/            React + Vite + TanStack Router/Query + Tailwind v4 + shadcn/ui. src/client é GERADO
 data/raw|processed/  Excel recebidos | CSV/JSON limpos (gerados)
 docs/                projeto/ · engenharia/ · dados/ · marca/ (só Markdown, sem PDFs)
-brand/               símbolo, logotipos, fontes, avatares (assets da marca)
-scripts/             etl/ e export_openapi.py
+brand/               símbolo, logotipos, fontes, avatares, redes (gerados por `just brand`)
+scripts/             etl/, brand/, eval_*.py e export_openapi.py
 .claude/             agentes e skills partilhados (também lidos por GLM/ZCode, ver abaixo)
 openapi.json         contrato exportado, versionado
 ```
@@ -67,7 +71,7 @@ O `operationId` é o nome da função Python: nomes claros (`list_zones`, `creat
 **Python (API).**
 - Feature-based: `features/<nome>/{router,service,models,schemas}.py`. Routers finos, sem prefixo (aplica-se no `main.py`);
   services sem FastAPI que levantam `AppError`; `domain/` só funções puras (fórmulas, otimização), 100% testadas com valores calculados à mão.
-- I/O externo só em `adapters/` (OpenRouter, OSRM), injetado por `Depends`; nos testes troca-se por falsos.
+- I/O externo só em `adapters/` (OpenRouter, email; um futuro cliente OSRM também), injetado por `Depends`; nos testes troca-se por falsos.
 - Tudo tipado: `mypy --strict` e `ruff` limpos. Pydantic v2 em todos os pedidos e respostas. Erros no formato `{code, message, details}`.
 - Config só por `core/config.py` (`.env.example` lista tudo). Segredos nunca no código nem nos logs.
 - Rotas que chamam OR-Tools são `def` (threadpool), com limite de tempo (`SOLVER_TIME_LIMIT_S`) e sementes fixas.

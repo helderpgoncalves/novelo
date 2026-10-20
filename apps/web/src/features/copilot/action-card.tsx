@@ -11,6 +11,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { useIsGuest } from '@/features/auth/use-current-user';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
@@ -85,6 +86,9 @@ export function ActionCard({
   const undo = useMutation({ ...undoCopilotActionMutation(), onSuccess: done, onError: fail });
   const busy = confirm.isPending || reject.isPending || undo.isPending;
   const proposed = action.status === 'proposed';
+  // A API recusa ações de risco alto/crítico a convidados: explica-se antes de haver um clique sem saída.
+  const guestBlocked =
+    useIsGuest() && (action.risk === 'high' || action.risk === 'critical' || action.requires_text);
   const result = typeof action.result?.message === 'string' ? action.result.message : null;
 
   return (
@@ -112,7 +116,12 @@ export function ActionCard({
         <p className="text-muted-foreground text-sm leading-relaxed">{action.impact}</p>
       )}
       {result && !proposed && <p className="text-sm">{result}</p>}
-      {proposed && (
+      {proposed && guestBlocked && (
+        <p className="text-muted-foreground text-sm leading-relaxed" role="note">
+          {m.guest_action_blocked()}
+        </p>
+      )}
+      {proposed && !guestBlocked && (
         <>
           {needsText && (
             <div className="space-y-1.5">

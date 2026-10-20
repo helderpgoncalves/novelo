@@ -7,48 +7,112 @@
 **A ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães ao menor custo.**
 
 Projeto do Desafio 5 (TexVitrus, Vitrus Ambiente) do Hack4Guimarães 2035, por Hélder Gonçalves e Flávio Fernandes.
-Em produção em **[novelo.helder.si](https://novelo.helder.si)**.
+Em produção em **[novelo.helder.si](https://novelo.helder.si)**. O repositório é privado.
 
 O decisor define um orçamento e uma meta de captura. O Novelo devolve cenários comparáveis em euros, toneladas e €/t, calculados por um otimizador
 sobre os dados reais da Vitrus, e acompanha cada saco de roupa até à fábrica, do saco ao fio.
 
+## Índice
+
+[O problema](#o-problema) · [Os números](#os-números-que-alimentam-tudo) · [O que o Novelo faz](#o-que-o-novelo-faz) · [IA](#ia-com-rédea-curta) · [Dados](#dados-e-regra-zero) · [Arquitetura](#arquitetura) · [Stack](#stack) · [Arrancar](#arrancar) · [Testes](#testes-e-qualidade) · [Estrutura](#estrutura-do-repositório) · [Produção](#produção-e-deploy) · [Segurança e RGPD](#segurança-e-rgpd) · [Marca](#marca) · [Hackathon](#hackathon-equipa-e-critérios) · [Limitações](#limitações-conhecidas-e-roteiro) · [Documentação](#documentação)
+
 ## O problema
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil. A recolha seletiva é obrigatória desde 2025 e, a partir de 17 de abril de 2028, os produtores
-passam a pagar (Diretiva (UE) 2025/1892). O concelho tem 156 830 habitantes dispersos por 48 freguesias. A pergunta da Vitrus é simples:
-**como recolher mais têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?**
+Em Guimarães, 5,4% do lixo indiferenciado é têxtil, segundo o Plano de Ação Integrado para a Circularidade Têxtil (Município de Guimarães, URBACT, 25/11/2025).
+A recolha seletiva de têxteis é obrigatória desde 1 de janeiro de 2025 e, até 17 de abril de 2028, cada Estado-Membro tem de ter um regime em que os produtores
+pagam a recolha, a triagem e a reciclagem (Diretiva (UE) 2025/1892). O concelho tem 156 830 habitantes (INE, Censos 2021) dispersos por 48 freguesias, o que
+encarece o porta a porta e torna arriscado pôr contentores ao acaso.
 
-## Os números reais que alimentam tudo
+A pergunta da Vitrus é simples: **como recolher mais têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?**
+O Novelo responde com a camada de decisão: onde investir, que modo de recolha usar em cada zona e quanto custa cada tonelada.
 
-Todos vêm dos ficheiros da Vitrus e do INE (ver [análise dos dados recebidos](docs/dados/analise-dados-recebidos.md)). Nada é inventado: o que não tem fonte leva a etiqueta "estimativa".
+## Os números que alimentam tudo
 
-| Facto | Valor |
-| --- | --- |
-| Têxtil recolhido em 2025 (4 entidades) | **301,3 t** (0,16 kg por habitante e mês) |
-| População do concelho (soma das freguesias, INE) | **156 830** habitantes |
-| Potencial estimado (0,7 kg/hab/mês) | **≈ 1 317 t por ano** |
-| Captura atual | **≈ 22,9%** do potencial, faltam cerca de 1 016 t |
-| Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito |
-| Rede atual | 40 circuitos, 29 viaturas, 82 localidades servidas |
+Os valores da Vitrus e do INE vêm dos ficheiros recebidos (ver [análise dos dados recebidos](docs/dados/analise-dados-recebidos.md)). O que é cálculo nosso ou
+depende de um pressuposto leva "estimativa". Nada é inventado: sem fonte, não entra.
+
+| Facto | Valor | Origem |
+| --- | --- | --- |
+| Têxtil recolhido em 2025 (4 entidades) | **301,3 t**, 0,16 kg por habitante e mês (1,92 kg por habitante e ano) | Vitrus (`dados_textil.xlsx`); duas das quatro entidades enviaram percentagens, não quilos, por isso o destino é em parte estimativa |
+| População do concelho | **156 830** habitantes em 48 freguesias | INE, Censos 2021 (soma das freguesias) |
+| Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus |
+| Rede atual | 40 circuitos, 29 viaturas, 82 localidades, 101 turnos por semana | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`, semana de 21 a 25/09/2026) |
+| Potencial | **≈ 1 317 t por ano** (0,7 kg/hab/mês × 156 830 × 12) | **Estimativa**; 0,7 kg vem do plano municipal |
+| Captura atual | **≈ 22,9%** do potencial; faltam cerca de **1 016 t** | **Estimativa** (301,3 ÷ 1 317,4) |
+| Referência francesa | 4,27 kg/hab/ano contra 1,92 em Guimarães; meta equivalente de 669,7 t | França: Refashion, fonte secundária, **por verificar**; o resto é cálculo |
+
+**Uma incerteza que dizemos em voz alta.** O plano escreve "0,7 kg de têxteis nos RSU por mês per capita". Se isto for o que *ainda vai* no indiferenciado, e não a
+geração total, o potencial a captar é o mesmo mas a captura de 2025 desce de 22,9% para cerca de 18,6% (estimativa). Está por esclarecer com a Vitrus
+([pergunta Q6](docs/projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54)); até lá, o ecrã mostra sempre "estimativa".
 
 ## O que o Novelo faz
 
-| Funcionalidade | Em resumo |
-| --- | --- |
-| **Simulador da rede** | Otimizador com OR-Tools (CP-SAT para a escolha de pontos e modos, VRP para as rotas), combinando três modos: contentor de rua, ponto em local existente e recolha a pedido aproveitando os circuitos já existentes |
-| **Cenários e comparação** | Guarda cada cenário com investimento, custo anual, toneladas, €/t e cobertura; compara dois lado a lado |
-| **"E se...?" em português** | O decisor pergunta em linguagem natural; a IA só traduz para uma alteração estruturada e o otimizador faz as contas. Um verificador rejeita qualquer número da explicação que não venha do otimizador |
-| **Triagem por foto** | Duas fotos (peça e etiqueta) dão tipo, estado, composição e marca, sempre confirmadas pelo operador. As fotos não são guardadas |
-| **Lotes, QR e passaporte** | Cada lote tem código, QR e uma página pública com origem, composição, peso e histórico |
-| **Bolsa de fibra** | Lotes agregados por fibra, que os recicladores reservam |
-| **Evidência por marca** | Quilos por marca e composição, com o tamanho da amostra |
-| **Relatório RAP/EPR em PDF** | Custo por tipo de território (TIPAU), toneladas por fibra e destino, cenários, método e fontes |
-| **Mapa da rede** | Freguesias, localidades e contentores (o inventário municipal de 20 de outubro de 2026 já está no ETL e na API; os contentores de têxteis continuam por receber) |
-| **Dados da Vitrus** | Circuitos, frota, localidades e alertas de qualidade, com pesquisa, filtros, ordenação, colunas visíveis e paginação |
-| **Conta completa** | Login, registo, Google, confirmação de email, recuperar password, "manter sessão iniciada", administração de utilizadores |
-| **Produto cuidado** | Português (pt-PT) e inglês, tema claro e escuro, PWA instalável e pensada primeiro para telemóvel, acessibilidade AA |
+Uma história, do saco ao fio: planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028.
 
-Detalhe de cada uma em [docs/engenharia/features.md](docs/engenharia/features.md).
+| Funcionalidade | Onde | Em resumo |
+| --- | --- | --- |
+| **Ponto de partida** | `/` | Os números reais de 2025, a lacuna para o potencial, o destino do recolhido, a comparação com referências e o relógio regulatório |
+| **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, modos e rotas. Otimizador OR-Tools: CP-SAT escolhe pontos e modos, VRP faz as rotas, combinando contentor de rua, ponto em local existente e recolha a pedido nos circuitos que já passam |
+| **Cenários e comparação** | `/scenarios` | Cada cenário guarda investimento, custo anual, toneladas, €/t e cobertura; compara-se lado a lado, com fluxos, referência francesa, robustez e incerteza (tornado e Monte Carlo P10/P50/P90). A fronteira de Pareto aparece no ponto de partida |
+| **Pressupostos** | `/assumptions` | Cada parâmetro com valor, unidade e origem (Vitrus, plano, pressuposto da equipa) |
+| **Piloto de 3 meses** | `/pilot` | Escolhe 2 a 4 freguesias de maior valor de aprendizagem e calcula o piso de sinal: toneladas mínimas para medir o rejeito |
+| **Cobertura** | `/coverage` | Parte da população a pé de um contentor **de têxteis**, por freguesia. Fica em espera até a Vitrus enviar as localizações; não inventa cobertura |
+| **"E se...?"** | no cenário e no copiloto | Pergunta em português; a IA só traduz para uma alteração estruturada e o otimizador faz as contas. Um verificador rejeita números que não venham do otimizador |
+| **Copiloto** | `/chat`, painel `⌘K` | Conversa em streaming com 46 ferramentas tipadas, gráficos e tabelas construídos pelo servidor, ações que só correm com confirmação, memória por utilizador, anexos e `@menções` |
+| **Triagem por foto** | `/triage` | Uma foto da peça e, opcionalmente, outra da etiqueta dão tipo, estado, composição e marca, sempre confirmadas pelo operador. As fotos não são guardadas |
+| **Lotes, QR e passaporte** | `/lots`, `/passport/:código` | Cada lote tem código, QR e uma página pública com origem, composição, peso e histórico |
+| **Bolsa de fibra** | `/market` | Lotes agregados por fibra, que os recicladores reservam |
+| **Evidência por marca** | `/brands` | Quilos por marca e composição, com o tamanho da amostra |
+| **Relatório RAP/EPR em PDF** | `/reports` | Custo por tipo de território (TIPAU), toneladas por fibra e destino, cenários, método e fontes |
+| **Mapa da rede** | `/map` | Freguesias (CAOP 2019), localidades e camadas dos contentores municipais; os de têxteis entram quando chegarem |
+| **Rede municipal** | `/municipal` | 2 751 contentores municipais de outras frações (**não são de têxteis**) em 6 separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas e qualidade. Servem de candidatos, produtores B2B e densidade |
+| **Dados da Vitrus** | `/circuits`, `/fleet`, `/localities`, `/data-quality` | Circuitos, localidades e alertas de qualidade; a Frota tem calendário da semana tipo (por viatura ou circuito, conflitos reais, exportação `.ics`), mapa e visão geral |
+| **Entrada e contas** | `/login`, `/join` | Login por **magic link** (principal), password ou Google; entrada de evento por **QR** como convidado; confirmação de email; administração de utilizadores e convidados |
+| **Administração de IA** | `/admin/ai` | Modelo por tarefa, reserva, limites, orçamento mensal e custos |
+| **Produto cuidado** | tudo | pt-PT e inglês, tema claro e escuro, PWA instalável feita primeiro para telemóvel, acessibilidade AA, visita guiada na primeira entrada |
+
+Detalhe de cada uma em [docs/engenharia/features.md](docs/engenharia/features.md); o copiloto tem [documento próprio](docs/engenharia/copiloto.md).
+
+## IA com rédea curta
+
+O modelo (via OpenRouter) devolve JSON validado por Pydantic e **nunca faz contas**: todos os números vêm do otimizador ou da base de dados.
+
+```mermaid
+flowchart LR
+    P["Pergunta em português"] --> M1["Modelo: traduz<br/>para ScenarioDelta"]
+    M1 --> C["Utilizador confirma<br/>'Entendi: ...'"]
+    C --> O["Otimizador OR-Tools<br/>calcula os KPIs"]
+    O --> M2["Modelo: escreve<br/>a explicação"]
+    M2 --> V{"Verificador:<br/>todo o número<br/>está nos KPIs?"}
+    V -->|sim| R["Resposta"]
+    V -->|"não, 1.ª vez"| M2
+    V -->|"não, 2.ª vez"| T["Só a tabela de números"]
+```
+
+- **O que a IA faz:** percebe a pergunta, explica o resultado, descreve o ecrã, lê a etiqueta e a peça nas fotos, propõe a resolução de alertas e escreve o parágrafo do relatório RAP.
+- **O que a IA não faz:** contas, nem escrever valores em gráficos e tabelas (o servidor desenha-os a partir dos resultados), nem alterar dados sem um clique de confirmação.
+- **Verificador de números** (`ai/verify.py`): rejeita qualquer número do texto que não exista nos resultados de origem; no copiloto, o texto já transmitido é retirado (`retract`) e reescrito uma vez.
+- **Custos e travões:** modelo por tarefa e orçamento mensal no painel `/admin/ai`; sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503; sem IA, o relatório RAP sai com um texto determinístico.
+- **Convidados do evento** têm limites próprios de pedidos por hora e de gasto.
+
+Ver [IA](docs/engenharia/ia.md) e [Copiloto](docs/engenharia/copiloto.md).
+
+## Dados e regra zero
+
+**Regra zero:** os dados recebidos da Vitrus são obrigatórios em tudo o que for número. Um valor ou vem dos ficheiros, ou está em
+[dados e modelo](docs/engenharia/dados-e-modelo.md) como pressuposto com fonte, ou leva a etiqueta "estimativa" no ecrã.
+
+| Fonte | O que traz | Estado |
+| --- | --- | --- |
+| **Vitrus Ambiente** | Têxtil recolhido em 2025 por entidade e destino; circuitos, viaturas, localidades e turnos | Recebido, em uso |
+| **Vitrus Ambiente, pacote QGIS de 20/10/2026** | 2 751 contentores **municipais** de outras frações, 2 026 locais e a CAOP 2019 | Recebido; nunca se mistura com a rede de têxteis |
+| **Vitrus Ambiente** | Localização dos contentores **de têxteis**; custos por recolha, quilómetro e contentor | **Por receber** |
+| **INE** | População por freguesia (Censos 2021) e tipologia TIPAU | Em uso |
+| **CAOP** | Contornos das freguesias (2019, no pacote da Vitrus) | Em uso |
+| **OpenStreetMap** | Localidades geocodificadas dos circuitos (Nominatim) | Em uso (71 das 82) |
+
+`data/raw/` guarda os originais e nunca se edita; `just etl` gera `data/processed/`; a API importa-os no arranque, de forma idempotente, com a impressão digital (SHA-256) de cada ficheiro.
+Sem custos unitários da Vitrus, os custos do simulador são **pressupostos** visíveis em `/assumptions`, e a incerteza é mostrada como resultado (tornado e Monte Carlo), não como nota de rodapé.
 
 ## Arquitetura
 
@@ -56,38 +120,43 @@ Detalhe de cada uma em [docs/engenharia/features.md](docs/engenharia/features.md
 flowchart LR
     subgraph Cliente
         W["Web: React + Vite<br/>TanStack Router e Query<br/>shadcn/ui, PWA"]
+        QR["Telemóvel com QR<br/>passaporte e entrada de evento"]
     end
-    subgraph Servidor
-        N["nginx (SPA + /api)"]
-        A["API FastAPI<br/>OR-Tools, WeasyPrint"]
-        D[("Postgres 17")]
+    subgraph VPS["VPS (Coolify, Traefik, HTTPS)"]
+        N["web: nginx<br/>SPA + /api (SSE sem buffering)"]
+        A["api: FastAPI<br/>OR-Tools, WeasyPrint"]
+        D[("Postgres 17<br/>Alembic")]
     end
     subgraph Externos
         OR["OpenRouter (LLM)"]
         RS["Resend (email)"]
         GO["Google OAuth"]
     end
-    W -->|cliente gerado do OpenAPI| N --> A --> D
+    W -->|"cliente gerado do OpenAPI"| N
+    QR --> N
+    N --> A --> D
     A --> OR
     A --> RS
     A --> GO
-    X["data/processed<br/>Excel da Vitrus, INE, OSM"] -->|seed idempotente| D
+    X["data/processed<br/>Vitrus, INE, CAOP, OSM"] -->|"seed idempotente"| D
 ```
 
 O contrato é a única fonte de verdade: o FastAPI exporta o `openapi.json` e o hey-api gera o cliente TypeScript, os hooks do TanStack Query e os esquemas Zod.
-O web nunca escreve rotas nem tipos à mão. Mais em [docs/engenharia/arquitetura.md](docs/engenharia/arquitetura.md).
+O web nunca escreve rotas nem tipos à mão; `just check-contract` falha se o contrato e o cliente divergirem. No servidor, cada funcionalidade tem
+`router` fino, `service` sem FastAPI e `domain/` só com funções puras testadas à mão. Mais em [arquitetura](docs/engenharia/arquitetura.md).
 
 ## Stack
 
 | Camada | Escolha |
 | --- | --- |
 | API | Python 3.12, FastAPI, SQLAlchemy 2 assíncrono, Alembic, Pydantic v2, uv |
-| Otimização | OR-Tools (CP-SAT e VRP), funções puras em `domain/` |
+| Otimização | OR-Tools (CP-SAT e VRP), funções puras em `domain/`, sementes fixas e limite de tempo (`SOLVER_TIME_LIMIT_S`) |
 | Base de dados | PostgreSQL 17 |
-| Web | React, Vite, TanStack Router e Query, Tailwind v4, shadcn/ui, MapLibre, Paraglide (i18n), vite-plugin-pwa |
+| Web | React 19, Vite, TanStack Router e Query, Tailwind v4, shadcn/ui, MapLibre, ECharts, Paraglide (i18n), vite-plugin-pwa |
 | Contrato | OpenAPI e hey-api (cliente, SDK, Zod, React Query) |
-| IA | OpenRouter, saída estruturada validada por Pydantic, prompts versionados |
-| Email | Resend (em dev, os emails aparecem no log) |
+| IA | OpenRouter, saída estruturada validada por Pydantic, prompts versionados em `apps/api/src/novelo/ai/prompts/` |
+| Autenticação | argon2, JWT em cookies HttpOnly, magic link, Google OAuth |
+| Email | Resend (em dev os emails vão para o log) |
 | PDF | WeasyPrint com as fontes da marca |
 | Qualidade | Ruff, mypy strict, pytest, Biome, TypeScript strict, Vitest, Playwright |
 | Deploy | Docker Compose no Coolify, domínio único com HTTPS |
@@ -98,67 +167,145 @@ Requisitos: Docker, [just](https://github.com/casey/just), Node 22 com pnpm, [uv
 
 ```bash
 just setup      # cria o .env e instala as dependências
-just dev        # stack completa com hot reload
+just dev        # stack completa com hot reload (Docker)
 ```
 
 | Serviço | URL |
 | --- | --- |
 | Web | http://localhost:3190 |
-| API e documentação | http://localhost:8190/api/docs |
+| API e documentação | http://localhost:8190/api/docs (só em desenvolvimento) |
 | Postgres | `localhost:5590` |
 
-Em desenvolvimento existe um administrador: `admin@heldergoncalves.io` com a password `admin-novelo-dev-1` (definido no `.env`). Os emails de recuperar password e confirmação
-aparecem em `just logs api`. As variáveis estão descritas em [docs/engenharia/ambiente.md](docs/engenharia/ambiente.md).
+**Credenciais de desenvolvimento** (definidas no `.env.example`, nunca usar em produção):
+
+| O quê | Valor |
+| --- | --- |
+| Administrador | `admin@heldergoncalves.io` com a password `admin-novelo-dev-1` (`/login?method=password`) |
+| Entrada por QR | http://localhost:3190/join?c=novelo-dev (o código `novelo-dev` só existe em desenvolvimento) |
+| Emails (magic link, recuperar password, confirmação) | não saem: aparecem em `just logs api` |
+
+Sem `OPENROUTER_API_KEY` as funcionalidades de IA respondem 503; o resto funciona. As variáveis estão descritas em [ambiente](docs/engenharia/ambiente.md).
+
+Comandos (`just` sem argumentos lista tudo):
 
 | Comando | O que faz |
 | --- | --- |
-| `just check` | Lint, tipos, testes e verificação do contrato. Corre localmente; tem de passar antes de cada push |
+| `just dev` / `just down` | Sobe / para a stack de desenvolvimento (`down -v` apaga a base de dados) |
+| `just check` | `check-api`, `check-web`, `check-brand` e `check-contract`. Corre localmente; tem de passar antes de cada push |
 | `just gen` | Regenera `openapi.json` e o cliente TypeScript sempre que a API muda |
-| `just etl` | Converte os Excel de `data/raw` em `data/processed` |
+| `just etl` | Converte os Excel e o pacote QGIS de `data/raw` em `data/processed` |
+| `just seed` | Importa `data/processed` para a base de dados (idempotente; corre sozinho no arranque da API) |
 | `just fix` | Formata e corrige o que o lint conseguir |
 | `just migration "msg"` / `just migrate` | Migrações Alembic |
+| `just brand` / `just check-brand` | Regenera os assets da marca / mede o alinhamento do logótipo |
+| `just eval-copilot` / `just eval-triage` | Avaliações com o modelo real (precisam de `OPENROUTER_API_KEY`) |
 | `just build` | Constrói as imagens de produção |
+| `just logs [serviço]` | Logs da stack de desenvolvimento (aqui aparecem os emails) |
+| `just ui <componentes>` | Adiciona componentes shadcn/ui |
+| `just api`, `just web`, `just db` | Fora do Docker |
 
-## Dados e ETL
+## Testes e qualidade
 
-Os Excel recebidos ficam em `data/raw/` e nunca se editam. `just etl` limpa-os para CSV e JSON em `data/processed/`; a API importa-os para o Postgres no arranque
-(idempotente), juntamente com a geografia pública (freguesias da CAOP, população do INE, tipologia TIPAU, localidades geocodificadas a partir do OpenStreetMap).
-A 20 de outubro de 2026 a Vitrus enviou o inventário dos contentores **municipais** (outras frações, não são de têxteis) e a CAOP 2019: `just etl` produz `data/processed/municipal_*` e um GeoPackage para o QGIS (ver [análise dos contentores municipais](docs/dados/analise-contentores-municipais.md)); a API importa-os para tabelas `municipal_*` e serve-os em `/api/v1/municipal` (sem nomes de produtores, salvo `admin`). As localizações dos contentores **de têxteis** continuam por receber e entram pelo mesmo fluxo. Ver [dados e modelo](docs/engenharia/dados-e-modelo.md).
+`just check` é a barreira antes de cada push (não há integração contínua remota por agora). Contagens a 20 de outubro de 2026:
 
-## IA com rédea curta
+| Área | O que corre |
+| --- | --- |
+| API | **536 testes** de pytest (funções puras do `domain/`, rotas, autenticação e magic link, otimizador, relatório, copiloto com modelo falso, importação municipal), com Ruff e mypy strict limpos |
+| Web | **157 testes** de Vitest (formatação, erros tipados, DataTable, separadores, copiloto, agenda da frota, QR); Biome e `tsc` |
+| Ponta a ponta | **162 testes** de Playwright em 25 ficheiros, contra a stack de `just dev`, em desktop e telemóvel (`pnpm exec playwright test` em `apps/web`; não fazem parte do `just check`) |
+| Contrato | `just check-contract` falha se `openapi.json` ou o cliente gerado estiverem desatualizados |
+| Marca | `just check-brand` mede o logótipo em píxeis (tolerância de 0,5 px a 512 px) |
+| IA | `just eval-copilot`: 78 casos em pt-PT e en; a última corrida publicada (67 casos, antes dos casos municipais) aprovou todos ([avaliação](docs/engenharia/avaliacao-copiloto.md)) |
 
-O modelo (via OpenRouter) devolve JSON validado por Pydantic e **nunca faz contas**: todos os números vêm do otimizador ou da base de dados, e um verificador rejeita
-explicações com números que não existam nos factos. Sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503. Ver [docs/engenharia/ia.md](docs/engenharia/ia.md).
-
-## Testes
-
-- **API:** 76 testes de pytest (funções puras do `domain/`, rotas, autenticação, otimizador, relatório), com Ruff e mypy strict limpos.
-- **Web:** Vitest (formatação, erros tipados) e 27 testes Playwright ponta a ponta contra a stack de desenvolvimento, em desktop e telemóvel.
-- **Contrato:** `just check-contract` falha se o `openapi.json` ou o cliente gerado estiverem desatualizados.
-
-## Deploy
-
-Cada push para `main` é construído e posto no ar pelo Coolify, a partir de `docker-compose.yml`, em **novelo.helder.si** (um só domínio: o nginx do web serve a SPA e encaminha `/api`).
-Passo a passo e variáveis em [docs/engenharia/deploy.md](docs/engenharia/deploy.md). Por agora não há integração contínua remota: `just check` corre localmente antes de cada push.
+A exatidão da triagem por foto **ainda não foi medida**: não há imagens de teste com verdade-terreno ([avaliação da triagem](docs/engenharia/avaliacao-triagem.md)).
 
 ## Estrutura do repositório
 
 ```
 apps/api/            FastAPI (src/novelo/{core,features,domain,adapters,ai}), migrações e testes
 apps/web/            React + Vite. src/client é gerado; src/components/data-table é a tabela única do produto
-data/raw|processed/  Excel recebidos | CSV e JSON limpos (gerados)
+data/raw|processed/  Excel e pacote QGIS recebidos | CSV, JSON e GeoJSON limpos (gerados)
 docs/                projeto/ · pesquisa/ · engenharia/ · dados/ · marca/ (só Markdown)
-brand/               símbolo, logotipos, fontes e avatares (gerados por `just brand`)
-scripts/             etl/ e export_openapi.py
+brand/               símbolo, logotipos, fontes, avatares e redes (gerados por `just brand`)
+scripts/             etl/, brand/, eval_*.py e export_openapi.py
 .claude/             agentes e skills partilhados (Claude Code, GLM/Z.ai, ZCode)
 openapi.json         contrato exportado e versionado
+docker-compose.yml   produção (Coolify) · docker-compose.dev.yml desenvolvimento
 ```
+
+## Produção e deploy
+
+Cada push para `main` é construído e posto no ar pelo Coolify, a partir de `docker-compose.yml`, numa VPS, em **novelo.helder.si**. É um só domínio: o Traefik do Coolify
+dá o HTTPS e o nginx do contentor `web` serve a SPA e encaminha `/api` (com locations próprias para o stream do copiloto e para os anexos). A API arranca com
+`alembic upgrade head` e o seed idempotente. Em produção, `/api/docs` e `/api/openapi.json` estão desligados e a `SECRET_KEY` tem de ter 32 ou mais caracteres.
+Se o webhook automático falhar, o deploy faz-se à mão a partir do Coolify. Passo a passo, variáveis, operação e diagnóstico em [deploy](docs/engenharia/deploy.md).
+
+## Segurança e RGPD
+
+- **Sessão:** passwords com argon2id; JWT em cookies HttpOnly com rotação do token de renovação; tokens de uso único (magic link, recuperar password, confirmar email) guardados só como SHA-256.
+- **Sem sondar contas:** o magic link e a recuperação de password respondem sempre 204; os limites de pedidos protegem as rotas sensíveis (em memória, por processo).
+- **Papéis:** `admin`, `operator` e `guest` (convidado do evento: sem gestão de utilizadores, sem administração de IA, sem apagar dados, sem ações de risco alto, com limites de IA e de otimizador).
+- **Entrada por QR:** pede nome e email, regista a data e a versão do consentimento e só fica ativa em produção se `QUICK_JOIN_CODE` estiver definido. Texto público em `/privacy`.
+- **Fotografias da triagem:** reduzidas, enviadas ao modelo, processadas e descartadas; guardam-se só tipo, estado, composição, marca e peso. Nunca há dados de quem entregou a peça.
+- **IA:** o registo de uso guarda tarefa, modelo, tokens, custo e latência, nunca prompts, imagens nem respostas. Anexos do copiloto são validados pelo conteúdo e tratados como dado, não como ordem; as memórias são varridas contra injeção de prompt.
+- **Direitos:** cada utilizador exporta e apaga os seus dados do copiloto (`/chat`, Definições), e escolhe a retenção.
+- **Dados municipais:** os nomes dos estabelecimentos produtores só saem a um `admin`, e nunca pelo copiloto.
+- **Segredos:** só em variáveis de ambiente (Coolify em produção); `.env` nunca vai para o Git.
+
+## Marca
+
+Identidade calma e editorial: Linho, Tinta e Floresta, Newsreader nos títulos e Inter no texto (ambas SIL Open Font License). O símbolo são três fios quase fechados à volta de um ponto.
+`just brand` gera todos os assets a partir de uma só geometria. Ver [guia de marca](docs/marca/guia-de-marca.md) e os textos da [página do projeto](docs/marca/descricao.md).
+
+## Hackathon, equipa e critérios
+
+Hélder Gonçalves e Flávio Fernandes. O Hack4Guimarães 2035 avalia quatro critérios (fonte: FAQ oficial, ver [critérios](docs/projeto/criterios-de-avaliacao.md)):
+
+| Critério | Peso | Onde o Novelo responde |
+| --- | --- | --- |
+| Inovação e originalidade | 25% | IA que conduz o otimizador sem fazer contas; do saco ao fio numa só ferramenta |
+| Viabilidade técnica | 25% | Em produção, dados reais, pressupostos à vista, testes e contrato verificado |
+| Impacto e relevância | 30% | 301,3 t reais, lacuna estimada de 1 016 t, RAP em abril de 2028 |
+| Apresentação e potencial de continuidade | 20% | Demo de dois minutos e pedido de um piloto de 3 meses em duas freguesias |
+
+Submissão até 23 de outubro às 17h30; pitches a 26 de outubro.
+
+## Limitações conhecidas e roteiro
+
+Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
+
+| Limitação | Efeito | Próximo passo |
+| --- | --- | --- |
+| Sem custos unitários da Vitrus (recolha, quilómetro, contentor, vida útil) | €/t e custos dependem de pressupostos; mostramos o intervalo (P10-P90) | Pedir à Vitrus; substituir em `/assumptions` |
+| Sem a localização dos contentores de têxteis | A rede de partida não está no mapa; o simulador funciona sem ela | `data/raw` + `just etl` |
+| O que mede o 0,7 kg/hab/mês é incerto (Q6) | Captura de 22,9% ou cerca de 18,6% (estimativa) | Resposta da Vitrus |
+| Taxas de captura por modo sem dados locais | Calibradas só para a rua (28,6%); o resto é pressuposto | Piloto de 3 meses |
+| Exatidão da triagem por foto por medir | Sem verdade-terreno | `just eval-triage` com 30 ou mais peças |
+| Distâncias em linha reta com fator de desvio 1,3 | Rotas aproximadas; a variável `OSRM_URL` existe mas **não há cliente OSRM** | Integrar um motor de rotas |
+| Peso das peças por tabela de pesos médios por tipo | KPI "estimativa" | Balança nos pontos do piloto |
+| Códigos de zona `0308U1` a `0308U5` provisórios | Ligação por nome às freguesias CAOP | Validar com o INE |
+| Planeamento da Frota é "semana tipo" | Sem datas nem horas reais | Dados de operação da Vitrus |
+| Limites de pedidos em memória, por processo | Com vários processos os limites multiplicam-se | Armazenar num serviço partilhado |
+| Estado "A correr o otimizador..." do copiloto não mostra o progresso real do solver | Só uma indicação | Eventos de progresso |
+| `DataTable` pagina em blocos, sem virtualização de linhas | Tabelas com milhares de linhas gastam memória no navegador | Virtualização |
+| Agente semanal de operações (recalibra a captura com os lotes) | Não iniciado | Depois do hackathon |
+| Sem integração contínua remota | `just check` corre só localmente | Quando houver tempo |
 
 ## Documentação
 
-Critérios de avaliação do hackathon (pesos, matriz e o que falta ler) em [docs/projeto/criterios-de-avaliacao.md](docs/projeto/criterios-de-avaliacao.md). Estratégia e pitch em [docs/projeto/estrategia-para-ganhar.md](docs/projeto/estrategia-para-ganhar.md), [visualizações por página](docs/projeto/visualizacoes-por-pagina.md), [mentores](docs/projeto/mentores.md), [cenários e contingências](docs/projeto/cenarios-e-contingencias.md) e [docs/projeto/narrativa-do-pitch.md](docs/projeto/narrativa-do-pitch.md); pesquisa e fontes em [docs/pesquisa/](docs/pesquisa/README.md). Índice completo em [docs/README.md](docs/README.md). Para trabalhar com agentes de código: [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md) e [docs/engenharia/workflow-ia.md](docs/engenharia/workflow-ia.md).
+Índice completo em [docs/README.md](docs/README.md).
 
-## Equipa e créditos
+| Para quê | Onde |
+| --- | --- |
+| Perceber o projeto | [Visão geral](docs/projeto/visao-geral.md), [proposta](docs/projeto/proposta.md), [estratégia](docs/projeto/estrategia-para-ganhar.md), [critérios](docs/projeto/criterios-de-avaliacao.md) |
+| Pitch e júri | [Narrativa](docs/projeto/narrativa-do-pitch.md), [slides](docs/projeto/pitch-slides.md), [perguntas do júri](docs/projeto/perguntas-do-juri.md), [cenários e contingências](docs/projeto/cenarios-e-contingencias.md), [visualizações por página](docs/projeto/visualizacoes-por-pagina.md) |
+| Falar com mentores e Vitrus | [Perguntas aos orientadores](docs/projeto/perguntas-aos-orientadores.md), [mentores](docs/projeto/mentores.md) |
+| Provas | [Pesquisa](docs/pesquisa/README.md), [registo de afirmações](docs/pesquisa/registo-de-afirmacoes.md) |
+| Construir | [Arquitetura](docs/engenharia/arquitetura.md), [funcionalidades](docs/engenharia/features.md), [dados e modelo](docs/engenharia/dados-e-modelo.md), [IA](docs/engenharia/ia.md), [copiloto](docs/engenharia/copiloto.md), [ambiente](docs/engenharia/ambiente.md), [deploy](docs/engenharia/deploy.md), [backlog](docs/engenharia/backlog.md) |
+| Dados recebidos | [Análise dos dados](docs/dados/analise-dados-recebidos.md), [contentores municipais](docs/dados/analise-contentores-municipais.md) |
+| Trabalhar com agentes | [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [workflow](docs/engenharia/workflow-ia.md) |
 
-Hélder Gonçalves e Flávio Fernandes, com dados da Vitrus Ambiente, INE (Censos 2021 e tipologia TIPAU), CAOP e OpenStreetMap, e o Plano de Ação Integrado para a Circularidade
-Têxtil de Guimarães (Município de Guimarães / URBACT). Tipografia: Inter e Newsreader (SIL Open Font License). Direitos reservados à equipa até decisão em contrário.
+## Créditos e licença
+
+Dados da Vitrus Ambiente, INE (Censos 2021 e tipologia TIPAU), CAOP e OpenStreetMap; Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (Município de Guimarães / URBACT).
+Tipografia: Inter e Newsreader (SIL Open Font License). Direitos reservados à equipa até decisão em contrário; o repositório é privado e não tem ficheiro de licença.

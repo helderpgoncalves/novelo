@@ -1,34 +1,43 @@
 # Backlog
 
-O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que muda a realidade.
+O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que muda a realidade. Estado a 20 de outubro de 2026.
 
-## Feito (2026-10-19)
+## Feito
 
 | Frente | Entregue |
 | --- | --- |
-| Infra | Monorepo, Docker Compose de desenvolvimento e produção para o Coolify, `justfile`, `.env.example` completo |
+| Infra | Monorepo, Docker Compose de desenvolvimento e produção para o Coolify (VPS, `novelo.helder.si`), `justfile`, `.env.example` completo |
 | Contrato | OpenAPI exportado, cliente hey-api (SDK, Zod, React Query) e verificação com `just check-contract` |
 | Dados | ETL dos Excel da Vitrus, INE (população e TIPAU), CAOP e OSM; seed idempotente no Postgres; alertas de qualidade |
-| Autenticação | Login, registo, Google, confirmação de email, recuperar password, "manter sessão iniciada", administração de utilizadores |
-| Planeamento | Otimizador (CP-SAT e VRP), três modos combináveis, cenários, comparação, pressupostos com origem |
+| Rede municipal | Pacote QGIS de 20/10 (2 751 contentores de outras frações, 2 026 locais, CAOP 2019): ETL `municipal_containers.py`, API `/municipal`, ecrã com seis separadores, camadas no mapa, alertas `municipal_*`, exportação e ferramentas do copiloto |
+| Autenticação | Magic link (principal), password, Google, confirmação de email, recuperar password, "manter sessão iniciada", entrada por QR com papel `guest` e limites, cartaz do QR, administração de utilizadores e convidados, 4 emails transacionais com pré-visualização |
+| Planeamento | Otimizador (CP-SAT e VRP), três modos combináveis, cenários, comparação, pressupostos com origem, tornado e Monte Carlo, robustez, referência francesa, piloto com piso de sinal; simulador redesenhado |
 | "E se...?" | `ScenarioDelta`, confirmação, explicação e verificador de números |
+| Copiloto | SSE tipado, 46 ferramentas, threads, memória, anexos, `@menções`, artefactos, ações com confirmação e auditoria, página `/chat`, avaliação com 78 casos |
 | Operação | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra, evidência por marca |
 | Relatório | PDF RAP com custo por tipo de território (WeasyPrint) e histórico |
-| Web | Mapa, todos os ecrãs de dados, pt/en, claro/escuro, PWA mobile-first, `DataTable` com pesquisa, filtros, colunas e paginação |
-| Qualidade | 76 testes pytest, Vitest e 27 testes Playwright |
+| Web | Mapa, todos os ecrãs de dados, Frota refeita (calendário da semana tipo, `.ics`), pt/en, claro/escuro, PWA mobile-first com barra de separadores, páginas de erro, visita guiada, `DataTable` e `PageTabs` completos |
+| Marca | Geometria única, `just brand` (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) e `just check-brand` |
+| Qualidade | 536 testes pytest, 157 Vitest e 162 Playwright |
 
 ## Falta
 
 | Prioridade | Tarefa | Estado |
 | --- | --- | --- |
-| Alta | Localizações dos contentores (chegam a **2026-10-20**): colocar em `data/raw`, correr `just etl`, popular `containers` e mostrar a camada no mapa e como pontos de partida do simulador | Por fazer |
-| Alta | Custos unitários (recolha, quilómetro, contentor) da Vitrus para trocar os pressupostos por dados | Por pedir |
-| Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` | Por validar |
+| Alta | Localizações dos contentores **de têxteis** (o pacote de 20/10 foi só o municipal): colocar em `data/raw`, correr `just etl`, popular `containers`, mostrar a camada no mapa, calcular a cobertura e usá-los como pontos de partida do simulador | Por receber |
+| Alta | Custos unitários (recolha, quilómetro, contentor, vida útil) da Vitrus para trocar os pressupostos por dados | Por pedir |
+| Alta | Saber o que mede o 0,7 kg/hab/mês (pergunta Q6): decide se a captura de 2025 é 22,9% ou cerca de 18,6% | Por pedir |
+| Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` (a CAOP 2019 já traz os oficiais) | Por validar |
 | Média | Confirmar o depósito real da Vitrus (hoje o centro de Guimarães) | Por pedir |
-| Média | Verificar as imagens de produção com `just build` e um deploy de ensaio no Coolify | Por fazer |
+| Média | Medir a exatidão da triagem (`just eval-triage` com 30 ou mais peças com verdade-terreno) | Por fazer |
+| Média | Correr `just eval-copilot` com os 11 casos `muni_*` e atualizar a [avaliação](avaliacao-copiloto.md) | Por fazer |
+| Média | Passar as restantes variáveis (`MAGIC_LINK_*`, `GUEST_*`, `COPILOT_*`, `EMAIL_TRANSPORT`...) pelo `docker-compose.yml` de produção, se for preciso alterá-las no Coolify | Por decidir |
 | Média | Cenários A e B fixos, cinco perguntas "E se...?" de reserva, lote de demonstração | Por fazer |
+| Baixa | Cliente OSRM para distâncias por estrada (hoje linha reta x 1,3; `OSRM_URL` não é usada) | Adiado |
+| Baixa | Limites de pedidos partilhados entre processos (hoje em memória, por processo) | Adiado |
+| Baixa | Eventos de progresso do otimizador no stream do copiloto; virtualização de linhas no `DataTable` | Adiado |
 | Baixa | Integração contínua remota (por agora só `just check` local) | Adiado |
-| Baixa | Copiloto de operações (execução com uma semana simulada) | Adiado |
+| Baixa | Agente semanal de operações (execução com uma semana simulada) | Adiado |
 
 ## Pitch e entrega
 

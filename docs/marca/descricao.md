@@ -26,7 +26,7 @@ Ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães a
 
 ## Descrição
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia. A partir de 2028, a recolha e o tratamento destes resíduos passam a ser financiados pelos produtores, e os municípios precisam de saber onde recolher, como e a que custo.
+Em Guimarães, 5,4% do lixo indiferenciado é têxtil segundo o plano municipal de 2025, acima da média europeia. A partir de 2028, a recolha e o tratamento destes resíduos passam a ser financiados pelos produtores, e os municípios precisam de saber onde recolher, como e a que custo.
 
 O Novelo responde a isso. Cruza população, caracterização do lixo e rede viária para propor onde colocar pontos de recolha, que modo usar em cada zona (pontos em locais existentes, contentores de rua ou recolha a pedido) e que rotas fazer. Cada cenário mostra investimento, custo anual de operação, toneladas desviadas de aterro e custo por tonelada, lado a lado.
 
@@ -34,7 +34,7 @@ O decisor pode perguntar em português ("e se passarmos esta freguesia a recolha
 
 ## Description (EN)
 
-In Guimarães, textiles make up 5.4% of mixed municipal waste, above the EU average. From 2028, producers will fund textile collection and treatment, and municipalities need to know where to collect, how, and at what cost.
+In Guimarães, textiles make up 5.4% of mixed municipal waste according to the 2025 municipal action plan, above the EU average. From 2028, producers will fund textile collection and treatment, and municipalities need to know where to collect, how, and at what cost.
 
 Novelo answers that. It combines population, waste composition and the road network to propose where to place collection points, which mode fits each area (drop-off at existing venues, street containers or on-demand pickup) and which routes to run. Each scenario shows investment, yearly operating cost, tonnes diverted from landfill and cost per tonne, side by side.
 

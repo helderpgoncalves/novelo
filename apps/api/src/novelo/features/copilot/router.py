@@ -16,6 +16,7 @@ from novelo.ai.catalog import catalog as default_catalog
 from novelo.core.database import SessionLocal, get_db
 from novelo.core.deps import CurrentUser
 from novelo.core.errors import FeatureDisabledError
+from novelo.core.guest import guest_ai_guard
 from novelo.core.ratelimit import copilot_limiter
 from novelo.features.copilot import actions as action_service
 from novelo.features.copilot import history, memory_api, service, sessions, threads, uploads, user_settings
@@ -87,8 +88,9 @@ SSE_RESPONSE: dict[int | str, dict[str, Any]] = {
 }
 
 
-async def _per_user_limit(user: CurrentUser) -> None:
+async def _per_user_limit(user: CurrentUser, db: Db) -> None:
     copilot_limiter.check(f"copilot:{user.id}")
+    await guest_ai_guard(user, db)  # convidados: pedidos por hora e gasto de IA em 24 h
 
 
 async def _precheck(db: AsyncSession, user: User) -> None:

@@ -8,12 +8,12 @@
 
 ## O problema
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil, acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1 300 e 2 650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa a partir dos dados do município).
+Em Guimarães, 5,4% do lixo indiferenciado é têxtil, segundo o plano municipal (p. 30), acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1 300 e 2 650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa; o intervalo vem de duas leituras do plano, ver a pergunta Q6 em [Perguntas aos orientadores](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54)).
 
 - **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025, e o município fixou a meta de aumentar a recolha seletiva em 30%.
 - **A conta muda em 2028.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a ter, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem.
 - **O território torna-o caro.** Guimarães tem 156 830 habitantes em 48 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
-- **Ninguém tem os dados.** A triagem é manual, as microempresas têxteis deitam retalhos no lixo urbano sem registo, e só 4 dos 27 operadores licenciados na zona reciclam ou valorizam têxteis.
+- **Ninguém tem os dados.** A triagem é manual, as microempresas têxteis deitam retalhos no lixo urbano sem registo, e só 4 dos 27 operadores licenciados na zona reciclam ou valorizam têxteis (plano municipal, p. 32; por confirmar).
 
 A pergunta da Vitrus Ambiente é simples: como garantir têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?
 
@@ -61,7 +61,7 @@ O Novelo transforma uma obrigação legal num plano com preço. É útil já par
 2. **Copiloto de operações:** um agente que todas as semanas recalibra o modelo com os lotes reais, volta a otimizar e propõe alterações, sempre com aprovação humana.
 3. **Escala:** levar o modelo a outros municípios e às entidades gestoras da RAP, com os dados abertos de cada concelho.
 
-Em aberto: custos unitários reais da Vitrus e quem opera hoje os contentores têxteis. São as primeiras perguntas ao mentor.
+Em aberto: custos unitários reais da Vitrus, a localização dos contentores de têxteis e quem os opera, e o que medem os 0,7 kg/hab/mês do plano. São as primeiras perguntas ao mentor ([lista completa](perguntas-aos-orientadores.md)).
 
 ## Fontes
 

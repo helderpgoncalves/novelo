@@ -75,9 +75,10 @@ EXTERNAL_REFERENCES: tuple[ExternalReference, ...] = (
     ),
 )
 
-# Potencial do plano municipal: 0,7 kg/hab/mês (A8, "Por verificar": fonte pública do plano não localizada).
+# Potencial do plano municipal: 0,7 kg/hab/mês (fonte pública: Plano de Ação Integrado para a
+# Circularidade Têxtil de Guimarães, URBACT, 25/11/2025).
 PLAN_KG_PER_INHAB_MONTH = 0.7
-PLAN_SOURCE_LABEL = "Plano municipal de resíduos (fonte pública por localizar); por verificar"
+PLAN_SOURCE_LABEL = "Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025)"
 FRANCE_KEY = "france_2024"
 
 

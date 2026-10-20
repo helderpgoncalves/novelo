@@ -72,7 +72,8 @@ export function ServerErrorScreen({
         </>
       }
     >
-      <p>{specific}</p>
+      {/* Falha real e inesperada: a mensagem é anunciada como alerta (o título recebe o foco, sem duplicar). */}
+      <p role="alert">{specific}</p>
       <p className="text-xs">{m.err_500_hint()}</p>
       <ErrorReference value={ref} />
       {import.meta.env.DEV && error instanceof Error && (

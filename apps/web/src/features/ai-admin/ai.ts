@@ -74,13 +74,14 @@ export const formatUsd = (value: number, digits?: number): string => {
     currency: 'USD',
     minimumFractionDigits: Math.min(d, 2),
     maximumFractionDigits: d,
+    useGrouping: 'always',
   }).format(value);
 };
 
 export const formatMs = (value: number): string =>
   value >= 1000
     ? `${new Intl.NumberFormat(intlTag(), { maximumFractionDigits: 1 }).format(value / 1000)} s`
-    : `${new Intl.NumberFormat(intlTag(), { maximumFractionDigits: 0 }).format(value)} ms`;
+    : `${new Intl.NumberFormat(intlTag(), { maximumFractionDigits: 0, useGrouping: 'always' }).format(value)} ms`;
 
 export const formatSeconds = (value: number): string =>
   `${new Intl.NumberFormat(intlTag(), { maximumFractionDigits: 1 }).format(value)} s`;

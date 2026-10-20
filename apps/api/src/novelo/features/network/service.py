@@ -74,7 +74,7 @@ async def list_circuits(db: AsyncSession) -> CircuitsSummary:
             typology=c.typology,
             collection_type=c.collection_type,
             status=c.status,
-            localities=sorted(cl.locality.name for cl in c.localities),
+            localities=[cl.locality.name for cl in sorted(c.localities, key=lambda x: (x.position, x.locality.name))],
             weekdays=sorted(d.weekday for d in c.days),
             days_text=c.days_text,
             vehicles=sorted(plates_by_circuit.get(str(c.id), set())),
@@ -157,6 +157,8 @@ async def get_fleet(db: AsyncSession) -> FleetSummary:
                         circuit=a.circuit_label,
                         typology=a.typology,
                         crew=a.crew_size,
+                        collection_type=a.collection_type,
+                        note=a.note,
                     )
                     for a in sorted(rows, key=lambda r: (list(DayGroup).index(r.day_group), list(Shift).index(r.shift)))
                 ],
@@ -188,13 +190,13 @@ async def list_localities(db: AsyncSession) -> list[LocalityOut]:
     )
     parish_codes: dict[Any, str] = dict((await db.execute(select(Parish.id, Parish.dicofre))).all())
     by_locality: dict[str, dict[str, Any]] = {}
+    # Inclui as localidades sem circuito (se existirem na base): aparecem com listas vazias.
+    for loc in (await db.execute(select(Locality))).scalars():
+        by_locality[loc.name] = {"circuits": set(), "typologies": set(), "kinds": set(), "days": set(), "locality": loc}
     for c in circuits:
         for cl in c.localities:
             loc = cl.locality
-            entry = by_locality.setdefault(
-                loc.name,
-                {"circuits": set(), "typologies": set(), "kinds": set(), "days": set(), "locality": loc},
-            )
+            entry = by_locality[loc.name]
             entry["circuits"].add(c.code)
             entry["typologies"].add(c.typology)
             if c.collection_type != CollectionType.UNSPECIFIED:

@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, require_role
+from novelo.core.guest import NotGuest, SolverGuard
 from novelo.features.planning import service
 from novelo.features.planning.schemas import (
     ParametersOut,
@@ -46,7 +47,7 @@ async def list_zones(db: Db) -> list[ZoneOut]:
     return await service.list_zones(db)
 
 
-@router.post("/scenarios", response_model=ScenarioOut, status_code=201)
+@router.post("/scenarios", response_model=ScenarioOut, status_code=201, dependencies=[SolverGuard])
 async def create_scenario(body: ScenarioRequest, user: CurrentUser, db: Db) -> ScenarioOut:
     """Corre o otimizador (localização e modo por freguesia, mais rotas) e guarda o cenário."""
     return await service.run_scenario(db, body, user)
@@ -68,7 +69,7 @@ async def rename_scenario(scenario_id: uuid.UUID, body: ScenarioRename, db: Db) 
 
 
 @router.delete("/scenarios/{scenario_id}", status_code=204)
-async def delete_scenario(scenario_id: uuid.UUID, db: Db) -> Response:
+async def delete_scenario(scenario_id: uuid.UUID, _: NotGuest, db: Db) -> Response:
     await service.delete_scenario(db, scenario_id)
     return Response(status_code=204)
 

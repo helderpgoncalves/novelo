@@ -704,13 +704,37 @@ export type AuthConfig = {
      */
     google_enabled: boolean;
     /**
+     * Magic Link Enabled
+     *
+     * Há transporte de email utilizável: o link por email é a entrada principal
+     */
+    magic_link_enabled: boolean;
+    /**
      * Password Min Length
      */
     password_min_length?: number;
     /**
+     * Quick Join Enabled
+     *
+     * A entrada por QR do evento está ligada
+     */
+    quick_join_enabled: boolean;
+    /**
      * Registration Open
      */
     registration_open: boolean;
+    /**
+     * Turnstile Enabled
+     *
+     * As rotas públicas exigem o cabeçalho `X-Turnstile-Token` (Cloudflare Turnstile)
+     */
+    turnstile_enabled: boolean;
+    /**
+     * Turnstile Site Key
+     *
+     * Chave pública do widget; null se o Turnstile não estiver ativo
+     */
+    turnstile_site_key: string | null;
 };
 
 /**
@@ -1238,6 +1262,8 @@ export type CircuitOut = {
     days_text: string;
     /**
      * Localities
+     *
+     * Localidades pela ordem do ficheiro da Vitrus (a ordem do percurso)
      */
     localities: Array<string>;
     /**
@@ -1684,7 +1710,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      */
@@ -2723,7 +2749,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      *
@@ -3116,6 +3142,76 @@ export type GlobalDefaults = {
      * Vision Model
      */
     vision_model?: string | null;
+};
+
+/**
+ * GuestOut
+ */
+export type GuestOut = {
+    /**
+     * Actions Count
+     *
+     * Mensagens ao copiloto mais ações propostas
+     */
+    actions_count: number;
+    /**
+     * Consent At
+     */
+    consent_at: string | null;
+    /**
+     * Consent Version
+     */
+    consent_version: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Is Active
+     */
+    is_active: boolean;
+    /**
+     * Joined At
+     */
+    joined_at: string;
+    /**
+     * Last Login At
+     */
+    last_login_at: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+};
+
+/**
+ * GuestPage
+ */
+export type GuestPage = {
+    /**
+     * Items
+     */
+    items: Array<GuestOut>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
 };
 
 /**
@@ -3619,6 +3715,36 @@ export type LotSummary = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * MagicLinkRequest
+ */
+export type MagicLinkRequest = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Next
+     *
+     * Caminho relativo para onde voltar depois de entrar; outra coisa é ignorada (vai para `/`)
+     */
+    next?: string | null;
+};
+
+/**
+ * MagicLinkVerifyRequest
+ */
+export type MagicLinkVerifyRequest = {
+    /**
+     * Token
+     */
+    token: string;
 };
 
 /**
@@ -6683,6 +6809,98 @@ export type QuantilesOut = {
 };
 
 /**
+ * QuickJoinInfo
+ */
+export type QuickJoinInfo = {
+    /**
+     * Consent Version
+     *
+     * Versão do texto de consentimento que fica registada
+     */
+    consent_version: string;
+    /**
+     * Enabled
+     */
+    enabled: boolean;
+};
+
+/**
+ * QuickJoinPoster
+ */
+export type QuickJoinPoster = {
+    /**
+     * Code
+     *
+     * Código do evento
+     */
+    code: string;
+    /**
+     * Svg
+     *
+     * QR em SVG para o URL
+     */
+    svg: string;
+    /**
+     * Url
+     *
+     * URL de entrada do evento: `${APP_URL}/join?c=<código>`
+     */
+    url: string;
+};
+
+/**
+ * QuickJoinRequest
+ */
+export type QuickJoinRequest = {
+    /**
+     * Code
+     *
+     * Código do evento (vem no QR)
+     */
+    code: string;
+    /**
+     * Consent
+     *
+     * Aceitação do tratamento de dados; tem de ser true
+     */
+    consent: true;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Website
+     *
+     * Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot
+     */
+    website?: string | null;
+};
+
+/**
+ * QuickJoinResult
+ *
+ * `signed_in`: conta nova, sessão iniciada. `check_email`: o email já tem conta e recebeu um link de entrada.
+ */
+export type QuickJoinResult = {
+    /**
+     * Status
+     */
+    status: 'signed_in' | 'check_email';
+    /**
+     * Só quando `status` é `signed_in`
+     */
+    user?: UserOut | null;
+};
+
+/**
  * RangeChart
  */
 export type RangeChart = {
@@ -6818,6 +7036,12 @@ export type RegisterRequest = {
      * Remember Me
      */
     remember_me?: boolean;
+    /**
+     * Website
+     *
+     * Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot
+     */
+    website?: string | null;
 };
 
 /**
@@ -7450,10 +7674,20 @@ export type ScheduleEntry = {
      */
     circuit: string;
     /**
+     * Modo de recolha desta linha do planeamento
+     */
+    collection_type: CollectionType;
+    /**
      * Crew
      */
     crew: number;
     day_group: DayGroup;
+    /**
+     * Note
+     *
+     * Nota da linha do planeamento da Vitrus
+     */
+    note: string | null;
     shift: Shift;
     typology: Typology;
 };
@@ -7680,6 +7914,21 @@ export type SignalFloorOut = {
      * t previstas no piloto escolhido
      */
     tonnes_pilot: number;
+};
+
+/**
+ * SignedIn
+ *
+ * Sessão iniciada (cookies definidos). `next` é o caminho relativo guardado quando o link foi pedido.
+ */
+export type SignedIn = {
+    /**
+     * Next
+     *
+     * Caminho relativo seguro para onde navegar a seguir
+     */
+    next: string;
+    user: UserOut;
 };
 
 /**
@@ -8825,6 +9074,10 @@ export type UserAdminOut = {
      */
     is_active: boolean;
     /**
+     * Joined Via
+     */
+    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link';
+    /**
      * Last Login At
      */
     last_login_at: string | null;
@@ -8835,7 +9088,7 @@ export type UserAdminOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator';
+    role: 'admin' | 'operator' | 'guest';
 };
 
 /**
@@ -8849,7 +9102,7 @@ export type UserAdminUpdate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | null;
+    role?: 'admin' | 'operator' | 'guest' | null;
 };
 
 /**
@@ -8881,6 +9134,10 @@ export type UserOut = {
      */
     id: string;
     /**
+     * Joined Via
+     */
+    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link';
+    /**
      * Locale
      */
     locale: 'pt-PT' | 'en';
@@ -8891,7 +9148,7 @@ export type UserOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator';
+    role: 'admin' | 'operator' | 'guest';
 };
 
 /**
@@ -9812,6 +10069,14 @@ export type GetAuthConfigResponse = GetAuthConfigResponses[keyof GetAuthConfigRe
 
 export type ForgotPasswordData = {
     body: ForgotPasswordRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/forgot-password';
@@ -10003,6 +10268,14 @@ export type GoogleLoginError = GoogleLoginErrors[keyof GoogleLoginErrors];
 
 export type LoginData = {
     body: LoginRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/login';
@@ -10184,6 +10457,136 @@ export type LogoutAllResponses = {
 
 export type LogoutAllResponse = LogoutAllResponses[keyof LogoutAllResponses];
 
+export type RequestMagicLinkData = {
+    body: MagicLinkRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/magic-link';
+};
+
+export type RequestMagicLinkErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RequestMagicLinkError = RequestMagicLinkErrors[keyof RequestMagicLinkErrors];
+
+export type RequestMagicLinkResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type RequestMagicLinkResponse = RequestMagicLinkResponses[keyof RequestMagicLinkResponses];
+
+export type VerifyMagicLinkData = {
+    body: MagicLinkVerifyRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/magic-link/verify';
+};
+
+export type VerifyMagicLinkErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type VerifyMagicLinkError = VerifyMagicLinkErrors[keyof VerifyMagicLinkErrors];
+
+export type VerifyMagicLinkResponses = {
+    /**
+     * Successful Response
+     */
+    200: SignedIn;
+};
+
+export type VerifyMagicLinkResponse = VerifyMagicLinkResponses[keyof VerifyMagicLinkResponses];
+
 export type GetMeData = {
     body?: never;
     path?: never;
@@ -10306,6 +10709,273 @@ export type UpdateMeResponses = {
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
+export type QuickJoinData = {
+    body: QuickJoinRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/quick-join';
+};
+
+export type QuickJoinErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type QuickJoinError = QuickJoinErrors[keyof QuickJoinErrors];
+
+export type QuickJoinResponses = {
+    /**
+     * Successful Response
+     */
+    200: QuickJoinResult;
+};
+
+export type QuickJoinResponse = QuickJoinResponses[keyof QuickJoinResponses];
+
+export type ListGuestsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Q
+         *
+         * Procura no nome ou email
+         */
+        q?: string | null;
+    };
+    url: '/api/v1/auth/quick-join/guests';
+};
+
+export type ListGuestsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListGuestsError = ListGuestsErrors[keyof ListGuestsErrors];
+
+export type ListGuestsResponses = {
+    /**
+     * Successful Response
+     */
+    200: GuestPage;
+};
+
+export type ListGuestsResponse = ListGuestsResponses[keyof ListGuestsResponses];
+
+export type GetQuickJoinInfoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/quick-join/info';
+};
+
+export type GetQuickJoinInfoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetQuickJoinInfoError = GetQuickJoinInfoErrors[keyof GetQuickJoinInfoErrors];
+
+export type GetQuickJoinInfoResponses = {
+    /**
+     * Successful Response
+     */
+    200: QuickJoinInfo;
+};
+
+export type GetQuickJoinInfoResponse = GetQuickJoinInfoResponses[keyof GetQuickJoinInfoResponses];
+
+export type GetQuickJoinQrData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/quick-join/qr';
+};
+
+export type GetQuickJoinQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetQuickJoinQrError = GetQuickJoinQrErrors[keyof GetQuickJoinQrErrors];
+
+export type GetQuickJoinQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: QuickJoinPoster;
+};
+
+export type GetQuickJoinQrResponse = GetQuickJoinQrResponses[keyof GetQuickJoinQrResponses];
+
 export type RefreshData = {
     body?: never;
     path?: never;
@@ -10369,6 +11039,14 @@ export type RefreshResponse = RefreshResponses[keyof RefreshResponses];
 
 export type RegisterData = {
     body: RegisterRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/register';
@@ -10430,6 +11108,14 @@ export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
 
 export type ResendVerificationData = {
     body?: never;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/resend-verification';
@@ -10491,6 +11177,14 @@ export type ResendVerificationResponse = ResendVerificationResponses[keyof Resen
 
 export type ResetPasswordData = {
     body: ResetPasswordRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/reset-password';

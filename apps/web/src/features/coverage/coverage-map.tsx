@@ -21,12 +21,20 @@ interface CoverageMapProps {
 /** Mapa coroplético por freguesia: cobertura (%) quando há contentores, população enquanto não há. */
 export function CoverageMap({ zones, rows, metric, className }: CoverageMapProps) {
   const [hovered, setHovered] = useState<string | null>(null);
-  const extra = useMemo(
+  // A cobertura de cada freguesia, como texto: o GeoJSON só se reconstrói (e o mapa só reprocessa as geometrias)
+  // quando um valor muda, não a cada resposta nova da API com os mesmos números.
+  const coverageKey = rows.map((r) => `${r.code}:${r.coverage?.covered_pct ?? 0}`).join('|');
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `coverageKey` representa os valores de `rows`
+  const geojson = useMemo(
     () =>
-      Object.fromEntries(rows.map((r) => [r.code, { covered_pct: r.coverage?.covered_pct ?? 0 }])),
-    [rows],
+      zonesToGeoJson(
+        zones,
+        Object.fromEntries(
+          rows.map((r) => [r.code, { covered_pct: r.coverage?.covered_pct ?? 0 }]),
+        ),
+      ),
+    [zones, coverageKey],
   );
-  const geojson = useMemo(() => zonesToGeoJson(zones, extra), [zones, extra]);
   const max = useMemo(
     () => (metric === 'covered_pct' ? 100 : Math.max(1, ...zones.map((z) => z.population))),
     [zones, metric],

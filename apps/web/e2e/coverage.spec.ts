@@ -6,11 +6,15 @@ test.describe('cobertura da rede e contentores', () => {
     await login(page);
   });
 
-  test('estado à espera de dados explica a chegada a 20 de outubro', async ({ page }) => {
+  test('estado à espera de dados explica que faltam as localizações dos contentores de têxteis', async ({
+    page,
+  }) => {
     await page.goto('/pt/coverage');
     await expect(page.getByRole('heading', { level: 1, name: 'Cobertura da rede' })).toBeVisible();
     await expect(
-      page.getByRole('heading', { name: /chegam a 20 de outubro de 2026/ }),
+      page.getByRole('heading', {
+        name: /localizações dos contentores de têxteis ainda estão por chegar/,
+      }),
     ).toBeVisible();
     // A referência francesa leva sempre o selo enquanto não estiver verificada.
     await expect(page.getByText('referência externa, por verificar')).toBeVisible();
