@@ -25,7 +25,8 @@ e `data/processed/` (gerado por `just etl`). Análise e limites em `docs/dados/a
 | Potencial estimado (0,7 kg/hab/mês × 156 830 hab. do INE) | ≈ 1 317 t/ano | Procura; captura atual ≈ 22,9% |
 | Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Sankey observado; receita e €/t |
 | Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 82 localidades | Recolha a pedido sem km novos |
-| Localizações dos contentores | **chegam a 20 out 2026**: `data/raw/` + ETL | Pontos atuais da rede de partida |
+| Contentores municipais (NÃO são de têxteis) | **chegaram a 20 out 2026** em `data/raw/vitrus-mapa-qgis/`: 2 751 contentores, 2 026 locais, CAOP 2019; ETL `municipal_containers.py` → `data/processed/municipal_*` | Candidatos a pontos de têxteis, produtores B2B, geometria das freguesias, densidade; **nunca misturar com a rede de têxteis** |
+| Localizações dos contentores de têxteis | **continuam por receber**: `data/raw/` + `containers.py` | Pontos atuais da rede de partida |
 
 Nunca inventar um valor: ou vem dos dados, ou está em `docs/engenharia/dados-e-modelo.md` como pressuposto
 com fonte, ou leva a etiqueta "estimativa" no ecrã.
@@ -107,7 +108,7 @@ procedimento lendo diretamente `.claude/skills/<nome>/SKILL.md`. `.agents/skills
 | `add-web-feature` | Novo ecrã ou componente |
 | `contract-gen` | Mexeste na API ou o cliente está desatualizado |
 | `optimization-model` | Procura, custos, MIP de localização, VRP de rotas |
-| `data-etl` | Novos ficheiros de dados (localizações dos contentores, INE, CAOP, OSM) |
+| `data-etl` | Novos ficheiros de dados (contentores de têxteis, pacote municipal QGIS, INE, CAOP, OSM) |
 | `llm-feature` | "E se...?", triagem por foto, verificador, evals |
 | `deploy-coolify` | Deploy, domínio, variáveis, diagnóstico em produção |
 | `ship` | Fechar uma tarefa: check, commit, push |

@@ -16,7 +16,7 @@ Guimarães: 156 830 habitantes (soma das freguesias, INE), 48 freguesias dispers
 - Qualidade: Sarah e Ultriplo têm kg exatos; Nova Etapa e Vitrus usam percentagens de relatórios aplicadas ao total (marcar como estimativa).
 - Circuitos: 40 (19 PAP, 6 Moloks, 5 contentores, restantes serviços), 29 viaturas, 9 circuitos sem viatura, 2 viaturas nunca atribuídas (reserva), 82 localidades (71 geocodificadas).
 - RSU nacional: 517 kg/hab/ano; têxteis 4,55% (+ 9,1% têxteis sanitários, que NÃO entram na recolha de têxteis).
-- Contentores têxteis (localizações): chegam a 20 out 2026.
+- Contentores têxteis (localizações): **continuam por receber**. A 20 out chegou o inventário **municipal** (outras frações, 2 751 contentores, 2 026 locais, CAOP 2019): é infraestrutura de apoio, não a rede de têxteis (`docs/dados/analise-contentores-municipais.md`).
 
 ## Glossário
 RAP: responsabilidade alargada do produtor. PAP: porta a porta. Moloks: contentores enterrados/semienterrados. PAYT: pay-as-you-throw. RU/RSU: resíduos (sólidos) urbanos. Vitrus: empresa municipal de resíduos. TIPAU: tipologia de áreas urbanas (INE). Modo de recolha: `existing` (local existente), `street` (contentor de rua), `on_demand` (a pedido).

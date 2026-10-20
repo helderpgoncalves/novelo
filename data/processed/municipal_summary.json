@@ -1,0 +1,954 @@
+{
+  "note": "Contentores MUNICIPAIS de outras frações. Nenhum é de têxteis; não misturar com containers.csv.",
+  "received_on": "2026-10-20",
+  "inputs": [
+    {
+      "file": "Contentores de Profundidade.txt",
+      "bytes": 43493,
+      "sha256": "1cbd4edf8b215ff2292c4917a8c0632cd204f1508a30c79324bd29716a79dac0"
+    },
+    {
+      "file": "Contentores de Superfície.txt",
+      "bytes": 46452,
+      "sha256": "8c39c5c918afbe242a4277407d82a166cd5dcfbc1286d7d6bdd28c72b41a8158"
+    },
+    {
+      "file": "Contentores Orgânico - Coletivo.txt",
+      "bytes": 37130,
+      "sha256": "3c758945b11ab3c74566a50c9782e5669284ec72dc4e81318fc6410edcbff4f8"
+    },
+    {
+      "file": "Contentores Orgânico - Tipologia.txt",
+      "bytes": 78945,
+      "sha256": "1e3d95db452d42e882268fe16a6c502f53be8dfa790b23e7badd0145db008a0d"
+    },
+    {
+      "file": "Contentores Resíduos Verdes.txt",
+      "bytes": 4089,
+      "sha256": "4518aef32fce6acbd8434fbf530822a4eec6eb8a990fec1bebbdd4b8eb136b44"
+    },
+    {
+      "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.shp",
+      "bytes": 50646800,
+      "sha256": "1293355fa14ce8eb7a0068b9821983d6527df56049a233725658e1a3a03b2cb3"
+    },
+    {
+      "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.shx",
+      "bytes": 25884,
+      "sha256": "194cb4227abcb1743d46bd9d513a60f689eb0419cc287ca0243ba7c1648501f4"
+    },
+    {
+      "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.dbf",
+      "bytes": 4999163,
+      "sha256": "1c0fca9c60de22177c064f12cdf2a5fe7feb4ce7bdd6198a07a949dd2332d66f"
+    },
+    {
+      "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.prj",
+      "bytes": 412,
+      "sha256": "55f0ce93451308e2fba256872ee0c6f159269ce7603126983066a8872dfc79a4"
+    },
+    {
+      "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.cpg",
+      "bytes": 5,
+      "sha256": "3ad3031f5503a4404af825262ee8232cc04d4ea6683d42c5dd0a2f2a27ac9824"
+    },
+    {
+      "file": "Georreferenciação.qgz",
+      "bytes": 15204,
+      "sha256": "8925e95d020bf05f678b2c525ee32a09d1d0275d79ccf3d90999bba48869c350"
+    }
+  ],
+  "files": {
+    "profundidade": {
+      "file": "Contentores de Profundidade.txt",
+      "data_lines": 593,
+      "columns": [
+        "ID",
+        "tipologia",
+        "cap.",
+        "Freguesia",
+        "Rua",
+        "Coord. Y",
+        "Coord. X2"
+      ],
+      "unique_ids": 593,
+      "coords_swapped_vs_header": 593
+    },
+    "superficie": {
+      "file": "Contentores de Superfície.txt",
+      "data_lines": 795,
+      "columns": [
+        "ID",
+        "Capacidade",
+        "Nome",
+        "Freguesia",
+        "Coord_Y",
+        "Coord_X"
+      ],
+      "unique_ids": 795,
+      "coords_swapped_vs_header": 0
+    },
+    "organico_coletivo": {
+      "file": "Contentores Orgânico - Coletivo.txt",
+      "data_lines": 397,
+      "columns": [
+        "ID",
+        "tipologia",
+        "cap.",
+        "Material",
+        "Freguesia",
+        "Rua",
+        "Coord. Y",
+        "Coord. X"
+      ],
+      "unique_ids": 397,
+      "coords_swapped_vs_header": 394
+    },
+    "organico_tipologia": {
+      "file": "Contentores Orgânico - Tipologia.txt",
+      "data_lines": 923,
+      "columns": [
+        "ID",
+        "Capacidade",
+        "Tipologia",
+        "Nome",
+        "Freguesia",
+        "Coord_Y",
+        "Coord_X"
+      ],
+      "unique_ids": 922,
+      "coords_swapped_vs_header": 0
+    },
+    "residuos_verdes": {
+      "file": "Contentores Resíduos Verdes.txt",
+      "data_lines": 46,
+      "columns": [
+        "ID",
+        "tipologia",
+        "cap.",
+        "Freguesia",
+        "Rua",
+        "Quantidade",
+        "Coord. Y",
+        "Coord. X"
+      ],
+      "unique_ids": 46,
+      "coords_swapped_vs_header": 46
+    }
+  },
+  "caop": {
+    "national_polygons": 3223,
+    "guimaraes_polygons": 48,
+    "version": "CAOP 2019 (Cont_AAD_CAOP2019, PT-TM06/ETRS89, EPSG:3763)",
+    "taa_values": {
+      "ÁREA PRINCIPAL": 48
+    },
+    "area_ha_total": 24099.97,
+    "area_ha_attr_total": 24099.97,
+    "codes_differing_from_app": {
+      "030876": "0308U1",
+      "030881": "0308U2",
+      "030883": "0308U3",
+      "030884": "0308U4",
+      "030890": "0308U5"
+    },
+    "population_matched": 48,
+    "vs_osm": {
+      "parishes_compared": 44,
+      "missing_in_osm": [
+        "União das freguesias de Candoso São Tiago e Mascotelos",
+        "União das freguesias de Leitões, Oleiros e Figueiredo",
+        "União das freguesias de Souto Santa Maria, Souto São Salvador e Gondomar"
+      ],
+      "broken_in_osm": [
+        "União das freguesias de Briteiros São Salvador e Briteiros Santa Leocádia"
+      ],
+      "area_caop_km2": 204.91,
+      "area_osm_km2": 204.75,
+      "diff_pct": -0.08,
+      "iou_pct_min": 95.3,
+      "iou_pct_median": 97.9,
+      "worst_iou": [
+        {
+          "dicofre": "0308U4",
+          "name": "União das freguesias de Oliveira, São Paio e São Sebastião",
+          "area_caop_km2": 1.555,
+          "area_osm_km2": 1.532,
+          "diff_pct": -1.5,
+          "iou_pct": 95.3,
+          "centroid_shift_m": 15.0
+        },
+        {
+          "dicofre": "030801",
+          "name": "Aldão",
+          "area_caop_km2": 1.552,
+          "area_osm_km2": 1.536,
+          "diff_pct": -1.0,
+          "iou_pct": 96.7,
+          "centroid_shift_m": 4.0
+        },
+        {
+          "dicofre": "030830",
+          "name": "Mesão Frio",
+          "area_caop_km2": 4.13,
+          "area_osm_km2": 4.152,
+          "diff_pct": 0.5,
+          "iou_pct": 96.9,
+          "centroid_shift_m": 6.0
+        },
+        {
+          "dicofre": "030836",
+          "name": "Pinheiro",
+          "area_caop_km2": 1.933,
+          "area_osm_km2": 1.925,
+          "diff_pct": -0.4,
+          "iou_pct": 97.2,
+          "centroid_shift_m": 3.0
+        },
+        {
+          "dicofre": "030857",
+          "name": "Candoso (São Martinho)",
+          "area_caop_km2": 2.208,
+          "area_osm_km2": 2.197,
+          "diff_pct": -0.5,
+          "iou_pct": 97.2,
+          "centroid_shift_m": 10.0
+        }
+      ]
+    }
+  },
+  "containers": {
+    "rows_read": 2754,
+    "accepted": 2751,
+    "located": 2722,
+    "pending_no_coordinates": 29,
+    "rejected": 3,
+    "rejected_by_reason": {
+      "empty_row": 1,
+      "outside_municipality": 2
+    },
+    "by_file": {
+      "profundidade": 593,
+      "superficie": 793,
+      "organico_coletivo": 397,
+      "organico_tipologia": 922,
+      "residuos_verdes": 46
+    },
+    "by_kind": {
+      "underground": 591,
+      "platform": 2,
+      "surface": 793,
+      "organic_collective": 397,
+      "organic_producer": 922,
+      "green_waste": 46
+    },
+    "by_stream": {
+      "desconhecido": 1386,
+      "organico": 1319,
+      "verdes": 46
+    },
+    "by_brand": {
+      "bluebee": 66,
+      "molok": 488,
+      "greenbee": 37,
+      "(sem marca)": 2
+    },
+    "capacity_status": {
+      "ok": 1829,
+      "assumed_litres": 912,
+      "unknown": 10
+    },
+    "coord_swapped_by_header": {
+      "profundidade": 593,
+      "superficie": 0,
+      "organico_coletivo": 394,
+      "organico_tipologia": 0,
+      "residuos_verdes": 46
+    },
+    "coord_cleaned": 1,
+    "coord_approximate": 509,
+    "units_declared_green_waste": 95,
+    "capacity_litres_total": 4315830
+  },
+  "parish_check": {
+    "declared_distinct_spellings": 166,
+    "compared": 2670,
+    "equal": 2354,
+    "different": 316,
+    "different_over_100m": 210,
+    "unmapped_declared": 52,
+    "match_levels": {
+      "exact": 2596,
+      "same_words": 47,
+      "none": 55,
+      "partial": 36,
+      "contains_name": 17
+    },
+    "parishes_with_containers": 48
+  },
+  "sites": {
+    "total": 2026,
+    "by_class": {
+      "public": 1573,
+      "producer": 452,
+      "mixed": 1
+    },
+    "single_container": 1659,
+    "max_containers": 32,
+    "textile_candidates": 1187
+  },
+  "analysis": {
+    "coverage_pct_of_municipality_area": {
+      "200m": 31.4,
+      "300m": 47.8,
+      "500m": 70.9
+    },
+    "public_site_nn_distance_m": {
+      "n": 1574,
+      "mean": 112.4,
+      "p5": 1.7,
+      "p25": 11.9,
+      "median": 74.0,
+      "p75": 141.0,
+      "p95": 364.5,
+      "max": 1468.8
+    },
+    "links_organic_collective": {
+      "organic_collective_located": 394,
+      "street_located": 1383,
+      "radius_m": 15.0,
+      "organic_with_street_within_radius": 233,
+      "organic_with_underground_nearest": 219,
+      "bc_with_same_number_underground": 376,
+      "bc_same_number_within_radius": 5,
+      "bc_same_number_same_street": 6,
+      "median_distance_to_nearest_street_m": 10.1
+    },
+    "bc_series": {
+      "organico_coletivo": 397,
+      "residuos_verdes": 46,
+      "min": 1,
+      "max": 443,
+      "overlap": 0,
+      "union_is_contiguous": true
+    },
+    "near_duplicates": {
+      "cross_file_pairs": 118,
+      "cross_file_by_files": {
+        "organico_coletivo ~ profundidade": 107,
+        "organico_coletivo ~ superficie": 3,
+        "organico_tipologia ~ profundidade": 2,
+        "organico_coletivo ~ organico_tipologia": 2,
+        "organico_coletivo ~ organico_coletivo+profundidade": 1,
+        "organico_coletivo ~ organico_coletivo+superficie": 1,
+        "profundidade ~ superficie": 1,
+        "organico_tipologia ~ superficie": 1
+      },
+      "same_file_pairs": 24,
+      "same_file_by_file": {
+        "profundidade ~ profundidade": 8,
+        "organico_tipologia ~ organico_tipologia": 6,
+        "organico_coletivo ~ organico_coletivo": 5,
+        "superficie ~ superficie": 4,
+        "residuos_verdes ~ residuos_verdes": 1
+      }
+    },
+    "by_kind": {
+      "underground": {
+        "containers": 591,
+        "located": 591,
+        "capacity_litres_total": 2921000,
+        "capacity_values": {
+          "3000": 17,
+          "5000": 574
+        },
+        "brands": {
+          "bluebee": 66,
+          "molok": 488,
+          "greenbee": 37
+        }
+      },
+      "surface": {
+        "containers": 793,
+        "located": 790,
+        "capacity_litres_total": 872300,
+        "capacity_values": {
+          "1100": 793
+        },
+        "brands": {}
+      },
+      "platform": {
+        "containers": 2,
+        "located": 2,
+        "capacity_litres_total": 10000,
+        "capacity_values": {
+          "5000": 2
+        },
+        "brands": {}
+      },
+      "organic_collective": {
+        "containers": 397,
+        "located": 394,
+        "capacity_litres_total": 319780,
+        "capacity_values": {
+          "80": 111,
+          "360": 5,
+          "1100": 281
+        },
+        "brands": {}
+      },
+      "organic_producer": {
+        "containers": 922,
+        "located": 899,
+        "capacity_litres_total": 142150,
+        "capacity_values": {
+          "10": 5,
+          "30": 35,
+          "45": 178,
+          "80": 618,
+          "1100": 76
+        },
+        "brands": {}
+      },
+      "green_waste": {
+        "containers": 46,
+        "located": 46,
+        "capacity_litres_total": 50600,
+        "capacity_values": {
+          "1100": 46
+        },
+        "brands": {}
+      }
+    },
+    "by_producer_type": {
+      "restaurant": {
+        "label": "Restauração",
+        "containers": 446,
+        "located": 423,
+        "capacity_litres_total": 59300,
+        "producers_distinct": 304,
+        "top_parishes": [
+          [
+            "União das freguesias de Oliveira, São Paio e São Sebastião",
+            42
+          ],
+          [
+            "Caldelas",
+            40
+          ],
+          [
+            "Azurém",
+            31
+          ],
+          [
+            "Creixomil",
+            31
+          ],
+          [
+            "Brito",
+            30
+          ]
+        ]
+      },
+      "school": {
+        "label": "Escola",
+        "containers": 250,
+        "located": 250,
+        "capacity_litres_total": 28435,
+        "producers_distinct": 87,
+        "top_parishes": [
+          [
+            "União das freguesias de Oliveira, São Paio e São Sebastião",
+            26
+          ],
+          [
+            "Creixomil",
+            18
+          ],
+          [
+            "Caldelas",
+            17
+          ],
+          [
+            "Fermentões",
+            16
+          ],
+          [
+            "Urgezes",
+            15
+          ]
+        ]
+      },
+      "establishment": {
+        "label": "Estabelecimento",
+        "containers": 93,
+        "located": 93,
+        "capacity_litres_total": 24900,
+        "producers_distinct": 39,
+        "top_parishes": [
+          [
+            "União das freguesias de Oliveira, São Paio e São Sebastião",
+            25
+          ],
+          [
+            "Azurém",
+            17
+          ],
+          [
+            "Ponte",
+            12
+          ],
+          [
+            "Sande (São Martinho)",
+            6
+          ],
+          [
+            "Caldelas",
+            5
+          ]
+        ]
+      },
+      "large_producer": {
+        "label": "Grandes produtores",
+        "containers": 65,
+        "located": 65,
+        "capacity_litres_total": 20745,
+        "producers_distinct": 12,
+        "top_parishes": [
+          [
+            "Creixomil",
+            33
+          ],
+          [
+            "Moreira de Cónegos",
+            11
+          ],
+          [
+            "Selho (São Jorge)",
+            11
+          ],
+          [
+            "Silvares",
+            4
+          ],
+          [
+            "Ponte",
+            3
+          ]
+        ]
+      },
+      "care_home": {
+        "label": "Lar",
+        "containers": 47,
+        "located": 47,
+        "capacity_litres_total": 6105,
+        "producers_distinct": 17,
+        "top_parishes": [
+          [
+            "União das freguesias de Oliveira, São Paio e São Sebastião",
+            18
+          ],
+          [
+            "Urgezes",
+            6
+          ],
+          [
+            "Pencelo",
+            6
+          ],
+          [
+            "Creixomil",
+            5
+          ],
+          [
+            "Moreira de Cónegos",
+            5
+          ]
+        ]
+      },
+      "hospitality": {
+        "label": "Hotelaria",
+        "containers": 21,
+        "located": 21,
+        "capacity_litres_total": 2665,
+        "producers_distinct": 9,
+        "top_parishes": [
+          [
+            "Costa",
+            8
+          ],
+          [
+            "Mesão Frio",
+            3
+          ],
+          [
+            "São Torcato",
+            3
+          ],
+          [
+            "Creixomil",
+            2
+          ],
+          [
+            "União das freguesias de Oliveira, São Paio e São Sebastião",
+            2
+          ]
+        ]
+      }
+    },
+    "site_size_distribution": {
+      "1": 1659,
+      "2": 231,
+      "3": 65,
+      "4": 37,
+      "5": 10,
+      "6": 10,
+      "7": 2,
+      "8": 6,
+      "9": 1,
+      "10": 1,
+      "11": 2,
+      "13": 1,
+      "32": 1
+    },
+    "top_sites_by_containers": [
+      {
+        "site_id": "S35cf7ff0",
+        "containers": 32,
+        "units_declared": 32,
+        "capacity_litres_total": 3370,
+        "parish": "Creixomil",
+        "latitude": "41.44212",
+        "longitude": "-8.3053",
+        "kinds": "organic_producer",
+        "label": "Hospital Senhora da Oliveira - Guimarães"
+      },
+      {
+        "site_id": "S14383534",
+        "containers": 13,
+        "units_declared": 13,
+        "capacity_litres_total": 5120,
+        "parish": "Azurém",
+        "latitude": "41.45072",
+        "longitude": "-8.29348",
+        "kinds": "organic_producer",
+        "label": "Universidade do Minho - Campus de Azurém"
+      },
+      {
+        "site_id": "S79b481ee",
+        "containers": 11,
+        "units_declared": 11,
+        "capacity_litres_total": 12100,
+        "parish": "Caldelas",
+        "latitude": "41.484",
+        "longitude": "-8.351",
+        "kinds": "surface",
+        "label": "Escola Secundária"
+      },
+      {
+        "site_id": "S82f42e6a",
+        "containers": 11,
+        "units_declared": 11,
+        "capacity_litres_total": 880,
+        "parish": "Ponte",
+        "latitude": "41.47705",
+        "longitude": "-8.34014",
+        "kinds": "organic_producer",
+        "label": "Centro Escolar de Ponte"
+      },
+      {
+        "site_id": "S93f4ba02",
+        "containers": 10,
+        "units_declared": 10,
+        "capacity_litres_total": 4780,
+        "parish": "Selho (São Jorge)",
+        "latitude": "41.42682",
+        "longitude": "-8.35046",
+        "kinds": "organic_producer",
+        "label": "J Pereira Fernandes"
+      },
+      {
+        "site_id": "S21e474c7",
+        "containers": 9,
+        "units_declared": 9,
+        "capacity_litres_total": 475,
+        "parish": "União das freguesias de Oliveira, São Paio e São Sebastião",
+        "latitude": "41.4447",
+        "longitude": "-8.30075",
+        "kinds": "organic_producer",
+        "label": "Cenatex"
+      },
+      {
+        "site_id": "S509c7467",
+        "containers": 8,
+        "units_declared": 8,
+        "capacity_litres_total": 570,
+        "parish": "Brito",
+        "latitude": "41.4519",
+        "longitude": "-8.36272",
+        "kinds": "organic_producer",
+        "label": "Nova Creche - Centro Social de Brito"
+      },
+      {
+        "site_id": "S61c411e4",
+        "containers": 8,
+        "units_declared": 8,
+        "capacity_litres_total": 1625,
+        "parish": "Costa",
+        "latitude": "41.44338",
+        "longitude": "-8.27663",
+        "kinds": "organic_producer",
+        "label": "Pousada Mosteiro de Guimarães"
+      },
+      {
+        "site_id": "Sc6a55ece",
+        "containers": 8,
+        "units_declared": 8,
+        "capacity_litres_total": 640,
+        "parish": "Urgezes",
+        "latitude": "41.42485",
+        "longitude": "-8.29809",
+        "kinds": "organic_producer",
+        "label": "EB 2/3 de Gil Vicente"
+      },
+      {
+        "site_id": "Scb327a9c",
+        "containers": 8,
+        "units_declared": 8,
+        "capacity_litres_total": 2680,
+        "parish": "Silvares",
+        "latitude": "41.44432",
+        "longitude": "-8.33796",
+        "kinds": "organic_producer",
+        "label": "Panda Wok"
+      }
+    ],
+    "top_sites_by_capacity": [
+      {
+        "site_id": "S79b481ee",
+        "containers": 11,
+        "units_declared": 11,
+        "capacity_litres_total": 12100,
+        "parish": "Caldelas",
+        "latitude": "41.484",
+        "longitude": "-8.351",
+        "kinds": "surface",
+        "label": "Escola Secundária"
+      },
+      {
+        "site_id": "S565ec194",
+        "containers": 2,
+        "units_declared": 2,
+        "capacity_litres_total": 10000,
+        "parish": "Costa",
+        "latitude": "41.43772",
+        "longitude": "-8.28131",
+        "kinds": "underground",
+        "label": "Rua S. Roque"
+      },
+      {
+        "site_id": "S8f7fa313",
+        "containers": 2,
+        "units_declared": 2,
+        "capacity_litres_total": 10000,
+        "parish": "União das freguesias de Souto Santa Maria, Souto São Salvador e Gondomar",
+        "latitude": "41.50118",
+        "longitude": "-8.31459",
+        "kinds": "underground",
+        "label": "Rua Camilo Castelo Branco"
+      },
+      {
+        "site_id": "S013548fc",
+        "containers": 2,
+        "units_declared": 2,
+        "capacity_litres_total": 6100,
+        "parish": "Urgezes",
+        "latitude": "41.42062",
+        "longitude": "-8.29918",
+        "kinds": "organic_collective|underground",
+        "label": "Rua 1º de Maio"
+      },
+      {
+        "site_id": "S035f0b20",
+        "containers": 2,
+        "units_declared": 2,
+        "capacity_litres_total": 6100,
+        "parish": "Creixomil",
+        "latitude": "41.44353",
+        "longitude": "-8.3091",
+        "kinds": "organic_collective|underground",
+        "label": "Rua Teixeira de Pascoais"
+      }
+    ],
+    "repeated_producers": [
+      {
+        "name": "hospital senhora da oliveira guimaraes",
+        "type": "large_producer",
+        "containers": 32
+      },
+      {
+        "name": "universidade do minho campus de azurem",
+        "type": "establishment",
+        "containers": 13
+      },
+      {
+        "name": "j pereira fernandes",
+        "type": "large_producer",
+        "containers": 10
+      },
+      {
+        "name": "cenatex",
+        "type": "school",
+        "containers": 9
+      },
+      {
+        "name": "cercigui",
+        "type": "establishment",
+        "containers": 8
+      },
+      {
+        "name": "mit penha",
+        "type": "restaurant",
+        "containers": 8
+      },
+      {
+        "name": "nova creche centro social de brito",
+        "type": "school",
+        "containers": 8
+      },
+      {
+        "name": "panda wok",
+        "type": "restaurant",
+        "containers": 8
+      },
+      {
+        "name": "pousada mosteiro de guimaraes",
+        "type": "hospitality",
+        "containers": 8
+      },
+      {
+        "name": "centro escolar de urgezes",
+        "type": "school",
+        "containers": 7
+      }
+    ],
+    "parishes_ranked_by_gap": [
+      {
+        "rank": 1,
+        "name": "Lordelo",
+        "gap_t": 25.8,
+        "candidate_sites": 1,
+        "gap_t_per_candidate_site": 25.78,
+        "population": 3979
+      },
+      {
+        "rank": 2,
+        "name": "União das freguesias de Tabuadelo e São Faustino",
+        "gap_t": 15.6,
+        "candidate_sites": 0,
+        "gap_t_per_candidate_site": 15.65,
+        "population": 2415
+      },
+      {
+        "rank": 3,
+        "name": "União das freguesias de Serzedo e Calvos",
+        "gap_t": 14.7,
+        "candidate_sites": 0,
+        "gap_t_per_candidate_site": 14.66,
+        "population": 2263
+      },
+      {
+        "rank": 4,
+        "name": "Infantas",
+        "gap_t": 11.3,
+        "candidate_sites": 0,
+        "gap_t_per_candidate_site": 11.27,
+        "population": 1740
+      },
+      {
+        "rank": 5,
+        "name": "União das freguesias de Abação e Gémeos",
+        "gap_t": 17.4,
+        "candidate_sites": 3,
+        "gap_t_per_candidate_site": 5.79,
+        "population": 2682
+      },
+      {
+        "rank": 6,
+        "name": "Ronfe",
+        "gap_t": 29.1,
+        "candidate_sites": 10,
+        "gap_t_per_candidate_site": 2.91,
+        "population": 4496
+      },
+      {
+        "rank": 7,
+        "name": "União das freguesias de Atães e Rendufe",
+        "gap_t": 16.7,
+        "candidate_sites": 6,
+        "gap_t_per_candidate_site": 2.78,
+        "population": 2579
+      },
+      {
+        "rank": 8,
+        "name": "Candoso (São Martinho)",
+        "gap_t": 8.0,
+        "candidate_sites": 3,
+        "gap_t_per_candidate_site": 2.67,
+        "population": 1234
+      },
+      {
+        "rank": 9,
+        "name": "Moreira de Cónegos",
+        "gap_t": 30.1,
+        "candidate_sites": 14,
+        "gap_t_per_candidate_site": 2.15,
+        "population": 4651
+      },
+      {
+        "rank": 10,
+        "name": "Silvares",
+        "gap_t": 14.6,
+        "candidate_sites": 7,
+        "gap_t_per_candidate_site": 2.08,
+        "population": 2250
+      }
+    ]
+  },
+  "rules": {
+    "lat_range": [
+      36.5,
+      42.5
+    ],
+    "lon_range": [
+      -10.0,
+      -6.0
+    ],
+    "boundary_tolerance_m": 50.0,
+    "site_decimals": 5,
+    "low_precision_decimals": 3,
+    "near_duplicate_m": 5.0,
+    "link_radius_m": 15.0,
+    "coverage_radii_m": [
+      200,
+      300,
+      500
+    ],
+    "simplify_tolerance_m": 5.0,
+    "projected_crs": "EPSG:3763",
+    "potential_kg_per_inhab_month": 0.7,
+    "capture_today_pct": 22.9
+  },
+  "alerts": 25,
+  "outputs": [
+    "municipal_containers.csv",
+    "municipal_sites.csv",
+    "municipal_containers_rejected.csv",
+    "municipal_alerts.csv",
+    "municipal_by_parish.csv",
+    "municipal_links.csv",
+    "municipal_summary.json",
+    "caop_guimaraes.geojson",
+    "qgis/guimaraes_contentores_municipais.gpkg"
+  ]
+}

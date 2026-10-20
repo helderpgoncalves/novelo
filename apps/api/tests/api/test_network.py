@@ -52,6 +52,7 @@ async def test_data_quality_alerts_workflow(logged_in: httpx.AsyncClient) -> Non
         "vitrus_circuits_2026_09",
         "ine_census_2021",
         "osm_nominatim",
+        "vitrus_municipal_containers_2026_10",  # pacote QGIS municipal (20 out); alertas ainda não importados
     }
     alert = quality["alerts"][0]
 

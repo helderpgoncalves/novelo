@@ -10,3 +10,6 @@ node_modules
 **/dist
 docs
 brand
+
+# Dados brutos (só leitura, ~53 MB): a imagem da API leva apenas data/processed (ver apps/api/Dockerfile)
+data/raw

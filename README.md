@@ -43,7 +43,7 @@ Todos vêm dos ficheiros da Vitrus e do INE (ver [análise dos dados recebidos](
 | **Bolsa de fibra** | Lotes agregados por fibra, que os recicladores reservam |
 | **Evidência por marca** | Quilos por marca e composição, com o tamanho da amostra |
 | **Relatório RAP/EPR em PDF** | Custo por tipo de território (TIPAU), toneladas por fibra e destino, cenários, método e fontes |
-| **Mapa da rede** | Freguesias, localidades e, a partir de 20 de outubro de 2026, os contentores |
+| **Mapa da rede** | Freguesias, localidades e contentores (o inventário municipal de 20 de outubro de 2026 já está no ETL; os contentores de têxteis continuam por receber) |
 | **Dados da Vitrus** | Circuitos, frota, localidades e alertas de qualidade, com pesquisa, filtros, ordenação, colunas visíveis e paginação |
 | **Conta completa** | Login, registo, Google, confirmação de email, recuperar password, "manter sessão iniciada", administração de utilizadores |
 | **Produto cuidado** | Português (pt-PT) e inglês, tema claro e escuro, PWA instalável e pensada primeiro para telemóvel, acessibilidade AA |
@@ -123,7 +123,7 @@ aparecem em `just logs api`. As variáveis estão descritas em [docs/engenharia/
 
 Os Excel recebidos ficam em `data/raw/` e nunca se editam. `just etl` limpa-os para CSV e JSON em `data/processed/`; a API importa-os para o Postgres no arranque
 (idempotente), juntamente com a geografia pública (freguesias da CAOP, população do INE, tipologia TIPAU, localidades geocodificadas a partir do OpenStreetMap).
-As localizações dos contentores chegam a 20 de outubro de 2026 e entram pelo mesmo fluxo. Ver [dados e modelo](docs/engenharia/dados-e-modelo.md).
+A 20 de outubro de 2026 a Vitrus enviou o inventário dos contentores **municipais** (outras frações, não são de têxteis) e a CAOP 2019: `just etl` produz `data/processed/municipal_*` e um GeoPackage para o QGIS (ver [análise dos contentores municipais](docs/dados/analise-contentores-municipais.md)). As localizações dos contentores **de têxteis** continuam por receber e entram pelo mesmo fluxo. Ver [dados e modelo](docs/engenharia/dados-e-modelo.md).
 
 ## IA com rédea curta
 

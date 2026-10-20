@@ -12,7 +12,8 @@ Tudo o que o Novelo calcula parte destes ficheiros. Os originais ficam em `data/
 | INE | `data/raw/public/tipau.json` | Tipologia de Áreas Urbanas | Predominantemente urbana, mediamente urbana ou rural, por freguesia |
 | CAOP e OpenStreetMap | `data/raw/public/parishes.geojson` | atual | Contornos das freguesias |
 | OpenStreetMap (Nominatim) | `data/raw/public/localities_geocoded.json` | atual | Coordenadas das localidades dos circuitos |
-| Vitrus Ambiente | localizações dos contentores | **chegam a 20 de outubro de 2026** | Pontos atuais da rede de partida |
+| Vitrus Ambiente | `data/raw/vitrus-mapa-qgis/` (5 `.txt`, projeto QGIS, CAOP 2019) | recebido a 20 de outubro de 2026; inventário sem data (projeto QGIS de maio de 2025) | Contentores **municipais** de outras frações (profundidade, superfície, orgânico, resíduos verdes) e contornos oficiais das freguesias. **Não são de têxteis.** Ver [Análise dos contentores municipais](analise-contentores-municipais.md) |
+| Vitrus Ambiente | localizações dos contentores **de têxteis** | **por receber** | Pontos atuais da rede de partida |
 
 Cada ficheiro tem impressão digital (SHA-256), data de receção e período registados em `data/processed/sources.json` e visíveis no ecrã "Qualidade dos dados".
 
@@ -28,6 +29,8 @@ Cada ficheiro tem impressão digital (SHA-256), data de receção e período reg
 | Viaturas | 29, duas nunca atribuídas (`29-48-XU`, `74-HN-36`) |
 | Turnos | 101 por semana |
 | Localidades | 82 com pelo menos um circuito, 71 geocodificadas |
+| Contentores municipais (não são de têxteis) | 2 754 linhas, 2 751 aceites, 2 722 localizados, 2 026 locais, 17,4 por 1 000 hab. |
+| Freguesias CAOP 2019 | 48, 24 099,97 ha (241,0 km²) |
 
 ## Qualidade e limites
 
@@ -36,8 +39,10 @@ Cada ficheiro tem impressão digital (SHA-256), data de receção e período reg
 - **Datas diferentes.** A semana útil, o sábado e o domingo não são da mesma semana; o planeamento de fim de semana tem de ser confirmado.
 - **Geocodificação.** Algumas "localidades" dos circuitos (por exemplo "Ruas Estreitas") não são lugares e ficam sem coordenadas; o mapa usa as 71 que existem.
 - **Sem custos.** A Vitrus ainda não indicou custo por recolha, por quilómetro ou por contentor. Os custos do simulador são pressupostos marcados como tal em `features/planning/params.py` e no ecrã "Pressupostos".
-- **Contentores.** Sem localizações até 20 de outubro de 2026: a tabela `containers` existe e o simulador funciona sem ela; quando chegarem, `just etl` e o seed importam-nas e o mapa ganha a camada.
-- **Códigos provisórios.** Os códigos de zona `0308U1` a `0308U5` da tipologia são provisórios até à validação com o INE.
+- **Contentores de têxteis.** Continuam por receber: a tabela `containers` existe e o simulador funciona sem ela; quando chegarem, `just etl` (`containers.py`) e o seed importam-nas e o mapa ganha a camada.
+- **Contentores municipais (pacote QGIS, 20 de outubro).** São outra rede (outras frações) e nunca se misturam com a de têxteis. Vinte e cinco alertas em `municipal_alerts.csv`; os principais: cabeçalhos de coordenadas trocados em 3 de 5 ficheiros (corrigido linha a linha pelo intervalo), 29 contentores sem coordenadas, 509 com coordenadas de 3 casas decimais, 166 escritas diferentes de freguesia (conta o polígono, não o texto), 79 contentores a mais de 1 km da freguesia declarada, capacidades "???" e sem unidade, 1 linha vazia e 2 pontos fora do concelho (rejeitados). Fração dos contentores de profundidade e superfície **desconhecida**.
+- **Contornos das freguesias.** Os contornos OSM de `parishes.geojson` falham 3 uniões de freguesias e têm 1 minúscula; a CAOP 2019 do pacote (`caop_guimaraes.geojson`) tem as 48. As 5 uniões têm Dicofre oficial na CAOP (`030876`, `030881`, `030883`, `030884`, `030890`) onde a app tem os provisórios `0308U1` a `0308U5`: ligam-se por nome até a Vitrus/INE confirmarem.
+- **Códigos provisórios.** Os códigos de zona `0308U1` a `0308U5` da tipologia são provisórios até à validação com o INE; a CAOP 2019 já traz códigos oficiais para essas cinco freguesias (ver acima).
 
 ## Onde se usa cada dado
 
@@ -49,6 +54,8 @@ Cada ficheiro tem impressão digital (SHA-256), data de receção e período reg
 | Circuitos, viaturas e turnos | Circuitos, Frota, recolha a pedido sem km novos |
 | Localidades geocodificadas | Mapa, ligação entre circuitos e freguesias |
 | Alertas | Qualidade dos dados |
+| Contentores municipais, locais e produtores | Candidatos a pontos de têxteis, B2B (hotelaria, lares, escolas, grandes produtores), densidade por freguesia, mapa |
+| CAOP 2019 | Geometria das freguesias, área em km², atribuição de freguesia por ponto |
 
 ## Regra
 

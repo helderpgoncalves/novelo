@@ -1,0 +1,4 @@
+source_file,source_line,external_id,reason_key,reason,raw
+superficie,615,C617,outside_municipality,A 453 m do contorno de Guimarães (CAOP 2019); freguesia declarada: Figueiredo.,"{""Capacidade"": ""1100L"", ""Coord_X"": ""-8.383757"", ""Coord_Y"": ""41.417217"", ""Freguesia"": ""Figueiredo"", ""ID"": ""C617"", ""Nome"": ""Tv de entre latas""}"
+superficie,616,C618,outside_municipality,A 453 m do contorno de Guimarães (CAOP 2019); freguesia declarada: Figueiredo.,"{""Capacidade"": ""1100L"", ""Coord_X"": ""-8.383757"", ""Coord_Y"": ""41.417217"", ""Freguesia"": ""Figueiredo"", ""ID"": ""C618"", ""Nome"": ""Tv de entre latas""}"
+organico_tipologia,924,,empty_row,Linha totalmente vazia.,"{""Capacidade"": """", ""Coord_X"": """", ""Coord_Y"": """", ""Freguesia"": """", ""ID"": """", ""Nome"": """", ""Tipologia"": """"}"
