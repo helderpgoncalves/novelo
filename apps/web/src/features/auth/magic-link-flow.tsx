@@ -88,9 +88,9 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
           type="submit"
           className={AUTH_CTA}
           disabled={request.isPending || request.gate.blocked}
-          loading={request.isPending}
+          loading={request.isPending || request.gate.busy}
         >
-          {request.gate.verifying ? m.turnstile_verifying() : m.magic_submit()}
+          {m.magic_submit()}
         </Button>
       </form>
       {alternatives}

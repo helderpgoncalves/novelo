@@ -1,5 +1,7 @@
-import { type Ref, useEffect, useImperativeHandle, useRef } from 'react';
+import { type Ref, useEffect, useImperativeHandle, useRef, useState } from 'react';
+import { useMediaQuery } from '@/lib/motion';
 import { loadTurnstile, type TurnstileApi } from '@/lib/turnstile';
+import { cn } from '@/lib/utils';
 
 export interface TurnstileHandle {
   /** Pede um token novo (os tokens são de uso único). */
@@ -38,6 +40,10 @@ export function TurnstileWidget({
   ref,
 }: Props) {
   const box = useRef<HTMLDivElement>(null);
+  // Só se reserva altura quando a Cloudflare pede mesmo um clique (modo invisível não ocupa espaço).
+  const [interactive, setInteractive] = useState(false);
+  // `flexible` ocupa a largura do cartão (mínimo 300 px); em ecrãs mais estreitos usa a versão compacta.
+  const narrow = useMediaQuery('(max-width: 359px)');
   const api = useRef<TurnstileApi | null>(null);
   const id = useRef<string | null>(null);
   // Os callbacks mudam a cada render do formulário; o widget guarda sempre os mais recentes.
@@ -64,6 +70,9 @@ export function TurnstileWidget({
           theme,
           language,
           appearance,
+          size: narrow ? 'compact' : 'flexible',
+          'before-interactive-callback': () => setInteractive(true),
+          'after-interactive-callback': () => setInteractive(false),
           'refresh-expired': 'auto',
           'refresh-timeout': 'auto',
           callback: (token) => handlers.current.onToken(token),
@@ -84,9 +93,17 @@ export function TurnstileWidget({
       api.current = null;
       id.current = null;
     };
-  }, [siteKey, action, theme, language, appearance]);
+  }, [siteKey, action, theme, language, appearance, narrow]);
 
   return (
-    <div ref={box} data-testid="turnstile-widget" className="flex justify-center empty:hidden" />
+    <div
+      ref={box}
+      data-testid="turnstile-widget"
+      data-interactive={interactive || undefined}
+      className={cn(
+        'flex w-full justify-center [&_iframe]:max-w-full',
+        interactive ? 'min-h-[65px]' : 'empty:hidden',
+      )}
+    />
   );
 }
