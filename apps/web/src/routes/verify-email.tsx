@@ -1,9 +1,9 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { z } from 'zod';
-import { verifyEmailMutation } from '@/client/@tanstack/react-query.gen';
+import { getMeOptions, verifyEmailMutation } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,9 @@ function VerifyEmail() {
   }, [token, verify]);
 
   const state = !token || verify.isError ? 'error' : verify.isSuccess ? 'ok' : 'loading';
+  // Com sessão e a conta ainda por aprovar, a boa notícia vem com o próximo passo.
+  const me = useQuery({ ...getMeOptions(), enabled: state === 'ok', retry: false });
+  const awaitingApproval = me.data !== undefined && me.data.approval_status !== 'approved';
 
   return (
     <div className="grid min-h-dvh place-items-center px-6">
@@ -56,9 +59,15 @@ function VerifyEmail() {
             <>
               <CheckCircle2 className="mx-auto size-7 text-primary" aria-hidden="true" />
               <h1 className="text-2xl">{m.verify_ok_title()}</h1>
-              <p className="text-muted-foreground text-sm">{m.verify_ok_text()}</p>
+              <p className="text-muted-foreground text-sm">
+                {awaitingApproval ? m.verify_ok_pending() : m.verify_ok_text()}
+              </p>
               <Button asChild className="w-full">
-                <Link to="/">{m.verify_open_app()}</Link>
+                {awaitingApproval ? (
+                  <Link to="/pending-approval">{m.verify_see_status()}</Link>
+                ) : (
+                  <Link to="/">{m.verify_open_app()}</Link>
+                )}
               </Button>
             </>
           )}

@@ -18,12 +18,14 @@ import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { type ForgotValues, forgotSchema } from './schemas';
+import { useTurnstile } from './use-turnstile';
 
 export function ForgotForm() {
   const form = useForm<ForgotValues>({
     resolver: zodResolver(forgotSchema),
     defaultValues: { email: '' },
   });
+  const gate = useTurnstile('forgot_password');
   const forgot = useMutation(forgotPasswordMutation());
 
   if (forgot.isSuccess) {
@@ -41,7 +43,12 @@ export function ForgotForm() {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) => forgot.mutate({ body: { ...v, locale: getLocale() } }))}
+        onSubmit={form.handleSubmit((v) =>
+          forgot.mutate(
+            { body: { ...v, locale: getLocale() }, headers: gate.consume() },
+            { onError: gate.onApiError },
+          ),
+        )}
         className="space-y-4"
         noValidate
       >
@@ -65,13 +72,14 @@ export function ForgotForm() {
             </FormItem>
           )}
         />
+        {gate.field}
         <Button
           type="submit"
           className="h-10 w-full font-semibold"
-          disabled={forgot.isPending}
+          disabled={forgot.isPending || gate.blocked}
           loading={forgot.isPending}
         >
-          {m.forgot_submit()}
+          {gate.verifying ? m.turnstile_verifying() : m.forgot_submit()}
         </Button>
       </form>
     </Form>

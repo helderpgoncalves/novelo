@@ -6,14 +6,17 @@ import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { PageTabs } from '@/components/page-tabs';
 import { StatCell, StatStrip } from '@/components/stat-strip';
+import { AuditPanel } from '@/features/users/audit-panel';
 import { EventPoster } from '@/features/users/event-poster';
 import { GuestsTable } from '@/features/users/guests-table';
+import { InvitationsPanel } from '@/features/users/invitations-panel';
+import { PendingPanel } from '@/features/users/pending-panel';
 import { UsersTable } from '@/features/users/users-table';
 import { ForbiddenError } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
-const TABS = ['accounts', 'guests', 'poster'] as const;
+const TABS = ['accounts', 'pending', 'invitations', 'guests', 'poster', 'audit'] as const;
 
 export const Route = createFileRoute('/_app/users')({
   staticData: { skeleton: 'table' },
@@ -31,8 +34,11 @@ function Users() {
   const { user } = Route.useRouteContext();
   const { tab } = Route.useSearch();
   const navigate = Route.useNavigate();
-  const { data } = useSuspenseQuery(listUsersOptions());
+  // Pedidos novos aparecem sozinhos: a lista atualiza ao fim de 1 min (e depois de cada ação).
+  const { data, isFetching } = useSuspenseQuery({ ...listUsersOptions(), refetchInterval: 60_000 });
   const guests = data.filter((u) => u.role === 'guest').length;
+  const pending = data.filter((u) => u.approval_status === 'pending').length;
+  const impersonating = user.impersonation?.active === true;
 
   return (
     <Page>
@@ -44,15 +50,15 @@ function Users() {
       <StatStrip>
         <StatCell label={m.users_stat_accounts()} value={formatNumber(data.length)} />
         <StatCell
+          label={m.users_stat_pending()}
+          value={formatNumber(pending)}
+          hint={m.users_stat_pending_hint()}
+        />
+        <StatCell
           label={m.users_stat_admins()}
           value={formatNumber(data.filter((u) => u.role === 'admin').length)}
         />
         <StatCell label={m.users_stat_guests()} value={formatNumber(guests)} />
-        <StatCell
-          label={m.users_stat_unverified()}
-          value={formatNumber(data.filter((u) => !u.email_verified && u.role !== 'guest').length)}
-          hint={m.users_stat_unverified_hint()}
-        />
       </StatStrip>
       <PageTabs
         label={m.users_tabs_label()}
@@ -63,10 +69,34 @@ function Users() {
             id: 'accounts',
             label: m.users_tab_accounts(),
             count: data.length,
-            content: <UsersTable users={data} currentUserId={user.id} />,
+            content: (
+              <UsersTable
+                users={data}
+                currentUserId={user.id}
+                impersonating={impersonating}
+                refreshing={isFetching}
+              />
+            ),
           },
+          {
+            id: 'pending',
+            label: m.users_tab_pending(),
+            count: pending,
+            status: pending > 0 ? 'attention' : undefined,
+            statusLabel: pending > 0 ? m.users_tab_pending_status({ count: pending }) : undefined,
+            content: (
+              <PendingPanel
+                users={data}
+                currentUserId={user.id}
+                impersonating={impersonating}
+                refreshing={isFetching}
+              />
+            ),
+          },
+          { id: 'invitations', label: m.users_tab_invitations(), content: <InvitationsPanel /> },
           { id: 'guests', label: m.users_tab_guests(), count: guests, content: <GuestsTable /> },
           { id: 'poster', label: m.users_tab_poster(), content: <EventPoster /> },
+          { id: 'audit', label: m.users_tab_audit(), content: <AuditPanel users={data} /> },
         ]}
       />
     </Page>

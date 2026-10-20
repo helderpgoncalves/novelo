@@ -108,6 +108,7 @@ def test_icons_centered_and_safe(name: str) -> None:
 
 def test_email_and_avatar_sizes() -> None:
     assert Image.open(ROOT / "apps/web/public/email/novelo-logotipo-negativo.png").width == 264
+    assert Image.open(ROOT / "apps/web/public/email/novelo-logotipo.png").width == 264
     for n in (256, 512, 1024):
         assert Image.open(ROOT / f"brand/avatar/novelo-avatar-claro-{n}.png").size == (n, n)
     assert Image.open(ROOT / "apps/web/public/og-image.png").size == (1200, 630)

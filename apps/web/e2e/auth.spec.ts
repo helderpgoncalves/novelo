@@ -1,5 +1,14 @@
 import { expect, test } from '@playwright/test';
-import { ADMIN, lastEmail, linkFrom, login, PASSWORD, uniqueEmail } from './helpers';
+import {
+  ADMIN,
+  approveByEmail,
+  createApprovedUser,
+  lastEmail,
+  linkFrom,
+  login,
+  PASSWORD,
+  uniqueEmail,
+} from './helpers';
 
 test.describe('autenticação', () => {
   test('sem sessão redireciona para a entrada, guardando o destino', async ({ page }) => {
@@ -33,22 +42,35 @@ test.describe('autenticação', () => {
     await expect(page).toHaveURL(/\/pt\/login/);
   });
 
-  test('registo, confirmação de email e conta nova a funcionar', async ({ page }) => {
+  test('registo leva ao ecrã de espera; confirmar o email e ser aprovada abre a app', async ({
+    page,
+  }) => {
     const email = uniqueEmail('novo');
     await page.goto('/pt/register');
+    await expect(page.getByTestId('register-approval-notice')).toContainText(
+      'aprovadas por um administrador',
+    );
     await page.getByLabel('Nome').fill('Rita Silva');
     await page.getByLabel('Email').fill(email);
     await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Criar conta' }).click();
-    await expect(page).toHaveURL(/\/pt\/?$/);
-    await expect(page.getByText(`Confirma o teu email ${email}`)).toBeVisible();
+    await expect(page).toHaveURL(/\/pt\/pending-approval/);
+    await expect(page.getByRole('heading', { name: 'A aguardar aprovação' })).toBeVisible();
+    await expect(page.getByText('Confirma o teu email', { exact: true })).toBeVisible();
 
     const mail = await lastEmail(email);
-    expect(mail.subject).toBe('Confirma o teu email no Novelo');
+    expect(mail.subject).toMatch(/Confirma o teu email/);
     await page.goto(linkFrom(mail.text));
     await expect(page.getByRole('heading', { name: 'Email confirmado' })).toBeVisible();
-    await page.getByRole('link', { name: 'Abrir o Novelo' }).click();
-    await expect(page.getByText('Confirma o teu email')).toHaveCount(0);
+    await expect(page.getByText('Falta só um administrador aprovar')).toBeVisible();
+    await page.getByRole('link', { name: 'Ver o estado do pedido' }).click();
+    await expect(page.getByRole('heading', { name: 'A aguardar aprovação' })).toBeVisible();
+    await expect(page.getByText('Confirma o teu email', { exact: true })).toHaveCount(0);
+
+    await approveByEmail(email);
+    await page.getByRole('button', { name: 'Verificar agora' }).click();
+    await expect(page).toHaveURL(/\/pt\/?$/, { timeout: 15_000 });
+    await expect(page.locator('#content h1').first()).toBeVisible();
   });
 
   test('registo recusa email repetido com mensagem clara', async ({ page }) => {
@@ -61,14 +83,8 @@ test.describe('autenticação', () => {
 
   test('recuperar password de ponta a ponta', async ({ page }) => {
     const email = uniqueEmail('reset');
-    await page.goto('/pt/register');
-    await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
-    await page.getByRole('button', { name: 'Criar conta' }).click();
-    await expect(page).toHaveURL(/\/pt\/?$/);
-    await page.getByRole('button', { name: 'Menu da conta' }).click();
-    await page.getByRole('menuitem', { name: 'Terminar sessão' }).click();
-
+    await createApprovedUser(email);
+    await page.goto('/pt/login');
     await page.getByRole('link', { name: 'Entrar com palavra-passe' }).click();
     await page.getByRole('link', { name: 'Esqueceste-te?' }).click();
     await page.getByLabel('Email da conta').fill(email);
@@ -76,7 +92,7 @@ test.describe('autenticação', () => {
     await expect(page.getByText('Verifica o teu email')).toBeVisible();
 
     const mail = await lastEmail(email);
-    expect(mail.subject).toBe('Redefine a tua password do Novelo');
+    expect(mail.subject).toMatch(/Redefine a tua password/);
     await page.goto(linkFrom(mail.text));
     await page.getByLabel('Nova password').fill('outra-password-segura-9');
     await page.getByLabel('Repete a password').fill('outra-password-segura-9');

@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Eye } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,6 +11,7 @@ import { useSwitchLanguage } from '@/features/account/use-switch-language';
 import { ChangePasswordForm } from '@/features/auth/change-password-form';
 import { LogoutAllButton } from '@/features/auth/logout-all-button';
 import { ProfileForm } from '@/features/auth/profile-form';
+import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { getLocale, LOCALE_LABELS, type Locale, locales } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
@@ -62,6 +65,7 @@ function LanguageCard() {
 
 function Account() {
   const { user } = Route.useRouteContext();
+  const imp = useImpersonation();
   return (
     <Page>
       <PageHeader
@@ -69,46 +73,61 @@ function Account() {
         title={m.account_title()}
         description={m.account_description()}
       />
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
-        <Section title={m.rw_account_profile_section()} className="space-y-4 lg:col-span-7">
-          <AccountCard
-            title={m.account_profile_title()}
-            description={m.account_profile_description()}
-          >
-            <div className="flex flex-wrap gap-2">
-              <Badge variant="secondary">
-                {user.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
-              </Badge>
-              <Badge variant={user.email_verified ? 'secondary' : 'outline'}>
-                {user.email_verified ? m.account_email_verified() : m.account_email_unverified()}
-              </Badge>
-              {user.google_linked && <Badge variant="outline">{m.account_google_linked()}</Badge>}
-            </div>
-            <ProfileForm user={user} />
-          </AccountCard>
-          <LanguageCard />
-        </Section>
-        <Section title={m.rw_account_security_section()} className="space-y-4 lg:col-span-5">
-          <AccountCard
-            title={
-              user.has_password ? m.account_password_change_title() : m.account_password_set_title()
-            }
-            description={
-              user.has_password
-                ? m.account_password_change_description()
-                : m.account_password_set_description()
-            }
-          >
-            <ChangePasswordForm user={user} />
-          </AccountCard>
-          <AccountCard
-            title={m.account_sessions_title()}
-            description={m.account_sessions_description()}
-          >
-            <LogoutAllButton />
-          </AccountCard>
-        </Section>
-      </div>
+      {imp.active && (
+        <Alert>
+          <Eye />
+          <AlertDescription>{m.imp_blocked_account()}</AlertDescription>
+        </Alert>
+      )}
+      {/* Alterar o perfil, a password e as sessões é bloqueado pela API durante a impersonação: aqui fica desativado. */}
+      <fieldset
+        disabled={imp.active}
+        className="m-0 min-w-0 border-0 p-0 disabled:opacity-60"
+        title={imp.active ? m.imp_blocked_tip() : undefined}
+      >
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-6">
+          <Section title={m.rw_account_profile_section()} className="space-y-4 lg:col-span-7">
+            <AccountCard
+              title={m.account_profile_title()}
+              description={m.account_profile_description()}
+            >
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="secondary">
+                  {user.role === 'admin' ? m.account_role_admin() : m.account_role_operator()}
+                </Badge>
+                <Badge variant={user.email_verified ? 'secondary' : 'outline'}>
+                  {user.email_verified ? m.account_email_verified() : m.account_email_unverified()}
+                </Badge>
+                {user.google_linked && <Badge variant="outline">{m.account_google_linked()}</Badge>}
+              </div>
+              <ProfileForm user={user} />
+            </AccountCard>
+            <LanguageCard />
+          </Section>
+          <Section title={m.rw_account_security_section()} className="space-y-4 lg:col-span-5">
+            <AccountCard
+              title={
+                user.has_password
+                  ? m.account_password_change_title()
+                  : m.account_password_set_title()
+              }
+              description={
+                user.has_password
+                  ? m.account_password_change_description()
+                  : m.account_password_set_description()
+              }
+            >
+              <ChangePasswordForm user={user} />
+            </AccountCard>
+            <AccountCard
+              title={m.account_sessions_title()}
+              description={m.account_sessions_description()}
+            >
+              <LogoutAllButton />
+            </AccountCard>
+          </Section>
+        </div>
+      </fieldset>
     </Page>
   );
 }

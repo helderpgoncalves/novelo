@@ -260,7 +260,7 @@ class OpenRouterClient:
                         f"http_{resp.status_code}",
                         input_hash,
                     )
-                    raise UpstreamError(f"The model provider rejected the request (HTTP {resp.status_code}): {detail}")
+                    raise UpstreamError(f"The model provider rejected the request (HTTP {resp.status_code})")
                 else:
                     try:
                         data: dict[str, Any] = resp.json()
@@ -273,7 +273,7 @@ class OpenRouterClient:
             if attempt < self._s.llm_max_retries:
                 await asyncio.sleep(self._s.llm_retry_backoff_s * 2**attempt)
         await self._emit(task, model, None, time.perf_counter() - started_all, False, error_code, input_hash)
-        raise UpstreamError(f"The model provider is unavailable: {last}")
+        raise UpstreamError(f"The model provider is unavailable: {last}")  # `last` é só «HTTP 5xx», «timeout»...
 
     async def _emit(
         self,
@@ -365,7 +365,8 @@ class OpenRouterClient:
             if key:
                 response_cache.put(key, result.model_dump_json())
             return result
-        raise UpstreamError(f"The model did not return a valid response: {last_error}")
+        log.warning("llm response invalid after retries: %s", type(last_error).__name__)
+        raise UpstreamError("The model did not return a valid response")
 
     async def ping(self, model: str) -> CallUsage:
         """Chamada mínima para testar um modelo no painel. Devolve latência e custo."""
@@ -533,9 +534,7 @@ class OpenRouterClient:
                         await resp.aread()
                         detail = _error_detail(resp)
                         log.warning("llm stream rejected status=%s detail=%s", resp.status_code, detail)
-                        raise UpstreamError(
-                            f"The model provider rejected the request (HTTP {resp.status_code}): {detail}"
-                        )
+                        raise UpstreamError(f"The model provider rejected the request (HTTP {resp.status_code})")
                     else:
                         async for line in resp.aiter_lines():
                             if not line.startswith("data:"):
@@ -553,7 +552,7 @@ class OpenRouterClient:
             log.warning("llm stream failed attempt=%s reason=%s", attempt + 1, last)
             if attempt < self._s.llm_max_retries:
                 await asyncio.sleep(self._s.llm_retry_backoff_s * 2**attempt)
-        raise UpstreamError(f"The model provider is unavailable: {last}")
+        raise UpstreamError(f"The model provider is unavailable: {last}")  # `last` é só «HTTP 5xx», «timeout»...
 
     async def account(self) -> dict[str, Any]:
         """Saldo e limite da chave (`/credits` e `/key`). Falha com graça: devolve só o que conseguir."""

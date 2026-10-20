@@ -1,6 +1,41 @@
 {
   "components": {
     "schemas": {
+      "AcceptInvitationRequest": {
+        "properties": {
+          "name": {
+            "maxLength": 120,
+            "minLength": 1,
+            "title": "Name",
+            "type": "string"
+          },
+          "password": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Opcional: sem password a pessoa entra por link enviado por email",
+            "title": "Password"
+          },
+          "token": {
+            "maxLength": 200,
+            "minLength": 20,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token",
+          "name"
+        ],
+        "title": "AcceptInvitationRequest",
+        "type": "object"
+      },
       "ActionOut": {
         "properties": {
           "auto_approved": {
@@ -968,6 +1003,84 @@
         "title": "AllocationPart",
         "type": "object"
       },
+      "ApprovalStatusOut": {
+        "description": "Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).",
+        "properties": {
+          "decided_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quando foi aprovada",
+            "title": "Decided At"
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean"
+          },
+          "rejected_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejected Reason"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "email_verified",
+          "rejected_reason",
+          "decided_at"
+        ],
+        "title": "ApprovalStatusOut",
+        "type": "object"
+      },
+      "ApproveRequest": {
+        "properties": {
+          "confirm_admin": {
+            "default": false,
+            "description": "Obrigatório (true) quando `role` é `admin`",
+            "title": "Confirm Admin",
+            "type": "boolean"
+          },
+          "notify": {
+            "default": true,
+            "description": "Enviar o email «A tua conta foi aprovada»",
+            "title": "Notify",
+            "type": "boolean"
+          },
+          "role": {
+            "default": "operator",
+            "enum": [
+              "admin",
+              "operator",
+              "guest"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "title": "ApproveRequest",
+        "type": "object"
+      },
       "ArtifactEnvelope": {
         "properties": {
           "artifact": {
@@ -1303,8 +1416,216 @@
         "title": "AttachmentOut",
         "type": "object"
       },
+      "AuditEntryOut": {
+        "properties": {
+          "action": {
+            "description": "Ex.: `invitation.create`, `user.delete`, `impersonation.start`",
+            "title": "Action",
+            "type": "string"
+          },
+          "actor_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Email"
+          },
+          "actor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pessoa real; nulo se a conta foi eliminada",
+            "title": "Actor Id"
+          },
+          "actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Actor Name"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "description": "Contexto sem segredos (papel anterior, motivo, caminho...)",
+            "title": "Details",
+            "type": "object"
+          },
+          "effective_actor_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Actor Email"
+          },
+          "effective_actor_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Conta em nome de quem agiu; difere de `actor_id` durante uma impersonação",
+            "title": "Effective Actor Id"
+          },
+          "effective_actor_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Effective Actor Name"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "ip": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ip"
+          },
+          "target_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Id"
+          },
+          "target_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Email do alvo; apagado se o alvo for eliminado",
+            "title": "Target Label"
+          },
+          "target_type": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`user`, `invitation` ou `request`",
+            "title": "Target Type"
+          },
+          "user_agent": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Agent"
+          }
+        },
+        "required": [
+          "id",
+          "created_at",
+          "action",
+          "actor_id",
+          "actor_name",
+          "actor_email",
+          "effective_actor_id",
+          "effective_actor_name",
+          "effective_actor_email",
+          "target_type",
+          "target_id",
+          "target_label",
+          "ip",
+          "user_agent",
+          "details"
+        ],
+        "title": "AuditEntryOut",
+        "type": "object"
+      },
+      "AuditPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AuditEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "AuditPage",
+        "type": "object"
+      },
       "AuthConfig": {
         "properties": {
+          "approval_required": {
+            "default": true,
+            "description": "Contas novas (password ou Google) ficam à espera de aprovação de um administrador",
+            "title": "Approval Required",
+            "type": "boolean"
+          },
           "google_enabled": {
             "title": "Google Enabled",
             "type": "boolean"
@@ -2907,6 +3228,15 @@
               "email_taken",
               "cannot_modify_self",
               "conflict",
+              "account_pending",
+              "account_rejected",
+              "invitation_pending",
+              "last_admin",
+              "impersonation_active",
+              "impersonation_blocked",
+              "impersonation_forbidden",
+              "confirmation_mismatch",
+              "admin_confirmation_required",
               "rate_limited",
               "feature_disabled",
               "upstream_error",
@@ -4492,6 +4822,22 @@
         "title": "DayGroup",
         "type": "string"
       },
+      "DeleteUserRequest": {
+        "properties": {
+          "confirm_email": {
+            "description": "Email do utilizador a eliminar, escrito de novo (anti-engano)",
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Confirm Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm_email"
+        ],
+        "title": "DeleteUserRequest",
+        "type": "object"
+      },
       "EffectiveTask": {
         "properties": {
           "fallback_model": {
@@ -4664,6 +5010,15 @@
               "email_taken",
               "cannot_modify_self",
               "conflict",
+              "account_pending",
+              "account_rejected",
+              "invitation_pending",
+              "last_admin",
+              "impersonation_active",
+              "impersonation_blocked",
+              "impersonation_forbidden",
+              "confirmation_mismatch",
+              "admin_confirmation_required",
               "rate_limited",
               "feature_disabled",
               "upstream_error",
@@ -5732,6 +6087,433 @@
         "title": "HistoryPage",
         "type": "object"
       },
+      "ImpersonateRequest": {
+        "properties": {
+          "reason": {
+            "description": "Motivo (mínimo 10 caracteres); fica na auditoria",
+            "maxLength": 300,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "ImpersonateRequest",
+        "type": "object"
+      },
+      "ImpersonationOut": {
+        "description": "Estado de impersonação da sessão atual. `active=false` (e o resto nulo) numa sessão normal.",
+        "properties": {
+          "active": {
+            "default": false,
+            "title": "Active",
+            "type": "boolean"
+          },
+          "admin_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Administrador real que está a impersonar",
+            "title": "Admin Id"
+          },
+          "admin_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome (ou email) do administrador real",
+            "title": "Admin Name"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fim fixo da sessão; não é renovável",
+            "title": "Expires At"
+          }
+        },
+        "title": "ImpersonationOut",
+        "type": "object"
+      },
+      "ImpersonationStarted": {
+        "properties": {
+          "impersonation": {
+            "$ref": "#/components/schemas/ImpersonationOut"
+          },
+          "user": {
+            "$ref": "#/components/schemas/UserOut",
+            "description": "O utilizador impersonado (a sessão passa a ser dele)"
+          }
+        },
+        "required": [
+          "user",
+          "impersonation"
+        ],
+        "title": "ImpersonationStarted",
+        "type": "object"
+      },
+      "InvitationCreate": {
+        "properties": {
+          "confirm_admin": {
+            "default": false,
+            "description": "Obrigatório (true) quando `role` é `admin`",
+            "title": "Confirm Admin",
+            "type": "boolean"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "maxLength": 500,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Texto livre que aparece no email",
+            "title": "Message"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "maxLength": 120,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "default": "operator",
+            "enum": [
+              "admin",
+              "operator",
+              "guest"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "InvitationCreate",
+        "type": "object"
+      },
+      "InvitationOut": {
+        "properties": {
+          "accepted_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepted At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "email_delivered": {
+            "description": "O fornecedor de email aceitou o último envio; false = reenviar",
+            "title": "Email Delivered",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "invited_by_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invited By Id"
+          },
+          "invited_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invited By Name"
+          },
+          "last_sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Sent At"
+          },
+          "locale": {
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "revoked_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Revoked At"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "operator",
+              "guest"
+            ],
+            "title": "Role",
+            "type": "string"
+          },
+          "send_count": {
+            "title": "Send Count",
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "accepted",
+              "expired",
+              "revoked"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "role",
+          "locale",
+          "message",
+          "status",
+          "invited_by_id",
+          "invited_by_name",
+          "created_at",
+          "expires_at",
+          "accepted_at",
+          "revoked_at",
+          "last_sent_at",
+          "send_count",
+          "email_delivered"
+        ],
+        "title": "InvitationOut",
+        "type": "object"
+      },
+      "InvitationPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/InvitationOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "InvitationPage",
+        "type": "object"
+      },
+      "InvitationPreview": {
+        "description": "O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "invited_by_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invited By Name"
+          },
+          "locale": {
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "message": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Message"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "operator",
+              "guest"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "role",
+          "locale",
+          "invited_by_name",
+          "message",
+          "expires_at"
+        ],
+        "title": "InvitationPreview",
+        "type": "object"
+      },
+      "InvitationTokenRequest": {
+        "properties": {
+          "token": {
+            "maxLength": 200,
+            "minLength": 20,
+            "title": "Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "title": "InvitationTokenRequest",
+        "type": "object"
+      },
       "KpiItem": {
         "additionalProperties": false,
         "properties": {
@@ -6706,6 +7488,122 @@
           "composition"
         ],
         "title": "MarketLot",
+        "type": "object"
+      },
+      "MeOut": {
+        "description": "`/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação.",
+        "properties": {
+          "approval_status": {
+            "description": "`pending`/`rejected`: a conta autentica-se mas todas as rotas protegidas devolvem 403",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "title": "Approval Status",
+            "type": "string"
+          },
+          "avatar_url": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Avatar Url"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean"
+          },
+          "google_linked": {
+            "title": "Google Linked",
+            "type": "boolean"
+          },
+          "has_password": {
+            "title": "Has Password",
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "impersonation": {
+            "$ref": "#/components/schemas/ImpersonationOut"
+          },
+          "joined_via": {
+            "enum": [
+              "password",
+              "google",
+              "quick_join",
+              "magic_link",
+              "invited"
+            ],
+            "title": "Joined Via",
+            "type": "string"
+          },
+          "locale": {
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          },
+          "pending_approvals": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só para administradores: contas à espera de aprovação (badge do menu)",
+            "title": "Pending Approvals"
+          },
+          "role": {
+            "enum": [
+              "admin",
+              "operator",
+              "guest"
+            ],
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "avatar_url",
+          "role",
+          "joined_via",
+          "has_password",
+          "google_linked",
+          "email_verified",
+          "locale",
+          "approval_status"
+        ],
+        "title": "MeOut",
         "type": "object"
       },
       "MemoryEntryCreate": {
@@ -11706,6 +12604,31 @@
         "title": "RegisterRequest",
         "type": "object"
       },
+      "RejectRequest": {
+        "properties": {
+          "notify": {
+            "default": false,
+            "description": "Enviar um email neutro a avisar que não foi aprovada",
+            "title": "Notify",
+            "type": "boolean"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 300,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Motivo, mostrado à pessoa se existir",
+            "title": "Reason"
+          }
+        },
+        "title": "RejectRequest",
+        "type": "object"
+      },
       "ReportArtifact": {
         "additionalProperties": false,
         "properties": {
@@ -15006,6 +15929,27 @@
       "UserAdminOut": {
         "description": "Visão de administração: inclui estado da conta e último acesso.",
         "properties": {
+          "approval_status": {
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "title": "Approval Status",
+            "type": "string"
+          },
+          "approved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Approved At"
+          },
           "created_at": {
             "format": "date-time",
             "title": "Created At",
@@ -15037,7 +15981,8 @@
               "password",
               "google",
               "quick_join",
-              "magic_link"
+              "magic_link",
+              "invited"
             ],
             "title": "Joined Via",
             "type": "string"
@@ -15065,6 +16010,17 @@
             ],
             "title": "Name"
           },
+          "rejected_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rejected Reason"
+          },
           "role": {
             "enum": [
               "admin",
@@ -15085,13 +16041,22 @@
           "email_verified",
           "google_linked",
           "last_login_at",
-          "created_at"
+          "created_at",
+          "approval_status",
+          "approved_at",
+          "rejected_reason"
         ],
         "title": "UserAdminOut",
         "type": "object"
       },
       "UserAdminUpdate": {
         "properties": {
+          "confirm_admin": {
+            "default": false,
+            "description": "Obrigatório (true) para dar o papel `admin`; ignorado nos restantes casos",
+            "title": "Confirm Admin",
+            "type": "boolean"
+          },
           "is_active": {
             "anyOf": [
               {
@@ -15125,6 +16090,16 @@
       },
       "UserOut": {
         "properties": {
+          "approval_status": {
+            "description": "`pending`/`rejected`: a conta autentica-se mas todas as rotas protegidas devolvem 403",
+            "enum": [
+              "pending",
+              "approved",
+              "rejected"
+            ],
+            "title": "Approval Status",
+            "type": "string"
+          },
           "avatar_url": {
             "anyOf": [
               {
@@ -15162,7 +16137,8 @@
               "password",
               "google",
               "quick_join",
-              "magic_link"
+              "magic_link",
+              "invited"
             ],
             "title": "Joined Via",
             "type": "string"
@@ -15206,9 +16182,28 @@
           "has_password",
           "google_linked",
           "email_verified",
-          "locale"
+          "locale",
+          "approval_status"
         ],
         "title": "UserOut",
+        "type": "object"
+      },
+      "UsersSummary": {
+        "properties": {
+          "pending_approvals": {
+            "title": "Pending Approvals",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "pending_approvals",
+          "total"
+        ],
+        "title": "UsersSummary",
         "type": "object"
       },
       "ValidationErrorBody": {
@@ -15813,24 +16808,6 @@
       "get": {
         "description": "Saldo e limite da chave no OpenRouter. Se o fornecedor não responder, `available` é falso.",
         "operationId": "get_ai_credits",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -15953,24 +16930,6 @@
       "get": {
         "description": "Última avaliação da triagem por modelo (exatidão, custo e latência), gerada por `just eval-triage`.",
         "operationId": "get_triage_eval",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -16177,22 +17136,6 @@
               "title": "Limit",
               "type": "integer"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -16317,24 +17260,6 @@
       "get": {
         "description": "Configuração de IA por tarefa: modelo, reserva, tokens e raciocínio efetivos, com a origem de cada valor.",
         "operationId": "get_ai_settings",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -16455,24 +17380,6 @@
       "put": {
         "description": "Grava a configuração. Cada modelo tem de existir no catálogo e suportar o que as suas tarefas exigem.",
         "operationId": "update_ai_settings",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -16605,24 +17512,6 @@
       "post": {
         "description": "Uma chamada mínima ao modelo: devolve latência e custo reais (conta para o orçamento).",
         "operationId": "test_ai_model",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -16767,22 +17656,6 @@
               "title": "Days",
               "type": "integer"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -16903,27 +17776,131 @@
         ]
       }
     },
+    "/api/v1/auth/approval-status": {
+      "get": {
+        "description": "Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`.",
+        "operationId": "get_approval_status",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApprovalStatusOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Approval Status",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/change-password": {
       "post": {
         "operationId": "change_password",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -17363,22 +18340,6 @@
               ],
               "title": "Error"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "oauth_state",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Oauth State"
-            }
           }
         ],
         "responses": {
@@ -17636,8 +18597,415 @@
         ]
       }
     },
+    "/api/v1/auth/impersonation/stop": {
+      "post": {
+        "description": "Termina a impersonação e devolve a sessão ao administrador real (o cookie de acesso passa a ser o dele).",
+        "operationId": "stop_impersonation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Stop Impersonation",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/invitations/accept": {
+      "post": {
+        "description": "Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.\nO token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email.",
+        "operationId": "accept_invitation",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInvitationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SignedIn"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Accept Invitation",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/invitations/preview": {
+      "post": {
+        "description": "Mostra a quem foi o convite (email, papel, quem convidou) para a página de aceitar. Só com um token válido.",
+        "operationId": "preview_invitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationTokenRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationPreview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Preview Invitation",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/login": {
       "post": {
+        "description": "Credenciais erradas: sempre a mesma resposta. Além do limite por IP, há um limite de falhas por CONTA\n(independente do IP), que também responde igual para emails que não existem.",
         "operationId": "login",
         "parameters": [
           {
@@ -17790,24 +19158,6 @@
     "/api/v1/auth/logout": {
       "post": {
         "operationId": "logout",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "refresh_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Refresh Token"
-            }
-          }
-        ],
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -17923,24 +19273,6 @@
       "post": {
         "description": "Termina a sessão em todos os dispositivos.",
         "operationId": "logout_all",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -18331,31 +19663,14 @@
     },
     "/api/v1/auth/me": {
       "get": {
+        "description": "O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado\ne `impersonation` traz o administrador real. Para administradores traz `pending_approvals`.",
         "operationId": "get_me",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/UserOut"
+                  "$ref": "#/components/schemas/MeOut"
                 }
               }
             },
@@ -18469,24 +19784,6 @@
       },
       "patch": {
         "operationId": "update_me",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -18813,22 +20110,6 @@
               "description": "Procura no nome ou email",
               "title": "Q"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -19075,24 +20356,6 @@
       "get": {
         "description": "URL, código e QR (SVG) de entrada do evento (`/join?c=<código>`). Só administradores.",
         "operationId": "get_quick_join_qr",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -19214,24 +20477,6 @@
     "/api/v1/auth/refresh": {
       "post": {
         "operationId": "refresh",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "refresh_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Refresh Token"
-            }
-          }
-        ],
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -19514,22 +20759,6 @@
               ],
               "description": "Token do widget Cloudflare Turnstile (uso único)",
               "title": "X-Turnstile-Token"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -19916,24 +21145,6 @@
       "get": {
         "description": "Quilos e composição por marca, com o tamanho da amostra (evidência para a RAP).",
         "operationId": "get_brand_evidence",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -20162,22 +21373,6 @@
               "title": "Locale",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -20300,24 +21495,6 @@
       "post": {
         "description": "Propõe uma ação (por formulário, sem passar pelo modelo). Fica à espera de `confirm`; expira em 10 minutos.",
         "operationId": "propose_copilot_action",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -20473,22 +21650,6 @@
               ],
               "title": "Locale",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -20647,22 +21808,6 @@
               "title": "Locale",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -20810,22 +21955,6 @@
               ],
               "title": "Locale",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -21046,22 +22175,6 @@
               "title": "Limit",
               "type": "integer"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -21194,22 +22307,6 @@
               "format": "uuid",
               "title": "Artifact Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -21347,22 +22444,6 @@
               "default": true,
               "title": "Pinned",
               "type": "boolean"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -21512,22 +22593,6 @@
               "title": "Locale",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -21652,24 +22717,6 @@
       "post": {
         "description": "Imagens, PDF, CSV/XLSX, TXT/MD/JSON. O ficheiro é validado pelo conteúdo e descartado: guarda-se só o texto extraído.",
         "operationId": "upload_copilot_attachments",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -21806,24 +22853,6 @@
       "post": {
         "description": "Conversa em pt-PT/en sem streaming. O modelo escolhe ferramentas; os números do texto são verificados.",
         "operationId": "copilot_chat",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -21956,24 +22985,6 @@
       "get": {
         "description": "Comandos `/` disponíveis para o utilizador e as ações do composer (anexar ficheiro, anexar ecrã atual, @).",
         "operationId": "list_copilot_commands",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -22109,22 +23120,6 @@
               "title": "Confirmation",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -22247,24 +23242,6 @@
       "get": {
         "description": "Tudo o que o copiloto guarda sobre o utilizador: definições, memória, conversas e ações (RGPD).",
         "operationId": "export_copilot_data",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -22387,24 +23364,6 @@
       "get": {
         "description": "Um exemplo de cada evento do stream, na ordem típica. Documenta o contrato e dá ao cliente gerado os tipos.",
         "operationId": "get_copilot_event_schema",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -22649,22 +23608,6 @@
               "title": "Limit",
               "type": "integer"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -22802,22 +23745,6 @@
               "title": "Target",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -22952,22 +23879,6 @@
               ],
               "title": "Target"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -23089,24 +24000,6 @@
       },
       "post": {
         "operationId": "create_copilot_memory_entry",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -23248,22 +24141,6 @@
               "title": "Entry Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -23387,22 +24264,6 @@
               "format": "uuid",
               "title": "Entry Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -23538,24 +24399,6 @@
       "get": {
         "description": "Escritas de memória à espera de aprovação (quando `write_approval=ask`).",
         "operationId": "list_pending_memory",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -23690,22 +24533,6 @@
               "format": "uuid",
               "title": "Pending Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -23849,22 +24676,6 @@
               "format": "uuid",
               "title": "Pending Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -24046,22 +24857,6 @@
               "title": "Locale",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -24195,22 +24990,6 @@
               "format": "uuid",
               "title": "Message Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -24346,24 +25125,6 @@
       "post": {
         "description": "Como o copiloto responderia a uma frase de exemplo com a persona escolhida (chamada barata, sem ferramentas).",
         "operationId": "preview_copilot_persona",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -24496,24 +25257,6 @@
       "get": {
         "description": "Pastas simples (`project`) com o número de conversas.",
         "operationId": "list_copilot_projects",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -24697,22 +25440,6 @@
               ],
               "title": "Until"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -24837,24 +25564,6 @@
       "get": {
         "description": "Definições do utilizador (memória, persona, notificações, retenção...), com medidores de uso da memória.",
         "operationId": "get_copilot_settings",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -24974,24 +25683,6 @@
       },
       "put": {
         "operationId": "update_copilot_settings",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -25134,22 +25825,6 @@
               "title": "Token",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -25274,24 +25949,6 @@
       "post": {
         "description": "Responde em `text/event-stream` com eventos tipados (ver `CopilotEventMessage`). Menções, anexos e contexto\nda página são validados e resolvidos no servidor antes de abrir o stream; erros dessa fase são HTTP normais.",
         "operationId": "copilot_stream",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -25507,22 +26164,6 @@
               ],
               "title": "Project"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -25657,22 +26298,6 @@
               "title": "Thread Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -25796,22 +26421,6 @@
               "format": "uuid",
               "title": "Thread Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -25944,22 +26553,6 @@
               "format": "uuid",
               "title": "Thread Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -26105,22 +26698,6 @@
               "title": "Thread Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -26255,22 +26832,6 @@
               "title": "Thread Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -26404,22 +26965,6 @@
               "format": "uuid",
               "title": "Thread Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -26565,22 +27110,6 @@
               "title": "Locale",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -26714,22 +27243,6 @@
               "title": "Thread Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -26854,22 +27367,6 @@
               "format": "uuid",
               "title": "Thread Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -27004,22 +27501,6 @@
               "format": "uuid",
               "title": "Thread Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -27158,22 +27639,6 @@
               "format": "uuid",
               "title": "Alert Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -27319,22 +27784,6 @@
               "title": "Alert Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -27459,24 +27908,6 @@
       "get": {
         "description": "Fontes de dados recebidas (com proveniência) e inconsistências a confirmar com a Vitrus.",
         "operationId": "get_data_quality",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -27769,22 +28200,6 @@
               ],
               "title": "Parish Code"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -27911,24 +28326,6 @@
       "post": {
         "description": "Abre um lote no ponto de recolha: gera o código que vai no QR.",
         "operationId": "open_lot",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -28069,22 +28466,6 @@
               "title": "Code",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -28217,22 +28598,6 @@
             "schema": {
               "title": "Code",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -28376,22 +28741,6 @@
             "schema": {
               "title": "Code",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -28543,22 +28892,6 @@
               ],
               "title": "Fibre"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -28695,22 +29028,6 @@
             "schema": {
               "title": "Code",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -29131,22 +29448,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -29271,24 +29572,6 @@
       "get": {
         "description": "Densidade do concelho e distribuição entre freguesias; compara com a referência francesa (por verificar).",
         "operationId": "get_municipal_density_benchmark",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -29633,22 +29916,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -29789,22 +30056,6 @@
               ],
               "title": "Limit"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -29929,24 +30180,6 @@
       "get": {
         "description": "KPIs da rede municipal: contentores, locais, densidade, cobertura e qualidade (estimativas etiquetadas).",
         "operationId": "get_municipal_overview",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -30174,22 +30407,6 @@
               ],
               "title": "Has Candidates"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -30314,24 +30531,6 @@
       "get": {
         "description": "Contornos CAOP 2019 das 48 freguesias (substitui o OSM, que falha 3 uniões) com métricas para coroplético.",
         "operationId": "get_caop_parishes_geojson",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -30463,22 +30662,6 @@
               "maxLength": 8,
               "title": "Dicofre",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -30839,22 +31022,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -31214,22 +31381,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -31588,22 +31739,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -31763,22 +31898,6 @@
               "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
               "title": "Show Names",
               "type": "boolean"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -32151,22 +32270,6 @@
               "title": "Show Names",
               "type": "boolean"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -32291,24 +32394,6 @@
       "get": {
         "description": "Circuitos de recolha atuais da Vitrus, com localidades, dias e viaturas.",
         "operationId": "list_circuits",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -32486,22 +32571,6 @@
               ],
               "title": "Status"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -32649,22 +32718,6 @@
               "$ref": "#/components/schemas/ContainerKind",
               "default": "textile"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -32789,24 +32842,6 @@
       "get": {
         "description": "Frota e turnos: ocupação por tipologia e turno, e o horário de cada viatura.",
         "operationId": "get_fleet",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -32929,24 +32964,6 @@
       "get": {
         "description": "Cobertura por localidade: que circuitos passam e em que dias (base da recolha a pedido).",
         "operationId": "list_localities",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -33073,24 +33090,6 @@
       "get": {
         "description": "Cenários de referência externos, com pressupostos, fonte e o que implicam com os dados atuais.",
         "operationId": "list_benchmarks",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -33225,22 +33224,6 @@
             "schema": {
               "title": "Key",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -33457,22 +33440,6 @@
               "title": "Min Share",
               "type": "number"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -33597,24 +33564,6 @@
       "get": {
         "description": "Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto).",
         "operationId": "get_planning_parameters",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -33735,24 +33684,6 @@
       "put": {
         "description": "Atualiza os pressupostos ativos (só administradores). Os cenários já gravados mantêm os seus.",
         "operationId": "update_planning_parameters",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -33885,24 +33816,6 @@
       "post": {
         "description": "Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.",
         "operationId": "recommend_pilot",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -34034,24 +33947,6 @@
     "/api/v1/planning/scenarios": {
       "get": {
         "operationId": "list_scenarios",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -34176,24 +34071,6 @@
       "post": {
         "description": "Corre o otimizador (localização e modo por freguesia, mais rotas) e guarda o cenário.",
         "operationId": "create_scenario",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -34335,22 +34212,6 @@
               "title": "Scenario Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -34474,22 +34335,6 @@
               "format": "uuid",
               "title": "Scenario Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -34621,22 +34466,6 @@
               "format": "uuid",
               "title": "Scenario Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -34782,22 +34611,6 @@
               "title": "Scenario Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -34931,22 +34744,6 @@
               "format": "uuid",
               "title": "Scenario Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -35082,24 +34879,6 @@
       "get": {
         "description": "Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus.",
         "operationId": "list_zones",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -35609,24 +35388,6 @@
     "/api/v1/reports": {
       "get": {
         "operationId": "list_reports",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -35753,24 +35514,6 @@
       "post": {
         "description": "Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).\n\nInclui um briefing executivo: da IA, verificado contra os números, ou texto fixo sem IA.",
         "operationId": "create_rap_report",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -35912,22 +35655,6 @@
               "title": "Report Id",
               "type": "string"
             }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
           }
         ],
         "responses": {
@@ -36048,24 +35775,6 @@
       "get": {
         "description": "Têxtil recolhido em 2025 por entidade e destino, face à procura estimada.",
         "operationId": "get_textile_baseline",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -36188,24 +35897,6 @@
       "get": {
         "description": "Fluxo observado entidade → destino em toneladas (Sankey do ponto de partida).",
         "operationId": "get_observed_flows",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -36328,24 +36019,6 @@
       "get": {
         "description": "Página inicial: lacuna, referências, prazos regulatórios, freguesias, fronteira de cenários e manchetes.",
         "operationId": "get_overview",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -36468,24 +36141,6 @@
       "get": {
         "description": "Composição dos resíduos urbanos: onde os têxteis pesam face ao resto.",
         "operationId": "get_waste_composition",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "content": {
@@ -36608,24 +36263,6 @@
       "post": {
         "description": "Analisa as fotos com o modelo de visão. Não grava nada: o operador confirma e só então a peça entra no lote.",
         "operationId": "analyse_garment",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -36756,23 +36393,28 @@
     },
     "/api/v1/users": {
       "get": {
-        "description": "Platform accounts (admins only).",
+        "description": "Platform accounts (admins only). `approval_status=pending` is the «Pendentes» tab.",
         "operationId": "list_users",
         "parameters": [
           {
-            "in": "cookie",
-            "name": "access_token",
+            "in": "query",
+            "name": "approval_status",
             "required": false,
             "schema": {
               "anyOf": [
                 {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "rejected"
+                  ],
                   "type": "string"
                 },
                 {
                   "type": "null"
                 }
               ],
-              "title": "Access Token"
+              "title": "Approval Status"
             }
           }
         ],
@@ -36898,10 +36540,952 @@
         ]
       }
     },
+    "/api/v1/users/audit": {
+      "get": {
+        "description": "Registo de auditoria da administração (convites, eliminações, impersonação, papéis), do mais recente.",
+        "operationId": "list_audit",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Ação exata (`user.delete`) ou prefixo com ponto (`invitation.`)",
+            "in": "query",
+            "name": "action",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 60,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Ação exata (`user.delete`) ou prefixo com ponto (`invitation.`)",
+              "title": "Action"
+            }
+          },
+          {
+            "in": "query",
+            "name": "actor_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Actor Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "target_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 64,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Target Id"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Audit",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/invitations": {
+      "get": {
+        "description": "Convites enviados (pendentes, aceites, expirados, revogados), do mais recente.",
+        "operationId": "list_invitations",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "pending",
+                    "accepted",
+                    "expired",
+                    "revoked"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "description": "Procura no email",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Procura no email",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Invitations",
+        "tags": [
+          "users"
+        ]
+      },
+      "post": {
+        "description": "Invite someone by email with a role. 409 if the email already has an account or a pending invitation.\n`role=admin` needs `confirm_admin: true`. The link is valid for 7 days and works once.",
+        "operationId": "create_invitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InvitationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Invitation",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/invitations/{invitation_id}/resend": {
+      "post": {
+        "description": "New link and new deadline; the previous link stops working.",
+        "operationId": "resend_invitation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Resend Invitation",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/invitations/{invitation_id}/revoke": {
+      "post": {
+        "description": "The link stops working. Accepted invitations cannot be revoked.",
+        "operationId": "revoke_invitation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Revoke Invitation",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/summary": {
+      "get": {
+        "description": "Counters for the menu badge.",
+        "operationId": "get_users_summary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UsersSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Users Summary",
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/api/v1/users/{user_id}": {
-      "patch": {
-        "description": "Change role or activate/deactivate an account. Admins cannot change themselves.",
-        "operationId": "update_user",
+      "delete": {
+        "description": "Permanently delete an account and its personal data (GDPR). The body repeats the target's email.\nNot allowed on yourself, on the last active admin, or on someone being impersonated. Audited.",
+        "operationId": "delete_user",
         "parameters": [
           {
             "in": "path",
@@ -36912,21 +37496,140 @@
               "title": "User Id",
               "type": "string"
             }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteUserRequest"
+              }
+            }
           },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
                 }
-              ],
-              "title": "Access Token"
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete User",
+        "tags": [
+          "users"
+        ]
+      },
+      "patch": {
+        "description": "Change role or activate/deactivate an account. Admins cannot change themselves; the last active admin cannot\nbe demoted or deactivated; granting `admin` needs `confirm_admin: true`. Audited.",
+        "operationId": "update_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
             }
           }
         ],
@@ -37058,6 +37761,438 @@
         ]
       }
     },
+    "/api/v1/users/{user_id}/approve": {
+      "post": {
+        "description": "Approve a pending (or rejected) account and set its role. `role=admin` needs `confirm_admin`. Emails the user\nunless `notify=false`. Audited.",
+        "operationId": "approve_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Approve User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/impersonate": {
+      "post": {
+        "description": "See the app as a non-admin user for a fixed, non-renewable period. A reason (10+ characters) is required.\nThe access cookie becomes the impersonation session; `POST /auth/impersonation/stop` gives it back.",
+        "operationId": "start_impersonation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImpersonateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ImpersonationStarted"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Start Impersonation",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/reject": {
+      "post": {
+        "description": "Reject a pending account (optional reason shown to the person; optional neutral email). Audited.",
+        "operationId": "reject_user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Reject User",
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/api/v1/whatif": {
       "get": {
         "description": "Perguntas feitas sobre um cenário (histórico auditável).",
@@ -37071,22 +38206,6 @@
               "format": "uuid",
               "title": "Scenario Id",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],
@@ -37214,24 +38333,6 @@
       "post": {
         "description": "Passo 1: o modelo percebe a pergunta e descreve a alteração. Nada é calculado até o utilizador confirmar.",
         "operationId": "ask_what_if",
-        "parameters": [
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -37387,22 +38488,6 @@
               ],
               "title": "Locale",
               "type": "string"
-            }
-          },
-          {
-            "in": "cookie",
-            "name": "access_token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "title": "Access Token"
             }
           }
         ],

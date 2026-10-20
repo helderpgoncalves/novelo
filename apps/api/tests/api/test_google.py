@@ -38,6 +38,9 @@ async def test_callback_creates_and_links_user(
     login = await client.get(f"{AUTH}/google/login?next=/circuitos", follow_redirects=False)
     state = httpx.URL(login.headers["location"]).params["state"]
     cb = await client.get(f"{AUTH}/google/callback?code=abc&state={state}", follow_redirects=False)
-    assert cb.status_code == 302 and cb.headers["location"].endswith("/circuitos")
+    # conta nova por Google nunca é aprovada sozinha: vai para o ecrã de espera
+    assert cb.status_code == 302 and cb.headers["location"].endswith("/pending-approval")
     me = (await client.get(f"{AUTH}/me")).json()
     assert me["email"] == "rita@vitrus.pt" and me["google_linked"] and not me["has_password"]
+    assert me["approval_status"] == "pending"
+    assert (await client.get("/api/v1/planning/zones")).json()["code"] == "account_pending"

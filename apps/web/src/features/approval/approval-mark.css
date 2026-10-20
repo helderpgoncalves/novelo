@@ -1,0 +1,82 @@
+/* Símbolo do Novelo no ecrã de espera: os três fios rodam devagar em sentidos opostos (um novelo a enrolar). */
+.approval-arc {
+  /* Com `view-box` a origem é a do sistema de coordenadas (0,0), que é o centro do símbolo. */
+  transform-box: view-box;
+  transform-origin: 0 0;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+}
+.approval-arc-0 {
+  animation:
+    approval-draw 1.2s ease-out both,
+    approval-spin 14s linear 1.2s infinite;
+}
+.approval-arc-1 {
+  animation:
+    approval-draw 1.5s ease-out 0.15s both,
+    approval-spin 22s linear 1.65s infinite reverse;
+}
+.approval-arc-2 {
+  animation:
+    approval-draw 1.8s ease-out 0.3s both,
+    approval-spin 34s linear 2.1s infinite;
+}
+.approval-dot {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: approval-beat 3s ease-in-out infinite;
+}
+.approval-halo {
+  animation: approval-halo 4.5s ease-in-out infinite;
+}
+[data-state="rejected"] .approval-arc,
+[data-state="rejected"] .approval-dot,
+[data-state="rejected"] .approval-halo {
+  animation-play-state: paused;
+}
+[data-state="rejected"] svg {
+  opacity: 0.5;
+}
+@keyframes approval-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes approval-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes approval-beat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.14);
+  }
+}
+@keyframes approval-halo {
+  0%,
+  100% {
+    opacity: 0.55;
+    transform: scale(0.94);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .approval-arc,
+  .approval-arc-0,
+  .approval-arc-1,
+  .approval-arc-2,
+  .approval-dot,
+  .approval-halo {
+    animation: none;
+  }
+}

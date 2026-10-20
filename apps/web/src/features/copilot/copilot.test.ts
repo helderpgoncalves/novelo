@@ -3,7 +3,7 @@ import type { CopilotEventMessage } from '@/client';
 import { parseBlocks } from './markdown';
 import { applyEvent, closingEvents, newTurn } from './reducer';
 import { parseSseBlock, splitSse } from './sse';
-import { familyOf } from './thinking';
+import { familyOf, indicatorLabelKey } from './thinking';
 import { applyTrigger, findTrigger } from './triggers';
 
 const run = (events: CopilotEventMessage[]) =>
@@ -144,5 +144,48 @@ describe('fecho do stream (regressão do erro de 1 ms)', () => {
   it('um erro do servidor já na fila não é duplicado', () => {
     const err: CopilotEventMessage = { type: 'error', code: 'upstream_error', message: 'x' };
     expect(closingEvents([err], fresh(), false, 'ligação')).toEqual([]);
+  });
+});
+
+describe('indicador de trabalho (logo a girar)', () => {
+  const fold = (events: CopilotEventMessage[]) => run(events);
+  const streaming = (t: ReturnType<typeof run>) => t.message.state === 'streaming';
+
+  it('mantém-se durante texto, ferramentas e até ao done', () => {
+    let turn = newTurn('tmp-1');
+    const steps: CopilotEventMessage[] = [
+      { type: 'status', phase: 'thinking', label_key: 'status.thinking' },
+      { type: 'text_delta', delta: 'Olá' },
+      { type: 'tool_start', id: 'a', name: 'get_baseline', args_summary: '' },
+      { type: 'text_delta', delta: ' mundo' },
+    ];
+    for (const ev of steps) {
+      turn = applyEvent(turn, ev);
+      expect(streaming(turn)).toBe(true);
+    }
+    expect(indicatorLabelKey(turn.message, turn.status)).toBe('status.thinking');
+    expect(streaming(fold([...steps, { type: 'done', finish: 'stop' }]))).toBe(false);
+  });
+
+  it('a fase deduz-se quando não há status', () => {
+    const base = newTurn('t').message;
+    expect(indicatorLabelKey(base, null)).toBe('status.thinking');
+    expect(indicatorLabelKey({ ...base, text: 'x' }, null)).toBe('status.writing');
+    const tool = { id: 'a', name: 'n', args: '', summary: null, ok: null, durationMs: null };
+    expect(indicatorLabelKey({ ...base, text: 'x', tools: [tool] }, null)).toBe('status.working');
+    expect(
+      indicatorLabelKey(base, {
+        phase: 'tool',
+        labelKey: 'status.running_optimizer',
+        detail: null,
+      }),
+    ).toBe('status.running_optimizer');
+  });
+
+  it('erro e cancelamento terminam o estado streaming', () => {
+    expect(streaming(fold([{ type: 'error', code: 'ai_budget_exceeded', message: 'x' }]))).toBe(
+      false,
+    );
+    expect(streaming(fold([{ type: 'done', finish: 'cancelled' }]))).toBe(false);
   });
 });

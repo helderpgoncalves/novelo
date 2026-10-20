@@ -4,19 +4,27 @@ import { toast } from 'sonner';
 import type { UserOut } from '@/client';
 import { resendVerificationMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
+import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { useTurnstile } from './use-turnstile';
 
 /** Lembra o utilizador de confirmar o email e permite reenviar o link. */
 export function VerifyEmailBanner({ user }: { user: UserOut }) {
+  const gate = useTurnstile('resend_verification');
+  const imp = useImpersonation();
   const resend = useMutation({
     ...resendVerificationMutation(),
     onSuccess: () => toast.success(m.verify_resend_toast({ email: user.email })),
-    onError: (error) => toast.error(getErrorMessage(error)),
+    onError: (error) => {
+      gate.onApiError(error);
+      toast.error(getErrorMessage(error));
+    },
   });
 
   // Convidados entram por QR com o email que escreveram: pedir-lhes confirmação só seria ruído.
-  if (user.email_verified || user.role === 'guest') return null;
+  // Durante uma impersonação o reenvio é bloqueado pela API: o aviso não é para quem está só a ver.
+  if (user.email_verified || user.role === 'guest' || imp.active) return null;
 
   return (
     <div
@@ -29,12 +37,13 @@ export function VerifyEmailBanner({ user }: { user: UserOut }) {
         variant="outline"
         size="sm"
         className="h-8"
-        onClick={() => resend.mutate({})}
-        disabled={resend.isPending}
+        onClick={() => resend.mutate({ headers: gate.consume() })}
+        disabled={resend.isPending || gate.blocked}
         loading={resend.isPending}
       >
         {m.verify_banner_resend()}
       </Button>
+      {gate.field}
     </div>
   );
 }

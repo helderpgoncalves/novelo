@@ -21,6 +21,7 @@ import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type LoginValues, loginSchema } from './schemas';
 import { useAutofillSync } from './use-autofill-sync';
+import { useTurnstile } from './use-turnstile';
 
 const AUTOFILL_FIELDS = ['email', 'password'] as const;
 
@@ -35,11 +36,14 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
   const formRef = useRef<HTMLFormElement>(null);
   const syncAutofill = useAutofillSync(form, formRef, AUTOFILL_FIELDS);
 
+  const gate = useTurnstile('login');
   const login = useMutation({
     ...loginMutation(),
     onSuccess: async (user) => {
       queryClient.setQueryData(getMeQueryKey(), user);
-      await navigate({ to: next });
+      await navigate(
+        user.approval_status === 'approved' ? { to: next } : { to: '/pending-approval' },
+      );
     },
   });
 
@@ -49,7 +53,9 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
         ref={formRef}
         onSubmit={(e) => {
           syncAutofill();
-          void form.handleSubmit((v) => login.mutate({ body: v }))(e);
+          void form.handleSubmit((v) =>
+            login.mutate({ body: v, headers: gate.consume() }, { onError: gate.onApiError }),
+          )(e);
         }}
         className="space-y-4"
         noValidate
@@ -113,13 +119,14 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
             </FormItem>
           )}
         />
+        {gate.field}
         <Button
           type="submit"
           className="h-10 w-full font-semibold"
-          disabled={login.isPending}
+          disabled={login.isPending || gate.blocked}
           loading={login.isPending}
         >
-          {m.login_submit()}
+          {gate.verifying ? m.turnstile_verifying() : m.login_submit()}
         </Button>
       </form>
     </Form>

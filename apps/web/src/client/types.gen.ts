@@ -5,6 +5,26 @@ export type ClientOptions = {
 };
 
 /**
+ * AcceptInvitationRequest
+ */
+export type AcceptInvitationRequest = {
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Password
+     *
+     * Opcional: sem password a pessoa entra por link enviado por email
+     */
+    password?: string | null;
+    /**
+     * Token
+     */
+    token: string;
+};
+
+/**
  * ActionOut
  */
 export type ActionOut = {
@@ -508,6 +528,54 @@ export type AllocationPart = {
 };
 
 /**
+ * ApprovalStatusOut
+ *
+ * Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).
+ */
+export type ApprovalStatusOut = {
+    /**
+     * Decided At
+     *
+     * Quando foi aprovada
+     */
+    decided_at: string | null;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
+    /**
+     * Rejected Reason
+     */
+    rejected_reason: string | null;
+    /**
+     * Status
+     */
+    status: 'pending' | 'approved' | 'rejected';
+};
+
+/**
+ * ApproveRequest
+ */
+export type ApproveRequest = {
+    /**
+     * Confirm Admin
+     *
+     * Obrigatório (true) quando `role` é `admin`
+     */
+    confirm_admin?: boolean;
+    /**
+     * Notify
+     *
+     * Enviar o email «A tua conta foi aprovada»
+     */
+    notify?: boolean;
+    /**
+     * Role
+     */
+    role?: 'admin' | 'operator' | 'guest';
+};
+
+/**
  * ArtifactEnvelope
  */
 export type ArtifactEnvelope = {
@@ -696,9 +764,117 @@ export type AttachmentOut = {
 };
 
 /**
+ * AuditEntryOut
+ */
+export type AuditEntryOut = {
+    /**
+     * Action
+     *
+     * Ex.: `invitation.create`, `user.delete`, `impersonation.start`
+     */
+    action: string;
+    /**
+     * Actor Email
+     */
+    actor_email: string | null;
+    /**
+     * Actor Id
+     *
+     * Pessoa real; nulo se a conta foi eliminada
+     */
+    actor_id: string | null;
+    /**
+     * Actor Name
+     */
+    actor_name: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Details
+     *
+     * Contexto sem segredos (papel anterior, motivo, caminho...)
+     */
+    details: {
+        [key: string]: unknown;
+    };
+    /**
+     * Effective Actor Email
+     */
+    effective_actor_email: string | null;
+    /**
+     * Effective Actor Id
+     *
+     * Conta em nome de quem agiu; difere de `actor_id` durante uma impersonação
+     */
+    effective_actor_id: string | null;
+    /**
+     * Effective Actor Name
+     */
+    effective_actor_name: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Ip
+     */
+    ip: string | null;
+    /**
+     * Target Id
+     */
+    target_id: string | null;
+    /**
+     * Target Label
+     *
+     * Email do alvo; apagado se o alvo for eliminado
+     */
+    target_label: string | null;
+    /**
+     * Target Type
+     *
+     * `user`, `invitation` ou `request`
+     */
+    target_type: string | null;
+    /**
+     * User Agent
+     */
+    user_agent: string | null;
+};
+
+/**
+ * AuditPage
+ */
+export type AuditPage = {
+    /**
+     * Items
+     */
+    items: Array<AuditEntryOut>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
  * AuthConfig
  */
 export type AuthConfig = {
+    /**
+     * Approval Required
+     *
+     * Contas novas (password ou Google) ficam à espera de aprovação de um administrador
+     */
+    approval_required?: boolean;
     /**
      * Google Enabled
      */
@@ -1710,7 +1886,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      */
@@ -2653,6 +2829,18 @@ export type DataSourceOut = {
 export type DayGroup = 'weekday' | 'saturday' | 'sunday';
 
 /**
+ * DeleteUserRequest
+ */
+export type DeleteUserRequest = {
+    /**
+     * Confirm Email
+     *
+     * Email do utilizador a eliminar, escrito de novo (anti-engano)
+     */
+    confirm_email: string;
+};
+
+/**
  * EffectiveTask
  */
 export type EffectiveTask = {
@@ -2749,7 +2937,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      *
@@ -3347,6 +3535,233 @@ export type HistoryPage = {
 };
 
 /**
+ * ImpersonateRequest
+ */
+export type ImpersonateRequest = {
+    /**
+     * Reason
+     *
+     * Motivo (mínimo 10 caracteres); fica na auditoria
+     */
+    reason: string;
+};
+
+/**
+ * ImpersonationOut
+ *
+ * Estado de impersonação da sessão atual. `active=false` (e o resto nulo) numa sessão normal.
+ */
+export type ImpersonationOut = {
+    /**
+     * Active
+     */
+    active?: boolean;
+    /**
+     * Admin Id
+     *
+     * Administrador real que está a impersonar
+     */
+    admin_id?: string | null;
+    /**
+     * Admin Name
+     *
+     * Nome (ou email) do administrador real
+     */
+    admin_name?: string | null;
+    /**
+     * Expires At
+     *
+     * Fim fixo da sessão; não é renovável
+     */
+    expires_at?: string | null;
+};
+
+/**
+ * ImpersonationStarted
+ */
+export type ImpersonationStarted = {
+    impersonation: ImpersonationOut;
+    /**
+     * O utilizador impersonado (a sessão passa a ser dele)
+     */
+    user: UserOut;
+};
+
+/**
+ * InvitationCreate
+ */
+export type InvitationCreate = {
+    /**
+     * Confirm Admin
+     *
+     * Obrigatório (true) quando `role` é `admin`
+     */
+    confirm_admin?: boolean;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Message
+     *
+     * Texto livre que aparece no email
+     */
+    message?: string | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Role
+     */
+    role?: 'admin' | 'operator' | 'guest';
+};
+
+/**
+ * InvitationOut
+ */
+export type InvitationOut = {
+    /**
+     * Accepted At
+     */
+    accepted_at: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Email Delivered
+     *
+     * O fornecedor de email aceitou o último envio; false = reenviar
+     */
+    email_delivered: boolean;
+    /**
+     * Expires At
+     */
+    expires_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Invited By Id
+     */
+    invited_by_id: string | null;
+    /**
+     * Invited By Name
+     */
+    invited_by_name: string | null;
+    /**
+     * Last Sent At
+     */
+    last_sent_at: string | null;
+    /**
+     * Locale
+     */
+    locale: 'pt-PT' | 'en';
+    /**
+     * Message
+     */
+    message: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Revoked At
+     */
+    revoked_at: string | null;
+    /**
+     * Role
+     */
+    role: 'admin' | 'operator' | 'guest';
+    /**
+     * Send Count
+     */
+    send_count: number;
+    /**
+     * Status
+     */
+    status: 'pending' | 'accepted' | 'expired' | 'revoked';
+};
+
+/**
+ * InvitationPage
+ */
+export type InvitationPage = {
+    /**
+     * Items
+     */
+    items: Array<InvitationOut>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * InvitationPreview
+ *
+ * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
+ */
+export type InvitationPreview = {
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Expires At
+     */
+    expires_at: string;
+    /**
+     * Invited By Name
+     */
+    invited_by_name: string | null;
+    /**
+     * Locale
+     */
+    locale: 'pt-PT' | 'en';
+    /**
+     * Message
+     */
+    message: string | null;
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Role
+     */
+    role: 'admin' | 'operator' | 'guest';
+};
+
+/**
+ * InvitationTokenRequest
+ */
+export type InvitationTokenRequest = {
+    /**
+     * Token
+     */
+    token: string;
+};
+
+/**
  * KpiItem
  */
 export type KpiItem = {
@@ -3889,6 +4304,67 @@ export type MarketLot = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * MeOut
+ *
+ * `/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação.
+ */
+export type MeOut = {
+    /**
+     * Approval Status
+     *
+     * `pending`/`rejected`: a conta autentica-se mas todas as rotas protegidas devolvem 403
+     */
+    approval_status: 'pending' | 'approved' | 'rejected';
+    /**
+     * Avatar Url
+     */
+    avatar_url: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Email Verified
+     */
+    email_verified: boolean;
+    /**
+     * Google Linked
+     */
+    google_linked: boolean;
+    /**
+     * Has Password
+     */
+    has_password: boolean;
+    /**
+     * Id
+     */
+    id: string;
+    impersonation?: ImpersonationOut;
+    /**
+     * Joined Via
+     */
+    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link' | 'invited';
+    /**
+     * Locale
+     */
+    locale: 'pt-PT' | 'en';
+    /**
+     * Name
+     */
+    name: string | null;
+    /**
+     * Pending Approvals
+     *
+     * Só para administradores: contas à espera de aprovação (badge do menu)
+     */
+    pending_approvals?: number | null;
+    /**
+     * Role
+     */
+    role: 'admin' | 'operator' | 'guest';
 };
 
 /**
@@ -7045,6 +7521,24 @@ export type RegisterRequest = {
 };
 
 /**
+ * RejectRequest
+ */
+export type RejectRequest = {
+    /**
+     * Notify
+     *
+     * Enviar um email neutro a avisar que não foi aprovada
+     */
+    notify?: boolean;
+    /**
+     * Reason
+     *
+     * Motivo, mostrado à pessoa se existir
+     */
+    reason?: string | null;
+};
+
+/**
  * ReportArtifact
  */
 export type ReportArtifact = {
@@ -9050,6 +9544,14 @@ export type UsageTotals = {
  */
 export type UserAdminOut = {
     /**
+     * Approval Status
+     */
+    approval_status: 'pending' | 'approved' | 'rejected';
+    /**
+     * Approved At
+     */
+    approved_at: string | null;
+    /**
      * Created At
      */
     created_at: string;
@@ -9076,7 +9578,7 @@ export type UserAdminOut = {
     /**
      * Joined Via
      */
-    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link';
+    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link' | 'invited';
     /**
      * Last Login At
      */
@@ -9085,6 +9587,10 @@ export type UserAdminOut = {
      * Name
      */
     name: string | null;
+    /**
+     * Rejected Reason
+     */
+    rejected_reason: string | null;
     /**
      * Role
      */
@@ -9095,6 +9601,12 @@ export type UserAdminOut = {
  * UserAdminUpdate
  */
 export type UserAdminUpdate = {
+    /**
+     * Confirm Admin
+     *
+     * Obrigatório (true) para dar o papel `admin`; ignorado nos restantes casos
+     */
+    confirm_admin?: boolean;
     /**
      * Is Active
      */
@@ -9109,6 +9621,12 @@ export type UserAdminUpdate = {
  * UserOut
  */
 export type UserOut = {
+    /**
+     * Approval Status
+     *
+     * `pending`/`rejected`: a conta autentica-se mas todas as rotas protegidas devolvem 403
+     */
+    approval_status: 'pending' | 'approved' | 'rejected';
     /**
      * Avatar Url
      */
@@ -9136,7 +9654,7 @@ export type UserOut = {
     /**
      * Joined Via
      */
-    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link';
+    joined_via: 'password' | 'google' | 'quick_join' | 'magic_link' | 'invited';
     /**
      * Locale
      */
@@ -9149,6 +9667,20 @@ export type UserOut = {
      * Role
      */
     role: 'admin' | 'operator' | 'guest';
+};
+
+/**
+ * UsersSummary
+ */
+export type UsersSummary = {
+    /**
+     * Pending Approvals
+     */
+    pending_approvals: number;
+    /**
+     * Total
+     */
+    total: number;
 };
 
 /**
@@ -9945,6 +10477,67 @@ export type GetAiUsageResponses = {
 
 export type GetAiUsageResponse = GetAiUsageResponses[keyof GetAiUsageResponses];
 
+export type GetApprovalStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/approval-status';
+};
+
+export type GetApprovalStatusErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetApprovalStatusError = GetApprovalStatusErrors[keyof GetApprovalStatusErrors];
+
+export type GetApprovalStatusResponses = {
+    /**
+     * Successful Response
+     */
+    200: ApprovalStatusOut;
+};
+
+export type GetApprovalStatusResponse = GetApprovalStatusResponses[keyof GetApprovalStatusResponses];
+
 export type ChangePasswordData = {
     body: ChangePasswordRequest;
     path?: never;
@@ -10265,6 +10858,197 @@ export type GoogleLoginErrors = {
 };
 
 export type GoogleLoginError = GoogleLoginErrors[keyof GoogleLoginErrors];
+
+export type StopImpersonationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/impersonation/stop';
+};
+
+export type StopImpersonationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type StopImpersonationError = StopImpersonationErrors[keyof StopImpersonationErrors];
+
+export type StopImpersonationResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserOut;
+};
+
+export type StopImpersonationResponse = StopImpersonationResponses[keyof StopImpersonationResponses];
+
+export type AcceptInvitationData = {
+    body: AcceptInvitationRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/invitations/accept';
+};
+
+export type AcceptInvitationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AcceptInvitationError = AcceptInvitationErrors[keyof AcceptInvitationErrors];
+
+export type AcceptInvitationResponses = {
+    /**
+     * Successful Response
+     */
+    200: SignedIn;
+};
+
+export type AcceptInvitationResponse = AcceptInvitationResponses[keyof AcceptInvitationResponses];
+
+export type PreviewInvitationData = {
+    body: InvitationTokenRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/invitations/preview';
+};
+
+export type PreviewInvitationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type PreviewInvitationError = PreviewInvitationErrors[keyof PreviewInvitationErrors];
+
+export type PreviewInvitationResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitationPreview;
+};
+
+export type PreviewInvitationResponse = PreviewInvitationResponses[keyof PreviewInvitationResponses];
 
 export type LoginData = {
     body: LoginRequest;
@@ -10643,7 +11427,7 @@ export type GetMeResponses = {
     /**
      * Successful Response
      */
-    200: UserOut;
+    200: MeOut;
 };
 
 export type GetMeResponse = GetMeResponses[keyof GetMeResponses];
@@ -18311,7 +19095,12 @@ export type AnalyseGarmentResponse = AnalyseGarmentResponses[keyof AnalyseGarmen
 export type ListUsersData = {
     body?: never;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Approval Status
+         */
+        approval_status?: 'pending' | 'approved' | 'rejected' | null;
+    };
     url: '/api/v1/users';
 };
 
@@ -18370,6 +19159,498 @@ export type ListUsersResponses = {
 };
 
 export type ListUsersResponse = ListUsersResponses[keyof ListUsersResponses];
+
+export type ListAuditData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Action
+         *
+         * Ação exata (`user.delete`) ou prefixo com ponto (`invitation.`)
+         */
+        action?: string | null;
+        /**
+         * Actor Id
+         */
+        actor_id?: string | null;
+        /**
+         * Target Id
+         */
+        target_id?: string | null;
+        /**
+         * Date From
+         */
+        date_from?: string | null;
+        /**
+         * Date To
+         */
+        date_to?: string | null;
+    };
+    url: '/api/v1/users/audit';
+};
+
+export type ListAuditErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAuditError = ListAuditErrors[keyof ListAuditErrors];
+
+export type ListAuditResponses = {
+    /**
+     * Successful Response
+     */
+    200: AuditPage;
+};
+
+export type ListAuditResponse = ListAuditResponses[keyof ListAuditResponses];
+
+export type ListInvitationsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Status
+         */
+        status?: 'pending' | 'accepted' | 'expired' | 'revoked' | null;
+        /**
+         * Q
+         *
+         * Procura no email
+         */
+        q?: string | null;
+    };
+    url: '/api/v1/users/invitations';
+};
+
+export type ListInvitationsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListInvitationsError = ListInvitationsErrors[keyof ListInvitationsErrors];
+
+export type ListInvitationsResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitationPage;
+};
+
+export type ListInvitationsResponse = ListInvitationsResponses[keyof ListInvitationsResponses];
+
+export type CreateInvitationData = {
+    body: InvitationCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/invitations';
+};
+
+export type CreateInvitationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateInvitationError = CreateInvitationErrors[keyof CreateInvitationErrors];
+
+export type CreateInvitationResponses = {
+    /**
+     * Successful Response
+     */
+    201: InvitationOut;
+};
+
+export type CreateInvitationResponse = CreateInvitationResponses[keyof CreateInvitationResponses];
+
+export type ResendInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * Invitation Id
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/invitations/{invitation_id}/resend';
+};
+
+export type ResendInvitationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ResendInvitationError = ResendInvitationErrors[keyof ResendInvitationErrors];
+
+export type ResendInvitationResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitationOut;
+};
+
+export type ResendInvitationResponse = ResendInvitationResponses[keyof ResendInvitationResponses];
+
+export type RevokeInvitationData = {
+    body?: never;
+    path: {
+        /**
+         * Invitation Id
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/invitations/{invitation_id}/revoke';
+};
+
+export type RevokeInvitationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RevokeInvitationError = RevokeInvitationErrors[keyof RevokeInvitationErrors];
+
+export type RevokeInvitationResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitationOut;
+};
+
+export type RevokeInvitationResponse = RevokeInvitationResponses[keyof RevokeInvitationResponses];
+
+export type GetUsersSummaryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/summary';
+};
+
+export type GetUsersSummaryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetUsersSummaryError = GetUsersSummaryErrors[keyof GetUsersSummaryErrors];
+
+export type GetUsersSummaryResponses = {
+    /**
+     * Successful Response
+     */
+    200: UsersSummary;
+};
+
+export type GetUsersSummaryResponse = GetUsersSummaryResponses[keyof GetUsersSummaryResponses];
+
+export type DeleteUserData = {
+    body: DeleteUserRequest;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}';
+};
+
+export type DeleteUserErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteUserError = DeleteUserErrors[keyof DeleteUserErrors];
+
+export type DeleteUserResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteUserResponse = DeleteUserResponses[keyof DeleteUserResponses];
 
 export type UpdateUserData = {
     body: UserAdminUpdate;
@@ -18436,6 +19717,204 @@ export type UpdateUserResponses = {
 };
 
 export type UpdateUserResponse = UpdateUserResponses[keyof UpdateUserResponses];
+
+export type ApproveUserData = {
+    body: ApproveRequest;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}/approve';
+};
+
+export type ApproveUserErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ApproveUserError = ApproveUserErrors[keyof ApproveUserErrors];
+
+export type ApproveUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminOut;
+};
+
+export type ApproveUserResponse = ApproveUserResponses[keyof ApproveUserResponses];
+
+export type StartImpersonationData = {
+    body: ImpersonateRequest;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}/impersonate';
+};
+
+export type StartImpersonationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type StartImpersonationError = StartImpersonationErrors[keyof StartImpersonationErrors];
+
+export type StartImpersonationResponses = {
+    /**
+     * Successful Response
+     */
+    200: ImpersonationStarted;
+};
+
+export type StartImpersonationResponse = StartImpersonationResponses[keyof StartImpersonationResponses];
+
+export type RejectUserData = {
+    body: RejectRequest;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}/reject';
+};
+
+export type RejectUserErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RejectUserError = RejectUserErrors[keyof RejectUserErrors];
+
+export type RejectUserResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminOut;
+};
+
+export type RejectUserResponse = RejectUserResponses[keyof RejectUserResponses];
 
 export type ListWhatIfsData = {
     body?: never;

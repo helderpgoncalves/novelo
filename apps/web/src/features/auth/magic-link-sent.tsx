@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { ExternalLink, MailCheck } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import type { MagicLinkRequest } from '@/client';
 import { requestMagicLinkMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
@@ -9,13 +10,22 @@ import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { MAGIC_LINK_MINUTES, mailProvider, safeNext, storeLastEmail } from './passwordless';
 import { useCountdown } from './use-countdown';
+import { useTurnstile } from './use-turnstile';
 
 /** Pede o link por email. Usado pelo ecrã de entrada, pelo reenvio e pelo ecrã de link inválido. */
 export function useRequestMagicLink() {
-  return useMutation({
+  const gate = useTurnstile('magic_link');
+  const mutation = useMutation({
     ...requestMagicLinkMutation(),
     onSuccess: (_data, vars) => storeLastEmail(vars.body.email),
   });
+  /** Pede o link com um token Turnstile novo (uso único) e trata os erros de captcha. */
+  const send = (body: MagicLinkRequest, options?: { onSuccess?: () => void }) =>
+    mutation.mutate(
+      { body, headers: gate.consume() },
+      { onSuccess: options?.onSuccess, onError: gate.onApiError },
+    );
+  return { ...mutation, gate, send };
 }
 
 export function magicLinkBody(email: string, next?: string) {
@@ -51,15 +61,12 @@ export function MagicLinkSent({
 
   const onResend = () => {
     setResent(false);
-    resend.mutate(
-      { body: magicLinkBody(email, next) },
-      {
-        onSuccess: () => {
-          setSentAt(Date.now());
-          setResent(true);
-        },
+    resend.send(magicLinkBody(email, next), {
+      onSuccess: () => {
+        setSentAt(Date.now());
+        setResent(true);
       },
-    );
+    });
   };
 
   return (
@@ -90,12 +97,13 @@ export function MagicLinkSent({
 
       <div className="space-y-3">
         <FormAlert message={resend.isError ? getErrorMessage(resend.error) : null} />
+        {resend.gate.field}
         <div className="grid grid-cols-2 gap-2">
           <Button
             type="button"
             variant="outline"
             className="h-11"
-            disabled={seconds > 0 || resend.isPending}
+            disabled={seconds > 0 || resend.isPending || resend.gate.blocked}
             loading={resend.isPending}
             onClick={onResend}
           >

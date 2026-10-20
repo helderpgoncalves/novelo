@@ -26,13 +26,15 @@ from novelo.core.security import (
     create_refresh_token,
     decode_token,
     hash_password,
+    hash_password_async,
     hash_token,
     needs_rehash,
     new_opaque_token,
-    verify_password,
+    verify_password_async,
 )
 from novelo.features.auth import emails
 from novelo.features.auth.models import EmailVerificationToken, PasswordResetToken, RefreshToken
+from novelo.features.auth.schemas import password_problem
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
@@ -62,16 +64,25 @@ async def revoke_all_sessions(db: AsyncSession, user_id: object) -> None:
     )
 
 
+async def claim_unverified_account(db: AsyncSession, user: User) -> None:
+    """Defesa contra pré-sequestro: quem prova a posse do email por outro meio (Google, link por email) numa conta
+    cujo email NUNCA foi verificado recebe-a sem a password nem as sessões que alguém lhe pôs antes."""
+    if user.email_verified:
+        return
+    user.hashed_password = None
+    await revoke_all_sessions(db, user.id)
+
+
 async def login(db: AsyncSession, email: str, password: str, remember: bool = True) -> tuple[User, str, str]:
     user = await users.get_by_email(db, email)
     stored = user.hashed_password if user and user.hashed_password else _DUMMY_HASH
-    valid = verify_password(password, stored)
+    valid = await verify_password_async(password, stored)
     if not (user and user.hashed_password and valid):
         raise InvalidCredentialsError("Wrong email or password")
     if not user.is_active:
         raise AccountInactiveError("Account is inactive")
     if needs_rehash(user.hashed_password):
-        user.hashed_password = hash_password(password)
+        user.hashed_password = await hash_password_async(password)
     access, refresh = await issue_session(db, user, remember)
     return user, access, refresh
 
@@ -90,9 +101,14 @@ async def register(
         raise RegistrationClosedError("Registration is closed")
     if await users.get_by_email(db, email):
         raise EmailTakenError("An account with this email already exists")
-    user = await users.create_user(db, email=email, password=password, name=name, locale=locale)
+    user = await users.create_user(
+        db, email=email, password=password, name=name, locale=locale, approval_status="pending"
+    )
     access, refresh = await issue_session(db, user, remember)
+    from novelo.features.users import approvals  # noqa: PLC0415
+
     await send_verification(db, sender, user)
+    await approvals.notify_admins(db, sender, user)
     return user, access, refresh
 
 
@@ -101,21 +117,34 @@ async def rotate_refresh(db: AsyncSession, token: str) -> tuple[str, str]:
         payload = decode_token(token, "refresh")
     except ValueError as exc:
         raise SessionExpiredError("Session expired") from exc
-    row = (
-        await db.execute(select(RefreshToken).where(RefreshToken.token_hash == hash_token(token)))
-    ).scalar_one_or_none()
-    if row is None:
+    token_hash = hash_token(token)
+    # Consumo atómico: dois pedidos com o mesmo token não conseguem ambos rodar a sessão.
+    consumed = (
+        await db.execute(
+            update(RefreshToken)
+            .where(
+                RefreshToken.token_hash == token_hash,
+                RefreshToken.revoked.is_(False),
+                RefreshToken.expires_at > datetime.now(UTC),
+            )
+            .values(revoked=True)
+            .returning(RefreshToken.user_id)
+        )
+    ).first()
+    if consumed is None:
+        row = (await db.execute(select(RefreshToken).where(RefreshToken.token_hash == token_hash))).scalar_one_or_none()
+        if row is not None and row.revoked:
+            # Reutilização de um token já rodado: possível roubo, termina todas as sessões.
+            log.warning("refresh token reutilizado: sessões revogadas user=%s", row.user_id)
+            await revoke_all_sessions(db, row.user_id)
+            await db.commit()
+        else:
+            await db.rollback()
         raise SessionExpiredError("Session expired")
-    if row.revoked:
-        # Reutilização de um token já rodado: possível roubo, termina todas as sessões.
-        log.warning("refresh token reutilizado: sessões revogadas user=%s", row.user_id)
-        await revoke_all_sessions(db, row.user_id)
-        await db.commit()
+    user = await db.get(User, consumed.user_id)
+    if user is None or not user.is_active or str(user.id) != payload["sub"]:
+        await db.rollback()
         raise SessionExpiredError("Session expired")
-    user = await db.get(User, row.user_id)
-    if row.expires_at < datetime.now(UTC) or user is None or not user.is_active or str(user.id) != payload["sub"]:
-        raise SessionExpiredError("Session expired")
-    row.revoked = True
     return await issue_session(db, user, bool(payload.get("remember", True)))
 
 
@@ -149,35 +178,50 @@ async def request_password_reset(db: AsyncSession, sender: EmailSender, email: s
 
 
 async def reset_password(db: AsyncSession, token: str, new_password: str) -> None:
-    row = (
-        await db.execute(select(PasswordResetToken).where(PasswordResetToken.token_hash == hash_token(token)))
-    ).scalar_one_or_none()
+    new_hash = await hash_password_async(new_password)  # fora da transação e sempre, mesmo com token inválido
     now = datetime.now(UTC)
-    if row is None or row.used_at is not None or row.expires_at < now:
+    consumed = (
+        await db.execute(
+            update(PasswordResetToken)
+            .where(
+                PasswordResetToken.token_hash == hash_token(token),
+                PasswordResetToken.used_at.is_(None),
+                PasswordResetToken.expires_at > now,
+            )
+            .values(used_at=now)
+            .returning(PasswordResetToken.user_id)
+        )
+    ).first()
+    if consumed is None:
+        await db.rollback()
         raise InvalidTokenError("Invalid or expired password reset link")
-    user = await db.get(User, row.user_id)
+    user = await db.get(User, consumed.user_id)
     if user is None or not user.is_active:
+        await db.commit()  # o token fica gasto na mesma
         raise InvalidTokenError("Invalid or expired password reset link")
-    user.hashed_password = hash_password(new_password)
-    row.used_at = now
+    user.hashed_password = new_hash
     await revoke_all_sessions(db, user.id)
     await db.commit()
 
 
 async def change_password(db: AsyncSession, user: User, current: str | None, new: str) -> None:
-    if user.hashed_password and not (current and verify_password(current, user.hashed_password)):
+    if user.hashed_password and not (current and await verify_password_async(current, user.hashed_password)):
         raise CurrentPasswordIncorrectError("Current password is incorrect")
-    user.hashed_password = hash_password(new)
+    user.hashed_password = await hash_password_async(new)
     await revoke_all_sessions(db, user.id)
     await db.commit()
 
 
-async def login_with_google(db: AsyncSession, profile: dict[str, str], locale: str = "pt-PT") -> tuple[User, str, str]:
+async def login_with_google(
+    db: AsyncSession, profile: dict[str, str], locale: str = "pt-PT", sender: EmailSender | None = None
+) -> tuple[User, str, str]:
     """Liga por `sub`; se não houver, liga a conta existente com o mesmo email; senão cria."""
+    created = False
     user = await users.get_by_google_sub(db, profile["sub"])
     if user is None:
         user = await users.get_by_email(db, profile["email"])
         if user is not None:
+            await claim_unverified_account(db, user)
             user.google_sub = profile["sub"]
             user.email_verified = True
             user.avatar_url = user.avatar_url or profile.get("picture")
@@ -191,12 +235,18 @@ async def login_with_google(db: AsyncSession, profile: dict[str, str], locale: s
                 avatar_url=profile.get("picture"),
                 email_verified=True,
                 locale=locale,
+                approval_status="pending",
             )
+            created = True
         else:
             raise RegistrationClosedError("Registration is closed")
     if not user.is_active:
         raise AccountInactiveError("Account is inactive")
     access, refresh = await issue_session(db, user)
+    if created and sender is not None:
+        from novelo.features.users import approvals  # noqa: PLC0415
+
+        await approvals.notify_admins(db, sender, user)
     return user, access, refresh
 
 
@@ -206,6 +256,10 @@ async def seed_admin(db: AsyncSession) -> None:
     if not (settings.admin_email and settings.admin_password):
         return
     if await users.get_by_email(db, settings.admin_email) is None:
+        weak = password_problem(settings.admin_password)
+        if weak:
+            log.error("ADMIN_PASSWORD recusada (%s): o administrador inicial NÃO foi criado", weak)
+            return
         await users.create_user(
             db,
             email=settings.admin_email,
@@ -220,8 +274,8 @@ async def send_quietly(sender: EmailSender, to: str, subject: str, html: str, te
     """Um email falhado não pode partir o registo nem revelar nada ao utilizador."""
     try:
         await sender.send(to=to, subject=subject, html=html, text=text)
-    except AppError:
-        log.exception("failed to send email to %s", to)
+    except AppError as exc:
+        log.warning("email not sent (%s): %s", exc.code, exc.message)  # nunca o corpo nem o destinatário
 
 
 async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -> None:
@@ -244,17 +298,27 @@ async def send_verification(db: AsyncSession, sender: EmailSender, user: User) -
 
 
 async def verify_email(db: AsyncSession, token: str) -> None:
-    row = (
-        await db.execute(select(EmailVerificationToken).where(EmailVerificationToken.token_hash == hash_token(token)))
-    ).scalar_one_or_none()
     now = datetime.now(UTC)
-    if row is None or row.used_at is not None or row.expires_at < now:
+    consumed = (
+        await db.execute(
+            update(EmailVerificationToken)
+            .where(
+                EmailVerificationToken.token_hash == hash_token(token),
+                EmailVerificationToken.used_at.is_(None),
+                EmailVerificationToken.expires_at > now,
+            )
+            .values(used_at=now)
+            .returning(EmailVerificationToken.user_id)
+        )
+    ).first()
+    if consumed is None:
+        await db.rollback()
         raise InvalidTokenError("Invalid or expired email verification link")
-    user = await db.get(User, row.user_id)
+    user = await db.get(User, consumed.user_id)
     if user is None:
+        await db.commit()
         raise InvalidTokenError("Invalid or expired email verification link")
     user.email_verified = True
-    row.used_at = now
     await db.commit()
 
 

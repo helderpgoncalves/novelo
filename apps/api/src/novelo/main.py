@@ -7,10 +7,11 @@ from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.routing import APIRoute
 
+from novelo.adapters.email import warn_if_email_unavailable
 from novelo.core.captcha import warn_if_unprotected
 from novelo.core.config import get_settings
 from novelo.core.database import SessionLocal
-from novelo.core.deps import get_current_user
+from novelo.core.deps import NotImpersonating, get_current_user
 from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.hardening import HardeningMiddleware
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging
@@ -43,6 +44,7 @@ def _operation_id(route: APIRoute) -> str:
 @asynccontextmanager
 async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     warn_if_unprotected()
+    warn_if_email_unavailable()
     async with SessionLocal() as db:
         await auth_service.seed_admin(db)
     yield
@@ -105,7 +107,8 @@ def create_app() -> FastAPI:
         copilot_router,
         prefix=f"{API_PREFIX}/copilot",
         tags=["copilot"],
-        dependencies=protected,
+        # Conversas e memória são privadas: nem o administrador as lê impersonando (impersonation_blocked).
+        dependencies=[*protected, NotImpersonating],
         responses=COMMON_ERRORS,
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)

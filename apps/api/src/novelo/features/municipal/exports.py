@@ -114,8 +114,16 @@ async def _batches(
             return
 
 
+_FORMULA_START = ("=", "+", "-", "@", "\t", "\r")
+
+
 def _cell(value: Any) -> Any:
-    return "" if value is None else value
+    """Vazio para `None`; texto que o Excel/Calc interpretaria como fórmula leva o prefixo `'` (CSV injection)."""
+    if value is None:
+        return ""
+    if isinstance(value, str) and value.startswith(_FORMULA_START):
+        return f"'{value}"
+    return value
 
 
 async def stream_csv(db: AsyncSession, scope: ExportScope, f: SiteFilters, names: bool) -> AsyncIterator[bytes]:

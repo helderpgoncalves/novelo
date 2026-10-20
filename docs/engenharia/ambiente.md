@@ -10,7 +10,10 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Sessão | `SECRET_KEY`, `APP_URL`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `SESSION_TOKEN_HOURS` | `APP_URL` entra nos links dos emails e no retorno do Google |
 | Contas | `ALLOW_REGISTRATION`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PASSWORD_RESET_EXPIRE_MINUTES`, `EMAIL_VERIFY_EXPIRE_HOURS`, `RATE_LIMIT_ENABLED` | O administrador é criado no arranque se não existir |
 | Entrada sem password | `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_ENABLED`, `QUICK_JOIN_CODE`, `QUICK_JOIN_CONSENT_VERSION` | Ver «Magic link e entrada por QR» abaixo |
-| Convidados | `GUEST_AI_REQUESTS_PER_HOUR`, `GUEST_SOLVER_RUNS_PER_HOUR`, `GUEST_AI_BUDGET_USD` | Limites por convidado (role `guest`) |
+| Administração de utilizadores | `INVITATION_EXPIRE_DAYS` (7), `INVITATIONS_PER_HOUR` (30 por admin), `IMPERSONATION_MINUTES` (30, fixo) | Convites por email e impersonação; ver «Administração de utilizadores» em [Arquitetura](arquitetura.md). O compose repassa-os |
+| Convidados | `GUEST_AI_REQUESTS_PER_HOUR`, `GUEST_SOLVER_RUNS_PER_HOUR`, `GUEST_AI_BUDGET_USD`, `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD` | Limites por convidado e tetos globais do evento (role `guest`) |
+| IP e proxies | `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `FORWARDED_ALLOW_IPS`, `WEB_CONCURRENCY` | Ver «IP real do cliente e limites» abaixo |
+| Rotas caras | `SOLVER_RUNS_PER_MINUTE` (6), `SOLVER_MAX_CONCURRENCY` (2), `PDF_MAX_CONCURRENCY` (2), `LOGIN_ACCOUNT_MAX_FAILURES` (10), `COPILOT_ATTACHMENTS_PER_USER` (100), `COPILOT_ATTACHMENTS_MAX_MB` (50) | Limites por utilizador/conta e concorrência global, por processo |
 | Anti-bots | `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `TURNSTILE_ENABLED`, `TURNSTILE_REQUIRED`, `TURNSTILE_TIMEOUT_S` | Ver «Cloudflare Turnstile» abaixo |
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Ver abaixo |
 | Email | `RESEND_API_KEY`, `EMAIL_TRANSPORT`, `EMAIL_FROM`, `EMAIL_SUPPORT` | Ver abaixo |
@@ -23,14 +26,15 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 
 1. Criar uma chave em [resend.com/api-keys](https://resend.com/api-keys) e pô-la em `RESEND_API_KEY`.
 2. Verificar o domínio do `EMAIL_FROM` (por omissão `Novelo <novelo@heldergoncalves.io>`) no Resend.
-3. Sem chave, os emails (magic link, confirmar email, recuperar password, boas-vindas de convidado) não saem: aparecem no log da API (`just logs api`) e, em desenvolvimento, em `GET /api/v1/dev/emails` (caixa de saída de desenvolvimento, fora do OpenAPI e nunca montada em produção).
+3. Sem chave, **em desenvolvimento** os emails (magic link, confirmar email, recuperar password, boas-vindas de convidado) não saem: aparecem no log da API (`just logs api`) e, em desenvolvimento, em `GET /api/v1/dev/emails` (caixa de saída de desenvolvimento, fora do OpenAPI e nunca montada em produção). **Em produção** o log nunca recebe o corpo nem os links de um email (seriam credenciais): sem `RESEND_API_KEY` (ou com `EMAIL_TRANSPORT=log`) o envio responde 503 `feature_disabled` e o arranque regista um aviso.
 4. `EMAIL_TRANSPORT` escolhe o modo: `auto` (por omissão: Resend se houver chave), `log` (nunca envia; é o que o `docker-compose.dev.yml` assume, para os testes ponta a ponta não enviarem emails a sério) ou `resend` (força o envio real, útil em `.env.local` para testar o Resend em dev).
-5. `EMAIL_SUPPORT` (por omissão `novelo@heldergoncalves.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); o logótipo é `apps/web/public/email/novelo-logotipo-negativo.png`, servido em `https://<DOMAIN>/email/`.
+5. `EMAIL_SUPPORT` (por omissão `novelo@heldergoncalves.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); os logótipos são `apps/web/public/email/novelo-logotipo.png` (fundo claro) e `novelo-logotipo-negativo.png` (modo escuro), servidos em `https://<DOMAIN>/email/` e gerados por `just brand`.
 
 ### Testar emails
 
-- Pré-visualizar: `cd apps/api && uv run python -m novelo.cli preview-emails --out /tmp/emails` gera os 4 emails em pt-PT e en (HTML e texto). Para ver o logótipo sem deploy: `--base-url http://localhost:3190` com `just dev` a correr.
-- Automático: `tests/unit/test_emails.py` (HTML bem formado, alt em imagens, links https, sem placeholders, escape do nome, assunto até 70 caracteres).
+- Pré-visualizar: `cd apps/api && uv run python -m novelo.cli preview-emails --out /tmp/emails` gera os 8 emails em pt-PT e en (HTML e texto). Para ver o logótipo sem deploy: `--base-url http://localhost:3190` com `just dev` a correr.
+- Visual: layout neutro e institucional (`features/auth/email_layout.py`): cabeçalho claro com o logótipo sobre fundo cinza muito claro, cartão branco de 580 px com borda fina, títulos em sans-serif semibold, texto de 15 px com entrelinha 1,6, botão de 46 px e um único acento (verde da marca, só no botão e nas ligações). Modo escuro por `prefers-color-scheme` (com o logótipo trocado) e botão VML para o Outlook. Todos os emails seguem a mesma estrutura: eyebrow, título, parágrafos curtos, botão, quadro de dados, ligação alternativa, nota de segurança e rodapé; assuntos no formato `Ação · Novelo`; saudação só com o primeiro nome; durações normalizadas (60 minutos = 1 hora, 48 horas = 2 dias).
+- Automático: `tests/unit/test_emails.py` (HTML bem formado, alt em imagens, links https, sem placeholders, escape do nome, assunto uniforme até 70 caracteres, texto simples só com pontuação ASCII, saudação com primeiro nome, papel com maiúscula).
 - Com Resend: pôr `RESEND_API_KEY` e `EMAIL_FROM` com domínio verificado, arrancar a API e usar "Esqueci a password" com um endereço real; o email chega com HTML e versão texto. Para clientes reais (Gmail, Outlook, Apple Mail) enviar os HTML da pré-visualização pelo painel do Resend ou por um serviço como Mail-Tester.
 
 ## Cloudflare Turnstile
@@ -85,8 +89,29 @@ Entrada por QR do evento (`/join?c=<código>`): o convidado escreve nome e email
 | `GUEST_AI_REQUESTS_PER_HOUR` | `20` | Pedidos de IA por convidado e hora (copiloto, triagem, relatório RAP, sugestões de alertas, «E se...?») |
 | `GUEST_SOLVER_RUNS_PER_HOUR` | `10` | Execuções do otimizador por convidado e hora |
 | `GUEST_AI_BUDGET_USD` | `0.5` | Gasto de IA por convidado nas últimas 24 h (0 = sem limite); acima disso, 503 `ai_budget_exceeded` |
+| `GUEST_SIGNUPS_PER_HOUR` | `200` | Teto GLOBAL de entradas por QR por hora (conta na base de dados, não depende do IP; 0 = sem limite). Acima disso, 429 `rate_limited` |
+| `GUEST_AI_GLOBAL_BUDGET_USD` | `5` | Teto GLOBAL do gasto de IA de todos os convidados nas últimas 24 h (soma de `ai_usage` do role `guest`; 0 = sem limite) |
 
-O QR em SVG sai de `GET /auth/quick-join/qr` (administrador); o ecrã `/users`, separador «Cartaz do QR», mostra-o em ponto de impressão. Os convidados listam-se em `/users`, separador «Convidados». Os limites de pedidos (autenticação, magic link, QR, IA, otimizador) são **em memória, por processo**: o `entrypoint.sh` arranca 2 processos por omissão (`WEB_CONCURRENCY`), por isso o limite efetivo pode chegar ao dobro.
+O QR em SVG sai de `GET /auth/quick-join/qr` (administrador); o ecrã `/users`, separador «Cartaz do QR», mostra-o em ponto de impressão. Os convidados listam-se em `/users`, separador «Convidados». Decisão sobre enumeração: quem entra por QR com um email NOVO fica logo com sessão (é o fluxo do júri); com um email que já tem conta recebe `check_email` e um magic link. A resposta distingue os dois casos, ou seja, o QR permite perguntar «este email já tem conta?». Fica aceite porque devolver sempre `check_email` obrigaria o júri a abrir o email para entrar. Mitigações: código do evento, Turnstile, honeypot, limite por IP, por email e por falhas de código, teto global de entradas por hora (aplicado antes de saber se o email existe), e o convidado nasce com `email_verified=false` (ver «Pré-sequestro»). O trabalho dos dois ramos é equivalente (uma escrita e um email em segundo plano).
+
+Os limites de pedidos (autenticação, magic link, QR, IA, otimizador) são **em memória, por processo**: ver «IP real do cliente e limites».
+
+## IP real do cliente e limites
+
+`client_ip` (`core/ratelimit.py`) decide o IP usado nos limites, no Turnstile (`remoteip`), na auditoria e nos emails. **Nunca** confia no primeiro valor de `X-Forwarded-For` (forjável). Com `TRUSTED_PROXY_HOPS=N` a cadeia é `X-Forwarded-For` mais o par TCP e o cliente é o elemento N posições antes do fim: o que o atacante põe à esquerda não conta. Cada valor passa por `ipaddress.ip_address` (lixo é descartado, IPv4 mapeado em IPv6 é normalizado, tamanho limitado); se a posição de confiança for lixo, usa o par TCP.
+
+| Variável | Por omissão | Para que serve |
+| --- | --- | --- |
+| `TRUSTED_PROXY_HOPS` | `0` (dev), `2` (compose) | Nº de proxies de confiança à frente da API. `0` ignora os cabeçalhos. Produção: nginx e Traefik = 2 |
+| `TRUST_CLOUDFLARE_HEADER` | `false` (dev), `true` (compose) | Se o salto mais externo (posição `N`) é um IP publicado da Cloudflare, vale o `CF-Connecting-IP`; fora da Cloudflare o cabeçalho forjado é ignorado |
+| `FORWARDED_ALLOW_IPS` | `127.0.0.1` | Proxies cujos cabeçalhos o **uvicorn** aceita (`--forwarded-allow-ips`, antes era `*`). A API resolve o IP sozinha, por isso o uvicorn não reescreve o cliente: se o fizesse, a contagem de saltos seria feita duas vezes |
+| `WEB_CONCURRENCY` | `1` | Processos do uvicorn |
+
+Cadeia de produção: Cloudflare → Traefik (Coolify) → nginx (`web`) → API. O nginx acrescenta o IP do Traefik a `X-Forwarded-For` e deixa passar o `CF-Connecting-IP`. Se mudar a cadeia (por exemplo sem Cloudflare), ajustar `TRUSTED_PROXY_HOPS` e pôr `TRUST_CLOUDFLARE_HEADER=false`; um valor a mais atribui o IP a um proxy, um valor a menos aceita o que o cliente enviou.
+
+**Limiter em memória.** Janela deslizante por chave, apaga chaves vazias e tem teto de 20 000 chaves por limiter (expiradas primeiro, depois as mais antigas), por isso a memória não cresce sem limite. Os contadores são **por processo**: com `WEB_CONCURRENCY=2` todos os limites valeriam o dobro. Decisão: a produção corre **um processo** (a API é assíncrona e o solver corre em threads; o compose limita a 2 CPU) e o limiter continua em memória. Os tetos que protegem dinheiro não dependem dele: convidados por hora (`users.created_at`) e gasto de IA (`ai_usage`) contam-se na base de dados. Passar a vários processos exige mover os limiters de autenticação e de QR para Postgres (tabela de acertos por chave e janela).
+
+Outros limites novos: falhas de login por conta (hash do email, 10 em 15 min, também para emails inexistentes), registo por IP (10/h), execuções do otimizador por utilizador (6/min) com um máximo de 2 em simultâneo e de 2 PDF em simultâneo (429 «o servidor está ocupado»), passaporte público por IP (60/min).
 
 ## Desenvolvimento
 
@@ -94,7 +119,7 @@ O admin de dev é `admin@heldergoncalves.io` / `admin-novelo-dev-1` (entra-se em
 
 ## O que o compose de produção passa à API
 
-O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*`, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
+O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. Também repassa `LLM_MONTHLY_BUDGET_USD` (30 por omissão; o teto mensal global de IA, editável depois no painel `/admin/ai`), `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD`, `INVITATION_EXPIRE_DAYS`, `INVITATIONS_PER_HOUR`, `IMPERSONATION_MINUTES`, `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `WEB_CONCURRENCY`, `SOLVER_RUNS_PER_MINUTE` e `SOLVER_MAX_CONCURRENCY`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*` por convidado, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
 
 ## Copiloto
 

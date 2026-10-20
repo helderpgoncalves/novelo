@@ -1,8 +1,8 @@
 import io
-from typing import Annotated
+from typing import Annotated, cast
 
 import segno
-from fastapi import APIRouter, BackgroundTasks, Cookie, Depends, Query, Request, Response
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, Request, Response
 from fastapi.responses import RedirectResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,31 +10,45 @@ from novelo.adapters.email import EmailSender, get_email_sender
 from novelo.core.captcha import captcha
 from novelo.core.config import get_settings
 from novelo.core.database import get_db
-from novelo.core.deps import CurrentUser, require_role
+from novelo.core.deps import CurrentUser, NotImpersonating, SessionUser, require_role
 from novelo.core.errors import (
     AppError,
     FeatureDisabledError,
+    InvalidCredentialsError,
     RateLimitError,
     SessionExpiredError,
 )
 from novelo.core.ratelimit import (
     auth_limiter,
     client_ip,
+    invite_accept_limiter,
+    invite_preview_limiter,
+    login_account_limiter,
     magic_email_limiter,
     magic_link_limiter,
     magic_verify_limiter,
     quick_join_code_limiter,
     quick_join_email_limiter,
     quick_join_limiter,
+    register_limiter,
     reset_limiter,
 )
-from novelo.core.security import create_state_token, decode_token, hash_token, new_opaque_token
-from novelo.features.auth import google, passwordless, service
+from novelo.core.request_meta import Meta
+from novelo.core.security import (
+    create_access_token,
+    create_state_token,
+    decode_token,
+    hash_token,
+    new_opaque_token,
+)
+from novelo.features.auth import cookies, google, passwordless, service
 from novelo.features.auth.schemas import (
+    AcceptInvitationRequest,
     AuthConfig,
     ChangePasswordRequest,
     ForgotPasswordRequest,
     GuestPage,
+    InvitationTokenRequest,
     LoginRequest,
     MagicLinkRequest,
     MagicLinkVerifyRequest,
@@ -47,8 +61,18 @@ from novelo.features.auth.schemas import (
     SignedIn,
     VerifyEmailRequest,
 )
-from novelo.features.users.models import User
-from novelo.features.users.schemas import Locale, ProfileUpdate, UserOut
+from novelo.features.users import impersonation, invitations
+from novelo.features.users import service as users_service
+from novelo.features.users.models import ApprovalStatus, User
+from novelo.features.users.schemas import (
+    ApprovalStatusOut,
+    ImpersonationOut,
+    InvitationPreview,
+    Locale,
+    MeOut,
+    ProfileUpdate,
+    UserOut,
+)
 from novelo.features.users.service import to_out
 
 router = APIRouter()  # os erros comuns são declarados no include_router (main.py)
@@ -57,35 +81,11 @@ Db = Annotated[AsyncSession, Depends(get_db)]
 Sender = Annotated[EmailSender, Depends(get_email_sender)]
 Admin = Annotated[User, Depends(require_role("admin"))]
 
-ACCESS_COOKIE = "access_token"
-REFRESH_COOKIE = "refresh_token"
-STATE_COOKIE = "oauth_state"
-REFRESH_PATH = "/api/v1/auth"
-
-
-def _set_cookie(response: Response, key: str, value: str, max_age: int | None, path: str) -> None:
-    # max_age=None cria um cookie de sessão: some quando o browser fecha ("não manter sessão").
-    response.set_cookie(
-        key,
-        value,
-        max_age=max_age,
-        path=path,
-        httponly=True,
-        secure=get_settings().secure_cookies,
-        samesite="lax",
-    )
-
-
-def _set_session(response: Response, access: str, refresh: str, remember: bool = True) -> None:
-    s = get_settings()
-    _set_cookie(response, ACCESS_COOKIE, access, s.access_token_minutes * 60, "/")
-    max_age = s.refresh_token_days * 86400 if remember else None
-    _set_cookie(response, REFRESH_COOKIE, refresh, max_age, REFRESH_PATH)
-
-
-def _clear_session(response: Response) -> None:
-    response.delete_cookie(ACCESS_COOKIE, path="/")
-    response.delete_cookie(REFRESH_COOKIE, path=REFRESH_PATH)
+_set_cookie = cookies.set_cookie
+_set_session = cookies.set_session
+_clear_session = cookies.clear_session
+STATE_COOKIE = cookies.STATE_COOKIE
+REFRESH_PATH = cookies.REFRESH_PATH
 
 
 @router.get("/config", response_model=AuthConfig)
@@ -202,7 +202,17 @@ async def list_guests(
 
 @router.post("/login", response_model=UserOut, dependencies=[Depends(auth_limiter), Depends(captcha("login"))])
 async def login(body: LoginRequest, response: Response, db: Db) -> UserOut:
-    user, access, refresh = await service.login(db, body.email, body.password, body.remember_me)
+    """Credenciais erradas: sempre a mesma resposta. Além do limite por IP, há um limite de falhas por CONTA
+    (independente do IP), que também responde igual para emails que não existem."""
+    max_failures = get_settings().login_account_max_failures
+    account_key = f"login-account:{hash_token(body.email.strip().lower())}"
+    if login_account_limiter.is_blocked(account_key, max_failures):
+        raise RateLimitError("Too many attempts. Try again in a few minutes.")
+    try:
+        user, access, refresh = await service.login(db, body.email, body.password, body.remember_me)
+    except InvalidCredentialsError:
+        login_account_limiter.check(account_key, max_failures)
+        raise
     _set_session(response, access, refresh, body.remember_me)
     return to_out(user)
 
@@ -211,7 +221,7 @@ async def login(body: LoginRequest, response: Response, db: Db) -> UserOut:
     "/register",
     response_model=UserOut,
     status_code=201,
-    dependencies=[Depends(auth_limiter), Depends(captcha("register"))],
+    dependencies=[Depends(auth_limiter), Depends(register_limiter), Depends(captcha("register"))],
 )
 async def register(body: RegisterRequest, response: Response, db: Db, sender: Sender) -> UserOut:
     if body.website:
@@ -224,7 +234,8 @@ async def register(body: RegisterRequest, response: Response, db: Db, sender: Se
 
 
 @router.post("/refresh", status_code=204)
-async def refresh(response: Response, db: Db, refresh_token: Annotated[str | None, Cookie()] = None) -> None:
+async def refresh(request: Request, response: Response, db: Db) -> None:
+    refresh_token = cookies.read_cookie(request, cookies.REFRESH_COOKIE)
     if not refresh_token:
         _clear_session(response)
         raise SessionExpiredError("No session cookie")
@@ -234,22 +245,71 @@ async def refresh(response: Response, db: Db, refresh_token: Annotated[str | Non
 
 
 @router.post("/logout", status_code=204)
-async def logout(response: Response, db: Db, refresh_token: Annotated[str | None, Cookie()] = None) -> None:
-    await service.logout(db, refresh_token)
+async def logout(request: Request, response: Response, db: Db) -> None:
+    await impersonation.end_by_token(db, cookies.read_cookie(request, cookies.ACCESS_COOKIE))
+    await service.logout(db, cookies.read_cookie(request, cookies.REFRESH_COOKIE))
     _clear_session(response)
 
 
-@router.get("/me", response_model=UserOut)
-async def get_me(user: CurrentUser) -> UserOut:
-    return to_out(user)
+def _impersonation_out(user: User) -> ImpersonationOut:
+    info = user.impersonation
+    if info is None:
+        return ImpersonationOut()
+    return ImpersonationOut(active=True, admin_id=info.admin_id, admin_name=info.admin_name, expires_at=info.expires_at)
 
 
-@router.patch("/me", response_model=UserOut)
+@router.get("/me", response_model=MeOut)
+async def get_me(user: SessionUser, db: Db) -> MeOut:
+    """O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado
+    e `impersonation` traz o administrador real. Para administradores traz `pending_approvals`."""
+    pending = await users_service.count_pending(db) if user.role == "admin" else None
+    return MeOut(**to_out(user).model_dump(), impersonation=_impersonation_out(user), pending_approvals=pending)
+
+
+@router.get("/approval-status", response_model=ApprovalStatusOut)
+async def get_approval_status(user: SessionUser) -> ApprovalStatusOut:
+    """Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`."""
+    return ApprovalStatusOut(
+        status=cast(ApprovalStatus, user.approval_status),
+        email_verified=user.email_verified,
+        rejected_reason=user.rejected_reason if user.approval_status == "rejected" else None,
+        decided_at=user.approved_at,
+    )
+
+
+@router.post("/impersonation/stop", response_model=UserOut)
+async def stop_impersonation(response: Response, user: CurrentUser, db: Db, meta: Meta) -> UserOut:
+    """Termina a impersonação e devolve a sessão ao administrador real (o cookie de acesso passa a ser o dele)."""
+    admin = await impersonation.stop(db, user, meta)
+    cookies.set_access(response, create_access_token(admin.id, admin.role), get_settings().access_token_minutes * 60)
+    return to_out(admin)
+
+
+@router.post("/invitations/preview", response_model=InvitationPreview, dependencies=[Depends(invite_preview_limiter)])
+async def preview_invitation(body: InvitationTokenRequest, db: Db) -> InvitationPreview:
+    """Mostra a quem foi o convite (email, papel, quem convidou) para a página de aceitar. Só com um token válido."""
+    return await invitations.preview(db, body.token)
+
+
+@router.post(
+    "/invitations/accept",
+    response_model=SignedIn,
+    dependencies=[Depends(invite_accept_limiter), Depends(captcha("accept_invitation"))],
+)
+async def accept_invitation(body: AcceptInvitationRequest, response: Response, db: Db, meta: Meta) -> SignedIn:
+    """Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.
+    O token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email."""
+    user, access, refresh = await invitations.accept(db, body.token, body.name, body.password, meta)
+    _set_session(response, access, refresh, True)
+    return SignedIn(user=to_out(user), next="/")
+
+
+@router.patch("/me", response_model=UserOut, dependencies=[NotImpersonating])
 async def update_me(body: ProfileUpdate, user: CurrentUser, db: Db) -> UserOut:
     return to_out(await service.update_profile(db, user, body.name, body.locale))
 
 
-@router.post("/logout-all", status_code=204)
+@router.post("/logout-all", status_code=204, dependencies=[NotImpersonating])
 async def logout_all(response: Response, user: CurrentUser, db: Db) -> None:
     """Termina a sessão em todos os dispositivos."""
     await service.revoke_all_sessions(db, user.id)
@@ -265,9 +325,9 @@ async def verify_email(body: VerifyEmailRequest, db: Db) -> None:
 @router.post(
     "/resend-verification",
     status_code=204,
-    dependencies=[Depends(reset_limiter), Depends(captcha("resend_verification"))],
+    dependencies=[Depends(reset_limiter), Depends(captcha("resend_verification")), NotImpersonating],
 )
-async def resend_verification(user: CurrentUser, db: Db, sender: Sender) -> None:
+async def resend_verification(user: SessionUser, db: Db, sender: Sender) -> None:
     await service.send_verification(db, sender, user)
 
 
@@ -287,7 +347,7 @@ async def reset_password(body: ResetPasswordRequest, response: Response, db: Db)
     _clear_session(response)
 
 
-@router.post("/change-password", status_code=204)
+@router.post("/change-password", status_code=204, dependencies=[NotImpersonating])
 async def change_password(body: ChangePasswordRequest, response: Response, user: CurrentUser, db: Db) -> None:
     await service.change_password(db, user, body.current_password, body.new_password)
     _clear_session(response)
@@ -298,6 +358,7 @@ async def change_password(body: ChangePasswordRequest, response: Response, user:
     status_code=302,
     responses={302: {"description": "Redirects to Google"}},
     response_class=RedirectResponse,
+    dependencies=[NotImpersonating],
 )
 def google_login(
     next: Annotated[str, Query(description="Path to return to after signing in")] = "/",
@@ -323,12 +384,13 @@ def google_login(
 async def google_callback(
     request: Request,
     db: Db,
+    sender: Sender,
     code: str | None = None,
     state: str | None = None,
     error: str | None = None,
-    oauth_state: Annotated[str | None, Cookie()] = None,
 ) -> RedirectResponse:
     s = get_settings()
+    oauth_state = cookies.read_cookie(request, cookies.STATE_COOKIE)
     base = s.app_url.rstrip("/")
     if error or not code or not state:
         return RedirectResponse(f"{base}/login?error=google_failed", status_code=302)
@@ -340,10 +402,13 @@ async def google_callback(
         return RedirectResponse(f"{base}/login?error=google_failed", status_code=302)
     try:
         profile = await google.fetch_profile(code)
-        _, access, refresh_token = await service.login_with_google(db, profile, claims.get("locale", "pt-PT"))
+        account, access, refresh_token = await service.login_with_google(
+            db, profile, claims.get("locale", "pt-PT"), sender
+        )
     except AppError as exc:
         return RedirectResponse(f"{base}/login?error={exc.code}", status_code=302)
-    redirect = RedirectResponse(f"{base}{claims.get('next', '/')}", status_code=302)
+    target = claims.get("next", "/") if account.approval_status == "approved" else "/pending-approval"
+    redirect = RedirectResponse(f"{base}{target}", status_code=302)
     _set_session(redirect, access, refresh_token)
-    redirect.delete_cookie(STATE_COOKIE, path=REFRESH_PATH)
+    cookies.delete_cookie(redirect, STATE_COOKIE, REFRESH_PATH)
     return redirect

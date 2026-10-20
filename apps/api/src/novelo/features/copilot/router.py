@@ -14,9 +14,9 @@ from novelo.adapters.openrouter import OpenRouterClient
 from novelo.ai.catalog import ModelCatalog, get_catalog
 from novelo.ai.catalog import catalog as default_catalog
 from novelo.core.database import SessionLocal, get_db
-from novelo.core.deps import CurrentUser
+from novelo.core.deps import CurrentUser, NotImpersonating
 from novelo.core.errors import FeatureDisabledError
-from novelo.core.guest import guest_ai_guard
+from novelo.core.guest import NotGuestDep, PdfGuard, guest_ai_guard
 from novelo.core.ratelimit import copilot_limiter
 from novelo.features.copilot import actions as action_service
 from novelo.features.copilot import history, memory_api, service, sessions, threads, uploads, user_settings
@@ -155,7 +155,9 @@ async def sse(events: AsyncGenerator[CopilotEvent, None]) -> AsyncIterator[bytes
 
 
 def _stream(deps: StreamDeps, user: User, turn: PreparedTurn) -> StreamingResponse:
-    return StreamingResponse(sse(stream_turn(deps, user.id, turn)), media_type="text/event-stream", headers=SSE_HEADERS)
+    return StreamingResponse(
+        sse(stream_turn(deps, user.id, turn, user.impersonation)), media_type="text/event-stream", headers=SSE_HEADERS
+    )
 
 
 # --- Conversa em streaming ---------------------------------------------------------------------------
@@ -331,14 +333,17 @@ async def compact_copilot_thread(
         await llm.aclose()
 
 
-@router.get("/threads/{thread_id}/export", response_model=ThreadExport)
+@router.get("/threads/{thread_id}/export", response_model=ThreadExport, dependencies=[NotImpersonating])
 async def export_copilot_thread(thread_id: uuid.UUID, user: CurrentUser, db: Db) -> ThreadExport:
     """A conversa em Markdown, para o comando `/exportar`."""
     return await threads.export(db, user, thread_id)
 
 
 @router.get(
-    "/threads/{thread_id}/export.pdf", response_class=Response, responses={200: {"content": {"application/pdf": {}}}}
+    "/threads/{thread_id}/export.pdf",
+    response_class=Response,
+    responses={200: {"content": {"application/pdf": {}}}},
+    dependencies=[NotImpersonating, PdfGuard],
 )
 async def export_copilot_thread_pdf(thread_id: uuid.UUID, user: CurrentUser, db: Db) -> Response:
     """A conversa em PDF."""
@@ -360,7 +365,7 @@ async def unshare_copilot_thread(thread_id: uuid.UUID, user: CurrentUser, db: Db
     return Response(status_code=204)
 
 
-@router.get("/shared/{token}", response_model=ThreadOut)
+@router.get("/shared/{token}", response_model=ThreadOut, dependencies=[NotGuestDep])
 async def get_shared_copilot_thread(
     token: Annotated[str, Path(max_length=64)], user: CurrentUser, db: Db, catalog: Catalog
 ) -> ThreadOut:
@@ -630,7 +635,7 @@ async def delete_copilot_memory_entry(entry_id: uuid.UUID, user: CurrentUser, db
     return Response(status_code=204)
 
 
-@router.delete("/memory/entries", status_code=204)
+@router.delete("/memory/entries", status_code=204, dependencies=[NotImpersonating])
 async def clear_copilot_memory(target: MemoryTarget, user: CurrentUser, db: Db) -> Response:
     """Esvazia uma memória (`memory` ou `user`)."""
     await memory_api.clear(db, user, target)
@@ -668,13 +673,13 @@ async def search_copilot_sessions(
     return await sessions.search(db, user.id, q, limit, None, since, until)
 
 
-@router.get("/data/export", response_model=DataExport)
+@router.get("/data/export", response_model=DataExport, dependencies=[NotImpersonating])
 async def export_copilot_data(user: CurrentUser, db: Db, catalog: Catalog) -> DataExport:
     """Tudo o que o copiloto guarda sobre o utilizador: definições, memória, conversas e ações (RGPD)."""
     return await memory_api.export_data(db, user, catalog)
 
 
-@router.delete("/data")
+@router.delete("/data", dependencies=[NotImpersonating])
 async def delete_copilot_data(
     confirmation: Annotated[str, Query(min_length=6, max_length=10, description="APAGAR ou DELETE")],
     user: CurrentUser,

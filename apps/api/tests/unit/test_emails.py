@@ -46,7 +46,16 @@ def _brand(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(emails, "_brand", lambda: Brand(app_url=BASE, support_email="novelo@heldergoncalves.io"))
 
 
-NAMES = ["verify-email", "password-reset", "magic-link", "guest-welcome"]
+NAMES = [
+    "verify-email",
+    "password-reset",
+    "magic-link",
+    "guest-welcome",
+    "invitation",
+    "approval-granted",
+    "approval-rejected",
+    "approval-requested",
+]
 
 
 @pytest.mark.parametrize("name", NAMES)
@@ -58,7 +67,8 @@ def test_email_quality(locale: str, name: str) -> None:
     assert parsed.errors == [] and parsed.stack == []
     assert html.startswith("<!DOCTYPE html>") and f'lang="{locale}"' in html
     assert 'name="color-scheme"' in html and "prefers-color-scheme" in html
-    assert parsed.imgs and all(i.get("alt") for i in parsed.imgs)
+    # o 2.º logótipo (modo escuro) é decorativo, com alt vazio
+    assert parsed.imgs and parsed.imgs[0].get("alt") and all("alt" in i for i in parsed.imgs)
     assert all(str(i["src"]).startswith("https://") for i in parsed.imgs)
     https = [u for u in parsed.links if not u.startswith("mailto:")]
     assert https and all(u.startswith("https://") for u in https)
@@ -66,7 +76,11 @@ def test_email_quality(locale: str, name: str) -> None:
         assert "{{" not in content and "}}" not in content
         assert not re.search(r"\{[a-z_]+\}", content)
     assert text.strip() and "<" not in text
-    assert 0 < len(subject) <= 70
+    assert 0 < len(subject) <= 70 and subject.endswith(" · Novelo")
+    assert "localhost" not in html and "localhost" not in text
+    assert not re.search(r"[“”«»‘’–—·…]", text)
+    assert "Ferreira" not in html and "Ferreira" not in text  # saudação só com o primeiro nome
+    assert "#2E6B57" in html and "#C4A06A" not in html and "#14211D" not in html  # um só acento, sem fio dourado
 
 
 def test_name_is_escaped() -> None:
@@ -89,4 +103,21 @@ def test_validity_and_singular() -> None:
     _, _, text = emails.password_reset("pt-PT", f"{BASE}/x", 1)
     assert "1 minuto" in text and "Uma só vez" in text
     _, _, text_en = emails.verify_email("en", f"{BASE}/x", None, 48)
-    assert "48 hours" in text_en
+    assert "2 days" in text_en
+    _, _, text_hour = emails.password_reset("en", f"{BASE}/x", 60)
+    assert "1 hour" in text_hour
+
+
+def test_role_is_capitalised_and_greeting_uses_first_name() -> None:
+    _, html, text = emails.approval_granted("pt-PT", f"{BASE}/x", "Ana Maria Ferreira", "operator")
+    assert "Operador" in html and "Operador" in text
+    assert "Olá, Ana." in text and "Maria" not in text
+    _, html_en, _ = emails.invitation("en", f"{BASE}/x", inviter="Rui Costa", role="admin", days=7)
+    assert "Administrator" in html_en and "Valid for" in html_en and "7 days" in html_en
+
+
+def test_subjects_are_short_and_uniform() -> None:
+    for locale in ("pt-PT", "en"):
+        subjects = [subject for subject, _, _ in emails.sample_emails(locale).values()]
+        assert all(s.endswith(" · Novelo") and len(s) <= 50 for s in subjects)
+    assert emails.sample_emails("pt-PT")["verify-email"][0] == "Confirma o teu email · Novelo"

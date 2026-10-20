@@ -6,6 +6,7 @@ Não revela se um email tem conta: quem chama responde sempre da mesma forma.
 
 import hmac
 import logging
+import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
 from typing import Literal
@@ -16,7 +17,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.config import get_settings
-from novelo.core.errors import FeatureDisabledError, InvalidEventCodeError, InvalidTokenError
+from novelo.core.errors import FeatureDisabledError, InvalidEventCodeError, InvalidTokenError, RateLimitError
 from novelo.core.security import hash_token, new_opaque_token
 from novelo.features.auth import emails, service
 from novelo.features.auth.models import LoginToken
@@ -100,6 +101,13 @@ async def _create_token(
     return token
 
 
+async def _decoy_token(db: AsyncSession) -> None:
+    """Conta inexistente: faz o mesmo trabalho (token, hash, escrita e commit) para o tempo não revelar nada."""
+    hash_token(new_opaque_token())
+    await db.execute(update(LoginToken).where(LoginToken.id == uuid.uuid4()).values(used_at=None))
+    await db.commit()
+
+
 def _magic_email(user: User, token: str, ip: str | None, user_agent: str | None) -> Outgoing:
     s = get_settings()
     url = f"{s.app_url.rstrip('/')}/magic-link?token={token}"
@@ -119,6 +127,7 @@ async def request_magic_link(
     """Cria o token e compõe o email. Devolve `None` (sem erro) se não há conta ativa: o chamador responde igual."""
     user = await users.get_by_email(db, email)
     if user is None or not user.is_active:
+        await _decoy_token(db)
         return None
     token = await _create_token(db, user, purpose, safe_next(next_path), ip, user_agent)
     return _magic_email(user, token, ip, user_agent)
@@ -144,6 +153,7 @@ async def verify_magic_link(db: AsyncSession, token: str) -> tuple[User, str, st
     if user is None or not user.is_active:
         await db.commit()  # o token fica gasto na mesma
         raise InvalidTokenError("Invalid or expired sign-in link")
+    await service.claim_unverified_account(db, user)
     user.email_verified = True  # o link chegou à caixa de correio: provou a posse do email
     access, refresh = await service.issue_session(db, user, remember=True)
     return user, access, refresh, safe_next(consumed.next_path)
@@ -173,12 +183,27 @@ class QuickJoinOutcome:
     emails: list[Outgoing]
 
 
+async def _enforce_signup_cap(db: AsyncSession) -> None:
+    """Teto GLOBAL de entradas por QR na última hora, sem depender do IP (wifi do evento, IPs rotativos, botnet).
+    Aplica-se a emails novos e existentes, para o teto não servir de oráculo de contas."""
+    cap = get_settings().guest_signups_per_hour
+    if not cap:
+        return
+    since = datetime.now(UTC) - timedelta(hours=1)
+    joined = await db.scalar(
+        select(func.count()).select_from(User).where(User.joined_via == "quick_join", User.created_at >= since)
+    )
+    if (joined or 0) >= cap:
+        raise RateLimitError("The event is receiving too many new guests right now. Try again in a few minutes.")
+
+
 async def quick_join(
     db: AsyncSession, *, name: str, email: str, locale: str, ip: str | None, user_agent: str | None
 ) -> QuickJoinOutcome:
     """Email novo: cria um convidado e inicia sessão. Email com conta: NUNCA inicia sessão (anti-tomada de conta),
     só envia um link de entrada para a caixa de correio do dono. O código do evento já foi validado."""
     s = get_settings()
+    await _enforce_signup_cap(db)
     existing = await users.get_by_email(db, email)
     if existing is None:
         try:
@@ -187,6 +212,7 @@ async def quick_join(
                 email=email,
                 name=name,
                 role="guest",
+                email_verified=False,  # ninguém provou a posse do email: ver `claim_unverified_account`
                 locale=locale,
                 joined_via="quick_join",
                 consent_at=datetime.now(UTC),

@@ -1,10 +1,11 @@
 from datetime import datetime
+from typing import cast
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from novelo.core.security import hash_password
-from novelo.features.users.models import User
+from novelo.core.security import hash_password_async
+from novelo.features.users.models import ApprovalStatus, User
 from novelo.features.users.schemas import UserAdminOut, UserOut
 
 
@@ -20,6 +21,7 @@ def to_out(user: User) -> UserOut:
         google_linked=user.google_sub is not None,
         email_verified=user.email_verified,
         locale=user.locale,
+        approval_status=cast(ApprovalStatus, user.approval_status),
     )
 
 
@@ -45,11 +47,12 @@ async def create_user(
     joined_via: str = "password",
     consent_at: datetime | None = None,
     consent_version: str | None = None,
+    approval_status: str = "approved",
 ) -> User:
     user = User(
         email=email.lower(),
         name=name,
-        hashed_password=hash_password(password) if password else None,
+        hashed_password=await hash_password_async(password) if password else None,
         role=role,
         google_sub=google_sub,
         avatar_url=avatar_url,
@@ -58,6 +61,7 @@ async def create_user(
         joined_via=joined_via,
         consent_at=consent_at,
         consent_version=consent_version,
+        approval_status=approval_status,
     )
     db.add(user)
     await db.commit()
@@ -76,8 +80,18 @@ def to_admin_out(user: User) -> UserAdminOut:
         google_linked=user.google_sub is not None,
         last_login_at=user.last_login_at,
         created_at=user.created_at,
+        approval_status=cast(ApprovalStatus, user.approval_status),
+        approved_at=user.approved_at,
+        rejected_reason=user.rejected_reason,
     )
 
 
-async def list_users(db: AsyncSession) -> list[User]:
-    return list((await db.execute(select(User).order_by(User.created_at))).scalars())
+async def list_users(db: AsyncSession, approval_status: str | None = None) -> list[User]:
+    query = select(User).order_by(User.created_at)
+    if approval_status:
+        query = query.where(User.approval_status == approval_status)
+    return list((await db.execute(query)).scalars())
+
+
+async def count_pending(db: AsyncSession) -> int:
+    return int(await db.scalar(select(func.count()).select_from(User).where(User.approval_status == "pending")) or 0)

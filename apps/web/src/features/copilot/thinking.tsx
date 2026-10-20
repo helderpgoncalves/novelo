@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
+import { BrandSpinner } from '@/components/brand-logo';
 import { m } from '@/paraglide/messages';
-import type { StatusInfo } from './types';
+import type { ChatMessage, StatusInfo } from './types';
 import { useReducedMotion } from './use-reduced-motion';
 
 type Family =
@@ -94,12 +95,33 @@ export function familyOf(labelKey: string): Family {
   return FAMILY_OF[labelKey.replace(/^status\./, '')] ?? 'working';
 }
 
+/**
+ * Fase da frase do indicador. Usa o `status` do servidor; sem ele (entre eventos) deduz: ferramenta por
+ * acabar = "a consultar", texto a fluir = "a escrever", senão "a pensar". Nunca devolve "nada": o indicador
+ * não desaparece enquanto a mensagem está a fazer streaming.
+ */
+export function indicatorLabelKey(
+  message: Pick<ChatMessage, 'text' | 'tools'>,
+  status: StatusInfo | null,
+): string {
+  if (status?.labelKey) return status.labelKey;
+  if (message.tools.some((t) => t.ok === null)) return 'status.working';
+  if (message.text.length > 0) return 'status.writing';
+  return 'status.thinking';
+}
+
 const ROTATE_MS = 2600;
 
 /** Frases temáticas (têxtil, recolha, otimização) que rodam enquanto o copiloto trabalha. */
-export function ThinkingLine({ status }: { status: StatusInfo | null }) {
+export function ThinkingLine({
+  status,
+  message,
+}: {
+  status: StatusInfo | null;
+  message?: Pick<ChatMessage, 'text' | 'tools'>;
+}) {
   const reduced = useReducedMotion();
-  const family = familyOf(status?.labelKey ?? 'status.thinking');
+  const family = familyOf(indicatorLabelKey(message ?? { text: '', tools: [] }, status));
   const phrases = PHRASES[family]();
   const [step, setStep] = useState(0);
 
@@ -117,12 +139,9 @@ export function ThinkingLine({ status }: { status: StatusInfo | null }) {
   return (
     <div
       data-testid="copilot-thinking"
-      className="flex min-w-0 items-center gap-2.5 py-1 text-[0.9375rem]"
+      className="flex h-7 min-w-0 items-center gap-2.5 text-[0.9375rem]"
     >
-      <span
-        className="size-1.5 shrink-0 rounded-full bg-primary motion-safe:animate-pulse"
-        aria-hidden="true"
-      />
+      <BrandSpinner />
       {/* O leitor de ecrã ouve só a fase (a primeira frase da família), não cada frase que roda. */}
       <span className="sr-only" role="status">
         {phrases[0]}

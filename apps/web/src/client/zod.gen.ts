@@ -3,6 +3,15 @@
 import * as z from 'zod';
 
 /**
+ * AcceptInvitationRequest
+ */
+export const zAcceptInvitationRequest = z.object({
+    name: z.string().min(1).max(120),
+    password: z.string().max(128).nullish(),
+    token: z.string().min(20).max(200)
+});
+
+/**
  * ActionType
  */
 export const zActionType = z.enum([
@@ -192,6 +201,35 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * ApprovalStatusOut
+ *
+ * Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).
+ */
+export const zApprovalStatusOut = z.object({
+    decided_at: z.iso.datetime().nullable(),
+    email_verified: z.boolean(),
+    rejected_reason: z.string().nullable(),
+    status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ])
+});
+
+/**
+ * ApproveRequest
+ */
+export const zApproveRequest = z.object({
+    confirm_admin: z.boolean().optional().default(false),
+    notify: z.boolean().optional().default(true),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ]).optional().default('operator')
+});
+
+/**
  * ArtifactSource
  */
 export const zArtifactSource = z.object({
@@ -220,9 +258,41 @@ export const zAttachmentOut = z.object({
 });
 
 /**
+ * AuditEntryOut
+ */
+export const zAuditEntryOut = z.object({
+    action: z.string(),
+    actor_email: z.string().nullable(),
+    actor_id: z.uuid().nullable(),
+    actor_name: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    details: z.record(z.string(), z.unknown()),
+    effective_actor_email: z.string().nullable(),
+    effective_actor_id: z.uuid().nullable(),
+    effective_actor_name: z.string().nullable(),
+    id: z.uuid(),
+    ip: z.string().nullable(),
+    target_id: z.string().nullable(),
+    target_label: z.string().nullable(),
+    target_type: z.string().nullable(),
+    user_agent: z.string().nullable()
+});
+
+/**
+ * AuditPage
+ */
+export const zAuditPage = z.object({
+    items: z.array(zAuditEntryOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
  * AuthConfig
  */
 export const zAuthConfig = z.object({
+    approval_required: z.boolean().optional().default(true),
     google_enabled: z.boolean(),
     magic_link_enabled: z.boolean(),
     password_min_length: z.int().optional().default(10),
@@ -609,6 +679,15 @@ export const zCopilotErrorEvent = z.object({
         'email_taken',
         'cannot_modify_self',
         'conflict',
+        'account_pending',
+        'account_rejected',
+        'invitation_pending',
+        'last_admin',
+        'impersonation_active',
+        'impersonation_blocked',
+        'impersonation_forbidden',
+        'confirmation_mismatch',
+        'admin_confirmation_required',
         'rate_limited',
         'feature_disabled',
         'upstream_error',
@@ -922,6 +1001,13 @@ export const zDayGroup = z.enum([
 ]);
 
 /**
+ * DeleteUserRequest
+ */
+export const zDeleteUserRequest = z.object({
+    confirm_email: z.string().min(3).max(255)
+});
+
+/**
  * EffectiveTask
  */
 export const zEffectiveTask = z.object({
@@ -982,6 +1068,15 @@ export const zErrorBody = z.object({
         'email_taken',
         'cannot_modify_self',
         'conflict',
+        'account_pending',
+        'account_rejected',
+        'invitation_pending',
+        'last_admin',
+        'impersonation_active',
+        'impersonation_blocked',
+        'impersonation_forbidden',
+        'confirmation_mismatch',
+        'admin_confirmation_required',
         'rate_limited',
         'feature_disabled',
         'upstream_error',
@@ -1309,6 +1404,108 @@ export const zHistoryPage = z.object({
 });
 
 /**
+ * ImpersonateRequest
+ */
+export const zImpersonateRequest = z.object({
+    reason: z.string().max(300)
+});
+
+/**
+ * ImpersonationOut
+ *
+ * Estado de impersonação da sessão atual. `active=false` (e o resto nulo) numa sessão normal.
+ */
+export const zImpersonationOut = z.object({
+    active: z.boolean().optional().default(false),
+    admin_id: z.uuid().nullish(),
+    admin_name: z.string().nullish(),
+    expires_at: z.iso.datetime().nullish()
+});
+
+/**
+ * InvitationCreate
+ */
+export const zInvitationCreate = z.object({
+    confirm_admin: z.boolean().optional().default(false),
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    message: z.string().max(500).nullish(),
+    name: z.string().max(120).nullish(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ]).optional().default('operator')
+});
+
+/**
+ * InvitationOut
+ */
+export const zInvitationOut = z.object({
+    accepted_at: z.iso.datetime().nullable(),
+    created_at: z.iso.datetime(),
+    email: z.string(),
+    email_delivered: z.boolean(),
+    expires_at: z.iso.datetime(),
+    id: z.uuid(),
+    invited_by_id: z.uuid().nullable(),
+    invited_by_name: z.string().nullable(),
+    last_sent_at: z.iso.datetime().nullable(),
+    locale: z.enum(['pt-PT', 'en']),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    revoked_at: z.iso.datetime().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ]),
+    send_count: z.int(),
+    status: z.enum([
+        'pending',
+        'accepted',
+        'expired',
+        'revoked'
+    ])
+});
+
+/**
+ * InvitationPage
+ */
+export const zInvitationPage = z.object({
+    items: z.array(zInvitationOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
+ * InvitationPreview
+ *
+ * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
+ */
+export const zInvitationPreview = z.object({
+    email: z.string(),
+    expires_at: z.iso.datetime(),
+    invited_by_name: z.string().nullable(),
+    locale: z.enum(['pt-PT', 'en']),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ])
+});
+
+/**
+ * InvitationTokenRequest
+ */
+export const zInvitationTokenRequest = z.object({
+    token: z.string().min(20).max(200)
+});
+
+/**
  * KpiItem
  */
 export const zKpiItem = z.object({
@@ -1507,6 +1704,41 @@ export const zMarketEntry = z.object({
     lots: z.int(),
     parishes: z.array(z.string()),
     weight_kg: z.number()
+});
+
+/**
+ * MeOut
+ *
+ * `/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação.
+ */
+export const zMeOut = z.object({
+    approval_status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
+    avatar_url: z.string().nullable(),
+    email: z.string(),
+    email_verified: z.boolean(),
+    google_linked: z.boolean(),
+    has_password: z.boolean(),
+    id: z.uuid(),
+    impersonation: zImpersonationOut.optional(),
+    joined_via: z.enum([
+        'password',
+        'google',
+        'quick_join',
+        'magic_link',
+        'invited'
+    ]),
+    locale: z.enum(['pt-PT', 'en']),
+    name: z.string().nullable(),
+    pending_approvals: z.int().nullish(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ])
 });
 
 /**
@@ -2768,6 +3000,14 @@ export const zRegisterRequest = z.object({
 });
 
 /**
+ * RejectRequest
+ */
+export const zRejectRequest = z.object({
+    notify: z.boolean().optional().default(false),
+    reason: z.string().max(300).nullish()
+});
+
+/**
  * ReportOut
  */
 export const zReportOut = z.object({
@@ -4015,6 +4255,12 @@ export const zAiUsageOut = z.object({
  * Visão de administração: inclui estado da conta e último acesso.
  */
 export const zUserAdminOut = z.object({
+    approval_status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
+    approved_at: z.iso.datetime().nullable(),
     created_at: z.iso.datetime(),
     email: z.string(),
     email_verified: z.boolean(),
@@ -4025,10 +4271,12 @@ export const zUserAdminOut = z.object({
         'password',
         'google',
         'quick_join',
-        'magic_link'
+        'magic_link',
+        'invited'
     ]),
     last_login_at: z.iso.datetime().nullable(),
     name: z.string().nullable(),
+    rejected_reason: z.string().nullable(),
     role: z.enum([
         'admin',
         'operator',
@@ -4040,6 +4288,7 @@ export const zUserAdminOut = z.object({
  * UserAdminUpdate
  */
 export const zUserAdminUpdate = z.object({
+    confirm_admin: z.boolean().optional().default(false),
     is_active: z.boolean().nullish(),
     role: z.enum([
         'admin',
@@ -4052,6 +4301,11 @@ export const zUserAdminUpdate = z.object({
  * UserOut
  */
 export const zUserOut = z.object({
+    approval_status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
     avatar_url: z.string().nullable(),
     email: z.string(),
     email_verified: z.boolean(),
@@ -4062,7 +4316,8 @@ export const zUserOut = z.object({
         'password',
         'google',
         'quick_join',
-        'magic_link'
+        'magic_link',
+        'invited'
     ]),
     locale: z.enum(['pt-PT', 'en']),
     name: z.string().nullable(),
@@ -4071,6 +4326,14 @@ export const zUserOut = z.object({
         'operator',
         'guest'
     ])
+});
+
+/**
+ * ImpersonationStarted
+ */
+export const zImpersonationStarted = z.object({
+    impersonation: zImpersonationOut,
+    user: zUserOut
 });
 
 /**
@@ -4091,6 +4354,14 @@ export const zQuickJoinResult = z.object({
 export const zSignedIn = z.object({
     next: z.string(),
     user: zUserOut
+});
+
+/**
+ * UsersSummary
+ */
+export const zUsersSummary = z.object({
+    pending_approvals: z.int(),
+    total: z.int()
 });
 
 /**
@@ -4598,6 +4869,11 @@ export const zGetAiUsageQuery = z.object({
  */
 export const zGetAiUsageResponse = zAiUsageOut;
 
+/**
+ * Successful Response
+ */
+export const zGetApprovalStatusResponse = zApprovalStatusOut;
+
 export const zChangePasswordBody = zChangePasswordRequest;
 
 /**
@@ -4631,6 +4907,29 @@ export const zGoogleLoginQuery = z.object({
     next: z.string().optional().default('/'),
     locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
 });
+
+/**
+ * Successful Response
+ */
+export const zStopImpersonationResponse = zUserOut;
+
+export const zAcceptInvitationBody = zAcceptInvitationRequest;
+
+export const zAcceptInvitationHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zAcceptInvitationResponse = zSignedIn;
+
+export const zPreviewInvitationBody = zInvitationTokenRequest;
+
+/**
+ * Successful Response
+ */
+export const zPreviewInvitationResponse = zInvitationPreview;
 
 export const zLoginBody = zLoginRequest;
 
@@ -4674,7 +4973,7 @@ export const zVerifyMagicLinkResponse = zSignedIn;
 /**
  * Successful Response
  */
-export const zGetMeResponse = zUserOut;
+export const zGetMeResponse = zMeOut;
 
 export const zUpdateMeBody = zProfileUpdate;
 
@@ -5720,12 +6019,93 @@ export const zAnalyseGarmentBody = zBodyAnalyseGarment;
  */
 export const zAnalyseGarmentResponse = zTriageResult;
 
+export const zListUsersQuery = z.object({
+    approval_status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]).nullish()
+});
+
 /**
  * Response List Users
  *
  * Successful Response
  */
 export const zListUsersResponse = z.array(zUserAdminOut);
+
+export const zListAuditQuery = z.object({
+    offset: z.int().gte(0).optional().default(0),
+    limit: z.int().gte(1).lte(200).optional().default(50),
+    action: z.string().max(60).nullish(),
+    actor_id: z.uuid().nullish(),
+    target_id: z.string().max(64).nullish(),
+    date_from: z.iso.datetime().nullish(),
+    date_to: z.iso.datetime().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListAuditResponse = zAuditPage;
+
+export const zListInvitationsQuery = z.object({
+    offset: z.int().gte(0).optional().default(0),
+    limit: z.int().gte(1).lte(200).optional().default(50),
+    status: z.enum([
+        'pending',
+        'accepted',
+        'expired',
+        'revoked'
+    ]).nullish(),
+    q: z.string().max(100).nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zListInvitationsResponse = zInvitationPage;
+
+export const zCreateInvitationBody = zInvitationCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateInvitationResponse = zInvitationOut;
+
+export const zResendInvitationPath = z.object({
+    invitation_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zResendInvitationResponse = zInvitationOut;
+
+export const zRevokeInvitationPath = z.object({
+    invitation_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRevokeInvitationResponse = zInvitationOut;
+
+/**
+ * Successful Response
+ */
+export const zGetUsersSummaryResponse = zUsersSummary;
+
+export const zDeleteUserBody = zDeleteUserRequest;
+
+export const zDeleteUserPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteUserResponse = z.void();
 
 export const zUpdateUserBody = zUserAdminUpdate;
 
@@ -5737,6 +6117,39 @@ export const zUpdateUserPath = z.object({
  * Successful Response
  */
 export const zUpdateUserResponse = zUserAdminOut;
+
+export const zApproveUserBody = zApproveRequest;
+
+export const zApproveUserPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zApproveUserResponse = zUserAdminOut;
+
+export const zStartImpersonationBody = zImpersonateRequest;
+
+export const zStartImpersonationPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zStartImpersonationResponse = zImpersonationStarted;
+
+export const zRejectUserBody = zRejectRequest;
+
+export const zRejectUserPath = z.object({
+    user_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRejectUserResponse = zUserAdminOut;
 
 export const zListWhatIfsQuery = z.object({
     scenario_id: z.uuid()

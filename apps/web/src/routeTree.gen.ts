@@ -9,13 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
+import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
+import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
-import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppSplatRouteImport } from './routes/_app/$'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
@@ -47,12 +50,22 @@ import { Route as AppScenariosScenarioIdRouteImport } from './routes/_app/scenar
 import { Route as AppScenariosCompareRouteImport } from './routes/_app/scenarios.compare'
 import { Route as AppChatSharedTokenRouteImport } from './routes/_app/chat_.shared.$token'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppRoute = AppRouteImport.update({
   id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AcceptInviteRoute = AcceptInviteRouteImport.update({
+  id: '/accept-invite',
+  path: '/accept-invite',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -65,20 +78,25 @@ const MagicLinkRoute = MagicLinkRouteImport.update({
   path: '/magic-link',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PendingApprovalRoute = PendingApprovalRouteImport.update({
+  id: '/pending-approval',
+  path: '/pending-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
   getParentRoute: () => rootRouteImport,
 } as any)
 const VerifyEmailRoute = VerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
   getParentRoute: () => rootRouteImport,
-} as any)
-const AppIndexRoute = AppIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => AppRoute,
 } as any)
 const AppSplatRoute = AppSplatRouteImport.update({
   id: '/$',
@@ -232,10 +250,13 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof AppIndexRoute
+  '/': typeof IndexRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
@@ -269,10 +290,13 @@ export interface FileRoutesByFullPath {
   '/chat/shared/$token': typeof AppChatSharedTokenRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof AppIndexRoute
+  '/': typeof IndexRoute
+  '/accept-invite': typeof AcceptInviteRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/$': typeof AppSplatRoute
   '/account': typeof AppAccountRoute
@@ -307,11 +331,15 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
+  '/accept-invite': typeof AcceptInviteRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
+  '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
   '/_app/$': typeof AppSplatRoute
   '/_app/account': typeof AppAccountRoute
@@ -336,7 +364,6 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
-  '/_app/': typeof AppIndexRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
@@ -349,9 +376,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/accept-invite'
     | '/join'
     | '/magic-link'
+    | '/pending-approval'
     | '/privacy'
+    | '/terms'
     | '/verify-email'
     | '/$'
     | '/account'
@@ -386,9 +416,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/accept-invite'
     | '/join'
     | '/magic-link'
+    | '/pending-approval'
     | '/privacy'
+    | '/terms'
     | '/verify-email'
     | '/$'
     | '/account'
@@ -422,11 +455,15 @@ export interface FileRouteTypes {
     | '/chat/shared/$token'
   id:
     | '__root__'
+    | '/'
     | '/_app'
     | '/_auth'
+    | '/accept-invite'
     | '/join'
     | '/magic-link'
+    | '/pending-approval'
     | '/privacy'
+    | '/terms'
     | '/verify-email'
     | '/_app/$'
     | '/_app/account'
@@ -451,7 +488,6 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/passport/$code'
-    | '/_app/'
     | '/_app/admin/ai'
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
@@ -462,17 +498,28 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
+  AcceptInviteRoute: typeof AcceptInviteRoute
   JoinRoute: typeof JoinRoute
   MagicLinkRoute: typeof MagicLinkRoute
+  PendingApprovalRoute: typeof PendingApprovalRoute
   PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   PassportCodeRoute: typeof PassportCodeRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app': {
       id: '/_app'
       path: ''
@@ -485,6 +532,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accept-invite': {
+      id: '/accept-invite'
+      path: '/accept-invite'
+      fullPath: '/accept-invite'
+      preLoaderRoute: typeof AcceptInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -501,11 +555,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagicLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/pending-approval': {
+      id: '/pending-approval'
+      path: '/pending-approval'
+      fullPath: '/pending-approval'
+      preLoaderRoute: typeof PendingApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/privacy': {
       id: '/privacy'
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/verify-email': {
@@ -514,13 +582,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/verify-email'
       preLoaderRoute: typeof VerifyEmailRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_app/': {
-      id: '/_app/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof AppIndexRouteImport
-      parentRoute: typeof AppRoute
     }
     '/_app/$': {
       id: '/_app/$'
@@ -754,7 +815,6 @@ interface AppRouteChildren {
   AppSimulatorRoute: typeof AppSimulatorRoute
   AppTriageRoute: typeof AppTriageRoute
   AppUsersRoute: typeof AppUsersRoute
-  AppIndexRoute: typeof AppIndexRoute
   AppAdminAiRoute: typeof AppAdminAiRoute
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
@@ -783,7 +843,6 @@ const AppRouteChildren: AppRouteChildren = {
   AppSimulatorRoute: AppSimulatorRoute,
   AppTriageRoute: AppTriageRoute,
   AppUsersRoute: AppUsersRoute,
-  AppIndexRoute: AppIndexRoute,
   AppAdminAiRoute: AppAdminAiRoute,
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,
@@ -812,11 +871,15 @@ const AuthRouteChildren: AuthRouteChildren = {
 const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
+  AcceptInviteRoute: AcceptInviteRoute,
   JoinRoute: JoinRoute,
   MagicLinkRoute: MagicLinkRoute,
+  PendingApprovalRoute: PendingApprovalRoute,
   PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   PassportCodeRoute: PassportCodeRoute,
 }

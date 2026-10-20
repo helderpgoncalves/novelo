@@ -181,6 +181,7 @@ export function renderInline(text: string): ReactNode[] {
 export function SafeMarkdown({ text, className }: { text: string; className?: string }) {
   return (
     <div
+      data-testid="copilot-text"
       className={
         className ??
         'space-y-3 text-[0.9375rem] leading-relaxed [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5'

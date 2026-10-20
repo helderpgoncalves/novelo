@@ -102,8 +102,8 @@ export default defineConfig({
       workbox: {
         // Só a casca da app fica em cache; a API (dados autenticados) nunca.
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//],
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        navigateFallbackDenylist: [/^\/api\//, /^\/robots\.txt$/, /^\/sitemap\.xml$/],
+        globPatterns: ['**/*.{js,mjs,css,html,svg,png,woff2}'],
         globIgnores: ['screenshots/**'],
         maximumFileSizeToCacheInBytes: 3_000_000,
       },
@@ -130,6 +130,8 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: ['./src/test/setup.ts'],
     globals: true,
+    // Threads: arranque mais barato que processos; cada ficheiro continua isolado.
+    pool: 'threads',
     exclude: ['node_modules', 'e2e'],
   },
 });

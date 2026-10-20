@@ -50,6 +50,8 @@ export interface NavItem {
   /** No backlog, ainda sem ecrã. */
   soon?: boolean;
   adminOnly?: boolean;
+  /** Contador à direita do rótulo (pedidos de acesso por aprovar). */
+  badge?: 'pending-approvals';
 }
 
 export interface NavSection {
@@ -103,7 +105,13 @@ export const NAV: NavSection[] = [
   {
     title: () => m.nav_section_admin(),
     items: [
-      { label: () => m.nav_users(), to: '/users', icon: Users, adminOnly: true },
+      {
+        label: () => m.nav_users(),
+        to: '/users',
+        icon: Users,
+        adminOnly: true,
+        badge: 'pending-approvals',
+      },
       { label: () => m.nav_ai_admin(), to: '/admin/ai', icon: Bot, adminOnly: true },
     ],
   },

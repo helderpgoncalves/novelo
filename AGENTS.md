@@ -37,7 +37,10 @@ com fonte, ou leva a etiqueta "estimativa" no ecrã.
 | Comando | O que faz |
 | --- | --- |
 | `just dev` | Stack completa com hot reload (Docker): web :3190, api :8190, postgres :5590 |
-| `just check` | API (Ruff, mypy, pytest) + web (Biome, tsc, Vitest) + marca + contrato. Corre localmente (não há CI remota por agora). **Tem de passar antes de cada push** |
+| `just check-fast` | Iteração diária: API (Ruff, mypy, pytest em paralelo), web (Biome, tsc, Vitest), marca e contrato, tudo em paralelo; VRP cortado nos testes. Alvo < 90 s |
+| `just check` | O mesmo com os limites reais do solver. Corre localmente (não há CI remota por agora). **Tem de passar antes de cada push**. Alvo < 5 min |
+| `just e2e` / `just e2e-full` | Playwright contra a stack de dev: fluxos críticos (desktop) / tudo (desktop + mobile). Ver `docs/engenharia/testes.md` |
+| `just test-api -k nome` | Só pytest (paralelo, uma BD por worker); `test-shuffle` ordem aleatória, `test-slowest` os mais lentos |
 | `just gen` | Regenera `openapi.json` e o cliente TypeScript. Correr sempre que a API mudar |
 | `just etl` | Excel e pacote QGIS (contentores municipais, CAOP) de `data/raw/` para `data/processed/` |
 | `just seed` | Importa `data/processed/` para a base de dados (idempotente; a API já o faz ao arrancar) |
@@ -132,5 +135,5 @@ procedimento lendo diretamente `.claude/skills/<nome>/SKILL.md`. `.agents/skills
 
 ## Documentação
 
-Índice em `docs/README.md`. Arquitetura: `docs/engenharia/arquitetura.md`. Modelo e pressupostos:
+Índice em `docs/README.md`. Testes e tempos: `docs/engenharia/testes.md`. Arquitetura: `docs/engenharia/arquitetura.md`. Modelo e pressupostos:
 `docs/engenharia/dados-e-modelo.md`. Backlog por dia: `docs/engenharia/backlog.md`. Se a realidade mudar, atualiza o doc no mesmo commit.

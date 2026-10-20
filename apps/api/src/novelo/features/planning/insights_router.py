@@ -24,7 +24,7 @@ async def run_scenario_sensitivity(scenario_id: uuid.UUID, body: SensitivityRequ
     return await sensitivity_service.scenario_sensitivity(db, scenario_id, body)
 
 
-@router.get("/compare-robustness", response_model=RobustnessOut)
+@router.get("/compare-robustness", response_model=RobustnessOut, dependencies=[SolverGuard])
 async def compare_scenario_robustness(
     db: Db,
     recommended_id: uuid.UUID,
@@ -60,7 +60,7 @@ async def create_benchmark_scenario(key: str, body: BenchmarkScenarioRequest, us
     return await benchmark_service.create_benchmark_scenario(db, key, body, user)
 
 
-@router.post("/pilot", response_model=PilotOut)
+@router.post("/pilot", response_model=PilotOut, dependencies=[SolverGuard])
 async def recommend_pilot(body: PilotRequest, db: Db) -> PilotOut:
     """Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir."""
     return await pilot_service.recommend_pilot(db, body)

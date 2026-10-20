@@ -1,3 +1,5 @@
+import { setWorkerUrl } from 'maplibre-gl';
+import maplibreWorkerUrl from 'maplibre-gl/dist/maplibre-gl-worker.mjs?url';
 import { baseStyle, GUIMARAES_BOUNDS } from '@/lib/map';
 import { useTheme } from '@/lib/theme';
 import 'maplibre-gl/dist/maplibre-gl.css';
@@ -7,6 +9,11 @@ import MapGL, {
   NavigationControl,
   ScaleControl,
 } from 'react-map-gl/maplibre';
+
+// O MapLibre 6 procura o worker ao lado do seu bundle (assets/maplibre-gl-worker.mjs), mas o Vite não o emite: em
+// produção o nginx devolvia o index.html e dava "Worker failed to load". Com `?url` o Vite copia o ficheiro para
+// assets/ e o worker é servido do mesmo domínio (cumpre `worker-src 'self'`, sem blob: nem unsafe-eval).
+setWorkerUrl(maplibreWorkerUrl);
 
 interface BaseMapProps {
   children?: ReactNode;

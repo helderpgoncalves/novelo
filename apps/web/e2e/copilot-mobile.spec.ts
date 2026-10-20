@@ -1,5 +1,5 @@
 import { expect, type Page, request, test } from '@playwright/test';
-import { login, PASSWORD, uniqueEmail } from './helpers';
+import { approveByEmail, login, PASSWORD, uniqueEmail } from './helpers';
 
 // Copiloto em telemóvel (390×844 e 430×932, claro e escuro): ecrã inteiro, cabeçalho de uma linha,
 // estado vazio sóbrio, menu "+", histórico em folha e gráfico legível. Com SHOTS=<pasta> guarda capturas.
@@ -18,6 +18,7 @@ test.beforeAll(async () => {
   });
   expect(res.ok()).toBeTruthy();
   await api.dispose();
+  await approveByEmail(user.email); // contas novas esperam por aprovação
 });
 
 const shot = async (page: Page, name: string) => {

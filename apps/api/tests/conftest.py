@@ -1,10 +1,12 @@
 """Fixtures partilhadas. Os testes de API usam um Postgres real (DATABASE_URL de teste)."""
 
 import asyncio
+import hashlib
 import json
 import os
+import time
 from collections.abc import AsyncGenerator, AsyncIterator, Iterator
-from contextlib import asynccontextmanager
+from contextlib import asynccontextmanager, suppress
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -55,14 +57,19 @@ from novelo.main import create_app
 from novelo.seed import seed
 
 
-async def _seed_reference_data() -> None:
-    engine = create_async_engine(TEST_DB)
+async def _seed_reference_data(url: str) -> None:
+    engine = create_async_engine(url)
     async with async_sessionmaker(engine, expire_on_commit=False)() as db:
         await seed(db, get_settings().data_dir)
     await engine.dispose()
 
 
-TEST_DB = os.environ.get("TEST_DATABASE_URL", "postgresql+asyncpg://novelo:novelo@localhost:5590/novelo_test")
+_BASE_DB = os.environ.get("TEST_DATABASE_URL", "postgresql+asyncpg://novelo:novelo@localhost:5590/novelo_test")
+# Uma base de dados por processo de teste (cada worker do xdist tem a sua; duas corridas em simultâneo também não
+# se pisam). É clonada de um template construído uma só vez (ver `_database`) e apagada no fim da sessão.
+_RUN_ID = (os.environ.get("PYTEST_XDIST_TESTRUNUID") or str(os.getpid()))[:8]
+_WORKER = os.environ.get("PYTEST_XDIST_WORKER", "main")
+TEST_DB = f"{_BASE_DB}_{_RUN_ID}_{_WORKER}"
 
 
 CATALOG_ITEMS = {
@@ -148,23 +155,157 @@ def _clean_ai_cache() -> None:
     response_cache.clear()  # a cache de respostas é global ao processo: cada teste começa vazio
 
 
+_SEED_SOURCES = (
+    "seed.py",
+    "core/upsert.py",
+    "domain/geo.py",
+    "domain/parish_area.py",
+    "features/municipal/importer.py",
+    "features/planning/params.py",
+    "features/planning/service.py",
+)
+
+
+def _template_fingerprint() -> str:
+    """Muda quando muda o esquema (DDL dos modelos), o código do seed ou os dados importados: reconstrói o template."""
+    from sqlalchemy.dialects import postgresql  # noqa: PLC0415
+    from sqlalchemy.schema import CreateIndex, CreateTable  # noqa: PLC0415
+
+    h = hashlib.sha1(usedforsecurity=False)
+    for table in Base.metadata.sorted_tables:
+        h.update(str(CreateTable(table).compile(dialect=postgresql.dialect())).encode())
+        for index in sorted(table.indexes, key=lambda i: str(i.name)):
+            h.update(str(CreateIndex(index).compile(dialect=postgresql.dialect())).encode())
+    root = Path(__file__).resolve().parents[1] / "src" / "novelo"
+    for rel in _SEED_SOURCES:
+        h.update(rel.encode())
+        h.update((root / rel).read_bytes())
+    data = get_settings().data_dir
+    for f in sorted(data.rglob("*")) if data.exists() else []:
+        if f.is_file():
+            st = f.stat()
+            h.update(f"{f.relative_to(data).as_posix()}:{st.st_size}:{st.st_mtime_ns}".encode())
+    return h.hexdigest()[:12]
+
+
+def _build_template(admin: Any, template: str, base_name: str) -> None:
+    """Cria o template com o esquema (create_all) e os dados de referência. Corre 1x por alteração, sob lock."""
+    building = f"{template}_building"
+    admin.execute(text(f'DROP DATABASE IF EXISTS "{building}"'))
+    admin.execute(text(f'CREATE DATABASE "{building}"'))
+    url = _BASE_DB.rsplit("/", 1)[0] + "/" + building
+    sync = create_engine(url.replace("+asyncpg", "+psycopg2"))
+    Base.metadata.create_all(sync)
+    sync.dispose()
+    asyncio.run(_seed_reference_data(url))
+    admin.execute(text(f'ALTER DATABASE "{building}" RENAME TO "{template}"'))
+    stale = admin.execute(
+        text("SELECT datname FROM pg_database WHERE datname LIKE :p AND datname <> :t"),
+        {"p": f"{base_name}\\_tpl\\_%", "t": template},
+    ).scalars()
+    for name in list(stale):
+        admin.execute(text(f'DROP DATABASE IF EXISTS "{name}"'))
+
+
+def _drop_orphans(admin: Any, base_name: str) -> None:
+    """Apaga bases de corridas mortas há mais de 6 h (o comentário da base guarda a hora de criação)."""
+    names = admin.execute(
+        text(
+            "SELECT datname FROM pg_database WHERE datname LIKE :p AND datname NOT LIKE :t "
+            "AND COALESCE(NULLIF(shobj_description(oid, 'pg_database'), '')::bigint, 0) < :limit"
+        ),
+        {"p": f"{base_name}\\_%\\_%", "t": f"{base_name}\\_tpl\\_%", "limit": int(time.time()) - 6 * 3600},
+    ).scalars()
+    for name in list(names):
+        with suppress(Exception):  # em uso por outra corrida: fica
+            admin.execute(text(f'DROP DATABASE IF EXISTS "{name}"'))
+
+
 @pytest.fixture(scope="session", autouse=True)
 def _database() -> Iterator[None]:
+    """BD de teste por processo, clonada de um template (esquema + seed feitos 1x, reutilizados entre corridas)."""
     admin = create_engine(
         TEST_DB.replace("+asyncpg", "+psycopg2").rsplit("/", 1)[0] + "/postgres", isolation_level="AUTOCOMMIT"
     )
     name = TEST_DB.rsplit("/", 1)[1]
+    base_name = _BASE_DB.rsplit("/", 1)[1]
+    template = f"{base_name}_tpl_{_template_fingerprint()}"
     try:
-        with admin.connect() as conn:
-            conn.execute(text(f'DROP DATABASE IF EXISTS "{name}"'))
-            conn.execute(text(f'CREATE DATABASE "{name}"'))
+        conn = admin.connect()
     except Exception:  # sem Postgres: só correm os testes que não precisam da BD
         yield
         return
-    sync = create_engine(TEST_DB.replace("+asyncpg", "+psycopg2"))
-    Base.metadata.create_all(sync)
-    asyncio.run(_seed_reference_data())
+    try:
+        conn.execute(text("SELECT pg_advisory_lock(727274)"))  # serializa construção e clonagem entre workers
+        exists = conn.execute(text("SELECT 1 FROM pg_database WHERE datname = :n"), {"n": template}).scalar()
+        if not exists:
+            _build_template(conn, template, base_name)
+        _drop_orphans(conn, base_name)
+        conn.execute(text(f'DROP DATABASE IF EXISTS "{name}"'))
+        conn.execute(text(f'CREATE DATABASE "{name}" TEMPLATE "{template}"'))
+        conn.execute(text(f"COMMENT ON DATABASE \"{name}\" IS '{int(time.time())}'"))
+        conn.execute(text("SELECT pg_advisory_unlock(727274)"))
+    finally:
+        conn.close()
     yield
+    with admin.connect() as conn:
+        conn.execute(text(f'DROP DATABASE IF EXISTS "{name}" WITH (FORCE)'))
+    admin.dispose()
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _cheap_password_hashing() -> None:
+    """Argon2 com custo mínimo só nos testes (o custo real custa ~50 ms por hash e há centenas de logins)."""
+    from argon2 import PasswordHasher  # noqa: PLC0415
+
+    from novelo.core import security  # noqa: PLC0415
+
+    security._hasher = PasswordHasher(time_cost=1, memory_cost=8, parallelism=1)
+
+
+# Marcadores atribuídos por ficheiro (sem tocar nos testes): `pytest -m "not solver"`, `-m llm`, `-m slow`.
+_MARKS: dict[str, tuple[str, ...]] = {
+    "solver": (
+        "test_planning", "test_insights", "test_whatif", "test_overview", "test_network", "test_domain",
+        "test_sensitivity", "test_benchmarks", "test_coverage", "test_copilot",
+    ),
+    "llm": ("test_copilot", "test_whatif", "test_ai_", "test_openrouter", "test_stream_adapter", "test_alert_suggest",
+            "test_lots", "test_verify", "test_catalog", "test_eval_triage"),
+    "slow": ("test_etl_", "test_reports", "test_copilot_attachments"),
+}  # fmt: skip
+
+
+def pytest_collection_modifyitems(items: list[pytest.Item]) -> None:
+    for item in items:
+        stem = item.path.stem
+        for mark, prefixes in _MARKS.items():
+            if stem.startswith(prefixes):
+                item.add_marker(getattr(pytest.mark, mark))
+
+
+@pytest.fixture(scope="session", autouse=True)
+def _capped_routing_search() -> Iterator[None]:
+    """O VRP (guided local search) gasta sempre o tempo todo (2 s por modo e por cenário, são ~85% dos 6 min da suite).
+
+    Nos testes rápidos (por omissão) a pesquisa é cortada a `NOVELO_TEST_VRP_MS` (250 ms). `NOVELO_TEST_SOLVER=full`
+    (usado por `just check`) mantém os limites de produção. A solução continua a ser válida; só pode ser menos curta.
+    """
+    if os.environ.get("NOVELO_TEST_SOLVER", "fast") == "full":
+        yield
+        return
+    from ortools.constraint_solver import pywrapcp  # noqa: PLC0415
+
+    original = pywrapcp.RoutingModel.SolveWithParameters
+    limit_ns = int(os.environ.get("NOVELO_TEST_VRP_MS", "250")) * 1_000_000
+
+    def capped(self: Any, search_parameters: Any, *args: Any, **kwargs: Any) -> Any:
+        search_parameters.time_limit.seconds = 0
+        search_parameters.time_limit.nanos = limit_ns
+        return original(self, search_parameters, *args, **kwargs)
+
+    pywrapcp.RoutingModel.SolveWithParameters = capped
+    yield
+    pywrapcp.RoutingModel.SolveWithParameters = original
 
 
 @pytest.fixture
@@ -363,6 +504,12 @@ async def client(
         quick_join_limiter,
     ):
         limiter.reset()
+    # Todos os limitadores (incl. os novos) começam vazios em cada teste: sem isto o estado passa de teste para teste
+    # dentro do mesmo worker e o resultado dependeria da distribuição do xdist.
+    from novelo.core.ratelimit import RateLimiter  # noqa: PLC0415
+
+    if hasattr(RateLimiter, "reset_all"):
+        RateLimiter.reset_all()
     response_cache.clear()
     async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as c:
         yield c
@@ -392,11 +539,18 @@ async def make_user(client: httpx.AsyncClient, session: AsyncSession) -> Any:
 
 
 @pytest.fixture
-async def logged_in(client: httpx.AsyncClient) -> httpx.AsyncClient:
+async def logged_in(client: httpx.AsyncClient, session: AsyncSession) -> httpx.AsyncClient:
     resp = await client.post(
         "/api/v1/auth/register", json={"email": "ana@vitrus.pt", "password": PASSWORD, "name": "Ana"}
     )
     assert resp.status_code == 201
+    assert resp.json()["approval_status"] == "pending"  # o registo público espera por um administrador
+    from sqlalchemy import update  # noqa: PLC0415
+
+    from novelo.features.users.models import User  # noqa: PLC0415
+
+    await session.execute(update(User).where(User.email == "ana@vitrus.pt").values(approval_status="approved"))
+    await session.commit()
     return client
 
 
