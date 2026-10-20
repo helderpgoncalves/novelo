@@ -8,6 +8,7 @@ import { m } from '@/paraglide/messages';
 import { FACTS } from './facts';
 import { BODY, CONTAINER, Heading, MONO, Section } from './layout';
 import { ParishMap } from './parish-map';
+import { sectionNumber } from './sections';
 
 /** Micro-visual SVG de um cartão (decorativo). Os `group-hover:` só atuam com rato (Tailwind envolve-os em `@media (hover: hover)`). */
 function Art({ children }: { children: ReactNode }) {
@@ -442,7 +443,7 @@ export function Features() {
       <div className={`${CONTAINER} flex flex-col gap-12 lg:gap-16`}>
         <Heading
           id="produto"
-          n="04"
+          n={sectionNumber('produto')}
           size="xl"
           eyebrow={m.landing_product_eyebrow()}
           title={m.landing_features_title()}

@@ -357,7 +357,7 @@ def write_css(bgs: dict) -> None:
 def kept_files() -> dict[str, dict[str, int]]:
     """Ficheiros que este script não gera mas que vivem na pasta (painel do ecrã de entrada, `login_panel.py`): só no manifesto."""
     out = {}
-    for f in sorted(LANDING.glob("login-*")):
+    for f in sorted([*LANDING.glob("login-*"), *LANDING.glob("hackathon-*")]):
         with Image.open(f) as im:
             out[f.name] = {"bytes": f.stat().st_size, "w": im.size[0], "h": im.size[1]}
     return out
@@ -366,7 +366,7 @@ def kept_files() -> dict[str, dict[str, int]]:
 def main() -> None:
     LANDING.mkdir(parents=True, exist_ok=True)
     for old in LANDING.iterdir():  # sem órfãos: a pasta só tem o que este script gera, o painel de entrada e os créditos
-        if old.is_file() and old.name not in {"CREDITS.md", "manifest.json"} and not old.name.startswith("login-"):
+        if old.is_file() and old.name not in {"CREDITS.md", "manifest.json"} and not old.name.startswith(("login-", "hackathon-")):
             old.unlink()
     wr = Writer()
     print("hero:")

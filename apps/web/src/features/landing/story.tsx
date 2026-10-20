@@ -16,6 +16,7 @@ import {
   Section,
   STAT,
 } from './layout';
+import { sectionNumber } from './sections';
 
 const stagger = (i: number) => ({ '--i': i }) as CSSProperties;
 
@@ -50,7 +51,7 @@ export function Problem() {
       <div className={`${CONTAINER} flex flex-col gap-12 lg:gap-16`}>
         <Heading
           id="problema"
-          n="01"
+          n={sectionNumber('problema')}
           size="xl"
           eyebrow={m.landing_problem_eyebrow()}
           title={m.landing_problem_title()}
@@ -279,7 +280,7 @@ export function Method() {
       <div className={`${CONTAINER} flex flex-col gap-14 lg:gap-20`}>
         <Heading
           id="metodo"
-          n="02"
+          n={sectionNumber('metodo')}
           align="center"
           eyebrow={m.landing_method_eyebrow()}
           title={m.landing_method_title()}

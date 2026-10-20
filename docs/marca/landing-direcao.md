@@ -10,7 +10,7 @@ ponta a ponta, com a lista ficheiro a ficheiro do que implementar. A linguagem v
 | Tema | Decisão |
 | --- | --- |
 | Conceito | **«O fio que liga a cidade.»** Rede, novelo, fibra: o território visto de cima, feito de pontos, e os três fios do símbolo como fio condutor da página. |
-| Imagem | **Fotografia de Guimarães com dither próprio**: a Penha no hero e no painel de entrada; Paço dos Duques (faixas), antiga fábrica têxtil e Couros (cartões), Plataforma das Artes (CTA final); claro e escuro, mesma série e mesmo motor, sem texturas geradas. Licenças livres e créditos no rodapé. |
+| Imagem | **Fotografia de Guimarães com dither próprio**: a Penha no hero e no painel de entrada; Paço dos Duques (faixas), antiga fábrica têxtil e Couros (cartões), Plataforma das Artes (CTA final); claro e escuro, mesma série e mesmo motor, sem texturas geradas. Licenças livres; os créditos vivem na página «Créditos e licenças» (`/pt/creditos`, `/en/credits`), ligada no rodapé. |
 | Tipografia | **Newsreader** (títulos, número), **Inter** (texto), **Geist Mono** (etiquetas e dados), em subsets pt-PT de **110,7 KB** no total. Mantém a voz da marca; não se troca de serifa. |
 | Navbar | Transparente sobre o hero; ao rolar, Linho a 80% com desfoque e linha de 1 px; indicador ativo por *scroll-spy*; em telemóvel, folha a ecrã inteiro com ligações grandes e CTA fixo em baixo. |
 | Movimento | Pouco e barato: revelação por opacidade e 12 px de deslocamento, parallax da imagem só por CSS, sem bibliotecas. Canvas só como opção (secção «Efeito»). |
@@ -77,7 +77,7 @@ desce no lado esquerdo e se liga ao símbolo de cada secção (opcional, só se 
 | CTA | **Criar conta** (primário) e **Entrar** (secundário); nota «sem cartão, acesso por aprovação» só se for verdade (usar `landing_register_note`) |
 | Prova em linha (mono) | `301,3 t recolhidas em 2025 · 0,16 kg/hab/mês · 156 830 habitantes` (números da Regra Zero, com a fonte no hover/`title`) |
 | Imagem | Hero dither (Penha), claro/escuro; a zona esquerda quase só papel (texto), a direita com o santuário e o vale |
-| Crédito | Rodapé: «Fotografias: Penha: RaquelRosa7, CC BY-SA 4.0 · Paço dos Duques: Luis Miguel Jorge Duarte, CC BY-SA 4.0 · …» (`photo-credits.ts`, `PhotoCredits`) |
+| Crédito | Página «Créditos e licenças» (autor, licença com ligação, origem e uso de cada fotografia; `photo-credits.ts` é a fonte única). O rodapé liga a ela; sem bloco inline |
 
 ### Sistema de secções (ritmo)
 
@@ -506,7 +506,7 @@ Ordem sugerida, cada passo independente e verificável.
 3. **`apps/web/src/features/landing/hero.tsx`**: `<picture>` da secção 4 (claro/escuro conforme o tema), `figure` sem cartão, título com `<em>` no fim em `Newsreader Display Italic`, etiqueta mono, linha de prova. Manter um só `h1`.
 4. **`landing-nav.tsx`**: navbar da secção 2 (estado de scroll, *scroll-spy*, esconder ao rolar no móvel, folha `100dvh`, CTA fixo móvel). Sem dependências.
 5. **`layout.tsx`, `story.tsx`, `product.tsx`, `closing.tsx`**: ritmo e fundos da tabela de secções; `textura-*` como `background-image` com `image-set()` (AVIF) em camadas `::before` com `aria-hidden`; uma secção escura.
-6. **Rodapé**: crédito da fotografia (CC BY-SA 4.0) com ligação, ligações Privacidade, Termos, contacto.
+6. **Rodapé** (`footer.tsx`): marca, Produto, Projeto, Legal (Privacidade, Termos, Contacto, Créditos e licenças), cartão do Hack4Guimarães 2035 com a capa oficial, parceiros e barra com idioma e tema.
 7. **`routes/_auth.tsx` e `features/auth`**: *split-screen* e faixa móvel da secção 5; `<meta name="robots" content="noindex">` nas rotas `_auth`.
 8. **`apps/web/scripts/prerender.mjs`** (novo) e `package.json` (`"build": "vite build && node scripts/prerender.mjs && tsc --noEmit"`): fase 1 da secção 7.8; gerar `sitemap.xml` com `lastmod` e `hreflang`.
 9. **`apps/web/public/robots.txt`**: bloquear as privadas; manter `Sitemap`.

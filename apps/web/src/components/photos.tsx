@@ -8,15 +8,13 @@ import {
   HERO_WIDE_SIZES,
   type HeroSource,
 } from '@/features/landing/landing-assets.generated';
-import { PHOTO_CREDITS } from '@/features/landing/photo-credits';
 import { dataSaver } from '@/lib/motion';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
-import { m } from '@/paraglide/messages';
 
 /**
  * Fotografias de Guimarães em meio-tom Novelo, em derivados AVIF + WebP gerados por `just brand-landing` (nomes com hash do
- * conteúdo: cache imutável; créditos em `features/landing/photo-credits.ts` e `public/landing/CREDITS.md`). Aqui vivem os
+ * conteúdo: cache imutável; créditos na página «Créditos e licenças» (`features/landing/photo-credits.ts`) e em `public/landing/CREDITS.md`). Aqui vivem os
  * componentes que as mostram: tema claro/escuro, dimensões explícitas (CLS 0) e a menor largura com `Save-Data`.
  */
 
@@ -101,29 +99,5 @@ export function PhotoBand({ flip = false, className }: { flip?: boolean; classNa
         className,
       )}
     />
-  );
-}
-
-/** Crédito discreto de todas as fotografias da landing (CC BY e CC BY-SA exigem atribuição visível), para o rodapé. */
-export function PhotoCredits() {
-  const link =
-    'rounded-sm underline underline-offset-2 outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring';
-  return (
-    <p className="text-pretty font-mono text-[11px] text-muted-foreground leading-relaxed">
-      {m.landing_photo_credit()}{' '}
-      {PHOTO_CREDITS.map((c, i) => (
-        <span key={c.id}>
-          {i > 0 && ' · '}
-          <a href={c.page} target="_blank" rel="noopener noreferrer" className={link}>
-            {c.label()}
-          </a>
-          : {c.author},{' '}
-          <a href={c.licenseUrl} target="_blank" rel="noopener noreferrer" className={link}>
-            {c.license}
-          </a>
-        </span>
-      ))}
-      . {m.landing_photo_credit_adapted()}
-    </p>
   );
 }

@@ -17,6 +17,7 @@ import {
   type Status,
   StatusBadge,
 } from './layout';
+import { sectionNumber } from './sections';
 
 const stagger = (i: number) => ({ '--i': i }) as CSSProperties;
 
@@ -223,7 +224,7 @@ export function Rigor() {
       <div className={`${CONTAINER} flex flex-col gap-12 lg:gap-16`}>
         <Heading
           id="rigor"
-          n="07"
+          n={sectionNumber('rigor')}
           eyebrow={m.landing_rigor_eyebrow()}
           title={m.landing_rigor_title()}
           lead={m.landing_rigor_lead()}
@@ -346,7 +347,7 @@ export function Team() {
       <div className={`${CONTAINER} flex flex-col gap-14 lg:gap-20`}>
         <Heading
           id="equipa"
-          n="08"
+          n={sectionNumber('equipa')}
           eyebrow={m.landing_team_eyebrow()}
           title={m.landing_team_title()}
           lead={m.landing_team_lead()}
