@@ -1,6 +1,9 @@
 # Novelo: proposta para o Desafio 5 do Hack4Guimarães 2035
 
-![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](../img/banner-proposta.png)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="../img/banner-escuro.png">
+  <img src="../img/banner-proposta.png" alt="Novelo: recolha seletiva de têxteis, desenhada ao menor custo" width="100%">
+</picture>
 
 *19 de outubro de 2026 · Hélder Gonçalves e Flávio Fernandes*
 

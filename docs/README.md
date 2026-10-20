@@ -63,6 +63,8 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 | Documento | Para quê |
 | --- | --- |
 | [Guia de marca](marca/guia-de-marca.md) | Cores, tipografia, símbolo, construção do logótipo, `just brand` e `just check-brand` |
+| [Linguagem dither](marca/linguagem-dither.md) | Pontos de meio-tom como imagem da marca: princípios, rampas, gerador e tabela de ativos |
+| [Landing: direção](marca/landing-direcao.md) | Pesquisa de referências, direção, tipografia, hero, painel de entrada, checklist móvel e SEO ponta a ponta |
 | [Descrição](marca/descricao.md) | Textos da página do projeto |
 
 Para agentes de código: [AGENTS.md](../AGENTS.md) (fonte única) e [CLAUDE.md](../CLAUDE.md).

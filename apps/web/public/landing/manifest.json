@@ -1,0 +1,191 @@
+{
+  "generated_by": "scripts/brand/landing_hero.py",
+  "files": {
+    "hero-16x9-dark-1280.avif": {
+      "bytes": 268106,
+      "w": 1280,
+      "h": 720
+    },
+    "hero-16x9-dark-1920.avif": {
+      "bytes": 656287,
+      "w": 1920,
+      "h": 1080
+    },
+    "hero-16x9-dark-640.avif": {
+      "bytes": 51429,
+      "w": 640,
+      "h": 360
+    },
+    "hero-16x9-dark-640.webp": {
+      "bytes": 70350,
+      "w": 640,
+      "h": 360
+    },
+    "hero-16x9-light-1280.avif": {
+      "bytes": 283566,
+      "w": 1280,
+      "h": 720
+    },
+    "hero-16x9-light-1920.avif": {
+      "bytes": 484288,
+      "w": 1920,
+      "h": 1080
+    },
+    "hero-16x9-light-640.avif": {
+      "bytes": 50075,
+      "w": 640,
+      "h": 360
+    },
+    "hero-16x9-light-640.webp": {
+      "bytes": 69860,
+      "w": 640,
+      "h": 360
+    },
+    "hero-4x3-dark-1536.avif": {
+      "bytes": 554384,
+      "w": 1536,
+      "h": 1152
+    },
+    "hero-4x3-dark-768.avif": {
+      "bytes": 99236,
+      "w": 768,
+      "h": 576
+    },
+    "hero-4x3-dark-768.webp": {
+      "bytes": 137730,
+      "w": 768,
+      "h": 576
+    },
+    "hero-4x3-light-1536.avif": {
+      "bytes": 423903,
+      "w": 1536,
+      "h": 1152
+    },
+    "hero-4x3-light-768.avif": {
+      "bytes": 102422,
+      "w": 768,
+      "h": 576
+    },
+    "hero-4x3-light-768.webp": {
+      "bytes": 141262,
+      "w": 768,
+      "h": 576
+    },
+    "hero-mobile-dark-1296.avif": {
+      "bytes": 511246,
+      "w": 1296,
+      "h": 1620
+    },
+    "hero-mobile-dark-432.avif": {
+      "bytes": 50949,
+      "w": 432,
+      "h": 540
+    },
+    "hero-mobile-dark-432.webp": {
+      "bytes": 67666,
+      "w": 432,
+      "h": 540
+    },
+    "hero-mobile-dark-864.avif": {
+      "bytes": 286221,
+      "w": 864,
+      "h": 1080
+    },
+    "hero-mobile-light-1296.avif": {
+      "bytes": 435719,
+      "w": 1296,
+      "h": 1620
+    },
+    "hero-mobile-light-432.avif": {
+      "bytes": 53060,
+      "w": 432,
+      "h": 540
+    },
+    "hero-mobile-light-432.webp": {
+      "bytes": 68818,
+      "w": 432,
+      "h": 540
+    },
+    "hero-mobile-light-864.avif": {
+      "bytes": 254196,
+      "w": 864,
+      "h": 1080
+    },
+    "login-faixa-dark-1200.avif": {
+      "bytes": 97153,
+      "w": 1200,
+      "h": 360
+    },
+    "login-faixa-dark-2400.avif": {
+      "bytes": 213193,
+      "w": 2400,
+      "h": 720
+    },
+    "login-faixa-light-1200.avif": {
+      "bytes": 60809,
+      "w": 1200,
+      "h": 360
+    },
+    "login-faixa-light-2400.avif": {
+      "bytes": 173425,
+      "w": 2400,
+      "h": 720
+    },
+    "login-painel-dark-1440.avif": {
+      "bytes": 634861,
+      "w": 1440,
+      "h": 1920
+    },
+    "login-painel-dark-960.avif": {
+      "bytes": 377090,
+      "w": 960,
+      "h": 1280
+    },
+    "login-painel-light-1440.avif": {
+      "bytes": 570610,
+      "w": 1440,
+      "h": 1920
+    },
+    "login-painel-light-960.avif": {
+      "bytes": 328245,
+      "w": 960,
+      "h": 1280
+    },
+    "textura-campo-dark-1280.avif": {
+      "bytes": 177365,
+      "w": 1280,
+      "h": 720
+    },
+    "textura-campo-light-1280.avif": {
+      "bytes": 178147,
+      "w": 1280,
+      "h": 720
+    },
+    "textura-dunas-dark-1280.avif": {
+      "bytes": 63643,
+      "w": 1280,
+      "h": 720
+    },
+    "textura-dunas-light-1280.avif": {
+      "bytes": 73169,
+      "w": 1280,
+      "h": 720
+    },
+    "textura-fio-dark-1280.avif": {
+      "bytes": 236045,
+      "w": 1280,
+      "h": 720
+    },
+    "textura-fio-light-1280.avif": {
+      "bytes": 175630,
+      "w": 1280,
+      "h": 720
+    },
+    "tile-cruz-dark.svg": {
+      "bytes": 217
+    },
+    "tile-cruz-light.svg": {
+      "bytes": 217
+    }
+  }
+}

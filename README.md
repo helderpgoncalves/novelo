@@ -1,5 +1,8 @@
 <p align="center">
-  <img src="brand/redes/novelo-banner-2400x450.png" alt="Novelo: recolha seletiva de têxteis, desenhada ao menor custo" width="100%">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="brand/redes/novelo-banner-2400x450-escuro.png">
+    <img src="brand/redes/novelo-banner-2400x450.png" alt="Novelo: recolha seletiva de têxteis, desenhada ao menor custo" width="100%">
+  </picture>
 </p>
 
 # Novelo
@@ -7,7 +10,7 @@
 **A ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães ao menor custo.**
 
 Projeto do Desafio 5 (TexVitrus, Vitrus Ambiente) do Hack4Guimarães 2035, por Hélder Gonçalves e Flávio Fernandes.
-Em produção em **[novelo.helder.si](https://novelo.helder.si)**. O repositório é privado.
+Em produção em **[novelo.helder.si](https://novelo.helder.si)**. O repositório é público.
 
 O decisor define um orçamento e uma meta de captura. O Novelo devolve cenários comparáveis em euros, toneladas e €/t, calculados por um otimizador
 sobre os dados reais da Vitrus, e acompanha cada saco de roupa até à fábrica, do saco ao fio.
@@ -255,7 +258,7 @@ Se o webhook automático falhar, o deploy faz-se à mão a partir do Coolify. Pa
 ## Marca
 
 Identidade calma e editorial: Linho, Tinta e Floresta, Newsreader nos títulos e Inter no texto (ambas SIL Open Font License). O símbolo são três fios quase fechados à volta de um ponto.
-`just brand` gera todos os assets a partir de uma só geometria. Ver [guia de marca](docs/marca/guia-de-marca.md) e os textos da [página do projeto](docs/marca/descricao.md).
+`just brand` gera todos os assets a partir de uma só geometria, incluindo os fundos em **dither** (pontos de meio-tom, ver [linguagem dither](docs/marca/linguagem-dither.md)), as imagens de partilha e os banners. Ver [guia de marca](docs/marca/guia-de-marca.md), a [direção da landing](docs/marca/landing-direcao.md) e os textos da [página do projeto](docs/marca/descricao.md).
 
 ## Hackathon, equipa e critérios
 
@@ -308,4 +311,4 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 ## Créditos e licença
 
 Dados da Vitrus Ambiente, INE (Censos 2021 e tipologia TIPAU), CAOP e OpenStreetMap; Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (Município de Guimarães / URBACT).
-Tipografia: Inter e Newsreader (SIL Open Font License). Direitos reservados à equipa até decisão em contrário; o repositório é privado e não tem ficheiro de licença.
+Tipografia: Inter e Newsreader (SIL Open Font License). Direitos reservados à equipa até decisão em contrário; o repositório é público (verificado a 20 de outubro de 2026) mas não tem ficheiro de licença. A fotografia do hero da landing é CC BY-SA 4.0 (`apps/web/public/landing/CREDITS.md`).

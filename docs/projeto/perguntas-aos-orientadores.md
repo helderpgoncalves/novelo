@@ -72,7 +72,7 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 
 > **Pergunta.** Podemos usar publicamente, em slides, demo, relatório e repositório partilhado com a organização, os dados que nos enviaram (301,3 t por entidade, circuitos e matrículas, 2 751 contentores municipais com nomes de produtores) e o nome da Vitrus? O que deve ficar só agregado?
 
-**Porque perguntamos.** `data/raw/` está versionado no Git (19 ficheiros, incluindo os cinco `.txt` do pacote QGIS). O GitHub indica que o repositório é **privado** a 20 de outubro (`gh repo view`), mas a organização pode verificar o histórico para a originalidade (E12) e os [Cenários](cenarios-e-contingencias.md) assumem um repositório público. Os ficheiros trazem 922 contentores de produtores (nomes de estabelecimentos), 29 matrículas e relatórios com o nome de três operadores. Os desafios de empresas podem ter condições próprias de dados e propriedade intelectual (M17).
+**Porque perguntamos.** `data/raw/` está versionado no Git (19 ficheiros, incluindo os cinco `.txt` do pacote QGIS). O repositório é **público** (`gh repo view`, verificado a 20 de outubro de 2026): estes ficheiros já estão expostos, e a organização pode verificar o histórico para a originalidade (E12). Os ficheiros trazem 922 contentores de produtores (nomes de estabelecimentos), 29 matrículas e relatórios com o nome de três operadores. Os desafios de empresas podem ter condições próprias de dados e propriedade intelectual (M17).
 
 | Se a resposta for | O Novelo passa a… | Atualizar |
 | --- | --- | --- |
@@ -80,7 +80,7 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 | **B.** Só agregados, sem nomes nem matrículas | Ocultar `producer_name` e matrículas nos ecrãs e no PDF; retirar `data/raw/` do que for partilhado (`git rm` em novo commit; reescrever histórico só se pedido por escrito) | `cenarios-e-contingencias.md` B.4; API e ecrã "Frota"; `.gitignore` |
 | **C.** Sem resposta até 22 | Tratar como B | Registo: "sem resposta" |
 
-**Valor assumido.** Estimativa de risco, não de valor: só agregados por freguesia e por tipo de produtor; "operador A, B, C" nos slides; repositório privado até haver resposta.
+**Valor assumido.** Estimativa de risco, não de valor: só agregados por freguesia e por tipo de produtor; "operador A, B, C" nos slides; se a resposta for B, retirar `data/raw/` do repositório público de imediato.
 **A quem · prazo.** V (Lucas), com cópia à organização (O) para o repositório. **21.**
 
 ### Q2. A lista de contentores de têxteis
@@ -368,7 +368,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | L1 | V · 21 | Ver [Q1](#q1-autorização-de-uso-dos-dados-e-do-nome): autorização de uso | `data/raw/` no Git | Ver Q1 |
 | L2 | V · 22 | Podemos mostrar **nomes de produtores** (922 contentores, 452 locais, 6 tipos) no mapa e na demo? Há empresários em nome individual? Há contacto B2B autorizado? | Restauração 304 produtores distintos, escolas 87, estabelecimentos 39, lares 17, grandes produtores 12, hotelaria 9 | Se não: camada só agregada |
 | L3 | V · 22 | Podemos mostrar **matrículas** e nomes de operadores (Ultriplo, H Sarah Trading, Nova Etapa) nos slides? | 29 matrículas; rejeito por operador é dado comercial | Se não: "operador A, B, C" e matrículas mascaradas |
-| L4 | O, V · 21 | O repositório (privado hoje) tem de ser partilhado ou tornado público? Pode ir sem `data/raw/`? | A organização verifica o histórico (E12); hashes SHA-256 em `sources.json` | Se público: retirar ficheiros brutos antes e manter só os hashes |
+| L4 | O, V · 21 | O repositório (público hoje) pode ficar assim com `data/raw/`? Pode ir sem esses ficheiros? | A organização verifica o histórico (E12); hashes SHA-256 em `sources.json` | Como já é público: retirar os ficheiros brutos (e do histórico, se exigido) e manter só os hashes |
 | L5 | O · 22 | A organização tem política RGPD para fotos, gravação de pitches e contas de convidado (jurados, mentores)? | A app envia e-mails de verificação e boas-vindas a convidados | Se há: aviso e retenção; se não: sem contas de jurados, só demonstração |
 | L6 | V · 22 | Aceitam que dados agregados da Vitrus (nunca nomes nem matrículas) sigam para modelos de IA de terceiros via OpenRouter? | Os recursos de IA enviam texto e dados do cenário a um fornecedor externo; sem chave a API responde 503 | Se não: copiloto sem dados da Vitrus; documentar em [IA](../engenharia/ia.md) |
 | L7 | O, V · pós | Que licença pode ter o repositório e que direitos tem a Vitrus sobre os dados depois de 28 de outubro? A app pode manter os dados em produção? | A propriedade intelectual é dos autores [F59]; condições próprias dos desafios (M17) | Se há restrição: remover dados da produção |
@@ -561,7 +561,7 @@ Somos a equipa Novelo (Hélder Gonçalves e Flávio Fernandes), no desafio 5, Te
 1. O texto do separador **Rules** na TAIKAI, com o detalhe de cada um dos quatro critérios.
 2. A duração do pitch, se há perguntas do júri e quanto tempo duram, e se a demo ao vivo é permitida.
 3. O que a submissão de **23 de outubro às 17h30** tem de conter (ligação do repositório, vídeo, PDF, ligação da aplicação) e como identificar as ferramentas de IA, APIs e código de terceiros.
-4. Se o repositório pode ser privado e partilhado com a organização para a verificação de originalidade.
+4. Se o repositório pode ficar público (hoje é) com os dados brutos, ou se os devemos retirar, para a verificação de originalidade.
 5. As condições próprias do desafio TexVitrus sobre dados e propriedade intelectual.
 6. Se o Luís Miguel Oliveira, da Fibrenamics, é mentor deste desafio, e o horário dos mentores no CIAJG.
 7. O formato da sala no dia 26 (ligação, ecrã, som) e a ordem dos pitches.
@@ -571,7 +571,7 @@ Hélder Gonçalves e Flávio Fernandes
 
 **WhatsApp**
 
-> Bom dia, somos a equipa Novelo (TexVitrus). Podem enviar-nos o texto do separador Rules da TAIKAI e dizer-nos: duração do pitch e das perguntas, se a demo ao vivo é permitida, o que a submissão de 23/10 às 17h30 tem de conter, e se o repositório pode ser privado e partilhado convosco? Obrigado.
+> Bom dia, somos a equipa Novelo (TexVitrus). Podem enviar-nos o texto do separador Rules da TAIKAI e dizer-nos: duração do pitch e das perguntas, se a demo ao vivo é permitida, o que a submissão de 23/10 às 17h30 tem de conter, e se o repositório pode ficar público (hoje é) com os dados brutos, ou se os devemos retirar? Obrigado.
 
 ---
 
