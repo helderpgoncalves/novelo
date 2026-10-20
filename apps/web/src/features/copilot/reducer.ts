@@ -1,5 +1,6 @@
 import type { CopilotEventMessage, MessageOut } from '@/client';
-import type { ChatMessage, EventOf, MemoryNote, ToolStep, Turn } from './types';
+import type { ChatMessage, EventOf, MemoryNote, ToolStep, Turn, WebSearchInfo } from './types';
+import { applyWebSearch, sourcesFromServer } from './web';
 
 export function emptyMessage(role: ChatMessage['role'], id: string, text = ''): ChatMessage {
   return {
@@ -18,6 +19,7 @@ export function emptyMessage(role: ChatMessage['role'], id: string, text = ''): 
     clarify: null,
     memory: [],
     sources: [],
+    webSearches: [],
     suggestions: [],
     verification: null,
     navigate: [],
@@ -43,6 +45,14 @@ const upsert = <T extends { id: string }>(items: T[], item: T): T[] =>
   items.some((i) => i.id === item.id)
     ? items.map((i) => (i.id === item.id ? item : i))
     : [...items, item];
+
+const toWebSearch = (event: EventOf<'web_search'>): WebSearchInfo => ({
+  state: event.state,
+  query: event.query ?? null,
+  results: event.results ?? 0,
+  requests: event.requests ?? 0,
+  reason: event.reason ?? null,
+});
 
 /** Aplica um evento do stream à volta em curso (função pura: é o que os testes cobrem). */
 export function applyEvent(turn: Turn, event: CopilotEventMessage): Turn {
@@ -131,10 +141,18 @@ export function applyEvent(turn: Turn, event: CopilotEventMessage): Turn {
       return set({ clarify: { question: event.question, options: event.options } });
     case 'sources':
       return set({ sources: event.items });
+    case 'web_search':
+      return set({ webSearches: applyWebSearch(msg.webSearches, toWebSearch(event)) });
     case 'suggestions':
       return set({ suggestions: event.items });
     case 'verification':
-      return set({ verification: { verified: event.verified, warning: event.warning ?? null } });
+      return set({
+        verification: {
+          verified: event.verified,
+          warning: event.warning ?? null,
+          externalNumbers: event.external_numbers ?? [],
+        },
+      });
     case 'navigate':
       return set({
         navigate: [
@@ -214,7 +232,13 @@ export function fromServer(message: MessageOut): ChatMessage {
     verification:
       message.verified === null
         ? null
-        : { verified: message.verified, warning: message.verified ? null : 'numbers_unverified' },
+        : {
+            verified: message.verified,
+            warning: message.verified ? null : 'numbers_unverified',
+            externalNumbers: [],
+          },
+    // O servidor só devolve as fontes web ao recarregar; as internas ficam só durante a resposta.
+    sources: sourcesFromServer(message.web_sources),
     feedback: message.feedback,
     model: message.model,
     // O servidor não guarda o motivo: uma resposta falhada reaberta mostra "ficou a meio" e Gerar de novo.

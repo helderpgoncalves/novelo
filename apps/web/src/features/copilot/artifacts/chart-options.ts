@@ -588,8 +588,78 @@ function gauge(spec: GaugeChart, c: ChartContext): EChartsCoreOption {
   };
 }
 
+export interface PieSlice {
+  name: string;
+  value: number;
+  /** Fração de 0 a 1 do total. */
+  share: number;
+}
+
+/** Fatias de um gráfico circular: uma série, só valores positivos, por ordem decrescente. */
+export function pieSlices(spec: CartesianChart): PieSlice[] {
+  const points = (spec.series[0]?.points ?? []).flatMap((p) =>
+    typeof p.y === 'number' && Number.isFinite(p.y) && p.y > 0
+      ? [{ name: String(p.x), value: p.y }]
+      : [],
+  );
+  const total = points.reduce((sum, p) => sum + p.value, 0);
+  return points
+    .map((p) => ({ ...p, share: total > 0 ? p.value / total : 0 }))
+    .sort((a, b) => b.value - a.value);
+}
+
+/** Cores das fatias: a paleta da marca e, se faltarem, tons intermédios. */
+const PIE_EXTRA_LIGHT = ['#9ac7b4', '#dcc79c', '#8c9a94', '#4f8c76'];
+const PIE_EXTRA_DARK = ['#4f8c76', '#dcc79c', '#6f817a', '#a8d0bf'];
+
+function pie(spec: CartesianChart, c: ChartContext): EChartsCoreOption {
+  const slices = pieSlices(spec);
+  const colors = [...palette(c), ...(c.dark ? PIE_EXTRA_DARK : PIE_EXTRA_LIGHT)];
+  const unit = spec.y_unit;
+  return {
+    ...base(c),
+    color: colors,
+    legend: {
+      type: 'scroll',
+      bottom: 0,
+      icon: 'circle',
+      itemWidth: 10,
+      itemHeight: 10,
+      textStyle: { color: mutedColor(c), fontSize: 12 },
+      pageTextStyle: { color: mutedColor(c) },
+    },
+    tooltip: {
+      ...tooltipBase(c),
+      trigger: 'item',
+      formatter: (p: { name: string; value: number; percent: number }) =>
+        `<b>${p.name}</b><br/>${fmt(p.value, unit)} · ${fmt(p.percent, '%')}`,
+    },
+    series: [
+      {
+        type: 'pie',
+        radius: c.narrow ? ['38%', '64%'] : ['42%', '68%'],
+        center: ['50%', '45%'],
+        minAngle: 3,
+        avoidLabelOverlap: true,
+        itemStyle: { borderColor: c.dark ? '#0f1815' : '#faf8f3', borderWidth: 2 },
+        label: {
+          show: !c.narrow,
+          color: textColor(c),
+          fontSize: 12,
+          formatter: (p: { name: string; percent: number }) => `${p.name}\n${fmt(p.percent, '%')}`,
+        },
+        labelLine: { show: !c.narrow, lineStyle: { color: lineColor(c) } },
+        emphasis: { scaleSize: 4, label: { show: true, fontWeight: 600 } },
+        data: slices.map((sl) => ({ name: sl.name, value: sl.value })),
+      },
+    ],
+  };
+}
+
 export function buildOption(spec: ChartSpec, c: ChartContext): EChartsCoreOption {
   switch (spec.kind) {
+    case 'pie':
+      return pie(spec, c);
     case 'waterfall':
       return waterfall(spec, c);
     case 'sankey':
@@ -614,6 +684,8 @@ export function chartHeight(spec: ChartSpec, narrow: boolean): number {
   switch (spec.kind) {
     case 'gauge':
       return 230;
+    case 'pie':
+      return narrow ? 330 : 340;
     case 'sankey':
       return 320;
     case 'heatmap':
@@ -646,6 +718,12 @@ export function describeChart(spec: ChartSpec): string {
       break;
     case 'gauge':
       body = fmt(spec.value, spec.unit);
+      break;
+    case 'pie':
+      body = pieSlices(spec)
+        .slice(0, 12)
+        .map((sl) => `${sl.name}: ${fmt(sl.share * 100, '%')} (${fmt(sl.value, spec.y_unit)})`)
+        .join('; ');
       break;
     case 'sankey':
       body = spec.links

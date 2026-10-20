@@ -34,6 +34,15 @@ export interface MemoryNote {
   undone?: boolean;
 }
 
+/** Uma pesquisa na web deste pedido (a consulta já vem sanitizada do servidor). */
+export interface WebSearchInfo {
+  state: EventOf<'web_search'>['state'];
+  query: string | null;
+  results: number;
+  requests: number;
+  reason: EventOf<'web_search'>['reason'] | null;
+}
+
 export interface NavigateHint {
   label: string;
   route: string;
@@ -60,8 +69,14 @@ export interface ChatMessage {
   clarify: { question: string; options: string[] } | null;
   memory: MemoryNote[];
   sources: CopilotSource[];
+  webSearches: WebSearchInfo[];
   suggestions: string[];
-  verification: { verified: boolean; warning: 'numbers_unverified' | null } | null;
+  verification: {
+    verified: boolean;
+    warning: 'numbers_unverified' | null;
+    /** Números aceites por virem de fontes web («fonte externa»). */
+    externalNumbers: number[];
+  } | null;
   navigate: NavigateHint[];
   /** O texto foi apagado por falhar a verificação dos números. */
   retracted: boolean;

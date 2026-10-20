@@ -153,6 +153,11 @@ export function ChatView({
         case '/modelo':
           void router.navigate({ to: '/admin/ai', search: { tab: 'overview', days: 30 } });
           return;
+        case '/websearch':
+          // Sem argumento: o servidor responde com o estado atual (ligada/desligada) sem chamar o modelo.
+          if (!chat.busy)
+            chat.send({ text: name, mentions: [], attachments: [], pageContext: null });
+          return;
         case '/compact':
         case '/exportar': {
           if (name === '/compact') {
