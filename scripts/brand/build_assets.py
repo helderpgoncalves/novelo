@@ -256,15 +256,12 @@ def compose(base: Path, size: tuple[int, int], g: Geometry, left: float, baselin
 
 
 def build_social(g: Geometry) -> None:
-    og = compose(BASE / "partilha-base.png", (1200, 630), g, 80, 275, 83)
-    write(BRAND / "redes/novelo-partilha-1200x630.png", og)
-    write(PUBLIC / "og-image.png", og)
-    write(BRAND / "redes/novelo-capa-1920x1080.png", compose(BASE / "capa-base.png", (1920, 1080), g, 128, 476, 125))
-    # banner: o tagline é redesenhado em curvas (Inter 400) alinhado à tinta do símbolo
-    d, width = text_path(BRAND / "fontes/inter/inter-latin-standard-normal.woff2", {"wght": 400, "opsz": 14}, "Recolha seletiva de têxteis, desenhada ao menor custo.")
-    k = 761 / width
-    tagline = f'<path transform="translate(133 307.5) scale({n5(k)})" d="{d}" fill="#5E6B66"/>'
-    write(BRAND / "redes/novelo-banner-2400x450.png", compose(BASE / "banner-base.png", (2400, 450), g, 133, 225, 94, tagline))
+    """Partilha (OG por página e idioma), banners e capa, claros e escuros: fundos dither (dither_assets.py).
+    Escreve brand/redes/, apps/web/public/og*, docs/img/banner-*. Verifica dimensões, peso e contraste AA do texto."""
+    import dither_assets
+
+    contrasts = dither_assets.place_social(dither_assets.Ctx(g, rsvg))
+    print("partilha/banners: contraste mínimo do texto", min(contrasts.values()))
 
 
 # --- 5. Email ---------------------------------------------------------------------------------------
@@ -415,6 +412,26 @@ def build_preview(g: Geometry, r_sym: float) -> None:
         f'<figure><img src="avatar/novelo-avatar-{k}-256.png" width="96" style="{"border-radius:50%" if "circulo" in k else ""}"><figcaption>{k}</figcaption></figure>'
         for k in ("claro", "escuro", "circulo-claro", "circulo-escuro")
     )
+    og = "".join(
+        f'<figure><img src="redes/novelo-partilha-{v}-{l}.png" width="300"><figcaption>{v} · {l}</figcaption></figure>'
+        for v in ("landing", "entrar", "passaporte", "relatorio")
+        for l in ("pt", "en")
+    )
+    landing = "".join(
+        f'<figure><img src="../apps/web/public/landing/{f}" width="{w}"><figcaption>{f}</figcaption></figure>'
+        for f, w in (
+            ("hero-16x9-light-640.avif", 300),
+            ("hero-16x9-dark-640.avif", 300),
+            ("textura-fio-light-1280.avif", 300),
+            ("textura-campo-light-1280.avif", 300),
+            ("textura-dunas-light-1280.avif", 300),
+            ("login-painel-light-960.avif", 160),
+            ("login-painel-dark-960.avif", 160),
+            ("login-faixa-light-1200.avif", 300),
+            ("login-faixa-dark-1200.avif", 300),
+            ("hero-mobile-light-432.avif", 160),
+        )
+    )
     html = f"""<!doctype html>
 <html lang="pt-PT"><meta charset="utf-8"><title>Novelo: verificação do logótipo</title>
 <style>
@@ -427,7 +444,9 @@ section{{padding:24px 32px}} h1{{margin:0;padding:16px 32px;background:#fff;font
 <section style="background:#fff" class="guides"><h2>construção</h2>{guides}</section>
 {"".join(rows)}
 <section style="background:#F4F1EA"><h2>favicon, ícones PWA, avatares</h2><div class="row">{fav}</div><div class="row">{icons}</div><div class="row">{avatars}</div></section>
-<section style="background:#F4F1EA"><h2>imagens de partilha</h2><div class="row"><img src="redes/novelo-partilha-1200x630.png" width="600"><img src="redes/novelo-banner-2400x450.png" width="600"></div></section>
+<section style="background:#F4F1EA"><h2>linguagem dither: partilha (OG) por página e idioma</h2><div class="row">{og}</div></section>
+<section style="background:#F4F1EA"><h2>linguagem dither: banner e capa, claro e escuro</h2><div class="row"><img src="redes/novelo-banner-2400x450.png" width="600"><img src="redes/novelo-banner-2400x450-escuro.png" width="600"></div><div class="row"><img src="redes/novelo-capa-1920x1080.png" width="400"><img src="redes/novelo-capa-1920x1080-escuro.png" width="400"></div></section>
+<section style="background:#F4F1EA"><h2>linguagem dither: hero, texturas e painel de entrada (apps/web/public/landing)</h2><div class="row">{landing}</div></section>
 </html>
 """
     write(BRAND / "preview.html", html)

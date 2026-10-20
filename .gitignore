@@ -38,3 +38,4 @@ apps/web/playwright-report/
 # Caches locais dos scripts de verificação
 .cache/
 apps/web/.gen-check/
+scripts/brand/cache/
