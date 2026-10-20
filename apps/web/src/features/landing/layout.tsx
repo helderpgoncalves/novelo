@@ -1,109 +1,100 @@
-import type { LucideIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { BrandSymbol } from '@/components/brand-logo';
 import { PUBLIC_GUTTER, PUBLIC_WIDE } from '@/components/public-shell';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 /**
- * Sistema de espaçamento e de componentes ÚNICO da landing. Nenhuma secção define medidas próprias:
- * - `SECTION_Y`: padding vertical de toda a secção; `CONTAINER`: largura e margens laterais iguais ao cabeçalho;
- * - ritmo: eyebrow → título (`space-y-4`), cabeçalho → conteúdo (`gap-10 lg:gap-14`), grelhas (`GRID_GAP`);
- * - `CARD` é o único cartão; `IconTile` o único ícone de cartão; `BODY` o único texto corrente.
+ * Primitivas da landing. Cada secção compõe o seu próprio layout (bento, pipeline, instrumento, janela, lista editorial),
+ * mas todas partilham o ritmo vertical (`SECTION_Y`), a largura (`CONTAINER`, igual à do topo) e o cabeçalho (`Heading`).
  */
-export const SECTION_Y = 'py-16 sm:py-20 lg:py-28';
+export const SECTION_Y = 'py-20 sm:py-24 lg:py-28';
 export const CONTAINER = `mx-auto w-full ${PUBLIC_WIDE} ${PUBLIC_GUTTER}`;
-export const GRID_GAP = 'gap-4 lg:gap-6';
-export const CARD_SURFACE = 'rounded-lg border border-border bg-card shadow-xs';
-export const CARD = `${CARD_SURFACE} p-6`;
-/** Cartão que reage ao rato e ao toque (sobe 2 px, afunda ao premir). */
-export const CARD_LIFT = `${CARD} lp-card`;
-/** Legenda de figura e etiquetas técnicas: mono, pequeno, Pedra. */
+/** Legenda e etiquetas técnicas: mono, pequeno, Pedra. */
 export const MONO = 'font-mono text-[12px] text-muted-foreground leading-relaxed tracking-tight';
-export const CARD_TITLE = 'text-xl leading-snug';
 export const BODY = 'text-pretty text-muted-foreground leading-relaxed';
 /** Número de destaque (serif, algarismos alinhados). */
-export const STAT =
-  'font-medium font-serif text-4xl text-primary tabular-nums leading-none lg:text-5xl';
-/** Botões: a mesma altura de 44 px do ecrã de entrada. */
+export const STAT = 'font-medium font-serif text-primary tabular-nums leading-none';
+/** Cartão de base: canto grande, linha fina, sem sombra (a profundidade vem do contraste de fundos). */
+export const CARD = 'rounded-[1.375rem] border border-border bg-card';
 export const CTA_PRIMARY = 'h-11 px-6 font-semibold';
-export const CTA_SECONDARY = 'h-11 px-6 font-medium';
 
-/** Cabeçalho de secção: eyebrow, título serifado e subtítulo, sempre com o mesmo ritmo e largura de leitura. */
-export function SectionHeading({
-  id,
-  eyebrow,
-  title,
-  lead,
-}: {
-  id: string;
-  eyebrow: string;
-  title: string;
-  lead?: ReactNode;
-}) {
-  return (
-    <div className="max-w-3xl space-y-4">
-      <p className="eyebrow">{eyebrow}</p>
-      <h2 id={id} className="lp-headline">
-        {title}
-      </h2>
-      {lead && <p className="lp-lead max-w-2xl text-muted-foreground">{lead}</p>}
-    </div>
-  );
-}
+type Tone = 'plain' | 'band' | 'dark';
 
-/** Secção da landing. `tone="band"` alterna o fundo para dar ritmo à página; o conteúdo entra ao rolar (um bloco). */
-export function LandingSection({
+/**
+ * Secção da landing. `band` alterna o fundo; `dark` é a secção de tinta (re-tematiza os tokens com a classe `dark`, por isso o
+ * texto, os cartões e os controlos ficam certos sem cores soltas). Abaixo da dobra só pinta quando se aproxima (`defer`).
+ */
+export function Section({
   id,
-  eyebrow,
-  title,
-  lead,
   tone = 'plain',
   defer = true,
+  className,
   children,
 }: {
   id: string;
-  eyebrow: string;
-  title: string;
-  lead?: ReactNode;
-  tone?: 'plain' | 'band';
-  /** `content-visibility: auto`: só pinta quando se aproxima do ecrã (todas as secções abaixo da dobra). */
+  tone?: Tone;
   defer?: boolean;
+  className?: string;
   children: ReactNode;
 }) {
-  const headingId = `${id}-title`;
   return (
     <section
       id={id}
-      aria-labelledby={headingId}
+      aria-labelledby={`${id}-title`}
       className={cn(
         'scroll-mt-[calc(var(--nav-h)+0.5rem)]',
         defer && 'lp-defer',
         SECTION_Y,
-        tone === 'band' && 'border-border border-y bg-card/40',
+        tone === 'band' && 'border-border border-y bg-card/50',
+        tone === 'dark' && 'dark border-border border-y bg-[#14211d] text-foreground',
+        className,
       )}
     >
-      <div data-reveal="" className={cn(CONTAINER, 'flex flex-col gap-10 lg:gap-14')}>
-        <SectionHeading id={headingId} eyebrow={eyebrow} title={title} lead={lead} />
-        {children}
-      </div>
+      {children}
     </section>
   );
 }
 
-/** Ícone de cartão: mesma família (Lucide), mesmo tamanho (20 px) e traço, sobre o mesmo bloco. */
-export function IconTile({ icon: Icon }: { icon: LucideIcon }) {
-  return (
-    <span className="grid size-11 shrink-0 place-items-center rounded-md bg-accent text-primary">
-      <Icon className="size-5" strokeWidth={1.75} aria-hidden="true" />
-    </span>
-  );
-}
+const SIZES = { xl: 'lp-h-xl', lg: '', md: 'lp-h-md' } as const;
 
-/** Bloco de uma ilustração decorativa da marca (mesma proporção em toda a landing). */
-export function SymbolWatermark({ className }: { className?: string }) {
+/** Cabeçalho de secção: número editorial em mono, título serifado (três tamanhos) e subtítulo. */
+export function Heading({
+  id,
+  n,
+  eyebrow,
+  title,
+  lead,
+  size = 'lg',
+  align = 'left',
+  className,
+}: {
+  id: string;
+  /** Número da secção («01»). */
+  n?: string;
+  eyebrow: string;
+  title: string;
+  lead?: ReactNode;
+  size?: keyof typeof SIZES;
+  align?: 'left' | 'center';
+  className?: string;
+}) {
   return (
-    <BrandSymbol className={cn('pointer-events-none absolute size-72 opacity-25', className)} />
+    <div
+      className={cn(
+        'flex flex-col gap-4',
+        align === 'center' ? 'mx-auto items-center text-center' : 'max-w-3xl',
+        className,
+      )}
+    >
+      <p className="lp-eyebrow">
+        {n && <span className="lp-eyebrow-n">{n}</span>}
+        {eyebrow}
+      </p>
+      <h2 id={`${id}-title`} className={cn('lp-headline', SIZES[size])}>
+        {title}
+      </h2>
+      {lead && <p className="lp-lead max-w-2xl text-muted-foreground">{lead}</p>}
+    </div>
   );
 }
 
@@ -189,9 +180,14 @@ export function StatusBadge({ status }: { status: Status }) {
 }
 
 /** Etiqueta "estimativa": todo o número que não foi medido a leva (regra do projeto). */
-export function Estimate() {
+export function Estimate({ className }: { className?: string }) {
   return (
-    <span className="ml-2 inline-flex items-center rounded-full border border-border px-2 py-0.5 align-middle font-semibold text-[11px] text-muted-foreground uppercase tracking-wider">
+    <span
+      className={cn(
+        'ml-2 inline-flex items-center rounded-full border border-current/25 px-2 py-0.5 align-middle font-semibold text-[10px] uppercase leading-none tracking-wider',
+        className,
+      )}
+    >
       {m.landing_estimate_tag()}
     </span>
   );

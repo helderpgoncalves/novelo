@@ -1,24 +1,14 @@
 import { Link } from '@tanstack/react-router';
-import { ChevronDown, Factory, Landmark, Truck } from 'lucide-react';
+import { ArrowRight, Factory, Landmark, Plus, Truck } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { GithubMark } from '@/components/github-mark';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 import { REPO_URL } from './facts';
-import {
-  BODY,
-  CARD_LIFT,
-  CARD_TITLE,
-  CONTAINER,
-  CTA_PRIMARY,
-  CTA_SECONDARY,
-  GRID_GAP,
-  IconTile,
-  LandingSection,
-  SECTION_Y,
-} from './layout';
+import { BODY, CONTAINER, Heading, SECTION_Y, Section } from './layout';
 
-/** Para quem é: três perfis, cartões iguais. */
+/** Para quem é: lista editorial (nome grande em serifa, texto ao lado) em vez de cartões; o título fica fixo à esquerda. */
 export function Audience() {
   const people = [
     { icon: Landmark, title: m.landing_aud_council_title(), text: m.landing_aud_council_text() },
@@ -30,25 +20,48 @@ export function Audience() {
     },
   ];
   return (
-    <LandingSection
-      id="para-quem"
-      eyebrow={m.landing_audience_eyebrow()}
-      title={m.landing_audience_title()}
-    >
-      <ul className={`grid md:grid-cols-3 ${GRID_GAP}`}>
-        {people.map((p) => (
-          <li key={p.title} className={`${CARD_LIFT} flex flex-col gap-4`}>
-            <IconTile icon={p.icon} />
-            <h3 className={CARD_TITLE}>{p.title}</h3>
-            <p className={BODY}>{p.text}</p>
-          </li>
-        ))}
-      </ul>
-    </LandingSection>
+    <Section id="para-quem" className="border-border border-t">
+      <div className={`${CONTAINER} grid gap-12 lg:grid-cols-12 lg:gap-16`}>
+        <Heading
+          id="para-quem"
+          n="05"
+          size="md"
+          eyebrow={m.landing_audience_eyebrow()}
+          title={m.landing_audience_title()}
+          className="lg:sticky lg:top-28 lg:col-span-5 lg:self-start"
+        />
+        <ul
+          data-reveal=""
+          data-fx="stagger"
+          className="flex flex-col divide-y divide-border border-border border-y lg:col-span-7"
+        >
+          {people.map((p, i) => (
+            <li
+              key={p.title}
+              data-s=""
+              style={{ '--i': i } as CSSProperties}
+              className="lp-aud group grid gap-3 py-8 sm:grid-cols-[3rem_1fr] sm:gap-x-6"
+            >
+              <p.icon
+                className="size-6 text-primary transition-transform duration-500 group-hover:-translate-y-0.5"
+                strokeWidth={1.5}
+                aria-hidden="true"
+              />
+              <div className="flex flex-col gap-2">
+                <h3 className="font-medium font-serif text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-tight tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-1">
+                  {p.title}
+                </h3>
+                <p className={`${BODY} max-w-xl text-[1.0625rem]`}>{p.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </Section>
   );
 }
 
-/** Perguntas frequentes em `<details>` nativo: teclado, leitores de ecrã e zero JavaScript. */
+/** Perguntas frequentes em `<details>` nativo (teclado, leitores de ecrã, zero JavaScript): título fixo à esquerda, lista à direita. */
 export function Faq() {
   const items = [
     { q: m.landing_faq_q1(), a: m.landing_faq_a1() },
@@ -59,32 +72,37 @@ export function Faq() {
     { q: m.landing_faq_q6(), a: m.landing_faq_a6({ count: formatNumber(2751) }) },
   ];
   return (
-    <LandingSection
-      id="perguntas"
-      tone="band"
-      eyebrow={m.landing_faq_eyebrow()}
-      title={m.landing_faq_title()}
-    >
-      <div className="max-w-3xl divide-y divide-border overflow-hidden rounded-lg border border-border bg-card shadow-xs">
-        {items.map((item) => (
-          <details key={item.q} name="faq" className="group">
-            <summary className="flex min-h-14 cursor-pointer list-none items-center justify-between gap-4 px-6 py-4 font-medium outline-none transition-colors hover:bg-accent/50 focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset [&::-webkit-details-marker]:hidden">
-              {item.q}
-              <ChevronDown
-                className="size-5 shrink-0 text-muted-foreground transition-transform duration-200 group-open:rotate-180"
-                strokeWidth={1.75}
-                aria-hidden="true"
-              />
-            </summary>
-            <p className={`${BODY} px-6 pb-5`}>{item.a}</p>
-          </details>
-        ))}
+    <Section id="perguntas" tone="band">
+      <div className={`${CONTAINER} grid gap-12 lg:grid-cols-12 lg:gap-16`}>
+        <Heading
+          id="perguntas"
+          n="09"
+          size="md"
+          eyebrow={m.landing_faq_eyebrow()}
+          title={m.landing_faq_title()}
+          className="lg:sticky lg:top-28 lg:col-span-4 lg:self-start"
+        />
+        <div className="divide-y divide-border border-border border-y lg:col-span-8">
+          {items.map((item, i) => (
+            <details key={item.q} name="faq" open={i === 0} className="group">
+              <summary className="flex min-h-16 cursor-pointer list-none items-center justify-between gap-6 py-4 font-medium font-serif text-xl outline-none transition-colors hover:text-primary focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-4 focus-visible:ring-offset-background sm:text-2xl [&::-webkit-details-marker]:hidden">
+                {item.q}
+                <Plus
+                  className="size-6 shrink-0 text-primary transition-transform duration-300 group-open:rotate-45"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+              </summary>
+              <p className={`${BODY} max-w-2xl pb-6 text-[1.0625rem]`}>{item.a}</p>
+            </details>
+          ))}
+        </div>
       </div>
-    </LandingSection>
+    </Section>
   );
 }
 
-/** Convite final: cartão de tinta com a fotografia das dunas a dissolver-se e os três botões (demo, conta, código). */
+/** Convite final: cartão de tinta a toda a largura com a Plataforma das Artes em meio-tom, título grande e os botões. */
 export function FinalCta() {
   return (
     <section
@@ -92,37 +110,39 @@ export function FinalCta() {
       aria-labelledby="comecar-title"
       className={`lp-defer scroll-mt-[calc(var(--nav-h)+0.5rem)] ${SECTION_Y}`}
     >
-      <div data-reveal="" className={CONTAINER}>
-        <div className="photo-bg photo-plataforma photo-dark relative isolate overflow-hidden rounded-2xl bg-[#14211d] p-8 text-[#f4f1ea] lg:p-16">
-          <div className="relative flex max-w-2xl flex-col gap-6">
-            <h2 id="comecar-title" className="lp-headline">
+      <div data-reveal="" data-fx="scale" className={CONTAINER}>
+        <div className="photo-bg photo-plataforma photo-dark relative isolate flex min-h-[26rem] flex-col justify-end overflow-hidden rounded-[1.75rem] bg-[#14211d] p-7 text-[#f4f1ea] max-sm:-mx-4 max-sm:rounded-[1.75rem] sm:p-12 lg:min-h-[32rem] lg:p-16">
+          <div className="relative flex max-w-3xl flex-col gap-6">
+            <h2 id="comecar-title" className="lp-headline lp-h-xl">
               {m.landing_cta_title()}
             </h2>
-            <p className="lp-lead text-[#f4f1ea]/75">{m.landing_cta_lead()}</p>
-            <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:flex-wrap">
+            <p className="lp-lead max-w-xl text-[#f4f1ea]/80">{m.landing_cta_lead()}</p>
+            <div className="flex flex-col gap-3 pt-3 sm:flex-row sm:flex-wrap sm:items-center">
               <Button
                 asChild
-                className={`${CTA_PRIMARY} lp-press h-12 bg-[#f4f1ea] text-[#14211d] text-base hover:bg-[#f4f1ea]/90`}
+                className="lp-press h-[3.25rem] gap-2 bg-[#f4f1ea] px-7 font-semibold text-[#14211d] text-base hover:bg-[#f4f1ea]/90 sm:h-12"
               >
-                <Link to="/login">{m.landing_cta_demo()}</Link>
+                <Link to="/login">
+                  {m.landing_cta_demo()}
+                  <ArrowRight aria-hidden="true" />
+                </Link>
               </Button>
               <Button
                 asChild
                 variant="outline"
-                className={`${CTA_SECONDARY} lp-press h-12 border-[#f4f1ea]/40 bg-transparent text-[#f4f1ea] text-base hover:bg-[#f4f1ea]/10 hover:text-[#f4f1ea]`}
+                className="lp-press h-[3.25rem] border-[#f4f1ea]/45 bg-transparent px-6 font-medium text-[#f4f1ea] text-base hover:bg-[#f4f1ea]/10 hover:text-[#f4f1ea] sm:h-12"
               >
                 <Link to="/register">{m.landing_register()}</Link>
               </Button>
-              <Button
-                asChild
-                variant="ghost"
-                className={`${CTA_SECONDARY} lp-press h-12 gap-2 text-[#f4f1ea] text-base hover:bg-[#f4f1ea]/10 hover:text-[#f4f1ea]`}
+              <a
+                href={REPO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="lp-press inline-flex min-h-11 items-center gap-2 rounded-md px-2 font-medium text-[#f4f1ea] text-base underline decoration-[#f4f1ea]/40 underline-offset-[0.3em] outline-none hover:decoration-current focus-visible:ring-2 focus-visible:ring-[#f4f1ea]"
               >
-                <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-                  <GithubMark className="size-4" />
-                  {m.landing_cta_code()}
-                </a>
-              </Button>
+                <GithubMark className="size-4" />
+                {m.landing_cta_code()}
+              </a>
             </div>
           </div>
         </div>

@@ -137,7 +137,7 @@ function DesktopNav({ activeGroup }: { activeGroup: string | null }) {
         <span
           ref={pillRef}
           aria-hidden="true"
-          className="lp-pill absolute inset-y-0 left-0 rounded-full bg-foreground/[0.07] dark:bg-foreground/10"
+          className="lp-pill absolute inset-y-1.5 left-0 rounded-full"
         />
         {items.map((s, i) => (
           <li key={s.id} className={cn(s.xl && 'hidden xl:block')}>
@@ -154,10 +154,10 @@ function DesktopNav({ activeGroup }: { activeGroup: string | null }) {
               onFocus={() => setHover(s.id)}
               onBlur={() => setHover(null)}
               className={cn(
-                'relative inline-flex h-11 items-center rounded-full px-3.5 font-medium text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
+                'relative inline-flex h-11 items-center rounded-full px-3.5 font-medium text-[0.9375rem] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
                 activeGroup === s.id
                   ? 'text-foreground'
-                  : 'text-muted-foreground hover:text-foreground',
+                  : 'text-foreground/80 hover:text-foreground',
               )}
             >
               {s.label}
@@ -369,7 +369,7 @@ function MobileMenu({
           className={cn('min-h-0 flex-1 overflow-y-auto overscroll-contain py-2', PUBLIC_GUTTER)}
         >
           <ul className="divide-y divide-border/70">
-            {items.map((s, i) => (
+            {items.map((s) => (
               <li key={s.id}>
                 <a
                   href={`#${s.id}`}
@@ -383,7 +383,7 @@ function MobileMenu({
                   className="lp-press group flex min-h-14 items-baseline gap-4 py-3 outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 >
                   <span className="w-6 font-mono text-muted-foreground text-xs tabular-nums">
-                    {String(i + 1).padStart(2, '0')}
+                    {s.n}
                   </span>
                   <span className="font-medium font-serif text-3xl tracking-tight group-aria-[current=location]:text-primary">
                     {s.label}
@@ -474,7 +474,7 @@ export function LandingHeader() {
             <Button
               asChild
               variant="outline"
-              className="lp-press hidden h-11 bg-transparent px-4 font-medium md:inline-flex"
+              className="lp-press hidden h-11 border-foreground/25 bg-transparent px-4 font-medium hover:bg-foreground/5 md:inline-flex"
             >
               <Link to="/register">{m.landing_register()}</Link>
             </Button>
@@ -517,11 +517,14 @@ export function LandingHeader() {
   );
 }
 
-/** «Nesta página»: índice fixo à esquerda (a partir de 1536 px) com o progresso de leitura. */
+/**
+ * «Nesta página»: coluna fixa à esquerda a partir de 1536 px (por baixo disso a barra do topo já tem âncoras). Só aparece depois
+ * do hero, alinhada com a margem do conteúdo; marcador de progresso de leitura, número mono e item ativo em destaque.
+ */
 export function LandingToc() {
   const items = tocItems();
   const active = useActiveSection(OBSERVED);
-  const progressRef = useRef<HTMLSpanElement>(null);
+  const navRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
     let frame = 0;
@@ -529,10 +532,10 @@ export function LandingToc() {
       frame = 0;
       const doc = document.documentElement;
       const max = doc.scrollHeight - window.innerHeight;
-      progressRef.current?.style.setProperty(
-        '--read',
-        String(max > 0 ? Math.min(1, window.scrollY / max) : 0),
-      );
+      const el = navRef.current;
+      if (!el) return;
+      el.style.setProperty('--read', String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
+      el.dataset.shown = String(window.scrollY > window.innerHeight * 0.7);
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -546,21 +549,11 @@ export function LandingToc() {
   }, []);
 
   return (
-    <nav
-      aria-label={m.landing_toc_title()}
-      className="fixed top-1/2 left-6 z-30 hidden w-44 -translate-y-1/2 2xl:block"
-    >
-      <p className="mb-3 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
-        {m.landing_toc_title()}
-      </p>
-      <div className="relative border-border border-l pl-4">
-        <span
-          ref={progressRef}
-          aria-hidden="true"
-          className="absolute top-0 -left-px h-full w-px origin-top bg-primary"
-          style={{ transform: 'scaleY(var(--read, 0))' }}
-        />
-        <ul className="flex flex-col">
+    <nav ref={navRef} aria-label={m.landing_toc_title()} data-shown="false" className="lp-toc">
+      <p className="lp-toc-title">{m.landing_toc_title()}</p>
+      <div className="lp-toc-rail">
+        <span aria-hidden="true" className="lp-toc-fill" />
+        <ol>
           {items.map((s) => {
             const on = active !== null && (TOC_ALIAS[active] ?? active) === s.id;
             return (
@@ -572,19 +565,14 @@ export function LandingToc() {
                     e.preventDefault();
                     goTo(s.id);
                   }}
-                  className={cn(
-                    'block rounded-sm py-1.5 text-sm outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring',
-                    on
-                      ? 'font-medium text-foreground'
-                      : 'text-muted-foreground hover:text-foreground',
-                  )}
                 >
+                  <span aria-hidden="true">{s.n}</span>
                   {s.label}
                 </a>
               </li>
             );
           })}
-        </ul>
+        </ol>
       </div>
     </nav>
   );
