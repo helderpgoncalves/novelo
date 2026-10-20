@@ -19,9 +19,9 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 ## Resend (email)
 
 1. Criar uma chave em [resend.com/api-keys](https://resend.com/api-keys) e pô-la em `RESEND_API_KEY`.
-2. Verificar o domínio do `EMAIL_FROM` (por omissão `Novelo <noreply@bitsapiens.io>`) no Resend.
+2. Verificar o domínio do `EMAIL_FROM` (por omissão `Novelo <novelo@heldergoncalves.io>`) no Resend.
 3. Sem chave, os emails (confirmar email, recuperar password) não saem: aparecem no log da API (`just logs api`) e, em desenvolvimento, em `GET /api/v1/dev/emails` (caixa de saída de desenvolvimento, continua a funcionar sem Resend).
-4. `EMAIL_SUPPORT` (por omissão `suporte@bitsapiens.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); o logótipo é `apps/web/public/email/novelo-logotipo-negativo.png`, servido em `https://<DOMAIN>/email/`.
+4. `EMAIL_SUPPORT` (por omissão `novelo@heldergoncalves.io`) é o contacto de ajuda no rodapé; confirmar que a caixa existe. Os links e o logótipo dos emails usam `APP_URL` (derivado de `DOMAIN`); o logótipo é `apps/web/public/email/novelo-logotipo-negativo.png`, servido em `https://<DOMAIN>/email/`.
 
 ### Testar emails
 
