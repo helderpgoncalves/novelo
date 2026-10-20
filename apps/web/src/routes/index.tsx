@@ -9,17 +9,18 @@ import {
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { HomePending } from '@/components/app-loading';
-import { AppFrame } from '@/components/layout/app-frame';
-import { HOME_TABS, HomePage } from '@/features/home/home-page';
+import { HOME_TABS } from '@/features/home/tabs';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { ogImage, SITE_URL } from '@/lib/seo';
 import { resolvePublicSessionUser } from '@/lib/session';
 import { m } from '@/paraglide/messages';
 
-// A landing é um pacote à parte (não pesa na app).
+// A landing e a home da app são pacotes à parte: quem não tem sessão nunca descarrega a app (nem o echarts), e quem
+// tem sessão não descarrega a landing.
 const LandingPage = lazy(() =>
   import('@/features/landing/landing-page').then((mod) => ({ default: mod.LandingPage })),
 );
+const AuthedHome = lazy(() => import('@/features/home/authed-home'));
 
 // "/" é a página inicial pública para quem não tem sessão (é o "Application home page" da Google: sem login, com
 // Privacidade e Termos à vista) e a página inicial da app para quem tem. Por isso não vive dentro de `_app`.
@@ -75,11 +76,12 @@ function Home() {
       </Suspense>
     );
   return (
-    <AppFrame user={user}>
-      <HomePage
+    <Suspense fallback={<HomePending />}>
+      <AuthedHome
+        user={user}
         tab={tab}
         onTabChange={(next) => void navigate({ search: { tab: next }, replace: true })}
       />
-    </AppFrame>
+    </Suspense>
   );
 }

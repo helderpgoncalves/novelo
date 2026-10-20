@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 import { getAiSettingsOptions } from '@/client/@tanstack/react-query.gen';
-import { AI_TABS, AiAdminPage } from '@/features/ai-admin/ai-admin-page';
+import { AiAdminPage } from '@/features/ai-admin/ai-admin-page';
+import { AI_TABS } from '@/features/ai-admin/tabs';
 import { ForbiddenError } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 

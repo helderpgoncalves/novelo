@@ -100,11 +100,42 @@ export default defineConfig({
         ],
       },
       workbox: {
-        // Só a casca da app fica em cache; a API (dados autenticados) nunca.
+        // Só a casca da app fica em cache; a API (dados autenticados) nunca. O precache é o mínimo (o resto guarda-se ao
+        // usar, em `runtimeCaching`): antes eram 9 MB, com imagens de partilha, páginas públicas e todos os pacotes.
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//, /^\/robots\.txt$/, /^\/sitemap\.xml$/],
-        globPatterns: ['**/*.{js,mjs,css,html,svg,png,woff2}'],
-        globIgnores: ['screenshots/**'],
+        navigateFallbackDenylist: [
+          /^\/api\//,
+          /^\/robots\.txt$/,
+          /^\/sitemap\.xml$/,
+          // Páginas públicas pré-renderizadas: sempre da rede (frescas), nunca a casca antiga da app.
+          /^\/(pt|en)(\/|$)/,
+        ],
+        globPatterns: ['**/*.{js,mjs,css,html,svg,woff2}'],
+        globIgnores: [
+          'screenshots/**',
+          'og/**',
+          'landing/**',
+          'email/**',
+          'icons/**',
+          'pt/**',
+          'en/**',
+          // Pacotes pesados e de uso ocasional: guardam-se ao primeiro uso.
+          'assets/echarts-*.js',
+          'assets/landing-page-*',
+          'assets/maplibre-*',
+        ],
+        runtimeCaching: [
+          {
+            // Ficheiros com hash no nome nunca mudam: cache primeiro, com limite para não crescer sem fim.
+            urlPattern: ({ url }) => url.pathname.startsWith('/assets/'),
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'novelo-assets',
+              expiration: { maxEntries: 120, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            },
+          },
+        ],
+        cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 3_000_000,
       },
     }),

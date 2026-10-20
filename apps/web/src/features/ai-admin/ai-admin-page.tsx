@@ -12,13 +12,11 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { m } from '@/paraglide/messages';
 import { LimitsTab } from './limits-tab';
 import { OverviewTab } from './overview-tab';
+import type { AiTab } from './tabs';
 import { TasksTab } from './tasks-tab';
 import { TriageEvalTab } from './triage-eval-tab';
 
 const SKELETON_KEYS = ['a', 'b', 'c', 'd', 'e', 'f'];
-
-export const AI_TABS = ['overview', 'models', 'limits', 'triage'] as const;
-export type AiTab = (typeof AI_TABS)[number];
 
 interface Props {
   tab: AiTab;
