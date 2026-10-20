@@ -53,16 +53,21 @@ const ARC_MOTION = [
 /** Arcos guiados pelo dedo (puxar para atualizar): ver `.ptr-arc-*` em styles.css. */
 const PULL_MOTION = ['ptr-arc ptr-arc-1', 'ptr-arc ptr-arc-2', 'ptr-arc ptr-arc-3'] as const;
 
+/** Arcos que rodam uma vez ao passar o rato ou focar a ligação `.brand-link` (ver styles.css). */
+const HOVER_MOTION = ['bh bh-1', 'bh bh-2', 'bh bh-3'] as const;
+
 function SymbolMarks({
   tone,
   transform,
   animated = false,
   motion = ARC_MOTION,
+  hover = false,
 }: {
   tone: Tone;
   transform?: string;
   animated?: boolean;
   motion?: readonly [string, string, string];
+  hover?: boolean;
 }) {
   const c = TONES[tone];
   const strokes = [c.inner, c.mid, c.outer] as const;
@@ -75,7 +80,7 @@ function SymbolMarks({
           fill="none"
           strokeWidth={SYMBOL.strokeWidth}
           strokeLinecap="round"
-          className={cn(strokes[i], animated && motion[i])}
+          className={cn(strokes[i], animated && motion[i], hover && HOVER_MOTION[i])}
         />
       ))}
       <path d={SYMBOL.dot} fillRule="evenodd" className={cn(c.dot, animated && 'brand-dot')} />
@@ -150,10 +155,13 @@ export function BrandPullSymbol({ className }: { className?: string }) {
 export function BrandLogo({
   tone = 'auto',
   stacked = false,
+  interactive = false,
   className,
 }: {
   tone?: Tone;
   stacked?: boolean;
+  /** Os arcos reagem ao hover/foco do ascendente `.brand-link` (nunca em ciclo). */
+  interactive?: boolean;
   className?: string;
 }) {
   const g = stacked ? STACKED : LOCKUP;
@@ -164,7 +172,7 @@ export function BrandLogo({
       role="img"
       aria-label="Novelo"
     >
-      <SymbolMarks tone={tone} transform={g.symbolTransform} />
+      <SymbolMarks tone={tone} transform={g.symbolTransform} hover={interactive} />
       <path d={g.wordmark} className={TONES[tone].word} />
     </svg>
   );

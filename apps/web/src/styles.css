@@ -15,6 +15,52 @@
   font-display: swap;
 }
 
+/* Fontes da landing e do ecrã de entrada (docs/marca/landing-direcao.md, secção 3): subsets pt-PT, 110 KB no total.
+   Só se descarregam nas páginas que as usam (regras `[data-lp-fonts]` abaixo); a app autenticada fica com as de cima. */
+@font-face {
+  font-family: "Newsreader Display";
+  src: url("/fonts/newsreader-display-roman.woff2") format("woff2");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Newsreader Display";
+  src: url("/fonts/newsreader-display-italic.woff2") format("woff2");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Inter Landing";
+  src: url("/fonts/inter-landing.woff2") format("woff2");
+  font-weight: 400 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Geist Mono Landing";
+  src: url("/fonts/geist-mono-landing.woff2") format("woff2");
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: swap;
+}
+html:has([data-lp-fonts]) body {
+  font-family: "Inter Landing", "Inter", system-ui, sans-serif;
+  font-feature-settings: "kern", "calt";
+}
+html:has([data-lp-fonts]) :is(h1, h2, h3, .font-serif) {
+  font-family: "Newsreader Display", "Newsreader", Georgia, serif;
+}
+html:has([data-lp-fonts]) .font-mono {
+  font-family: "Geist Mono Landing", ui-monospace, "SF Mono", Menlo, monospace;
+  font-feature-settings: "zero";
+}
+html:has([data-lp-fonts]) h1 em {
+  font-style: italic;
+  font-weight: 400;
+}
+
 /* Identidade Novelo (docs/marca/guia-de-marca.md) expressa nos tokens do shadcn.
    Linho #F4F1EA · Tinta #14211D · Floresta #2E6B57 · Pedra #5E6B66 · Areia #C4A06A · Linha #DCD5C8 */
 :root {
@@ -50,6 +96,11 @@
   --sidebar-accent-foreground: #14211d;
   --sidebar-border: #dcd5c8;
   --sidebar-ring: #2e6b57;
+  /* Dither (docs/marca/referencias): pontos de meio-tom em Areia e Floresta sobre um fundo claro. */
+  --dither-gold: #c4a06a;
+  --dither-green: #2e6b57;
+  --dither-ground: #faf8f3;
+  --dither-grain: 0.07;
 }
 
 .dark {
@@ -84,6 +135,10 @@
   --sidebar-accent-foreground: #f1eee6;
   --sidebar-border: #26362f;
   --sidebar-ring: #7fb39c;
+  --dither-gold: #c4a06a;
+  --dither-green: #7fb39c;
+  --dither-ground: #14211d;
+  --dither-grain: 0.12;
 }
 
 @theme inline {
@@ -214,20 +269,22 @@ html[data-tabbar] {
   @apply font-semibold text-[11px] text-primary uppercase tracking-[0.18em];
 }
 
-/* Escala tipográfica da landing pública (fluida, uma só): título principal, título de secção e subtítulo. */
-@utility lp-display {
-  font-size: clamp(2.5rem, 1.7rem + 3.4vw, 4.5rem);
-  line-height: 1.04;
+/* Escala tipográfica fluida da landing (docs/marca/landing-direcao.md, secção 3). */
+@utility lp-hero {
+  font-size: clamp(2.75rem, 1.55rem + 5.4vw, 6.25rem);
+  line-height: 1;
+  letter-spacing: -0.028em;
   text-wrap: balance;
 }
 @utility lp-headline {
-  font-size: clamp(1.875rem, 1.45rem + 1.7vw, 2.75rem);
-  line-height: 1.1;
+  font-size: clamp(2rem, 1.3rem + 3vw, 3.75rem);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 @utility lp-lead {
-  font-size: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
-  line-height: 1.6;
+  font-size: clamp(1.125rem, 1.05rem + 0.4vw, 1.375rem);
+  line-height: 1.5;
   text-wrap: pretty;
 }
 
@@ -624,5 +681,308 @@ html[data-tab-hidden] :is(.brand-arc, .brand-dot, .ptr-arc, .ptr-svg, .brand-dri
 @media (prefers-reduced-motion: reduce) {
   .copilot-launcher-busy {
     animation: none;
+  }
+}
+
+/* ---------- Landing: navegação, dither e microinterações ---------- */
+
+/* Altura estável do topo da landing (sem CLS): barra + zona segura (notch, Dynamic Island). Âncoras e rolagem usam-na. */
+html:has([data-landing]) {
+  --nav-h: calc(3.5rem + env(safe-area-inset-top));
+  scroll-padding-top: calc(var(--nav-h) + 0.5rem);
+}
+@media (min-width: 1024px) {
+  html:has([data-landing]) {
+    --nav-h: calc(4rem + env(safe-area-inset-top));
+  }
+}
+@media (max-height: 480px) and (orientation: landscape) {
+  html:has([data-landing]) {
+    --nav-h: calc(3rem + env(safe-area-inset-top));
+  }
+}
+
+/* Mola suave (linear() com leve ultrapassagem); sem suporte cai para a curva cúbica. */
+:root {
+  --ease-spring: cubic-bezier(0.2, 0.9, 0.25, 1.15);
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --ease-spring: linear(
+      0,
+      0.18 6%,
+      0.52 13%,
+      0.8 20%,
+      0.97 27%,
+      1.04 34%,
+      1.05 40%,
+      1.03 48%,
+      1 58%,
+      0.995 72%,
+      1
+    );
+  }
+}
+
+/* Topo: transparente sobre o hero; ao rolar ganha fundo, desfoque e um fio. Esconde ao descer (< lg) e volta ao subir. */
+.lp-header {
+  background: transparent;
+  border-bottom: 1px solid transparent;
+  transition:
+    transform 320ms var(--ease-out),
+    background-color 240ms ease,
+    border-color 240ms ease,
+    box-shadow 240ms ease;
+}
+.lp-header[data-scrolled='true'] {
+  background: color-mix(in oklab, var(--background) 94%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--border) 80%, transparent);
+}
+@supports (backdrop-filter: blur(1px)) {
+  .lp-header[data-scrolled='true'] {
+    background: color-mix(in oklab, var(--background) 72%, transparent);
+    -webkit-backdrop-filter: saturate(1.6) blur(14px);
+    backdrop-filter: saturate(1.6) blur(14px);
+  }
+}
+.lp-header[data-hidden='true'] {
+  transform: translateY(-101%);
+}
+
+/* Pílula deslizante do separador ativo. */
+.lp-pill {
+  transform: translateX(var(--pill-x, 0)) scale(var(--pill-s, 1));
+  width: var(--pill-w, 0);
+  opacity: var(--pill-o, 0);
+  transition:
+    transform 380ms var(--ease-spring),
+    width 380ms var(--ease-spring),
+    opacity 200ms ease;
+}
+
+/* Logótipo: os arcos rodam suavemente ao passar o rato ou focar (nunca em ciclo). */
+@media (prefers-reduced-motion: no-preference) {
+  .bh {
+    transition: transform 900ms var(--ease-spring);
+  }
+  .brand-link:focus-visible .bh-1 {
+    transform: rotate(120deg);
+  }
+  .brand-link:focus-visible .bh-2 {
+    transform: rotate(-90deg);
+  }
+  .brand-link:focus-visible .bh-3 {
+    transform: rotate(60deg);
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .brand-link:hover .bh-1 {
+    transform: rotate(120deg);
+  }
+  .brand-link:hover .bh-2 {
+    transform: rotate(-90deg);
+  }
+  .brand-link:hover .bh-3 {
+    transform: rotate(60deg);
+  }
+}
+
+/* Folha do menu móvel (<dialog>): ocupa o ecrã todo, entra e sai por baixo da zona segura. */
+.lp-sheet {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: var(--background);
+  color: var(--foreground);
+  overscroll-behavior: contain;
+}
+.lp-sheet:not([open]) {
+  display: none;
+}
+.lp-sheet::backdrop {
+  background: transparent;
+}
+.lp-sheet[data-state='opening'],
+.lp-sheet[data-state='closing'] {
+  opacity: 0;
+  transform: translateY(-1.5rem);
+}
+.lp-sheet[data-state='open'] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 260ms var(--ease-out),
+    transform 380ms var(--ease-out);
+}
+.lp-sheet[data-state='closing'] {
+  transition:
+    opacity 200ms ease,
+    transform 240ms ease;
+}
+.lp-sheet[data-dragging='true'] {
+  transition: none;
+}
+
+/* Cartões da landing: sobem 2 px ao passar o rato (só com rato) e afundam ao premir. */
+.lp-card {
+  transition:
+    transform 260ms var(--ease-spring),
+    border-color 200ms ease,
+    box-shadow 200ms ease;
+}
+@media (hover: hover) {
+  .lp-card:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--primary) 38%, var(--border));
+    box-shadow: 0 10px 28px -16px color-mix(in oklab, var(--foreground) 35%, transparent);
+  }
+}
+.lp-card:active {
+  transform: scale(0.985);
+  transition-duration: 90ms;
+}
+.lp-press {
+  transition: transform 220ms var(--ease-spring);
+}
+.lp-press:active {
+  transform: scale(0.97);
+  transition-duration: 80ms;
+}
+
+/* Secções abaixo da dobra só se pintam quando se aproximam; a altura estimada evita saltos da barra de rolagem. */
+.lp-defer {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 720px;
+}
+
+/* Entrada do visual do hero (só opacidade e transform; o texto nunca anima, por causa do LCP). */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lp-rise {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+  }
+  .lp-rise {
+    animation: lp-rise 800ms var(--ease-out) 120ms both;
+  }
+  @keyframes lp-hint {
+    0%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.5;
+    }
+    50% {
+      transform: translateY(6px);
+      opacity: 1;
+    }
+  }
+  .lp-hint {
+    animation: lp-hint 2.2s ease-in-out 3;
+  }
+  /* Desenho dos traços dos diagramas ao entrar (pathLength normalizado a 1). */
+  .lp-draw [data-draw] {
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 1100ms var(--ease-out);
+  }
+  .lp-draw[data-in='true'] [data-draw] {
+    stroke-dashoffset: 0;
+  }
+  .lp-draw [data-fade] {
+    opacity: 0;
+    transition: opacity 600ms ease 300ms;
+  }
+  .lp-draw[data-in='true'] [data-fade] {
+    opacity: 1;
+  }
+}
+
+/* Cursor de escrita do Copiloto. */
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes lp-caret {
+    50% {
+      opacity: 0;
+    }
+  }
+  .lp-caret::after {
+    content: '';
+    display: inline-block;
+    width: 2px;
+    height: 1em;
+    margin-left: 2px;
+    vertical-align: -0.15em;
+    background: currentColor;
+    animation: lp-caret 1s steps(1) infinite;
+  }
+}
+
+/* Sem scroll horizontal por causa de decorações. */
+body:has([data-landing]) {
+  overflow-x: clip;
+}
+
+/* Texturas dither (AVIF, claro e escuro): fundos de cartões e separadores. O ficheiro só se pede quando o elemento existe. */
+.tx {
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.tx-campo {
+  background-image: url("/landing/textura-campo-light-1280.avif");
+  background-position: right bottom;
+}
+.tx-dunas {
+  background-image: url("/landing/textura-dunas-light-1280.avif");
+  background-position: center bottom;
+}
+.tx-fio {
+  background-image: url("/landing/textura-fio-light-1280.avif");
+  background-position: right center;
+}
+.dark .tx-campo,
+.tx-dark.tx-campo {
+  background-image: url("/landing/textura-campo-dark-1280.avif");
+}
+.dark .tx-dunas {
+  background-image: url("/landing/textura-dunas-dark-1280.avif");
+}
+.dark .tx-fio,
+.tx-dark.tx-fio {
+  background-image: url("/landing/textura-fio-dark-1280.avif");
+}
+
+/* Hero: imagem dither com parallax de 24 px só em CSS (compositor, sem JS) e véu de pontos que se dissolve uma vez. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes hero-drift {
+      to {
+        transform: translate3d(0, 24px, 0) scale(1.04);
+      }
+    }
+    .hero-drift {
+      animation: hero-drift linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
+  }
+  @keyframes hero-veil {
+    to {
+      opacity: 0;
+    }
+  }
+  .hero-veil {
+    background: var(--background);
+    -webkit-mask-image: url("/landing/tile-cruz-light.svg");
+    mask-image: url("/landing/tile-cruz-light.svg");
+    -webkit-mask-size: 16px 16px;
+    mask-size: 16px 16px;
+    animation: hero-veil 700ms ease-out 150ms both;
   }
 }

@@ -9,13 +9,34 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline, LotStateBadge } from '@/features/lots/lot-parts';
 import { formatNumber, formatPercent } from '@/lib/format';
+import { getLocale } from '@/lib/i18n';
 import { fibreLabel } from '@/lib/lots';
+import { ogImage, SITE_URL } from '@/lib/seo';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
 // Página pública (sem sessão): é para onde o QR do lote aponta. Só mostra o que o reciclador e a câmara precisam.
 export const Route = createFileRoute('/passport/$code')({
-  head: () => ({ meta: [{ title: m.title_passport() }] }),
+  // Indexável (o passaporte é público) mas fora do sitemap: há um código por lote.
+  head: ({ params }) => ({
+    meta: [
+      { title: m.title_passport() },
+      { name: 'description', content: m.seo_passport_description({ code: params.code }) },
+      { name: 'robots', content: 'index, follow' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:title', content: m.title_passport() },
+      { property: 'og:description', content: m.seo_passport_description({ code: params.code }) },
+      { property: 'og:image', content: ogImage('passaporte') },
+      { property: 'og:image:alt', content: m.seo_og_alt_passaporte() },
+      { name: 'twitter:image', content: ogImage('passaporte') },
+    ],
+    links: [
+      {
+        rel: 'canonical',
+        href: `${SITE_URL}/${getLocale() === 'en' ? 'en' : 'pt'}/passport/${params.code}`,
+      },
+    ],
+  }),
   component: PassportPage,
 });
 

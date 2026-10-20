@@ -49,6 +49,8 @@ export function PublicShell({
   actions,
   nav,
   menu,
+  header,
+  footerExtra,
   width = 'max-w-5xl',
 }: {
   children: ReactNode;
@@ -58,6 +60,10 @@ export function PublicShell({
   nav?: ReactNode;
   /** Botão do menu em ecrãs estreitos (< `lg`). */
   menu?: ReactNode;
+  /** Substitui o topo por omissão (a landing traz o seu, fixo e transparente). */
+  header?: ReactNode;
+  /** Linha extra no fim do rodapé (ex.: crédito da fotografia). */
+  footerExtra?: ReactNode;
   width?: string;
 }) {
   return (
@@ -68,26 +74,28 @@ export function PublicShell({
       >
         {m.common_skip_to_content()}
       </a>
-      <header className="sticky top-0 z-40 border-border/60 border-b bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
-        <div className={`mx-auto flex h-16 w-full items-center gap-3 ${PUBLIC_GUTTER} ${width}`}>
-          <Link
-            to="/"
-            aria-label="Novelo"
-            className="flex min-h-11 shrink-0 items-center rounded-sm"
-          >
-            <BrandLogo className="h-8" />
-          </Link>
-          {nav && <div className="hidden flex-1 justify-center lg:flex">{nav}</div>}
-          <div className="ml-auto flex items-center gap-1 lg:ml-0">
-            {actions}
-            <div className="flex items-center [&_button]:size-11">
-              <LanguageSwitcher />
-              <ThemeToggle />
+      {header ?? (
+        <header className="sticky top-0 z-40 border-border/60 border-b bg-background/90 pt-[env(safe-area-inset-top)] backdrop-blur supports-[backdrop-filter]:bg-background/80">
+          <div className={`mx-auto flex h-16 w-full items-center gap-3 ${PUBLIC_GUTTER} ${width}`}>
+            <Link
+              to="/"
+              aria-label="Novelo"
+              className="flex min-h-11 shrink-0 items-center rounded-sm"
+            >
+              <BrandLogo className="h-8" />
+            </Link>
+            {nav && <div className="hidden flex-1 justify-center lg:flex">{nav}</div>}
+            <div className="ml-auto flex items-center gap-1 lg:ml-0">
+              {actions}
+              <div className="flex items-center [&_button]:size-11">
+                <LanguageSwitcher />
+                <ThemeToggle />
+              </div>
+              {menu}
             </div>
-            {menu}
           </div>
-        </div>
-      </header>
+        </header>
+      )}
       <div className="flex-1">{children}</div>
       <footer className="border-border border-t bg-card/40 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
         <div className={`mx-auto flex w-full flex-col gap-6 py-10 ${PUBLIC_GUTTER} ${width}`}>
@@ -103,6 +111,7 @@ export function PublicShell({
           <p className="border-border border-t pt-5 text-muted-foreground text-xs">
             {m.landing_footer_note()}
           </p>
+          {footerExtra}
         </div>
       </footer>
     </div>
