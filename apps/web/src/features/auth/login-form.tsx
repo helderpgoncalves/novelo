@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { getMeQueryKey, loginMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
@@ -19,6 +20,9 @@ import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type LoginValues, loginSchema } from './schemas';
+import { useAutofillSync } from './use-autofill-sync';
+
+const AUTOFILL_FIELDS = ['email', 'password'] as const;
 
 export function LoginForm({ next }: { next: string }) {
   const queryClient = useQueryClient();
@@ -27,6 +31,9 @@ export function LoginForm({ next }: { next: string }) {
     resolver: zodResolver(loginSchema),
     defaultValues: { email: '', password: '', remember_me: true },
   });
+
+  const formRef = useRef<HTMLFormElement>(null);
+  const syncAutofill = useAutofillSync(form, formRef, AUTOFILL_FIELDS);
 
   const login = useMutation({
     ...loginMutation(),
@@ -39,7 +46,11 @@ export function LoginForm({ next }: { next: string }) {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) => login.mutate({ body: v }))}
+        ref={formRef}
+        onSubmit={(e) => {
+          syncAutofill();
+          void form.handleSubmit((v) => login.mutate({ body: v }))(e);
+        }}
         className="space-y-4"
         noValidate
       >
@@ -54,8 +65,11 @@ export function LoginForm({ next }: { next: string }) {
                 <Input
                   {...field}
                   type="email"
-                  autoComplete="email"
+                  autoComplete="username"
                   inputMode="email"
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder={m.login_email_placeholder()}
                   className="h-10"
                 />
