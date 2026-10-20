@@ -1,16 +1,48 @@
 import { registerSW } from 'virtual:pwa-register';
 import { toast } from 'sonner';
+import { hasSessionHint, SESSION_EVENT } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
 const UPDATE_CHECK_MS = 60 * 60 * 1000;
 const UPDATE_TOAST_ID = 'pwa-update';
 
+let started = false;
+
+/** Visitante sem sessão: não precisa de service worker (a landing vem sempre fresca da rede). Retira o que houver. */
+function retireServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  void navigator.serviceWorker
+    .getRegistrations()
+    .then((regs) => Promise.all(regs.map((r) => r.unregister())))
+    .then(() => caches.keys())
+    .then((keys) =>
+      Promise.all(keys.filter((k) => k.startsWith('workbox-')).map((k) => caches.delete(k))),
+    )
+    .catch(() => undefined);
+}
+
 /**
- * Regista o service worker. Quando há versão nova mostra um aviso fixo com "Atualizar"
- * (a app só recarrega por vontade da pessoa) e volta a procurar versões de hora a hora
- * e sempre que a app instalada regressa ao primeiro plano.
+ * Regista o service worker SÓ para quem tem sessão (a app instalada e o uso offline), e só quando o browser está
+ * livre: quem apenas vê a landing não descarrega o precache nem fica preso a uma versão antiga da casca depois de
+ * cada atualização. Quando há versão nova mostra um aviso fixo com "Atualizar" (a app só recarrega por vontade da
+ * pessoa) e volta a procurar versões de hora a hora e sempre que a app regressa ao primeiro plano.
  */
 export function registerPwa() {
+  if (!hasSessionHint()) {
+    retireServiceWorker();
+    // Quando a pessoa entrar, o login avisa e o service worker regista-se nessa altura.
+    window.addEventListener(SESSION_EVENT, registerPwa, { once: true });
+    return;
+  }
+  if (started) return;
+  started = true;
+  const start = () => startServiceWorker();
+  if (typeof window.requestIdleCallback === 'function')
+    window.requestIdleCallback(start, { timeout: 5000 });
+  else window.setTimeout(start, 2000);
+}
+
+function startServiceWorker() {
   const updateSW = registerSW({
     immediate: true,
     onNeedRefresh() {

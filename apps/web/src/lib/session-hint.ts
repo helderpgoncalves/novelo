@@ -5,6 +5,8 @@
  */
 const NAME = 'novelo_session';
 const MAX_AGE_S = 60 * 60 * 24 * 30;
+/** Evento na `window` quando a pista passa a existir (entrou): o service worker só se regista a partir daí. */
+export const SESSION_EVENT = 'novelo:session';
 
 export function hasSessionHint(): boolean {
   if (typeof document === 'undefined') return false;
@@ -16,6 +18,7 @@ export function setSessionHint(): void {
   const secure = window.location.protocol === 'https:' ? '; Secure' : '';
   // biome-ignore lint/suspicious/noDocumentCookie: pista não sensível; a Cookie Store API ainda não é universal.
   document.cookie = `${NAME}=1; Path=/; Max-Age=${MAX_AGE_S}; SameSite=Lax${secure}`;
+  window.dispatchEvent(new Event(SESSION_EVENT));
 }
 
 export function clearSessionHint(): void {

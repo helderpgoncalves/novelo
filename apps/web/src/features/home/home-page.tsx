@@ -41,9 +41,7 @@ import { MotionProvider } from './motion';
 import { ParishMap } from './parish-map';
 import { RegulatoryClock } from './regulatory-clock';
 import { EstimateTag, SourceLine, StorySection } from './story-section';
-
-export const HOME_TABS = ['entities', 'flows', 'waste', 'parishes'] as const;
-export type HomeTab = (typeof HOME_TABS)[number];
+import type { HomeTab } from './tabs';
 
 export function HomePage({
   tab,
