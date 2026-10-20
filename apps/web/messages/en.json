@@ -2859,5 +2859,8 @@
   "fl_alert_grouped_hint": "grouping confirmed by the plan note, not a conflict",
   "fl_detail_collection": "Collection type",
   "fl_detail_collection_of": "{circuit}: {kinds}",
-  "fl_map_order_route": "Localities in the order of the Vitrus route."
+  "fl_map_order_route": "Localities in the order of the Vitrus route.",
+  "error_captcha_required": "Please confirm you are not a robot and try again.",
+  "error_captcha_failed": "We could not confirm you are a person. Refresh the page and try again.",
+  "error_captcha_unavailable": "The security check is unavailable. Please try again in a moment."
 }
