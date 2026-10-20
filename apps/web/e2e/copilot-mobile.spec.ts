@@ -104,13 +104,13 @@ for (const { w, h } of sizes) {
         await page.goto('/pt/chat');
         const root = page.getByTestId('copilot-page');
         await expect(root).toBeVisible();
-        await expect(page.getByRole('tab', { name: 'Artefactos' })).toBeHidden();
+        await expect(page.getByRole('tab', { name: 'Conversa' })).toBeVisible(); // secções deslizantes sob a barra
         await expect(page.getByRole('button', { name: 'Ir para o fim' })).toHaveCount(0);
         await expect(root.getByTestId('copilot-empty-suggestions')).toBeVisible();
         expect(await overflow(page)).toBeLessThanOrEqual(1);
         await shot(page, `pagina-${tag}`);
         await root.getByRole('button', { name: 'Mais opções' }).click();
-        await expect(page.getByRole('menuitem', { name: 'Artefactos' })).toBeVisible();
+        await expect(page.getByRole('menuitem', { name: 'Nova conversa' })).toBeVisible();
       });
     });
   }

@@ -56,6 +56,7 @@ export function TabBar({ onMore }: { onMore: () => void }) {
             <li key={tab.to} className="flex min-w-0 flex-1">
               <Link
                 to={tab.to}
+                data-tour={`nav:${tab.to}`}
                 className={cn(itemClass, active && 'bg-primary/10 text-primary')}
                 aria-current={active ? 'page' : undefined}
               >

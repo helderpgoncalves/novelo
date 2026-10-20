@@ -10,7 +10,7 @@ export function LegalPage({ doc, other }: { doc: LegalDoc; other: 'privacy' | 't
   const locale = getLocale();
   return (
     <PublicShell>
-      <main className="mx-auto w-full max-w-3xl space-y-10 px-4 py-8 sm:px-6 sm:py-12">
+      <main id="content" className="mx-auto w-full max-w-3xl space-y-10 px-4 py-8 sm:px-6 sm:py-12">
         <div className="space-y-3">
           <h1 className="text-balance text-4xl sm:text-5xl">{doc.title}</h1>
           <p className="text-muted-foreground text-sm">{doc.updated}</p>

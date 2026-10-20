@@ -12,6 +12,7 @@ import {
   Pin,
   PinOff,
   Search,
+  SlidersHorizontal,
   SquarePen,
   Trash2,
   Users,
@@ -55,6 +56,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Switch } from '@/components/ui/switch';
 import { getErrorMessage } from '@/lib/errors';
 import { cn } from '@/lib/utils';
@@ -152,7 +154,7 @@ function NameDialog({
 }
 
 /** Três pontos a saltar: a conversa está a gerar uma resposta (parados com movimento reduzido). */
-function GeneratingDots() {
+export function GeneratingDots() {
   return (
     <span role="img" aria-label={m.cp_generating()} className="flex shrink-0 items-center gap-0.5">
       {[0, 1, 2].map((n) => (
@@ -173,6 +175,8 @@ export function ThreadList({
   onSelect,
   onNew,
   onGone,
+  heading,
+  headingClassName,
   className,
 }: {
   selectedId: string | null;
@@ -180,6 +184,9 @@ export function ThreadList({
   onNew: () => void;
   /** A conversa deixou de existir (apagada): a página decide o que mostrar. */
   onGone: (id: string) => void;
+  /** Mostra «Conversas» à esquerda do botão «Nova conversa» (a coluna do desktop e a folha). */
+  heading?: boolean;
+  headingClassName?: string;
   className?: string;
 }) {
   const qc = useQueryClient();
@@ -270,19 +277,26 @@ export function ThreadList({
     (a, b) => Number(b.pinned) - Number(a.pinned),
   );
   const total = threads.data?.total ?? 0;
+  const filtering = archived || project !== '';
 
   return (
     <div className={cn('flex min-h-0 flex-col', className)} data-testid="copilot-thread-list">
-      <div className="space-y-2.5 border-b px-3 pt-3 pb-2.5">
+      <div className={cn('flex h-12 shrink-0 items-center gap-2 px-3', headingClassName)}>
+        {heading && (
+          <h2 className="min-w-0 flex-1 truncate px-1 font-medium font-serif text-[1.0625rem] tracking-tight">
+            {m.chat_threads()}
+          </h2>
+        )}
         <Button
-          variant="outline"
-          className="h-11 w-full justify-center gap-2 sm:h-10"
+          className={cn('h-10 gap-1.5 rounded-lg px-3 md:h-9', !heading && 'w-full')}
           onClick={onNew}
         >
           <SquarePen className="size-4" strokeWidth={1.75} aria-hidden="true" />
           {m.chat_new()}
         </Button>
-        <div className="relative">
+      </div>
+      <div className="flex shrink-0 items-center gap-1.5 px-3 pt-1 pb-2.5">
+        <div className="relative min-w-0 flex-1">
           <Search
             className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
             strokeWidth={1.75}
@@ -294,38 +308,62 @@ export function ThreadList({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={m.chat_search_threads()}
             aria-label={m.chat_search_threads()}
-            className="h-11 bg-background pl-9 text-base shadow-none sm:h-10 md:text-base"
+            className="h-11 rounded-lg border-transparent bg-muted/60 pl-9 text-base shadow-none md:h-9 md:text-sm"
           />
         </div>
-        <div className="flex min-h-10 items-center justify-between gap-3 text-sm">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Switch id="threads-archived" checked={archived} onCheckedChange={setArchived} />
-            <label htmlFor="threads-archived">{m.chat_archived()}</label>
-          </div>
-          {(projects.data?.length ?? 0) > 0 && (
-            <select
-              aria-label={m.chat_project_filter()}
-              value={project}
-              onChange={(e) => setProject(e.target.value)}
-              className="h-10 min-w-0 max-w-[55%] rounded-md border border-input bg-background px-2 text-base md:text-sm"
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                'relative size-11 shrink-0 rounded-lg text-muted-foreground md:size-9',
+                filtering && 'text-primary',
+              )}
+              aria-label={m.chat_filters()}
             >
-              <option value="">{m.chat_all_projects()}</option>
-              {projects.data?.map((p) => (
-                <option key={p.name} value={p.name}>
-                  {p.name} ({p.threads})
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+              <SlidersHorizontal className="size-4" strokeWidth={1.75} aria-hidden="true" />
+              {filtering && (
+                <span
+                  role="img"
+                  aria-label={m.chat_filters_active()}
+                  className="absolute top-2 right-2 size-1.5 rounded-full bg-primary md:top-1.5 md:right-1.5"
+                />
+              )}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="w-64 space-y-3">
+            <div className="flex min-h-10 items-center justify-between gap-3">
+              <label htmlFor="threads-archived" className="font-medium">
+                {m.chat_archived()}
+              </label>
+              <Switch id="threads-archived" checked={archived} onCheckedChange={setArchived} />
+            </div>
+            {(projects.data?.length ?? 0) > 0 && (
+              <select
+                aria-label={m.chat_project_filter()}
+                value={project}
+                onChange={(e) => setProject(e.target.value)}
+                className="h-11 w-full rounded-md border border-input bg-background px-2 text-base md:h-10 md:text-sm"
+              >
+                <option value="">{m.chat_all_projects()}</option>
+                {projects.data?.map((p) => (
+                  <option key={p.name} value={p.name}>
+                    {p.name} ({p.threads})
+                  </option>
+                ))}
+              </select>
+            )}
+          </PopoverContent>
+        </Popover>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {threads.isPending ? (
-          <div role="status" aria-label={m.chat_loading_threads()} className="space-y-px py-2">
+          <div role="status" aria-label={m.chat_loading_threads()} className="space-y-px px-2 py-1">
             <span className="sr-only">{m.chat_loading_threads()}</span>
             {[0, 1, 2, 3, 4].map((n) => (
-              <div key={n} aria-hidden="true" className="space-y-2 px-4 py-3">
+              <div key={n} aria-hidden="true" className="space-y-2 px-3 py-3">
                 <div className="h-3.5 w-2/3 animate-pulse rounded bg-muted motion-reduce:animate-none" />
                 <div className="h-3 w-5/6 animate-pulse rounded bg-muted/70 motion-reduce:animate-none" />
               </div>
@@ -345,13 +383,13 @@ export function ThreadList({
             />
           </div>
         ) : (
-          <div>
+          <div className="pb-3">
             {groupThreads(items).map((g) => (
               <section key={g.key} aria-label={groupLabel[g.key]()}>
-                <h3 className="sticky top-0 z-[1] border-border/60 border-b bg-background/95 px-4 py-1.5 font-semibold font-sans text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em] backdrop-blur">
+                <h3 className="px-5 pt-4 pb-1.5 font-semibold font-sans text-[0.6875rem] text-muted-foreground uppercase tracking-[0.14em]">
                   {groupLabel[g.key]()}
                 </h3>
-                <ul className="divide-y divide-border/50">
+                <ul className="space-y-0.5 px-2">
                   {g.items.map((t) => {
                     const busy = generating.has(t.id);
                     const fresh = !busy && unread.has(t.id);
@@ -362,8 +400,8 @@ export function ThreadList({
                           onClick={() => onSelect(t.id)}
                           aria-current={t.id === selectedId ? 'true' : undefined}
                           className={cn(
-                            'flex min-h-[4.25rem] w-full flex-col items-start justify-center gap-0.5 border-transparent border-l-2 px-4 py-2.5 pr-12 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
-                            t.id === selectedId && 'border-primary bg-primary/8',
+                            'flex min-h-14 w-full flex-col items-start justify-center gap-0.5 rounded-lg px-3 py-2 pr-11 text-left transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
+                            t.id === selectedId && 'bg-primary/10 hover:bg-primary/10',
                           )}
                         >
                           <span className="flex w-full items-center gap-2">
@@ -419,12 +457,16 @@ export function ThreadList({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="-translate-y-1/2 absolute top-1/2 right-1 size-10"
+                              className="-translate-y-1/2 absolute top-1/2 right-1 size-10 text-muted-foreground md:size-8"
                               aria-label={m.chat_thread_menu({
                                 title: t.title || m.chat_untitled(),
                               })}
                             >
-                              <MoreVertical className="size-4" aria-hidden="true" />
+                              <MoreVertical
+                                className="size-4"
+                                strokeWidth={1.75}
+                                aria-hidden="true"
+                              />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end" className="w-56">

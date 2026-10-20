@@ -1,10 +1,11 @@
 import { Outlet, useMatches } from '@tanstack/react-router';
-import { type ReactNode, Suspense, useEffect, useState } from 'react';
+import { type ReactNode, Suspense, useEffect, useRef, useState } from 'react';
 import type { MeOut } from '@/client';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { TabBar } from '@/components/layout/tab-bar';
 import { Topbar } from '@/components/layout/topbar';
 import { OfflineBanner } from '@/components/offline-banner';
+import { PullToRefresh } from '@/components/pull-to-refresh';
 import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { ImpersonationBanner } from '@/features/impersonation/impersonation-banner';
@@ -17,6 +18,7 @@ import { m } from '@/paraglide/messages';
 /** Casca da app autenticada: barra lateral, topo, separadores e o conteúdo (`children` ou a rota filha). */
 export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const mainRef = useRef<HTMLElement>(null);
   const fullBleed = useMatches({ select: (ms) => ms.some((x) => x.staticData?.fullBleed) });
 
   const keyboardOpen = useKeyboardOpen();
@@ -49,11 +51,15 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
           <Topbar user={user} showMenuButton={fullBleed} onMenuClick={() => setMenuOpen(true)} />
           <OfflineBanner />
           <VerifyEmailBanner user={user} />
+          <PullToRefresh scrollRef={mainRef} disabled={fullBleed} />
           <main
             id="content"
+            ref={mainRef}
             className={cn(
               'flex-1',
-              fullBleed ? 'flex min-h-0 flex-col overflow-hidden' : 'overflow-y-auto',
+              fullBleed
+                ? 'flex min-h-0 flex-col overflow-hidden'
+                : 'overflow-y-auto overscroll-y-contain',
             )}
           >
             {fullBleed ? (

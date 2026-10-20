@@ -39,8 +39,8 @@ export interface TourStep {
 
 /** Ligações da navegação (barra lateral em desktop, barra de separadores em telemóvel). */
 const nav = (to: string) => [
-  `aside a[href$="${to}"]`,
-  `[data-testid="tab-bar"] a[href$="${to}"]`,
+  `aside a[data-tour="nav:${to}"]`,
+  `[data-testid="tab-bar"] a[data-tour="nav:${to}"]`,
   // sem barra lateral nem separadores visíveis (ex.: telemóvel): o botão «Mais» abre a gaveta completa
 ];
 const MORE = '[data-testid="tab-bar"] button[aria-haspopup="dialog"]';
@@ -159,6 +159,9 @@ const BY_ROLE: Record<'guest' | 'operator' | 'admin', readonly TourStepId[]> = {
     'finish',
   ],
 };
+
+/** Os seletores de todos os passos (para os testes). */
+export const allSteps = (): TourStep[] => Object.values(STEPS);
 
 export const stepIdsFor = (role: string): readonly TourStepId[] =>
   role === 'guest' ? BY_ROLE.guest : role === 'admin' ? BY_ROLE.admin : BY_ROLE.operator;

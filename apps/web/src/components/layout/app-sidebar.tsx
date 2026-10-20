@@ -65,6 +65,7 @@ function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }
                   <Link
                     to={item.to}
                     onClick={onNavigate}
+                    data-tour={`nav:${item.to}`}
                     activeOptions={{ exact: item.to === '/' }}
                     className={cn(
                       'flex h-10 items-center gap-2.5 rounded-lg px-2.5 text-muted-foreground text-sm transition-colors lg:h-9',

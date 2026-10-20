@@ -1,37 +1,20 @@
 import { useEffect, useState } from 'react';
-import type { Box } from './placement';
+import type { Box, Size } from './placement';
+import { candidates, isUsableTarget, spotlightBox, visibleFraction } from './target';
 
-const PAD = 6;
+const readViewport = (): Size => ({ width: window.innerWidth, height: window.innerHeight });
 
-const isVisible = (el: Element): boolean => {
-  const r = el.getBoundingClientRect();
-  if (r.width < 2 || r.height < 2) return false;
-  const cs = getComputedStyle(el);
-  return cs.visibility !== 'hidden' && cs.display !== 'none';
-};
-
-/** O primeiro elemento visível que corresponde a um dos seletores (ou `null`: papel sem acesso, ecrã estreito...). */
+/** O primeiro alvo utilizável (visível, plausível) entre os seletores; `null` se nenhum (o passo fica centrado). */
 export function resolveTarget(
   selectors: readonly string[],
   root: ParentNode = document,
+  viewport: Size = readViewport(),
 ): HTMLElement | null {
-  for (const selector of selectors) {
-    let found: NodeListOf<Element>;
-    try {
-      found = root.querySelectorAll(selector);
-    } catch {
-      continue; // seletor inválido nunca parte a visita
-    }
-    for (const el of found) if (el instanceof HTMLElement && isVisible(el)) return el;
-  }
-  return null;
+  return candidates(selectors, root).find((el) => isUsableTarget(el, viewport)) ?? null;
 }
 
-/** Retângulo do alvo, em coordenadas do viewport e com folga; `null` se não houver alvo visível. */
-export const boxOf = (el: Element): Box => {
-  const r = el.getBoundingClientRect();
-  return { x: r.left - PAD, y: r.top - PAD, width: r.width + PAD * 2, height: r.height + PAD * 2 };
-};
+/** Retângulo (com folga) do alvo, cortado ao que se vê e sempre dentro do viewport. */
+export const boxOf = (el: Element): Box => spotlightBox(el, readViewport());
 
 const same = (a: Box | null, b: Box | null) =>
   a === b ||
@@ -47,11 +30,19 @@ export interface Target {
   el: HTMLElement;
 }
 
+const SETTLE_FRAMES = 3;
+const SETTLE_MAX_MS = 900;
+
 /**
- * Segue o alvo enquanto `enabled`: reposiciona em scroll, redimensionamento, teclado do iOS e mudanças de tamanho,
- * e volta a procurá-lo se desaparecer ou ainda não existir (a rota pode estar a montar).
+ * Segue o alvo enquanto `enabled`. Antes de o destacar traz-o ao centro de todos os ancestrais com scroll (a lista da
+ * barra lateral é um deles) e espera que o scroll assente; só então mede. Reposiciona em scroll, redimensionamento,
+ * teclado do iOS e mudanças de tamanho. Um alvo cortado ou implausível é descartado (próximo seletor ou cartão centrado).
  */
-export function useTargetRect(selectors: readonly string[], enabled: boolean): Target | null {
+export function useTargetRect(
+  selectors: readonly string[],
+  enabled: boolean,
+  reducedMotion = false,
+): Target | null {
   const [target, setTarget] = useState<Target | null>(null);
   const key = selectors.join('|');
 
@@ -64,24 +55,79 @@ export function useTargetRect(selectors: readonly string[], enabled: boolean): T
     let el: HTMLElement | null = null;
     let frame = 0;
     let observer: ResizeObserver | undefined;
+    let settling: { since: number; stable: number; last: string; el: HTMLElement } | null = null;
+    let disposed = false;
+    const scrolled = new WeakSet<Element>();
 
-    const measure = () => {
-      frame = 0;
-      if (!(el?.isConnected && isVisible(el))) {
-        observer?.disconnect();
-        el = resolveTarget(selectors);
-        if (el) {
-          observer = new ResizeObserver(schedule);
-          observer.observe(el);
-          // O alvo pode estar fora do ecrã (lista de navegação com scroll): traz-se à vista antes de o destacar.
-          const r = el.getBoundingClientRect();
-          if (r.top < 0 || r.bottom > window.innerHeight) el.scrollIntoView({ block: 'nearest' });
-        }
-      }
-      const next = el ? { box: boxOf(el), el } : null;
+    const publish = (next: Target | null) =>
       setTarget((prev) =>
         prev?.el === next?.el && same(prev?.box ?? null, next?.box ?? null) ? prev : next,
       );
+
+    const watch = (found: HTMLElement | null) => {
+      observer?.disconnect();
+      el = found;
+      if (el) {
+        observer = new ResizeObserver(schedule);
+        observer.observe(el);
+        // A lista pode redimensionar-se (ex.: o selo de pedidos pendentes) sem o alvo mudar.
+        if (el.parentElement) observer.observe(el.parentElement);
+      }
+    };
+
+    const measure = () => {
+      frame = 0;
+      if (disposed) return;
+      const viewport = readViewport();
+
+      // 1. A assentar: o alvo foi pedido ao scroll; espera que a posição deixe de mudar.
+      if (settling) {
+        const r = settling.el.getBoundingClientRect();
+        const sig = `${Math.round(r.left)}:${Math.round(r.top)}:${Math.round(r.width)}:${Math.round(r.height)}`;
+        settling.stable = sig === settling.last ? settling.stable + 1 : 0;
+        settling.last = sig;
+        if (settling.stable < SETTLE_FRAMES && performance.now() - settling.since < SETTLE_MAX_MS) {
+          schedule();
+          return;
+        }
+        settling = null;
+      }
+
+      // 2. O alvo atual continua válido?
+      if (el?.isConnected && isUsableTarget(el, viewport)) {
+        publish({ box: spotlightBox(el, viewport), el });
+        return;
+      }
+
+      // 3. Procurar de novo: o primeiro candidato renderizado que fique à vista (depois de o trazer ao centro).
+      watch(null);
+      for (const cand of candidates(selectors)) {
+        const r = cand.getBoundingClientRect();
+        const cs = getComputedStyle(cand);
+        if (r.width < 2 || r.height < 2 || cs.display === 'none' || cs.visibility === 'hidden')
+          continue;
+        if (!scrolled.has(cand) && visibleFraction(cand, viewport) < 0.999) {
+          scrolled.add(cand);
+          cand.scrollIntoView({
+            block: 'center',
+            inline: 'nearest',
+            behavior: reducedMotion ? 'auto' : 'smooth',
+          });
+          if (!reducedMotion) {
+            // espera o fim do scroll suave e volta a medir (sem publicar posições intermédias)
+            watch(cand);
+            settling = { since: performance.now(), stable: 0, last: '', el: cand };
+            schedule();
+            return;
+          }
+        }
+        if (isUsableTarget(cand, viewport)) {
+          watch(cand);
+          publish({ box: spotlightBox(cand, viewport), el: cand });
+          return;
+        }
+      }
+      publish(null);
     };
     function schedule() {
       if (!frame) frame = requestAnimationFrame(measure);
@@ -91,20 +137,23 @@ export function useTargetRect(selectors: readonly string[], enabled: boolean): T
     const vv = window.visualViewport;
     window.addEventListener('resize', schedule);
     window.addEventListener('scroll', schedule, true);
+    window.addEventListener('scrollend', schedule, true);
     vv?.addEventListener('resize', schedule);
     vv?.addEventListener('scroll', schedule);
     // Rede de segurança: layout assíncrono (rota a montar, fontes, animações da gaveta).
     const poll = window.setInterval(schedule, 400);
     return () => {
+      disposed = true;
       if (frame) cancelAnimationFrame(frame);
       observer?.disconnect();
       window.clearInterval(poll);
       window.removeEventListener('resize', schedule);
       window.removeEventListener('scroll', schedule, true);
+      window.removeEventListener('scrollend', schedule, true);
       vv?.removeEventListener('resize', schedule);
       vv?.removeEventListener('scroll', schedule);
     };
-  }, [key, enabled]);
+  }, [key, enabled, reducedMotion]);
 
   return enabled ? target : null;
 }

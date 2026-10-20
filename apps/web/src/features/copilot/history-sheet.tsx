@@ -27,14 +27,14 @@ export function HistorySheet({ open, onOpenChange, selectedId, onSelect, onNew, 
         className="mx-auto h-[min(82dvh,44rem)] max-w-2xl gap-0 rounded-t-2xl p-0 pb-[env(safe-area-inset-bottom)]"
       >
         <div aria-hidden="true" className="mx-auto mt-2 h-1 w-9 shrink-0 rounded-full bg-border" />
-        <SheetHeader className="px-4 pt-2 pb-2 pr-14">
-          <SheetTitle className="font-medium font-serif text-lg tracking-tight">
-            {m.chat_threads()}
-          </SheetTitle>
-          <SheetDescription className="sr-only">{m.chat_threads_description()}</SheetDescription>
+        <SheetHeader className="sr-only">
+          <SheetTitle>{m.chat_threads()}</SheetTitle>
+          <SheetDescription>{m.chat_threads_description()}</SheetDescription>
         </SheetHeader>
         <ThreadList
-          className="min-h-0 flex-1 border-t"
+          heading
+          headingClassName="pr-14"
+          className="min-h-0 flex-1"
           selectedId={selectedId}
           onSelect={onSelect}
           onNew={onNew}

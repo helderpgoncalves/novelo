@@ -23,6 +23,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { WorkingState } from '@/components/working-state';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
@@ -212,6 +213,13 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
                 removeLabel={m.triage_retake()}
               />
             </div>
+            {analyse.isPending && (
+              <WorkingState
+                title={m.working_triage_title()}
+                subtitle={m.working_triage_hint()}
+                trackElapsed
+              />
+            )}
             <Button
               className="h-12 w-full gap-2 font-semibold"
               disabled={!itemPhoto || analyse.isPending}
@@ -220,7 +228,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
                 analyse.mutate({ body: { item_photo: itemPhoto, label_photo: labelPhoto } })
               }
             >
-              {analyse.isPending ? <BrandSpinner tone="mono" /> : <ScanLine />}
+              <ScanLine />
               {analyse.isPending ? m.triage_analysing() : m.triage_analyse()}
             </Button>
             <p className="text-center text-muted-foreground text-xs">{m.triage_privacy()}</p>
