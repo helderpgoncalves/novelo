@@ -3954,5 +3954,6 @@
   "pending_conf_mail_subject": "Pedido de acesso ao Novelo",
   "pending_conf_mail_body": "Olá, pedi acesso ao Novelo com {email} mas o email de confirmação não me chegou.",
   "auth_invite_reason": "Escreve o email para onde foi enviado o convite. Se ainda estiver por aceitar, reenviamos-to.",
-  "inv_request_new": "Pedir novo convite"
+  "inv_request_new": "Pedir novo convite",
+  "invite_not_delivered": "Email não enviado"
 }
