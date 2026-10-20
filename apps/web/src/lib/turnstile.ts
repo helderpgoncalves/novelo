@@ -12,6 +12,8 @@ export interface TurnstileRenderOptions {
   size?: 'normal' | 'flexible' | 'compact';
   'refresh-expired': 'auto' | 'manual' | 'never';
   'refresh-timeout': 'auto' | 'manual' | 'never';
+  'before-interactive-callback'?: () => void;
+  'after-interactive-callback'?: () => void;
   callback: (token: string) => void;
   'expired-callback': () => void;
   'timeout-callback': () => void;

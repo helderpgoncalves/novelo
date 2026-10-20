@@ -146,9 +146,9 @@ export function RegisterForm({ next }: { next: string }) {
           type="submit"
           className={AUTH_CTA}
           disabled={register.isPending || gate.blocked}
-          loading={register.isPending}
+          loading={register.isPending || gate.busy}
         >
-          {gate.verifying ? m.turnstile_verifying() : m.register_submit()}
+          {m.register_submit()}
         </Button>
       </form>
     </Form>

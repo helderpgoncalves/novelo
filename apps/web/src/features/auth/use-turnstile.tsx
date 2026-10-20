@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { type TurnstileHandle, TurnstileWidget } from '@/components/turnstile-widget';
 import { Button } from '@/components/ui/button';
@@ -27,6 +27,8 @@ export interface TurnstileGate {
   blocked: boolean;
   /** A mostrar "A verificar…" no botão. */
   verifying: boolean;
+  /** A espera passa dos 400 ms: só então o botão mostra o spinner discreto (sem piscar). */
+  busy: boolean;
   /** Cabeçalhos para o cliente gerado, sem consumir o token (útil para ver se há). */
   headers: () => { 'X-Turnstile-Token': string } | undefined;
   /** Devolve os cabeçalhos e pede logo outro token (uso único). Chamar uma vez por tentativa. */
@@ -101,6 +103,14 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
     widget.current?.reset();
   }, [store]);
 
+  const verifying = enabled && token === null && phase === 'verifying';
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
+    if (!verifying) return setBusy(false);
+    const t = setTimeout(() => setBusy(true), 400);
+    return () => clearTimeout(t);
+  }, [verifying]);
+
   const field = useMemo(
     () =>
       enabled && siteKey ? (
@@ -148,7 +158,8 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
   return {
     enabled,
     blocked: config.isPending || (enabled && token === null),
-    verifying: enabled && token === null && phase === 'verifying',
+    verifying,
+    busy,
     headers,
     consume,
     onApiError,

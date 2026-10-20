@@ -78,9 +78,9 @@ export function ForgotForm() {
           type="submit"
           className={AUTH_CTA}
           disabled={forgot.isPending || gate.blocked}
-          loading={forgot.isPending}
+          loading={forgot.isPending || gate.busy}
         >
-          {gate.verifying ? m.turnstile_verifying() : m.forgot_submit()}
+          {m.forgot_submit()}
         </Button>
       </form>
     </Form>

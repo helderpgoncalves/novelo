@@ -16,7 +16,7 @@ export const AUTH_BUTTONS = 'flex flex-col gap-3';
 /** Altura e peso comuns a todos os botões e campos (alvo de toque de 44 px). */
 export const AUTH_CONTROL = 'h-11';
 export const AUTH_BUTTON = 'h-11 w-full font-medium';
-export const AUTH_CTA = 'h-11 w-full font-semibold';
+export const AUTH_CTA = 'h-11 w-full font-semibold disabled:opacity-70';
 
 /** Cabeçalho comum dos ecrãs de entrada: título serifado e um subtítulo curto. */
 export function AuthHeading({ title, subtitle }: { title: string; subtitle?: string }) {

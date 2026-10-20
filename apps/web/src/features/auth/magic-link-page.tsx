@@ -124,16 +124,14 @@ export function MagicLinkPage({
               {state === 'bad' && lastEmail.current && (
                 <Button
                   className={AUTH_CTA}
-                  loading={renew.isPending}
+                  loading={renew.isPending || renew.gate.busy}
                   disabled={renew.gate.blocked}
                   onClick={() => {
                     const email = lastEmail.current;
                     renew.send(magicLinkBody(email), { onSuccess: () => setRequested(email) });
                   }}
                 >
-                  {renew.gate.verifying
-                    ? m.turnstile_verifying()
-                    : m.magic_request_new_to({ email: lastEmail.current })}
+                  {m.magic_request_new_to({ email: lastEmail.current })}
                 </Button>
               )}
               <Button

@@ -131,9 +131,9 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
           type="submit"
           className={AUTH_CTA}
           disabled={login.isPending || gate.blocked}
-          loading={login.isPending}
+          loading={login.isPending || gate.busy}
         >
-          {gate.verifying ? m.turnstile_verifying() : m.login_submit()}
+          {m.login_submit()}
         </Button>
       </form>
     </Form>

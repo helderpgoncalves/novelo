@@ -32,10 +32,11 @@ function AuthLayout() {
   return (
     <div
       data-lp-fonts=""
-      className="flex min-h-dvh flex-col lg:grid lg:grid-cols-[minmax(480px,46fr)_54fr]"
+      className="flex min-h-dvh flex-col lg:grid lg:grid-cols-[54fr_minmax(480px,46fr)]"
     >
       <AuthStrip />
-      <main className="flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
+      {/* O formulário vem primeiro no DOM (teclado e leitores de ecrã); a imagem decorativa fica à esquerda por `order`. */}
+      <main className="lg:order-2 flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-between">
           <BrandLogo className="h-8" />
           <div className="ml-auto flex items-center gap-1">
@@ -51,7 +52,7 @@ function AuthLayout() {
           <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
         </div>
       </main>
-      <AuthPanel />
+      <AuthPanel className="lg:order-1" />
     </div>
   );
 }
