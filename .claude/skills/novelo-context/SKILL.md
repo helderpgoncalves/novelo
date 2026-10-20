@@ -22,7 +22,7 @@ Guimarães: 156 830 habitantes (soma das freguesias, INE), 48 freguesias dispers
 RAP: responsabilidade alargada do produtor. PAP: porta a porta. Moloks: contentores enterrados/semienterrados. PAYT: pay-as-you-throw. RU/RSU: resíduos (sólidos) urbanos. Vitrus: empresa municipal de resíduos. TIPAU: tipologia de áreas urbanas (INE). Modo de recolha: `existing` (local existente), `street` (contentor de rua), `on_demand` (a pedido).
 
 ## Decisões fixas
-Web React+Vite SPA (sem SSR), tabelas sempre com `DataTable`; um só domínio `novelo.bitsapiens.io` com `/api` por nginx; Postgres; LLM via OpenRouter; contrato OpenAPI→hey-api; otimização OR-Tools (MIP + VRP); marca em `docs/marca/guia-de-marca.md`.
+Web React+Vite SPA (sem SSR), tabelas sempre com `DataTable`; um só domínio `novelo.helder.si` com `/api` por nginx; Postgres; LLM via OpenRouter; contrato OpenAPI→hey-api; otimização OR-Tools (MIP + VRP); marca em `docs/marca/guia-de-marca.md`.
 
 ## Nunca cortar
 Comparação de cenários, "E se...?", relatório RAP. Ordem de corte: copiloto, evidência por marca, animação do Sankey, bolsa de fibra.

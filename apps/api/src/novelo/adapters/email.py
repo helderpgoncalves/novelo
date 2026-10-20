@@ -43,7 +43,7 @@ DEV_OUTBOX: deque[dict[str, str]] = deque(maxlen=50)
 
 
 class LogSender:
-    """Dev: sem RESEND_API_KEY o email vai para o log da API e para a caixa de saída de desenvolvimento."""
+    """Dev (sem chave ou EMAIL_TRANSPORT=log): o email vai para o log da API e para a caixa de saída de dev."""
 
     async def send(self, *, to: str, subject: str, html: str, text: str) -> None:
         log.info("EMAIL (sem RESEND_API_KEY) para=%s assunto=%s\n%s", to, subject, text)
@@ -52,4 +52,6 @@ class LogSender:
 
 def get_email_sender() -> EmailSender:
     settings = get_settings()
-    return ResendSender(settings) if settings.resend_api_key else LogSender()
+    if settings.email_transport == "log" or not settings.resend_api_key:
+        return LogSender()
+    return ResendSender(settings)

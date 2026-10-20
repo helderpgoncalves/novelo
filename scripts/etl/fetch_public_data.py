@@ -26,7 +26,7 @@ from shapely.ops import unary_union
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "data" / "raw" / "public"
 PROCESSED = ROOT / "data" / "processed"
-UA = "novelo-hackathon/1.0 (https://novelo.bitsapiens.io; contacto-removido)"
+UA = "novelo-hackathon/1.0 (https://novelo.helder.si; contacto-removido)"
 INE = "https://www.ine.pt/ine/json_indicador/pindica.jsp"
 NOMINATIM = "https://nominatim.openstreetmap.org/search"
 

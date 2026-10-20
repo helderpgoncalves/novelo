@@ -169,7 +169,7 @@ class OpenRouterClient:
             transport=transport,
             headers={
                 "Authorization": f"Bearer {self._s.openrouter_api_key}",
-                "HTTP-Referer": "https://novelo.bitsapiens.io",
+                "HTTP-Referer": "https://novelo.helder.si",
                 "X-Title": "Novelo",
             },
         )

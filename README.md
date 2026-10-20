@@ -7,7 +7,7 @@
 **A ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães ao menor custo.**
 
 Projeto do Desafio 5 (TexVitrus, Vitrus Ambiente) do Hack4Guimarães 2035, por Hélder Gonçalves e Flávio Fernandes.
-Em produção em **[novelo.bitsapiens.io](https://novelo.bitsapiens.io)**.
+Em produção em **[novelo.helder.si](https://novelo.helder.si)**.
 
 O decisor define um orçamento e uma meta de captura. O Novelo devolve cenários comparáveis em euros, toneladas e €/t, calculados por um otimizador
 sobre os dados reais da Vitrus, e acompanha cada saco de roupa até à fábrica, do saco ao fio.
@@ -107,7 +107,7 @@ just dev        # stack completa com hot reload
 | API e documentação | http://localhost:8190/api/docs |
 | Postgres | `localhost:5590` |
 
-Em desenvolvimento existe um administrador: `admin@bitsapiens.io` com a password `admin-novelo-dev-1` (definido no `.env`). Os emails de recuperar password e confirmação
+Em desenvolvimento existe um administrador: `admin@heldergoncalves.io` com a password `admin-novelo-dev-1` (definido no `.env`). Os emails de recuperar password e confirmação
 aparecem em `just logs api`. As variáveis estão descritas em [docs/engenharia/ambiente.md](docs/engenharia/ambiente.md).
 
 | Comando | O que faz |
@@ -138,7 +138,7 @@ explicações com números que não existam nos factos. Sem `OPENROUTER_API_KEY`
 
 ## Deploy
 
-Cada push para `main` é construído e posto no ar pelo Coolify, a partir de `docker-compose.yml`, em **novelo.bitsapiens.io** (um só domínio: o nginx do web serve a SPA e encaminha `/api`).
+Cada push para `main` é construído e posto no ar pelo Coolify, a partir de `docker-compose.yml`, em **novelo.helder.si** (um só domínio: o nginx do web serve a SPA e encaminha `/api`).
 Passo a passo e variáveis em [docs/engenharia/deploy.md](docs/engenharia/deploy.md). Por agora não há integração contínua remota: `just check` corre localmente antes de cada push.
 
 ## Estrutura do repositório

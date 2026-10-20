@@ -11,7 +11,7 @@ Novelo é a ferramenta de decisão que desenha a rede de recolha de têxteis de 
 triagem por foto, lotes com QR e passaporte público, bolsa de fibra, evidência por marca, relatório RAP em PDF e mapa. Domínio completo: `docs/engenharia/features.md`.
 
 - **Equipa:** Hélder Gonçalves e Flávio Fernandes. Hackathon de 5 dias: velocidade e perfeição, sem desperdício.
-- **Produção:** https://novelo.bitsapiens.io (Coolify, `docker-compose.yml`). Dev: `just dev`.
+- **Produção:** https://novelo.helder.si (Coolify, `docker-compose.yml`). Dev: `just dev`.
 - **Ambiente:** `docs/engenharia/ambiente.md` (variáveis), `docs/engenharia/ia.md` (OpenRouter), `docs/engenharia/workflow-ia.md` (agentes).
 
 ## Regra zero: usar os dados reais da Vitrus

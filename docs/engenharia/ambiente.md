@@ -32,7 +32,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 ## Google OAuth
 
 1. Em [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials), criar um cliente "Web application".
-2. URIs de redirecionamento: `http://localhost:3190/api/v1/auth/google/callback` (dev) e `https://novelo.bitsapiens.io/api/v1/auth/google/callback` (produção).
+2. URIs de redirecionamento: `http://localhost:3190/api/v1/auth/google/callback` (dev) e `https://novelo.helder.si/api/v1/auth/google/callback` (produção).
 3. Preencher `GOOGLE_CLIENT_ID` e `GOOGLE_CLIENT_SECRET`. Sem eles o botão do Google não aparece (o web pergunta a `GET /api/v1/auth/config`).
 
 ## OpenRouter
@@ -54,7 +54,7 @@ Os modelos por omissão são `openai/gpt-6-luna` para texto e para visão (US$ 0
 
 ## Desenvolvimento
 
-O admin de dev é `admin@bitsapiens.io` / `admin-novelo-dev-1`. O compose de dev desliga o limite de pedidos (`RATE_LIMIT_ENABLED=false`) porque os testes ponta a ponta partilham o mesmo IP.
+O admin de dev é `admin@heldergoncalves.io` / `admin-novelo-dev-1`. O compose de dev desliga o limite de pedidos (`RATE_LIMIT_ENABLED=false`) porque os testes ponta a ponta partilham o mesmo IP.
 
 ## Copiloto
 

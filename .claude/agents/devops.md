@@ -1,6 +1,6 @@
 ---
 name: devops
-description: Docker, docker compose dev e prod, Coolify, domínio novelo.bitsapiens.io e diagnóstico de produção. Usar para infra e deploys.
+description: Docker, docker compose dev e prod, Coolify, domínio novelo.helder.si e diagnóstico de produção. Usar para infra e deploys.
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 
