@@ -1,4 +1,5 @@
 import type { AuditEntryOut, InvitationOut, UserAdminOut } from '@/client';
+import { needsAction } from './email-logic';
 
 /** Lógica pura da administração de contas: sem React, testada à parte. As regras finais vivem sempre na API. */
 
@@ -80,9 +81,12 @@ export const byOldestFirst = (a: UserAdminOut, b: UserAdminOut): number =>
 
 export const needsAdminConfirm = (role: Role): boolean => role === 'admin';
 
-/** Convites cujo último envio o fornecedor de email não aceitou (a lista avisa e oferece "Reenviar"). */
+/**
+ * Convites abertos cujo último email não saiu ou voltou (falhou, devolvido, spam, ignorado ou nunca tentado):
+ * a lista avisa e oferece «Reenviar» e «Copiar link». Usa `delivery_status`; `email_delivered` é só compatibilidade.
+ */
 export const undelivered = (items: InvitationOut[]): InvitationOut[] =>
-  items.filter((i) => i.status === 'pending' && !i.email_delivered);
+  items.filter((i) => i.status === 'pending' && needsAction(i.delivery_status));
 
 export const canResend = (inv: InvitationOut): boolean =>
   inv.status === 'pending' || inv.status === 'expired';

@@ -138,13 +138,15 @@ describe('convites', () => {
     ...over,
   });
 
-  it('só os pendentes com o email por entregar pedem atenção', () => {
+  it('só os pendentes cujo email não saiu ou voltou pedem atenção', () => {
     const items = [
-      inv({ id: '1', email_delivered: false }),
-      inv({ id: '2', email_delivered: false, status: 'revoked' }),
-      inv({ id: '3' }),
+      inv({ id: '1', email_delivered: false, delivery_status: 'failed' }),
+      inv({ id: '2', email_delivered: false, delivery_status: 'failed', status: 'revoked' }),
+      inv({ id: '3', delivery_status: 'sent' }),
+      inv({ id: '4', delivery_status: 'none' }),
+      inv({ id: '5', delivery_status: 'bounced' }),
     ];
-    expect(undelivered(items).map((i) => i.id)).toEqual(['1']);
+    expect(undelivered(items).map((i) => i.id)).toEqual(['1', '4', '5']);
   });
 
   it('reenviar e revogar só fazem sentido enquanto o convite está por aceitar', () => {

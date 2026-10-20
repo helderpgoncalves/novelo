@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AlertTriangle, Ban, MailPlus, RotateCw } from 'lucide-react';
+import { useNavigate } from '@tanstack/react-router';
+import { AlertTriangle, Ban, Link2, MailPlus, MailSearch, RotateCw } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { InvitationOut } from '@/client';
@@ -26,9 +27,18 @@ import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
+import { DeliveryBadge } from './delivery-badge';
+import {
+  canCopyLink,
+  DELIVERY_META,
+  statusLabel as deliveryLabel,
+  errorText,
+  wentOut,
+} from './email-logic';
 import { InviteDialog } from './invite-dialog';
 import { canResend, canRevoke, undelivered } from './logic';
 import { roleLabel } from './role-picker';
+import { useInvitationLink } from './use-invitation-link';
 
 const PAGE = 200;
 
@@ -55,6 +65,8 @@ function StatusBadge({ status }: { status: InvitationOut['status'] }) {
 /** Convites enviados: criar, reenviar (novo link) e revogar, com aviso quando o email não saiu. */
 export function InvitationsPanel() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
+  const link = useInvitationLink();
   const [inviting, setInviting] = useState(false);
   const [revoking, setRevoking] = useState<InvitationOut | null>(null);
   const list = useQuery(listInvitationsOptions({ query: { limit: PAGE } }));
@@ -65,8 +77,11 @@ export function InvitationsPanel() {
     ...resendInvitationMutation(),
     onSuccess: async (inv) => {
       await invalidateAdminQueries(queryClient);
-      if (inv.email_delivered) toast.success(m.invite_resent({ email: inv.email }));
-      else toast.warning(m.invite_not_delivered_toast());
+      if (wentOut(inv.delivery_status)) toast.success(m.invite_resent({ email: inv.email }));
+      else
+        toast.warning(
+          inv.delivery_error ? errorText(inv.delivery_error) : m.invite_not_delivered_toast(),
+        );
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -116,13 +131,21 @@ export function InvitationsPanel() {
       cell: (i) => (
         <div className="flex flex-wrap items-center gap-1.5">
           <StatusBadge status={i.status} />
-          {i.status === 'pending' && !i.email_delivered && (
-            <Badge variant="outline" className="border-destructive/50 text-destructive">
-              <AlertTriangle aria-hidden="true" />
-              {m.invite_not_delivered()}
-            </Badge>
-          )}
         </div>
+      ),
+    },
+    {
+      id: 'delivery',
+      header: m.users_delivery_col(),
+      label: m.users_delivery_col(),
+      value: (i) => i.delivery_status,
+      exportValue: (i) =>
+        [deliveryLabel(i.delivery_status), i.delivery_error ? errorText(i.delivery_error) : '']
+          .filter(Boolean)
+          .join(': '),
+      filter: { format: (v) => DELIVERY_META[v as InvitationOut['delivery_status']].label() },
+      cell: (i) => (
+        <DeliveryBadge status={i.delivery_status} at={i.last_email_at} error={i.delivery_error} />
       ),
     },
     {
@@ -200,6 +223,24 @@ export function InvitationsPanel() {
               onSelect: () => resend.mutate({ path: { invitation_id: i.id } }),
             });
           }
+          if (canCopyLink(i)) {
+            actions.push({
+              id: 'copy-link',
+              label: m.email_link_action(),
+              icon: <Link2 />,
+              onSelect: () => link.ask(i),
+            });
+          }
+          actions.push({
+            id: 'emails',
+            label: m.email_link_view(),
+            icon: <MailSearch />,
+            onSelect: () =>
+              void navigate({
+                to: '/users',
+                search: { tab: 'audit', view: 'emails', q: i.email },
+              }),
+          });
           if (canRevoke(i)) {
             actions.push({
               id: 'revoke',
@@ -218,6 +259,7 @@ export function InvitationsPanel() {
         </p>
       )}
       <InviteDialog open={inviting} onOpenChange={setInviting} />
+      {link.element}
       <AlertDialog open={revoking !== null} onOpenChange={(o) => !o && setRevoking(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>

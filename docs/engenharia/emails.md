@@ -75,6 +75,14 @@ Quem se regista (palavra-passe ou Google) fica `approval_status=pending` e receb
 
 `provider_not_configured`, `provider_auth_invalid`, `domain_not_verified`, `failures_last_hour` (3 ou mais), `high_failure_rate` (> 20 % com pelo menos 5 envios na última hora), `webhook_silent` (webhook configurado sem eventos há 24 h com envios recentes) e `no_admin_recipients`. Estão em `GET /users/emails/summary` e o número em `GET /auth/me` (`email_alerts`). `GET /ready` traz `email`: `ok`, `not_configured` ou `failing`.
 
+## O que a pessoa e o administrador veem (web)
+
+- **«Verifica o teu email»** (link de entrada e recuperar palavra-passe): diz o que pedimos (nunca que chegou), reenvio com contagem de 30 s e a dica do convite. `503 email_unavailable` troca-o por um ecrã de problema com tentar de novo, Google, palavra-passe e suporte; `409 email_suppressed` tem mensagem própria; `429` bloqueia o botão outra vez.
+- **Pendente de aprovação:** consulta `GET /auth/approval-status` a cada 20 s (e ao voltar ao separador) até haver decisão; mostra o estado do email de confirmação (`confirmation_email`) e, se não saiu, «Reenviar email».
+- **Utilizadores → Convites:** coluna de entrega por convite, «Copiar link do convite» (link novo copiado uma vez, o anterior deixa de valer) e «Ver emails deste convite». Convidar mostra o estado real do envio.
+- **Utilizadores → Contas:** `approval_email` por pessoa e, se aprovar/recusar não avisou, o aviso com «Reenviar email».
+- **Utilizadores → Auditoria → Emails** (`?tab=audit&view=emails`): alertas com a correção, o que sabemos de cada envio, DNS, tabela de envios e endereços bloqueados. Um banner discreto em toda a app avisa os administradores quando `email_alerts > 0`.
+
 ## Configurar a entrega verificada (3 opções)
 
 ### 1. Webhook (recomendado; funciona com a chave de envio)
@@ -82,7 +90,7 @@ Quem se regista (palavra-passe ou Google) fica `approval_status=pending` e receb
 1. Resend → **Webhooks** → *Add Webhook* → **Endpoint** `https://novelo.helder.si/api/v1/webhooks/resend`.
 2. Eventos: `email.sent`, `email.delivered`, `email.delivery_delayed`, `email.bounced`, `email.complained`, `email.failed`.
 3. Copiar o *Signing Secret* (`whsec_...`) e pô-lo no Coolify como `RESEND_WEBHOOK_SECRET` (Environment Variables da aplicação, **segredo**); fazer *Redeploy*.
-4. Verificar: administrador → **Utilizadores → Emails → Enviar teste**; o estado passa de `sent` a `delivered` em segundos. Sem o segredo o endpoint responde 503 e fica desativado.
+4. Verificar: administrador → **Utilizadores → Auditoria → Emails → Enviar email de teste**; o estado passa de `sent` a `delivered` em segundos. Sem o segredo o endpoint responde 503 e fica desativado.
 
 O endpoint verifica a assinatura Svix (`svix-id`, `svix-timestamp`, `svix-signature`) sobre o corpo bruto, com tolerância de 5 min e comparação de tempo constante; limita o corpo a 64 KB e os pedidos por IP; é idempotente e ignora eventos e ids desconhecidos (responde 200). Não precisa de sessão: a assinatura é a autenticação.
 
@@ -108,7 +116,7 @@ Usa a API (nunca o Resend): confere `/ready`, o resumo, o DNS, envia um email de
 
 ## Runbook: «um utilizador diz que não recebeu o email»
 
-1. **Pedir o email exato** com que tentou. Em **Utilizadores → Emails** pesquisar por esse endereço (`GET /users/emails?q=`).
+1. **Pedir o email exato** com que tentou. Em **Utilizadores → Auditoria → Emails** (ou «Ver emails deste convite», na linha do convite) pesquisar por esse endereço (`GET /users/emails?q=`).
 2. **Não há registo nenhum?** O pedido nem chegou ao envio: verificar `GET /ready` (`email`) e o banner de alertas. Pode ter escrito o email errado ou ter sido travado pelos limites (3 por 10 min por email; neutro 1 a cada 30 min; convite 1 a cada 5 min).
 3. Ver o **estado**:
    - `failed`: ler o `error_code` (tabela acima) e agir (chave, domínio, destinatário). Depois reenviar (convite: *Reenviar*; conta: *Reenviar email*; ou pedir ao utilizador para repetir).

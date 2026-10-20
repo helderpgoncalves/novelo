@@ -196,7 +196,9 @@ function InvalidInvite() {
       </div>
       <div className={AUTH_BUTTONS}>
         <Button asChild className={AUTH_CTA}>
-          <Link to="/login">{m.inv_go_login()}</Link>
+          <Link to="/login" search={{ reason: 'invite' }}>
+            {m.inv_request_new()}
+          </Link>
         </Button>
         <Button asChild variant="ghost" className={AUTH_BUTTON}>
           <a href={mailtoLink(m.inv_contact_subject(), m.inv_contact_body())}>{m.inv_contact()}</a>

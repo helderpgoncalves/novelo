@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { AlertCircle, Check, MailWarning, X } from 'lucide-react';
+import { AlertCircle, Check, Hourglass, Loader, MailCheck, MailWarning, X } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { MeOut } from '@/client';
@@ -8,6 +8,7 @@ import {
   getApprovalStatusOptions,
   getMeQueryKey,
   logoutMutation,
+  resendRegistrationEmailMutation,
   resendVerificationMutation,
 } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
@@ -17,7 +18,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { useCountdown } from '@/features/auth/use-countdown';
 import { markTourPending } from '@/features/onboarding/tour-store';
-import { getErrorMessage } from '@/lib/errors';
+import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { intlTag } from '@/lib/i18n';
 import { queryClient as sharedClient } from '@/lib/query-client';
 import { mailtoLink, SUPPORT_EMAIL } from '@/lib/support';
@@ -27,9 +28,12 @@ import { ApprovalMark } from './approval-mark';
 import {
   type ApprovalState,
   approvalSteps,
+  CONFIRMATION_RESEND_SECONDS,
+  type ConfirmationKind,
+  confirmationView,
   ENTER_DELAY_MS,
   ENTER_DELAY_REDUCED_MS,
-  pollDelay,
+  pollInterval,
   type Step,
   type StepId,
 } from './steps';
@@ -104,6 +108,82 @@ function Stepper({ steps }: { steps: Step[] }) {
   );
 }
 
+const CONFIRMATION_TEXT: Record<ConfirmationKind, (email: string) => string> = {
+  none: () => '',
+  sending: () => m.pending_conf_sending(),
+  sent: () => m.pending_conf_sent(),
+  delivered: (email) => m.pending_conf_delivered({ email }),
+  delayed: () => m.pending_conf_delayed(),
+  failed: () => m.pending_conf_failed(),
+  returned: (email) => m.pending_conf_returned({ email }),
+};
+
+/** O estado do email de confirmação do pedido, sem prometer o que não sabemos; reenvio ou contacto se não chegou. */
+function ConfirmationEmail({
+  kind,
+  email,
+  canResend,
+  canContact,
+  waiting,
+  pending,
+  error,
+  onResend,
+}: {
+  kind: ConfirmationKind;
+  email: string;
+  canResend: boolean;
+  canContact: boolean;
+  waiting: number;
+  pending: boolean;
+  error: string | null;
+  onResend: () => void;
+}) {
+  const bad = kind === 'failed' || kind === 'returned';
+  const Icon = bad
+    ? MailWarning
+    : kind === 'sending'
+      ? Loader
+      : kind === 'delayed'
+        ? Hourglass
+        : MailCheck;
+  return (
+    <div
+      data-testid="approval-confirmation-email"
+      data-kind={kind}
+      className={cn('space-y-3 border-t pt-4 text-sm', bad && '[&_svg]:text-destructive')}
+    >
+      <p role="status" className="flex items-start gap-2.5 leading-relaxed">
+        <Icon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+        {CONFIRMATION_TEXT[kind](email)}
+      </p>
+      {error && (
+        <p role="alert" className="flex items-start gap-2.5 text-destructive leading-relaxed">
+          <AlertCircle className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
+          {error}
+        </p>
+      )}
+      {canResend && (
+        <Button
+          variant="outline"
+          className="h-11 w-full font-semibold"
+          loading={pending}
+          disabled={waiting > 0}
+          onClick={onResend}
+        >
+          {waiting > 0 ? m.pa_resend_wait({ seconds: waiting }) : m.pending_conf_resend()}
+        </Button>
+      )}
+      {(canContact || (error !== null && !canResend)) && (
+        <Button asChild variant="outline" className="h-11 w-full font-semibold">
+          <a href={mailtoLink(m.pending_conf_mail_subject(), m.pending_conf_mail_body({ email }))}>
+            {m.pending_conf_contact()}
+          </a>
+        </Button>
+      )}
+    </div>
+  );
+}
+
 function useReducedMotion(): boolean {
   const [reduced, setReduced] = useState(
     () =>
@@ -126,12 +206,9 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
   const reduced = useReducedMotion();
   const status = useQuery({
     ...getApprovalStatusOptions(),
-    // Abranda a cada verificação e pára quando a tab está escondida (o React Query pausa o intervalo em segundo plano).
-    refetchInterval: (query) => {
-      const state = query.state.data?.status;
-      if (state && state !== 'pending') return false;
-      return pollDelay(query.state.dataUpdateCount + query.state.errorUpdateCount);
-    },
+    // A cada 20 s enquanto pendente (pára quando aprovado ou recusado); o React Query pausa o intervalo com o
+    // separador escondido e, ao voltar, `refetchOnWindowFocus` verifica logo.
+    refetchInterval: (query) => pollInterval(query.state.data?.status),
     refetchOnWindowFocus: true,
     retry: false,
   });
@@ -183,6 +260,24 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
   });
   const cooling = sentAt > 0 && wait > 0;
 
+  // Email «recebemos o teu pedido»: o estado real e, se não saiu, o botão para reenviar.
+  const confirmation = confirmationView(data?.confirmation_email);
+  const [confSentAt, setConfSentAt] = useState<number>(0);
+  const confWait = useCountdown(confSentAt, CONFIRMATION_RESEND_SECONDS);
+  const confCooling = confSentAt > 0 && confWait > 0;
+  const resendConfirmation = useMutation({
+    ...resendRegistrationEmailMutation(),
+    onSuccess: () => {
+      setConfSentAt(Date.now());
+      toast.success(m.pending_conf_resent());
+      void status.refetch();
+    },
+    // 429: a API não diz quanto falta, por isso a espera recomeça; 409/503 já têm mensagem própria.
+    onError: (error) => {
+      if (getErrorCode(error) === 'rate_limited') setConfSentAt(Date.now());
+    },
+  });
+
   const rejected = state === 'rejected';
   const approved = state === 'approved';
   const checkedAt = status.dataUpdatedAt
@@ -233,8 +328,20 @@ export function PendingApprovalPage({ user }: { user: MeOut }) {
           {approved ? m.pa_status_live_approved() : rejected ? m.pa_status_live_rejected() : ''}
         </div>
 
-        <div className="rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-6">
+        <div className="space-y-4 rounded-2xl bg-card p-4 ring-1 ring-foreground/10 sm:p-6">
           <Stepper steps={steps} />
+          {!approved && !rejected && confirmation.kind !== 'none' && (
+            <ConfirmationEmail
+              kind={confirmation.kind}
+              email={user.email}
+              canResend={confirmation.canResend}
+              canContact={confirmation.canContact}
+              waiting={confCooling ? confWait : 0}
+              pending={resendConfirmation.isPending}
+              error={resendConfirmation.isError ? getErrorMessage(resendConfirmation.error) : null}
+              onResend={() => resendConfirmation.mutate({})}
+            />
+          )}
         </div>
 
         {rejected && (

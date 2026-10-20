@@ -1,4 +1,4 @@
-import { CheckCheck, UserCheck, UserX } from 'lucide-react';
+import { CheckCheck, Send, UserCheck, UserX } from 'lucide-react';
 import type { UserAdminOut } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { EmptyState } from '@/components/states';
@@ -7,8 +7,11 @@ import { Button } from '@/components/ui/button';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { originLabel } from './badges';
+import { ApprovalEmailCell } from './delivery-badge';
+import { canRetryEmail, DELIVERY_META } from './email-logic';
 import { byOldestFirst } from './logic';
 import { useAccountDialogs } from './use-account-dialogs';
+import { useResendUserEmail } from './use-resend-user-email';
 
 interface Props {
   /** Todas as contas (a lista filtra as pendentes): os diálogos precisam do conjunto completo. */
@@ -21,6 +24,7 @@ interface Props {
 /** Pedidos de acesso à espera de decisão, do mais antigo para o mais recente. */
 export function PendingPanel({ users, currentUserId, impersonating, refreshing }: Props) {
   const dialogs = useAccountDialogs({ users, selfId: currentUserId, impersonating });
+  const resend = useResendUserEmail();
   const pending = users.filter((u) => u.approval_status === 'pending').sort(byOldestFirst);
 
   const columns: Column<UserAdminOut>[] = [
@@ -48,6 +52,15 @@ export function PendingPanel({ users, currentUserId, impersonating, refreshing }
       exportValue: (u) => originLabel(u.joined_via),
       filter: { format: (v) => originLabel(v as UserAdminOut['joined_via']) },
       cell: (u) => <Badge variant="secondary">{originLabel(u.joined_via)}</Badge>,
+    },
+    {
+      id: 'notice',
+      header: m.users_approval_email_col(),
+      label: m.users_approval_email_col(),
+      value: (u) => u.approval_email?.status ?? 'none',
+      exportValue: (u) => DELIVERY_META[u.approval_email?.status ?? 'none'].label(),
+      filter: { format: (v) => DELIVERY_META[v as keyof typeof DELIVERY_META].label() },
+      cell: (u) => <ApprovalEmailCell email={u.approval_email} />,
     },
     {
       id: 'requested',
@@ -105,6 +118,18 @@ export function PendingPanel({ users, currentUserId, impersonating, refreshing }
         searchLabel={m.users_search()}
         refreshing={refreshing}
         controls="auto"
+        rowActions={(u) =>
+          u.approval_email && canRetryEmail(u.approval_email.status)
+            ? [
+                {
+                  id: 'resend-email',
+                  label: m.email_resend_one(),
+                  icon: <Send />,
+                  onSelect: () => resend.mutate({ path: { user_id: u.id } }),
+                },
+              ]
+            : []
+        }
         initialSort={{ id: 'requested', desc: false }}
         empty={<EmptyState title={m.pending_empty_title()} description={m.pending_empty_text()} />}
         bulkActions={[

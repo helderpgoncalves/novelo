@@ -19,6 +19,7 @@ import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
+import { EmailWarnings } from './email-warnings';
 import { displayName, normalizeText, REJECT_REASON_MAX } from './logic';
 
 export function RejectDialog({
@@ -44,15 +45,29 @@ function RejectBody({ user, onClose }: { user: UserAdminOut; onClose: () => void
   const reasonId = useId();
   const [reason, setReason] = useState('');
   const [notify, setNotify] = useState(false);
+  const [warned, setWarned] = useState<UserAdminOut | null>(null);
   const name = displayName(user);
   const reject = useMutation({
     ...rejectUserMutation(),
-    onSuccess: async () => {
+    onSuccess: async (decided) => {
       await invalidateAdminQueries(queryClient);
       toast.success(m.reject_done({ name }));
-      onClose();
+      // O email (se foi pedido) não saiu: fica o aviso com «Reenviar email» e o contacto direto.
+      if (decided.email_warning) setWarned(decided);
+      else onClose();
     },
   });
+
+  if (warned) {
+    return (
+      <EmailWarnings
+        users={[warned]}
+        decision="rejected"
+        onClose={onClose}
+        title={m.reject_done({ name })}
+      />
+    );
+  }
 
   return (
     <>

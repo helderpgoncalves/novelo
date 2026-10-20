@@ -95,6 +95,55 @@ test.describe('acesso', () => {
     await expect(page.getByTestId('pending-badge').first()).toBeVisible();
     await shot(page, 'users-audit');
   });
+
+  test('os emails são uma vista da Auditoria (não um quarto separador)', async ({ page }) => {
+    await login(page);
+    // O endereço antigo `tab=emails` abre a vista certa.
+    await page.goto('/pt/users?tab=emails');
+    await expect(page).toHaveURL(/tab=audit/);
+    await expect(page).toHaveURL(/view=emails/);
+    await expect(page.getByRole('tab')).toHaveCount(3);
+    const panel = page.getByTestId('emails-panel');
+    await expect(panel).toBeVisible();
+    // O que sabemos de cada envio, dito em linguagem simples, e a saúde do DNS.
+    await expect(panel.getByTestId('email-tracking')).toBeVisible();
+    await expect(panel.getByRole('heading', { name: 'Saúde do DNS do remetente' })).toBeVisible();
+    await expect(panel.getByRole('heading', { name: 'Endereços bloqueados' })).toBeVisible();
+
+    // Email de teste: mostra o estado a evoluir.
+    await panel.getByRole('button', { name: 'Enviar email de teste' }).click();
+    await expect(panel.getByTestId('email-test-result')).toBeVisible({ timeout: 15_000 });
+
+    // A tabela de envios tem filtros no servidor e o teste aparece lá.
+    await panel.getByLabel('Estado', { exact: true }).click();
+    await page.getByRole('option', { name: 'Todos os estados' }).click();
+    await expect(
+      panel.getByRole('row').filter({ hasText: 'Email de teste' }).first(),
+    ).toBeVisible();
+
+    // Voltar às ações da auditoria.
+    await page.getByRole('button', { name: 'Ações', exact: true }).click();
+    await expect(page.getByLabel('Ação', { exact: true })).toBeVisible();
+  });
+
+  test('«Ver emails deste convite» abre a vista de emails já pesquisada', async ({ page }) => {
+    const invited = uniqueEmail('ver-emails');
+    created.push(invited);
+    const api = await adminApi();
+    const res = await api.post('/api/v1/users/invitations', {
+      data: { email: invited, role: 'operator', locale: 'pt-PT' },
+    });
+    expect(res.ok()).toBeTruthy();
+    await api.dispose();
+    await login(page);
+    await page.goto('/pt/users?tab=invitations');
+    await rowAction(page, invited, /^Ver emails deste convite/);
+    await expect(page).toHaveURL(/view=emails/);
+    await expect(page).toHaveURL(/q=/);
+    await expect(page.getByRole('searchbox', { name: 'Email do destinatário' })).toHaveValue(
+      invited,
+    );
+  });
 });
 
 test.describe('convites', () => {
@@ -116,10 +165,16 @@ test.describe('convites', () => {
     await dialog.getByRole('radio', { name: /Operador/ }).click();
     await shot(adminPage, 'invite-dialog');
     await dialog.getByRole('button', { name: 'Enviar convite' }).click();
-    await expect(adminPage.getByText(`Convite enviado para ${invited}`)).toBeVisible();
+    // O diálogo mostra o estado REAL do envio (não um «enviado» otimista) e só fecha em «Concluir».
+    await expect(dialog.getByText(`Convite enviado a ${invited}`)).toBeVisible();
+    await expect(dialog.getByTestId('invite-result').getByTestId('delivery-badge')).toBeVisible();
+    await expect(dialog.getByRole('button', { name: 'Copiar link' })).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Concluir' }).click();
     const row = adminPage.getByRole('row', { name: new RegExp(invited.replace(/\./g, '\\.')) });
     await expect(row).toContainText('Pendente');
-    await expect(adminPage.getByText('Convites sem email entregue')).toHaveCount(0);
+    // Entrega com ícone e texto (nunca só a cor): o email saiu, por isso não há aviso de convites sem email.
+    await expect(row.getByTestId('delivery-badge')).not.toHaveAttribute('data-status', 'failed');
+    await expect(adminPage.getByText(/Convites cujo email não saiu/)).toHaveCount(0);
 
     // A pessoa abre o link do email numa sessão limpa.
     const mail = await lastEmail(invited);
@@ -161,7 +216,10 @@ test.describe('convites', () => {
   test('convite inválido tem saída amável', async ({ page }) => {
     await page.goto('/pt/accept-invite?token=isto-nao-e-um-convite-valido-1234567890');
     await expect(page.getByRole('heading', { name: 'Este convite já não é válido' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Ir para a entrada' })).toBeVisible();
+    // Saída neutra: pedir novo convite leva à entrada por email, onde reenviamos o convite.
+    await page.getByRole('link', { name: 'Pedir novo convite' }).click();
+    await expect(page).toHaveURL(/\/pt\/login\?.*reason=invite/);
+    await expect(page.getByText(/reenviamos-to/)).toBeVisible();
     await page.goto('/pt/accept-invite');
     await expect(page.getByRole('heading', { name: 'Este convite já não é válido' })).toBeVisible();
   });

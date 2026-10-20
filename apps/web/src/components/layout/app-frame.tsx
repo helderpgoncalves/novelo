@@ -11,6 +11,7 @@ import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { ImpersonationBanner } from '@/features/impersonation/impersonation-banner';
 import { OnboardingTour } from '@/features/onboarding/onboarding-tour';
 import { StarterChecklist } from '@/features/onboarding/starter-checklist';
+import { EmailAlertsBanner } from '@/features/users/email-alerts-banner';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -51,6 +52,7 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
           <Topbar user={user} showMenuButton={fullBleed} onMenuClick={() => setMenuOpen(true)} />
           <OfflineBanner />
           <VerifyEmailBanner user={user} />
+          <EmailAlertsBanner user={user} />
           <PullToRefresh scrollRef={mainRef} disabled={fullBleed} />
           <main
             id="content"

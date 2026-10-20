@@ -11,6 +11,8 @@ import {
   AUTH_STACK,
   AuthHeading,
 } from './auth-ui';
+import { classifySendError, isBlockingFailure } from './email-flow';
+import { EmailProblem } from './email-problem';
 import { FormAlert } from './form-alert';
 import { MagicLinkSent, magicLinkBody, useRequestMagicLink } from './magic-link-sent';
 import { looksLikeEmail, readLastEmail } from './passwordless';
@@ -32,6 +34,10 @@ export function MagicLinkFlow({
 }) {
   const [email, setEmail] = useState<string | null>(null);
   const [problem, setProblem] = useState<string | null>(null);
+  // O último email que se tentou enviar: se o envio falhar, o ecrã de problema fala dele.
+  const [attempt, setAttempt] = useState('');
+  // Falha que troca o formulário pelo ecrã de problema; fica até a tentativa seguinte correr bem.
+  const [blocked, setBlocked] = useState<'unavailable' | 'suppressed' | null>(null);
   const input = useRef<HTMLInputElement>(null);
   const request = useRequestMagicLink();
 
@@ -53,6 +59,39 @@ export function MagicLinkFlow({
     );
   }
 
+  const submit = (value: string) => {
+    setAttempt(value);
+    request.send(magicLinkBody(value, next), {
+      onSuccess: () => {
+        setBlocked(null);
+        setEmail(value);
+      },
+      onError: (error) => {
+        const kind = classifySendError(error);
+        setBlocked(isBlockingFailure(kind) ? kind : null);
+      },
+    });
+  };
+
+  if (attempt && blocked) {
+    return (
+      <EmailProblem
+        kind={blocked}
+        email={attempt}
+        purpose="link"
+        next={next}
+        retrying={request.isPending}
+        retryBlocked={request.gate.blocked}
+        gateField={request.gate.field}
+        onRetry={() => submit(attempt)}
+        onChangeEmail={() => {
+          setBlocked(null);
+          request.reset();
+        }}
+      />
+    );
+  }
+
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     // Lê do DOM: os gestores de palavras-passe preenchem sem disparar `input`.
@@ -60,7 +99,7 @@ export function MagicLinkFlow({
     if (!value) return setProblem(m.validation_email_required());
     if (!looksLikeEmail(value)) return setProblem(m.validation_email_invalid());
     setProblem(null);
-    request.send(magicLinkBody(value, next), { onSuccess: () => setEmail(value) });
+    submit(value);
   };
 
   return (
@@ -83,7 +122,7 @@ export function MagicLinkFlow({
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
-              defaultValue={readLastEmail()}
+              defaultValue={attempt || readLastEmail()}
               placeholder={m.login_email_placeholder()}
               aria-invalid={problem ? true : undefined}
               aria-describedby="magic-email-problem"

@@ -17,6 +17,7 @@ import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
+import { EmailWarnings } from './email-warnings';
 import { displayName, needsAdminConfirm, type Role } from './logic';
 import { RolePicker } from './role-picker';
 
@@ -42,6 +43,7 @@ function ApproveBody({ users, onClose }: { users: UserAdminOut[]; onClose: () =>
   const [role, setRole] = useState<Role>('operator');
   const [notify, setNotify] = useState(true);
   const [confirmAdmin, setConfirmAdmin] = useState(false);
+  const [warned, setWarned] = useState<UserAdminOut[] | null>(null);
   const many = users.length > 1;
   const first = users[0];
   const name = first ? displayName(first) : '';
@@ -63,16 +65,32 @@ function ApproveBody({ users, onClose }: { users: UserAdminOut[]; onClose: () =>
       );
       const failed = results.filter((r) => r.status === 'rejected');
       if (failed.length === results.length) throw (failed[0] as PromiseRejectedResult).reason;
-      return { ok: results.length - failed.length, failed: failed.length };
+      // Quem foi aprovado mas ficou sem o email: a ação está feita, a pessoa pode não saber.
+      const warned = results.flatMap((r) =>
+        r.status === 'fulfilled' && r.value.data.email_warning ? [r.value.data] : [],
+      );
+      return { ok: results.length - failed.length, failed: failed.length, warned };
     },
-    onSuccess: async ({ ok, failed }) => {
+    onSuccess: async ({ ok, failed, warned: unnotified }) => {
       await invalidateAdminQueries(queryClient);
       if (failed > 0) toast.warning(m.approve_done_partial({ ok, failed }));
       else toast.success(many ? m.approve_done_many({ count: ok }) : m.approve_done({ name }));
-      onClose();
+      if (unnotified.length > 0) setWarned(unnotified);
+      else onClose();
     },
   });
   const ready = !needsAdminConfirm(role) || confirmAdmin;
+
+  if (warned) {
+    return (
+      <EmailWarnings
+        users={warned}
+        decision="approved"
+        onClose={onClose}
+        title={many ? m.approve_title_many({ count: users.length }) : m.approve_done({ name })}
+      />
+    );
+  }
 
   return (
     <>
