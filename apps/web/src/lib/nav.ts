@@ -8,6 +8,7 @@ import {
   Layers,
   type LucideIcon,
   MapPinned,
+  MessagesSquare,
   Radar,
   Route as RouteIcon,
   ScanLine,
@@ -31,6 +32,7 @@ export interface NavItem {
     | '/data-quality'
     | '/map'
     | '/coverage'
+    | '/chat'
     | '/triage'
     | '/lots'
     | '/market'
@@ -61,6 +63,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
       { label: () => m.nav_map(), to: '/map', icon: MapPinned },
       { label: () => m.nav_coverage(), to: '/coverage', icon: Radar },
+      { label: () => m.nav_chat(), to: '/chat', icon: MessagesSquare },
     ],
   },
   {

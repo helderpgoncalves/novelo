@@ -28,7 +28,7 @@ function refreshSession(): Promise<boolean> {
 export const SESSION_EXPIRED_EVENT = 'novelo:session-expired';
 
 // fetch com renovação silenciosa da sessão: um 401 tenta o refresh uma vez e repete o pedido.
-const authFetch: typeof fetch = async (input, init) => {
+export const authFetch: typeof fetch = async (input, init) => {
   const retry = input instanceof Request ? input.clone() : null;
   const res = await fetch(input, init);
   const url = input instanceof Request ? input.url : String(input);
