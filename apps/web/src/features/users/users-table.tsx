@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Eye, KeyRound, Power, PowerOff, Trash2, UserCheck, UserX } from 'lucide-react';
+import { Eye, KeyRound, Power, PowerOff, Send, Trash2, UserCheck, UserX } from 'lucide-react';
 import { toast } from 'sonner';
 import { type UserAdminOut, updateUser } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
@@ -16,9 +16,12 @@ import {
   stateLabel,
 } from './badges';
 import { invalidateAdminQueries } from './cache';
+import { ApprovalEmailCell } from './delivery-badge';
+import { canRetryEmail, DELIVERY_META } from './email-logic';
 import { updateBlocker } from './logic';
 import { roleLabel } from './role-picker';
 import { useAccountDialogs } from './use-account-dialogs';
+import { useResendUserEmail } from './use-resend-user-email';
 
 interface Props {
   users: UserAdminOut[];
@@ -31,6 +34,7 @@ interface Props {
 export function UsersTable({ users, currentUserId, impersonating, refreshing }: Props) {
   const queryClient = useQueryClient();
   const dialogs = useAccountDialogs({ users, selfId: currentUserId, impersonating });
+  const resendEmail = useResendUserEmail();
   const reactivate = useMutation({
     mutationFn: async (targets: UserAdminOut[]) => {
       const results = await Promise.allSettled(
@@ -108,6 +112,17 @@ export function UsersTable({ users, currentUserId, impersonating, refreshing }: 
       cell: (u) => <span className="text-muted-foreground">{originLabel(u.joined_via)}</span>,
     },
     {
+      // O email que avisa a pessoa do pedido ou da decisão: escondido por omissão, à vista nos pedidos por aprovar.
+      id: 'notice',
+      header: m.users_approval_email_col(),
+      label: m.users_approval_email_col(),
+      defaultHidden: true,
+      value: (u) => u.approval_email?.status ?? 'none',
+      exportValue: (u) => DELIVERY_META[u.approval_email?.status ?? 'none'].label(),
+      filter: { format: (v) => DELIVERY_META[v as keyof typeof DELIVERY_META].label() },
+      cell: (u) => <ApprovalEmailCell email={u.approval_email} />,
+    },
+    {
       id: 'login',
       type: 'datetime',
       header: m.users_table_last_login(),
@@ -159,6 +174,14 @@ export function UsersTable({ users, currentUserId, impersonating, refreshing }: 
               label: m.users_action_reject(),
               icon: <UserX />,
               onSelect: () => dialogs.show('reject', [u]),
+            });
+          }
+          if (u.approval_email && canRetryEmail(u.approval_email.status)) {
+            actions.push({
+              id: 'resend-email',
+              label: m.email_resend_one(),
+              icon: <Send />,
+              onSelect: () => resendEmail.mutate({ path: { user_id: u.id } }),
             });
           }
           actions.push({

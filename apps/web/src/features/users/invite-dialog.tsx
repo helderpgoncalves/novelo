@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
 import { z } from 'zod';
 import type { InvitationOut } from '@/client';
 import { createInvitationMutation } from '@/client/@tanstack/react-query.gen';
@@ -32,6 +31,7 @@ import { getLocale, LOCALE_LABELS, type Locale, locales } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
+import { InviteResult } from './invite-result';
 import { INVITE_MESSAGE_MAX, needsAdminConfirm, type Role } from './logic';
 import { RolePicker } from './role-picker';
 
@@ -71,6 +71,7 @@ function InviteBody({ onClose }: { onClose: () => void }) {
   const [confirmAdmin, setConfirmAdmin] = useState(false);
   const [locale, setLocale] = useState<Locale>(getLocale());
   const [fieldError, setFieldError] = useState(false);
+  const [result, setResult] = useState<InvitationOut | null>(null);
   const form = useForm<Values>({
     resolver: zodResolver(schema),
     defaultValues: { email: '', name: '', message: '' },
@@ -86,12 +87,13 @@ function InviteBody({ onClose }: { onClose: () => void }) {
       ),
     onSuccess: async (invitation: InvitationOut) => {
       await invalidateAdminQueries(queryClient);
-      if (invitation.email_delivered) toast.success(m.invite_sent({ email: invitation.email }));
-      else toast.warning(m.invite_not_delivered_toast());
-      onClose();
+      // O diálogo fica aberto com o estado real do envio (enviado ou não) e as saídas se falhou.
+      setResult(invitation);
     },
   });
   const ready = !needsAdminConfirm(role) || confirmAdmin;
+
+  if (result) return <InviteResult invitation={result} onClose={onClose} />;
 
   return (
     <>

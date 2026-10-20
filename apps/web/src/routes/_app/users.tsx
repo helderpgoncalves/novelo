@@ -6,24 +6,40 @@ import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { PageTabs } from '@/components/page-tabs';
 import { AccountsSection } from '@/features/users/accounts-section';
-import { AuditPanel } from '@/features/users/audit-panel';
+import { AuditSection } from '@/features/users/audit-section';
 import { InvitationsSection } from '@/features/users/invitations-section';
 import { ForbiddenError } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
-// Três separadores. Os valores antigos (`pending`, `guests`, `poster`) continuam a abrir o sítio certo.
+// Três separadores. Os valores antigos (`pending`, `guests`, `poster`, `emails`) continuam a abrir o sítio certo:
+// os emails são uma vista da Auditoria (`?tab=audit&view=emails`), não um quarto separador.
 const TABS = ['accounts', 'invitations', 'audit'] as const;
-const LEGACY = { pending: 'accounts', guests: 'invitations', poster: 'invitations' } as const;
+const LEGACY = {
+  pending: 'accounts',
+  guests: 'invitations',
+  poster: 'invitations',
+  emails: 'audit',
+} as const;
 
 const searchSchema = z
   .object({
     tab: z.enum([...TABS, ...Object.keys(LEGACY)] as [string, ...string[]]).catch('accounts'),
-    view: z.enum(['pending']).optional().catch(undefined),
+    view: z.enum(['pending', 'emails']).optional().catch(undefined),
+    // Pesquisa por email na vista de emails (ex.: «Ver emails deste convite»).
+    q: z.string().max(200).optional().catch(undefined),
   })
-  .transform(({ tab, view }) => ({
-    tab: (tab in LEGACY ? LEGACY[tab as keyof typeof LEGACY] : tab) as (typeof TABS)[number],
-    view: tab === 'pending' ? ('pending' as const) : view,
-  }));
+  .transform(({ tab, view, q }) => {
+    const resolved = (
+      tab in LEGACY ? LEGACY[tab as keyof typeof LEGACY] : tab
+    ) as (typeof TABS)[number];
+    const wanted = tab === 'pending' ? 'pending' : tab === 'emails' ? 'emails' : view;
+    const allowed = resolved === 'accounts' ? 'pending' : resolved === 'audit' ? 'emails' : null;
+    return {
+      tab: resolved,
+      view: wanted === allowed ? (wanted as 'pending' | 'emails') : undefined,
+      q: resolved === 'audit' && q ? q : undefined,
+    };
+  });
 
 export const Route = createFileRoute('/_app/users')({
   staticData: { skeleton: 'table' },
@@ -39,12 +55,13 @@ export const Route = createFileRoute('/_app/users')({
 
 function Users() {
   const { user } = Route.useRouteContext();
-  const { tab, view } = Route.useSearch();
+  const { tab, view, q } = Route.useSearch();
   const navigate = Route.useNavigate();
   // Pedidos novos aparecem sozinhos: a lista atualiza ao fim de 1 min (e depois de cada ação).
   const { data, isFetching } = useSuspenseQuery({ ...listUsersOptions(), refetchInterval: 60_000 });
   const pending = data.filter((u) => u.approval_status === 'pending').length;
   const impersonating = user.impersonation?.active === true;
+  const emailAlerts = user.email_alerts ?? 0;
 
   return (
     <Page>
@@ -81,7 +98,33 @@ function Users() {
             ),
           },
           { id: 'invitations', label: m.users_tab_invitations(), content: <InvitationsSection /> },
-          { id: 'audit', label: m.users_tab_audit(), content: <AuditPanel users={data} /> },
+          {
+            id: 'audit',
+            label: m.users_tab_audit(),
+            status: emailAlerts > 0 ? 'attention' : undefined,
+            statusLabel:
+              emailAlerts > 0 ? m.users_tab_audit_alerts({ count: emailAlerts }) : undefined,
+            content: (
+              <AuditSection
+                users={data}
+                view={view === 'emails' ? 'emails' : 'actions'}
+                alerts={emailAlerts}
+                q={q ?? ''}
+                onViewChange={(next) =>
+                  void navigate({
+                    search: { tab: 'audit', view: next === 'emails' ? 'emails' : undefined },
+                    replace: true,
+                  })
+                }
+                onQChange={(next) =>
+                  void navigate({
+                    search: { tab: 'audit', view: 'emails', q: next || undefined },
+                    replace: true,
+                  })
+                }
+              />
+            ),
+          },
         ]}
       />
     </Page>

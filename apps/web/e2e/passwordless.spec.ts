@@ -159,6 +159,128 @@ test.describe('entrada sem palavra-passe', () => {
   });
 });
 
+// O email pode não sair (fornecedor em baixo, endereço bloqueado, demasiados pedidos): o ecrã diz a verdade e dá saídas.
+test.describe('verifica o teu email: quando o email não sai', () => {
+  const ENTRY = '**/api/v1/auth/magic-link';
+  const unavailable = { code: 'email_unavailable', message: 'x', details: null };
+
+  async function requestLink(page: Page, email = 'sem.email@example.pt') {
+    await page.goto('/pt/login');
+    await page.getByLabel('Email', { exact: true }).fill(email);
+    await page.getByRole('button', { name: 'Receber link de acesso' }).click();
+    return email;
+  }
+
+  test('503 no pedido: ecrã de problema com alternativas, nunca o de sucesso', async ({ page }) => {
+    let calls = 0;
+    await page.route(ENTRY, (route) => {
+      calls += 1;
+      if (calls === 1) return route.fulfill({ status: 503, json: unavailable });
+      return route.fulfill({ status: 204 });
+    });
+    const email = await requestLink(page);
+    const problem = page.getByTestId('email-problem');
+    await expect(problem).toBeVisible();
+    await expect(problem).toHaveAttribute('data-kind', 'unavailable');
+    await expect(
+      page.getByRole('heading', { name: 'Não conseguimos enviar o email' }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toHaveCount(0);
+    await expect(problem).toContainText(email);
+    // Saídas: tentar de novo, outro email, palavra-passe e suporte (sem o endereço no HTML).
+    await expect(problem.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
+    await expect(problem.getByRole('link', { name: 'Entrar com palavra-passe' })).toBeVisible();
+    await expect(problem.getByRole('button', { name: 'Escrever ao suporte' })).toBeVisible();
+    expect(await page.content()).not.toContain('novelo@heldergoncalves.io');
+
+    // Tentar de novo: agora sai, e passa ao ecrã de sucesso.
+    await problem.getByRole('button', { name: 'Tentar de novo' }).click();
+    await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toBeVisible();
+    await expect(page.getByTestId('magic-sent-email')).toHaveText(email);
+  });
+
+  test('503 num reenvio troca o ecrã de sucesso pelo de problema', async ({ page }) => {
+    await page.clock.install();
+    let calls = 0;
+    await page.route(ENTRY, (route) => {
+      calls += 1;
+      if (calls === 1) return route.fulfill({ status: 204 });
+      return route.fulfill({ status: 503, json: unavailable });
+    });
+    await requestLink(page);
+    await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toBeVisible();
+    // Texto honesto e a dica do convite.
+    await expect(page.getByText(/Pedimos o envio/)).toBeVisible();
+    await expect(page.getByText(/Tens um convite\? Usa este mesmo email/)).toBeVisible();
+    // A contagem de 30 s: ao fim dela o botão liberta; aqui adiantamos o relógio.
+    await expect(page.getByRole('button', { name: /Reenviar em \d+ s/ })).toBeDisabled();
+    await page.clock.fastForward(31_000);
+    await page.getByRole('button', { name: 'Reenviar link' }).click();
+    await expect(page.getByTestId('email-problem')).toBeVisible();
+  });
+
+  test('409: endereço bloqueado tem mensagem própria e não oferece repetir', async ({ page }) => {
+    await page.route(ENTRY, (route) =>
+      route.fulfill({
+        status: 409,
+        json: { code: 'email_suppressed', message: 'x', details: null },
+      }),
+    );
+    await requestLink(page);
+    const problem = page.getByTestId('email-problem');
+    await expect(problem).toHaveAttribute('data-kind', 'suppressed');
+    await expect(
+      page.getByRole('heading', { name: 'Este endereço não recebe os nossos emails' }),
+    ).toBeVisible();
+    await expect(problem.getByRole('button', { name: 'Tentar de novo' })).toHaveCount(0);
+    await expect(problem.getByRole('button', { name: 'Usar outro email' })).toBeVisible();
+  });
+
+  test('429 num reenvio avisa e volta a bloquear o botão', async ({ page }) => {
+    await page.clock.install();
+    let calls = 0;
+    await page.route(ENTRY, (route) => {
+      calls += 1;
+      if (calls === 1) return route.fulfill({ status: 204 });
+      return route.fulfill({
+        status: 429,
+        json: { code: 'rate_limited', message: 'x', details: null },
+      });
+    });
+    await requestLink(page);
+    await page.clock.fastForward(31_000);
+    await page.getByRole('button', { name: 'Reenviar link' }).click();
+    await expect(page.getByText(/emails a mais em pouco tempo/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Reenviar em \d+ s/ })).toBeDisabled();
+  });
+});
+
+test('recuperar a palavra-passe: 503 mostra o problema e o reenvio tem contagem', async ({
+  page,
+}) => {
+  let calls = 0;
+  await page.route('**/api/v1/auth/forgot-password', (route) => {
+    calls += 1;
+    if (calls === 1) {
+      return route.fulfill({
+        status: 503,
+        json: { code: 'email_unavailable', message: 'x', details: null },
+      });
+    }
+    return route.fulfill({ status: 204 });
+  });
+  await page.goto('/pt/forgot-password');
+  await page.getByLabel('Email da conta').fill('esqueci@example.pt');
+  await page.getByRole('button', { name: 'Enviar link de recuperação' }).click();
+  await expect(page.getByTestId('email-problem')).toBeVisible();
+  // Sem a opção «palavra-passe» (é a que se perdeu).
+  await expect(page.getByRole('link', { name: 'Entrar com palavra-passe' })).toHaveCount(0);
+  await page.getByRole('button', { name: 'Tentar de novo' }).click();
+  await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toBeVisible();
+  await expect(page.getByTestId('magic-sent-email')).toHaveText('esqueci@example.pt');
+  await expect(page.getByRole('button', { name: /Reenviar em \d+ s/ })).toBeDisabled();
+});
+
 test.describe('administração dos convidados', () => {
   test('o admin vê convidados e o cartaz do QR com o link e o código', async ({ page }) => {
     const email = uniqueEmail('lista');

@@ -188,3 +188,34 @@ test('sem Turnstile (config desligada) nada aparece', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
   await expect(page.getByTestId('turnstile-field')).toHaveCount(0);
 });
+
+test('link de entrada: se o email não sai, «Tentar de novo» repete o pedido com token novo', async ({
+  page,
+}) => {
+  await mockTurnstile(page);
+  const seen: (string | undefined)[] = [];
+  await page.route('**/api/v1/auth/magic-link', (route: Route) => {
+    seen.push(route.request().headers()['x-turnstile-token']);
+    if (seen.length === 1) {
+      return route.fulfill({
+        status: 503,
+        json: { code: 'email_unavailable', message: 'x', details: null },
+      });
+    }
+    return route.fulfill({ status: 204 });
+  });
+  await page.goto('/pt/login');
+  await page.getByLabel('Email', { exact: true }).fill('sem.email@example.pt');
+  await expect(page.getByRole('button', { name: 'Receber link de acesso' })).toBeEnabled();
+  await page.getByRole('button', { name: 'Receber link de acesso' }).click();
+  await expect(page.getByTestId('email-problem')).toBeVisible();
+  // O ecrã de problema traz o seu próprio widget; o botão espera por um token novo.
+  const retry = page.getByRole('button', { name: 'Tentar de novo' });
+  await expect(retry).toBeEnabled();
+  await retry.click();
+  await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toBeVisible();
+  expect(seen).toHaveLength(2);
+  expect(seen[0]).toBeTruthy();
+  expect(seen[1]).toBeTruthy();
+  expect(seen[1]).not.toBe(seen[0]);
+});

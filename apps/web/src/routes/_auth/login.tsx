@@ -29,7 +29,7 @@ export const Route = createFileRoute('/_auth/login')({
     next: z.string().startsWith('/').optional().catch(undefined),
     error: z.string().optional().catch(undefined),
     // 'expired': chegámos aqui porque a sessão terminou (ver main.tsx e o ecrã de sessão terminada).
-    reason: z.enum(['expired']).optional().catch(undefined),
+    reason: z.enum(['expired', 'invite']).optional().catch(undefined),
     // O link por email é a entrada principal; `password` mostra o formulário clássico.
     method: z.enum(['password']).optional().catch(undefined),
   }),
@@ -46,6 +46,13 @@ function loginError(code: string | undefined): string | null {
   if (code === 'google_failed') return m.login_error_google_failed();
   return isErrorCode(code) ? getErrorMessage({ code }) : m.login_error_generic();
 }
+
+const reasonMessage = (reason: 'expired' | 'invite' | undefined): string | null =>
+  reason === 'expired'
+    ? m.login_session_expired()
+    : reason === 'invite'
+      ? m.auth_invite_reason()
+      : null;
 
 function Login() {
   const { next, error, reason, method } = Route.useSearch();
@@ -91,7 +98,7 @@ function Login() {
     return (
       <div className={AUTH_BLOCKS}>
         <FormAlert message={loginError(error)} />
-        <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
+        <FormAlert tone="info" message={reasonMessage(reason)} />
         <MagicLinkFlow next={next} alternatives={alternative('password')} />
       </div>
     );
@@ -103,7 +110,7 @@ function Login() {
     <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.login_title()} subtitle={m.login_subtitle()} />
       <FormAlert message={loginError(error)} />
-      <FormAlert tone="info" message={reason === 'expired' ? m.login_session_expired() : null} />
+      <FormAlert tone="info" message={reasonMessage(reason === 'invite' ? undefined : reason)} />
       <div className={AUTH_STACK}>
         <LoginForm next={next ?? '/'} initialEmail={readLastEmail()} />
         {alternatives.methods}

@@ -6,6 +6,9 @@ const ADMIN_QUERIES = new Set([
   'getUsersSummary',
   'listAudit',
   'listInvitations',
+  'listEmails',
+  'getEmailSummary',
+  'listEmailSuppressions',
   'getMe',
 ]);
 

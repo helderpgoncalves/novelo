@@ -31,8 +31,8 @@ async function openPending(admin: import('@playwright/test').Page, email: string
 }
 
 test.describe('aprovação de contas', () => {
-  // Dois navegadores e a verificação automática (4 s a 30 s): mais folga que os 30 s por omissão.
-  test.describe.configure({ timeout: 90_000 });
+  // Dois navegadores e a verificação automática (a cada 20 s): mais folga que os 30 s por omissão.
+  test.describe.configure({ timeout: 120_000 });
   test('espera, o admin aprova em /users e a pessoa entra sozinha com aviso por email', async ({
     browser,
     baseURL,
@@ -48,6 +48,12 @@ test.describe('aprovação de contas', () => {
     await expect(person.getByTestId('approval-steps')).toContainText('Aprovação');
     await expect(person.getByTestId('approval-checking')).toBeVisible();
     await expect(person.getByRole('button', { name: 'Reenviar verificação' })).toBeVisible();
+    // O email «recebemos o teu pedido» tem estado real: nunca promete o que não sabe.
+    const confirmation = person.getByTestId('approval-confirmation-email');
+    await expect(confirmation).toBeVisible();
+    await expect(confirmation).toContainText(/email (a confirmar|de confirmação)/i);
+    // Diz o que acontece a seguir.
+    await expect(person.getByText(/Quando decidir, esta página abre sozinha/)).toBeVisible();
     // Sem navegação da app: é um ecrã próprio.
     await expect(person.getByRole('navigation', { name: 'Principal' })).toHaveCount(0);
     if (SHOTS) await person.screenshot({ path: `${SHOTS}/approval-waiting.png` });
@@ -73,7 +79,7 @@ test.describe('aprovação de contas', () => {
     const mail = await lastEmail(email);
     expect(mail.subject).toMatch(/aprovada/i);
     await expect(person.getByRole('heading', { name: /Aprovado! Bem-vindo/ })).toBeVisible({
-      timeout: 25_000,
+      timeout: 45_000,
     });
     await expect(person).toHaveURL(/\/pt\/?$/, { timeout: 15_000 });
     await expect(person.locator('#content h1').first()).toBeVisible();
@@ -102,7 +108,7 @@ test.describe('aprovação de contas', () => {
     await expect(
       person.getByRole('heading', { name: 'O teu pedido não foi aprovado' }),
     ).toBeVisible({
-      timeout: 25_000,
+      timeout: 45_000,
     });
     await expect(person.getByText('Não reconhecemos o teu contacto.')).toBeVisible();
     await expect(person.getByRole('link', { name: /Contactar a equipa/ })).toHaveAttribute(

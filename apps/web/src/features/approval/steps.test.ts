@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { approvalSteps, POLL_FIRST_MS, POLL_MAX_MS, pollDelay } from './steps';
+import { approvalSteps, confirmationView, POLL_MS, pollInterval } from './steps';
 
 describe('approvalSteps', () => {
   it('à espera, com o email por confirmar: email e aprovação em curso', () => {
@@ -27,23 +27,51 @@ describe('approvalSteps', () => {
   });
 });
 
-describe('pollDelay', () => {
-  it('começa curto, cresce ×1,5 e nunca passa do teto', () => {
-    expect(pollDelay(0)).toBe(POLL_FIRST_MS);
-    expect(pollDelay(1)).toBe(6_000);
-    expect(pollDelay(2)).toBe(9_000);
-    expect(pollDelay(3)).toBe(13_500);
-    expect(pollDelay(50)).toBe(POLL_MAX_MS);
+describe('pollInterval', () => {
+  it('pergunta a cada 20 s enquanto o pedido está pendente (ou ainda desconhecido)', () => {
+    expect(pollInterval('pending')).toBe(POLL_MS);
+    expect(pollInterval(undefined)).toBe(POLL_MS);
+    expect(POLL_MS).toBe(20_000);
   });
 
-  it('é monótono e tolera valores estranhos', () => {
-    let previous = 0;
-    for (let i = 0; i < 12; i++) {
-      const delay = pollDelay(i);
-      expect(delay).toBeGreaterThanOrEqual(previous);
-      previous = delay;
+  it('pára quando a decisão é final', () => {
+    expect(pollInterval('approved')).toBe(false);
+    expect(pollInterval('rejected')).toBe(false);
+  });
+});
+
+describe('confirmationView', () => {
+  it('não promete mais do que sabe: «enviado» e «entregue» são coisas diferentes', () => {
+    expect(confirmationView('sent').kind).toBe('sent');
+    expect(confirmationView('delivered').kind).toBe('delivered');
+    expect(confirmationView('queued').kind).toBe('sending');
+    expect(confirmationView('delayed').kind).toBe('delayed');
+  });
+
+  it('só oferece «Reenviar» quando o email não chegou a sair', () => {
+    expect(confirmationView('failed')).toEqual({
+      kind: 'failed',
+      canResend: true,
+      canContact: false,
+    });
+    expect(confirmationView('skipped').canResend).toBe(true);
+    for (const ok of ['queued', 'sent', 'delivered', 'delayed'] as const) {
+      expect(confirmationView(ok).canResend).toBe(false);
     }
-    expect(pollDelay(-3)).toBe(POLL_FIRST_MS);
-    expect(pollDelay(Number.NaN)).toBe(POLL_FIRST_MS);
+  });
+
+  it('endereço devolvido: não adianta reenviar, oferece o contacto da equipa', () => {
+    for (const bad of ['bounced', 'complained'] as const) {
+      expect(confirmationView(bad)).toEqual({
+        kind: 'returned',
+        canResend: false,
+        canContact: true,
+      });
+    }
+  });
+
+  it('sem registo (convite, conta antiga) ou valor desconhecido: não mostra nada', () => {
+    expect(confirmationView('none').kind).toBe('none');
+    expect(confirmationView(undefined).kind).toBe('none');
   });
 });

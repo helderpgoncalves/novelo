@@ -25,17 +25,74 @@ export function approvalSteps(status: ApprovalState, emailVerified: boolean): St
   ];
 }
 
-export const POLL_FIRST_MS = 4_000;
-export const POLL_MAX_MS = 20_000;
+/** Intervalo fixo das verificações: suave para a API e suficiente para quem espera à frente do ecrã. */
+export const POLL_MS = 20_000;
 
 /**
- * Intervalo até à próxima verificação: começa curto (quem acabou de pedir costuma esperar à frente do ecrã) e
- * abranda ×1,5 a cada tentativa até 20 s, para não martelar a API de quem deixa a página aberta horas.
+ * Intervalo até à próxima verificação do estado, ou `false` para parar: só se pergunta enquanto o pedido está
+ * pendente (aprovado ou recusado é final). O React Query já pausa o intervalo com o separador escondido e o
+ * ecrã refaz o pedido ao voltar ao separador.
  */
-export function pollDelay(attempt: number): number {
-  const n = Number.isFinite(attempt) ? Math.max(0, Math.floor(attempt)) : 0;
-  return Math.min(POLL_MAX_MS, Math.round(POLL_FIRST_MS * 1.5 ** n));
+export function pollInterval(status: ApprovalState | undefined): number | false {
+  return status === 'approved' || status === 'rejected' ? false : POLL_MS;
 }
+
+/** Estado do email «recebemos o teu pedido» enviado a esta conta (vem de `GET /auth/approval-status`). */
+export type ConfirmationEmail =
+  | 'queued'
+  | 'sent'
+  | 'delivered'
+  | 'delayed'
+  | 'bounced'
+  | 'complained'
+  | 'failed'
+  | 'skipped'
+  | 'none';
+
+export type ConfirmationKind =
+  | 'none'
+  | 'sending'
+  | 'sent'
+  | 'delivered'
+  | 'delayed'
+  | 'failed'
+  | 'returned';
+
+export interface ConfirmationView {
+  kind: ConfirmationKind;
+  /** Mostra o botão «Reenviar email» (só quando o email não chegou a sair). */
+  canResend: boolean;
+  /** Mostra o contacto da equipa (o endereço foi devolvido: reenviar não resolve). */
+  canContact: boolean;
+}
+
+/**
+ * Como apresentar o email de confirmação sem prometer o que não sabemos: `sent` quer dizer «o fornecedor aceitou»
+ * e só `delivered` diz que chegou ao servidor de destino. `none` (convites, contas antigas) não mostra nada.
+ */
+export function confirmationView(status: ConfirmationEmail | undefined): ConfirmationView {
+  switch (status) {
+    case 'queued':
+      return { kind: 'sending', canResend: false, canContact: false };
+    case 'sent':
+      return { kind: 'sent', canResend: false, canContact: false };
+    case 'delivered':
+      return { kind: 'delivered', canResend: false, canContact: false };
+    case 'delayed':
+      return { kind: 'delayed', canResend: false, canContact: false };
+    case 'failed':
+    case 'skipped':
+      return { kind: 'failed', canResend: true, canContact: false };
+    case 'bounced':
+    case 'complained':
+      return { kind: 'returned', canResend: false, canContact: true };
+    default:
+      return { kind: 'none', canResend: false, canContact: false };
+  }
+}
+
+/** Espera antes de deixar reenviar o email de confirmação (a API também limita). */
+export const CONFIRMATION_RESEND_SECONDS = 30;
 
 /** Pausa antes de entrar na app depois de aprovada: tempo de ler a boa notícia, sem arrastar. */
 export const ENTER_DELAY_MS = 1_800;
