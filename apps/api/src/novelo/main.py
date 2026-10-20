@@ -10,11 +10,11 @@ from fastapi.routing import APIRoute
 from novelo.adapters.email import warn_if_email_unavailable
 from novelo.core.captcha import warn_if_unprotected
 from novelo.core.config import get_settings
-from novelo.core.database import SessionLocal
+from novelo.core.database import SessionLocal, engine
 from novelo.core.deps import NotImpersonating, get_current_user
 from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.hardening import HardeningMiddleware
-from novelo.core.logging import RequestLoggingMiddleware, configure_logging
+from novelo.core.logging import RequestLoggingMiddleware, configure_logging, install_query_counter
 from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
@@ -55,6 +55,8 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
 def create_app() -> FastAPI:
     settings = get_settings()
     configure_logging(settings.log_level)
+    if settings.log_level.lower() == "debug":
+        install_query_counter(engine.sync_engine)
 
     app = FastAPI(
         title="Novelo API",

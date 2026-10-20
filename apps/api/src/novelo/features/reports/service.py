@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import defer
 
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.errors import NotFoundError
@@ -44,7 +45,9 @@ async def create_rap(
 
 
 async def list_reports(db: AsyncSession) -> list[ReportOut]:
-    rows = (await db.execute(select(Report).order_by(Report.created_at.desc()))).scalars().all()
+    # Só metadados: o PDF (centenas de KB por linha) e o resumo ficam na base até ao download.
+    stmt = select(Report).options(defer(Report.pdf), defer(Report.summary)).order_by(Report.created_at.desc())
+    rows = (await db.execute(stmt)).scalars().all()
     return [_out(r) for r in rows]
 
 

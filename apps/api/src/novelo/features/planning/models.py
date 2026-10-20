@@ -2,7 +2,7 @@ import uuid
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Integer, Numeric, SmallInteger, String, Text
+from sqlalchemy import Boolean, CheckConstraint, ForeignKey, Index, Integer, Numeric, SmallInteger, String, Text, text
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -33,6 +33,7 @@ class Scenario(Base, UuidPkMixin, TimestampMixin):
         enum_check("objective", ScenarioObjective),
         enum_check("status", ScenarioStatus),
         CheckConstraint("budget_eur_year IS NULL OR budget_eur_year >= 0", name="budget_non_negative"),
+        Index("ix_scenarios_created_at", "created_at"),  # listas e home ordenam por data, mais recentes primeiro
     )
 
     label: Mapped[str] = mapped_column(String(80))
@@ -52,6 +53,8 @@ class Scenario(Base, UuidPkMixin, TimestampMixin):
     annual_cost_eur: Mapped[Decimal] = mapped_column(Numeric(12, 2))
     eur_per_tonne: Mapped[Decimal | None] = mapped_column(Numeric(10, 2))
     coverage_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2))
+    # Modos de recolha com pelo menos uma freguesia (derivado de `result.modes`): a home não abre o JSON todo.
+    modes: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
     parent_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("scenarios.id", ondelete="SET NULL"), index=True
     )

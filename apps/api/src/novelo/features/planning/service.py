@@ -1,12 +1,13 @@
 """Simulador: lê as zonas e os pressupostos, corre o otimizador e guarda o cenário."""
 
+import asyncio
 import uuid
 from collections import defaultdict
 from decimal import Decimal
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import defer, selectinload
 
 from novelo.core.errors import NotFoundError
 from novelo.domain import network
@@ -347,7 +348,8 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
     params = request.params or PlanningParams.model_validate(stored.values)
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
-    result, solver_status = compute(zones, params, request, baseline.total_t)
+    # CP-SAT e VRP são CPU síncrono (até `solver_time_limit_s`): fora do event loop, com dados puros (sem sessão).
+    result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t)
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis
@@ -362,6 +364,7 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
         parameter_set_version=stored.version,
         constraints={k: [m.value for m in v] for k, v in request.constraints.items()},
         result=result.model_dump(mode="json"),
+        modes=[m.mode.value for m in result.modes if m.zones > 0],
         tonnes_year=Decimal(str(kpis.tonnes_year)),
         capex_eur=Decimal(str(kpis.capex_eur)),
         annual_cost_eur=Decimal(str(kpis.annual_cost_eur)),
@@ -375,8 +378,16 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
     return _out(row)
 
 
-async def list_scenarios(db: AsyncSession) -> list[ScenarioSummary]:
-    rows = (await db.execute(select(Scenario).order_by(Scenario.created_at.desc()))).scalars().all()
+async def list_scenarios(db: AsyncSession, limit: int | None = None) -> list[ScenarioSummary]:
+    """Resumos (KPIs desnormalizados): o JSON do resultado, dos pressupostos e das restrições fica na base."""
+    stmt = (
+        select(Scenario)
+        .options(defer(Scenario.result), defer(Scenario.params), defer(Scenario.constraints))
+        .order_by(Scenario.created_at.desc())
+    )
+    if limit is not None:
+        stmt = stmt.limit(limit)
+    rows = (await db.execute(stmt)).scalars().all()
     return [_summary(r) for r in rows]
 
 

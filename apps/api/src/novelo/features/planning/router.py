@@ -8,6 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, require_role
 from novelo.core.guest import NotGuest, NotGuestDep, SolverGuard
+from novelo.features.datasets.versioning import PlanningCache
 from novelo.features.planning import service
 from novelo.features.planning.schemas import (
     ParametersOut,
@@ -30,9 +31,11 @@ class ScenarioRename(BaseModel):
 
 
 @router.get("/parameters", response_model=ParametersOut)
-async def get_planning_parameters(db: Db) -> ParametersOut:
+async def get_planning_parameters(db: Db, cache: PlanningCache) -> ParametersOut | Response:
     """Pressupostos ativos do simulador, com a origem de cada um (plano, dados da Vitrus ou pressuposto)."""
-    return await service.get_parameters(db)
+    if cache.fresh:
+        return cache.not_modified()
+    return cache.stamp(await service.get_parameters(db))
 
 
 @router.put("/parameters", response_model=ParametersOut)
@@ -42,9 +45,11 @@ async def update_planning_parameters(body: PlanningParams, admin: Admin, db: Db)
 
 
 @router.get("/zones", response_model=list[ZoneOut])
-async def list_zones(db: Db) -> list[ZoneOut]:
+async def list_zones(db: Db, cache: PlanningCache) -> list[ZoneOut] | Response:
     """Freguesias com população (INE, Censos 2021), procura estimada e serviço atual da Vitrus."""
-    return await service.list_zones(db)
+    if cache.fresh:
+        return cache.not_modified()
+    return cache.json_response(await service.list_zones(db))
 
 
 @router.post("/scenarios", response_model=ScenarioOut, status_code=201, dependencies=[SolverGuard])

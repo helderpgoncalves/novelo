@@ -11,7 +11,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from novelo.core.errors import ForbiddenError
+from novelo.core.errors import ForbiddenError, RateLimitError
+from novelo.core.guest import solver_slots
 from novelo.domain.overview import pareto_ids
 from novelo.domain.vocab import (
     Fibre,
@@ -290,7 +291,12 @@ async def get_pareto_frontier(box: "CopilotTools", args: ParetoArgs) -> dict[str
                 )
         return out
 
-    rows = await asyncio.to_thread(run)
+    if not solver_slots.acquire():  # mesma vaga das rotas do otimizador: o Copiloto não fura o limite global
+        raise RateLimitError("The server is busy running other simulations. Try again in a few seconds.")
+    try:
+        rows = await asyncio.to_thread(run)
+    finally:
+        solver_slots.release()
     front = set(pareto_ids([(r["budget_eur_year"], r["eur_per_tonne"], r["tonnes"]) for r in rows]))
     for r in rows:
         r["frontier"] = "sim" if r["budget_eur_year"] in front else "não"

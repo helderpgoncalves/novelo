@@ -103,7 +103,7 @@ async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: s
         out.append(_Candidate(item, [label, *extra]))
 
     if kind == MentionType.SCENARIO:
-        for sc in (await planning.list_scenarios(db))[:CANDIDATES]:
+        for sc in await planning.list_scenarios(db, CANDIDATES):
             sub = f"{_num(sc.eur_per_tonne, 1, pt)} €/t · {_num(sc.tonnes_year, 1, pt)} t/{'ano' if pt else 'yr'}"
             add(str(sc.id), sc.label, sub, "layers", f"/scenarios/{sc.id}")
     elif kind == MentionType.PARISH:

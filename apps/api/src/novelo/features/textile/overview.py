@@ -9,6 +9,7 @@ from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import defer
 
 from novelo.domain.benchmarks import target_tonnes
 from novelo.domain.overview import days_until, pareto_ids, parish_potential_t, share_pct
@@ -194,11 +195,16 @@ async def _parishes(db: AsyncSession) -> list[OverviewParish]:
 
 
 async def _frontier(db: AsyncSession) -> tuple[list[FrontierPoint], list[Any]]:
-    rows = (await db.execute(select(Scenario).order_by(Scenario.created_at.desc()).limit(MAX_SCENARIOS))).scalars()
+    stmt = (
+        select(Scenario)
+        .options(defer(Scenario.result), defer(Scenario.params), defer(Scenario.constraints))
+        .order_by(Scenario.created_at.desc())
+        .limit(MAX_SCENARIOS)
+    )
+    rows = (await db.execute(stmt)).scalars()
     points: list[FrontierPoint] = []
     for s in rows:
-        modes_raw = s.result.get("modes", []) if isinstance(s.result, dict) else []
-        modes = [CollectionMode(m["mode"]) for m in modes_raw if m.get("zones", 0) > 0]
+        modes = [CollectionMode(m) for m in s.modes]
         points.append(
             FrontierPoint(
                 id=s.id,
