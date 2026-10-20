@@ -47,7 +47,15 @@ def fetch_population(client: httpx.Client) -> list[dict]:
             try:
                 resp = client.get(
                     INE,
-                    params={"op": 2, "varcd": "0011609", "Dim1": "S7A2021", "Dim2": code, "Dim3": "T", "Dim4": "T", "lang": "PT"},
+                    params={
+                        "op": 2,
+                        "varcd": "0011609",
+                        "Dim1": "S7A2021",
+                        "Dim2": code,
+                        "Dim3": "T",
+                        "Dim4": "T",
+                        "lang": "PT",
+                    },
                     timeout=40,
                 )
                 data = resp.json()[0]
@@ -93,9 +101,11 @@ def main() -> None:
 
         # Incremental: reaproveita os polígonos já descarregados (o Nominatim é lento e deve ser tratado com cuidado).
         cache_file = OUT / "parishes.geojson"
-        cached = {
-            f["properties"]["dicofre"]: f for f in json.loads(cache_file.read_text())["features"]
-        } if cache_file.exists() else {}
+        cached = (
+            {f["properties"]["dicofre"]: f for f in json.loads(cache_file.read_text())["features"]}
+            if cache_file.exists()
+            else {}
+        )
         features = []
         for p in parishes:
             if p["dicofre"] in cached:
@@ -127,13 +137,20 @@ def main() -> None:
                     hit = {"osm_id": "union"}
             if not geometry:
                 # Sem contorno: ficamos só com um ponto (a freguesia entra no otimizador mas não no mapa coroplético).
-                point = geocode(client, (CONSTITUENTS.get(p["name"].replace("União das freguesias de ", "")) or [p["name"]])[0])
+                point = geocode(
+                    client, (CONSTITUENTS.get(p["name"].replace("União das freguesias de ", "")) or [p["name"]])[0]
+                )
                 print("  sem polígono, só ponto:", p["name"], "->", bool(point))
                 if point:
                     features.append(
                         {
                             "type": "Feature",
-                            "properties": {**p, "lat": round(float(point["lat"]), 6), "lon": round(float(point["lon"]), 6), "osm_id": None},
+                            "properties": {
+                                **p,
+                                "lat": round(float(point["lat"]), 6),
+                                "lon": round(float(point["lon"]), 6),
+                                "osm_id": None,
+                            },
                             "geometry": None,
                         }
                     )
@@ -142,11 +159,18 @@ def main() -> None:
             features.append(
                 {
                     "type": "Feature",
-                    "properties": {**p, "lat": round(centroid.y, 6), "lon": round(centroid.x, 6), "osm_id": hit.get("osm_id")},
+                    "properties": {
+                        **p,
+                        "lat": round(centroid.y, 6),
+                        "lon": round(centroid.x, 6),
+                        "osm_id": hit.get("osm_id"),
+                    },
                     "geometry": mapping(shape(geometry).simplify(0.0002)),
                 }
             )
-        (OUT / "parishes.geojson").write_text(json.dumps({"type": "FeatureCollection", "features": features}, ensure_ascii=False))
+        (OUT / "parishes.geojson").write_text(
+            json.dumps({"type": "FeatureCollection", "features": features}, ensure_ascii=False)
+        )
         print(f"OSM: {len(features)} polígonos de freguesia")
 
         polygons = [(f["properties"]["dicofre"], shape(f["geometry"])) for f in features if f["geometry"]]
@@ -169,7 +193,13 @@ def main() -> None:
             point = Point(float(hit["lon"]), float(hit["lat"]))
             parish = next((code for code, poly in polygons if poly.contains(point)), None)
             localities.append(
-                {"locality": name, "lat": round(point.y, 6), "lon": round(point.x, 6), "dicofre": parish, "osm_display": hit["display_name"]}
+                {
+                    "locality": name,
+                    "lat": round(point.y, 6),
+                    "lon": round(point.x, 6),
+                    "dicofre": parish,
+                    "osm_display": hit["display_name"],
+                }
             )
         (OUT / "localities_geocoded.json").write_text(json.dumps(localities, ensure_ascii=False, indent=1))
         located = sum(1 for x in localities if x["lat"] is not None)

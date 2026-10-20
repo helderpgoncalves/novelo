@@ -14,6 +14,7 @@ class AiTask(StrEnum):
     EXPLAIN = "explain"
     BRIEFING = "briefing"
     ALERT_RESOLUTION = "alert_resolution"
+    COPILOT_AUX = "copilot_aux"  # título, sugestões e resumos do copiloto (modelo barato)
     TRIAGE = "triage"  # visão
     TEST = "test"  # ping do painel (modelo explícito; não é configurável)
 
@@ -25,6 +26,7 @@ CONFIGURABLE_TASKS: tuple[AiTask, ...] = (
     AiTask.EXPLAIN,
     AiTask.BRIEFING,
     AiTask.ALERT_RESOLUTION,
+    AiTask.COPILOT_AUX,
     AiTask.TRIAGE,
 )
 
@@ -34,6 +36,7 @@ TASK_REQUIREMENTS: dict[AiTask, frozenset[str]] = {
     AiTask.EXPLAIN: frozenset({STRUCTURED}),
     AiTask.BRIEFING: frozenset({STRUCTURED}),
     AiTask.ALERT_RESOLUTION: frozenset({STRUCTURED}),
+    AiTask.COPILOT_AUX: frozenset({STRUCTURED}),
     AiTask.TRIAGE: frozenset({IMAGE, STRUCTURED}),
     AiTask.TEST: frozenset(),
 }
@@ -49,6 +52,7 @@ TASK_MAX_TOKENS: dict[AiTask, int] = {
     AiTask.EXPLAIN: 300,
     AiTask.BRIEFING: 400,
     AiTask.ALERT_RESOLUTION: 500,
+    AiTask.COPILOT_AUX: 400,
     AiTask.TRIAGE: 500,
     AiTask.TEST: 16,
 }
@@ -63,6 +67,9 @@ SCHEMA_TASKS: dict[str, AiTask] = {
     "TriageAnalysis": AiTask.TRIAGE,
     "AlertSuggestion": AiTask.ALERT_RESOLUTION,
     "_Briefing": AiTask.BRIEFING,
+    "_ThreadTitle": AiTask.COPILOT_AUX,
+    "_Suggestions": AiTask.COPILOT_AUX,
+    "_ThreadSummary": AiTask.COPILOT_AUX,
 }
 
 # Operação típica de cada tarefa, para estimar o custo enquanto não há histórico: (tokens de entrada, de saída).
@@ -74,6 +81,7 @@ TYPICAL_TOKENS: dict[AiTask, tuple[int, int]] = {
     AiTask.WHATIF: (1500, 200),
     AiTask.EXPLAIN: (600, 150),
     AiTask.ALERT_RESOLUTION: (800, 250),
+    AiTask.COPILOT_AUX: (900, 150),
 }
 
 OPERATION_LABEL: dict[AiTask, str] = {
@@ -83,4 +91,5 @@ OPERATION_LABEL: dict[AiTask, str] = {
     AiTask.WHATIF: "per_question",
     AiTask.EXPLAIN: "per_explanation",
     AiTask.ALERT_RESOLUTION: "per_alert",
+    AiTask.COPILOT_AUX: "per_helper_call",
 }

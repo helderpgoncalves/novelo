@@ -12,6 +12,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Google | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Ver abaixo |
 | Email | `RESEND_API_KEY`, `EMAIL_FROM` | Ver abaixo |
 | IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
+| Copiloto | `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS` | Limites do sistema; o resto cada utilizador gere nas suas definições. Ver [Copiloto](copiloto.md) |
 | Otimização | `SOLVER_TIME_LIMIT_S`, `OSRM_URL` | O OSRM é opcional |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
 
@@ -47,3 +48,16 @@ Os modelos por omissão são `openai/gpt-6-luna` para texto e para visão (US$ 0
 ## Desenvolvimento
 
 O admin de dev é `admin@bitsapiens.io` / `admin-novelo-dev-1`. O compose de dev desliga o limite de pedidos (`RATE_LIMIT_ENABLED=false`) porque os testes ponta a ponta partilham o mesmo IP.
+
+## Copiloto
+
+| Variável | Por omissão | Para que serve |
+| --- | --- | --- |
+| `COPILOT_CONTEXT_CAP_TOKENS` | `64000` | Janela útil máxima de contexto (mesmo que o modelo aceite mais): controla custo e latência |
+| `COPILOT_MEMORY_CHAR_LIMIT` | `2200` | Limite das notas do copiloto (`memory`) por utilizador |
+| `COPILOT_USER_CHAR_LIMIT` | `1375` | Limite do perfil do utilizador (`user`) |
+| `COPILOT_DEFAULT_PERSONA` | `default` | Persona por omissão (`default`, `analyst`, `mentor`, `executive`, `storyteller`) |
+| `COPILOT_MAX_RETENTION_DAYS` | `0` (sem máximo) | Retenção máxima das conversas, acima da escolhida pelo utilizador |
+| `COPILOT_REVIEW_EVERY_TURNS` | `3` | De quantas em quantas perguntas corre a revisão automática da memória |
+
+Para apagar o que passou do prazo de retenção: `cd apps/api && uv run python -m novelo.cli purge-copilot` (uma vez por dia, por exemplo numa tarefa agendada do Coolify). Para avaliar o copiloto com o modelo real: `just eval-copilot`.

@@ -66,17 +66,54 @@ COLUMNS = [
 # --- Dicionários de cabeçalhos (normalizados: minúsculas, sem acentos, só letras/dígitos separados por espaço) ---
 HEADERS: dict[str, tuple[str, ...]] = {
     "ref": (
-        "n o", "no", "id contentor", "cod contentor", "codigo contentor", "n contentor", "numero contentor", "ref contentor",
-        "id", "codigo", "cod", "referencia", "ref", "identificador", "numero", "num", "n", "objectid", "fid", "gid",
+        "n o",
+        "no",
+        "id contentor",
+        "cod contentor",
+        "codigo contentor",
+        "n contentor",
+        "numero contentor",
+        "ref contentor",
+        "id",
+        "codigo",
+        "cod",
+        "referencia",
+        "ref",
+        "identificador",
+        "numero",
+        "num",
+        "n",
+        "objectid",
+        "fid",
+        "gid",
     ),
     "lat": ("latitude", "lat", "latitud", "lat wgs84", "latitude wgs84", "coord lat", "coordenada lat"),
-    "lon": ("longitude", "lon", "long", "lng", "longitud", "lon wgs84", "longitude wgs84", "coord lon", "coordenada lon"),
+    "lon": (
+        "longitude",
+        "lon",
+        "long",
+        "lng",
+        "longitud",
+        "lon wgs84",
+        "longitude wgs84",
+        "coord lon",
+        "coordenada lon",
+    ),
     "x": ("x", "coord x", "coordenada x", "coordx", "xcoord", "x m", "easting", "x pt tm06", "x etrs89"),
     "y": ("y", "coord y", "coordenada y", "coordy", "ycoord", "y m", "northing", "y pt tm06", "y etrs89"),
     "latlon": ("coordenadas", "coordenada", "coords", "gps", "posicao gps", "localizacao gps", "lat lon", "lat long"),
     "kind": (
-        "tipo contentor", "tipo de contentor", "tipologia", "tipo", "fluxo", "material", "categoria", "fileira",
-        "tipo de residuo", "residuo", "kind",
+        "tipo contentor",
+        "tipo de contentor",
+        "tipologia",
+        "tipo",
+        "fluxo",
+        "material",
+        "categoria",
+        "fileira",
+        "tipo de residuo",
+        "residuo",
+        "kind",
     ),
     "status": ("estado", "situacao", "status", "estado contentor", "situacao contentor", "ativo", "operacional"),
     "address": ("morada", "endereco", "arruamento", "rua", "local", "localizacao", "designacao", "address"),
@@ -91,7 +128,10 @@ KIND_RULES: tuple[tuple[tuple[str, ...], str], ...] = (
     (("textil", "texteis", "roupa", "vestuario", "calcado", "vitrus textil"), "textile"),
     (("indiferenciad", "rsu", "lixo", "resto", "nao reciclavel"), "undifferentiated"),
     (("organic", "biorresiduo", "bio", "compost"), "organic"),
-    (("reciclav", "papel", "cartao", "vidro", "vidrao", "plastico", "embalagem", "metal", "ecoponto", "oleao"), "recyclable"),
+    (
+        ("reciclav", "papel", "cartao", "vidro", "vidrao", "plastico", "embalagem", "metal", "ecoponto", "oleao"),
+        "recyclable",
+    ),
 )
 STATUS_RULES: tuple[tuple[tuple[str, ...], str], ...] = (
     (("inativ", "desativ", "removid", "retirad", "fora de servico", "avariad", "encerrad", "nao"), "inactive"),
@@ -233,7 +273,9 @@ def _read_csv(path: Path) -> Iterator[RawRow]:
     for offset, row in enumerate(rows[header_index + 1 :], start=header_index + 2):
         if not any(c.strip() for c in row):
             continue
-        yield RawRow(path.name, offset, {h: (row[i].strip() if i < len(row) else "") for i, h in enumerate(headers) if h})
+        yield RawRow(
+            path.name, offset, {h: (row[i].strip() if i < len(row) else "") for i, h in enumerate(headers) if h}
+        )
 
 
 def _read_xlsx(path: Path) -> Iterator[RawRow]:
@@ -552,7 +594,9 @@ def build_alerts(res: Result) -> list[dict[str, str]]:
     if res.unknown_statuses:
         notes.append("estados não reconhecidos (contam como 'ativo'): " + _top(res.unknown_statuses))
     if res.swapped:
-        notes.append(f"{res.swapped} linhas com latitude/longitude (ou X/Y) trocadas, corrigidas por cairem no concelho")
+        notes.append(
+            f"{res.swapped} linhas com latitude/longitude (ou X/Y) trocadas, corrigidas por cairem no concelho"
+        )
     if res.untyped and res.kind_default == "other":
         notes.append(f"{res.untyped} contentores sem tipo no ficheiro ficam como 'outro'")
     if notes:
@@ -617,7 +661,9 @@ def run(raw_dir: Path = RAW, out_dir: Path = OUT, default_kind: str = "other") -
     res = normalise(rows, default_kind=default_kind)
     out_dir.mkdir(parents=True, exist_ok=True)
     _write_csv(out_dir, "containers.csv", COLUMNS, res.containers)
-    _write_csv(out_dir, "containers_rejected.csv", ["file", "line", "reason_key", "reason", "external_ref"], res.rejected)
+    _write_csv(
+        out_dir, "containers_rejected.csv", ["file", "line", "reason_key", "reason", "external_ref"], res.rejected
+    )
     alerts = build_alerts(res)
     _write_csv(out_dir, "containers_alerts.csv", ["id", "type_key", "detail", "suggestion"], alerts)
     received = datetime.fromtimestamp(max(p.stat().st_mtime for p in inputs), UTC).date().isoformat()

@@ -98,21 +98,12 @@ Para comparar modelos com dados reais antes de trocar: `just eval-triage --model
 
 ## Copiloto
 
-`POST /copilot/chat` (`copilot_chat`). O modelo conversa em pt-PT ou en e escolhe **ferramentas tipadas e determinísticas** (tool calling no formato OpenAI, no máximo 6 voltas por pedido):
+O copiloto tem documento próprio: [Copiloto](copiloto.md) (streaming SSE com eventos tipados, 42 ferramentas, artefactos, ações com confirmação, memória e persona por utilizador, anexos, menções, histórico, avaliação). Aqui ficam só as regras de IA que o atravessam:
 
-| Ferramenta | O que faz |
-| --- | --- |
-| `get_baseline` | Recolha observada em 2025, destinos, potencial e captura |
-| `list_scenarios` | Cenários guardados com os KPIs |
-| `run_scenario` | Cria um cenário novo (parâmetros validados) |
-| `compare_scenarios` | Compara 2 a 4 cenários, com as diferenças já calculadas |
-| `what_if` | Deriva um cenário novo de um existente (reusa `ScenarioDelta`) |
-| `get_coverage` | Cobertura da população pela rede de contentores |
-| `get_sensitivity` | Tornado e P10/P50/P90 de um cenário |
-
-A resposta traz o texto e `cards` (cenário e KPIs vindos do otimizador, não do texto) para o ecrã desenhar. **Todos os números do texto passam pelo verificador**, com tolerância de arredondamento ("301,3" aceita-se se o resultado é 301,27). Se falhar, o modelo reescreve uma vez; se voltar a falhar, devolve só os cartões com um aviso (`warning: numbers_unverified`).
-
-Guardrails: recusa pedidos fora do âmbito; **não existe nenhuma ferramenta que apague, renomeie ou altere**; só cria cenários (nome com prefixo `Copilot ·`), no máximo 2 por pedido, e uma chamada repetida não cria duplicados; limite de 12 pedidos por minuto por utilizador. `get_coverage` e `get_sensitivity` ligam-se aos services de `network` e `planning` e respondem "indisponível" se o service não existir. Para ligar outro service: `register_provider("get_coverage", fn)` em `features/copilot/tools.py`.
+- Os números do texto passam sempre pelo verificador (`unsupported_rounded`, com tolerância de arredondamento e sem contar rótulos como "P90" nem marcadores de listas). Se o texto já foi transmitido e falha, o servidor emite `retract` e reescreve uma vez; à segunda falha, só aviso e resultados.
+- Os gráficos e as tabelas são construídos pelo servidor a partir dos resultados das ferramentas; o modelo nunca escreve os valores.
+- Tarefas de IA do copiloto: `copilot` (conversa) e `copilot_aux` (título, sugestões, resumo de compactação, revisão de memória e pré-visualização de persona), ambas configuráveis em `/admin/ai`.
+- **Saída estruturada estrita**: o adaptador converte cada esquema Pydantic para o formato que o modo `strict` aceita (objetos fechados, todos os campos obrigatórios, sem irmãos de `$ref`); o Pydantic continua a validar a resposta com o modelo original. Sem isto, o fornecedor devolve 400 "Provider returned error".
 
 ## Outras funcionalidades
 
@@ -131,6 +122,6 @@ Guardrails: recusa pedidos fora do âmbito; **não existe nenhuma ferramenta que
 
 ## Testes
 
-Nenhum teste chama a API real. `tests/unit/test_ai_client.py` (tool calling, limite de 6 voltas, repetições, reserva, orçamento, custo, cache, logs sem segredos), `test_catalog.py` (cache, ETag, stale-while-error), `test_images.py`, `test_verify.py`, `test_briefing.py`, `test_eval_triage.py`; `tests/api/test_copilot.py`, `test_ai_admin.py`, `test_alert_suggest.py`, `test_whatif.py`, `test_lots.py` e `test_reports.py` cobrem as rotas com um adaptador falso injetado por `Depends`.
+Nenhum teste chama a API real. `tests/unit/test_stream_adapter.py` (streaming), `tests/unit/test_ai_client.py` (tool calling, limite de 6 voltas, repetições, reserva, orçamento, custo, cache, logs sem segredos), `test_catalog.py` (cache, ETag, stale-while-error), `test_images.py`, `test_verify.py`, `test_briefing.py`, `test_eval_triage.py`; `tests/api/test_copilot.py`, `test_ai_admin.py`, `test_alert_suggest.py`, `test_whatif.py`, `test_lots.py` e `test_reports.py` cobrem as rotas com um adaptador falso injetado por `Depends`.
 
 Com chave real (manual): `curl` autenticado a `POST /api/v1/copilot/chat` e, no painel, "Testar modelo". Sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503.

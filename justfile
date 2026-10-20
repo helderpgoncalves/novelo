@@ -56,6 +56,10 @@ gen:
 eval-triage *ARGS:
     uv run --project apps/api python scripts/eval_triage.py {{ARGS}}
 
+# Avalia o copiloto ponta a ponta com o modelo real (60 casos pt/en): just eval-copilot [--only id] [--fresh] [--no-fail]
+eval-copilot *ARGS:
+    uv run --project apps/api python scripts/eval_copilot.py {{ARGS}}
+
 # Converte os Excel de data/raw em data/processed
 etl:
     uv run scripts/etl/build_processed.py

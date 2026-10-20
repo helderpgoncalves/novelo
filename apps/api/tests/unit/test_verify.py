@@ -32,3 +32,40 @@ def test_rounded_verifier_accepts_rounding_and_rejects_invented_numbers() -> Non
     assert unsupported_rounded("Captou 305 t.", facts) == {305.0}
     assert unsupported_rounded("O id 123 não é um facto.", facts) == {123.0}  # dígitos de ids não contam
     assert unsupported_rounded("Pediu 20 000 € por ano.", facts, also_allowed="orçamento de 20 000 €") == set()
+
+
+def test_rounded_verifier_ignores_labels_with_digits_and_list_markers() -> None:
+    from novelo.ai.verify import unsupported_rounded  # noqa: PLC0415
+
+    facts = {"p50": 410.5}
+    assert unsupported_rounded("A mediana (P50) é 410,5 €/t; o intervalo P10-P90 vem da simulação.", facts) == set()
+    assert unsupported_rounded("1. Creixomil\n2. Azurém\n3. Ponte", facts) == set()
+    assert unsupported_rounded("Há 3 freguesias e 410,5 €/t.", facts) == {3.0}
+
+
+def test_dot_thousands_separator_is_accepted_when_the_integer_matches() -> None:
+    from novelo.ai.verify import unsupported_rounded  # noqa: PLC0415
+
+    facts = {"annual_cost_eur": 37198.99}
+    assert unsupported_rounded("O custo anual é de 37.199 € (P10).", facts) == set()
+    assert unsupported_rounded("O custo anual é de 38.100 €.", facts) == {38.1}
+
+
+def test_number_formats_english_and_portuguese() -> None:
+    from novelo.ai.verify import unsupported_rounded  # noqa: PLC0415
+
+    facts = {"a": 37198.99, "b": 52041.78, "c": 1317.4, "d": 301.27}
+    assert (
+        unsupported_rounded("From 37,198.99 to 52,041.78 €/yr", facts) == set()
+    )  # inglês: vírgula de milhares e ponto decimal
+    assert unsupported_rounded("De 37.198,99 a 52.041,78 €/ano", facts) == set()  # português antigo
+    assert unsupported_rounded("Cerca de 1 317 t, ou 1.317 t, ou 1,317 t; 301,3 t", facts) == set()
+    assert unsupported_rounded("Entre 37,198.90 e 52,041.78", facts) == {37198.9}
+    assert unsupported_rounded("Valor de 5,5 e 12.5", facts) == {5.5, 12.5}
+
+
+def test_a_negative_difference_can_be_written_as_less_by_the_absolute_value() -> None:
+    from novelo.ai.verify import unsupported_rounded  # noqa: PLC0415
+
+    assert unsupported_rounded("Menos 1,92 t por ano.", {"difference_tonnes_per_year": -1.92}) == set()
+    assert unsupported_rounded("Menos 2,5 t por ano.", {"difference_tonnes_per_year": -1.92}) == {2.5}

@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { addLotItem, analyseGarment, applyWhatIf, askWhatIf, changeLotState, changePassword, compactCopilotThread, compareScenarioRobustness, copilotChat, createBenchmarkScenario, createRapReport, createScenario, deleteCopilotThread, deleteScenario, downloadReport, exportCopilotThread, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getAuthConfig, getBrandEvidence, getCopilotEventSchema, getCopilotThread, getCoverage, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getOverview, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getTextileBaseline, getTriageEval, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listBenchmarks, listCircuits, listContainers, listCopilotCommands, listCopilotThreads, listLocalities, listLots, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, ready, recommendPilot, refresh, register, renameCopilotThread, renameScenario, resendVerification, reserveLot, resetPassword, runScenarioSensitivity, searchCopilotMentions, sendCopilotFeedback, suggestAlertResolution, testAiModel, updateAiSettings, updateDataAlert, updateMe, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail } from '../sdk.gen';
-import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, ReadyData, ReadyError, ReadyResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RenameCopilotThreadData, RenameCopilotThreadError, RenameCopilotThreadResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
+import { addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteScenario, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getAuthConfig, getBrandEvidence, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getObservedFlows, getOverview, getPassport, getPlanningParameters, getScenario, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTriageEval, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listLocalities, listLots, listPendingMemory, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, proposeCopilotAction, ready, recommendPilot, refresh, refreshCopilotArtifact, register, rejectCopilotAction, rejectPendingMemory, renameScenario, resendVerification, reserveLot, resetPassword, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, shareCopilotThread, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail } from '../sdk.gen';
+import type { AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, ReadyData, ReadyError, ReadyResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -462,6 +462,268 @@ export const getBrandEvidenceOptions = (options?: Options<GetBrandEvidenceData>)
     queryKey: getBrandEvidenceQueryKey(options)
 });
 
+export const listCopilotActionsQueryKey = (options?: Options<ListCopilotActionsData>) => createQueryKey('listCopilotActions', options);
+
+/**
+ * List Copilot Actions
+ *
+ * Registo de ações (quem, o quê, parâmetros, resultado, estado). `scope=all` é auditoria só para administradores (sem conversas).
+ */
+export const listCopilotActionsOptions = (options?: Options<ListCopilotActionsData>) => queryOptions<ListCopilotActionsResponse, ListCopilotActionsError, ListCopilotActionsResponse, ReturnType<typeof listCopilotActionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCopilotActions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCopilotActionsQueryKey(options)
+});
+
+const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
+    const params = { ...queryKey[0] };
+    if (page.body) {
+        params.body = {
+            ...queryKey[0].body as any,
+            ...page.body as any
+        };
+    }
+    if (page.headers) {
+        params.headers = {
+            ...queryKey[0].headers,
+            ...page.headers
+        };
+    }
+    if (page.path) {
+        params.path = {
+            ...queryKey[0].path as any,
+            ...page.path as any
+        };
+    }
+    if (page.query) {
+        params.query = {
+            ...queryKey[0].query as any,
+            ...page.query as any
+        };
+    }
+    return params as unknown as typeof page;
+};
+
+export const listCopilotActionsInfiniteQueryKey = (options?: Options<ListCopilotActionsData>): QueryKey<Options<ListCopilotActionsData>> => createQueryKey('listCopilotActions', options, true);
+
+/**
+ * List Copilot Actions
+ *
+ * Registo de ações (quem, o quê, parâmetros, resultado, estado). `scope=all` é auditoria só para administradores (sem conversas).
+ */
+export const listCopilotActionsInfiniteOptions = (options?: Options<ListCopilotActionsData>) => {
+    const opts = infiniteQueryOptions<ListCopilotActionsResponse, ListCopilotActionsError, InfiniteData<ListCopilotActionsResponse>, QueryKey<Options<ListCopilotActionsData>>, string | null | Pick<QueryKey<Options<ListCopilotActionsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListCopilotActionsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listCopilotActions({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listCopilotActionsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Propose Copilot Action
+ *
+ * Propõe uma ação (por formulário, sem passar pelo modelo). Fica à espera de `confirm`; expira em 10 minutos.
+ */
+export const proposeCopilotActionMutation = (options?: Partial<Options<ProposeCopilotActionData>>): UseMutationOptions<ProposeCopilotActionResponse, ProposeCopilotActionError, Options<ProposeCopilotActionData>> => {
+    const mutationOptions: UseMutationOptions<ProposeCopilotActionResponse, ProposeCopilotActionError, Options<ProposeCopilotActionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await proposeCopilotAction({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Confirm Copilot Action
+ *
+ * Executa a ação proposta COMO o utilizador. Idempotente: confirmar de novo devolve o resultado guardado.
+ */
+export const confirmCopilotActionMutation = (options?: Partial<Options<ConfirmCopilotActionData>>): UseMutationOptions<ConfirmCopilotActionResponse, ConfirmCopilotActionError, Options<ConfirmCopilotActionData>> => {
+    const mutationOptions: UseMutationOptions<ConfirmCopilotActionResponse, ConfirmCopilotActionError, Options<ConfirmCopilotActionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await confirmCopilotAction({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Reject Copilot Action
+ */
+export const rejectCopilotActionMutation = (options?: Partial<Options<RejectCopilotActionData>>): UseMutationOptions<RejectCopilotActionResponse, RejectCopilotActionError, Options<RejectCopilotActionData>> => {
+    const mutationOptions: UseMutationOptions<RejectCopilotActionResponse, RejectCopilotActionError, Options<RejectCopilotActionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await rejectCopilotAction({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Undo Copilot Action
+ *
+ * Desfaz uma ação executada, se for reversível (criações, estados de alertas, pressupostos, contas, modelo de IA).
+ */
+export const undoCopilotActionMutation = (options?: Partial<Options<UndoCopilotActionData>>): UseMutationOptions<UndoCopilotActionResponse, UndoCopilotActionError, Options<UndoCopilotActionData>> => {
+    const mutationOptions: UseMutationOptions<UndoCopilotActionResponse, UndoCopilotActionError, Options<UndoCopilotActionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await undoCopilotAction({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listCopilotArtifactsQueryKey = (options?: Options<ListCopilotArtifactsData>) => createQueryKey('listCopilotArtifacts', options);
+
+/**
+ * List Copilot Artifacts
+ *
+ * Galeria de gráficos, tabelas, mapas... gerados nas conversas.
+ */
+export const listCopilotArtifactsOptions = (options?: Options<ListCopilotArtifactsData>) => queryOptions<ListCopilotArtifactsResponse, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ReturnType<typeof listCopilotArtifactsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCopilotArtifacts({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCopilotArtifactsQueryKey(options)
+});
+
+export const listCopilotArtifactsInfiniteQueryKey = (options?: Options<ListCopilotArtifactsData>): QueryKey<Options<ListCopilotArtifactsData>> => createQueryKey('listCopilotArtifacts', options, true);
+
+/**
+ * List Copilot Artifacts
+ *
+ * Galeria de gráficos, tabelas, mapas... gerados nas conversas.
+ */
+export const listCopilotArtifactsInfiniteOptions = (options?: Options<ListCopilotArtifactsData>) => {
+    const opts = infiniteQueryOptions<ListCopilotArtifactsResponse, ListCopilotArtifactsError, InfiniteData<ListCopilotArtifactsResponse>, QueryKey<Options<ListCopilotArtifactsData>>, string | null | Pick<QueryKey<Options<ListCopilotArtifactsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListCopilotArtifactsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listCopilotArtifacts({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listCopilotArtifactsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Delete Copilot Artifact
+ */
+export const deleteCopilotArtifactMutation = (options?: Partial<Options<DeleteCopilotArtifactData>>): UseMutationOptions<DeleteCopilotArtifactResponse, DeleteCopilotArtifactError, Options<DeleteCopilotArtifactData>> => {
+    const mutationOptions: UseMutationOptions<DeleteCopilotArtifactResponse, DeleteCopilotArtifactError, Options<DeleteCopilotArtifactData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteCopilotArtifact({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Pin Copilot Artifact
+ *
+ * Fixar (ou largar) um artefacto no painel.
+ */
+export const pinCopilotArtifactMutation = (options?: Partial<Options<PinCopilotArtifactData>>): UseMutationOptions<PinCopilotArtifactResponse, PinCopilotArtifactError, Options<PinCopilotArtifactData>> => {
+    const mutationOptions: UseMutationOptions<PinCopilotArtifactResponse, PinCopilotArtifactError, Options<PinCopilotArtifactData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await pinCopilotArtifact({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Refresh Copilot Artifact
+ *
+ * Volta a calcular o artefacto com os dados atuais (mesma ferramenta, mesmos argumentos).
+ */
+export const refreshCopilotArtifactMutation = (options?: Partial<Options<RefreshCopilotArtifactData>>): UseMutationOptions<RefreshCopilotArtifactResponse, RefreshCopilotArtifactError, Options<RefreshCopilotArtifactData>> => {
+    const mutationOptions: UseMutationOptions<RefreshCopilotArtifactResponse, RefreshCopilotArtifactError, Options<RefreshCopilotArtifactData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await refreshCopilotArtifact({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 /**
  * Upload Copilot Attachments
  *
@@ -520,6 +782,45 @@ export const listCopilotCommandsOptions = (options?: Options<ListCopilotCommands
     queryKey: listCopilotCommandsQueryKey(options)
 });
 
+/**
+ * Delete Copilot Data
+ *
+ * Apaga TUDO o que o copiloto guarda sobre o utilizador (RGPD). Fica só o registo da eliminação.
+ */
+export const deleteCopilotDataMutation = (options?: Partial<Options<DeleteCopilotDataData>>): UseMutationOptions<unknown, DeleteCopilotDataError, Options<DeleteCopilotDataData>> => {
+    const mutationOptions: UseMutationOptions<unknown, DeleteCopilotDataError, Options<DeleteCopilotDataData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteCopilotData({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const exportCopilotDataQueryKey = (options?: Options<ExportCopilotDataData>) => createQueryKey('exportCopilotData', options);
+
+/**
+ * Export Copilot Data
+ *
+ * Tudo o que o copiloto guarda sobre o utilizador: definições, memória, conversas e ações (RGPD).
+ */
+export const exportCopilotDataOptions = (options?: Options<ExportCopilotDataData>) => queryOptions<ExportCopilotDataResponse, ExportCopilotDataError, ExportCopilotDataResponse, ReturnType<typeof exportCopilotDataQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportCopilotData({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportCopilotDataQueryKey(options)
+});
+
 export const getCopilotEventSchemaQueryKey = (options?: Options<GetCopilotEventSchemaData>) => createQueryKey('getCopilotEventSchema', options);
 
 /**
@@ -539,6 +840,200 @@ export const getCopilotEventSchemaOptions = (options?: Options<GetCopilotEventSc
     },
     queryKey: getCopilotEventSchemaQueryKey(options)
 });
+
+export const listCopilotHistoryQueryKey = (options?: Options<ListCopilotHistoryData>) => createQueryKey('listCopilotHistory', options);
+
+/**
+ * List Copilot History
+ *
+ * Cronologia unificada (conversas, ações, artefactos, memórias, anexos) com cursor estável e pesquisa sem acentos.
+ */
+export const listCopilotHistoryOptions = (options?: Options<ListCopilotHistoryData>) => queryOptions<ListCopilotHistoryResponse, ListCopilotHistoryError, ListCopilotHistoryResponse, ReturnType<typeof listCopilotHistoryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCopilotHistory({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCopilotHistoryQueryKey(options)
+});
+
+export const listCopilotHistoryInfiniteQueryKey = (options?: Options<ListCopilotHistoryData>): QueryKey<Options<ListCopilotHistoryData>> => createQueryKey('listCopilotHistory', options, true);
+
+/**
+ * List Copilot History
+ *
+ * Cronologia unificada (conversas, ações, artefactos, memórias, anexos) com cursor estável e pesquisa sem acentos.
+ */
+export const listCopilotHistoryInfiniteOptions = (options?: Options<ListCopilotHistoryData>) => {
+    const opts = infiniteQueryOptions<ListCopilotHistoryResponse, ListCopilotHistoryError, InfiniteData<ListCopilotHistoryResponse>, QueryKey<Options<ListCopilotHistoryData>>, string | null | Pick<QueryKey<Options<ListCopilotHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListCopilotHistoryData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    cursor: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listCopilotHistory({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listCopilotHistoryInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+/**
+ * Clear Copilot Memory
+ *
+ * Esvazia uma memória (`memory` ou `user`).
+ */
+export const clearCopilotMemoryMutation = (options?: Partial<Options<ClearCopilotMemoryData>>): UseMutationOptions<ClearCopilotMemoryResponse, ClearCopilotMemoryError, Options<ClearCopilotMemoryData>> => {
+    const mutationOptions: UseMutationOptions<ClearCopilotMemoryResponse, ClearCopilotMemoryError, Options<ClearCopilotMemoryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await clearCopilotMemory({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listCopilotMemoryEntriesQueryKey = (options?: Options<ListCopilotMemoryEntriesData>) => createQueryKey('listCopilotMemoryEntries', options);
+
+/**
+ * List Copilot Memory Entries
+ */
+export const listCopilotMemoryEntriesOptions = (options?: Options<ListCopilotMemoryEntriesData>) => queryOptions<ListCopilotMemoryEntriesResponse, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ReturnType<typeof listCopilotMemoryEntriesQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCopilotMemoryEntries({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCopilotMemoryEntriesQueryKey(options)
+});
+
+/**
+ * Create Copilot Memory Entry
+ */
+export const createCopilotMemoryEntryMutation = (options?: Partial<Options<CreateCopilotMemoryEntryData>>): UseMutationOptions<CreateCopilotMemoryEntryResponse, CreateCopilotMemoryEntryError, Options<CreateCopilotMemoryEntryData>> => {
+    const mutationOptions: UseMutationOptions<CreateCopilotMemoryEntryResponse, CreateCopilotMemoryEntryError, Options<CreateCopilotMemoryEntryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCopilotMemoryEntry({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete Copilot Memory Entry
+ */
+export const deleteCopilotMemoryEntryMutation = (options?: Partial<Options<DeleteCopilotMemoryEntryData>>): UseMutationOptions<DeleteCopilotMemoryEntryResponse, DeleteCopilotMemoryEntryError, Options<DeleteCopilotMemoryEntryData>> => {
+    const mutationOptions: UseMutationOptions<DeleteCopilotMemoryEntryResponse, DeleteCopilotMemoryEntryError, Options<DeleteCopilotMemoryEntryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteCopilotMemoryEntry({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update Copilot Memory Entry
+ */
+export const updateCopilotMemoryEntryMutation = (options?: Partial<Options<UpdateCopilotMemoryEntryData>>): UseMutationOptions<UpdateCopilotMemoryEntryResponse, UpdateCopilotMemoryEntryError, Options<UpdateCopilotMemoryEntryData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCopilotMemoryEntryResponse, UpdateCopilotMemoryEntryError, Options<UpdateCopilotMemoryEntryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateCopilotMemoryEntry({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listPendingMemoryQueryKey = (options?: Options<ListPendingMemoryData>) => createQueryKey('listPendingMemory', options);
+
+/**
+ * List Pending Memory
+ *
+ * Escritas de memória à espera de aprovação (quando `write_approval=ask`).
+ */
+export const listPendingMemoryOptions = (options?: Options<ListPendingMemoryData>) => queryOptions<ListPendingMemoryResponse, ListPendingMemoryError, ListPendingMemoryResponse, ReturnType<typeof listPendingMemoryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listPendingMemory({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listPendingMemoryQueryKey(options)
+});
+
+/**
+ * Approve Pending Memory
+ */
+export const approvePendingMemoryMutation = (options?: Partial<Options<ApprovePendingMemoryData>>): UseMutationOptions<ApprovePendingMemoryResponse, ApprovePendingMemoryError, Options<ApprovePendingMemoryData>> => {
+    const mutationOptions: UseMutationOptions<ApprovePendingMemoryResponse, ApprovePendingMemoryError, Options<ApprovePendingMemoryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await approvePendingMemory({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Reject Pending Memory
+ */
+export const rejectPendingMemoryMutation = (options?: Partial<Options<RejectPendingMemoryData>>): UseMutationOptions<RejectPendingMemoryResponse, RejectPendingMemoryError, Options<RejectPendingMemoryData>> => {
+    const mutationOptions: UseMutationOptions<RejectPendingMemoryResponse, RejectPendingMemoryError, Options<RejectPendingMemoryData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await rejectPendingMemory({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const searchCopilotMentionsQueryKey = (options?: Options<SearchCopilotMentionsData>) => createQueryKey('searchCopilotMentions', options);
 
@@ -579,12 +1074,128 @@ export const sendCopilotFeedbackMutation = (options?: Partial<Options<SendCopilo
     return mutationOptions;
 };
 
+/**
+ * Preview Copilot Persona
+ *
+ * Como o copiloto responderia a uma frase de exemplo com a persona escolhida (chamada barata, sem ferramentas).
+ */
+export const previewCopilotPersonaMutation = (options?: Partial<Options<PreviewCopilotPersonaData>>): UseMutationOptions<PreviewCopilotPersonaResponse, PreviewCopilotPersonaError, Options<PreviewCopilotPersonaData>> => {
+    const mutationOptions: UseMutationOptions<PreviewCopilotPersonaResponse, PreviewCopilotPersonaError, Options<PreviewCopilotPersonaData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await previewCopilotPersona({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listCopilotProjectsQueryKey = (options?: Options<ListCopilotProjectsData>) => createQueryKey('listCopilotProjects', options);
+
+/**
+ * List Copilot Projects
+ *
+ * Pastas simples (`project`) com o número de conversas.
+ */
+export const listCopilotProjectsOptions = (options?: Options<ListCopilotProjectsData>) => queryOptions<ListCopilotProjectsResponse, ListCopilotProjectsError, ListCopilotProjectsResponse, ReturnType<typeof listCopilotProjectsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCopilotProjects({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCopilotProjectsQueryKey(options)
+});
+
+export const searchCopilotSessionsQueryKey = (options: Options<SearchCopilotSessionsData>) => createQueryKey('searchCopilotSessions', options);
+
+/**
+ * Search Copilot Sessions
+ *
+ * Pesquisa nas conversas anteriores do utilizador (sem acentos, prefixos), com excertos e datas.
+ */
+export const searchCopilotSessionsOptions = (options: Options<SearchCopilotSessionsData>) => queryOptions<SearchCopilotSessionsResponse, SearchCopilotSessionsError, SearchCopilotSessionsResponse, ReturnType<typeof searchCopilotSessionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await searchCopilotSessions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: searchCopilotSessionsQueryKey(options)
+});
+
+export const getCopilotSettingsQueryKey = (options?: Options<GetCopilotSettingsData>) => createQueryKey('getCopilotSettings', options);
+
+/**
+ * Get Copilot Settings
+ *
+ * Definições do utilizador (memória, persona, notificações, retenção...), com medidores de uso da memória.
+ */
+export const getCopilotSettingsOptions = (options?: Options<GetCopilotSettingsData>) => queryOptions<GetCopilotSettingsResponse, GetCopilotSettingsError, GetCopilotSettingsResponse, ReturnType<typeof getCopilotSettingsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCopilotSettings({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCopilotSettingsQueryKey(options)
+});
+
+/**
+ * Update Copilot Settings
+ */
+export const updateCopilotSettingsMutation = (options?: Partial<Options<UpdateCopilotSettingsData>>): UseMutationOptions<UpdateCopilotSettingsResponse, UpdateCopilotSettingsError, Options<UpdateCopilotSettingsData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCopilotSettingsResponse, UpdateCopilotSettingsError, Options<UpdateCopilotSettingsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateCopilotSettings({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getSharedCopilotThreadQueryKey = (options: Options<GetSharedCopilotThreadData>) => createQueryKey('getSharedCopilotThread', options);
+
+/**
+ * Get Shared Copilot Thread
+ *
+ * Conversa partilhada (só leitura).
+ */
+export const getSharedCopilotThreadOptions = (options: Options<GetSharedCopilotThreadData>) => queryOptions<GetSharedCopilotThreadResponse, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, ReturnType<typeof getSharedCopilotThreadQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getSharedCopilotThread({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getSharedCopilotThreadQueryKey(options)
+});
+
 export const listCopilotThreadsQueryKey = (options?: Options<ListCopilotThreadsData>) => createQueryKey('listCopilotThreads', options);
 
 /**
  * List Copilot Threads
  *
- * Conversas do utilizador, a mais recente primeiro.
+ * Conversas do utilizador (fixadas primeiro, depois a mais recente). `q` pesquisa títulos e mensagens, sem acentos.
  */
 export const listCopilotThreadsOptions = (options?: Options<ListCopilotThreadsData>) => queryOptions<ListCopilotThreadsResponse, ListCopilotThreadsError, ListCopilotThreadsResponse, ReturnType<typeof listCopilotThreadsQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -599,41 +1210,12 @@ export const listCopilotThreadsOptions = (options?: Options<ListCopilotThreadsDa
     queryKey: listCopilotThreadsQueryKey(options)
 });
 
-const createInfiniteParams = <K extends Pick<QueryKey<Options>[0], 'body' | 'headers' | 'path' | 'query'>>(queryKey: QueryKey<Options>, page: K) => {
-    const params = { ...queryKey[0] };
-    if (page.body) {
-        params.body = {
-            ...queryKey[0].body as any,
-            ...page.body as any
-        };
-    }
-    if (page.headers) {
-        params.headers = {
-            ...queryKey[0].headers,
-            ...page.headers
-        };
-    }
-    if (page.path) {
-        params.path = {
-            ...queryKey[0].path as any,
-            ...page.path as any
-        };
-    }
-    if (page.query) {
-        params.query = {
-            ...queryKey[0].query as any,
-            ...page.query as any
-        };
-    }
-    return params as unknown as typeof page;
-};
-
 export const listCopilotThreadsInfiniteQueryKey = (options?: Options<ListCopilotThreadsData>): QueryKey<Options<ListCopilotThreadsData>> => createQueryKey('listCopilotThreads', options, true);
 
 /**
  * List Copilot Threads
  *
- * Conversas do utilizador, a mais recente primeiro.
+ * Conversas do utilizador (fixadas primeiro, depois a mais recente). `q` pesquisa títulos e mensagens, sem acentos.
  */
 export const listCopilotThreadsInfiniteOptions = (options?: Options<ListCopilotThreadsData>) => {
     const opts = infiniteQueryOptions<ListCopilotThreadsResponse, ListCopilotThreadsError, InfiniteData<ListCopilotThreadsResponse>, QueryKey<Options<ListCopilotThreadsData>>, number | Pick<QueryKey<Options<ListCopilotThreadsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
@@ -663,7 +1245,7 @@ export const listCopilotThreadsInfiniteOptions = (options?: Options<ListCopilotT
 /**
  * Delete Copilot Thread
  *
- * Apaga a conversa e o texto extraído dos anexos que usou.
+ * Apaga a conversa e o histórico derivado (mensagens, artefactos e anexos que usou).
  */
 export const deleteCopilotThreadMutation = (options?: Partial<Options<DeleteCopilotThreadData>>): UseMutationOptions<DeleteCopilotThreadResponse, DeleteCopilotThreadError, Options<DeleteCopilotThreadData>> => {
     const mutationOptions: UseMutationOptions<DeleteCopilotThreadResponse, DeleteCopilotThreadError, Options<DeleteCopilotThreadData>> = {
@@ -698,12 +1280,14 @@ export const getCopilotThreadOptions = (options: Options<GetCopilotThreadData>) 
 });
 
 /**
- * Rename Copilot Thread
+ * Update Copilot Thread
+ *
+ * Renomear, fixar, arquivar ou mover para uma pasta (qualquer subconjunto).
  */
-export const renameCopilotThreadMutation = (options?: Partial<Options<RenameCopilotThreadData>>): UseMutationOptions<RenameCopilotThreadResponse, RenameCopilotThreadError, Options<RenameCopilotThreadData>> => {
-    const mutationOptions: UseMutationOptions<RenameCopilotThreadResponse, RenameCopilotThreadError, Options<RenameCopilotThreadData>> = {
+export const updateCopilotThreadMutation = (options?: Partial<Options<UpdateCopilotThreadData>>): UseMutationOptions<UpdateCopilotThreadResponse, UpdateCopilotThreadError, Options<UpdateCopilotThreadData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCopilotThreadResponse, UpdateCopilotThreadError, Options<UpdateCopilotThreadData>> = {
         mutationFn: async (fnOptions) => {
-            const { data } = await renameCopilotThread({
+            const { data } = await updateCopilotThread({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -751,6 +1335,82 @@ export const exportCopilotThreadOptions = (options: Options<ExportCopilotThreadD
         return data;
     },
     queryKey: exportCopilotThreadQueryKey(options)
+});
+
+export const exportCopilotThreadPdfQueryKey = (options: Options<ExportCopilotThreadPdfData>) => createQueryKey('exportCopilotThreadPdf', options);
+
+/**
+ * Export Copilot Thread Pdf
+ *
+ * A conversa em PDF.
+ */
+export const exportCopilotThreadPdfOptions = (options: Options<ExportCopilotThreadPdfData>) => queryOptions<ExportCopilotThreadPdfResponse, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ReturnType<typeof exportCopilotThreadPdfQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportCopilotThreadPdf({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportCopilotThreadPdfQueryKey(options)
+});
+
+/**
+ * Unshare Copilot Thread
+ */
+export const unshareCopilotThreadMutation = (options?: Partial<Options<UnshareCopilotThreadData>>): UseMutationOptions<UnshareCopilotThreadResponse, UnshareCopilotThreadError, Options<UnshareCopilotThreadData>> => {
+    const mutationOptions: UseMutationOptions<UnshareCopilotThreadResponse, UnshareCopilotThreadError, Options<UnshareCopilotThreadData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await unshareCopilotThread({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Share Copilot Thread
+ *
+ * Cria (ou devolve) o link de partilha só de leitura para outros utilizadores autenticados.
+ */
+export const shareCopilotThreadMutation = (options?: Partial<Options<ShareCopilotThreadData>>): UseMutationOptions<ShareCopilotThreadResponse, ShareCopilotThreadError, Options<ShareCopilotThreadData>> => {
+    const mutationOptions: UseMutationOptions<ShareCopilotThreadResponse, ShareCopilotThreadError, Options<ShareCopilotThreadData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await shareCopilotThread({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getCopilotThreadTimelineQueryKey = (options: Options<GetCopilotThreadTimelineData>) => createQueryKey('getCopilotThreadTimeline', options);
+
+/**
+ * Get Copilot Thread Timeline
+ *
+ * Cronologia de eventos da conversa: mensagens, ferramentas, memórias, anexos, ações e artefactos.
+ */
+export const getCopilotThreadTimelineOptions = (options: Options<GetCopilotThreadTimelineData>) => queryOptions<GetCopilotThreadTimelineResponse, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, ReturnType<typeof getCopilotThreadTimelineQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCopilotThreadTimeline({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCopilotThreadTimelineQueryKey(options)
 });
 
 /**

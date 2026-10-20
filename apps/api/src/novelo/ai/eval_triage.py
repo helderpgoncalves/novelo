@@ -1,4 +1,3 @@
-# ruff: noqa: E501
 """Avaliação da triagem por foto contra uma verdade-terreno: exatidão por campo, matriz de confusão, custo e latência.
 
 A lógica vive aqui (testável sem rede, com um modelo falso); `scripts/eval_triage.py` é só a linha de comandos.

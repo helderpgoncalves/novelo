@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type ServerSentEventsResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, ReadyData, ReadyErrors, ReadyResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshData, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RenameCopilotThreadData, RenameCopilotThreadErrors, RenameCopilotThreadResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
+import type { AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, ApprovePendingMemoryData, ApprovePendingMemoryErrors, ApprovePendingMemoryResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ClearCopilotMemoryData, ClearCopilotMemoryErrors, ClearCopilotMemoryResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, ConfirmCopilotActionData, ConfirmCopilotActionErrors, ConfirmCopilotActionResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryErrors, CreateCopilotMemoryEntryResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteCopilotArtifactData, DeleteCopilotArtifactErrors, DeleteCopilotArtifactResponses, DeleteCopilotDataData, DeleteCopilotDataErrors, DeleteCopilotDataResponses, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryErrors, DeleteCopilotMemoryEntryResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotDataData, ExportCopilotDataErrors, ExportCopilotDataResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadPdfData, ExportCopilotThreadPdfErrors, ExportCopilotThreadPdfResponses, ExportCopilotThreadResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotSettingsData, GetCopilotSettingsErrors, GetCopilotSettingsResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCopilotThreadTimelineData, GetCopilotThreadTimelineErrors, GetCopilotThreadTimelineResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetSharedCopilotThreadData, GetSharedCopilotThreadErrors, GetSharedCopilotThreadResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotActionsData, ListCopilotActionsErrors, ListCopilotActionsResponses, ListCopilotArtifactsData, ListCopilotArtifactsErrors, ListCopilotArtifactsResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotHistoryData, ListCopilotHistoryErrors, ListCopilotHistoryResponses, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesErrors, ListCopilotMemoryEntriesResponses, ListCopilotProjectsData, ListCopilotProjectsErrors, ListCopilotProjectsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListPendingMemoryData, ListPendingMemoryErrors, ListPendingMemoryResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, PinCopilotArtifactData, PinCopilotArtifactErrors, PinCopilotArtifactResponses, PreviewCopilotPersonaData, PreviewCopilotPersonaErrors, PreviewCopilotPersonaResponses, ProposeCopilotActionData, ProposeCopilotActionErrors, ProposeCopilotActionResponses, ReadyData, ReadyErrors, ReadyResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshCopilotArtifactData, RefreshCopilotArtifactErrors, RefreshCopilotArtifactResponses, RefreshData, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RejectCopilotActionData, RejectCopilotActionErrors, RejectCopilotActionResponses, RejectPendingMemoryData, RejectPendingMemoryErrors, RejectPendingMemoryResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SearchCopilotSessionsData, SearchCopilotSessionsErrors, SearchCopilotSessionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, ShareCopilotThreadData, ShareCopilotThreadErrors, ShareCopilotThreadResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UndoCopilotActionData, UndoCopilotActionErrors, UndoCopilotActionResponses, UnshareCopilotThreadData, UnshareCopilotThreadErrors, UnshareCopilotThreadResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryErrors, UpdateCopilotMemoryEntryResponses, UpdateCopilotSettingsData, UpdateCopilotSettingsErrors, UpdateCopilotSettingsResponses, UpdateCopilotThreadData, UpdateCopilotThreadErrors, UpdateCopilotThreadResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -219,6 +219,79 @@ export const verifyEmail = <ThrowOnError extends boolean = false>(options: Optio
 export const getBrandEvidence = <ThrowOnError extends boolean = false>(options?: Options<GetBrandEvidenceData, ThrowOnError>): RequestResult<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError> => (options?.client ?? client).get<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError>({ url: '/api/v1/brands', ...options });
 
 /**
+ * List Copilot Actions
+ *
+ * Registo de ações (quem, o quê, parâmetros, resultado, estado). `scope=all` é auditoria só para administradores (sem conversas).
+ */
+export const listCopilotActions = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotActionsData, ThrowOnError>): RequestResult<ListCopilotActionsResponses, ListCopilotActionsErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotActionsResponses, ListCopilotActionsErrors, ThrowOnError>({ url: '/api/v1/copilot/actions', ...options });
+
+/**
+ * Propose Copilot Action
+ *
+ * Propõe uma ação (por formulário, sem passar pelo modelo). Fica à espera de `confirm`; expira em 10 minutos.
+ */
+export const proposeCopilotAction = <ThrowOnError extends boolean = false>(options: Options<ProposeCopilotActionData, ThrowOnError>): RequestResult<ProposeCopilotActionResponses, ProposeCopilotActionErrors, ThrowOnError> => (options.client ?? client).post<ProposeCopilotActionResponses, ProposeCopilotActionErrors, ThrowOnError>({
+    url: '/api/v1/copilot/actions',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Confirm Copilot Action
+ *
+ * Executa a ação proposta COMO o utilizador. Idempotente: confirmar de novo devolve o resultado guardado.
+ */
+export const confirmCopilotAction = <ThrowOnError extends boolean = false>(options: Options<ConfirmCopilotActionData, ThrowOnError>): RequestResult<ConfirmCopilotActionResponses, ConfirmCopilotActionErrors, ThrowOnError> => (options.client ?? client).post<ConfirmCopilotActionResponses, ConfirmCopilotActionErrors, ThrowOnError>({
+    url: '/api/v1/copilot/actions/{action_id}/confirm',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Reject Copilot Action
+ */
+export const rejectCopilotAction = <ThrowOnError extends boolean = false>(options: Options<RejectCopilotActionData, ThrowOnError>): RequestResult<RejectCopilotActionResponses, RejectCopilotActionErrors, ThrowOnError> => (options.client ?? client).post<RejectCopilotActionResponses, RejectCopilotActionErrors, ThrowOnError>({ url: '/api/v1/copilot/actions/{action_id}/reject', ...options });
+
+/**
+ * Undo Copilot Action
+ *
+ * Desfaz uma ação executada, se for reversível (criações, estados de alertas, pressupostos, contas, modelo de IA).
+ */
+export const undoCopilotAction = <ThrowOnError extends boolean = false>(options: Options<UndoCopilotActionData, ThrowOnError>): RequestResult<UndoCopilotActionResponses, UndoCopilotActionErrors, ThrowOnError> => (options.client ?? client).post<UndoCopilotActionResponses, UndoCopilotActionErrors, ThrowOnError>({ url: '/api/v1/copilot/actions/{action_id}/undo', ...options });
+
+/**
+ * List Copilot Artifacts
+ *
+ * Galeria de gráficos, tabelas, mapas... gerados nas conversas.
+ */
+export const listCopilotArtifacts = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotArtifactsData, ThrowOnError>): RequestResult<ListCopilotArtifactsResponses, ListCopilotArtifactsErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotArtifactsResponses, ListCopilotArtifactsErrors, ThrowOnError>({ url: '/api/v1/copilot/artifacts', ...options });
+
+/**
+ * Delete Copilot Artifact
+ */
+export const deleteCopilotArtifact = <ThrowOnError extends boolean = false>(options: Options<DeleteCopilotArtifactData, ThrowOnError>): RequestResult<DeleteCopilotArtifactResponses, DeleteCopilotArtifactErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCopilotArtifactResponses, DeleteCopilotArtifactErrors, ThrowOnError>({ url: '/api/v1/copilot/artifacts/{artifact_id}', ...options });
+
+/**
+ * Pin Copilot Artifact
+ *
+ * Fixar (ou largar) um artefacto no painel.
+ */
+export const pinCopilotArtifact = <ThrowOnError extends boolean = false>(options: Options<PinCopilotArtifactData, ThrowOnError>): RequestResult<PinCopilotArtifactResponses, PinCopilotArtifactErrors, ThrowOnError> => (options.client ?? client).put<PinCopilotArtifactResponses, PinCopilotArtifactErrors, ThrowOnError>({ url: '/api/v1/copilot/artifacts/{artifact_id}/pin', ...options });
+
+/**
+ * Refresh Copilot Artifact
+ *
+ * Volta a calcular o artefacto com os dados atuais (mesma ferramenta, mesmos argumentos).
+ */
+export const refreshCopilotArtifact = <ThrowOnError extends boolean = false>(options: Options<RefreshCopilotArtifactData, ThrowOnError>): RequestResult<RefreshCopilotArtifactResponses, RefreshCopilotArtifactErrors, ThrowOnError> => (options.client ?? client).post<RefreshCopilotArtifactResponses, RefreshCopilotArtifactErrors, ThrowOnError>({ url: '/api/v1/copilot/artifacts/{artifact_id}/refresh', ...options });
+
+/**
  * Upload Copilot Attachments
  *
  * Imagens, PDF, CSV/XLSX, TXT/MD/JSON. O ficheiro é validado pelo conteúdo e descartado: guarda-se só o texto extraído.
@@ -255,11 +328,97 @@ export const copilotChat = <ThrowOnError extends boolean = false>(options: Optio
 export const listCopilotCommands = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotCommandsData, ThrowOnError>): RequestResult<ListCopilotCommandsResponses, ListCopilotCommandsErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotCommandsResponses, ListCopilotCommandsErrors, ThrowOnError>({ url: '/api/v1/copilot/commands', ...options });
 
 /**
+ * Delete Copilot Data
+ *
+ * Apaga TUDO o que o copiloto guarda sobre o utilizador (RGPD). Fica só o registo da eliminação.
+ */
+export const deleteCopilotData = <ThrowOnError extends boolean = false>(options: Options<DeleteCopilotDataData, ThrowOnError>): RequestResult<DeleteCopilotDataResponses, DeleteCopilotDataErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCopilotDataResponses, DeleteCopilotDataErrors, ThrowOnError>({ url: '/api/v1/copilot/data', ...options });
+
+/**
+ * Export Copilot Data
+ *
+ * Tudo o que o copiloto guarda sobre o utilizador: definições, memória, conversas e ações (RGPD).
+ */
+export const exportCopilotData = <ThrowOnError extends boolean = false>(options?: Options<ExportCopilotDataData, ThrowOnError>): RequestResult<ExportCopilotDataResponses, ExportCopilotDataErrors, ThrowOnError> => (options?.client ?? client).get<ExportCopilotDataResponses, ExportCopilotDataErrors, ThrowOnError>({ url: '/api/v1/copilot/data/export', ...options });
+
+/**
  * Get Copilot Event Schema
  *
  * Um exemplo de cada evento do stream, na ordem típica. Documenta o contrato e dá ao cliente gerado os tipos.
  */
 export const getCopilotEventSchema = <ThrowOnError extends boolean = false>(options?: Options<GetCopilotEventSchemaData, ThrowOnError>): RequestResult<GetCopilotEventSchemaResponses, GetCopilotEventSchemaErrors, ThrowOnError> => (options?.client ?? client).get<GetCopilotEventSchemaResponses, GetCopilotEventSchemaErrors, ThrowOnError>({ url: '/api/v1/copilot/event-schema', ...options });
+
+/**
+ * List Copilot History
+ *
+ * Cronologia unificada (conversas, ações, artefactos, memórias, anexos) com cursor estável e pesquisa sem acentos.
+ */
+export const listCopilotHistory = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotHistoryData, ThrowOnError>): RequestResult<ListCopilotHistoryResponses, ListCopilotHistoryErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotHistoryResponses, ListCopilotHistoryErrors, ThrowOnError>({ url: '/api/v1/copilot/history', ...options });
+
+/**
+ * Clear Copilot Memory
+ *
+ * Esvazia uma memória (`memory` ou `user`).
+ */
+export const clearCopilotMemory = <ThrowOnError extends boolean = false>(options: Options<ClearCopilotMemoryData, ThrowOnError>): RequestResult<ClearCopilotMemoryResponses, ClearCopilotMemoryErrors, ThrowOnError> => (options.client ?? client).delete<ClearCopilotMemoryResponses, ClearCopilotMemoryErrors, ThrowOnError>({ url: '/api/v1/copilot/memory/entries', ...options });
+
+/**
+ * List Copilot Memory Entries
+ */
+export const listCopilotMemoryEntries = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotMemoryEntriesData, ThrowOnError>): RequestResult<ListCopilotMemoryEntriesResponses, ListCopilotMemoryEntriesErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotMemoryEntriesResponses, ListCopilotMemoryEntriesErrors, ThrowOnError>({ url: '/api/v1/copilot/memory/entries', ...options });
+
+/**
+ * Create Copilot Memory Entry
+ */
+export const createCopilotMemoryEntry = <ThrowOnError extends boolean = false>(options: Options<CreateCopilotMemoryEntryData, ThrowOnError>): RequestResult<CreateCopilotMemoryEntryResponses, CreateCopilotMemoryEntryErrors, ThrowOnError> => (options.client ?? client).post<CreateCopilotMemoryEntryResponses, CreateCopilotMemoryEntryErrors, ThrowOnError>({
+    url: '/api/v1/copilot/memory/entries',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Copilot Memory Entry
+ */
+export const deleteCopilotMemoryEntry = <ThrowOnError extends boolean = false>(options: Options<DeleteCopilotMemoryEntryData, ThrowOnError>): RequestResult<DeleteCopilotMemoryEntryResponses, DeleteCopilotMemoryEntryErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCopilotMemoryEntryResponses, DeleteCopilotMemoryEntryErrors, ThrowOnError>({ url: '/api/v1/copilot/memory/entries/{entry_id}', ...options });
+
+/**
+ * Update Copilot Memory Entry
+ */
+export const updateCopilotMemoryEntry = <ThrowOnError extends boolean = false>(options: Options<UpdateCopilotMemoryEntryData, ThrowOnError>): RequestResult<UpdateCopilotMemoryEntryResponses, UpdateCopilotMemoryEntryErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCopilotMemoryEntryResponses, UpdateCopilotMemoryEntryErrors, ThrowOnError>({
+    url: '/api/v1/copilot/memory/entries/{entry_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Pending Memory
+ *
+ * Escritas de memória à espera de aprovação (quando `write_approval=ask`).
+ */
+export const listPendingMemory = <ThrowOnError extends boolean = false>(options?: Options<ListPendingMemoryData, ThrowOnError>): RequestResult<ListPendingMemoryResponses, ListPendingMemoryErrors, ThrowOnError> => (options?.client ?? client).get<ListPendingMemoryResponses, ListPendingMemoryErrors, ThrowOnError>({ url: '/api/v1/copilot/memory/pending', ...options });
+
+/**
+ * Approve Pending Memory
+ */
+export const approvePendingMemory = <ThrowOnError extends boolean = false>(options: Options<ApprovePendingMemoryData, ThrowOnError>): RequestResult<ApprovePendingMemoryResponses, ApprovePendingMemoryErrors, ThrowOnError> => (options.client ?? client).post<ApprovePendingMemoryResponses, ApprovePendingMemoryErrors, ThrowOnError>({
+    url: '/api/v1/copilot/memory/pending/{pending_id}/approve',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Reject Pending Memory
+ */
+export const rejectPendingMemory = <ThrowOnError extends boolean = false>(options: Options<RejectPendingMemoryData, ThrowOnError>): RequestResult<RejectPendingMemoryResponses, RejectPendingMemoryErrors, ThrowOnError> => (options.client ?? client).post<RejectPendingMemoryResponses, RejectPendingMemoryErrors, ThrowOnError>({ url: '/api/v1/copilot/memory/pending/{pending_id}/reject', ...options });
 
 /**
  * Search Copilot Mentions
@@ -283,6 +442,60 @@ export const sendCopilotFeedback = <ThrowOnError extends boolean = false>(option
 });
 
 /**
+ * Preview Copilot Persona
+ *
+ * Como o copiloto responderia a uma frase de exemplo com a persona escolhida (chamada barata, sem ferramentas).
+ */
+export const previewCopilotPersona = <ThrowOnError extends boolean = false>(options: Options<PreviewCopilotPersonaData, ThrowOnError>): RequestResult<PreviewCopilotPersonaResponses, PreviewCopilotPersonaErrors, ThrowOnError> => (options.client ?? client).post<PreviewCopilotPersonaResponses, PreviewCopilotPersonaErrors, ThrowOnError>({
+    url: '/api/v1/copilot/persona/preview',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Copilot Projects
+ *
+ * Pastas simples (`project`) com o número de conversas.
+ */
+export const listCopilotProjects = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotProjectsData, ThrowOnError>): RequestResult<ListCopilotProjectsResponses, ListCopilotProjectsErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotProjectsResponses, ListCopilotProjectsErrors, ThrowOnError>({ url: '/api/v1/copilot/projects', ...options });
+
+/**
+ * Search Copilot Sessions
+ *
+ * Pesquisa nas conversas anteriores do utilizador (sem acentos, prefixos), com excertos e datas.
+ */
+export const searchCopilotSessions = <ThrowOnError extends boolean = false>(options: Options<SearchCopilotSessionsData, ThrowOnError>): RequestResult<SearchCopilotSessionsResponses, SearchCopilotSessionsErrors, ThrowOnError> => (options.client ?? client).get<SearchCopilotSessionsResponses, SearchCopilotSessionsErrors, ThrowOnError>({ url: '/api/v1/copilot/sessions/search', ...options });
+
+/**
+ * Get Copilot Settings
+ *
+ * Definições do utilizador (memória, persona, notificações, retenção...), com medidores de uso da memória.
+ */
+export const getCopilotSettings = <ThrowOnError extends boolean = false>(options?: Options<GetCopilotSettingsData, ThrowOnError>): RequestResult<GetCopilotSettingsResponses, GetCopilotSettingsErrors, ThrowOnError> => (options?.client ?? client).get<GetCopilotSettingsResponses, GetCopilotSettingsErrors, ThrowOnError>({ url: '/api/v1/copilot/settings', ...options });
+
+/**
+ * Update Copilot Settings
+ */
+export const updateCopilotSettings = <ThrowOnError extends boolean = false>(options: Options<UpdateCopilotSettingsData, ThrowOnError>): RequestResult<UpdateCopilotSettingsResponses, UpdateCopilotSettingsErrors, ThrowOnError> => (options.client ?? client).put<UpdateCopilotSettingsResponses, UpdateCopilotSettingsErrors, ThrowOnError>({
+    url: '/api/v1/copilot/settings',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Shared Copilot Thread
+ *
+ * Conversa partilhada (só leitura).
+ */
+export const getSharedCopilotThread = <ThrowOnError extends boolean = false>(options: Options<GetSharedCopilotThreadData, ThrowOnError>): RequestResult<GetSharedCopilotThreadResponses, GetSharedCopilotThreadErrors, ThrowOnError> => (options.client ?? client).get<GetSharedCopilotThreadResponses, GetSharedCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/shared/{token}', ...options });
+
+/**
  * Copilot Stream
  *
  * Responde em `text/event-stream` com eventos tipados (ver `CopilotEventMessage`). Menções, anexos e contexto
@@ -300,14 +513,14 @@ export const copilotStream = <ThrowOnError extends boolean = false>(options: Opt
 /**
  * List Copilot Threads
  *
- * Conversas do utilizador, a mais recente primeiro.
+ * Conversas do utilizador (fixadas primeiro, depois a mais recente). `q` pesquisa títulos e mensagens, sem acentos.
  */
 export const listCopilotThreads = <ThrowOnError extends boolean = false>(options?: Options<ListCopilotThreadsData, ThrowOnError>): RequestResult<ListCopilotThreadsResponses, ListCopilotThreadsErrors, ThrowOnError> => (options?.client ?? client).get<ListCopilotThreadsResponses, ListCopilotThreadsErrors, ThrowOnError>({ url: '/api/v1/copilot/threads', ...options });
 
 /**
  * Delete Copilot Thread
  *
- * Apaga a conversa e o texto extraído dos anexos que usou.
+ * Apaga a conversa e o histórico derivado (mensagens, artefactos e anexos que usou).
  */
 export const deleteCopilotThread = <ThrowOnError extends boolean = false>(options: Options<DeleteCopilotThreadData, ThrowOnError>): RequestResult<DeleteCopilotThreadResponses, DeleteCopilotThreadErrors, ThrowOnError> => (options.client ?? client).delete<DeleteCopilotThreadResponses, DeleteCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}', ...options });
 
@@ -317,9 +530,11 @@ export const deleteCopilotThread = <ThrowOnError extends boolean = false>(option
 export const getCopilotThread = <ThrowOnError extends boolean = false>(options: Options<GetCopilotThreadData, ThrowOnError>): RequestResult<GetCopilotThreadResponses, GetCopilotThreadErrors, ThrowOnError> => (options.client ?? client).get<GetCopilotThreadResponses, GetCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}', ...options });
 
 /**
- * Rename Copilot Thread
+ * Update Copilot Thread
+ *
+ * Renomear, fixar, arquivar ou mover para uma pasta (qualquer subconjunto).
  */
-export const renameCopilotThread = <ThrowOnError extends boolean = false>(options: Options<RenameCopilotThreadData, ThrowOnError>): RequestResult<RenameCopilotThreadResponses, RenameCopilotThreadErrors, ThrowOnError> => (options.client ?? client).patch<RenameCopilotThreadResponses, RenameCopilotThreadErrors, ThrowOnError>({
+export const updateCopilotThread = <ThrowOnError extends boolean = false>(options: Options<UpdateCopilotThreadData, ThrowOnError>): RequestResult<UpdateCopilotThreadResponses, UpdateCopilotThreadErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCopilotThreadResponses, UpdateCopilotThreadErrors, ThrowOnError>({
     url: '/api/v1/copilot/threads/{thread_id}',
     ...options,
     headers: {
@@ -343,11 +558,37 @@ export const compactCopilotThread = <ThrowOnError extends boolean = false>(optio
 export const exportCopilotThread = <ThrowOnError extends boolean = false>(options: Options<ExportCopilotThreadData, ThrowOnError>): RequestResult<ExportCopilotThreadResponses, ExportCopilotThreadErrors, ThrowOnError> => (options.client ?? client).get<ExportCopilotThreadResponses, ExportCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/export', ...options });
 
 /**
+ * Export Copilot Thread Pdf
+ *
+ * A conversa em PDF.
+ */
+export const exportCopilotThreadPdf = <ThrowOnError extends boolean = false>(options: Options<ExportCopilotThreadPdfData, ThrowOnError>): RequestResult<ExportCopilotThreadPdfResponses, ExportCopilotThreadPdfErrors, ThrowOnError> => (options.client ?? client).get<ExportCopilotThreadPdfResponses, ExportCopilotThreadPdfErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/export.pdf', ...options });
+
+/**
  * Regenerate Copilot Response
  *
  * Apaga a última resposta e volta a gerá-la a partir da última pergunta (mesmos anexos e menções).
  */
 export const regenerateCopilotResponse = <ThrowOnError extends boolean = false>(options: Options<RegenerateCopilotResponseData, ThrowOnError, RegenerateCopilotResponseResponse>): Promise<ServerSentEventsResult<RegenerateCopilotResponseResponses>> => (options.client ?? client).sse.post<RegenerateCopilotResponseResponses, RegenerateCopilotResponseErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/regenerate', ...options });
+
+/**
+ * Unshare Copilot Thread
+ */
+export const unshareCopilotThread = <ThrowOnError extends boolean = false>(options: Options<UnshareCopilotThreadData, ThrowOnError>): RequestResult<UnshareCopilotThreadResponses, UnshareCopilotThreadErrors, ThrowOnError> => (options.client ?? client).delete<UnshareCopilotThreadResponses, UnshareCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/share', ...options });
+
+/**
+ * Share Copilot Thread
+ *
+ * Cria (ou devolve) o link de partilha só de leitura para outros utilizadores autenticados.
+ */
+export const shareCopilotThread = <ThrowOnError extends boolean = false>(options: Options<ShareCopilotThreadData, ThrowOnError>): RequestResult<ShareCopilotThreadResponses, ShareCopilotThreadErrors, ThrowOnError> => (options.client ?? client).post<ShareCopilotThreadResponses, ShareCopilotThreadErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/share', ...options });
+
+/**
+ * Get Copilot Thread Timeline
+ *
+ * Cronologia de eventos da conversa: mensagens, ferramentas, memórias, anexos, ações e artefactos.
+ */
+export const getCopilotThreadTimeline = <ThrowOnError extends boolean = false>(options: Options<GetCopilotThreadTimelineData, ThrowOnError>): RequestResult<GetCopilotThreadTimelineResponses, GetCopilotThreadTimelineErrors, ThrowOnError> => (options.client ?? client).get<GetCopilotThreadTimelineResponses, GetCopilotThreadTimelineErrors, ThrowOnError>({ url: '/api/v1/copilot/threads/{thread_id}/timeline', ...options });
 
 /**
  * Update Data Alert
