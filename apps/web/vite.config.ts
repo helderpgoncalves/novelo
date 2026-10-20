@@ -117,6 +117,8 @@ export default defineConfig({
     watch: { usePolling: process.env.CHOKIDAR_USEPOLLING === 'true' },
   },
   build: {
+    // O pré-render lê o manifesto para pré-carregar o pacote da landing (e apaga-o a seguir).
+    manifest: true,
     rollupOptions: {
       output: {
         manualChunks: (id: string) =>

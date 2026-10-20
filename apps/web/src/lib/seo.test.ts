@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import en from '../../messages/en.json';
 import pt from '../../messages/pt-PT.json';
 import {
+  auditHtml,
   buildHead,
   buildJsonLd,
   buildSitemap,
@@ -130,5 +131,33 @@ describe('sitemap', () => {
       xml.match(/hreflang="x-default" href="https:\/\/novelo\.helder\.si\/pt\/"/g),
     ).toHaveLength(2);
     expect(xml.match(/xhtml:link/g)).toHaveLength(6 * 3);
+  });
+});
+
+describe('auditoria da CSP e páginas públicas sem splash', () => {
+  const SPLASH = `<div class="boot-splash" role="status"><svg class="brand-spin"></svg><!-- brand:splash:end --></div>`;
+  const base = BASE.replace('<div class="boot-splash"></div>', SPLASH);
+  for (const route of ROUTES) {
+    it(`${route.id}: sem splash no #root, sem inline executável, sem email literal`, () => {
+      const html = renderRoute(base, route, 'pt-PT', pt as Record<string, string>, [
+        '/assets/landing-x.js',
+      ]);
+      expect(auditHtml(html, { publicPage: true })).toEqual([]);
+      expect(html).not.toContain('boot-splash');
+      expect(html).not.toContain('@');
+      expect(html.includes('rel="modulepreload"')).toBe(route.id === 'landing');
+    });
+  }
+  it('apanha script inline, handlers e javascript:', () => {
+    expect(auditHtml('<script>alert(1)</script>')).toHaveLength(1);
+    expect(auditHtml('<script type="module">x()</script>')).toHaveLength(1);
+    expect(
+      auditHtml('<script type="application/ld+json">{"a":1}</script><script src="/a.js"></script>'),
+    ).toEqual([]);
+    expect(auditHtml('<a href="x" onclick="y()">')).toHaveLength(1);
+    expect(auditHtml('<a href="javascript:void(0)">')).toHaveLength(1);
+    expect(
+      auditHtml('<div id="root"><div class="boot-splash"></div></div>', { publicPage: true }),
+    ).toHaveLength(1);
   });
 });

@@ -148,7 +148,7 @@ export function buildHead(route, locale, messages) {
     meta('name', 'twitter:description', description),
     meta('name', 'twitter:image', image),
     meta('name', 'twitter:image:alt', alt),
-    `<script type="application/ld+json">${JSON.stringify(buildJsonLd(route, locale, messages)).replace(/</g, '\\u003c')}</script>`,
+    `<script type="application/ld+json">${JSON.stringify(buildJsonLd(route, locale, messages)).replace(/</g, '\\u003c').replace(/@/g, '\\u0040')}</script>`,
   ];
   return lines.join('\n    ');
 }
@@ -202,7 +202,7 @@ export function buildSummary(locale, messages) {
     `<section><h2>${t('landing_features_title')}</h2><ul>${li(features.map((f) => `<strong>${t(`landing_feat_${f}_title`)}</strong> ${t(`landing_feat_${f}_text`)}`))}</ul></section>`,
     `<section><h2>${t('landing_rigor_title')}</h2><p>${t('landing_rigor_lead')}</p><h3>${t('landing_not_title')}</h3><ul>${li([1, 2, 3, 4].map((n) => t(`landing_not_${n}`)))}</ul><h3>${t('landing_limits_title')}</h3><ul>${li([1, 2, 3, 4, 5].map((n) => t(`landing_limit_${n}`)))}</ul></section>`,
     `<section><h2>${t('landing_faq_title')}</h2>${faq}</section></main>`,
-    `<footer><p><a href="/${prefix}/privacy">${t('public_nav_privacy')}</a> · <a href="/${prefix}/terms">${t('public_nav_terms')}</a> · <a href="mailto:novelo@heldergoncalves.io">novelo@heldergoncalves.io</a></p></footer>`,
+    `<footer><p><a href="/${prefix}/privacy">${t('public_nav_privacy')}</a> · <a href="/${prefix}/terms">${t('public_nav_terms')}</a></p></footer>`,
     `</div>`,
   ].join('');
 }
@@ -223,13 +223,27 @@ export function stripSeoTags(html) {
   return SEO_TAGS.reduce((acc, re) => acc.replace(re, ''), html);
 }
 
-/** HTML final de uma rota: `lang`, `<head>` localizado, preloads e, na landing, o resumo dentro de `#root`. */
-export function renderRoute(baseHtml, route, locale, messages) {
+/** `<link rel="modulepreload">` dos ficheiros JS do pacote da landing (a landing nunca espera por um chunk lazy). */
+export function buildModulePreloads(hrefs) {
+  return hrefs.map((href) => `<link rel="modulepreload" crossorigin href="${href}" />`).join('\n    ');
+}
+
+/** O ecrã de arranque (`.boot-splash`) é só da app autenticada: as páginas públicas não o levam no `#root`. */
+const BOOT_SPLASH = /<div class="boot-splash"[^>]*>[\s\S]*?(?:<!-- brand:splash:end -->)?<\/div>/;
+
+/**
+ * HTML final de uma rota: `lang`, `<head>` localizado, preloads e, na landing, o resumo dentro de `#root`.
+ * Sem splash no `#root`: a página pública mostra o fundo do tema (html) até o React montar, nunca um spinner.
+ * `landingChunks`: hrefs do pacote da landing, pré-carregados com modulepreload (só na landing).
+ */
+export function renderRoute(baseHtml, route, locale, messages, landingChunks = []) {
   const lang = LOCALES[locale].lang;
   let html = stripSeoTags(baseHtml).replace(/<html lang="[^"]*"/, `<html lang="${lang}"`);
+  html = html.replace(BOOT_SPLASH, '');
+  const chunks = route.id === 'landing' && landingChunks.length ? `\n    ${buildModulePreloads(landingChunks)}` : '';
   html = html.replace(
     '</head>',
-    `    ${buildHead(route, locale, messages)}\n    ${buildPreloads(route)}\n  </head>`,
+    `    ${buildHead(route, locale, messages)}\n    ${buildPreloads(route)}${chunks}\n  </head>`,
   );
   if (route.id === 'landing') {
     html = html.replace('<div id="root">', `<div id="root">${buildSummary(locale, messages)}`);
@@ -250,4 +264,25 @@ export function buildSitemap(lastmod) {
     }
   }
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls.join('\n')}\n</urlset>\n`;
+}
+
+/**
+ * Auditoria da CSP ("sem scripts inline"): devolve os problemas de um HTML. Falha em `<script>` executável sem `src`
+ * (JSON-LD `application/ld+json` não executa e passa), em handlers `on*=` nos elementos, em `javascript:` e no
+ * ecrã de arranque dentro de `#root` nas páginas públicas (`publicPage`).
+ */
+export function auditHtml(html, { publicPage = false } = {}) {
+  const problems = [];
+  for (const m of html.matchAll(/<script\b([^>]*)>([\s\S]*?)<\/script>/gi)) {
+    const attrs = m[1] ?? '';
+    const type = /\btype\s*=\s*["']?([^"'\s>]+)/i.exec(attrs)?.[1]?.toLowerCase();
+    const executable = !type || type === 'module' || type === 'text/javascript' || type === 'application/javascript';
+    if (executable && !/\bsrc\s*=/.test(attrs)) problems.push(`script inline executável: ${(m[2] ?? '').trim().slice(0, 60)}`);
+  }
+  const noScripts = html.replace(/<script\b[\s\S]*?<\/script>/gi, '');
+  for (const m of noScripts.matchAll(/<[a-z][^>]*\s(on[a-z]+)\s*=/gi)) problems.push(`handler inline ${m[1]}=`);
+  if (/javascript:/i.test(noScripts)) problems.push('URL javascript:');
+  if (publicPage && /boot-splash|brand-spin|brand-arc/.test(/<div id="root">[\s\S]*$/.exec(noScripts)?.[0] ?? ''))
+    problems.push('splash/spinner no #root de uma página pública');
+  return problems;
 }
