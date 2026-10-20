@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { OverviewReference } from '@/client';
-import { daysUntil, pickBenchmark } from './derive';
-
-const ref = (key: string, verified: boolean, scope: OverviewReference['scope']) =>
-  ({ key, verified, scope, kg_per_inhab_year: 1 }) as OverviewReference;
+import type { Overview, OverviewMilestone, OverviewParish } from '@/client';
+import { daysUntil, eprDeadline, questionInputs, trustCounts, trustItems } from './derive';
 
 describe('daysUntil', () => {
   it('conta dias de calendário', () => {
@@ -12,14 +9,59 @@ describe('daysUntil', () => {
   });
 });
 
-describe('pickBenchmark', () => {
-  it('prefere a França verificada', () => {
-    const refs = [ref('eu27_2020', true, 'eu'), ref('france_2024', true, 'country')];
-    expect(pickBenchmark(refs)?.key).toBe('france_2024');
+describe('eprDeadline', () => {
+  const now = new Date(2026, 9, 20, 12);
+  it('usa o marco da API e conta os dias na hora', () => {
+    const d = eprDeadline(
+      [
+        {
+          who_pays: 'producers',
+          date: '2028-04-17',
+          source_label: 'X',
+          verified: true,
+        } as OverviewMilestone,
+      ],
+      now,
+    );
+    expect(d.days).toBe(545);
+    expect(d.sourceLabel).toBe('X');
   });
-  it('ignora referências por verificar', () => {
-    const refs = [ref('france_2024', false, 'country'), ref('eu27_2020', true, 'eu')];
-    expect(pickBenchmark(refs)?.key).toBe('eu27_2020');
-    expect(pickBenchmark([ref('france_2024', false, 'country')])).toBeUndefined();
+  it('recai no prazo conhecido sem marco e nunca fica negativo', () => {
+    expect(eprDeadline([], now).date).toBe('2028-04-17');
+    expect(eprDeadline([], new Date(2030, 0, 1)).days).toBe(0);
+  });
+});
+
+describe('trustItems', () => {
+  const parishes = (n: number) => [{ containers_count: n } as OverviewParish];
+  it('as localizações de contentores de têxteis estão em falta até chegarem', () => {
+    const missing = trustItems({ parishes: parishes(0) });
+    expect(missing.find((i) => i.key === 'textile_containers')?.status).toBe('missing');
+    expect(
+      trustItems({ parishes: parishes(3) }).find((i) => i.key === 'textile_containers')?.status,
+    ).toBe('measured');
+  });
+  it('conta os três estados', () => {
+    const c = trustCounts(trustItems({ parishes: parishes(0) }));
+    expect(c.measured + c.estimate + c.missing).toBe(11);
+    expect(c.missing).toBe(2);
+  });
+});
+
+describe('questionInputs', () => {
+  it('usa as freguesias com mais potencial e uma meta redonda', () => {
+    const overview = {
+      gap: { collected_t: 301.3, missing_t: 1016 },
+      parishes: [
+        { name: 'A', potential_t: 5 },
+        { name: 'B', potential_t: 50 },
+        { name: 'C', potential_t: 20 },
+        { name: 'D', potential_t: 1 },
+      ],
+    } as unknown as Overview;
+    const q = questionInputs(overview, 40000);
+    expect(q.topParishes).toEqual(['B', 'C', 'A']);
+    expect(q.targetT).toBe(560);
+    expect(q.budgetEur).toBe(40000);
   });
 });

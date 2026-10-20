@@ -10,92 +10,90 @@ async function noHorizontalOverflow(page: Page) {
   expect(overflow).toBeLessThanOrEqual(0);
 }
 
-test.describe('página inicial', () => {
+test.describe('sala de decisão', () => {
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
 
-  test('gancho com os números reais e uma só chamada principal', async ({ page }) => {
+  test('título e faixa de situação com os números reais, selo e fonte', async ({ page }) => {
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toContainText('Guimarães recolhe');
-    await expect(h1).toContainText('1,92');
-    await expect(h1).toContainText('A França, 4,27');
     await expect(h1).toContainText(/Faltam ≈ 1\s?016 t/);
-    await expect(h1).toContainText('estimativa');
 
-    await expect(page.getByRole('link', { name: 'Simular a rede' }).first()).toHaveAttribute(
-      'href',
-      /\/simulator/,
-    );
-    // Os indicadores continuam a ser o primeiro grupo de definições da página.
-    const strip = page.locator('dl').first();
-    await expect(strip).toContainText('301,3 t');
+    const strip = page.getByRole('region', { name: 'Situação em números' });
+    await expect(strip).toContainText('301,3');
     await expect(strip).toContainText('22,9%');
+    await expect(strip).toContainText('medido');
+    await expect(strip).toContainText('estimativa');
+    await expect(strip).toContainText(/\d+\s*dias/);
+    await expect(strip).toContainText('Dias até');
   });
 
-  test('referências por verificar levam selo; as verificadas não', async ({ page }) => {
-    const section = page.locator('#problema');
-    await expect(section.getByRole('heading', { level: 2 })).toContainText('vezes mais');
-    const germany = section.getByRole('listitem').filter({ hasText: 'Alemanha' });
-    await expect(germany).toContainText('por verificar');
-    const france = section.getByRole('listitem').filter({ hasText: 'França' });
-    await expect(france).not.toContainText('por verificar');
-    await expect(france.getByRole('link', { name: /Refashion/ })).toBeVisible();
-  });
+  test('mapa: camada, teclado, detalhe e URL partilhável', async ({ page }) => {
+    const map = page.getByRole('listbox', { name: /Mapa de meio-tom das 48 freguesias/ });
+    await expect(map).toBeVisible();
+    await expect(page.getByText('Não existe captura por freguesia')).toBeVisible();
 
-  test('cascata do potencial e relógio regulatório', async ({ page }) => {
-    await expect(page.getByRole('img', { name: /Fluxo de têxtil: de um potencial/ })).toBeVisible();
-    const clock = page.locator('#relogio');
-    await expect(clock.getByRole('heading', { level: 2 })).toContainText(/Em \d+ dias/);
-    await expect(clock.getByText('17/04/2028').first()).toBeVisible();
-    await expect(clock.getByText('verificado').first()).toBeVisible();
-    await expect(clock).toContainText('pagam os produtores');
-  });
+    await page
+      .getByRole('radio', { name: /Contentores municipais \(não são de têxteis\)/ })
+      .click();
+    await expect(page).toHaveURL(/layer=containers/);
 
-  test('freguesias: ranking liga ao detalhe e contentores explicam a espera', async ({ page }) => {
-    const section = page.locator('#territorio');
-    await expect(section.getByRole('img', { name: /Mapa das 48 freguesias/ })).toBeVisible();
-    await expect(section).toContainText('20/10/2026');
-    const second = section.locator('ol > li').nth(1).getByRole('button');
-    const name = (await second.locator('span.truncate').innerText()).trim();
-    await second.hover();
-    await expect(section.locator('[aria-live="polite"]')).toContainText(name);
-    await second.click();
-    await expect(second).toHaveAttribute('aria-pressed', 'true');
-  });
-
-  test('fronteira de Pareto abre o cenário com o teclado', async ({ page }) => {
-    const section = page.locator('#decisao');
-    const points = section.getByRole('link', { name: /por ano a .* euros por tonelada/ });
-    await expect(points.first()).toBeVisible();
-    await points.first().focus();
-    await expect(section.getByRole('status')).toContainText('Custo por tonelada');
+    await map.focus();
+    await page.keyboard.press('ArrowRight');
     await page.keyboard.press('Enter');
-    await expect(page).toHaveURL(/\/scenarios\/[0-9a-f-]+/);
+    await expect(page).toHaveURL(/parish=\w+/);
+    await expect(page.getByRole('link', { name: 'Ver no mapa completo' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Perguntar ao Copiloto' })).toBeVisible();
+
+    await page.keyboard.press('Escape');
+    await expect(page).not.toHaveURL(/parish=/);
   });
 
-  test('provas: fontes, manchetes e separadores', async ({ page }) => {
+  test('orçamento: a alça mexe nos números e abre o simulador com o orçamento', async ({
+    page,
+  }) => {
+    const slider = page.getByRole('slider', { name: 'Orçamento anual' });
+    await expect(slider).toBeVisible();
+    await slider.focus();
+    await page.keyboard.press('End');
+    await expect(page).toHaveURL(/budget=\d+/);
+    const open = page.getByRole('link', { name: 'Abrir no simulador com este orçamento' });
+    await expect(open).toHaveAttribute('href', /\/simulator\?.*budget=\d+/);
+  });
+
+  test('o fio, confiança dos dados e próximos passos', async ({ page }) => {
+    await expect(page.getByRole('img', { name: /Do potencial estimado de/ })).toBeVisible();
+    const trust = page.locator('#confianca');
+    await expect(trust).toContainText('medidos');
+    await expect(trust).toContainText('em falta');
+
+    await page.locator('#passos').scrollIntoViewIfNeeded();
+    await expect(page.locator('#passos')).toContainText(
+      /contas por aprovar|Sem contas por aprovar/,
+    );
+  });
+
+  test('evidência por baixo da dobra: tabelas com fonte e separador na URL', async ({ page }) => {
     const proofs = page.locator('#provas');
+    await proofs.scrollIntoViewIfNeeded();
     await expect(proofs.getByText('Vitrus Ambiente').first()).toBeVisible();
-    await expect(proofs).toContainText('59,4%');
     await proofs.getByRole('tab', { name: /^Freguesias/ }).click();
     await expect(page).toHaveURL(/tab=parishes/);
     await expect(proofs.getByText('1–10 de 48')).toBeVisible();
   });
 
-  test('sem cenários mostra o estado vazio com a próxima ação', async ({ page }) => {
+  test('sem cenários guardados o orçamento mostra o estado vazio com a próxima ação', async ({
+    page,
+  }) => {
     await page.route(OVERVIEW, async (route) => {
       const response = await route.fetch();
       const body = await response.json();
-      await route.fulfill({
-        response,
-        json: { ...body, scenario_frontier: [], pareto_ids: [] },
-      });
+      await route.fulfill({ response, json: { ...body, scenario_frontier: [], pareto_ids: [] } });
     });
     await page.reload();
-    const empty = page.locator('#decisao');
-    await expect(empty).toContainText('Sem cenários calculados');
-    await expect(empty.getByRole('link', { name: 'Calcular o primeiro cenário' })).toBeVisible();
+    await expect(page.getByText('Ainda não há cenários guardados')).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Calcular o primeiro cenário' })).toBeVisible();
   });
 
   test('erro da API mostra mensagem e permite tentar de novo', async ({ page }) => {
@@ -111,48 +109,27 @@ test.describe('página inicial', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Guimarães recolhe');
   });
 
-  test('o copiloto abre a partir do gancho', async ({ page }) => {
-    await page.getByRole('button', { name: 'Perguntar ao copiloto' }).first().click();
+  test('o Copiloto abre com uma pergunta sugerida', async ({ page }) => {
+    await page.locator('#passos').scrollIntoViewIfNeeded();
+    await page
+      .getByRole('button', { name: /Que freguesias têm mais potencial por captar/ })
+      .click();
     await expect(page.getByRole('dialog')).toBeVisible();
-  });
-});
-
-test.describe('movimento reduzido', () => {
-  test.use({ reducedMotion: 'reduce' });
-  test('mostra logo os valores finais e não oferece pausa', async ({ page }) => {
-    await login(page);
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('1,92');
-    await expect(page.getByRole('button', { name: /animações/ })).toHaveCount(0);
-    // Sem contagem: o número visível já é o final, logo ao primeiro frame.
-    const visible = await page.locator('#home-hero-title [role="img"] > span').first().innerText();
-    expect(visible).toBe('1,92');
-  });
-});
-
-test.describe('pausa das animações', () => {
-  test('o botão pausa e retoma', async ({ page }) => {
-    await login(page);
-    const button = page.getByRole('button', { name: 'Pausar animações' });
-    await button.click();
-    await expect(page.getByRole('button', { name: 'Retomar animações' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
   });
 });
 
 test.describe('telemóvel', () => {
   test.use({ viewport: { width: 390, height: 844 }, hasTouch: true });
-  test('sem scroll horizontal e com alvos tocáveis', async ({ page }) => {
+  test('sem scroll horizontal, faixa em carrossel e alvos tocáveis', async ({ page }) => {
     await login(page);
     await page.waitForTimeout(500);
     await noHorizontalOverflow(page);
-    const cta = page.getByRole('link', { name: 'Simular a rede' }).first();
-    const box = await cta.boundingBox();
+    const chip = page.getByRole('radio', { name: 'População' });
+    const box = await chip.boundingBox();
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(40);
-    await page.locator('#relogio').scrollIntoViewIfNeeded();
+    await page.locator('#orcamento').scrollIntoViewIfNeeded();
     await noHorizontalOverflow(page);
-    await page.locator('#decisao').scrollIntoViewIfNeeded();
+    await page.locator('#provas').scrollIntoViewIfNeeded();
     await noHorizontalOverflow(page);
   });
 });

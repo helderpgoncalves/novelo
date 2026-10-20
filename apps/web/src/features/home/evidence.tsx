@@ -6,7 +6,7 @@ import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { formatDate } from '@/lib/i18n';
 import { tipauLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
-import { EstimateTag, UnverifiedTag } from './story-section';
+import { EstimateTag, UnverifiedTag } from './tags';
 
 type Ctx = OverviewHighlight['context'];
 const num = (ctx: Ctx, key: string) => Number(ctx[key] ?? 0);

@@ -154,45 +154,22 @@ export function FormSkeleton({ fields = 5 }: { fields?: number }) {
   );
 }
 
-/** Página inicial: gancho (frase + anel), indicadores e capítulos com título à esquerda e visual à direita. */
+/** Página inicial (sala de decisão): cabeçalho, faixa de situação e mapa com o controlo de orçamento ao lado. */
 function HomeSkeleton() {
   return (
-    <div className="space-y-8 sm:space-y-10">
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-        <div className="space-y-6 lg:col-span-8 lg:py-4">
-          <Skeleton className="h-3 w-40" />
-          <div className="space-y-3">
-            <Skeleton className="h-11 w-full sm:h-14" />
-            <Skeleton className="h-11 w-4/5 sm:h-14" />
-            <Skeleton className="h-11 w-3/5 sm:h-14" />
-          </div>
-          <Skeleton className="h-5 w-full max-w-2xl" />
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Skeleton className="h-12 w-full sm:w-44" />
-            <Skeleton className="h-12 w-full sm:w-52" />
-          </div>
-        </div>
-        <div className="space-y-4 rounded-xl bg-card p-5 ring-1 ring-foreground/10 lg:col-span-4">
-          <Skeleton className="mx-auto aspect-square w-full max-w-[17rem] rounded-full" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-full" />
-        </div>
+    <div className="space-y-6 sm:space-y-8">
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-48" />
+        <Skeleton className="h-9 w-full max-w-2xl sm:h-10" />
       </div>
       <StatStripSkeleton />
-      {[0, 1].map((i) => (
-        <div
-          key={i}
-          className="grid grid-cols-1 gap-6 border-border border-t pt-8 lg:grid-cols-12 lg:gap-x-10"
-        >
-          <div className="space-y-3 lg:col-span-4">
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-          </div>
-          <ChartSkeleton className="h-80 lg:col-span-8" />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-12">
+        <MapSkeleton className="lg:col-span-8" />
+        <div className="space-y-5 lg:col-span-4">
+          <CardSkeleton />
+          <CardSkeleton />
         </div>
-      ))}
+      </div>
     </div>
   );
 }

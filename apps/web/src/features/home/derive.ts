@@ -1,7 +1,4 @@
-import type { FrontierPoint, OverviewMilestone, OverviewParish, OverviewReference } from '@/client';
-
-/** Localizações dos contentores chegam nesta data (AGENTS.md, "Regra zero"). */
-export const CONTAINERS_ARRIVAL = '2026-10-20';
+import type { Overview, OverviewMilestone, OverviewParish } from '@/client';
 
 const DAY_MS = 86_400_000;
 
@@ -13,49 +10,9 @@ export function daysUntil(isoDate: string, now: Date = new Date()): number {
   return Math.round((target - today) / DAY_MS);
 }
 
-/** A referência externa verificada usada no gancho: França, senão UE-27, senão a primeira verificada. */
-export function pickBenchmark(references: OverviewReference[]): OverviewReference | undefined {
-  const verified = references.filter((r) => r.verified && r.scope !== 'municipality');
-  return (
-    verified.find((r) => r.key === 'france_2024') ??
-    verified.find((r) => r.key === 'eu27_2020') ??
-    verified[0]
-  );
-}
-
-/** A referência "Guimarães hoje" (dado Vitrus). */
-export const pickSelf = (references: OverviewReference[]): OverviewReference | undefined =>
-  references.find((r) => r.key === 'guimaraes_2025');
-
 /** O marco em que passam a pagar os produtores (RAP), a data final do relógio. */
 export const pickEprMilestone = (timeline: OverviewMilestone[]): OverviewMilestone | undefined =>
   timeline.find((t) => t.who_pays === 'producers');
-
-export interface FrontierStats {
-  total: number;
-  pareto: FrontierPoint[];
-  minEur: number;
-  maxEur: number;
-  minTonnes: number;
-  maxTonnes: number;
-}
-
-/** Resumo da fronteira: só cenários viáveis com €/t conhecido entram nos eixos. */
-export function frontierStats(points: FrontierPoint[]): FrontierStats | null {
-  const usable = points.filter((p) => p.status === 'feasible' && p.eur_per_tonne !== null);
-  const pareto = usable.filter((p) => p.is_pareto).sort((a, b) => a.tonnes_year - b.tonnes_year);
-  if (pareto.length === 0) return null;
-  const eur = pareto.map((p) => p.eur_per_tonne ?? 0);
-  const tonnes = pareto.map((p) => p.tonnes_year);
-  return {
-    total: usable.length,
-    pareto,
-    minEur: Math.min(...eur),
-    maxEur: Math.max(...eur),
-    minTonnes: Math.min(...tonnes),
-    maxTonnes: Math.max(...tonnes),
-  };
-}
 
 /** Freguesias por potencial decrescente e a quota das `n` maiores. */
 export function rankParishes(parishes: OverviewParish[], n = 5) {
@@ -63,4 +20,88 @@ export function rankParishes(parishes: OverviewParish[], n = 5) {
   const total = sorted.reduce((s, p) => s + p.potential_t, 0);
   const top = sorted.slice(0, n).reduce((s, p) => s + p.potential_t, 0);
   return { sorted, topSharePct: total > 0 ? (top / total) * 100 : 0, topCount: n };
+}
+
+/** Prazo do regime de responsabilidade alargada do produtor (Diretiva (UE) 2025/1892), se a API não o trouxer. */
+export const EPR_FALLBACK_DATE = '2028-04-17';
+
+export interface EprDeadline {
+  date: string;
+  days: number;
+  sourceLabel: string;
+  verified: boolean;
+}
+
+/** O marco em que os produtores passam a pagar, com os dias contados na hora (não os do servidor, que podem ficar velhos na cache). */
+export function eprDeadline(timeline: OverviewMilestone[], now: Date = new Date()): EprDeadline {
+  const epr = pickEprMilestone(timeline);
+  const date = epr?.date ?? EPR_FALLBACK_DATE;
+  return {
+    date,
+    days: Math.max(0, daysUntil(date, now)),
+    sourceLabel: epr?.source_label ?? 'Diretiva (UE) 2025/1892',
+    verified: epr?.verified ?? true,
+  };
+}
+
+export type TrustKey =
+  | 'collected'
+  | 'destinations'
+  | 'circuits'
+  | 'population'
+  | 'boundaries'
+  | 'municipal_containers'
+  | 'potential'
+  | 'parish_demand'
+  | 'costs'
+  | 'capture_by_parish'
+  | 'textile_containers';
+export type TrustStatus = 'measured' | 'estimate' | 'missing';
+
+export interface TrustItem {
+  key: TrustKey;
+  status: TrustStatus;
+}
+
+/** O que é medido, o que é estimativa e o que ainda falta; as localizações de contentores de têxteis vêm das freguesias. */
+export function trustItems(overview: Pick<Overview, 'parishes'>): TrustItem[] {
+  const textileContainers = overview.parishes.reduce((s, p) => s + p.containers_count, 0);
+  return [
+    { key: 'collected', status: 'measured' },
+    { key: 'destinations', status: 'measured' },
+    { key: 'circuits', status: 'measured' },
+    { key: 'population', status: 'measured' },
+    { key: 'boundaries', status: 'measured' },
+    { key: 'municipal_containers', status: 'measured' },
+    { key: 'potential', status: 'estimate' },
+    { key: 'parish_demand', status: 'estimate' },
+    { key: 'costs', status: 'estimate' },
+    { key: 'capture_by_parish', status: 'missing' },
+    { key: 'textile_containers', status: textileContainers > 0 ? 'measured' : 'missing' },
+  ];
+}
+
+export function trustCounts(items: TrustItem[]): Record<TrustStatus, number> {
+  const out: Record<TrustStatus, number> = { measured: 0, estimate: 0, missing: 0 };
+  for (const i of items) out[i.status] += 1;
+  return out;
+}
+
+export interface QuestionInputs {
+  /** Nomes das freguesias com mais potencial por captar, por ordem. */
+  topParishes: string[];
+  /** Meta redonda a um quarto do caminho entre o recolhido e o potencial (t/ano). */
+  targetT: number;
+  /** Orçamento escolhido no controlo (€/ano), se houver. */
+  budgetEur: number | null;
+}
+
+/** Dados das perguntas sugeridas ao Copiloto: tudo vem do resumo, nada é inventado. */
+export function questionInputs(overview: Overview, budgetEur: number | null): QuestionInputs {
+  const { gap, parishes } = overview;
+  const topParishes = rankParishes(parishes)
+    .sorted.slice(0, 3)
+    .map((p) => p.name);
+  const targetT = Math.round((gap.collected_t + gap.missing_t * 0.25) / 10) * 10;
+  return { topParishes, targetT, budgetEur };
 }
