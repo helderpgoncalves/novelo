@@ -1,9 +1,10 @@
-import { PhotoBand, PhotoCredits } from '@/components/photos';
+import { PhotoBand } from '@/components/photos';
 import { PublicShell } from '@/components/public-shell';
 import './landing-assets.generated.css';
 import { Audience, Faq, FinalCta } from './closing';
 import { Copilot } from './copilot';
 import { Features } from './features';
+import { LandingFooter } from './footer';
 import { Hero } from './hero';
 import { Evidence } from './lab';
 import { LandingHeader, LandingToc } from './landing-nav';
@@ -21,7 +22,7 @@ import { Method, Problem } from './story';
 export function LandingPage() {
   useRevealOnScroll();
   return (
-    <PublicShell width="max-w-6xl" header={<LandingHeader />} footerExtra={<PhotoCredits />}>
+    <PublicShell width="max-w-6xl" header={<LandingHeader />} footer={<LandingFooter />}>
       <LandingToc />
       <main id="content" data-landing="" data-lp-fonts="" tabIndex={-1} className="outline-none">
         <Hero />

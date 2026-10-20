@@ -719,52 +719,156 @@ html:has([data-landing]) {
   }
 }
 
-/* Topo: vidro translúcido desde o início (as ligações leem-se sobre a fotografia) e mais denso ao rolar, com um fio.
+/* Topo: transparente sobre o hero; depois de rolar, fundo do papel e um fio de 1 px (sem desfoque, sem sombra).
    Esconde ao descer (< lg) e volta ao subir. */
 .lp-header {
-  background: color-mix(in oklab, var(--background) 86%, transparent);
   border-bottom: 1px solid transparent;
   transition:
     transform 320ms var(--ease-out),
-    background-color 240ms ease,
-    border-color 240ms ease;
+    background-color 200ms ease,
+    border-color 200ms ease;
 }
 .lp-header[data-scrolled='true'] {
-  background: color-mix(in oklab, var(--background) 94%, transparent);
-  border-bottom-color: color-mix(in oklab, var(--border) 85%, transparent);
-}
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  .lp-header {
-    background: color-mix(in oklab, var(--background) 58%, transparent);
-    -webkit-backdrop-filter: saturate(1.5) blur(10px);
-    backdrop-filter: saturate(1.5) blur(10px);
-  }
-  .lp-header[data-scrolled='true'] {
-    background: color-mix(in oklab, var(--background) 80%, transparent);
-  }
+  background: color-mix(in oklab, var(--background) 96%, transparent);
+  border-bottom-color: color-mix(in oklab, var(--foreground) 10%, transparent);
 }
 .lp-header[data-hidden='true'] {
   transform: translateY(-101%);
 }
 
-/* Pílula deslizante da secção ativa: fundo suave e um traço de 2 px na base. */
-.lp-pill {
-  background: color-mix(in oklab, var(--primary) 14%, transparent);
-  transform: translateX(var(--pill-x, 0)) scale(var(--pill-s, 1));
-  width: var(--pill-w, 0);
-  opacity: var(--pill-o, 0);
+/* Traço da secção ativa na navegação larga: 2 px, desliza entre itens; sem fundo nem desfocagem. */
+.lp-nav-line {
+  position: absolute;
+  left: 0;
+  bottom: 0.4rem;
+  height: 2px;
+  border-radius: 1px;
+  background: var(--primary);
+  width: max(0px, calc(var(--line-w, 0px) - 1.75rem));
+  transform: translateX(calc(var(--line-x, 0px) + 0.875rem));
+  opacity: var(--line-o, 0);
   transition:
-    transform 380ms var(--ease-spring),
-    width 380ms var(--ease-spring),
-    opacity 200ms ease;
+    transform 320ms var(--ease-out),
+    width 320ms var(--ease-out),
+    opacity 160ms ease;
 }
-.lp-pill::after {
+
+/* «Entrar»: botão de tinta, raio de 8 px; o alvo de toque (44 px) excede a caixa visível. */
+.lp-nav-cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  height: 2.25rem;
+  padding-inline: 0.875rem;
+  border-radius: 8px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  outline: none;
+  transition: opacity 160ms ease;
+}
+.lp-nav-cta::after {
   content: '';
   position: absolute;
-  inset: auto 1rem 0.2rem;
-  height: 2px;
-  border-radius: 2px;
-  background: var(--primary);
+  inset: -0.25rem -0.125rem;
+}
+.lp-nav-cta:hover {
+  opacity: 0.86;
+}
+.lp-nav-cta:focus-visible,
+.lp-menu-btn:focus-visible,
+.lp-nav-text:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.lp-nav-text {
+  align-items: center;
+  height: 2.5rem;
+  padding-inline: 0.875rem;
+  border-radius: 8px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: color-mix(in oklab, var(--foreground) 72%, transparent);
+  outline: none;
+  transition: color 160ms ease;
+}
+.lp-nav-text:hover {
+  color: var(--foreground);
+}
+@media (min-width: 1024px) {
+  .lp-nav-cta {
+    height: 2.5rem;
+    padding-inline: 1.125rem;
+    font-size: 0.9375rem;
+  }
+}
+
+/* Botão do menu: duas linhas finas (a de baixo mais curta) que se cruzam num × quando o menu abre. */
+.lp-menu-btn {
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-right: -0.625rem;
+  border-radius: 8px;
+  color: var(--foreground);
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.lp-glyph {
+  position: relative;
+  display: block;
+  width: 24px;
+  height: 24px;
+}
+.lp-glyph-a,
+.lp-glyph-b {
+  position: absolute;
+  left: 3px;
+  width: 18px;
+  height: 1.5px;
+  transition: transform 300ms var(--ease-out);
+}
+.lp-glyph-a,
+.lp-glyph-b > span {
+  display: block;
+  border-radius: 1px;
+  background: currentColor;
+}
+.lp-glyph-b > span {
+  height: 100%;
+}
+.lp-glyph-a {
+  top: 7.5px;
+}
+.lp-glyph-b {
+  top: 15px;
+}
+.lp-glyph-b > span {
+  width: 100%;
+  transform: scaleX(0.6667);
+  transform-origin: right center;
+  transition: transform 300ms var(--ease-out);
+}
+.lp-glyph[data-open='true'] .lp-glyph-a {
+  transform: translateY(3.75px) rotate(45deg);
+}
+.lp-glyph[data-open='true'] .lp-glyph-b {
+  transform: translateY(-3.75px) rotate(-45deg);
+}
+.lp-glyph[data-open='true'] .lp-glyph-b > span {
+  transform: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-glyph-a,
+  .lp-glyph-b,
+  .lp-glyph-b > span,
+  .lp-nav-line {
+    transition: none;
+  }
 }
 
 /* Logótipo: os arcos rodam suavemente ao passar o rato ou focar (nunca em ciclo). */
@@ -1393,25 +1497,25 @@ body:has([data-landing]) {
 
 /* ---------- Hero: a Penha ao fim do dia ----------
    Dois arranjos, com as mesmas condições de media que as fontes do <picture> (landing-assets.generated.ts):
-   - empilhado (telemóvel e tablet de pé): a fotografia 4:5 (pico em foco) enche o primeiro ecrã e o texto fica na metade de
-     baixo, ao alcance do polegar. O véu (`.lp-hs-inner::before`) nasce 5,5 rem acima da primeira linha e só cobre o texto e a
-     prova, por isso o pico e as encostas por cima ficam vivos e o encontro com o papel é um degradé curto;
+   - empilhado (telemóvel e tablet de pé): a fotografia 4:5 ocupa de forma deliberada a parte de cima (`--hs-h`, cerca de metade do
+     ecrã), com o campanário e o monte nítidos; a base dissolve-se no papel por uma máscara contínua (a grelha de pontos mantém-se
+     regular, só perde densidade) e o título sobe-lhe por cima, já na zona clara. Sem vazio: o texto segue a fotografia;
    - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura e grelha de 12 colunas: título (7 colunas, três
      linhas), prova em faixa fina por baixo e, a partir de 1024 px, o cartão de leitura no canto do céu (o campanário fica livre).
      O véu passa a uma mancha suave só atrás do texto. */
 .lp-hs {
   --hs-sky: var(--hero-sky-light, #f4ead9);
+  --hs-h: clamp(17rem, 52svh, 36rem);
   position: relative;
   isolation: isolate;
   overflow: clip;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
   min-height: 100vh;
   min-height: 100svh;
-  background-color: var(--hs-sky);
-  padding-top: calc(var(--nav-h) + 9rem);
-  padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+  background-color: var(--background);
+  padding-top: calc(var(--hs-h) - 2rem);
+  padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
 }
 .dark .lp-hs {
   --hs-sky: var(--hero-sky-dark, #2a2c21);
@@ -1419,13 +1523,45 @@ body:has([data-landing]) {
 .lp-hs-media {
   position: absolute;
   z-index: -1;
-  left: 0;
-  right: 0;
-  top: calc(var(--nav-h) + 1.75rem - 0.29 * 125vw);
-  aspect-ratio: 4 / 5;
+  inset: 0 0 auto;
+  height: var(--hs-h);
+  background-color: var(--hs-sky);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 52%,
+    rgb(0 0 0 / 0.93) 62%,
+    rgb(0 0 0 / 0.74) 72%,
+    rgb(0 0 0 / 0.47) 82%,
+    rgb(0 0 0 / 0.2) 91%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 52%,
+    rgb(0 0 0 / 0.93) 62%,
+    rgb(0 0 0 / 0.74) 72%,
+    rgb(0 0 0 / 0.47) 82%,
+    rgb(0 0 0 / 0.2) 91%,
+    transparent 100%
+  );
+}
+.lp-hs-media picture {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 .lp-hs-media img {
-  object-position: 50% 0%;
+  object-position: 50% 22%;
+}
+/* Escuro: o céu da fotografia é claro; um degradé curto no topo garante o contraste do logótipo e do menu (AA). */
+.dark .lp-hs-media::after {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 5rem;
+  background: linear-gradient(to bottom, color-mix(in oklab, var(--background) 72%, transparent), transparent);
 }
 .lp-hs-card,
 .lp-hs-hint {
@@ -1436,24 +1572,8 @@ body:has([data-landing]) {
   display: flex;
   flex: 1;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-start;
   gap: 1.25rem;
-}
-.lp-hs-inner::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: -5.5rem auto -3rem 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(
-    to bottom,
-    transparent 0,
-    color-mix(in oklab, var(--background) 55%, transparent) 2.5rem,
-    color-mix(in oklab, var(--background) 92%, transparent) 4.5rem,
-    var(--background) 5.5rem
-  );
 }
 .lp-hs-copy {
   display: flex;
@@ -1602,8 +1722,7 @@ body:has([data-landing]) {
 }
 @media (min-width: 640px) {
   .lp-hs {
-    min-height: min(100svh, 46rem);
-    padding-top: calc(var(--nav-h) + 12rem);
+    --hs-h: clamp(24rem, 58svh, 44rem);
   }
   .lp-hs-title {
     font-size: clamp(3.25rem, 1.8rem + 3.8vw, 4.5rem);
@@ -1636,7 +1755,7 @@ body:has([data-landing]) {
 }
 @media (min-width: 640px) and (min-aspect-ratio: 6/5) {
   .lp-hs {
-    justify-content: flex-start;
+    background-color: var(--hs-sky);
     min-height: clamp(32rem, 100svh, 60rem);
     padding-top: calc(var(--nav-h) + clamp(1.5rem, 12svh, 7rem));
     padding-bottom: clamp(2rem, 6svh, 4rem);
@@ -1652,7 +1771,9 @@ body:has([data-landing]) {
   }
   .lp-hs-media {
     inset: 0;
-    aspect-ratio: auto;
+    height: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
   .lp-hs-media img {
     object-position: 62% 0%;
@@ -1667,9 +1788,12 @@ body:has([data-landing]) {
   }
   /* Véu: uma mancha suave só atrás do texto (nunca uma faixa), com o tom do papel do tema. */
   .lp-hs-inner::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
     inset: -5rem auto -5rem calc(50% - 50vw);
     width: min(86vw, 72rem);
-    transform: none;
+    pointer-events: none;
     background: radial-gradient(
       ellipse 66% 72% at 36% 52%,
       color-mix(in oklab, var(--background) 82%, transparent) 0,
@@ -1781,3 +1905,1058 @@ body:has([data-landing]) {
   border: 4px solid var(--background);
   box-shadow: 0 1px 4px rgb(0 0 0 / 0.3);
 }
+
+/* lp-cp:start — Demo do Copiloto da landing (features/landing/copilot-chat.tsx). Só transform e opacity; sem JS depois do fim.
+   data-play: idle (por começar, tudo transparente), run (animações encadeadas por --d), done (estado final, sem animações). */
+.lp-cp {
+  --cp-line: color-mix(in oklab, var(--foreground) 12%, transparent);
+  --cp-win: color-mix(in oklab, var(--foreground) 3%, var(--background));
+  --cp-card: color-mix(in oklab, var(--foreground) 5.5%, var(--background));
+  --cp-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 1.25rem;
+  background: var(--cp-win);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, var(--foreground) 6%, transparent),
+    0 40px 90px -50px rgb(0 0 0 / 0.65);
+  font-size: 14px;
+}
+.lp-cp-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  height: 3.25rem;
+  padding: 0 1rem;
+  border-bottom: 1px solid var(--cp-line);
+  background: color-mix(in oklab, var(--foreground) 3%, transparent);
+}
+.lp-cp-name {
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.lp-cp-kbd {
+  padding: 1px 6px;
+  border: 1px solid var(--cp-line);
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  line-height: 1.5;
+  color: var(--muted-foreground);
+}
+.lp-cp-seal {
+  margin-left: auto;
+  padding: 2px 10px;
+  border: 1px solid var(--cp-line);
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.lp-cp-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.25rem 1rem 1rem;
+}
+.lp-cp-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+}
+.lp-cp-row-user {
+  justify-content: flex-end;
+  align-items: flex-end;
+}
+.lp-cp-avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 50%;
+  background: var(--cp-card);
+  color: var(--muted-foreground);
+}
+.lp-cp-avatar-ai {
+  border-color: color-mix(in oklab, var(--primary) 35%, transparent);
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.lp-cp-bubble {
+  max-width: 85%;
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 1rem 1rem 0.25rem 1rem;
+  background: var(--cp-card);
+  font-size: 14.5px;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+
+/* A pensar: linha do tempo vertical */
+.lp-cp-think {
+  padding: 0.75rem 0.875rem 0.5rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 0.875rem;
+  background: color-mix(in oklab, var(--foreground) 2.5%, transparent);
+}
+.lp-cp-think-head {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--muted-foreground);
+}
+.lp-cp-spin {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.lp-cp-swap {
+  display: grid;
+}
+.lp-cp-swap > * {
+  grid-area: 1 / 1;
+}
+.lp-cp-t-run {
+  opacity: 0;
+}
+.lp-cp-t-done {
+  color: var(--primary);
+}
+.lp-cp-steps {
+  margin: 0.375rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+.lp-cp-step {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1.5rem 1fr;
+  align-items: center;
+  column-gap: 0.75rem;
+  height: 2rem;
+}
+.lp-cp-step::before,
+.lp-cp-step::after {
+  content: '';
+  position: absolute;
+  left: 0.71875rem;
+  top: 1.75rem;
+  bottom: -0.25rem;
+  width: 1px;
+  background: var(--cp-line);
+}
+.lp-cp-step::after {
+  background: color-mix(in oklab, var(--primary) 70%, transparent);
+  transform-origin: top;
+}
+.lp-cp-step:last-child::before,
+.lp-cp-step:last-child::after {
+  display: none;
+}
+.lp-cp-node {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 50%;
+  background: var(--cp-win);
+  color: var(--muted-foreground);
+}
+.lp-cp-node::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border: 1px solid color-mix(in oklab, var(--primary) 50%, transparent);
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--primary) 14%, transparent);
+}
+.lp-cp-node > svg {
+  grid-area: 1 / 1;
+  z-index: 1;
+}
+.lp-cp-ico {
+  opacity: 0;
+}
+.lp-cp-chk {
+  color: var(--primary);
+}
+.lp-cp-step-label {
+  font-size: 13px;
+  line-height: 1.3;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.lp-cp-ring {
+  position: absolute;
+  inset: -3px;
+  opacity: 0;
+}
+.lp-cp-spin > .lp-cp-ring {
+  inset: 0;
+}
+.lp-cp-ring svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.lp-cp-ring circle {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-dasharray: 20 46;
+}
+.lp-cp-spin > .lp-cp-chk {
+  grid-area: 1 / 1;
+}
+
+/* Resposta */
+.lp-cp-ai {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+.lp-cp-answer {
+  margin: 0;
+  padding-top: 0.125rem;
+  font-size: 15px;
+  line-height: 1.65;
+  text-wrap: pretty;
+  color: color-mix(in oklab, var(--foreground) 90%, transparent);
+}
+.lp-cp-num {
+  padding: 0.05em 0.3em;
+  border-radius: 0.3em;
+  background: color-mix(in oklab, var(--primary) 16%, transparent);
+  color: var(--foreground);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lp-cp-cite {
+  white-space: nowrap;
+  margin-left: 0.2em;
+  padding: 0.12em 0.4em;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 0.68em;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+  vertical-align: 0.3em;
+}
+.lp-cp-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+.lp-cp-sources > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 3px 0.75rem 3px 3px;
+  border: 1px solid var(--cp-line);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.lp-cp-sources b {
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: color-mix(in oklab, var(--primary) 18%, transparent);
+  color: var(--primary);
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+}
+
+/* Cartão de resultado */
+.lp-cp-card {
+  overflow: hidden;
+  border: 1px solid var(--cp-line);
+  border-radius: 0.875rem;
+  background: var(--cp-card);
+}
+.lp-cp-card-head {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.375rem 0.75rem;
+  padding: 0.75rem 0.875rem;
+}
+.lp-cp .lp-cp-card-head h3 {
+  margin: 0;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+}
+.lp-cp-est {
+  padding: 2px 0.5rem;
+  border: 1px solid color-mix(in oklab, var(--color-areia) 45%, transparent);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--color-areia) 12%, transparent);
+  color: var(--color-areia);
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.lp-cp-kpis {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0;
+  border-block: 1px solid var(--cp-line);
+  background: var(--cp-line);
+}
+.lp-cp-kpis > div {
+  min-width: 0;
+  padding: 0.75rem 0.875rem;
+  background: var(--cp-card);
+}
+.lp-cp-kpi-wide {
+  grid-column: span 2;
+}
+.lp-cp-kpis dt {
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.lp-cp-kpis dd {
+  margin: 0.125rem 0 0;
+  font-family: var(--font-serif);
+  font-size: 1.375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.lp-cp-kpis small {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.lp-cp-kpis .lp-cp-delta {
+  color: var(--primary);
+}
+.lp-cp-gauge {
+  display: block;
+  width: 100%;
+  height: 1.25rem;
+  margin-top: 0.375rem;
+}
+.lp-cp-gauge-track {
+  stroke: var(--cp-line);
+  stroke-width: 1;
+}
+.lp-cp-gauge-band {
+  fill: color-mix(in oklab, var(--primary) 32%, transparent);
+}
+.lp-cp-gauge-dot {
+  fill: var(--primary);
+  stroke: var(--cp-card);
+  stroke-width: 2;
+}
+.lp-cp-bars {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.75rem 0.875rem;
+}
+.lp-cp-bar-row {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr) 4.5rem;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 12px;
+}
+.lp-cp-bar-row > span {
+  color: var(--muted-foreground);
+}
+.lp-cp-bar-row > b {
+  font-weight: 500;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.lp-cp-track {
+  display: block;
+  height: 0.5rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--foreground) 8%, transparent);
+}
+.lp-cp-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--primary);
+}
+.lp-cp-fill-base {
+  background: color-mix(in oklab, var(--foreground) 32%, transparent);
+}
+.lp-cp-card-foot {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5625rem 0.875rem;
+  border-top: 1px solid var(--cp-line);
+  color: var(--muted-foreground);
+  font-size: 12px;
+}
+.lp-cp-card-foot svg {
+  color: var(--primary);
+}
+
+/* Verificação */
+.lp-cp-verify {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 0.625rem;
+  margin: 0;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid color-mix(in oklab, var(--primary) 45%, transparent);
+  border-radius: 0.75rem;
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+  font-size: 13.5px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.lp-cp-verify svg {
+  color: var(--primary);
+}
+.lp-cp-verify span {
+  min-width: 0;
+  flex: 1 1 12rem;
+}
+.lp-cp-verify em {
+  margin-left: auto;
+  color: var(--primary);
+  font-size: 10.5px;
+  font-style: normal;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Seguimento e campo de entrada */
+.lp-cp-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0 1rem 1rem;
+}
+.lp-cp-chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--cp-line);
+  border-radius: 999px;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+  font-size: 13px;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+.lp-cp-chip:hover {
+  border-color: color-mix(in oklab, var(--primary) 50%, transparent);
+  background: color-mix(in oklab, var(--primary) 10%, transparent);
+}
+.lp-cp-foot {
+  padding: 0.875rem 1rem 0.25rem;
+  border-top: 1px solid var(--cp-line);
+}
+.lp-cp-composer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 3.25rem;
+  padding: 0.375rem 0.375rem 0.375rem 1rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 20%, transparent);
+  border-radius: 0.875rem;
+  background: var(--cp-card);
+  color: var(--muted-foreground);
+  font-size: 15px;
+  transition: border-color 160ms ease;
+}
+.lp-cp-composer:hover {
+  border-color: color-mix(in oklab, var(--primary) 60%, transparent);
+}
+.lp-cp-send {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.625rem;
+  background: var(--primary);
+  color: var(--primary-foreground);
+}
+.lp-cp-foot-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+}
+.lp-cp-foot-row p {
+  margin: 0;
+  color: var(--muted-foreground);
+  font-size: 11.5px;
+  line-height: 1.4;
+}
+.lp-cp-replay {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0 0.5rem;
+  border-radius: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 12.5px;
+  font-weight: 500;
+}
+.lp-cp-replay:hover {
+  color: var(--foreground);
+}
+.lp-cp :is(a, button):focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+@media (min-width: 640px) {
+  .lp-cp-bar {
+    padding: 0 1.25rem;
+  }
+  .lp-cp-body {
+    padding: 1.5rem 1.5rem 1.25rem;
+  }
+  .lp-cp-chips {
+    padding: 0 1.5rem 1.125rem;
+  }
+  .lp-cp-foot {
+    padding: 1rem 1.5rem 0.25rem;
+  }
+  .lp-cp-kpis {
+    grid-template-columns: 1fr 1fr 1.35fr;
+  }
+  .lp-cp-kpi-wide {
+    grid-column: auto;
+  }
+  .lp-cp-bar-row {
+    grid-template-columns: 3.5rem minmax(0, 1fr) 5rem;
+  }
+}
+@media (pointer: coarse) {
+  .lp-cp-chip {
+    min-height: 2.75rem;
+  }
+}
+
+/* Estados: idle (por começar) e run (animações). Sem estado = final. */
+.lp-cp[data-play='idle'] .lp-cp-a {
+  opacity: 0;
+  visibility: hidden;
+}
+.lp-cp[data-play='idle'] .lp-cp-w {
+  opacity: 0;
+}
+@keyframes lp-cp-in {
+  from {
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+}
+@keyframes lp-cp-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes lp-cp-ring-vis {
+  0%,
+  94% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes lp-cp-rot {
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes lp-cp-out {
+  to {
+    opacity: 0;
+  }
+}
+@keyframes lp-cp-show {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes lp-cp-line {
+  from {
+    transform: scaleY(0);
+  }
+}
+@keyframes lp-cp-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes lp-cp-pop {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+}
+.lp-cp-grow {
+  transform-origin: left center;
+  transform-box: fill-box;
+}
+.lp-cp-pop {
+  transform-origin: center;
+  transform-box: fill-box;
+}
+.lp-cp[data-play='run'] {
+  & .lp-cp-a {
+    animation: lp-cp-in 0.6s var(--cp-ease) var(--d, 0s) both;
+  }
+  & .lp-cp-w {
+    animation: lp-cp-fade 0.35s ease var(--d, 0s) both;
+  }
+  & .lp-cp-ring {
+    animation: lp-cp-ring-vis var(--dur) var(--s) both;
+  }
+  & .lp-cp-ring svg {
+    animation: lp-cp-rot 0.9s linear var(--s) var(--n) both;
+  }
+  & .lp-cp-ico {
+    opacity: 1;
+    animation: lp-cp-out 0.2s ease var(--e) both;
+  }
+  & .lp-cp-chk {
+    animation: lp-cp-show 0.35s var(--cp-ease) var(--e, var(--d)) both;
+  }
+  & .lp-cp-node::after {
+    animation: lp-cp-fade 0.3s ease var(--e) both;
+  }
+  & .lp-cp-step::after {
+    animation: lp-cp-line 0.45s var(--cp-ease) var(--e) both;
+  }
+  & .lp-cp-t-run {
+    opacity: 1;
+    animation: lp-cp-out 0.25s ease var(--e) both;
+  }
+  & .lp-cp-t-done {
+    animation: lp-cp-fade 0.3s ease var(--e) both;
+  }
+  & .lp-cp-grow {
+    animation: lp-cp-grow 0.8s var(--cp-ease) var(--d) both;
+  }
+  & .lp-cp-pop {
+    animation: lp-cp-pop 0.4s var(--cp-ease) var(--d) both;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .lp-cp .lp-cp-a,
+  .lp-cp .lp-cp-w {
+    animation: none !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+}
+/* lp-cp:end */
+
+/* ===== lp-ft: rodapé da landing e página «Créditos e licenças» (features/landing/footer.tsx, features/credits) ===== */
+
+/* Ligações do rodapé: alvo de 44 px em toque; em rato e a partir de 1024 px a lista aperta-se. Hairline de foco visível. */
+.lp-ft-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  border-radius: 0.25rem;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  text-decoration: underline;
+  text-decoration-color: transparent;
+  text-underline-offset: 0.3em;
+  outline: none;
+  transition:
+    color 160ms ease,
+    text-decoration-color 160ms ease;
+}
+@media (min-width: 1024px) and (pointer: fine) {
+  .lp-ft-link {
+    min-height: 2.125rem;
+  }
+}
+.lp-ft-link:hover,
+.lp-ft-link:focus-visible {
+  color: var(--foreground);
+  text-decoration-color: currentColor;
+}
+.lp-ft-link:focus-visible,
+.lp-ft-stretch:focus-visible,
+.lp-cr-link:focus-visible,
+.lp-cr-toc a:focus-visible,
+.lp-cr-button:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.lp-ft-strong {
+  color: var(--foreground);
+  font-weight: 500;
+}
+
+/* Cartão do hackathon: miniatura 16:9 à esquerda (cantos de 12 px, hairline), texto à direita; a ligação cobre o cartão todo. */
+.lp-ft-card {
+  position: relative;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  overflow: hidden;
+  transition: border-color 200ms ease;
+}
+.lp-ft-card:has(.lp-ft-stretch:hover) {
+  border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+}
+.lp-ft-card:has(.lp-ft-stretch:focus-visible) {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+.lp-ft-card .lp-ft-stretch:focus-visible {
+  outline: none;
+}
+.lp-ft-stretch::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+.lp-ft-card-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 0.875rem;
+  padding: 0.75rem;
+}
+@media (min-width: 640px) {
+  .lp-ft-card-grid {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 1.5rem;
+    padding: 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  .lp-ft-card-grid {
+    grid-template-columns: minmax(0, 4fr) minmax(0, 8fr);
+    gap: 2.5rem;
+    padding: 1.25rem;
+  }
+}
+.lp-ft-media {
+  aspect-ratio: 16 / 9;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: #0a2a6b;
+  align-self: center;
+}
+.lp-ft-cover {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  outline: 1px solid color-mix(in oklab, var(--foreground) 14%, transparent);
+  outline-offset: -1px;
+  transition: transform 600ms var(--ease-out);
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .lp-ft-card:hover .lp-ft-cover {
+    transform: scale(1.03);
+  }
+  .lp-ft-card:hover .lp-ft-cta svg {
+    transform: translate(2px, -2px);
+  }
+}
+.lp-ft-cta {
+  color: var(--primary);
+}
+.lp-ft-cta svg {
+  transition: transform 240ms var(--ease-out);
+}
+.lp-ft-card-note {
+  border-top: 1px solid var(--border);
+  padding: 0.75rem 0.875rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  text-wrap: pretty;
+}
+@media (min-width: 640px) {
+  .lp-ft-card-note {
+    padding: 0.875rem 1rem;
+  }
+}
+@media (min-width: 1024px) {
+  .lp-ft-card-note {
+    padding: 0.875rem 1.25rem;
+  }
+}
+
+/* Parceiros e dados: etiqueta mono e nomes em linha, separados por ponto médio. */
+.lp-ft-partners {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.5rem 0;
+}
+@media (min-width: 768px) {
+  .lp-ft-partners {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 2rem;
+  }
+  .lp-ft-partners > h2 {
+    flex: 0 0 9rem;
+  }
+}
+.lp-ft-partners ul {
+  column-gap: 1.25rem;
+}
+@media (min-width: 768px) {
+  .lp-ft-partners ul {
+    column-gap: 0;
+  }
+  .lp-ft-partners li:not(:first-child)::before {
+    content: '·';
+    margin: 0 0.625rem;
+    color: color-mix(in oklab, var(--muted-foreground) 55%, transparent);
+  }
+}
+
+/* Barra final: direitos, «feito para» e controlos de idioma e tema. */
+.lp-ft-bar {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0 1rem;
+  border-top: 1px solid var(--border);
+  padding-top: 0.5rem;
+  color: var(--muted-foreground);
+  font-size: 0.8125rem;
+}
+.lp-ft-copy {
+  grid-column: 1 / -1;
+  padding-top: 0.625rem;
+  text-wrap: pretty;
+}
+.lp-ft-made {
+  font: 500 11.5px/1.3 var(--lp-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.lp-ft-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  margin-right: -0.5rem;
+}
+.lp-ft-controls button {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+@media (min-width: 640px) {
+  .lp-ft-bar {
+    grid-template-columns: auto 1fr auto;
+    padding-top: 0;
+  }
+  .lp-ft-copy {
+    grid-column: auto;
+    padding-top: 0;
+  }
+  .lp-ft-made {
+    justify-self: start;
+    margin-left: 1rem;
+    padding-left: 1rem;
+    border-left: 1px solid var(--border);
+  }
+}
+
+/* Página «Créditos e licenças». */
+.lp-cr-link {
+  border-radius: 0.25rem;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--foreground) 35%, transparent);
+  text-underline-offset: 0.25em;
+  outline: none;
+  transition: color 160ms ease, text-decoration-color 160ms ease;
+}
+.lp-cr-link:hover {
+  color: var(--primary);
+  text-decoration-color: currentColor;
+}
+.lp-cr-toc {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.25rem;
+}
+@media (min-width: 1024px) {
+  .lp-cr-toc {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    gap: 0;
+    border-left: 1px solid var(--border);
+  }
+}
+.lp-cr-toc a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 0.875rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--muted-foreground);
+  font-size: 0.9375rem;
+  text-decoration: none;
+  outline: none;
+  transition: color 160ms ease, border-color 160ms ease;
+}
+.lp-cr-toc a:hover {
+  color: var(--foreground);
+  border-color: color-mix(in oklab, var(--primary) 45%, var(--border));
+}
+@media (min-width: 1024px) {
+  .lp-cr-toc a {
+    min-height: 2.25rem;
+    padding: 0 0 0 1rem;
+    border: 0;
+    border-radius: 0;
+  }
+}
+.lp-cr-row {
+  display: grid;
+  grid-template-columns: 5.5rem minmax(0, 1fr);
+  gap: 1rem;
+  padding: 1.25rem 0;
+}
+@media (min-width: 640px) {
+  .lp-cr-row {
+    grid-template-columns: 9rem minmax(0, 1fr);
+    gap: 1.5rem;
+  }
+}
+/* Miniatura: papel do cartão com o derivado em meio-tom por cima; 4:3, canto de 8 px, hairline. */
+.lp-cr-thumb {
+  aspect-ratio: 4 / 3;
+  align-self: start;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  background-color: var(--card);
+  outline: 1px solid var(--border);
+  outline-offset: -1px;
+}
+.lp-cr-thumb.photo-bg {
+  --photo-mask: none;
+  --photo-o: 1;
+  --photo-pos: center;
+  --photo-size: cover;
+}
+.dark .lp-cr-thumb.photo-bg {
+  background-color: #14211d;
+}
+.lp-cr-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.lp-cr-dl {
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  gap: 0.25rem 1rem;
+  font-size: 0.9375rem;
+  line-height: 1.5;
+}
+.lp-cr-dl dt {
+  font: 500 11.5px/1.9 var(--lp-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+.lp-cr-dl dd {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.lp-cr-note {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  background: var(--card);
+  color: var(--muted-foreground);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+.lp-cr-note h3 {
+  color: var(--foreground);
+}
+.lp-cr-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border-radius: 0.625rem;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  text-decoration: none;
+  outline: none;
+}
+.lp-cr-hack {
+  display: grid;
+  gap: 1.25rem;
+}
+@media (min-width: 640px) {
+  .lp-cr-hack {
+    grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+    gap: 2rem;
+  }
+}
+/* ===== /lp-ft ===== */

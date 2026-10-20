@@ -12,18 +12,41 @@ export function navItems(): { id: string; label: string; xl?: boolean }[] {
   ];
 }
 
+/** Secções numeradas da página, pela ordem em que aparecem. A numeração sai daqui (índice do menu, «Nesta página» e cabeçalhos). */
+const NUMBERED = [
+  'problema',
+  'metodo',
+  'prova',
+  'produto',
+  'para-quem',
+  'copiloto',
+  'rigor',
+  'equipa',
+  'perguntas',
+] as const;
+
+export type NumberedSection = (typeof NUMBERED)[number];
+
+/** Número editorial contínuo («01», «02»…) de uma secção, gerado a partir da lista real. */
+export function sectionNumber(id: NumberedSection): string {
+  return String(NUMBERED.indexOf(id) + 1).padStart(2, '0');
+}
+
+const TOC_LABEL: Record<NumberedSection, () => string> = {
+  problema: () => m.landing_problem_eyebrow(),
+  metodo: () => m.landing_nav_method(),
+  prova: () => m.landing_nav_proof(),
+  produto: () => m.landing_nav_product(),
+  'para-quem': () => m.landing_nav_audience(),
+  copiloto: () => m.landing_nav_copilot(),
+  rigor: () => m.landing_nav_rigor(),
+  equipa: () => m.landing_nav_team(),
+  perguntas: () => m.landing_nav_faq(),
+};
+
 /** Índice completo (menu móvel e «Nesta página»), pela ordem da página, com o número editorial de cada secção. */
-export function tocItems(): { id: string; n: string; label: string }[] {
-  return [
-    { id: 'problema', n: '01', label: m.landing_problem_eyebrow() },
-    { id: 'metodo', n: '02', label: m.landing_nav_method() },
-    { id: 'prova', n: '03', label: m.landing_nav_proof() },
-    { id: 'produto', n: '04', label: m.landing_nav_product() },
-    { id: 'copiloto', n: '06', label: m.landing_nav_copilot() },
-    { id: 'rigor', n: '07', label: m.landing_nav_rigor() },
-    { id: 'equipa', n: '08', label: m.landing_nav_team() },
-    { id: 'perguntas', n: '09', label: m.landing_nav_faq() },
-  ];
+export function tocItems(): { id: NumberedSection; n: string; label: string }[] {
+  return NUMBERED.map((id) => ({ id, n: sectionNumber(id), label: TOC_LABEL[id]() }));
 }
 
 /** Cada secção observada e o item do topo a que pertence (a pílula fica no grupo). */
@@ -42,6 +65,5 @@ export const SECTION_GROUP: Record<string, string> = {
 
 /** Secções sem entrada própria no índice «Nesta página» e o item que as representa. */
 export const TOC_ALIAS: Record<string, string> = {
-  'para-quem': 'produto',
   referencias: 'equipa',
 };

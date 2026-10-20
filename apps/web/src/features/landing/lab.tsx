@@ -14,6 +14,7 @@ import {
   type Status,
   StatusBadge,
 } from './layout';
+import { sectionNumber } from './sections';
 
 const MIN_T = FACTS.collectedT;
 const MAX_T = 1500;
@@ -299,7 +300,7 @@ export function Evidence() {
         <div className="grid gap-6 lg:grid-cols-12 lg:items-end lg:gap-10">
           <Heading
             id="prova"
-            n="03"
+            n={sectionNumber('prova')}
             size="md"
             eyebrow={m.landing_proof_eyebrow()}
             title={m.landing_proof_title()}

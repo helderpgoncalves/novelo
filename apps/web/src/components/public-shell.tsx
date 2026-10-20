@@ -18,7 +18,7 @@ const linkClass =
 export function LegalLinks({ className }: { className?: string }) {
   return (
     <nav aria-label={m.public_nav_label()} className={className}>
-      <ul className="flex flex-wrap items-center gap-x-5 gap-y-0">
+      <ul className="flex flex-wrap items-center gap-x-4 gap-y-0 sm:gap-x-5">
         <li>
           <Link to="/privacy" className={linkClass}>
             {m.public_nav_privacy()}
@@ -35,6 +35,11 @@ export function LegalLinks({ className }: { className?: string }) {
             <span className="sr-only">: {CONTACT_EMAIL}</span>
           </a>
         </li>
+        <li>
+          <Link to="/credits" className={linkClass}>
+            {m.public_nav_credits()}
+          </Link>
+        </li>
       </ul>
     </nav>
   );
@@ -42,7 +47,7 @@ export function LegalLinks({ className }: { className?: string }) {
 
 /**
  * Estrutura das páginas públicas (sem sessão): topo fixo com marca, navegação, idioma e tema; rodapé com
- * Privacidade, Termos e contacto (o mesmo do ecrã de entrada).
+ * Privacidade, Termos, contacto e Créditos (o mesmo do ecrã de entrada).
  */
 export function PublicShell({
   children,
@@ -50,7 +55,7 @@ export function PublicShell({
   nav,
   menu,
   header,
-  footerExtra,
+  footer,
   width = 'max-w-5xl',
 }: {
   children: ReactNode;
@@ -62,8 +67,8 @@ export function PublicShell({
   menu?: ReactNode;
   /** Substitui o topo por omissão (a landing traz o seu, fixo e transparente). */
   header?: ReactNode;
-  /** Linha extra no fim do rodapé (ex.: crédito da fotografia). */
-  footerExtra?: ReactNode;
+  /** Substitui o rodapé compacto por omissão (a landing traz o seu, completo). */
+  footer?: ReactNode;
   width?: string;
 }) {
   return (
@@ -97,23 +102,24 @@ export function PublicShell({
         </header>
       )}
       <div className="flex-1">{children}</div>
-      <footer className="border-border border-t bg-card/40 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
-        <div className={`mx-auto flex w-full flex-col gap-6 py-10 ${PUBLIC_GUTTER} ${width}`}>
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col gap-3">
-              <BrandLogo className="h-7 self-start" />
-              <p className="max-w-sm text-pretty text-muted-foreground text-sm">
-                {m.landing_footer_tagline()}
-              </p>
+      {footer ?? (
+        <footer className="border-border border-t bg-card/40 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
+          <div className={`mx-auto flex w-full flex-col gap-6 py-10 ${PUBLIC_GUTTER} ${width}`}>
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3">
+                <BrandLogo className="h-7 self-start" />
+                <p className="max-w-sm text-pretty text-muted-foreground text-sm">
+                  {m.landing_footer_tagline()}
+                </p>
+              </div>
+              <LegalLinks className="text-sm" />
             </div>
-            <LegalLinks className="text-sm" />
+            <p className="border-border border-t pt-5 text-muted-foreground text-xs">
+              {m.landing_footer_note()}
+            </p>
           </div>
-          <p className="border-border border-t pt-5 text-muted-foreground text-xs">
-            {m.landing_footer_note()}
-          </p>
-          {footerExtra}
-        </div>
-      </footer>
+        </footer>
+      )}
     </div>
   );
 }

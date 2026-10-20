@@ -144,6 +144,10 @@ brand-landing:
 
 brand-hero: brand-landing
 
+# Capa do Hack4Guimarães 2035 para o rodapé da landing (descarrega da Taikai; precisa de avifenc e cwebp)
+brand-hackathon:
+    {{BRAND_RUN}} hackathon_cover.py
+
 # Só o painel do ecrã de entrada (fotografia da Penha em meio-tom; precisa de rsvg-convert)
 brand-login:
     {{BRAND_RUN}} login_panel.py

@@ -7,6 +7,7 @@ import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 import { REPO_URL } from './facts';
 import { BODY, CONTAINER, Heading, SECTION_Y, Section } from './layout';
+import { sectionNumber } from './sections';
 
 /** Para quem é: lista editorial (nome grande em serifa, texto ao lado) em vez de cartões; o título fica fixo à esquerda. */
 export function Audience() {
@@ -24,7 +25,7 @@ export function Audience() {
       <div className={`${CONTAINER} grid gap-12 lg:grid-cols-12 lg:gap-16`}>
         <Heading
           id="para-quem"
-          n="05"
+          n={sectionNumber('para-quem')}
           size="md"
           eyebrow={m.landing_audience_eyebrow()}
           title={m.landing_audience_title()}
@@ -76,7 +77,7 @@ export function Faq() {
       <div className={`${CONTAINER} grid gap-12 lg:grid-cols-12 lg:gap-16`}>
         <Heading
           id="perguntas"
-          n="09"
+          n={sectionNumber('perguntas')}
           size="md"
           eyebrow={m.landing_faq_eyebrow()}
           title={m.landing_faq_title()}

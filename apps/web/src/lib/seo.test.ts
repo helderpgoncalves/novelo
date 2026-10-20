@@ -12,6 +12,7 @@ import {
   landingFaq,
   ROUTES,
   renderRoute,
+  routePath,
   routeUrl,
   SITE,
   stripSeoTags,
@@ -146,17 +147,52 @@ describe('pré-render', () => {
   });
 });
 
+describe('créditos e licenças (slug traduzido)', () => {
+  const credits = ROUTES.find((r) => r.id === 'credits');
+  if (!credits) throw new Error('rota em falta');
+  it('URL por idioma: /pt/creditos e /en/credits, indexável', () => {
+    expect(routePath('pt-PT', credits)).toBe('creditos');
+    expect(routePath('en', credits)).toBe('credits');
+    expect(routeUrl('pt-PT', credits)).toBe(`${SITE}/pt/creditos`);
+    expect(routeUrl('en', credits)).toBe(`${SITE}/en/credits`);
+    expect(credits.index).toBe(true);
+  });
+  it('hreflang cruzado, canonical próprio e sem noindex', () => {
+    const head = buildHead(credits, 'pt-PT', pt as Record<string, string>);
+    expect(head).toContain(`rel="canonical" href="${SITE}/pt/creditos"`);
+    expect(head).toContain(`hreflang="pt-PT" href="${SITE}/pt/creditos"`);
+    expect(head).toContain(`hreflang="en" href="${SITE}/en/credits"`);
+    expect(head).toContain(`hreflang="x-default" href="${SITE}/pt/creditos"`);
+    expect(head).not.toContain('noindex');
+    const en1 = buildHead(credits, 'en', en as Record<string, string>);
+    expect(en1).toContain(`rel="canonical" href="${SITE}/en/credits"`);
+    expect(en1).toContain('Credits and licences');
+  });
+  it('as outras rotas mantêm o mesmo caminho nos dois idiomas', () => {
+    for (const r of ROUTES.filter((x) => x.id !== 'credits'))
+      expect(routePath('pt-PT', r)).toBe(routePath('en', r));
+  });
+  it('o rodapé do resumo da landing liga aos créditos do idioma certo', () => {
+    expect(buildSummary('pt-PT', pt as Record<string, string>)).toContain('href="/pt/creditos"');
+    expect(buildSummary('en', en as Record<string, string>)).toContain('href="/en/credits"');
+  });
+});
+
 describe('sitemap', () => {
   const xml = buildSitemap('2026-10-20');
   it('só rotas indexáveis, com lastmod, hreflang completo e x-default', () => {
     expect(xml).toContain('<loc>https://novelo.helder.si/pt/</loc>');
     expect(xml).toContain('<loc>https://novelo.helder.si/en/privacy</loc>');
+    expect(xml).toContain('<loc>https://novelo.helder.si/pt/creditos</loc>');
+    expect(xml).toContain('<loc>https://novelo.helder.si/en/credits</loc>');
+    expect(xml).not.toContain('/pt/credits<');
+    expect(xml).not.toContain('/en/creditos');
     expect(xml).not.toContain('/login');
-    expect(xml.match(/<lastmod>2026-10-20<\/lastmod>/g)).toHaveLength(6);
+    expect(xml.match(/<lastmod>2026-10-20<\/lastmod>/g)).toHaveLength(8);
     expect(
       xml.match(/hreflang="x-default" href="https:\/\/novelo\.helder\.si\/pt\/"/g),
     ).toHaveLength(2);
-    expect(xml.match(/xhtml:link/g)).toHaveLength(6 * 3);
+    expect(xml.match(/xhtml:link/g)).toHaveLength(8 * 3);
   });
 });
 

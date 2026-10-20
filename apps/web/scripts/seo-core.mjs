@@ -23,6 +23,8 @@ export const ROUTES = [
   { id: 'register', path: 'register', index: false, og: 'entrar', title: 'title_register', description: 'seo_register_description', alt: 'seo_og_alt_entrar', },
   { id: 'privacy', path: 'privacy', index: true, og: 'landing', title: 'title_privacy_policy', description: 'seo_privacy_description', alt: 'seo_og_alt_landing', crumb: 'public_nav_privacy' },
   { id: 'terms', path: 'terms', index: true, og: 'landing', title: 'title_terms', description: 'seo_terms_description', alt: 'seo_og_alt_landing', crumb: 'public_nav_terms' },
+  // Slug traduzido: /pt/creditos e /en/credits (a rota da app é /credits; ver paraglide.options.mjs).
+  { id: 'credits', path: 'credits', paths: { pt: 'creditos', en: 'credits' }, index: true, og: 'landing', title: 'title_credits', description: 'seo_credits_description', alt: 'seo_og_alt_landing', crumb: 'public_nav_credits' },
 ];
 
 /** Substitui `{nome}` pelos parâmetros (o mesmo formato das mensagens do Paraglide). */
@@ -36,10 +38,14 @@ export const escapeHtml = (text) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
+/** Segmento do caminho de uma rota num idioma (`paths` quando o slug é traduzido; senão `path`). */
+export const routePath = (locale, route) => route.paths?.[LOCALES[locale].prefix] ?? route.path;
+
 /** URL absoluto de uma rota num idioma: `/pt/` para a landing, `/pt/privacy` para as outras. */
 export function routeUrl(locale, route) {
   const { prefix } = LOCALES[locale];
-  return route.path === '' ? `${SITE}/${prefix}/` : `${SITE}/${prefix}/${route.path}`;
+  const path = routePath(locale, route);
+  return path === '' ? `${SITE}/${prefix}/` : `${SITE}/${prefix}/${path}`;
 }
 
 export const ogImageUrl = (locale, route) =>
@@ -200,7 +206,7 @@ export function buildSummary(locale, messages) {
     `<section><h2>${t('landing_features_title')}</h2><ul>${li(features.map((f) => `<strong>${t(`landing_feat_${f}_title`)}</strong> ${t(`landing_feat_${f}_text`)}`))}</ul></section>`,
     `<section><h2>${t('landing_rigor_title')}</h2><p>${t('landing_rigor_lead')}</p><h3>${t('landing_not_title')}</h3><ul>${li([1, 2, 3, 4].map((n) => t(`landing_not_${n}`)))}</ul><h3>${t('landing_limits_title')}</h3><ul>${li([1, 2, 3, 4, 5].map((n) => t(`landing_limit_${n}`)))}</ul></section>`,
     `<section><h2>${t('landing_faq_title')}</h2>${faq}</section></main>`,
-    `<footer><p><a href="/${prefix}/privacy">${t('public_nav_privacy')}</a> · <a href="/${prefix}/terms">${t('public_nav_terms')}</a></p></footer>`,
+    `<footer><p><a href="/${prefix}/privacy">${t('public_nav_privacy')}</a> · <a href="/${prefix}/terms">${t('public_nav_terms')}</a> · <a href="/${prefix}/${prefix === 'pt' ? 'creditos' : 'credits'}">${t('footer_credits')}</a></p></footer>`,
     `</div>`,
   ].join('');
 }

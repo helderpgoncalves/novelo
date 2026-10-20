@@ -7,7 +7,7 @@ referência de estilo. O papel (Linho `#F4F1EA`, Tinta `#0F1815`) é sempre o fu
 
 ## Fontes e licenças
 
-Registo completo (título, página, data) em `apps/web/public/landing/CREDITS.md`; o crédito visível está no rodapé da landing (`PhotoCredits`).
+Registo completo (título, página, data) em `apps/web/public/landing/CREDITS.md`; o crédito visível está na página «Créditos e licenças», ligada no rodapé das páginas públicas.
 
 | Fotografia | Autor | Licença | Uso |
 | --- | --- | --- | --- |

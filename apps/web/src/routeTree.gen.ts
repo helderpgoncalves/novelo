@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
 import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
@@ -66,6 +67,11 @@ const AuthRoute = AuthRouteImport.update({
 const AcceptInviteRoute = AcceptInviteRouteImport.update({
   id: '/accept-invite',
   path: '/accept-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CreditsRoute = CreditsRouteImport.update({
+  id: '/credits',
+  path: '/credits',
   getParentRoute: () => rootRouteImport,
 } as any)
 const JoinRoute = JoinRouteImport.update({
@@ -252,6 +258,7 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
@@ -292,6 +299,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
@@ -335,6 +343,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/accept-invite': typeof AcceptInviteRoute
+  '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
@@ -377,6 +386,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accept-invite'
+    | '/credits'
     | '/join'
     | '/magic-link'
     | '/pending-approval'
@@ -417,6 +427,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accept-invite'
+    | '/credits'
     | '/join'
     | '/magic-link'
     | '/pending-approval'
@@ -459,6 +470,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/accept-invite'
+    | '/credits'
     | '/join'
     | '/magic-link'
     | '/pending-approval'
@@ -502,6 +514,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   AcceptInviteRoute: typeof AcceptInviteRoute
+  CreditsRoute: typeof CreditsRoute
   JoinRoute: typeof JoinRoute
   MagicLinkRoute: typeof MagicLinkRoute
   PendingApprovalRoute: typeof PendingApprovalRoute
@@ -539,6 +552,13 @@ declare module '@tanstack/react-router' {
       path: '/accept-invite'
       fullPath: '/accept-invite'
       preLoaderRoute: typeof AcceptInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/credits': {
+      id: '/credits'
+      path: '/credits'
+      fullPath: '/credits'
+      preLoaderRoute: typeof CreditsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/join': {
@@ -875,6 +895,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   AcceptInviteRoute: AcceptInviteRoute,
+  CreditsRoute: CreditsRoute,
   JoinRoute: JoinRoute,
   MagicLinkRoute: MagicLinkRoute,
   PendingApprovalRoute: PendingApprovalRoute,

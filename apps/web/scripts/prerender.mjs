@@ -1,11 +1,11 @@
 // Pré-render leve, depois de `vite build`: escreve dist/{pt,en}/index.html (landing, com resumo semântico) e as páginas
-// públicas (login, registo, privacidade, termos) com `<head>` localizado, mais o sitemap.xml. Zero dependências.
+// públicas (login, registo, privacidade, termos, créditos) com `<head>` localizado, mais o sitemap.xml. Zero dependências.
 // O nginx serve `<rota>/index.html` antes do fallback do SPA (ver nginx.conf). Funções puras em seo-core.mjs.
 import { execSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { LOCALE_IDS, LOCALES, ROUTES, auditHtml, buildSitemap, renderRoute } from './seo-core.mjs';
+import { LOCALE_IDS, LOCALES, ROUTES, auditHtml, buildSitemap, renderRoute, routePath } from './seo-core.mjs';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
@@ -55,11 +55,11 @@ let written = 0;
 for (const locale of LOCALE_IDS) {
   const messages = JSON.parse(readFileSync(join(root, 'messages', `${LOCALES[locale].file}.json`), 'utf8'));
   for (const route of ROUTES) {
-    const dir = join(dist, LOCALES[locale].prefix, route.path);
+    const dir = join(dist, LOCALES[locale].prefix, routePath(locale, route));
     mkdirSync(dir, { recursive: true });
     const html = renderRoute(base, route, locale, messages, chunks, heroLinks);
     const problems = auditHtml(html, { publicPage: true });
-    if (problems.length) failures.push(`${LOCALES[locale].prefix}/${route.path}: ${problems.join('; ')}`);
+    if (problems.length) failures.push(`${LOCALES[locale].prefix}/${routePath(locale, route)}: ${problems.join('; ')}`);
     writeFileSync(join(dir, 'index.html'), html);
     written++;
   }
