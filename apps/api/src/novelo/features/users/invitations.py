@@ -17,6 +17,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
 from novelo.adapters.email import EmailSender
+from novelo.core.avatar import safe_avatar_url
 from novelo.core.config import get_settings
 from novelo.core.errors import (
     AdminConfirmationRequiredError,
@@ -60,7 +61,7 @@ def status_of(inv: Invitation, now: datetime | None = None) -> InvitationStatus:
     return "expired" if inv.expires_at <= now else "pending"
 
 
-def to_out(inv: Invitation, invited_by_name: str | None, delivery: EmailDelivery | None = None) -> InvitationOut:
+def to_out(inv: Invitation, inviter: User | None, delivery: EmailDelivery | None = None) -> InvitationOut:
     return InvitationOut(
         id=inv.id,
         email=inv.email,
@@ -70,7 +71,9 @@ def to_out(inv: Invitation, invited_by_name: str | None, delivery: EmailDelivery
         message=inv.message,
         status=status_of(inv),
         invited_by_id=inv.invited_by_id,
-        invited_by_name=invited_by_name,
+        invited_by_name=(inviter.name or inviter.email) if inviter else None,
+        invited_by_email=inviter.email if inviter else None,
+        invited_by_avatar_url=safe_avatar_url(inviter.avatar_url) if inviter else None,
         created_at=inv.created_at,
         expires_at=inv.expires_at,
         accepted_at=inv.accepted_at,
@@ -84,15 +87,17 @@ def to_out(inv: Invitation, invited_by_name: str | None, delivery: EmailDelivery
     )
 
 
-async def _out(db: AsyncSession, inv: Invitation, invited_by_name: str | None) -> InvitationOut:
+async def _out(db: AsyncSession, inv: Invitation, inviter: User | None) -> InvitationOut:
     latest = (await email_log.latest_by_invitation(db, [inv.id])).get(inv.id)
-    return to_out(inv, invited_by_name, latest)
+    return to_out(inv, inviter, latest)
+
+
+async def _inviter(db: AsyncSession, inv: Invitation) -> User | None:
+    return await db.get(User, inv.invited_by_id) if inv.invited_by_id is not None else None
 
 
 async def _inviter_name(db: AsyncSession, inv: Invitation) -> str | None:
-    if inv.invited_by_id is None:
-        return None
-    inviter = await db.get(User, inv.invited_by_id)
+    inviter = await _inviter(db, inv)
     return (inviter.name or inviter.email) if inviter else None
 
 
@@ -176,7 +181,7 @@ async def create(
     )
     await db.commit()
     delivery = await _send(db, sender, inv, admin, token)
-    return to_out(inv, admin.name or admin.email, delivery)
+    return to_out(inv, admin, delivery)
 
 
 async def _get(db: AsyncSession, invitation_id: uuid.UUID) -> Invitation:
@@ -213,7 +218,7 @@ async def resend(
     )
     await db.commit()
     delivery = await _send(db, sender, inv, admin, token)
-    return to_out(inv, await _inviter_name(db, inv), delivery)
+    return to_out(inv, await _inviter(db, inv), delivery)
 
 
 async def new_link(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta: RequestMeta) -> InvitationLinkOut:
@@ -239,7 +244,7 @@ async def new_link(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta
     )
     await db.commit()
     return InvitationLinkOut(
-        url=_accept_url(token), expires_at=inv.expires_at, invitation=await _out(db, inv, await _inviter_name(db, inv))
+        url=_accept_url(token), expires_at=inv.expires_at, invitation=await _out(db, inv, await _inviter(db, inv))
     )
 
 
@@ -322,7 +327,7 @@ async def revoke(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta: 
             details={"role": inv.role},
         )
         await db.commit()
-    return await _out(db, inv, await _inviter_name(db, inv))
+    return await _out(db, inv, await _inviter(db, inv))
 
 
 async def list_invitations(
@@ -344,7 +349,7 @@ async def list_invitations(
     total = await db.scalar(select(func.count()).select_from(Invitation).where(*where)) or 0
     rows = (
         await db.execute(
-            select(Invitation, inviter.name, inviter.email)
+            select(Invitation, inviter)
             .outerjoin(inviter, inviter.id == Invitation.invited_by_id)
             .where(*where)
             .order_by(Invitation.created_at.desc(), Invitation.id)
@@ -352,9 +357,9 @@ async def list_invitations(
             .limit(limit)
         )
     ).all()
-    latest = await email_log.latest_by_invitation(db, [inv.id for inv, _, _ in rows])
+    latest = await email_log.latest_by_invitation(db, [inv.id for inv, _ in rows])
     return InvitationPage(
-        items=[to_out(inv, name or email, latest.get(inv.id)) for inv, name, email in rows],
+        items=[to_out(inv, who, latest.get(inv.id)) for inv, who in rows],
         total=int(total),
         offset=offset,
         limit=limit,

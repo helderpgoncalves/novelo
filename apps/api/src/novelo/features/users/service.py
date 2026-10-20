@@ -4,6 +4,7 @@ from typing import Literal, cast
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.core.avatar import safe_avatar_url
 from novelo.core.security import hash_password_async
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.models import DeliveryStatus, EmailDelivery, EmailTemplate
@@ -78,6 +79,7 @@ def to_admin_out(
         id=user.id,
         email=user.email,
         name=user.name,
+        avatar_url=safe_avatar_url(user.avatar_url),
         role=user.role,
         joined_via=user.joined_via,
         is_active=user.is_active,

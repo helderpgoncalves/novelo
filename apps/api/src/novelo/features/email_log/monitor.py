@@ -75,8 +75,19 @@ def tracking_mode(reader: EmailStatusReader | None = None) -> DeliveryTracking:
     return "api" if api else "provider_accepted_only"
 
 
-def to_out(row: EmailDelivery) -> EmailDeliveryOut:
-    return EmailDeliveryOut.model_validate(row, from_attributes=True)
+def to_out(row: EmailDelivery, names: dict[str, str | None] | None = None) -> EmailDeliveryOut:
+    out = EmailDeliveryOut.model_validate(row, from_attributes=True)
+    out.to_name = (names or {}).get(row.to_email.lower())
+    return out
+
+
+async def names_by_email(db: AsyncSession, emails_: list[str]) -> dict[str, str | None]:
+    """Nome das contas com estes emails: um só SELECT para a página inteira."""
+    wanted = {e.lower() for e in emails_}
+    if not wanted:
+        return {}
+    rows = await db.execute(select(User.email, User.name).where(User.email.in_(wanted)))
+    return {email: name for email, name in rows.all()}
 
 
 async def list_deliveries(
@@ -103,14 +114,15 @@ async def list_deliveries(
         .scalars()
         .all()
     )
-    return EmailDeliveryPage(items=[to_out(r) for r in rows], total=int(total), offset=offset, limit=limit)
+    names = await names_by_email(db, [r.to_email for r in rows])
+    return EmailDeliveryPage(items=[to_out(r, names) for r in rows], total=int(total), offset=offset, limit=limit)
 
 
 async def get_delivery(db: AsyncSession, delivery_id: uuid.UUID) -> EmailDeliveryOut:
     row = await db.get(EmailDelivery, delivery_id)
     if row is None:
         raise NotFoundError("Email not found")
-    return to_out(row)
+    return to_out(row, await names_by_email(db, [row.to_email]))
 
 
 # --- reconciliação com a API do Resend (opcional, precisa de RESEND_READ_API_KEY) ---------------------------------
@@ -386,7 +398,7 @@ async def admin_tick(db: AsyncSession, sender: EmailSender) -> list[EmailAlertKi
 async def send_test(db: AsyncSession, sender: EmailSender, admin: User) -> EmailDeliveryOut:
     subject, html, text = emails.test_email(admin.locale, admin.name)
     row = await service.deliver(db, sender, "test_email", admin.email, subject, html, text, user_id=admin.id)
-    return to_out(row)
+    return to_out(row, {admin.email.lower(): admin.name})
 
 
 # --- supressões ---------------------------------------------------------------------------------------------------

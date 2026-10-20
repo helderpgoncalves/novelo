@@ -29,6 +29,9 @@ class EmailDeliveryOut(BaseModel):
 
     id: uuid.UUID
     to_email: str
+    to_name: str | None = Field(
+        default=None, description="Nome da pessoa se existir uma conta com este email; nulo caso contrário"
+    )
     template: EmailTemplate
     status: DeliveryStatus = Field(
         description="`sent` = o Resend aceitou (não é entregue); `delivered` só com webhook ou chave de leitura"

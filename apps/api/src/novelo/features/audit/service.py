@@ -11,6 +11,7 @@ from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
+from novelo.core.avatar import safe_avatar_url
 from novelo.core.request_meta import RequestMeta
 from novelo.features.audit.models import AuditLog
 from novelo.features.audit.schemas import AuditEntryOut, AuditPage
@@ -133,7 +134,7 @@ async def list_audit(
     total = await db.scalar(select(func.count()).select_from(AuditLog).where(*where)) or 0
     rows = (
         await db.execute(
-            select(AuditLog, actor.email, actor.name, effective.email, effective.name)
+            select(AuditLog, actor.email, actor.name, actor.avatar_url, effective.email, effective.name)
             .outerjoin(actor, actor.id == AuditLog.actor_id)
             .outerjoin(effective, effective.id == AuditLog.effective_actor_id)
             .where(*where)
@@ -142,6 +143,17 @@ async def list_audit(
             .limit(limit)
         )
     ).all()
+    target_ids: set[uuid.UUID] = set()
+    for r, *_rest in rows:
+        if r.target_type == "user" and r.target_id:
+            try:
+                target_ids.add(uuid.UUID(r.target_id))
+            except ValueError:
+                continue
+    avatars: dict[str, str | None] = {}
+    if target_ids:  # um só SELECT para todos os alvos da página
+        found = await db.execute(select(User.id, User.avatar_url).where(User.id.in_(target_ids)))
+        avatars = {str(uid): safe_avatar_url(url) for uid, url in found.all()}
     items = [
         AuditEntryOut(
             id=r.id,
@@ -150,16 +162,18 @@ async def list_audit(
             actor_id=r.actor_id,
             actor_name=a_name,
             actor_email=a_email,
+            actor_avatar_url=safe_avatar_url(a_avatar),
             effective_actor_id=r.effective_actor_id,
             effective_actor_name=e_name,
             effective_actor_email=e_email,
             target_type=r.target_type,
             target_id=r.target_id,
             target_label=r.target_label,
+            target_avatar_url=avatars.get(r.target_id) if r.target_type == "user" and r.target_id else None,
             ip=r.ip,
             user_agent=r.user_agent,
             details=r.details,
         )
-        for r, a_email, a_name, e_email, e_name in rows
+        for r, a_email, a_name, a_avatar, e_email, e_name in rows
     ]
     return AuditPage(items=items, total=int(total), offset=offset, limit=limit)
