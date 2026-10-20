@@ -6,6 +6,8 @@ import { toast } from 'sonner';
 import { stopImpersonation } from '@/client';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
+import { UserAvatar } from '@/components/user-chip';
+import type { Person } from '@/lib/person';
 import { m } from '@/paraglide/messages';
 import { announceMark, formatCountdown, secondsUntil } from './countdown';
 import { useImpersonation } from './use-impersonation';
@@ -53,7 +55,14 @@ export function useEndImpersonation() {
  * Faixa global, acima de tudo: nunca se esquece que se está a ver como outra pessoa. Contagem decrescente até ao
  * fim fixo da sessão; ao zero volta ao administrador sem ecrã de erro. Anuncia só os marcos (5 min, 1 min, 30 s).
  */
-export function ImpersonationBanner({ viewedName }: { viewedName: string }) {
+export function ImpersonationBanner({
+  viewedName,
+  viewed,
+}: {
+  viewedName: string;
+  /** A pessoa que se está a ver, para o avatar. */
+  viewed?: Person;
+}) {
   const imp = useImpersonation();
   const { end, ending } = useEndImpersonation();
   const [now, setNow] = useState(() => Date.now());
@@ -95,6 +104,7 @@ export function ImpersonationBanner({ viewedName }: { viewedName: string }) {
       className="relative z-40 flex shrink-0 flex-wrap items-center gap-x-4 gap-y-2 border-[#14211d] border-b-2 bg-areia px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2 text-[#14211d] sm:px-6"
     >
       <Eye className="size-5 shrink-0" aria-hidden="true" />
+      {viewed && <UserAvatar person={viewed} size="xs" decorative />}
       <p className="min-w-0 flex-1 text-sm leading-snug">
         <strong className="break-words font-semibold">{m.imp_banner({ name: viewedName })}</strong>
         <span aria-hidden="true">

@@ -23,6 +23,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { UserChip } from '@/components/user-chip';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
@@ -103,14 +104,7 @@ export function InvitationsPanel() {
       label: m.invite_col_email(),
       value: (i) => `${i.name ?? ''} ${i.email}`,
       exportValue: (i) => i.email,
-      cell: (i) => (
-        <div className="min-w-0">
-          <p className="break-words font-medium">{i.name ?? i.email}</p>
-          {i.name && (
-            <p className="break-words font-normal text-muted-foreground text-xs">{i.email}</p>
-          )}
-        </div>
-      ),
+      cell: (i) => <UserChip person={i} />,
     },
     {
       id: 'role',
@@ -154,7 +148,12 @@ export function InvitationsPanel() {
       value: (i) => i.invited_by_name ?? '',
       className: 'text-muted-foreground',
       filter: { format: (v) => v || m.common_dash() },
-      cell: (i) => i.invited_by_name ?? m.common_dash(),
+      cell: (i) =>
+        i.invited_by_name ? (
+          <UserChip person={{ name: i.invited_by_name }} size="xs" variant="inline" />
+        ) : (
+          m.common_dash()
+        ),
     },
     {
       id: 'sent',
@@ -268,6 +267,7 @@ export function InvitationsPanel() {
             </AlertDialogTitle>
             <AlertDialogDescription>{m.invite_revoke_text()}</AlertDialogDescription>
           </AlertDialogHeader>
+          {revoking && <UserChip person={revoking} size="md" />}
           <AlertDialogFooter>
             <AlertDialogCancel className="h-10">{m.common_cancel()}</AlertDialogCancel>
             <Button

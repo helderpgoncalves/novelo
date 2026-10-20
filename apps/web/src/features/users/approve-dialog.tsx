@@ -12,9 +12,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { UserAvatarStack } from '@/components/user-chip';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
 import { EmailWarnings } from './email-warnings';
@@ -98,10 +100,9 @@ function ApproveBody({ users, onClose }: { users: UserAdminOut[]; onClose: () =>
         <DialogTitle className="break-words font-serif text-xl">
           {many ? m.approve_title_many({ count: users.length }) : m.approve_title({ name })}
         </DialogTitle>
-        <DialogDescription className="break-words">
-          {many ? m.approve_text() : `${first?.email ?? ''} · ${m.approve_text()}`}
-        </DialogDescription>
+        <DialogDescription className="break-words">{m.approve_text()}</DialogDescription>
       </DialogHeader>
+      {many ? <UserAvatarStack people={users} /> : first && <AccountChip user={first} size="md" />}
       <form
         className="space-y-4"
         onSubmit={(e) => {

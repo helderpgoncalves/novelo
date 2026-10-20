@@ -1,5 +1,6 @@
 import type { AuditEntryOut } from '@/client';
 import { formatDateTime, LOCALE_LABELS, type Locale } from '@/lib/i18n';
+import type { Person } from '@/lib/person';
 import { m } from '@/paraglide/messages';
 import { originLabel } from './badges';
 import { auditActor, auditDetailPairs, auditKey, auditOnBehalf, type Role } from './logic';
@@ -137,3 +138,18 @@ export function auditActorText(entry: AuditEntryOut): ActorText {
 
 export const auditTargetText = (entry: AuditEntryOut): string =>
   entry.target_label ?? (entry.target_type ? m.audit_target_deleted() : m.audit_target_none());
+
+const PERSON_TARGETS = new Set(['user', 'invitation', 'email']);
+
+/** O alvo como pessoa (conta, convite ou destinatário de email), para o avatar; `null` se não for uma pessoa. */
+export function auditTargetPerson(
+  entry: Pick<AuditEntryOut, 'target_id' | 'target_type' | 'target_label'>,
+  users: ReadonlyMap<string, Person>,
+): Person | null {
+  if (!entry.target_type || !PERSON_TARGETS.has(entry.target_type)) return null;
+  const known = entry.target_id ? users.get(entry.target_id) : undefined;
+  if (known) return known;
+  const label = entry.target_label?.trim();
+  if (!label) return null;
+  return label.includes('@') ? { email: label } : { name: label };
+}

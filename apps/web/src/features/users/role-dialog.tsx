@@ -17,6 +17,7 @@ import {
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { blockerText } from './blocker-text';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
@@ -79,7 +80,11 @@ function RoleBody({
         <DialogTitle className="break-words font-serif text-xl">
           {m.users_role_title({ name })}
         </DialogTitle>
-        <DialogDescription className="break-words">{user.email}</DialogDescription>
+        <DialogDescription asChild>
+          <div>
+            <AccountChip user={user} size="md" />
+          </div>
+        </DialogDescription>
       </DialogHeader>
       {blocker ? (
         <>

@@ -19,6 +19,7 @@ import { Label } from '@/components/ui/label';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { blockerText } from './blocker-text';
 import { invalidateAdminQueries } from './cache';
 import { type Blocker, deleteBlocker, displayName, emailMatches } from './logic';
@@ -82,6 +83,7 @@ function DeleteBody({
         </DialogTitle>
         <DialogDescription>{m.users_delete_intro()}</DialogDescription>
       </DialogHeader>
+      <AccountChip user={user} size="md" />
       {blocker ? (
         <Alert variant="destructive">
           <ShieldAlert />

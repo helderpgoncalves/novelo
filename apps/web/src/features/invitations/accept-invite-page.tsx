@@ -27,6 +27,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { UserAvatar } from '@/components/user-chip';
 import {
   AUTH_BUTTON,
   AUTH_BUTTONS,
@@ -259,14 +260,18 @@ function AcceptForm({
         <p className="text-muted-foreground text-sm leading-relaxed">
           {inviter ? m.inv_invited_by({ inviter, role }) : m.inv_invited_generic({ role })}
         </p>
-        <p className="[overflow-wrap:anywhere] rounded-md bg-muted px-3 py-2 font-medium text-sm">
-          {m.inv_for_email({ email: preview.email })}
+        <p className="flex min-w-0 items-center gap-3 rounded-md bg-muted px-3 py-2 font-medium text-sm">
+          <UserAvatar person={preview} size="md" decorative />
+          <span className="min-w-0 [overflow-wrap:anywhere]">
+            {m.inv_for_email({ email: preview.email })}
+          </span>
         </p>
       </div>
       {preview.message && (
         <figure className="space-y-1 border-areia border-l-2 pl-4">
           <blockquote className="break-words text-sm leading-relaxed">{preview.message}</blockquote>
-          <figcaption className="text-muted-foreground text-xs">
+          <figcaption className="flex items-center gap-2 text-muted-foreground text-xs">
+            {inviter && <UserAvatar person={{ name: inviter }} size="xs" decorative />}
             {inviter ? m.inv_message_from({ inviter }) : m.inv_message_anon()}
           </figcaption>
         </figure>

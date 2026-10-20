@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { originLabel } from './badges';
 import { ApprovalEmailCell } from './delivery-badge';
 import { canRetryEmail, DELIVERY_META } from './email-logic';
@@ -36,13 +37,11 @@ export function PendingPanel({ users, currentUserId, impersonating, refreshing }
       value: (u) => `${u.name ?? ''} ${u.email}`,
       exportValue: (u) => u.email,
       cell: (u) => (
-        <div className="min-w-0">
-          <p className="break-words font-medium">{u.name ?? u.email}</p>
-          <p className="[overflow-wrap:anywhere] font-normal text-muted-foreground text-xs">
-            {u.name && `${u.email} · `}
+        <AccountChip user={u} selfId={currentUserId}>
+          <p className="truncate font-normal text-muted-foreground text-xs">
             {u.email_verified ? m.users_email_confirmed() : m.users_email_unconfirmed()}
           </p>
-        </div>
+        </AccountChip>
       ),
     },
     {

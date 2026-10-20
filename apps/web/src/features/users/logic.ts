@@ -70,8 +70,7 @@ export function impersonateBlocker(
   return null;
 }
 
-export const displayName = (user: { name: string | null; email: string }): string =>
-  user.name ?? user.email;
+export { displayName } from '@/lib/person';
 
 /** Ordem em que os pedidos pendentes aparecem: os mais antigos primeiro (esperam há mais tempo). */
 export const byOldestFirst = (a: UserAdminOut, b: UserAdminOut): number =>

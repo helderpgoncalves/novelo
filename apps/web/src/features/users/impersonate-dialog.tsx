@@ -20,6 +20,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { blockerText } from './blocker-text';
 import {
   displayName,
@@ -92,6 +93,7 @@ function ImpersonateBody({
         </DialogTitle>
         <DialogDescription>{m.users_imp_intro()}</DialogDescription>
       </DialogHeader>
+      <AccountChip user={user} size="md" />
       {blocker ? (
         <>
           <Alert variant="destructive">

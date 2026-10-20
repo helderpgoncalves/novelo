@@ -3,10 +3,10 @@ import { Eye, KeyRound, Power, PowerOff, Send, Trash2, UserCheck, UserX } from '
 import { toast } from 'sonner';
 import { type UserAdminOut, updateUser } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
-import { Badge } from '@/components/ui/badge';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import {
   type AccountState,
   accountState,
@@ -64,17 +64,8 @@ export function UsersTable({ users, currentUserId, impersonating, refreshing }: 
       value: (u) => `${u.name ?? ''} ${u.email}`,
       exportValue: (u) => u.email,
       cell: (u) => (
-        <div className="min-w-0">
-          <p className="break-words font-medium">
-            {u.name ?? u.email}
-            {u.id === currentUserId && (
-              <Badge variant="outline" className="ml-2 align-middle">
-                {m.users_you()}
-              </Badge>
-            )}
-          </p>
-          <p className="[overflow-wrap:anywhere] font-normal text-muted-foreground text-xs">
-            {u.name && `${u.email} · `}
+        <AccountChip user={u} selfId={currentUserId}>
+          <p className="truncate font-normal text-muted-foreground text-xs">
             {u.email_verified ? m.users_email_confirmed() : m.users_email_unconfirmed()}
             {u.google_linked && ` · ${m.users_google()}`}
           </p>
@@ -83,7 +74,7 @@ export function UsersTable({ users, currentUserId, impersonating, refreshing }: 
               {m.users_rejected_reason({ reason: u.rejected_reason })}
             </p>
           )}
-        </div>
+        </AccountChip>
       ),
     },
     {

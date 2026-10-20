@@ -6,7 +6,6 @@ import type { MeOut } from '@/client';
 import { logoutMutation } from '@/client/@tanstack/react-query.gen';
 import { GithubMark } from '@/components/github-mark';
 import { InstallIosDialog } from '@/components/install-ios-dialog';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -17,24 +16,18 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { UserAvatar } from '@/components/user-chip';
 import { useEndImpersonation } from '@/features/impersonation/impersonation-banner';
 import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { stepsFor } from '@/features/onboarding/steps';
 import { canResumeTour, openTour, readTourProgress } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { REPO_URL } from '@/lib/links';
+import { displayName } from '@/lib/person';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
 
 const TOUR_OPEN_DELAY_MS = 180;
-
-const initials = (user: MeOut) =>
-  (user.name ?? user.email)
-    .split(/[\s@.]+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join('');
 
 export function UserMenu({ user }: { user: MeOut }) {
   const navigate = useNavigate();
@@ -60,14 +53,7 @@ export function UserMenu({ user }: { user: MeOut }) {
             data-tour="user-menu"
             aria-label={m.common_account_menu()}
           >
-            <Avatar className="size-7">
-              {user.avatar_url && (
-                <AvatarImage src={user.avatar_url} alt="" referrerPolicy="no-referrer" />
-              )}
-              <AvatarFallback className="bg-primary/10 font-semibold text-[11px] text-primary">
-                {initials(user)}
-              </AvatarFallback>
-            </Avatar>
+            <UserAvatar person={user} className="size-9" decorative />
             {user.role === 'guest' && (
               <span
                 title={m.guest_account_hint()}
@@ -80,10 +66,20 @@ export function UserMenu({ user }: { user: MeOut }) {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-60">
           <DropdownMenuLabel className="space-y-0.5">
-            <p className="truncate font-medium text-sm">
-              {user.name ?? m.user_menu_default_name()}
-            </p>
-            <p className="truncate font-normal text-muted-foreground text-xs">{user.email}</p>
+            <div className="flex min-w-0 items-center gap-3">
+              <UserAvatar person={user} size="md" decorative />
+              <div className="min-w-0">
+                <p className="truncate font-medium text-sm" title={displayName(user)}>
+                  {displayName(user) || m.user_menu_default_name()}
+                </p>
+                <p
+                  className="truncate font-normal text-muted-foreground text-xs"
+                  title={user.email}
+                >
+                  {user.email}
+                </p>
+              </div>
+            </div>
             {imp.active && (
               <>
                 <Badge className="mt-1 gap-1 bg-areia text-[#14211d] text-[10px] uppercase hover:bg-areia">

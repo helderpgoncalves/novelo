@@ -41,6 +41,7 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { UserChip } from '@/components/user-chip';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
@@ -150,7 +151,7 @@ export function EmailSuppressions() {
       label: m.email_sup_col_email(),
       primary: true,
       value: (s) => s.to_email,
-      cell: (s) => <span className="[overflow-wrap:anywhere] font-medium">{s.to_email}</span>,
+      cell: (s) => <UserChip person={{ email: s.to_email }} />,
     },
     {
       id: 'reason',

@@ -17,6 +17,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
+import { AccountChip } from './account-chip';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
 import { EmailWarnings } from './email-warnings';
@@ -75,8 +76,9 @@ function RejectBody({ user, onClose }: { user: UserAdminOut; onClose: () => void
         <DialogTitle className="break-words font-serif text-xl">
           {m.reject_title({ name })}
         </DialogTitle>
-        <DialogDescription className="break-words">{`${user.email} · ${m.reject_text()}`}</DialogDescription>
+        <DialogDescription className="break-words">{m.reject_text()}</DialogDescription>
       </DialogHeader>
+      <AccountChip user={user} size="md" />
       <form
         className="space-y-4"
         onSubmit={(e) => {

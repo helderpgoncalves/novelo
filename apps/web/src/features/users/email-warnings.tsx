@@ -6,11 +6,11 @@ import type { UserAdminOut } from '@/client';
 import { resendUserEmailMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import { DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UserChip } from '@/components/user-chip';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
 import { warningText } from './email-logic';
-import { displayName } from './logic';
 
 export type Decision = 'approved' | 'rejected';
 
@@ -45,10 +45,7 @@ function WarningRow({ initial, decision }: { initial: UserAdminOut; decision: De
       className="space-y-2 rounded-xl bg-card p-3 ring-1 ring-foreground/10"
       data-testid="email-warning"
     >
-      <p className="break-words font-medium text-sm">
-        {displayName(user)}
-        {user.name && <span className="font-normal text-muted-foreground"> · {user.email}</span>}
-      </p>
+      <UserChip person={user} />
       {warning ? (
         <>
           <p className="flex items-start gap-2 text-sm leading-relaxed" role="alert">
