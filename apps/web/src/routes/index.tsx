@@ -8,12 +8,12 @@ import {
   getWasteCompositionOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
-import { BootSplash } from '@/components/app-loading';
+import { HomePending } from '@/components/app-loading';
 import { AppFrame } from '@/components/layout/app-frame';
 import { HOME_TABS, HomePage } from '@/features/home/home-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { ogImage, SITE_URL } from '@/lib/seo';
-import { resolveSessionUser } from '@/lib/session';
+import { resolvePublicSessionUser } from '@/lib/session';
 import { m } from '@/paraglide/messages';
 
 // A landing é um pacote à parte (não pesa na app).
@@ -27,7 +27,7 @@ export const Route = createFileRoute('/')({
   staticData: { skeleton: 'home' },
   validateSearch: z.object({ tab: z.enum(HOME_TABS).optional().catch(undefined) }),
   beforeLoad: async ({ context: { queryClient } }) => {
-    const user = await resolveSessionUser(queryClient);
+    const user = await resolvePublicSessionUser(queryClient);
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
@@ -58,7 +58,7 @@ export const Route = createFileRoute('/')({
       ? []
       : [{ rel: 'canonical', href: `${SITE_URL}/${getLocale() === 'en' ? 'en' : 'pt'}/` }],
   }),
-  pendingComponent: BootSplash,
+  pendingComponent: HomePending,
   pendingMs: 0,
   pendingMinMs: 0,
   component: Home,
@@ -70,7 +70,7 @@ function Home() {
   const navigate = Route.useNavigate();
   if (!user)
     return (
-      <Suspense fallback={<BootSplash />}>
+      <Suspense fallback={null}>
         <LandingPage />
       </Suspense>
     );

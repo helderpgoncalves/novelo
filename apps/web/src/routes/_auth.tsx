@@ -1,16 +1,19 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
-import { BootSplash } from '@/components/app-loading';
+import { NoPending } from '@/components/app-loading';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthPanel, AuthStrip } from '@/features/auth/auth-panel';
+import { hasSessionHint } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_auth')({
   // Quem já tem sessão não precisa de ver o ecrã de entrada.
   beforeLoad: async ({ context: { queryClient } }) => {
+    // Sem pista local de sessão não há nada a verificar: o ecrã de entrada aparece de imediato.
+    if (!hasSessionHint()) return;
     const user = await queryClient
       .fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false })
       .catch(() => null);
@@ -19,7 +22,7 @@ export const Route = createFileRoute('/_auth')({
   },
   // Entrada e registo não se indexam: nada de útil para pesquisa e não são a página pública.
   head: () => ({ meta: [{ name: 'robots', content: 'noindex, nofollow' }] }),
-  pendingComponent: BootSplash,
+  pendingComponent: NoPending,
   pendingMs: 0,
   pendingMinMs: 0,
   component: AuthLayout,

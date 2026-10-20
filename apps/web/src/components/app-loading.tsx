@@ -2,6 +2,7 @@ import { type CSSProperties, useState } from 'react';
 import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { RouteSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
+import { hasSessionHint } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
 const NAV_GROUPS = [
@@ -19,7 +20,8 @@ export function BootSplash() {
   // Continua a fase do splash do index.html (que começou em `__splashT0`) para não haver salto ao trocar.
   const [elapsed] = useState(() => {
     const t0 = (window as { __splashT0?: number }).__splashT0;
-    return t0 === undefined ? 0 : Math.max(0, Math.round(performance.now() - t0));
+    // Sem `__splashT0` (script externo ainda não correu, ou bloqueado): fase 0, sem salto relevante.
+    return typeof t0 !== 'number' ? 0 : Math.max(0, Math.round(performance.now() - t0));
   });
   return (
     <div
@@ -34,6 +36,18 @@ export function BootSplash() {
       <span className="sr-only">{m.common_loading()}</span>
     </div>
   );
+}
+
+/** Sem carregamento visível: rotas públicas (landing, entrada, legais) nunca mostram splash nem esqueleto. */
+export function NoPending() {
+  return null;
+}
+
+/**
+ * Pendente de "/": só quem traz a pista de sessão vai para a app e vê o esqueleto; visitantes veem a landing sem espera.
+ */
+export function HomePending() {
+  return hasSessionHint() ? <AppShellSkeleton /> : null;
 }
 
 /**

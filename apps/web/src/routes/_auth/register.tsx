@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { Info } from 'lucide-react';
 import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
+import { NoPending } from '@/components/app-loading';
 import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
@@ -20,6 +21,8 @@ import { m } from '@/paraglide/messages';
 export const Route = createFileRoute('/_auth/register')({
   validateSearch: z.object({ next: z.string().startsWith('/').optional().catch(undefined) }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getAuthConfigOptions()),
+  // O ecrã de entrada é público: sem esqueleto de carregamento.
+  pendingComponent: NoPending,
   head: () => ({ meta: [{ title: m.title_register() }] }),
   component: Register,
 });

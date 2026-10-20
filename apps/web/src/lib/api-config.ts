@@ -1,4 +1,5 @@
 import type { CreateClientConfig } from '../client/client.gen';
+import { clearSessionHint, setSessionHint } from './session-hint';
 
 // Rotas de autenticação não passam pelo refresh automático (evita ciclos).
 const NO_REFRESH = [
@@ -87,9 +88,26 @@ async function announceForbidden(res: Response): Promise<void> {
   }
 }
 
+// Rotas /auth/ que não implicam sessão aberta.
+const NO_SESSION_SIGNAL = ['/auth/config', '/auth/forgot-password', '/auth/reset-password'];
+
+/** Mantém a pista local de sessão (ver session-hint.ts) alinhada com o que a API responde. */
+function trackSessionHint(input: RequestInfo | URL, res: Response): void {
+  const url = input instanceof Request ? input.url : String(input);
+  if (!url.includes('/auth/')) return;
+  if (url.includes('/auth/logout')) {
+    if (res.ok) clearSessionHint();
+  } else if (res.ok) {
+    if (!NO_SESSION_SIGNAL.some((p) => url.includes(p))) setSessionHint();
+  } else if (res.status === 401 && url.includes('/auth/me')) {
+    clearSessionHint();
+  }
+}
+
 // fetch com renovação silenciosa da sessão: um 401 tenta o refresh uma vez e repete o pedido.
 export const authFetch: typeof fetch = async (input, init) => {
   const res = await sessionFetch(input, init);
+  trackSessionHint(input, res);
   if (res.status === 403) await announceForbidden(res);
   return res;
 };

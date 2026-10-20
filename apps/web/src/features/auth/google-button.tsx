@@ -2,6 +2,7 @@ import type { GoogleLoginData } from '@/client';
 import { client } from '@/client/client.gen';
 import { Button } from '@/components/ui/button';
 import { getLocale } from '@/lib/i18n';
+import { setSessionHint } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
 /** "G" oficial da Google (marca multicolor, igual em tema claro e escuro; kit de marca "Sign in with Google"). */
@@ -47,7 +48,7 @@ export function GoogleButton({
   });
   return (
     <Button asChild variant="outline" className="h-11 w-full gap-3 font-medium">
-      <a href={href}>
+      <a href={href} onClick={setSessionHint}>
         <GoogleMark />
         <span>{mode === 'signup' ? m.google_signup() : m.google_signin()}</span>
       </a>

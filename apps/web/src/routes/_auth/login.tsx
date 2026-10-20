@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router';
 import { KeyRound, Mail } from 'lucide-react';
 import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
+import { NoPending } from '@/components/app-loading';
 import { Button } from '@/components/ui/button';
 import {
   AUTH_BLOCKS,
@@ -33,6 +34,8 @@ export const Route = createFileRoute('/_auth/login')({
     method: z.enum(['password']).optional().catch(undefined),
   }),
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(getAuthConfigOptions()),
+  // O ecrã de entrada é público: sem esqueleto de carregamento.
+  pendingComponent: NoPending,
   head: () => ({ meta: [{ title: m.title_login() }] }),
   component: Login,
 });
