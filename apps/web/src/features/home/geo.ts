@@ -117,3 +117,97 @@ export function insidePolygon(x: number, y: number, rings: Pt[][]): boolean {
   }
   return inside;
 }
+
+/** Distância de um ponto ao segmento `a`-`b`. */
+function segmentDistance(px: number, py: number, a: Pt, b: Pt): number {
+  const dx = b[0] - a[0];
+  const dy = b[1] - a[1];
+  const len2 = dx * dx + dy * dy;
+  const t = len2 === 0 ? 0 : Math.max(0, Math.min(1, ((px - a[0]) * dx + (py - a[1]) * dy) / len2));
+  return Math.hypot(px - (a[0] + t * dx), py - (a[1] + t * dy));
+}
+
+/** Distância ao contorno mais próximo (anéis exterior e buracos). */
+function boundaryDistance(x: number, y: number, rings: Pt[][]): number {
+  let best = Infinity;
+  for (const ring of rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const a = ring[j];
+      const b = ring[i];
+      if (!a || !b) continue;
+      const d = segmentDistance(x, y, a, b);
+      if (d < best) best = d;
+    }
+  }
+  return best;
+}
+
+/** Extensão horizontal do interior à altura `y` à volta de `x`: `[esquerda, direita]`. */
+function chordAt(x: number, y: number, rings: Pt[][]): [number, number] {
+  const xs: number[] = [];
+  for (const ring of rings) {
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const a = ring[j];
+      const b = ring[i];
+      if (!a || !b || a[1] > y === b[1] > y) continue;
+      xs.push(a[0] + ((y - a[1]) * (b[0] - a[0])) / (b[1] - a[1]));
+    }
+  }
+  xs.sort((p, q) => p - q);
+  for (let i = 0; i + 1 < xs.length; i += 2) {
+    const lo = xs[i] ?? x;
+    const hi = xs[i + 1] ?? x;
+    if (x >= lo && x <= hi) return [lo, hi];
+  }
+  return [x, x];
+}
+
+export interface InteriorPoint {
+  x: number;
+  y: number;
+  /** Raio do maior círculo inscrito à volta do ponto. */
+  radius: number;
+  /** Largura horizontal do interior à altura do ponto. */
+  chord: number;
+}
+
+/**
+ * Ponto interior para pôr a etiqueta: o mais afastado do contorno (ideia do «polo de inacessibilidade»), por
+ * pesquisa em grelha refinada. O `x` centra-se na corda horizontal para o texto cair no meio da forma.
+ */
+export function interiorPoint(rings: Pt[][]): InteriorPoint | null {
+  const outer = rings[0] ?? [];
+  if (outer.length < 3) return null;
+  let x0 = Infinity;
+  let x1 = -Infinity;
+  let y0 = Infinity;
+  let y1 = -Infinity;
+  for (const [x, y] of outer) {
+    if (x < x0) x0 = x;
+    if (x > x1) x1 = x;
+    if (y < y0) y0 = y;
+    if (y > y1) y1 = y;
+  }
+  let cell = Math.max(x1 - x0, y1 - y0) / 16;
+  if (cell <= 0) return null;
+  let best = { x: (x0 + x1) / 2, y: (y0 + y1) / 2, d: -Infinity };
+  const scan = (cx: number, cy: number, half: number, n: number) => {
+    for (let i = -n; i <= n; i++) {
+      for (let j = -n; j <= n; j++) {
+        const x = cx + (i * half) / n;
+        const y = cy + (j * half) / n;
+        if (x < x0 || x > x1 || y < y0 || y > y1 || !insidePolygon(x, y, rings)) continue;
+        const d = boundaryDistance(x, y, rings);
+        if (d > best.d) best = { x, y, d };
+      }
+    }
+  };
+  scan((x0 + x1) / 2, (y0 + y1) / 2, Math.max(x1 - x0, y1 - y0) / 2, 16);
+  for (let round = 0; round < 4; round++) {
+    scan(best.x, best.y, cell, 3);
+    cell /= 2;
+  }
+  if (best.d === -Infinity) return null;
+  const [lo, hi] = chordAt(best.x, best.y, rings);
+  return { x: (lo + hi) / 2, y: best.y, radius: best.d, chord: Math.max(0, hi - lo) };
+}

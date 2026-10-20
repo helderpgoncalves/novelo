@@ -2,14 +2,14 @@ import type { OverviewDataSource, OverviewHighlight, OverviewParish } from '@/cl
 import { type Column, DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { formatDate } from '@/lib/i18n';
 import { tipauLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
-import { EstimateTag, UnverifiedTag } from './tags';
+import { num, pct, tonnes } from './safe';
+import { EstimateTag, EYEBROW, UnverifiedTag } from './tags';
 
 type Ctx = OverviewHighlight['context'];
-const num = (ctx: Ctx, key: string) => Number(ctx[key] ?? 0);
+const val = (ctx: Ctx, key: string) => Number(ctx[key] ?? Number.NaN);
 const str = (ctx: Ctx, key: string) => String(ctx[key] ?? '');
 
 /** Texto de cada manchete: a chave da API escolhe a frase; os números vêm todos do servidor. */
@@ -17,17 +17,17 @@ const HIGHLIGHT_TEXT: Record<string, (h: OverviewHighlight) => string> = {
   top_entity_share: (h) =>
     m.home_hl_top_entity_share({
       entity: str(h.context, 'entity'),
-      tonnes: formatTonnes(num(h.context, 'tonnes')),
+      tonnes: tonnes(val(h.context, 'tonnes'), 1),
     }),
   reuse_share: (h) =>
     m.home_hl_reuse_share({
-      reuse: formatTonnes(num(h.context, 'reuse_t')),
-      total: formatTonnes(num(h.context, 'total_t')),
+      reuse: tonnes(val(h.context, 'reuse_t'), 1),
+      total: tonnes(val(h.context, 'total_t'), 1),
     }),
   france_equivalent_t: (h) =>
     m.home_hl_france_equivalent({
-      multiple: formatNumber(num(h.context, 'multiple'), 1),
-      kg: formatNumber(num(h.context, 'kg_per_inhab_year'), 2),
+      multiple: num(val(h.context, 'multiple'), 1),
+      kg: num(val(h.context, 'kg_per_inhab_year'), 2),
     }),
   textile_in_mixed_waste: () => m.home_hl_textile_in_mixed_waste(),
   parish_size_ratio: (h) =>
@@ -35,19 +35,19 @@ const HIGHLIGHT_TEXT: Record<string, (h: OverviewHighlight) => string> = {
       largest: str(h.context, 'largest'),
       smallest: str(h.context, 'smallest'),
     }),
-  top_parishes_share: (h) => m.home_hl_top_parishes_share({ count: num(h.context, 'count') }),
+  top_parishes_share: (h) => m.home_hl_top_parishes_share({ count: val(h.context, 'count') }),
 };
 
 function highlightValue(h: OverviewHighlight): string {
   switch (h.unit) {
     case 'pct':
-      return formatPercent(h.value, h.value < 10 ? 2 : 1);
+      return pct(h.value, h.value < 10 ? 2 : 1);
     case 't':
-      return formatTonnes(h.value, 0);
+      return tonnes(h.value, 0);
     case 'x':
-      return `${formatNumber(h.value, 1)}×`;
+      return Number.isFinite(h.value) ? `${num(h.value, 1)}×` : '—';
     case 'kg_per_inhab_year':
-      return `${formatNumber(h.value, 2)} kg`;
+      return Number.isFinite(h.value) ? `${num(h.value, 2)} kg` : '—';
   }
 }
 
@@ -60,8 +60,8 @@ export function Highlights({ highlights }: { highlights: OverviewHighlight[] }) 
           <p className="font-medium font-serif text-4xl tabular-nums leading-none sm:text-[2.6rem]">
             {highlightValue(h)}
           </p>
-          <p className="text-sm leading-snug">{HIGHLIGHT_TEXT[h.key]?.(h)}</p>
-          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-[11px] text-muted-foreground">
+          <p className="text-[15px] leading-snug">{HIGHLIGHT_TEXT[h.key]?.(h)}</p>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-muted-foreground text-xs">
             {h.is_estimate && <EstimateTag />}
             {!h.verified && <UnverifiedTag />}
             {h.source_label}
@@ -88,16 +88,16 @@ export function DataSources({ sources }: { sources: OverviewDataSource[] }) {
             key={s.key}
             className="flex flex-col gap-2 rounded-lg bg-card p-4 ring-1 ring-foreground/10"
           >
-            <p className="eyebrow text-[10px] tracking-[0.14em]">{KIND_LABEL[s.kind]()}</p>
-            <p className="font-semibold text-sm leading-snug">{s.name}</p>
-            <p className="text-muted-foreground text-xs">{s.provider}</p>
+            <p className={EYEBROW}>{KIND_LABEL[s.kind]()}</p>
+            <p className="font-semibold text-[15px] leading-snug">{s.name}</p>
+            <p className="text-[13px] text-muted-foreground">{s.provider}</p>
             <div className="mt-auto flex flex-wrap items-center gap-1.5 pt-1">
               {s.methods.map((method) => (
                 <Tooltip key={method}>
                   <TooltipTrigger asChild>
                     <Badge
                       variant={method === 'weighed' ? 'secondary' : 'outline'}
-                      className="h-6 cursor-help px-2 font-semibold text-[10px] uppercase tracking-wider"
+                      className="h-7 cursor-help px-2.5 font-semibold text-xs"
                     >
                       {method === 'weighed' ? m.method_weighed() : m.method_percentage()}
                     </Badge>
@@ -110,11 +110,11 @@ export function DataSources({ sources }: { sources: OverviewDataSource[] }) {
                 </Tooltip>
               ))}
             </div>
-            <p className="text-[11px] text-muted-foreground tabular-nums">
+            <p className="text-muted-foreground text-xs tabular-nums">
               {s.period_start && s.period_end
                 ? `${formatDate(s.period_start, 'short')} – ${formatDate(s.period_end, 'short')} · `
                 : ''}
-              {m.home_source_rows({ rows: formatNumber(s.rows) })}
+              {m.home_source_rows({ rows: num(s.rows) })}
             </p>
           </li>
         ))}
@@ -144,7 +144,7 @@ export function ParishesTable({ parishes }: { parishes: OverviewParish[] }) {
       header: m.home_col_population(),
       align: 'right',
       value: (p) => p.population,
-      cell: (p) => formatNumber(p.population),
+      cell: (p) => num(p.population),
     },
     {
       id: 'potential',
@@ -152,7 +152,7 @@ export function ParishesTable({ parishes }: { parishes: OverviewParish[] }) {
       align: 'right',
       badge: true,
       value: (p) => p.potential_t,
-      cell: (p) => formatTonnes(p.potential_t),
+      cell: (p) => tonnes(p.potential_t),
     },
     {
       id: 'circuits',
@@ -160,7 +160,7 @@ export function ParishesTable({ parishes }: { parishes: OverviewParish[] }) {
       align: 'right',
       hideable: true,
       value: (p) => p.circuits_count,
-      cell: (p) => formatNumber(p.circuits_count),
+      cell: (p) => num(p.circuits_count),
     },
     {
       id: 'containers',
@@ -168,7 +168,7 @@ export function ParishesTable({ parishes }: { parishes: OverviewParish[] }) {
       align: 'right',
       defaultHidden: true,
       value: (p) => p.containers_count,
-      cell: (p) => formatNumber(p.containers_count),
+      cell: (p) => num(p.containers_count),
     },
   ];
   return (

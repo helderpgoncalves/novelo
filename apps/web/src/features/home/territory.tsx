@@ -1,16 +1,16 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { type ReactNode, useMemo } from 'react';
 import type { Overview } from '@/client';
 import { getCaopParishesGeojsonOptions } from '@/client/@tanstack/react-query.gen';
+import { AsyncBoundary } from '@/components/async-boundary';
 import { DetailSheet } from '@/components/detail-sheet';
 import { Panel } from '@/components/page';
-import { formatNumber } from '@/lib/format';
+import { MapSkeleton } from '@/components/skeletons';
 import { useMediaQuery } from '@/lib/motion';
-import { m } from '@/paraglide/messages';
 import { DecisionMap } from './decision-map';
-import { rankParishes } from './derive';
-import { buildMapModel, type LayerId, layerValues, parishGapT } from './map-model';
+import { buildMapModel, type LayerId, layerValues } from './map-model';
 import { ParishDetail } from './parish-detail';
+import { ParishTable, sortByGap, topRows } from './parish-table';
 
 interface TerritoryProps {
   overview: Overview;
@@ -20,11 +20,66 @@ interface TerritoryProps {
   onParishChange: (code: string | null) => void;
   covered: Set<string> | null;
   coveredNote: string | null;
-  /** Controlo de orçamento (coluna lateral em ecrã largo, logo abaixo do mapa em telemóvel). */
+  /** Controlo de orçamento: uma faixa por baixo do mapa e da lista. */
   budget: ReactNode;
 }
 
-/** O mapa de meio-tom, o detalhe da freguesia e o orçamento: a peça central da sala de decisão. */
+/** O mapa dos contornos CAOP: pede-os e espera por eles à parte, para a lista e o orçamento não esperarem. */
+function MapPanel({
+  overview,
+  layer,
+  onLayerChange,
+  selected,
+  onSelect,
+  covered,
+  coveredNote,
+  fallbackCode,
+}: Pick<TerritoryProps, 'overview' | 'layer' | 'onLayerChange' | 'covered' | 'coveredNote'> & {
+  selected: string | null;
+  onSelect: (code: string | null) => void;
+  fallbackCode: string | null;
+}) {
+  const { gap, parishes } = overview;
+  const { data: caop } = useSuspenseQuery(getCaopParishesGeojsonOptions());
+  const model = useMemo(() => buildMapModel(caop.features), [caop]);
+  const municipalContainers = useMemo(
+    () => new Map(caop.features.map((f) => [f.properties.dicofre, f.properties.containers])),
+    [caop],
+  );
+  const areaKm2 = useMemo(() => {
+    const out = new Map(model.parishes.map((p) => [p.code, p.areaKm2]));
+    for (const p of parishes) if (p.area_km2 && p.area_km2 > 0) out.set(p.code, p.area_km2);
+    return out;
+  }, [model, parishes]);
+  const values = useMemo(
+    () =>
+      layerValues(layer, {
+        parishes,
+        capturePct: gap.capture_pct,
+        areaKm2,
+        municipalContainers,
+      }),
+    [layer, parishes, gap.capture_pct, areaKm2, municipalContainers],
+  );
+  return (
+    <DecisionMap
+      model={model}
+      layer={layer}
+      onLayerChange={onLayerChange}
+      values={values}
+      selected={selected}
+      onSelect={onSelect}
+      covered={covered}
+      coveredNote={coveredNote}
+      fallbackCode={fallbackCode}
+    />
+  );
+}
+
+/**
+ * O mapa, a lista das freguesias com mais potencial por captar (a mesma informação para quem lê melhor em lista), o
+ * detalhe da freguesia escolhida e o orçamento. Em telemóvel: mapa, orçamento, lista; o detalhe abre numa folha.
+ */
 export function Territory({
   overview,
   layer,
@@ -36,100 +91,65 @@ export function Territory({
   budget,
 }: TerritoryProps) {
   const { gap, parishes } = overview;
-  const { data: caop } = useSuspenseQuery(getCaopParishesGeojsonOptions());
   const wide = useMediaQuery('(min-width: 1024px)');
-  const model = useMemo(() => buildMapModel(caop.features), [caop]);
-  const byCode = useMemo(() => new Map(parishes.map((p) => [p.code, p])), [parishes]);
-  const ranking = useMemo(() => rankParishes(parishes).sorted, [parishes]);
-  const shapes = useMemo(() => new Map(model.parishes.map((p) => [p.code, p])), [model]);
-  const municipalContainers = useMemo(
-    () => new Map(caop.features.map((f) => [f.properties.dicofre, f.properties.containers])),
-    [caop],
+  // Mesmo pedido que o mapa (a cache junta-os): aqui só serve para contar contentores municipais no detalhe.
+  const caop = useQuery(getCaopParishesGeojsonOptions());
+  const rows = useMemo(
+    () => sortByGap(topRows(parishes, gap.capture_pct)),
+    [parishes, gap.capture_pct],
   );
-
-  const values = useMemo(
-    () =>
-      layerValues(layer, {
-        parishes,
-        capturePct: gap.capture_pct,
-        areaKm2: new Map(model.parishes.map((p) => [p.code, p.areaKm2])),
-        municipalContainers,
-      }),
-    [layer, parishes, gap.capture_pct, model, municipalContainers],
+  const byCode = useMemo(() => new Map(rows.map((r) => [r.parish.code, r])), [rows]);
+  const caopProps = useMemo(
+    () => new Map((caop.data?.features ?? []).map((f) => [f.properties.dicofre, f.properties])),
+    [caop.data],
   );
 
   const selected = parish && byCode.has(parish) ? parish : null;
-  const selectedParish = selected ? byCode.get(selected) : undefined;
+  const row = selected ? byCode.get(selected) : undefined;
+  const props = selected ? caopProps.get(selected) : undefined;
 
-  const detail = selectedParish && (
+  const detail = row && (
     <ParishDetail
-      parish={selectedParish}
-      areaKm2={shapes.get(selectedParish.code)?.areaKm2 ?? 0}
-      capturePct={gap.capture_pct}
-      municipalContainers={municipalContainers.get(selectedParish.code) ?? 0}
-      covered={covered ? covered.has(selectedParish.code) : null}
+      parish={row.parish}
+      gapT={row.gapT}
+      areaKm2={row.parish.area_km2 ?? props?.area_km2 ?? null}
+      municipalContainers={props ? props.containers : null}
+      covered={covered ? covered.has(row.parish.code) : null}
       onClose={() => onParishChange(null)}
     />
   );
-  const topGap = Math.max(1e-9, ...ranking.map((p) => parishGapT(p, gap.capture_pct)));
 
   return (
     <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
-      <Panel className="p-3 sm:p-5 lg:col-span-8">
-        <DecisionMap
-          model={model}
-          layer={layer}
-          onLayerChange={onLayerChange}
-          values={values}
-          selected={selected}
-          onSelect={onParishChange}
-          covered={covered}
-          coveredNote={coveredNote}
-          fallbackCode={ranking[0]?.code ?? null}
-        />
+      <Panel className="p-3 sm:p-5 lg:col-span-7 lg:row-start-1">
+        <AsyncBoundary fallback={<MapSkeleton className="lg:h-[40rem]" />}>
+          <MapPanel
+            overview={overview}
+            layer={layer}
+            onLayerChange={onLayerChange}
+            selected={selected}
+            onSelect={onParishChange}
+            covered={covered}
+            coveredNote={coveredNote}
+            fallbackCode={rows[0]?.parish.code ?? null}
+          />
+        </AsyncBoundary>
       </Panel>
 
-      <div className="space-y-5 lg:col-span-4">
-        <Panel id="orcamento" className="scroll-mt-20">
-          {budget}
-        </Panel>
-        {wide && detail ? (
-          <Panel>{detail}</Panel>
-        ) : (
-          <Panel>
-            <h3 className="eyebrow mb-3">{m.home_rank_heading()}</h3>
-            <ol className="space-y-1">
-              {ranking.slice(0, 8).map((p) => {
-                const t = parishGapT(p, gap.capture_pct);
-                return (
-                  <li key={p.code}>
-                    <button
-                      type="button"
-                      onClick={() => onParishChange(p.code)}
-                      className="group grid min-h-10 w-full grid-cols-[1fr_auto] items-center gap-x-3 gap-y-0.5 rounded-md px-2 py-1 text-left outline-none hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/60"
-                    >
-                      <span className="truncate font-medium text-sm">{p.name}</span>
-                      <span className="text-sm tabular-nums">{formatNumber(t, 1)} t</span>
-                      <span
-                        className="col-span-2 block h-1 rounded-full bg-primary/70"
-                        style={{ width: `${Math.max(3, (t / topGap) * 100)}%` }}
-                        aria-hidden="true"
-                      />
-                    </button>
-                  </li>
-                );
-              })}
-            </ol>
-            <p className="mt-2 text-muted-foreground text-xs">{m.home_rank_note()}</p>
-          </Panel>
-        )}
+      <Panel id="orcamento" className="scroll-mt-20 lg:col-span-12 lg:row-start-2">
+        {budget}
+      </Panel>
+
+      <div className="min-w-0 space-y-5 lg:col-span-5 lg:col-start-8 lg:row-start-1">
+        {wide && detail && <Panel>{detail}</Panel>}
+        <ParishTable rows={rows} selected={selected} onSelect={onParishChange} />
       </div>
 
-      {!wide && selectedParish && (
+      {!wide && row && (
         <DetailSheet
           open
           onOpenChange={(open) => !open && onParishChange(null)}
-          title={selectedParish.name}
+          title={row.parish.name}
         >
           {detail}
         </DetailSheet>

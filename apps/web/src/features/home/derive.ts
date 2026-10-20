@@ -2,10 +2,21 @@ import type { Overview, OverviewMilestone, OverviewParish } from '@/client';
 
 const DAY_MS = 86_400_000;
 
-/** Dias de calendário entre hoje (hora local) e uma data ISO; negativo se já passou. */
-export function daysUntil(isoDate: string, now: Date = new Date()): number {
-  const [y, mo, d] = isoDate.split('-').map(Number);
-  const target = Date.UTC(y ?? 0, (mo ?? 1) - 1, d ?? 1);
+const ISO_DAY = /^(\d{4})-(\d{2})-(\d{2})/;
+
+/**
+ * Dias de calendário entre hoje (hora local) e uma data ISO (`2028-04-17` ou um carimbo completo); negativo se já
+ * passou. `null` se a data estiver vazia ou for inválida.
+ */
+export function daysUntil(
+  isoDate: string | null | undefined,
+  now: Date = new Date(),
+): number | null {
+  const match = typeof isoDate === 'string' ? ISO_DAY.exec(isoDate) : null;
+  if (!match) return null;
+  const [y, mo, d] = [Number(match[1]), Number(match[2]), Number(match[3])];
+  const target = Date.UTC(y, mo - 1, d);
+  if (Number.isNaN(target) || mo < 1 || mo > 12 || d < 1 || d > 31) return null;
   const today = Date.UTC(now.getFullYear(), now.getMonth(), now.getDate());
   return Math.round((target - today) / DAY_MS);
 }
@@ -16,9 +27,10 @@ export const pickEprMilestone = (timeline: OverviewMilestone[]): OverviewMilesto
 
 /** Freguesias por potencial decrescente e a quota das `n` maiores. */
 export function rankParishes(parishes: OverviewParish[], n = 5) {
-  const sorted = [...parishes].sort((a, b) => b.potential_t - a.potential_t);
-  const total = sorted.reduce((s, p) => s + p.potential_t, 0);
-  const top = sorted.slice(0, n).reduce((s, p) => s + p.potential_t, 0);
+  const potential = (p: OverviewParish) => (Number.isFinite(p.potential_t) ? p.potential_t : 0);
+  const sorted = [...parishes].sort((a, b) => potential(b) - potential(a));
+  const total = sorted.reduce((s, p) => s + potential(p), 0);
+  const top = sorted.slice(0, n).reduce((s, p) => s + potential(p), 0);
   return { sorted, topSharePct: total > 0 ? (top / total) * 100 : 0, topCount: n };
 }
 
@@ -34,12 +46,14 @@ export interface EprDeadline {
 
 /** O marco em que os produtores passam a pagar, com os dias contados na hora (não os do servidor, que podem ficar velhos na cache). */
 export function eprDeadline(timeline: OverviewMilestone[], now: Date = new Date()): EprDeadline {
-  const epr = pickEprMilestone(timeline);
-  const date = epr?.date ?? EPR_FALLBACK_DATE;
+  const epr = pickEprMilestone(timeline ?? []);
+  // Uma data vazia ou inválida da API não derruba a faixa: recai no prazo conhecido.
+  const usable = daysUntil(epr?.date, now) !== null;
+  const date = usable && epr ? epr.date : EPR_FALLBACK_DATE;
   return {
     date,
-    days: Math.max(0, daysUntil(date, now)),
-    sourceLabel: epr?.source_label ?? 'Diretiva (UE) 2025/1892',
+    days: Math.max(0, daysUntil(date, now) ?? 0),
+    sourceLabel: epr?.source_label || 'Diretiva (UE) 2025/1892',
     verified: epr?.verified ?? true,
   };
 }

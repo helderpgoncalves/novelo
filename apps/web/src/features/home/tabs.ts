@@ -2,6 +2,13 @@
 export const HOME_TABS = ['entities', 'flows', 'waste', 'parishes'] as const;
 export type HomeTab = (typeof HOME_TABS)[number];
 
-/** Camadas do mapa de meio-tom. A ordem é a dos botões. */
-export const LAYER_IDS = ['gap', 'population', 'containers', 'circuits', 'data_gaps'] as const;
+/** Camadas do mapa. A ordem é a dos botões. */
+export const LAYER_IDS = [
+  'gap',
+  'population',
+  'density',
+  'containers',
+  'circuits',
+  'data_gaps',
+] as const;
 export type LayerId = (typeof LAYER_IDS)[number];

@@ -12,9 +12,9 @@ import { PageTabs } from '@/components/page-tabs';
 import { ChartSkeleton, DataTableSkeleton } from '@/components/skeletons';
 import { EntityTable } from '@/features/baseline/entity-table';
 import { WasteCompositionChart } from '@/features/baseline/waste-composition';
-import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 import { DataSources, Highlights, ParishesTable } from './evidence';
+import { num } from './safe';
 import type { HomeTab } from './tabs';
 import { SourceLine } from './tags';
 
@@ -42,7 +42,7 @@ function Waste() {
   return (
     <Section
       title={m.section_waste_title()}
-      description={m.section_waste_description({ kg: formatNumber(data.kg_per_inhab_year_pt) })}
+      description={m.section_waste_description({ kg: num(data.kg_per_inhab_year_pt) })}
     >
       <Panel>
         <WasteCompositionChart waste={data} />
@@ -110,7 +110,7 @@ export function EvidenceTabs({ overview, tab, onTabChange }: EvidenceTabsProps) 
                 <ParishesTable parishes={overview.parishes} />
                 <SourceLine>
                   {m.home_s5_source({
-                    rate: formatNumber(overview.gap.potential_kg_per_inhab_month, 1),
+                    rate: num(overview.gap.potential_kg_per_inhab_month, 1),
                   })}
                 </SourceLine>
               </div>
