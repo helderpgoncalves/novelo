@@ -2,14 +2,11 @@ import { createFileRoute } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 import { z } from 'zod';
 import {
-  getObservedFlowsOptions,
+  getCaopParishesGeojsonOptions,
   getOverviewOptions,
-  getTextileBaselineOptions,
-  getWasteCompositionOptions,
-  listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { HomePending } from '@/components/app-loading';
-import { HOME_TABS } from '@/features/home/tabs';
+import { HOME_TABS, LAYER_IDS } from '@/features/home/tabs';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { ogImage, SITE_URL } from '@/lib/seo';
 import { resolvePublicSessionUser } from '@/lib/session';
@@ -26,23 +23,29 @@ const AuthedHome = lazy(() => import('@/features/home/authed-home'));
 // Privacidade e Termos à vista) e a página inicial da app para quem tem. Por isso não vive dentro de `_app`.
 export const Route = createFileRoute('/')({
   staticData: { skeleton: 'home' },
-  validateSearch: z.object({ tab: z.enum(HOME_TABS).optional().catch(undefined) }),
+  // Estado partilhável da sala de decisão: separador da evidência, camada do mapa, freguesia aberta e orçamento escolhido.
+  validateSearch: z.object({
+    tab: z.enum(HOME_TABS).optional().catch(undefined),
+    layer: z.enum(LAYER_IDS).optional().catch(undefined),
+    parish: z
+      .string()
+      .regex(/^\w{4,8}$/)
+      .optional()
+      .catch(undefined),
+    budget: z.number().positive().max(10_000_000).optional().catch(undefined),
+  }),
   beforeLoad: async ({ context: { queryClient } }) => {
     const user = await resolvePublicSessionUser(queryClient);
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
   },
-  loader: ({ context: { queryClient, user } }) =>
-    user
-      ? Promise.all([
-          queryClient.ensureQueryData(getOverviewOptions()),
-          queryClient.ensureQueryData(getTextileBaselineOptions()),
-          queryClient.ensureQueryData(getObservedFlowsOptions()),
-          queryClient.ensureQueryData(getWasteCompositionOptions()),
-          queryClient.ensureQueryData(listZonesOptions()),
-        ])
-      : undefined,
+  // Só o resumo bloqueia o primeiro desenho; os contornos CAOP das freguesias pedem-se já mas o mapa espera por ela com o seu esqueleto.
+  loader: ({ context: { queryClient, user } }) => {
+    if (!user) return undefined;
+    void queryClient.prefetchQuery(getCaopParishesGeojsonOptions());
+    return queryClient.ensureQueryData(getOverviewOptions());
+  },
   head: ({ match }) => ({
     meta: match.context.user
       ? [{ title: m.home_title() }]
@@ -67,7 +70,7 @@ export const Route = createFileRoute('/')({
 
 function Home() {
   const { user } = Route.useRouteContext();
-  const { tab = 'entities' } = Route.useSearch();
+  const { tab = 'entities', layer = 'gap', parish, budget } = Route.useSearch();
   const navigate = Route.useNavigate();
   if (!user)
     return (
@@ -79,8 +82,18 @@ function Home() {
     <Suspense fallback={<HomePending />}>
       <AuthedHome
         user={user}
-        tab={tab}
-        onTabChange={(next) => void navigate({ search: { tab: next }, replace: true })}
+        search={{ tab, layer, parish: parish ?? null, budget: budget ?? null }}
+        onSearch={(patch) =>
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              ...patch,
+              parish: 'parish' in patch ? (patch.parish ?? undefined) : prev.parish,
+            }),
+            replace: true,
+            resetScroll: false,
+          })
+        }
       />
     </Suspense>
   );

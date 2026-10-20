@@ -3955,5 +3955,8 @@
   "pending_conf_mail_body": "Hello, I requested access to Novelo with {email} but the confirmation email did not reach me.",
   "auth_invite_reason": "Enter the email the invitation was sent to. If it is still open, we will send it again.",
   "inv_request_new": "Request a new invitation",
-  "invite_not_delivered": "Email not sent"
+  "invite_not_delivered": "Email not sent",
+  "email_link_valid": "Valid until {when}.",
+  "email_alerts_none": "No active alerts.",
+  "email_failures_hour": "Failures in the last hour"
 }
