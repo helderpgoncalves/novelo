@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect, useMatches } from '@tanstack/react-router';
 import { Suspense, useState } from 'react';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { AppSidebar } from '@/components/layout/app-sidebar';
@@ -7,6 +7,7 @@ import { OfflineBanner } from '@/components/offline-banner';
 import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { getLocale, switchLocale } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app')({
@@ -26,6 +27,7 @@ export const Route = createFileRoute('/_app')({
 function AppLayout() {
   const { user } = Route.useRouteContext();
   const [menuOpen, setMenuOpen] = useState(false);
+  const fullBleed = useMatches({ select: (ms) => ms.some((x) => x.staticData?.fullBleed) });
 
   return (
     <div className="flex h-dvh overflow-hidden bg-background">
@@ -40,12 +42,24 @@ function AppLayout() {
         <Topbar user={user} onMenuClick={() => setMenuOpen(true)} />
         <OfflineBanner />
         <VerifyEmailBanner user={user} />
-        <main id="content" className="flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-[96rem] px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:px-10 lg:py-8 2xl:px-14">
-            <Suspense fallback={<RouteSkeleton />}>
+        <main
+          id="content"
+          className={cn(
+            'flex-1',
+            fullBleed ? 'flex min-h-0 flex-col overflow-hidden' : 'overflow-y-auto',
+          )}
+        >
+          {fullBleed ? (
+            <Suspense fallback={null}>
               <Outlet />
             </Suspense>
-          </div>
+          ) : (
+            <div className="mx-auto w-full max-w-[96rem] px-4 pt-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:p-6 lg:px-10 lg:py-8 2xl:px-14">
+              <Suspense fallback={<RouteSkeleton />}>
+                <Outlet />
+              </Suspense>
+            </div>
+          )}
         </main>
       </div>
     </div>

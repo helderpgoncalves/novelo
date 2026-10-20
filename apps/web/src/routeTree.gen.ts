@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/_app/index'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
 import { Route as AppBrandsRouteImport } from './routes/_app/brands'
+import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as AppCircuitsRouteImport } from './routes/_app/circuits'
 import { Route as AppCoverageRouteImport } from './routes/_app/coverage'
 import { Route as AppDataQualityRouteImport } from './routes/_app/data-quality'
@@ -39,6 +40,7 @@ import { Route as AppLotsCodeRouteImport } from './routes/_app/lots.$code'
 import { Route as AppScenariosIndexRouteImport } from './routes/_app/scenarios.index'
 import { Route as AppScenariosScenarioIdRouteImport } from './routes/_app/scenarios.$scenarioId'
 import { Route as AppScenariosCompareRouteImport } from './routes/_app/scenarios.compare'
+import { Route as AppChatSharedTokenRouteImport } from './routes/_app/chat_.shared.$token'
 
 const AppRoute = AppRouteImport.update({
   id: '/_app',
@@ -71,6 +73,11 @@ const AppAssumptionsRoute = AppAssumptionsRouteImport.update({
 const AppBrandsRoute = AppBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppChatRoute = AppChatRouteImport.update({
+  id: '/chat',
+  path: '/chat',
   getParentRoute: () => AppRoute,
 } as any)
 const AppCircuitsRoute = AppCircuitsRouteImport.update({
@@ -188,6 +195,11 @@ const AppScenariosCompareRoute = AppScenariosCompareRouteImport.update({
   path: '/scenarios/compare',
   getParentRoute: () => AppRoute,
 } as any)
+const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
+  id: '/chat_/shared/$token',
+  path: '/chat/shared/$token',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
@@ -195,6 +207,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
   '/data-quality': typeof AppDataQualityRoute
@@ -218,6 +231,7 @@ export interface FileRoutesByFullPath {
   '/scenarios/compare': typeof AppScenariosCompareRoute
   '/lots/': typeof AppLotsIndexRoute
   '/scenarios/': typeof AppScenariosIndexRoute
+  '/chat/shared/$token': typeof AppChatSharedTokenRoute
 }
 export interface FileRoutesByTo {
   '/': typeof AppIndexRoute
@@ -225,6 +239,7 @@ export interface FileRoutesByTo {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
   '/data-quality': typeof AppDataQualityRoute
@@ -248,6 +263,7 @@ export interface FileRoutesByTo {
   '/scenarios/compare': typeof AppScenariosCompareRoute
   '/lots': typeof AppLotsIndexRoute
   '/scenarios': typeof AppScenariosIndexRoute
+  '/chat/shared/$token': typeof AppChatSharedTokenRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -257,6 +273,7 @@ export interface FileRoutesById {
   '/_app/account': typeof AppAccountRoute
   '/_app/assumptions': typeof AppAssumptionsRoute
   '/_app/brands': typeof AppBrandsRoute
+  '/_app/chat': typeof AppChatRoute
   '/_app/circuits': typeof AppCircuitsRoute
   '/_app/coverage': typeof AppCoverageRoute
   '/_app/data-quality': typeof AppDataQualityRoute
@@ -281,6 +298,7 @@ export interface FileRoutesById {
   '/_app/scenarios/compare': typeof AppScenariosCompareRoute
   '/_app/lots/': typeof AppLotsIndexRoute
   '/_app/scenarios/': typeof AppScenariosIndexRoute
+  '/_app/chat_/shared/$token': typeof AppChatSharedTokenRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -290,6 +308,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/chat'
     | '/circuits'
     | '/coverage'
     | '/data-quality'
@@ -313,6 +332,7 @@ export interface FileRouteTypes {
     | '/scenarios/compare'
     | '/lots/'
     | '/scenarios/'
+    | '/chat/shared/$token'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -320,6 +340,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/chat'
     | '/circuits'
     | '/coverage'
     | '/data-quality'
@@ -343,6 +364,7 @@ export interface FileRouteTypes {
     | '/scenarios/compare'
     | '/lots'
     | '/scenarios'
+    | '/chat/shared/$token'
   id:
     | '__root__'
     | '/_app'
@@ -351,6 +373,7 @@ export interface FileRouteTypes {
     | '/_app/account'
     | '/_app/assumptions'
     | '/_app/brands'
+    | '/_app/chat'
     | '/_app/circuits'
     | '/_app/coverage'
     | '/_app/data-quality'
@@ -375,6 +398,7 @@ export interface FileRouteTypes {
     | '/_app/scenarios/compare'
     | '/_app/lots/'
     | '/_app/scenarios/'
+    | '/_app/chat_/shared/$token'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -433,6 +457,13 @@ declare module '@tanstack/react-router' {
       path: '/brands'
       fullPath: '/brands'
       preLoaderRoute: typeof AppBrandsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/chat': {
+      id: '/_app/chat'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof AppChatRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/circuits': {
@@ -596,6 +627,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppScenariosCompareRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/chat_/shared/$token': {
+      id: '/_app/chat_/shared/$token'
+      path: '/chat/shared/$token'
+      fullPath: '/chat/shared/$token'
+      preLoaderRoute: typeof AppChatSharedTokenRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
@@ -603,6 +641,7 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppAssumptionsRoute: typeof AppAssumptionsRoute
   AppBrandsRoute: typeof AppBrandsRoute
+  AppChatRoute: typeof AppChatRoute
   AppCircuitsRoute: typeof AppCircuitsRoute
   AppCoverageRoute: typeof AppCoverageRoute
   AppDataQualityRoute: typeof AppDataQualityRoute
@@ -622,12 +661,14 @@ interface AppRouteChildren {
   AppScenariosCompareRoute: typeof AppScenariosCompareRoute
   AppLotsIndexRoute: typeof AppLotsIndexRoute
   AppScenariosIndexRoute: typeof AppScenariosIndexRoute
+  AppChatSharedTokenRoute: typeof AppChatSharedTokenRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppAssumptionsRoute: AppAssumptionsRoute,
   AppBrandsRoute: AppBrandsRoute,
+  AppChatRoute: AppChatRoute,
   AppCircuitsRoute: AppCircuitsRoute,
   AppCoverageRoute: AppCoverageRoute,
   AppDataQualityRoute: AppDataQualityRoute,
@@ -647,6 +688,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppScenariosCompareRoute: AppScenariosCompareRoute,
   AppLotsIndexRoute: AppLotsIndexRoute,
   AppScenariosIndexRoute: AppScenariosIndexRoute,
+  AppChatSharedTokenRoute: AppChatSharedTokenRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)

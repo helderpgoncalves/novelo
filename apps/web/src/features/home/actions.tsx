@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { ArrowUpRight, Map as MapIcon, ScanLine, SlidersHorizontal, Sparkles } from 'lucide-react';
+import { openCopilot } from '@/features/copilot/store';
 import { m } from '@/paraglide/messages';
-import { openCopilot } from './copilot-link';
 
 const TILE =
   'group flex min-h-16 items-center gap-3 rounded-lg bg-card p-4 text-left ring-1 ring-foreground/10 outline-none transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/60';
@@ -74,7 +74,7 @@ export function Shortcuts() {
             <li key={q}>
               <button
                 type="button"
-                onClick={() => openCopilot()}
+                onClick={() => openCopilot({ question: q })}
                 className="inline-flex min-h-10 w-full items-center gap-2 rounded-full px-4 py-2 text-left text-sm outline-none ring-1 ring-foreground/20 transition-colors hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/60 sm:w-auto"
               >
                 <Sparkles className="size-3.5 shrink-0 text-primary" aria-hidden="true" />

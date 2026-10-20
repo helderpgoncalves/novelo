@@ -330,6 +330,22 @@ Recusados: executáveis (MZ, ELF, Mach-O, `#!`), HTML/SVG/scripts, ZIP que não 
 
 `GET /copilot/history` é uma cronologia unificada (conversas, ações, artefactos, memórias, anexos) com **cursor estável** ordenado por `(instante, tipo, id)` (sem repetidos nem saltos, mesmo com instantes iguais), filtros por tipo, datas e estado, e pesquisa sem acentos em mensagens, títulos, artefactos e ações. As conversas têm pesquisa, fixar, arquivar, pastas (`project`), partilha só de leitura por link para outros utilizadores autenticados, exportação em Markdown e PDF, regenerar, e **editar uma mensagem do utilizador criando um ramo** (`edit_message_id`; a conversa original fica intacta). `GET /copilot/threads/{id}/timeline` junta mensagens, ferramentas, memórias, anexos, ações e artefactos de uma conversa. Apagar uma conversa apaga o histórico derivado (mensagens, artefactos, anexos usados).
 
+## Interface web
+
+Duas superfícies partilham os mesmos componentes (`apps/web/src/features/copilot/`) e o mesmo hook `useChat`:
+
+- **Página `/chat`** (no menu, ecrã inteiro): separadores *Conversa* (lista de conversas à esquerda, em folha no telemóvel), *Histórico* (cronologia com cursor, `DataTable`), *Artefactos* (galeria: fixar, atualizar, apagar), *Ações* (registo com Desfazer; auditoria `scope=all` para administradores) e *Definições* (memória editável com aprovações pendentes, personalidade com pré-visualização, comportamento e retenção, exportar/apagar dados com a palavra `APAGAR`). O estado vive no URL (`?tab=`, `?thread=`). As conversas partilhadas abrem em `/chat/shared/:token`, só de leitura.
+- **Painel lateral** (⌘K / Ctrl+K): a mesma conversa, retomada a partir do `sessionStorage`; "Ecrã inteiro" leva-a para `/chat?thread=`.
+- **`openCopilot({ question, send, threadId })`** (`store.ts`) abre o painel (ou usa a página `/chat`, se estiver aberta) e envia a pergunta; substitui o antigo `copilot-link.ts`.
+
+Como funciona o streaming: `sse.ts` faz `fetch` + `ReadableStream` ao `POST /copilot/stream` (e `/regenerate`), ignora `: ping`, junta blocos incompletos e devolve cada evento da união `CopilotEventMessage`. `reducer.ts` aplica os eventos a uma volta (`retract` apaga o texto; `done`/`error` fecham), e o hook agrupa-os a cada 40 ms para não redesenhar por cada token. `AbortController` cancela (o servidor grava a resposta parcial como `cancelled`). Erros antes de abrir o stream (404, 403, 429, 503) chegam como `{code, message}` e usam as mesmas mensagens traduzidas do resto da app.
+
+Interface da resposta: o assistente ocupa a largura toda (sem bolha), o utilizador fica compacto à direita. Em vez de skeletons, `thinking.tsx` mostra frases temáticas (têxtil, recolha, otimização) escolhidas pelo `label_key` do evento `status` (17 famílias, três frases cada, em pt/en) e que rodam a cada 2,6 s; com `prefers-reduced-motion` ficam estáticas e sem animação. Os 13 tipos de gráfico são desenhados com echarts (`artifacts/chart-options.ts`), as tabelas e comparações com o `DataTable`, os mapas com MapLibre. As ações propostas aparecem como cartões Confirmar / Rejeitar / Desfazer (as críticas pedem escrever `APAGAR`); as notas de memória mostram "Guardei na memória" com Desfazer.
+
+Campo de mensagem flutuante: o texto cresce sozinho (16 px, sem zoom no iOS), Enter envia e Shift+Enter muda de linha; anexar e enviar estão dentro do campo; chips de anexos com pré-visualização, arrastar e colar ficheiros; `@` abre o auto-completar de menções (`search_copilot_mentions`) com teclado; `/` lista os comandos (`list_copilot_commands`); o botão "Anexar o ecrã atual" envia o `page_context`. O scroll segue o fim enquanto escreve, pára se a pessoa subir e mostra "Ir para o fim".
+
+Testes: `apps/web/src/features/copilot/copilot.test.ts` (reducer, SSE, gatilhos `@` e `/`, frases, Markdown) e `apps/web/e2e/copilot-v2.spec.ts` (Playwright contra a API e o modelo reais: streaming, parar, `@`, anexos, gráficos, tabelas, ação com confirmação, memória, histórico, conversas, painel, scroll, movimento reduzido, telemóvel e apagar dados).
+
 ## Operação
 
 - **nginx** (`apps/web/nginx.conf`): `/api/v1/copilot/stream` e `/regenerate` sem buffering (`proxy_buffering off`, HTTP/1.1, `gzip off`, leitura até 300 s); `/api/v1/copilot/attachments` com `client_max_body_size 55m`. A API também envia `X-Accel-Buffering: no`.

@@ -44,6 +44,8 @@ declare module '@tanstack/react-router' {
   // Cada rota pode indicar a forma do seu esqueleto de carregamento.
   interface StaticDataRouteOption {
     skeleton?: import('@/components/skeletons').SkeletonVariant;
+    /** Ecrã inteiro: a página ocupa a área de conteúdo sem margens nem rolagem da página (ex.: /chat). */
+    fullBleed?: boolean;
   }
 }
 
