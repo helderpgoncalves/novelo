@@ -156,8 +156,11 @@ class ActionDef:
     critical: bool = False
 
 
-def forbidden_for(d: ActionDef, role: str) -> bool:
-    """Admin-only para quem não é admin; convidados também não fazem ações de risco alto ou crítico (apagar, reservar)."""
+def forbidden_for(d: ActionDef, role: str, impersonating: bool = False) -> bool:
+    """Admin-only para quem não é admin; convidados também não fazem ações de risco alto ou crítico (apagar, reservar).
+    Numa impersonação, um administrador nunca executa ações críticas (apagar dados) em nome de outra pessoa."""
+    if impersonating and d.critical:
+        return True
     if d.admin_only and role != "admin":
         return True
     return role == "guest" and (d.critical or d.risk in {"high", "critical"})
@@ -463,7 +466,7 @@ async def e_parameter(ctx: Ctx, p: ParameterP) -> tuple[dict[str, Any], dict[str
 
 
 async def e_user_active(ctx: Ctx, p: UserActiveP) -> tuple[dict[str, Any], dict[str, Any] | None]:
-    from novelo.features.auth import service as auth_service  # noqa: PLC0415
+    from novelo.features.users import accounts  # noqa: PLC0415
 
     if p.user_id == ctx.user.id:
         raise ActionError("You cannot change your own account")
@@ -471,9 +474,7 @@ async def e_user_active(ctx: Ctx, p: UserActiveP) -> tuple[dict[str, Any], dict[
     if target is None:
         raise NotFoundError("User not found")
     before = target.is_active
-    target.is_active = p.is_active
-    if not p.is_active:
-        await auth_service.revoke_all_sessions(ctx.db, target.id)
+    await accounts.set_active(ctx.db, ctx.user, target, p.is_active, None)
     await ctx.db.commit()
     return {"user_id": str(target.id), "is_active": p.is_active}, {
         "kind": "restore_user_active",
@@ -483,13 +484,16 @@ async def e_user_active(ctx: Ctx, p: UserActiveP) -> tuple[dict[str, Any], dict[
 
 
 async def e_user_role(ctx: Ctx, p: UserRoleP) -> tuple[dict[str, Any], dict[str, Any] | None]:
+    from novelo.features.users import accounts  # noqa: PLC0415
+
     if p.user_id == ctx.user.id:
         raise ActionError("You cannot change your own account")
     target = await ctx.db.get(User, p.user_id)
     if target is None:
         raise NotFoundError("User not found")
     before = target.role
-    target.role = p.role
+    # A confirmação em duas etapas do copiloto (proposta + confirmar) já é a confirmação reforçada.
+    await accounts.change_role(ctx.db, ctx.user, target, p.role, confirm_admin=True, meta=None)
     await ctx.db.commit()
     return {"user_id": str(target.id), "role": p.role}, {
         "kind": "restore_user_role",
@@ -651,7 +655,7 @@ async def propose(
 ) -> CopilotAction:
     """Valida o tipo, os parâmetros e o role. Cria a proposta (e executa-a só se for auto-aprovada)."""
     d = ACTIONS[type_]
-    if forbidden_for(d, ctx.user.role):
+    if forbidden_for(d, ctx.user.role, ctx.user.impersonation is not None):
         raise ForbiddenError("Only administrators can do this")
     try:
         params = d.params.model_validate(raw_params)
@@ -742,7 +746,9 @@ async def _run(ctx: Ctx, action_id: uuid.UUID) -> CopilotAction:
     row = await ctx.db.get(CopilotAction, action_id)
     assert row is not None
     d = ACTIONS[ActionType(row.type)]
-    if forbidden_for(d, ctx.user.role):  # o role pode ter mudado entre a proposta e a confirmação
+    if forbidden_for(
+        d, ctx.user.role, ctx.user.impersonation is not None
+    ):  # o role pode ter mudado entre a proposta e a confirmação
         row.status, row.result, row.decided_at = (
             "failed",
             {"error": "forbidden", "message": "Insufficient permissions"},
@@ -778,7 +784,7 @@ async def undo(ctx: Ctx, action_id: uuid.UUID) -> CopilotAction:
     if row.status != "executed" or not row.reversible or not row.undo:
         raise ConflictError("This action cannot be undone")
     d = ACTIONS[ActionType(row.type)]
-    if forbidden_for(d, ctx.user.role):
+    if forbidden_for(d, ctx.user.role, ctx.user.impersonation is not None):
         raise ForbiddenError("Only administrators can undo this")
     assert d.undo is not None
     row.result = {**row.result, **await d.undo(ctx, row.undo)}

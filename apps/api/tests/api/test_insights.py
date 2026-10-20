@@ -6,12 +6,14 @@ from collections.abc import AsyncGenerator
 import httpx
 import pytest
 from fastapi import Depends
+from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
 from novelo.core.deps import get_current_user
 from novelo.core.errors import COMMON_ERRORS
 from novelo.features.planning.insights_router import router as insights_router
+from novelo.features.users.models import User
 from novelo.main import create_app
 from tests.conftest import PASSWORD
 
@@ -39,6 +41,8 @@ async def api(session: AsyncSession) -> AsyncGenerator[httpx.AsyncClient, None]:
             "/api/v1/auth/register", json={"email": "ana@vitrus.pt", "password": PASSWORD, "name": "Ana"}
         )
         assert resp.status_code == 201
+        await session.execute(update(User).where(User.email == "ana@vitrus.pt").values(approval_status="approved"))
+        await session.commit()
         yield c
 
 

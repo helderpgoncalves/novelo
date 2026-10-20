@@ -30,6 +30,15 @@ ErrorCode = Literal[
     "email_taken",
     "cannot_modify_self",
     "conflict",
+    "account_pending",
+    "account_rejected",
+    "invitation_pending",
+    "last_admin",
+    "impersonation_active",
+    "impersonation_blocked",
+    "impersonation_forbidden",
+    "confirmation_mismatch",
+    "admin_confirmation_required",
     "rate_limited",
     "feature_disabled",
     "upstream_error",
@@ -137,6 +146,69 @@ class CannotModifySelfError(AppError):
 class ConflictError(AppError):
     status_code = 409
     code = "conflict"
+
+
+class AccountPendingError(AppError):
+    """Conta registada mas ainda não aprovada por um administrador."""
+
+    status_code = 403
+    code = "account_pending"
+
+
+class AccountRejectedError(AppError):
+    """O administrador recusou esta conta."""
+
+    status_code = 403
+    code = "account_rejected"
+
+
+class InvitationPendingError(AppError):
+    """Já existe um convite por aceitar para este email."""
+
+    status_code = 409
+    code = "invitation_pending"
+
+
+class LastAdminError(AppError):
+    """A operação deixaria a plataforma sem nenhum administrador ativo."""
+
+    status_code = 409
+    code = "last_admin"
+
+
+class ImpersonationActiveError(AppError):
+    """O utilizador está a ser impersonado neste momento."""
+
+    status_code = 409
+    code = "impersonation_active"
+
+
+class ImpersonationBlockedError(AppError):
+    """Ação não permitida dentro de uma sessão de impersonação."""
+
+    status_code = 403
+    code = "impersonation_blocked"
+
+
+class ImpersonationForbiddenError(AppError):
+    """Não se pode impersonar este utilizador (administradores nunca)."""
+
+    status_code = 403
+    code = "impersonation_forbidden"
+
+
+class ConfirmationMismatchError(AppError):
+    """O email de confirmação não coincide com o do alvo."""
+
+    status_code = 400
+    code = "confirmation_mismatch"
+
+
+class AdminConfirmationRequiredError(AppError):
+    """Dar o papel de administrador exige `confirm_admin: true`."""
+
+    status_code = 400
+    code = "admin_confirmation_required"
 
 
 class RateLimitError(AppError):

@@ -34,8 +34,9 @@ web:
 db:
     docker compose -f docker-compose.dev.yml up -d db
 
+# Espera pela BD de dev (:5590). Se já responde, não toca no Docker (~10 ms); senão sobe-a e espera pelo healthcheck.
 db-wait:
-    docker compose -f docker-compose.dev.yml up -d --wait db
+    @(exec 3<>/dev/tcp/127.0.0.1/5590) 2>/dev/null || docker compose -f docker-compose.dev.yml up -d --wait db
 
 # Logs de um serviço (ex.: just logs api para ver o link de recuperar password em dev)
 logs SERVICE="api":
@@ -68,13 +69,68 @@ etl:
     uv run scripts/etl/municipal_containers.py
 
 # --- Qualidade: tudo o que tem de passar antes de cada push (sem CI remota) ----------------------------------------
-check: check-api check-web check-brand check-contract
+# Os dois alvos correm API (lint+tipos / testes), web (biome / tsc / vitest), marca e contrato EM PARALELO.
+# check-fast: iteração diária (VRP cortado a 250 ms nos testes). check: o que se corre antes do push (limites reais).
+# Tempos e como depurar testes lentos: docs/engenharia/testes.md
 
+# Rápido: tudo em paralelo, solver cortado nos testes (alvo < 90 s)
+check-fast: db-wait web-i18n
+    NOVELO_TEST_SOLVER=fast scripts/parallel.sh {{CHECK_JOBS}}
+
+# Completo, antes de cada push: tudo em paralelo, limites reais do solver (alvo < 5 min)
+check: db-wait web-i18n
+    NOVELO_TEST_SOLVER=full scripts/parallel.sh {{CHECK_JOBS}}
+
+CHECK_JOBS := '"api-lint=just api-lint" "api-test=just test-api" "web-lint=just web-lint" "web-types=just web-types" "web-test=just web-test" "brand=just check-brand" "contract=just check-contract"'
+
+# Só a API (lint + tipos + testes); o solver segue NOVELO_TEST_SOLVER (fast por omissão)
 check-api: db-wait
-    cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run mypy && uv run pytest -q
+    scripts/parallel.sh "api-lint=just api-lint" "api-test=just test-api"
 
-check-web:
-    pnpm lint && pnpm typecheck && pnpm test
+# Só o web (biome + tsc + vitest em paralelo)
+check-web: web-i18n
+    scripts/parallel.sh "web-lint=just web-lint" "web-types=just web-types" "web-test=just web-test"
+
+api-lint:
+    cd apps/api && uv run ruff check . && uv run ruff format --check . && uv run mypy
+
+# pytest em paralelo (xdist, uma BD por worker clonada de um template). Ex.: just test-api -k planning -m "not slow"
+test-api *ARGS: db-wait
+    cd apps/api && uv run pytest -q -n auto --dist worksteal {{ARGS}}
+
+# Ordem aleatória (pytest-randomly) para caçar testes dependentes; repete uma falha com --randomly-seed=N
+test-shuffle *ARGS: db-wait
+    cd apps/api && uv run pytest -q -n auto -o addopts="" {{ARGS}}
+
+# Os 25 testes mais lentos (serial, para medir de forma limpa)
+test-slowest: db-wait
+    cd apps/api && uv run pytest -q -n 0 --durations=25 -p no:cacheprovider
+
+# Compila as mensagens do Paraglide só se mudaram (carimbo)
+web-i18n:
+    pnpm --filter web i18n
+
+web-lint:
+    pnpm --filter web exec biome check .
+
+# tsc incremental (tsBuildInfo em node_modules/.cache): 20 s a frio, ~5 s a seguir
+web-types:
+    pnpm --filter web exec tsc --noEmit
+
+web-test:
+    pnpm --filter web exec vitest run
+
+# Só os ficheiros web afetados desde o último commit
+web-test-changed: web-i18n
+    pnpm --filter web exec vitest run --changed
+
+# Ponta a ponta, fluxos críticos (smoke, desktop). Reaproveita a stack de `just dev`; senão arranca API e Vite.
+e2e *ARGS: db-wait
+    cd apps/web && E2E_SUITE=smoke pnpm exec playwright test --project=desktop {{ARGS}}
+
+# Ponta a ponta completo (desktop + mobile, inclui o copiloto com o modelo real)
+e2e-full *ARGS: db-wait
+    cd apps/web && pnpm exec playwright test {{ARGS}}
 
 # Marca: regenera TODOS os assets (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) de uma só fonte
 brand:
@@ -88,17 +144,16 @@ brand-shots:
 check-brand:
     {{BRAND_RUN}} -m pytest -q test_brand.py
 
-# Falha se o contrato ou o cliente gerado estiverem desatualizados
-check-contract: gen
-    git diff --exit-code -- openapi.json apps/web/src/client
+# Falha se o contrato/cliente estiverem desatualizados (compara sem escrever; salta se nada mudou: scripts/check-contract.sh)
+check-contract:
+    scripts/check-contract.sh
 
 fix:
     cd apps/api && uv run ruff check --fix . && uv run ruff format .
     pnpm --filter web lint:fix
 
-test:
-    cd apps/api && uv run pytest -q
-    pnpm test
+test: db-wait web-i18n
+    scripts/parallel.sh "api-test=just test-api" "web-test=just web-test"
 
 # Nova migração a partir dos modelos: just migration "descrição"
 migration MSG:

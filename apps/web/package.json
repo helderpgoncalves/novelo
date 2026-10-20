@@ -11,8 +11,10 @@
     "lint:fix": "biome check --write .",
     "typecheck": "pnpm i18n && tsc --noEmit",
     "test": "pnpm i18n && vitest run",
+    "test:changed": "pnpm i18n && vitest run --changed",
     "i18n": "node scripts/i18n.mjs",
-    "e2e": "playwright test"
+    "e2e": "E2E_SUITE=smoke playwright test --project=desktop",
+    "e2e:full": "playwright test"
   },
   "dependencies": {
     "@hookform/resolvers": "^6.0.0",

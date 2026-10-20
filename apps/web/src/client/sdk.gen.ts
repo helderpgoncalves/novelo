@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type ServerSentEventsResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, ApprovePendingMemoryData, ApprovePendingMemoryErrors, ApprovePendingMemoryResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ClearCopilotMemoryData, ClearCopilotMemoryErrors, ClearCopilotMemoryResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, ConfirmCopilotActionData, ConfirmCopilotActionErrors, ConfirmCopilotActionResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryErrors, CreateCopilotMemoryEntryResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteCopilotArtifactData, DeleteCopilotArtifactErrors, DeleteCopilotArtifactResponses, DeleteCopilotDataData, DeleteCopilotDataErrors, DeleteCopilotDataResponses, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryErrors, DeleteCopilotMemoryEntryResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotDataData, ExportCopilotDataErrors, ExportCopilotDataResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadPdfData, ExportCopilotThreadPdfErrors, ExportCopilotThreadPdfResponses, ExportCopilotThreadResponses, ExportMunicipalSitesData, ExportMunicipalSitesErrors, ExportMunicipalSitesResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCaopParishesGeojsonData, GetCaopParishesGeojsonErrors, GetCaopParishesGeojsonResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotSettingsData, GetCopilotSettingsErrors, GetCopilotSettingsResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCopilotThreadTimelineData, GetCopilotThreadTimelineErrors, GetCopilotThreadTimelineResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkErrors, GetMunicipalDensityBenchmarkResponses, GetMunicipalGapRankingData, GetMunicipalGapRankingErrors, GetMunicipalGapRankingResponses, GetMunicipalOverviewData, GetMunicipalOverviewErrors, GetMunicipalOverviewResponses, GetMunicipalParishData, GetMunicipalParishErrors, GetMunicipalParishResponses, GetMunicipalSiteData, GetMunicipalSiteErrors, GetMunicipalSiteResponses, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonErrors, GetMunicipalSitesGeojsonResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetQuickJoinInfoData, GetQuickJoinInfoErrors, GetQuickJoinInfoResponses, GetQuickJoinQrData, GetQuickJoinQrErrors, GetQuickJoinQrResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetSharedCopilotThreadData, GetSharedCopilotThreadErrors, GetSharedCopilotThreadResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTextileCandidateSitesData, GetTextileCandidateSitesErrors, GetTextileCandidateSitesResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotActionsData, ListCopilotActionsErrors, ListCopilotActionsResponses, ListCopilotArtifactsData, ListCopilotArtifactsErrors, ListCopilotArtifactsResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotHistoryData, ListCopilotHistoryErrors, ListCopilotHistoryResponses, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesErrors, ListCopilotMemoryEntriesResponses, ListCopilotProjectsData, ListCopilotProjectsErrors, ListCopilotProjectsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListGuestsData, ListGuestsErrors, ListGuestsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListMunicipalContainersData, ListMunicipalContainersErrors, ListMunicipalContainersResponses, ListMunicipalParishesData, ListMunicipalParishesErrors, ListMunicipalParishesResponses, ListMunicipalProducersData, ListMunicipalProducersErrors, ListMunicipalProducersResponses, ListMunicipalSitesData, ListMunicipalSitesErrors, ListMunicipalSitesResponses, ListPendingMemoryData, ListPendingMemoryErrors, ListPendingMemoryResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, PinCopilotArtifactData, PinCopilotArtifactErrors, PinCopilotArtifactResponses, PreviewCopilotPersonaData, PreviewCopilotPersonaErrors, PreviewCopilotPersonaResponses, ProposeCopilotActionData, ProposeCopilotActionErrors, ProposeCopilotActionResponses, QuickJoinData, QuickJoinErrors, QuickJoinResponses, ReadyData, ReadyErrors, ReadyResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshCopilotArtifactData, RefreshCopilotArtifactErrors, RefreshCopilotArtifactResponses, RefreshData, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RejectCopilotActionData, RejectCopilotActionErrors, RejectCopilotActionResponses, RejectPendingMemoryData, RejectPendingMemoryErrors, RejectPendingMemoryResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, RequestMagicLinkData, RequestMagicLinkErrors, RequestMagicLinkResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SearchCopilotSessionsData, SearchCopilotSessionsErrors, SearchCopilotSessionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, ShareCopilotThreadData, ShareCopilotThreadErrors, ShareCopilotThreadResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UndoCopilotActionData, UndoCopilotActionErrors, UndoCopilotActionResponses, UnshareCopilotThreadData, UnshareCopilotThreadErrors, UnshareCopilotThreadResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryErrors, UpdateCopilotMemoryEntryResponses, UpdateCopilotSettingsData, UpdateCopilotSettingsErrors, UpdateCopilotSettingsResponses, UpdateCopilotThreadData, UpdateCopilotThreadErrors, UpdateCopilotThreadResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses, VerifyMagicLinkData, VerifyMagicLinkErrors, VerifyMagicLinkResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, ApprovePendingMemoryData, ApprovePendingMemoryErrors, ApprovePendingMemoryResponses, ApproveUserData, ApproveUserErrors, ApproveUserResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ClearCopilotMemoryData, ClearCopilotMemoryErrors, ClearCopilotMemoryResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, ConfirmCopilotActionData, ConfirmCopilotActionErrors, ConfirmCopilotActionResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryErrors, CreateCopilotMemoryEntryResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteCopilotArtifactData, DeleteCopilotArtifactErrors, DeleteCopilotArtifactResponses, DeleteCopilotDataData, DeleteCopilotDataErrors, DeleteCopilotDataResponses, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryErrors, DeleteCopilotMemoryEntryResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotDataData, ExportCopilotDataErrors, ExportCopilotDataResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadPdfData, ExportCopilotThreadPdfErrors, ExportCopilotThreadPdfResponses, ExportCopilotThreadResponses, ExportMunicipalSitesData, ExportMunicipalSitesErrors, ExportMunicipalSitesResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetApprovalStatusData, GetApprovalStatusErrors, GetApprovalStatusResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCaopParishesGeojsonData, GetCaopParishesGeojsonErrors, GetCaopParishesGeojsonResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotSettingsData, GetCopilotSettingsErrors, GetCopilotSettingsResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCopilotThreadTimelineData, GetCopilotThreadTimelineErrors, GetCopilotThreadTimelineResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkErrors, GetMunicipalDensityBenchmarkResponses, GetMunicipalGapRankingData, GetMunicipalGapRankingErrors, GetMunicipalGapRankingResponses, GetMunicipalOverviewData, GetMunicipalOverviewErrors, GetMunicipalOverviewResponses, GetMunicipalParishData, GetMunicipalParishErrors, GetMunicipalParishResponses, GetMunicipalSiteData, GetMunicipalSiteErrors, GetMunicipalSiteResponses, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonErrors, GetMunicipalSitesGeojsonResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetQuickJoinInfoData, GetQuickJoinInfoErrors, GetQuickJoinInfoResponses, GetQuickJoinQrData, GetQuickJoinQrErrors, GetQuickJoinQrResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetSharedCopilotThreadData, GetSharedCopilotThreadErrors, GetSharedCopilotThreadResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTextileCandidateSitesData, GetTextileCandidateSitesErrors, GetTextileCandidateSitesResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetUsersSummaryData, GetUsersSummaryErrors, GetUsersSummaryResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListAuditData, ListAuditErrors, ListAuditResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotActionsData, ListCopilotActionsErrors, ListCopilotActionsResponses, ListCopilotArtifactsData, ListCopilotArtifactsErrors, ListCopilotArtifactsResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotHistoryData, ListCopilotHistoryErrors, ListCopilotHistoryResponses, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesErrors, ListCopilotMemoryEntriesResponses, ListCopilotProjectsData, ListCopilotProjectsErrors, ListCopilotProjectsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListGuestsData, ListGuestsErrors, ListGuestsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListMunicipalContainersData, ListMunicipalContainersErrors, ListMunicipalContainersResponses, ListMunicipalParishesData, ListMunicipalParishesErrors, ListMunicipalParishesResponses, ListMunicipalProducersData, ListMunicipalProducersErrors, ListMunicipalProducersResponses, ListMunicipalSitesData, ListMunicipalSitesErrors, ListMunicipalSitesResponses, ListPendingMemoryData, ListPendingMemoryErrors, ListPendingMemoryResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, PinCopilotArtifactData, PinCopilotArtifactErrors, PinCopilotArtifactResponses, PreviewCopilotPersonaData, PreviewCopilotPersonaErrors, PreviewCopilotPersonaResponses, PreviewInvitationData, PreviewInvitationErrors, PreviewInvitationResponses, ProposeCopilotActionData, ProposeCopilotActionErrors, ProposeCopilotActionResponses, QuickJoinData, QuickJoinErrors, QuickJoinResponses, ReadyData, ReadyErrors, ReadyResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshCopilotArtifactData, RefreshCopilotArtifactErrors, RefreshCopilotArtifactResponses, RefreshData, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RejectCopilotActionData, RejectCopilotActionErrors, RejectCopilotActionResponses, RejectPendingMemoryData, RejectPendingMemoryErrors, RejectPendingMemoryResponses, RejectUserData, RejectUserErrors, RejectUserResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, RequestMagicLinkData, RequestMagicLinkErrors, RequestMagicLinkResponses, ResendInvitationData, ResendInvitationErrors, ResendInvitationResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SearchCopilotSessionsData, SearchCopilotSessionsErrors, SearchCopilotSessionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, ShareCopilotThreadData, ShareCopilotThreadErrors, ShareCopilotThreadResponses, StartImpersonationData, StartImpersonationErrors, StartImpersonationResponses, StopImpersonationData, StopImpersonationErrors, StopImpersonationResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UndoCopilotActionData, UndoCopilotActionErrors, UndoCopilotActionResponses, UnshareCopilotThreadData, UnshareCopilotThreadErrors, UnshareCopilotThreadResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryErrors, UpdateCopilotMemoryEntryResponses, UpdateCopilotSettingsData, UpdateCopilotSettingsErrors, UpdateCopilotSettingsResponses, UpdateCopilotThreadData, UpdateCopilotThreadErrors, UpdateCopilotThreadResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses, VerifyMagicLinkData, VerifyMagicLinkErrors, VerifyMagicLinkResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -82,6 +82,13 @@ export const testAiModel = <ThrowOnError extends boolean = false>(options: Optio
 export const getAiUsage = <ThrowOnError extends boolean = false>(options?: Options<GetAiUsageData, ThrowOnError>): RequestResult<GetAiUsageResponses, GetAiUsageErrors, ThrowOnError> => (options?.client ?? client).get<GetAiUsageResponses, GetAiUsageErrors, ThrowOnError>({ url: '/api/v1/ai/usage', ...options });
 
 /**
+ * Get Approval Status
+ *
+ * Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`.
+ */
+export const getApprovalStatus = <ThrowOnError extends boolean = false>(options?: Options<GetApprovalStatusData, ThrowOnError>): RequestResult<GetApprovalStatusResponses, GetApprovalStatusErrors, ThrowOnError> => (options?.client ?? client).get<GetApprovalStatusResponses, GetApprovalStatusErrors, ThrowOnError>({ url: '/api/v1/auth/approval-status', ...options });
+
+/**
  * Change Password
  */
 export const changePassword = <ThrowOnError extends boolean = false>(options: Options<ChangePasswordData, ThrowOnError>): RequestResult<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError> => (options.client ?? client).post<ChangePasswordResponses, ChangePasswordErrors, ThrowOnError>({
@@ -125,7 +132,46 @@ export const googleCallback = <ThrowOnError extends boolean = false>(options?: O
 export const googleLogin = <ThrowOnError extends boolean = false>(options?: Options<GoogleLoginData, ThrowOnError>): RequestResult<unknown, GoogleLoginErrors, ThrowOnError> => (options?.client ?? client).get<unknown, GoogleLoginErrors, ThrowOnError>({ url: '/api/v1/auth/google/login', ...options });
 
 /**
+ * Stop Impersonation
+ *
+ * Termina a impersonação e devolve a sessão ao administrador real (o cookie de acesso passa a ser o dele).
+ */
+export const stopImpersonation = <ThrowOnError extends boolean = false>(options?: Options<StopImpersonationData, ThrowOnError>): RequestResult<StopImpersonationResponses, StopImpersonationErrors, ThrowOnError> => (options?.client ?? client).post<StopImpersonationResponses, StopImpersonationErrors, ThrowOnError>({ url: '/api/v1/auth/impersonation/stop', ...options });
+
+/**
+ * Accept Invitation
+ *
+ * Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.
+ * O token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email.
+ */
+export const acceptInvitation = <ThrowOnError extends boolean = false>(options: Options<AcceptInvitationData, ThrowOnError>): RequestResult<AcceptInvitationResponses, AcceptInvitationErrors, ThrowOnError> => (options.client ?? client).post<AcceptInvitationResponses, AcceptInvitationErrors, ThrowOnError>({
+    url: '/api/v1/auth/invitations/accept',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Preview Invitation
+ *
+ * Mostra a quem foi o convite (email, papel, quem convidou) para a página de aceitar. Só com um token válido.
+ */
+export const previewInvitation = <ThrowOnError extends boolean = false>(options: Options<PreviewInvitationData, ThrowOnError>): RequestResult<PreviewInvitationResponses, PreviewInvitationErrors, ThrowOnError> => (options.client ?? client).post<PreviewInvitationResponses, PreviewInvitationErrors, ThrowOnError>({
+    url: '/api/v1/auth/invitations/preview',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Login
+ *
+ * Credenciais erradas: sempre a mesma resposta. Além do limite por IP, há um limite de falhas por CONTA
+ * (independente do IP), que também responde igual para emails que não existem.
  */
 export const login = <ThrowOnError extends boolean = false>(options: Options<LoginData, ThrowOnError>): RequestResult<LoginResponses, LoginErrors, ThrowOnError> => (options.client ?? client).post<LoginResponses, LoginErrors, ThrowOnError>({
     url: '/api/v1/auth/login',
@@ -178,6 +224,9 @@ export const verifyMagicLink = <ThrowOnError extends boolean = false>(options: O
 
 /**
  * Get Me
+ *
+ * O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado
+ * e `impersonation` traz o administrador real. Para administradores traz `pending_approvals`.
  */
 export const getMe = <ThrowOnError extends boolean = false>(options?: Options<GetMeData, ThrowOnError>): RequestResult<GetMeResponses, GetMeErrors, ThrowOnError> => (options?.client ?? client).get<GetMeResponses, GetMeErrors, ThrowOnError>({ url: '/api/v1/auth/me', ...options });
 
@@ -1114,17 +1163,127 @@ export const analyseGarment = <ThrowOnError extends boolean = false>(options: Op
 /**
  * List Users
  *
- * Platform accounts (admins only).
+ * Platform accounts (admins only). `approval_status=pending` is the «Pendentes» tab.
  */
 export const listUsers = <ThrowOnError extends boolean = false>(options?: Options<ListUsersData, ThrowOnError>): RequestResult<ListUsersResponses, ListUsersErrors, ThrowOnError> => (options?.client ?? client).get<ListUsersResponses, ListUsersErrors, ThrowOnError>({ url: '/api/v1/users', ...options });
 
 /**
+ * List Audit
+ *
+ * Registo de auditoria da administração (convites, eliminações, impersonação, papéis), do mais recente.
+ */
+export const listAudit = <ThrowOnError extends boolean = false>(options?: Options<ListAuditData, ThrowOnError>): RequestResult<ListAuditResponses, ListAuditErrors, ThrowOnError> => (options?.client ?? client).get<ListAuditResponses, ListAuditErrors, ThrowOnError>({ url: '/api/v1/users/audit', ...options });
+
+/**
+ * List Invitations
+ *
+ * Convites enviados (pendentes, aceites, expirados, revogados), do mais recente.
+ */
+export const listInvitations = <ThrowOnError extends boolean = false>(options?: Options<ListInvitationsData, ThrowOnError>): RequestResult<ListInvitationsResponses, ListInvitationsErrors, ThrowOnError> => (options?.client ?? client).get<ListInvitationsResponses, ListInvitationsErrors, ThrowOnError>({ url: '/api/v1/users/invitations', ...options });
+
+/**
+ * Create Invitation
+ *
+ * Invite someone by email with a role. 409 if the email already has an account or a pending invitation.
+ * `role=admin` needs `confirm_admin: true`. The link is valid for 7 days and works once.
+ */
+export const createInvitation = <ThrowOnError extends boolean = false>(options: Options<CreateInvitationData, ThrowOnError>): RequestResult<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError> => (options.client ?? client).post<CreateInvitationResponses, CreateInvitationErrors, ThrowOnError>({
+    url: '/api/v1/users/invitations',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Resend Invitation
+ *
+ * New link and new deadline; the previous link stops working.
+ */
+export const resendInvitation = <ThrowOnError extends boolean = false>(options: Options<ResendInvitationData, ThrowOnError>): RequestResult<ResendInvitationResponses, ResendInvitationErrors, ThrowOnError> => (options.client ?? client).post<ResendInvitationResponses, ResendInvitationErrors, ThrowOnError>({ url: '/api/v1/users/invitations/{invitation_id}/resend', ...options });
+
+/**
+ * Revoke Invitation
+ *
+ * The link stops working. Accepted invitations cannot be revoked.
+ */
+export const revokeInvitation = <ThrowOnError extends boolean = false>(options: Options<RevokeInvitationData, ThrowOnError>): RequestResult<RevokeInvitationResponses, RevokeInvitationErrors, ThrowOnError> => (options.client ?? client).post<RevokeInvitationResponses, RevokeInvitationErrors, ThrowOnError>({ url: '/api/v1/users/invitations/{invitation_id}/revoke', ...options });
+
+/**
+ * Get Users Summary
+ *
+ * Counters for the menu badge.
+ */
+export const getUsersSummary = <ThrowOnError extends boolean = false>(options?: Options<GetUsersSummaryData, ThrowOnError>): RequestResult<GetUsersSummaryResponses, GetUsersSummaryErrors, ThrowOnError> => (options?.client ?? client).get<GetUsersSummaryResponses, GetUsersSummaryErrors, ThrowOnError>({ url: '/api/v1/users/summary', ...options });
+
+/**
+ * Delete User
+ *
+ * Permanently delete an account and its personal data (GDPR). The body repeats the target's email.
+ * Not allowed on yourself, on the last active admin, or on someone being impersonated. Audited.
+ */
+export const deleteUser = <ThrowOnError extends boolean = false>(options: Options<DeleteUserData, ThrowOnError>): RequestResult<DeleteUserResponses, DeleteUserErrors, ThrowOnError> => (options.client ?? client).delete<DeleteUserResponses, DeleteUserErrors, ThrowOnError>({
+    url: '/api/v1/users/{user_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Update User
  *
- * Change role or activate/deactivate an account. Admins cannot change themselves.
+ * Change role or activate/deactivate an account. Admins cannot change themselves; the last active admin cannot
+ * be demoted or deactivated; granting `admin` needs `confirm_admin: true`. Audited.
  */
 export const updateUser = <ThrowOnError extends boolean = false>(options: Options<UpdateUserData, ThrowOnError>): RequestResult<UpdateUserResponses, UpdateUserErrors, ThrowOnError> => (options.client ?? client).patch<UpdateUserResponses, UpdateUserErrors, ThrowOnError>({
     url: '/api/v1/users/{user_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Approve User
+ *
+ * Approve a pending (or rejected) account and set its role. `role=admin` needs `confirm_admin`. Emails the user
+ * unless `notify=false`. Audited.
+ */
+export const approveUser = <ThrowOnError extends boolean = false>(options: Options<ApproveUserData, ThrowOnError>): RequestResult<ApproveUserResponses, ApproveUserErrors, ThrowOnError> => (options.client ?? client).post<ApproveUserResponses, ApproveUserErrors, ThrowOnError>({
+    url: '/api/v1/users/{user_id}/approve',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Start Impersonation
+ *
+ * See the app as a non-admin user for a fixed, non-renewable period. A reason (10+ characters) is required.
+ * The access cookie becomes the impersonation session; `POST /auth/impersonation/stop` gives it back.
+ */
+export const startImpersonation = <ThrowOnError extends boolean = false>(options: Options<StartImpersonationData, ThrowOnError>): RequestResult<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError> => (options.client ?? client).post<StartImpersonationResponses, StartImpersonationErrors, ThrowOnError>({
+    url: '/api/v1/users/{user_id}/impersonate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Reject User
+ *
+ * Reject a pending account (optional reason shown to the person; optional neutral email). Audited.
+ */
+export const rejectUser = <ThrowOnError extends boolean = false>(options: Options<RejectUserData, ThrowOnError>): RequestResult<RejectUserResponses, RejectUserErrors, ThrowOnError> => (options.client ?? client).post<RejectUserResponses, RejectUserErrors, ThrowOnError>({
+    url: '/api/v1/users/{user_id}/reject',
     ...options,
     headers: {
         'Content-Type': 'application/json',

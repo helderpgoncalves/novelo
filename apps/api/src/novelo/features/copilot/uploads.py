@@ -3,9 +3,11 @@
 import asyncio
 
 from fastapi import UploadFile
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.ai.catalog import ModelCatalog
+from novelo.core.config import get_settings
 from novelo.features.copilot import attachments as att
 from novelo.features.copilot.models import CopilotAttachment
 from novelo.features.copilot.schemas import AttachmentOut
@@ -23,11 +25,28 @@ async def model_sees_images(db: AsyncSession, catalog: ModelCatalog) -> bool:
     return bool(found and found.supports_image)
 
 
+async def _stored(db: AsyncSession, user: User) -> tuple[int, int]:
+    """Anexos e bytes que o utilizador já tem guardados."""
+    count, used = (
+        await db.execute(
+            select(func.count(), func.coalesce(func.sum(CopilotAttachment.size_bytes), 0)).where(
+                CopilotAttachment.user_id == user.id
+            )
+        )
+    ).one()
+    return int(count), int(used)
+
+
 async def upload(db: AsyncSession, user: User, files: list[UploadFile], catalog: ModelCatalog) -> list[AttachmentOut]:
     if not files:
         raise att.AttachmentError("No files received")
     if len(files) > att.MAX_FILES:
         raise att.AttachmentError(f"At most {att.MAX_FILES} files per upload")
+    s = get_settings()
+    stored_count, stored_bytes = await _stored(db, user)
+    if stored_count + len(files) > s.copilot_attachments_per_user:
+        raise att.AttachmentError(f"Attachment limit reached ({s.copilot_attachments_per_user} files)")
+    cap = s.copilot_attachments_max_mb * 1024 * 1024
     can_see = await model_sees_images(db, catalog)
     rows: list[CopilotAttachment] = []
     images: list[tuple[CopilotAttachment, bytes]] = []
@@ -44,6 +63,9 @@ async def upload(db: AsyncSession, user: User, files: list[UploadFile], catalog:
             user_id=user.id, kind=out.kind, filename=name, mime=out.mime, size_bytes=len(data),
             preview=out.preview, meta=out.meta, data=out.data,
         )  # fmt: skip
+        stored_bytes += len(data)
+        if stored_bytes > cap:
+            raise att.AttachmentError(f"Attachment storage limit reached ({s.copilot_attachments_max_mb} MB)")
         rows.append(row)
         if out.image_jpeg is not None:
             images.append((row, out.image_jpeg))

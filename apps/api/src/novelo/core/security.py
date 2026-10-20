@@ -1,11 +1,15 @@
 """Passwords (argon2id), JWT de sessão e tokens opacos de uso único."""
 
+import asyncio
 import hashlib
 import secrets
 import uuid
+import weakref
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import anyio
+import anyio.to_thread
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import InvalidHashError, VerificationError
@@ -27,6 +31,29 @@ def verify_password(plain: str, hashed: str) -> bool:
         return False
 
 
+# Argon2 usa ~64 MiB e ~50 ms de CPU: corre numa thread (não bloqueia o event loop) e com poucos em simultâneo.
+_HASH_CONCURRENCY = 4
+_hash_limiters: "weakref.WeakKeyDictionary[asyncio.AbstractEventLoop, anyio.CapacityLimiter]" = (
+    weakref.WeakKeyDictionary()
+)
+
+
+def _hash_limiter() -> anyio.CapacityLimiter:
+    loop = asyncio.get_running_loop()
+    limiter = _hash_limiters.get(loop)
+    if limiter is None:
+        limiter = _hash_limiters[loop] = anyio.CapacityLimiter(_HASH_CONCURRENCY)
+    return limiter
+
+
+async def hash_password_async(plain: str) -> str:
+    return await anyio.to_thread.run_sync(hash_password, plain, limiter=_hash_limiter())
+
+
+async def verify_password_async(plain: str, hashed: str) -> bool:
+    return await anyio.to_thread.run_sync(verify_password, plain, hashed, limiter=_hash_limiter())
+
+
 def needs_rehash(hashed: str) -> bool:
     return _hasher.check_needs_rehash(hashed)
 
@@ -40,6 +67,14 @@ def _encode(claims: dict[str, Any], lifetime: timedelta) -> str:
 def create_access_token(user_id: uuid.UUID, role: str) -> str:
     minutes = get_settings().access_token_minutes
     return _encode({"sub": str(user_id), "role": role, "type": "access"}, timedelta(minutes=minutes))
+
+
+def create_impersonation_token(
+    user_id: uuid.UUID, role: str, admin_id: uuid.UUID, session_id: uuid.UUID, minutes: int
+) -> str:
+    """Sessão de impersonação: acesso ao alvo (`sub`) com o administrador real em `imp`. Sem refresh, expiração fixa."""
+    claims = {"sub": str(user_id), "role": role, "type": "access", "imp": str(admin_id), "sid": str(session_id)}
+    return _encode(claims, timedelta(minutes=minutes))
 
 
 def create_refresh_token(user_id: uuid.UUID, remember: bool = True) -> str:

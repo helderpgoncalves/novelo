@@ -269,7 +269,9 @@ def build_social(g: Geometry) -> None:
 
 # --- 5. Email ---------------------------------------------------------------------------------------
 def build_email(g: Geometry) -> None:
-    # cabeçalho escuro (Tinta); 264 px de largura = @2x de 132 px (LOGO_WIDTH_PX em auth/email_layout.py)
+    # 264 px de largura = @2x; mostrado a 120 px (LOGO_WIDTH_PX em auth/email_layout.py).
+    # O cabeçalho é claro (positivo); o negativo só entra no modo escuro dos clientes de email.
+    write(PUBLIC / "email/novelo-logotipo.png", rsvg(lockup_svg(g, PALETTES["positivo"]), 264))
     write(PUBLIC / "email/novelo-logotipo-negativo.png", rsvg(lockup_svg(g, PALETTES["negativo"]), 264))
 
 

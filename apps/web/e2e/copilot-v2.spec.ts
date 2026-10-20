@@ -1,5 +1,5 @@
 import { expect, type Page, request, test } from '@playwright/test';
-import { login, PASSWORD, uniqueEmail } from './helpers';
+import { approveByEmail, login, PASSWORD, uniqueEmail } from './helpers';
 
 // O copiloto v2 de ponta a ponta, com a API real e o modelo real (a chave OpenRouter está no servidor).
 // Uma conta nova para o ficheiro todo: memória, histórico e dados começam vazios e podem ser apagados no fim.
@@ -19,6 +19,7 @@ test.beforeAll(async () => {
   });
   expect(res.ok()).toBeTruthy();
   await api.dispose();
+  await approveByEmail(user.email); // contas novas esperam por aprovação
 });
 
 const composer = (page: Page) => page.getByRole('combobox', { name: 'Pergunta ao copiloto' });

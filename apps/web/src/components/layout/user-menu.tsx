@@ -1,8 +1,8 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Download, LogOut, Route as RouteIcon, UserRound } from 'lucide-react';
+import { Download, Eye, LogOut, Route as RouteIcon, UserRound } from 'lucide-react';
 import { useState } from 'react';
-import type { UserOut } from '@/client';
+import type { MeOut } from '@/client';
 import { logoutMutation } from '@/client/@tanstack/react-query.gen';
 import { InstallIosDialog } from '@/components/install-ios-dialog';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
@@ -16,12 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useEndImpersonation } from '@/features/impersonation/impersonation-banner';
+import { useImpersonation } from '@/features/impersonation/use-impersonation';
 import { openTour } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
 
-const initials = (user: UserOut) =>
+const initials = (user: MeOut) =>
   (user.name ?? user.email)
     .split(/[\s@.]+/)
     .filter(Boolean)
@@ -29,10 +31,12 @@ const initials = (user: UserOut) =>
     .map((part) => part[0]?.toUpperCase())
     .join('');
 
-export function UserMenu({ user }: { user: UserOut }) {
+export function UserMenu({ user }: { user: MeOut }) {
   const navigate = useNavigate();
   const { canInstall, needsIosSteps, install } = useInstallPrompt();
   const [iosHelp, setIosHelp] = useState(false);
+  const imp = useImpersonation();
+  const { end: endImpersonation } = useEndImpersonation();
   const logout = useMutation({
     ...logoutMutation(),
     onSettled: async () => {
@@ -74,6 +78,17 @@ export function UserMenu({ user }: { user: UserOut }) {
               {user.name ?? m.user_menu_default_name()}
             </p>
             <p className="truncate font-normal text-muted-foreground text-xs">{user.email}</p>
+            {imp.active && (
+              <>
+                <Badge className="mt-1 gap-1 bg-areia text-[#14211d] text-[10px] uppercase hover:bg-areia">
+                  <Eye aria-hidden="true" />
+                  {m.imp_menu_title()}
+                </Badge>
+                <p className="whitespace-normal pt-1 font-normal text-muted-foreground text-xs leading-relaxed">
+                  {m.imp_menu_note({ admin: imp.adminName ?? '' })}
+                </p>
+              </>
+            )}
             {user.role === 'guest' && (
               <>
                 <Badge variant="secondary" className="mt-1 text-[10px] uppercase">
@@ -98,9 +113,18 @@ export function UserMenu({ user }: { user: UserOut }) {
             </DropdownMenuItem>
           )}
           <DropdownMenuSeparator />
-          <DropdownMenuItem variant="destructive" onSelect={() => logout.mutate({})}>
-            <LogOut /> {m.user_menu_logout()}
-          </DropdownMenuItem>
+          {imp.active ? (
+            <DropdownMenuItem
+              variant="destructive"
+              onSelect={() => void endImpersonation('stopped')}
+            >
+              <LogOut /> {m.imp_exit()}
+            </DropdownMenuItem>
+          ) : (
+            <DropdownMenuItem variant="destructive" onSelect={() => logout.mutate({})}>
+              <LogOut /> {m.user_menu_logout()}
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <InstallIosDialog open={iosHelp} onOpenChange={setIosHelp} />

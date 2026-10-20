@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Menu } from 'lucide-react';
-import type { UserOut } from '@/client';
+import type { MeOut } from '@/client';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -18,7 +18,7 @@ export function Topbar({
   showMenuButton,
   onMenuClick,
 }: {
-  user: UserOut;
+  user: MeOut;
   showMenuButton: boolean;
   onMenuClick: () => void;
 }) {

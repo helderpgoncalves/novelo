@@ -19,7 +19,15 @@
     <!-- "default": barra de estado opaca que o iOS pinta (texto escuro/claro) segundo o modo do sistema, por isso
          nunca fica ilegível. black-translucent sobreporia a app à barra com texto SEMPRE branco, ilegível no tema claro. -->
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-    <meta name="description" content="Novelo: recolha seletiva de têxteis de Guimarães, desenhada ao menor custo." />
+    <meta
+      name="description"
+      content="Novelo desenha a rede de recolha seletiva de têxteis de Guimarães ao menor custo: orçamento e meta entram, saem cenários comparáveis em euros, toneladas e €/t."
+    />
+    <link rel="canonical" href="https://novelo.helder.si/" />
+    <link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/" />
+    <link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/" />
+    <link rel="alternate" hreflang="x-default" href="https://novelo.helder.si/" />
+    <meta property="og:url" content="https://novelo.helder.si/" />
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="Novelo" />
     <meta property="og:title" content="Novelo: recolha seletiva de têxteis, desenhada ao menor custo" />
@@ -29,7 +37,7 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://novelo.helder.si/og-image.png" />
-    <title>Novelo</title>
+    <title>Novelo: recolha seletiva de têxteis, desenhada ao menor custo</title>
     <style>
       html { background: #f4f1ea; }
       html.dark { background: #0f1815; }
@@ -45,21 +53,20 @@
     </style>
   </head>
   <body>
-    <script>
-      // Aplica o tema guardado antes da primeira pintura (sem flash).
-      (function () {
-        try {
-          var stored = localStorage.getItem('novelo-theme');
-          var dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
-          if (dark) document.documentElement.classList.add('dark');
-          if (stored) {
-            var metas = document.querySelectorAll('meta[name="theme-color"]');
-            for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', dark ? '#0F1815' : '#F4F1EA');
-          }
-        } catch (e) {}
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
     <div id="root"><div class="boot-splash" role="status" aria-label="A carregar"><!-- brand:splash:start --><svg class="boot-splash-mark" viewBox="-418 -351.32 836 769.32" width="56" height="51.533" aria-hidden="true"><path class="a1" d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a2" d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71" fill="none" stroke-width="56" stroke-linecap="round"/><path class="a3" d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32" fill="none" stroke-width="56" stroke-linecap="round"/><path class="dot" d="M0 -92.0A92.0 92.0 0 1 1 0 92.0A92.0 92.0 0 1 1 0 -92.0ZM0 -38.0A38.0 38.0 0 1 0 0 38.0A38.0 38.0 0 1 0 0 -38.0Z" fill-rule="evenodd"/></svg><!-- brand:splash:end --></div></div>
+    <!-- Sem JavaScript (e para quem só lê o HTML, como verificadores): nome, descrição e ligações legais. -->
+    <noscript>
+      <main style="max-width: 40rem; margin: 0 auto; padding: 2rem 1rem; font-family: system-ui, sans-serif; line-height: 1.5">
+        <h1>Novelo</h1>
+        <p>Recolha seletiva de têxteis de Guimarães, desenhada ao menor custo. Novelo needs JavaScript to run.</p>
+        <p>
+          <a href="/pt/login">Entrar</a> · <a href="/pt/privacy">Política de Privacidade</a> ·
+          <a href="/pt/terms">Termos de Utilização</a> · <a href="/en/privacy">Privacy Policy</a> ·
+          <a href="/en/terms">Terms of Use</a> · <a href="mailto:novelo@heldergoncalves.io">novelo@heldergoncalves.io</a>
+        </p>
+      </main>
+    </noscript>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

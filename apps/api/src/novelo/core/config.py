@@ -34,6 +34,12 @@ class Settings(BaseSettings):
     database_url: str = Field("postgresql+asyncpg://novelo:novelo@localhost:5590/novelo", alias="DATABASE_URL")
     data_dir: Path = Field(_REPO_ROOT / "data" / "processed", alias="DATA_DIR")
     cors_origins: list[str] = Field(["http://localhost:3190"], alias="CORS_ORIGINS")
+    # IP real do cliente (core/ratelimit.py `client_ip`). Nº de proxies de confiança À FRENTE da API que acrescentam
+    # o IP que os liga a `X-Forwarded-For` (produção: nginx e Traefik = 2). 0 = ignora cabeçalhos e usa o par TCP.
+    trusted_proxy_hops: int = Field(0, ge=0, le=10, alias="TRUSTED_PROXY_HOPS")
+    # Aceita `CF-Connecting-IP` só quando o salto mais externo de confiança é um IP publicado da Cloudflare.
+    trust_cloudflare_header: bool = Field(False, alias="TRUST_CLOUDFLARE_HEADER")
+    web_concurrency: int = Field(1, ge=1, alias="WEB_CONCURRENCY")  # processos do uvicorn (limites valem por processo)
 
     # LLM via OpenRouter (API compatível com OpenAI). Sem chave, as features de IA ficam desligadas.
     openrouter_api_key: str = Field("", alias="OPENROUTER_API_KEY")
@@ -81,6 +87,22 @@ class Settings(BaseSettings):
     guest_ai_budget_usd: float = Field(
         0.5, ge=0, alias="GUEST_AI_BUDGET_USD"
     )  # por convidado, últimas 24 h; 0 = sem limite
+    # Tetos GLOBAIS do evento (independentes do IP e do convidado): criação de convidados por hora e gasto de IA
+    # de todos os convidados nas últimas 24 h. 0 = sem limite.
+    guest_signups_per_hour: int = Field(200, ge=0, alias="GUEST_SIGNUPS_PER_HOUR")
+    guest_ai_global_budget_usd: float = Field(5.0, ge=0, alias="GUEST_AI_GLOBAL_BUDGET_USD")
+    # Rotas caras: execuções por utilizador e por minuto, e concorrência global (por processo).
+    solver_runs_per_minute: int = Field(6, ge=1, alias="SOLVER_RUNS_PER_MINUTE")
+    solver_max_concurrency: int = Field(2, ge=1, le=16, alias="SOLVER_MAX_CONCURRENCY")
+    pdf_max_concurrency: int = Field(2, ge=1, le=16, alias="PDF_MAX_CONCURRENCY")
+    login_account_max_failures: int = Field(10, ge=1, alias="LOGIN_ACCOUNT_MAX_FAILURES")  # por conta, 15 min
+    # Anexos do copiloto: teto por utilizador (ficheiros e bytes guardados).
+    copilot_attachments_per_user: int = Field(100, ge=1, alias="COPILOT_ATTACHMENTS_PER_USER")
+    copilot_attachments_max_mb: int = Field(50, ge=1, alias="COPILOT_ATTACHMENTS_MAX_MB")
+    # Administração de utilizadores: convites por email e impersonação (ver docs/engenharia/arquitetura.md, segurança).
+    invitation_days: int = Field(7, ge=1, le=30, alias="INVITATION_EXPIRE_DAYS")
+    invitations_per_hour: int = Field(30, ge=1, alias="INVITATIONS_PER_HOUR")  # por administrador
+    impersonation_minutes: int = Field(30, ge=5, le=120, alias="IMPERSONATION_MINUTES")  # fixo, sem renovação
     admin_email: str = Field("", alias="ADMIN_EMAIL")
     admin_password: str = Field("", alias="ADMIN_PASSWORD")
 

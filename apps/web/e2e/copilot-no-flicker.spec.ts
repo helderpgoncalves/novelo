@@ -1,6 +1,6 @@
 import { expect, type Page, request, test } from '@playwright/test';
 import { errorSightings, watchForErrors } from './error-watch';
-import { login, PASSWORD, uniqueEmail } from './helpers';
+import { approveByEmail, login, PASSWORD, uniqueEmail } from './helpers';
 
 // Regressão: ao acabar a geração o copiloto não pode mostrar, nem por um frame, nenhum elemento de erro.
 // O MutationObserver apanha o que um screenshot não apanha (um erro que vive 1 ms).
@@ -15,6 +15,7 @@ test.beforeAll(async () => {
   });
   expect(res.ok()).toBeTruthy();
   await api.dispose();
+  await approveByEmail(user.email); // contas novas esperam por aprovação
 });
 
 test.beforeEach(() => test.setTimeout(150_000));

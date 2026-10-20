@@ -3,6 +3,7 @@ import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { BootSplash } from '@/components/app-loading';
 import { BrandLogo, BrandSymbol } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { m } from '@/paraglide/messages';
 
@@ -12,7 +13,8 @@ export const Route = createFileRoute('/_auth')({
     const user = await queryClient
       .fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false })
       .catch(() => null);
-    if (user) throw redirect({ to: '/' });
+    if (user)
+      throw redirect({ to: user.approval_status === 'approved' ? '/' : '/pending-approval' });
   },
   pendingComponent: BootSplash,
   pendingMs: 0,
@@ -64,7 +66,10 @@ function AuthLayout() {
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-10">
           <Outlet />
         </div>
-        <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
+        <div className="flex flex-col items-center gap-2">
+          <LegalLinks className="text-sm [&_ul]:justify-center" />
+          <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
+        </div>
       </main>
     </div>
   );

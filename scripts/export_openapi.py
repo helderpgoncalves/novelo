@@ -1,6 +1,7 @@
 """Escreve openapi.json na raiz a partir de create_app(), sem arrancar o servidor.
 
-Uso: `just gen` (corre isto e depois o hey-api no web).
+Uso: `just gen` (corre isto e depois o hey-api no web). Com um argumento escreve nesse caminho em vez de
+na raiz (usado por `just check-contract`, que compara sem tocar nos ficheiros do repositório).
 """
 
 import json
@@ -15,7 +16,8 @@ os.environ.setdefault("APP_ENV", "development")  # o OpenAPI só é exposto fora
 from novelo.main import create_app  # noqa: E402
 
 spec = create_app().openapi()
-(ROOT / "openapi.json").write_text(
+target = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "openapi.json"
+target.write_text(
     json.dumps(spec, ensure_ascii=False, indent=2, sort_keys=True) + "\n", encoding="utf-8"
 )
 print(f"openapi.json: {len(spec['paths'])} rotas")

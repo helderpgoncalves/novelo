@@ -2,11 +2,12 @@ import re
 from datetime import UTC, datetime, timedelta
 
 import httpx
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.security import hash_token
 from novelo.features.auth.models import PasswordResetToken
+from novelo.features.users.models import User
 from tests.conftest import PASSWORD, OutboxSender
 
 AUTH = "/api/v1/auth"
@@ -181,12 +182,16 @@ async def test_errors_have_stable_typed_codes(client: httpx.AsyncClient) -> None
     assert token.json()["code"] == "invalid_token"
 
 
-async def test_emails_follow_the_account_language(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
+async def test_emails_follow_the_account_language(
+    client: httpx.AsyncClient, outbox: OutboxSender, session: AsyncSession
+) -> None:
     await client.post(f"{AUTH}/register", json={"email": "a@b.pt", "password": PASSWORD, "locale": "en"})
-    assert outbox.sent[0]["subject"] == "Confirm your email on Novelo"
+    assert outbox.sent[0]["subject"] == "Confirm your email · Novelo"
     assert (await client.get(f"{AUTH}/me")).json()["locale"] == "en"
+    await session.execute(update(User).where(User.email == "a@b.pt").values(approval_status="approved"))
+    await session.commit()  # o registo público fica pendente: aprovar para poder editar o perfil
     patched = await client.patch(f"{AUTH}/me", json={"locale": "pt-PT"})
     assert patched.json()["locale"] == "pt-PT"
     outbox.sent.clear()
     await client.post(f"{AUTH}/forgot-password", json={"email": "a@b.pt", "locale": "en"})
-    assert outbox.sent[0]["subject"] == "Redefine a tua password do Novelo"  # a preferência da conta tem prioridade
+    assert outbox.sent[0]["subject"] == "Redefine a tua password · Novelo"  # a preferência da conta tem prioridade

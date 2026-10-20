@@ -7,6 +7,7 @@ import {
   MapPinned,
   MessagesSquare,
 } from 'lucide-react';
+import { usePendingApprovals } from '@/features/users/use-pending-approvals';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
@@ -39,6 +40,7 @@ const isActive = (pathname: string, to: Tab['to']) =>
 export function TabBar({ onMore }: { onMore: () => void }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const inTabs = TABS.some((t) => isActive(pathname, t.to));
+  const pending = usePendingApprovals();
 
   return (
     <nav
@@ -67,11 +69,30 @@ export function TabBar({ onMore }: { onMore: () => void }) {
           <button
             type="button"
             onClick={onMore}
-            aria-label={m.nav_more_aria()}
+            aria-label={
+              pending > 0
+                ? `${m.nav_more_aria()}. ${m.nav_pending_aria({ count: pending })}`
+                : m.nav_more_aria()
+            }
             aria-haspopup="dialog"
             className={cn(itemClass, !inTabs && 'bg-primary/10 text-primary')}
           >
-            <LayoutGrid className="size-5" aria-hidden="true" strokeWidth={!inTabs ? 2.25 : 1.75} />
+            <span className="relative">
+              <LayoutGrid
+                className="size-5"
+                aria-hidden="true"
+                strokeWidth={!inTabs ? 2.25 : 1.75}
+              />
+              {pending > 0 && (
+                <span
+                  aria-hidden="true"
+                  data-testid="pending-badge-more"
+                  className="-top-1.5 -right-2.5 absolute grid h-4 min-w-4 place-items-center rounded-full bg-areia px-1 font-semibold text-[#14211d] text-[10px] tabular-nums"
+                >
+                  {pending > 99 ? '99+' : pending}
+                </span>
+              )}
+            </span>
             <span>{m.nav_more()}</span>
           </button>
         </li>

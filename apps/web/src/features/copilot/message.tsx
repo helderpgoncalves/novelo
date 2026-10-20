@@ -346,7 +346,6 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
       {message.retracted && streaming && !message.text && (
         <p className="text-muted-foreground text-sm italic">{m.chat_retracted()}</p>
       )}
-      {streaming && <ThinkingLine status={status} />}
 
       {message.cards.length > 0 && (
         <div className="grid gap-3">
@@ -407,6 +406,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
           onRetry={last && chat ? () => void chat.retry() : null}
         />
       )}
+      {streaming && <ThinkingLine status={status} message={message} />}
       {message.state === 'cancelled' && (
         <p className="text-muted-foreground text-xs italic">{m.chat_cancelled()}</p>
       )}

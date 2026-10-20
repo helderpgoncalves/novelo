@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
-from novelo.core.guest import AiGuard
+from novelo.core.guest import AiGuard, PdfGuard
 from novelo.features.lots.router import get_llm
 from novelo.features.reports import service
 from novelo.features.reports.schemas import ReportOut, ReportRequest
@@ -18,7 +18,7 @@ Db = Annotated[AsyncSession, Depends(get_db)]
 Llm = Annotated[OpenRouterClient, Depends(get_llm)]
 
 
-@router.post("/rap", response_model=ReportOut, status_code=201, dependencies=[AiGuard])
+@router.post("/rap", response_model=ReportOut, status_code=201, dependencies=[AiGuard, PdfGuard])
 async def create_rap_report(body: ReportRequest, user: CurrentUser, db: Db, llm: Llm) -> ReportOut:
     """Gera o relatório RAP em PDF para 1 a 3 cenários (custo por território, material, marcas, método).
 

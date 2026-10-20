@@ -19,6 +19,7 @@ import { m } from '@/paraglide/messages';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { PASSWORD_MIN, type ResetValues, resetSchema } from './schemas';
+import { useTurnstile } from './use-turnstile';
 
 export function ResetForm({ token }: { token: string }) {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export function ResetForm({ token }: { token: string }) {
     resolver: zodResolver(resetSchema),
     defaultValues: { password: '', confirm: '' },
   });
+  const gate = useTurnstile('reset_password');
   const reset = useMutation({
     ...resetPasswordMutation(),
     onSuccess: async () => {
@@ -37,7 +39,12 @@ export function ResetForm({ token }: { token: string }) {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit((v) => reset.mutate({ body: { token, password: v.password } }))}
+        onSubmit={form.handleSubmit((v) =>
+          reset.mutate(
+            { body: { token, password: v.password }, headers: gate.consume() },
+            { onError: gate.onApiError },
+          ),
+        )}
         className="space-y-4"
         noValidate
       >
@@ -76,13 +83,14 @@ export function ResetForm({ token }: { token: string }) {
             </FormItem>
           )}
         />
+        {gate.field}
         <Button
           type="submit"
           className="h-10 w-full font-semibold"
-          disabled={reset.isPending}
+          disabled={reset.isPending || gate.blocked}
           loading={reset.isPending}
         >
-          {m.reset_submit()}
+          {gate.verifying ? m.turnstile_verifying() : m.reset_submit()}
         </Button>
       </form>
     </Form>

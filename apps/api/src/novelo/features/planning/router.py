@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, require_role
-from novelo.core.guest import NotGuest, SolverGuard
+from novelo.core.guest import NotGuest, NotGuestDep, SolverGuard
 from novelo.features.planning import service
 from novelo.features.planning.schemas import (
     ParametersOut,
@@ -63,7 +63,7 @@ async def get_scenario(scenario_id: uuid.UUID, db: Db) -> ScenarioOut:
     return await service.get_scenario(db, scenario_id)
 
 
-@router.patch("/scenarios/{scenario_id}", response_model=ScenarioSummary)
+@router.patch("/scenarios/{scenario_id}", response_model=ScenarioSummary, dependencies=[NotGuestDep])
 async def rename_scenario(scenario_id: uuid.UUID, body: ScenarioRename, db: Db) -> ScenarioSummary:
     return await service.rename_scenario(db, scenario_id, body.label)
 

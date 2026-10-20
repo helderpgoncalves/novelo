@@ -1,6 +1,6 @@
 import { mkdirSync } from 'node:fs';
 import { expect, type Page, request, test } from '@playwright/test';
-import { ADMIN, login, PASSWORD, uniqueEmail } from './helpers';
+import { ADMIN, approveByEmail, login, PASSWORD, uniqueEmail } from './helpers';
 
 // Ecrãs de erro de ponta a ponta: 404, 403, rede, API a reiniciar, versão nova, erro de rota, sessão e formulários.
 // Com E2E_SHOTS=<pasta> também grava capturas (claro/escuro) para revisão visual.
@@ -22,6 +22,7 @@ test.beforeAll(async () => {
   });
   expect(res.ok()).toBeTruthy();
   await api.dispose();
+  await approveByEmail(operator.email); // contas novas esperam por aprovação
 });
 
 async function shot(page: Page, name: string) {

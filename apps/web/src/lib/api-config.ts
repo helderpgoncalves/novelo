@@ -62,8 +62,39 @@ function refreshSession(): Promise<boolean> {
 
 export const SESSION_EXPIRED_EVENT = 'novelo:session-expired';
 
+/** Conta por aprovar ou rejeitada: qualquer pedido protegido responde 403 e a app leva a pessoa ao ecrã de espera. */
+export const APPROVAL_BLOCKED_EVENT = 'novelo:approval-blocked';
+/** Ação recusada porque a sessão é de impersonação (403 `impersonation_blocked`): aviso global de segurança. */
+export const IMPERSONATION_BLOCKED_EVENT = 'novelo:impersonation-blocked';
+
+export type ApprovalBlockedCode = 'account_pending' | 'account_rejected';
+
+/** Lê o código de um 403 sem consumir o corpo que o cliente gerado vai ler. */
+async function announceForbidden(res: Response): Promise<void> {
+  try {
+    const body: unknown = await res.clone().json();
+    const code =
+      typeof body === 'object' && body !== null ? (body as { code?: unknown }).code : null;
+    if (code === 'account_pending' || code === 'account_rejected') {
+      window.dispatchEvent(
+        new CustomEvent<ApprovalBlockedCode>(APPROVAL_BLOCKED_EVENT, { detail: code }),
+      );
+    } else if (code === 'impersonation_blocked') {
+      window.dispatchEvent(new Event(IMPERSONATION_BLOCKED_EVENT));
+    }
+  } catch {
+    // corpo que não é JSON: não é um erro da nossa API
+  }
+}
+
 // fetch com renovação silenciosa da sessão: um 401 tenta o refresh uma vez e repete o pedido.
 export const authFetch: typeof fetch = async (input, init) => {
+  const res = await sessionFetch(input, init);
+  if (res.status === 403) await announceForbidden(res);
+  return res;
+};
+
+const sessionFetch: typeof fetch = async (input, init) => {
   const retry = input instanceof Request ? input.clone() : null;
   const res = typedGatewayError(await fetch(input, init));
   const url = input instanceof Request ? input.url : String(input);

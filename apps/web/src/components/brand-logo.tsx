@@ -76,6 +76,34 @@ export function BrandSymbol({ tone = 'auto', className }: { tone?: Tone; classNa
   );
 }
 
+/**
+ * Símbolo a girar (estados de "a trabalhar"). Caixa quadrada centrada no ponto do símbolo, para rodar sobre o
+ * seu centro sem oscilar. A volta (~1,4 s) está em `.brand-spin` (styles.css); com movimento reduzido vira um
+ * pulso de opacidade subtil. Decorativo: quem o usa anuncia o estado por texto.
+ */
+export function BrandSpinner({
+  tone = 'auto',
+  className,
+  spin = true,
+}: {
+  tone?: Tone;
+  className?: string;
+  /** `false`: só a geometria centrada (para animações próprias, ex.: `.brand-drift`). */
+  spin?: boolean;
+}) {
+  return (
+    <svg
+      viewBox="-420 -420 840 840"
+      className={cn(spin && 'brand-spin', 'size-[18px] shrink-0', className)}
+      aria-hidden="true"
+      focusable="false"
+      data-testid="brand-spinner"
+    >
+      <SymbolMarks tone={tone} />
+    </svg>
+  );
+}
+
 /** Lockup horizontal (símbolo + wordmark) ou empilhado. Dimensiona-se pela altura. */
 export function BrandLogo({
   tone = 'auto',

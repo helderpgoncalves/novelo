@@ -1,0 +1,6 @@
+# Novelo: as páginas públicas são a inicial, a Política de Privacidade e os Termos; o resto exige sessão.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://novelo.helder.si/sitemap.xml

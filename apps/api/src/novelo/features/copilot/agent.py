@@ -58,7 +58,7 @@ from novelo.features.copilot.schemas import (
 from novelo.features.copilot.schemas_memory import CopilotSettings
 from novelo.features.copilot.tables import fold
 from novelo.features.copilot.tools import STATUS_KEYS, CopilotTools, args_summary, status_detail
-from novelo.features.users.models import User
+from novelo.features.users.models import ImpersonationInfo, User
 
 log = logging.getLogger("novelo.copilot")
 _MEMORY_CUE = re.compile(
@@ -704,14 +704,18 @@ def memory_text(thread: CopilotThread, prior: list[CopilotMessage]) -> str:
     return memory.memo_block(thread, memory.recent_digests(prior))
 
 
-async def stream_turn(deps: StreamDeps, user_id: uuid.UUID, turn: PreparedTurn) -> AsyncGenerator[CopilotEvent, None]:
-    """Gerador de eventos de um pedido. Abre a sua própria sessão (vive tanto como o stream)."""
+async def stream_turn(
+    deps: StreamDeps, user_id: uuid.UUID, turn: PreparedTurn, impersonation: ImpersonationInfo | None = None
+) -> AsyncGenerator[CopilotEvent, None]:
+    """Gerador de eventos de um pedido. Abre a sua própria sessão (vive tanto como o stream).
+    `impersonation` vem do pedido HTTP: esta sessão nova não o sabe, e as ações críticas dependem dele."""
     async with deps.session_factory() as db:
         user = await db.get(User, user_id)
         if user is None:
             yield CopilotErrorEvent(code="unauthenticated", message="Account no longer exists")
             yield CopilotDoneEvent(finish="error")
             return
+        user.impersonation = impersonation
         try:
             llm = await deps.make_llm(db, user)
         except (AiBudgetExceededError, FeatureDisabledError) as exc:

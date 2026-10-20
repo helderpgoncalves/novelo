@@ -1,8 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
+import { Info } from 'lucide-react';
 import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { EmptyState } from '@/components/states';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Separator } from '@/components/ui/separator';
 import { GoogleButton } from '@/features/auth/google-button';
 import { RegisterForm } from '@/features/auth/register-form';
@@ -39,9 +41,15 @@ function Register() {
         <h1 className="text-3xl">{m.register_title()}</h1>
         <p className="text-muted-foreground text-sm">{m.register_subtitle()}</p>
       </div>
+      {config.approval_required !== false && (
+        <Alert role="note" data-testid="register-approval-notice">
+          <Info />
+          <AlertDescription>{m.register_approval_notice()}</AlertDescription>
+        </Alert>
+      )}
       {config.google_enabled && (
         <>
-          <GoogleButton next={next} />
+          <GoogleButton next={next} mode="signup" />
           <div className="flex items-center gap-3 text-muted-foreground text-xs">
             <Separator className="flex-1" />
             {m.login_or_email()}

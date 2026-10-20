@@ -9,9 +9,17 @@ from novelo.features.users.schemas import Locale, UserOut
 PASSWORD_MIN = 10
 
 
+def password_problem(value: str) -> str | None:
+    """Motivo pelo qual a password não serve, ou `None`. Fonte única (registo, reset, convite e `seed_admin`)."""
+    if value.strip() != value or len(value) < PASSWORD_MIN or len(value) > 128:
+        return f"Password must be at least {PASSWORD_MIN} characters with no surrounding spaces"
+    return None
+
+
 def _check_password(value: str) -> str:
-    if value.strip() != value or len(value) < PASSWORD_MIN:
-        raise ValueError(f"Password must be at least {PASSWORD_MIN} characters with no surrounding spaces")
+    problem = password_problem(value)
+    if problem:
+        raise ValueError(problem)
     return value
 
 
@@ -67,6 +75,9 @@ class AuthConfig(BaseModel):
     )
     turnstile_site_key: str | None = Field(description="Chave pública do widget; null se o Turnstile não estiver ativo")
     password_min_length: int = PASSWORD_MIN
+    approval_required: bool = Field(
+        default=True, description="Contas novas (password ou Google) ficam à espera de aprovação de um administrador"
+    )
 
 
 class VerifyEmailRequest(BaseModel):
@@ -151,3 +162,30 @@ class GuestPage(BaseModel):
     total: int
     offset: int
     limit: int
+
+
+class InvitationTokenRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+
+
+class AcceptInvitationRequest(BaseModel):
+    token: str = Field(min_length=20, max_length=200)
+    name: str = Field(min_length=1, max_length=120)
+    password: str | None = Field(
+        default=None,
+        max_length=128,
+        description="Opcional: sem password a pessoa entra por link enviado por email",
+    )
+
+    @field_validator("password")
+    @classmethod
+    def _pw(cls, value: str | None) -> str | None:
+        return None if value is None else _check_password(value)
+
+    @field_validator("name")
+    @classmethod
+    def _strip_name(cls, value: str) -> str:
+        value = " ".join(value.split())
+        if not value:
+            raise ValueError("Name must not be blank")
+        return value

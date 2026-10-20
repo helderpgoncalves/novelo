@@ -1,12 +1,20 @@
+import '@/lib/zod-config';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createRouter, RouterProvider } from '@tanstack/react-router';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import { toast } from 'sonner';
+import { getMeQueryKey } from '@/client/@tanstack/react-query.gen';
 import { RouteError } from '@/components/route-error';
 import { RouteSkeleton } from '@/components/skeletons';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { SESSION_EXPIRED_EVENT } from '@/lib/api-config';
+import {
+  APPROVAL_BLOCKED_EVENT,
+  IMPERSONATION_BLOCKED_EVENT,
+  SESSION_EXPIRED_EVENT,
+} from '@/lib/api-config';
+import { getErrorMessage } from '@/lib/errors';
 import { captureInstallPrompt, registerPwa } from '@/lib/pwa';
 import { queryClient } from '@/lib/query-client';
 import { ThemeProvider } from '@/lib/theme';
@@ -59,6 +67,21 @@ window.addEventListener(SESSION_EXPIRED_EVENT, () => {
       search: { next: `${path.pathname}${path.search}`, reason: 'expired' },
     });
   }
+});
+
+// Conta por aprovar ou rejeitada: qualquer 403 `account_pending`/`account_rejected` leva ao ecrã de espera.
+// A cache de `me` descarta-se antes: o guarda das rotas tem de ler o estado real, não o de há 30 s.
+window.addEventListener(APPROVAL_BLOCKED_EVENT, () => {
+  if (deLocalizeUrl(window.location.href).pathname.startsWith('/pending-approval')) return;
+  queryClient.removeQueries({ queryKey: getMeQueryKey() });
+  void router.navigate({ to: '/pending-approval', replace: true });
+});
+
+// Rede de segurança: uma ação bloqueada durante a impersonação (403 `impersonation_blocked`) nunca falha em silêncio.
+window.addEventListener(IMPERSONATION_BLOCKED_EVENT, () => {
+  toast.warning(getErrorMessage({ code: 'impersonation_blocked' }), {
+    id: 'impersonation-blocked',
+  });
 });
 
 // PWA: aviso de versão nova e captura do pedido de instalação (dispara antes de o menu existir).

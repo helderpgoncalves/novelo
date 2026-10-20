@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://novelo.helder.si/pt/</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/"/>
+  </url>
+  <url>
+    <loc>https://novelo.helder.si/en/</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/"/>
+  </url>
+  <url>
+    <loc>https://novelo.helder.si/pt/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/privacy"/>
+  </url>
+  <url>
+    <loc>https://novelo.helder.si/en/privacy</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/privacy"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/privacy"/>
+  </url>
+  <url>
+    <loc>https://novelo.helder.si/pt/terms</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/terms"/>
+  </url>
+  <url>
+    <loc>https://novelo.helder.si/en/terms</loc>
+    <xhtml:link rel="alternate" hreflang="pt-PT" href="https://novelo.helder.si/pt/terms"/>
+    <xhtml:link rel="alternate" hreflang="en" href="https://novelo.helder.si/en/terms"/>
+  </url>
+</urlset>

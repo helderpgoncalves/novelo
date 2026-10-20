@@ -24,7 +24,7 @@ async def test_admin_lists_and_updates_users(client: httpx.AsyncClient, session:
     emails = [u["email"] for u in (await client.get("/api/v1/users")).json()]
     assert {"admin@x.pt", "rui@x.pt"} <= set(emails)
 
-    promoted = await client.patch(f"/api/v1/users/{other.id}", json={"role": "admin"})
+    promoted = await client.patch(f"/api/v1/users/{other.id}", json={"role": "admin", "confirm_admin": True})
     assert promoted.json()["role"] == "admin"
     deactivated = await client.patch(f"/api/v1/users/{other.id}", json={"is_active": False})
     assert deactivated.json()["is_active"] is False

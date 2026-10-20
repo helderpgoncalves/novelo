@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
-from novelo.core.guest import AiGuard
+from novelo.core.guest import AiGuard, NotGuestDep
 from novelo.core.ratelimit import alerts_limiter
 from novelo.features.datasets import ai, service
 from novelo.features.datasets.schemas import AlertSuggestionOut, AlertUpdate, DataAlertOut, DataQuality
@@ -24,7 +24,7 @@ async def get_data_quality(db: Db) -> DataQuality:
     return await service.get_quality(db)
 
 
-@router.patch("/alerts/{alert_id}", response_model=DataAlertOut)
+@router.patch("/alerts/{alert_id}", response_model=DataAlertOut, dependencies=[NotGuestDep])
 async def update_data_alert(alert_id: uuid.UUID, body: AlertUpdate, user: CurrentUser, db: Db) -> DataAlertOut:
     """Marca uma inconsistência como resolvida, ignorada ou volta a abri-la."""
     return await service.update_alert(db, alert_id, body, user)

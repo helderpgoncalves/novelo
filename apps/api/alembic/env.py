@@ -6,6 +6,7 @@ from sqlalchemy import create_engine, pool
 from novelo.core.config import get_settings
 from novelo.core.database import Base
 from novelo.features.ai_admin import models as ai_admin_models  # noqa: F401
+from novelo.features.audit import models as audit_models  # noqa: F401
 from novelo.features.auth import models as auth_models  # noqa: F401
 from novelo.features.copilot import models as copilot_models  # noqa: F401
 from novelo.features.datasets import models as dataset_models  # noqa: F401

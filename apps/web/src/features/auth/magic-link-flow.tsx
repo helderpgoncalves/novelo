@@ -45,7 +45,7 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
     if (!value) return setProblem(m.validation_email_required());
     if (!looksLikeEmail(value)) return setProblem(m.validation_email_invalid());
     setProblem(null);
-    request.mutate({ body: magicLinkBody(value, next) }, { onSuccess: () => setEmail(value) });
+    request.send(magicLinkBody(value, next), { onSuccess: () => setEmail(value) });
   };
 
   return (
@@ -81,13 +81,14 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
             {problem}
           </p>
         </div>
+        {request.gate.field}
         <Button
           type="submit"
           className="h-11 w-full font-semibold"
-          disabled={request.isPending}
+          disabled={request.isPending || request.gate.blocked}
           loading={request.isPending}
         >
-          {m.magic_submit()}
+          {request.gate.verifying ? m.turnstile_verifying() : m.magic_submit()}
         </Button>
       </form>
       {alternatives}

@@ -38,6 +38,8 @@ dev = [
   "openpyxl>=3.1.5",
   "shapely>=2.0",  # só para testar scripts/etl/municipal_containers.py (a imagem de produção não os instala)
   "pyshp>=2.3",
+  "pytest-xdist>=3.8.0",
+  "pytest-randomly>=5.0.0",
 ]
 
 [build-system]
@@ -81,3 +83,10 @@ files = ["src"]
 testpaths = ["tests"]
 asyncio_mode = "auto"
 pythonpath = ["src"]
+# -p no:randomly: ordem fixa por omissão; `just test-shuffle` liga a ordem aleatória (pytest-randomly) para caçar testes frágeis.
+addopts = "-p no:randomly"
+markers = [
+    "solver: usa OR-Tools (CP-SAT ou VRP); no modo rápido o VRP é cortado (NOVELO_TEST_SOLVER=full repõe o limite real)",
+    "llm: caminho de IA/copiloto, sempre com o modelo falso (nunca rede)",
+    "slow: leitura de dados reais, PDF ou ficheiros grandes",
+]

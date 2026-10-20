@@ -1,34 +1,45 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { Eye, KeyRound, Power, PowerOff, Trash2, UserCheck, UserX } from 'lucide-react';
 import { toast } from 'sonner';
-import type { UserAdminOut } from '@/client';
-import { listUsersQueryKey, updateUserMutation } from '@/client/@tanstack/react-query.gen';
+import { type UserAdminOut, updateUser } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
 import { formatDateTime } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { ApprovalBadge, approvalLabel, originLabel, RoleBadge } from './badges';
+import { invalidateAdminQueries } from './cache';
+import { updateBlocker } from './logic';
+import { roleLabel } from './role-picker';
+import { useAccountDialogs } from './use-account-dialogs';
 
-const roleLabel = (role: UserAdminOut['role']) =>
-  role === 'admin'
-    ? m.account_role_admin()
-    : role === 'guest'
-      ? m.account_role_guest()
-      : m.account_role_operator();
-
-export function UsersTable({
-  users,
-  currentUserId,
-}: {
+interface Props {
   users: UserAdminOut[];
   currentUserId: string;
-}) {
+  impersonating: boolean;
+  refreshing?: boolean;
+}
+
+/** Todas as contas, com as ações de administração em cada linha e em massa. */
+export function UsersTable({ users, currentUserId, impersonating, refreshing }: Props) {
   const queryClient = useQueryClient();
-  const update = useMutation({
-    ...updateUserMutation(),
-    onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: listUsersQueryKey() });
-      toast.success(m.users_updated());
+  const dialogs = useAccountDialogs({ users, selfId: currentUserId, impersonating });
+  const reactivate = useMutation({
+    mutationFn: async (targets: UserAdminOut[]) => {
+      const results = await Promise.allSettled(
+        targets.map((u) =>
+          updateUser({ path: { user_id: u.id }, body: { is_active: true }, throwOnError: true }),
+        ),
+      );
+      const failed = results.filter((r) => r.status === 'rejected');
+      if (failed.length === results.length && failed[0])
+        throw (failed[0] as PromiseRejectedResult).reason;
+      return { ok: results.length - failed.length, failed: failed.length };
+    },
+    onSuccess: async ({ ok, failed }) => {
+      await invalidateAdminQueries(queryClient);
+      if (failed > 0) toast.warning(m.users_bulk_partial({ ok, failed }));
+      else toast.success(ok === 1 ? m.users_updated() : m.users_bulk_done({ ok }));
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -40,14 +51,27 @@ export function UsersTable({
       primary: true,
       label: m.users_table_user(),
       value: (u) => `${u.name ?? ''} ${u.email}`,
+      exportValue: (u) => u.email,
       cell: (u) => (
         <div className="min-w-0">
-          <p className="break-words font-medium">{u.name ?? u.email}</p>
-          <p className="break-words font-normal text-muted-foreground text-xs">
+          <p className="break-words font-medium">
+            {u.name ?? u.email}
+            {u.id === currentUserId && (
+              <Badge variant="outline" className="ml-2 align-middle">
+                {m.users_you()}
+              </Badge>
+            )}
+          </p>
+          <p className="[overflow-wrap:anywhere] font-normal text-muted-foreground text-xs">
             {u.name && `${u.email} · `}
             {u.email_verified ? m.users_email_confirmed() : m.users_email_unconfirmed()}
             {u.google_linked && ` · ${m.users_google()}`}
           </p>
+          {u.approval_status === 'rejected' && u.rejected_reason && (
+            <p className="[overflow-wrap:anywhere] font-normal text-muted-foreground text-xs">
+              {m.users_rejected_reason({ reason: u.rejected_reason })}
+            </p>
+          )}
         </div>
       ),
     },
@@ -56,9 +80,15 @@ export function UsersTable({
       header: m.users_table_role(),
       value: (u) => u.role,
       filter: { format: (v) => roleLabel(v as UserAdminOut['role']) },
-      cell: (u) => (
-        <Badge variant={u.role === 'admin' ? 'default' : 'secondary'}>{roleLabel(u.role)}</Badge>
-      ),
+      cell: (u) => <RoleBadge role={u.role} />,
+    },
+    {
+      id: 'approval',
+      header: m.users_table_approval(),
+      value: (u) => u.approval_status,
+      exportValue: (u) => approvalLabel(u.approval_status),
+      filter: { format: (v) => approvalLabel(v as UserAdminOut['approval_status']) },
+      cell: (u) => <ApprovalBadge status={u.approval_status} />,
     },
     {
       id: 'status',
@@ -74,6 +104,14 @@ export function UsersTable({
       ),
     },
     {
+      id: 'origin',
+      header: m.users_table_origin(),
+      value: (u) => u.joined_via,
+      exportValue: (u) => originLabel(u.joined_via),
+      filter: { format: (v) => originLabel(v as UserAdminOut['joined_via']) },
+      cell: (u) => <span className="text-muted-foreground">{originLabel(u.joined_via)}</span>,
+    },
+    {
       id: 'login',
       type: 'datetime',
       header: m.users_table_last_login(),
@@ -83,55 +121,109 @@ export function UsersTable({
       cell: (u) => (u.last_login_at ? formatDateTime(u.last_login_at) : m.common_never()),
     },
     {
-      id: 'actions',
-      header: m.users_table_actions(),
-      label: m.users_table_actions(),
-      hideable: false,
-      align: 'right',
-      full: true,
-      cell: (u) => {
-        const self = u.id === currentUserId;
-        return (
-          <div className="flex flex-wrap gap-2 md:justify-end">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={self || update.isPending}
-              onClick={() =>
-                update.mutate({
-                  path: { user_id: u.id },
-                  body: { role: u.role === 'admin' ? 'operator' : 'admin' },
-                })
-              }
-            >
-              {u.role === 'admin' ? m.users_make_operator() : m.users_make_admin()}
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-              disabled={self || update.isPending}
-              onClick={() =>
-                update.mutate({ path: { user_id: u.id }, body: { is_active: !u.is_active } })
-              }
-            >
-              {u.is_active ? m.users_deactivate() : m.users_reactivate()}
-            </Button>
-          </div>
-        );
-      },
+      id: 'created',
+      type: 'datetime',
+      header: m.users_table_created(),
+      className: 'text-muted-foreground',
+      defaultHidden: true,
+      value: (u) => u.created_at,
+      searchable: false,
+      cell: (u) => formatDateTime(u.created_at),
     },
   ];
 
+  const bulkTargets = (rows: UserAdminOut[]) =>
+    rows.filter((u) => updateBlocker(u, users, currentUserId) === null);
+
   return (
-    <DataTable
-      id="users"
-      exportName="utilizadores"
-      columns={columns}
-      rows={users}
-      getRowId={(u) => u.id}
-      caption={m.users_title()}
-      searchLabel={m.users_search()}
-    />
+    <>
+      <DataTable
+        id="users"
+        exportName="utilizadores"
+        columns={columns}
+        rows={users}
+        getRowId={(u) => u.id}
+        caption={m.users_title()}
+        searchLabel={m.users_search()}
+        refreshing={refreshing}
+        initialSort={{ id: 'created', desc: true }}
+        rowActions={(u) => {
+          const actions = [];
+          if (u.approval_status !== 'approved') {
+            actions.push({
+              id: 'approve',
+              label: m.users_action_approve(),
+              icon: <UserCheck />,
+              onSelect: () => dialogs.show('approve', [u]),
+            });
+          }
+          if (u.approval_status === 'pending') {
+            actions.push({
+              id: 'reject',
+              label: m.users_action_reject(),
+              icon: <UserX />,
+              onSelect: () => dialogs.show('reject', [u]),
+            });
+          }
+          actions.push({
+            id: 'role',
+            label: m.users_action_change_role(),
+            icon: <KeyRound />,
+            onSelect: () => dialogs.show('role', [u]),
+          });
+          actions.push(
+            u.is_active
+              ? {
+                  id: 'deactivate',
+                  label: m.users_deactivate(),
+                  icon: <PowerOff />,
+                  onSelect: () => dialogs.show('deactivate', [u]),
+                }
+              : {
+                  id: 'reactivate',
+                  label: m.users_reactivate(),
+                  icon: <Power />,
+                  onSelect: () => reactivate.mutate([u]),
+                },
+          );
+          actions.push({
+            id: 'impersonate',
+            label: m.users_action_impersonate(),
+            icon: <Eye />,
+            onSelect: () => dialogs.show('impersonate', [u]),
+          });
+          actions.push({
+            id: 'delete',
+            label: m.users_action_delete(),
+            icon: <Trash2 />,
+            destructive: true,
+            onSelect: () => dialogs.show('delete', [u]),
+          });
+          return actions;
+        }}
+        bulkActions={[
+          {
+            id: 'reactivate',
+            label: m.users_bulk_reactivate(),
+            icon: <Power />,
+            disabled: (rows) => bulkTargets(rows.filter((r) => !r.is_active)).length === 0,
+            onSelect: (rows) => reactivate.mutate(bulkTargets(rows.filter((r) => !r.is_active))),
+          },
+          {
+            id: 'deactivate',
+            label: m.users_bulk_deactivate(),
+            icon: <PowerOff />,
+            destructive: true,
+            disabled: (rows) => bulkTargets(rows.filter((r) => r.is_active)).length === 0,
+            onSelect: (rows) =>
+              dialogs.show(
+                'deactivate',
+                rows.filter((r) => r.is_active),
+              ),
+          },
+        ]}
+      />
+      {dialogs.element}
+    </>
   );
 }

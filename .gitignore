@@ -34,3 +34,7 @@ apps/web/src/paraglide/
 # Resultados de testes ponta a ponta
 apps/web/test-results/
 apps/web/playwright-report/
+
+# Caches locais dos scripts de verificação
+.cache/
+apps/web/.gen-check/

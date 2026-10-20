@@ -1,11 +1,29 @@
 import { Link } from '@tanstack/react-router';
 import { BrandLogo } from '@/components/brand-logo';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
+import { usePendingApprovals } from '@/features/users/use-pending-approvals';
 import { NAV } from '@/lib/nav';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
+function PendingBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <>
+      <span
+        aria-hidden="true"
+        data-testid="pending-badge"
+        className="ml-auto grid h-5 min-w-5 place-items-center rounded-full bg-areia px-1.5 font-semibold text-[#14211d] text-[11px] tabular-nums"
+      >
+        {count > 99 ? '99+' : count}
+      </span>
+      <span className="sr-only">{m.nav_pending_aria({ count })}</span>
+    </>
+  );
+}
+
 function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }) {
+  const pending = usePendingApprovals();
   const sections = NAV.map((section) => ({
     ...section,
     items: section.items.filter((item) => !item.adminOnly || role === 'admin'),
@@ -59,6 +77,7 @@ function NavList({ role, onNavigate }: { role: string; onNavigate?: () => void }
                   >
                     <Icon className="size-4" />
                     {item.label()}
+                    {item.badge === 'pending-approvals' && <PendingBadge count={pending} />}
                   </Link>
                 </li>
               );

@@ -35,7 +35,10 @@ export function MagicLinkPage({
     onSuccess: async ({ user, next }) => {
       queryClient.clear(); // nada da sessão anterior (outra conta) fica na cache
       queryClient.setQueryData(getMeQueryKey(), user);
-      await navigate({ to: safeNext(next), replace: true });
+      await navigate({
+        to: user.approval_status === 'approved' ? safeNext(next) : '/pending-approval',
+        replace: true,
+      });
     },
   });
   const renew = useRequestMagicLink();
@@ -112,6 +115,7 @@ export function MagicLinkPage({
               </p>
             </div>
             <FormAlert message={renew.isError ? getErrorMessage(renew.error) : null} />
+            {state === 'bad' && lastEmail.current && renew.gate.field}
             {state === 'failed' && (
               <Button
                 className="h-11 w-full font-semibold"
@@ -125,15 +129,15 @@ export function MagicLinkPage({
               <Button
                 className="h-11 w-full font-semibold"
                 loading={renew.isPending}
+                disabled={renew.gate.blocked}
                 onClick={() => {
                   const email = lastEmail.current;
-                  renew.mutate(
-                    { body: magicLinkBody(email) },
-                    { onSuccess: () => setRequested(email) },
-                  );
+                  renew.send(magicLinkBody(email), { onSuccess: () => setRequested(email) });
                 }}
               >
-                {m.magic_request_new_to({ email: lastEmail.current })}
+                {renew.gate.verifying
+                  ? m.turnstile_verifying()
+                  : m.magic_request_new_to({ email: lastEmail.current })}
               </Button>
             )}
             <Button
