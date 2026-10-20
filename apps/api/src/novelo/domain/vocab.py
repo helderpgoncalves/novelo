@@ -61,6 +61,30 @@ class AlertKind(StrEnum):
     CONTAINER_ROWS_REJECTED = "container_rows_rejected"
     CONTAINER_PENDING_LOCATION = "container_pending_location"
     CONTAINER_ASSUMED_VALUES = "container_assumed_values"
+    # Pacote QGIS dos contentores municipais (outras frações, não é têxtil): alertas de `municipal_alerts.csv`.
+    MUNICIPAL_BLANK_ROWS = "municipal_blank_rows"
+    MUNICIPAL_BOUNDARY_TOLERANCE = "municipal_boundary_tolerance"
+    MUNICIPAL_CAOP_VERSION = "municipal_caop_version"
+    MUNICIPAL_CAOP_VS_OSM = "municipal_caop_vs_osm"
+    MUNICIPAL_CAPACITY_OUTLIER = "municipal_capacity_outlier"
+    MUNICIPAL_CAPACITY_UNIT_ASSUMED = "municipal_capacity_unit_assumed"
+    MUNICIPAL_CAPACITY_UNKNOWN = "municipal_capacity_unknown"
+    MUNICIPAL_COORD_SUSPECT = "municipal_coord_suspect"
+    MUNICIPAL_COORDS_ARTIFACT = "municipal_coords_artifact"
+    MUNICIPAL_COORDS_LOW_PRECISION = "municipal_coords_low_precision"
+    MUNICIPAL_COORDS_MISSING = "municipal_coords_missing"
+    MUNICIPAL_COORDS_SWAPPED = "municipal_coords_swapped"
+    MUNICIPAL_CROSS_FILE_OVERLAP = "municipal_cross_file_overlap"
+    MUNICIPAL_EMPTY_ROW = "municipal_empty_row"
+    MUNICIPAL_NOT_TEXTILE = "municipal_not_textile"
+    MUNICIPAL_OSM_CONTOURS_INCOMPLETE = "municipal_osm_contours_incomplete"
+    MUNICIPAL_OUTSIDE_MUNICIPALITY = "municipal_outside_municipality"
+    MUNICIPAL_PARISH_MISMATCH = "municipal_parish_mismatch"
+    MUNICIPAL_PARISH_NAMES_INCONSISTENT = "municipal_parish_names_inconsistent"
+    MUNICIPAL_PARISH_UNMAPPED = "municipal_parish_unmapped"
+    MUNICIPAL_QUANTITY_SEMANTICS = "municipal_quantity_semantics"
+    MUNICIPAL_STACKED_UNITS = "municipal_stacked_units"
+    MUNICIPAL_STREAM_UNKNOWN = "municipal_stream_unknown"
 
 
 class AlertStatus(StrEnum):
@@ -191,3 +215,91 @@ class Tipau(StrEnum):
     APU = "apu"  # predominantemente urbana
     AMU = "amu"  # mediamente urbana
     APR = "apr"  # predominantemente rural
+
+
+# --- Rede MUNICIPAL (outras frações; nunca confundir com os contentores de têxteis) -----------------------------
+
+
+class MunicipalKind(StrEnum):
+    """Tipo de contentor municipal (ficheiro de origem + equipamento)."""
+
+    UNDERGROUND = "underground"  # enterrado/semienterrado (molok, bluebee, greenbee)
+    PLATFORM = "platform"  # "plataforma": equipamento por esclarecer (2 casos)
+    SURFACE = "surface"  # contentor de rodas de 1 100 L
+    ORGANIC_COLLECTIVE = "organic_collective"
+    ORGANIC_PRODUCER = "organic_producer"  # contentor de um produtor (restauração, escola, lar...)
+    GREEN_WASTE = "green_waste"
+
+
+class MunicipalStream(StrEnum):
+    """Fração. Só se afirma o que os ficheiros dizem: enterrados e superfície ficam `unknown`."""
+
+    ORGANIC = "organico"
+    GREEN = "verdes"
+    UNKNOWN = "desconhecido"
+
+
+class ProducerType(StrEnum):
+    RESTAURANT = "restaurant"
+    SCHOOL = "school"
+    ESTABLISHMENT = "establishment"
+    LARGE_PRODUCER = "large_producer"
+    CARE_HOME = "care_home"
+    HOSPITALITY = "hospitality"
+
+
+class SiteClass(StrEnum):
+    PUBLIC = "public"  # só contentores de rua
+    PRODUCER = "producer"  # só contentores de produtores
+    MIXED = "mixed"
+
+
+class CoordPrecision(StrEnum):
+    PRECISE = "precise"  # 4 ou mais casas decimais
+    APPROXIMATE = "approximate"  # 3 casas ou menos (~100 m)
+
+
+class CoordStatus(StrEnum):
+    OK = "ok"
+    PENDING = "pending"  # sem coordenadas: conta como contentor, não entra no mapa
+
+
+class CapacityStatus(StrEnum):
+    OK = "ok"
+    ASSUMED_LITRES = "assumed_litres"  # sem unidade no ficheiro: lido como litros (assumido)
+    UNKNOWN = "unknown"
+
+
+class ParishMatch(StrEnum):
+    """Freguesia declarada no ficheiro contra o polígono CAOP que contém o ponto."""
+
+    EQUAL = "igual"
+    DIFFERENT = "diferente"
+    NO_COORDS = "sem_coord"
+    UNMAPPED = "nao_mapeada"  # o nome declarado não é de uma freguesia (ex.: "Cidade")
+
+
+class ParishMatchLevel(StrEnum):
+    EXACT = "exact"
+    SAME_WORDS = "same_words"
+    CONTAINS_NAME = "contains_name"
+    PARTIAL = "partial"
+    NONE = "none"
+
+
+class MunicipalSourceFile(StrEnum):
+    UNDERGROUND = "profundidade"
+    SURFACE = "superficie"
+    ORGANIC_COLLECTIVE = "organico_coletivo"
+    ORGANIC_PRODUCER = "organico_tipologia"
+    GREEN_WASTE = "residuos_verdes"
+
+
+PRODUCER_TYPE_LABELS: dict[ProducerType, str] = {
+    ProducerType.RESTAURANT: "Restauração",
+    ProducerType.SCHOOL: "Escola",
+    ProducerType.ESTABLISHMENT: "Estabelecimento",
+    ProducerType.LARGE_PRODUCER: "Grandes produtores",
+    ProducerType.CARE_HOME: "Lar",
+    ProducerType.HOSPITALITY: "Hotelaria",
+}

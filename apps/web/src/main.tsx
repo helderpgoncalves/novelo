@@ -54,7 +54,10 @@ window.addEventListener(SESSION_EXPIRED_EVENT, () => {
   queryClient.clear();
   const path = deLocalizeUrl(window.location.href);
   if (!path.pathname.startsWith('/login')) {
-    void router.navigate({ to: '/login', search: { next: `${path.pathname}${path.search}` } });
+    void router.navigate({
+      to: '/login',
+      search: { next: `${path.pathname}${path.search}`, reason: 'expired' },
+    });
   }
 });
 

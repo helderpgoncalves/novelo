@@ -122,7 +122,7 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 | Cenário | Prob. | Sinal de aviso | Resposta preparada | Dono |
 | --- | --- | --- | --- | --- |
 | **Pergunta sobre RGPD e fotos** | Média | "As fotos ficam guardadas?" | Não guardamos fotos de quem entrega; apagadas depois de processadas; ficam marca, composição, estado e peso | H |
-| **Pedido para retirar dados da Vitrus do repositório público** | Baixa | Mentor ou Vitrus | Remover de `data/raw` com `git rm` num novo commit. Reescrever o histórico **só se pedido por escrito**, porque a organização pode verificar a originalidade pelo histórico dos repositórios; avisar a equipa e a organização | HF |
+| **Pedido para retirar dados da Vitrus do repositório** | Baixa | Mentor ou Vitrus | Remover de `data/raw` com `git rm` num novo commit. Reescrever o histórico **só se pedido por escrito**, porque a organização pode verificar a originalidade pelo histórico dos repositórios; avisar a equipa e a organização | HF |
 
 ---
 
@@ -135,7 +135,7 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 | **O mentor oferece um contacto** (Sasia, Riopele, CITEVE, entidade gestora) | Média | "Falem com X" | Pedir apresentação por email com uma frase de contexto; enviar nesse dia a pergunta única; registar a resposta com data | H |
 | **O mentor oferece um ensaio ou uma parceria** (Fibrenamics) | Baixa | "Mandem um lote" | Confirmar volume, formato e custo por escrito; não dizer "validado" antes de haver resultado; entra no plano do piloto | H |
 | **O mentor não responde** | Média | Sem resposta em 24 h | Segunda mensagem curta; ir ao local (CIAJG) e pedir 5 minutos; alternativa institucional (reunião inicial da Fibrenamics, `green@`) | H |
-| **O mentor pede para o projeto ser partilhado** | Média | "Mandem-me o repositório" | O repositório é público e a propriedade intelectual é nossa [F59]; mandar o link do README e da demo | H |
+| **O mentor pede para o projeto ser partilhado** | Média | "Mandem-me o repositório" | O repositório é privado (partilha-se o acesso a quem pedir) e a propriedade intelectual é nossa [F59]; mandar o link do README e da demo | H |
 | **Pedem dados que não podemos dar** (código, base de dados) | Baixa | Pedido insistente | Mostrar a demo e o relatório; nada de credenciais; propor reunião | H |
 | **O mentor muda de ideias entre dias** | Baixa | Indicação contraditória | Anotar quem disse o quê e quando; pedir confirmação por escrito | HF |
 | **Identificação errada** (Prof. Paulo Afonso é outra pessoa) | Baixa | Perfil não bate | Confirmar a identidade logo na primeira mensagem; ver [Mentores](mentores.md#prof-paulo-afonso-uminho-produção-e-sistemas) | H |
@@ -262,9 +262,9 @@ Doze perguntas, três por critério ou menos, que acrescem às 48 anteriores. Os
 | Cenário | Prob. | Sinal | Resposta preparada | Dono |
 | --- | --- | --- | --- | --- |
 | **Ganhamos** (28 de outubro) | Média | Anúncio | Aceitar o prémio com uma frase de agradecimento à Vitrus e ao município; propor logo o piloto; registar contactos | H |
-| **Não ganhamos** | Média | Anúncio | Pedir feedback ao júri e aos mentores; manter o repositório público e a demo online; continuar o contacto com Vitrus e Fibrenamics | HF |
+| **Não ganhamos** | Média | Anúncio | Pedir feedback ao júri e aos mentores; manter a demo online e partilhar o repositório a quem pedir; continuar o contacto com Vitrus e Fibrenamics | HF |
 | **Convite para um piloto** | Média | Conversa pós-pitch | Responder em 48 h com plano de 3 meses, KPIs, piso de sinal, dados necessários e responsabilidades | H |
-| **Pedido de licença ou propriedade intelectual** | Baixa | Email | A propriedade dos protótipos é dos autores [F59]; escolher uma licença antes de partilhar mais (hoje o repositório é público); aconselhamento jurídico se houver interesse comercial | HF |
+| **Pedido de licença ou propriedade intelectual** | Baixa | Email | A propriedade dos protótipos é dos autores [F59]; escolher uma licença antes de partilhar mais (hoje o repositório é privado); aconselhamento jurídico se houver interesse comercial | HF |
 | **Interesse em financiamento ou consórcio** | Baixa | Contacto de mentor | Reunir Vitrus, Fibrenamics e UMinho; identificar uma candidatura concreta (**hipótese**, nenhuma identificada) | H |
 | **Pedido de um serviço pago** | Baixa | Município ou entidade | Definir âmbito mínimo (planeamento e relatório), preço e responsabilidade; só aceitar com custos unitários reais | H |
 | **Conflito entre a equipa e a organização** (por exemplo, sobre direitos de uso) | Baixa | Contrato ou regulamento | Ler o separador Rules e o regulamento completo (ainda não os temos); perguntar à organização | HF |

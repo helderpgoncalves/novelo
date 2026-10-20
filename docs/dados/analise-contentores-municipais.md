@@ -273,17 +273,15 @@ O script é PEP 723 (`numpy`, `pyproj`, `pyshp`, `shapely`), idempotente: duas e
 3. Em `locais`, `textile_candidate = 'true'` mostra os candidatos; `nn_distance_m` serve para um mapa de calor.
 4. O projeto original da Vitrus (`Georreferenciação.qgz`) abre-se na pasta `data/raw/vitrus-mapa-qgis/`. Declara vírgula decimal nos ficheiros de texto, que usam ponto: se alguma camada não aparecer, é isso; o GeoPackage evita o problema.
 
-## Contrato de dados para a API (próxima fase)
+## Contrato de dados para a API (implementado)
 
-A API lê estes ficheiros no seed, tal como lê os de `data/processed/` (`DATA_DIR`). Propostas:
+O `seed` importa estes ficheiros (`DATA_DIR`) para `municipal_containers`, `municipal_sites`, `municipal_parish_stats` (com o contorno CAOP), `municipal_links` e `municipal_meta`, com a fonte `vitrus_municipal_containers_2026_10` e o SHA-256 do pacote; os 25 alertas `municipal_*` entram em `data_alerts` e aparecem no ecrã "Qualidade dos dados". Rotas em `/api/v1/municipal` (autenticadas, com ETag): `get_municipal_overview`, `list_municipal_parishes`, `get_municipal_parish`, `list_municipal_sites`, `get_municipal_sites_geojson`, `get_municipal_site`, `list_municipal_containers`, `list_municipal_producers`, `get_textile_candidate_sites`, `get_municipal_gap_ranking`, `get_municipal_density_benchmark`, `export_municipal_sites`, `get_caop_parishes_geojson`. `kind`, `stream`, `parish_match`, `producer_type`, `site_class`, `coord_precision` e `alert.kind` são enums. Detalhe em [Arquitetura](../engenharia/arquitetura.md#rede-municipal-municipal).
 
-- `GET /municipal/containers`, `GET /municipal/sites` (filtros `kind`, `stream`, `parish`, `site_class`, `textile_candidate`, `bbox`), com os campos dos CSV tal como estão. O tipo de `kind` e `stream` e `parish_match` é enum.
-- `GET /municipal/by-parish` (48 linhas) e `GET /municipal/summary` (JSON de `municipal_summary.json`).
-- `GET /municipal/parishes.geojson` com `caop_guimaraes.geojson` (substitui os contornos OSM, que falham 3 uniões).
-- Alertas: acrescentar `municipal_alerts.csv` à fonte `vitrus_municipal_containers_2026_10` (já em `sources.json`) no ecrã "Qualidade dos dados".
-- **Nunca** juntar `municipal_*` à tabela `containers` de têxteis; usar tabelas e tipos próprios (`municipal_container`, `municipal_site`).
+- **Nunca** se junta `municipal_*` à tabela `containers` de têxteis.
+- **Nomes de produtores** (pergunta 12): a API não os devolve por omissão; só um `admin` que peça `show_names=true`. O copiloto nunca os mostra. Se a Vitrus não autorizar, basta nunca ligar o parâmetro no web.
+- Os candidatos têm uma ordem explícita (`rank_rule`): coordenada precisa; freguesia com mais lacuna estimada por candidato; enterrado; orgânico a menos de 15 m; mais contentores. É uma ordem de leitura, não uma recomendação.
 
-Ecrãs e camadas de mapa propostos: camada "Rede municipal" (pontos por `kind`, agrupados a baixa escala), camada "Candidatos a têxteis" (locais), camada "Produtores" (por tipo, sem nomes por omissão), mapa de calor de `nn_distance_m`, coroplético de contentores por 1 000 hab. e de cobertura a 300 m, ranking de lacuna por freguesia com a etiqueta "estimativa", e ecrã "Qualidade dos dados" com os alertas `municipal_*`. Gráficos: barras por freguesia, histograma do vizinho mais próximo, tamanho dos locais, produtores por tipo e freguesia.
+Ecrãs e camadas de mapa propostos (por fazer no web): camada "Rede municipal" (pontos por `kind`, agrupados a baixa escala), camada "Candidatos a têxteis" (locais), camada "Produtores" (por tipo, sem nomes por omissão), mapa de calor de `nn_distance_m`, coroplético de contentores por 1 000 hab. e de cobertura a 300 m, ranking de lacuna por freguesia com a etiqueta "estimativa", e ecrã "Qualidade dos dados" com os alertas `municipal_*`. Gráficos: barras por freguesia, histograma do vizinho mais próximo, tamanho dos locais, produtores por tipo e freguesia.
 
 ## Fontes
 

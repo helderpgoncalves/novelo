@@ -75,7 +75,7 @@ function SidebarBody({ role, onNavigate }: { role: string; onNavigate?: () => vo
     <div className="flex h-full flex-col">
       <div className="flex h-16 items-center border-sidebar-border border-b px-5">
         <Link to="/" onClick={onNavigate} aria-label={m.nav_home_aria()}>
-          <BrandLogo />
+          <BrandLogo className="h-6" />
         </Link>
       </div>
       <NavList role={role} onNavigate={onNavigate} />

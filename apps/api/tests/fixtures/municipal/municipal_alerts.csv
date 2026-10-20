@@ -1,0 +1,3 @@
+id,type_key,detail,suggestion
+1,municipal_not_textile,Os ficheiros do pacote de teste são de contentores MUNICIPAIS.,Manter a rede separada.
+2,municipal_coords_missing,1 contentor sem coordenadas: C900,Pedir as coordenadas à Vitrus.

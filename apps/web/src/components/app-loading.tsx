@@ -1,4 +1,4 @@
-import { BrandSymbol } from '@/components/brand-logo';
+import { BrandLogo, BrandSymbol } from '@/components/brand-logo';
 import { RouteSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { m } from '@/paraglide/messages';
@@ -40,7 +40,7 @@ export function AppShellSkeleton() {
     >
       <aside className="hidden w-64 shrink-0 border-sidebar-border border-r bg-sidebar pt-[env(safe-area-inset-top)] lg:block">
         <div className="flex h-16 items-center border-sidebar-border border-b px-5">
-          <BrandSymbol className="size-8" />
+          <BrandLogo className="h-6" />
         </div>
         <div className="space-y-6 px-3 py-4">
           {NAV_GROUPS.map((group) => (
@@ -55,7 +55,7 @@ export function AppShellSkeleton() {
       </aside>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <div className="flex h-[calc(3.5rem+env(safe-area-inset-top))] shrink-0 items-center justify-between gap-3 border-border/60 border-b px-4 pt-[env(safe-area-inset-top)] sm:px-6 lg:h-[calc(4rem+env(safe-area-inset-top))] lg:px-8">
-          <BrandSymbol className="size-7 lg:hidden" />
+          <BrandLogo className="h-6 lg:hidden" />
           <Skeleton className="hidden h-9 w-72 rounded-lg lg:block" />
           <div className="flex items-center gap-2">
             <Skeleton className="size-9 rounded-lg" />

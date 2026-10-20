@@ -72,6 +72,7 @@ export function UsersTable({
     },
     {
       id: 'login',
+      type: 'datetime',
       header: m.users_table_last_login(),
       className: 'text-muted-foreground',
       value: (u) => u.last_login_at,
@@ -122,9 +123,10 @@ export function UsersTable({
   return (
     <DataTable
       id="users"
+      exportName="utilizadores"
       columns={columns}
       rows={users}
-      getKey={(u) => u.id}
+      getRowId={(u) => u.id}
       caption={m.users_title()}
       searchLabel={m.users_search()}
     />

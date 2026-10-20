@@ -27,6 +27,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'population',
+      aggregate: 'sum',
+      format: (n) => formatNumber(n),
       value: (a) => a.population,
       searchable: false,
       header: m.alloc_population(),
@@ -35,6 +37,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'points',
+      aggregate: 'sum',
+      format: (n) => formatNumber(n),
       value: (a) => a.points,
       searchable: false,
       header: m.alloc_points(),
@@ -43,6 +47,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'tonnes',
+      aggregate: 'sum',
+      format: (n) => formatTonnes(n, 2),
       value: (a) => a.tonnes,
       searchable: false,
       header: m.alloc_tonnes(),
@@ -51,6 +57,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'capex',
+      aggregate: 'sum',
+      format: (n) => formatEur(n),
       value: (a) => a.capex_eur,
       searchable: false,
       header: m.alloc_capex(),
@@ -59,6 +67,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'cost',
+      aggregate: 'sum',
+      format: (n) => formatEur(n),
       value: (a) => a.annual_cost_eur,
       searchable: false,
       header: m.alloc_annual_cost(),
@@ -67,6 +77,8 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     },
     {
       id: 'km',
+      aggregate: 'sum',
+      format: (n) => formatNumber(n),
       value: (a) => a.km_year,
       searchable: false,
       header: m.alloc_km(),
@@ -78,9 +90,10 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
   return (
     <DataTable
       id="allocations"
+      exportName="cenario-freguesias"
       columns={columns}
       rows={rows}
-      getKey={(a) => a.parish_code}
+      getRowId={(a) => a.parish_code}
       caption={m.alloc_parish()}
       searchLabel={m.scenario_search_parish()}
       pageSize={10}

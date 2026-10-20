@@ -1,222 +1,339 @@
-import { ArrowDownUp, Columns3, ListFilter, Search, X } from 'lucide-react';
+import { ArrowDownUp, ChevronDown, ListFilter, Rows2, Rows3, Search, X } from 'lucide-react';
+import { type ReactNode, type RefObject, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from '@/components/ui/sheet';
+import { formatNumber } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { ColumnsPopover } from './columns-panel';
+import { FilterEditor } from './filter-editors';
+import { filterValueLabel } from './filter-label';
+import { ActiveFilters, FiltersPopover } from './filters';
+import { CheckRow, CountDot } from './parts';
 import { type Column, columnLabel, isHideable } from './types';
-import type { useTableState } from './use-table-state';
-
-type State<T> = ReturnType<typeof useTableState<T>>;
+import type { TableState } from './use-table-state';
+import { ViewsMenu } from './views-menu';
 
 interface ToolbarProps<T> {
   columns: Column<T>[];
-  state: State<T>;
+  state: TableState<T>;
   searchLabel: string;
+  searchRef: RefObject<HTMLInputElement | null>;
+  title?: ReactNode;
+  exportMenu: ReactNode;
+  extra?: ReactNode;
+  /** Controla o que a barra mostra além da pesquisa (tabelas pequenas só pesquisam). */
+  full: boolean;
 }
 
-const triggerClass = 'h-10 gap-2';
-
-function CountDot({ n }: { n: number }) {
+function SearchBox<T>({
+  state,
+  label,
+  inputRef,
+  className,
+}: {
+  state: TableState<T>;
+  label: string;
+  inputRef: RefObject<HTMLInputElement | null>;
+  className?: string;
+}) {
   return (
-    <span className="rounded-full bg-primary px-1.5 font-semibold text-[11px] text-primary-foreground tabular-nums">
-      {n}
-    </span>
-  );
-}
-
-function FacetItems<T>({ column, state }: { column: Column<T>; state: State<T> }) {
-  const selected = state.filters[column.id] ?? [];
-  return (
-    <>
-      <DropdownMenuLabel className="text-muted-foreground text-xs">
-        {columnLabel(column)}
-      </DropdownMenuLabel>
-      {(state.facets[column.id] ?? []).map((o) => (
-        <DropdownMenuCheckboxItem
-          key={o.value}
-          checked={selected.includes(o.value)}
-          onSelect={(e) => e.preventDefault()}
-          onCheckedChange={(on) =>
-            state.setFilter(
-              column.id,
-              on ? [...selected, o.value] : selected.filter((v) => v !== o.value),
-            )
+    <div className={cn('relative min-w-0', className)}>
+      <Search
+        className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <Input
+        ref={inputRef}
+        data-table-search
+        type="search"
+        value={state.query}
+        onChange={(e) => state.setQuery(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Escape') {
+            if (state.query) {
+              e.preventDefault();
+              e.stopPropagation();
+              state.setQuery('');
+            } else {
+              e.currentTarget.blur();
+            }
           }
-        >
-          <span className="flex-1">{o.label}</span>
-          <span className="text-muted-foreground text-xs tabular-nums">{o.count}</span>
-        </DropdownMenuCheckboxItem>
-      ))}
-      {selected.length > 0 && (
+        }}
+        placeholder={label}
+        aria-label={label}
+        aria-keyshortcuts="/"
+        // O botão nativo de limpar do `type=search` varia entre navegadores; usamos o nosso.
+        className="h-10 pr-14 pl-9 [&::-webkit-search-cancel-button]:hidden"
+      />
+      {state.query ? (
         <button
           type="button"
-          className="mt-1 w-full rounded-sm px-2 py-1.5 text-left text-primary text-sm hover:bg-accent"
-          onClick={() => state.setFilter(column.id, [])}
+          onClick={() => {
+            state.setQuery('');
+            inputRef.current?.focus();
+          }}
+          aria-label={m.dt_clear_search()}
+          className="-translate-y-1/2 absolute top-1/2 right-1 flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-muted"
         >
-          {m.table_clear_filter()}
+          <X className="size-4" />
         </button>
+      ) : (
+        <span
+          aria-hidden="true"
+          className="-translate-y-1/2 pointer-events-none absolute top-1/2 right-2.5 hidden h-5 min-w-5 items-center justify-center rounded border bg-muted px-1 font-mono text-[11px] text-muted-foreground md:inline-flex"
+        >
+          /
+        </span>
       )}
-    </>
+    </div>
   );
 }
 
-export function TableToolbar<T>({ columns, state, searchLabel }: ToolbarProps<T>) {
-  const hideable = columns.filter((c) => isHideable(c, state.primaryId));
-
+function DensityToggle<T>({ state }: { state: TableState<T> }) {
+  const compact = state.density === 'compact';
   return (
-    <div className="flex flex-wrap items-center gap-2">
-      <div className="relative w-full sm:max-w-xs sm:flex-1">
-        <Search
-          className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
-          aria-hidden="true"
-        />
-        <Input
-          type="search"
-          value={state.query}
-          onChange={(e) => state.setQuery(e.target.value)}
-          placeholder={searchLabel}
-          aria-label={searchLabel}
-          className="h-10 pl-9"
-        />
-      </div>
+    <Button
+      variant="outline"
+      size="icon"
+      className="size-10"
+      aria-pressed={compact}
+      aria-label={m.dt_density_compact()}
+      title={compact ? m.dt_density_comfortable() : m.dt_density_compact()}
+      onClick={() => state.setDensity(compact ? 'comfortable' : 'compact')}
+    >
+      {compact ? <Rows3 /> : <Rows2 />}
+    </Button>
+  );
+}
 
-      {/* Telemóvel: um só menu com todos os filtros. */}
-      {state.filterableColumns.length > 0 && (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className={`${triggerClass} flex-1 sm:hidden`}>
-              <ListFilter />
-              {m.table_filters()}
-              {state.filterCount > 0 && <CountDot n={state.filterCount} />}
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="max-h-[70vh] min-w-60">
-            {state.filterableColumns.map((c, i) => (
-              <div key={c.id}>
-                {i > 0 && <DropdownMenuSeparator />}
-                <FacetItems column={c} state={state} />
-              </div>
-            ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      )}
+function SectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <h3 className="font-semibold text-[11px] text-muted-foreground uppercase tracking-wider">
+      {children}
+    </h3>
+  );
+}
 
-      {/* Ecrãs maiores: um botão por coluna filtrável. */}
-      {state.filterableColumns.map((c) => {
-        const count = state.filters[c.id]?.length ?? 0;
-        return (
-          <DropdownMenu key={c.id}>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className={`${triggerClass} hidden sm:inline-flex`}>
-                <ListFilter />
-                {columnLabel(c)}
-                {count > 0 && <CountDot n={count} />}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start" className="max-h-80 min-w-52">
-              <FacetItems column={c} state={state} />
-            </DropdownMenuContent>
-          </DropdownMenu>
-        );
-      })}
-
-      {state.isFiltered && (
-        <Button
-          variant="ghost"
-          className="h-10 gap-1.5 text-muted-foreground"
-          onClick={state.clearAll}
-        >
-          <X />
-          {m.table_clear_all()}
-        </Button>
-      )}
-
-      <div className="flex flex-1 items-center gap-2 sm:ml-auto sm:flex-none">
-        {state.sortableColumns.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className={`${triggerClass} flex-1 sm:flex-none md:hidden`}>
-                <ArrowDownUp />
-                {m.table_sort()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-52">
-              <DropdownMenuRadioGroup
-                value={state.sort?.id ?? ''}
-                onValueChange={(id) =>
-                  state.setSort(id ? { id, desc: state.sort?.desc ?? false } : null)
-                }
-              >
-                <DropdownMenuRadioItem value="">{m.table_sort_none()}</DropdownMenuRadioItem>
-                {state.sortableColumns.map((c) => (
-                  <DropdownMenuRadioItem key={c.id} value={c.id}>
-                    {columnLabel(c)}
-                  </DropdownMenuRadioItem>
-                ))}
-              </DropdownMenuRadioGroup>
-              {state.sort && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuRadioGroup
-                    value={state.sort.desc ? 'desc' : 'asc'}
-                    onValueChange={(d) =>
-                      state.sort && state.setSort({ id: state.sort.id, desc: d === 'desc' })
-                    }
-                  >
-                    <DropdownMenuRadioItem value="asc">{m.table_sort_asc()}</DropdownMenuRadioItem>
-                    <DropdownMenuRadioItem value="desc">
-                      {m.table_sort_desc()}
-                    </DropdownMenuRadioItem>
-                  </DropdownMenuRadioGroup>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-
-        {hideable.length > 0 && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className={`${triggerClass} flex-1 sm:flex-none`}>
-                <Columns3 />
-                {m.table_columns()}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="min-w-52">
-              <DropdownMenuLabel className="text-muted-foreground text-xs">
-                {m.table_columns_title()}
-              </DropdownMenuLabel>
-              {hideable.map((c) => (
-                <DropdownMenuCheckboxItem
-                  key={c.id}
-                  checked={!state.hidden.includes(c.id)}
-                  onSelect={(e) => e.preventDefault()}
-                  onCheckedChange={(on) => state.toggleColumn(c.id, on)}
+/** Folha inferior com todos os controlos, para telemóvel. */
+function MobileSheet<T>({
+  columns,
+  state,
+  open,
+  onOpenChange,
+  exportMenu,
+  extra,
+  full,
+}: ToolbarProps<T> & { open: boolean; onOpenChange: (open: boolean) => void }) {
+  const hideable = columns.filter((c) => isHideable(c, state.primaryId));
+  const sortId = state.sort[0]?.id ?? '';
+  const sortDesc = state.sort[0]?.desc ?? false;
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="max-h-[88dvh] gap-0 rounded-t-2xl p-0">
+        <SheetHeader className="border-b px-4 py-3 pr-14 text-left">
+          <SheetTitle className="font-serif text-lg">{m.dt_sheet_title()}</SheetTitle>
+          <SheetDescription>
+            {m.dt_sheet_description({
+              matched: formatNumber(state.matched),
+              total: formatNumber(state.total),
+            })}
+          </SheetDescription>
+        </SheetHeader>
+        <div className="flex-1 space-y-6 overflow-y-auto overscroll-contain px-4 py-4">
+          {state.sortableColumns.length > 0 && (
+            <section className="space-y-2">
+              <SectionLabel>{m.table_sort()}</SectionLabel>
+              <div className="flex gap-2">
+                <Select
+                  value={sortId || 'none'}
+                  onValueChange={(id) =>
+                    id === 'none' ? state.setSort([]) : state.setSort([{ id, desc: sortDesc }])
+                  }
                 >
-                  {columnLabel(c)}
-                </DropdownMenuCheckboxItem>
-              ))}
-              <DropdownMenuSeparator />
-              <button
-                type="button"
-                className="w-full rounded-sm px-2 py-1.5 text-left text-primary text-sm hover:bg-accent"
-                onClick={state.resetColumns}
-              >
-                {m.table_columns_reset()}
-              </button>
-            </DropdownMenuContent>
-          </DropdownMenu>
+                  <SelectTrigger className="h-11 flex-1" aria-label={m.table_sort()}>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">{m.table_sort_none()}</SelectItem>
+                    {state.sortableColumns.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {columnLabel(c)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Button
+                  variant="outline"
+                  className="h-11 gap-2"
+                  disabled={!sortId}
+                  onClick={() => state.setSort([{ id: sortId, desc: !sortDesc }])}
+                  aria-label={sortDesc ? m.table_sort_desc() : m.table_sort_asc()}
+                >
+                  <ArrowDownUp />
+                  {sortDesc ? m.table_sort_desc() : m.table_sort_asc()}
+                </Button>
+              </div>
+            </section>
+          )}
+
+          {state.filterableColumns.length > 0 && (
+            <section className="space-y-2">
+              <SectionLabel>{m.table_filters()}</SectionLabel>
+              <ul className="divide-y rounded-lg border">
+                {state.filterableColumns.map((c) => {
+                  const f = state.filters[c.id];
+                  return (
+                    <li key={c.id}>
+                      <Collapsible defaultOpen={!!f}>
+                        <CollapsibleTrigger className="group/c flex min-h-12 w-full items-center gap-2 px-3 py-2 text-left text-sm">
+                          <span className="min-w-0 flex-1">
+                            <span className="block truncate font-medium">{columnLabel(c)}</span>
+                            {f && (
+                              <span className="block truncate text-primary text-xs">
+                                {filterValueLabel(c, state.meta[c.id], f)}
+                              </span>
+                            )}
+                          </span>
+                          <ChevronDown className="size-4 text-muted-foreground transition-transform group-data-[state=open]/c:rotate-180" />
+                        </CollapsibleTrigger>
+                        <CollapsibleContent className="space-y-2 px-3 pb-3">
+                          <FilterEditor column={c} state={state} />
+                          {f && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-9 text-primary"
+                              onClick={() => state.setFilter(c.id, null)}
+                            >
+                              {m.table_clear_filter()}
+                            </Button>
+                          )}
+                        </CollapsibleContent>
+                      </Collapsible>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
+          )}
+
+          {full && hideable.length > 0 && (
+            <section className="space-y-2">
+              <SectionLabel>{m.table_columns_title()}</SectionLabel>
+              <ul className="grid grid-cols-2 gap-x-3">
+                {hideable.map((c) => (
+                  <li key={c.id}>
+                    <CheckRow
+                      className="min-h-11 text-sm"
+                      checked={!state.hidden.includes(c.id)}
+                      onChange={(on) => state.toggleColumn(c.id, on)}
+                    >
+                      <span className="block truncate">{columnLabel(c)}</span>
+                    </CheckRow>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
+          {full && (
+            <section className="space-y-2">
+              <SectionLabel>{m.dt_more()}</SectionLabel>
+              <div className="flex flex-wrap gap-2 [&_.dt-label]:inline! [&_button]:h-11">
+                <ViewsMenu state={state} />
+                {exportMenu}
+                {extra}
+              </div>
+            </section>
+          )}
+        </div>
+        <div className="flex gap-2 border-t bg-background px-4 py-3">
+          {state.isFiltered && (
+            <Button variant="outline" className="h-11" onClick={state.clearAll}>
+              {m.table_clear_all()}
+            </Button>
+          )}
+          <Button className="h-11 flex-1" onClick={() => onOpenChange(false)}>
+            {m.dt_show_results({ n: formatNumber(state.matched) })}
+          </Button>
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+/**
+ * Barra do cartão. Uma só pesquisa em todos os ecrãs. Em ecrãs largos: filtros à esquerda e vistas, colunas,
+ * densidade e exportar à direita. Em telemóvel: pesquisa e um botão "Filtros" que abre a folha com tudo.
+ */
+export function TableToolbar<T>(props: ToolbarProps<T>) {
+  const { title, state, columns, searchLabel, searchRef, exportMenu, extra, full } = props;
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const sheetCount = state.filterCount + (state.sort.length > 0 ? 1 : 0);
+  return (
+    <div className="border-b bg-card">
+      {title && (
+        <div className="flex items-baseline gap-2 px-4 pt-3.5">
+          <h3 className="truncate font-serif font-medium text-lg tracking-[-0.01em]">{title}</h3>
+          <span className="text-muted-foreground text-sm tabular-nums">
+            {formatNumber(state.total)}
+          </span>
+        </div>
+      )}
+      <div className="flex flex-wrap items-center gap-2 px-3 py-3 md:px-4">
+        <SearchBox
+          state={state}
+          label={searchLabel}
+          inputRef={searchRef}
+          className="min-w-0 flex-1 md:max-w-xs"
+        />
+        <Button
+          variant="outline"
+          className="h-10 gap-2 md:hidden"
+          onClick={() => setSheetOpen(true)}
+          data-testid="dt-filters-mobile"
+        >
+          <ListFilter />
+          {m.table_filters()}
+          {sheetCount > 0 && <CountDot n={sheetCount} />}
+        </Button>
+        {full && state.filterableColumns.length > 0 && (
+          <FiltersPopover columns={columns} state={state} className="hidden md:inline-flex" />
         )}
+        <div className="ml-auto hidden items-center gap-2 md:flex">
+          {full && (
+            <>
+              <ViewsMenu state={state} />
+              <ColumnsPopover columns={columns} state={state} />
+              <DensityToggle state={state} />
+              {exportMenu}
+            </>
+          )}
+          {extra}
+        </div>
       </div>
+      {state.isFiltered && (
+        <div className="px-3 pb-3 md:px-4">
+          <ActiveFilters columns={columns} state={state} />
+        </div>
+      )}
+      <MobileSheet {...props} open={sheetOpen} onOpenChange={setSheetOpen} />
     </div>
   );
 }

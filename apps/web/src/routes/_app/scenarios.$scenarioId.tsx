@@ -10,12 +10,12 @@ import {
 } from '@/client/@tanstack/react-query.gen';
 import { Page, Section } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { Panel } from '@/components/panel';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { FlowsSankey } from '@/features/baseline/flows-sankey';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
@@ -96,7 +96,8 @@ function ScenarioPage() {
         <ScenarioAnchor scenario={scenario} />
       </div>
 
-      <Tabs
+      <PageTabs
+        label={m.rw_tabs_label()}
         value={tab}
         onValueChange={(next) =>
           navigate({
@@ -104,77 +105,92 @@ function ScenarioPage() {
             replace: true,
           })
         }
-        className="gap-6"
-      >
-        <TabsList
-          variant="line"
-          className="h-11 w-full justify-start gap-1 overflow-x-auto border-b"
-        >
-          {TABS.map((id) => (
-            <TabsTrigger key={id} value={id} className="h-11 flex-none px-3 sm:px-4">
-              {tabLabel[id]()}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-
-        <TabsContent value="summary" className="space-y-8">
-          <Section title={m.scenario_modes_title()} description={m.scenario_modes_description()}>
-            <ModeSummaryCards modes={result.modes} totalTonnes={result.kpis.tonnes_year} />
-          </Section>
-          <Section title={m.scenario_flows_title()} description={m.scenario_flows_description()}>
-            <Panel>
-              <FlowsSankey flows={flows} />
-            </Panel>
-          </Section>
-          <Collapsible className="rounded-xl bg-card ring-1 ring-foreground/10">
-            <CollapsibleTrigger className="flex min-h-12 w-full items-center justify-between gap-3 px-5 py-3 text-left font-medium text-sm">
-              {m.scenario_params_title()}
-              <span className="text-muted-foreground text-xs">
-                {m.scenario_params_description()}
-              </span>
-            </CollapsibleTrigger>
-            <CollapsibleContent className="px-5 pb-5">
-              <ParameterSummary params={scenario.params} />
-            </CollapsibleContent>
-          </Collapsible>
-        </TabsContent>
-
-        <TabsContent value="network" className="space-y-8">
-          <Section
-            title={m.scenario_map_title()}
-            description={m.scenario_map_description()}
-            actions={
-              <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
-                <Switch checked={showRoutes} onCheckedChange={setShowRoutes} />
-                {m.scenario_show_routes()}
-              </Label>
-            }
-          >
-            <ScenarioMap
-              zones={zones}
-              result={result}
-              showRoutes={showRoutes}
-              className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 lg:h-[36rem]"
-            />
-          </Section>
-          <Section title={m.scenario_routes_title()} description={m.scenario_routes_description()}>
-            <RoutesTable routes={result.routes} />
-          </Section>
-          <Section title={m.scenario_alloc_title()}>
-            <AllocationsTable allocations={result.allocations} />
-          </Section>
-        </TabsContent>
-
-        <TabsContent value="uncertainty">
-          <UncertaintyPanel scenario={scenario} />
-        </TabsContent>
-
-        <TabsContent value="whatif">
-          <Section title={m.whatif_title()} description={m.whatif_description()}>
-            <WhatIfPanel scenario={scenario} />
-          </Section>
-        </TabsContent>
-      </Tabs>
+        tabs={[
+          {
+            id: 'summary',
+            label: tabLabel.summary(),
+            contentClassName: 'space-y-8',
+            content: (
+              <>
+                <Section
+                  title={m.scenario_modes_title()}
+                  description={m.scenario_modes_description()}
+                >
+                  <ModeSummaryCards modes={result.modes} totalTonnes={result.kpis.tonnes_year} />
+                </Section>
+                <Section
+                  title={m.scenario_flows_title()}
+                  description={m.scenario_flows_description()}
+                >
+                  <Panel>
+                    <FlowsSankey flows={flows} />
+                  </Panel>
+                </Section>
+                <Collapsible className="rounded-xl bg-card ring-1 ring-foreground/10">
+                  <CollapsibleTrigger className="flex min-h-12 w-full items-center justify-between gap-3 px-5 py-3 text-left font-medium text-sm">
+                    {m.scenario_params_title()}
+                    <span className="text-muted-foreground text-xs">
+                      {m.scenario_params_description()}
+                    </span>
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="px-5 pb-5">
+                    <ParameterSummary params={scenario.params} />
+                  </CollapsibleContent>
+                </Collapsible>
+              </>
+            ),
+          },
+          {
+            id: 'network',
+            label: tabLabel.network(),
+            contentClassName: 'space-y-8',
+            content: (
+              <>
+                <Section
+                  title={m.scenario_map_title()}
+                  description={m.scenario_map_description()}
+                  actions={
+                    <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
+                      <Switch checked={showRoutes} onCheckedChange={setShowRoutes} />
+                      {m.scenario_show_routes()}
+                    </Label>
+                  }
+                >
+                  <ScenarioMap
+                    zones={zones}
+                    result={result}
+                    showRoutes={showRoutes}
+                    className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 lg:h-[36rem]"
+                  />
+                </Section>
+                <Section
+                  title={m.scenario_routes_title()}
+                  description={m.scenario_routes_description()}
+                >
+                  <RoutesTable routes={result.routes} />
+                </Section>
+                <Section title={m.scenario_alloc_title()}>
+                  <AllocationsTable allocations={result.allocations} />
+                </Section>
+              </>
+            ),
+          },
+          {
+            id: 'uncertainty',
+            label: tabLabel.uncertainty(),
+            content: <UncertaintyPanel scenario={scenario} />,
+          },
+          {
+            id: 'whatif',
+            label: tabLabel.whatif(),
+            content: (
+              <Section title={m.whatif_title()} description={m.whatif_description()}>
+                <WhatIfPanel scenario={scenario} />
+              </Section>
+            ),
+          },
+        ]}
+      />
     </Page>
   );
 }

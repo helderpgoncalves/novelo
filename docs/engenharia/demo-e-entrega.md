@@ -30,7 +30,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 - [ ] Vídeo de 60 s da demo no portátil e num segundo dispositivo
 - [ ] Slides finais exportados em PDF
 - [ ] Números da frase-âncora iguais nos slides, na demo, no vídeo e no relatório
-- [ ] Repositório público ou partilhado, com README e instruções para correr
+- [ ] Repositório privado partilhado com a organização (acesso verificado), com README e instruções para correr
 - [ ] Fontes dos dados no README, nos slides e no relatório
 - [ ] Página do projeto atualizada com capa, avatar, teaser e descrição
 - [ ] 3 ensaios cronometrados feitos

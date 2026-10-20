@@ -73,9 +73,10 @@ export function CircuitsTable({ circuits }: { circuits: CircuitOut[] }) {
   return (
     <DataTable
       id="circuits"
+      exportName="circuitos"
       columns={columns}
       rows={circuits}
-      getKey={(c) => c.code}
+      getRowId={(c) => c.code}
       caption={m.circuits_title()}
       searchLabel={m.circuits_search()}
       pageSize={25}

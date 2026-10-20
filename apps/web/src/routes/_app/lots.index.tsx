@@ -78,9 +78,10 @@ function Lots() {
       ) : (
         <DataTable
           id="lots"
+          exportName="lotes"
           columns={columns}
           rows={data}
-          getKey={(l) => l.code}
+          getRowId={(l) => l.code}
           caption={m.lots_title()}
           searchLabel={m.lots_search()}
         />
@@ -143,6 +144,7 @@ const columns: Column<LotSummary>[] = [
   },
   {
     id: 'opened',
+    type: 'datetime',
     header: m.lots_col_opened(),
     className: 'text-muted-foreground',
     value: (l) => l.opened_at,

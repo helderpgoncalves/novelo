@@ -102,7 +102,9 @@ No hackathon mostra-se uma execução, com dados simulados de uma semana. No pit
 | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, frota, localidades, qualidade dos dados | Feito |
-| Camada dos contentores existentes no mapa | Falta: dados a chegar a 20 de outubro de 2026 |
+| Tabelas de dados e separadores de nível profissional: filtros partilháveis por URL, vistas guardadas, colunas fixáveis e reordenáveis, exportar CSV/XLSX/JSON, seleção e ações em massa, teclado (ver [Arquitetura](arquitetura.md#web)) | Feito |
+| Rede municipal (outras frações, não é têxtil): API de dados, GeoJSON, candidatos, produtores, lacuna estimada e exportação; ferramentas do copiloto | Feito na API; ecrãs e camadas de mapa por fazer no web |
+| Camada dos contentores de **têxteis** no mapa | Falta: a lista de contentores de têxteis continua por receber |
 | Copiloto de operações | Não iniciado (fica para depois) |
 
 ## O que fica de fora, de propósito

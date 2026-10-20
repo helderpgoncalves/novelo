@@ -17,10 +17,10 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A5 | O destino de duas entidades é estimado por percentagem | Nova Etapa e Vitrus (percentagens de relatórios) | `dados_textil.xlsx` | Dado Vitrus (diz-se "estimativa") | 5 |
 | A6 | Circuitos, viaturas, localidades | 40 circuitos, 29 viaturas, 82 localidades (71 geocodificadas) | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 4 |
 | A7 | Circuitos sem viatura atribuída | 9 | idem | Dado Vitrus | demo |
-| A8 | Potencial do plano municipal | 0,7 kg/hab/mês ≈ 1 317 t/ano | Plano municipal × INE | **Por verificar** (a fonte pública do plano não foi localizada); Cálculo para as 1 317 t | 2 |
+| A8 | Potencial do plano municipal | 0,7 kg/hab/mês ≈ 1 317 t/ano | Plano municipal × INE | **Por verificar**: fonte pública localizada a 20 out (Plano de Ação Integrado, URBACT, p. 30, F74, citando Perebynos et al. 2023, F75); falta confirmar com a Vitrus se o 0,7 é o têxtil que fica no indiferenciado ou a geração total, e o ano (resumo do estudo: dados de 2016). Cálculo para as 1 317 t. Ver [Q6](../projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | 2 |
 | A9 | Captura atual face ao potencial | 22,9% | 301,3 ÷ 1 317 | Cálculo | 2 |
-| A10 | Têxtil no indiferenciado | 5,4% | Plano municipal | **Por verificar**: documentos públicos citam cerca de 5% e uma declaração fala em cerca de 11%; usar "cerca de 5%" só depois de confirmar | 2 |
-| A11 | 4 de 27 operadores licenciados valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** | 6 |
+| A10 | Têxtil no indiferenciado | 5,4% | Plano municipal | **Por verificar**: o Plano de Ação Integrado (F74, p. 30) dá 5,4% em Guimarães contra 4,7% na Europa e cerca de 4% em Portugal; documentos públicos citam cerca de 5% e uma declaração fala em cerca de 11%; usar "cerca de 5%" só depois de confirmar o ano e o âmbito (Q6) | 2 |
+| A11 | 4 de 27 operadores licenciados valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar**: o Plano (F74, p. 32) fala em 27 operadores com licença LER 04 em Guimarães e sete concelhos vizinhos, 4 deles com reciclagem ou valorização (R3 e R5); LER 04 é resíduo industrial, pelo que não prova pós-consumo | 6 |
 | A12 | Total de têxtil no indiferenciado por ano | 1 300 a 2 650 t | Cálculo nosso (315 kg/hab de indiferenciado × 5,4%, ver [proposta](../projeto/proposta.md)) | Cálculo (depende de A10) | não usar até A10 |
 | A13 | Doze alertas de qualidade nos dados dos circuitos | 12 | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 7 |
 | A14 | Localizações dos contentores **de têxteis** | por receber (a 20 out chegou só o pacote municipal, ver G1) | Vitrus | Por obter | 4 |
@@ -40,7 +40,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | B8 | A rede de recolha deve cobrir todo o território, não só as zonas rentáveis | art. 11.º e considerando 36 | [F1], [F2] | Primária | 3, 6 |
 | B9 | A triagem dá prioridade à reutilização e à triagem local | art. 22.º-D n.º 5, considerando 48 | [F1] | Primária | 5 |
 | B10 | A economia social pode manter pontos de recolha próprios | art. 22.º-C n.º 11 | [F1] | Primária | 6 |
-| B11 | Portugal ainda não tem entidade gestora nem regime de RAP de têxteis aprovado | "ainda não se encontra aprovado o fluxo" (APA, dez 2025) | [F2] | Primária (dezembro de 2025; reconfirmar antes do pitch) | 2 |
+| B11 | Portugal ainda não tem entidade gestora nem regime de RAP de têxteis aprovado | "ainda não se encontra aprovado o fluxo" (APA, dez 2025) | [F2] | Primária (dezembro de 2025); reconfirmada a 8 out 2026: a APA diz que o modelo nacional, as entidades gestoras e os valores estão por definir (F71) | 2 |
 | B12 | O município assume sozinho o custo desde 2025 | posição da ZERO e da ANMP | [F5], [F6] | Secundária | 2 |
 | B13 | Projeto-piloto da APED, financiado pelo Fundo Ambiental | 450 000 € | APA [F2] | Primária | não usar |
 | B14 | A diretiva fixa metas de recolha de têxteis | **não**: só pede à Comissão que avalie a viabilidade (considerando 59) | [F1] | Primária | **não afirmar metas** |

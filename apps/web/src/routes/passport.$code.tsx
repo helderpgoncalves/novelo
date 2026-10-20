@@ -31,7 +31,7 @@ function PassportPage() {
     <div className="min-h-dvh bg-background">
       <header className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
         <Link to="/" aria-label="Novelo">
-          <BrandLogo />
+          <BrandLogo className="h-7" />
         </Link>
         <LanguageSwitcher />
       </header>

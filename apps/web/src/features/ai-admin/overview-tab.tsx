@@ -255,9 +255,6 @@ function UsageTable({
   kind: 'task' | 'model';
   query: { isPending: boolean; isError: boolean; error: unknown; refetch: () => unknown };
 }) {
-  if (query.isPending) return <Skeleton className="h-56 w-full rounded-xl" />;
-  if (query.isError) return <ErrorState error={query.error} onRetry={() => query.refetch()} />;
-
   const columns: Column<UsageGroup>[] = [
     {
       id: 'name',
@@ -314,8 +311,11 @@ function UsageTable({
       id={id}
       columns={columns}
       rows={groups ?? []}
-      getKey={(g) => (kind === 'task' ? (g.task ?? '') : (g.model ?? ''))}
+      getRowId={(g) => (kind === 'task' ? (g.task ?? '') : (g.model ?? ''))}
       controls="never"
+      loading={query.isPending}
+      error={query.isError ? query.error : undefined}
+      onRetry={() => query.refetch()}
       initialSort={{ id: 'cost', desc: true }}
       empty={
         <EmptyState title={m.aiadm_usage_empty_title()} description={m.aiadm_usage_empty_desc()} />

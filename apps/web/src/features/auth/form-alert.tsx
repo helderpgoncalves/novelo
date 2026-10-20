@@ -1,4 +1,4 @@
-import { AlertCircle, CheckCircle2 } from 'lucide-react';
+import { AlertCircle, CheckCircle2, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function FormAlert({
@@ -6,10 +6,10 @@ export function FormAlert({
   tone = 'error',
 }: {
   message: string | null;
-  tone?: 'error' | 'success';
+  tone?: 'error' | 'success' | 'info';
 }) {
   if (!message) return null;
-  const Icon = tone === 'error' ? AlertCircle : CheckCircle2;
+  const Icon = tone === 'error' ? AlertCircle : tone === 'info' ? Info : CheckCircle2;
   return (
     <Alert
       variant={tone === 'error' ? 'destructive' : 'default'}

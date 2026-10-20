@@ -1,11 +1,8 @@
 import { Link, useNavigate } from '@tanstack/react-router';
 import { GitCompareArrows } from 'lucide-react';
-import { useState } from 'react';
 import type { ScenarioObjective, ScenarioSummary } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
 import { objectiveLabel } from '@/lib/scenario';
@@ -13,28 +10,7 @@ import { m } from '@/paraglide/messages';
 
 export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
   const navigate = useNavigate();
-  const [selected, setSelected] = useState<string[]>([]);
-  const toggle = (id: string) =>
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev.slice(-1), id],
-    );
-
   const columns: Column<ScenarioSummary>[] = [
-    {
-      id: 'select',
-      header: <span className="sr-only">{m.scenarios_select()}</span>,
-      className: 'w-10',
-      desktopOnly: true,
-      label: m.scenarios_select(),
-      hideable: false,
-      cell: (s) => (
-        <Checkbox
-          checked={selected.includes(s.id)}
-          onCheckedChange={() => toggle(s.id)}
-          aria-label={m.scenarios_select_one({ label: s.label })}
-        />
-      ),
-    },
     {
       id: 'name',
       header: m.scenarios_col_name(),
@@ -107,6 +83,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
     },
     {
       id: 'created',
+      type: 'datetime',
       defaultHidden: true,
       header: m.scenarios_col_created(),
       className: 'text-muted-foreground',
@@ -117,26 +94,25 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
   ];
 
   return (
-    <div className="space-y-3">
-      <div className="flex justify-end">
-        <Button
-          variant="outline"
-          className="h-9 gap-2"
-          disabled={selected.length !== 2}
-          onClick={() =>
-            navigate({ to: '/scenarios/compare', search: { a: selected[0], b: selected[1] } })
-          }
-        >
-          <GitCompareArrows /> {m.scenario_compare()}
-        </Button>
-      </div>
-      <DataTable
-        id="scenarios"
-        columns={columns}
-        rows={scenarios}
-        getKey={(s) => s.id}
-        caption={m.scenarios_title()}
-      />
-    </div>
+    <DataTable
+      id="scenarios"
+      exportName="cenarios"
+      columns={columns}
+      rows={scenarios}
+      getRowId={(s) => s.id}
+      caption={m.scenarios_title()}
+      selectable
+      bulkActions={[
+        {
+          id: 'compare',
+          label: m.scenario_compare(),
+          icon: <GitCompareArrows />,
+          disabled: (rows) => rows.length !== 2,
+          onSelect: ([a, b]) => {
+            if (a && b) navigate({ to: '/scenarios/compare', search: { a: a.id, b: b.id } });
+          },
+        },
+      ]}
+    />
   );
 }

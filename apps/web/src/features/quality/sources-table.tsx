@@ -7,6 +7,7 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
   const columns: Column<DataSourceOut>[] = [
     {
       id: 'file',
+      exportValue: (s) => s.file_name,
       header: m.quality_source_file(),
       primary: true,
       label: m.quality_source_file(),
@@ -35,12 +36,14 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
     },
     {
       id: 'received',
+      type: 'date',
       header: m.quality_source_received(),
       value: (s) => s.received_on,
       cell: (s) => (s.received_on ? formatDate(s.received_on) : m.common_dash()),
     },
     {
       id: 'period',
+      type: 'date',
       header: m.quality_source_period(),
       value: (s) => s.period_start,
       searchable: false,
@@ -62,9 +65,10 @@ export function SourcesTable({ sources }: { sources: DataSourceOut[] }) {
   return (
     <DataTable
       id="sources"
+      exportName="fontes-recebidas"
       columns={columns}
       rows={sources}
-      getKey={(s) => s.key}
+      getRowId={(s) => s.key}
       caption={m.quality_sources_title()}
     />
   );

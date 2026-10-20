@@ -1,0 +1,69 @@
+{
+  "upm": 2000,
+  "cap": 1430,
+  "xheight": 1024,
+  "overshoot": 22,
+  "ascender": 1486,
+  "unit": 476.6666666666667,
+  "clear": 715.0,
+  "sym_scale": 1.9159777465813967,
+  "sym_w": 1601.7573961420476,
+  "sym_h": 1474,
+  "word_dx": 2034.424062808714,
+  "word_x0": 2078.424062808714,
+  "word_x1": 8229.424062808714,
+  "box_x0": 0.0,
+  "box_y0": -1486,
+  "box_w": 8229.424062808714,
+  "box_h": 1542,
+  "st_sym_scale": 3.7175687620236055,
+  "st_sym_h": 2860,
+  "st_gap": 953.3333333333334,
+  "st_box_x0": -3075.5,
+  "st_box_y0": -5299.333333333334,
+  "st_box_w": 6151.0,
+  "st_box_h": 5321.333333333334,
+  "minimum_lockup_px": 96,
+  "minimum_stacked_px": 64,
+  "minimum_symbol_px": 16,
+  "symbol_radius": 446.0412677096145,
+  "clear_horizontal": 715.0,
+  "palettes": {
+    "positivo": [
+      "#A9C2B7",
+      "#2E6B57",
+      "#C4A06A",
+      "#14211D",
+      "#14211D"
+    ],
+    "negativo": [
+      "#3E6658",
+      "#7FB39C",
+      "#C4A06A",
+      "#F4F1EA",
+      "#F4F1EA"
+    ],
+    "mono-escuro": [
+      "#14211D",
+      "#14211D",
+      "#14211D",
+      "#14211D",
+      "#14211D"
+    ],
+    "mono-claro": [
+      "#F4F1EA",
+      "#F4F1EA",
+      "#F4F1EA",
+      "#F4F1EA",
+      "#F4F1EA"
+    ]
+  },
+  "contrast": {
+    "tinta_sobre_linho": 14.72,
+    "linho_sobre_tinta": 14.72,
+    "floresta_sobre_linho": 5.55,
+    "floresta_clara_sobre_tinta": 6.98,
+    "areia_sobre_tinta": 6.79,
+    "favicon_arco_interior_sobre_tinta": 4.83
+  }
+}

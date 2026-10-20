@@ -140,7 +140,7 @@ export function TriageEvalTab() {
           id="ai-triage-eval"
           columns={columns}
           rows={data.models}
-          getKey={(r) => r.model}
+          getRowId={(r) => r.model}
           controls="never"
           initialSort={{ id: 'mean', desc: true }}
           empty={

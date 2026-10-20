@@ -41,7 +41,7 @@ function VerifyEmail() {
         <LanguageSwitcher />
       </div>
       <div className="w-full max-w-sm space-y-6 text-center">
-        <BrandLogo className="justify-center" />
+        <BrandLogo className="mx-auto h-9" />
         <div
           className="space-y-4 rounded-xl bg-card p-8 ring-1 ring-foreground/10"
           aria-live="polite"

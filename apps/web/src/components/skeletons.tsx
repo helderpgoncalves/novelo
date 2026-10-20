@@ -65,17 +65,20 @@ export function DataTableSkeleton({
   columns?: number;
   controls?: boolean;
 }) {
+  // Mesma estrutura do cartão da tabela (barra, cabeçalho, linhas, rodapé) para não haver salto quando chega.
   return (
-    <div className="space-y-3">
+    <div className="overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10">
       {controls && (
-        <div className="flex flex-wrap items-center gap-2">
-          <Skeleton className="h-10 w-full sm:max-w-xs sm:flex-1" />
-          <Skeleton className="h-10 w-28" />
-          <Skeleton className="h-10 w-28" />
-          <Skeleton className="h-10 w-28 sm:ml-auto" />
+        <div className="flex flex-wrap items-center gap-2 border-b px-3 py-3 md:px-4">
+          <Skeleton className="h-10 min-w-0 flex-1 md:max-w-xs" />
+          <Skeleton className="h-10 w-24" />
+          <Skeleton className="ml-auto hidden h-10 w-24 md:block" />
+          <Skeleton className="hidden h-10 w-24 md:block" />
+          <Skeleton className="hidden h-10 w-10 md:block" />
+          <Skeleton className="hidden h-10 w-24 md:block" />
         </div>
       )}
-      <ul className="divide-y divide-border overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 md:hidden">
+      <ul className="divide-y divide-border md:hidden">
         {Array.from({ length: Math.min(rows, 4) }, (_, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: lista estática de blocos
           <li key={i} className="space-y-3 p-4">
@@ -92,7 +95,7 @@ export function DataTableSkeleton({
           </li>
         ))}
       </ul>
-      <div className="hidden overflow-hidden rounded-xl bg-card ring-1 ring-foreground/10 md:block">
+      <div className="hidden md:block">
         <div className="flex h-10 items-center gap-6 border-b px-4">
           {Array.from({ length: columns }, (_, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: lista estática de blocos
@@ -109,7 +112,7 @@ export function DataTableSkeleton({
           </div>
         ))}
       </div>
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between border-t px-4 py-3">
         <Skeleton className="h-4 w-28" />
         <Skeleton className="h-10 w-48" />
       </div>

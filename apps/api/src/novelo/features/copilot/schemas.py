@@ -96,6 +96,7 @@ class MentionType(StrEnum):
     FIBRE = "fibre"
     PAGE = "page"
     DATA_SOURCE = "data_source"
+    MUNICIPAL_SITE = "municipal_site"  # local da rede municipal (outras frações; não é têxtil)
 
 
 class MentionRef(BaseModel):

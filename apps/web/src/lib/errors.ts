@@ -28,6 +28,11 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   internal_error: () => m.error_internal_error(),
 };
 
+// Códigos que só existem no cliente: o nginx devolve 502/503/504 (HTML) enquanto a API reinicia.
+const CLIENT_MESSAGES = { service_unavailable: () => m.error_service_unavailable() } as const;
+type ClientCode = keyof typeof CLIENT_MESSAGES;
+export const SERVICE_UNAVAILABLE: ClientCode = 'service_unavailable';
+
 export type ApiError = ErrorBody | ValidationErrorBody;
 
 const isApiError = (error: unknown): error is ApiError =>
@@ -36,16 +41,80 @@ const isApiError = (error: unknown): error is ApiError =>
   'code' in error &&
   typeof (error as { code: unknown }).code === 'string';
 
+const isClientCode = (value: unknown): value is ClientCode =>
+  typeof value === 'string' && value in CLIENT_MESSAGES;
+
 export const isErrorCode = (value: unknown): value is ErrorCode =>
   typeof value === 'string' && value in MESSAGES;
 
 /** Mensagem traduzida para qualquer erro devolvido pelo cliente gerado. */
 export function getErrorMessage(error: unknown): string {
-  if (isApiError(error) && isErrorCode(error.code)) return MESSAGES[error.code]();
-  if (error instanceof TypeError) return m.error_network(); // fetch falhou: sem rede
+  const code: unknown = isApiError(error) ? error.code : undefined;
+  if (isErrorCode(code)) return MESSAGES[code]();
+  if (isClientCode(code)) return CLIENT_MESSAGES[code]();
+  if (isNetworkError(error)) return m.error_network();
   return m.error_unknown();
 }
 
 /** Código de um erro da API (para decisões de fluxo, ex.: 'session_expired'). */
 export const getErrorCode = (error: unknown): ErrorCode | null =>
   isApiError(error) && isErrorCode(error.code) ? error.code : null;
+
+/** `fetch` falhou antes de haver resposta (sem rede, servidor em baixo). Chrome, Safari e Firefox dizem-no de formas diferentes. */
+export const isNetworkError = (error: unknown): boolean =>
+  error instanceof TypeError &&
+  !isChunkError(error) &&
+  /fetch|network|load failed/i.test(error.message);
+
+/** Um ficheiro do site que já não existe: acontece a quem tinha a app aberta durante um deploy novo. */
+export const isChunkError = (error: unknown): boolean =>
+  error instanceof Error &&
+  /dynamically imported module|importing a module script failed|ChunkLoadError|error loading dynamically/i.test(
+    `${error.name} ${error.message}`,
+  );
+
+/** Lançado pelas rotas que exigem um papel (ver `requireRole`): o URL mantém-se e mostra-se o ecrã 403. */
+export class ForbiddenError extends Error {
+  constructor(readonly requiredRole: 'admin' | 'operator' | null = null) {
+    super('forbidden');
+    this.name = 'ForbiddenError';
+  }
+}
+
+export type ErrorKind =
+  | 'offline'
+  | 'maintenance'
+  | 'forbidden'
+  | 'not_found'
+  | 'session'
+  | 'chunk'
+  | 'generic';
+
+/** Em que família cai um erro: decide o ecrã, o texto e se vale a pena tentar de novo sozinho. */
+export function classifyError(error: unknown): ErrorKind {
+  // Sem rede, um ficheiro que não chega não é uma versão nova: é só a rede.
+  if (isChunkError(error))
+    return typeof navigator !== 'undefined' && !navigator.onLine ? 'offline' : 'chunk';
+  if (error instanceof ForbiddenError) return 'forbidden';
+  if (isNetworkError(error)) return 'offline';
+  if (isApiError(error)) {
+    const code: string = error.code ?? '';
+    switch (code) {
+      case SERVICE_UNAVAILABLE:
+        return 'maintenance';
+      case 'forbidden':
+        return 'forbidden';
+      case 'not_found':
+      case 'user_not_found':
+        return 'not_found';
+      case 'unauthenticated':
+      case 'session_expired':
+        return 'session';
+    }
+  }
+  return 'generic';
+}
+
+/** Falha de infraestrutura (rede ou API a reiniciar): tentar de novo resolve sem a pessoa fazer mais nada. */
+export const isTransient = (kind: ErrorKind): boolean =>
+  kind === 'offline' || kind === 'maintenance';

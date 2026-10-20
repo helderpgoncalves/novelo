@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import type { CopilotEventMessage } from '@/client';
 import { parseBlocks } from './markdown';
-import { applyEvent, newTurn } from './reducer';
+import { applyEvent, closingEvents, newTurn } from './reducer';
 import { parseSseBlock, splitSse } from './sse';
 import { familyOf } from './thinking';
 import { applyTrigger, findTrigger } from './triggers';
@@ -114,5 +114,35 @@ describe('frases e markdown', () => {
       '# Título\n\n- a\n- b\n\n| x | y |\n|---|---|\n| 1 | 2 |\n\n```\ncódigo\n```',
     );
     expect(blocks.map((b) => b.kind)).toEqual(['h', 'ul', 'table', 'code']);
+  });
+});
+
+describe('fecho do stream (regressão do erro de 1 ms)', () => {
+  const done: CopilotEventMessage = { type: 'done', finish: 'stop' };
+  const fresh = () => newTurn('tmp-1');
+
+  it('não inventa erro quando o `done` ainda está na fila', () => {
+    expect(closingEvents([done], fresh(), false, 'ligação')).toEqual([]);
+  });
+
+  it('não inventa erro quando o `done` já foi aplicado', () => {
+    expect(closingEvents([], applyEvent(fresh(), done), false, 'ligação')).toEqual([]);
+  });
+
+  it('sem `done` e sem cancelar, o stream cortado é erro de ligação', () => {
+    expect(closingEvents([], fresh(), false, 'ligação')).toEqual([
+      { type: 'error', code: 'connection', message: 'ligação' },
+    ]);
+  });
+
+  it('cancelar fecha com `done` cancelado', () => {
+    expect(closingEvents([], fresh(), true, 'ligação')).toEqual([
+      { type: 'done', finish: 'cancelled' },
+    ]);
+  });
+
+  it('um erro do servidor já na fila não é duplicado', () => {
+    const err: CopilotEventMessage = { type: 'error', code: 'upstream_error', message: 'x' };
+    expect(closingEvents([err], fresh(), false, 'ligação')).toEqual([]);
   });
 });

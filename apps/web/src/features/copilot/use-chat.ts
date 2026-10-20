@@ -12,7 +12,7 @@ import { getCopilotThreadOptions } from '@/client/@tanstack/react-query.gen';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { invalidateCopilot } from './cache';
-import { applyEvent, emptyMessage, fromServer, newTurn } from './reducer';
+import { applyEvent, closingEvents, emptyMessage, fromServer, newTurn } from './reducer';
 import { regeneratePath, STREAM_PATH, StreamHttpError, streamEvents } from './sse';
 import type { ChatMessage, ContextInfo, EventOf, StatusInfo, Turn } from './types';
 
@@ -39,7 +39,7 @@ function errorFrom(e: unknown): { code: string; message: string } {
       message: typeof body?.message === 'string' ? body.message : `HTTP ${e.status}`,
     };
   }
-  return { code: 'upstream_error', message: m.chat_error_connection() };
+  return { code: 'connection', message: m.chat_error_connection() };
 }
 
 /**
@@ -134,6 +134,7 @@ export function useChat({ threadId, onThreadId }: Options) {
               navigate: mine.navigate,
               plan: mine.plan,
               retracted: mine.retracted,
+              error: mine.error ?? fresh.error,
               tools: mine.tools.length ? mine.tools : fresh.tools,
             };
           }
@@ -167,7 +168,6 @@ export function useChat({ threadId, onThreadId }: Options) {
       let currentId = first.message.id;
       let queue: CopilotEventMessage[] = [];
       let timer: ReturnType<typeof setTimeout> | null = null;
-      let sawDone = false;
 
       const flush = () => {
         timer = null;
@@ -176,7 +176,6 @@ export function useChat({ threadId, onThreadId }: Options) {
         queue = [];
         const before = currentId;
         for (const ev of batch) {
-          if (ev.type === 'done') sawDone = true;
           turn = applyEvent(turn, ev);
         }
         currentId = turn.message.id;
@@ -208,12 +207,7 @@ export function useChat({ threadId, onThreadId }: Options) {
       }
       if (timer !== null) clearTimeout(timer);
       if (mine !== gen.current) return;
-      if (!sawDone) {
-        if (ctrl.signal.aborted) queue.push({ type: 'done', finish: 'cancelled' });
-        else if (!queue.some((q) => q.type === 'error') && !turn.message.error) {
-          queue.push({ type: 'error', code: 'upstream_error', message: m.chat_error_connection() });
-        }
-      }
+      queue.push(...closingEvents(queue, turn, ctrl.signal.aborted, m.chat_error_connection()));
       flush();
       // Sem `done` (erro antes de acabar), a mensagem não pode ficar a "escrever" para sempre.
       setMessages((prev) =>

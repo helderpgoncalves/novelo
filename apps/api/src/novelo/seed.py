@@ -12,15 +12,16 @@ import unicodedata
 import uuid
 from datetime import UTC, date, datetime
 from pathlib import Path
-from typing import Any
 
 from sqlalchemy import delete, select, update
-from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.core.upsert import upsert as _upsert
 from novelo.domain.geo import point_in_geometry
 from novelo.domain.parish_area import geometry_area_km2
 from novelo.features.datasets.models import DataAlert, DataSource
+from novelo.features.municipal import importer as municipal_importer
+from novelo.features.municipal.importer import MUNICIPAL_SOURCE
 from novelo.features.network.models import (
     Circuit,
     CircuitDay,
@@ -51,18 +52,6 @@ def _read(data_dir: Path, name: str) -> list[dict[str, str]]:
 
 def _date(value: str | None) -> date | None:
     return date.fromisoformat(value) if value else None
-
-
-async def _upsert(
-    db: AsyncSession, model: Any, rows: list[dict[str, Any]], keys: list[str], update: list[str]
-) -> dict[tuple[Any, ...], uuid.UUID]:
-    """INSERT .. ON CONFLICT DO UPDATE; devolve {chave natural: id}."""
-    if not rows:
-        return {}
-    stmt = insert(model).values(rows)
-    stmt = stmt.on_conflict_do_update(index_elements=keys, set_={c: stmt.excluded[c] for c in update})
-    ids = (await db.execute(stmt.returning(*(getattr(model, k) for k in keys), model.id))).all()
-    return {tuple(r[:-1]): r[-1] for r in ids}
 
 
 MIN_PLAUSIBLE_PARISH_KM2 = (
@@ -267,6 +256,10 @@ async def seed(db: AsyncSession, data_dir: Path) -> dict[str, int]:
     # --- Contentores (opcional: só depois de a Vitrus enviar as localizações) ------------------------------------
     if (CONTAINERS_SOURCE,) in sources and (data_dir / "containers.csv").exists():
         counts.update(await import_containers(db, data_dir, sources[(CONTAINERS_SOURCE,)]))
+
+    # --- Rede MUNICIPAL (outras frações; tabelas próprias, nunca misturada com os têxteis) ---------------------
+    if (MUNICIPAL_SOURCE,) in sources and municipal_importer.has_package(data_dir):
+        counts.update(await municipal_importer.import_municipal(db, data_dir, sources[(MUNICIPAL_SOURCE,)]))
 
     # --- Pressupostos do simulador (conjunto ativo; nunca sobrescreve os editados) -------------------------------
     await ensure_default_parameters(db)

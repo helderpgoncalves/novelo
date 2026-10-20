@@ -6,6 +6,8 @@ Os projetos são avaliados por quatro critérios ponderados: inovação e origin
 
 > **Quem são os mentores deste desafio.** O enunciado [F62] indica **Lucas Nascimento (Vitrus Ambiente)** e, "para qualquer desafio", o **Prof. Paulo Afonso** (Universidade do Minho, Departamento de Produção e Sistemas). **Luís Miguel Oliveira não consta** nesse texto. O utilizador indicou-o como mentor do hackathon; o papel dele neste desafio está **por confirmar** (M18). Tratá-lo como contacto de oportunidade (Fibrenamics, fibras, parcerias), não como mentor atribuído, até haver confirmação.
 
+> **Perguntas atualizadas.** Este documento é o perfil de cada mentor e as mensagens-tipo. A lista priorizada de perguntas, derivada dos dados recebidos até 20 de outubro (com respostas possíveis, ações, mensagens prontas, guião de 15 minutos e registo de respostas), está em [Perguntas aos orientadores](perguntas-aos-orientadores.md). Se as tabelas abaixo e essa lista divergirem, vale a lista.
+
 Fontes: [Fontes](../pesquisa/fontes.md) (F41 a F62) e [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md#f-mentores-fibrenamics-e-hackathon) (M1 a M17). Escrito a 19 de outubro de 2026. Estados usados: **verificado** (lido numa fonte), **hipótese** (inferência nossa) e **por verificar**.
 
 > **Regra de ouro com mentores:** chegar com o telemóvel aberto no Novelo, uma pergunta por vez, números com a palavra "estimativa" quando o forem, e **nunca** apresentar como validado o que ainda não foi ouvido. Anotar de imediato cada resposta no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md) com data e nome.
@@ -97,6 +99,8 @@ Antes de afinar qualquer critério, precisamos do texto das Regras. **Quem pergu
 
 ### Perguntas, por ordem de impacto
 
+Lista consolidada para o Luís Miguel: [Q9](perguntas-aos-orientadores.md#q9-fibrenamics-critérios-de-lote-destino-de-baixo-valor-e-papel) e [operação](perguntas-aos-orientadores.md#48-operação-lote-triagem-e-recicladores). A tabela abaixo fica como ponto de partida.
+
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |
 | 1 | A Fibrenamics ensaia ou aceita **têxtil pós-consumo triado**? Em que condições e com que volume mínimo? | A lista pública do Green não menciona têxteis e o Lusitano não diz se é pós-consumo (M7) | Define se somos "fornecedor de lotes" ou "fonte de dados"; muda a frase do slide da indústria |
@@ -181,10 +185,12 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 
 ### Perguntas, por ordem de impacto
 
+Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perguntas](perguntas-aos-orientadores.md#2-as-10-perguntas-em-detalhe) e [perguntas por tema](perguntas-aos-orientadores.md#4-perguntas-por-tema). A tabela abaixo fica como ponto de partida.
+
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |
 | 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
-| 2 | **Plano municipal:** qual o documento e a página de onde vêm 5,4% de têxtil no indiferenciado, 0,7 kg/hab/mês e "4 de 27 operadores"? | A fonte pública não foi encontrada (A8, A10, A11) | Passam de "por verificar" a "verificado"; entram (ou não) em slide |
+| 2 | **Plano municipal:** o que medem os 0,7 kg/hab/mês e os 5,4% (têxtil que fica no indiferenciado ou geração total) e de que ano? | A fonte foi localizada a 20 out: Plano de Ação Integrado (URBACT), p. 30 e p. 32; o significado do 0,7 e o ano (dados de 2016, segundo o resumo do estudo) por confirmar (A8, A10, A11). Ver [Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | Passam de "por verificar" a "verificado"; entram (ou não) em slide |
 | 3 | **Texto das Regras**: detalhe de cada um dos quatro critérios, duração do pitch, formato da demo e das perguntas, e quem avalia. Ver a [pergunta comum](#pergunta-comum-às-regras-e-ao-formato). | Os pesos são públicos (E4); o detalhe não (E6, M16) | Afinamos o guião e o tempo |
 | 4 | **Contentores de têxteis:** onde está a lista, formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | A 20 de outubro chegou só o inventário **municipal** (outras frações), não o de têxteis | ETL de têxteis (`containers.py`) pronto; decidimos o tratamento de "sem tipo" |
 | 5 | **Depósito:** de onde saem os circuitos e onde se descarrega? | O VRP assume o centro de Guimarães | Parametrizamos o ponto de partida |
@@ -273,6 +279,8 @@ Servem sobretudo o **impacto e relevância (30%)** e a **continuidade (20%)**. S
 4. **1:45 a 2:00**: a pergunta: "Como defender estes custos perante a Vitrus e perante a futura entidade gestora?"
 
 ### Perguntas, por ordem de impacto
+
+Perguntas do Prof. Paulo Afonso que dependem dos dados novos: [secção 4.11](perguntas-aos-orientadores.md#411-modelo-e-investimento-prof-paulo-afonso). A tabela abaixo continua a ser a lista completa.
 
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |

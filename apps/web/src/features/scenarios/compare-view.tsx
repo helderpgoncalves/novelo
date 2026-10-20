@@ -181,7 +181,7 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
             id="compare-metrics"
             columns={columns}
             rows={METRICS}
-            getKey={(x) => x.key}
+            getRowId={(x) => x.key}
             controls="never"
             pageSize={20}
             caption={m.compare_title()}

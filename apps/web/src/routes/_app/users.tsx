@@ -1,18 +1,19 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, redirect } from '@tanstack/react-router';
+import { createFileRoute } from '@tanstack/react-router';
 import { listUsersOptions } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { UsersTable } from '@/features/users/users-table';
+import { ForbiddenError } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app/users')({
   staticData: { skeleton: 'table' },
-  // Só administradores: a API também o impõe (403), isto evita um ecrã de erro.
+  // Só administradores: a API também o impõe (403); aqui mostra-se o ecrã 403 com o URL intacto.
   beforeLoad: ({ context: { user } }) => {
-    if (user.role !== 'admin') throw redirect({ to: '/' });
+    if (user.role !== 'admin') throw new ForbiddenError('admin');
   },
   loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(listUsersOptions()),
   head: () => ({ meta: [{ title: m.title_users() }] }),

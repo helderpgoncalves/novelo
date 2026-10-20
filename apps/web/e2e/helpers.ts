@@ -1,3 +1,4 @@
+import { inflateRawSync } from 'node:zlib';
 import { expect, type Page, request } from '@playwright/test';
 
 export const ADMIN = { email: 'admin@heldergoncalves.io', password: 'admin-novelo-dev-1' };
@@ -35,3 +36,27 @@ export const linkFrom = (text: string): string => {
   if (!match) throw new Error('Sem link no email');
   return match[0];
 };
+
+/** Lê um ficheiro de dentro de um ZIP (XLSX): suficiente para verificar o conteúdo descarregado. */
+export function readZipEntry(zip: Buffer, name: string): string | null {
+  const eocd = zip.lastIndexOf(Buffer.from([0x50, 0x4b, 0x05, 0x06]));
+  if (eocd < 0) return null;
+  const count = zip.readUInt16LE(eocd + 10);
+  let offset = zip.readUInt32LE(eocd + 16);
+  for (let i = 0; i < count; i++) {
+    const method = zip.readUInt16LE(offset + 10);
+    const packed = zip.readUInt32LE(offset + 20);
+    const nameLen = zip.readUInt16LE(offset + 28);
+    const extraLen = zip.readUInt16LE(offset + 30);
+    const commentLen = zip.readUInt16LE(offset + 32);
+    const local = zip.readUInt32LE(offset + 42);
+    const entry = zip.subarray(offset + 46, offset + 46 + nameLen).toString('utf8');
+    if (entry === name) {
+      const start = local + 30 + zip.readUInt16LE(local + 26) + zip.readUInt16LE(local + 28);
+      const body = zip.subarray(start, start + packed);
+      return (method === 8 ? inflateRawSync(body) : body).toString('utf8');
+    }
+    offset += 46 + nameLen + extraLen + commentLen;
+  }
+  return null;
+}

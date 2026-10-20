@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect, useMatches } from '@tanstack/react-router';
 import { Suspense, useEffect, useState } from 'react';
-import { getMeOptions } from '@/client/@tanstack/react-query.gen';
+import type { UserOut } from '@/client';
+import { getMeOptions, getMeQueryKey } from '@/client/@tanstack/react-query.gen';
 import { AppShellSkeleton } from '@/components/app-loading';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { TabBar } from '@/components/layout/tab-bar';
@@ -9,15 +10,26 @@ import { OfflineBanner } from '@/components/offline-banner';
 import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
+import { classifyError, isTransient } from '@/lib/errors';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
-    const user = await queryClient
-      .fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false })
-      .catch(() => null);
+    let user: UserOut | null;
+    try {
+      user = await queryClient.fetchQuery({ ...getMeOptions(), staleTime: 30_000, retry: false });
+    } catch (error) {
+      const kind = classifyError(error);
+      // Só uma recusa de autenticação leva ao login; qualquer outra falha mostra o ecrã de erro.
+      if (kind === 'session' || kind === 'forbidden') user = null;
+      else if (isTransient(kind)) {
+        // Sem rede ou com a API a reiniciar a sessão não acabou: segue com a que está em cache, se houver.
+        user = queryClient.getQueryData<UserOut>(getMeQueryKey()) ?? null;
+        if (!user) throw error;
+      } else throw error;
+    }
     if (!user) throw redirect({ to: '/login', search: { next: location.href } });
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
     if (user.locale !== getLocale()) switchLocale(user.locale);

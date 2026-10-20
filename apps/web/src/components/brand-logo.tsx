@@ -1,58 +1,101 @@
+import { LOCKUP, STACKED, SYMBOL } from '@/components/brand-geometry.gen';
 import { cn } from '@/lib/utils';
 
-type Tone = 'color' | 'negative' | 'mono';
+/**
+ * Logótipo do Novelo. A geometria (símbolo, wordmark em curvas, caixa simétrica ao eixo do símbolo) vem de
+ * `brand-geometry.gen.ts`, gerado por `just brand` a partir da fonte real: nada é montado à mão aqui.
+ * O tamanho define-se só pela altura (`h-7`, `h-8`...); a largura segue a proporção do viewBox.
+ */
+type Tone = 'auto' | 'color' | 'negative' | 'mono';
 
-const PALETTE: Record<Tone, [string, string, string, string, string]> = {
-  color: ['#A9C2B7', '#2E6B57', '#C4A06A', '#14211D', '#F4F1EA'],
-  negative: ['#3E6658', '#7FB39C', '#C4A06A', '#F4F1EA', '#14211D'],
-  mono: ['currentColor', 'currentColor', 'currentColor', 'currentColor', 'transparent'],
+type ToneClasses = { inner: string; mid: string; outer: string; dot: string; word: string };
+
+/** `auto` segue o tema (html.dark); as outras são fixas. Classes literais para o Tailwind as detetar. */
+const TONES: Record<Tone, ToneClasses> = {
+  auto: {
+    inner: 'stroke-[#A9C2B7] dark:stroke-[#3E6658]',
+    mid: 'stroke-[#2E6B57] dark:stroke-[#7FB39C]',
+    outer: 'stroke-[#C4A06A]',
+    dot: 'fill-[#14211D] dark:fill-[#F4F1EA]',
+    word: 'fill-current',
+  },
+  color: {
+    inner: 'stroke-[#A9C2B7]',
+    mid: 'stroke-[#2E6B57]',
+    outer: 'stroke-[#C4A06A]',
+    dot: 'fill-[#14211D]',
+    word: 'fill-[#14211D]',
+  },
+  negative: {
+    inner: 'stroke-[#3E6658]',
+    mid: 'stroke-[#7FB39C]',
+    outer: 'stroke-[#C4A06A]',
+    dot: 'fill-[#F4F1EA]',
+    word: 'fill-[#F4F1EA]',
+  },
+  mono: {
+    inner: 'stroke-current',
+    mid: 'stroke-current',
+    outer: 'stroke-current',
+    dot: 'fill-current',
+    word: 'fill-current',
+  },
 };
 
-/** Símbolo do Novelo: três fios quase fechados à volta do ponto de recolha. */
-export function BrandSymbol({ tone = 'color', className }: { tone?: Tone; className?: string }) {
-  const [inner, mid, outer, dot, hole] = PALETTE[tone];
+function SymbolMarks({ tone, transform }: { tone: Tone; transform?: string }) {
+  const c = TONES[tone];
+  const strokes = [c.inner, c.mid, c.outer] as const;
+  return (
+    <g transform={transform}>
+      {SYMBOL.arcs.map((d, i) => (
+        <path
+          key={d}
+          d={d}
+          fill="none"
+          strokeWidth={SYMBOL.strokeWidth}
+          strokeLinecap="round"
+          className={strokes[i]}
+        />
+      ))}
+      <path d={SYMBOL.dot} fillRule="evenodd" className={c.dot} />
+    </g>
+  );
+}
+
+/** Só o símbolo. O viewBox é a caixa de tinta: centra-se pela tinta em qualquer contentor (`size-8`, etc.). */
+export function BrandSymbol({ tone = 'auto', className }: { tone?: Tone; className?: string }) {
   return (
     <svg
-      viewBox="-512 -512 1024 1024"
+      viewBox={SYMBOL.viewBox}
       className={cn('size-8 shrink-0', className)}
       aria-hidden="true"
-      role="img"
+      focusable="false"
     >
-      <title>Novelo</title>
-      <path
-        d="M134.99 -160.87A210 210 0 1 1 -117.43 -174.10"
-        fill="none"
-        stroke={inner}
-        strokeWidth="56"
-        strokeLinecap="round"
-      />
-      <path
-        d="M192.84 -229.81A300 300 0 1 1 -167.76 -248.71"
-        fill="none"
-        stroke={mid}
-        strokeWidth="56"
-        strokeLinecap="round"
-      />
-      <path
-        d="M250.69 -298.76A390 390 0 1 1 -218.09 -323.32"
-        fill="none"
-        stroke={outer}
-        strokeWidth="56"
-        strokeLinecap="round"
-      />
-      <circle r="92" fill={dot} />
-      <circle r="38" fill={hole} />
+      <SymbolMarks tone={tone} />
     </svg>
   );
 }
 
-export function BrandLogo({ tone = 'color', className }: { tone?: Tone; className?: string }) {
+/** Lockup horizontal (símbolo + wordmark) ou empilhado. Dimensiona-se pela altura. */
+export function BrandLogo({
+  tone = 'auto',
+  stacked = false,
+  className,
+}: {
+  tone?: Tone;
+  stacked?: boolean;
+  className?: string;
+}) {
+  const g = stacked ? STACKED : LOCKUP;
   return (
-    <span className={cn('inline-flex items-center gap-2.5', className)}>
-      <BrandSymbol tone={tone} className="size-8" />
-      <span className="font-medium font-serif text-[1.65rem] leading-none tracking-[-0.02em]">
-        Novelo
-      </span>
-    </span>
+    <svg
+      viewBox={g.viewBox}
+      className={cn('block h-8 w-auto shrink-0', className)}
+      role="img"
+      aria-label="Novelo"
+    >
+      <SymbolMarks tone={tone} transform={g.symbolTransform} />
+      <path d={g.wordmark} className={TONES[tone].word} />
+    </svg>
   );
 }

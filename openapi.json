@@ -665,7 +665,30 @@
           "normalized_spelling",
           "container_rows_rejected",
           "container_pending_location",
-          "container_assumed_values"
+          "container_assumed_values",
+          "municipal_blank_rows",
+          "municipal_boundary_tolerance",
+          "municipal_caop_version",
+          "municipal_caop_vs_osm",
+          "municipal_capacity_outlier",
+          "municipal_capacity_unit_assumed",
+          "municipal_capacity_unknown",
+          "municipal_coord_suspect",
+          "municipal_coords_artifact",
+          "municipal_coords_low_precision",
+          "municipal_coords_missing",
+          "municipal_coords_swapped",
+          "municipal_cross_file_overlap",
+          "municipal_empty_row",
+          "municipal_not_textile",
+          "municipal_osm_contours_incomplete",
+          "municipal_outside_municipality",
+          "municipal_parish_mismatch",
+          "municipal_parish_names_inconsistent",
+          "municipal_parish_unmapped",
+          "municipal_quantity_semantics",
+          "municipal_stacked_units",
+          "municipal_stream_unknown"
         ],
         "title": "AlertKind",
         "type": "string"
@@ -1619,6 +1642,182 @@
         "title": "BudgetOut",
         "type": "object"
       },
+      "CaopFeature": {
+        "properties": {
+          "geometry": {
+            "additionalProperties": true,
+            "description": "Polygon/MultiPolygon GeoJSON (WGS84, simplificado a 5 m)",
+            "title": "Geometry",
+            "type": "object"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/CaopProps"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "geometry",
+          "properties"
+        ],
+        "title": "CaopFeature",
+        "type": "object"
+      },
+      "CaopFeatureCollection": {
+        "properties": {
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/CaopFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "source",
+          "features"
+        ],
+        "title": "CaopFeatureCollection",
+        "type": "object"
+      },
+      "CaopProps": {
+        "properties": {
+          "area_ha": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Area Ha"
+          },
+          "area_km2": {
+            "title": "Area Km2",
+            "type": "number"
+          },
+          "candidate_sites": {
+            "title": "Candidate Sites",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "containers_per_1000_hab": {
+            "title": "Containers Per 1000 Hab",
+            "type": "number"
+          },
+          "cover_pct_300m": {
+            "title": "Cover Pct 300M",
+            "type": "number"
+          },
+          "dicofre": {
+            "title": "Dicofre",
+            "type": "string"
+          },
+          "dicofre_caop": {
+            "title": "Dicofre Caop",
+            "type": "string"
+          },
+          "gap_rank": {
+            "title": "Gap Rank",
+            "type": "integer"
+          },
+          "gap_t_per_candidate_site": {
+            "description": "Estimativa",
+            "title": "Gap T Per Candidate Site",
+            "type": "number"
+          },
+          "lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lat"
+          },
+          "lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lon"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "public_sites_per_1000_hab": {
+            "title": "Public Sites Per 1000 Hab",
+            "type": "number"
+          }
+        },
+        "required": [
+          "dicofre",
+          "dicofre_caop",
+          "name",
+          "population",
+          "area_ha",
+          "area_km2",
+          "containers",
+          "containers_per_1000_hab",
+          "public_sites_per_1000_hab",
+          "cover_pct_300m",
+          "candidate_sites",
+          "gap_t_per_candidate_site",
+          "gap_rank",
+          "lat",
+          "lon"
+        ],
+        "title": "CaopProps",
+        "type": "object"
+      },
+      "CapacityStatus": {
+        "enum": [
+          "ok",
+          "assumed_litres",
+          "unknown"
+        ],
+        "title": "CapacityStatus",
+        "type": "string"
+      },
       "CaptureScale": {
         "properties": {
           "factor": {
@@ -2363,6 +2562,22 @@
           "planned"
         ],
         "title": "ContainerStatus",
+        "type": "string"
+      },
+      "CoordPrecision": {
+        "enum": [
+          "precise",
+          "approximate"
+        ],
+        "title": "CoordPrecision",
+        "type": "string"
+      },
+      "CoordStatus": {
+        "enum": [
+          "ok",
+          "pending"
+        ],
+        "title": "CoordStatus",
         "type": "string"
       },
       "CopilotActionResultEvent": {
@@ -4433,6 +4648,23 @@
         ],
         "title": "ErrorBody",
         "type": "object"
+      },
+      "ExportFormat": {
+        "enum": [
+          "csv",
+          "xlsx",
+          "geojson"
+        ],
+        "title": "ExportFormat",
+        "type": "string"
+      },
+      "ExportScope": {
+        "enum": [
+          "sites",
+          "containers"
+        ],
+        "title": "ExportScope",
+        "type": "string"
       },
       "FeedbackIn": {
         "properties": {
@@ -6541,7 +6773,8 @@
           "brand",
           "fibre",
           "page",
-          "data_source"
+          "data_source",
+          "municipal_site"
         ],
         "title": "MentionType",
         "type": "string"
@@ -6845,6 +7078,2359 @@
           "annual_cost_eur"
         ],
         "title": "ModeSummary",
+        "type": "object"
+      },
+      "MunicipalCandidateOut": {
+        "properties": {
+          "parish_gap_rank": {
+            "title": "Parish Gap Rank",
+            "type": "integer"
+          },
+          "parish_gap_t_per_candidate": {
+            "description": "Estimativa da freguesia, usada na ordem",
+            "title": "Parish Gap T Per Candidate",
+            "type": "number"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "reason_text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Justificação do ETL, em português",
+            "title": "Reason Text"
+          },
+          "reasons": {
+            "description": "Chaves: underground, organic_collective_nearby, three_or_more_containers, approximate_coordinates",
+            "items": {
+              "type": "string"
+            },
+            "title": "Reasons",
+            "type": "array"
+          },
+          "site": {
+            "$ref": "#/components/schemas/MunicipalSiteOut"
+          }
+        },
+        "required": [
+          "rank",
+          "site",
+          "reasons",
+          "reason_text",
+          "parish_gap_t_per_candidate",
+          "parish_gap_rank"
+        ],
+        "title": "MunicipalCandidateOut",
+        "type": "object"
+      },
+      "MunicipalCandidatesOut": {
+        "properties": {
+          "is_estimate": {
+            "const": true,
+            "default": true,
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalCandidateOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "rank_rule": {
+            "title": "Rank Rule",
+            "type": "string"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          },
+          "total_precise": {
+            "title": "Total Precise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rank_rule",
+          "note",
+          "total",
+          "total_precise",
+          "items",
+          "next_cursor"
+        ],
+        "title": "MunicipalCandidatesOut",
+        "type": "object"
+      },
+      "MunicipalContainerOut": {
+        "properties": {
+          "boundary_note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Boundary Note"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "capacity_litres": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity Litres"
+          },
+          "capacity_raw": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Capacity Raw"
+          },
+          "capacity_status": {
+            "$ref": "#/components/schemas/CapacityStatus"
+          },
+          "container_uid": {
+            "title": "Container Uid",
+            "type": "string"
+          },
+          "coord_cleaned": {
+            "title": "Coord Cleaned",
+            "type": "boolean"
+          },
+          "coord_precision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CoordPrecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "coord_status": {
+            "$ref": "#/components/schemas/CoordStatus"
+          },
+          "coord_suspect": {
+            "title": "Coord Suspect",
+            "type": "boolean"
+          },
+          "coord_swapped": {
+            "title": "Coord Swapped",
+            "type": "boolean"
+          },
+          "declared_parish": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Como escrito no ficheiro; nunca é usado para contar",
+            "title": "Declared Parish"
+          },
+          "external_id": {
+            "title": "External Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MunicipalKind"
+          },
+          "latitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latitude"
+          },
+          "longitude": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Longitude"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Code"
+          },
+          "parish_dicofre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Dicofre"
+          },
+          "parish_match": {
+            "$ref": "#/components/schemas/ParishMatch"
+          },
+          "parish_match_level": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ParishMatchLevel"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "parish_mismatch_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Mismatch Distance M"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "producer_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SENSÍVEL: só para admins com show_names=true; caso contrário null",
+            "title": "Producer Name"
+          },
+          "producer_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ProducerType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Id"
+          },
+          "source_file": {
+            "$ref": "#/components/schemas/MunicipalSourceFile"
+          },
+          "source_line": {
+            "description": "Linha física no ficheiro de origem (1 = cabeçalho)",
+            "title": "Source Line",
+            "type": "integer"
+          },
+          "stream": {
+            "$ref": "#/components/schemas/MunicipalStream"
+          },
+          "street": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street"
+          }
+        },
+        "required": [
+          "container_uid",
+          "source_file",
+          "source_line",
+          "external_id",
+          "kind",
+          "stream",
+          "brand",
+          "capacity_litres",
+          "capacity_raw",
+          "capacity_status",
+          "producer_type",
+          "producer_name",
+          "street",
+          "quantity",
+          "declared_parish",
+          "parish_dicofre",
+          "parish_code",
+          "parish_name",
+          "parish_match",
+          "parish_match_level",
+          "parish_mismatch_distance_m",
+          "coord_suspect",
+          "latitude",
+          "longitude",
+          "coord_status",
+          "coord_swapped",
+          "coord_cleaned",
+          "coord_precision",
+          "boundary_note",
+          "site_id"
+        ],
+        "title": "MunicipalContainerOut",
+        "type": "object"
+      },
+      "MunicipalContainerPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalContainerOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "names_visible": {
+            "title": "Names Visible",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "next_cursor",
+          "names_visible"
+        ],
+        "title": "MunicipalContainerPage",
+        "type": "object"
+      },
+      "MunicipalContainerTotals": {
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "integer"
+          },
+          "brands": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Enterrados por marca (molok, bluebee, greenbee)",
+            "title": "Brands",
+            "type": "object"
+          },
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "capacity_unknown": {
+            "description": "Contentores sem capacidade conhecida",
+            "title": "Capacity Unknown",
+            "type": "integer"
+          },
+          "located": {
+            "title": "Located",
+            "type": "integer"
+          },
+          "pending": {
+            "description": "Sem coordenadas: contam como contentores, não entram no mapa nem por freguesia",
+            "title": "Pending",
+            "type": "integer"
+          },
+          "rejected": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Linhas rejeitadas pelo ETL (fora do concelho, linha vazia)",
+            "title": "Rejected"
+          }
+        },
+        "required": [
+          "accepted",
+          "located",
+          "pending",
+          "rejected",
+          "capacity_litres_total",
+          "capacity_unknown",
+          "brands"
+        ],
+        "title": "MunicipalContainerTotals",
+        "type": "object"
+      },
+      "MunicipalCoverageKpis": {
+        "properties": {
+          "basis": {
+            "const": "area",
+            "default": "area",
+            "description": "Cobertura da ÁREA do concelho, não da população",
+            "title": "Basis",
+            "type": "string"
+          },
+          "is_estimate": {
+            "const": true,
+            "default": true,
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "nn_distance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MunicipalNnDistance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Vizinho mais próximo entre locais públicos"
+          },
+          "parishes_half_covered_300m": {
+            "description": "Freguesias com 50% ou mais da área a ≤ 300 m de um local",
+            "title": "Parishes Half Covered 300M",
+            "type": "integer"
+          },
+          "parishes_under_quarter_300m": {
+            "description": "Freguesias com menos de 25% da área a ≤ 300 m de um local",
+            "title": "Parishes Under Quarter 300M",
+            "type": "integer"
+          },
+          "pct_200m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct 200M"
+          },
+          "pct_300m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct 300M"
+          },
+          "pct_500m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct 500M"
+          }
+        },
+        "required": [
+          "pct_200m",
+          "pct_300m",
+          "pct_500m",
+          "parishes_half_covered_300m",
+          "parishes_under_quarter_300m",
+          "nn_distance"
+        ],
+        "title": "MunicipalCoverageKpis",
+        "type": "object"
+      },
+      "MunicipalDensityBenchmarkOut": {
+        "properties": {
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "parishes": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalParishDensity"
+            },
+            "title": "Parishes",
+            "type": "array"
+          },
+          "people_per_public_site": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "People Per Public Site"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "stats": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalDensityStat"
+            },
+            "title": "Stats",
+            "type": "array"
+          },
+          "textile_reference": {
+            "$ref": "#/components/schemas/MunicipalTextileReference"
+          }
+        },
+        "required": [
+          "population",
+          "stats",
+          "people_per_public_site",
+          "parishes",
+          "textile_reference",
+          "note"
+        ],
+        "title": "MunicipalDensityBenchmarkOut",
+        "type": "object"
+      },
+      "MunicipalDensityKpis": {
+        "properties": {
+          "area_km2": {
+            "description": "Área CAOP 2019 das 48 freguesias",
+            "title": "Area Km2",
+            "type": "number"
+          },
+          "containers_per_1000_hab": {
+            "title": "Containers Per 1000 Hab",
+            "type": "number"
+          },
+          "containers_per_km2": {
+            "title": "Containers Per Km2",
+            "type": "number"
+          },
+          "population": {
+            "description": "Soma das freguesias (INE, Censos 2021)",
+            "title": "Population",
+            "type": "integer"
+          },
+          "public_sites_per_1000_hab": {
+            "title": "Public Sites Per 1000 Hab",
+            "type": "number"
+          },
+          "public_sites_per_km2": {
+            "title": "Public Sites Per Km2",
+            "type": "number"
+          }
+        },
+        "required": [
+          "population",
+          "area_km2",
+          "containers_per_1000_hab",
+          "public_sites_per_1000_hab",
+          "containers_per_km2",
+          "public_sites_per_km2"
+        ],
+        "title": "MunicipalDensityKpis",
+        "type": "object"
+      },
+      "MunicipalDensityStat": {
+        "properties": {
+          "concelho": {
+            "description": "Valor do concelho inteiro",
+            "title": "Concelho",
+            "type": "number"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/MunicipalDistributionOut",
+            "description": "Distribuição entre as 48 freguesias"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "unit",
+          "concelho",
+          "distribution"
+        ],
+        "title": "MunicipalDensityStat",
+        "type": "object"
+      },
+      "MunicipalDistributionOut": {
+        "properties": {
+          "maximum": {
+            "title": "Maximum",
+            "type": "number"
+          },
+          "median": {
+            "title": "Median",
+            "type": "number"
+          },
+          "minimum": {
+            "title": "Minimum",
+            "type": "number"
+          },
+          "p25": {
+            "title": "P25",
+            "type": "number"
+          },
+          "p75": {
+            "title": "P75",
+            "type": "number"
+          }
+        },
+        "required": [
+          "minimum",
+          "p25",
+          "median",
+          "p75",
+          "maximum"
+        ],
+        "title": "MunicipalDistributionOut",
+        "type": "object"
+      },
+      "MunicipalEstimateNote": {
+        "description": "Campos desta resposta que são estimativa e porquê.",
+        "properties": {
+          "fields": {
+            "description": "Nomes dos campos que são estimativa",
+            "items": {
+              "type": "string"
+            },
+            "title": "Fields",
+            "type": "array"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "required": [
+          "fields",
+          "note"
+        ],
+        "title": "MunicipalEstimateNote",
+        "type": "object"
+      },
+      "MunicipalGapParameters": {
+        "properties": {
+          "capture_pct": {
+            "description": "Captura média atual do concelho (301,3 t ÷ 1 317 t), igual em todas",
+            "title": "Capture Pct",
+            "type": "number"
+          },
+          "kg_per_inhab_month": {
+            "title": "Kg Per Inhab Month",
+            "type": "number"
+          },
+          "months_per_year": {
+            "default": 12,
+            "title": "Months Per Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kg_per_inhab_month",
+          "capture_pct"
+        ],
+        "title": "MunicipalGapParameters",
+        "type": "object"
+      },
+      "MunicipalGapRankingOut": {
+        "properties": {
+          "caveat": {
+            "title": "Caveat",
+            "type": "string"
+          },
+          "is_estimate": {
+            "const": true,
+            "default": true,
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalGapRow"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "parameters": {
+            "$ref": "#/components/schemas/MunicipalGapParameters"
+          },
+          "rule": {
+            "title": "Rule",
+            "type": "string"
+          }
+        },
+        "required": [
+          "rule",
+          "parameters",
+          "caveat",
+          "items"
+        ],
+        "title": "MunicipalGapRankingOut",
+        "type": "object"
+      },
+      "MunicipalGapRow": {
+        "properties": {
+          "candidate_sites": {
+            "title": "Candidate Sites",
+            "type": "integer"
+          },
+          "candidate_sites_precise": {
+            "title": "Candidate Sites Precise",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "containers_per_1000_hab": {
+            "title": "Containers Per 1000 Hab",
+            "type": "number"
+          },
+          "dicofre": {
+            "title": "Dicofre",
+            "type": "string"
+          },
+          "gap_t_per_candidate_site": {
+            "title": "Gap T Per Candidate Site",
+            "type": "number"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "rank": {
+            "title": "Rank",
+            "type": "integer"
+          },
+          "textile_gap_t": {
+            "title": "Textile Gap T",
+            "type": "number"
+          },
+          "textile_potential_t": {
+            "title": "Textile Potential T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "rank",
+          "dicofre",
+          "name",
+          "population",
+          "containers",
+          "containers_per_1000_hab",
+          "candidate_sites",
+          "candidate_sites_precise",
+          "textile_potential_t",
+          "textile_gap_t",
+          "gap_t_per_candidate_site"
+        ],
+        "title": "MunicipalGapRow",
+        "type": "object"
+      },
+      "MunicipalKind": {
+        "description": "Tipo de contentor municipal (ficheiro de origem + equipamento).",
+        "enum": [
+          "underground",
+          "platform",
+          "surface",
+          "organic_collective",
+          "organic_producer",
+          "green_waste"
+        ],
+        "title": "MunicipalKind",
+        "type": "string"
+      },
+      "MunicipalKindCount": {
+        "properties": {
+          "capacity_litres_total": {
+            "description": "Soma da capacidade declarada, em litros (desconhecidas ficam fora)",
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/MunicipalKind"
+          },
+          "located": {
+            "description": "Com coordenadas válidas dentro do concelho",
+            "title": "Located",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "containers",
+          "located",
+          "capacity_litres_total"
+        ],
+        "title": "MunicipalKindCount",
+        "type": "object"
+      },
+      "MunicipalKindCounts": {
+        "properties": {
+          "green_waste": {
+            "title": "Green Waste",
+            "type": "integer"
+          },
+          "organic_collective": {
+            "title": "Organic Collective",
+            "type": "integer"
+          },
+          "organic_producer": {
+            "title": "Organic Producer",
+            "type": "integer"
+          },
+          "platform": {
+            "title": "Platform",
+            "type": "integer"
+          },
+          "surface": {
+            "title": "Surface",
+            "type": "integer"
+          },
+          "underground": {
+            "title": "Underground",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "underground",
+          "surface",
+          "platform",
+          "organic_collective",
+          "organic_producer",
+          "green_waste"
+        ],
+        "title": "MunicipalKindCounts",
+        "type": "object"
+      },
+      "MunicipalLinkOut": {
+        "properties": {
+          "distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance M"
+          },
+          "nearest_street_kind": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Street Kind"
+          },
+          "nearest_street_uid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Street Uid"
+          },
+          "organic_uid": {
+            "title": "Organic Uid",
+            "type": "string"
+          },
+          "same_number_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same Number Distance M"
+          },
+          "same_number_same_street": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same Number Same Street"
+          },
+          "same_number_uid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Same Number Uid"
+          },
+          "within_link_radius": {
+            "description": "Contentor de rua a ≤ 15 m do orgânico coletivo",
+            "title": "Within Link Radius",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "organic_uid",
+          "nearest_street_uid",
+          "nearest_street_kind",
+          "distance_m",
+          "within_link_radius",
+          "same_number_uid",
+          "same_number_distance_m",
+          "same_number_same_street"
+        ],
+        "title": "MunicipalLinkOut",
+        "type": "object"
+      },
+      "MunicipalNeighbourOut": {
+        "properties": {
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "distance_m": {
+            "title": "Distance M",
+            "type": "number"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalKind"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "site_class": {
+            "$ref": "#/components/schemas/SiteClass"
+          },
+          "site_id": {
+            "title": "Site Id",
+            "type": "string"
+          },
+          "textile_candidate": {
+            "title": "Textile Candidate",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "site_id",
+          "distance_m",
+          "parish_name",
+          "site_class",
+          "containers",
+          "kinds",
+          "textile_candidate"
+        ],
+        "title": "MunicipalNeighbourOut",
+        "type": "object"
+      },
+      "MunicipalNnDistance": {
+        "properties": {
+          "max_m": {
+            "title": "Max M",
+            "type": "number"
+          },
+          "mean_m": {
+            "title": "Mean M",
+            "type": "number"
+          },
+          "median_m": {
+            "title": "Median M",
+            "type": "number"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "p25_m": {
+            "title": "P25 M",
+            "type": "number"
+          },
+          "p5_m": {
+            "title": "P5 M",
+            "type": "number"
+          },
+          "p75_m": {
+            "title": "P75 M",
+            "type": "number"
+          },
+          "p95_m": {
+            "title": "P95 M",
+            "type": "number"
+          }
+        },
+        "required": [
+          "n",
+          "mean_m",
+          "p5_m",
+          "p25_m",
+          "median_m",
+          "p75_m",
+          "p95_m",
+          "max_m"
+        ],
+        "title": "MunicipalNnDistance",
+        "type": "object"
+      },
+      "MunicipalOverview": {
+        "properties": {
+          "by_kind": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalKindCount"
+            },
+            "title": "By Kind",
+            "type": "array"
+          },
+          "by_producer_type": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalProducerTypeCount"
+            },
+            "title": "By Producer Type",
+            "type": "array"
+          },
+          "by_stream": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalStreamCount"
+            },
+            "title": "By Stream",
+            "type": "array"
+          },
+          "containers": {
+            "$ref": "#/components/schemas/MunicipalContainerTotals"
+          },
+          "coverage": {
+            "$ref": "#/components/schemas/MunicipalCoverageKpis"
+          },
+          "density": {
+            "$ref": "#/components/schemas/MunicipalDensityKpis"
+          },
+          "estimates": {
+            "$ref": "#/components/schemas/MunicipalEstimateNote"
+          },
+          "quality": {
+            "$ref": "#/components/schemas/MunicipalQualityKpis"
+          },
+          "sites": {
+            "$ref": "#/components/schemas/MunicipalSiteTotals"
+          },
+          "source": {
+            "$ref": "#/components/schemas/MunicipalSourceInfo"
+          }
+        },
+        "required": [
+          "source",
+          "containers",
+          "sites",
+          "density",
+          "coverage",
+          "quality",
+          "by_kind",
+          "by_stream",
+          "by_producer_type",
+          "estimates"
+        ],
+        "title": "MunicipalOverview",
+        "type": "object"
+      },
+      "MunicipalParishCount": {
+        "properties": {
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "dicofre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dicofre"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          }
+        },
+        "required": [
+          "dicofre",
+          "name",
+          "containers"
+        ],
+        "title": "MunicipalParishCount",
+        "type": "object"
+      },
+      "MunicipalParishDensity": {
+        "properties": {
+          "below_p25": {
+            "description": "Abaixo do 1.º quartil das freguesias em contentores por 1 000 hab.",
+            "title": "Below P25",
+            "type": "boolean"
+          },
+          "containers_per_1000_hab": {
+            "title": "Containers Per 1000 Hab",
+            "type": "number"
+          },
+          "dicofre": {
+            "title": "Dicofre",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "public_sites_per_1000_hab": {
+            "title": "Public Sites Per 1000 Hab",
+            "type": "number"
+          }
+        },
+        "required": [
+          "dicofre",
+          "name",
+          "population",
+          "containers_per_1000_hab",
+          "public_sites_per_1000_hab",
+          "below_p25"
+        ],
+        "title": "MunicipalParishDensity",
+        "type": "object"
+      },
+      "MunicipalParishList": {
+        "properties": {
+          "estimates": {
+            "$ref": "#/components/schemas/MunicipalEstimateNote"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalParishOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "estimates"
+        ],
+        "title": "MunicipalParishList",
+        "type": "object"
+      },
+      "MunicipalParishOut": {
+        "properties": {
+          "area_km2": {
+            "title": "Area Km2",
+            "type": "number"
+          },
+          "by_kind": {
+            "$ref": "#/components/schemas/MunicipalKindCounts"
+          },
+          "candidate_sites": {
+            "title": "Candidate Sites",
+            "type": "integer"
+          },
+          "candidate_sites_precise": {
+            "title": "Candidate Sites Precise",
+            "type": "integer"
+          },
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "centroid_lat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centroid Lat"
+          },
+          "centroid_lon": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Centroid Lon"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "containers_coord_suspect": {
+            "title": "Containers Coord Suspect",
+            "type": "integer"
+          },
+          "containers_pending": {
+            "title": "Containers Pending",
+            "type": "integer"
+          },
+          "containers_per_1000_hab": {
+            "title": "Containers Per 1000 Hab",
+            "type": "number"
+          },
+          "containers_per_km2": {
+            "title": "Containers Per Km2",
+            "type": "number"
+          },
+          "cover_pct_200m": {
+            "description": "% da área a ≤ 200 m de um local público (área, não população)",
+            "title": "Cover Pct 200M",
+            "type": "number"
+          },
+          "cover_pct_300m": {
+            "title": "Cover Pct 300M",
+            "type": "number"
+          },
+          "cover_pct_500m": {
+            "title": "Cover Pct 500M",
+            "type": "number"
+          },
+          "dicofre": {
+            "description": "Código da app/INE (uniões: 0308U1..5); liga a `parishes` e ao simulador",
+            "title": "Dicofre",
+            "type": "string"
+          },
+          "dicofre_caop": {
+            "description": "Código CAOP 2019 (uniões: 030876, 030881, 030883, 030884, 030890)",
+            "title": "Dicofre Caop",
+            "type": "string"
+          },
+          "gap_rank": {
+            "description": "1 = mais toneladas de lacuna por local candidato (estimativa)",
+            "title": "Gap Rank",
+            "type": "integer"
+          },
+          "gap_t_per_candidate_site": {
+            "description": "Estimativa: lacuna ÷ max(1, locais candidatos)",
+            "title": "Gap T Per Candidate Site",
+            "type": "number"
+          },
+          "mean_nn_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mean Nn Distance M"
+          },
+          "median_nn_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Median Nn Distance M"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "producers": {
+            "$ref": "#/components/schemas/MunicipalProducersByType",
+            "description": "Contentores de produtores por tipo"
+          },
+          "public_sites": {
+            "title": "Public Sites",
+            "type": "integer"
+          },
+          "public_sites_per_1000_hab": {
+            "title": "Public Sites Per 1000 Hab",
+            "type": "number"
+          },
+          "public_sites_per_km2": {
+            "title": "Public Sites Per Km2",
+            "type": "number"
+          },
+          "sites": {
+            "title": "Sites",
+            "type": "integer"
+          },
+          "textile_gap_t": {
+            "description": "Estimativa: potencial × (1 − captura média do concelho)",
+            "title": "Textile Gap T",
+            "type": "number"
+          },
+          "textile_potential_t": {
+            "description": "Estimativa: 0,7 kg/hab/mês × população × 12",
+            "title": "Textile Potential T",
+            "type": "number"
+          }
+        },
+        "required": [
+          "dicofre",
+          "dicofre_caop",
+          "name",
+          "population",
+          "area_km2",
+          "containers",
+          "containers_pending",
+          "sites",
+          "public_sites",
+          "by_kind",
+          "capacity_litres_total",
+          "containers_per_1000_hab",
+          "public_sites_per_1000_hab",
+          "containers_per_km2",
+          "public_sites_per_km2",
+          "mean_nn_distance_m",
+          "median_nn_distance_m",
+          "cover_pct_200m",
+          "cover_pct_300m",
+          "cover_pct_500m",
+          "producers",
+          "containers_coord_suspect",
+          "candidate_sites",
+          "candidate_sites_precise",
+          "textile_potential_t",
+          "textile_gap_t",
+          "gap_t_per_candidate_site",
+          "gap_rank",
+          "centroid_lat",
+          "centroid_lon"
+        ],
+        "title": "MunicipalParishOut",
+        "type": "object"
+      },
+      "MunicipalParishSort": {
+        "enum": [
+          "name",
+          "population",
+          "containers",
+          "containers_per_1000_hab",
+          "public_sites_per_1000_hab",
+          "containers_per_km2",
+          "mean_nn_distance_m",
+          "cover_pct_300m",
+          "candidate_sites",
+          "gap_rank",
+          "producers"
+        ],
+        "title": "MunicipalParishSort",
+        "type": "string"
+      },
+      "MunicipalProducerSite": {
+        "properties": {
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "coord_precision": {
+            "$ref": "#/components/schemas/CoordPrecision"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "parish_dicofre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Dicofre"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "producer_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SENSÍVEL: só admins com show_names=true",
+            "title": "Producer Names"
+          },
+          "producer_types": {
+            "items": {
+              "$ref": "#/components/schemas/ProducerType"
+            },
+            "title": "Producer Types",
+            "type": "array"
+          },
+          "site_id": {
+            "title": "Site Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "site_id",
+          "latitude",
+          "longitude",
+          "parish_dicofre",
+          "parish_name",
+          "producer_types",
+          "containers",
+          "capacity_litres_total",
+          "coord_precision",
+          "producer_names"
+        ],
+        "title": "MunicipalProducerSite",
+        "type": "object"
+      },
+      "MunicipalProducerTypeCount": {
+        "properties": {
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "located": {
+            "title": "Located",
+            "type": "integer"
+          },
+          "producers_distinct": {
+            "description": "Estabelecimentos distintos (contagem; não revela nomes)",
+            "title": "Producers Distinct",
+            "type": "integer"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ProducerType"
+          }
+        },
+        "required": [
+          "type",
+          "label",
+          "containers",
+          "located",
+          "producers_distinct",
+          "capacity_litres_total"
+        ],
+        "title": "MunicipalProducerTypeCount",
+        "type": "object"
+      },
+      "MunicipalProducerTypeSummary": {
+        "properties": {
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "located": {
+            "title": "Located",
+            "type": "integer"
+          },
+          "producers_distinct": {
+            "title": "Producers Distinct",
+            "type": "integer"
+          },
+          "sites": {
+            "title": "Sites",
+            "type": "integer"
+          },
+          "textile_hypothesis": {
+            "description": "Hipótese nossa de interesse para têxteis; a validar com a Vitrus",
+            "title": "Textile Hypothesis",
+            "type": "string"
+          },
+          "top_parishes": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalParishCount"
+            },
+            "title": "Top Parishes",
+            "type": "array"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ProducerType"
+          }
+        },
+        "required": [
+          "type",
+          "label",
+          "containers",
+          "located",
+          "sites",
+          "producers_distinct",
+          "capacity_litres_total",
+          "top_parishes",
+          "textile_hypothesis"
+        ],
+        "title": "MunicipalProducerTypeSummary",
+        "type": "object"
+      },
+      "MunicipalProducersByType": {
+        "properties": {
+          "care_home": {
+            "title": "Care Home",
+            "type": "integer"
+          },
+          "establishment": {
+            "title": "Establishment",
+            "type": "integer"
+          },
+          "hospitality": {
+            "title": "Hospitality",
+            "type": "integer"
+          },
+          "large_producer": {
+            "title": "Large Producer",
+            "type": "integer"
+          },
+          "restaurant": {
+            "title": "Restaurant",
+            "type": "integer"
+          },
+          "school": {
+            "title": "School",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "restaurant",
+          "school",
+          "establishment",
+          "large_producer",
+          "care_home",
+          "hospitality"
+        ],
+        "title": "MunicipalProducersByType",
+        "type": "object"
+      },
+      "MunicipalProducersOut": {
+        "properties": {
+          "by_type": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalProducerTypeSummary"
+            },
+            "title": "By Type",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalProducerSite"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "names_visible": {
+            "title": "Names Visible",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Next Cursor"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "names_visible",
+          "by_type",
+          "items",
+          "total",
+          "next_cursor"
+        ],
+        "title": "MunicipalProducersOut",
+        "type": "object"
+      },
+      "MunicipalQualityKpis": {
+        "properties": {
+          "alerts_total": {
+            "title": "Alerts Total",
+            "type": "integer"
+          },
+          "capacity_assumed_containers": {
+            "description": "Capacidade sem unidade, lida como litros (assumido)",
+            "title": "Capacity Assumed Containers",
+            "type": "integer"
+          },
+          "containers_coord_suspect": {
+            "description": "Declarados a mais de 1 km da freguesia do polígono",
+            "title": "Containers Coord Suspect",
+            "type": "integer"
+          },
+          "open_alerts": {
+            "title": "Open Alerts",
+            "type": "integer"
+          },
+          "parish_compared": {
+            "title": "Parish Compared",
+            "type": "integer"
+          },
+          "parish_equal": {
+            "title": "Parish Equal",
+            "type": "integer"
+          },
+          "parish_equal_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Equal Pct"
+          },
+          "sites_approximate": {
+            "description": "Coordenadas com 3 casas decimais ou menos (~100 m): confirmar no terreno",
+            "title": "Sites Approximate",
+            "type": "integer"
+          },
+          "sites_precise": {
+            "title": "Sites Precise",
+            "type": "integer"
+          },
+          "stream_unknown_containers": {
+            "description": "Fração desconhecida (enterrados e superfície)",
+            "title": "Stream Unknown Containers",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sites_precise",
+          "sites_approximate",
+          "containers_coord_suspect",
+          "parish_compared",
+          "parish_equal",
+          "parish_equal_pct",
+          "stream_unknown_containers",
+          "capacity_assumed_containers",
+          "open_alerts",
+          "alerts_total"
+        ],
+        "title": "MunicipalQualityKpis",
+        "type": "object"
+      },
+      "MunicipalSiteDetail": {
+        "properties": {
+          "containers": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalContainerOut"
+            },
+            "title": "Containers",
+            "type": "array"
+          },
+          "links": {
+            "description": "Relações espaciais dos orgânicos coletivos deste local",
+            "items": {
+              "$ref": "#/components/schemas/MunicipalLinkOut"
+            },
+            "title": "Links",
+            "type": "array"
+          },
+          "names_visible": {
+            "title": "Names Visible",
+            "type": "boolean"
+          },
+          "neighbours": {
+            "description": "Outros locais a ≤ radius_m, do mais perto para o mais longe",
+            "items": {
+              "$ref": "#/components/schemas/MunicipalNeighbourOut"
+            },
+            "title": "Neighbours",
+            "type": "array"
+          },
+          "parish": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MunicipalParishOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "radius_m": {
+            "title": "Radius M",
+            "type": "integer"
+          },
+          "site": {
+            "$ref": "#/components/schemas/MunicipalSiteOut"
+          }
+        },
+        "required": [
+          "site",
+          "containers",
+          "neighbours",
+          "links",
+          "parish",
+          "radius_m",
+          "names_visible"
+        ],
+        "title": "MunicipalSiteDetail",
+        "type": "object"
+      },
+      "MunicipalSiteOut": {
+        "properties": {
+          "by_kind": {
+            "$ref": "#/components/schemas/MunicipalKindCounts"
+          },
+          "by_stream": {
+            "$ref": "#/components/schemas/MunicipalStreamCounts"
+          },
+          "candidate_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidate Reason"
+          },
+          "capacity_litres_total": {
+            "title": "Capacity Litres Total",
+            "type": "integer"
+          },
+          "capacity_unknown": {
+            "title": "Capacity Unknown",
+            "type": "integer"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "coord_precision": {
+            "$ref": "#/components/schemas/CoordPrecision"
+          },
+          "coord_suspect_containers": {
+            "title": "Coord Suspect Containers",
+            "type": "integer"
+          },
+          "kinds": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalKind"
+            },
+            "title": "Kinds",
+            "type": "array"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "nn_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Distância ao local público mais próximo (só locais públicos)",
+            "title": "Nn Distance M"
+          },
+          "organic_collective_within_15m": {
+            "title": "Organic Collective Within 15M",
+            "type": "integer"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Code"
+          },
+          "parish_dicofre": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Dicofre"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "producer_names": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SENSÍVEL: só para admins com show_names=true; caso contrário null",
+            "title": "Producer Names"
+          },
+          "producer_types": {
+            "items": {
+              "$ref": "#/components/schemas/ProducerType"
+            },
+            "title": "Producer Types",
+            "type": "array"
+          },
+          "site_class": {
+            "$ref": "#/components/schemas/SiteClass"
+          },
+          "site_id": {
+            "description": "S + 8 hexadecimais; estável entre importações",
+            "title": "Site Id",
+            "type": "string"
+          },
+          "source_files": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalSourceFile"
+            },
+            "title": "Source Files",
+            "type": "array"
+          },
+          "streets": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Streets",
+            "type": "array"
+          },
+          "textile_candidate": {
+            "description": "Local público com contentor de rua: lugar possível, não recomendado",
+            "title": "Textile Candidate",
+            "type": "boolean"
+          },
+          "units_declared": {
+            "description": "Nos resíduos verdes usa `Quantidade` (semântica por esclarecer)",
+            "title": "Units Declared",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "site_id",
+          "latitude",
+          "longitude",
+          "parish_dicofre",
+          "parish_code",
+          "parish_name",
+          "site_class",
+          "containers",
+          "units_declared",
+          "capacity_litres_total",
+          "capacity_unknown",
+          "by_kind",
+          "by_stream",
+          "kinds",
+          "producer_types",
+          "producer_names",
+          "streets",
+          "source_files",
+          "coord_precision",
+          "organic_collective_within_15m",
+          "nn_distance_m",
+          "textile_candidate",
+          "candidate_reason",
+          "coord_suspect_containers"
+        ],
+        "title": "MunicipalSiteOut",
+        "type": "object"
+      },
+      "MunicipalSitePage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalSiteOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "names_visible": {
+            "title": "Names Visible",
+            "type": "boolean"
+          },
+          "next_cursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Passar em `cursor` para a página seguinte; null no fim",
+            "title": "Next Cursor"
+          },
+          "total": {
+            "description": "Total com os filtros aplicados",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "next_cursor",
+          "names_visible"
+        ],
+        "title": "MunicipalSitePage",
+        "type": "object"
+      },
+      "MunicipalSiteTotals": {
+        "properties": {
+          "max_containers": {
+            "title": "Max Containers",
+            "type": "integer"
+          },
+          "mixed": {
+            "title": "Mixed",
+            "type": "integer"
+          },
+          "producer": {
+            "title": "Producer",
+            "type": "integer"
+          },
+          "public": {
+            "title": "Public",
+            "type": "integer"
+          },
+          "single_container": {
+            "title": "Single Container",
+            "type": "integer"
+          },
+          "textile_candidates": {
+            "description": "Locais públicos com contentor de rua: lugares possíveis, não recomendados",
+            "title": "Textile Candidates",
+            "type": "integer"
+          },
+          "textile_candidates_precise": {
+            "title": "Textile Candidates Precise",
+            "type": "integer"
+          },
+          "textile_candidates_underground": {
+            "title": "Textile Candidates Underground",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "total",
+          "public",
+          "producer",
+          "mixed",
+          "single_container",
+          "max_containers",
+          "textile_candidates",
+          "textile_candidates_precise",
+          "textile_candidates_underground"
+        ],
+        "title": "MunicipalSiteTotals",
+        "type": "object"
+      },
+      "MunicipalSortOrder": {
+        "enum": [
+          "asc",
+          "desc"
+        ],
+        "title": "MunicipalSortOrder",
+        "type": "string"
+      },
+      "MunicipalSourceFile": {
+        "enum": [
+          "profundidade",
+          "superficie",
+          "organico_coletivo",
+          "organico_tipologia",
+          "residuos_verdes"
+        ],
+        "title": "MunicipalSourceFile",
+        "type": "string"
+      },
+      "MunicipalSourceInfo": {
+        "properties": {
+          "caop_version": {
+            "description": "Versão da CAOP usada para as freguesias e para atribuir cada local",
+            "title": "Caop Version",
+            "type": "string"
+          },
+          "file_sha256": {
+            "description": "SHA-256 do pacote recebido; muda quando os dados mudam",
+            "title": "File Sha256",
+            "type": "string"
+          },
+          "imported_at": {
+            "format": "date-time",
+            "title": "Imported At",
+            "type": "string"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "not_textile": {
+            "const": true,
+            "default": true,
+            "title": "Not Textile",
+            "type": "boolean"
+          },
+          "note": {
+            "default": "Contentores municipais de outras frações (profundidade, superfície, orgânico, resíduos verdes). Não são contentores de têxteis; servem para escolher lugares possíveis, não para medir recolha de têxteis.",
+            "title": "Note",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "received_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Received On"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "provider",
+          "received_on",
+          "imported_at",
+          "file_sha256",
+          "caop_version"
+        ],
+        "title": "MunicipalSourceInfo",
+        "type": "object"
+      },
+      "MunicipalStream": {
+        "description": "Fração. Só se afirma o que os ficheiros dizem: enterrados e superfície ficam `unknown`.",
+        "enum": [
+          "organico",
+          "verdes",
+          "desconhecido"
+        ],
+        "title": "MunicipalStream",
+        "type": "string"
+      },
+      "MunicipalStreamCount": {
+        "properties": {
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "stream": {
+            "$ref": "#/components/schemas/MunicipalStream"
+          }
+        },
+        "required": [
+          "stream",
+          "containers"
+        ],
+        "title": "MunicipalStreamCount",
+        "type": "object"
+      },
+      "MunicipalStreamCounts": {
+        "properties": {
+          "desconhecido": {
+            "title": "Desconhecido",
+            "type": "integer"
+          },
+          "organico": {
+            "title": "Organico",
+            "type": "integer"
+          },
+          "verdes": {
+            "title": "Verdes",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "organico",
+          "verdes",
+          "desconhecido"
+        ],
+        "title": "MunicipalStreamCounts",
+        "type": "object"
+      },
+      "MunicipalTextileReference": {
+        "properties": {
+          "candidate_sites": {
+            "title": "Candidate Sites",
+            "type": "integer"
+          },
+          "candidates_per_reference_point": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Candidates Per Reference Point"
+          },
+          "is_estimate": {
+            "const": true,
+            "default": true,
+            "title": "Is Estimate",
+            "type": "boolean"
+          },
+          "note": {
+            "title": "Note",
+            "type": "string"
+          },
+          "people_per_point": {
+            "title": "People Per Point",
+            "type": "integer"
+          },
+          "reference_points": {
+            "description": "Pontos que a referência daria ao concelho (população ÷ habitantes por ponto)",
+            "title": "Reference Points",
+            "type": "integer"
+          },
+          "verified": {
+            "description": "false = referência por verificar com a fonte",
+            "title": "Verified",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "people_per_point",
+          "verified",
+          "reference_points",
+          "candidate_sites",
+          "candidates_per_reference_point",
+          "note"
+        ],
+        "title": "MunicipalTextileReference",
         "type": "object"
       },
       "Overview": {
@@ -7623,6 +10209,28 @@
         "title": "ParishCoverage",
         "type": "object"
       },
+      "ParishMatch": {
+        "description": "Freguesia declarada no ficheiro contra o polígono CAOP que contém o ponto.",
+        "enum": [
+          "igual",
+          "diferente",
+          "sem_coord",
+          "nao_mapeada"
+        ],
+        "title": "ParishMatch",
+        "type": "string"
+      },
+      "ParishMatchLevel": {
+        "enum": [
+          "exact",
+          "same_words",
+          "contains_name",
+          "partial",
+          "none"
+        ],
+        "title": "ParishMatchLevel",
+        "type": "string"
+      },
       "Passport": {
         "description": "Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.",
         "properties": {
@@ -8389,6 +10997,43 @@
         ],
         "title": "Point",
         "type": "object"
+      },
+      "PointGeometry": {
+        "properties": {
+          "coordinates": {
+            "description": "[longitude, latitude]",
+            "items": {
+              "type": "number"
+            },
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Coordinates",
+            "type": "array"
+          },
+          "type": {
+            "const": "Point",
+            "default": "Point",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "coordinates"
+        ],
+        "title": "PointGeometry",
+        "type": "object"
+      },
+      "ProducerType": {
+        "enum": [
+          "restaurant",
+          "school",
+          "establishment",
+          "large_producer",
+          "care_home",
+          "hospitality"
+        ],
+        "title": "ProducerType",
+        "type": "string"
       },
       "ProfileUpdate": {
         "properties": {
@@ -10087,6 +12732,207 @@
           "explanation"
         ],
         "title": "SignalFloorOut",
+        "type": "object"
+      },
+      "SiteClass": {
+        "enum": [
+          "public",
+          "producer",
+          "mixed"
+        ],
+        "title": "SiteClass",
+        "type": "string"
+      },
+      "SiteFeature": {
+        "properties": {
+          "geometry": {
+            "$ref": "#/components/schemas/PointGeometry"
+          },
+          "id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Id"
+          },
+          "properties": {
+            "$ref": "#/components/schemas/SiteFeatureProps"
+          },
+          "type": {
+            "const": "Feature",
+            "default": "Feature",
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "geometry",
+          "properties"
+        ],
+        "title": "SiteFeature",
+        "type": "object"
+      },
+      "SiteFeatureCollection": {
+        "properties": {
+          "clustered": {
+            "title": "Clustered",
+            "type": "boolean"
+          },
+          "features": {
+            "items": {
+              "$ref": "#/components/schemas/SiteFeature"
+            },
+            "title": "Features",
+            "type": "array"
+          },
+          "total_sites": {
+            "description": "Locais que cumprem os filtros e a bbox",
+            "title": "Total Sites",
+            "type": "integer"
+          },
+          "type": {
+            "const": "FeatureCollection",
+            "default": "FeatureCollection",
+            "title": "Type",
+            "type": "string"
+          },
+          "zoom": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Zoom"
+          }
+        },
+        "required": [
+          "features",
+          "total_sites",
+          "clustered",
+          "zoom"
+        ],
+        "title": "SiteFeatureCollection",
+        "type": "object"
+      },
+      "SiteFeatureProps": {
+        "properties": {
+          "cluster": {
+            "description": "true = grupo de locais (não tem site_id); false = um local",
+            "title": "Cluster",
+            "type": "boolean"
+          },
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "coord_precision": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CoordPrecision"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/MunicipalKind"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tipo principal para colorir o ponto"
+          },
+          "kinds": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/MunicipalKind"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kinds"
+          },
+          "nn_distance_m": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nn Distance M"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "point_count": {
+            "description": "Locais no grupo (1 se for um local)",
+            "title": "Point Count",
+            "type": "integer"
+          },
+          "site_class": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SiteClass"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Site Id"
+          },
+          "textile_candidate": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Textile Candidate"
+          }
+        },
+        "required": [
+          "cluster",
+          "point_count",
+          "containers"
+        ],
+        "title": "SiteFeatureProps",
         "type": "object"
       },
       "SlotCount": {
@@ -24602,6 +27448,3451 @@
         "summary": "Reserve Lot",
         "tags": [
           "lots"
+        ]
+      }
+    },
+    "/api/v1/municipal/containers": {
+      "get": {
+        "description": "Tabela completa dos contentores (com os pendentes sem coordenadas), por cursor e ordenada por `container_uid`.",
+        "operationId": "list_municipal_containers",
+        "parameters": [
+          {
+            "description": "Itens por página",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "description": "Itens por página",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "`next_cursor` da página anterior",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` da página anterior",
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Kind"
+            }
+          },
+          {
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "O local do contentor é candidato a têxteis",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "O local do contentor é candidato a têxteis",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "true = com coordenadas; false = pendentes",
+            "in": "query",
+            "name": "located",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "true = com coordenadas; false = pendentes",
+              "title": "Located"
+            }
+          },
+          {
+            "in": "query",
+            "name": "parish_match",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ParishMatch"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parish Match"
+            }
+          },
+          {
+            "description": "molok, bluebee, greenbee",
+            "in": "query",
+            "name": "brand",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 24,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "molok, bluebee, greenbee",
+              "title": "Brand"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, rua, freguesia, marca",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, rua, freguesia, marca",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalContainerPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Municipal Containers",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/density-benchmark": {
+      "get": {
+        "description": "Densidade do concelho e distribuição entre freguesias; compara com a referência francesa (por verificar).",
+        "operationId": "get_municipal_density_benchmark",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalDensityBenchmarkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Density Benchmark",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/export": {
+      "get": {
+        "description": "Exporta locais ou contentores filtrados em CSV, XLSX ou GeoJSON. Sem nomes de produtores, salvo admin.",
+        "operationId": "export_municipal_sites",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "format",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ExportFormat",
+              "default": "csv"
+            }
+          },
+          {
+            "description": "Uma linha por local ou por contentor",
+            "in": "query",
+            "name": "scope",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/ExportScope",
+              "default": "sites",
+              "description": "Uma linha por local ou por contentor"
+            }
+          },
+          {
+            "description": "Tipos de contentor presentes no local",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de contentor presentes no local",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Frações presentes no local",
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Frações presentes no local",
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "Só candidatos (true) ou só não candidatos (false)",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só candidatos (true) ou só não candidatos (false)",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "description": "Local com contentores a mais de 1 km da freguesia declarada",
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local com contentores a mais de 1 km da freguesia declarada",
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, freguesia, ruas",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, freguesia, ruas",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/geo+json": {},
+              "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {},
+              "text/csv": {}
+            },
+            "description": "Ficheiro CSV (UTF-8 com BOM), XLSX ou GeoJSON"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Export Municipal Sites",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/gap-ranking": {
+      "get": {
+        "description": "Lacuna de têxtil por freguesia (ESTIMATIVA, captura média igual em todas), com a regra explícita.",
+        "operationId": "get_municipal_gap_ranking",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 48,
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Limit"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalGapRankingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Gap Ranking",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/overview": {
+      "get": {
+        "description": "KPIs da rede municipal: contentores, locais, densidade, cobertura e qualidade (estimativas etiquetadas).",
+        "operationId": "get_municipal_overview",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Overview",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/parishes": {
+      "get": {
+        "description": "As 48 freguesias com população, contentores por 1 000 hab., por km², vizinho mais próximo e produtores.",
+        "operationId": "list_municipal_parishes",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MunicipalParishSort",
+              "default": "name"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "$ref": "#/components/schemas/MunicipalSortOrder",
+              "default": "asc"
+            }
+          },
+          {
+            "description": "Nome (sem acentos) ou código",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Nome (sem acentos) ou código",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "min_population",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Min Population"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_containers_per_1000_hab",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Containers Per 1000 Hab"
+            }
+          },
+          {
+            "in": "query",
+            "name": "max_cover_pct_300m",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 100,
+                  "minimum": 0,
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Max Cover Pct 300M"
+            }
+          },
+          {
+            "in": "query",
+            "name": "has_candidates",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Has Candidates"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalParishList"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Municipal Parishes",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/parishes/caop.geojson": {
+      "get": {
+        "description": "Contornos CAOP 2019 das 48 freguesias (substitui o OSM, que falha 3 uniões) com métricas para coroplético.",
+        "operationId": "get_caop_parishes_geojson",
+        "parameters": [
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CaopFeatureCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Caop Parishes Geojson",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/parishes/{dicofre}": {
+      "get": {
+        "description": "Uma freguesia pelo código da app/INE (ou CAOP).",
+        "operationId": "get_municipal_parish",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "dicofre",
+            "required": true,
+            "schema": {
+              "maxLength": 8,
+              "title": "Dicofre",
+              "type": "string"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalParishOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Parish",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/producers": {
+      "get": {
+        "description": "Produtores (hotelaria, lares, escolas, restauração, grandes) por tipo e local. Sem nomes por omissão.",
+        "operationId": "list_municipal_producers",
+        "parameters": [
+          {
+            "description": "Itens por página",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "description": "Itens por página",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "`next_cursor` da página anterior",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` da página anterior",
+              "title": "Cursor"
+            }
+          },
+          {
+            "description": "Tipos de contentor presentes no local",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de contentor presentes no local",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Frações presentes no local",
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Frações presentes no local",
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "Só candidatos (true) ou só não candidatos (false)",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só candidatos (true) ou só não candidatos (false)",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "description": "Local com contentores a mais de 1 km da freguesia declarada",
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local com contentores a mais de 1 km da freguesia declarada",
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, freguesia, ruas",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, freguesia, ruas",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalProducersOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Municipal Producers",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/sites": {
+      "get": {
+        "description": "Locais (contentores no mesmo ponto) com filtros e paginação por cursor, ordenados por `site_id`.",
+        "operationId": "list_municipal_sites",
+        "parameters": [
+          {
+            "description": "Itens por página",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "description": "Itens por página",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "`next_cursor` da página anterior",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` da página anterior",
+              "title": "Cursor"
+            }
+          },
+          {
+            "description": "Tipos de contentor presentes no local",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de contentor presentes no local",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Frações presentes no local",
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Frações presentes no local",
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "Só candidatos (true) ou só não candidatos (false)",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só candidatos (true) ou só não candidatos (false)",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "description": "Local com contentores a mais de 1 km da freguesia declarada",
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local com contentores a mais de 1 km da freguesia declarada",
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, freguesia, ruas",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, freguesia, ruas",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalSitePage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Municipal Sites",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/sites/geojson": {
+      "get": {
+        "description": "GeoJSON leve dos locais por bbox/zoom, com agrupamento opcional no servidor. Comprimido (gzip).",
+        "operationId": "get_municipal_sites_geojson",
+        "parameters": [
+          {
+            "description": "Zoom do mapa; com `cluster` agrupa abaixo do 16",
+            "in": "query",
+            "name": "zoom",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maximum": 22,
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Zoom do mapa; com `cluster` agrupa abaixo do 16",
+              "title": "Zoom"
+            }
+          },
+          {
+            "description": "Agrupar no servidor (grelha por zoom)",
+            "in": "query",
+            "name": "cluster",
+            "required": false,
+            "schema": {
+              "default": true,
+              "description": "Agrupar no servidor (grelha por zoom)",
+              "title": "Cluster",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Tipos de contentor presentes no local",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de contentor presentes no local",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Frações presentes no local",
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Frações presentes no local",
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "Só candidatos (true) ou só não candidatos (false)",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só candidatos (true) ou só não candidatos (false)",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "description": "Local com contentores a mais de 1 km da freguesia declarada",
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local com contentores a mais de 1 km da freguesia declarada",
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, freguesia, ruas",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, freguesia, ruas",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SiteFeatureCollection"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Sites Geojson",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/sites/{site_id}": {
+      "get": {
+        "description": "Um local com os seus contentores, as relações com orgânicos coletivos e os locais vizinhos.",
+        "operationId": "get_municipal_site",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "site_id",
+            "required": true,
+            "schema": {
+              "maxLength": 12,
+              "title": "Site Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Raio dos vizinhos",
+            "in": "query",
+            "name": "radius_m",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "description": "Raio dos vizinhos",
+              "maximum": 1000,
+              "minimum": 10,
+              "title": "Radius M",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalSiteDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Municipal Site",
+        "tags": [
+          "municipal"
+        ]
+      }
+    },
+    "/api/v1/municipal/textile-candidates": {
+      "get": {
+        "description": "Locais candidatos a têxteis do ETL, com justificação e ordem explícita. Lugares possíveis, não recomendados.",
+        "operationId": "get_textile_candidate_sites",
+        "parameters": [
+          {
+            "description": "Só com coordenada precisa (4 ou mais casas)",
+            "in": "query",
+            "name": "precise_only",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Só com coordenada precisa (4 ou mais casas)",
+              "title": "Precise Only",
+              "type": "boolean"
+            }
+          },
+          {
+            "description": "Itens por página",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 100,
+              "description": "Itens por página",
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "`next_cursor` da página anterior",
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 200,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "`next_cursor` da página anterior",
+              "title": "Cursor"
+            }
+          },
+          {
+            "description": "Tipos de contentor presentes no local",
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalKind"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Tipos de contentor presentes no local",
+              "title": "Kind"
+            }
+          },
+          {
+            "description": "Frações presentes no local",
+            "in": "query",
+            "name": "stream",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/MunicipalStream"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Frações presentes no local",
+              "title": "Stream"
+            }
+          },
+          {
+            "description": "Códigos de freguesia (app/INE ou CAOP)",
+            "in": "query",
+            "name": "parish",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Códigos de freguesia (app/INE ou CAOP)",
+              "title": "Parish"
+            }
+          },
+          {
+            "in": "query",
+            "name": "producer_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/ProducerType"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Producer Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "site_class",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "items": {
+                    "$ref": "#/components/schemas/SiteClass"
+                  },
+                  "type": "array"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Site Class"
+            }
+          },
+          {
+            "description": "Só candidatos (true) ou só não candidatos (false)",
+            "in": "query",
+            "name": "textile_candidate",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Só candidatos (true) ou só não candidatos (false)",
+              "title": "Textile Candidate"
+            }
+          },
+          {
+            "description": "Local com contentores a mais de 1 km da freguesia declarada",
+            "in": "query",
+            "name": "coord_suspect",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Local com contentores a mais de 1 km da freguesia declarada",
+              "title": "Coord Suspect"
+            }
+          },
+          {
+            "in": "query",
+            "name": "coord_precision",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CoordPrecision"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Coord Precision"
+            }
+          },
+          {
+            "description": "Pesquisa sem acentos: id, freguesia, ruas",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 80,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Pesquisa sem acentos: id, freguesia, ruas",
+              "title": "Q"
+            }
+          },
+          {
+            "description": "min_lon,min_lat,max_lon,max_lat",
+            "in": "query",
+            "name": "bbox",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "min_lon,min_lat,max_lon,max_lat",
+              "title": "Bbox"
+            }
+          },
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          },
+          {
+            "in": "cookie",
+            "name": "access_token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Access Token"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalCandidatesOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Textile Candidate Sites",
+        "tags": [
+          "municipal"
         ]
       }
     },

@@ -135,6 +135,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 - **Cobertura**: parte da área a 200/300/500 m de um local público (31,4%, 47,8%, 70,9%), em CAOP 2019 e EPSG:3763. É cobertura de **área**; a de população precisa de BGRI.
 - **Lacuna por freguesia** (`municipal_by_parish.csv`): `potencial = pop × 0,7 kg × 12`, `lacuna = potencial × (1 − 22,9%)`, igual captura média em todas as freguesias porque não há têxtil recolhido por freguesia; **estimativa**. Ordena-se por tonelada de lacuna por local candidato.
 - **Freguesias**: a atribuição de uma coordenada à freguesia usa o polígono CAOP 2019, nunca o nome escrito.
+- **Na base de dados e na API**: `municipal_containers` (2 751), `municipal_sites` (2 026), `municipal_parish_stats` (48, com o contorno), `municipal_links` (394) e `municipal_meta`, importados no `seed` com a fonte e o SHA-256 do pacote; nunca na tabela `containers`. A lista candidata é ordenada por uma regra explícita sem pesos inventados (coordenada precisa; freguesia com mais lacuna estimada por candidato; enterrado; orgânico a menos de 15 m; mais contentores). Rotas e permissões em [Arquitetura](arquitetura.md#rede-municipal-municipal). **Nomes de produtores** (estabelecimentos privados): por omissão não saem da API; só um `admin` os pede, à espera da decisão da Vitrus (pergunta 12 da análise).
 
 ## Pressupostos
 

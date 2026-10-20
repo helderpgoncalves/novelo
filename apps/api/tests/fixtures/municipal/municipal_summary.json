@@ -1,0 +1,41 @@
+{
+ "note": "Contentores MUNICIPAIS de teste.",
+ "received_on": "2026-10-20",
+ "caop": {
+  "version": "CAOP 2019 (fixture)"
+ },
+ "containers": {
+  "rows_read": 12,
+  "accepted": 11,
+  "located": 10,
+  "pending_no_coordinates": 1,
+  "rejected": 1
+ },
+ "analysis": {
+  "coverage_pct_of_municipality_area": {
+   "200m": 30.0,
+   "300m": 45.0,
+   "500m": 70.0
+  },
+  "public_site_nn_distance_m": {
+   "n": 4,
+   "mean": 1857.0,
+   "p5": 139.0,
+   "p25": 139.0,
+   "median": 862.0,
+   "p75": 2000.0,
+   "p95": 4000.0,
+   "max": 5600.0
+  },
+  "top_sites_by_containers": [
+   {
+    "name": "Hotel Teste",
+    "containers": 2
+   }
+  ]
+ },
+ "rules": {
+  "potential_kg_per_inhab_month": 0.7,
+  "capture_today_pct": 25.0
+ }
+}

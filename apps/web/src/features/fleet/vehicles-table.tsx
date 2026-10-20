@@ -97,9 +97,10 @@ export function VehiclesTable({ vehicles }: { vehicles: VehicleOut[] }) {
   return (
     <DataTable
       id="vehicles"
+      exportName="viaturas"
       columns={columns}
       rows={vehicles}
-      getKey={(v) => v.plate}
+      getRowId={(v) => v.plate}
       caption={m.fleet_vehicles_title()}
       searchLabel={m.fleet_vehicle_search()}
       pageSize={10}

@@ -31,7 +31,7 @@ async def get_quality(db: AsyncSession) -> DataQuality:
         await db.execute(
             select(DataAlert, DataSource.key)
             .join(DataSource, DataSource.id == DataAlert.source_id)
-            .order_by(DataAlert.number)
+            .order_by(DataSource.received_on, DataSource.key, DataAlert.number)
         )
     ).all()
     alerts = [_alert_out(a, key) for a, key in rows]

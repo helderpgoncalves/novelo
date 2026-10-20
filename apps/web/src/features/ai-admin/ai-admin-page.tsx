@@ -5,10 +5,10 @@ import type { AiSettingsOut } from '@/client';
 import { getAiSettingsOptions } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
+import { PageTabs } from '@/components/page-tabs';
 import { ErrorState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { m } from '@/paraglide/messages';
 import { LimitsTab } from './limits-tab';
 import { OverviewTab } from './overview-tab';
@@ -43,48 +43,44 @@ export function AiAdminPage({ tab, days }: Props) {
           )
         }
       />
-      <Tabs
+      <PageTabs
+        label={m.rw_tabs_label()}
         value={tab}
         onValueChange={(next) =>
           navigate({ search: (prev) => ({ ...prev, tab: next as AiTab }), replace: true })
         }
-        className="gap-6"
-      >
-        <div className="-mx-4 overflow-x-auto px-4 sm:mx-0 sm:px-0">
-          <TabsList variant="line" className="h-auto w-max min-w-full justify-start border-b">
-            <TabsTrigger value="overview" className="h-10 flex-none px-3">
-              {m.aiadm_tab_overview()}
-            </TabsTrigger>
-            <TabsTrigger value="models" className="h-10 flex-none px-3">
-              {m.aiadm_tab_models()}
-            </TabsTrigger>
-            <TabsTrigger value="limits" className="h-10 flex-none px-3">
-              {m.aiadm_tab_limits()}
-            </TabsTrigger>
-            <TabsTrigger value="triage" className="h-10 flex-none px-3">
-              {m.aiadm_tab_triage()}
-            </TabsTrigger>
-          </TabsList>
-        </div>
-
-        <TabsContent value="overview">
-          <OverviewTab
-            days={days}
-            onDaysChange={(next) =>
-              navigate({ search: (prev) => ({ ...prev, days: next }), replace: true })
-            }
-          />
-        </TabsContent>
-        <TabsContent value="models">
-          <WithSettings query={settings}>{(s) => <TasksTab settings={s} />}</WithSettings>
-        </TabsContent>
-        <TabsContent value="limits">
-          <WithSettings query={settings}>{(s) => <LimitsTab settings={s} />}</WithSettings>
-        </TabsContent>
-        <TabsContent value="triage">
-          <TriageEvalTab />
-        </TabsContent>
-      </Tabs>
+        tabs={[
+          {
+            id: 'overview',
+            label: m.aiadm_tab_overview(),
+            content: (
+              <OverviewTab
+                days={days}
+                onDaysChange={(next) =>
+                  navigate({ search: (prev) => ({ ...prev, days: next }), replace: true })
+                }
+              />
+            ),
+          },
+          {
+            id: 'models',
+            label: m.aiadm_tab_models(),
+            status: settings.data && !settings.data.enabled ? 'error' : undefined,
+            statusLabel: m.aiadm_key_off(),
+            content: (
+              <WithSettings query={settings}>{(s) => <TasksTab settings={s} />}</WithSettings>
+            ),
+          },
+          {
+            id: 'limits',
+            label: m.aiadm_tab_limits(),
+            content: (
+              <WithSettings query={settings}>{(s) => <LimitsTab settings={s} />}</WithSettings>
+            ),
+          },
+          { id: 'triage', label: m.aiadm_tab_triage(), content: <TriageEvalTab /> },
+        ]}
+      />
     </Page>
   );
 }

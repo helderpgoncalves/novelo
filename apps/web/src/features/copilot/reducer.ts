@@ -1,5 +1,5 @@
 import type { CopilotEventMessage, MessageOut } from '@/client';
-import type { ChatMessage, MemoryNote, ToolStep, Turn } from './types';
+import type { ChatMessage, EventOf, MemoryNote, ToolStep, Turn } from './types';
 
 export function emptyMessage(role: ChatMessage['role'], id: string, text = ''): ChatMessage {
   return {
@@ -166,6 +166,32 @@ export function applyEvent(turn: Turn, event: CopilotEventMessage): Turn {
   }
 }
 
+/**
+ * Eventos de fecho a juntar quando o stream acaba. O `done` pode ainda estar na fila (os eventos são
+ * aplicados em lotes de 40 ms), por isso olha para a fila **e** para a volta já aplicada: ver só uma
+ * delas inventava um erro de ligação por cima de uma resposta completa.
+ */
+export function closingEvents(
+  pending: CopilotEventMessage[],
+  turn: Turn,
+  aborted: boolean,
+  connectionMessage: string,
+): CopilotEventMessage[] {
+  const finished = turn.finish !== null || pending.some((e) => e.type === 'done');
+  if (finished) return [];
+  if (aborted) return [{ type: 'done', finish: 'cancelled' }];
+  const failed = turn.message.error !== null || pending.some((e) => e.type === 'error');
+  return failed
+    ? []
+    : [
+        {
+          type: 'error',
+          code: 'connection' as EventOf<'error'>['code'],
+          message: connectionMessage,
+        },
+      ];
+}
+
 /** Mensagem guardada no servidor para o formato do ecrã. */
 export function fromServer(message: MessageOut): ChatMessage {
   return {
@@ -191,5 +217,10 @@ export function fromServer(message: MessageOut): ChatMessage {
         : { verified: message.verified, warning: message.verified ? null : 'numbers_unverified' },
     feedback: message.feedback,
     model: message.model,
+    // O servidor não guarda o motivo: uma resposta falhada reaberta mostra "ficou a meio" e Gerar de novo.
+    error:
+      message.status === 'error'
+        ? { code: 'connection' as EventOf<'error'>['code'], message: '' }
+        : null,
   };
 }
