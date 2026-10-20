@@ -5,6 +5,7 @@ import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { AuthPanel } from '@/features/auth/auth-panel';
+import { MobileCorner } from '@/features/auth/mobile-corner';
 import { hasSessionHint } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
@@ -31,11 +32,12 @@ function AuthLayout() {
   return (
     <div
       data-lp-fonts=""
-      className="flex min-h-dvh flex-col lg:grid lg:grid-cols-[54fr_minmax(480px,46fr)]"
+      className="relative flex min-h-dvh flex-col lg:grid lg:grid-cols-[54fr_minmax(480px,46fr)]"
     >
+      <MobileCorner />
       {/* O formulário vem primeiro no DOM (teclado e leitores de ecrã); a imagem decorativa fica à esquerda por `order`.
           Em telemóvel não há logótipo nem imagem: o ecrã é só o formulário. */}
-      <main className="lg:order-2 flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
+      <main className="relative lg:order-2 flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
         <div className="flex items-center justify-end">
           <div className="flex items-center gap-1">
             <LanguageSwitcher />
@@ -45,7 +47,8 @@ function AuthLayout() {
         <div className="mx-auto flex w-full max-w-sm flex-1 flex-col justify-center py-8">
           <Outlet />
         </div>
-        <div className="flex flex-col items-center gap-1">
+        {/* Véu de papel atrás do rodapé em telemóvel: mantém o contraste AA do texto sobre a Penha do canto. */}
+        <div className="relative flex flex-col items-center gap-1 rounded-lg bg-[color-mix(in_srgb,var(--background)_86%,transparent)] shadow-[0_0_14px_12px_color-mix(in_srgb,var(--background)_86%,transparent)] lg:bg-transparent lg:shadow-none">
           <LegalLinks className="text-xs [&_ul]:justify-center" />
           <p className="text-center text-muted-foreground text-xs">{m.auth_footer()}</p>
         </div>
