@@ -1,3 +1,4 @@
+import { intlTag } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 
 export type GroupKey = 'pinned' | 'today' | 'yesterday' | 'week' | 'month' | 'older';
@@ -44,4 +45,15 @@ export function groupThreads<T extends { pinned: boolean; updated_at: string }>(
     const items = buckets.get(key);
     return items ? [{ key, items }] : [];
   });
+}
+
+/** Hora nas conversas de hoje e de ontem, dia da semana na última semana, dia e mês depois (e o ano nas antigas). */
+export function threadTime(iso: string, group: GroupKey, tag: string = intlTag()): string {
+  const date = new Date(iso);
+  const fmt = (o: Intl.DateTimeFormatOptions) => new Intl.DateTimeFormat(tag, o).format(date);
+  if (group === 'today' || group === 'yesterday')
+    return fmt({ hour: '2-digit', minute: '2-digit' });
+  if (group === 'week') return fmt({ weekday: 'short' });
+  if (group === 'month') return fmt({ day: 'numeric', month: 'short' });
+  return fmt({ day: 'numeric', month: 'short', year: 'numeric' });
 }

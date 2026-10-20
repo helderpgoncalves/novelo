@@ -7,7 +7,7 @@ from typing import Any
 
 import httpx
 import pytest
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.ai.catalog import ModelCatalog
@@ -312,3 +312,91 @@ async def test_event_schema_documents_every_event_and_the_openapi_has_the_union(
     ok = spec["paths"]["/api/v1/copilot/stream"]["post"]["responses"]["200"]["content"]
     assert ok["text/event-stream"]["schema"]["$ref"].endswith("/CopilotEventMessage")
     assert spec["paths"]["/api/v1/copilot/stream"]["post"]["operationId"] == "copilot_stream"
+
+
+# --- título criativo da conversa (modelo barato, em paralelo com a resposta) ---------------------------
+
+
+class _Title:
+    def __init__(self, title: str) -> None:
+        self.title = title
+
+
+async def _run_turn(session: AsyncSession, llm: FakeLlm, catalog: ModelCatalog, text: str) -> list[Any]:
+    user = (await session.execute(select(User))).scalars().one()
+    deps = stream_deps_for(session, llm, catalog)
+    return [ev async for ev in stream_turn(deps, user.id, PreparedTurn(user_text=text, locale="pt-PT", thread_id=None))]
+
+
+async def test_creative_title_replaces_the_provisional_one(
+    logged_in: httpx.AsyncClient, llm: FakeLlm, session: AsyncSession, catalog: ModelCatalog
+) -> None:
+    llm.queue_rounds({"text": ["Olá."]})
+    llm.queue("_ThreadTitle", _Title("  «Fio da meada em Azurém.»  "))
+    events = await _run_turn(session, llm, catalog, "Quanto recolhemos em Azurém?")
+    titles = [e.title for e in events if e.type == "title"]
+    assert titles == ["Quanto recolhemos em Azurém?", "Fio da meada em Azurém"]
+    kinds = [e.type for e in events]
+    assert kinds.index("text_delta") < len(kinds) - 1 and kinds[-1] == "done"
+    thread = (await session.execute(select(CopilotThread))).scalars().one()
+    assert thread.title == "Fio da meada em Azurém" and thread.search_text == "fio da meada em azurem"
+    call = next(c for c in llm.calls if c["schema"] == "_ThreadTitle")
+    assert "Azurém" in str(call["user"]) and "assistant" not in str(call["user"])  # só a primeira mensagem
+
+
+@pytest.mark.parametrize(
+    "outcome", [RuntimeError("boom"), AiBudgetExceededError("budget"), _Title("Título com 2025"), _Title("Um")]
+)
+async def test_title_failure_or_bad_title_keeps_the_provisional_one(
+    logged_in: httpx.AsyncClient, llm: FakeLlm, session: AsyncSession, catalog: ModelCatalog, outcome: object
+) -> None:
+    llm.queue_rounds({"text": ["Olá."]})
+    llm.queue("_ThreadTitle", outcome)
+    events = await _run_turn(session, llm, catalog, "Quanto recolhemos?")
+    assert [e.title for e in events if e.type == "title"] == ["Quanto recolhemos?"]
+    assert events[-1].type == "done" and not any(e.type == "error" for e in events)
+    assert (await session.execute(select(CopilotThread.title))).scalar_one() == "Quanto recolhemos?"
+
+
+async def test_title_does_not_overwrite_a_user_rename(
+    logged_in: httpx.AsyncClient, session: AsyncSession, catalog: ModelCatalog
+) -> None:
+    class Renaming(FakeLlm):
+        async def structured(self, **kw: Any) -> object:
+            await asyncio.sleep(0.05)  # o título chega depois de o utilizador renomear
+            return await super().structured(**kw)
+
+        async def stream_round(self, **kw: Any) -> Any:
+            await session.execute(update(CopilotThread).values(title="O meu nome"))
+            await session.commit()
+            async for piece in super().stream_round(**kw):
+                yield piece
+
+    llm = Renaming()
+    llm.queue_rounds({"text": ["Olá."]})
+    llm.queue("_ThreadTitle", _Title("Novelo de Creixomil"))
+    events = await _run_turn(session, llm, catalog, "E se Creixomil passar a pedido?")
+    assert [e.title for e in events if e.type == "title"] == ["E se Creixomil passar a pedido?"]
+    assert (await session.execute(select(CopilotThread.title))).scalar_one() == "O meu nome"
+
+
+async def test_title_does_not_delay_the_first_token(
+    logged_in: httpx.AsyncClient, session: AsyncSession, catalog: ModelCatalog
+) -> None:
+    class Slow(FakeLlm):
+        async def structured(self, **kw: Any) -> object:
+            await asyncio.sleep(30)  # nunca chega a tempo
+            return await super().structured(**kw)
+
+    llm = Slow()
+    llm.queue_rounds({"text": ["Olá."]})
+    user = (await session.execute(select(User))).scalars().one()
+    gen = stream_turn(
+        stream_deps_for(session, llm, catalog), user.id, PreparedTurn(user_text="Olá", locale="pt-PT", thread_id=None)
+    )
+    async for ev in gen:
+        if ev.type == "text_delta":
+            break
+    await gen.aclose()  # primeiro token sem esperar pelo título; a tarefa é cancelada sem fugas
+    await asyncio.sleep(0)
+    assert not [t for t in asyncio.all_tasks() if "make_title" in repr(t)]

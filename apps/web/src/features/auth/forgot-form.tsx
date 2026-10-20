@@ -65,7 +65,7 @@ export function ForgotForm() {
                   type="email"
                   autoComplete="email"
                   inputMode="email"
-                  className="h-10"
+                  className="h-11"
                 />
               </FormControl>
               <FormMessage />
@@ -75,7 +75,7 @@ export function ForgotForm() {
         {gate.field}
         <Button
           type="submit"
-          className="h-10 w-full font-semibold"
+          className="h-11 w-full font-semibold"
           disabled={forgot.isPending || gate.blocked}
           loading={forgot.isPending}
         >

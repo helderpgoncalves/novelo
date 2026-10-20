@@ -77,7 +77,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
                   autoCorrect="off"
                   spellCheck={false}
                   placeholder={m.login_email_placeholder()}
-                  className="h-10"
+                  className="h-11"
                 />
               </FormControl>
               <FormMessage />
@@ -96,7 +96,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
                 </Link>
               </div>
               <FormControl>
-                <PasswordInput {...field} autoComplete="current-password" className="h-10" />
+                <PasswordInput {...field} autoComplete="current-password" className="h-11" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,7 +122,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
         {gate.field}
         <Button
           type="submit"
-          className="h-10 w-full font-semibold"
+          className="h-11 w-full font-semibold"
           disabled={login.isPending || gate.blocked}
           loading={login.isPending}
         >

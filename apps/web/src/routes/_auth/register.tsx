@@ -5,7 +5,13 @@ import { z } from 'zod';
 import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
+import {
+  AuthConsent,
+  AuthDivider,
+  AuthHeading,
+  AuthSwitch,
+  authLinkClass,
+} from '@/features/auth/auth-ui';
 import { GoogleButton } from '@/features/auth/google-button';
 import { RegisterForm } from '@/features/auth/register-form';
 import { m } from '@/paraglide/messages';
@@ -27,7 +33,7 @@ function Register() {
         title={m.register_closed_title()}
         description={m.register_closed_text()}
         action={
-          <Link to="/login" className="font-medium text-primary text-sm hover:underline">
+          <Link to="/login" className={authLinkClass}>
             {m.register_go_login()}
           </Link>
         }
@@ -37,33 +43,27 @@ function Register() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl">{m.register_title()}</h1>
-        <p className="text-muted-foreground text-sm">{m.register_subtitle()}</p>
-      </div>
+      <AuthHeading title={m.register_title()} subtitle={m.register_subtitle()} />
       {config.approval_required !== false && (
         <Alert role="note" data-testid="register-approval-notice">
           <Info />
           <AlertDescription>{m.register_approval_notice()}</AlertDescription>
         </Alert>
       )}
-      {config.google_enabled && (
-        <>
-          <GoogleButton next={next} mode="signup" />
-          <div className="flex items-center gap-3 text-muted-foreground text-xs">
-            <Separator className="flex-1" />
-            {m.login_or_email()}
-            <Separator className="flex-1" />
-          </div>
-        </>
-      )}
       <RegisterForm next={next ?? '/'} />
-      <p className="text-center text-muted-foreground text-sm">
-        {m.register_have_account()}{' '}
-        <Link to="/login" search={{ next }} className="font-medium text-primary hover:underline">
+      {config.google_enabled && (
+        <div className="space-y-4">
+          <AuthDivider>{m.login_or_other()}</AuthDivider>
+          <GoogleButton next={next} mode="signup" />
+        </div>
+      )}
+      <AuthSwitch>
+        {m.register_have_account()}
+        <Link to="/login" search={{ next }} className={authLinkClass}>
           {m.register_login()}
         </Link>
-      </p>
+      </AuthSwitch>
+      <AuthConsent />
     </div>
   );
 }

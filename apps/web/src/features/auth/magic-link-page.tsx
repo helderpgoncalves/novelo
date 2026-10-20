@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { getMeQueryKey, verifyMagicLinkMutation } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
@@ -69,7 +70,7 @@ export function MagicLinkPage({
       : 'loading';
 
   return (
-    <div className="grid min-h-dvh grid-rows-[auto_1fr] px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+    <div className="grid min-h-dvh grid-rows-[auto_1fr_auto] px-6 pt-[max(1rem,env(safe-area-inset-top))] pb-[max(1rem,env(safe-area-inset-bottom))]">
       <header className="flex items-center justify-between">
         <BrandLogo className="h-8" />
         <div className="flex items-center gap-1">
@@ -77,7 +78,7 @@ export function MagicLinkPage({
           <ThemeToggle />
         </div>
       </header>
-      <main className="mx-auto flex w-full max-w-sm flex-col justify-center py-10">
+      <main className="mx-auto flex w-full max-w-sm flex-col justify-center py-8">
         {requested ? (
           <MagicLinkSent
             email={requested}
@@ -154,6 +155,7 @@ export function MagicLinkPage({
           </div>
         )}
       </main>
+      <LegalLinks className="text-xs [&_ul]:justify-center" />
     </div>
   );
 }

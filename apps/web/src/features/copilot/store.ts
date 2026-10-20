@@ -73,6 +73,10 @@ export function registerChatPage(): () => void {
   };
 }
 
+/** Leitura síncrona para fora do React (gestor de streams): o painel está aberto / a página /chat está montada? */
+export const isCopilotSheetOpen = () => state.sheetOpen;
+export const isChatPageOpen = () => pages > 0;
+
 export const useCopilotUi = () =>
   useSyncExternalStore(
     subscribe,

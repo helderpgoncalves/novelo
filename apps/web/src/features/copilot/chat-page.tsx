@@ -89,7 +89,27 @@ export function ChatPage({
     <div className="flex min-h-0 flex-1 flex-col" data-testid="copilot-page">
       <ChatHeader
         level="h1"
-        className="sm:px-4 lg:px-6"
+        className="sm:px-6 lg:px-8"
+        wideTitle={m.chat_page_title()}
+        nav={
+          <Tabs
+            value={tab}
+            onValueChange={(v) => go({ tab: v as ChatTab })}
+            className="h-full min-w-0 gap-0"
+          >
+            <TabsList
+              variant="line"
+              aria-label={m.chat_page_title()}
+              className="h-full w-max min-w-0 gap-1 border-b-0 pb-0"
+            >
+              {tabs.map((t) => (
+                <TabsTrigger key={t.id} value={t.id} className="h-full px-3.5 sm:px-4">
+                  {t.label}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        }
         title={
           tab === 'chat'
             ? (chat.title ?? m.chat_page_title())
@@ -156,37 +176,31 @@ export function ChatPage({
           </>
         }
       />
-      <div className="hidden shrink-0 border-b bg-background sm:block">
-        <Tabs value={tab} onValueChange={(v) => go({ tab: v as ChatTab })}>
-          <div className="overflow-x-auto px-4 sm:px-6 lg:px-8">
-            <TabsList
-              variant="line"
-              aria-label={m.chat_page_title()}
-              className="h-auto w-max min-w-full justify-start gap-1 pb-0"
-            >
-              {tabs.map((t) => (
-                <TabsTrigger key={t.id} value={t.id} className="h-11 flex-none px-3.5 sm:px-4">
-                  {t.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-        </Tabs>
-      </div>
-
       {tab === 'chat' ? (
         <div className="flex min-h-0 flex-1">
           <aside
-            className="hidden w-80 shrink-0 border-r bg-card/40 lg:block xl:w-96"
+            className="hidden w-80 shrink-0 border-r bg-card/40 lg:block"
             aria-label={m.chat_threads()}
           >
             {list}
           </aside>
-          <ChatView chat={chat} handlesRequests onOpenThread={openThread} />
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
+            {chat.title && (
+              <div className="hidden h-11 shrink-0 items-center border-b px-6 sm:flex lg:px-8">
+                <h2
+                  className="truncate font-medium font-serif text-base tracking-tight"
+                  data-testid="copilot-thread-title"
+                >
+                  {chat.title}
+                </h2>
+              </div>
+            )}
+            <ChatView chat={chat} layout="page" handlesRequests onOpenThread={openThread} />
+          </div>
         </div>
       ) : (
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <div className="mx-auto w-full max-w-6xl px-4 py-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-6xl px-4 py-5 pb-[max(2rem,env(safe-area-inset-bottom))] sm:px-6 sm:py-7 lg:px-8">
             {tab === 'history' && (
               <HistoryTab onOpenThread={openThread} onGo={(t) => go({ tab: t })} />
             )}

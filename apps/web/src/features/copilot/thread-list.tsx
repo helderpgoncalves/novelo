@@ -57,13 +57,13 @@ import {
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { getErrorMessage } from '@/lib/errors';
-import { formatDateTime } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { invalidateCopilot } from './cache';
 import { downloadBlob, downloadText } from './download';
+import { useGeneratingThreadIds, useUnreadThreadIds } from './generation';
 import { plainText as plain } from './markdown';
-import { groupLabel, groupThreads } from './thread-groups';
+import { dateGroup, groupLabel, groupThreads, threadTime } from './thread-groups';
 
 type Dialogs =
   | { kind: 'rename'; thread: ThreadSummaryOut }
@@ -151,6 +151,22 @@ function NameDialog({
   );
 }
 
+/** Três pontos a saltar: a conversa está a gerar uma resposta (parados com movimento reduzido). */
+function GeneratingDots() {
+  return (
+    <span role="img" aria-label={m.cp_generating()} className="flex shrink-0 items-center gap-0.5">
+      {[0, 1, 2].map((n) => (
+        <span
+          key={n}
+          aria-hidden="true"
+          style={{ animationDelay: `${n * 150}ms` }}
+          className="size-1.5 animate-bounce rounded-full bg-primary motion-reduce:animate-none"
+        />
+      ))}
+    </span>
+  );
+}
+
 /** Lista de conversas: pesquisa, projetos, arquivo, fixar, renomear, exportar, partilhar e apagar. */
 export function ThreadList({
   selectedId,
@@ -173,6 +189,8 @@ export function ThreadList({
   const [project, setProject] = useState('');
   const [limit, setLimit] = useState(PAGE);
   const [dialog, setDialog] = useState<Dialogs>(null);
+  const generating = useGeneratingThreadIds();
+  const unread = useUnreadThreadIds();
   const projects = useQuery(listCopilotProjectsOptions());
   const threads = useQuery({
     ...listCopilotThreadsOptions({
@@ -255,41 +273,41 @@ export function ThreadList({
 
   return (
     <div className={cn('flex min-h-0 flex-col', className)} data-testid="copilot-thread-list">
-      <div className="space-y-2 border-b px-3 pt-3 pb-2.5">
-        <div className="flex items-center gap-2">
-          <div className="relative min-w-0 flex-1">
-            <Search
-              className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3.5 size-4 text-muted-foreground"
-              strokeWidth={1.75}
-              aria-hidden="true"
-            />
-            <Input
-              type="search"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={m.chat_search_threads()}
-              aria-label={m.chat_search_threads()}
-              className="h-11 rounded-full bg-muted/40 pl-10 text-base shadow-none md:text-base"
-            />
-          </div>
-          <Button
-            variant="outline"
-            size="icon"
-            className="size-11 shrink-0 rounded-full"
-            onClick={onNew}
-            aria-label={m.chat_new()}
-            title={m.chat_new()}
-          >
-            <SquarePen className="size-[1.125rem]" strokeWidth={1.75} aria-hidden="true" />
-          </Button>
+      <div className="space-y-2.5 border-b px-3 pt-3 pb-2.5">
+        <Button
+          variant="outline"
+          className="h-11 w-full justify-center gap-2 sm:h-10"
+          onClick={onNew}
+        >
+          <SquarePen className="size-4" strokeWidth={1.75} aria-hidden="true" />
+          {m.chat_new()}
+        </Button>
+        <div className="relative">
+          <Search
+            className="-translate-y-1/2 pointer-events-none absolute top-1/2 left-3 size-4 text-muted-foreground"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+          <Input
+            type="search"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder={m.chat_search_threads()}
+            aria-label={m.chat_search_threads()}
+            className="h-11 bg-background pl-9 text-base shadow-none sm:h-10 md:text-base"
+          />
         </div>
-        <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-muted-foreground text-xs">
+        <div className="flex min-h-10 items-center justify-between gap-3 text-sm">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Switch id="threads-archived" checked={archived} onCheckedChange={setArchived} />
+            <label htmlFor="threads-archived">{m.chat_archived()}</label>
+          </div>
           {(projects.data?.length ?? 0) > 0 && (
             <select
               aria-label={m.chat_project_filter()}
               value={project}
               onChange={(e) => setProject(e.target.value)}
-              className="h-10 min-w-0 flex-1 rounded-md border border-input bg-transparent px-2 text-base md:text-sm dark:bg-input/30"
+              className="h-10 min-w-0 max-w-[55%] rounded-md border border-input bg-background px-2 text-base md:text-sm"
             >
               <option value="">{m.chat_all_projects()}</option>
               {projects.data?.map((p) => (
@@ -299,18 +317,20 @@ export function ThreadList({
               ))}
             </select>
           )}
-          <div className="ml-auto flex min-h-10 items-center gap-2 text-sm">
-            <Switch id="threads-archived" checked={archived} onCheckedChange={setArchived} />
-            <label htmlFor="threads-archived">{m.chat_archived()}</label>
-          </div>
         </div>
       </div>
 
       <div className="min-h-0 flex-1 overflow-y-auto">
         {threads.isPending ? (
-          <p role="status" className="p-6 text-center text-muted-foreground text-sm">
-            {m.chat_loading_threads()}
-          </p>
+          <div role="status" aria-label={m.chat_loading_threads()} className="space-y-px py-2">
+            <span className="sr-only">{m.chat_loading_threads()}</span>
+            {[0, 1, 2, 3, 4].map((n) => (
+              <div key={n} aria-hidden="true" className="space-y-2 px-4 py-3">
+                <div className="h-3.5 w-2/3 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+                <div className="h-3 w-5/6 animate-pulse rounded bg-muted/70 motion-reduce:animate-none" />
+              </div>
+            ))}
+          </div>
         ) : threads.error ? (
           <div className="p-3">
             <ErrorState error={threads.error} onRetry={() => void threads.refetch()} />
@@ -328,125 +348,159 @@ export function ThreadList({
           <div>
             {groupThreads(items).map((g) => (
               <section key={g.key} aria-label={groupLabel[g.key]()}>
-                <h3 className="px-4 pt-4 pb-1.5 font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]">
+                <h3 className="sticky top-0 z-[1] border-border/60 border-b bg-background/95 px-4 py-1.5 font-semibold font-sans text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em] backdrop-blur">
                   {groupLabel[g.key]()}
                 </h3>
-                <ul className="divide-y divide-border/60 border-border/60 border-y">
-                  {g.items.map((t) => (
-                    <li key={t.id} className="relative" data-testid="copilot-thread-item">
-                      <button
-                        type="button"
-                        onClick={() => onSelect(t.id)}
-                        aria-current={t.id === selectedId ? 'true' : undefined}
-                        className={cn(
-                          'flex min-h-14 w-full flex-col items-start justify-center gap-0.5 border-transparent border-l-2 px-4 py-2 pr-14 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
-                          t.id === selectedId && 'border-primary bg-muted/60',
-                        )}
-                      >
-                        <span className="flex w-full items-center gap-1.5">
-                          {t.pinned && (
-                            <Pin
-                              className="size-3 shrink-0 text-primary"
-                              aria-label={m.chat_pinned()}
-                            />
+                <ul className="divide-y divide-border/50">
+                  {g.items.map((t) => {
+                    const busy = generating.has(t.id);
+                    const fresh = !busy && unread.has(t.id);
+                    return (
+                      <li key={t.id} className="relative" data-testid="copilot-thread-item">
+                        <button
+                          type="button"
+                          onClick={() => onSelect(t.id)}
+                          aria-current={t.id === selectedId ? 'true' : undefined}
+                          className={cn(
+                            'flex min-h-[4.25rem] w-full flex-col items-start justify-center gap-0.5 border-transparent border-l-2 px-4 py-2.5 pr-12 text-left transition-colors hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
+                            t.id === selectedId && 'border-primary bg-primary/8',
                           )}
-                          <span className="truncate font-medium text-[0.9375rem]">
-                            {t.title || m.chat_untitled()}
+                        >
+                          <span className="flex w-full items-center gap-2">
+                            {t.pinned && (
+                              <Pin
+                                className="size-3 shrink-0 text-primary"
+                                aria-label={m.chat_pinned()}
+                              />
+                            )}
+                            <span className="min-w-0 flex-1 truncate font-medium text-[0.9375rem] leading-snug">
+                              {t.title || m.chat_untitled()}
+                            </span>
+                            {busy ? (
+                              <GeneratingDots />
+                            ) : (
+                              <span className="flex shrink-0 items-center gap-1.5 text-muted-foreground text-xs tabular-nums">
+                                {fresh && (
+                                  <span
+                                    role="img"
+                                    aria-label={m.cp_unread()}
+                                    className="size-2 rounded-full bg-primary"
+                                  />
+                                )}
+                                <time dateTime={t.updated_at}>
+                                  {threadTime(
+                                    t.updated_at,
+                                    g.key === 'pinned' ? dateGroup(t.updated_at) : g.key,
+                                  )}
+                                </time>
+                              </span>
+                            )}
                           </span>
-                        </span>
-                        {t.snippet && (
-                          <span className="line-clamp-1 w-full text-muted-foreground text-xs">
-                            {plain(t.snippet)}
-                          </span>
-                        )}
-                        <span className="flex flex-wrap items-center gap-1.5 text-muted-foreground text-xs tabular-nums">
-                          {formatDateTime(t.updated_at)}
-                          {t.project && (
-                            <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-                              {t.project}
-                            </Badge>
+                          {t.snippet && (
+                            <span className="line-clamp-1 w-full text-muted-foreground text-xs leading-snug">
+                              {plain(t.snippet)}
+                            </span>
                           )}
-                          {t.shared && <Users className="size-3" aria-label={m.chat_shared()} />}
-                        </span>
-                      </button>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="absolute top-1.5 right-1 size-11"
-                            aria-label={m.chat_thread_menu({ title: t.title || m.chat_untitled() })}
-                          >
-                            <MoreVertical className="size-4" aria-hidden="true" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56">
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            onSelect={() => patch(t, { pinned: !t.pinned })}
-                          >
-                            {t.pinned ? <PinOff /> : <Pin />}
-                            {t.pinned ? m.chat_unpin() : m.chat_pin()}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            onSelect={() => setDialog({ kind: 'rename', thread: t })}
-                          >
-                            <Pencil />
-                            {m.chat_rename()}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            onSelect={() => setDialog({ kind: 'project', thread: t })}
-                          >
-                            <FolderInput />
-                            {m.chat_move_project()}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            onSelect={() => patch(t, { archived: !t.archived })}
-                          >
-                            {t.archived ? <ArchiveRestore /> : <Archive />}
-                            {t.archived ? m.chat_unarchive() : m.chat_archive()}
-                          </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem className="min-h-10" onSelect={() => void exportMd(t)}>
-                            <Download />
-                            {m.chat_export_md()}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="min-h-10" onSelect={() => void exportPdf(t)}>
-                            <FileDown />
-                            {m.chat_export_pdf()}
-                          </DropdownMenuItem>
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            onSelect={() => share.mutate({ path: { thread_id: t.id } })}
-                          >
-                            <Link2 />
-                            {m.chat_share()}
-                          </DropdownMenuItem>
-                          {t.shared && (
+                          {(t.project || t.shared) && (
+                            <span className="flex flex-wrap items-center gap-1.5 pt-0.5 text-muted-foreground text-xs">
+                              {t.project && (
+                                <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
+                                  {t.project}
+                                </Badge>
+                              )}
+                              {t.shared && (
+                                <Users className="size-3" aria-label={m.chat_shared()} />
+                              )}
+                            </span>
+                          )}
+                        </button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="-translate-y-1/2 absolute top-1/2 right-1 size-10"
+                              aria-label={m.chat_thread_menu({
+                                title: t.title || m.chat_untitled(),
+                              })}
+                            >
+                              <MoreVertical className="size-4" aria-hidden="true" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-56">
                             <DropdownMenuItem
                               className="min-h-10"
-                              onSelect={() => unshare.mutate({ path: { thread_id: t.id } })}
+                              onSelect={() => patch(t, { pinned: !t.pinned })}
                             >
-                              <Link2Off />
-                              {m.chat_unshare()}
+                              {t.pinned ? <PinOff /> : <Pin />}
+                              {t.pinned ? m.chat_unpin() : m.chat_pin()}
                             </DropdownMenuItem>
-                          )}
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem
-                            className="min-h-10"
-                            variant="destructive"
-                            onSelect={() => setDialog({ kind: 'delete', thread: t })}
-                          >
-                            <Trash2 />
-                            {m.chat_delete()}
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </li>
-                  ))}
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => setDialog({ kind: 'rename', thread: t })}
+                            >
+                              <Pencil />
+                              {m.chat_rename()}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => setDialog({ kind: 'project', thread: t })}
+                            >
+                              <FolderInput />
+                              {m.chat_move_project()}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => patch(t, { archived: !t.archived })}
+                            >
+                              {t.archived ? <ArchiveRestore /> : <Archive />}
+                              {t.archived ? m.chat_unarchive() : m.chat_archive()}
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => void exportMd(t)}
+                            >
+                              <Download />
+                              {m.chat_export_md()}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => void exportPdf(t)}
+                            >
+                              <FileDown />
+                              {m.chat_export_pdf()}
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              onSelect={() => share.mutate({ path: { thread_id: t.id } })}
+                            >
+                              <Link2 />
+                              {m.chat_share()}
+                            </DropdownMenuItem>
+                            {t.shared && (
+                              <DropdownMenuItem
+                                className="min-h-10"
+                                onSelect={() => unshare.mutate({ path: { thread_id: t.id } })}
+                              >
+                                <Link2Off />
+                                {m.chat_unshare()}
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              className="min-h-10"
+                              variant="destructive"
+                              onSelect={() => setDialog({ kind: 'delete', thread: t })}
+                            >
+                              <Trash2 />
+                              {m.chat_delete()}
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </li>
+                    );
+                  })}
                 </ul>
               </section>
             ))}

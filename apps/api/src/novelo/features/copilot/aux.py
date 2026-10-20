@@ -1,5 +1,6 @@
 """Chamadas baratas à volta de uma resposta: título da conversa e sugestões de seguimento (com alternativa fixa)."""
 
+import asyncio
 import json
 import logging
 import re
@@ -46,27 +47,46 @@ def first_message_title(user_text: str) -> str:
     return text[:60].rsplit(" ", 1)[0].rstrip(".,;:!?") + "…"
 
 
-def fallback_title(user_text: str) -> str:
-    words = re.sub(r"\s+", " ", user_text).strip().split(" ")
-    return (" ".join(words[:7]).rstrip(".,;:!?") or "Conversa")[:80]
+TITLE_TIMEOUT_S = 8.0
+_TITLE_MAX_WORDS = 8
+_TITLE_MAX_CHARS = 60
 
 
-async def make_title(llm: OpenRouterClient, user_text: str, answer: str) -> str:
+def clean_title(raw: str) -> str | None:
+    """Normaliza o título do modelo; `None` se não servir (vazio, longo, com números ou várias linhas)."""
+    title = re.sub(r"\s+", " ", raw).strip().strip("\"'«»“”`*# ").rstrip(".!?;:… ").strip()
+    if not title or len(title) > _TITLE_MAX_CHARS or re.search(r"\d", title):
+        return None
+    words = title.split(" ")
+    if not 2 <= len(words) <= _TITLE_MAX_WORDS:
+        return None
+    return title[0].upper() + title[1:]
+
+
+async def make_title(llm: OpenRouterClient, user_text: str) -> str | None:
+    """Título criativo a partir da PRIMEIRA mensagem. `None` quando falha ou o resultado não é aceitável.
+
+    O chamador mantém o título provisório nesse caso. O orçamento esgotado e a IA desligada também dão `None`:
+    o título nunca pode estragar nem atrasar a resposta.
+    """
     system, _ = load("copilot_title")
     try:
-        out = await llm.structured(
-            system=system,
-            user=json.dumps({"user": user_text[:400], "assistant": answer[:400]}, ensure_ascii=False),
-            schema=_ThreadTitle,
-            task=AiTask.COPILOT_AUX,
-            retries=0,
+        out = await asyncio.wait_for(
+            llm.structured(
+                system=system,
+                user=json.dumps({"first_message": user_text[:400]}, ensure_ascii=False),
+                schema=_ThreadTitle,
+                task=AiTask.COPILOT_AUX,
+                retries=0,
+            ),
+            timeout=TITLE_TIMEOUT_S,
         )
-        title = out.title.strip().strip('"«»').rstrip(".")
-        return title if title and not re.search(r"\d", title) else fallback_title(user_text)
     except (AiBudgetExceededError, FeatureDisabledError):
-        raise
+        return None
     except Exception:
-        return fallback_title(user_text)
+        log.info("thread title falls back to the provisional one")
+        return None
+    return clean_title(out.title)
 
 
 async def make_suggestions(

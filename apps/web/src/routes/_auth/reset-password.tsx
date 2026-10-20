@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { z } from 'zod';
 import { EmptyState } from '@/components/states';
+import { AuthHeading, authLinkClass } from '@/features/auth/auth-ui';
 import { ResetForm } from '@/features/auth/reset-form';
 import { m } from '@/paraglide/messages';
 
@@ -18,7 +19,7 @@ function ResetPage() {
         title={m.reset_invalid_title()}
         description={m.reset_invalid_text()}
         action={
-          <Link to="/forgot-password" className="font-medium text-primary text-sm hover:underline">
+          <Link to="/forgot-password" className={authLinkClass}>
             {m.reset_request_new()}
           </Link>
         }
@@ -27,10 +28,7 @@ function ResetPage() {
   }
   return (
     <div className="space-y-6">
-      <div className="space-y-2">
-        <h1 className="text-3xl">{m.reset_title()}</h1>
-        <p className="text-muted-foreground text-sm">{m.reset_subtitle()}</p>
-      </div>
+      <AuthHeading title={m.reset_title()} subtitle={m.reset_subtitle()} />
       <ResetForm token={token} />
     </div>
   );

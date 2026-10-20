@@ -66,6 +66,7 @@ _MEMORY_CUE = re.compile(
 )
 
 MAX_ROUNDS = 6
+TITLE_WAIT_S = 4.0  # no fim do turno, quanto se espera pelo título criativo
 REWRITE_ROUNDS = 3
 TOOL_RESULT_CHARS = 12_000
 TRACE_RESULT_BYTES = 60_000
@@ -151,6 +152,8 @@ class _Run:
         self.model = ""
         self.emitted_cards: set[uuid.UUID] = set()
         self.recalled = False
+        self.title_task: asyncio.Task[str | None] | None = None  # título criativo, em paralelo com a resposta
+        self.provisional_title = ""
 
     # --- persistência ----------------------------------------------------------------------------
 
@@ -285,9 +288,13 @@ class _Run:
         try:
             async with aclosing(self._body()) as events:
                 async for event in events:
+                    async for early in self._creative_title(wait=False):  # assim que estiver pronto, sem esperar
+                        self._all_events.append(early)
+                        yield early
                     self._all_events.append(event)
                     yield event
         except (asyncio.CancelledError, GeneratorExit):
+            self._drop_title_task()
             with anyio.CancelScope(
                 shield=True
             ):  # o cliente desligou: guardar o que houver e deixar o cancelamento seguir
@@ -295,6 +302,7 @@ class _Run:
                 await self._persist("cancelled", self._usage_dict())
             raise
         except Exception as exc:
+            self._drop_title_task()
             if not isinstance(exc, AppError):
                 log.exception("copilot stream failed")
             with anyio.CancelScope(shield=True):
@@ -303,6 +311,37 @@ class _Run:
             message = exc.message if isinstance(exc, AppError) else "Unexpected server error"
             yield CopilotErrorEvent(code=_error_code(exc), message=message)
             yield CopilotDoneEvent(finish="error")
+
+    def _drop_title_task(self) -> None:
+        if self.title_task is not None and not self.title_task.done():
+            self.title_task.cancel()
+        self.title_task = None
+
+    async def _creative_title(self, *, wait: bool) -> AsyncGenerator[CopilotEvent, None]:
+        """Emite o título criativo quando o modelo o devolver. Falha ou título renomeado pelo utilizador: fica o provisório.
+
+        Só toca na base de dados aqui (a sessão não é partilhável com a tarefa). Com `wait`, espera pouco: no fim do turno.
+        """
+        task = self.title_task
+        if task is None or self.thread is None or not (wait or task.done()):
+            return
+        self.title_task = None
+        try:
+            new = await asyncio.wait_for(task, timeout=TITLE_WAIT_S) if wait else task.result()
+        except Exception:  # inclui TimeoutError  # nunca estraga a resposta
+            task.cancel()
+            return
+        if not new or new == self.provisional_title:
+            return
+        # Não renomeia o que o utilizador já renomeou: só atualiza se o título na BD ainda for o provisório.
+        res = await self.db.execute(
+            update(CopilotThread)
+            .where(CopilotThread.id == self.thread.id, CopilotThread.title == self.provisional_title)
+            .values(title=new, search_text=fold(new))
+        )
+        await self.db.commit()
+        if res.rowcount:  # type: ignore[attr-defined]
+            yield CopilotTitleEvent(title=new)
 
     def _usage_dict(self) -> dict[str, Any]:
         calls = list(getattr(self.llm, "usage", []))[self.usage0 :]
@@ -384,6 +423,9 @@ class _Run:
             self.thread.search_text = fold(self.thread.title)
             await self.db.commit()
             yield CopilotTitleEvent(title=self.thread.title)
+            if t.user_text.strip() != "/compact":
+                self.provisional_title = self.thread.title
+                self.title_task = asyncio.create_task(aux.make_title(self.llm, t.user_text))
         yield _status("thinking", "status.thinking")
         base, version = load("copilot")
         self.prompt_version = version
@@ -468,6 +510,8 @@ class _Run:
                     await review.run(self.db, self.llm, self.user_id, self.thread, self.settings, stored, self.text)
                 ):
                     yield ev
+        async for ev in self._creative_title(wait=True):
+            yield ev
         usage = self._usage_dict()
         await self._persist("complete", usage)
         yield CopilotUsageEvent(**{k: usage[k] for k in ("prompt_tokens", "completion_tokens", "tokens", "cost_usd")})

@@ -15,9 +15,11 @@ import { m } from '@/paraglide/messages';
 import { ChatHeader } from './chat-header';
 import { ChatView } from './chat-view';
 import { exportThreadMarkdown } from './export-thread';
+import { useIsGenerating, useUnreadThreadIds } from './generation';
 import { HistorySheet } from './history-sheet';
 import { setCopilotSheetOpen, toggleCopilotSheet, useCopilotUi } from './store';
 import { useChat } from './use-chat';
+import { useReducedMotion } from './use-reduced-motion';
 import { useIsMobile, useVisualViewport } from './use-viewport';
 
 const isMac = () => typeof navigator !== 'undefined' && /mac/i.test(navigator.userAgent);
@@ -51,7 +53,10 @@ export function CopilotLauncher() {
     setThreadId(id);
     writeThread(id);
   }, []);
-  const chat = useChat({ threadId, onThreadId });
+  const generating = useIsGenerating();
+  const unread = useUnreadThreadIds().size;
+  const reduced = useReducedMotion();
+  const chat = useChat({ threadId, onThreadId, surface: 'sheet' });
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -69,15 +74,41 @@ export function CopilotLauncher() {
       <Button
         variant="outline"
         size="sm"
-        className="h-10 gap-2 px-3"
+        className={cn(
+          'relative h-10 gap-2 px-3',
+          generating && 'border-primary/50',
+          generating && !reduced && 'copilot-launcher-busy',
+        )}
         onClick={toggleCopilotSheet}
-        aria-label={m.copilot_launcher_label()}
+        aria-busy={generating}
+        aria-label={
+          generating
+            ? m.copilot_launcher_generating()
+            : unread > 0
+              ? m.copilot_launcher_unread({ count: unread })
+              : m.copilot_launcher_label()
+        }
+        data-generating={generating || undefined}
       >
         <MessageCircle className="size-4" strokeWidth={1.75} aria-hidden="true" />
         <span className="hidden sm:inline">{m.copilot_launcher()}</span>
         <kbd className="hidden rounded border bg-muted px-1.5 font-mono text-[10px] text-muted-foreground lg:inline">
           {isMac() ? '⌘K' : 'Ctrl K'}
         </kbd>
+        {unread > 0 && !generating && (
+          <span
+            data-testid="copilot-unread"
+            aria-hidden="true"
+            className="absolute -top-1 -right-1 flex size-4 items-center justify-center rounded-full bg-primary text-[10px] font-medium leading-none text-primary-foreground"
+          >
+            {unread > 9 ? '9+' : unread}
+          </span>
+        )}
+        {generating && (
+          <span className="sr-only" role="status">
+            {m.copilot_generating_status()}
+          </span>
+        )}
       </Button>
       <Sheet open={sheetOpen} onOpenChange={setCopilotSheetOpen}>
         <SheetContent

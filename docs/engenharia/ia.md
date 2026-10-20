@@ -95,6 +95,10 @@ Para comparar modelos com dados reais antes de trocar: `just eval-triage --model
 - **Cache em memória** (1 h) das respostas idênticas do "E se...?" e das explicações: a chave é o hash do input determinístico.
 - **Semáforo** de concorrência (`LLM_MAX_CONCURRENCY`) para não saturar o fornecedor.
 - **Prompts estáveis no início** (prompt de sistema primeiro, dados variáveis depois), para beneficiar do prompt caching do fornecedor. Cabeçalhos `HTTP-Referer` e `X-Title` enviados.
+- **`cache_control` explícito** no prompt de sistema só nos modelos `anthropic/*` (OpenAI e Gemini fazem cache automática do prefixo estável; os outros ignorariam o marcador).
+- **Routing por latência** nas tarefas `copilot_aux` (`provider.sort`, `LLM_AUX_PROVIDER_SORT=latency`; vazio desliga): o título, as sugestões e os resumos vão para o fornecedor mais rápido.
+- **Ligações HTTP reaproveitadas**: os clientes (um por pedido) partilham um só transporte `httpx` por event loop, com keep-alive; poupa DNS e TLS em cada turno.
+- **Título da conversa criativo**: gerado por `copilot_aux` (prompt `copilot_title_v2`) a partir da primeira mensagem, em paralelo com a resposta (nunca atrasa o primeiro token; espera-se no máximo 4 s no fim do turno). O provisório (a pergunta cortada) fica se o modelo falhar, o orçamento acabar ou o utilizador já tiver renomeado a conversa.
 - **Catálogo** do OpenRouter com cache de 1 h, `ETag` e stale-while-error: se o fornecedor não responder, serve-se a cópia anterior (`stale: true`).
 
 ## Copiloto

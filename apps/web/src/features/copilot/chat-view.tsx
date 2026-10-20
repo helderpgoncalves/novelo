@@ -22,11 +22,19 @@ interface Props {
   /** Esta superfície trata dos pedidos `openCopilot({question})` (a que estiver visível). */
   handlesRequests: boolean;
   onOpenThread?: (id: string) => void;
+  /** `page` (página /chat) ou `panel` (⌘K): muda só o estado vazio. */
+  layout?: 'page' | 'panel';
   className?: string;
 }
 
 /** Conversa completa (mensagens, rolar, campo flutuante): a mesma no painel ⌘K e na página /chat. */
-export function ChatView({ chat, handlesRequests, onOpenThread, className }: Props) {
+export function ChatView({
+  chat,
+  handlesRequests,
+  onOpenThread,
+  layout = 'panel',
+  className,
+}: Props) {
   const { messages, busy, status, load, context } = chat;
   const router = useRouter();
   const reduced = useReducedMotion();
@@ -217,9 +225,18 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
           )}
         >
           {load.state === 'loading' && (
-            <p role="status" className="py-10 text-center text-muted-foreground text-sm">
-              {m.chat_opening()}
-            </p>
+            <div role="status" aria-label={m.chat_opening()} className="space-y-6 py-8">
+              <span className="sr-only">{m.chat_opening()}</span>
+              <div
+                aria-hidden="true"
+                className="ml-auto h-10 w-2/3 animate-pulse rounded-2xl bg-muted motion-reduce:animate-none sm:w-1/2"
+              />
+              <div aria-hidden="true" className="space-y-2.5">
+                <div className="h-3.5 w-full animate-pulse rounded bg-muted motion-reduce:animate-none" />
+                <div className="h-3.5 w-11/12 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+                <div className="h-3.5 w-3/5 animate-pulse rounded bg-muted motion-reduce:animate-none" />
+              </div>
+            </div>
           )}
           {load.state === 'error' && (
             <div role="alert" className="space-y-3 py-10 text-center">
@@ -230,7 +247,7 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
               </Button>
             </div>
           )}
-          {empty && <EmptyChat route={page.context?.route ?? null} onPick={ask} />}
+          {empty && <EmptyChat route={page.context?.route ?? null} onPick={ask} variant={layout} />}
           {messages.length > 0 && (
             <ol
               className="space-y-8"

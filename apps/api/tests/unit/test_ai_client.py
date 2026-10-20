@@ -263,3 +263,54 @@ async def test_account_exposes_only_whitelisted_fields() -> None:
 
     data = await OpenRouterClient(settings(), transport=httpx.MockTransport(handler)).account()
     assert data == {"limit": 10, "usage": 2.5}
+
+
+def test_clean_title_accepts_short_creative_titles_only() -> None:
+    from novelo.features.copilot.aux import clean_title  # noqa: PLC0415
+
+    assert clean_title(" «fio da meada em Azurém.» ") == "Fio da meada em Azurém"
+    assert clean_title("Rede de 2025") is None  # números
+    assert clean_title("Palavra") is None  # curto demais
+    assert clean_title("um dois três quatro cinco seis sete oito nove") is None  # longo demais
+    assert clean_title("x" * 70 + " y") is None
+    assert clean_title("") is None
+
+
+async def test_aux_tasks_route_by_latency_and_main_tasks_do_not() -> None:
+    bodies: list[dict[str, Any]] = []
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        bodies.append(json.loads(req.content))
+        return reply({"content": json.dumps({"text": "ok"})})
+
+    client = OpenRouterClient(settings(), transport=httpx.MockTransport(handler))
+    await client.structured(system="s", user="u", schema=Out, task="copilot_aux")
+    await client.structured(system="s", user="u", schema=Out, task="triage")
+    assert bodies[0]["provider"] == {"sort": "latency"} and "provider" not in bodies[1]
+    off = OpenRouterClient(settings(LLM_AUX_PROVIDER_SORT=""), transport=httpx.MockTransport(handler))
+    await off.structured(system="s", user="u", schema=Out, task="copilot_aux")
+    assert "provider" not in bodies[2]
+
+
+async def test_only_anthropic_models_get_explicit_cache_control_on_the_system_prompt() -> None:
+    bodies: list[dict[str, Any]] = []
+
+    def handler(req: httpx.Request) -> httpx.Response:
+        bodies.append(json.loads(req.content))
+        return reply({"content": json.dumps({"text": "ok"})})
+
+    client = OpenRouterClient(settings(), transport=httpx.MockTransport(handler))
+    await client.structured(system="SYS", user="u", schema=Out, task="explain", model="anthropic/claude-x")
+    await client.structured(system="SYS", user="u", schema=Out, task="explain", model="openai/gpt-x")
+    cached = bodies[0]["messages"][0]
+    assert cached["content"] == [{"type": "text", "text": "SYS", "cache_control": {"type": "ephemeral"}}]
+    assert bodies[1]["messages"][0] == {"role": "system", "content": "SYS"}
+
+
+async def test_clients_share_one_connection_pool_that_survives_client_close() -> None:
+    a, b = OpenRouterClient(settings()), OpenRouterClient(settings())
+    ta, tb = a._http._transport, b._http._transport
+    assert ta is tb
+    await a.aclose()
+    assert b._http._transport is tb and not b._http.is_closed
+    await b.aclose()

@@ -405,3 +405,22 @@ html[data-tabbar] {
     overflow: visible !important;
   }
 }
+
+/* Botão do copiloto enquanto gera: anel suave a respirar, na cor primária da marca. */
+.copilot-launcher-busy {
+  animation: copilot-breathe 2.2s ease-in-out infinite;
+}
+@keyframes copilot-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in oklab, var(--primary) 0%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--primary) 22%, transparent);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .copilot-launcher-busy {
+    animation: none;
+  }
+}

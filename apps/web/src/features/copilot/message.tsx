@@ -4,7 +4,6 @@ import {
   AlertTriangle,
   ArrowRight,
   ArrowUpRight,
-  BadgeCheck,
   Bookmark,
   Check,
   ChevronDown,
@@ -17,7 +16,7 @@ import {
   Undo2,
   Wrench,
 } from 'lucide-react';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { toast } from 'sonner';
 import type { AttachmentOut } from '@/client';
 import {
@@ -26,9 +25,7 @@ import {
   sendCopilotFeedbackMutation,
   updateCopilotMemoryEntryMutation,
 } from '@/client/@tanstack/react-query.gen';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { getErrorMessage } from '@/lib/errors';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -37,6 +34,8 @@ import { ArtifactView } from './artifacts/artifact-view';
 import { invalidateCopilot } from './cache';
 import { CopilotError } from './copilot-error';
 import { SafeMarkdown } from './markdown';
+import { MentionChip } from './mention-chip';
+import { segmentText } from './mentions';
 import { CopilotScenarioCard, fromCard } from './scenario-card';
 import { ThinkingLine } from './thinking';
 import type { ChatMessage, MemoryNote, StatusInfo } from './types';
@@ -58,11 +57,22 @@ export function AttachmentPill({ attachment }: { attachment: AttachmentOut }) {
 }
 
 export function UserMessage({ message }: { message: ChatMessage }) {
+  const resolved = message.mentions.flatMap((x) =>
+    x.label ? [{ ref: x.ref, label: x.label }] : [],
+  );
   return (
     <li className="flex flex-col items-end gap-1.5" data-testid="copilot-user-message">
       <div className="max-w-[88%] space-y-2 rounded-2xl rounded-br-md bg-primary/10 px-3.5 py-2.5 text-foreground sm:max-w-[75%]">
         <p className="whitespace-pre-wrap break-words text-[0.9375rem] leading-relaxed">
-          {message.text}
+          {segmentText(message.text, resolved).map((seg, i) =>
+            seg.mention ? (
+              // biome-ignore lint/suspicious/noArrayIndexKey: os troços são fixos para o mesmo texto
+              <MentionChip key={i} mention={seg.mention} />
+            ) : (
+              // biome-ignore lint/suspicious/noArrayIndexKey: os troços são fixos para o mesmo texto
+              <span key={i}>{seg.text}</span>
+            ),
+          )}
         </p>
         {message.attachments.length > 0 && (
           <ul className="flex flex-wrap gap-1.5" aria-label={m.chat_attachments()}>
@@ -71,19 +81,6 @@ export function UserMessage({ message }: { message: ChatMessage }) {
                 <AttachmentPill attachment={a} />
               </li>
             ))}
-          </ul>
-        )}
-        {message.mentions.some((x) => x.label) && (
-          <ul className="flex flex-wrap gap-1.5" aria-label={m.chat_mentions()}>
-            {message.mentions
-              .filter((x) => x.label)
-              .map((x) => (
-                <li key={`${x.ref.type}-${x.ref.id}`}>
-                  <Badge variant="outline" className="font-normal">
-                    @{x.label}
-                  </Badge>
-                </li>
-              ))}
           </ul>
         )}
       </div>
@@ -168,84 +165,91 @@ function MemoryNotice({ note, onUndone }: { note: MemoryNote; onUndone: () => vo
   );
 }
 
-function Steps({ message }: { message: ChatMessage }) {
-  if (message.tools.length === 0 && message.plan.length === 0) return null;
+function StepsPanel({ message }: { message: ChatMessage }) {
   return (
-    <Collapsible className="text-xs">
-      <CollapsibleTrigger className="group flex min-h-9 items-center gap-1.5 text-muted-foreground hover:text-foreground">
-        <Wrench className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-        {m.chat_steps({ count: message.tools.length })}
-        <ChevronDown
-          className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
-          aria-hidden="true"
-        />
-      </CollapsibleTrigger>
-      <CollapsibleContent className="space-y-2 pt-1">
-        {message.plan.length > 0 && (
-          <ol className="list-decimal space-y-0.5 pl-5 text-muted-foreground">
-            {message.plan.map((s) => (
-              <li key={s}>{s}</li>
-            ))}
-          </ol>
-        )}
-        <ul className="space-y-1">
-          {message.tools.map((t) => (
-            <li
-              key={t.id}
-              className="flex flex-wrap items-baseline gap-x-2 rounded-md bg-muted/50 px-2 py-1"
-            >
-              <code className="font-mono text-[11px]">{t.name}</code>
-              <span className={cn('text-muted-foreground', t.ok === false && 'text-destructive')}>
-                {t.summary ?? t.args}
-              </span>
-              {t.durationMs !== null && (
-                <span className="ml-auto text-muted-foreground tabular-nums">
-                  {t.durationMs} ms
-                </span>
-              )}
-            </li>
+    <div className="space-y-2">
+      {message.plan.length > 0 && (
+        <ol className="list-decimal space-y-0.5 pl-5 text-muted-foreground">
+          {message.plan.map((s) => (
+            <li key={s}>{s}</li>
           ))}
-        </ul>
-      </CollapsibleContent>
-    </Collapsible>
+        </ol>
+      )}
+      <ul className="space-y-1">
+        {message.tools.map((t) => (
+          <li
+            key={t.id}
+            className="flex flex-wrap items-baseline gap-x-2 rounded-md bg-muted/50 px-2 py-1"
+          >
+            <code className="font-mono text-[11px]">{t.name}</code>
+            <span className={cn('text-muted-foreground', t.ok === false && 'text-destructive')}>
+              {t.summary ?? t.args}
+            </span>
+            {t.durationMs !== null && (
+              <span className="ml-auto text-muted-foreground tabular-nums">{t.durationMs} ms</span>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
-function Sources({ message }: { message: ChatMessage }) {
-  if (message.sources.length === 0) return null;
+function SourcesPanel({ message }: { message: ChatMessage }) {
   return (
-    <Collapsible className="text-xs">
-      <CollapsibleTrigger className="group flex min-h-9 items-center gap-1.5 text-muted-foreground hover:text-foreground">
-        <ListChecks className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-        {m.chat_sources({ count: message.sources.length })}
-        <ChevronDown
-          className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
-          aria-hidden="true"
-        />
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <ul className="flex flex-wrap gap-1.5 pt-1">
-          {message.sources.map((s, i) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: fontes podem repetir o rótulo
-            <li key={i}>
-              {s.ref?.startsWith('/') ? (
-                <Link
-                  to={s.ref as never}
-                  className="inline-flex items-center gap-1 rounded-full border px-2 py-0.5 hover:bg-muted"
-                >
-                  {s.label}
-                  <ArrowUpRight className="size-3" aria-hidden="true" />
-                </Link>
-              ) : (
-                <span className="inline-flex rounded-full border px-2 py-0.5 text-muted-foreground">
-                  {s.label}
-                </span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </CollapsibleContent>
-    </Collapsible>
+    <ul className="flex flex-wrap gap-1.5">
+      {message.sources.map((s, i) => (
+        // biome-ignore lint/suspicious/noArrayIndexKey: fontes podem repetir o rótulo
+        <li key={i}>
+          {s.ref?.startsWith('/') ? (
+            <Link
+              to={s.ref as never}
+              className="inline-flex min-h-8 items-center gap-1 rounded-full border px-2.5 py-0.5 hover:bg-muted"
+            >
+              {s.label}
+              <ArrowUpRight className="size-3" aria-hidden="true" />
+            </Link>
+          ) : (
+            <span className="inline-flex min-h-8 items-center rounded-full border px-2.5 py-0.5 text-muted-foreground">
+              {s.label}
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Botão discreto que abre/fecha um painel por baixo da barra (passos, fontes). */
+function DisclosureButton({
+  icon: Icon,
+  label,
+  open,
+  controls,
+  onToggle,
+}: {
+  icon: typeof Wrench;
+  label: string;
+  open: boolean;
+  controls: string;
+  onToggle: () => void;
+}) {
+  return (
+    <Button
+      variant="ghost"
+      size="sm"
+      className="h-10 gap-1.5 px-2.5 text-muted-foreground text-xs hover:text-foreground sm:h-8"
+      aria-expanded={open}
+      aria-controls={controls}
+      onClick={onToggle}
+    >
+      <Icon className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
+      {label}
+      <ChevronDown
+        className={cn('size-3.5 transition-transform', open && 'rotate-180')}
+        aria-hidden="true"
+      />
+    </Button>
   );
 }
 
@@ -280,7 +284,7 @@ function Feedback({ message, onChange }: { message: ChatMessage; onChange: (v: 1
   });
   const rate = (rating: 1 | -1) =>
     send.mutate({ path: { message_id: message.id }, body: { rating } });
-  const cls = 'size-10 sm:size-8';
+  const cls = 'size-10 text-muted-foreground hover:text-foreground sm:size-8';
   return (
     <>
       <Button
@@ -327,10 +331,16 @@ interface AssistantProps {
 /** Resposta do copiloto: a toda a largura, sem bolha, com texto, cartões, artefactos, ações e notas. */
 export function AssistantMessage({ message, chat, last, status, onAsk }: AssistantProps) {
   const [copied, setCopied] = useState(false);
+  const [panel, setPanel] = useState<'steps' | 'sources' | null>(null);
+  const panelId = useId();
   const streaming = message.state === 'streaming';
+  // O selo «verificado» não diz nada de novo (é o comportamento esperado); só o contrário é relevante:
+  // avisa que os números do texto não puderam ser confirmados e que só valem os cartões.
   const verification = message.verification;
   const unverified =
-    verification && (!verification.verified || verification.warning === 'numbers_unverified');
+    !!verification && (!verification.verified || verification.warning === 'numbers_unverified');
+  const hasSteps = message.tools.length > 0 || message.plan.length > 0;
+  const hasSources = message.sources.length > 0;
   const canRate = !streaming && !message.id.startsWith('tmp-') && message.state !== 'error';
 
   const copy = async () => {
@@ -343,6 +353,20 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
     <li className="space-y-3" data-testid="copilot-assistant-message" data-state={message.state}>
       <p className="sr-only">{m.copilot_role_assistant()}</p>
       {message.text && <SafeMarkdown text={message.text} />}
+      {!streaming && unverified && (
+        <p
+          role="note"
+          data-testid="copilot-unverified"
+          className="flex items-start gap-1.5 text-destructive text-xs leading-snug"
+        >
+          <AlertTriangle
+            className="mt-px size-3.5 shrink-0"
+            strokeWidth={1.75}
+            aria-hidden="true"
+          />
+          {m.copilot_unverified()}
+        </p>
+      )}
       {message.retracted && streaming && !message.text && (
         <p className="text-muted-foreground text-sm italic">{m.chat_retracted()}</p>
       )}
@@ -411,61 +435,76 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
         <p className="text-muted-foreground text-xs italic">{m.chat_cancelled()}</p>
       )}
 
-      {!streaming && (verification || message.tools.length > 0 || message.sources.length > 0) && (
-        <div className="border-border/60 border-t pt-1 text-muted-foreground">
-          {verification &&
-            (unverified ? (
-              <p className="flex min-h-9 items-center gap-1.5 text-destructive text-xs">
-                <AlertTriangle className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
-                {m.copilot_unverified()}
-              </p>
-            ) : (
-              <p className="flex min-h-9 items-center gap-1.5 text-xs">
-                <BadgeCheck
-                  className="size-3.5 text-primary"
-                  strokeWidth={1.75}
-                  aria-hidden="true"
-                />
-                {m.copilot_verified()}
-              </p>
-            ))}
-          <Steps message={message} />
-          <Sources message={message} />
-        </div>
-      )}
       <Navigate message={message} />
 
-      {!streaming && message.text && (
-        <div className="-ml-2 flex flex-wrap items-center gap-0.5">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="size-10 sm:size-8"
-            aria-label={m.chat_copy()}
-            onClick={() => void copy()}
-          >
-            {copied ? (
-              <Check className="size-4 text-primary" aria-hidden="true" />
-            ) : (
-              <Copy className="size-4" aria-hidden="true" />
+      {!streaming && (message.text || hasSteps || hasSources) && (
+        <div className="space-y-1.5">
+          <div className="-ml-2 flex flex-wrap items-center gap-x-0.5 gap-y-0">
+            {message.text && (
+              <>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="size-10 text-muted-foreground hover:text-foreground sm:size-8"
+                  aria-label={m.chat_copy()}
+                  onClick={() => void copy()}
+                >
+                  {copied ? (
+                    <Check className="size-4 text-primary" aria-hidden="true" />
+                  ) : (
+                    <Copy className="size-4" aria-hidden="true" />
+                  )}
+                </Button>
+                {chat && canRate && (
+                  <Feedback
+                    message={message}
+                    onChange={(v) => chat.patchMessage(message.id, (x) => ({ ...x, feedback: v }))}
+                  />
+                )}
+                {last && chat?.threadId && !chat.busy && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-10 gap-1.5 px-2.5 text-muted-foreground text-xs hover:text-foreground sm:h-8"
+                    onClick={() => void chat.regenerate()}
+                  >
+                    <RefreshCw className="size-3.5" aria-hidden="true" />
+                    {m.chat_regenerate()}
+                  </Button>
+                )}
+              </>
             )}
-          </Button>
-          {chat && canRate && (
-            <Feedback
-              message={message}
-              onChange={(v) => chat.patchMessage(message.id, (x) => ({ ...x, feedback: v }))}
-            />
+            {message.text && (hasSteps || hasSources) && (
+              <span aria-hidden="true" className="mx-1.5 h-4 w-px bg-border" />
+            )}
+            {hasSteps && (
+              <DisclosureButton
+                icon={Wrench}
+                label={m.chat_steps({ count: message.tools.length })}
+                open={panel === 'steps'}
+                controls={`${panelId}-steps`}
+                onToggle={() => setPanel(panel === 'steps' ? null : 'steps')}
+              />
+            )}
+            {hasSources && (
+              <DisclosureButton
+                icon={ListChecks}
+                label={m.chat_sources({ count: message.sources.length })}
+                open={panel === 'sources'}
+                controls={`${panelId}-sources`}
+                onToggle={() => setPanel(panel === 'sources' ? null : 'sources')}
+              />
+            )}
+          </div>
+          {panel === 'steps' && hasSteps && (
+            <div id={`${panelId}-steps`} className="text-xs">
+              <StepsPanel message={message} />
+            </div>
           )}
-          {last && chat?.threadId && !chat.busy && (
-            <Button
-              variant="ghost"
-              size="sm"
-              className="h-10 gap-1.5 sm:h-8"
-              onClick={() => void chat.regenerate()}
-            >
-              <RefreshCw className="size-3.5" aria-hidden="true" />
-              {m.chat_regenerate()}
-            </Button>
+          {panel === 'sources' && hasSources && (
+            <div id={`${panelId}-sources`} className="text-xs">
+              <SourcesPanel message={message} />
+            </div>
           )}
         </div>
       )}
@@ -481,7 +520,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
               <button
                 type="button"
                 onClick={() => onAsk(s)}
-                className="group flex min-h-11 w-full items-center justify-between gap-3 py-2.5 text-left text-[0.9375rem] leading-snug transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
+                className="group flex min-h-11 w-full items-center justify-between gap-3 py-2.5 text-left text-sm leading-snug transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
               >
                 <span>{s}</span>
                 <ArrowRight
