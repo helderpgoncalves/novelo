@@ -1,6 +1,7 @@
 import { createFileRoute, Outlet, redirect, useMatches } from '@tanstack/react-router';
 import { Suspense, useState } from 'react';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
+import { AppShellSkeleton } from '@/components/app-loading';
 import { AppSidebar } from '@/components/layout/app-sidebar';
 import { Topbar } from '@/components/layout/topbar';
 import { OfflineBanner } from '@/components/offline-banner';
@@ -20,7 +21,9 @@ export const Route = createFileRoute('/_app')({
     if (user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
   },
-  pendingComponent: RouteSkeleton,
+  pendingComponent: AppShellSkeleton,
+  pendingMs: 0,
+  pendingMinMs: 0,
   component: AppLayout,
 });
 
