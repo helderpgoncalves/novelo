@@ -1,11 +1,10 @@
 import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { getMeOptions } from '@/client/@tanstack/react-query.gen';
 import { NoPending } from '@/components/app-loading';
-import { BrandLogo } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { AuthPanel, AuthStrip } from '@/features/auth/auth-panel';
+import { AuthPanel } from '@/features/auth/auth-panel';
 import { hasSessionHint } from '@/lib/session-hint';
 import { m } from '@/paraglide/messages';
 
@@ -34,12 +33,11 @@ function AuthLayout() {
       data-lp-fonts=""
       className="flex min-h-dvh flex-col lg:grid lg:grid-cols-[54fr_minmax(480px,46fr)]"
     >
-      <AuthStrip />
-      {/* O formulário vem primeiro no DOM (teclado e leitores de ecrã); a imagem decorativa fica à esquerda por `order`. */}
+      {/* O formulário vem primeiro no DOM (teclado e leitores de ecrã); a imagem decorativa fica à esquerda por `order`.
+          Em telemóvel não há logótipo nem imagem: o ecrã é só o formulário. */}
       <main className="lg:order-2 flex flex-1 flex-col pt-6 pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))] lg:pt-[max(1.5rem,env(safe-area-inset-top))]">
-        <div className="flex items-center justify-between">
-          <BrandLogo className="h-8 lg:hidden" />
-          <div className="ml-auto flex items-center gap-1">
+        <div className="flex items-center justify-end">
+          <div className="flex items-center gap-1">
             <LanguageSwitcher />
             <ThemeToggle />
           </div>
