@@ -188,3 +188,11 @@ login_account_limiter = RateLimiter(limit=10, window_s=900, name="login-account"
 solver_user_limiter = RateLimiter(limit=6, window_s=60, name="solver")
 pdf_user_limiter = RateLimiter(limit=6, window_s=60, name="pdf")
 passport_limiter = RateLimiter(limit=60, window_s=60, name="passport")  # passaporte público do lote, por IP
+
+# Email: webhook do Resend (por IP), alertas e ferramentas de administração, reenvios do próprio utilizador.
+webhook_limiter = RateLimiter(limit=300, window_s=60, name="webhook")
+email_test_limiter = RateLimiter(limit=3, window_s=3600, name="email-test")  # por administrador
+email_refresh_limiter = RateLimiter(limit=6, window_s=60, name="email-refresh")  # por administrador
+invite_link_limiter = RateLimiter(limit=10, window_s=3600, name="invite-link")  # por administrador
+registration_resend_limiter = RateLimiter(limit=2, window_s=3600, name="registration-resend")  # por utilizador
+verify_cooldown_limiter = RateLimiter(limit=1, window_s=60, name="verify-cooldown")  # por utilizador

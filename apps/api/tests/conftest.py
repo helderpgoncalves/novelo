@@ -52,6 +52,7 @@ from novelo.features.ai_admin import models as _ai_models  # noqa: F401
 from novelo.features.auth import models as _auth_models  # noqa: F401
 from novelo.features.copilot import models as _copilot_models  # noqa: F401
 from novelo.features.datasets import models as _dataset_models  # noqa: F401
+from novelo.features.email_log import models as _email_log_models  # noqa: F401
 from novelo.features.lots import models as _lot_models  # noqa: F401
 from novelo.features.lots.router import get_llm
 from novelo.features.municipal import models as _municipal_models  # noqa: F401
@@ -121,9 +122,17 @@ class OutboxSender:
 
     def __init__(self) -> None:
         self.sent: list[dict[str, str]] = []
+        self.keys: list[str | None] = []
+        self.errors: list[Exception] = []  # cada envio consome o primeiro (e levanta-o) até esvaziar
 
-    async def send(self, *, to: str, subject: str, html: str, text: str) -> None:
+    async def send(
+        self, *, to: str, subject: str, html: str, text: str, idempotency_key: str | None = None
+    ) -> str | None:
+        if self.errors:
+            raise self.errors.pop(0)
         self.sent.append({"to": to, "subject": subject, "html": html, "text": text})
+        self.keys.append(idempotency_key)
+        return f"msg-{len(self.sent)}"
 
 
 class FakeTurnstile:

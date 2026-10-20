@@ -45,6 +45,10 @@ services:
       - RESEND_API_KEY=${RESEND_API_KEY:-}
       - EMAIL_FROM=${EMAIL_FROM:-Novelo <novelo@heldergoncalves.io>}
       - EMAIL_SUPPORT=${EMAIL_SUPPORT:-novelo@heldergoncalves.io}
+      - EMAIL_REPLY_TO=${EMAIL_REPLY_TO:-}
+      - RESEND_WEBHOOK_SECRET=${RESEND_WEBHOOK_SECRET:-}
+      - RESEND_READ_API_KEY=${RESEND_READ_API_KEY:-}
+      - EMAIL_NOT_FOUND_PER_HOUR=${EMAIL_NOT_FOUND_PER_HOUR:-30}
       - CORS_ORIGINS=["https://${DOMAIN:-novelo.helder.si}"]
       - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
       - OPENROUTER_BASE_URL=${OPENROUTER_BASE_URL:-https://openrouter.ai/api/v1}

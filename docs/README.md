@@ -45,6 +45,7 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 | [Avaliação do copiloto](engenharia/avaliacao-copiloto.md) | Resultado gerado por `just eval-copilot` (última corrida: 67 casos) |
 | [Avaliação da triagem](engenharia/avaliacao-triagem.md) | Como medir a triagem por foto; ainda sem corrida |
 | [Ambiente](engenharia/ambiente.md) | Variáveis `.env`, Resend e `EMAIL_TRANSPORT`, Google OAuth, OpenRouter, magic link, entrada por QR e limites de convidados |
+| [Emails](engenharia/emails.md) | Envio e entrega dos emails: estados, códigos de erro, webhook do Resend, supressões, alertas e *runbook* «não recebi o email» |
 | [Testes e verificação](engenharia/testes.md) | `just check-fast` / `check` / `e2e`, paralelismo, BD por worker, tempos medidos e como depurar testes lentos |
 | [Deploy](engenharia/deploy.md) | Coolify na VPS, domínio, variáveis que o compose repassa, deploy manual, operação |
 | [Workflow com agentes](engenharia/workflow-ia.md) | Claude Code e GLM/Z.ai/ZCode a partilhar o mesmo contexto |

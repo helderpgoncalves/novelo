@@ -10,6 +10,7 @@ from novelo.features.audit import models as audit_models  # noqa: F401
 from novelo.features.auth import models as auth_models  # noqa: F401
 from novelo.features.copilot import models as copilot_models  # noqa: F401
 from novelo.features.datasets import models as dataset_models  # noqa: F401
+from novelo.features.email_log import models as email_log_models  # noqa: F401
 from novelo.features.lots import models as lot_models  # noqa: F401
 from novelo.features.municipal import models as municipal_models  # noqa: F401
 from novelo.features.network import models as network_models  # noqa: F401

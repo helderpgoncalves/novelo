@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { acceptInvitation, addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, approveUser, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createInvitation, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteScenario, deleteUser, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, exportMunicipalSites, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getApprovalStatus, getAuthConfig, getBrandEvidence, getCaopParishesGeojson, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getFibreMarket, getFleet, getLot, getLotQr, getMe, getMunicipalDensityBenchmark, getMunicipalGapRanking, getMunicipalOverview, getMunicipalParish, getMunicipalSite, getMunicipalSitesGeojson, getObservedFlows, getOverview, getPassport, getPlanningParameters, getQuickJoinInfo, getQuickJoinQr, getScenario, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTextileCandidateSites, getTriageEval, getUsersSummary, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listAudit, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listGuests, listInvitations, listLocalities, listLots, listMunicipalContainers, listMunicipalParishes, listMunicipalProducers, listMunicipalSites, listPendingMemory, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, previewInvitation, proposeCopilotAction, quickJoin, ready, recommendPilot, refresh, refreshCopilotArtifact, register, rejectCopilotAction, rejectPendingMemory, rejectUser, renameScenario, requestMagicLink, resendInvitation, resendVerification, reserveLot, resetPassword, revokeInvitation, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, shareCopilotThread, startImpersonation, stopImpersonation, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updateOnboarding, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail, verifyMagicLink } from '../sdk.gen';
-import type { AcceptInvitationData, AcceptInvitationError, AcceptInvitationResponse, AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, ApproveUserData, ApproveUserError, ApproveUserResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateInvitationData, CreateInvitationError, CreateInvitationResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ExportMunicipalSitesData, ExportMunicipalSitesError, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetApprovalStatusData, GetApprovalStatusError, GetApprovalStatusResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCaopParishesGeojsonData, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, GetMunicipalGapRankingData, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, GetMunicipalOverviewData, GetMunicipalOverviewError, GetMunicipalOverviewResponse, GetMunicipalParishData, GetMunicipalParishError, GetMunicipalParishResponse, GetMunicipalSiteData, GetMunicipalSiteError, GetMunicipalSiteResponse, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetQuickJoinInfoData, GetQuickJoinInfoError, GetQuickJoinInfoResponse, GetQuickJoinQrData, GetQuickJoinQrError, GetQuickJoinQrResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTextileCandidateSitesData, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetUsersSummaryData, GetUsersSummaryError, GetUsersSummaryResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListAuditData, ListAuditError, ListAuditResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListGuestsData, ListGuestsError, ListGuestsResponse, ListInvitationsData, ListInvitationsError, ListInvitationsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListMunicipalContainersData, ListMunicipalContainersError, ListMunicipalContainersResponse, ListMunicipalParishesData, ListMunicipalParishesError, ListMunicipalParishesResponse, ListMunicipalProducersData, ListMunicipalProducersError, ListMunicipalProducersResponse, ListMunicipalSitesData, ListMunicipalSitesError, ListMunicipalSitesResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, PreviewInvitationData, PreviewInvitationError, PreviewInvitationResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, QuickJoinData, QuickJoinError, QuickJoinResponse, ReadyData, ReadyError, ReadyResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RejectUserData, RejectUserError, RejectUserResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, RequestMagicLinkData, RequestMagicLinkError, RequestMagicLinkResponse, ResendInvitationData, ResendInvitationError, ResendInvitationResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RevokeInvitationData, RevokeInvitationError, RevokeInvitationResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, StartImpersonationData, StartImpersonationError, StartImpersonationResponse, StopImpersonationData, StopImpersonationError, StopImpersonationResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateOnboardingData, UpdateOnboardingError, UpdateOnboardingResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse, VerifyMagicLinkData, VerifyMagicLinkError, VerifyMagicLinkResponse } from '../types.gen';
+import { acceptInvitation, addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, approveUser, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createEmailSuppression, createInvitation, createInvitationLink, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteEmailSuppression, deleteScenario, deleteUser, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, exportMunicipalSites, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getApprovalStatus, getAuthConfig, getBrandEvidence, getCaopParishesGeojson, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getEmail, getEmailDnsHealth, getEmailSummary, getFibreMarket, getFleet, getLot, getLotQr, getMe, getMunicipalDensityBenchmark, getMunicipalGapRanking, getMunicipalOverview, getMunicipalParish, getMunicipalSite, getMunicipalSitesGeojson, getObservedFlows, getOverview, getPassport, getPlanningParameters, getQuickJoinInfo, getQuickJoinQr, getScenario, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTextileCandidateSites, getTriageEval, getUsersSummary, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listAudit, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listEmails, listEmailSuppressions, listGuests, listInvitations, listLocalities, listLots, listMunicipalContainers, listMunicipalParishes, listMunicipalProducers, listMunicipalSites, listPendingMemory, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, previewInvitation, proposeCopilotAction, quickJoin, ready, receiveResendWebhook, recommendPilot, refresh, refreshCopilotArtifact, refreshEmailStatus, register, rejectCopilotAction, rejectPendingMemory, rejectUser, renameScenario, requestMagicLink, resendInvitation, resendRegistrationEmail, resendUserEmail, resendVerification, reserveLot, resetPassword, revokeInvitation, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, sendTestEmail, shareCopilotThread, startImpersonation, stopImpersonation, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updateOnboarding, updatePlanningParameters, updateUser, uploadCopilotAttachments, verifyEmail, verifyMagicLink } from '../sdk.gen';
+import type { AcceptInvitationData, AcceptInvitationError, AcceptInvitationResponse, AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, ApproveUserData, ApproveUserError, ApproveUserResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateEmailSuppressionData, CreateEmailSuppressionError, CreateEmailSuppressionResponse, CreateInvitationData, CreateInvitationError, CreateInvitationLinkData, CreateInvitationLinkError, CreateInvitationLinkResponse, CreateInvitationResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteEmailSuppressionData, DeleteEmailSuppressionError, DeleteEmailSuppressionResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ExportMunicipalSitesData, ExportMunicipalSitesError, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetApprovalStatusData, GetApprovalStatusError, GetApprovalStatusResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCaopParishesGeojsonData, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetEmailData, GetEmailDnsHealthData, GetEmailDnsHealthError, GetEmailDnsHealthResponse, GetEmailError, GetEmailResponse, GetEmailSummaryData, GetEmailSummaryError, GetEmailSummaryResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, GetMunicipalGapRankingData, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, GetMunicipalOverviewData, GetMunicipalOverviewError, GetMunicipalOverviewResponse, GetMunicipalParishData, GetMunicipalParishError, GetMunicipalParishResponse, GetMunicipalSiteData, GetMunicipalSiteError, GetMunicipalSiteResponse, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetQuickJoinInfoData, GetQuickJoinInfoError, GetQuickJoinInfoResponse, GetQuickJoinQrData, GetQuickJoinQrError, GetQuickJoinQrResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTextileCandidateSitesData, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetUsersSummaryData, GetUsersSummaryError, GetUsersSummaryResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListAuditData, ListAuditError, ListAuditResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListEmailsData, ListEmailsError, ListEmailsResponse, ListEmailSuppressionsData, ListEmailSuppressionsError, ListEmailSuppressionsResponse, ListGuestsData, ListGuestsError, ListGuestsResponse, ListInvitationsData, ListInvitationsError, ListInvitationsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListMunicipalContainersData, ListMunicipalContainersError, ListMunicipalContainersResponse, ListMunicipalParishesData, ListMunicipalParishesError, ListMunicipalParishesResponse, ListMunicipalProducersData, ListMunicipalProducersError, ListMunicipalProducersResponse, ListMunicipalSitesData, ListMunicipalSitesError, ListMunicipalSitesResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, PreviewInvitationData, PreviewInvitationError, PreviewInvitationResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, QuickJoinData, QuickJoinError, QuickJoinResponse, ReadyData, ReadyError, ReadyResponse, ReceiveResendWebhookData, ReceiveResendWebhookError, ReceiveResendWebhookResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshEmailStatusData, RefreshEmailStatusError, RefreshEmailStatusResponse, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RejectUserData, RejectUserError, RejectUserResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, RequestMagicLinkData, RequestMagicLinkError, RequestMagicLinkResponse, ResendInvitationData, ResendInvitationError, ResendInvitationResponse, ResendRegistrationEmailData, ResendRegistrationEmailError, ResendRegistrationEmailResponse, ResendUserEmailData, ResendUserEmailError, ResendUserEmailResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RevokeInvitationData, RevokeInvitationError, RevokeInvitationResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, SendTestEmailData, SendTestEmailError, SendTestEmailResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, StartImpersonationData, StartImpersonationError, StartImpersonationResponse, StopImpersonationData, StopImpersonationError, StopImpersonationResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateOnboardingData, UpdateOnboardingError, UpdateOnboardingResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse, VerifyMagicLinkData, VerifyMagicLinkError, VerifyMagicLinkResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -182,7 +182,8 @@ export const getApprovalStatusQueryKey = (options?: Options<GetApprovalStatusDat
 /**
  * Get Approval Status
  *
- * Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`.
+ * Leve, para o ecrã de espera fazer polling (e redirecionar quando `status` passa a `approved`).
+ * Funciona com a conta `pending` ou `rejected`; `confirmation_email` diz se o aviso «recebemos o teu pedido» saiu.
  */
 export const getApprovalStatusOptions = (options?: Options<GetApprovalStatusData>) => queryOptions<GetApprovalStatusResponse, GetApprovalStatusError, GetApprovalStatusResponse, ReturnType<typeof getApprovalStatusQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -237,7 +238,8 @@ export const getAuthConfigOptions = (options?: Options<GetAuthConfigData>) => qu
 /**
  * Forgot Password
  *
- * Responde 204 exista ou não a conta: não revela que emails estão registados.
+ * Responde 204 exista ou não a conta e envia SEMPRE um email (link de recuperação, aviso de conta inativa,
+ * o convite de novo ou o email neutro «não encontrámos uma conta»). 503 `email_unavailable` se não puder sair.
  */
 export const forgotPasswordMutation = (options?: Partial<Options<ForgotPasswordData>>): UseMutationOptions<ForgotPasswordResponse, ForgotPasswordError, Options<ForgotPasswordData>> => {
     const mutationOptions: UseMutationOptions<ForgotPasswordResponse, ForgotPasswordError, Options<ForgotPasswordData>> = {
@@ -407,7 +409,9 @@ export const logoutAllMutation = (options?: Partial<Options<LogoutAllData>>): Us
 /**
  * Request Magic Link
  *
- * Envia um link de entrada válido 15 min e de uso único. Responde 204 exista ou não a conta.
+ * Envia um email, SEMPRE, e responde 204 exista ou não a conta: link de entrada (15 min, uso único) para contas
+ * ativas; aviso sem link para contas desativadas/recusadas; o convite de novo para quem só tem convite; e um
+ * email neutro para o resto. Se o email não puder sair responde 503 `email_unavailable` (igual para todos).
  */
 export const requestMagicLinkMutation = (options?: Partial<Options<RequestMagicLinkData>>): UseMutationOptions<RequestMagicLinkResponse, RequestMagicLinkError, Options<RequestMagicLinkData>> => {
     const mutationOptions: UseMutationOptions<RequestMagicLinkResponse, RequestMagicLinkError, Options<RequestMagicLinkData>> = {
@@ -448,7 +452,8 @@ export const getMeQueryKey = (options?: Options<GetMeData>) => createQueryKey('g
  * Get Me
  *
  * O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado
- * e `impersonation` traz o administrador real. Para administradores traz `pending_approvals`.
+ * e `impersonation` traz o administrador real. Para administradores traz `pending_approvals` e `email_alerts`
+ * (e dispara, no máximo 1x por dia, o lembrete de contas por aprovar há mais de 24 h).
  */
 export const getMeOptions = (options?: Options<GetMeData>) => queryOptions<GetMeResponse, GetMeError, GetMeResponse, ReturnType<typeof getMeQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -675,9 +680,29 @@ export const registerMutation = (options?: Partial<Options<RegisterData>>): UseM
 };
 
 /**
+ * Resend Registration Email
+ *
+ * Para quem aguarda aprovação: reenvia «recebemos o teu pedido» (2 por hora). 503 se não sair.
+ */
+export const resendRegistrationEmailMutation = (options?: Partial<Options<ResendRegistrationEmailData>>): UseMutationOptions<ResendRegistrationEmailResponse, ResendRegistrationEmailError, Options<ResendRegistrationEmailData>> => {
+    const mutationOptions: UseMutationOptions<ResendRegistrationEmailResponse, ResendRegistrationEmailError, Options<ResendRegistrationEmailData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await resendRegistrationEmail({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
  * Resend Verification
  *
- * Reenvia o email de verificação. Sem captcha: exige sessão iniciada; o limitador trava abusos.
+ * Reenvia o email de verificação (uma vez por minuto). Sem captcha: exige sessão iniciada.
+ * 503 `email_unavailable` se o email não puder sair.
  */
 export const resendVerificationMutation = (options?: Partial<Options<ResendVerificationData>>): UseMutationOptions<ResendVerificationResponse, ResendVerificationError, Options<ResendVerificationData>> => {
     const mutationOptions: UseMutationOptions<ResendVerificationResponse, ResendVerificationError, Options<ResendVerificationData>> = {
@@ -2955,6 +2980,216 @@ export const listAuditInfiniteOptions = (options?: Options<ListAuditData>) => {
     return opts as Omit<typeof opts, 'initialData'>;
 };
 
+export const listEmailsQueryKey = (options?: Options<ListEmailsData>) => createQueryKey('listEmails', options);
+
+/**
+ * List Emails
+ *
+ * Envios de email (só metadados, sem corpos), do mais recente. Sincroniza o estado com o Resend se houver chave.
+ */
+export const listEmailsOptions = (options?: Options<ListEmailsData>) => queryOptions<ListEmailsResponse, ListEmailsError, ListEmailsResponse, ReturnType<typeof listEmailsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listEmails({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listEmailsQueryKey(options)
+});
+
+export const listEmailsInfiniteQueryKey = (options?: Options<ListEmailsData>): QueryKey<Options<ListEmailsData>> => createQueryKey('listEmails', options, true);
+
+/**
+ * List Emails
+ *
+ * Envios de email (só metadados, sem corpos), do mais recente. Sincroniza o estado com o Resend se houver chave.
+ */
+export const listEmailsInfiniteOptions = (options?: Options<ListEmailsData>) => {
+    const opts = infiniteQueryOptions<ListEmailsResponse, ListEmailsError, InfiniteData<ListEmailsResponse>, QueryKey<Options<ListEmailsData>>, number | Pick<QueryKey<Options<ListEmailsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListEmailsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listEmails({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listEmailsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const getEmailDnsHealthQueryKey = (options?: Options<GetEmailDnsHealthData>) => createQueryKey('getEmailDnsHealth', options);
+
+/**
+ * Get Email Dns Health
+ *
+ * Verifica SPF, DKIM, return-path e DMARC do domínio do EMAIL_FROM (cache de 10 min).
+ */
+export const getEmailDnsHealthOptions = (options?: Options<GetEmailDnsHealthData>) => queryOptions<GetEmailDnsHealthResponse, GetEmailDnsHealthError, GetEmailDnsHealthResponse, ReturnType<typeof getEmailDnsHealthQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getEmailDnsHealth({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getEmailDnsHealthQueryKey(options)
+});
+
+/**
+ * Refresh Email Status
+ *
+ * «Atualizar estado»: consulta o Resend sobre os envios por confirmar (precisa de `RESEND_READ_API_KEY`).
+ */
+export const refreshEmailStatusMutation = (options?: Partial<Options<RefreshEmailStatusData>>): UseMutationOptions<RefreshEmailStatusResponse, RefreshEmailStatusError, Options<RefreshEmailStatusData>> => {
+    const mutationOptions: UseMutationOptions<RefreshEmailStatusResponse, RefreshEmailStatusError, Options<RefreshEmailStatusData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await refreshEmailStatus({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getEmailSummaryQueryKey = (options?: Options<GetEmailSummaryData>) => createQueryKey('getEmailSummary', options);
+
+/**
+ * Get Email Summary
+ *
+ * Contagens por estado (24 h e 7 dias), taxa de sucesso, falhas por código, o que sabemos da entrega
+ * (`delivery_tracking`) e os alertas ativos. Pode enviar, no máximo de 6 em 6 h, o email de alerta.
+ */
+export const getEmailSummaryOptions = (options?: Options<GetEmailSummaryData>) => queryOptions<GetEmailSummaryResponse, GetEmailSummaryError, GetEmailSummaryResponse, ReturnType<typeof getEmailSummaryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getEmailSummary({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getEmailSummaryQueryKey(options)
+});
+
+export const listEmailSuppressionsQueryKey = (options?: Options<ListEmailSuppressionsData>) => createQueryKey('listEmailSuppressions', options);
+
+/**
+ * List Email Suppressions
+ *
+ * Endereços que não recebem emails (ressalto permanente, queixa de spam ou bloqueio manual).
+ */
+export const listEmailSuppressionsOptions = (options?: Options<ListEmailSuppressionsData>) => queryOptions<ListEmailSuppressionsResponse, ListEmailSuppressionsError, ListEmailSuppressionsResponse, ReturnType<typeof listEmailSuppressionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listEmailSuppressions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listEmailSuppressionsQueryKey(options)
+});
+
+/**
+ * Create Email Suppression
+ *
+ * Bloqueia manualmente um endereço (`reason=manual`). 409 se já estiver bloqueado. Auditado.
+ */
+export const createEmailSuppressionMutation = (options?: Partial<Options<CreateEmailSuppressionData>>): UseMutationOptions<CreateEmailSuppressionResponse, CreateEmailSuppressionError, Options<CreateEmailSuppressionData>> => {
+    const mutationOptions: UseMutationOptions<CreateEmailSuppressionResponse, CreateEmailSuppressionError, Options<CreateEmailSuppressionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createEmailSuppression({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete Email Suppression
+ *
+ * Volta a permitir emails para o endereço. Auditado.
+ */
+export const deleteEmailSuppressionMutation = (options?: Partial<Options<DeleteEmailSuppressionData>>): UseMutationOptions<DeleteEmailSuppressionResponse, DeleteEmailSuppressionError, Options<DeleteEmailSuppressionData>> => {
+    const mutationOptions: UseMutationOptions<DeleteEmailSuppressionResponse, DeleteEmailSuppressionError, Options<DeleteEmailSuppressionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteEmailSuppression({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Send Test Email
+ *
+ * Envia um email de teste ao próprio administrador (3 por hora) e devolve o registo; consulta
+ * `GET /users/emails/{id}` para ver `sent` passar a `delivered`.
+ */
+export const sendTestEmailMutation = (options?: Partial<Options<SendTestEmailData>>): UseMutationOptions<SendTestEmailResponse, SendTestEmailError, Options<SendTestEmailData>> => {
+    const mutationOptions: UseMutationOptions<SendTestEmailResponse, SendTestEmailError, Options<SendTestEmailData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await sendTestEmail({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getEmailQueryKey = (options: Options<GetEmailData>) => createQueryKey('getEmail', options);
+
+/**
+ * Get Email
+ *
+ * Um envio (para acompanhar o email de teste até `delivered`).
+ */
+export const getEmailOptions = (options: Options<GetEmailData>) => queryOptions<GetEmailResponse, GetEmailError, GetEmailResponse, ReturnType<typeof getEmailQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getEmail({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getEmailQueryKey(options)
+});
+
 export const listInvitationsQueryKey = (options?: Options<ListInvitationsData>) => createQueryKey('listInvitations', options);
 
 /**
@@ -3028,6 +3263,26 @@ export const createInvitationMutation = (options?: Partial<Options<CreateInvitat
 };
 
 /**
+ * Create Invitation Link
+ *
+ * New invitation link, returned ONCE, to send through another channel when the email fails. The previous
+ * link stops working; nothing is emailed and the token is not stored. Audited.
+ */
+export const createInvitationLinkMutation = (options?: Partial<Options<CreateInvitationLinkData>>): UseMutationOptions<CreateInvitationLinkResponse, CreateInvitationLinkError, Options<CreateInvitationLinkData>> => {
+    const mutationOptions: UseMutationOptions<CreateInvitationLinkResponse, CreateInvitationLinkError, Options<CreateInvitationLinkData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createInvitationLink({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
  * Resend Invitation
  *
  * New link and new deadline; the previous link stops working.
@@ -3070,7 +3325,8 @@ export const getUsersSummaryQueryKey = (options?: Options<GetUsersSummaryData>) 
 /**
  * Get Users Summary
  *
- * Counters for the menu badge.
+ * Counters for the menu badge. Also (at most once a day) emails the admins a reminder if accounts have been
+ * waiting for approval for over 24 h.
  */
 export const getUsersSummaryOptions = (options?: Options<GetUsersSummaryData>) => queryOptions<GetUsersSummaryResponse, GetUsersSummaryError, GetUsersSummaryResponse, ReturnType<typeof getUsersSummaryQueryKey>>({
     queryFn: async ({ queryKey, signal }) => {
@@ -3174,6 +3430,47 @@ export const rejectUserMutation = (options?: Partial<Options<RejectUserData>>): 
     const mutationOptions: UseMutationOptions<RejectUserResponse, RejectUserError, Options<RejectUserData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await rejectUser({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Resend User Email
+ *
+ * Re-send the email that matches the account state («request received», approved or rejected). If it could
+ * not be sent, `email_warning` says so. Audited.
+ */
+export const resendUserEmailMutation = (options?: Partial<Options<ResendUserEmailData>>): UseMutationOptions<ResendUserEmailResponse, ResendUserEmailError, Options<ResendUserEmailData>> => {
+    const mutationOptions: UseMutationOptions<ResendUserEmailResponse, ResendUserEmailError, Options<ResendUserEmailData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await resendUserEmail({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Receive Resend Webhook
+ *
+ * Eventos do Resend (sent, delivered, delivery_delayed, bounced, complained, failed). Sem sessão: a autenticação
+ * é a assinatura Svix (`svix-id`, `svix-timestamp`, `svix-signature`) sobre o corpo bruto. Sem
+ * `RESEND_WEBHOOK_SECRET` responde 503. Idempotente; eventos desconhecidos respondem 200 `ignored`.
+ */
+export const receiveResendWebhookMutation = (options?: Partial<Options<ReceiveResendWebhookData>>): UseMutationOptions<ReceiveResendWebhookResponse, ReceiveResendWebhookError, Options<ReceiveResendWebhookData>> => {
+    const mutationOptions: UseMutationOptions<ReceiveResendWebhookResponse, ReceiveResendWebhookError, Options<ReceiveResendWebhookData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await receiveResendWebhook({
                 ...options,
                 ...fnOptions,
                 throwOnError: true

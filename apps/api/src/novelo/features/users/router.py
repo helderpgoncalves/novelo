@@ -15,6 +15,7 @@ from novelo.core.ratelimit import (
     admin_impersonate_limiter,
     admin_invite_limiter,
     invite_email_limiter,
+    invite_link_limiter,
     invite_resend_limiter,
 )
 from novelo.core.request_meta import Meta
@@ -31,6 +32,7 @@ from novelo.features.users.schemas import (
     ImpersonationOut,
     ImpersonationStarted,
     InvitationCreate,
+    InvitationLinkOut,
     InvitationOut,
     InvitationPage,
     InvitationStatus,
@@ -47,17 +49,23 @@ Sender = Annotated[EmailSender, Depends(get_email_sender)]
 Admin = Annotated[User, Depends(require_role("admin"))]
 
 
+def _decided(decision: approvals.Decision) -> UserAdminOut:
+    return service.to_admin_out(decision.user, email_warning=service.warning_of(decision.delivery))
+
+
 @router.get("", response_model=list[UserAdminOut])
 async def list_users(
     _: Admin, db: Db, approval_status: Annotated[ApprovalStatus | None, Query()] = None
 ) -> list[UserAdminOut]:
     """Platform accounts (admins only). `approval_status=pending` is the «Pendentes» tab."""
-    return [service.to_admin_out(u) for u in await service.list_users(db, approval_status)]
+    return await service.admin_outs(db, await service.list_users(db, approval_status))
 
 
 @router.get("/summary", response_model=UsersSummary)
-async def get_users_summary(_: Admin, db: Db) -> UsersSummary:
-    """Counters for the menu badge."""
+async def get_users_summary(_: Admin, db: Db, sender: Sender) -> UsersSummary:
+    """Counters for the menu badge. Also (at most once a day) emails the admins a reminder if accounts have been
+    waiting for approval for over 24 h."""
+    await approvals.remind_if_overdue(db, sender)
     return UsersSummary(pending_approvals=await service.count_pending(db), total=len(await service.list_users(db)))
 
 
@@ -68,7 +76,7 @@ async def approve_user(
     """Approve a pending (or rejected) account and set its role. `role=admin` needs `confirm_admin`. Emails the user
     unless `notify=false`. Audited."""
     admin_approval_limiter.check(f"admin-approval:{admin.id}")
-    return service.to_admin_out(await approvals.approve(db, sender, admin, user_id, body, meta))
+    return _decided(await approvals.approve(db, sender, admin, user_id, body, meta))
 
 
 @router.post("/{user_id}/reject", response_model=UserAdminOut)
@@ -77,7 +85,15 @@ async def reject_user(
 ) -> UserAdminOut:
     """Reject a pending account (optional reason shown to the person; optional neutral email). Audited."""
     admin_approval_limiter.check(f"admin-approval:{admin.id}")
-    return service.to_admin_out(await approvals.reject(db, sender, admin, user_id, body, meta))
+    return _decided(await approvals.reject(db, sender, admin, user_id, body, meta))
+
+
+@router.post("/{user_id}/resend-email", response_model=UserAdminOut)
+async def resend_user_email(user_id: uuid.UUID, admin: Admin, db: Db, sender: Sender, meta: Meta) -> UserAdminOut:
+    """Re-send the email that matches the account state («request received», approved or rejected). If it could
+    not be sent, `email_warning` says so. Audited."""
+    admin_approval_limiter.check(f"admin-approval:{admin.id}")
+    return _decided(await approvals.resend_email(db, sender, admin, user_id, meta))
 
 
 @router.patch("/{user_id}", response_model=UserAdminOut)
@@ -170,6 +186,17 @@ async def resend_invitation(
     admin_invite_limiter.check(f"admin-invite:{admin.id}", get_settings().invitations_per_hour)
     invite_resend_limiter.check(f"invite-resend:{invitation_id}")
     return await invitations.resend(db, sender, admin, invitation_id, meta)
+
+
+@router.post("/invitations/{invitation_id}/link", response_model=InvitationLinkOut)
+async def create_invitation_link(
+    invitation_id: uuid.UUID, response: Response, admin: Admin, db: Db, meta: Meta
+) -> InvitationLinkOut:
+    """New invitation link, returned ONCE, to send through another channel when the email fails. The previous
+    link stops working; nothing is emailed and the token is not stored. Audited."""
+    invite_link_limiter.check(f"invite-link:{admin.id}")
+    response.headers["Cache-Control"] = "no-store"
+    return await invitations.new_link(db, admin, invitation_id, meta)
 
 
 @router.post("/invitations/{invitation_id}/revoke", response_model=InvitationOut)

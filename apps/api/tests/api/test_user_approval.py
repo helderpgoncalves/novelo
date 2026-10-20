@@ -46,7 +46,10 @@ async def test_registered_account_is_pending_and_locked_out(client: httpx.AsyncC
         me.status_code == 200 and me.json()["approval_status"] == "pending" and me.json()["pending_approvals"] is None
     )
     status = (await client.get(f"{AUTH}/approval-status")).json()
-    assert status == {"status": "pending", "email_verified": False, "rejected_reason": None, "decided_at": None}
+    assert status == {
+        "status": "pending", "email_verified": False, "rejected_reason": None, "decided_at": None,
+        "confirmation_email": "sent",
+    }  # fmt: skip
     assert (await client.get(f"{AUTH}/config")).json()["approval_required"] is True
     assert (await client.post(f"{AUTH}/resend-verification")).status_code == 204  # ainda verifica o email
     assert (await client.post(f"{AUTH}/logout")).status_code == 204
@@ -58,11 +61,12 @@ async def test_email_verification_does_not_approve(
     import re  # noqa: PLC0415
 
     await register(client)
-    token = re.search(r"token=([\w-]+)", next(m for m in outbox.sent if m["to"] == "novo@x.pt")["text"])
+    token = re.search(r"token=([\w-]+)", next(m for m in outbox.sent if "verify-email" in m["text"])["text"])
     assert token
     assert (await client.post(f"{AUTH}/verify-email", json={"token": token.group(1)})).status_code == 204
     assert (await client.get(f"{AUTH}/approval-status")).json() == {
         "status": "pending", "email_verified": True, "rejected_reason": None, "decided_at": None,
+        "confirmation_email": "sent",
     }  # fmt: skip
     assert (await client.get("/api/v1/planning/zones")).status_code == 403
 

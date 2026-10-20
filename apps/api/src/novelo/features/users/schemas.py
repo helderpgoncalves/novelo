@@ -4,6 +4,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
 
+from novelo.features.email_log.schemas import ApprovalEmailOut, DeliveryStatusOrNone, EmailWarning
 from novelo.features.users.models import ApprovalStatus, JoinedVia, Role
 
 Locale = Literal["pt-PT", "en"]
@@ -45,6 +46,14 @@ class UserAdminOut(BaseModel):
     approval_status: ApprovalStatus
     approved_at: datetime | None
     rejected_reason: str | None
+    approval_email: ApprovalEmailOut | None = Field(
+        default=None,
+        description="Só nas listas: o email que avisa a pessoa do pedido (pendente) ou da decisão; nulo nas ações",
+    )
+    email_warning: EmailWarning | None = Field(
+        default=None,
+        description="Só ao aprovar/recusar/reenviar: preenchido se o email para a pessoa NÃO saiu (a ação foi feita)",
+    )
 
 
 class ImpersonationOut(BaseModel):
@@ -85,6 +94,9 @@ class MeOut(UserOut):
     pending_approvals: int | None = Field(
         default=None, description="Só para administradores: contas à espera de aprovação (badge do menu)"
     )
+    email_alerts: int | None = Field(
+        default=None, description="Só para administradores: nº de alertas de email ativos (banner em /users?tab=emails)"
+    )
 
 
 class ApprovalStatusOut(BaseModel):
@@ -94,6 +106,9 @@ class ApprovalStatusOut(BaseModel):
     email_verified: bool
     rejected_reason: str | None
     decided_at: datetime | None = Field(description="Quando foi aprovada")
+    confirmation_email: DeliveryStatusOrNone = Field(
+        default="none", description="Estado do email «recebemos o teu pedido» enviado a esta conta"
+    )
 
 
 class UsersSummary(BaseModel):
@@ -182,7 +197,22 @@ class InvitationOut(BaseModel):
     revoked_at: datetime | None
     last_sent_at: datetime | None
     send_count: int
-    email_delivered: bool = Field(description="O fornecedor de email aceitou o último envio; false = reenviar")
+    email_delivered: bool = Field(
+        description="O fornecedor aceitou o último envio (não é entregue: ver `delivery_status`); false = reenviar"
+    )
+    delivery_status: DeliveryStatusOrNone = Field(
+        description="Estado do último email do convite (`none` = nunca houve tentativa)"
+    )
+    last_email_at: datetime | None = Field(description="Quando foi a última tentativa de envio")
+    delivery_error: str | None = Field(description="Código curto da falha do último envio, se falhou")
+
+
+class InvitationLinkOut(BaseModel):
+    """O link do convite, mostrado UMA vez; o anterior deixou de funcionar."""
+
+    url: str = Field(description="Link `/accept-invite?token=...` para o admin enviar por outro canal. Não é guardado")
+    expires_at: datetime
+    invitation: InvitationOut
 
 
 class InvitationPage(BaseModel):

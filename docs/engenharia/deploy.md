@@ -47,7 +47,8 @@ Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descri
 | `ALLOW_REGISTRATION` | Opcional | `false` para só entrarem contas existentes |
 | `QUICK_JOIN_ENABLED`, `QUICK_JOIN_CODE` | **Segredo** (o código) | A entrada por QR do evento só fica ativa em produção com `QUICK_JOIN_CODE` definido; mudar o código fecha os QR antigos |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | **Segredo** | Redirecionamento: `https://novelo.helder.si/api/v1/auth/google/callback` |
-| `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_SUPPORT` | **Segredo** (a chave) | O domínio do `EMAIL_FROM` tem de estar verificado no Resend. Sem chave não há magic link por email |
+| `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_SUPPORT`, `EMAIL_REPLY_TO` | **Segredo** (a chave) | O domínio do `EMAIL_FROM` tem de estar verificado no Resend. Sem chave não há magic link por email |
+| `RESEND_WEBHOOK_SECRET`, `RESEND_READ_API_KEY`, `EMAIL_NOT_FOUND_PER_HOUR` | **Segredo** (os dois primeiros) | Entrega verificada dos emails; ver [Emails](emails.md). Sem eles só se sabe que o Resend aceitou o email |
 | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION` | **Segredo** e opções | Sem chave, a IA responde 503. Depois do primeiro arranque os modelos mudam em `/admin/ai` |
 | `SOLVER_TIME_LIMIT_S`, `LOG_LEVEL` | Opcional | |
 
@@ -74,7 +75,7 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 | Deploy não arranca | Variáveis em falta no recurso; logs do `api` (migração ou seed) |
 | `502` em `/api` | Healthcheck do `api`; `DATABASE_URL` |
 | Google devolve erro de redirecionamento | URI de retorno igual à de produção na consola Google |
-| Emails não chegam | `RESEND_API_KEY` e domínio do `EMAIL_FROM` verificado; sem chave o magic link está desligado |
+| Emails não chegam | `RESEND_API_KEY` e domínio do `EMAIL_FROM` verificado; sem chave o magic link está desligado. Ver o *runbook* em [Emails](emails.md#runbook-um-utilizador-diz-que-não-recebeu-o-email) |
 | `/join` diz que o acesso está fechado | `QUICK_JOIN_CODE` por definir em produção |
 | O copiloto "fica pendurado" ou chega de uma vez | Algo entre o browser e a API está a fazer buffering do stream (ver as locations do `nginx.conf`) |
 | IA responde 503 | `OPENROUTER_API_KEY` |

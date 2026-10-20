@@ -528,11 +528,41 @@ export type AllocationPart = {
 };
 
 /**
+ * ApprovalEmailOut
+ *
+ * O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).
+ */
+export type ApprovalEmailOut = {
+    /**
+     * At
+     */
+    at: string | null;
+    /**
+     * Error Code
+     */
+    error_code: string | null;
+    /**
+     * Status
+     */
+    status: 'queued' | 'sent' | 'delivered' | 'delayed' | 'bounced' | 'complained' | 'failed' | 'skipped' | 'none';
+    /**
+     * Template
+     */
+    template: 'magic_link' | 'invitation' | 'registration_received' | 'approval_requested' | 'approval_granted' | 'approval_rejected' | 'verify_email' | 'guest_welcome' | 'password_reset' | 'account_unavailable' | 'account_not_found' | 'pending_reminder' | 'email_alert' | 'test_email' | null;
+};
+
+/**
  * ApprovalStatusOut
  *
  * Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).
  */
 export type ApprovalStatusOut = {
+    /**
+     * Confirmation Email
+     *
+     * Estado do email «recebemos o teu pedido» enviado a esta conta
+     */
+    confirmation_email?: 'queued' | 'sent' | 'delivered' | 'delayed' | 'bounced' | 'complained' | 'failed' | 'skipped' | 'none';
     /**
      * Decided At
      *
@@ -1888,7 +1918,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      */
@@ -2938,6 +2968,32 @@ export type DeleteUserRequest = {
 };
 
 /**
+ * DnsCheck
+ */
+export type DnsCheck = {
+    /**
+     * Detail
+     *
+     * Código curto do que foi encontrado (`found`, `missing`, `policy_none`...)
+     */
+    detail: string;
+    /**
+     * Hint
+     *
+     * O que fazer, em inglês (o web traduz a partir de `key` e `detail`)
+     */
+    hint: string;
+    /**
+     * Key
+     */
+    key: 'dkim' | 'spf' | 'return_path' | 'dmarc';
+    /**
+     * Status
+     */
+    status: 'ok' | 'warn' | 'fail' | 'unknown';
+};
+
+/**
  * EffectiveTask
  */
 export type EffectiveTask = {
@@ -2973,6 +3029,230 @@ export type EffectiveTask = {
      * Reasoning Source
      */
     reasoning_source: 'database' | 'global_default' | 'env' | 'code';
+};
+
+/**
+ * EmailDeliveryOut
+ *
+ * Um envio. Só metadados: o assunto, o corpo e os links nunca são guardados.
+ */
+export type EmailDeliveryOut = {
+    /**
+     * Attempts
+     */
+    attempts: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Delivered At
+     */
+    delivered_at: string | null;
+    /**
+     * Error Code
+     *
+     * Código curto da falha (`timeout`, `provider_5xx`, `not_configured`...)
+     */
+    error_code: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Invitation Id
+     */
+    invitation_id: string | null;
+    /**
+     * Provider Message Id
+     *
+     * Para procurar o email em resend.com/emails
+     */
+    provider_message_id: string | null;
+    /**
+     * Sent At
+     */
+    sent_at: string | null;
+    /**
+     * Status
+     *
+     * `sent` = o Resend aceitou (não é entregue); `delivered` só com webhook ou chave de leitura
+     */
+    status: 'queued' | 'sent' | 'delivered' | 'delayed' | 'bounced' | 'complained' | 'failed' | 'skipped';
+    /**
+     * Template
+     */
+    template: 'magic_link' | 'invitation' | 'registration_received' | 'approval_requested' | 'approval_granted' | 'approval_rejected' | 'verify_email' | 'guest_welcome' | 'password_reset' | 'account_unavailable' | 'account_not_found' | 'pending_reminder' | 'email_alert' | 'test_email';
+    /**
+     * To Email
+     */
+    to_email: string;
+    /**
+     * Updated At
+     */
+    updated_at: string;
+    /**
+     * User Id
+     */
+    user_id: string | null;
+};
+
+/**
+ * EmailDeliveryPage
+ */
+export type EmailDeliveryPage = {
+    /**
+     * Items
+     */
+    items: Array<EmailDeliveryOut>;
+    /**
+     * Limit
+     */
+    limit: number;
+    /**
+     * Offset
+     */
+    offset: number;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
+ * EmailDnsHealth
+ */
+export type EmailDnsHealth = {
+    /**
+     * Checked At
+     */
+    checked_at: string;
+    /**
+     * Checks
+     */
+    checks: Array<DnsCheck>;
+    /**
+     * Domain
+     *
+     * Domínio do EMAIL_FROM
+     */
+    domain: string;
+    /**
+     * Overall
+     */
+    overall: 'ok' | 'warn' | 'fail' | 'unknown';
+};
+
+/**
+ * EmailRefreshOut
+ */
+export type EmailRefreshOut = {
+    /**
+     * Checked
+     *
+     * Envios consultados no fornecedor
+     */
+    checked: number;
+    /**
+     * Delivery Tracking
+     */
+    delivery_tracking: 'api+webhook' | 'webhook' | 'api' | 'provider_accepted_only';
+    /**
+     * Updated
+     *
+     * Envios cujo estado mudou
+     */
+    updated: number;
+};
+
+/**
+ * EmailSummary
+ */
+export type EmailSummary = {
+    /**
+     * Alerts
+     *
+     * Alertas ativos (o UI mostra um banner)
+     */
+    alerts: Array<'provider_not_configured' | 'provider_auth_invalid' | 'domain_not_verified' | 'failures_last_hour' | 'high_failure_rate' | 'webhook_silent' | 'no_admin_recipients'>;
+    /**
+     * Avg Delivery Delay S
+     *
+     * Atraso médio entre o envio e a entrega (24 h)
+     */
+    avg_delivery_delay_s: number | null;
+    /**
+     * Delivery Tracking
+     *
+     * O que sabemos: `provider_accepted_only` = só que o Resend aceitou o email
+     */
+    delivery_tracking: 'api+webhook' | 'webhook' | 'api' | 'provider_accepted_only';
+    /**
+     * Failures By Error Code
+     *
+     * Falhas e ressaltos das últimas 24 h por código
+     */
+    failures_by_error_code: Array<FailureCount>;
+    /**
+     * Failures Last Hour
+     */
+    failures_last_hour: number;
+    last_24h: StatusCounts;
+    last_7d: StatusCounts;
+    /**
+     * Last Failure At
+     */
+    last_failure_at: string | null;
+    /**
+     * Provider Configured
+     *
+     * Há um fornecedor real (Resend com chave) para enviar
+     */
+    provider_configured: boolean;
+    /**
+     * Read Key Configured
+     *
+     * `RESEND_READ_API_KEY` definida: o estado pode ser consultado
+     */
+    read_key_configured: boolean;
+    /**
+     * Success Rate 24H Pct
+     *
+     * Aceites pelo Resend / (aceites + falhados + ressaltados) nas últimas 24 h; nulo sem envios
+     */
+    success_rate_24h_pct: number | null;
+    /**
+     * Unconfirmed
+     *
+     * Em `sent` há mais de 15 min sem confirmação do webhook; 0 se não há como confirmar
+     */
+    unconfirmed: number;
+    /**
+     * Webhook Configured
+     *
+     * `RESEND_WEBHOOK_SECRET` definido: o Resend pode confirmar entregas
+     */
+    webhook_configured: boolean;
+};
+
+/**
+ * EmailWarning
+ *
+ * O email da ação não saiu: a ação foi feita, mas a pessoa pode não ter sido avisada.
+ */
+export type EmailWarning = {
+    /**
+     * Code
+     */
+    code: 'email_failed' | 'email_skipped';
+    /**
+     * Error Code
+     */
+    error_code: string | null;
+    /**
+     * Template
+     */
+    template: 'magic_link' | 'invitation' | 'registration_received' | 'approval_requested' | 'approval_granted' | 'approval_rejected' | 'verify_email' | 'guest_welcome' | 'password_reset' | 'account_unavailable' | 'account_not_found' | 'pending_reminder' | 'email_alert' | 'test_email';
 };
 
 /**
@@ -3034,7 +3314,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      *
@@ -3052,6 +3332,20 @@ export type ExportFormat = 'csv' | 'xlsx' | 'geojson';
  * ExportScope
  */
 export type ExportScope = 'sites' | 'containers';
+
+/**
+ * FailureCount
+ */
+export type FailureCount = {
+    /**
+     * Count
+     */
+    count: number;
+    /**
+     * Error Code
+     */
+    error_code: string;
+};
 
 /**
  * FeedbackIn
@@ -3719,6 +4013,25 @@ export type InvitationCreate = {
 };
 
 /**
+ * InvitationLinkOut
+ *
+ * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
+ */
+export type InvitationLinkOut = {
+    /**
+     * Expires At
+     */
+    expires_at: string;
+    invitation: InvitationOut;
+    /**
+     * Url
+     *
+     * Link `/accept-invite?token=...` para o admin enviar por outro canal. Não é guardado
+     */
+    url: string;
+};
+
+/**
  * InvitationOut
  */
 export type InvitationOut = {
@@ -3731,13 +4044,25 @@ export type InvitationOut = {
      */
     created_at: string;
     /**
+     * Delivery Error
+     *
+     * Código curto da falha do último envio, se falhou
+     */
+    delivery_error: string | null;
+    /**
+     * Delivery Status
+     *
+     * Estado do último email do convite (`none` = nunca houve tentativa)
+     */
+    delivery_status: 'queued' | 'sent' | 'delivered' | 'delayed' | 'bounced' | 'complained' | 'failed' | 'skipped' | 'none';
+    /**
      * Email
      */
     email: string;
     /**
      * Email Delivered
      *
-     * O fornecedor de email aceitou o último envio; false = reenviar
+     * O fornecedor aceitou o último envio (não é entregue: ver `delivery_status`); false = reenviar
      */
     email_delivered: boolean;
     /**
@@ -3756,6 +4081,12 @@ export type InvitationOut = {
      * Invited By Name
      */
     invited_by_name: string | null;
+    /**
+     * Last Email At
+     *
+     * Quando foi a última tentativa de envio
+     */
+    last_email_at: string | null;
     /**
      * Last Sent At
      */
@@ -4423,6 +4754,12 @@ export type MeOut = {
      * Email
      */
     email: string;
+    /**
+     * Email Alerts
+     *
+     * Só para administradores: nº de alertas de email ativos (banner em /users?tab=emails)
+     */
+    email_alerts?: number | null;
     /**
      * Email Verified
      */
@@ -7601,6 +7938,12 @@ export type Readiness = {
      */
     database: boolean;
     /**
+     * Email
+     *
+     * `not_configured`: sem fornecedor de email em produção; `failing`: 3 ou mais falhas na última hora
+     */
+    email: 'ok' | 'not_configured' | 'failing';
+    /**
      * Llm Enabled
      */
     llm_enabled: boolean;
@@ -8695,6 +9038,98 @@ export type SlotCount = {
 };
 
 /**
+ * StatusCounts
+ */
+export type StatusCounts = {
+    /**
+     * Bounced
+     */
+    bounced?: number;
+    /**
+     * Complained
+     */
+    complained?: number;
+    /**
+     * Delayed
+     */
+    delayed?: number;
+    /**
+     * Delivered
+     */
+    delivered?: number;
+    /**
+     * Failed
+     */
+    failed?: number;
+    /**
+     * Queued
+     */
+    queued?: number;
+    /**
+     * Sent
+     */
+    sent?: number;
+    /**
+     * Skipped
+     */
+    skipped?: number;
+    /**
+     * Total
+     */
+    total?: number;
+};
+
+/**
+ * SuppressionCreate
+ */
+export type SuppressionCreate = {
+    /**
+     * Email
+     */
+    email: string;
+};
+
+/**
+ * SuppressionOut
+ */
+export type SuppressionOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Reason
+     */
+    reason: 'bounced' | 'complained' | 'manual';
+    /**
+     * Source Delivery Id
+     */
+    source_delivery_id: string | null;
+    /**
+     * To Email
+     */
+    to_email: string;
+};
+
+/**
+ * SuppressionPage
+ */
+export type SuppressionPage = {
+    /**
+     * Items
+     */
+    items: Array<SuppressionOut>;
+    /**
+     * Total
+     */
+    total: number;
+};
+
+/**
  * TableArtifact
  */
 export type TableArtifact = {
@@ -9710,6 +10145,10 @@ export type UsageTotals = {
  */
 export type UserAdminOut = {
     /**
+     * Só nas listas: o email que avisa a pessoa do pedido (pendente) ou da decisão; nulo nas ações
+     */
+    approval_email?: ApprovalEmailOut | null;
+    /**
      * Approval Status
      */
     approval_status: 'pending' | 'approved' | 'rejected';
@@ -9729,6 +10168,10 @@ export type UserAdminOut = {
      * Email Verified
      */
     email_verified: boolean;
+    /**
+     * Só ao aprovar/recusar/reenviar: preenchido se o email para a pessoa NÃO saiu (a ação foi feita)
+     */
+    email_warning?: EmailWarning | null;
     /**
      * Google Linked
      */
@@ -10025,6 +10468,16 @@ export type WaterfallStep = {
      * Value
      */
     value: number;
+};
+
+/**
+ * WebhookAck
+ */
+export type WebhookAck = {
+    /**
+     * Status
+     */
+    status: 'updated' | 'ignored';
 };
 
 /**
@@ -12108,6 +12561,67 @@ export type RegisterResponses = {
 };
 
 export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
+
+export type ResendRegistrationEmailData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/resend-registration-email';
+};
+
+export type ResendRegistrationEmailErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ResendRegistrationEmailError = ResendRegistrationEmailErrors[keyof ResendRegistrationEmailErrors];
+
+export type ResendRegistrationEmailResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type ResendRegistrationEmailResponse = ResendRegistrationEmailResponses[keyof ResendRegistrationEmailResponses];
 
 export type ResendVerificationData = {
     body?: never;
@@ -19455,6 +19969,593 @@ export type ListAuditResponses = {
 
 export type ListAuditResponse = ListAuditResponses[keyof ListAuditResponses];
 
+export type ListEmailsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Offset
+         */
+        offset?: number;
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Status
+         */
+        status?: 'queued' | 'sent' | 'delivered' | 'delayed' | 'bounced' | 'complained' | 'failed' | 'skipped' | null;
+        /**
+         * Template
+         */
+        template?: 'magic_link' | 'invitation' | 'registration_received' | 'approval_requested' | 'approval_granted' | 'approval_rejected' | 'verify_email' | 'guest_welcome' | 'password_reset' | 'account_unavailable' | 'account_not_found' | 'pending_reminder' | 'email_alert' | 'test_email' | null;
+        /**
+         * Q
+         *
+         * Procura no email do destinatário
+         */
+        q?: string | null;
+    };
+    url: '/api/v1/users/emails';
+};
+
+export type ListEmailsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListEmailsError = ListEmailsErrors[keyof ListEmailsErrors];
+
+export type ListEmailsResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailDeliveryPage;
+};
+
+export type ListEmailsResponse = ListEmailsResponses[keyof ListEmailsResponses];
+
+export type GetEmailDnsHealthData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/emails/health';
+};
+
+export type GetEmailDnsHealthErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetEmailDnsHealthError = GetEmailDnsHealthErrors[keyof GetEmailDnsHealthErrors];
+
+export type GetEmailDnsHealthResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailDnsHealth;
+};
+
+export type GetEmailDnsHealthResponse = GetEmailDnsHealthResponses[keyof GetEmailDnsHealthResponses];
+
+export type RefreshEmailStatusData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/emails/refresh';
+};
+
+export type RefreshEmailStatusErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RefreshEmailStatusError = RefreshEmailStatusErrors[keyof RefreshEmailStatusErrors];
+
+export type RefreshEmailStatusResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailRefreshOut;
+};
+
+export type RefreshEmailStatusResponse = RefreshEmailStatusResponses[keyof RefreshEmailStatusResponses];
+
+export type GetEmailSummaryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/emails/summary';
+};
+
+export type GetEmailSummaryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetEmailSummaryError = GetEmailSummaryErrors[keyof GetEmailSummaryErrors];
+
+export type GetEmailSummaryResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailSummary;
+};
+
+export type GetEmailSummaryResponse = GetEmailSummaryResponses[keyof GetEmailSummaryResponses];
+
+export type ListEmailSuppressionsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Q
+         */
+        q?: string | null;
+    };
+    url: '/api/v1/users/emails/suppressions';
+};
+
+export type ListEmailSuppressionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListEmailSuppressionsError = ListEmailSuppressionsErrors[keyof ListEmailSuppressionsErrors];
+
+export type ListEmailSuppressionsResponses = {
+    /**
+     * Successful Response
+     */
+    200: SuppressionPage;
+};
+
+export type ListEmailSuppressionsResponse = ListEmailSuppressionsResponses[keyof ListEmailSuppressionsResponses];
+
+export type CreateEmailSuppressionData = {
+    body: SuppressionCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/emails/suppressions';
+};
+
+export type CreateEmailSuppressionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateEmailSuppressionError = CreateEmailSuppressionErrors[keyof CreateEmailSuppressionErrors];
+
+export type CreateEmailSuppressionResponses = {
+    /**
+     * Successful Response
+     */
+    201: SuppressionOut;
+};
+
+export type CreateEmailSuppressionResponse = CreateEmailSuppressionResponses[keyof CreateEmailSuppressionResponses];
+
+export type DeleteEmailSuppressionData = {
+    body?: never;
+    path: {
+        /**
+         * Suppression Id
+         */
+        suppression_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/emails/suppressions/{suppression_id}';
+};
+
+export type DeleteEmailSuppressionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteEmailSuppressionError = DeleteEmailSuppressionErrors[keyof DeleteEmailSuppressionErrors];
+
+export type DeleteEmailSuppressionResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteEmailSuppressionResponse = DeleteEmailSuppressionResponses[keyof DeleteEmailSuppressionResponses];
+
+export type SendTestEmailData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/users/emails/test';
+};
+
+export type SendTestEmailErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SendTestEmailError = SendTestEmailErrors[keyof SendTestEmailErrors];
+
+export type SendTestEmailResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailDeliveryOut;
+};
+
+export type SendTestEmailResponse = SendTestEmailResponses[keyof SendTestEmailResponses];
+
+export type GetEmailData = {
+    body?: never;
+    path: {
+        /**
+         * Delivery Id
+         */
+        delivery_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/emails/{delivery_id}';
+};
+
+export type GetEmailErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetEmailError = GetEmailErrors[keyof GetEmailErrors];
+
+export type GetEmailResponses = {
+    /**
+     * Successful Response
+     */
+    200: EmailDeliveryOut;
+};
+
+export type GetEmailResponse = GetEmailResponses[keyof GetEmailResponses];
+
 export type ListInvitationsData = {
     body?: never;
     path?: never;
@@ -19595,6 +20696,72 @@ export type CreateInvitationResponses = {
 };
 
 export type CreateInvitationResponse = CreateInvitationResponses[keyof CreateInvitationResponses];
+
+export type CreateInvitationLinkData = {
+    body?: never;
+    path: {
+        /**
+         * Invitation Id
+         */
+        invitation_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/invitations/{invitation_id}/link';
+};
+
+export type CreateInvitationLinkErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateInvitationLinkError = CreateInvitationLinkErrors[keyof CreateInvitationLinkErrors];
+
+export type CreateInvitationLinkResponses = {
+    /**
+     * Successful Response
+     */
+    200: InvitationLinkOut;
+};
+
+export type CreateInvitationLinkResponse = CreateInvitationLinkResponses[keyof CreateInvitationLinkResponses];
 
 export type ResendInvitationData = {
     body?: never;
@@ -20118,6 +21285,133 @@ export type RejectUserResponses = {
 };
 
 export type RejectUserResponse = RejectUserResponses[keyof RejectUserResponses];
+
+export type ResendUserEmailData = {
+    body?: never;
+    path: {
+        /**
+         * User Id
+         */
+        user_id: string;
+    };
+    query?: never;
+    url: '/api/v1/users/{user_id}/resend-email';
+};
+
+export type ResendUserEmailErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ResendUserEmailError = ResendUserEmailErrors[keyof ResendUserEmailErrors];
+
+export type ResendUserEmailResponses = {
+    /**
+     * Successful Response
+     */
+    200: UserAdminOut;
+};
+
+export type ResendUserEmailResponse = ResendUserEmailResponses[keyof ResendUserEmailResponses];
+
+export type ReceiveResendWebhookData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/webhooks/resend';
+};
+
+export type ReceiveResendWebhookErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ReceiveResendWebhookError = ReceiveResendWebhookErrors[keyof ReceiveResendWebhookErrors];
+
+export type ReceiveResendWebhookResponses = {
+    /**
+     * Successful Response
+     */
+    200: WebhookAck;
+};
+
+export type ReceiveResendWebhookResponse = ReceiveResendWebhookResponses[keyof ReceiveResendWebhookResponses];
 
 export type ListWhatIfsData = {
     body?: never;

@@ -89,19 +89,22 @@ async def test_magic_link_expired(client: httpx.AsyncClient, session: AsyncSessi
 async def test_magic_link_unknown_token_and_unknown_email(client: httpx.AsyncClient, outbox: OutboxSender) -> None:
     bad = await client.post(f"{AUTH}/magic-link/verify", json={"token": "x" * 43})
     assert bad.status_code == 400 and bad.json()["code"] == "invalid_token"
-    # Email sem conta: 204, nenhum email, nenhum token.
+    # Email sem conta nem convite: 204 igual, e sai o email neutro (nunca fica ninguém à espera), sem link de entrada.
     resp = await client.post(f"{AUTH}/magic-link", json={"email": "ninguem@x.pt"})
-    assert resp.status_code == 204 and resp.content == b"" and outbox.sent == []
+    assert resp.status_code == 204 and resp.content == b""
+    assert len(outbox.sent) == 1 and "magic-link?token" not in outbox.sent[0]["text"]
+    assert outbox.sent[0]["subject"] == "Não encontrámos uma conta · Novelo"
 
 
-async def test_magic_link_inactive_account_gets_nothing(
+async def test_magic_link_inactive_account_gets_a_notice_without_link(
     client: httpx.AsyncClient, session: AsyncSession, outbox: OutboxSender
 ) -> None:
     user = await users.create_user(session, email="off@x.pt", password=PASSWORD)
     user.is_active = False
     await session.commit()
     assert (await client.post(f"{AUTH}/magic-link", json={"email": "off@x.pt"})).status_code == 204
-    assert outbox.sent == []
+    assert len(outbox.sent) == 1 and "token=" not in outbox.sent[0]["text"]
+    assert outbox.sent[0]["subject"] == "Não conseguimos dar-te acesso · Novelo"
 
 
 async def test_magic_link_rate_limits(client: httpx.AsyncClient, session: AsyncSession, outbox: OutboxSender) -> None:

@@ -33,10 +33,14 @@ from novelo.core.security import hash_password_async, hash_token, new_opaque_tok
 from novelo.features.audit import service as audit
 from novelo.features.auth import emails
 from novelo.features.auth import service as auth_service
+from novelo.features.email_log import service as email_log
+from novelo.features.email_log.models import EmailDelivery
+from novelo.features.email_log.schemas import DeliveryStatusOrNone
 from novelo.features.users import service as users
 from novelo.features.users.models import Invitation, Role, User
 from novelo.features.users.schemas import (
     InvitationCreate,
+    InvitationLinkOut,
     InvitationOut,
     InvitationPage,
     InvitationPreview,
@@ -56,7 +60,7 @@ def status_of(inv: Invitation, now: datetime | None = None) -> InvitationStatus:
     return "expired" if inv.expires_at <= now else "pending"
 
 
-def to_out(inv: Invitation, invited_by_name: str | None) -> InvitationOut:
+def to_out(inv: Invitation, invited_by_name: str | None, delivery: EmailDelivery | None = None) -> InvitationOut:
     return InvitationOut(
         id=inv.id,
         email=inv.email,
@@ -74,7 +78,15 @@ def to_out(inv: Invitation, invited_by_name: str | None) -> InvitationOut:
         last_sent_at=inv.last_sent_at,
         send_count=inv.send_count,
         email_delivered=inv.last_sent_at is not None,
+        delivery_status=cast(DeliveryStatusOrNone, delivery.status) if delivery else "none",
+        last_email_at=delivery.created_at if delivery else None,
+        delivery_error=delivery.error_code if delivery and delivery.status in {"failed", "skipped"} else None,
     )
+
+
+async def _out(db: AsyncSession, inv: Invitation, invited_by_name: str | None) -> InvitationOut:
+    latest = (await email_log.latest_by_invitation(db, [inv.id])).get(inv.id)
+    return to_out(inv, invited_by_name, latest)
 
 
 async def _inviter_name(db: AsyncSession, inv: Invitation) -> str | None:
@@ -88,8 +100,11 @@ def _accept_url(token: str) -> str:
     return f"{get_settings().app_url.rstrip('/')}/accept-invite?token={token}"
 
 
-async def _send(db: AsyncSession, sender: EmailSender, inv: Invitation, inviter: User, token: str) -> None:
-    """Envia e regista o envio. Se o fornecedor falhar, o convite fica (sem `last_sent_at`) e o admin pode reenviar."""
+async def _send(
+    db: AsyncSession, sender: EmailSender, inv: Invitation, inviter: User, token: str, *, strict: bool = False
+) -> EmailDelivery:
+    """Envia e regista. Se o fornecedor falhar, o convite fica (sem `last_sent_at`) e o admin vê o estado, reenvia
+    ou copia o link. Com `strict` levanta 503/409 (pedidos do próprio convidado)."""
     subject, html, text = emails.invitation(
         inv.locale,
         _accept_url(token),
@@ -99,14 +114,14 @@ async def _send(db: AsyncSession, sender: EmailSender, inv: Invitation, inviter:
         invitee_name=inv.name,
         message=inv.message,
     )
-    try:
-        await sender.send(to=inv.email, subject=subject, html=html, text=text)
-    except AppError:
-        log.exception("failed to send invitation %s", inv.id)
-        return
-    inv.last_sent_at = datetime.now(UTC)
-    inv.send_count += 1
-    await db.commit()
+    delivery = await email_log.deliver(
+        db, sender, "invitation", inv.email, subject, html, text, invitation_id=inv.id, strict=strict
+    )
+    if delivery.status == "sent":
+        inv.last_sent_at = datetime.now(UTC)
+        inv.send_count += 1
+        await db.commit()
+    return delivery
 
 
 async def create(
@@ -160,8 +175,8 @@ async def create(
         details={"role": inv.role, "locale": inv.locale, "has_message": inv.message is not None},
     )
     await db.commit()
-    await _send(db, sender, inv, admin, token)
-    return to_out(inv, admin.name or admin.email)
+    delivery = await _send(db, sender, inv, admin, token)
+    return to_out(inv, admin.name or admin.email, delivery)
 
 
 async def _get(db: AsyncSession, invitation_id: uuid.UUID) -> Invitation:
@@ -197,8 +212,97 @@ async def resend(
         details={"role": inv.role},
     )
     await db.commit()
-    await _send(db, sender, inv, admin, token)
-    return to_out(inv, await _inviter_name(db, inv))
+    delivery = await _send(db, sender, inv, admin, token)
+    return to_out(inv, await _inviter_name(db, inv), delivery)
+
+
+async def new_link(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta: RequestMeta) -> InvitationLinkOut:
+    """Novo token (o anterior deixa de valer) e o URL de convite, devolvido UMA vez, para o admin o enviar por
+    outro canal quando o email falha. Não envia nada nem guarda o token."""
+    inv = await _get(db, invitation_id)
+    if status_of(inv) in {"accepted", "revoked"}:
+        raise ConflictError("This invitation is no longer open")
+    if await users.get_by_email(db, inv.email) is not None:
+        raise EmailTakenError("An account with this email already exists")
+    token = new_opaque_token()
+    inv.token_hash = hash_token(token)
+    inv.expires_at = datetime.now(UTC) + timedelta(days=get_settings().invitation_days)
+    await audit.record_by(
+        db,
+        admin,
+        "invitation.link",
+        meta=meta,
+        target_type="invitation",
+        target_id=inv.id,
+        target_label=inv.email,
+        details={"role": inv.role},
+    )
+    await db.commit()
+    return InvitationLinkOut(
+        url=_accept_url(token), expires_at=inv.expires_at, invitation=await _out(db, inv, await _inviter_name(db, inv))
+    )
+
+
+SELF_RESEND_GAP = timedelta(minutes=5)
+SELF_RESEND_PER_DAY = 5
+
+
+async def self_resend(db: AsyncSession, sender: EmailSender, email: str, meta: RequestMeta | None) -> bool:
+    """Quem tem um convite por aceitar mas SEM conta pede entrada: reenvia o convite (token novo).
+
+    `True` = o email tem um convite aberto (reenviado ou travado pelos limites: 1 a cada 5 min, 5 por dia);
+    `False` = não há convite aberto e o chamador segue para o email «não encontrámos uma conta». Se o envio falhar,
+    o token anterior é reposto (não se perde um link que ainda possa estar na caixa de correio) e levanta 503/409."""
+    address = email.lower()
+    inv = (
+        await db.execute(
+            select(Invitation).where(
+                Invitation.email == address, Invitation.accepted_at.is_(None), Invitation.revoked_at.is_(None)
+            )
+        )
+    ).scalar_one_or_none()
+    if inv is None or inv.invited_by_id is None:
+        return False
+    inviter = await db.get(User, inv.invited_by_id)
+    if inviter is None or not inviter.is_active or inviter.role != "admin":
+        return False  # o convite já não pode ser aceite (convidante sem papel): segue o email neutro
+    await email_log.advisory_lock(db, f"invite-self:{inv.id}")
+    now = datetime.now(UTC)
+    if (
+        await email_log.count_recent(
+            db, ["invitation"], now - SELF_RESEND_GAP, invitation_id=inv.id, include_failed=False
+        )
+        or await email_log.count_recent(
+            db, ["invitation"], now - timedelta(days=1), invitation_id=inv.id, include_failed=False
+        )
+        >= SELF_RESEND_PER_DAY
+    ):
+        await db.commit()
+        log.info("invitation self-resend limited invitation=%s", inv.id)
+        return True
+    previous = (inv.token_hash, inv.expires_at, inv.last_sent_at)
+    token = new_opaque_token()
+    inv.token_hash = hash_token(token)
+    inv.expires_at = now + timedelta(days=get_settings().invitation_days)
+    inv.last_sent_at = None
+    await audit.record(
+        db,
+        "invitation.self_resend",
+        actor_id=None,
+        target_type="invitation",
+        target_id=inv.id,
+        target_label=inv.email,
+        meta=meta,
+        details={"role": inv.role},
+    )
+    await db.commit()
+    try:
+        await _send(db, sender, inv, inviter, token, strict=True)
+    except AppError:
+        inv.token_hash, inv.expires_at, inv.last_sent_at = previous
+        await db.commit()
+        raise
+    return True
 
 
 async def revoke(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta: RequestMeta) -> InvitationOut:
@@ -218,7 +322,7 @@ async def revoke(db: AsyncSession, admin: User, invitation_id: uuid.UUID, meta: 
             details={"role": inv.role},
         )
         await db.commit()
-    return to_out(inv, await _inviter_name(db, inv))
+    return await _out(db, inv, await _inviter_name(db, inv))
 
 
 async def list_invitations(
@@ -248,8 +352,9 @@ async def list_invitations(
             .limit(limit)
         )
     ).all()
+    latest = await email_log.latest_by_invitation(db, [inv.id for inv, _, _ in rows])
     return InvitationPage(
-        items=[to_out(inv, name or email) for inv, name, email in rows],
+        items=[to_out(inv, name or email, latest.get(inv.id)) for inv, name, email in rows],
         total=int(total),
         offset=offset,
         limit=limit,

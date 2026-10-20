@@ -2915,8 +2915,8 @@
   "landing_feat_triage_text": "Uma fotografia da etiqueta dá composição e estado da peça. O operador confirma.",
   "landing_feat_lots_title": "Lotes com QR e passaporte",
   "landing_feat_lots_text": "Cada lote tem uma página pública com origem, composição, peso e histórico.",
-  "landing_feat_exchange_title": "Bolsa de fibra e marcas",
-  "landing_feat_exchange_text": "Lotes agregados por fibra para quem recicla, e evidência por marca para a discussão da RAP.",
+  "landing_feat_exchange_title": "Bolsa de fibra",
+  "landing_feat_exchange_text": "Lotes agregados por fibra para quem recicla: composição e peso à vista, reserva num clique.",
   "landing_feat_report_title": "Relatório RAP em PDF",
   "landing_feat_report_text": "Um clique gera o dossiê com custos por território, material recolhido, método e fontes.",
   "landing_copilot_eyebrow": "Copiloto",
@@ -3612,5 +3612,10 @@
   "landing_photo_paco": "Paço dos Duques",
   "landing_photo_fabrica": "Antiga fábrica têxtil",
   "landing_photo_couros": "Couros",
-  "landing_photo_plataforma": "Plataforma das Artes"
+  "landing_photo_plataforma": "Plataforma das Artes",
+  "landing_feat_brands_title": "Evidência por marca",
+  "landing_feat_brands_text": "Quilos por marca e por composição ao longo do tempo: a base factual da discussão da RAP.",
+  "landing_rigor_yes_title": "O que garantimos",
+  "error_email_unavailable": "Não conseguimos enviar o email agora. Tenta outra vez dentro de instantes, entra com o Google ou com a palavra-passe, ou escreve ao suporte.",
+  "error_email_suppressed": "Este endereço não recebe mensagens (foi devolvido ou marcado como spam). Fala com o administrador."
 }

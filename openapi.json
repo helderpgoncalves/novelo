@@ -1004,9 +1004,104 @@
         "title": "AllocationPart",
         "type": "object"
       },
+      "ApprovalEmailOut": {
+        "description": "O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).",
+        "properties": {
+          "at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "At"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "sent",
+              "delivered",
+              "delayed",
+              "bounced",
+              "complained",
+              "failed",
+              "skipped",
+              "none"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "template": {
+            "anyOf": [
+              {
+                "enum": [
+                  "magic_link",
+                  "invitation",
+                  "registration_received",
+                  "approval_requested",
+                  "approval_granted",
+                  "approval_rejected",
+                  "verify_email",
+                  "guest_welcome",
+                  "password_reset",
+                  "account_unavailable",
+                  "account_not_found",
+                  "pending_reminder",
+                  "email_alert",
+                  "test_email"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Template"
+          }
+        },
+        "required": [
+          "status",
+          "template",
+          "at",
+          "error_code"
+        ],
+        "title": "ApprovalEmailOut",
+        "type": "object"
+      },
       "ApprovalStatusOut": {
         "description": "Estado de aprovação da conta da sessão (leve, para o ecrã de espera fazer polling).",
         "properties": {
+          "confirmation_email": {
+            "default": "none",
+            "description": "Estado do email «recebemos o teu pedido» enviado a esta conta",
+            "enum": [
+              "queued",
+              "sent",
+              "delivered",
+              "delayed",
+              "bounced",
+              "complained",
+              "failed",
+              "skipped",
+              "none"
+            ],
+            "title": "Confirmation Email",
+            "type": "string"
+          },
           "decided_at": {
             "anyOf": [
               {
@@ -3242,6 +3337,8 @@
               "admin_confirmation_required",
               "rate_limited",
               "feature_disabled",
+              "email_unavailable",
+              "email_suppressed",
               "upstream_error",
               "ai_budget_exceeded",
               "captcha_required",
@@ -5008,6 +5105,48 @@
         "title": "DeleteUserRequest",
         "type": "object"
       },
+      "DnsCheck": {
+        "properties": {
+          "detail": {
+            "description": "Código curto do que foi encontrado (`found`, `missing`, `policy_none`...)",
+            "title": "Detail",
+            "type": "string"
+          },
+          "hint": {
+            "description": "O que fazer, em inglês (o web traduz a partir de `key` e `detail`)",
+            "title": "Hint",
+            "type": "string"
+          },
+          "key": {
+            "enum": [
+              "dkim",
+              "spf",
+              "return_path",
+              "dmarc"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "ok",
+              "warn",
+              "fail",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "status",
+          "detail",
+          "hint"
+        ],
+        "title": "DnsCheck",
+        "type": "object"
+      },
       "EffectiveTask": {
         "properties": {
           "fallback_model": {
@@ -5090,6 +5229,433 @@
           "reasoning_source"
         ],
         "title": "EffectiveTask",
+        "type": "object"
+      },
+      "EmailDeliveryOut": {
+        "description": "Um envio. Só metadados: o assunto, o corpo e os links nunca são guardados.",
+        "properties": {
+          "attempts": {
+            "title": "Attempts",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "delivered_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delivered At"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Código curto da falha (`timeout`, `provider_5xx`, `not_configured`...)",
+            "title": "Error Code"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "invitation_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Invitation Id"
+          },
+          "provider_message_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Para procurar o email em resend.com/emails",
+            "title": "Provider Message Id"
+          },
+          "sent_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sent At"
+          },
+          "status": {
+            "description": "`sent` = o Resend aceitou (não é entregue); `delivered` só com webhook ou chave de leitura",
+            "enum": [
+              "queued",
+              "sent",
+              "delivered",
+              "delayed",
+              "bounced",
+              "complained",
+              "failed",
+              "skipped"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "template": {
+            "enum": [
+              "magic_link",
+              "invitation",
+              "registration_received",
+              "approval_requested",
+              "approval_granted",
+              "approval_rejected",
+              "verify_email",
+              "guest_welcome",
+              "password_reset",
+              "account_unavailable",
+              "account_not_found",
+              "pending_reminder",
+              "email_alert",
+              "test_email"
+            ],
+            "title": "Template",
+            "type": "string"
+          },
+          "to_email": {
+            "title": "To Email",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "user_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Id"
+          }
+        },
+        "required": [
+          "id",
+          "to_email",
+          "template",
+          "status",
+          "error_code",
+          "attempts",
+          "user_id",
+          "invitation_id",
+          "provider_message_id",
+          "created_at",
+          "sent_at",
+          "delivered_at",
+          "updated_at"
+        ],
+        "title": "EmailDeliveryOut",
+        "type": "object"
+      },
+      "EmailDeliveryPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/EmailDeliveryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "limit": {
+            "title": "Limit",
+            "type": "integer"
+          },
+          "offset": {
+            "title": "Offset",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total",
+          "offset",
+          "limit"
+        ],
+        "title": "EmailDeliveryPage",
+        "type": "object"
+      },
+      "EmailDnsHealth": {
+        "properties": {
+          "checked_at": {
+            "format": "date-time",
+            "title": "Checked At",
+            "type": "string"
+          },
+          "checks": {
+            "items": {
+              "$ref": "#/components/schemas/DnsCheck"
+            },
+            "title": "Checks",
+            "type": "array"
+          },
+          "domain": {
+            "description": "Domínio do EMAIL_FROM",
+            "title": "Domain",
+            "type": "string"
+          },
+          "overall": {
+            "enum": [
+              "ok",
+              "warn",
+              "fail",
+              "unknown"
+            ],
+            "title": "Overall",
+            "type": "string"
+          }
+        },
+        "required": [
+          "domain",
+          "checked_at",
+          "overall",
+          "checks"
+        ],
+        "title": "EmailDnsHealth",
+        "type": "object"
+      },
+      "EmailRefreshOut": {
+        "properties": {
+          "checked": {
+            "description": "Envios consultados no fornecedor",
+            "title": "Checked",
+            "type": "integer"
+          },
+          "delivery_tracking": {
+            "enum": [
+              "api+webhook",
+              "webhook",
+              "api",
+              "provider_accepted_only"
+            ],
+            "title": "Delivery Tracking",
+            "type": "string"
+          },
+          "updated": {
+            "description": "Envios cujo estado mudou",
+            "title": "Updated",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "checked",
+          "updated",
+          "delivery_tracking"
+        ],
+        "title": "EmailRefreshOut",
+        "type": "object"
+      },
+      "EmailSummary": {
+        "properties": {
+          "alerts": {
+            "description": "Alertas ativos (o UI mostra um banner)",
+            "items": {
+              "enum": [
+                "provider_not_configured",
+                "provider_auth_invalid",
+                "domain_not_verified",
+                "failures_last_hour",
+                "high_failure_rate",
+                "webhook_silent",
+                "no_admin_recipients"
+              ],
+              "type": "string"
+            },
+            "title": "Alerts",
+            "type": "array"
+          },
+          "avg_delivery_delay_s": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Atraso médio entre o envio e a entrega (24 h)",
+            "title": "Avg Delivery Delay S"
+          },
+          "delivery_tracking": {
+            "description": "O que sabemos: `provider_accepted_only` = só que o Resend aceitou o email",
+            "enum": [
+              "api+webhook",
+              "webhook",
+              "api",
+              "provider_accepted_only"
+            ],
+            "title": "Delivery Tracking",
+            "type": "string"
+          },
+          "failures_by_error_code": {
+            "description": "Falhas e ressaltos das últimas 24 h por código",
+            "items": {
+              "$ref": "#/components/schemas/FailureCount"
+            },
+            "title": "Failures By Error Code",
+            "type": "array"
+          },
+          "failures_last_hour": {
+            "title": "Failures Last Hour",
+            "type": "integer"
+          },
+          "last_24h": {
+            "$ref": "#/components/schemas/StatusCounts"
+          },
+          "last_7d": {
+            "$ref": "#/components/schemas/StatusCounts"
+          },
+          "last_failure_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Failure At"
+          },
+          "provider_configured": {
+            "description": "Há um fornecedor real (Resend com chave) para enviar",
+            "title": "Provider Configured",
+            "type": "boolean"
+          },
+          "read_key_configured": {
+            "description": "`RESEND_READ_API_KEY` definida: o estado pode ser consultado",
+            "title": "Read Key Configured",
+            "type": "boolean"
+          },
+          "success_rate_24h_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Aceites pelo Resend / (aceites + falhados + ressaltados) nas últimas 24 h; nulo sem envios",
+            "title": "Success Rate 24H Pct"
+          },
+          "unconfirmed": {
+            "description": "Em `sent` há mais de 15 min sem confirmação do webhook; 0 se não há como confirmar",
+            "title": "Unconfirmed",
+            "type": "integer"
+          },
+          "webhook_configured": {
+            "description": "`RESEND_WEBHOOK_SECRET` definido: o Resend pode confirmar entregas",
+            "title": "Webhook Configured",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "provider_configured",
+          "webhook_configured",
+          "read_key_configured",
+          "delivery_tracking",
+          "last_24h",
+          "last_7d",
+          "last_failure_at",
+          "failures_last_hour",
+          "success_rate_24h_pct",
+          "failures_by_error_code",
+          "avg_delivery_delay_s",
+          "unconfirmed",
+          "alerts"
+        ],
+        "title": "EmailSummary",
+        "type": "object"
+      },
+      "EmailWarning": {
+        "description": "O email da ação não saiu: a ação foi feita, mas a pessoa pode não ter sido avisada.",
+        "properties": {
+          "code": {
+            "enum": [
+              "email_failed",
+              "email_skipped"
+            ],
+            "title": "Code",
+            "type": "string"
+          },
+          "error_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Error Code"
+          },
+          "template": {
+            "enum": [
+              "magic_link",
+              "invitation",
+              "registration_received",
+              "approval_requested",
+              "approval_granted",
+              "approval_rejected",
+              "verify_email",
+              "guest_welcome",
+              "password_reset",
+              "account_unavailable",
+              "account_not_found",
+              "pending_reminder",
+              "email_alert",
+              "test_email"
+            ],
+            "title": "Template",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "template",
+          "error_code"
+        ],
+        "title": "EmailWarning",
         "type": "object"
       },
       "EntityBaseline": {
@@ -5191,6 +5757,8 @@
               "admin_confirmation_required",
               "rate_limited",
               "feature_disabled",
+              "email_unavailable",
+              "email_suppressed",
               "upstream_error",
               "ai_budget_exceeded",
               "captcha_required",
@@ -5230,6 +5798,24 @@
         ],
         "title": "ExportScope",
         "type": "string"
+      },
+      "FailureCount": {
+        "properties": {
+          "count": {
+            "title": "Count",
+            "type": "integer"
+          },
+          "error_code": {
+            "title": "Error Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "error_code",
+          "count"
+        ],
+        "title": "FailureCount",
+        "type": "object"
       },
       "FeedbackIn": {
         "properties": {
@@ -6403,6 +6989,31 @@
         "title": "InvitationCreate",
         "type": "object"
       },
+      "InvitationLinkOut": {
+        "description": "O link do convite, mostrado UMA vez; o anterior deixou de funcionar.",
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          },
+          "invitation": {
+            "$ref": "#/components/schemas/InvitationOut"
+          },
+          "url": {
+            "description": "Link `/accept-invite?token=...` para o admin enviar por outro canal. Não é guardado",
+            "title": "Url",
+            "type": "string"
+          }
+        },
+        "required": [
+          "url",
+          "expires_at",
+          "invitation"
+        ],
+        "title": "InvitationLinkOut",
+        "type": "object"
+      },
       "InvitationOut": {
         "properties": {
           "accepted_at": {
@@ -6422,12 +7033,40 @@
             "title": "Created At",
             "type": "string"
           },
+          "delivery_error": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Código curto da falha do último envio, se falhou",
+            "title": "Delivery Error"
+          },
+          "delivery_status": {
+            "description": "Estado do último email do convite (`none` = nunca houve tentativa)",
+            "enum": [
+              "queued",
+              "sent",
+              "delivered",
+              "delayed",
+              "bounced",
+              "complained",
+              "failed",
+              "skipped",
+              "none"
+            ],
+            "title": "Delivery Status",
+            "type": "string"
+          },
           "email": {
             "title": "Email",
             "type": "string"
           },
           "email_delivered": {
-            "description": "O fornecedor de email aceitou o último envio; false = reenviar",
+            "description": "O fornecedor aceitou o último envio (não é entregue: ver `delivery_status`); false = reenviar",
             "title": "Email Delivered",
             "type": "boolean"
           },
@@ -6463,6 +7102,19 @@
               }
             ],
             "title": "Invited By Name"
+          },
+          "last_email_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quando foi a última tentativa de envio",
+            "title": "Last Email At"
           },
           "last_sent_at": {
             "anyOf": [
@@ -6558,7 +7210,10 @@
           "revoked_at",
           "last_sent_at",
           "send_count",
-          "email_delivered"
+          "email_delivered",
+          "delivery_status",
+          "last_email_at",
+          "delivery_error"
         ],
         "title": "InvitationOut",
         "type": "object"
@@ -7687,6 +8342,18 @@
           "email": {
             "title": "Email",
             "type": "string"
+          },
+          "email_alerts": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só para administradores: nº de alertas de email ativos (banner em /users?tab=emails)",
+            "title": "Email Alerts"
           },
           "email_verified": {
             "title": "Email Verified",
@@ -12759,6 +13426,16 @@
             "title": "Database",
             "type": "boolean"
           },
+          "email": {
+            "description": "`not_configured`: sem fornecedor de email em produção; `failing`: 3 ou mais falhas na última hora",
+            "enum": [
+              "ok",
+              "not_configured",
+              "failing"
+            ],
+            "title": "Email",
+            "type": "string"
+          },
           "llm_enabled": {
             "title": "Llm Enabled",
             "type": "boolean"
@@ -12775,7 +13452,8 @@
         "required": [
           "status",
           "database",
-          "llm_enabled"
+          "llm_enabled",
+          "email"
         ],
         "title": "Readiness",
         "type": "object"
@@ -14551,6 +15229,141 @@
         "title": "SlotCount",
         "type": "object"
       },
+      "StatusCounts": {
+        "properties": {
+          "bounced": {
+            "default": 0,
+            "title": "Bounced",
+            "type": "integer"
+          },
+          "complained": {
+            "default": 0,
+            "title": "Complained",
+            "type": "integer"
+          },
+          "delayed": {
+            "default": 0,
+            "title": "Delayed",
+            "type": "integer"
+          },
+          "delivered": {
+            "default": 0,
+            "title": "Delivered",
+            "type": "integer"
+          },
+          "failed": {
+            "default": 0,
+            "title": "Failed",
+            "type": "integer"
+          },
+          "queued": {
+            "default": 0,
+            "title": "Queued",
+            "type": "integer"
+          },
+          "sent": {
+            "default": 0,
+            "title": "Sent",
+            "type": "integer"
+          },
+          "skipped": {
+            "default": 0,
+            "title": "Skipped",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "title": "StatusCounts",
+        "type": "object"
+      },
+      "SuppressionCreate": {
+        "properties": {
+          "email": {
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "email"
+        ],
+        "title": "SuppressionCreate",
+        "type": "object"
+      },
+      "SuppressionOut": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "reason": {
+            "enum": [
+              "bounced",
+              "complained",
+              "manual"
+            ],
+            "title": "Reason",
+            "type": "string"
+          },
+          "source_delivery_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Source Delivery Id"
+          },
+          "to_email": {
+            "title": "To Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "to_email",
+          "reason",
+          "source_delivery_id",
+          "created_at"
+        ],
+        "title": "SuppressionOut",
+        "type": "object"
+      },
+      "SuppressionPage": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SuppressionOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "SuppressionPage",
+        "type": "object"
+      },
       "TableArtifact": {
         "additionalProperties": false,
         "properties": {
@@ -16212,6 +17025,17 @@
       "UserAdminOut": {
         "description": "Visão de administração: inclui estado da conta e último acesso.",
         "properties": {
+          "approval_email": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ApprovalEmailOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só nas listas: o email que avisa a pessoa do pedido (pendente) ou da decisão; nulo nas ações"
+          },
           "approval_status": {
             "enum": [
               "pending",
@@ -16245,6 +17069,17 @@
           "email_verified": {
             "title": "Email Verified",
             "type": "boolean"
+          },
+          "email_warning": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EmailWarning"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só ao aprovar/recusar/reenviar: preenchido se o email para a pessoa NÃO saiu (a ação foi feita)"
           },
           "google_linked": {
             "title": "Google Linked",
@@ -16768,6 +17603,23 @@
           "value"
         ],
         "title": "WaterfallStep",
+        "type": "object"
+      },
+      "WebhookAck": {
+        "properties": {
+          "status": {
+            "enum": [
+              "updated",
+              "ignored"
+            ],
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "WebhookAck",
         "type": "object"
       },
       "WeighingMethod": {
@@ -18061,7 +18913,7 @@
     },
     "/api/v1/auth/approval-status": {
       "get": {
-        "description": "Leve, para o ecrã de espera fazer polling. Funciona com a conta `pending` ou `rejected`.",
+        "description": "Leve, para o ecrã de espera fazer polling (e redirecionar quando `status` passa a `approved`).\nFunciona com a conta `pending` ou `rejected`; `confirmation_email` diz se o aviso «recebemos o teu pedido» saiu.",
         "operationId": "get_approval_status",
         "responses": {
           "200": {
@@ -18429,7 +19281,7 @@
     },
     "/api/v1/auth/forgot-password": {
       "post": {
-        "description": "Responde 204 exista ou não a conta: não revela que emails estão registados.",
+        "description": "Responde 204 exista ou não a conta e envia SEMPRE um email (link de recuperação, aviso de conta inativa,\no convite de novo ou o email neutro «não encontrámos uma conta»). 503 `email_unavailable` se não puder sair.",
         "operationId": "forgot_password",
         "parameters": [
           {
@@ -19649,7 +20501,7 @@
     },
     "/api/v1/auth/magic-link": {
       "post": {
-        "description": "Envia um link de entrada válido 15 min e de uso único. Responde 204 exista ou não a conta.",
+        "description": "Envia um email, SEMPRE, e responde 204 exista ou não a conta: link de entrada (15 min, uso único) para contas\nativas; aviso sem link para contas desativadas/recusadas; o convite de novo para quem só tem convite; e um\nemail neutro para o resto. Se o email não puder sair responde 503 `email_unavailable` (igual para todos).",
         "operationId": "request_magic_link",
         "parameters": [
           {
@@ -19926,7 +20778,7 @@
     },
     "/api/v1/auth/me": {
       "get": {
-        "description": "O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado\ne `impersonation` traz o administrador real. Para administradores traz `pending_approvals`.",
+        "description": "O utilizador da sessão (mesmo com a conta por aprovar, para o ecrã de espera). Em impersonação é o impersonado\ne `impersonation` traz o administrador real. Para administradores traz `pending_approvals` e `email_alerts`\n(e dispara, no máximo 1x por dia, o lembrete de contas por aprovar há mais de 24 h).",
         "operationId": "get_me",
         "responses": {
           "200": {
@@ -21134,9 +21986,124 @@
         ]
       }
     },
+    "/api/v1/auth/resend-registration-email": {
+      "post": {
+        "description": "Para quem aguarda aprovação: reenvia «recebemos o teu pedido» (2 por hora). 503 se não sair.",
+        "operationId": "resend_registration_email",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Resend Registration Email",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/resend-verification": {
       "post": {
-        "description": "Reenvia o email de verificação. Sem captcha: exige sessão iniciada; o limitador trava abusos.",
+        "description": "Reenvia o email de verificação (uma vez por minuto). Sem captcha: exige sessão iniciada.\n503 `email_unavailable` se o email não puder sair.",
         "operationId": "resend_verification",
         "responses": {
           "204": {
@@ -37131,6 +38098,1250 @@
         ]
       }
     },
+    "/api/v1/users/emails": {
+      "get": {
+        "description": "Envios de email (só metadados, sem corpos), do mais recente. Sincroniza o estado com o Resend se houver chave.",
+        "operationId": "list_emails",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 200,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "queued",
+                    "sent",
+                    "delivered",
+                    "delayed",
+                    "bounced",
+                    "complained",
+                    "failed",
+                    "skipped"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "template",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "enum": [
+                    "magic_link",
+                    "invitation",
+                    "registration_received",
+                    "approval_requested",
+                    "approval_granted",
+                    "approval_rejected",
+                    "verify_email",
+                    "guest_welcome",
+                    "password_reset",
+                    "account_unavailable",
+                    "account_not_found",
+                    "pending_reminder",
+                    "email_alert",
+                    "test_email"
+                  ],
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Template"
+            }
+          },
+          {
+            "description": "Procura no email do destinatário",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Procura no email do destinatário",
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Emails",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/health": {
+      "get": {
+        "description": "Verifica SPF, DKIM, return-path e DMARC do domínio do EMAIL_FROM (cache de 10 min).",
+        "operationId": "get_email_dns_health",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDnsHealth"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Email Dns Health",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/refresh": {
+      "post": {
+        "description": "«Atualizar estado»: consulta o Resend sobre os envios por confirmar (precisa de `RESEND_READ_API_KEY`).",
+        "operationId": "refresh_email_status",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailRefreshOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Refresh Email Status",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/summary": {
+      "get": {
+        "description": "Contagens por estado (24 h e 7 dias), taxa de sucesso, falhas por código, o que sabemos da entrega\n(`delivery_tracking`) e os alertas ativos. Pode enviar, no máximo de 6 em 6 h, o email de alerta.",
+        "operationId": "get_email_summary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Email Summary",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/suppressions": {
+      "get": {
+        "description": "Endereços que não recebem emails (ressalto permanente, queixa de spam ou bloqueio manual).",
+        "operationId": "list_email_suppressions",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuppressionPage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Email Suppressions",
+        "tags": [
+          "emails"
+        ]
+      },
+      "post": {
+        "description": "Bloqueia manualmente um endereço (`reason=manual`). 409 se já estiver bloqueado. Auditado.",
+        "operationId": "create_email_suppression",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SuppressionCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuppressionOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Email Suppression",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/suppressions/{suppression_id}": {
+      "delete": {
+        "description": "Volta a permitir emails para o endereço. Auditado.",
+        "operationId": "delete_email_suppression",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "suppression_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Suppression Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete Email Suppression",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/test": {
+      "post": {
+        "description": "Envia um email de teste ao próprio administrador (3 por hora) e devolve o registo; consulta\n`GET /users/emails/{id}` para ver `sent` passar a `delivered`.",
+        "operationId": "send_test_email",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Send Test Email",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
+    "/api/v1/users/emails/{delivery_id}": {
+      "get": {
+        "description": "Um envio (para acompanhar o email de teste até `delivered`).",
+        "operationId": "get_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "delivery_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Delivery Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailDeliveryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Email",
+        "tags": [
+          "emails"
+        ]
+      }
+    },
     "/api/v1/users/invitations": {
       "get": {
         "description": "Convites enviados (pendentes, aceites, expirados, revogados), do mais recente.",
@@ -37449,6 +39660,140 @@
         ]
       }
     },
+    "/api/v1/users/invitations/{invitation_id}/link": {
+      "post": {
+        "description": "New invitation link, returned ONCE, to send through another channel when the email fails. The previous\nlink stops working; nothing is emailed and the token is not stored. Audited.",
+        "operationId": "create_invitation_link",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "invitation_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Invitation Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationLinkOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Invitation Link",
+        "tags": [
+          "users"
+        ]
+      }
+    },
     "/api/v1/users/invitations/{invitation_id}/resend": {
       "post": {
         "description": "New link and new deadline; the previous link stops working.",
@@ -37719,7 +40064,7 @@
     },
     "/api/v1/users/summary": {
       "get": {
-        "description": "Counters for the menu badge.",
+        "description": "Counters for the menu badge. Also (at most once a day) emails the admins a reminder if accounts have been\nwaiting for approval for over 24 h.",
         "operationId": "get_users_summary",
         "responses": {
           "200": {
@@ -38547,6 +40892,262 @@
         "summary": "Reject User",
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/v1/users/{user_id}/resend-email": {
+      "post": {
+        "description": "Re-send the email that matches the account state («request received», approved or rejected). If it could\nnot be sent, `email_warning` says so. Audited.",
+        "operationId": "resend_user_email",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserAdminOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Resend User Email",
+        "tags": [
+          "users"
+        ]
+      }
+    },
+    "/api/v1/webhooks/resend": {
+      "post": {
+        "description": "Eventos do Resend (sent, delivered, delivery_delayed, bounced, complained, failed). Sem sessão: a autenticação\né a assinatura Svix (`svix-id`, `svix-timestamp`, `svix-signature`) sobre o corpo bruto. Sem\n`RESEND_WEBHOOK_SECRET` responde 503. Idempotente; eventos desconhecidos respondem 200 `ignored`.",
+        "operationId": "receive_resend_webhook",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookAck"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Receive Resend Webhook",
+        "tags": [
+          "webhooks"
         ]
       }
     },

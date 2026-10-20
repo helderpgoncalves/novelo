@@ -12,7 +12,7 @@ from typing import Any
 
 import httpx
 import pytest
-from sqlalchemy import select, update
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.adapters.email import LogSender, UnavailableSender, get_email_sender
@@ -24,8 +24,9 @@ from novelo.core.ratelimit import RateLimiter, passport_limiter
 from novelo.features.ai_admin.models import AiUsage
 from novelo.features.ai_admin.service import build_runtime
 from novelo.features.auth import google, service
-from novelo.features.auth.models import EmailVerificationToken, PasswordResetToken, RefreshToken
+from novelo.features.auth.models import EmailVerificationToken, LoginToken, PasswordResetToken, RefreshToken
 from novelo.features.copilot.models import CopilotAttachment
+from novelo.features.email_log import service as email_log
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 from tests.conftest import PASSWORD, OutboxSender
@@ -218,7 +219,7 @@ async def test_global_guest_ai_budget_and_monthly_budget(
 
 
 async def test_email_never_goes_to_the_log_outside_development(
-    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture, session: AsyncSession
 ) -> None:
     s = get_settings()
     monkeypatch.setattr(s, "resend_api_key", "")
@@ -232,7 +233,10 @@ async def test_email_never_goes_to_the_log_outside_development(
     monkeypatch.setattr(s, "email_transport", "log")  # nem forçando o transporte de log
     assert isinstance(get_email_sender(), UnavailableSender)
     with caplog.at_level(logging.DEBUG):
-        await service.send_quietly(sender, "a@x.pt", "s", "<p>", "https://x/reset-password?token=SEGREDO")
+        row = await email_log.deliver(
+            session, sender, "password_reset", "a@x.pt", "s", "<p>", "https://x/reset-password?token=SEGREDO"
+        )
+    assert row.status == "failed" and row.error_code == "not_configured"  # a falha fica registada, sem corpo
     assert "SEGREDO" not in caplog.text and "a@x.pt" not in caplog.text
 
 
@@ -404,7 +408,11 @@ async def test_magic_link_for_unknown_accounts_leaves_no_token_and_answers_the_s
 ) -> None:
     monkeypatch.setattr(get_settings(), "email_transport", "log")
     resp = await client.post(f"{AUTH}/magic-link", json={"email": "fantasma@x.pt"})
-    assert resp.status_code == 204 and outbox.sent == []
+    assert resp.status_code == 204
+    assert (
+        await session.scalar(select(func.count()).select_from(LoginToken))
+    ) == 0  # nenhum token para quem não existe
+    assert len(outbox.sent) == 1 and "token=" not in outbox.sent[0]["text"]  # só o email neutro
 
 
 # --- J: CSRF, cookies __Host- e cabeçalhos ---------------------------------------------------------------

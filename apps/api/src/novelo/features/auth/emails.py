@@ -121,6 +121,71 @@ _TEXTS: dict[str, dict[str, str]] = {
         "req_notice_title": "Porque recebo isto?",
         "req_notice": "Recebes este aviso por seres administrador do Novelo. Podes ignorá-lo se o pedido já estiver tratado.",
         "req_reason": "Recebeste este email porque és administrador do Novelo.",
+        "reg_subject": "Recebemos o teu pedido · Novelo",
+        "reg_preheader": "Um administrador vai rever o teu pedido. Avisamos-te por email.",
+        "reg_eyebrow": "Pedido de conta",
+        "reg_title": "Recebemos o teu pedido",
+        "reg_p1": "Obrigado por te registares no Novelo. Um administrador vai rever o teu pedido e só depois podes entrar.",
+        "reg_p2": "Não precisas de fazer mais nada: quando houver uma decisão, avisamos-te por email para este endereço.",
+        "reg_button": "Ver o estado do pedido",
+        "reg_notice_title": "Não pediste esta conta?",
+        "reg_notice": "Podes ignorar este email.",
+        "reg_reason": "Recebeste este email porque este endereço foi usado para pedir uma conta no Novelo.",
+        "una_subject": "Não conseguimos dar-te acesso · Novelo",
+        "una_preheader": "A conta ou o pedido associado a este email não permite entrar.",
+        "una_eyebrow": "Acesso",
+        "una_title": "Não podemos dar-te acesso",
+        "una_inactive": "Pediste acesso ao Novelo, mas a conta associada a este email não está ativa.",
+        "una_rejected": "Pediste acesso ao Novelo, mas o pedido de conta associado a este email foi recusado.",
+        "una_p2": "Se achas que houve um engano, fala com o administrador do Novelo ou escreve-nos para o suporte.",
+        "una_button": "Abrir o Novelo",
+        "una_notice_title": "Não foste tu?",
+        "una_notice": "Podes ignorar este email: ninguém entra na conta sem um acesso válido.",
+        "una_reason": "Recebeste este email porque foi pedido um acesso para este endereço.",
+        "nf_subject": "Não encontrámos uma conta · Novelo",
+        "nf_preheader": "Não existe nenhuma conta do Novelo com este email.",
+        "nf_eyebrow": "Acesso",
+        "nf_title": "Não encontrámos uma conta com este email",
+        "nf_p1": "Pediste um acesso ao Novelo, mas não existe nenhuma conta nem convite para este endereço. Podes ter escrito o email de outra forma ou usado outro endereço.",
+        "nf_open": "Podes criar uma conta. Depois de um administrador a aprovar, já podes entrar.",
+        "nf_closed": "O registo está fechado. Pede acesso a um administrador do Novelo, que te pode enviar um convite.",
+        "nf_button_open": "Criar conta",
+        "nf_button_closed": "Abrir o Novelo",
+        "nf_notice_title": "Não pediste isto?",
+        "nf_notice": "Ignora este email: não foi criada nenhuma conta.",
+        "nf_reason": "Recebeste este email porque foi pedido um acesso para este endereço.",
+        "rem_subject": "Há contas por rever há mais de um dia · Novelo",
+        "rem_preheader": "Pedidos de conta à espera de aprovação há mais de 24 horas.",
+        "rem_eyebrow": "Lembrete",
+        "rem_title_one": "1 conta espera há mais de um dia",
+        "rem_title_many": "{n} contas esperam há mais de um dia",
+        "rem_p1": "Estes pedidos esperam por aprovação há mais de 24 horas. Cada pessoa continua à espera de uma resposta.",
+        "rem_p2": "Enviamos no máximo um lembrete por dia.",
+        "alert_subject": "Os emails precisam de atenção · Novelo",
+        "alert_preheader": "Detetámos problemas no envio de emails do Novelo.",
+        "alert_eyebrow": "Monitorização",
+        "alert_title": "Os emails do Novelo precisam de atenção",
+        "alert_p1": "Detetámos o seguinte no envio de emails:",
+        "alert_p2": "Enquanto isto durar, há pessoas que podem não receber convites nem links de acesso. Envia o link do convite por outro canal.",
+        "alert_button": "Ver o estado dos emails",
+        "alert_notice_title": "Porque recebo isto?",
+        "alert_notice": "Enviamos no máximo um destes avisos a cada 6 horas, ao administrador mais antigo.",
+        "alert_provider_not_configured": "O fornecedor de email não está configurado: nenhum email sai.",
+        "alert_provider_auth_invalid": "A chave do fornecedor foi recusada.",
+        "alert_domain_not_verified": "O domínio do remetente não está verificado no fornecedor.",
+        "alert_failures_last_hour": "Houve 3 ou mais falhas de envio na última hora.",
+        "alert_high_failure_rate": "Mais de 20% dos envios da última hora falharam.",
+        "alert_webhook_silent": "O webhook está configurado mas não recebe eventos há mais de 24 horas.",
+        "alert_no_admin_recipients": "Não há administradores com email para receber os avisos de contas novas.",
+        "test_subject": "Email de teste · Novelo",
+        "test_preheader": "Se estás a ler isto, o envio de emails do Novelo funciona.",
+        "test_eyebrow": "Teste",
+        "test_title": "O envio de emails funciona",
+        "test_p1": "Este é um email de teste enviado pelo painel de administração. Chegou à tua caixa de entrada.",
+        "test_button": "Abrir o Novelo",
+        "test_notice_title": "Não pediste este teste?",
+        "test_notice": "Podes ignorar este email.",
+        "test_reason": "Recebeste este email porque um administrador do Novelo fez um teste de envio.",
         "fact_validity": "Validade",
         "fact_use": "Utilização",
         "fact_once": "Uma só vez",
@@ -224,6 +289,71 @@ _TEXTS: dict[str, dict[str, str]] = {
         "req_notice_title": "Why am I getting this?",
         "req_notice": "You get this notice because you are a Novelo administrator. You can ignore it if the request is already handled.",
         "req_reason": "You received this email because you are a Novelo administrator.",
+        "reg_subject": "We received your request · Novelo",
+        "reg_preheader": "An administrator will review it. We will let you know by email.",
+        "reg_eyebrow": "Account request",
+        "reg_title": "We received your request",
+        "reg_p1": "Thank you for signing up to Novelo. An administrator will review your request and only then can you sign in.",
+        "reg_p2": "There is nothing else to do: once there is a decision, we will tell you by email at this address.",
+        "reg_button": "See the request status",
+        "reg_notice_title": "Did you not request this account?",
+        "reg_notice": "You can ignore this email.",
+        "reg_reason": "You received this email because this address was used to request a Novelo account.",
+        "una_subject": "We could not give you access · Novelo",
+        "una_preheader": "The account or request linked to this email does not allow signing in.",
+        "una_eyebrow": "Access",
+        "una_title": "We cannot give you access",
+        "una_inactive": "You asked for access to Novelo, but the account linked to this email is not active.",
+        "una_rejected": "You asked for access to Novelo, but the account request linked to this email was declined.",
+        "una_p2": "If you think this is a mistake, talk to a Novelo administrator or write to support.",
+        "una_button": "Open Novelo",
+        "una_notice_title": "Was this not you?",
+        "una_notice": "You can ignore this email: nobody gets into the account without valid access.",
+        "una_reason": "You received this email because access was requested for this address.",
+        "nf_subject": "We could not find an account · Novelo",
+        "nf_preheader": "There is no Novelo account with this email.",
+        "nf_eyebrow": "Access",
+        "nf_title": "We could not find an account with this email",
+        "nf_p1": "You asked for access to Novelo, but there is no account or invitation for this address. You may have typed the email differently or used another address.",
+        "nf_open": "You can create an account. Once an administrator approves it, you can sign in.",
+        "nf_closed": "Registration is closed. Ask a Novelo administrator for access; they can send you an invitation.",
+        "nf_button_open": "Create an account",
+        "nf_button_closed": "Open Novelo",
+        "nf_notice_title": "Did you not ask for this?",
+        "nf_notice": "Ignore this email: no account was created.",
+        "nf_reason": "You received this email because access was requested for this address.",
+        "rem_subject": "Accounts waiting for over a day · Novelo",
+        "rem_preheader": "Account requests have been waiting for approval for more than 24 hours.",
+        "rem_eyebrow": "Reminder",
+        "rem_title_one": "1 account has been waiting for over a day",
+        "rem_title_many": "{n} accounts have been waiting for over a day",
+        "rem_p1": "These requests have been waiting for approval for more than 24 hours. Each person is still waiting for an answer.",
+        "rem_p2": "We send at most one reminder per day.",
+        "alert_subject": "Emails need attention · Novelo",
+        "alert_preheader": "We detected problems sending Novelo emails.",
+        "alert_eyebrow": "Monitoring",
+        "alert_title": "Novelo emails need attention",
+        "alert_p1": "We detected the following with email delivery:",
+        "alert_p2": "While this lasts, people may not receive invitations or sign-in links. Send the invitation link through another channel.",
+        "alert_button": "See the email status",
+        "alert_notice_title": "Why am I getting this?",
+        "alert_notice": "We send at most one of these notices every 6 hours, to the longest-standing administrator.",
+        "alert_provider_not_configured": "The email provider is not configured: no email is sent.",
+        "alert_provider_auth_invalid": "The provider rejected the API key.",
+        "alert_domain_not_verified": "The sender domain is not verified at the provider.",
+        "alert_failures_last_hour": "There were 3 or more send failures in the last hour.",
+        "alert_high_failure_rate": "More than 20% of the emails sent in the last hour failed.",
+        "alert_webhook_silent": "The webhook is configured but has received no events for over 24 hours.",
+        "alert_no_admin_recipients": "There are no administrators with an email to receive new-account notices.",
+        "test_subject": "Test email · Novelo",
+        "test_preheader": "If you are reading this, Novelo email delivery works.",
+        "test_eyebrow": "Test",
+        "test_title": "Email delivery works",
+        "test_p1": "This is a test email sent from the administration panel. It reached your inbox.",
+        "test_button": "Open Novelo",
+        "test_notice_title": "Did you not ask for this test?",
+        "test_notice": "You can ignore this email.",
+        "test_reason": "You received this email because a Novelo administrator ran a delivery test.",
         "fact_validity": "Valid for",
         "fact_use": "Use",
         "fact_once": "Single use",
@@ -474,6 +604,109 @@ def approval_requested(locale: str, url: str, count: int, who: str) -> EmailPart
     return _finish(locale, subject, content)
 
 
+def registration_received(locale: str, name: str | None, url: str) -> EmailParts:
+    """Para quem se registou: o pedido foi recebido e um administrador vai rever."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["reg_preheader"],
+        eyebrow=t["reg_eyebrow"],
+        title=t["reg_title"],
+        paragraphs=[*_greet(t, name), t["reg_p1"], t["reg_p2"]],
+        cta_label=t["reg_button"],
+        url=url,
+        notice_title=t["reg_notice_title"],
+        notice=t["reg_notice"],
+        reason=t["reg_reason"],
+    )
+    return _finish(locale, t["reg_subject"], content)
+
+
+def account_unavailable(locale: str, url: str, *, rejected: bool) -> EmailParts:
+    """Pediram acesso para uma conta desativada ou recusada: sem link de entrada, só a saída (falar com o admin)."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["una_preheader"],
+        eyebrow=t["una_eyebrow"],
+        title=t["una_title"],
+        paragraphs=[t["una_rejected" if rejected else "una_inactive"], t["una_p2"]],
+        cta_label=t["una_button"],
+        url=url,
+        notice_title=t["una_notice_title"],
+        notice=t["una_notice"],
+        reason=t["una_reason"],
+    )
+    return _finish(locale, t["una_subject"], content)
+
+
+def account_not_found(locale: str, url: str, *, registration_open: bool) -> EmailParts:
+    """Pediram acesso para um email sem conta nem convite: neutro, sem revelar nada a terceiros."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["nf_preheader"],
+        eyebrow=t["nf_eyebrow"],
+        title=t["nf_title"],
+        paragraphs=[t["nf_p1"], t["nf_open" if registration_open else "nf_closed"]],
+        cta_label=t["nf_button_open" if registration_open else "nf_button_closed"],
+        url=url,
+        notice_title=t["nf_notice_title"],
+        notice=t["nf_notice"],
+        reason=t["nf_reason"],
+    )
+    return _finish(locale, t["nf_subject"], content)
+
+
+def pending_reminder(locale: str, url: str, count: int) -> EmailParts:
+    """Resumo diário aos administradores: contas por aprovar há mais de 24 horas."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["rem_preheader"],
+        eyebrow=t["rem_eyebrow"],
+        title=t["rem_title_many"].format(n=count) if count != 1 else t["rem_title_one"],
+        paragraphs=[t["rem_p1"], t["rem_p2"]],
+        cta_label=t["req_button"],
+        url=url,
+        notice_title=t["req_notice_title"],
+        notice=t["req_notice"],
+        reason=t["req_reason"],
+    )
+    return _finish(locale, t["rem_subject"], content)
+
+
+def email_alert(locale: str, url: str, kinds: list[str]) -> EmailParts:
+    """Aviso ao administrador de que o envio de emails tem problemas (`kinds` = códigos de alerta)."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["alert_preheader"],
+        eyebrow=t["alert_eyebrow"],
+        title=t["alert_title"],
+        paragraphs=[t["alert_p1"], t["alert_p2"]],
+        bullets=[t[f"alert_{k}"] for k in kinds if f"alert_{k}" in t],
+        cta_label=t["alert_button"],
+        url=url,
+        notice_title=t["alert_notice_title"],
+        notice=t["alert_notice"],
+        reason=t["req_reason"],
+    )
+    return _finish(locale, t["alert_subject"], content)
+
+
+def test_email(locale: str, name: str | None) -> EmailParts:
+    """Email de teste do painel de administração."""
+    t = _t(locale)
+    content = Content(
+        preheader=t["test_preheader"],
+        eyebrow=t["test_eyebrow"],
+        title=t["test_title"],
+        paragraphs=[*_greet(t, name), t["test_p1"]],
+        cta_label=t["test_button"],
+        url=_brand().base,
+        notice_title=t["test_notice_title"],
+        notice=t["test_notice"],
+        reason=t["test_reason"],
+    )
+    return _finish(locale, t["test_subject"], content)
+
+
 SAMPLE_NAME = "Ana Ferreira"
 
 
@@ -494,6 +727,16 @@ def sample_emails(locale: str) -> dict[str, EmailParts]:
             locale, base, SAMPLE_NAME, "Só aceitamos contas de entidades parceiras."
         ),
         "approval-requested": lambda: approval_requested(locale, f"{base}/users?tab=pending", 3, "ana@exemplo.pt"),
+        "registration-received": lambda: registration_received(locale, SAMPLE_NAME, f"{base}/pending-approval"),
+        "account-inactive": lambda: account_unavailable(locale, base, rejected=False),
+        "account-rejected": lambda: account_unavailable(locale, base, rejected=True),
+        "account-not-found": lambda: account_not_found(locale, f"{base}/register", registration_open=True),
+        "account-not-found-closed": lambda: account_not_found(locale, base, registration_open=False),
+        "pending-reminder": lambda: pending_reminder(locale, f"{base}/users?tab=pending", 2),
+        "email-alert": lambda: email_alert(
+            locale, f"{base}/users?tab=emails", ["provider_auth_invalid", "high_failure_rate"]
+        ),
+        "test-email": lambda: test_email(locale, SAMPLE_NAME),
         "invitation": lambda: invitation(
             locale,
             f"{base}/accept-invite?token=EXEMPLO",
