@@ -56,10 +56,32 @@ class ImpersonationOut(BaseModel):
     expires_at: datetime | None = Field(default=None, description="Fim fixo da sessão; não é renovável")
 
 
+ChecklistItem = Literal["scenario", "copilot", "map"]
+
+
+class OnboardingOut(BaseModel):
+    """Estado da introdução guiada da conta (vale em todos os dispositivos)."""
+
+    tour_seen_at: datetime | None = Field(default=None, description="Quando a introdução foi vista ou saltada")
+    checklist_done: list[ChecklistItem] = Field(
+        default_factory=list, description="Primeiros passos já feitos (cenário e copiloto deduzem-se dos dados)"
+    )
+    checklist_dismissed: bool = Field(default=False, description="A pessoa dispensou o checklist")
+
+
+class OnboardingUpdate(BaseModel):
+    tour: Literal["seen", "reset"] | None = Field(
+        default=None, description="`seen` marca a introdução como vista; `reset` volta a oferecê-la"
+    )
+    mark: ChecklistItem | None = Field(default=None, description="Marca um primeiro passo como feito")
+    checklist_dismissed: bool | None = Field(default=None, description="Dispensa (ou repõe) o checklist")
+
+
 class MeOut(UserOut):
     """`/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação."""
 
     impersonation: ImpersonationOut = Field(default_factory=ImpersonationOut)
+    onboarding: OnboardingOut = Field(default_factory=OnboardingOut)
     pending_approvals: int | None = Field(
         default=None, description="Só para administradores: contas à espera de aprovação (badge do menu)"
     )

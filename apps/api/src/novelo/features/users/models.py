@@ -1,10 +1,10 @@
 import uuid
 from dataclasses import dataclass
 from datetime import UTC, datetime
-from typing import Literal
+from typing import Any, Literal
 
 from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, String, text
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from novelo.core.database import Base, TimestampMixin, UuidPkMixin
@@ -58,6 +58,9 @@ class User(Base, UuidPkMixin, TimestampMixin):
     )
     approved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     rejected_reason: Mapped[str | None] = mapped_column(String(300))
+    # Introdução guiada: quando foi vista (ou saltada) e o checklist «Primeiros passos» (`done`, `dismissed`).
+    onboarding_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    onboarding_state: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default=text("'{}'::jsonb"))
     # Não persistido: preenchido em cada pedido por `core/deps.get_current_user`. `None` = sessão normal.
     impersonation: ImpersonationInfo | None = None
 

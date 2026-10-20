@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
-import { AuthHeading } from './auth-ui';
+import { AUTH_BLOCKS, AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS, AuthHeading } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { MagicLinkSent, magicLinkBody, useRequestMagicLink } from './magic-link-sent';
 import { looksLikeEmail, readLastEmail } from './passwordless';
@@ -50,11 +50,11 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
   };
 
   return (
-    <div className="space-y-6">
+    <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.login_title()} subtitle={m.login_magic_subtitle()} />
-      <form onSubmit={onSubmit} className="space-y-4" noValidate>
+      <form onSubmit={onSubmit} className={AUTH_FIELDS} noValidate>
         <FormAlert message={request.isError ? getErrorMessage(request.error) : null} />
-        <div className="space-y-2">
+        <div className="flex flex-col gap-2">
           <label htmlFor="magic-email" className="font-medium text-sm leading-none">
             {m.login_email()}
           </label>
@@ -73,7 +73,7 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
             aria-invalid={problem ? true : undefined}
             aria-describedby="magic-email-problem"
             onChange={() => problem && setProblem(null)}
-            className="h-11"
+            className={AUTH_CONTROL}
           />
           <p
             id="magic-email-problem"
@@ -86,7 +86,7 @@ export function MagicLinkFlow({ next, alternatives }: { next?: string; alternati
         {request.gate.field}
         <Button
           type="submit"
-          className="h-11 w-full font-semibold"
+          className={AUTH_CTA}
           disabled={request.isPending || request.gate.blocked}
           loading={request.isPending}
         >

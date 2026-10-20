@@ -18,10 +18,13 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { useEndImpersonation } from '@/features/impersonation/impersonation-banner';
 import { useImpersonation } from '@/features/impersonation/use-impersonation';
-import { openTour } from '@/features/onboarding/tour-store';
+import { stepsFor } from '@/features/onboarding/steps';
+import { canResumeTour, openTour, readTourProgress } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { queryClient } from '@/lib/query-client';
 import { m } from '@/paraglide/messages';
+
+const TOUR_OPEN_DELAY_MS = 180;
 
 const initials = (user: MeOut) =>
   (user.name ?? user.email)
@@ -52,6 +55,7 @@ export function UserMenu({ user }: { user: MeOut }) {
           <Button
             variant="ghost"
             className="h-10 gap-2 px-1.5"
+            data-tour="user-menu"
             aria-label={m.common_account_menu()}
           >
             <Avatar className="size-7">
@@ -104,7 +108,19 @@ export function UserMenu({ user }: { user: MeOut }) {
           <DropdownMenuItem onSelect={() => navigate({ to: '/account' })}>
             <UserRound /> {m.user_menu_account()}
           </DropdownMenuItem>
-          <DropdownMenuItem onSelect={openTour}>
+          {/* Pequeno atraso: o menu devolve o foco ao botão ao fechar; só depois a introdução o toma. */}
+          {canResumeTour(user.id, stepsFor(user.role).length) && (
+            <DropdownMenuItem
+              onSelect={() =>
+                window.setTimeout(() => openTour(readTourProgress(user.id)), TOUR_OPEN_DELAY_MS)
+              }
+            >
+              <RouteIcon /> {m.user_menu_tour_resume()}
+            </DropdownMenuItem>
+          )}
+          <DropdownMenuItem
+            onSelect={() => window.setTimeout(() => openTour(0), TOUR_OPEN_DELAY_MS)}
+          >
             <RouteIcon /> {m.user_menu_tour()}
           </DropdownMenuItem>
           {(canInstall || needsIosSteps) && (

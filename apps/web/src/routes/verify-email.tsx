@@ -1,10 +1,10 @@
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { CheckCircle2, Loader2, XCircle } from 'lucide-react';
+import { CheckCircle2, XCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { z } from 'zod';
 import { getMeOptions, verifyEmailMutation } from '@/client/@tanstack/react-query.gen';
-import { BrandLogo } from '@/components/brand-logo';
+import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
@@ -51,7 +51,7 @@ function VerifyEmail() {
         >
           {state === 'loading' && (
             <>
-              <Loader2 className="mx-auto size-7 animate-spin text-primary" aria-hidden="true" />
+              <BrandSpinner className="mx-auto size-7" />
               <p className="font-medium">{m.verify_loading()}</p>
             </>
           )}

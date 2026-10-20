@@ -23,7 +23,7 @@ async function registerViaUi(page: import('@playwright/test').Page, email: strin
 }
 
 async function openPending(admin: import('@playwright/test').Page, email: string) {
-  await admin.goto('/pt/users?tab=pending');
+  await admin.goto('/pt/users?tab=accounts&view=pending');
   // A barra de pesquisa só aparece quando a tabela é grande; com poucos pedidos a linha já está à vista.
   await admin.getByRole('heading', { name: 'Utilizadores', level: 1 }).waitFor();
   const search = admin.getByRole('searchbox', { name: /Pesquisar/ }).first();
@@ -120,7 +120,9 @@ test.describe('aprovação de contas', () => {
     await deleteByEmail(email);
   });
 
-  test('o admin vê o pedido nas Pendentes e a conta fica à espera na lista', async ({ page }) => {
+  test('o admin vê o pedido na vista de pedidos por aprovar e a conta fica à espera na lista', async ({
+    page,
+  }) => {
     const email = uniqueEmail('pendente');
     const api = await adminApi();
     // Cria o pedido pela API pública (sem aprovar).
@@ -136,8 +138,11 @@ test.describe('aprovação de contas', () => {
     await anon.dispose();
 
     await login(page);
-    await page.goto('/pt/users?tab=pending');
-    await expect(page.getByRole('tab', { name: /Pendentes/ })).toBeVisible();
+    await page.goto('/pt/users?tab=accounts');
+    // Os pedidos por aprovar são uma vista das Contas, com faixa em destaque.
+    await expect(page.getByText('Há pedidos de acesso à espera de decisão.')).toBeVisible();
+    await page.getByRole('button', { name: 'Rever pedidos' }).click();
+    await expect(page).toHaveURL(/view=pending/);
     await expect(page.getByTestId('pending-badge').first()).toBeVisible();
     await expect(page.getByRole('row', { name: new RegExp(email) })).toBeVisible();
 

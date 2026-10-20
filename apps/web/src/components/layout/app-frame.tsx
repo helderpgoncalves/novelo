@@ -9,6 +9,7 @@ import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { ImpersonationBanner } from '@/features/impersonation/impersonation-banner';
 import { OnboardingTour } from '@/features/onboarding/onboarding-tour';
+import { StarterChecklist } from '@/features/onboarding/starter-checklist';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -31,7 +32,10 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
 
   return (
     // Laterais: em paisagem o entalhe fica de um lado e a app não pode ficar por baixo dele.
-    <div className="flex h-dvh flex-col overflow-hidden bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+    <div
+      data-app-frame
+      className="flex h-dvh flex-col overflow-hidden bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]"
+    >
       <a
         href="#content"
         className="sr-only z-50 rounded-md bg-primary px-3 py-2 text-primary-foreground focus:not-sr-only focus:absolute focus:top-[calc(env(safe-area-inset-top)+0.5rem)] focus:left-[calc(env(safe-area-inset-left)+0.5rem)]"
@@ -61,6 +65,7 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
             )}
           </main>
           {showTabBar && <TabBar onMore={() => setMenuOpen(true)} />}
+          <StarterChecklist user={user} />
           <OnboardingTour user={user} />
         </div>
       </div>

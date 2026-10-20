@@ -3,7 +3,6 @@ import {
   ArrowUp,
   AtSign,
   FileText,
-  LoaderCircle,
   Monitor,
   Paperclip,
   Plus,
@@ -32,6 +31,7 @@ import {
   searchCopilotMentionsOptions,
   uploadCopilotAttachmentsMutation,
 } from '@/client/@tanstack/react-query.gen';
+import { BrandSpinner } from '@/components/brand-logo';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -571,10 +571,10 @@ export const Composer = forwardRef<ComposerHandle, Props>(function Composer(
                 )}
                 <span className="min-w-0 max-w-40 truncate">{f.file.name}</span>
                 {f.status === 'uploading' && (
-                  <LoaderCircle
-                    className="size-4 shrink-0 animate-spin text-muted-foreground motion-reduce:animate-none"
-                    aria-label={m.chat_file_uploading()}
-                  />
+                  <>
+                    <BrandSpinner className="size-4 shrink-0" />
+                    <span className="sr-only">{m.chat_file_uploading()}</span>
+                  </>
                 )}
                 {f.status === 'error' && (
                   <span className="text-destructive">{m.chat_file_failed()}</span>

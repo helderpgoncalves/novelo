@@ -52,6 +52,22 @@ Decisão: por omissão (`auto`) a produção sem secret arranca na mesma (não b
 
 Contrato: o token vai no cabeçalho `X-Turnstile-Token`, de uso único (pedir um token novo a cada tentativa, `turnstile.reset()` depois de uma falha). Erros: 400 `captcha_required`, 403 `captcha_failed`, 503 `captcha_unavailable` (Cloudflare em baixo, ou obrigatório sem secret). A API confirma também o `action` do widget (se a Cloudflare o devolver) e, com chaves reais, o hostname de `APP_URL`.
 
+### Onde há captcha e porquê
+
+O Turnstile só fica onde faz sentido de segurança, sem fricção desnecessária. Quem já prova algo (um token secreto de uso único ou uma sessão) não leva captcha, mas mantém sempre o limitador.
+
+| Rota | Captcha | Porquê |
+| --- | --- | --- |
+| `POST /auth/login` | sim (`login`) | Força bruta de credenciais |
+| `POST /auth/register` | sim (`register`) | Criação de contas em massa |
+| `POST /auth/magic-link` | sim (`magic_link`) | Envia email a terceiros |
+| `POST /auth/forgot-password` | sim (`forgot_password`) | Envia email a terceiros |
+| `POST /auth/quick-join` | sim (`quick_join`) | Entrada pública por QR; cria conta e envia email |
+| `POST /auth/reset-password` | não | O token do email, de uso único, já é o segredo; mantém o limitador |
+| `POST /auth/invitations/accept` | não | O token do convite, de uso único, já é o segredo; mantém o limitador por IP |
+| `POST /auth/resend-verification` | não | Exige sessão iniciada; mantém o limitador e o bloqueio em impersonação |
+| `POST /auth/magic-link/verify`, `POST /auth/verify-email` | não | Token secreto de uso único com limitador |
+
 ## Google OAuth
 
 1. Em [console.cloud.google.com/apis/credentials](https://console.cloud.google.com/apis/credentials), criar um cliente "Web application".

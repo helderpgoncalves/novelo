@@ -29,8 +29,9 @@ const tabsListVariants = cva(
         // Segmentado: uma pastilha desliza por baixo do separador ativo.
         default:
           'gap-0.5 rounded-lg bg-muted p-[3px] group-data-[orientation=horizontal]/tabs:h-10',
-        // Linha: sublinhado animado, o desenho para separadores de página.
-        line: 'gap-1 rounded-none bg-transparent group-data-[orientation=horizontal]/tabs:border-b',
+        // Linha: sublinhado de 2 px animado sobre um fio de 1 px (o fio vive no invólucro, para o indicador
+        // não ser cortado pela rolagem). O `pb-px`/`-mb-px` faz o indicador sobrepor-se ao fio.
+        line: 'gap-1 rounded-none bg-transparent group-data-[orientation=horizontal]/tabs:-mb-px group-data-[orientation=horizontal]/tabs:pb-px',
       },
     },
     defaultVariants: {
@@ -114,11 +115,18 @@ function TabsList({
 
   const scrollBy = (dir: -1 | 1) =>
     ref.current?.scrollBy?.({ left: dir * ref.current.clientWidth * 0.6, behavior: 'smooth' });
+  // Telemóvel: só um esbatido nas margens (a rolagem é por toque). Ecrãs maiores: setas clicáveis.
   const arrow =
-    'absolute top-0 z-20 hidden h-full w-9 items-center from-background via-background/90 to-transparent text-muted-foreground hover:text-foreground group-data-[orientation=horizontal]/tabs:flex';
+    'pointer-events-none absolute top-0 bottom-px z-20 hidden w-8 items-center from-background via-background/80 to-transparent text-muted-foreground hover:text-foreground group-data-[orientation=horizontal]/tabs:flex sm:pointer-events-auto sm:w-9';
 
   return (
-    <div className="relative min-w-0 max-w-full" data-slot="tabs-list-wrap">
+    <div
+      className={cn(
+        'relative min-w-0 max-w-full',
+        variant === 'line' && 'group-data-[orientation=horizontal]/tabs:border-b',
+      )}
+      data-slot="tabs-list-wrap"
+    >
       <TabsPrimitive.List
         ref={ref}
         data-slot="tabs-list"
@@ -134,7 +142,7 @@ function TabsList({
               'pointer-events-none absolute left-0 group-data-[orientation=vertical]/tabs:hidden motion-reduce:transition-none',
               ready && 'transition-[transform,width] duration-200 ease-out',
               variant === 'line'
-                ? '-bottom-px h-0.5 rounded-full bg-primary'
+                ? 'bottom-0 h-0.5 rounded-full bg-primary'
                 : 'inset-y-[3px] rounded-md bg-background shadow-sm ring-1 ring-foreground/5',
             )}
             style={{ width: indicator.w, transform: `translateX(${indicator.x}px)` }}
@@ -150,7 +158,7 @@ function TabsList({
           onClick={() => scrollBy(-1)}
           className={cn(arrow, 'left-0 justify-start bg-gradient-to-r')}
         >
-          <ChevronLeft className="size-4" />
+          <ChevronLeft className="hidden size-4 sm:block" />
         </button>
       )}
       {edge.end && (
@@ -161,7 +169,7 @@ function TabsList({
           onClick={() => scrollBy(1)}
           className={cn(arrow, 'right-0 justify-end bg-gradient-to-l')}
         >
-          <ChevronRight className="size-4" />
+          <ChevronRight className="hidden size-4 sm:block" />
         </button>
       )}
     </div>
@@ -194,11 +202,11 @@ function TabsTrigger({
     <TabsPrimitive.Trigger
       data-slot="tabs-trigger"
       className={cn(
-        "group/tab relative z-10 inline-flex h-11 flex-none shrink-0 items-center justify-center gap-2 rounded-md border border-transparent px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors outline-none group-data-[orientation=vertical]/tabs:h-9 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground sm:px-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "group/tab relative z-10 inline-flex h-11 flex-none shrink-0 items-center justify-center gap-2 rounded-md border border-transparent px-3.5 text-sm font-medium whitespace-nowrap text-muted-foreground transition-colors outline-none group-data-[orientation=vertical]/tabs:h-9 group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:justify-start hover:text-foreground focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 data-[state=active]:text-foreground sm:px-4 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         // Pastilha: o fundo vem do indicador; a caixa fica mais baixa para caber no preenchimento da lista.
         'group-data-[variant=default]/tabs-list:h-9 group-data-[variant=default]/tabs-list:px-3',
         // Linha: sem arredondar, o indicador cola-se ao rebordo da lista.
-        'group-data-[variant=line]/tabs-list:rounded-b-none',
+        'group-data-[variant=line]/tabs-list:h-10 group-data-[variant=line]/tabs-list:rounded-b-none group-data-[variant=line]/tabs-list:px-3',
         className,
       )}
       {...props}
@@ -206,7 +214,7 @@ function TabsTrigger({
       {icon}
       {children}
       {count !== undefined && (
-        <span className="rounded-full bg-background/60 px-1.5 py-px font-semibold text-[10px] text-muted-foreground tabular-nums ring-1 ring-foreground/5 group-data-[state=active]/tab:bg-primary/10 group-data-[state=active]/tab:text-primary group-data-[state=active]/tab:ring-primary/20">
+        <span className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-muted px-1.5 font-medium text-[11px] text-muted-foreground tabular-nums leading-none group-data-[state=active]/tab:bg-primary/10 group-data-[state=active]/tab:text-primary">
           {count}
         </span>
       )}

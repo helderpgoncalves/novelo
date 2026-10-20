@@ -4355,6 +4355,7 @@ export type MeOut = {
      * Name
      */
     name: string | null;
+    onboarding?: OnboardingOut;
     /**
      * Pending Approvals
      *
@@ -6166,6 +6167,56 @@ export type MunicipalTextileReference = {
      * false = referência por verificar com a fonte
      */
     verified: boolean;
+};
+
+/**
+ * OnboardingOut
+ *
+ * Estado da introdução guiada da conta (vale em todos os dispositivos).
+ */
+export type OnboardingOut = {
+    /**
+     * Checklist Dismissed
+     *
+     * A pessoa dispensou o checklist
+     */
+    checklist_dismissed?: boolean;
+    /**
+     * Checklist Done
+     *
+     * Primeiros passos já feitos (cenário e copiloto deduzem-se dos dados)
+     */
+    checklist_done?: Array<'scenario' | 'copilot' | 'map'>;
+    /**
+     * Tour Seen At
+     *
+     * Quando a introdução foi vista ou saltada
+     */
+    tour_seen_at?: string | null;
+};
+
+/**
+ * OnboardingUpdate
+ */
+export type OnboardingUpdate = {
+    /**
+     * Checklist Dismissed
+     *
+     * Dispensa (ou repõe) o checklist
+     */
+    checklist_dismissed?: boolean | null;
+    /**
+     * Mark
+     *
+     * Marca um primeiro passo como feito
+     */
+    mark?: 'scenario' | 'copilot' | 'map' | null;
+    /**
+     * Tour
+     *
+     * `seen` marca a introdução como vista; `reset` volta a oferecê-la
+     */
+    tour?: 'seen' | 'reset' | null;
 };
 
 /**
@@ -10922,14 +10973,6 @@ export type StopImpersonationResponse = StopImpersonationResponses[keyof StopImp
 
 export type AcceptInvitationData = {
     body: AcceptInvitationRequest;
-    headers?: {
-        /**
-         * X-Turnstile-Token
-         *
-         * Token do widget Cloudflare Turnstile (uso único)
-         */
-        'X-Turnstile-Token'?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/invitations/accept';
@@ -11493,6 +11536,67 @@ export type UpdateMeResponses = {
 
 export type UpdateMeResponse = UpdateMeResponses[keyof UpdateMeResponses];
 
+export type UpdateOnboardingData = {
+    body: OnboardingUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/me/onboarding';
+};
+
+export type UpdateOnboardingErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateOnboardingError = UpdateOnboardingErrors[keyof UpdateOnboardingErrors];
+
+export type UpdateOnboardingResponses = {
+    /**
+     * Successful Response
+     */
+    200: OnboardingOut;
+};
+
+export type UpdateOnboardingResponse = UpdateOnboardingResponses[keyof UpdateOnboardingResponses];
+
 export type QuickJoinData = {
     body: QuickJoinRequest;
     headers?: {
@@ -11892,14 +11996,6 @@ export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
 
 export type ResendVerificationData = {
     body?: never;
-    headers?: {
-        /**
-         * X-Turnstile-Token
-         *
-         * Token do widget Cloudflare Turnstile (uso único)
-         */
-        'X-Turnstile-Token'?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/resend-verification';
@@ -11961,14 +12057,6 @@ export type ResendVerificationResponse = ResendVerificationResponses[keyof Resen
 
 export type ResetPasswordData = {
     body: ResetPasswordRequest;
-    headers?: {
-        /**
-         * X-Turnstile-Token
-         *
-         * Token do widget Cloudflare Turnstile (uso único)
-         */
-        'X-Turnstile-Token'?: string | null;
-    };
     path?: never;
     query?: never;
     url: '/api/v1/auth/reset-password';

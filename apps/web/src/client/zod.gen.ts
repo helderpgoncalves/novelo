@@ -1707,41 +1707,6 @@ export const zMarketEntry = z.object({
 });
 
 /**
- * MeOut
- *
- * `/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação.
- */
-export const zMeOut = z.object({
-    approval_status: z.enum([
-        'pending',
-        'approved',
-        'rejected'
-    ]),
-    avatar_url: z.string().nullable(),
-    email: z.string(),
-    email_verified: z.boolean(),
-    google_linked: z.boolean(),
-    has_password: z.boolean(),
-    id: z.uuid(),
-    impersonation: zImpersonationOut.optional(),
-    joined_via: z.enum([
-        'password',
-        'google',
-        'quick_join',
-        'magic_link',
-        'invited'
-    ]),
-    locale: z.enum(['pt-PT', 'en']),
-    name: z.string().nullable(),
-    pending_approvals: z.int().nullish(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ])
-});
-
-/**
  * MemoryEntryCreate
  */
 export const zMemoryEntryCreate = z.object({
@@ -2262,6 +2227,70 @@ export const zMunicipalDensityBenchmarkOut = z.object({
     population: z.int(),
     stats: z.array(zMunicipalDensityStat),
     textile_reference: zMunicipalTextileReference
+});
+
+/**
+ * OnboardingOut
+ *
+ * Estado da introdução guiada da conta (vale em todos os dispositivos).
+ */
+export const zOnboardingOut = z.object({
+    checklist_dismissed: z.boolean().optional().default(false),
+    checklist_done: z.array(z.enum([
+        'scenario',
+        'copilot',
+        'map'
+    ])).optional(),
+    tour_seen_at: z.iso.datetime().nullish()
+});
+
+/**
+ * MeOut
+ *
+ * `/auth/me`: o utilizador da sessão (o impersonado, se houver impersonação) e o estado de impersonação.
+ */
+export const zMeOut = z.object({
+    approval_status: z.enum([
+        'pending',
+        'approved',
+        'rejected'
+    ]),
+    avatar_url: z.string().nullable(),
+    email: z.string(),
+    email_verified: z.boolean(),
+    google_linked: z.boolean(),
+    has_password: z.boolean(),
+    id: z.uuid(),
+    impersonation: zImpersonationOut.optional(),
+    joined_via: z.enum([
+        'password',
+        'google',
+        'quick_join',
+        'magic_link',
+        'invited'
+    ]),
+    locale: z.enum(['pt-PT', 'en']),
+    name: z.string().nullable(),
+    onboarding: zOnboardingOut.optional(),
+    pending_approvals: z.int().nullish(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest'
+    ])
+});
+
+/**
+ * OnboardingUpdate
+ */
+export const zOnboardingUpdate = z.object({
+    checklist_dismissed: z.boolean().nullish(),
+    mark: z.enum([
+        'scenario',
+        'copilot',
+        'map'
+    ]).nullish(),
+    tour: z.enum(['seen', 'reset']).nullish()
 });
 
 /**
@@ -4915,10 +4944,6 @@ export const zStopImpersonationResponse = zUserOut;
 
 export const zAcceptInvitationBody = zAcceptInvitationRequest;
 
-export const zAcceptInvitationHeaders = z.object({
-    'X-Turnstile-Token': z.string().nullish()
-});
-
 /**
  * Successful Response
  */
@@ -4982,6 +5007,13 @@ export const zUpdateMeBody = zProfileUpdate;
  */
 export const zUpdateMeResponse = zUserOut;
 
+export const zUpdateOnboardingBody = zOnboardingUpdate;
+
+/**
+ * Successful Response
+ */
+export const zUpdateOnboardingResponse = zOnboardingOut;
+
 export const zQuickJoinBody = zQuickJoinRequest;
 
 export const zQuickJoinHeaders = z.object({
@@ -5030,20 +5062,12 @@ export const zRegisterHeaders = z.object({
  */
 export const zRegisterResponse = zUserOut;
 
-export const zResendVerificationHeaders = z.object({
-    'X-Turnstile-Token': z.string().nullish()
-});
-
 /**
  * Successful Response
  */
 export const zResendVerificationResponse = z.void();
 
 export const zResetPasswordBody = zResetPasswordRequest;
-
-export const zResetPasswordHeaders = z.object({
-    'X-Turnstile-Token': z.string().nullish()
-});
 
 /**
  * Successful Response

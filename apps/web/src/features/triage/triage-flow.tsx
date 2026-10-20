@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Loader2, PackagePlus, ScanLine } from 'lucide-react';
+import { PackagePlus, ScanLine } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { LotItemIn, LotSummary, ZoneOut } from '@/client';
@@ -11,6 +11,7 @@ import {
   listLotsQueryKey,
   openLotMutation,
 } from '@/client/@tanstack/react-query.gen';
+import { BrandSpinner } from '@/components/brand-logo';
 import { Panel, SectionTitle } from '@/components/page';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -125,7 +126,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
               disabled={open.isPending}
               onClick={() => open.mutate({ body: { parish_code: parish || null } })}
             >
-              {open.isPending ? <Loader2 className="animate-spin" /> : <PackagePlus />}
+              {open.isPending ? <BrandSpinner tone="mono" /> : <PackagePlus />}
               {m.triage_open_lot()}
             </Button>
           </div>
@@ -219,7 +220,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
                 analyse.mutate({ body: { item_photo: itemPhoto, label_photo: labelPhoto } })
               }
             >
-              {analyse.isPending ? <Loader2 className="animate-spin" /> : <ScanLine />}
+              {analyse.isPending ? <BrandSpinner tone="mono" /> : <ScanLine />}
               {analyse.isPending ? m.triage_analysing() : m.triage_analyse()}
             </Button>
             <p className="text-center text-muted-foreground text-xs">{m.triage_privacy()}</p>

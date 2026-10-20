@@ -337,17 +337,18 @@ def splice(path: Path, tag: str, content: str) -> None:
 
 def build_html(g: Geometry) -> None:
     arcs = "".join(
-        f'<path class="a{i + 1}" d="{d}" fill="none" stroke-width="{n(STROKE)}" stroke-linecap="round"/>'
+        f'<path class="a{i + 1} brand-arc brand-arc-{i + 1}" d="{d}" fill="none" stroke-width="{n(STROKE)}" stroke-linecap="round"/>'
         for i, d in enumerate(
             ("M134.99 -160.87A210 210 0 1 1 -117.43 -174.10", "M192.84 -229.81A300 300 0 1 1 -167.76 -248.71", "M250.69 -298.76A390 390 0 1 1 -218.09 -323.32")
         )
     )
     from geometry import DOT_PATH
 
-    vb = f"{n(-SYM_HALF_W)} {n(SYM_TOP)} {n(SYM_W)} {n(SYM_H)}"
+    # Caixa quadrada centrada no ponto (igual à do BrandSpinner): os arcos rodam sobre o centro sem oscilar.
+    vb = "-420 -420 840 840"
     splash = (
-        f'<svg class="boot-splash-mark" viewBox="{vb}" width="56" height="{n(56 * SYM_H / SYM_W)}" aria-hidden="true">'
-        f'{arcs}<path class="dot" d="{DOT_PATH}" fill-rule="evenodd"/></svg>'
+        f'<svg class="boot-splash-mark brand-spin" viewBox="{vb}" width="56" height="56" aria-hidden="true">'
+        f'{arcs}<path class="dot brand-dot" d="{DOT_PATH}" fill-rule="evenodd"/></svg>'
     )
     css = (
         "\n      .boot-splash-mark .a1 { stroke: #A9C2B7; } .boot-splash-mark .a2 { stroke: #2E6B57; }"

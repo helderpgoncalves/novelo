@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
-import { Loader2, MailX } from 'lucide-react';
+import { MailX } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -12,7 +12,7 @@ import {
   getMeQueryKey,
   previewInvitationMutation,
 } from '@/client/@tanstack/react-query.gen';
-import { BrandLogo } from '@/components/brand-logo';
+import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
 import { LegalLinks } from '@/components/public-shell';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -27,11 +27,17 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import {
+  AUTH_BUTTON,
+  AUTH_BUTTONS,
+  AUTH_CONTROL,
+  AUTH_CTA,
+  AUTH_FIELDS,
+} from '@/features/auth/auth-ui';
 import { FormAlert } from '@/features/auth/form-alert';
 import { PasswordInput } from '@/features/auth/password-input';
 import { safeNext } from '@/features/auth/passwordless';
 import { PASSWORD_MIN } from '@/features/auth/schemas';
-import { HoneypotField, useTurnstile } from '@/features/auth/use-turnstile';
 import { markTourPending } from '@/features/onboarding/tour-store';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { applyApiFieldErrors } from '@/lib/form-errors';
@@ -153,10 +159,10 @@ export function AcceptInvitePage({
   if (preview.isError) {
     return (
       <Shell>
-        <div className="space-y-5 text-center" role="alert">
+        <div className="flex flex-col gap-5 text-center" role="alert">
           <h1 className="text-2xl">{m.err_inline_title_offline()}</h1>
           <p className="text-muted-foreground text-sm">{getErrorMessage(preview.error)}</p>
-          <Button className="h-11 w-full font-semibold" onClick={load} loading={preview.isPending}>
+          <Button className={AUTH_CTA} onClick={load} loading={preview.isPending}>
             {m.common_retry()}
           </Button>
         </div>
@@ -167,10 +173,7 @@ export function AcceptInvitePage({
   return (
     <Shell>
       <div role="status" aria-live="polite" className="space-y-4 text-center">
-        <Loader2
-          className="mx-auto size-8 animate-spin text-primary motion-reduce:animate-none"
-          aria-hidden="true"
-        />
+        <BrandSpinner className="mx-auto size-8" />
         <p className="font-medium">{m.inv_loading()}</p>
       </div>
     </Shell>
@@ -180,10 +183,10 @@ export function AcceptInvitePage({
 function InvalidInvite() {
   return (
     <div
-      className="motion-safe:fade-in-0 motion-safe:animate-in space-y-6 duration-300"
+      className="motion-safe:fade-in-0 motion-safe:animate-in flex flex-col gap-6 duration-300"
       data-testid="invite-invalid"
     >
-      <div className="space-y-3">
+      <div className="flex flex-col gap-3">
         <span className="flex size-12 items-center justify-center rounded-full bg-areia/25 text-foreground">
           <MailX className="size-6" aria-hidden="true" />
         </span>
@@ -191,11 +194,11 @@ function InvalidInvite() {
         <p className="text-muted-foreground text-sm leading-relaxed">{m.inv_invalid_text()}</p>
         <p className="text-muted-foreground text-sm leading-relaxed">{m.inv_invalid_login()}</p>
       </div>
-      <div className="space-y-2">
-        <Button asChild className="h-11 w-full font-semibold">
+      <div className={AUTH_BUTTONS}>
+        <Button asChild className={AUTH_CTA}>
           <Link to="/login">{m.inv_go_login()}</Link>
         </Button>
-        <Button asChild variant="ghost" className="h-11 w-full">
+        <Button asChild variant="ghost" className={AUTH_BUTTON}>
           <a href={mailtoLink(m.inv_contact_subject(), m.inv_contact_body())}>{m.inv_contact()}</a>
         </Button>
       </div>
@@ -214,7 +217,6 @@ function AcceptForm({
   onSignedIn: (user: import('@/client').UserOut, next: string) => Promise<void>;
   onInvalid: () => void;
 }) {
-  const gate = useTurnstile('accept_invitation');
   const [fieldError, setFieldError] = useState(false);
   const [withPassword, setWithPassword] = useState(true);
   const form = useForm<Values>({
@@ -225,7 +227,6 @@ function AcceptForm({
     ...acceptInvitationMutation(),
     onMutate: () => setFieldError(false),
     onError: (error) => {
-      gate.onApiError(error);
       if (getErrorCode(error) === 'invalid_token') onInvalid();
       else setFieldError(applyApiFieldErrors(form, error, {}));
     },
@@ -240,7 +241,6 @@ function AcceptForm({
           name: v.name.trim(),
           password: usePassword && v.password ? v.password : null,
         },
-        headers: gate.consume(),
       });
     })();
 
@@ -250,8 +250,8 @@ function AcceptForm({
   const pending = accept.isPending;
 
   return (
-    <div className="motion-safe:fade-in-0 motion-safe:animate-in space-y-6 duration-300">
-      <div className="space-y-2">
+    <div className="motion-safe:fade-in-0 motion-safe:animate-in flex flex-col gap-6 duration-300">
+      <div className="flex flex-col gap-2">
         <p className="eyebrow">{m.inv_eyebrow()}</p>
         <h1 className="text-3xl">{m.inv_heading()}</h1>
         <p className="text-muted-foreground text-sm leading-relaxed">
@@ -272,18 +272,17 @@ function AcceptForm({
       <Form {...form}>
         <form
           noValidate
-          className="space-y-4"
+          className={AUTH_FIELDS}
           onSubmit={(e) => {
             e.preventDefault();
             void submit(withPassword);
           }}
         >
-          <HoneypotField />
           <FormAlert
             message={accept.isError && !fieldError ? getErrorMessage(accept.error) : null}
           />
           {emailTaken && (
-            <Button asChild variant="outline" className="h-11 w-full">
+            <Button asChild variant="outline" className={AUTH_BUTTON}>
               <Link to="/login">{m.inv_go_login()}</Link>
             </Button>
           )}
@@ -294,7 +293,7 @@ function AcceptForm({
               <FormItem>
                 <FormLabel>{m.inv_name()}</FormLabel>
                 <FormControl>
-                  <Input {...field} autoComplete="name" className="h-11" />
+                  <Input {...field} autoComplete="name" className={AUTH_CONTROL} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -310,7 +309,7 @@ function AcceptForm({
                   <PasswordInput
                     {...field}
                     autoComplete="new-password"
-                    className="h-11"
+                    className={AUTH_CONTROL}
                     onChange={(e) => {
                       setWithPassword(true);
                       field.onChange(e);
@@ -322,22 +321,21 @@ function AcceptForm({
               </FormItem>
             )}
           />
-          {gate.field}
-          <div className="space-y-2">
+          <div className={AUTH_BUTTONS}>
             <Button
               type="submit"
-              className="h-11 w-full font-semibold"
-              disabled={pending || gate.blocked}
+              className={AUTH_CTA}
+              disabled={pending}
               loading={pending && withPassword}
               onClick={() => setWithPassword(true)}
             >
-              {gate.verifying ? m.turnstile_verifying() : m.inv_submit()}
+              {m.inv_submit()}
             </Button>
             <Button
               type="button"
               variant="ghost"
-              className="h-11 w-full"
-              disabled={pending || gate.blocked}
+              className={AUTH_BUTTON}
+              disabled={pending}
               loading={pending && !withPassword}
               onClick={() => {
                 setWithPassword(false);

@@ -1,4 +1,5 @@
-import { BrandLogo, BrandSymbol } from '@/components/brand-logo';
+import { type CSSProperties, useState } from 'react';
+import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { RouteSkeleton } from '@/components/skeletons';
 import { Skeleton } from '@/components/ui/skeleton';
 import { m } from '@/paraglide/messages';
@@ -15,13 +16,21 @@ const NAV_GROUPS = [
  * para que a passagem do HTML para a app não tenha salto nem piscar.
  */
 export function BootSplash() {
+  // Continua a fase do splash do index.html (que começou em `__splashT0`) para não haver salto ao trocar.
+  const [elapsed] = useState(() => {
+    const t0 = (window as { __splashT0?: number }).__splashT0;
+    return t0 === undefined ? 0 : Math.max(0, Math.round(performance.now() - t0));
+  });
   return (
     <div
       role="status"
       aria-live="polite"
       className="boot-splash flex min-h-dvh items-center justify-center bg-background"
     >
-      <BrandSymbol className="boot-splash-mark size-14" />
+      <BrandSpinner
+        className="boot-splash-mark size-14"
+        style={{ '--spin-t': `${elapsed}ms` } as CSSProperties}
+      />
       <span className="sr-only">{m.common_loading()}</span>
     </div>
   );
@@ -34,6 +43,7 @@ export function BootSplash() {
 export function AppShellSkeleton() {
   return (
     <div
+      data-app-frame
       className="flex h-dvh overflow-hidden bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]"
       role="status"
       aria-live="polite"

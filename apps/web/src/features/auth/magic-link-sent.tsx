@@ -6,7 +6,9 @@ import { requestMagicLinkMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
 import { getLocale } from '@/lib/i18n';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { AUTH_BLOCKS, AUTH_BUTTON, AUTH_BUTTONS, AUTH_CTA } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { MAGIC_LINK_MINUTES, mailProvider, safeNext, storeLastEmail } from './passwordless';
 import { useCountdown } from './use-countdown';
@@ -70,8 +72,13 @@ export function MagicLinkSent({
   };
 
   return (
-    <div className="motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:animate-in space-y-6 duration-300">
-      <div className="space-y-3">
+    <div
+      className={cn(
+        AUTH_BLOCKS,
+        'motion-safe:fade-in-0 motion-safe:slide-in-from-bottom-2 motion-safe:animate-in duration-300',
+      )}
+    >
+      <div className="flex flex-col gap-3">
         <span className="flex size-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <MailCheck className="size-6" aria-hidden="true" />
         </span>
@@ -87,7 +94,7 @@ export function MagicLinkSent({
       </div>
 
       {provider && (
-        <Button asChild className="h-11 w-full font-semibold">
+        <Button asChild className={AUTH_CTA}>
           <a href={provider.url} target="_blank" rel="noopener noreferrer">
             <ExternalLink aria-hidden="true" />
             {m.magic_open_mail({ provider: provider.name })}
@@ -95,25 +102,23 @@ export function MagicLinkSent({
         </Button>
       )}
 
-      <div className="space-y-3">
+      <div className={AUTH_BUTTONS}>
         <FormAlert message={resend.isError ? getErrorMessage(resend.error) : null} />
         {resend.gate.field}
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="h-11"
-            disabled={seconds > 0 || resend.isPending || resend.gate.blocked}
-            loading={resend.isPending}
-            onClick={onResend}
-          >
-            {seconds > 0 ? m.magic_resend_in({ seconds }) : m.magic_resend()}
-          </Button>
-          <Button type="button" variant="ghost" className="h-11" onClick={onChangeEmail}>
-            {m.magic_change_email()}
-          </Button>
-        </div>
-        <p role="status" className="min-h-5 text-primary text-xs">
+        <Button
+          type="button"
+          variant="outline"
+          className={AUTH_BUTTON}
+          disabled={seconds > 0 || resend.isPending || resend.gate.blocked}
+          loading={resend.isPending}
+          onClick={onResend}
+        >
+          {seconds > 0 ? m.magic_resend_in({ seconds }) : m.magic_resend()}
+        </Button>
+        <Button type="button" variant="ghost" className={AUTH_BUTTON} onClick={onChangeEmail}>
+          {m.magic_change_email()}
+        </Button>
+        <p role="status" className="text-center text-primary text-xs empty:hidden">
           {resent ? m.magic_resent() : ''}
         </p>
       </div>

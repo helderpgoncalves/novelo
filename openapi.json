@@ -7568,6 +7568,9 @@
             ],
             "title": "Name"
           },
+          "onboarding": {
+            "$ref": "#/components/schemas/OnboardingOut"
+          },
           "pending_approvals": {
             "anyOf": [
               {
@@ -10542,6 +10545,96 @@
           "note"
         ],
         "title": "MunicipalTextileReference",
+        "type": "object"
+      },
+      "OnboardingOut": {
+        "description": "Estado da introdução guiada da conta (vale em todos os dispositivos).",
+        "properties": {
+          "checklist_dismissed": {
+            "default": false,
+            "description": "A pessoa dispensou o checklist",
+            "title": "Checklist Dismissed",
+            "type": "boolean"
+          },
+          "checklist_done": {
+            "description": "Primeiros passos já feitos (cenário e copiloto deduzem-se dos dados)",
+            "items": {
+              "enum": [
+                "scenario",
+                "copilot",
+                "map"
+              ],
+              "type": "string"
+            },
+            "title": "Checklist Done",
+            "type": "array"
+          },
+          "tour_seen_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quando a introdução foi vista ou saltada",
+            "title": "Tour Seen At"
+          }
+        },
+        "title": "OnboardingOut",
+        "type": "object"
+      },
+      "OnboardingUpdate": {
+        "properties": {
+          "checklist_dismissed": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Dispensa (ou repõe) o checklist",
+            "title": "Checklist Dismissed"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "enum": [
+                  "scenario",
+                  "copilot",
+                  "map"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Marca um primeiro passo como feito",
+            "title": "Mark"
+          },
+          "tour": {
+            "anyOf": [
+              {
+                "enum": [
+                  "seen",
+                  "reset"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`seen` marca a introdução como vista; `reset` volta a oferecê-la",
+            "title": "Tour"
+          }
+        },
+        "title": "OnboardingUpdate",
         "type": "object"
       },
       "Overview": {
@@ -18721,28 +18814,8 @@
     },
     "/api/v1/auth/invitations/accept": {
       "post": {
-        "description": "Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.\nO token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email.",
+        "description": "Aceita o convite: cria a conta (email verificado, nome e password opcional) e inicia uma sessão de 30 dias.\nO token só funciona uma vez. Sem password a pessoa volta a entrar por link enviado por email.\nSem captcha: o token de uso único já é o segredo; o limitador por IP trava tentativas.",
         "operationId": "accept_invitation",
-        "parameters": [
-          {
-            "description": "Token do widget Cloudflare Turnstile (uso único)",
-            "in": "header",
-            "name": "X-Turnstile-Token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Token do widget Cloudflare Turnstile (uso único)",
-              "title": "X-Turnstile-Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -19912,6 +19985,138 @@
         ]
       }
     },
+    "/api/v1/auth/me/onboarding": {
+      "put": {
+        "description": "Guarda o progresso da introdução guiada (vista/saltada/repetir, primeiros passos). Não vale em impersonação.",
+        "operationId": "update_onboarding",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OnboardingUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OnboardingOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update Onboarding",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
     "/api/v1/auth/quick-join": {
       "post": {
         "description": "Entrada do evento com nome, email e código do QR. Email novo: convidado com sessão iniciada.\nEmail que já tem conta: não inicia sessão; envia um link de entrada e responde `check_email`.",
@@ -20741,27 +20946,8 @@
     },
     "/api/v1/auth/resend-verification": {
       "post": {
+        "description": "Reenvia o email de verificação. Sem captcha: exige sessão iniciada; o limitador trava abusos.",
         "operationId": "resend_verification",
-        "parameters": [
-          {
-            "description": "Token do widget Cloudflare Turnstile (uso único)",
-            "in": "header",
-            "name": "X-Turnstile-Token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Token do widget Cloudflare Turnstile (uso único)",
-              "title": "X-Turnstile-Token"
-            }
-          }
-        ],
         "responses": {
           "204": {
             "description": "Successful Response"
@@ -20875,27 +21061,8 @@
     },
     "/api/v1/auth/reset-password": {
       "post": {
+        "description": "Define a nova password com o token do email (uso único). Sem captcha: o token já é o segredo.",
         "operationId": "reset_password",
-        "parameters": [
-          {
-            "description": "Token do widget Cloudflare Turnstile (uso único)",
-            "in": "header",
-            "name": "X-Turnstile-Token",
-            "required": false,
-            "schema": {
-              "anyOf": [
-                {
-                  "type": "string"
-                },
-                {
-                  "type": "null"
-                }
-              ],
-              "description": "Token do widget Cloudflare Turnstile (uso único)",
-              "title": "X-Turnstile-Token"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {

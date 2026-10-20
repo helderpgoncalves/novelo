@@ -1,4 +1,4 @@
-"""Convites por email: criar, listar, reenviar, revogar e aceitar (público, com Turnstile)."""
+"""Convites por email: criar, listar, reenviar, revogar e aceitar (público, sem Turnstile, com limitador)."""
 
 import re
 from collections.abc import Callable
@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.email import get_email_sender
 from novelo.core.config import get_settings
 from novelo.core.errors import UpstreamError
+from novelo.core.ratelimit import invite_accept_limiter
 from novelo.core.security import hash_token
 from novelo.features.audit.models import AuditLog
 from novelo.features.users import service as users
@@ -284,7 +285,7 @@ async def test_accept_validates_input(client: httpx.AsyncClient, make_user: Make
     assert (await client.post(f"{AUTH}/invitations/accept", json={"token": token, "name": "A"})).status_code == 200
 
 
-async def test_turnstile_guards_accept_but_not_admin_routes(
+async def test_accept_needs_no_turnstile_but_is_rate_limited(
     client: httpx.AsyncClient, make_user: Maker, outbox: OutboxSender, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     admin = await make_user("boss@x.pt", "admin")
@@ -293,13 +294,14 @@ async def test_turnstile_guards_accept_but_not_admin_routes(
     monkeypatch.setattr(s, "turnstile_secret_key", "real-secret")
     monkeypatch.setattr(s, "turnstile_site_key", "site-key")
     assert (await invite(admin)).status_code == 201  # rota de admin: sem Turnstile
-    body = {"token": token_of(outbox), "name": "A"}
-    missing = await client.post(f"{AUTH}/invitations/accept", json=body)
-    assert missing.status_code == 400 and missing.json()["code"] == "captcha_required"
-    bad = await client.post(f"{AUTH}/invitations/accept", json=body, headers={"X-Turnstile-Token": "bad"})
-    assert bad.status_code == 403 and bad.json()["code"] == "captcha_failed"
-    ok = await client.post(f"{AUTH}/invitations/accept", json=body, headers={"X-Turnstile-Token": "good"})
-    assert ok.status_code == 200
+    ok = await client.post(f"{AUTH}/invitations/accept", json={"token": token_of(outbox), "name": "A"})
+    assert ok.status_code == 200  # o token de uso único é o segredo: sem cabeçalho de captcha
+    monkeypatch.setattr(invite_accept_limiter, "limit", 2)
+    codes = [
+        (await client.post(f"{AUTH}/invitations/accept", json={"token": "x" * 43, "name": "B"})).status_code
+        for _ in range(3)
+    ]
+    assert codes[-1] == 429
 
 
 async def test_audit_never_holds_the_token(make_user: Maker, outbox: OutboxSender, session: AsyncSession) -> None:

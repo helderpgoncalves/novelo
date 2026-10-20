@@ -167,11 +167,10 @@ test.describe('administração dos convidados', () => {
     await page.context().clearCookies();
 
     await login(page);
-    await page.goto('/pt/users?tab=guests');
+    await page.goto('/pt/users?tab=invitations');
     await expect(page.getByRole('table').getByText(email)).toBeVisible();
 
-    await page.getByRole('tab', { name: /Cartaz do QR/ }).click();
-    await expect(page).toHaveURL(/tab=poster/);
+    await page.getByRole('button', { name: 'Cartaz do QR' }).click();
     await expect(page.getByTestId('event-poster')).toBeVisible();
     await expect(page.getByText('Lê o QR, escreve o teu nome e email, e entras.')).toBeVisible();
     await expect(page.getByRole('textbox', { name: 'Código do evento' })).toHaveValue(CODE);

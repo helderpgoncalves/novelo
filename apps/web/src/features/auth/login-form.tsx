@@ -16,7 +16,9 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { getErrorMessage } from '@/lib/errors';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS, authLinkClass } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type LoginValues, loginSchema } from './schemas';
@@ -57,7 +59,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
             login.mutate({ body: v, headers: gate.consume() }, { onError: gate.onApiError }),
           )(e);
         }}
-        className="space-y-4"
+        className={AUTH_FIELDS}
         noValidate
       >
         <FormAlert message={login.isError ? getErrorMessage(login.error) : null} />
@@ -77,7 +79,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
                   autoCorrect="off"
                   spellCheck={false}
                   placeholder={m.login_email_placeholder()}
-                  className="h-11"
+                  className={AUTH_CONTROL}
                 />
               </FormControl>
               <FormMessage />
@@ -91,12 +93,17 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
             <FormItem>
               <div className="flex items-center justify-between">
                 <FormLabel>{m.login_password()}</FormLabel>
-                <Link to="/forgot-password" className="text-primary text-xs hover:underline">
+                <Link to="/forgot-password" className={cn(authLinkClass, 'min-h-0 text-xs')}>
                   {m.login_forgot()}
                 </Link>
               </div>
               <FormControl>
-                <PasswordInput {...field} autoComplete="current-password" className="h-11" />
+                <PasswordInput
+                  {...field}
+                  autoComplete="current-password"
+                  placeholder={m.login_password_placeholder()}
+                  className={AUTH_CONTROL}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,7 +129,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
         {gate.field}
         <Button
           type="submit"
-          className="h-11 w-full font-semibold"
+          className={AUTH_CTA}
           disabled={login.isPending || gate.blocked}
           loading={login.isPending}
         >

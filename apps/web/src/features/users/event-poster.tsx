@@ -71,6 +71,7 @@ const PRINT_CSS = `
   @page { size: A4 portrait; margin: 0; }
   html, body { background: #f4f1ea !important; }
   body * { visibility: hidden !important; }
+  [data-slot="dialog-content"] { transform: none !important; animation: none !important; overflow: visible !important; max-height: none !important; }
   #event-poster, #event-poster * { visibility: visible !important; }
   #event-poster { position: fixed; inset: 0; width: 100vw !important; height: 100vh; aspect-ratio: auto; }
 }`;

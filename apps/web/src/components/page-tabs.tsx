@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 export interface PageTab<T extends string> {
   id: T;
   label: string;
-  /** Contagem opcional mostrada ao lado do rótulo. */
+  /** Contagem opcional, num badge neutro ao lado do rótulo; não se mostra a zero. */
   count?: number;
   /** Ponto (`attention`) ou triângulo (`error`) quando o separador precisa de atenção. */
   status?: TabStatus;
@@ -26,8 +26,8 @@ interface PageTabsProps<T extends string> {
 }
 
 /**
- * Separadores de página: uma vista de cada vez para o detalhe secundário. Linha inferior animada, contagens,
- * indicador de atenção/erro, rolagem com setas quando não cabem e o estado de cada separador (pesquisa,
+ * Separadores de página: uma vista de cada vez para o detalhe secundário. Fio inferior de 1 px com sublinhado ativo de 2 px (animado), contagens discretas,
+ * indicador de atenção/erro, rolagem com esbatido nas margens (e setas em ecrãs largos) quando não cabem, setas do teclado e o estado de cada separador (pesquisa,
  * filtros, rolagem) preservado ao voltar: os separadores já visitados ficam montados e escondidos.
  * O separador ativo deve viver na URL (`validateSearch`), a cargo de quem usa.
  */
@@ -52,7 +52,7 @@ export function PageTabs<T extends string>({
           <TabsTrigger
             key={t.id}
             value={t.id}
-            count={t.count}
+            count={t.count !== undefined && t.count > 0 ? t.count : undefined}
             status={t.status}
             statusLabel={t.statusLabel}
             icon={t.icon}

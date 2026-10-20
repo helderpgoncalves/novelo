@@ -6,6 +6,7 @@ import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
 import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import {
+  AUTH_BLOCKS,
   AuthConsent,
   AuthDivider,
   AuthHeading,
@@ -42,7 +43,7 @@ function Register() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.register_title()} subtitle={m.register_subtitle()} />
       {config.approval_required !== false && (
         <Alert role="note" data-testid="register-approval-notice">
@@ -52,7 +53,7 @@ function Register() {
       )}
       <RegisterForm next={next ?? '/'} />
       {config.google_enabled && (
-        <div className="space-y-4">
+        <div className={AUTH_BLOCKS}>
           <AuthDivider>{m.login_or_other()}</AuthDivider>
           <GoogleButton next={next} mode="signup" />
         </div>
