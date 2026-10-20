@@ -2,9 +2,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useRouter } from '@tanstack/react-router';
 import {
   AlertTriangle,
+  ArrowRight,
   ArrowUpRight,
   BadgeCheck,
-  Brain,
+  Bookmark,
   Check,
   ChevronDown,
   Copy,
@@ -143,7 +144,7 @@ function MemoryNotice({ note, onUndone }: { note: MemoryNote; onUndone: () => vo
         note.status === 'pending' && 'border-areia bg-areia/10',
       )}
     >
-      <Brain className="size-4 shrink-0 text-primary" aria-hidden="true" />
+      <Bookmark className="size-4 shrink-0 text-primary" aria-hidden="true" />
       <span className="min-w-0 flex-1 break-words">
         {note.undone ? m.chat_memory_undone() : text}
       </span>
@@ -171,7 +172,7 @@ function Steps({ message }: { message: ChatMessage }) {
   return (
     <Collapsible className="text-xs">
       <CollapsibleTrigger className="group flex min-h-9 items-center gap-1.5 text-muted-foreground hover:text-foreground">
-        <Wrench className="size-3.5" aria-hidden="true" />
+        <Wrench className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
         {m.chat_steps({ count: message.tools.length })}
         <ChevronDown
           className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
@@ -214,7 +215,7 @@ function Sources({ message }: { message: ChatMessage }) {
   return (
     <Collapsible className="text-xs">
       <CollapsibleTrigger className="group flex min-h-9 items-center gap-1.5 text-muted-foreground hover:text-foreground">
-        <ListChecks className="size-3.5" aria-hidden="true" />
+        <ListChecks className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
         {m.chat_sources({ count: message.sources.length })}
         <ChevronDown
           className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
@@ -339,9 +340,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
 
   return (
     <li className="space-y-3" data-testid="copilot-assistant-message" data-state={message.state}>
-      <p className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
-        {m.copilot_role_assistant()}
-      </p>
+      <p className="sr-only">{m.copilot_role_assistant()}</p>
       {message.text && <SafeMarkdown text={message.text} />}
       {message.retracted && streaming && !message.text && (
         <p className="text-muted-foreground text-sm italic">{m.chat_retracted()}</p>
@@ -351,7 +350,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
       {message.cards.length > 0 && (
         <div className="grid gap-3">
           {message.cards.map((c) => (
-            <CopilotScenarioCard key={c.scenario_id} card={fromCard(c)} />
+            <CopilotScenarioCard key={c.scenario_id} card={fromCard(c)} bleed />
           ))}
         </div>
       )}
@@ -384,7 +383,7 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
 
       {chat && message.clarify && !streaming && (
         <div
-          className="space-y-2 rounded-xl border border-primary/30 bg-primary/5 p-3.5"
+          className="space-y-2 border-primary/50 border-l-2 pl-3.5"
           data-testid="copilot-clarify"
         >
           {!message.text.includes(message.clarify.question.slice(0, 24)) && (
@@ -423,19 +422,23 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
         <p className="text-muted-foreground text-xs italic">{m.chat_cancelled()}</p>
       )}
 
-      {!streaming && (
-        <div className="space-y-1">
+      {!streaming && (verification || message.tools.length > 0 || message.sources.length > 0) && (
+        <div className="border-border/60 border-t pt-1 text-muted-foreground">
           {verification &&
             (unverified ? (
-              <Badge variant="outline" className="gap-1 border-destructive/40 text-destructive">
-                <AlertTriangle className="size-3" aria-hidden="true" />
+              <p className="flex min-h-9 items-center gap-1.5 text-destructive text-xs">
+                <AlertTriangle className="size-3.5" strokeWidth={1.75} aria-hidden="true" />
                 {m.copilot_unverified()}
-              </Badge>
+              </p>
             ) : (
-              <Badge variant="secondary" className="gap-1 text-floresta dark:text-foreground">
-                <BadgeCheck className="size-3" aria-hidden="true" />
+              <p className="flex min-h-9 items-center gap-1.5 text-xs">
+                <BadgeCheck
+                  className="size-3.5 text-primary"
+                  strokeWidth={1.75}
+                  aria-hidden="true"
+                />
                 {m.copilot_verified()}
-              </Badge>
+              </p>
             ))}
           <Steps message={message} />
           <Sources message={message} />
@@ -480,18 +483,23 @@ export function AssistantMessage({ message, chat, last, status, onAsk }: Assista
 
       {chat && last && !streaming && message.suggestions.length > 0 && (
         <ul
-          className="flex flex-wrap gap-2"
+          className="border-border/60 border-t"
           aria-label={m.copilot_suggestions_label()}
           data-testid="copilot-suggestions"
         >
           {message.suggestions.map((s) => (
-            <li key={s} className="max-w-full">
+            <li key={s} className="border-border/60 border-b">
               <button
                 type="button"
                 onClick={() => onAsk(s)}
-                className="min-h-10 max-w-full rounded-full border bg-card px-3.5 py-2 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+                className="group flex min-h-11 w-full items-center justify-between gap-3 py-2.5 text-left text-[0.9375rem] leading-snug transition-colors hover:text-primary focus-visible:outline-2 focus-visible:outline-ring"
               >
-                {s}
+                <span>{s}</span>
+                <ArrowRight
+                  className="size-4 shrink-0 text-muted-foreground group-hover:text-primary"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
               </button>
             </li>
           ))}

@@ -11,9 +11,10 @@ test.describe('copiloto de IA', () => {
     const panel = page.getByRole('dialog', { name: 'Copiloto Novelo' });
     await expect(panel).toBeVisible();
     await expect(panel.getByText('Em que posso ajudar?')).toBeVisible();
-    await expect(panel.getByRole('button', { name: /60 mil euros/ })).toBeVisible();
-    await expect(panel.getByRole('button', { name: /meta francesa/ })).toBeVisible();
-    await expect(panel.getByRole('button', { name: /lacuna de cobertura/ })).toBeVisible();
+    // Na página inicial as perguntas falam do ponto de partida.
+    await expect(panel.getByRole('button', { name: /taxa de captura atual/ })).toBeVisible();
+    await expect(panel.getByRole('button', { name: /ponto de partida/ })).toBeVisible();
+    await expect(panel.getByRole('button', { name: /Para onde vai o têxtil/ })).toBeVisible();
     await page.keyboard.press('Escape');
     await expect(panel).toBeHidden();
   });

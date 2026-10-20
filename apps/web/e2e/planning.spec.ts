@@ -34,12 +34,18 @@ test.describe('simulador e cenários', () => {
   test('calcular um cenário de ponta a ponta e ver o resultado', async ({ page }) => {
     await page.goto('/pt/simulator');
     await page.getByLabel('Nome do cenário').fill('Cenário E2E');
-    await page.getByRole('spinbutton', { name: 'Orçamento anual' }).fill('45000');
+    await page.getByRole('textbox', { name: 'Orçamento anual' }).fill('45000');
     await page.getByRole('button', { name: 'Calcular cenário' }).click();
-    await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}/, { timeout: 60_000 });
+    // O resultado aparece no próprio simulador, com o estado do cenário e a comparação com 2025.
+    await expect(page).toHaveURL(/\/pt\/simulator\?.*r=[0-9a-f-]{36}/, { timeout: 60_000 });
+    await expect(page.getByRole('heading', { level: 2, name: 'Cenário E2E' })).toBeVisible();
+    await expect(page.getByText('Face a 2025 e à meta')).toBeVisible();
+    await expect(page.getByText('Têxtil captado').first()).toBeVisible();
+    await expect(page.getByText('Custo por tonelada').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();
+    await page.getByRole('link', { name: 'Abrir cenário' }).click();
+    await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}/);
     await expect(page.getByRole('heading', { level: 1, name: 'Cenário E2E' })).toBeVisible();
-    await expect(page.getByText('Têxtil captado')).toBeVisible();
-    await expect(page.getByText('Custo por tonelada')).toBeVisible();
     await page.getByRole('tab', { name: 'Rede e rotas' }).click();
     await expect(page.locator('canvas.maplibregl-canvas').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();

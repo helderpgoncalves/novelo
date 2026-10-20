@@ -3,6 +3,7 @@ import { ArrowUpRight } from 'lucide-react';
 import type { ScenarioCard as ScenarioCardData, ScenarioCardSpec } from '@/client';
 import { Badge } from '@/components/ui/badge';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 function Kpi({ label, value }: { label: string; value: string }) {
@@ -47,9 +48,15 @@ export const fromSpec = (s: ScenarioCardSpec): CardProps => ({
 });
 
 /** Cartão de um cenário: os números vêm do otimizador, não do texto do modelo. */
-export function CopilotScenarioCard({ card }: { card: CardProps }) {
+export function CopilotScenarioCard({ card, bleed }: { card: CardProps; bleed?: boolean }) {
   return (
-    <article className="overflow-hidden rounded-xl border bg-card" aria-label={card.label}>
+    <article
+      className={cn(
+        'overflow-hidden border bg-card',
+        bleed ? '-mx-4 rounded-none border-x-0 sm:mx-0 sm:rounded-xl sm:border-x' : 'rounded-xl',
+      )}
+      aria-label={card.label}
+    >
       <header className="flex flex-wrap items-center gap-2 px-3 pt-3">
         <h3 className="min-w-0 flex-1 truncate font-sans font-semibold text-sm">{card.label}</h3>
         {card.createdNow && (

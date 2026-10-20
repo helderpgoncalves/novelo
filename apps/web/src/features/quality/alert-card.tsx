@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { Sparkles } from 'lucide-react';
+import { Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { DataAlertOut } from '@/client';
@@ -81,7 +81,7 @@ export function AlertCard({ alert }: { alert: DataAlertOut }) {
               className="h-10 gap-2"
               onClick={() => suggest.mutate({ path: { alert_id: alert.id } })}
             >
-              <Sparkles className="size-4 text-primary" aria-hidden="true" />
+              <Lightbulb className="size-4 text-primary" aria-hidden="true" />
               {m.quality_suggest()}
             </Button>
           )}

@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowRight, Sparkles, Wand2 } from 'lucide-react';
+import { AlertTriangle, ArrowRight, Lightbulb, Wand2 } from 'lucide-react';
 import type { AlertSuggestionOut } from '@/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -42,7 +42,7 @@ export function SuggestionCard({ suggestion: s, applying, onApply, onDismiss }: 
       <div className="flex flex-wrap items-center gap-2">
         <Badge variant="secondary" className="gap-1.5">
           {ai ? (
-            <Sparkles className="size-3" aria-hidden="true" />
+            <Lightbulb className="size-3" aria-hidden="true" />
           ) : (
             <Wand2 className="size-3" aria-hidden="true" />
           )}

@@ -1,33 +1,25 @@
-import { useEffect, useState } from 'react';
+import { useSyncExternalStore } from 'react';
+import {
+  getInstallEvent,
+  isIosDevice,
+  isStandalone,
+  promptInstall,
+  subscribeInstall,
+} from '@/lib/pwa';
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>;
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
-}
-
-/** Permite instalar o Novelo como app (PWA) quando o browser o oferece. */
+/**
+ * Instalar o Novelo como app:
+ * - `canInstall`: o browser (Chrome/Edge/Android) ofereceu o diálogo nativo;
+ * - `needsIosSteps`: iPhone/iPad, onde não há diálogo e é preciso "Adicionar ao ecrã principal";
+ * - `installed`: já corre instalada, não se oferece nada.
+ */
 export function useInstallPrompt() {
-  const [event, setEvent] = useState<BeforeInstallPromptEvent | null>(null);
-
-  useEffect(() => {
-    const onPrompt = (e: Event) => {
-      e.preventDefault();
-      setEvent(e as BeforeInstallPromptEvent);
-    };
-    const onInstalled = () => setEvent(null);
-    window.addEventListener('beforeinstallprompt', onPrompt);
-    window.addEventListener('appinstalled', onInstalled);
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onPrompt);
-      window.removeEventListener('appinstalled', onInstalled);
-    };
-  }, []);
-
-  const install = async () => {
-    if (!event) return;
-    await event.prompt();
-    setEvent(null);
+  const event = useSyncExternalStore(subscribeInstall, getInstallEvent, () => null);
+  const installed = isStandalone();
+  return {
+    installed,
+    canInstall: !installed && event !== null,
+    needsIosSteps: !installed && event === null && isIosDevice(),
+    install: promptInstall,
   };
-
-  return { canInstall: event !== null, install };
 }

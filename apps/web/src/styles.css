@@ -128,12 +128,31 @@
   --color-areia: #c4a06a;
 }
 
+/* Espaço ocupado ao fundo pela barra de separadores (só em telemóvel/tablet; < lg), para os avisos subirem. */
+html[data-tabbar] {
+  --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 1024px) {
+  html[data-tabbar] {
+    --tabbar-h: env(safe-area-inset-bottom);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
   html {
     -webkit-text-size-adjust: 100%;
+    /* App instalada: sem realce cinzento ao tocar, sem zoom por duplo toque (o pinch continua) e sem
+       "puxar para atualizar" nem efeito elástico a arrastar o ecrã todo; quem rola são os contentores. */
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    overscroll-behavior: none;
+  }
+  /* Cromado da app (barras, separadores, menus): não se seleciona texto nem abre o menu de pressão longa. */
+  .select-none {
+    -webkit-touch-callout: none;
   }
   body {
     @apply bg-background font-sans text-foreground antialiased;

@@ -20,17 +20,24 @@ test.describe('planeamento: incerteza, robustez, referência e piloto', () => {
 
   test('calcular um cenário e ver o separador Incerteza com o tornado', async ({ page }) => {
     await page.goto('/pt/simulator');
-    // Passos claros e resumo lateral
-    await expect(page.getByRole('heading', { level: 2, name: 'Objetivo' })).toBeVisible();
-    await expect(page.getByRole('heading', { level: 2, name: 'Modos de recolha' })).toBeVisible();
+    // Secções colapsáveis com o valor escolhido e resumo vivo
+    await expect(page.getByRole('heading', { level: 2, name: /^Objetivo/ })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 2, name: /^Pressupostos/ })).toBeVisible();
     await expect(
-      page.getByRole('heading', { level: 2, name: 'Restrições por freguesia' }),
+      page.getByRole('heading', { level: 2, name: /^Restrições por freguesia/ }),
     ).toBeVisible();
-    await expect(page.getByText('Resumo do cenário')).toBeVisible();
+    await expect(page.getByText('Por calcular').first()).toBeVisible();
     await page.getByLabel('Nome do cenário').fill('Cenário incerteza');
-    await page.getByRole('spinbutton', { name: 'Orçamento anual' }).fill('45000');
+    await page.getByRole('textbox', { name: 'Orçamento anual' }).fill('45000');
     await page.getByRole('button', { name: 'Calcular cenário' }).click();
-    await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}/, { timeout: 60_000 });
+    await expect(page).toHaveURL(/\/pt\/simulator\?.*r=[0-9a-f-]{36}/, { timeout: 60_000 });
+    await expect(page.getByRole('heading', { level: 2, name: 'Cenário incerteza' })).toBeVisible();
+    // Mudar o orçamento deixa o resultado desatualizado até recalcular
+    await page.getByRole('textbox', { name: 'Orçamento anual' }).fill('50000');
+    await expect(page.getByText('Desatualizado').first()).toBeVisible();
+    await page.getByRole('link', { name: 'Ver incerteza' }).click();
+    await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}\?tab=uncertainty/);
+    await page.getByRole('tab', { name: 'Resumo' }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'Cenário incerteza' })).toBeVisible();
     await expect(page.getByRole('tab', { name: 'Resumo' })).toHaveAttribute(
       'aria-selected',

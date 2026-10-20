@@ -33,6 +33,20 @@ const readStored = (): Theme => {
 const resolve = (theme: Theme): 'light' | 'dark' =>
   theme === 'system' ? (window.matchMedia(MEDIA).matches ? 'dark' : 'light') : theme;
 
+/** Cores da barra do sistema (mesmas do fundo do topo: linho e tinta). */
+export const THEME_COLOR = { light: '#F4F1EA', dark: '#0F1815' } as const;
+
+/**
+ * Atualiza as `<meta name="theme-color">`. Com tema fixo na app, as duas variantes (por esquema do sistema)
+ * ficam com a mesma cor, para a barra do browser seguir a app e não o sistema; em "sistema" voltam as originais.
+ */
+function syncThemeColor(theme: Theme, resolved: 'light' | 'dark') {
+  for (const meta of document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]')) {
+    const own = meta.media.includes('dark') ? 'dark' : 'light';
+    meta.content = THEME_COLOR[theme === 'system' ? own : resolved];
+  }
+}
+
 /** Tema claro, escuro ou automático. O script em index.html aplica-o antes da primeira pintura. */
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>(readStored);
@@ -44,6 +58,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       setResolved(next);
       document.documentElement.classList.toggle('dark', next === 'dark');
       document.documentElement.style.colorScheme = next;
+      syncThemeColor(theme, next);
     };
     apply();
     const media = window.matchMedia(MEDIA);

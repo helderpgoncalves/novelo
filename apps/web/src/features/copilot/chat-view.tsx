@@ -1,68 +1,21 @@
 import { useMutation } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
-import { ArrowDown, AtSign, Paperclip, Slash, Sparkles, Upload } from 'lucide-react';
+import { ArrowDown, Upload } from 'lucide-react';
 import { type DragEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { exportCopilotThread } from '@/client';
 import { compactCopilotThreadMutation } from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { Composer, type ComposerHandle } from './composer';
-import { downloadText } from './download';
+import { EmptyChat } from './empty-chat';
+import { exportThreadMarkdown } from './export-thread';
 import { AssistantMessage, UserMessage } from './message';
-import { usePageContext } from './page-context';
+import { usePageInfo } from './page-context';
 import { consumeCopilotRequest, useCopilotUi } from './store';
 import type { Chat, SendInput } from './use-chat';
 import { useReducedMotion } from './use-reduced-motion';
-
-function EmptyChat({ onPick }: { onPick: (text: string) => void }) {
-  const suggestions = [
-    m.copilot_suggestion_simulate(),
-    m.copilot_suggestion_compare(),
-    m.copilot_suggestion_coverage(),
-    m.chat_suggestion_flows(),
-  ];
-  return (
-    <div className="flex min-h-full flex-col justify-center gap-6 py-8">
-      <div className="space-y-2">
-        <Sparkles className="size-6 text-primary" aria-hidden="true" />
-        <h2 className="font-serif text-2xl sm:text-3xl">{m.copilot_empty_title()}</h2>
-        <p className="max-w-xl text-muted-foreground text-sm leading-relaxed">
-          {m.copilot_empty_description()}
-        </p>
-      </div>
-      <ul className="grid gap-2 sm:grid-cols-2" aria-label={m.copilot_suggestions_label()}>
-        {suggestions.map((s) => (
-          <li key={s}>
-            <button
-              type="button"
-              onClick={() => onPick(s)}
-              className="min-h-11 w-full rounded-xl border bg-card px-4 py-2.5 text-left text-sm transition-colors hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
-            >
-              {s}
-            </button>
-          </li>
-        ))}
-      </ul>
-      <ul className="flex flex-wrap gap-x-5 gap-y-1.5 text-muted-foreground text-xs">
-        <li className="flex items-center gap-1.5">
-          <AtSign className="size-3.5" aria-hidden="true" />
-          {m.chat_tip_mention()}
-        </li>
-        <li className="flex items-center gap-1.5">
-          <Slash className="size-3.5" aria-hidden="true" />
-          {m.chat_tip_commands()}
-        </li>
-        <li className="flex items-center gap-1.5">
-          <Paperclip className="size-3.5" aria-hidden="true" />
-          {m.chat_tip_attach()}
-        </li>
-      </ul>
-    </div>
-  );
-}
 
 interface Props {
   chat: Chat;
@@ -77,7 +30,13 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
   const { messages, busy, status, load, context } = chat;
   const router = useRouter();
   const reduced = useReducedMotion();
-  const getPageContext = usePageContext();
+  const page = usePageInfo();
+  const [contextOn, setContextOn] = useState(true);
+  const pageRef = useRef(page);
+  pageRef.current = page;
+  const contextOnRef = useRef(contextOn);
+  contextOnRef.current = contextOn;
+  const getPageContext = useCallback(() => pageRef.current.context, []);
   const scroller = useRef<HTMLDivElement>(null);
   const content = useRef<HTMLDivElement>(null);
   const composer = useRef<ComposerHandle>(null);
@@ -87,7 +46,6 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
   const ui = useCopilotUi();
   const [announce, setAnnounce] = useState('');
   const wasBusy = useRef(false);
-  const canAttachScreen = getPageContext() !== null;
 
   const scrollToEnd = useCallback(
     (smooth = false) => {
@@ -133,7 +91,13 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
     [chat, scrollToEnd],
   );
   const ask = useCallback(
-    (text: string) => send({ text, mentions: [], attachments: [], pageContext: null }),
+    (text: string) =>
+      send({
+        text,
+        mentions: [],
+        attachments: [],
+        pageContext: contextOnRef.current ? pageRef.current.context : null,
+      }),
     [send],
   );
 
@@ -183,23 +147,15 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
           return;
         case '/compact':
         case '/exportar': {
-          if (!id) {
-            toast.info(m.chat_no_thread_yet());
-            return;
-          }
           if (name === '/compact') {
+            if (!id) {
+              toast.info(m.chat_no_thread_yet());
+              return;
+            }
             compact.mutate({ path: { thread_id: id } });
             return;
           }
-          try {
-            const { data } = await exportCopilotThread({
-              path: { thread_id: id },
-              throwOnError: true,
-            });
-            downloadText(data.filename, data.markdown);
-          } catch (e) {
-            toast.error(getErrorMessage(e));
-          }
+          await exportThreadMarkdown(id);
           return;
         }
         default:
@@ -253,7 +209,13 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
         className="min-h-0 flex-1 overflow-y-auto overscroll-contain"
         data-testid="copilot-scroller"
       >
-        <div ref={content} className="mx-auto w-full max-w-3xl px-4 pt-4 pb-8 sm:px-6">
+        <div
+          ref={content}
+          className={cn(
+            'mx-auto w-full max-w-3xl px-4 pt-4 pb-6 sm:px-6',
+            empty && 'flex min-h-full flex-col',
+          )}
+        >
           {load.state === 'loading' && (
             <p role="status" className="py-10 text-center text-muted-foreground text-sm">
               {m.chat_opening()}
@@ -268,10 +230,10 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
               </Button>
             </div>
           )}
-          {empty && <EmptyChat onPick={ask} />}
+          {empty && <EmptyChat route={page.context?.route ?? null} onPick={ask} />}
           {messages.length > 0 && (
             <ol
-              className="space-y-7"
+              className="space-y-8"
               aria-label={m.copilot_title()}
               aria-live="polite"
               aria-relevant="additions text"
@@ -295,19 +257,19 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
         </div>
       </div>
 
-      <div className="relative z-10 -mt-6 bg-gradient-to-t from-background from-70% to-transparent px-3 pt-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] sm:px-6">
-        {!stick && (
+      <div className="relative z-10 shrink-0 bg-background px-3 pt-1.5 pb-[max(0.625rem,env(safe-area-inset-bottom))] sm:px-6 sm:pb-[max(1rem,env(safe-area-inset-bottom))]">
+        {!stick && messages.length > 0 && (
           <Button
             variant="outline"
             size="sm"
-            className="absolute -top-2 left-1/2 h-10 -translate-x-1/2 gap-1.5 rounded-full bg-background shadow-md"
+            className="-top-12 -translate-x-1/2 absolute left-1/2 h-10 gap-1.5 rounded-full bg-background px-4 shadow-sm"
             onClick={() => {
               stickRef.current = true;
               setStick(true);
               scrollToEnd(true);
             }}
           >
-            <ArrowDown className="size-4" aria-hidden="true" />
+            <ArrowDown className="size-4" strokeWidth={1.75} aria-hidden="true" />
             {m.chat_to_end()}
           </Button>
         )}
@@ -319,10 +281,12 @@ export function ChatView({ chat, handlesRequests, onOpenThread, className }: Pro
             onStop={chat.stop}
             onCommand={(n) => void onCommand(n)}
             getPageContext={getPageContext}
-            canAttachScreen={canAttachScreen}
+            pageLabel={page.label}
+            contextOn={contextOn}
+            onContextChange={setContextOn}
           />
           {pct >= 70 && (
-            <p className="mt-1 px-2 text-muted-foreground text-xs">
+            <p className="mt-1 px-3 text-muted-foreground text-xs">
               {m.chat_context_full({ pct })}
             </p>
           )}

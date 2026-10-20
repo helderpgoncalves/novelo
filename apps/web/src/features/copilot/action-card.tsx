@@ -132,7 +132,7 @@ export function ActionCard({
           <div className="flex flex-wrap items-center gap-2">
             <Button
               size="sm"
-              className="h-10 px-4"
+              className="h-11 flex-1 px-4 sm:h-10 sm:flex-none"
               variant={
                 action.risk === 'critical' || action.risk === 'high' ? 'destructive' : 'default'
               }
@@ -149,13 +149,13 @@ export function ActionCard({
             <Button
               size="sm"
               variant="outline"
-              className="h-10 px-4"
+              className="h-11 flex-1 px-4 sm:h-10 sm:flex-none"
               disabled={busy}
               onClick={() => reject.mutate({ path: { action_id: action.id } })}
             >
               {m.chat_action_reject()}
             </Button>
-            <span className="text-muted-foreground text-xs">
+            <span className="w-full text-muted-foreground text-xs">
               {m.chat_action_expires({ time: formatDateTime(action.expires_at) })}
             </span>
           </div>

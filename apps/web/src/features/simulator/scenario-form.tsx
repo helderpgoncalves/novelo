@@ -1,37 +1,53 @@
-import { useMutation } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { ChevronDown, Loader2, Sparkles } from 'lucide-react';
-import { useMemo, useState } from 'react';
-import type {
-  ParametersOut,
-  PlanningParams,
-  ScenarioObjective,
-  ScenarioRequest,
-  ZoneOut,
+import { ChevronDown } from 'lucide-react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { toast } from 'sonner';
+import {
+  createScenario,
+  type ParametersOut,
+  type PlanningParams,
+  type ScenarioObjective,
+  type ScenarioOut,
+  type ScenarioRequest,
+  type ZoneOut,
 } from '@/client';
-import { createScenarioMutation } from '@/client/@tanstack/react-query.gen';
+import {
+  getScenarioOptions,
+  getScenarioQueryKey,
+  listScenariosQueryKey,
+} from '@/client/@tanstack/react-query.gen';
 import { ModeDot } from '@/components/mode-badge';
-import { NumberField } from '@/components/number-field';
-import { EstimateTag, Panel } from '@/components/panel';
-import { StepSection } from '@/components/step-section';
+import { ErrorState } from '@/components/states';
 import { StickyActions } from '@/components/sticky-actions';
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Slider } from '@/components/ui/slider';
+import { Skeleton } from '@/components/ui/skeleton';
 import { getParam, PARAM_GROUPS, validateParams } from '@/features/assumptions/param-fields';
 import { ParametersForm } from '@/features/assumptions/parameters-form';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { MODES, modeHint, modeLabel, objectiveHint, objectiveLabel } from '@/lib/scenario';
-import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { type Constraints, ConstraintsEditor } from './constraints-editor';
+import { FormSection } from './form-section';
+import { HelpHint } from './help-hint';
+import { NumericControl } from './numeric-control';
+import { ProgressSteps, type StepId } from './progress-steps';
+import { type RunStatus, useElapsedSeconds } from './run-status';
+import { Segmented } from './segmented';
+import { type RunControl, SummaryBar, type SummaryData, SummaryPanel } from './summary';
+
+const ScenarioResult = lazy(() =>
+  import('./scenario-result').then((mod) => ({ default: mod.ScenarioResult })),
+);
 
 const OBJECTIVES: ScenarioObjective[] = ['max_tonnes', 'min_cost'];
+const BUDGET_MAX = 200_000;
+type SectionId = 'goal' | 'assumptions' | 'options';
 
 export interface FormSeed {
   label: string;
@@ -47,10 +63,39 @@ interface ScenarioFormProps {
   parameters: ParametersOut;
   zones: ZoneOut[];
   seed: FormSeed;
+  /** Toneladas recolhidas em 2025 (dados da Vitrus), referência para a meta. */
+  baselineTonnes: number;
+  /** Cenário cujo resultado está na URL (`r`). */
+  resultId?: string;
 }
 
-export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
-  const navigate = useNavigate();
+/** Ordena as chaves para comparar objetos vindos do servidor e do formulário. */
+const stable = (value: unknown): string =>
+  JSON.stringify(value, (_k, v) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(Object.entries(v).sort(([a], [b]) => a.localeCompare(b)))
+      : v,
+  );
+
+function matchesRequest(s: ScenarioOut, r: ScenarioRequest): boolean {
+  return (
+    s.objective === r.objective &&
+    (s.budget_eur_year ?? null) === (r.budget_eur_year ?? null) &&
+    Math.abs((s.target_tonnes ?? 0) - (r.target_tonnes ?? 0)) < 0.002 &&
+    stable(s.params) === stable(r.params) &&
+    stable(s.constraints) === stable(r.constraints)
+  );
+}
+
+export function ScenarioForm({
+  parameters,
+  zones,
+  seed,
+  baselineTonnes,
+  resultId,
+}: ScenarioFormProps) {
+  const navigate = useNavigate({ from: '/simulator' });
+  const queryClient = useQueryClient();
   const [label, setLabel] = useState(seed.label);
   const [objective, setObjective] = useState<ScenarioObjective>(seed.objective);
   const [budget, setBudget] = useState(seed.budget);
@@ -58,34 +103,38 @@ export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
   const [params, setParams] = useState(seed.params);
   const [constraints, setConstraints] = useState<Constraints>(seed.constraints);
   const [submitted, setSubmitted] = useState(false);
+  const [open, setOpen] = useState<Set<SectionId>>(new Set(['goal']));
+  const resultRef = useRef<HTMLElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
+  const cancelledRef = useRef(false);
+  const scrollOnArrival = useRef(false);
 
-  const potential = useMemo(
-    () => (zones.reduce((sum, z) => sum + z.population, 0) * params.kg_per_inhab_month * 12) / 1000,
-    [zones, params.kg_per_inhab_month],
-  );
+  const population = useMemo(() => zones.reduce((sum, z) => sum + z.population, 0), [zones]);
+  const potential = (population * params.kg_per_inhab_month * 12) / 1000;
   const targetTonnes = (targetPct / 100) * potential;
+  const baselinePct = potential > 0 ? (baselineTonnes / potential) * 100 : 0;
+
   const paramErrors = validateParams(params);
+  const paramErrorCount = Object.keys(paramErrors).length;
   const labelError = label.trim() ? undefined : m.sim_label_required();
   const budgetError =
     objective === 'max_tonnes' && !(budget > 0) ? m.validation_number_positive() : undefined;
+  const targetError =
+    objective === 'min_cost' && !(targetPct >= 1 && targetPct <= 100)
+      ? m.validation_number_positive()
+      : undefined;
   const hasErrors =
-    Object.keys(paramErrors).length > 0 || Boolean(labelError) || Boolean(budgetError);
+    paramErrorCount > 0 || Boolean(labelError) || Boolean(budgetError) || Boolean(targetError);
 
   const changedParams = PARAM_GROUPS.flatMap((g) => g.fields).filter(
     (f) => getParam(params, f.path) !== getParam(parameters.values, f.path),
   ).length;
   const restrictedZones = Object.keys(constraints).length;
+  const containers = zones.reduce((sum, z) => sum + (z.existing_containers ?? 0), 0);
+  const zonesWithContainers = zones.filter((z) => (z.existing_containers ?? 0) > 0).length;
 
-  const create = useMutation({
-    ...createScenarioMutation(),
-    onSuccess: (scenario) =>
-      navigate({ to: '/scenarios/$scenarioId', params: { scenarioId: scenario.id } }),
-  });
-
-  const submit = () => {
-    setSubmitted(true);
-    if (hasErrors) return;
-    const body: ScenarioRequest = {
+  const request = useCallback(
+    (): ScenarioRequest => ({
       label: label.trim(),
       objective,
       budget_eur_year: objective === 'max_tonnes' ? budget : null,
@@ -93,230 +142,418 @@ export function ScenarioForm({ parameters, zones, seed }: ScenarioFormProps) {
       params,
       constraints,
       parent_id: seed.parentId ?? null,
-    };
-    create.mutate({ body });
-  };
-
-  const runButton = (
-    <Button type="submit" className="h-11 w-full font-semibold" disabled={create.isPending}>
-      {create.isPending ? <Loader2 className="animate-spin" /> : <Sparkles />}
-      {create.isPending ? m.sim_running() : m.sim_run()}
-    </Button>
+    }),
+    [label, objective, budget, targetTonnes, params, constraints, seed.parentId],
   );
 
-  return (
-    <form
-      className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10"
-      onSubmit={(e) => {
+  // Estado partilhável: o objetivo e o valor ficam na URL (replace, sem encher o histórico).
+  const mounted = useRef(false);
+  useEffect(() => {
+    if (!mounted.current) {
+      mounted.current = true;
+      return;
+    }
+    const id = window.setTimeout(() => {
+      navigate({
+        search: (prev) => ({
+          ...prev,
+          goal: objective,
+          budget: Number.isFinite(budget) && budget > 0 ? budget : undefined,
+          target: Number.isFinite(targetPct) ? targetPct : undefined,
+          name: label.trim() && label.trim() !== m.sim_label_default() ? label.trim() : undefined,
+        }),
+        replace: true,
+      });
+    }, 400);
+    return () => window.clearTimeout(id);
+  }, [objective, budget, targetPct, label, navigate]);
+
+  const create = useMutation({
+    mutationFn: async (body: ScenarioRequest) => {
+      const controller = new AbortController();
+      abortRef.current = controller;
+      cancelledRef.current = false;
+      const { data } = await createScenario({
+        body,
+        signal: controller.signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    onSuccess: async (scenario) => {
+      queryClient.setQueryData(
+        getScenarioQueryKey({ path: { scenario_id: scenario.id } }),
+        scenario,
+      );
+      await queryClient.invalidateQueries({ queryKey: listScenariosQueryKey() });
+      scrollOnArrival.current = true;
+      await navigate({ search: (prev) => ({ ...prev, r: scenario.id }), replace: true });
+    },
+    onError: () => {
+      if (cancelledRef.current) {
+        create.reset();
+        toast(m.simx_cancelled());
+      }
+    },
+  });
+  const running = create.isPending;
+  const elapsed = useElapsedSeconds(running);
+
+  const resultQuery = useQuery({
+    ...getScenarioOptions({ path: { scenario_id: resultId ?? '' } }),
+    enabled: Boolean(resultId),
+  });
+  const scenario = resultId ? resultQuery.data : undefined;
+
+  const status: RunStatus = running
+    ? 'running'
+    : scenario
+      ? scenario.status === 'infeasible'
+        ? 'infeasible'
+        : matchesRequest(scenario, request())
+          ? 'done'
+          : 'stale'
+      : submitted && hasErrors
+        ? 'invalid'
+        : 'draft';
+
+  // Ao chegar um resultado novo, leva o utilizador até ele e põe lá o foco.
+  const revealResult = useCallback(() => {
+    const el = resultRef.current;
+    if (!scrollOnArrival.current || !el) return;
+    scrollOnArrival.current = false;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    el.scrollIntoView({ behavior: reduce ? 'auto' : 'smooth', block: 'start' });
+    el.focus({ preventScroll: true });
+  }, []);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: reage a um resultado novo
+  useEffect(revealResult, [scenario, revealResult]);
+
+  const toggleSection = (id: SectionId, next: boolean) =>
+    setOpen((prev) => {
+      const copy = new Set(prev);
+      if (next) copy.add(id);
+      else copy.delete(id);
+      return copy;
+    });
+  const jumpTo = useCallback((id: StepId) => {
+    if (id === 'result') {
+      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      resultRef.current?.focus({ preventScroll: true });
+      return;
+    }
+    setOpen((prev) => new Set(prev).add(id));
+    window.setTimeout(() => {
+      document.getElementById(`sec-${id}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 30);
+  }, []);
+
+  const cancel = useCallback(() => {
+    cancelledRef.current = true;
+    abortRef.current?.abort();
+  }, []);
+
+  const submit = useCallback(() => {
+    if (create.isPending) return;
+    setSubmitted(true);
+    if (hasErrors) {
+      if (labelError || budgetError || targetError) jumpTo('goal');
+      else jumpTo('assumptions');
+      return;
+    }
+    create.mutate(request());
+  }, [create, hasErrors, labelError, budgetError, targetError, request, jumpTo]);
+
+  // Atalhos: Ctrl/⌘ + Enter calcula; Esc cancela um cálculo em curso.
+  const submitRef = useRef(submit);
+  submitRef.current = submit;
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
         e.preventDefault();
-        submit();
-      }}
-      noValidate
-    >
-      <div className="min-w-0 space-y-10 sm:space-y-12 lg:col-span-8 xl:col-span-9">
-        <FormAlert message={create.isError ? getErrorMessage(create.error) : null} />
+        submitRef.current();
+      } else if (e.key === 'Escape' && create.isPending) {
+        cancel();
+      }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [cancel, create.isPending]);
 
-        <StepSection
-          step={1}
-          title={m.sim_step_objective()}
-          description={m.sim_step_objective_text()}
-        >
-          <Panel className="space-y-6">
-            <div className="max-w-md space-y-1.5">
-              <Label htmlFor="label">{m.sim_label()}</Label>
-              <Input
-                id="label"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                maxLength={80}
-                className="h-10"
-                aria-invalid={submitted && labelError ? true : undefined}
+  const valueText =
+    objective === 'max_tonnes'
+      ? Number.isFinite(budget)
+        ? m.simx_eur_year({ value: formatEur(budget) })
+        : m.common_dash()
+      : `${formatPercent(targetPct, 0)} · ${formatTonnes(targetTonnes, 0)}`;
+
+  const problems = [
+    labelError,
+    budgetError,
+    targetError,
+    paramErrorCount > 0 ? `${m.sim_assumptions_title()}: ${paramErrorCount}` : undefined,
+  ].filter((x): x is string => Boolean(x));
+
+  const summary: SummaryData = {
+    goalLabel: objectiveLabel[objective](),
+    valueLabel: objective === 'max_tonnes' ? m.sim_budget() : m.sim_target(),
+    valueText,
+    potentialText: formatTonnes(potential, 0),
+    locationsText:
+      containers > 0
+        ? m.simx_sum_locations_value({
+            n: formatNumber(containers),
+            zones: formatNumber(zonesWithContainers),
+          })
+        : m.sim_existing_none(),
+    restrictionsText:
+      restrictedZones === 0 ? m.sim_summary_none() : m.sim_summary_zones({ n: restrictedZones }),
+    assumptionsText:
+      changedParams === 0 ? m.sim_summary_defaults() : m.sim_summary_changed({ n: changedParams }),
+    problems: submitted || status === 'invalid' ? problems : [],
+  };
+
+  const run: RunControl = {
+    status,
+    pending: running,
+    elapsed,
+    onCancel: cancel,
+    result: scenario,
+    onSeeResult: () => jumpTo('result'),
+  };
+
+  const goalSummary =
+    objective === 'max_tonnes'
+      ? m.simx_sum_goal_budget({
+          goal: objectiveLabel[objective](),
+          value: Number.isFinite(budget) ? m.simx_eur_year({ value: formatEur(budget) }) : '…',
+        })
+      : m.simx_sum_goal_target({
+          goal: objectiveLabel[objective](),
+          pct: formatPercent(targetPct, 0),
+          tonnes: formatTonnes(targetTonnes, 0),
+        });
+
+  return (
+    <>
+      <form
+        className="space-y-6"
+        onSubmit={(e) => {
+          e.preventDefault();
+          submit();
+        }}
+        noValidate
+      >
+        <div className="grid items-start gap-6 lg:grid-cols-12 lg:gap-8">
+          <div className="min-w-0 space-y-3 lg:col-span-7 xl:col-span-8">
+            <div className="sticky top-0 z-10 -mx-4 bg-background/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none">
+              <ProgressSteps
+                goalInvalid={submitted && Boolean(labelError || budgetError || targetError)}
+                assumptionsChanged={changedParams > 0}
+                optionsChanged={restrictedZones > 0}
+                status={status}
+                onSelect={jumpTo}
               />
-              {submitted && labelError && <p className="text-destructive text-xs">{labelError}</p>}
             </div>
+            <FormAlert
+              message={
+                create.isError && !cancelledRef.current ? getErrorMessage(create.error) : null
+              }
+            />
 
-            <fieldset className="space-y-3">
-              <legend className="mb-1 font-medium text-sm">{m.sim_objective()}</legend>
-              <RadioGroup
-                value={objective}
-                onValueChange={(v) => setObjective(v as ScenarioObjective)}
-                className="grid grid-cols-1 gap-2 md:grid-cols-2"
-              >
-                {OBJECTIVES.map((o) => (
-                  <Label
-                    key={o}
-                    htmlFor={`objective-${o}`}
-                    className={cn(
-                      'flex min-h-12 cursor-pointer items-start gap-3 rounded-lg border p-3 font-normal transition-colors',
-                      objective === o ? 'border-primary bg-primary/5' : 'hover:bg-muted/50',
-                    )}
-                  >
-                    <RadioGroupItem id={`objective-${o}`} value={o} className="mt-0.5" />
-                    <span className="space-y-0.5">
-                      <span className="block font-medium text-sm">{objectiveLabel[o]()}</span>
-                      <span className="block text-muted-foreground text-xs leading-relaxed">
-                        {objectiveHint[o]()}
-                      </span>
-                    </span>
-                  </Label>
-                ))}
-              </RadioGroup>
-            </fieldset>
+            <FormSection
+              id="sec-goal"
+              title={m.sim_step_objective()}
+              summary={goalSummary}
+              open={open.has('goal')}
+              onOpenChange={(v) => toggleSection('goal', v)}
+              invalid={submitted && Boolean(labelError || budgetError || targetError)}
+            >
+              <div className="space-y-1.5">
+                <Label htmlFor="label" className="text-sm">
+                  {m.sim_label()}
+                </Label>
+                <Input
+                  id="label"
+                  value={label}
+                  onChange={(e) => setLabel(e.target.value)}
+                  maxLength={80}
+                  className="h-10"
+                  aria-invalid={submitted && labelError ? true : undefined}
+                />
+                {submitted && labelError && (
+                  <p role="alert" className="text-destructive text-xs">
+                    {labelError}
+                  </p>
+                )}
+              </div>
 
-            {objective === 'max_tonnes' ? (
-              <div className="max-w-xl space-y-3">
-                <NumberField
+              <div className="space-y-2">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-medium text-sm">{m.sim_objective()}</span>
+                  <HelpHint label={m.sim_objective()}>
+                    <ul className="space-y-2">
+                      {OBJECTIVES.map((o) => (
+                        <li key={o}>
+                          <span className="font-medium">{objectiveLabel[o]()}.</span>{' '}
+                          {objectiveHint[o]()}
+                        </li>
+                      ))}
+                    </ul>
+                  </HelpHint>
+                </div>
+                <Segmented
+                  label={m.simx_goal_aria()}
+                  value={objective}
+                  onChange={setObjective}
+                  options={OBJECTIVES.map((o) => ({ value: o, label: objectiveLabel[o]() }))}
+                />
+              </div>
+
+              {objective === 'max_tonnes' ? (
+                <NumericControl
                   label={m.sim_budget()}
+                  help={m.simx_help_budget()}
                   value={budget}
                   onChange={setBudget}
                   unit="€/ano"
                   step={1000}
+                  sliderMin={5000}
+                  sliderMax={BUDGET_MAX}
                   min={0}
+                  formatBound={formatEur}
                   error={submitted ? budgetError : undefined}
-                  hint={m.sim_budget_hint({ value: formatEur(budget || 0) })}
+                  hint={
+                    budget > 0 && population > 0
+                      ? m.simx_budget_per_inhab({
+                          value: `${formatNumber(budget / population, 2)} €`,
+                        })
+                      : undefined
+                  }
                 />
-                <Slider
-                  value={[Math.min(Number.isFinite(budget) ? budget : 0, 200000)]}
-                  min={0}
-                  max={200000}
-                  step={1000}
-                  onValueChange={([v]) => setBudget(v ?? 0)}
-                  aria-label={m.sim_budget()}
-                />
-              </div>
-            ) : (
-              <div className="max-w-xl space-y-3">
-                <NumberField
+              ) : (
+                <NumericControl
                   label={m.sim_target()}
+                  help={m.simx_help_target({ kg: formatNumber(params.kg_per_inhab_month, 1) })}
                   value={targetPct}
                   onChange={setTargetPct}
                   unit="%"
                   step={1}
+                  sliderMin={1}
+                  sliderMax={100}
                   min={1}
                   max={100}
+                  marker={{ value: baselinePct, label: m.simx_marker_2025() }}
+                  formatBound={(v) => `${formatNumber(v)}%`}
+                  error={submitted ? targetError : undefined}
                   hint={m.sim_target_hint({
                     tonnes: formatTonnes(targetTonnes, 0),
                     potential: formatTonnes(potential, 0),
                   })}
                 />
-                <Slider
-                  value={[Math.min(Number.isFinite(targetPct) ? targetPct : 0, 100)]}
-                  min={1}
-                  max={100}
-                  step={1}
-                  onValueChange={([v]) => setTargetPct(v ?? 1)}
-                  aria-label={m.sim_target()}
-                />
-              </div>
-            )}
-          </Panel>
-        </StepSection>
+              )}
+              <p className="text-muted-foreground text-xs">
+                {m.simx_reference_2025({
+                  tonnes: formatTonnes(baselineTonnes, 1),
+                  pct: formatPercent(baselinePct, 1),
+                })}
+              </p>
+            </FormSection>
 
-        <StepSection step={2} title={m.sim_step_modes()} description={m.sim_step_modes_text()}>
-          <ModesOverview params={params} zones={zones} />
-        </StepSection>
-
-        <StepSection
-          step={3}
-          title={m.sim_constraints_title()}
-          description={m.sim_step_constraints_text()}
-        >
-          <Panel>
-            <ConstraintsEditor zones={zones} value={constraints} onChange={setConstraints} />
-          </Panel>
-        </StepSection>
-
-        <StepSection
-          step={4}
-          title={m.sim_assumptions_title()}
-          description={m.sim_assumptions_description()}
-        >
-          <ParametersForm
-            value={params}
-            onChange={setParams}
-            meta={parameters.meta}
-            errors={submitted ? paramErrors : {}}
-            defaultOpen={['general', 'street']}
-          />
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            className="h-10"
-            onClick={() => setParams(parameters.values)}
-          >
-            {m.sim_assumptions_reset()}
-          </Button>
-        </StepSection>
-      </div>
-
-      <aside className="lg:col-span-4 lg:self-start xl:col-span-3 lg:sticky lg:top-4">
-        <Panel title={m.sim_summary_title()} aside={<EstimateTag label={m.common_estimate()} />}>
-          <dl className="space-y-3 text-sm">
-            <SummaryRow label={m.sim_objective()} value={objectiveLabel[objective]()} />
-            {objective === 'max_tonnes' ? (
-              <SummaryRow
-                label={m.sim_budget()}
-                value={Number.isFinite(budget) ? formatEur(budget) : m.common_dash()}
-              />
-            ) : (
-              <SummaryRow
-                label={m.sim_target()}
-                value={`${formatTonnes(targetTonnes, 0)} (${formatNumber(targetPct)}%)`}
-              />
-            )}
-            <SummaryRow label={m.sim_summary_potential()} value={formatTonnes(potential, 0)} />
-            <SummaryRow
-              label={m.sim_summary_constraints()}
-              value={
-                restrictedZones === 0
-                  ? m.sim_summary_none()
-                  : m.sim_summary_zones({ n: restrictedZones })
-              }
-            />
-            <SummaryRow
-              label={m.sim_summary_assumptions()}
-              value={
+            <FormSection
+              id="sec-assumptions"
+              title={m.simx_sec_assumptions()}
+              summary={
                 changedParams === 0
-                  ? m.sim_summary_defaults()
-                  : m.sim_summary_changed({ n: changedParams })
+                  ? m.simx_sum_assumptions_default()
+                  : m.simx_sum_assumptions_changed({ n: changedParams })
               }
-            />
-          </dl>
-          {submitted && hasErrors && (
-            <p role="alert" className="text-destructive text-xs">
-              {m.sim_summary_errors()}
-            </p>
-          )}
-          <div className="hidden space-y-2 lg:block">
-            {runButton}
-            {create.isPending && (
-              <p className="text-center text-muted-foreground text-xs">{m.sim_running_hint()}</p>
-            )}
+              open={open.has('assumptions')}
+              onOpenChange={(v) => toggleSection('assumptions', v)}
+              invalid={submitted && paramErrorCount > 0}
+            >
+              <ModesOverview params={params} zones={zones} />
+              <ParametersForm
+                value={params}
+                onChange={setParams}
+                meta={parameters.meta}
+                errors={submitted ? paramErrors : {}}
+                defaultOpen={['general']}
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-10"
+                disabled={changedParams === 0}
+                onClick={() => setParams(parameters.values)}
+              >
+                {m.sim_assumptions_reset()}
+              </Button>
+            </FormSection>
+
+            <FormSection
+              id="sec-options"
+              title={m.sim_constraints_title()}
+              summary={
+                restrictedZones === 0
+                  ? m.simx_sum_options_none()
+                  : m.simx_sum_options_some({ n: restrictedZones })
+              }
+              open={open.has('options')}
+              onOpenChange={(v) => toggleSection('options', v)}
+            >
+              <ConstraintsEditor zones={zones} value={constraints} onChange={setConstraints} />
+            </FormSection>
           </div>
-        </Panel>
-      </aside>
 
-      <StickyActions className="col-span-full lg:hidden">
-        {runButton}
-        {create.isPending && (
-          <p className="mt-2 text-center text-muted-foreground text-xs">{m.sim_running_hint()}</p>
-        )}
-      </StickyActions>
-    </form>
+          <aside className="hidden lg:sticky lg:top-4 lg:col-span-5 lg:block xl:col-span-4">
+            <SummaryPanel data={summary} run={run} />
+          </aside>
+        </div>
+
+        <StickyActions className="lg:hidden">
+          <SummaryBar data={summary} run={run} />
+        </StickyActions>
+      </form>
+
+      {resultId && (
+        <>
+          {resultQuery.isPending && (
+            <section
+              id="resultado"
+              ref={resultRef}
+              tabIndex={-1}
+              aria-busy="true"
+              aria-label={m.simx_res_loading()}
+              className="space-y-4 outline-none"
+            >
+              <Skeleton className="h-8 w-56" />
+              <Skeleton className="h-40 w-full rounded-xl" />
+              <Skeleton className="h-64 w-full rounded-xl" />
+            </section>
+          )}
+          {resultQuery.isError && (
+            <ErrorState error={resultQuery.error} onRetry={() => resultQuery.refetch()} />
+          )}
+          {scenario && (
+            <Suspense fallback={<Skeleton className="h-96 w-full rounded-xl" />}>
+              <ScenarioResult
+                ref={resultRef}
+                scenario={scenario}
+                zones={zones}
+                status={status}
+                onMount={revealResult}
+              />
+            </Suspense>
+          )}
+        </>
+      )}
+    </>
   );
 }
 
-function SummaryRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="flex items-baseline justify-between gap-3">
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="whitespace-nowrap text-right font-medium tabular-nums">{value}</dd>
-    </div>
-  );
-}
-
-/** Os três modos de recolha com os números-chave dos pressupostos atuais e, nos existentes, onde há contentores. */
+/** Os três modos de recolha: números-chave dos pressupostos atuais, em linhas compactas. */
 function ModesOverview({ params, zones }: { params: PlanningParams; zones: ZoneOut[] }) {
   const withContainers = zones
     .filter((z) => (z.existing_containers ?? 0) > 0)
@@ -324,73 +561,84 @@ function ModesOverview({ params, zones }: { params: PlanningParams; zones: ZoneO
   const totalContainers = withContainers.reduce((sum, z) => sum + (z.existing_containers ?? 0), 0);
 
   return (
-    <ul className="grid grid-cols-1 gap-4 md:grid-cols-3">
-      {MODES.map((mode) => {
-        const p = params.modes[mode];
-        if (!p) return null;
-        return (
-          <li
-            key={mode}
-            className="min-w-0 space-y-3 rounded-xl bg-card p-4 ring-1 ring-foreground/10 sm:p-5"
-          >
-            <p className="flex items-center gap-2 font-medium">
-              <ModeDot mode={mode} /> {modeLabel[mode]()}
-            </p>
-            <p className="text-muted-foreground text-xs leading-relaxed">{modeHint[mode]()}</p>
-            <dl className="space-y-1 text-sm tabular-nums">
-              <SummaryRow
-                label={m.param_capture_rate()}
-                value={formatPercent(p.capture_rate * 100, 1)}
-              />
-              {mode !== 'on_demand' && (
-                <SummaryRow
-                  label={m.sim_mode_density()}
-                  value={m.sim_mode_people({ n: formatNumber(p.people_per_point) })}
+    <div className="space-y-2">
+      <div className="flex items-center justify-between gap-2">
+        <h3 className="font-medium text-sm">{m.sim_step_modes()}</h3>
+        <HelpHint label={m.sim_step_modes()}>{m.simx_help_modes()}</HelpHint>
+      </div>
+      <ul className="grid grid-cols-1 gap-2 md:grid-cols-3">
+        {MODES.map((mode) => {
+          const p = params.modes[mode];
+          if (!p) return null;
+          return (
+            <li key={mode} className="min-w-0 space-y-2 rounded-lg border p-3">
+              <p className="flex items-center justify-between gap-2 font-medium text-sm">
+                <span className="flex items-center gap-2">
+                  <ModeDot mode={mode} /> {modeLabel[mode]()}
+                </span>
+                <HelpHint label={modeLabel[mode]()}>{modeHint[mode]()}</HelpHint>
+              </p>
+              <dl className="grid grid-cols-3 gap-2 text-xs tabular-nums md:grid-cols-1 md:gap-1">
+                <Metric
+                  label={m.simx_mode_capture()}
+                  value={formatPercent(p.capture_rate * 100, 1)}
                 />
-              )}
-              <SummaryRow
-                label={m.param_capex_per_point()}
-                value={formatEur(p.capex_per_point_eur)}
-              />
-            </dl>
-            {mode === 'existing' && (
-              <Collapsible className="border-t pt-3">
-                <p className="font-medium text-sm">
-                  {totalContainers > 0
-                    ? m.sim_existing_total({
-                        n: formatNumber(totalContainers),
-                        zones: withContainers.length,
-                      })
-                    : m.sim_existing_none()}
-                </p>
-                {totalContainers > 0 && (
-                  <>
-                    <CollapsibleTrigger className="group flex min-h-10 items-center gap-1.5 text-muted-foreground text-xs">
-                      {m.sim_existing_by_zone()}
-                      <ChevronDown
-                        className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
-                        aria-hidden="true"
-                      />
-                    </CollapsibleTrigger>
-                    <CollapsibleContent>
-                      <ul className="max-h-48 space-y-1 overflow-y-auto pr-1 text-sm">
-                        {withContainers.map((z) => (
-                          <li key={z.code} className="flex justify-between gap-3">
-                            <span className="min-w-0 truncate">{z.name}</span>
-                            <span className="tabular-nums">
-                              {formatNumber(z.existing_containers ?? 0)}
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    </CollapsibleContent>
-                  </>
+                {mode !== 'on_demand' && (
+                  <Metric
+                    label={m.simx_mode_density()}
+                    value={m.sim_mode_people({ n: formatNumber(p.people_per_point) })}
+                  />
                 )}
-              </Collapsible>
-            )}
-          </li>
-        );
-      })}
-    </ul>
+                <Metric label={m.simx_mode_capex()} value={formatEur(p.capex_per_point_eur)} />
+              </dl>
+              {mode === 'existing' && (
+                <Collapsible className="border-t pt-2">
+                  <p className="font-medium text-sm">
+                    {totalContainers > 0
+                      ? m.sim_existing_total({
+                          n: formatNumber(totalContainers),
+                          zones: withContainers.length,
+                        })
+                      : m.sim_existing_none()}
+                  </p>
+                  {totalContainers > 0 && (
+                    <>
+                      <CollapsibleTrigger className="group flex min-h-10 items-center gap-1.5 text-muted-foreground text-xs">
+                        {m.sim_existing_by_zone()}
+                        <ChevronDown
+                          className="size-3.5 transition-transform group-data-[state=open]:rotate-180"
+                          aria-hidden="true"
+                        />
+                      </CollapsibleTrigger>
+                      <CollapsibleContent>
+                        <ul className="max-h-48 space-y-1 overflow-y-auto pr-1 text-sm">
+                          {withContainers.map((z) => (
+                            <li key={z.code} className="flex justify-between gap-3">
+                              <span className="min-w-0 truncate">{z.name}</span>
+                              <span className="tabular-nums">
+                                {formatNumber(z.existing_containers ?? 0)}
+                              </span>
+                            </li>
+                          ))}
+                        </ul>
+                      </CollapsibleContent>
+                    </>
+                  )}
+                </Collapsible>
+              )}
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+function Metric({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="min-w-0 md:flex md:items-baseline md:justify-between md:gap-2">
+      <dt className="truncate text-muted-foreground">{label}</dt>
+      <dd className="font-medium text-sm">{value}</dd>
+    </div>
   );
 }

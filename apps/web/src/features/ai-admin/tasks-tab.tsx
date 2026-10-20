@@ -1,4 +1,4 @@
-import { Cpu, Sparkles } from 'lucide-react';
+import { BadgeCheck, Cpu } from 'lucide-react';
 import { useState } from 'react';
 import type { AiSettingsOut, TaskConfigOut } from '@/client';
 import { Badge } from '@/components/ui/badge';
@@ -76,7 +76,7 @@ function TaskCard({
           <SourceBadge source={e.model_source} />
           {isRecommended && (
             <Badge variant="secondary" className="gap-1">
-              <Sparkles className="size-3" aria-hidden="true" />
+              <BadgeCheck className="size-3" aria-hidden="true" />
               {m.aiadm_recommended()}
             </Badge>
           )}

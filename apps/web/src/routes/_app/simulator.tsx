@@ -5,6 +5,7 @@ import type { ScenarioOut } from '@/client';
 import {
   getPlanningParametersOptions,
   getScenarioOptions,
+  getTextileBaselineOptions,
   listZonesOptions,
 } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
@@ -12,14 +13,24 @@ import { PageHeader } from '@/components/page-header';
 import { type FormSeed, ScenarioForm } from '@/features/simulator/scenario-form';
 import { m } from '@/paraglide/messages';
 
+const uuid = z.string().uuid().optional().catch(undefined);
+
 export const Route = createFileRoute('/_app/simulator')({
-  // `from` pré-preenche o formulário com um cenário existente (ajustar e voltar a correr).
-  validateSearch: z.object({ from: z.string().uuid().optional().catch(undefined) }),
+  // Estado partilhável: `from` pré-preenche com um cenário, `r` mostra um resultado, o resto é o formulário.
+  validateSearch: z.object({
+    from: uuid,
+    r: uuid,
+    goal: z.enum(['max_tonnes', 'min_cost']).optional().catch(undefined),
+    budget: z.number().positive().max(10_000_000).optional().catch(undefined),
+    target: z.number().min(1).max(100).optional().catch(undefined),
+    name: z.string().max(80).optional().catch(undefined),
+  }),
   loaderDeps: ({ search }) => ({ from: search.from }),
   loader: ({ context: { queryClient }, deps }) =>
     Promise.all([
       queryClient.ensureQueryData(getPlanningParametersOptions()),
       queryClient.ensureQueryData(listZonesOptions()),
+      queryClient.ensureQueryData(getTextileBaselineOptions()),
       deps.from
         ? queryClient.ensureQueryData(getScenarioOptions({ path: { scenario_id: deps.from } }))
         : Promise.resolve(null),
@@ -47,30 +58,46 @@ function seedFrom(scenario: ScenarioOut | null | undefined, defaults: FormSeed):
 }
 
 function Simulator() {
-  const { from } = Route.useSearch();
+  const search = Route.useSearch();
   const { data: parameters } = useSuspenseQuery(getPlanningParametersOptions());
   const { data: zones } = useSuspenseQuery(listZonesOptions());
-  const [, , base] = Route.useLoaderData();
+  const { data: baseline } = useSuspenseQuery(getTextileBaselineOptions());
+  const [, , , base] = Route.useLoaderData();
 
+  // Valores por omissão dos dados reais: a meta parte da captura de 2025 mais 10 pontos percentuais.
   const defaults: FormSeed = {
     label: m.sim_label_default(),
     objective: 'max_tonnes',
-    budget: 40000,
-    targetPct: 40,
+    budget: 60000,
+    targetPct: Math.min(100, Math.max(1, Math.round(baseline.capture_of_demand_pct) + 10)),
     params: parameters.values,
     constraints: {},
   };
-  const seed = seedFrom(base, defaults);
+  const fromBase = seedFrom(base, defaults);
+  const seed: FormSeed = {
+    ...fromBase,
+    objective: search.goal ?? fromBase.objective,
+    budget: search.budget ?? fromBase.budget,
+    targetPct: search.target ?? fromBase.targetPct,
+    label: search.name ?? fromBase.label,
+  };
 
   return (
-    <Page>
+    <Page className="space-y-6 sm:space-y-8">
       <PageHeader
         eyebrow={m.sim_eyebrow()}
         title={m.sim_title()}
-        description={m.sim_description()}
+        description={<span className="hidden sm:inline">{m.simx_description()}</span>}
       />
       {/* A chave recria o formulário quando se muda de cenário de origem */}
-      <ScenarioForm key={from ?? 'new'} parameters={parameters} zones={zones} seed={seed} />
+      <ScenarioForm
+        key={search.from ?? 'new'}
+        parameters={parameters}
+        zones={zones}
+        seed={seed}
+        baselineTonnes={baseline.total_t}
+        resultId={search.r}
+      />
     </Page>
   );
 }

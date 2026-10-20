@@ -1,19 +1,16 @@
 import { useNavigate } from '@tanstack/react-router';
-import { MessagesSquare, PanelLeft, Sparkles, SquarePen } from 'lucide-react';
+import { ChevronLeft, Download, History, SquarePen } from 'lucide-react';
 import { useCallback, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
-import {
-  Sheet,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-} from '@/components/ui/sheet';
+import { DropdownMenuItem, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { m } from '@/paraglide/messages';
 import { ActionsTab } from './actions-tab';
+import { ChatHeader } from './chat-header';
 import { ChatView } from './chat-view';
+import { exportThreadMarkdown } from './export-thread';
 import { GalleryTab } from './gallery-tab';
+import { HistorySheet } from './history-sheet';
 import { type ChatTab, HistoryTab } from './history-tab';
 import { SettingsTab } from './settings/settings-tab';
 import { registerChatPage, useCopilotUi } from './store';
@@ -90,36 +87,76 @@ export function ChatPage({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col" data-testid="copilot-page">
-      <header className="shrink-0 border-b bg-background">
-        <div className="flex items-center gap-2 px-4 pt-3 sm:px-6 lg:px-8">
-          <Sparkles className="size-5 text-primary" aria-hidden="true" />
-          <h1 className="min-w-0 flex-1 truncate font-serif text-xl sm:text-2xl">
-            {tab === 'chat' && chat.title ? chat.title : m.chat_page_title()}
-          </h1>
-          {tab === 'chat' && (
-            <>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 gap-1.5 lg:hidden"
-                onClick={() => setListOpen(true)}
-              >
-                <PanelLeft className="size-4" aria-hidden="true" />
-                {m.chat_threads()}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="h-10 gap-1.5 lg:hidden"
-                onClick={chat.newChat}
-              >
-                <SquarePen className="size-4" aria-hidden="true" />
-                <span className="hidden sm:inline">{m.chat_new()}</span>
-                <span className="sr-only sm:hidden">{m.chat_new()}</span>
-              </Button>
-            </>
-          )}
-        </div>
+      <ChatHeader
+        level="h1"
+        className="sm:px-4 lg:px-6"
+        title={
+          tab === 'chat'
+            ? (chat.title ?? m.chat_page_title())
+            : (tabs.find((t) => t.id === tab)?.label ?? m.chat_page_title())
+        }
+        leading={
+          tab !== 'chat' ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-11 text-muted-foreground sm:hidden"
+              aria-label={m.chat_tab_chat()}
+              onClick={() => go({ tab: 'chat' })}
+            >
+              <ChevronLeft className="size-5" strokeWidth={1.75} aria-hidden="true" />
+            </Button>
+          ) : undefined
+        }
+        actions={
+          tab === 'chat' ? (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="size-11 text-muted-foreground lg:hidden"
+              aria-label={m.chat_threads()}
+              onClick={() => setListOpen(true)}
+            >
+              <History className="size-5" strokeWidth={1.75} aria-hidden="true" />
+            </Button>
+          ) : undefined
+        }
+        menu={
+          <>
+            <DropdownMenuItem
+              className="min-h-11"
+              onSelect={() => {
+                if (tab !== 'chat') go({ tab: 'chat' });
+                chat.newChat();
+              }}
+            >
+              <SquarePen />
+              {m.chat_new()}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="min-h-11"
+              disabled={!chat.threadId}
+              onSelect={() => void exportThreadMarkdown(chat.threadId)}
+            >
+              <Download />
+              {m.cp_menu_export()}
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="sm:hidden" />
+            {tabs
+              .filter((t) => t.id !== tab)
+              .map((t) => (
+                <DropdownMenuItem
+                  key={t.id}
+                  className="min-h-11 sm:hidden"
+                  onSelect={() => go({ tab: t.id })}
+                >
+                  {t.label}
+                </DropdownMenuItem>
+              ))}
+          </>
+        }
+      />
+      <div className="hidden shrink-0 border-b bg-background sm:block">
         <Tabs value={tab} onValueChange={(v) => go({ tab: v as ChatTab })}>
           <div className="overflow-x-auto px-4 sm:px-6 lg:px-8">
             <TabsList
@@ -135,7 +172,7 @@ export function ChatPage({
             </TabsList>
           </div>
         </Tabs>
-      </header>
+      </div>
 
       {tab === 'chat' ? (
         <div className="flex min-h-0 flex-1">
@@ -167,18 +204,19 @@ export function ChatPage({
         </div>
       )}
 
-      <Sheet open={listOpen} onOpenChange={setListOpen}>
-        <SheetContent side="left" className="w-full max-w-full gap-0 p-0 sm:max-w-sm">
-          <SheetHeader className="border-b px-4 py-3 pr-14">
-            <SheetTitle className="flex items-center gap-2 font-serif text-xl">
-              <MessagesSquare className="size-5 text-primary" aria-hidden="true" />
-              {m.chat_threads()}
-            </SheetTitle>
-            <SheetDescription className="sr-only">{m.chat_threads_description()}</SheetDescription>
-          </SheetHeader>
-          <div className="min-h-0 flex-1">{list}</div>
-        </SheetContent>
-      </Sheet>
+      <HistorySheet
+        open={listOpen}
+        onOpenChange={setListOpen}
+        selectedId={thread}
+        onSelect={openThread}
+        onNew={() => {
+          setListOpen(false);
+          chat.newChat();
+        }}
+        onGone={(id) => {
+          if (id === thread) chat.newChat();
+        }}
+      />
     </div>
   );
 }

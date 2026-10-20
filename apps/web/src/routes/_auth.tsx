@@ -51,7 +51,7 @@ function AuthLayout() {
           ))}
         </dl>
       </aside>
-      <main className="flex flex-col px-6 py-6 sm:px-12">
+      <main className="flex flex-col pt-[max(1.5rem,env(safe-area-inset-top))] pr-[max(1.5rem,env(safe-area-inset-right))] pb-[max(1.5rem,env(safe-area-inset-bottom))] pl-[max(1.5rem,env(safe-area-inset-left))] sm:pr-[max(3rem,env(safe-area-inset-right))] sm:pl-[max(3rem,env(safe-area-inset-left))]">
         <div className="flex items-center justify-between">
           <div className="lg:hidden">
             <BrandLogo />

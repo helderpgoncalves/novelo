@@ -397,20 +397,23 @@ test.describe('painel ⌘K', () => {
     await expect(panel).toBeVisible();
     await expect(panel.getByTestId('copilot-user-message').first()).toBeVisible();
     await waitForAnswer(page);
-    await panel.getByRole('link', { name: 'Ecrã inteiro' }).click();
+    await panel.getByRole('button', { name: 'Mais opções' }).click();
+    await page.getByRole('menuitem', { name: 'Ecrã inteiro' }).click();
     await expect(page).toHaveURL(/\/pt\/chat\?thread=/);
     await expect(page.getByTestId('copilot-user-message').first()).toBeVisible();
   });
 
-  test('anexar o ecrã atual envia o contexto da página', async ({ page }) => {
+  test('o ecrã atual segue com a pergunta e pode ser removido', async ({ page }) => {
     await login(page, user);
     await page.goto('/pt/scenarios');
     // Só depois de a página montar é que o atalho está ligado.
     await expect(page.locator('#content h1').first()).toBeVisible();
     await page.keyboard.press('Control+k');
     const panel = page.getByRole('dialog', { name: 'Copiloto Novelo' });
-    await panel.getByRole('button', { name: 'Anexar o ecrã atual' }).click();
-    await expect(panel.getByText('Ecrã atual').first()).toBeVisible();
+    // O copiloto já vê o ecrã atual (linha removível por cima do campo).
+    await expect(panel.getByTestId('copilot-context-chip')).toContainText(
+      'A ver: Comparar cenários',
+    );
     const req = page.waitForRequest((r) => r.url().includes('/copilot/stream'));
     await composer(page).fill('Que ecrã estou a ver?');
     await composer(page).press('Enter');

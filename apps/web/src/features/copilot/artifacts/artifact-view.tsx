@@ -253,7 +253,7 @@ export function ArtifactView({
     <figure
       data-testid="copilot-artifact"
       data-type={body.artifact_type}
-      className="min-w-0 space-y-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10 sm:p-4"
+      className="-mx-4 min-w-0 space-y-3 border-border/70 border-y bg-card px-4 py-3.5 sm:mx-0 sm:rounded-xl sm:border-y-0 sm:p-4 sm:ring-1 sm:ring-foreground/10"
     >
       <figcaption className="flex items-start gap-2">
         <h3 className="min-w-0 flex-1 text-balance font-sans font-semibold text-sm leading-snug">
