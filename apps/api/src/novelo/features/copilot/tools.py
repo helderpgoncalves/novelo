@@ -780,7 +780,7 @@ class CopilotTools:
         }
 
     async def _list(self, args: ListScenariosArgs) -> dict[str, Any]:
-        rows = (await planning.list_scenarios(self.db))[: args.limit]
+        rows = await planning.list_scenarios(self.db, args.limit)
         facts = [scenario_facts(r) for r in rows]
         return {
             "count": len(rows),

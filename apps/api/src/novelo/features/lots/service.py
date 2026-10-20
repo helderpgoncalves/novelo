@@ -7,9 +7,9 @@ from collections import Counter, defaultdict
 from datetime import UTC, datetime
 
 import segno
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import load_only, selectinload
 
 from novelo.core.config import get_settings
 from novelo.core.errors import ConflictError, NotFoundError
@@ -112,7 +112,10 @@ async def _parish_names(db: AsyncSession) -> dict[uuid.UUID, tuple[str, str]]:
     }
 
 
-def _summary(lot: Lot, parishes: dict[uuid.UUID, tuple[str, str]]) -> LotSummary:
+def _summary(
+    lot: Lot, parishes: dict[uuid.UUID, tuple[str, str]], *, n_items: int | None = None, grams: int | None = None
+) -> LotSummary:
+    """`n_items`/`grams` vêm de um agregado SQL nas listas; sem eles contam-se as peças já carregadas."""
     code, name = parishes.get(lot.parish_id, (None, None)) if lot.parish_id else (None, None)
     return LotSummary(
         code=lot.code,
@@ -120,8 +123,8 @@ def _summary(lot: Lot, parishes: dict[uuid.UUID, tuple[str, str]]) -> LotSummary
         parish_code=code,
         parish_name=name,
         dominant_fibre=lot.dominant_fibre,
-        items=len(lot.items),
-        weight_kg=round(sum(i.estimated_weight_g for i in lot.items) / 1000, 3),
+        items=len(lot.items) if n_items is None else n_items,
+        weight_kg=round((sum(i.estimated_weight_g for i in lot.items) if grams is None else grams) / 1000, 3),
         opened_at=lot.created_at,
     )
 
@@ -169,7 +172,21 @@ async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> 
 async def list_lots(
     db: AsyncSession, fibre: Fibre | None, state: LotState | None, parish_code: str | None
 ) -> list[LotSummary]:
-    query = select(Lot).options(selectinload(Lot.items)).order_by(Lot.created_at.desc())
+    # Contagem e peso por lote em SQL: não se carregam as peças (com a composição em JSON) só para somar.
+    totals = (
+        select(
+            LotItem.lot_id.label("lot_id"),
+            func.count().label("n"),
+            func.coalesce(func.sum(LotItem.estimated_weight_g), 0).label("grams"),
+        )
+        .group_by(LotItem.lot_id)
+        .subquery()
+    )
+    query = (
+        select(Lot, func.coalesce(totals.c.n, 0), func.coalesce(totals.c.grams, 0))
+        .outerjoin(totals, totals.c.lot_id == Lot.id)
+        .order_by(Lot.created_at.desc())
+    )
     if fibre:
         query = query.where(Lot.dominant_fibre == fibre)
     if state:
@@ -178,8 +195,8 @@ async def list_lots(
     if parish_code:
         ids = [pid for pid, (code, _) in parishes.items() if code == parish_code]
         query = query.where(Lot.parish_id.in_(ids))
-    lots = (await db.execute(query)).scalars().all()
-    return [_summary(lot, parishes) for lot in lots]
+    rows = (await db.execute(query)).all()
+    return [_summary(lot, parishes, n_items=int(n), grams=int(grams)) for lot, n, grams in rows]
 
 
 def _destination_kg(lot: Lot) -> dict[TextileDestination, float]:
@@ -308,7 +325,9 @@ async def reserve(db: AsyncSession, user: User, code: str, body: ReserveRequest)
 
 
 async def brands(db: AsyncSession) -> BrandsOut:
-    items = (await db.execute(select(LotItem))).scalars().all()
+    # Só as três colunas usadas: a composição em JSON de cada peça não é precisa para a evidência por marca.
+    stmt = select(LotItem).options(load_only(LotItem.brand, LotItem.estimated_weight_g, LotItem.dominant_fibre))
+    items = (await db.execute(stmt)).scalars().all()
     by_brand: dict[str, list[LotItem]] = defaultdict(list)
     for i in items:
         if i.brand:
