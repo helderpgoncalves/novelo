@@ -6,6 +6,9 @@ services:
     build:
       context: .
       dockerfile: apps/web/Dockerfile
+    mem_limit: 256m
+    cpus: 1
+    pids_limit: 256
     environment:
       - SERVICE_FQDN_WEB_80
     depends_on:
@@ -17,6 +20,10 @@ services:
     build:
       context: .
       dockerfile: apps/api/Dockerfile
+    # Limites de recursos: o VPS é partilhado com outros projetos; o solver ou um PDF não podem esgotá-lo.
+    mem_limit: 1536m
+    cpus: 2
+    pids_limit: 512
     environment:
       - APP_ENV=production
       - LOG_LEVEL=${LOG_LEVEL:-info}
@@ -58,6 +65,9 @@ services:
 
   db:
     image: postgres:17-alpine
+    mem_limit: 512m
+    cpus: 1
+    pids_limit: 256
     environment:
       - POSTGRES_USER=novelo
       - POSTGRES_PASSWORD=${SERVICE_PASSWORD_POSTGRES}
