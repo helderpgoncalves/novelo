@@ -72,7 +72,9 @@ async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: h
     assert text_of(events) == "Recolheram-se 301,3 t em 2025, cerca de 23% do potencial."
     usage = next(e for e in events if e["type"] == "usage")
     assert usage["tokens"] == 2 * 1050 and usage["cost_usd"] == pytest.approx(0.0008)
-    assert next(e for e in events if e["type"] == "title")["title"] == "Quanto recolhemos?"  # título = primeira mensagem
+    assert (
+        next(e for e in events if e["type"] == "title")["title"] == "Quanto recolhemos?"
+    )  # título = primeira mensagem
 
     thread = (await logged_in.get(f"{T}/{start['thread_id']}")).json()
     assert [m["role"] for m in thread["messages"]] == ["user", "assistant"] and thread["title"] == "Quanto recolhemos?"
