@@ -147,6 +147,7 @@ class QuickJoinInfo(BaseModel):
 class GuestOut(BaseModel):
     id: uuid.UUID
     name: str | None
+    avatar_url: str | None = Field(default=None, description="Foto da conta (só https). Só leitura")
     email: str
     email_verified: bool
     is_active: bool

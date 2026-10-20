@@ -36,6 +36,9 @@ class UserAdminOut(BaseModel):
     id: uuid.UUID
     email: str
     name: str | None
+    avatar_url: str | None = Field(
+        default=None, description="Foto da conta (só https; nulo se não houver ou não for https). Só leitura"
+    )
     role: Role
     joined_via: JoinedVia
     is_active: bool
@@ -191,6 +194,10 @@ class InvitationOut(BaseModel):
     status: InvitationStatus
     invited_by_id: uuid.UUID | None
     invited_by_name: str | None
+    invited_by_email: str | None = Field(
+        default=None, description="Email de quem convidou; nulo se a conta já não existe"
+    )
+    invited_by_avatar_url: str | None = Field(default=None, description="Foto de quem convidou (só https)")
     created_at: datetime
     expires_at: datetime
     accepted_at: datetime | None

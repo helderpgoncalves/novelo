@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.adapters.email import EmailSender
+from novelo.core.avatar import safe_avatar_url
 from novelo.core.config import get_settings
 from novelo.core.errors import FeatureDisabledError, InvalidEventCodeError, InvalidTokenError, RateLimitError
 from novelo.core.request_meta import RequestMeta
@@ -230,6 +231,7 @@ async def list_guests(db: AsyncSession, offset: int, limit: int, q: str | None) 
         GuestOut(
             id=u.id,
             name=u.name,
+            avatar_url=safe_avatar_url(u.avatar_url),
             email=u.email,
             email_verified=u.email_verified,
             is_active=u.is_active,

@@ -804,6 +804,12 @@ export type AuditEntryOut = {
      */
     action: string;
     /**
+     * Actor Avatar Url
+     *
+     * Foto do ator (só https); nulo se não for uma conta
+     */
+    actor_avatar_url?: string | null;
+    /**
      * Actor Email
      */
     actor_email: string | null;
@@ -851,6 +857,12 @@ export type AuditEntryOut = {
      * Ip
      */
     ip: string | null;
+    /**
+     * Target Avatar Url
+     *
+     * Foto do alvo quando é uma conta existente (só https); nulo caso contrário
+     */
+    target_avatar_url?: string | null;
     /**
      * Target Id
      */
@@ -3088,6 +3100,12 @@ export type EmailDeliveryOut = {
      */
     to_email: string;
     /**
+     * To Name
+     *
+     * Nome da pessoa se existir uma conta com este email; nulo caso contrário
+     */
+    to_name?: string | null;
+    /**
      * Updated At
      */
     updated_at: string;
@@ -3734,6 +3752,12 @@ export type GuestOut = {
      */
     actions_count: number;
     /**
+     * Avatar Url
+     *
+     * Foto da conta (só https). Só leitura
+     */
+    avatar_url?: string | null;
+    /**
      * Consent At
      */
     consent_at: string | null;
@@ -4073,6 +4097,18 @@ export type InvitationOut = {
      * Id
      */
     id: string;
+    /**
+     * Invited By Avatar Url
+     *
+     * Foto de quem convidou (só https)
+     */
+    invited_by_avatar_url?: string | null;
+    /**
+     * Invited By Email
+     *
+     * Email de quem convidou; nulo se a conta já não existe
+     */
+    invited_by_email?: string | null;
     /**
      * Invited By Id
      */
@@ -10156,6 +10192,12 @@ export type UserAdminOut = {
      * Approved At
      */
     approved_at: string | null;
+    /**
+     * Avatar Url
+     *
+     * Foto da conta (só https; nulo se não houver ou não for https). Só leitura
+     */
+    avatar_url?: string | null;
     /**
      * Created At
      */

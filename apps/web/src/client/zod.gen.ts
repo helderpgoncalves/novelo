@@ -311,6 +311,7 @@ export const zAttachmentOut = z.object({
  */
 export const zAuditEntryOut = z.object({
     action: z.string(),
+    actor_avatar_url: z.string().nullish(),
     actor_email: z.string().nullable(),
     actor_id: z.uuid().nullable(),
     actor_name: z.string().nullable(),
@@ -321,6 +322,7 @@ export const zAuditEntryOut = z.object({
     effective_actor_name: z.string().nullable(),
     id: z.uuid(),
     ip: z.string().nullable(),
+    target_avatar_url: z.string().nullish(),
     target_id: z.string().nullable(),
     target_label: z.string().nullable(),
     target_type: z.string().nullable(),
@@ -1196,6 +1198,7 @@ export const zEmailDeliveryOut = z.object({
         'test_email'
     ]),
     to_email: z.string(),
+    to_name: z.string().nullish(),
     updated_at: z.iso.datetime(),
     user_id: z.uuid().nullable()
 });
@@ -1552,6 +1555,7 @@ export const zGlobalDefaults = z.object({
  */
 export const zGuestOut = z.object({
     actions_count: z.int(),
+    avatar_url: z.string().nullish(),
     consent_at: z.iso.datetime().nullable(),
     consent_version: z.string().nullable(),
     email: z.string(),
@@ -1690,6 +1694,8 @@ export const zInvitationOut = z.object({
     email_delivered: z.boolean(),
     expires_at: z.iso.datetime(),
     id: z.uuid(),
+    invited_by_avatar_url: z.string().nullish(),
+    invited_by_email: z.string().nullish(),
     invited_by_id: z.uuid().nullable(),
     invited_by_name: z.string().nullable(),
     last_email_at: z.iso.datetime().nullable(),
@@ -4640,6 +4646,7 @@ export const zUserAdminOut = z.object({
         'rejected'
     ]),
     approved_at: z.iso.datetime().nullable(),
+    avatar_url: z.string().nullish(),
     created_at: z.iso.datetime(),
     email: z.string(),
     email_verified: z.boolean(),

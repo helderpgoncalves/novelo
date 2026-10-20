@@ -117,7 +117,7 @@ async def test_list_filters_paginates_and_has_no_bodies(make_user: Maker, sessio
     assert everything["total"] == 3 and len(everything["items"]) == 2 and everything["limit"] == 2
     item = everything["items"][0]
     assert set(item) == {
-        "id", "to_email", "template", "status", "error_code", "attempts", "user_id", "invitation_id",
+        "id", "to_email", "to_name", "template", "status", "error_code", "attempts", "user_id", "invitation_id",
         "provider_message_id", "created_at", "sent_at", "delivered_at", "updated_at",
     }  # fmt: skip
     by_status = (await admin.get(E, params={"status": "failed"})).json()

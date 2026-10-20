@@ -12,6 +12,7 @@ class AuditEntryOut(BaseModel):
     actor_id: uuid.UUID | None = Field(description="Pessoa real; nulo se a conta foi eliminada")
     actor_name: str | None
     actor_email: str | None
+    actor_avatar_url: str | None = Field(default=None, description="Foto do ator (só https); nulo se não for uma conta")
     effective_actor_id: uuid.UUID | None = Field(
         description="Conta em nome de quem agiu; difere de `actor_id` durante uma impersonação"
     )
@@ -20,6 +21,9 @@ class AuditEntryOut(BaseModel):
     target_type: str | None = Field(description="`user`, `invitation` ou `request`")
     target_id: str | None
     target_label: str | None = Field(description="Email do alvo; apagado se o alvo for eliminado")
+    target_avatar_url: str | None = Field(
+        default=None, description="Foto do alvo quando é uma conta existente (só https); nulo caso contrário"
+    )
     ip: str | None
     user_agent: str | None
     details: dict[str, Any] = Field(description="Contexto sem segredos (papel anterior, motivo, caminho...)")
