@@ -186,3 +186,14 @@ O modelo por freguesia (secções 1 a 3) decide **que modo** serve cada freguesi
 - Cobertura de **população por proxy**, não por quarteirão. A coordenada aproximada (3 casas, ~100 m) de 350 locais é assinalada.
 - A sensibilidade (tornado e Monte Carlo) só existe para cenários por freguesia; a API responde 409 aos de locais.
 - Os locais de produtores (hotelaria, lares, escolas: 452) não entram como candidatos nem como procura; ficam para um módulo B2B.
+
+**O que os locais reais mudam (21 de outubro de 2026, pressupostos por omissão, estimativa).** O modelo por freguesia assume 1 ponto por 1 500 habitantes servindo 80% da população, onde quer que seja. Com os locais que existem, a mesma ambição custa mais:
+
+| Rede | Orçamento | Têxtil | €/t | Locais | Cobertura |
+| --- | --- | --- | --- | --- | --- |
+| Por freguesia (rua e locais existentes) | 60 000 € (gasta 44 288 €) | 361 t | 122,7 | 150 pontos | 82,6% |
+| Locais reais, ponto «existing», 300 m, com recolha a pedido | 60 000 € | 255 t | 235 | 99 locais + 34 freguesias a pedido | 80,9% |
+| Locais reais, ponto «street», 300 m, com recolha a pedido | 44 300 € | 275 t | 161 | 123 locais + 9 freguesias a pedido | 73,1% |
+| Locais reais, ponto «street», 500 m, com recolha a pedido | 44 300 € | 337 t | 130 | 116 locais + 7 freguesias a pedido | 87,7% |
+
+Leitura: o modelo por freguesia equivale a um raio a pé de cerca de 500 m. A 300 m, o mesmo têxtil custa 1,3 a 1,9 vezes mais por tonelada. Para cobrir 80% do proxy de população são precisos cerca de 219 locais a 300 m e 130 a 500 m (majorantes do solver, 30 s). A rede por freguesia **era otimista**; a por locais diz onde pôr cada ponto.
