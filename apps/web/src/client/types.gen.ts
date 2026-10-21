@@ -8643,6 +8643,10 @@ export type ScenarioOut = {
     parent_id: string | null;
     result: ScenarioResult;
     /**
+     * Siting
+     */
+    siting?: 'parish' | 'sites';
+    /**
      * Solver Status
      */
     solver_status: 'optimal' | 'feasible' | 'infeasible';
@@ -8702,6 +8706,12 @@ export type ScenarioRequest = {
      * Pressupostos de captura e custo usados nos locais (`existing` ou `street`)
      */
     site_mode?: CollectionMode;
+    /**
+     * Site On Demand
+     *
+     * Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)
+     */
+    site_on_demand?: boolean;
     /**
      * Site Radius M
      *
@@ -8801,6 +8811,10 @@ export type ScenarioSummary = {
      * Parent Id
      */
     parent_id: string | null;
+    /**
+     * Siting
+     */
+    siting?: 'parish' | 'sites';
     status: ScenarioStatus;
     /**
      * Target Tonnes
@@ -9251,6 +9265,18 @@ export type SitingSummary = {
      * Demand Points
      */
     demand_points: number;
+    /**
+     * On Demand
+     *
+     * A recolha a pedido podia completar a rede
+     */
+    on_demand?: boolean;
+    /**
+     * On Demand Zones
+     *
+     * Freguesias onde a recolha a pedido foi ligada
+     */
+    on_demand_zones?: number;
     /**
      * Opened
      */

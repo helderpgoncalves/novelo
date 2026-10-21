@@ -3582,6 +3582,7 @@ export const zScenarioRequest = z.object({
     params: zPlanningParams.nullish(),
     parent_id: z.uuid().nullish(),
     site_mode: zCollectionMode.optional().default('existing'),
+    site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
     target_tonnes: z.number().gte(0).nullish()
@@ -3606,6 +3607,7 @@ export const zScenarioSummary = z.object({
     label: z.string(),
     objective: zScenarioObjective,
     parent_id: z.uuid().nullable(),
+    siting: z.enum(['parish', 'sites']).optional().default('parish'),
     status: zScenarioStatus,
     target_tonnes: z.number().nullable(),
     tonnes_year: z.number()
@@ -3879,6 +3881,8 @@ export const zSiteSelection = z.object({
 export const zSitingSummary = z.object({
     candidates: z.int(),
     demand_points: z.int(),
+    on_demand: z.boolean().optional().default(false),
+    on_demand_zones: z.int().optional().default(0),
     opened: z.int(),
     population_proxy: z.string(),
     radius_m: z.int(),
@@ -3917,6 +3921,7 @@ export const zScenarioOut = z.object({
     params: zPlanningParams,
     parent_id: z.uuid().nullable(),
     result: zScenarioResult,
+    siting: z.enum(['parish', 'sites']).optional().default('parish'),
     solver_status: z.enum([
         'optimal',
         'feasible',

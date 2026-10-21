@@ -166,3 +166,23 @@ Só há um ano de têxtil (2025, totais anuais por entidade), por isso **não h�
 - **Triangulação do potencial.** Confronta as leituras publicadas do têxtil gerado por habitante e mostra a captura de 2025 que cada uma implica: 0,7 kg/mês do plano municipal (8,4 kg/ano, captura 22,9%), 5,4% × 315 kg do indiferenciado (17,0 kg/ano, 11,3%) e 4,55% × 517 kg da composição dos RSU em Portugal (23,5 kg/ano, 8,2%). Em nenhuma Guimarães passa de 22,9%; todas são **estimativa**. A referência francesa (4,27 kg/hab/ano) continua marcada «por verificar».
 - **Validação cruzada espacial (deixar uma de fora).** Cada freguesia é prevista só com as outras 47, na proporção da população, e comparada com os contentores municipais que lá estão. Resultado (48 freguesias): R² 0,76 e erro mediano de 36% em todos os contentores; 0,84 nos enterrados; 0,06 nos de superfície, onde a população não diz onde estão. Não prova a procura de têxtil: mostra que a população é um proxy razoável do sítio onde a recolha existe, e onde deixa de ser.
 - **O que não se testa (e como se resolve):** série temporal (precisa dos quilos mensais por entidade; a H Sarah Trading tem-nos por mês), custos locais (a Vitrus ainda não os enviou) e contentores de têxteis (localizações por receber). O piloto de três meses fecha o ciclo previsto contra observado.
+
+## 8. Rede por locais reais
+
+O modelo por freguesia (secções 1 a 3) decide **que modo** serve cada freguesia, com um ponto no centro dela. A rede por locais reais decide **que locais abrir**: usa os 1 187 locais públicos de contentores municipais que a Vitrus enviou a 20 de outubro de 2026 (`municipal_sites`, `textile_candidate = true`) como candidatos. Código em `domain/siting.py` (funções puras) e `features/planning/site_service.py`; escolhe-se no simulador («Rede: Locais reais») ou com `siting: "sites"` no pedido de cenário. O resultado tem o mesmo contrato do cenário por freguesia (alocações, rotas, KPIs), mais `result.sites` e `result.siting`.
+
+**Procura por ponto.** Os habitantes não estão localizados abaixo da freguesia (o BGRI não chegou). Cada freguesia reparte a sua procura pelos seus locais públicos com contentores (1 574 pontos de procura), na proporção do número de contentores do local: `t_i = D_z · w_i / Σ w · c`. É um proxy, validado ao nível da freguesia (R² 0,76; ver secção 7), e por isso tudo o que daqui sai leva «estimativa».
+
+**Cobertura.** Um ponto fica servido se houver um local aberto a menos de `radius_m` (200, 300 ou 500 m; 300 por omissão). Vários locais a servir o mesmo ponto não captam duas vezes (cobertura por união).
+
+**Escolha dos locais.** Cobertura máxima com orçamento (ou custo mínimo para uma meta) em CP-SAT: `x_j` = abrir o local `j`, `y_i` ≤ Σ `x_j` dos locais ao alcance, maximizar Σ `t_i · y_i` com Σ `custo_j · x_j` ≤ orçamento. O custo fixo de um local é `capex/N + recolhas/ano · c_recolha` (pressupostos do modo `existing`, ou `street` se escolhido). Pontos com os mesmos locais ao alcance juntam-se (não muda o ótimo). Uma solução gulosa (o local com mais têxtil novo por euro) entra como dica completa, por isso o CP-SAT nunca devolve pior do que ela; semente fixa e um só trabalhador (determinismo).
+
+**Rotas e km.** O VRP (a mesma função da rede por freguesia) corre sobre os locais abertos, com capacidade das viaturas e o desvio da estrada. Como os km não são lineares nos locais escolhidos, o orçamento do solver sobe ou desce pela folga ou excesso do custo real (locais + km) até o cenário caber no orçamento pedido (até 4 voltas).
+
+**Recolha a pedido como complemento** (`site_on_demand`, ligado por omissão). Os dois canais captam de forma independente, como no modelo por freguesia: `t_i = D_i · (1 − (1 − c_s · y_i)(1 − c_o · z_p))`, com `z_p` = recolha a pedido ligada na freguesia `p` (custo do `mode_cost` do modelo por zonas, que aproveita os circuitos que já passam).
+
+**Limites.**
+- Os contentores são de **outras frações**; que se possa pôr têxtil nesses locais é um pressuposto a confirmar com a Vitrus (capacidade, autorização, custo).
+- Cobertura de **população por proxy**, não por quarteirão. A coordenada aproximada (3 casas, ~100 m) de 350 locais é assinalada.
+- A sensibilidade (tornado e Monte Carlo) só existe para cenários por freguesia; a API responde 409 aos de locais.
+- Os locais de produtores (hotelaria, lares, escolas: 452) não entram como candidatos nem como procura; ficam para um módulo B2B.

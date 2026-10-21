@@ -47,3 +47,22 @@ def test_modes_are_backfilled_from_the_stored_result(scratch_url: str) -> None: 
     assert down.returncode == 0, down.stderr[-800:]
     assert "modes" not in {c["name"] for c in inspect(engine).get_columns("scenarios")}
     engine.dispose()
+
+
+def test_siting_column_defaults_to_parish_and_rejects_other_values(scratch_url: str) -> None:  # noqa: F811
+    assert alembic(scratch_url, "upgrade", "0012").returncode == 0
+    engine = create_engine(scratch_url.replace("+asyncpg", "+psycopg2"))
+    with engine.begin() as conn:
+        _insert(conn, "old", {"modes": []})
+    assert alembic(scratch_url, "upgrade", "0013").returncode == 0
+    with engine.begin() as conn:
+        assert conn.execute(text("SELECT siting FROM scenarios WHERE label = 'old'")).scalar_one() == "parish"
+    with engine.begin() as conn:
+        try:
+            conn.execute(text("UPDATE scenarios SET siting = 'other'"))
+        except Exception as exc:
+            assert "ck_scenarios_siting" in str(exc)
+        else:
+            raise AssertionError("o valor 'other' devia ser rejeitado")
+    assert alembic(scratch_url, "downgrade", "0012").returncode == 0
+    assert "siting" not in {c["name"] for c in inspect(engine).get_columns("scenarios")}
