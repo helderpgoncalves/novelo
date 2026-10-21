@@ -76,8 +76,18 @@ class AuthConfig(BaseModel):
     turnstile_site_key: str | None = Field(description="Chave pública do widget; null se o Turnstile não estiver ativo")
     password_min_length: int = PASSWORD_MIN
     approval_required: bool = Field(
-        default=True, description="Contas novas (password ou Google) ficam à espera de aprovação de um administrador"
+        default=True,
+        description=(
+            "Contas novas (password ou Google) ficam à espera de aprovação de um administrador; `false` com o registo "
+            "aberto (definição `open_registration`)"
+        ),
     )
+
+
+class RegistrationInfo(BaseModel):
+    """Público e mínimo: o ecrã de registo diz «entras logo» quando `open` é verdadeiro."""
+
+    open: bool = Field(description="Registo aberto: quem se regista (password ou Google) entra logo, sem aprovação")
 
 
 class VerifyEmailRequest(BaseModel):

@@ -28,7 +28,7 @@ const TOP_DRIVERS = 5;
 const eurPerTonne = (v: number | null) =>
   v == null ? m.common_dash() : `${formatNumber(v, 0)} €/t`;
 
-function useSensitivity(scenarioId: string, swing: number, threshold: number | null) {
+export function useSensitivity(scenarioId: string, swing: number, threshold: number | null) {
   // A rota é um POST sem efeitos (cálculo puro com semente fixa): trata-se como leitura em cache.
   return useQuery<SensitivityOut>({
     queryKey: ['scenario-sensitivity', scenarioId, swing, threshold],

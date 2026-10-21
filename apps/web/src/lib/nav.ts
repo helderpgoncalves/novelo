@@ -1,23 +1,20 @@
 import {
   BadgeCheck,
-  BarChart3,
   Bot,
-  Boxes,
-  Container,
+  ClipboardCheck,
+  Compass,
   FileText,
   FlaskConical,
   GitCompareArrows,
-  Layers,
   type LucideIcon,
   MapPinned,
   MessagesSquare,
-  Radar,
+  Network,
+  QrCode,
   Route as RouteIcon,
   ScanLine,
-  ShieldCheck,
+  Sigma,
   SlidersHorizontal,
-  Store,
-  Tags,
   Truck,
   Users,
   Waypoints,
@@ -33,13 +30,10 @@ export interface NavItem {
     | '/localities'
     | '/data-quality'
     | '/map'
-    | '/coverage'
     | '/municipal'
     | '/chat'
     | '/triage'
     | '/lots'
-    | '/market'
-    | '/brands'
     | '/reports'
     | '/simulator'
     | '/scenarios'
@@ -61,44 +55,42 @@ export interface NavSection {
   items: NavItem[];
 }
 
-// A mesma fonte alimenta a sidebar desktop e o menu móvel.
+// A mesma fonte alimenta a sidebar desktop e o menu móvel. A ordem conta a história: o problema e onde está (Decidir),
+// porque se acredita nos números (Provar), de onde vêm (Dados da Vitrus), como se opera no piloto e como se presta contas.
 export const NAV: NavSection[] = [
   {
-    title: () => m.nav_section_overview(),
+    title: () => m.nav_section_decide(),
     items: [
-      { label: () => m.nav_baseline(), to: '/', icon: BarChart3 },
-      { label: () => m.nav_map(), to: '/map', icon: MapPinned },
-      { label: () => m.nav_coverage(), to: '/coverage', icon: Radar },
-      { label: () => m.nav_municipal(), to: '/municipal', icon: Container },
+      { label: () => m.nav_baseline(), to: '/', icon: Compass },
+      { label: () => m.nav_short_map(), to: '/map', icon: MapPinned },
+      { label: () => m.nav_short_simulator(), to: '/simulator', icon: SlidersHorizontal },
+      { label: () => m.nav_short_scenarios(), to: '/scenarios', icon: GitCompareArrows },
+      { label: () => m.nav_pilot(), to: '/pilot', icon: FlaskConical },
       { label: () => m.nav_chat(), to: '/chat', icon: MessagesSquare },
+    ],
+  },
+  {
+    title: () => m.nav_section_prove(),
+    items: [
+      { label: () => m.nav_validation(), to: '/validation', icon: BadgeCheck },
+      { label: () => m.nav_assumptions(), to: '/assumptions', icon: Sigma },
+      { label: () => m.nav_data_quality(), to: '/data-quality', icon: ClipboardCheck },
     ],
   },
   {
     title: () => m.nav_section_data(),
     items: [
-      { label: () => m.nav_circuits(), to: '/circuits', icon: RouteIcon },
+      { label: () => m.nav_short_circuits(), to: '/circuits', icon: RouteIcon },
       { label: () => m.nav_fleet(), to: '/fleet', icon: Truck },
       { label: () => m.nav_localities(), to: '/localities', icon: Waypoints },
-      { label: () => m.nav_data_quality(), to: '/data-quality', icon: ShieldCheck },
-    ],
-  },
-  {
-    title: () => m.nav_section_planning(),
-    items: [
-      { label: () => m.nav_simulator(), to: '/simulator', icon: Layers },
-      { label: () => m.nav_scenarios(), to: '/scenarios', icon: GitCompareArrows },
-      { label: () => m.nav_pilot(), to: '/pilot', icon: FlaskConical },
-      { label: () => m.nav_validation(), to: '/validation', icon: BadgeCheck },
-      { label: () => m.nav_assumptions(), to: '/assumptions', icon: SlidersHorizontal },
+      { label: () => m.nav_municipal(), to: '/municipal', icon: Network },
     ],
   },
   {
     title: () => m.nav_section_operations(),
     items: [
       { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
-      { label: () => m.nav_lots(), to: '/lots', icon: Boxes },
-      { label: () => m.nav_market(), to: '/market', icon: Store },
-      { label: () => m.nav_brands(), to: '/brands', icon: Tags },
+      { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
     ],
   },
   {

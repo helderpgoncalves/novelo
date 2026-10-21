@@ -4,7 +4,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 
 | Grupo | Variáveis | Notas |
 | --- | --- | --- |
-| Geral | `APP_ENV`, `LOG_LEVEL`, `DOMAIN`, `SEED_REFERENCE_SCENARIOS` | `APP_ENV=production` desliga `/api/docs` e `/api/openapi.json`. `LOG_LEVEL=debug` acrescenta `queries` (consultas SQL por pedido) ao registo de cada pedido. `SEED_REFERENCE_SCENARIOS=true` (por omissão em produção) cria uma só vez, em segundo plano, 5 cenários de referência por locais reais (20 000 a 150 000 €/ano) se ainda não houver nenhum: a sala de decisão usa-os |
+| Geral | `APP_ENV`, `LOG_LEVEL`, `DOMAIN`, `SEED_REFERENCE_SCENARIOS` | `APP_ENV=production` desliga `/api/docs` e `/api/openapi.json`. `LOG_LEVEL=debug` acrescenta `queries` (consultas SQL por pedido) ao registo de cada pedido. `SEED_REFERENCE_SCENARIOS=true` (por omissão em produção) garante em segundo plano, a cada arranque, 5 cenários de referência por locais reais (20 000 a 150 000 €/ano, a sala de decisão usa-os) e 1 por freguesia a 60 000 €/ano (ecrã inicial), e recalcula os desatualizados (ver [Arquitetura](arquitetura.md#cenários-de-referência)) |
 | Portas (dev) | `WEB_PORT=3190`, `API_PORT=8190`, `DB_PORT=5590` | `OSRM_PORT` existe no `.env.example` mas não é usada |
 | Base de dados | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Em produção a password é gerada pelo Coolify |
 | Sessão | `SECRET_KEY`, `APP_URL`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `SESSION_TOKEN_HOURS` | `APP_URL` entra nos links dos emails e no retorno do Google |

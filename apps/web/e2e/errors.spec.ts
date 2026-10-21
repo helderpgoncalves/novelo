@@ -53,13 +53,15 @@ test.describe('404', () => {
     await expect(heading(page, 'Esta página não existe')).toBeVisible();
     await expect(heading(page, 'Esta página não existe')).toBeFocused();
     // O menu mantém-se.
-    await expect(page.getByRole('link', { name: 'Mapa da rede' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Mapa', exact: true }).first()).toBeVisible();
     await expect(page.getByText('/cenario-que-nao-existe')).toBeVisible();
     await shot(page, '404');
 
     const search = page.getByRole('searchbox', { name: 'Procurar uma secção' });
     await search.fill('mapa');
-    await expect(page.locator('search').getByRole('link', { name: /Mapa da rede/ })).toBeVisible();
+    await expect(
+      page.locator('search').getByRole('link', { name: 'Mapa', exact: true }),
+    ).toBeVisible();
     await search.press('Enter');
     await expect(page).toHaveURL(/\/pt\/map/);
   });
@@ -105,7 +107,7 @@ test.describe('rede e API', () => {
     await context.setOffline(true);
     await goToFleet(page);
     await expect(heading(page, 'Estás sem ligação à internet')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Mapa da rede' }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Mapa', exact: true }).first()).toBeVisible();
     await expect(page.getByRole('alert')).toHaveCount(0);
     await shot(page, 'offline');
 

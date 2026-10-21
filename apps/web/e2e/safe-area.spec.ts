@@ -71,7 +71,7 @@ test('páginas principais sem overflow nem conteúdo tapado, claro e escuro', as
   await login(page);
   for (const scheme of ['light', 'dark'] as const) {
     await page.emulateMedia({ colorScheme: scheme });
-    for (const route of ['', '/map', '/chat', '/circuits', '/simulator', '/coverage']) {
+    for (const route of ['', '/map', '/chat', '/circuits', '/simulator', '/lots']) {
       await page.goto(`/pt${route}`);
       await expect(page.locator('#content')).toBeVisible();
       await page.waitForTimeout(400);

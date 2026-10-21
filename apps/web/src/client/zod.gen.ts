@@ -202,6 +202,36 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * AppSettingsOut
+ */
+export const zAppSettingsOut = z.object({
+    open_registration: z.boolean(),
+    pending_approvals: z.int(),
+    updated_at: z.iso.datetime().nullable(),
+    updated_by_id: z.uuid().nullable()
+});
+
+/**
+ * AppSettingsUpdate
+ */
+export const zAppSettingsUpdate = z.object({
+    approve_pending: z.boolean().optional().default(false),
+    open_registration: z.boolean().nullish()
+});
+
+/**
+ * AppSettingsUpdated
+ */
+export const zAppSettingsUpdated = z.object({
+    approved_pending: z.int(),
+    open_registration: z.boolean(),
+    pending_approvals: z.int(),
+    skipped_previously_rejected: z.int(),
+    updated_at: z.iso.datetime().nullable(),
+    updated_by_id: z.uuid().nullable()
+});
+
+/**
  * ApprovalEmailOut
  *
  * O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).
@@ -3399,6 +3429,15 @@ export const zRegisterRequest = z.object({
 });
 
 /**
+ * RegistrationInfo
+ *
+ * Público e mínimo: o ecrã de registo diz «entras logo» quando `open` é verdadeiro.
+ */
+export const zRegistrationInfo = z.object({
+    open: z.boolean()
+});
+
+/**
  * RejectRequest
  */
 export const zRejectRequest = z.object({
@@ -3672,6 +3711,37 @@ export const zScenarioRequest = z.object({
 export const zScenarioStatus = z.enum(['computed', 'infeasible']);
 
 /**
+ * ReferenceScenarioOut
+ *
+ * Cenário de referência atual (o mais recente de cada chave).
+ */
+export const zReferenceScenarioOut = z.object({
+    annual_cost_eur: z.number(),
+    budget_eur_year: z.number().nullable(),
+    capex_eur: z.number(),
+    coverage_pct: z.number(),
+    created_at: z.iso.datetime(),
+    eur_per_tonne: z.number().nullable(),
+    id: z.uuid(),
+    label: z.string(),
+    objective: zScenarioObjective,
+    onboarding: z.boolean(),
+    parent_id: z.uuid().nullable(),
+    reference_key: z.string().nullish(),
+    siting: z.enum(['parish', 'sites']).optional().default('parish'),
+    stale_reasons: z.array(z.enum([
+        'model_version',
+        'parameters',
+        'no_collection_plan',
+        'street'
+    ])),
+    status: zScenarioStatus,
+    target_tonnes: z.number().nullable(),
+    tonnes_year: z.number(),
+    up_to_date: z.boolean()
+});
+
+/**
  * ScenarioSummary
  */
 export const zScenarioSummary = z.object({
@@ -3685,6 +3755,7 @@ export const zScenarioSummary = z.object({
     label: z.string(),
     objective: zScenarioObjective,
     parent_id: z.uuid().nullable(),
+    reference_key: z.string().nullish(),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
     status: zScenarioStatus,
     target_tonnes: z.number().nullable(),
@@ -4008,6 +4079,7 @@ export const zScenarioOut = z.object({
     objective: zScenarioObjective,
     params: zPlanningParams,
     parent_id: z.uuid().nullable(),
+    reference_key: z.string().nullish(),
     result: zScenarioResult,
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
     solver_status: z.enum([
@@ -5424,6 +5496,18 @@ export const zZoneOut = z.object({
 /**
  * Successful Response
  */
+export const zGetAppSettingsResponse = zAppSettingsOut;
+
+export const zUpdateAppSettingsBody = zAppSettingsUpdate;
+
+/**
+ * Successful Response
+ */
+export const zUpdateAppSettingsResponse = zAppSettingsUpdated;
+
+/**
+ * Successful Response
+ */
 export const zGetAiCreditsResponse = zAiCreditsOut;
 
 /**
@@ -5643,6 +5727,11 @@ export const zRegisterHeaders = z.object({
  * Successful Response
  */
 export const zRegisterResponse = zUserOut;
+
+/**
+ * Successful Response
+ */
+export const zGetRegistrationInfoResponse = zRegistrationInfo;
 
 /**
  * Successful Response
@@ -6509,6 +6598,13 @@ export const zCreateScenarioBody = zScenarioRequest;
  * Successful Response
  */
 export const zCreateScenarioResponse = zScenarioOut;
+
+/**
+ * Response List Reference Scenarios
+ *
+ * Successful Response
+ */
+export const zListReferenceScenariosResponse = z.array(zReferenceScenarioOut);
 
 export const zDeleteScenarioPath = z.object({
     scenario_id: z.uuid()

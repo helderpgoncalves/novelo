@@ -14,11 +14,7 @@ const LABEL: Record<PotentialReadingOut['key'], () => string> = {
 export function ReadingsChart({ data }: { data: ModelValidationOut }) {
   const observed = data.baseline.observed_kg_per_inhab_year;
   const top = Math.max(...data.readings.map((r) => r.kg_per_inhab_year), observed);
-  // As leituras alternativas (não usadas pela Vitrus) mostram-se, mas não definem o teto da frase.
-  const used = data.readings.filter((r) => !r.is_alternative);
-  const maxCapture = Math.max(
-    ...(used.length > 0 ? used : data.readings).map((r) => r.implied_capture_pct),
-  );
+  const maxCapture = Math.max(...data.readings.map((r) => r.implied_capture_pct));
   const at = (kg: number) => `${(kg / top) * 100}%`;
 
   return (

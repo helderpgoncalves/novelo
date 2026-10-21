@@ -49,6 +49,7 @@ from novelo.core.ratelimit import (
     whatif_limiter,
 )
 from novelo.features.ai_admin import models as _ai_models  # noqa: F401
+from novelo.features.app_settings import models as _app_settings_models  # noqa: F401
 from novelo.features.auth import models as _auth_models  # noqa: F401
 from novelo.features.copilot import models as _copilot_models  # noqa: F401
 from novelo.features.datasets import models as _dataset_models  # noqa: F401

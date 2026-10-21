@@ -17,6 +17,7 @@ from novelo.core.errors import COMMON_ERRORS, register_error_handlers
 from novelo.core.hardening import HardeningMiddleware
 from novelo.core.logging import RequestLoggingMiddleware, configure_logging, install_query_counter
 from novelo.features.ai_admin.router import router as ai_router
+from novelo.features.app_settings.router import router as app_settings_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
 from novelo.features.copilot.router import router as copilot_router
@@ -90,6 +91,9 @@ def create_app() -> FastAPI:
         email_admin_router, prefix=f"{API_PREFIX}/users/emails", tags=["emails"], responses=COMMON_ERRORS
     )
     app.include_router(users_router, prefix=f"{API_PREFIX}/users", tags=["users"], responses=COMMON_ERRORS)
+    app.include_router(
+        app_settings_router, prefix=f"{API_PREFIX}/admin/settings", tags=["settings"], responses=COMMON_ERRORS
+    )
     # Webhooks: sem sessão; a autenticação é a assinatura do fornecedor.
     app.include_router(webhook_router, prefix=f"{API_PREFIX}/webhooks", tags=["webhooks"], responses=COMMON_ERRORS)
     # Dados da Vitrus: só para utilizadores autenticados.

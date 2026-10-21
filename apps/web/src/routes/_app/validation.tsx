@@ -36,9 +36,11 @@ function Validation() {
   if (isPending) return <PageSkeleton />;
   if (error || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
-  const captures = data.readings.map((r) => r.implied_capture_pct);
+  // Só as leituras que a Vitrus reconhece: as alternativas (um plano que a Vitrus não usa) ficam fora do ecrã.
+  const readings = data.readings.filter((r) => !r.is_alternative);
+  const captures = readings.map((r) => r.implied_capture_pct);
   // A leitura principal (Vitrus + APA); as outras só triangulam.
-  const base = data.readings.find((r) => r.is_model_base);
+  const base = readings.find((r) => r.is_model_base);
   const all = data.spatial.find((c) => c.kind === 'all');
   const underground = data.spatial.find((c) => c.kind === 'underground');
   const surface = data.spatial.find((c) => c.kind === 'surface');
@@ -84,7 +86,7 @@ function Validation() {
         )}
       </StatStrip>
 
-      <ReadingsChart data={data} />
+      <ReadingsChart data={{ ...data, readings }} />
 
       {all && (
         <Section

@@ -26,6 +26,7 @@ from novelo.features.auth import emails
 from novelo.features.auth import service as auth_service
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.models import EmailDelivery
+from novelo.features.users import open_registration
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 from novelo.features.users.schemas import ApproveRequest, RejectRequest
@@ -179,7 +180,12 @@ async def reject(
         target_type="user",
         target_id=target.id,
         target_label=target.email,
-        details={"has_reason": body.reason is not None, "notified": body.notify},
+        # O SHA-256 do email sobrevive à eliminação da conta: o registo aberto nunca aprova um email já recusado.
+        details={
+            "has_reason": body.reason is not None,
+            "notified": body.notify,
+            "email_sha256": open_registration.email_digest(target.email),
+        },
     )
     await db.commit()
     delivery = await _send_rejected(db, sender, target) if body.notify else None

@@ -12,7 +12,10 @@ type Ctx = OverviewHighlight['context'];
 const val = (ctx: Ctx, key: string) => Number(ctx[key] ?? Number.NaN);
 const str = (ctx: Ctx, key: string) => String(ctx[key] ?? '');
 
-/** Texto de cada manchete: a chave da API escolhe a frase; os números vêm todos do servidor. */
+/**
+ * Texto de cada manchete: a chave da API escolhe a frase; os números vêm todos do servidor. Manchetes sem frase aqui
+ * não se mostram (ex.: a equivalência à França, fonte secundária por verificar).
+ */
 const HIGHLIGHT_TEXT: Record<string, (h: OverviewHighlight) => string> = {
   top_entity_share: (h) =>
     m.home_hl_top_entity_share({
@@ -23,11 +26,6 @@ const HIGHLIGHT_TEXT: Record<string, (h: OverviewHighlight) => string> = {
     m.home_hl_reuse_share({
       reuse: tonnes(val(h.context, 'reuse_t'), 1),
       total: tonnes(val(h.context, 'total_t'), 1),
-    }),
-  france_equivalent_t: (h) =>
-    m.home_hl_france_equivalent({
-      multiple: num(val(h.context, 'multiple'), 1),
-      kg: num(val(h.context, 'kg_per_inhab_year'), 2),
     }),
   textile_in_mixed_waste: () => m.home_hl_textile_in_mixed_waste(),
   parish_size_ratio: (h) =>

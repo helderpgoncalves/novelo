@@ -213,8 +213,13 @@ async def _frontier(db: AsyncSession) -> tuple[list[FrontierPoint], list[Any]]:
     # A rede por locais reais é a que respeita onde há pontos de recolha: com pelo menos dois cenários assim, a
     # fronteira e o controlo de orçamento da sala de decisão usam só esses (misturar com a rede por freguesia, mais
     # otimista, faria a interpolação saltar entre dois modelos).
+    # Os cenários de referência (recalculados no arranque, sempre com o modelo atual) têm prioridade: a sala de decisão
+    # não pode depender de cenários de teste ou rascunhos que alguém guardou.
+    reference_sites = [r for r in rows if r.reference_key is not None and r.siting == "sites"]
     by_sites = [r for r in rows if r.siting == "sites"]
-    if len(by_sites) >= MIN_SITE_SCENARIOS:
+    if len(reference_sites) >= MIN_SITE_SCENARIOS:
+        rows = reference_sites
+    elif len(by_sites) >= MIN_SITE_SCENARIOS:
         rows = by_sites
     points: list[FrontierPoint] = []
     for s in rows:

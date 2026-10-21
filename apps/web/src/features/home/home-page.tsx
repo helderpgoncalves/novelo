@@ -16,6 +16,7 @@ import { questionInputs, trustItems } from './derive';
 import { EvidenceTabs } from './evidence-tabs';
 import { Fio } from './fio';
 import { NextSteps } from './next-steps';
+import { PilotNext, PlanStory } from './plan-story';
 import { num, pct } from './safe';
 import { SituationStrip } from './situation-strip';
 import type { HomeTab, LayerId } from './tabs';
@@ -40,6 +41,7 @@ interface HomePageProps {
 
 const ANCHORS = [
   ['mapa', () => m.home_nav_map()],
+  ['plano', () => m.home_nav_plan()],
   ['passos', () => m.home_nav_steps()],
   ['fio', () => m.home_nav_fio()],
   ['confianca', () => m.home_nav_trust()],
@@ -162,6 +164,23 @@ export function HomePage({ role, search, onSearch }: HomePageProps) {
               />
             }
           />
+        </AsyncBoundary>
+      </section>
+
+      <section id="plano" aria-labelledby="home-plan-title" className="scroll-mt-20 space-y-4">
+        <div className="space-y-1.5">
+          <h2 id="home-plan-title" className="text-balance text-[1.4rem] sm:text-2xl">
+            {m.home_plan_title()}
+          </h2>
+          <p className="max-w-3xl text-muted-foreground text-sm leading-relaxed">
+            {m.home_plan_description()}
+          </p>
+        </div>
+        <AsyncBoundary fallback={<CardSkeleton className="min-h-96" />}>
+          <PlanStory />
+        </AsyncBoundary>
+        <AsyncBoundary fallback={<CardSkeleton className="min-h-32" />}>
+          <PilotNext />
         </AsyncBoundary>
       </section>
 

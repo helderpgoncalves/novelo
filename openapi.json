@@ -1016,6 +1016,136 @@
         "title": "AllocationPart",
         "type": "object"
       },
+      "AppSettingsOut": {
+        "properties": {
+          "open_registration": {
+            "description": "Registo aberto: quem se regista (password ou Google) ou entra com a conta por aprovar fica logo aprovado, com o papel por omissão (`operator`). Contas recusadas e emails já recusados nunca",
+            "title": "Open Registration",
+            "type": "boolean"
+          },
+          "pending_approvals": {
+            "description": "Contas à espera de aprovação neste momento",
+            "title": "Pending Approvals",
+            "type": "integer"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Última alteração; nulo = nunca alterado (valores por omissão)",
+            "title": "Updated At"
+          },
+          "updated_by_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By Id"
+          }
+        },
+        "required": [
+          "open_registration",
+          "pending_approvals",
+          "updated_at",
+          "updated_by_id"
+        ],
+        "title": "AppSettingsOut",
+        "type": "object"
+      },
+      "AppSettingsUpdate": {
+        "properties": {
+          "approve_pending": {
+            "default": false,
+            "description": "Aprova também agora as contas `pending` (só com o registo aberto; 409 se ficar fechado). Os emails já recusados ficam à espera. Auditado por conta",
+            "title": "Approve Pending",
+            "type": "boolean"
+          },
+          "open_registration": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Omitido = mantém",
+            "title": "Open Registration"
+          }
+        },
+        "title": "AppSettingsUpdate",
+        "type": "object"
+      },
+      "AppSettingsUpdated": {
+        "properties": {
+          "approved_pending": {
+            "description": "Contas pendentes aprovadas por `approve_pending`",
+            "title": "Approved Pending",
+            "type": "integer"
+          },
+          "open_registration": {
+            "description": "Registo aberto: quem se regista (password ou Google) ou entra com a conta por aprovar fica logo aprovado, com o papel por omissão (`operator`). Contas recusadas e emails já recusados nunca",
+            "title": "Open Registration",
+            "type": "boolean"
+          },
+          "pending_approvals": {
+            "description": "Contas à espera de aprovação neste momento",
+            "title": "Pending Approvals",
+            "type": "integer"
+          },
+          "skipped_previously_rejected": {
+            "description": "Contas pendentes que ficaram à espera porque o email já foi recusado antes",
+            "title": "Skipped Previously Rejected",
+            "type": "integer"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Última alteração; nulo = nunca alterado (valores por omissão)",
+            "title": "Updated At"
+          },
+          "updated_by_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated By Id"
+          }
+        },
+        "required": [
+          "open_registration",
+          "pending_approvals",
+          "updated_at",
+          "updated_by_id",
+          "approved_pending",
+          "skipped_previously_rejected"
+        ],
+        "title": "AppSettingsUpdated",
+        "type": "object"
+      },
       "ApprovalEmailOut": {
         "description": "O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).",
         "properties": {
@@ -1754,7 +1884,7 @@
         "properties": {
           "approval_required": {
             "default": true,
-            "description": "Contas novas (password ou Google) ficam à espera de aprovação de um administrador",
+            "description": "Contas novas (password ou Google) ficam à espera de aprovação de um administrador; `false` com o registo aberto (definição `open_registration`)",
             "title": "Approval Required",
             "type": "boolean"
           },
@@ -14052,6 +14182,157 @@
         "title": "Readiness",
         "type": "object"
       },
+      "ReferenceScenarioOut": {
+        "description": "Cenário de referência atual (o mais recente de cada chave).",
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "budget_eur_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Budget Eur Year"
+          },
+          "capex_eur": {
+            "title": "Capex Eur",
+            "type": "number"
+          },
+          "coverage_pct": {
+            "title": "Coverage Pct",
+            "type": "number"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eur Per Tonne"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "objective": {
+            "$ref": "#/components/schemas/ScenarioObjective"
+          },
+          "onboarding": {
+            "description": "O plano por omissão do ecrã inicial e da introdução guiada",
+            "title": "Onboarding",
+            "type": "boolean"
+          },
+          "parent_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parent Id"
+          },
+          "reference_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores",
+            "title": "Reference Key"
+          },
+          "siting": {
+            "default": "parish",
+            "enum": [
+              "parish",
+              "sites"
+            ],
+            "title": "Siting",
+            "type": "string"
+          },
+          "stale_reasons": {
+            "description": "Porque está desatualizado: versão do modelo, versão dos pressupostos, sem plano de recolha ou contentor de rua",
+            "items": {
+              "enum": [
+                "model_version",
+                "parameters",
+                "no_collection_plan",
+                "street"
+              ],
+              "type": "string"
+            },
+            "title": "Stale Reasons",
+            "type": "array"
+          },
+          "status": {
+            "$ref": "#/components/schemas/ScenarioStatus"
+          },
+          "target_tonnes": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Target Tonnes"
+          },
+          "tonnes_year": {
+            "title": "Tonnes Year",
+            "type": "number"
+          },
+          "up_to_date": {
+            "description": "Falso enquanto o arranque o recalcula (o antigo fica até haver o novo)",
+            "title": "Up To Date",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "objective",
+          "status",
+          "budget_eur_year",
+          "target_tonnes",
+          "tonnes_year",
+          "capex_eur",
+          "annual_cost_eur",
+          "eur_per_tonne",
+          "coverage_pct",
+          "parent_id",
+          "created_at",
+          "up_to_date",
+          "stale_reasons",
+          "onboarding"
+        ],
+        "title": "ReferenceScenarioOut",
+        "type": "object"
+      },
       "ReferenceStandard": {
         "properties": {
           "name": {
@@ -14145,6 +14426,21 @@
           "password"
         ],
         "title": "RegisterRequest",
+        "type": "object"
+      },
+      "RegistrationInfo": {
+        "description": "Público e mínimo: o ecrã de registo diz «entras logo» quando `open` é verdadeiro.",
+        "properties": {
+          "open": {
+            "description": "Registo aberto: quem se regista (password ou Google) entra logo, sem aprovação",
+            "title": "Open",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "open"
+        ],
+        "title": "RegistrationInfo",
         "type": "object"
       },
       "RejectRequest": {
@@ -14929,6 +15225,18 @@
             ],
             "title": "Parent Id"
           },
+          "reference_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores",
+            "title": "Reference Key"
+          },
           "result": {
             "$ref": "#/components/schemas/ScenarioResult"
           },
@@ -15296,6 +15604,18 @@
               }
             ],
             "title": "Parent Id"
+          },
+          "reference_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores",
+            "title": "Reference Key"
           },
           "siting": {
             "default": "parish",
@@ -19007,6 +19327,258 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/admin/settings": {
+      "get": {
+        "description": "Global application settings (admins only): open registration and how many accounts wait for approval.",
+        "operationId": "get_app_settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettingsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get App Settings",
+        "tags": [
+          "settings"
+        ]
+      },
+      "patch": {
+        "description": "Change global settings (admins only, audited). `approve_pending=true` also approves the accounts already\nwaiting (only with open registration; emails rejected before keep waiting). Each approval is audited.",
+        "operationId": "update_app_settings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppSettingsUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppSettingsUpdated"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update App Settings",
+        "tags": [
+          "settings"
+        ]
+      }
+    },
     "/api/v1/ai/credits": {
       "get": {
         "description": "Saldo e limite da chave no OpenRouter. Se o fornecedor não responder, `available` é falso.",
@@ -20227,7 +20799,7 @@
     },
     "/api/v1/auth/config": {
       "get": {
-        "description": "O que o ecrã de entrada precisa de saber: Google ligado? registo aberto?",
+        "description": "O que o ecrã de entrada precisa de saber: Google ligado? registo permitido? precisa de aprovação?",
         "operationId": "get_auth_config",
         "responses": {
           "200": {
@@ -23049,6 +23621,128 @@
           }
         },
         "summary": "Register",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/registration": {
+      "get": {
+        "description": "Público (sem sessão): o registo está aberto? Com `open=true` quem se regista entra logo, sem esperar pela\naprovação de um administrador. Não expõe mais nada.",
+        "operationId": "get_registration_info",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RegistrationInfo"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Registration Info",
         "tags": [
           "auth"
         ]
@@ -36722,6 +37416,132 @@
           }
         },
         "summary": "Create Scenario",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/scenarios/reference": {
+      "get": {
+        "description": "Reference scenarios created by the app: 5 by real sites (20 000 to 150 000 €/yr, the budget curve) and 1 by\nparish at 60 000 €/yr (`onboarding=true`, `reference_key=parish:60000`) with a ready collection plan. The newest\nper key; `up_to_date=false` while startup recomputes it. Empty until the first background run finishes.",
+        "operationId": "list_reference_scenarios",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ReferenceScenarioOut"
+                  },
+                  "title": "Response List Reference Scenarios",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Reference Scenarios",
         "tags": [
           "planning"
         ]

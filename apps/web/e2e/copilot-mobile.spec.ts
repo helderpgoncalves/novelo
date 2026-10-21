@@ -165,7 +165,7 @@ test.describe('histórico agrupado e desktop', () => {
 
     test('painel lateral e página com duas colunas', async ({ page }) => {
       await login(page, user);
-      await page.goto('/pt/coverage');
+      await page.goto('/pt/map');
       await expect(page.locator('#content h1').first()).toBeVisible();
       await page.keyboard.press('Control+k');
       const panel = page.getByRole('dialog', { name: 'Copiloto Novelo' });
