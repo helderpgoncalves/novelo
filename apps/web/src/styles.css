@@ -2152,14 +2152,60 @@ body:has([data-landing]) {
     width: 1rem;
   }
 }
-/* Telemóvel baixo (375 x 667): a fotografia encolhe para o primeiro número do fio caber na primeira dobra. */
-@media (max-width: 639px) and (max-height: 720px) {
+/* Telemóvel (< 640 px): o hero é um ecrã inteiro. A fotografia cobre-o de alto a baixo, o texto assenta na metade de baixo
+   sobre um véu da cor do papel, e o hero acaba nos dois botões, na margem. O fio e o prazo vêm logo a seguir, já sem fotografia. */
+@media (max-width: 639px) {
   .lp-hs {
-    --hs-h: clamp(13rem, 42svh, 36rem);
-    padding-top: calc(var(--hs-h) - 1.25rem);
+    padding-top: 0;
+    padding-bottom: 0;
+    min-height: 0;
+  }
+  .lp-hs-media {
+    height: 100vh;
+    height: 100svh;
+    -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 3.5rem), transparent);
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 3.5rem), transparent);
+  }
+  .lp-hs-media img {
+    object-position: 70% 50%;
+  }
+  .lp-hs-media::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      transparent 0,
+      transparent 26%,
+      color-mix(in oklab, var(--background) 34%, transparent) 42%,
+      color-mix(in oklab, var(--background) 76%, transparent) 58%,
+      color-mix(in oklab, var(--background) 88%, transparent) 100%
+    );
+  }
+  .lp-hs-inner {
+    min-height: 100vh;
+    min-height: 100svh;
+    justify-content: flex-end;
+    padding-top: 5.5rem;
+    padding-bottom: max(1.75rem, env(safe-area-inset-bottom));
   }
   .lp-hs-ctas {
-    padding-top: 0.25rem;
+    gap: 0.5rem;
+    padding-top: 0.75rem;
+  }
+  .lp-hs-link {
+    align-self: stretch;
+    justify-content: center;
+    min-height: 3.25rem;
+    border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent);
+    border-radius: var(--radius-lg, 0.625rem);
+    text-decoration: none;
+    background: color-mix(in oklab, var(--background) 55%, transparent);
+    -webkit-backdrop-filter: blur(6px);
+    backdrop-filter: blur(6px);
+  }
+  .lp-hs-trace {
+    padding-top: 1rem;
   }
 }
 .lp-fm[data-k='end'] {
