@@ -4,7 +4,7 @@ import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 /** Os quatro números que decidem: toneladas, €/t, custo anual e investimento. */
-export function ScenarioKpis({ kpis }: { kpis: Kpis }) {
+export function ScenarioKpis({ kpis, bySites = false }: { kpis: Kpis; bySites?: boolean }) {
   const uplift = kpis.tonnes_year - kpis.baseline_observed_t;
   return (
     <StatStrip>
@@ -39,7 +39,11 @@ export function ScenarioKpis({ kpis }: { kpis: Kpis }) {
         label={m.kpi_capex()}
         value={formatEur(kpis.capex_eur)}
         tag={m.common_estimate()}
-        hint={m.kpi_capex_hint({ points: kpis.points })}
+        hint={
+          bySites
+            ? m.kpi_capex_hint_sites({ points: kpis.points })
+            : m.kpi_capex_hint({ points: kpis.points })
+        }
       />
     </StatStrip>
   );

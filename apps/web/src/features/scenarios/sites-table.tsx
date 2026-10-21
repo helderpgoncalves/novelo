@@ -1,0 +1,119 @@
+import { useMemo } from 'react';
+import type { SiteSelection } from '@/client';
+import { type Column, DataTable } from '@/components/data-table';
+import { Badge } from '@/components/ui/badge';
+import { formatNumber, formatTonnes } from '@/lib/format';
+import { m } from '@/paraglide/messages';
+
+const precisionLabel: Record<SiteSelection['coord_precision'], () => string> = {
+  precise: () => m.site_precision_precise(),
+  approximate: () => m.site_precision_approximate(),
+};
+
+const streetOf = (s: SiteSelection) => s.street ?? m.site_street_unknown();
+
+/** Locais abertos de um cenário por locais reais: o que cada um serve, em quantidades estimadas. */
+export function SitesTable({ sites }: { sites: SiteSelection[] }) {
+  const rows = useMemo(() => [...sites].sort((x, y) => y.tonnes - x.tonnes), [sites]);
+
+  const columns: Column<SiteSelection>[] = [
+    {
+      id: 'street',
+      header: m.site_col_street(),
+      primary: true,
+      value: streetOf,
+      cell: (s) => (
+        <span className={s.street ? undefined : 'text-muted-foreground'}>{streetOf(s)}</span>
+      ),
+    },
+    {
+      id: 'parish',
+      header: m.site_col_parish(),
+      className: 'text-muted-foreground',
+      value: (s) => s.parish_name,
+      filter: true,
+      cell: (s) => s.parish_name,
+    },
+    {
+      id: 'containers',
+      type: 'number',
+      aggregate: 'sum',
+      format: (n) => formatNumber(n),
+      value: (s) => s.containers,
+      searchable: false,
+      header: m.site_col_containers(),
+      align: 'right',
+      cell: (s) => formatNumber(s.containers),
+    },
+    {
+      id: 'tonnes',
+      type: 'number',
+      aggregate: 'sum',
+      format: (n) => formatTonnes(n, 2),
+      value: (s) => s.tonnes,
+      searchable: false,
+      badge: true,
+      header: m.site_col_tonnes(),
+      align: 'right',
+      cell: (s) => formatTonnes(s.tonnes, 2),
+    },
+    {
+      id: 'population',
+      type: 'number',
+      aggregate: 'sum',
+      format: (n) => formatNumber(n),
+      value: (s) => s.population_covered,
+      searchable: false,
+      header: m.site_col_population(),
+      align: 'right',
+      cell: (s) => formatNumber(s.population_covered),
+    },
+    {
+      id: 'vehicle',
+      type: 'number',
+      header: m.site_col_vehicle(),
+      align: 'right',
+      searchable: false,
+      value: (s) => s.vehicle,
+      filter: { format: (v) => `#${v}` },
+      cell: (s) => (s.vehicle == null ? m.common_dash() : <span>#{s.vehicle}</span>),
+    },
+    {
+      id: 'precision',
+      header: m.site_col_precision(),
+      searchable: false,
+      value: (s) => s.coord_precision,
+      filter: { format: (v) => precisionLabel[v as SiteSelection['coord_precision']]() },
+      cell: (s) =>
+        s.coord_precision === 'approximate' ? (
+          <Badge
+            variant="outline"
+            className="border-areia/70 font-normal"
+            title={m.site_precision_approximate_hint()}
+          >
+            {precisionLabel.approximate()}
+          </Badge>
+        ) : (
+          <span className="text-muted-foreground">{precisionLabel.precise()}</span>
+        ),
+    },
+  ];
+
+  return (
+    <DataTable
+      id="sites"
+      exportName="cenario-locais"
+      columns={columns}
+      rows={rows}
+      getRowId={(s) => s.site_id}
+      caption={m.site_title()}
+      searchLabel={m.site_search()}
+      pageSize={10}
+      empty={
+        <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
+          {m.site_empty()}
+        </p>
+      }
+    />
+  );
+}

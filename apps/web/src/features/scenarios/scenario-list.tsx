@@ -7,6 +7,7 @@ import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/form
 import { formatDateTime } from '@/lib/i18n';
 import { objectiveLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
+import { NetworkBadge } from './network-badge';
 
 export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
   const navigate = useNavigate();
@@ -26,6 +27,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
           >
             {s.label}
           </Link>
+          {s.siting === 'sites' && <NetworkBadge />}
           {s.status === 'infeasible' && (
             <Badge
               variant="outline"

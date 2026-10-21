@@ -25,6 +25,8 @@ import { ScenarioActions } from '@/features/scenarios/scenario-actions';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
+import { SitesTable } from '@/features/scenarios/sites-table';
+import { SitingOverview, SitingUncertaintyNote } from '@/features/scenarios/siting-overview';
 import { UncertaintyPanel } from '@/features/scenarios/uncertainty-panel';
 import { WhatIfPanel } from '@/features/whatif/whatif-panel';
 import { formatEur, formatTonnes } from '@/lib/format';
@@ -92,7 +94,8 @@ function ScenarioPage() {
       )}
 
       <div className="space-y-4">
-        <ScenarioKpis kpis={result.kpis} />
+        <ScenarioKpis kpis={result.kpis} bySites={Boolean(result.siting)} />
+        {result.siting && <SitingOverview siting={result.siting} sites={result.sites ?? []} />}
         <ScenarioAnchor scenario={scenario} />
       </div>
 
@@ -148,7 +151,9 @@ function ScenarioPage() {
               <>
                 <Section
                   title={m.scenario_map_title()}
-                  description={m.scenario_map_description()}
+                  description={
+                    result.siting ? m.site_map_description() : m.scenario_map_description()
+                  }
                   actions={
                     <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
                       <Switch checked={showRoutes} onCheckedChange={setShowRoutes} />
@@ -163,6 +168,11 @@ function ScenarioPage() {
                     className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 lg:h-[36rem]"
                   />
                 </Section>
+                {result.siting && (
+                  <Section title={m.site_title()} description={m.site_description()}>
+                    <SitesTable sites={result.sites ?? []} />
+                  </Section>
+                )}
                 <Section
                   title={m.scenario_routes_title()}
                   description={m.scenario_routes_description()}
@@ -178,7 +188,11 @@ function ScenarioPage() {
           {
             id: 'uncertainty',
             label: tabLabel.uncertainty(),
-            content: <UncertaintyPanel scenario={scenario} />,
+            content: result.siting ? (
+              <SitingUncertaintyNote scenarioId={scenario.id} />
+            ) : (
+              <UncertaintyPanel scenario={scenario} />
+            ),
           },
           {
             id: 'whatif',

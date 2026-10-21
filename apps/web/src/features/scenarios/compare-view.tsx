@@ -2,10 +2,13 @@ import { Link } from '@tanstack/react-router';
 import type { ScenarioOut, ZoneOut } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Section } from '@/components/page';
+import { Panel } from '@/components/panel';
 import { StatCell, StatStrip } from '@/components/stat-strip';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { NetworkBadge } from './network-badge';
 import { RobustnessCard } from './robustness-card';
 import { ScenarioMap } from './scenario-map';
 
@@ -58,6 +61,13 @@ const METRICS: Metric[] = [
     key: 'points',
     label: () => m.compare_points(),
     get: (s) => s.result.kpis.points,
+    format: (v) => formatNumber(v),
+    better: 'none',
+  },
+  {
+    key: 'sites',
+    label: () => m.site_kpi_opened(),
+    get: (s) => s.result.siting?.opened ?? null,
     format: (v) => formatNumber(v),
     better: 'none',
   },
@@ -127,6 +137,11 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
             >
               {s.label}
             </Link>
+            {s.result.siting && (
+              <span className="mt-1 block">
+                <NetworkBadge />
+              </span>
+            )}
           </span>
         ),
         cell: (x) => {
@@ -150,8 +165,21 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
     return metric && va != null && vb != null ? signed(vb - va, metric.format) : m.common_dash();
   };
 
+  const networkName = (s: ScenarioOut) =>
+    s.result.siting ? m.site_compare_network_sites() : m.site_compare_network_parish();
+  const mixedNetworks = Boolean(a.result.siting) !== Boolean(b.result.siting);
+  // A robustez (Monte Carlo) só existe entre cenários por freguesia: a API recusa os por locais.
+  const robustnessAvailable = !a.result.siting && !b.result.siting;
+
   return (
     <div className="space-y-8 sm:space-y-12">
+      {mixedNetworks && (
+        <Alert>
+          <AlertDescription>
+            {m.site_compare_mixed({ a: networkName(a), b: networkName(b) })}
+          </AlertDescription>
+        </Alert>
+      )}
       <StatStrip className="lg:grid-cols-3">
         <StatCell
           label={m.compare_delta_of({ label: m.kpi_tonnes() })}
@@ -189,7 +217,15 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
           <p className="text-muted-foreground text-xs">{m.compare_note()}</p>
         </div>
         <div className="lg:col-span-4">
-          <RobustnessCard a={a} b={b} />
+          {robustnessAvailable ? (
+            <RobustnessCard a={a} b={b} />
+          ) : (
+            <Panel title={m.rob_title()}>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                {m.site_rob_unavailable()}
+              </p>
+            </Panel>
+          )}
         </div>
       </div>
 
@@ -197,7 +233,10 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {[a, b].map((s) => (
             <div key={s.id} className="space-y-2">
-              <p className="font-medium font-serif text-lg">{s.label}</p>
+              <p className="flex flex-wrap items-center gap-x-2 gap-y-1 font-medium font-serif text-lg">
+                {s.label}
+                {s.result.siting && <NetworkBadge />}
+              </p>
               <ScenarioMap
                 zones={zones}
                 result={s.result}

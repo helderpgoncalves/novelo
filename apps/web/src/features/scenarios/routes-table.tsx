@@ -26,10 +26,10 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
       id: 'stops',
       header: m.route_stops(),
       full: true,
-      value: (r) => r.stops.map((s) => s.parish_name).join(' '),
+      value: (r) => r.stops.map((s) => s.label ?? s.parish_name).join(' '),
       sortable: false,
       className: 'max-w-md whitespace-normal text-muted-foreground',
-      cell: (r) => r.stops.map((s) => s.parish_name).join(' → '),
+      cell: (r) => r.stops.map((s) => s.label ?? s.parish_name).join(' → '),
     },
     {
       id: 'load',

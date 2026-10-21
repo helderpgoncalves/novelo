@@ -3581,7 +3581,7 @@ export const zScenarioRequest = z.object({
     objective: zScenarioObjective,
     params: zPlanningParams.nullish(),
     parent_id: z.uuid().nullish(),
-    site_mode: zCollectionMode.optional().default('existing'),
+    site_mode: zCollectionMode.optional().default('street'),
     site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),

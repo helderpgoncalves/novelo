@@ -10,6 +10,8 @@ import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
+import { SitesTable } from '@/features/scenarios/sites-table';
+import { SitingOverview } from '@/features/scenarios/siting-overview';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { modeLabel } from '@/lib/scenario';
 import { cn } from '@/lib/utils';
@@ -97,7 +99,7 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
       <Comparison scenario={scenario} />
 
       <div className="space-y-3">
-        <ScenarioKpis kpis={kpis} />
+        <ScenarioKpis kpis={kpis} bySites={Boolean(result.siting)} />
         <StatStrip className="lg:grid-cols-2">
           <StatCell
             label={m.simx_kpi_capture()}
@@ -113,6 +115,8 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
         </StatStrip>
       </div>
 
+      {result.siting && <SitingOverview siting={result.siting} sites={result.sites ?? []} />}
+
       <ScenarioAnchor scenario={scenario} />
 
       <Panel title={m.scenario_map_title()} className="space-y-3">
@@ -125,6 +129,18 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
       </Panel>
 
       <Why scenario={scenario} />
+
+      {result.siting && (
+        <section className="space-y-3" aria-labelledby="sites-title">
+          <div className="space-y-1">
+            <h3 id="sites-title" className="text-xl">
+              {m.site_title()}
+            </h3>
+            <p className="text-muted-foreground text-sm">{m.site_description()}</p>
+          </div>
+          <SitesTable sites={result.sites ?? []} />
+        </section>
+      )}
 
       <section className="space-y-3" aria-labelledby="alloc-title">
         <h3 id="alloc-title" className="text-xl">
@@ -262,15 +278,17 @@ function Why({ scenario }: { scenario: ScenarioOut }) {
       <Panel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="font-medium">{m.simx_deeper_title()}</p>
         <div className="flex flex-wrap gap-2">
-          <Button asChild variant="outline" className="h-10">
-            <Link
-              to="/scenarios/$scenarioId"
-              params={{ scenarioId: scenario.id }}
-              search={{ tab: 'uncertainty' }}
-            >
-              {m.simx_open_uncertainty()}
-            </Link>
-          </Button>
+          {!result.siting && (
+            <Button asChild variant="outline" className="h-10">
+              <Link
+                to="/scenarios/$scenarioId"
+                params={{ scenarioId: scenario.id }}
+                search={{ tab: 'uncertainty' }}
+              >
+                {m.simx_open_uncertainty()}
+              </Link>
+            </Button>
+          )}
           <Button asChild variant="outline" className="h-10">
             <Link
               to="/scenarios/$scenarioId"

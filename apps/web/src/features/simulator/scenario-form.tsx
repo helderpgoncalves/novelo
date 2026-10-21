@@ -4,6 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import {
+  type CollectionMode,
   createScenario,
   type ParametersOut,
   type PlanningParams,
@@ -25,6 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
 import { getParam, PARAM_GROUPS, validateParams } from '@/features/assumptions/param-fields';
 import { ParametersForm } from '@/features/assumptions/parameters-form';
 import { FormAlert } from '@/features/auth/form-alert';
@@ -47,6 +49,11 @@ const ScenarioResult = lazy(() =>
 
 const OBJECTIVES: ScenarioObjective[] = ['max_tonnes', 'min_cost'];
 const BUDGET_MAX = 200_000;
+const RADII = [200, 300, 500] as const;
+type Siting = NonNullable<ScenarioRequest['siting']>;
+const SITE_MODES: Extract<CollectionMode, 'existing' | 'street'>[] = ['street', 'existing'];
+const snapRadius = (r: number): number =>
+  RADII.reduce((best, x) => (Math.abs(x - r) < Math.abs(best - r) ? x : best), 300 as number);
 type SectionId = 'goal' | 'assumptions' | 'options';
 
 export interface FormSeed {
@@ -57,6 +64,12 @@ export interface FormSeed {
   params: PlanningParams;
   constraints: Constraints;
   parentId?: string;
+  /** Rede a desenhar: locais reais da rede municipal ou freguesias. */
+  siting: Siting;
+  radiusM: number;
+  siteMode: Extract<CollectionMode, 'existing' | 'street'>;
+  /** Completar a rede com recolha a pedido nas freguesias onde compensa. */
+  onDemand: boolean;
 }
 
 interface ScenarioFormProps {
@@ -78,7 +91,15 @@ const stable = (value: unknown): string =>
   );
 
 function matchesRequest(s: ScenarioOut, r: ScenarioRequest): boolean {
+  const siting = s.result.siting;
+  const sameNetwork =
+    (siting ? 'sites' : 'parish') === (r.siting ?? 'parish') &&
+    (!siting ||
+      (siting.radius_m === r.site_radius_m &&
+        siting.site_mode === r.site_mode &&
+        (siting.on_demand ?? true) === (r.site_on_demand ?? true)));
   return (
+    sameNetwork &&
     s.objective === r.objective &&
     (s.budget_eur_year ?? null) === (r.budget_eur_year ?? null) &&
     Math.abs((s.target_tonnes ?? 0) - (r.target_tonnes ?? 0)) < 0.002 &&
@@ -102,6 +123,10 @@ export function ScenarioForm({
   const [targetPct, setTargetPct] = useState(seed.targetPct);
   const [params, setParams] = useState(seed.params);
   const [constraints, setConstraints] = useState<Constraints>(seed.constraints);
+  const [siting, setSiting] = useState<Siting>(seed.siting);
+  const [radiusM, setRadiusM] = useState(snapRadius(seed.radiusM));
+  const [siteMode, setSiteMode] = useState(seed.siteMode);
+  const [onDemand, setOnDemand] = useState(seed.onDemand);
   const [submitted, setSubmitted] = useState(false);
   const [open, setOpen] = useState<Set<SectionId>>(new Set(['goal']));
   const resultRef = useRef<HTMLElement>(null);
@@ -142,8 +167,24 @@ export function ScenarioForm({
       params,
       constraints,
       parent_id: seed.parentId ?? null,
+      siting,
+      site_radius_m: radiusM,
+      site_mode: siteMode,
+      site_on_demand: onDemand,
     }),
-    [label, objective, budget, targetTonnes, params, constraints, seed.parentId],
+    [
+      label,
+      objective,
+      budget,
+      targetTonnes,
+      params,
+      constraints,
+      seed.parentId,
+      siting,
+      radiusM,
+      siteMode,
+      onDemand,
+    ],
   );
 
   // Estado partilhável: o objetivo e o valor ficam na URL (replace, sem encher o histórico).
@@ -161,12 +202,16 @@ export function ScenarioForm({
           budget: Number.isFinite(budget) && budget > 0 ? budget : undefined,
           target: Number.isFinite(targetPct) ? targetPct : undefined,
           name: label.trim() && label.trim() !== m.sim_label_default() ? label.trim() : undefined,
+          net: siting,
+          radius: siting === 'sites' ? (radiusM as 200 | 300 | 500) : undefined,
+          point: siting === 'sites' ? siteMode : undefined,
+          ondemand: siting === 'sites' ? onDemand : undefined,
         }),
         replace: true,
       });
     }, 400);
     return () => window.clearTimeout(id);
-  }, [objective, budget, targetPct, label, navigate]);
+  }, [objective, budget, targetPct, label, siting, radiusM, siteMode, onDemand, navigate]);
 
   const create = useMutation({
     mutationFn: async (body: ScenarioRequest) => {
@@ -306,6 +351,19 @@ export function ScenarioForm({
             zones: formatNumber(zonesWithContainers),
           })
         : m.sim_existing_none(),
+    networkText:
+      siting === 'sites'
+        ? `${m.site_sum_sites({
+            radius: String(radiusM),
+            mode: siteModeLabel[siteMode]().toLowerCase(),
+          })}${onDemand ? ` · ${m.site_sum_on_demand()}` : ''}`
+        : m.site_sum_parish(),
+    runNote:
+      siting === 'sites'
+        ? objective === 'max_tonnes'
+          ? m.site_run_note()
+          : m.site_run_note_target()
+        : m.simx_run_note(),
     restrictionsText:
       restrictedZones === 0 ? m.sim_summary_none() : m.sim_summary_zones({ n: restrictedZones }),
     assumptionsText:
@@ -458,6 +516,17 @@ export function ScenarioForm({
                   pct: formatPercent(baselinePct, 1),
                 })}
               </p>
+
+              <NetworkControl
+                siting={siting}
+                onSitingChange={setSiting}
+                radiusM={radiusM}
+                onRadiusChange={setRadiusM}
+                siteMode={siteMode}
+                onSiteModeChange={setSiteMode}
+                onDemand={onDemand}
+                onOnDemandChange={setOnDemand}
+              />
             </FormSection>
 
             <FormSection
@@ -550,6 +619,108 @@ export function ScenarioForm({
         </>
       )}
     </>
+  );
+}
+
+const siteModeLabel: Record<(typeof SITE_MODES)[number], () => string> = {
+  existing: () => m.site_mode_existing(),
+  street: () => m.site_mode_street(),
+};
+
+interface NetworkControlProps {
+  siting: Siting;
+  onSitingChange: (v: Siting) => void;
+  radiusM: number;
+  onRadiusChange: (v: number) => void;
+  siteMode: (typeof SITE_MODES)[number];
+  onSiteModeChange: (v: (typeof SITE_MODES)[number]) => void;
+  onDemand: boolean;
+  onOnDemandChange: (v: boolean) => void;
+}
+
+/** Rede a desenhar: locais reais da rede municipal (por omissão) ou freguesias, com raio a pé e tipo de ponto. */
+function NetworkControl({
+  siting,
+  onSitingChange,
+  radiusM,
+  onRadiusChange,
+  siteMode,
+  onSiteModeChange,
+  onDemand,
+  onOnDemandChange,
+}: NetworkControlProps) {
+  return (
+    <div className="space-y-4 border-t pt-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-medium text-sm">{m.site_net_label()}</span>
+          <HelpHint label={m.site_net_label()}>
+            <ul className="space-y-2">
+              <li>{m.site_net_help_sites()}</li>
+              <li>{m.site_net_help_parish()}</li>
+              <li className="text-muted-foreground">{m.site_net_help_assumption()}</li>
+            </ul>
+          </HelpHint>
+        </div>
+        <Segmented
+          label={m.site_net_aria()}
+          value={siting}
+          onChange={onSitingChange}
+          options={[
+            { value: 'sites', label: m.site_net_sites() },
+            { value: 'parish', label: m.site_net_parish() },
+          ]}
+        />
+      </div>
+
+      {siting === 'sites' && (
+        <>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium text-sm">{m.site_radius_label()}</span>
+              <HelpHint label={m.site_radius_label()}>{m.site_radius_help()}</HelpHint>
+            </div>
+            <Segmented
+              label={m.site_radius_aria()}
+              value={String(radiusM)}
+              onChange={(v) => onRadiusChange(Number(v))}
+              options={RADII.map((r) => ({
+                value: String(r),
+                label: m.site_radius_value({ n: String(r) }),
+              }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium text-sm">{m.site_mode_label()}</span>
+              <HelpHint label={m.site_mode_label()}>
+                <ul className="space-y-2">
+                  <li>{m.site_mode_help_existing()}</li>
+                  <li>{m.site_mode_help_street()}</li>
+                  <li className="text-muted-foreground">{m.site_net_help_assumption()}</li>
+                </ul>
+              </HelpHint>
+            </div>
+            <Segmented
+              label={m.site_mode_aria()}
+              value={siteMode}
+              onChange={onSiteModeChange}
+              options={SITE_MODES.map((o) => ({ value: o, label: siteModeLabel[o]() }))}
+            />
+          </div>
+          <div className="flex items-center justify-between gap-3">
+            <Label htmlFor="site-on-demand" className="min-h-10 flex-1 items-center text-sm">
+              {m.site_od_label()}
+            </Label>
+            <HelpHint label={m.site_od_label()}>{m.site_od_help()}</HelpHint>
+            <Switch id="site-on-demand" checked={onDemand} onCheckedChange={onOnDemandChange} />
+          </div>
+          <p className="text-muted-foreground text-xs leading-relaxed">
+            {m.site_net_slow()} {m.site_note_estimate()}
+          </p>
+        </>
+      )}
+    </div>
   );
 }
 

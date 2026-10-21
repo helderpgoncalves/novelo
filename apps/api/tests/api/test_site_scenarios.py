@@ -25,6 +25,7 @@ async def run(operator: httpx.AsyncClient, **extra: Any) -> dict[str, Any]:
         "objective": "max_tonnes",
         "budget_eur_year": 5000,
         "siting": "sites",
+        "site_mode": "existing",
         "site_on_demand": False,
         **extra,
     }
@@ -132,3 +133,22 @@ async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx
     await run(operator, label="Locais 2", budget_eur_year=4000)
     after = (await operator.get("/api/v1/textile/overview")).json()["scenario_frontier"]
     assert {p["label"] for p in after} == {"Locais 1", "Locais 2"}
+
+
+async def test_the_default_point_is_the_street_container_calibrated_with_2025(operator: httpx.AsyncClient) -> None:
+    resp = await operator.post(
+        f"{P}/scenarios",
+        json={
+            "label": "Rua",
+            "objective": "max_tonnes",
+            "budget_eur_year": 5000,
+            "siting": "sites",
+            "site_on_demand": False,
+        },
+    )
+    assert resp.status_code == 201
+    out = resp.json()
+    assert out["result"]["siting"]["site_mode"] == "street"
+    alloc = {a["parish_code"]: a for a in out["result"]["allocations"]}
+    capture = out["params"]["modes"]["street"]["capture_rate"]
+    assert alloc["030801"]["tonnes"] == pytest.approx(alloc["030801"]["demand_t"] * capture, abs=0.002)
