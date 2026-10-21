@@ -46,7 +46,15 @@ export function Problem() {
     { id: 'vehicles', value: FACTS.vehicles, label: m.landing_net_vehicles() },
     { id: 'places', value: FACTS.places, label: m.landing_net_places() },
   ] as const;
-  const ledger = [
+  const ledger: {
+    id: string;
+    op: string;
+    label: string;
+    value: string;
+    count?: number;
+    total?: boolean;
+    estimate?: boolean;
+  }[] = [
     { id: 'rsu', op: '', label: m.landing_ledger_rsu(), value: formatTonnes(FACTS.rsuT, 0) },
     {
       id: 'share',
@@ -59,6 +67,7 @@ export function Problem() {
       op: '=',
       label: m.landing_ledger_residual(),
       value: formatTonnes(FACTS.residualT),
+      count: FACTS.residualT,
       total: true,
       estimate: true,
     },
@@ -73,6 +82,7 @@ export function Problem() {
       op: '=',
       label: m.landing_ledger_potential(),
       value: formatTonnes(FACTS.potentialT),
+      count: FACTS.potentialT,
       total: true,
       estimate: true,
     },
@@ -152,7 +162,15 @@ export function Problem() {
                         row.id === 'residual' && 'text-primary',
                       )}
                     >
-                      {row.value}
+                      {row.count === undefined ? (
+                        row.value
+                      ) : (
+                        <CountUp
+                          value={row.count}
+                          format={(v) => formatTonnes(v)}
+                          duration={1200}
+                        />
+                      )}
                     </dd>
                   </div>
                 ))}

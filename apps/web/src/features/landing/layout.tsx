@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { PUBLIC_GUTTER, PUBLIC_WIDE } from '@/components/public-shell';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -57,7 +57,12 @@ export function Section({
 
 const SIZES = { xl: 'lp-h-xl', lg: '', md: 'lp-h-md' } as const;
 
-/** Cabeçalho de secção: número editorial em mono, título serifado (três tamanhos) e subtítulo. */
+const step = (i: number) => ({ '--i': i }) as CSSProperties;
+
+/**
+ * Cabeçalho de secção: número editorial em mono, título serifado (três tamanhos) e subtítulo. Ao entrar no ecrã revela-se em
+ * escada (etiqueta, título, subtítulo: subida curta e opacidade; ver `reveal.ts`).
+ */
 export function Heading({
   id,
   n,
@@ -80,20 +85,26 @@ export function Heading({
 }) {
   return (
     <div
+      data-reveal=""
+      data-fx="stagger"
       className={cn(
         'flex flex-col gap-4',
         align === 'center' ? 'mx-auto items-center text-center' : 'max-w-3xl',
         className,
       )}
     >
-      <p className="lp-eyebrow">
+      <p data-s="" style={step(0)} className="lp-eyebrow">
         {n && <span className="lp-eyebrow-n">{n}</span>}
         {eyebrow}
       </p>
-      <h2 id={`${id}-title`} className={cn('lp-headline', SIZES[size])}>
+      <h2 data-s="" style={step(1)} id={`${id}-title`} className={cn('lp-headline', SIZES[size])}>
         {title}
       </h2>
-      {lead && <p className="lp-lead max-w-2xl text-muted-foreground">{lead}</p>}
+      {lead && (
+        <p data-s="" style={step(2)} className="lp-lead max-w-2xl text-muted-foreground">
+          {lead}
+        </p>
+      )}
     </div>
   );
 }

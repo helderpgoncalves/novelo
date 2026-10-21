@@ -8,16 +8,16 @@ test.describe('páginas públicas (sem sessão)', () => {
     await page.goto('/pt/');
     await expect(page).toHaveURL(/\/pt\/?$/);
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Novelo');
-    await expect(page.getByText('301,3 t')).toBeVisible();
-    await expect(page.getByText('11,5%')).toBeVisible();
-    await expect(page.getByText('1,92 vs 4,27')).toBeVisible();
+    await expect(page.getByText('301,3 t').filter({ visible: true }).first()).toBeVisible();
+    await expect(page.getByText('11,5%').filter({ visible: true }).first()).toBeVisible();
+    await expect(page.getByText('1,92 vs 4,27').filter({ visible: true }).first()).toBeVisible();
     await expect(page.getByText('estimativa', { exact: true }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Criar conta' })).toBeVisible();
-    const legal = page.getByRole('navigation', { name: 'Informação legal e contacto' });
+    await expect(page.getByRole('banner').getByRole('link', { name: 'Criar conta' })).toBeVisible();
+    const legal = page.getByRole('navigation', { name: 'Rodapé' });
     await expect(legal.getByRole('link', { name: 'Privacidade' })).toBeVisible();
     await expect(legal.getByRole('link', { name: 'Termos' })).toBeVisible();
     await expect(legal.getByRole('link', { name: /novelo@heldergoncalves\.io/ })).toBeVisible();
-    await expect(page).toHaveTitle(/Novelo: recolha seletiva/);
+    await expect(page).toHaveTitle(/^Novelo: recolha de têxteis/);
   });
 
   test('a política em pt e en tem a declaração de Uso Limitado', async ({ page }) => {

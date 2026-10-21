@@ -12,11 +12,16 @@ Não há CI remota: tudo corre localmente com `just`. O objetivo é iterar depre
 | `just test-api -k nome -m "not slow"` | Um teste ou um grupo | pytest paralelo com argumentos livres |
 | `just test-shuffle` | Caçar testes dependentes | pytest em ordem aleatória (`pytest-randomly`); repetir com `--randomly-seed=N` |
 | `just test-slowest` | Medir | Serial, com os 25 testes mais lentos |
-| `just e2e` | Antes de mexer em fluxos de UI | Playwright, só desktop, ficheiros críticos (auth, home, planning, coverage, municipal, data-table, errors, operations) |
+| `just e2e` | Antes de mexer em fluxos de UI | Playwright, só desktop, ficheiros críticos (auth, home, planning, coverage, municipal, data-table, errors, operations, hero-layout) |
 | `just e2e-full` | Antes de uma demo | Playwright completo (desktop + mobile, inclui o copiloto com o modelo real) |
 
 `scripts/parallel.sh` corre os jobs em simultâneo, escreve cada saída num ficheiro, mostra `ok`/`FALHOU` à medida que acabam e,
 no fim, imprime a saída completa dos que falharam (ou as últimas linhas dos que passaram). Sai com 1 se algum falhar.
+
+`e2e/hero-layout.spec.ts` garante o hero da landing: em 13 viewports (320×640 a 2560×1300), claro e escuro, sem movimento, mede
+as caixas de todos os textos e controlos visíveis do hero (eyebrow, prazo, título, subtítulo, botões, linhas do painel dos
+números, nós e ponta do fio, barra do topo) e falha se dois se tocarem ou se algum sair do ecrã. Só precisa do web:
+`E2E_BASE_URL=http://localhost:3190 pnpm exec playwright test e2e/hero-layout.spec.ts --project=desktop` (em `apps/web`).
 
 ## Tempos medidos
 

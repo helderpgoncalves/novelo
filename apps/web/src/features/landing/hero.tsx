@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { m } from '@/paraglide/messages';
 import { HeroDeadline } from './hero-deadline';
 import { HeroFio } from './hero-fio';
+import { HeroLedger } from './hero-ledger';
 import { HERO_SKY } from './landing-assets.generated';
 import { CONTAINER } from './layout';
 
@@ -17,12 +18,12 @@ function splitTitle(title: string): [string, string | null, string] {
 }
 
 /**
- * Topo da página: uma pergunta com a resposta por descobrir. O título diz o que ninguém diz («Guimarães recolhe à parte 11,5 % do
- * têxtil que gera»), o subtítulo promete o método e o objeto do hero é o fio (`HeroFio`): desenha-se do vale ao campanário da Penha,
- * cheio até aos 11,5 % que a Vitrus já recolhe e a tracejado até ao potencial. Os ganchos (a pergunta das toneladas em falta, o
- * prazo europeu de 17 abr 2028) levam ao «Problema»; o botão primário leva ao «Método». Tudo numa grelha de 12 colunas com uma
- * só margem esquerda, a da barra de navegação. A fotografia é a Penha ao fim do dia (RaquelRosa7, CC BY-SA 4.0), em meio-tom;
- * em ecrã largo é enquadrada para o campanário ficar onde o fio termina. O texto não anima (LCP).
+ * Topo da página. O título diz o que ninguém diz («Só 11,5 % do têxtil de Guimarães é recolhido à parte»), o subtítulo diz o
+ * resto e o que o Novelo faz, e os números vivem num painel no fluxo do texto (`HeroLedger`): ao lado da cópia em ecrã largo,
+ * por baixo dos botões nos estreitos. Nada de texto por cima da fotografia. O objeto do hero é o fio (`HeroFio`), só gráfico:
+ * desenha-se do vale ao campanário da Penha, cheio até aos 11,5 % e a tracejado até ao potencial. A grelha reserva por baixo
+ * do texto a altura do campanário (proporcional à largura), por isso o fio e o texto nunca se cruzam. A fotografia é a Penha
+ * ao fim do dia (RaquelRosa7, CC BY-SA 4.0), em meio-tom, com um parallax curto ao rolar. O título não anima (LCP).
  */
 export function Hero() {
   const [before, pct, after] = splitTitle(m.landing_title());
@@ -69,6 +70,7 @@ export function Hero() {
             </Link>
           </div>
         </div>
+        <HeroLedger />
       </div>
       <div className={`${CONTAINER} lp-hs-trace`}>
         <HeroFio />

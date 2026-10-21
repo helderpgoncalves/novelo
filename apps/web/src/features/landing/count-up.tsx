@@ -3,7 +3,7 @@ import { motionAllowed, useInViewOnce } from '@/lib/motion';
 
 /**
  * Número que conta uma só vez ao entrar no ecrã (cerca de 0,9 s, desaceleração suave). Para leitores de ecrã e
- * rastreadores o valor final está sempre no texto; com movimento reduzido ou sem IntersectionObserver aparece já final.
+ * rastreadores o valor final está sempre no texto; a caixa tem desde o início a largura do valor final (sem saltos de layout); com movimento reduzido ou sem IntersectionObserver aparece já final.
  */
 export function CountUp({
   value,
@@ -38,7 +38,10 @@ export function CountUp({
   }, [seen, value, duration]);
 
   return (
-    <span ref={ref} className={className}>
+    <span ref={ref} className={className ? `lp-count ${className}` : 'lp-count'}>
+      <span aria-hidden="true" className="lp-count-ghost">
+        {format(value)}
+      </span>
       <span aria-hidden="true">{format(shown)}</span>
       <span className="sr-only">{format(value)}</span>
     </span>

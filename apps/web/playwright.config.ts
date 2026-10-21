@@ -8,7 +8,7 @@ import { defineConfig, devices } from '@playwright/test';
 const baseURL = process.env.E2E_BASE_URL ?? 'http://localhost:3190';
 const smoke = (process.env.E2E_SUITE ?? 'full') === 'smoke';
 const SMOKE_SPECS =
-  /(auth|home|planning|coverage|municipal|data-table|errors|operations)\.spec\.ts/;
+  /(auth|home|planning|coverage|municipal|data-table|errors|operations|hero-layout)\.spec\.ts/;
 const MOBILE_SPECS = /(responsive|safe-area)\.spec\.ts/;
 
 export default defineConfig({
