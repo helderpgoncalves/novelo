@@ -11,7 +11,7 @@ import uuid
 from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 from sqlalchemy import select, update
@@ -62,6 +62,8 @@ class CreateScenarioP(_P):
     budget_eur_year: float | None = Field(default=None, ge=0, le=5_000_000)
     target_pct: float | None = Field(default=None, ge=1, le=100)
     restrictions: list[ModeRestriction] = Field(default_factory=list, max_length=12)
+    siting: Literal["parish", "sites"] = "parish"
+    site_radius_m: int = Field(default=300, ge=100, le=1000)
 
 
 class DuplicateP(_P):
@@ -353,6 +355,7 @@ async def e_create(ctx: Ctx, p: CreateScenarioP) -> tuple[dict[str, Any], dict[s
         label=f"{COPILOT_PREFIX}{p.label}"[:80], objective=p.objective,
         budget_eur_year=p.budget_eur_year if p.objective == ScenarioObjective.MAX_TONNES else None,
         target_tonnes=target if p.objective == ScenarioObjective.MIN_COST else None, constraints=constraints,
+        siting=p.siting, site_radius_m=p.site_radius_m,
     )  # fmt: skip
     s = await planning.run_scenario(ctx.db, req, ctx.user)
     return _scenario_result(s), {"kind": "delete_scenario", "scenario_id": str(s.id)}
@@ -374,6 +377,7 @@ async def e_duplicate(ctx: Ctx, p: DuplicateP) -> tuple[dict[str, Any], dict[str
     req = ScenarioRequest(
         label=f"{COPILOT_PREFIX}{p.label or base.label}"[:80], objective=base.objective, budget_eur_year=base.budget_eur_year,
         target_tonnes=base.target_tonnes, params=base.params, constraints=base.constraints, parent_id=base.id,
+        **base.siting_options(),
     )  # fmt: skip
     s = await planning.run_scenario(ctx.db, req, ctx.user)
     return _scenario_result(s), {"kind": "delete_scenario", "scenario_id": str(s.id)}

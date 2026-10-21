@@ -8398,6 +8398,12 @@ export type RouteOut = {
  */
 export type RouteStop = {
     /**
+     * Label
+     *
+     * Rua do local (cenários por locais)
+     */
+    label?: string | null;
+    /**
      * Latitude
      */
     latitude: number;
@@ -8417,6 +8423,12 @@ export type RouteStop = {
      * Parish Name
      */
     parish_name: string;
+    /**
+     * Site Id
+     *
+     * Local da rede municipal (cenários por locais)
+     */
+    site_id?: string | null;
 };
 
 /**
@@ -8687,6 +8699,22 @@ export type ScenarioRequest = {
      */
     parent_id?: string | null;
     /**
+     * Pressupostos de captura e custo usados nos locais (`existing` ou `street`)
+     */
+    site_mode?: CollectionMode;
+    /**
+     * Site Radius M
+     *
+     * Distância a pé que um local serve (`sites`)
+     */
+    site_radius_m?: number;
+    /**
+     * Siting
+     *
+     * `parish`: por freguesia (modelo por zonas); `sites`: escolhe locais reais da rede municipal
+     */
+    siting?: 'parish' | 'sites';
+    /**
      * Target Tonnes
      *
      * Meta de captura (min_cost)
@@ -8715,6 +8743,16 @@ export type ScenarioResult = {
      * Routes
      */
     routes: Array<RouteOut>;
+    /**
+     * Sites
+     *
+     * Locais abertos (só cenários por locais)
+     */
+    sites?: Array<SiteSelection>;
+    /**
+     * Preenchido nos cenários por locais
+     */
+    siting?: SitingSummary | null;
 };
 
 /**
@@ -9135,6 +9173,105 @@ export type SiteFeatureProps = {
      * Textile Candidate
      */
     textile_candidate?: boolean | null;
+};
+
+/**
+ * SiteSelection
+ *
+ * Um local aberto num cenário por locais, com o que serve.
+ */
+export type SiteSelection = {
+    /**
+     * Containers
+     *
+     * Contentores municipais que já lá estão (outras frações)
+     */
+    containers: number;
+    /**
+     * Coord Precision
+     */
+    coord_precision: 'precise' | 'approximate';
+    /**
+     * Latitude
+     */
+    latitude: number;
+    /**
+     * Longitude
+     */
+    longitude: number;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Population Covered
+     */
+    population_covered: number;
+    /**
+     * Served Points
+     */
+    served_points: number;
+    /**
+     * Site Id
+     */
+    site_id: string;
+    /**
+     * Street
+     */
+    street: string | null;
+    /**
+     * Tonnes
+     *
+     * Têxtil dos pontos cujo local aberto mais próximo é este (estimativa)
+     */
+    tonnes: number;
+    /**
+     * Vehicle
+     *
+     * Viatura da rota que o visita
+     */
+    vehicle: number | null;
+};
+
+/**
+ * SitingSummary
+ *
+ * Como foi escolhida a rede por locais e o que não se sabe.
+ */
+export type SitingSummary = {
+    /**
+     * Candidates
+     */
+    candidates: number;
+    /**
+     * Demand Points
+     */
+    demand_points: number;
+    /**
+     * Opened
+     */
+    opened: number;
+    /**
+     * Population Proxy
+     */
+    population_proxy: string;
+    /**
+     * Radius M
+     */
+    radius_m: number;
+    /**
+     * Served Points
+     */
+    served_points: number;
+    site_mode: CollectionMode;
+    /**
+     * Solver Iterations
+     */
+    solver_iterations: number;
 };
 
 /**

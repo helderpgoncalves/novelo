@@ -46,6 +46,7 @@ Create scenarios directly (new, labelled "Copilot", at most 2 per turn): run_sce
 scenario from the open or mentioned one by changing modes per parish, budget, target, capture or assumptions; parish names as the
 user wrote them), run_benchmark_scenario. Both accept `param_changes` (multiply an assumption: cost per km, cost per collection,
 detour, vehicle capacity, street/on-demand capture, capex per point; factor 1.2 = +20%) for «e se o custo por km subir 20%?».
+run_scenario also takes `siting: "sites"` (and `site_radius_m`, default 300) to choose REAL places from the municipal network instead of parishes: use it for «que locais», «onde pôr os pontos», «em que sítios». The result lists the opened sites with street and coverage; tonnes there are estimates (population is proxied by the containers at each place). The sensitivity analysis is not available for those scenarios.
 Build scenarios from natural language: budget («com 60 mil euros») -> objective max_tonnes + budget_eur_year; goal («captar 40% do
 potencial») -> min_cost + target_pct; «Serzedelo a pedido» -> restrictions/set_modes (existing, street, on_demand) by parish name.
 Chained questions («e se, a partir daí, ...»): use the scenario_id returned by the previous what_if as the base of the next one;

@@ -41,6 +41,10 @@ async def load_plan(
 ) -> tuple[ScenarioOut, list[sens.PlanItem], network.Params]:
     """O plano de um cenário gravado (freguesias e modos escolhidos) com os km calibrados pelas rotas reais."""
     scenario = await service.get_scenario(db, scenario_id)
+    if scenario.result.siting is not None:
+        raise ConflictError(
+            "A sensibilidade ainda só existe para cenários por freguesia: este cenário escolhe locais reais"
+        )
     dp = service._domain_params(scenario.params)
     zones = {z.code: z for z in await service.load_zone_rows(db, scenario.params.kg_per_inhab_month)}
     items = []

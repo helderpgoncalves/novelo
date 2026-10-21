@@ -122,6 +122,10 @@ class RunScenarioArgs(_Args):
     param_changes: list[ParamChange] = Field(
         default_factory=list, max_length=4, description="Escalar pressupostos (custos, capturas...) só neste cenário"
     )
+    siting: Literal["parish", "sites"] = Field(
+        default="parish", description="`sites`: escolhe locais reais da rede municipal em vez de freguesias"
+    )
+    site_radius_m: int = Field(default=300, ge=100, le=1000, description="Distância a pé que um local serve")
 
     @model_validator(mode="after")
     def _inputs(self) -> "RunScenarioArgs":
@@ -841,6 +845,8 @@ class CopilotTools:
             target_tonnes=target if args.objective == ScenarioObjective.MIN_COST else None,
             params=params,
             constraints=constraints,
+            siting=args.siting,
+            site_radius_m=args.site_radius_m,
         )
         self._created += 1
         out = self._register(await planning.run_scenario(self.db, request, self.user), created=True)
@@ -930,6 +936,7 @@ class CopilotTools:
             params=params,
             constraints=constraints,
             parent_id=base.id,
+            **base.siting_options(),
         )
         self._created += 1
         new = await planning.run_scenario(self.db, request, self.user)
