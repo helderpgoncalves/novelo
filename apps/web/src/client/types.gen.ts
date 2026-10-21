@@ -3610,6 +3610,26 @@ export type FormSpec = {
 };
 
 /**
+ * FranceReference
+ */
+export type FranceReference = {
+    /**
+     * Capture Of Model Base Pct
+     *
+     * Parte do potencial-base que a França já recolhe
+     */
+    capture_of_model_base_pct: number;
+    /**
+     * Kg Per Inhab Year
+     */
+    kg_per_inhab_year: number;
+    /**
+     * Source
+     */
+    source: string;
+};
+
+/**
  * FrontierPoint
  */
 export type FrontierPoint = {
@@ -5177,6 +5197,34 @@ export type ModeSummary = {
      * Zones
      */
     zones: number;
+};
+
+/**
+ * ModelValidationOut
+ */
+export type ModelValidationOut = {
+    baseline: ValidationBaseline;
+    /**
+     * Cannot Test
+     *
+     * O que os dados de hoje não permitem testar, e porquê
+     */
+    cannot_test: Array<string>;
+    /**
+     * Estimates
+     *
+     * Campos que são estimativa e não medida
+     */
+    estimates: Array<string>;
+    france: FranceReference;
+    /**
+     * Readings
+     */
+    readings: Array<PotentialReadingOut>;
+    /**
+     * Spatial
+     */
+    spatial: Array<SpatialCheckOut>;
 };
 
 /**
@@ -7740,6 +7788,40 @@ export type PointGeometry = {
 };
 
 /**
+ * PotentialReadingOut
+ */
+export type PotentialReadingOut = {
+    /**
+     * Implied Capture Pct
+     *
+     * Captura de 2025 se esta leitura do potencial fosse a verdadeira
+     */
+    implied_capture_pct: number;
+    /**
+     * Implied Potential T
+     */
+    implied_potential_t: number;
+    /**
+     * Is Model Base
+     *
+     * A leitura que o modelo usa por omissão (0,7 kg/hab/mês)
+     */
+    is_model_base: boolean;
+    /**
+     * Key
+     */
+    key: 'plan_per_capita' | 'plan_share_of_residual' | 'pt_composition';
+    /**
+     * Kg Per Inhab Year
+     */
+    kg_per_inhab_year: number;
+    /**
+     * Source
+     */
+    source: string;
+};
+
+/**
  * ProducerType
  */
 export type ProducerType = 'restaurant' | 'school' | 'establishment' | 'large_producer' | 'care_home' | 'hospitality';
@@ -9074,6 +9156,50 @@ export type SlotCount = {
 };
 
 /**
+ * SpatialCheckOut
+ */
+export type SpatialCheckOut = {
+    /**
+     * Kind
+     */
+    kind: 'all' | 'underground' | 'surface';
+    /**
+     * Median Abs Pct Error
+     */
+    median_abs_pct_error: number;
+    /**
+     * N
+     */
+    n: number;
+    /**
+     * Pearson R
+     */
+    pearson_r: number;
+    /**
+     * R2
+     */
+    r2: number;
+    /**
+     * Spearman Rho
+     */
+    spearman_rho: number;
+    /**
+     * Within 25 Pct
+     */
+    within_25_pct: number;
+    /**
+     * Within 50 Pct
+     */
+    within_50_pct: number;
+    /**
+     * Worst
+     *
+     * As freguesias onde a regra mais falha, pelo erro absoluto
+     */
+    worst: Array<ZoneCheckOut>;
+};
+
+/**
  * StatusCounts
  */
 export type StatusCounts = {
@@ -10335,6 +10461,28 @@ export type UsersSummary = {
 };
 
 /**
+ * ValidationBaseline
+ */
+export type ValidationBaseline = {
+    /**
+     * Collected T
+     */
+    collected_t: number;
+    /**
+     * Observed Kg Per Inhab Year
+     */
+    observed_kg_per_inhab_year: number;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Year
+     */
+    year: number;
+};
+
+/**
  * ValidationErrorBody
  */
 export type ValidationErrorBody = {
@@ -10624,6 +10772,32 @@ export type WhatIfRequest = {
  * WhatIfStatus
  */
 export type WhatIfStatus = 'proposed' | 'applied' | 'rejected';
+
+/**
+ * ZoneCheckOut
+ */
+export type ZoneCheckOut = {
+    /**
+     * Observed
+     */
+    observed: number;
+    /**
+     * Pct Error
+     */
+    pct_error: number | null;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Predicted
+     */
+    predicted: number;
+    /**
+     * Zone
+     */
+    zone: string;
+};
 
 /**
  * ZoneOut
@@ -21393,6 +21567,67 @@ export type ResendUserEmailResponses = {
 };
 
 export type ResendUserEmailResponse = ResendUserEmailResponses[keyof ResendUserEmailResponses];
+
+export type GetModelValidationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/validation/model';
+};
+
+export type GetModelValidationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetModelValidationError = GetModelValidationErrors[keyof GetModelValidationErrors];
+
+export type GetModelValidationResponses = {
+    /**
+     * Successful Response
+     */
+    200: ModelValidationOut;
+};
+
+export type GetModelValidationResponse = GetModelValidationResponses[keyof GetModelValidationResponses];
 
 export type ReceiveResendWebhookData = {
     body?: never;

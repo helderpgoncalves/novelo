@@ -1502,6 +1502,15 @@ export const zFormArtifact = z.object({
 });
 
 /**
+ * FranceReference
+ */
+export const zFranceReference = z.object({
+    capture_of_model_base_pct: z.number(),
+    kg_per_inhab_year: z.number(),
+    source: z.string()
+});
+
+/**
  * GarmentType
  */
 export const zGarmentType = z.enum([
@@ -3027,6 +3036,22 @@ export const zPoint = z.object({
 export const zPointGeometry = z.object({
     coordinates: z.tuple([z.number(), z.number()]),
     type: z.literal('Point').optional().default('Point')
+});
+
+/**
+ * PotentialReadingOut
+ */
+export const zPotentialReadingOut = z.object({
+    implied_capture_pct: z.number(),
+    implied_potential_t: z.number(),
+    is_model_base: z.boolean(),
+    key: z.enum([
+        'plan_per_capita',
+        'plan_share_of_residual',
+        'pt_composition'
+    ]),
+    kg_per_inhab_year: z.number(),
+    source: z.string()
 });
 
 /**
@@ -4752,6 +4777,16 @@ export const zUsersSummary = z.object({
 });
 
 /**
+ * ValidationBaseline
+ */
+export const zValidationBaseline = z.object({
+    collected_t: z.number(),
+    observed_kg_per_inhab_year: z.number(),
+    population: z.int(),
+    year: z.int()
+});
+
+/**
  * ValidationErrorBody
  */
 export const zValidationErrorBody = z.object({
@@ -5187,6 +5222,48 @@ export const zWhatIfOut = z.object({
     target_pct: z.number().nullable(),
     understood: z.string(),
     unknown_parishes: z.array(z.string())
+});
+
+/**
+ * ZoneCheckOut
+ */
+export const zZoneCheckOut = z.object({
+    observed: z.int(),
+    pct_error: z.number().nullable(),
+    population: z.int(),
+    predicted: z.number(),
+    zone: z.string()
+});
+
+/**
+ * SpatialCheckOut
+ */
+export const zSpatialCheckOut = z.object({
+    kind: z.enum([
+        'all',
+        'underground',
+        'surface'
+    ]),
+    median_abs_pct_error: z.number(),
+    n: z.int(),
+    pearson_r: z.number(),
+    r2: z.number(),
+    spearman_rho: z.number(),
+    within_25_pct: z.int(),
+    within_50_pct: z.int(),
+    worst: z.array(zZoneCheckOut)
+});
+
+/**
+ * ModelValidationOut
+ */
+export const zModelValidationOut = z.object({
+    baseline: zValidationBaseline,
+    cannot_test: z.array(z.string()),
+    estimates: z.array(z.string()),
+    france: zFranceReference,
+    readings: z.array(zPotentialReadingOut),
+    spatial: z.array(zSpatialCheckOut)
 });
 
 /**
@@ -6656,6 +6733,11 @@ export const zResendUserEmailPath = z.object({
  * Successful Response
  */
 export const zResendUserEmailResponse = zUserAdminOut;
+
+/**
+ * Successful Response
+ */
+export const zGetModelValidationResponse = zModelValidationOut;
 
 /**
  * Successful Response

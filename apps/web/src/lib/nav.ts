@@ -1,4 +1,5 @@
 import {
+  BadgeCheck,
   BarChart3,
   Bot,
   Boxes,
@@ -43,6 +44,7 @@ export interface NavItem {
     | '/simulator'
     | '/scenarios'
     | '/pilot'
+    | '/validation'
     | '/assumptions'
     | '/users'
     | '/admin/ai';
@@ -86,6 +88,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_simulator(), to: '/simulator', icon: Layers },
       { label: () => m.nav_scenarios(), to: '/scenarios', icon: GitCompareArrows },
       { label: () => m.nav_pilot(), to: '/pilot', icon: FlaskConical },
+      { label: () => m.nav_validation(), to: '/validation', icon: BadgeCheck },
       { label: () => m.nav_assumptions(), to: '/assumptions', icon: SlidersHorizontal },
     ],
   },

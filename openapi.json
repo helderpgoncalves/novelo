@@ -6281,6 +6281,30 @@
         "title": "FormSpec",
         "type": "object"
       },
+      "FranceReference": {
+        "properties": {
+          "capture_of_model_base_pct": {
+            "description": "Parte do potencial-base que a França já recolhe",
+            "title": "Capture Of Model Base Pct",
+            "type": "number"
+          },
+          "kg_per_inhab_year": {
+            "title": "Kg Per Inhab Year",
+            "type": "number"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "kg_per_inhab_year",
+          "capture_of_model_base_pct",
+          "source"
+        ],
+        "title": "FranceReference",
+        "type": "object"
+      },
       "FrontierPoint": {
         "properties": {
           "annual_cost_eur": {
@@ -9109,6 +9133,56 @@
           "annual_cost_eur"
         ],
         "title": "ModeSummary",
+        "type": "object"
+      },
+      "ModelValidationOut": {
+        "properties": {
+          "baseline": {
+            "$ref": "#/components/schemas/ValidationBaseline"
+          },
+          "cannot_test": {
+            "description": "O que os dados de hoje não permitem testar, e porquê",
+            "items": {
+              "type": "string"
+            },
+            "title": "Cannot Test",
+            "type": "array"
+          },
+          "estimates": {
+            "description": "Campos que são estimativa e não medida",
+            "items": {
+              "type": "string"
+            },
+            "title": "Estimates",
+            "type": "array"
+          },
+          "france": {
+            "$ref": "#/components/schemas/FranceReference"
+          },
+          "readings": {
+            "items": {
+              "$ref": "#/components/schemas/PotentialReadingOut"
+            },
+            "title": "Readings",
+            "type": "array"
+          },
+          "spatial": {
+            "items": {
+              "$ref": "#/components/schemas/SpatialCheckOut"
+            },
+            "title": "Spatial",
+            "type": "array"
+          }
+        },
+        "required": [
+          "baseline",
+          "readings",
+          "france",
+          "spatial",
+          "estimates",
+          "cannot_test"
+        ],
+        "title": "ModelValidationOut",
         "type": "object"
       },
       "MunicipalCandidateOut": {
@@ -13144,6 +13218,51 @@
         "title": "PointGeometry",
         "type": "object"
       },
+      "PotentialReadingOut": {
+        "properties": {
+          "implied_capture_pct": {
+            "description": "Captura de 2025 se esta leitura do potencial fosse a verdadeira",
+            "title": "Implied Capture Pct",
+            "type": "number"
+          },
+          "implied_potential_t": {
+            "title": "Implied Potential T",
+            "type": "number"
+          },
+          "is_model_base": {
+            "description": "A leitura que o modelo usa por omissão (0,7 kg/hab/mês)",
+            "title": "Is Model Base",
+            "type": "boolean"
+          },
+          "key": {
+            "enum": [
+              "plan_per_capita",
+              "plan_share_of_residual",
+              "pt_composition"
+            ],
+            "title": "Key",
+            "type": "string"
+          },
+          "kg_per_inhab_year": {
+            "title": "Kg Per Inhab Year",
+            "type": "number"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "kg_per_inhab_year",
+          "implied_capture_pct",
+          "implied_potential_t",
+          "is_model_base",
+          "source"
+        ],
+        "title": "PotentialReadingOut",
+        "type": "object"
+      },
       "ProducerType": {
         "enum": [
           "restaurant",
@@ -15301,6 +15420,68 @@
         "title": "SlotCount",
         "type": "object"
       },
+      "SpatialCheckOut": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "all",
+              "underground",
+              "surface"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "median_abs_pct_error": {
+            "title": "Median Abs Pct Error",
+            "type": "number"
+          },
+          "n": {
+            "title": "N",
+            "type": "integer"
+          },
+          "pearson_r": {
+            "title": "Pearson R",
+            "type": "number"
+          },
+          "r2": {
+            "title": "R2",
+            "type": "number"
+          },
+          "spearman_rho": {
+            "title": "Spearman Rho",
+            "type": "number"
+          },
+          "within_25_pct": {
+            "title": "Within 25 Pct",
+            "type": "integer"
+          },
+          "within_50_pct": {
+            "title": "Within 50 Pct",
+            "type": "integer"
+          },
+          "worst": {
+            "description": "As freguesias onde a regra mais falha, pelo erro absoluto",
+            "items": {
+              "$ref": "#/components/schemas/ZoneCheckOut"
+            },
+            "title": "Worst",
+            "type": "array"
+          }
+        },
+        "required": [
+          "kind",
+          "n",
+          "pearson_r",
+          "spearman_rho",
+          "r2",
+          "median_abs_pct_error",
+          "within_25_pct",
+          "within_50_pct",
+          "worst"
+        ],
+        "title": "SpatialCheckOut",
+        "type": "object"
+      },
       "StatusCounts": {
         "properties": {
           "bounced": {
@@ -17408,6 +17589,34 @@
         "title": "UsersSummary",
         "type": "object"
       },
+      "ValidationBaseline": {
+        "properties": {
+          "collected_t": {
+            "title": "Collected T",
+            "type": "number"
+          },
+          "observed_kg_per_inhab_year": {
+            "title": "Observed Kg Per Inhab Year",
+            "type": "number"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "year": {
+            "title": "Year",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "year",
+          "collected_t",
+          "population",
+          "observed_kg_per_inhab_year"
+        ],
+        "title": "ValidationBaseline",
+        "type": "object"
+      },
       "ValidationErrorBody": {
         "properties": {
           "code": {
@@ -17919,6 +18128,46 @@
         ],
         "title": "WhatIfStatus",
         "type": "string"
+      },
+      "ZoneCheckOut": {
+        "properties": {
+          "observed": {
+            "title": "Observed",
+            "type": "integer"
+          },
+          "pct_error": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pct Error"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "predicted": {
+            "title": "Predicted",
+            "type": "number"
+          },
+          "zone": {
+            "title": "Zone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "zone",
+          "population",
+          "observed",
+          "predicted",
+          "pct_error"
+        ],
+        "title": "ZoneCheckOut",
+        "type": "object"
       },
       "ZoneOut": {
         "properties": {
@@ -41110,6 +41359,128 @@
         "summary": "Resend User Email",
         "tags": [
           "users"
+        ]
+      }
+    },
+    "/api/v1/validation/model": {
+      "get": {
+        "description": "O que se pode testar do modelo com os dados de hoje: triangulação do potencial e validação cruzada espacial.",
+        "operationId": "get_model_validation",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModelValidationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Model Validation",
+        "tags": [
+          "validation"
         ]
       }
     },
