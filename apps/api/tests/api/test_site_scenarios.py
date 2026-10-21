@@ -118,3 +118,17 @@ async def test_on_demand_completes_the_site_network(operator: httpx.AsyncClient)
     # Lordelo não tem local ao alcance, mas a recolha a pedido chega lá
     assert alloc["030828"]["tonnes"] > 0 and alloc["030828"]["modes"] == ["on_demand"]
     assert sum(a["tonnes"] for a in r["allocations"]) == pytest.approx(r["kpis"]["tonnes_year"], abs=0.01)
+
+
+async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx.AsyncClient) -> None:
+    parish = (
+        await operator.post(
+            f"{P}/scenarios", json={"label": "Freguesias", "objective": "max_tonnes", "budget_eur_year": 5000}
+        )
+    ).json()
+    await run(operator, label="Locais 1", budget_eur_year=2000)
+    before = (await operator.get("/api/v1/textile/overview")).json()["scenario_frontier"]
+    assert parish["id"] in {p["id"] for p in before}  # com um só cenário por locais, vale tudo
+    await run(operator, label="Locais 2", budget_eur_year=4000)
+    after = (await operator.get("/api/v1/textile/overview")).json()["scenario_frontier"]
+    assert {p["label"] for p in after} == {"Locais 1", "Locais 2"}

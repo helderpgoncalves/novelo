@@ -194,6 +194,9 @@ async def _parishes(db: AsyncSession) -> list[OverviewParish]:
     return out
 
 
+MIN_SITE_SCENARIOS = 2
+
+
 async def _frontier(db: AsyncSession) -> tuple[list[FrontierPoint], list[Any]]:
     stmt = (
         select(Scenario)
@@ -201,7 +204,13 @@ async def _frontier(db: AsyncSession) -> tuple[list[FrontierPoint], list[Any]]:
         .order_by(Scenario.created_at.desc())
         .limit(MAX_SCENARIOS)
     )
-    rows = (await db.execute(stmt)).scalars()
+    rows = list((await db.execute(stmt)).scalars())
+    # A rede por locais reais é a que respeita onde há pontos de recolha: com pelo menos dois cenários assim, a
+    # fronteira e o controlo de orçamento da sala de decisão usam só esses (misturar com a rede por freguesia, mais
+    # otimista, faria a interpolação saltar entre dois modelos).
+    by_sites = [r for r in rows if r.siting == "sites"]
+    if len(by_sites) >= MIN_SITE_SCENARIOS:
+        rows = by_sites
     points: list[FrontierPoint] = []
     for s in rows:
         modes = [CollectionMode(m) for m in s.modes]
