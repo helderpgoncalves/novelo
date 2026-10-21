@@ -38,6 +38,7 @@ import { Route as AppReportsRouteImport } from './routes/_app/reports'
 import { Route as AppSimulatorRouteImport } from './routes/_app/simulator'
 import { Route as AppTriageRouteImport } from './routes/_app/triage'
 import { Route as AppUsersRouteImport } from './routes/_app/users'
+import { Route as AppValidationRouteImport } from './routes/_app/validation'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
@@ -194,6 +195,11 @@ const AppUsersRoute = AppUsersRouteImport.update({
   path: '/users',
   getParentRoute: () => AppRoute,
 } as any)
+const AppValidationRoute = AppValidationRouteImport.update({
+  id: '/validation',
+  path: '/validation',
+  getParentRoute: () => AppRoute,
+} as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -283,6 +289,7 @@ export interface FileRoutesByFullPath {
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
+  '/validation': typeof AppValidationRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -324,6 +331,7 @@ export interface FileRoutesByTo {
   '/simulator': typeof AppSimulatorRoute
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
+  '/validation': typeof AppValidationRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
@@ -368,6 +376,7 @@ export interface FileRoutesById {
   '/_app/simulator': typeof AppSimulatorRoute
   '/_app/triage': typeof AppTriageRoute
   '/_app/users': typeof AppUsersRoute
+  '/_app/validation': typeof AppValidationRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
@@ -411,6 +420,7 @@ export interface FileRouteTypes {
     | '/simulator'
     | '/triage'
     | '/users'
+    | '/validation'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -452,6 +462,7 @@ export interface FileRouteTypes {
     | '/simulator'
     | '/triage'
     | '/users'
+    | '/validation'
     | '/forgot-password'
     | '/login'
     | '/register'
@@ -495,6 +506,7 @@ export interface FileRouteTypes {
     | '/_app/simulator'
     | '/_app/triage'
     | '/_app/users'
+    | '/_app/validation'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
@@ -729,6 +741,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppUsersRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/validation': {
+      id: '/_app/validation'
+      path: '/validation'
+      fullPath: '/validation'
+      preLoaderRoute: typeof AppValidationRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_auth/forgot-password': {
       id: '/_auth/forgot-password'
       path: '/forgot-password'
@@ -835,6 +854,7 @@ interface AppRouteChildren {
   AppSimulatorRoute: typeof AppSimulatorRoute
   AppTriageRoute: typeof AppTriageRoute
   AppUsersRoute: typeof AppUsersRoute
+  AppValidationRoute: typeof AppValidationRoute
   AppAdminAiRoute: typeof AppAdminAiRoute
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
@@ -863,6 +883,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppSimulatorRoute: AppSimulatorRoute,
   AppTriageRoute: AppTriageRoute,
   AppUsersRoute: AppUsersRoute,
+  AppValidationRoute: AppValidationRoute,
   AppAdminAiRoute: AppAdminAiRoute,
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,

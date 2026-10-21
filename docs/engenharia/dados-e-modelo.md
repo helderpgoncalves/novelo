@@ -158,3 +158,11 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Captura média igual em todas as freguesias (lacuna por freguesia) | 22,9% | Pressuposto: sem têxtil recolhido por freguesia (secção 6) |
 
 Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` sem uma linha nesta tabela. Os custos e as taxas por modo estão lá marcados como `assumption` e aparecem com a sua origem no ecrã "Pressupostos".
+
+## 7. Validação do modelo
+
+Só há um ano de têxtil (2025, totais anuais por entidade), por isso **não há backtest temporal e não se finge um**. O ecrã «Validação» (`/validation`, `GET /validation/model`, código em `domain/validation.py` e `features/validation/`) faz só o que os dados reais deixam fazer:
+
+- **Triangulação do potencial.** Confronta as leituras publicadas do têxtil gerado por habitante e mostra a captura de 2025 que cada uma implica: 0,7 kg/mês do plano municipal (8,4 kg/ano, captura 22,9%), 5,4% × 315 kg do indiferenciado (17,0 kg/ano, 11,3%) e 4,55% × 517 kg da composição dos RSU em Portugal (23,5 kg/ano, 8,2%). Em nenhuma Guimarães passa de 22,9%; todas são **estimativa**. A referência francesa (4,27 kg/hab/ano) continua marcada «por verificar».
+- **Validação cruzada espacial (deixar uma de fora).** Cada freguesia é prevista só com as outras 47, na proporção da população, e comparada com os contentores municipais que lá estão. Resultado (48 freguesias): R² 0,76 e erro mediano de 36% em todos os contentores; 0,84 nos enterrados; 0,06 nos de superfície, onde a população não diz onde estão. Não prova a procura de têxtil: mostra que a população é um proxy razoável do sítio onde a recolha existe, e onde deixa de ser.
+- **O que não se testa (e como se resolve):** série temporal (precisa dos quilos mensais por entidade; a H Sarah Trading tem-nos por mês), custos locais (a Vitrus ainda não os enviou) e contentores de têxteis (localizações por receber). O piloto de três meses fecha o ciclo previsto contra observado.
