@@ -1,8 +1,9 @@
 /**
  * Geometria do «fio» do hero: funções puras, sem DOM. O fio é uma curva de Bézier cúbica contínua (lê-se como uma linha de
  * fio, sem cantos) desenhada num `viewBox` fixo; o troço cheio vai até à fração do comprimento que a Vitrus já recolhe
- * (301,3 t de ≈ 1 317 t = 22,9 %) e o resto, a tracejado, é o que falta captar. As posições dos nós saem do comprimento de
- * arco real da curva, por isso 22,9 % do fio é mesmo 22,9 % do fio (e não 22,9 % da largura).
+ * (301,3 t de ≈ 2 626 t gerados = 11,5 %, estimativa Vitrus + APA) e o resto, a tracejado, é o que ainda vai para o lixo.
+ * As posições dos nós saem do comprimento de arco real da curva, por isso 11,5 % do fio é mesmo 11,5 % do fio (e não da
+ * largura).
  */
 import { FACTS } from './facts';
 
@@ -99,9 +100,9 @@ export function fioPointAt(f: number): { x: number; y: number } {
   return { x: a[0] + (b[0] - a[0]) * k, y: a[1] + (b[1] - a[1]) * k };
 }
 
-/** Fração do potencial que já se recolhe (301,3 t ÷ 1 317,4 t): onde acaba o troço cheio. */
+/** Fração do têxtil gerado que já se recolhe (301,3 t ÷ 2 626,0 t): onde acaba o troço cheio. */
 export const CAPTURED = FACTS.collectedT / FACTS.potentialT;
-/** O que falta captar, em toneladas (estimativa), arredondado como na sala de decisão. */
+/** O que ainda vai para o lixo, em toneladas (estimativa: 43 051 t × 5,4%), arredondado como na sala de decisão. */
 export const GAP_T = Math.round(FACTS.potentialT - FACTS.collectedT);
 /** Meio do troço tracejado (por comprimento): onde vive a marca do que falta. */
 export const GAP_MID = (CAPTURED + 1) / 2;

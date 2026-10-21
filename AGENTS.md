@@ -8,7 +8,7 @@ O `CLAUDE.md` importa este ficheiro. **Lê-o inteiro antes de mexer em código.*
 Novelo é a ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães ao menor custo
 (Desafio 5 TexVitrus, Hack4Guimarães 2035). Orçamento e meta entram, saem cenários comparáveis em
 €, toneladas e €/t. Funcionalidades: simulador da rede (CP-SAT e VRP), cenários e comparação, "E se...?" em português com verificador de números,
-triagem por foto, lotes com QR e passaporte público, bolsa de fibra, evidência por marca, relatório RAP em PDF e mapa. Domínio completo: `docs/engenharia/features.md`.
+triagem por foto (controlo de qualidade na entrega), lotes com QR e passaporte público, bolsa de fibra, evidência por marca, relatório RAP em PDF e mapa. Domínio completo: `docs/engenharia/features.md`.
 
 - **Equipa:** Hélder Gonçalves e Flávio Fernandes. Hackathon de 5 dias: velocidade e perfeição, sem desperdício.
 - **Produção:** https://novelo.helder.si (Coolify numa VPS, `docker-compose.yml`). Repositório público (verificado a 20 out 2026). Dev: `just dev`.
@@ -22,12 +22,15 @@ e `data/processed/` (gerado por `just etl`). Análise e limites em `docs/dados/a
 
 | Facto | Valor | Onde se usa |
 | --- | --- | --- |
-| Têxtil recolhido em 2025 (4 entidades) | 301,3 t = 0,16 kg/hab/mês | Ponto de partida; calibração da taxa de captura |
-| Potencial estimado (0,7 kg/hab/mês × 156 830 hab. do INE) | ≈ 1 317 t/ano | Procura; captura atual ≈ 22,9% |
-| Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Sankey observado; receita e €/t |
+| Têxtil recolhido em 2025 (4 entidades) | 301,3 t = 0,16 kg/hab/mês, recolhido à parte (fora do RSU) | Ponto de partida |
+| RSU recolhido pela Vitrus em 2025 | 43 051 t (Vitrus, 21 out 2026) | Base da procura |
+| Têxtil por desviar (43 051 t × 5,4% da APA) | ≈ 2 324,8 t/ano = 1,235 kg/hab/mês (estimativa) | Procura do modelo; gerado ≈ 2 626,0 t, captura atual ≈ 11,5% |
+| Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Sankey observado; receita só da reutilização (reciclar custa mais que fibra virgem) |
 | Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 82 localidades | Recolha a pedido sem km novos |
-| Contentores municipais (NÃO são de têxteis) | **chegaram a 20 out 2026** em `data/raw/vitrus-mapa-qgis/`: 2 751 contentores, 2 026 locais, CAOP 2019; ETL `municipal_containers.py` → `data/processed/municipal_*` | Candidatos a pontos de têxteis, produtores B2B, geometria das freguesias, densidade; **nunca misturar com a rede de têxteis** |
-| Localizações dos contentores de têxteis | **continuam por receber**: `data/raw/` + `containers.py` | Pontos atuais da rede de partida |
+| Contentores municipais (indiferenciado, orgânico, seletivo) | **chegaram a 20 out 2026** em `data/raw/vitrus-mapa-qgis/`: 2 751 contentores, 2 026 locais, CAOP 2019; ETL `municipal_containers.py` → `data/processed/municipal_*` | Base geográfica: onde o têxtil se perde no lixo e onde a viatura já passa; locais candidatos, produtores B2B, freguesias, densidade |
+| Contentores de têxteis | **não existem** e a Vitrus não os quer (contaminação estraga a reutilização; 21 out 2026) | Rede proposta sem contentores: local existente sem contentor novo (`existing`) + recolha a pedido nos circuitos (`on_demand`) |
+
+A base antiga (0,7 kg/hab/mês, 1 317 t, 22,9%, Plano de Ação Integrado/URBACT) já não se usa: a Vitrus não conhece esse plano.
 
 Nunca inventar um valor: ou vem dos dados, ou está em `docs/engenharia/dados-e-modelo.md` como pressuposto
 com fonte, ou leva a etiqueta "estimativa" no ecrã.
@@ -115,7 +118,7 @@ procedimento lendo diretamente `.claude/skills/<nome>/SKILL.md`. `.agents/skills
 | `add-web-feature` | Novo ecrã ou componente |
 | `contract-gen` | Mexeste na API ou o cliente está desatualizado |
 | `optimization-model` | Procura, custos, MIP de localização, VRP de rotas |
-| `data-etl` | Novos ficheiros de dados (contentores de têxteis, pacote municipal QGIS, INE, CAOP, OSM) |
+| `data-etl` | Novos ficheiros de dados (pacote municipal QGIS, INE, CAOP, OSM) |
 | `llm-feature` | "E se...?", triagem por foto, verificador, evals |
 | `deploy-coolify` | Deploy, domínio, variáveis, diagnóstico em produção |
 | `ship` | Fechar uma tarefa: check, commit, push |

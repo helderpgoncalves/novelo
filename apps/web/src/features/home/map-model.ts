@@ -123,16 +123,16 @@ export const LAYERS: LayerMeta[] = [
 
 export interface LayerContext {
   parishes: OverviewParish[];
-  /** Captura média do concelho, em % (a mesma em todas as freguesias: não há captura por freguesia). */
-  capturePct: number;
   areaKm2: Map<string, number>;
   /** Contentores municipais por freguesia (não são de têxteis). */
   municipalContainers: Map<string, number>;
 }
 
-/** Potencial por captar numa freguesia (t/ano): potencial × (1 − captura média do concelho). Estimativa. */
-export const parishGapT = (p: OverviewParish, capturePct: number): number =>
-  p.potential_t * (1 - capturePct / 100);
+/**
+ * Têxtil que ainda vai para o lixo numa freguesia (t/ano). A API já o dá em `potential_t` (população × 43 051 t × 5,4%
+ * ÷ população do concelho, Vitrus + APA): o recolhido à parte não entra, por isso não se desconta a captura. Estimativa.
+ */
+export const parishGapT = (p: OverviewParish): number => p.potential_t;
 
 /**
  * Valor de cada freguesia na camada. Uma freguesia sem valor válido não entra no mapa (fica «sem dados»). O potencial
@@ -147,7 +147,7 @@ export function layerValues(layer: LayerId, ctx: LayerContext): Map<string, numb
     const area = ctx.areaKm2.get(p.code) ?? 0;
     switch (layer) {
       case 'gap':
-        put(p.code, parishGapT(p, ctx.capturePct));
+        put(p.code, parishGapT(p));
         break;
       case 'population':
         put(p.code, p.population);

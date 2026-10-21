@@ -204,7 +204,9 @@ async def test_runtime_resolves_budget_and_records_usage_without_content(
     assert runtime.sink is not None
     await runtime.sink(UsageEvent("triage", "openai/gpt-6-luna", 1000, 100, 0.9, "provider", 800, True, None, "a" * 64))
     runtime = await service.build_runtime(session, user)
-    assert runtime.spent_usd == pytest.approx(0.9) and runtime.budget_state == "warning"
+    # 90% do orçamento: aviso no relatório de uso (ver `get_usage`), mas as chamadas continuam a sair
+    assert runtime.spent_usd == pytest.approx(0.9) and runtime.budget_usd == 1.0
+    runtime.check_budget()
     assert runtime.sink is not None
     await runtime.sink(UsageEvent("triage", "openai/gpt-6-luna", 1000, 100, 0.2, "provider", 800, True, None, None))
     stopped = await service.build_runtime(session, user)

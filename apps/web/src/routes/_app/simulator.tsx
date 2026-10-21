@@ -89,7 +89,7 @@ function Simulator() {
     constraints: {},
     siting: 'sites',
     radiusM: 300,
-    siteMode: 'street',
+    siteMode: 'existing',
     onDemand: true,
   };
   const fromBase = seedFrom(base, defaults);

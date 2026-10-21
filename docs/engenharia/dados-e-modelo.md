@@ -9,23 +9,25 @@ O modelo tem três passos: quanto têxtil há em cada zona, quanto custa cada fo
 | População por subsecção | INE, Censos 2021 (BGRI) | Procura por zona |
 | Limites de freguesia | CAOP, Direção-Geral do Território | Agregar e mostrar no mapa |
 | Estradas e locais candidatos (escolas, supermercados, juntas) | OpenStreetMap, extrato de Portugal | Rotas e pontos de recolha em locais existentes |
-| Têxtil recolhido, circuitos, viaturas e caracterização do lixo | Vitrus Ambiente (ver [análise dos dados](../dados/analise-dados-recebidos.md)) | Calibração e rede de partida |
-| Localizações dos contentores **de têxteis** | Vitrus Ambiente, por receber | Pontos atuais da rede (ETL `containers.py`, tabela `containers`) |
-| Contentores **municipais** de outras frações (2 751) e CAOP 2019 | Vitrus Ambiente, pacote QGIS de 20 de outubro de 2026 (ver [análise](../dados/analise-contentores-municipais.md)) | Pontos candidatos junto de recolha existente (investimento perto de zero, **pressuposto**), produtores B2B, geometria oficial das freguesias, densidade. ETL `municipal_containers.py` → `data/processed/municipal_*`; **não entram** na rede de têxteis |
-| Têxtil no indiferenciado: 5,4%; 0,7 kg/hab/mês | Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025), p. 30, que cita Perebynos et al. 2023 | Valor base da procura, com a incerteza descrita na secção 1 |
-| Custos unitários (recolha, km, contentor) | Vitrus Ambiente (ainda por receber) | Modelo de custos |
+| Têxtil recolhido, circuitos, viaturas e caracterização do lixo | Vitrus Ambiente (ver [análise dos dados](../dados/analise-dados-recebidos.md)) | Ponto de partida e rede de circuitos |
+| RSU recolhido em 2025: 43 051 t | Vitrus Ambiente, email do mentor de 21 de outubro de 2026 (ver [respostas](../dados/analise-dados-recebidos.md#respostas-da-vitrus-de-21-out-2026)) | Base da procura (secção 1) |
+| Têxtil no RSU: 5,4% | APA, valor indicado pela Vitrus a 21 de outubro de 2026 | Base da procura (secção 1) |
+| Contentores **municipais** de indiferenciado, orgânico e seletivo (2 751) e CAOP 2019 | Vitrus Ambiente, pacote QGIS de 20 de outubro de 2026 (ver [análise](../dados/analise-contentores-municipais.md)) | Base geográfica: onde o têxtil se perde no lixo e onde a viatura já passa. Locais candidatos sem contentor novo (investimento perto de zero, **pressuposto**), procura por local, produtores B2B, geometria oficial das freguesias, densidade. ETL `municipal_containers.py` → `data/processed/municipal_*` |
+| Custos unitários (recolha, km) | Vitrus Ambiente, pedidos ao departamento financeiro a 21 de outubro (não estão no site) | Modelo de custos; até lá, pressupostos |
+
+**Não há contentores de têxteis.** A Vitrus não os tem nem os quer (21 de outubro de 2026): o têxtil de contentor vem contaminado e perde a reutilização. A rede proposta é sem contentores. O Plano de Ação Integrado para a Circularidade Têxtil (Município de Guimarães / URBACT) deixou de ser fonte de números do modelo: a Vitrus não o usa; os números vêm da Vitrus e da APA.
 
 ## 1. Procura por zona
 
-Têxtil gerado na zona *z* por ano, a partir da população e do valor por habitante do plano municipal:
+Têxtil que ainda vai para o lixo na zona *z* por ano, a partir da população e do têxtil por habitante calculado com os valores da Vitrus e da APA:
 
 ```latex
-D_z = P_z \cdot q \cdot 12 \qquad q = 0{,}7\ \text{kg por habitante por mês}
+D_z = P_z \cdot q \cdot 12 \qquad q = \frac{43\,051\ \text{t} \times 5{,}4\%}{156\,830 \times 12} = 1{,}235\ \text{kg por habitante por mês}
 ```
 
-Com os 156 830 habitantes do concelho (soma das freguesias, INE), isto dá cerca de 1 317 t por ano (**estimativa**); a Vitrus recolhe hoje 301,3 t, ou seja, 22,9%. Onde a caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona.
+No concelho (156 830 habitantes, soma das freguesias, INE) dá 43 051 × 0,054 = **2 324,8 t por ano** por desviar (**estimativa**). As 301,3 t que as quatro entidades recolheram em 2025 foram recolhidas à parte, fora do RSU. O têxtil gerado é 2 324,8 + 301,3 = **2 626,0 t** e a captura atual é 301,27 ÷ 2 626,02 = **11,5%** (estimativa). Onde uma caracterização da Vitrus mostrar mais têxtil (rotas com microconfeções), *q* sobe nessa zona. No código, *q* deriva das constantes (43 051 t, 5,4%, população); não se escreve 1,235 à mão.
 
-**Pressuposto e incerteza (pergunta Q6).** A fonte é pública (o plano escreve «0,7 kg de têxteis nos RSU por mês per capita», p. 30), mas não sabemos o que a medida inclui: o modelo trata-a como a **procura total a captar**. Se for só o têxtil que ainda vai no indiferenciado, a geração total é pelo menos 1 317,4 + 301,3 = 1 618,6 t e a captura de 2025 é 18,6% em vez de 22,9% (cálculo, estimativa). Se incluir têxteis sanitários, ou vier de uma caracterização de 2016, o potencial recuperável é menor. Outra leitura do mesmo plano (5,4% × 315 kg de indiferenciado por habitante) dá 17,0 kg/hab/ano, o dobro dos 8,4 kg que resultam dos 0,7 kg/mês. Por isso o valor leva «estimativa» em todo o ecrã e entra na sensibilidade como o parâmetro de maior incerteza. A pergunta está em [Perguntas aos orientadores](../projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), com o que muda em cada resposta.
+**Pressuposto e incerteza.** Os 5,4% são uma média da APA, não uma caracterização do lixo de Guimarães, e o modelo aplica-os por igual a todas as freguesias. Por isso a procura leva «estimativa» em todo o ecrã e o kg/hab/mês entra na sensibilidade como parâmetro de maior incerteza. Até 21 de outubro de 2026 usávamos 0,7 kg/hab/mês do plano municipal (≈ 1 317 t, captura 22,9%); a Vitrus não conhece esse plano e indicou os seus valores (pergunta [Q6](../projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), respondida). A nova base é quase o dobro da antiga.
 
 Têxtil captado depende do modo de recolha *m* que serve a zona:
 
@@ -33,7 +35,14 @@ Têxtil captado depende do modo de recolha *m* que serve a zona:
 C_z = D_z \cdot c_m
 ```
 
-A taxa de captura *c* por modo não tem fonte local. Calibrámo-la com os dados reais: o contentor de rua serve 80% da população e a taxa de quem é servido é 22,9% / 80% = 28,6%, de modo que uma rede só de rua reproduz as 301 t que a Vitrus recolhe hoje. Os outros modos são pressupostos visíveis no ecrã, até haver dados do piloto.
+A taxa de captura *c* por modo não tem fonte local: é **pressuposto**, visível no ecrã, até haver dados do piloto. Antes calibrávamos o contentor de rua para reproduzir as 301 t de 2025; essa calibração saiu, porque as 301 t são recolhidas por terceiros e não há contentor de têxtil que as reproduza.
+
+**Modos.** Por omissão o modelo só oferece dois, ambos sem contentor:
+
+- `existing`: local existente, sem contentor novo. Entrega assistida num sítio com pessoas (ecocentro, junta, escola) ou, na rede por locais reais, paragem nos locais municipais onde a viatura já passa, com sacos fechados recolhidos no momento. Investimento perto de zero. Menos contaminação que um contentor (pressuposto qualitativo, sem número).
+- `on_demand`: recolha a pedido, porta a porta, nos circuitos que já existem (sem km novos onde já passa um circuito).
+
+`street` (contentor de rua) fica no modelo só como **referência** explícita (por exemplo, o desempenho francês, que é de contentores), nunca por omissão.
 
 ## 2. Modelo de custos
 
@@ -45,11 +54,13 @@ A taxa de captura *c* por modo não tem fonte local. Calibrámo-la com os dados 
 \text{EUR/t} = \frac{\text{custo anual}}{\sum_z C_z}
 ```
 
-*N* = anos de vida do equipamento. Pontos em locais existentes têm investimento perto de zero; contentores de rua têm investimento e recolha; recolha a pedido não tem investimento mas tem km.
+*N* = anos de vida do equipamento. Pontos em locais existentes têm investimento perto de zero (sem contentor novo); recolha a pedido não tem investimento mas tem km; o contentor de rua, só como referência, tem investimento e recolha.
+
+**Receita.** A reciclagem é mais cara que a fibra virgem (Vitrus, 21 de outubro de 2026), por isso não conta como receita. O valor está na reutilização: têxtil limpo e seco.
 
 ## 3. Otimização
 
-1. **Localização e modo (CP-SAT, OR-Tools):** escolher que pontos candidatos abrir e que modo serve cada zona, para **maximizar toneladas captadas com o orçamento dado** ou **minimizar custo para uma meta de captura**. Uma zona só conta como servida se tiver um ponto dentro da distância a pé definida para esse modo.
+1. **Localização e modo (CP-SAT, OR-Tools):** escolher que pontos candidatos abrir e que modo serve cada zona (por omissão `existing` e `on_demand`; `street` só se pedido), para **maximizar toneladas captadas com o orçamento dado** ou **minimizar custo para uma meta de captura**. Uma zona só conta como servida se tiver um ponto dentro da distância a pé definida para esse modo.
 2. **Rotas (VRP, OR-Tools):** com os pontos abertos, calcular rotas por veículo com capacidade e frequência de recolha, com distâncias em linha reta (haversine) e um fator de desvio de 1,3. Não há ainda cliente OSRM: a variável `OSRM_URL` existe mas não é usada, e distâncias por estrada ficam para quando houver dados de GPS ou um motor de rotas. A recolha a pedido aproveita os circuitos que já passam pela localidade, sem quilómetros novos.
 3. **KPIs:** investimento, custo anual, toneladas, €/t, % de população coberta.
 
@@ -84,10 +95,10 @@ Os custos unitários da Vitrus ainda não existem, por isso a incerteza é trata
 
 ### Sensibilidade (tornado e Monte Carlo)
 
-- **Tornado:** cada parâmetro de custo e de procura varia ±30% (configurável, `swing`), um de cada vez, sobre o plano do cenário. Resultado: impacto em €/t, toneladas e custo anual, ordenado por impacto em €/t. Cada barra leva a origem do parâmetro (plano, dados da Vitrus ou pressuposto).
+- **Tornado:** cada parâmetro de custo e de procura varia ±30% (configurável, `swing`), um de cada vez, sobre o plano do cenário. Resultado: impacto em €/t, toneladas e custo anual, ordenado por impacto em €/t. Cada barra leva a origem do parâmetro (dados da Vitrus e da APA, ou pressuposto).
 - **Monte Carlo:** 500 amostras (configurável), semente fixa 7, distribuição triangular `Tri(1 − s, 1 + s, moda 1)` multiplicada ao pressuposto, independente por parâmetro. Devolve P10/P50/P90 de €/t, custo anual e toneladas, e a probabilidade de o €/t ficar abaixo de um limiar.
 - **Decisão: não se resolve o CP-SAT em cada amostra.** Reavalia-se o modelo de custos sobre o plano já otimizado (mesmas freguesias e modos; os km usam as rotas reais do cenário, por isso o caso central reproduz os KPIs gravados). A pergunta é "o plano que propomos aguenta se os pressupostos estiverem errados?"; reotimizar a cada amostra responderia a "quanto custaria o melhor plano se soubéssemos a verdade?", sempre mais otimista, e custaria horas.
-- **Exemplo (cenário de 60 000 €/ano, 122,7 €/t, estimativa com os pressupostos da altura):** P10 92,5, P50 123,8, P90 164,7 €/t. O maior fator de incerteza é o kg/hab/mês (Plano municipal); 3 dos 5 maiores fatores são pressupostos sem dado.
+- **Exemplo (21 out 2026, base Vitrus + APA, rede sem contentores, estimativa):** cenário por freguesia com 60 000 €/ano (gasta 46 192 €): 371,7 t a 124,3 €/t. P10 97,7, P50 124,7, P90 161,1 €/t. Os 5 maiores fatores de incerteza são todos pressupostos sem dado (cobertura e captura do local existente, ±57,6 €/t cada; kg por recolha a pedido, ±53,5; custo por recolha, ±53,1; captura da recolha a pedido, ±31,4). O kg/hab/mês saiu do topo: passou a vir da Vitrus e da APA.
 
 ### Robustez
 
@@ -103,8 +114,9 @@ Os custos unitários da Vitrus ainda não existem, por isso a incerteza é trata
 Só entra como cenário de comparação (`GET /planning/benchmarks`, `POST /planning/benchmarks/{key}/scenario`), nunca como pressuposto base. Consequências com os dados reais (registo C13 a C15):
 
 - Meta: 4,27 × 156 830 / 1000 = **669,7 t/ano** (2,2 vezes as 301,3 t de hoje; hoje são 1,92 kg/hab/ano).
-- Exige captar **50,8%** do potencial (4,27 / 8,4); a Vitrus capta 22,9%.
-- **Limite alcançável do modelo: 562,6 t/ano** (todos os modos ligados em todas as freguesias, densidade francesa na rua, captura independente por canal, 1 − Π(1 − c·f)). A meta (669,7 t) fica **107,1 t acima do teto**: com os pressupostos atuais o cenário "custo mínimo para a meta" é impossível e sai `infeasible`. O argumento é a distância, não o custo; para a alcançar seriam precisas taxas de captura por modo mais altas, que só o piloto pode medir. A alternativa `max_tonnes` com orçamento corre normalmente.
+- Equivale a captar **25,5%** do têxtil gerado (669,7 / 2 626,0, cálculo, estimativa); a Vitrus capta 11,5%.
+- **Limite alcançável do modelo (21 out 2026, estimativa):** **992,8 t/ano** com todos os modos ligados em todas as freguesias (incluindo o contentor de rua à densidade francesa). A meta (669,7 t) fica **323,1 t abaixo do teto**: com a nova base o cenário "custo mínimo para a meta" deixa de ser `infeasible`. Sem contentores (só local existente e recolha a pedido), o teto do modelo por freguesia é **597,7 t/ano** (orçamento sem limite: 156 530 €/ano, 261,9 €/t), ainda acima da meta francesa.
+- É o único sítio onde o modo `street` entra: a referência francesa é de contentores de rua, que a Vitrus não quer. Serve para comparar, não para propor.
 
 ### Piloto de 3 meses
 
@@ -133,9 +145,9 @@ n = \left\lceil \frac{z^2\, p(1-p)}{h^2} \cdot \mathrm{deff} \right\rceil, \qqua
 
 O inventário municipal de 20 de outubro (**não é de têxteis**) entra no modelo só como **apoio**, nunca como rede de têxteis. Detalhe, regras e números em [Análise dos contentores municipais](../dados/analise-contentores-municipais.md).
 
-- **Locais candidatos** (modo `existing`): os 1 187 locais com contentor de rua (`municipal_sites.csv`, `textile_candidate = true`). O investimento perto de zero é pressuposto nosso; falta confirmar com a Vitrus se pode haver têxtil nesses locais e a que custo.
+- **Locais candidatos** (modo `existing`): os 1 187 locais com contentor municipal de rua (`municipal_sites.csv`, `textile_candidate = true`). Nenhum recebe contentor de têxtil: a viatura para e recolhe sacos fechados no momento. O investimento perto de zero é pressuposto nosso; falta confirmar com a Vitrus o tempo e o custo da paragem.
 - **Cobertura**: parte da área a 200/300/500 m de um local público (31,4%, 47,8%, 70,9%), em CAOP 2019 e EPSG:3763. É cobertura de **área**; a de população precisa de BGRI.
-- **Lacuna por freguesia** (`municipal_by_parish.csv`): `potencial = pop × 0,7 kg × 12`, `lacuna = potencial × (1 − 22,9%)`, igual captura média em todas as freguesias porque não há têxtil recolhido por freguesia; **estimativa**. Ordena-se por tonelada de lacuna por local candidato.
+- **Lacuna por freguesia** (`municipal_by_parish.csv`): têxtil que ainda vai para o lixo, `lacuna = pop × 1,235 kg × 12`, o mesmo por habitante em todas as freguesias porque não há têxtil por freguesia; **estimativa**. Ordena-se por tonelada de lacuna por local candidato.
 - **Freguesias**: a atribuição de uma coordenada à freguesia usa o polígono CAOP 2019, nunca o nome escrito.
 - **Na base de dados e na API**: `municipal_containers` (2 751), `municipal_sites` (2 026), `municipal_parish_stats` (48, com o contorno), `municipal_links` (394) e `municipal_meta`, importados no `seed` com a fonte e o SHA-256 do pacote; nunca na tabela `containers`. A lista candidata é ordenada por uma regra explícita sem pesos inventados (coordenada precisa; freguesia com mais lacuna estimada por candidato; enterrado; orgânico a menos de 15 m; mais contentores). Rotas e permissões em [Arquitetura](arquitetura.md#rede-municipal-municipal). **Nomes de produtores** (estabelecimentos privados): por omissão não saem da API; só um `admin` os pede, à espera da decisão da Vitrus (pergunta 12 da análise).
 
@@ -143,19 +155,22 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 
 | Parâmetro | Valor | Estado |
 | --- | --- | --- |
-| Têxtil por habitante (*q*) | 0,7 kg/hab/mês | Fonte: Plano de Ação Integrado (URBACT), p. 30. **Significado por confirmar** (secção 1, Q6): total ou só o que fica no indiferenciado |
+| RSU recolhido pela Vitrus (2025) | 43 051 t | Fonte: Vitrus, 21 de outubro de 2026 |
+| Têxtil no RSU | 5,4% | Fonte: APA, indicado pela Vitrus |
+| Têxtil por habitante por desviar (*q*) | 1,235 kg/hab/mês (derivado) | Cálculo: 43 051 t × 5,4% ÷ 156 830 ÷ 12; **estimativa** |
 | Habitantes | 156 830 | Fonte: INE, Censos 2021 (soma das freguesias) |
-| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto, a calibrar no piloto |
+| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto, a calibrar no piloto (já não há calibração do contentor de rua) |
+| Modos por omissão | `existing` e `on_demand` | Decisão (Vitrus, 21 de outubro): sem contentores de têxtil; `street` só como referência |
 | Distância máxima a pé por modo | a definir | Pressuposto, validar com o mentor |
-| Custo por recolha e por km | a pedir | Vitrus, dia 1 |
-| Custo de um contentor de rua | a pedir | Vitrus, dia 1 |
+| Custo por recolha e por km | pressuposto | Pedido ao departamento financeiro da Vitrus (21 de outubro) |
+| Custo de um contentor de rua | pressuposto | Só para o cenário de referência; a Vitrus não quer contentores |
 | Variação da sensibilidade | ±30%, distribuição triangular | Pressuposto da equipa (secção 5), configurável |
 | Recolha francesa: 4,27 kg/hab/ano; 1 ponto por 1 414 hab | referência externa | Por verificar (registo C1, C2) |
 | Pesos do piloto (0,25 / 0,15 / 0,30 / 0,30) | valor de aprendizagem | Pressuposto da equipa (secção 5) |
 | Efeito de desenho do ensaio (deff) e peso médio da peça | 2; 0,415 kg | Pressuposto, a validar no piloto (secção 5) |
-| Vida útil do equipamento (*N*) | a pedir | Vitrus, dia 1 |
-| Têxtil em locais municipais existentes sem investimento | a confirmar | Pressuposto (secção 6); perguntar à Vitrus |
-| Captura média igual em todas as freguesias (lacuna por freguesia) | 22,9% | Pressuposto: sem têxtil recolhido por freguesia (secção 6) |
+| Vida útil do equipamento (*N*) | pressuposto | Pedido à Vitrus |
+| Paragem em locais municipais existentes sem investimento | a confirmar | Pressuposto (secção 6); perguntar à Vitrus o tempo e o custo da paragem |
+| Têxtil por habitante igual em todas as freguesias | 1,235 kg/hab/mês | Pressuposto: sem caracterização nem têxtil por freguesia (secções 1 e 6) |
 
 Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` sem uma linha nesta tabela. Os custos e as taxas por modo estão lá marcados como `assumption` e aparecem com a sua origem no ecrã "Pressupostos".
 
@@ -163,40 +178,43 @@ Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` s
 
 Só há um ano de têxtil (2025, totais anuais por entidade), por isso **não há backtest temporal e não se finge um**. O ecrã «Validação» (`/validation`, `GET /validation/model`, código em `domain/validation.py` e `features/validation/`) faz só o que os dados reais deixam fazer:
 
-- **Triangulação do potencial.** Confronta as leituras publicadas do têxtil gerado por habitante e mostra a captura de 2025 que cada uma implica: 0,7 kg/mês do plano municipal (8,4 kg/ano, captura 22,9%), 5,4% × 315 kg do indiferenciado (17,0 kg/ano, 11,3%) e 4,55% × 517 kg da composição dos RSU em Portugal (23,5 kg/ano, 8,2%). Em nenhuma Guimarães passa de 22,9%; todas são **estimativa**. A referência francesa (4,27 kg/hab/ano) continua marcada «por verificar».
+- **Triangulação do potencial.** A leitura principal é a da Vitrus e da APA: 5,4% × 43 051 t de RSU = 14,8 kg/hab/ano por desviar, captura de 2025 de 11,5%. As outras leituras publicadas ficam só como triangulação: 4,55% × 517 kg da composição dos RSU em Portugal (23,5 kg/ano, captura 8,2%) e duas leituras do plano municipal, **não usadas pela Vitrus**: 5,4% × 315 kg do indiferenciado (17,0 kg/ano, 11,3%) e 0,7 kg/mês (8,4 kg/ano, 22,9%). Todas são **estimativa**. A referência francesa (4,27 kg/hab/ano) continua marcada «por verificar».
 - **Validação cruzada espacial (deixar uma de fora).** Cada freguesia é prevista só com as outras 47, na proporção da população, e comparada com os contentores municipais que lá estão. Resultado (48 freguesias): R² 0,76 e erro mediano de 36% em todos os contentores; 0,84 nos enterrados; 0,06 nos de superfície, onde a população não diz onde estão. Não prova a procura de têxtil: mostra que a população é um proxy razoável do sítio onde a recolha existe, e onde deixa de ser.
-- **O que não se testa (e como se resolve):** série temporal (precisa dos quilos mensais por entidade; a H Sarah Trading tem-nos por mês), custos locais (a Vitrus ainda não os enviou) e contentores de têxteis (localizações por receber). O piloto de três meses fecha o ciclo previsto contra observado.
+- **O que não se testa (e como se resolve):** série temporal (precisa dos quilos mensais por entidade; a H Sarah Trading tem-nos por mês), custos locais (pedidos ao departamento financeiro da Vitrus) e têxtil por contentor ou por freguesia (a Vitrus não tem dados de deposição de têxtil). O piloto de três meses fecha o ciclo previsto contra observado.
 
 ## 8. Rede por locais reais
 
-O modelo por freguesia (secções 1 a 3) decide **que modo** serve cada freguesia, com um ponto no centro dela. A rede por locais reais decide **que locais abrir**: usa os 1 187 locais públicos de contentores municipais que a Vitrus enviou a 20 de outubro de 2026 (`municipal_sites`, `textile_candidate = true`) como candidatos. Código em `domain/siting.py` (funções puras) e `features/planning/site_service.py`; escolhe-se no simulador («Rede: Locais reais») ou com `siting: "sites"` no pedido de cenário. O resultado tem o mesmo contrato do cenário por freguesia (alocações, rotas, KPIs), mais `result.sites` e `result.siting`.
+O modelo por freguesia (secções 1 a 3) decide **que modo** serve cada freguesia, com um ponto no centro dela. A rede por locais reais decide **que locais abrir**: usa os 1 187 locais públicos de contentores municipais que a Vitrus enviou a 20 de outubro de 2026 (`municipal_sites`, `textile_candidate = true`) como candidatos. São sítios onde a viatura já passa; nenhum recebe contentor de têxtil. Código em `domain/siting.py` (funções puras) e `features/planning/site_service.py`; escolhe-se no simulador («Rede: Locais reais») ou com `siting: "sites"` no pedido de cenário. O resultado tem o mesmo contrato do cenário por freguesia (alocações, rotas, KPIs), mais `result.sites` e `result.siting`.
 
-**Procura por ponto.** Os habitantes não estão localizados abaixo da freguesia (o BGRI não chegou). Cada freguesia reparte a sua procura pelos seus locais públicos com contentores (1 574 pontos de procura), na proporção do número de contentores do local: `t_i = D_z · w_i / Σ w · c`. É um proxy, validado ao nível da freguesia (R² 0,76; ver secção 7), e por isso tudo o que daqui sai leva «estimativa».
+**Procura por ponto.** Os habitantes não estão localizados abaixo da freguesia (o BGRI não chegou). Cada freguesia reparte a sua procura pelos seus locais públicos com contentores (1 574 pontos de procura), na proporção do número de contentores do local: `t_i = D_z · w_i / Σ w · c`. Representa onde o têxtil se perde no lixo (indiferenciado, orgânico, seletivo), não onde pôr contentores. É um proxy, validado ao nível da freguesia (R² 0,76; ver secção 7), e por isso tudo o que daqui sai leva «estimativa».
 
 **Cobertura.** Um ponto fica servido se houver um local aberto a menos de `radius_m` (200, 300 ou 500 m; 300 por omissão). Vários locais a servir o mesmo ponto não captam duas vezes (cobertura por união).
 
-**Escolha dos locais.** Cobertura máxima com orçamento (ou custo mínimo para uma meta) em CP-SAT: `x_j` = abrir o local `j`, `y_i` ≤ Σ `x_j` dos locais ao alcance, maximizar Σ `t_i · y_i` com Σ `custo_j · x_j` ≤ orçamento. O custo fixo de um local é `capex/N + recolhas/ano · c_recolha`, com os pressupostos do modo `street` por omissão (a captura calibrada com 2025: 28,6% de quem é servido) ou do modo `existing` (investimento quase nulo, captura mais baixa, ambos pressupostos da equipa). Pontos com os mesmos locais ao alcance juntam-se (não muda o ótimo). Uma solução gulosa (o local com mais têxtil novo por euro) entra como dica completa, por isso o CP-SAT nunca devolve pior do que ela; semente fixa e um só trabalhador (determinismo).
+**Escolha dos locais.** Cobertura máxima com orçamento (ou custo mínimo para uma meta) em CP-SAT: `x_j` = abrir o local `j`, `y_i` ≤ Σ `x_j` dos locais ao alcance, maximizar Σ `t_i · y_i` com Σ `custo_j · x_j` ≤ orçamento. O custo fixo de um local é `capex/N + recolhas/ano · c_recolha`, com os pressupostos do modo `existing` por omissão (investimento quase nulo, captura pressuposto da equipa); o modo `street` só entra se for pedido como referência. Pontos com os mesmos locais ao alcance juntam-se (não muda o ótimo). Uma solução gulosa (o local com mais têxtil novo por euro) entra como dica completa, por isso o CP-SAT nunca devolve pior do que ela; semente fixa e um só trabalhador (determinismo).
 
 **Rotas e km.** O VRP (a mesma função da rede por freguesia) corre sobre os locais abertos, com capacidade das viaturas e o desvio da estrada. Como os km não são lineares nos locais escolhidos, o orçamento do solver sobe ou desce pela folga ou excesso do custo real (locais + km) até o cenário caber no orçamento pedido (até 4 voltas).
 
 **Recolha a pedido como complemento** (`site_on_demand`, ligado por omissão). Os dois canais captam de forma independente, como no modelo por freguesia: `t_i = D_i · (1 − (1 − c_s · y_i)(1 − c_o · z_p))`, com `z_p` = recolha a pedido ligada na freguesia `p` (custo do `mode_cost` do modelo por zonas, que aproveita os circuitos que já passam).
 
 **Limites.**
-- Os contentores são de **outras frações**; que se possa pôr têxtil nesses locais é um pressuposto a confirmar com a Vitrus (capacidade, autorização, custo).
+- Os contentores são de **outras frações** e não recebem têxtil. A paragem nesses locais, com sacos fechados recolhidos no momento, é um pressuposto a confirmar com a Vitrus (tempo, custo).
 - Cobertura de **população por proxy**, não por quarteirão. A coordenada aproximada (3 casas, ~100 m) de 350 locais é assinalada.
 - A sensibilidade (tornado e Monte Carlo) e a robustez também funcionam nos cenários por locais, mas sobre os locais e as rotas já escolhidos (não reotimiza): ver «Sensibilidade por locais» abaixo. Cenários por locais calculados antes de existir `served_share` têm de ser recalculados (a API responde 409).
 - Os locais de produtores (hotelaria, lares, escolas: 452) não entram como candidatos nem como procura; ficam para um módulo B2B.
 
-**O que os locais reais mudam (21 de outubro de 2026, pressupostos por omissão, estimativa).** O modelo por freguesia assume 1 ponto por 1 500 habitantes servindo 80% da população, onde quer que seja. Com os locais que existem, a mesma ambição custa mais:
+**O que os locais reais mudam (21 out 2026, base Vitrus + APA, pressupostos por omissão, estimativa).** Mesmo orçamento (60 000 €/ano) em todas as linhas; o têxtil por desviar é 2 324,8 t/ano. As duas últimas linhas usam o contentor de rua só como **referência** (a Vitrus não quer contentores de têxtil).
 
-| Rede | Orçamento | Têxtil | €/t | Locais | Cobertura |
+| Rede | Gasta | Têxtil | €/t | Locais | Cobertura |
 | --- | --- | --- | --- | --- | --- |
-| Por freguesia (rua e locais existentes) | 60 000 € (gasta 44 288 €) | 361 t | 122,7 | 150 pontos | 82,6% |
-| Locais reais, ponto «existing», 300 m, com recolha a pedido | 60 000 € | 255 t | 235 | 99 locais + 34 freguesias a pedido | 80,9% |
-| Locais reais, ponto «street», 300 m, com recolha a pedido | 44 300 € | 275 t | 161 | 123 locais + 9 freguesias a pedido | 73,1% |
-| Locais reais, ponto «street», 500 m, com recolha a pedido | 44 300 € | 337 t | 130 | 116 locais + 7 freguesias a pedido | 87,7% |
+| Por freguesia (local existente e recolha a pedido) | 46 192 € | 371,7 t | 124,3 | 59 pontos | 74,1% |
+| Locais reais, local existente sem contentor novo, 300 m, com recolha a pedido | 59 502 € | 377,5 t | 157,6 | 181 locais + 13 freguesias a pedido | 83,0% |
+| Locais reais, local existente sem contentor novo, 500 m, com recolha a pedido | 59 616 € | 441,7 t | 134,9 | 132 locais + 17 freguesias a pedido | 90,8% |
+| Referência: locais reais, contentor de rua, 300 m | 59 347 € | 518,6 t | 114,4 | 189 locais | 78,0% |
+| Referência: locais reais, contentor de rua, 500 m, com recolha a pedido | 59 831 € | 627,4 t | 95,4 | 150 locais + 9 freguesias a pedido | 91,7% |
 
-Leitura: o modelo por freguesia equivale a um raio a pé de cerca de 500 m. A 300 m, o mesmo têxtil custa 1,3 a 1,9 vezes mais por tonelada. Para cobrir 80% do proxy de população são precisos cerca de 219 locais a 300 m e 130 a 500 m (majorantes do solver, 30 s). A rede por freguesia **era otimista**; a por locais diz onde pôr cada ponto.
+Leitura: sem contentores, a rede por locais reais a 500 m desvia 441,7 t (19% do têxtil no lixo) a 134,9 €/t, mais 70 t do que a rede por freguesia a quase o mesmo €/t; a 300 m o €/t sobe 17%. O contentor de rua parece mais barato por tonelada só porque o seu pressuposto de captura (28,6%) é mais alto que o do local existente (18%); o modelo **não conta a contaminação** que a Vitrus aponta (têxtil de contentor perde valor de reutilização), por isso não é comparável e fica só como referência. Os locais escolhidos são locais onde a viatura já passa (contentores municipais), sem contentor novo.
+
+**Correção de 21 out 2026.** O ciclo de orçamento podia ficar preso com o custo real ligeiramente acima do pedido (ex.: 60 095 € para 60 000 €) e devolver `infeasible` com dinheiro de sobra; agora o corte parte do custo que o solver viu para a solução escolhida, e se o CP-SAT não tiver solução no tempo dado usa-se a dica gulosa.
 
 **Sensibilidade por locais.** `domain/sensitivity.py` reavalia o plano fixo (locais abertos, rotas e freguesias com recolha a pedido) sem solver. Por freguesia, com `a` = fração da procura servida por locais (`allocation.served_share`) e `z` = recolha a pedido ligada: `têxtil = D · (c_s·a + c_o·z − c_s·c_o·a·z)`; `custo = locais · (capex/N + recolhas · c_recolha) + km das rotas · c_km + custo da recolha a pedido`, com os km das rotas a escalar com o desvio de estrada e com as recolhas por ano. Com os pressupostos centrais reproduz os KPIs do cenário (teste `test_sensitivity_reproduces_the_site_scenario`). O tornado só varia os parâmetros que contam para esta rede (captura, investimento, vida útil, recolhas, custos por recolha e por km, desvio, kg/hab/mês e, se houver recolha a pedido, os seus parâmetros).
 

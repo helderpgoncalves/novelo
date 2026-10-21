@@ -78,7 +78,7 @@ function Assumptions() {
           ) : undefined
         }
       />
-      <StatStrip>
+      <StatStrip className="lg:grid-cols-3">
         <StatCell
           label={m.rw_assumptions_stat_total()}
           value={formatNumber(data.meta.length)}
@@ -89,11 +89,6 @@ function Assumptions() {
           value={formatNumber(countBy('vitrus_data'))}
           hint={m.rw_assumptions_stat_data_hint()}
           tone="primary"
-        />
-        <StatCell
-          label={m.param_source_plan()}
-          value={formatNumber(countBy('plan'))}
-          hint={m.rw_assumptions_stat_plan_hint()}
         />
         <StatCell
           label={m.param_source_assumption()}
@@ -111,7 +106,6 @@ function Assumptions() {
           options={[
             { value: null, label: m.rw_assumptions_filter_all() },
             { value: 'vitrus_data', label: m.param_source_vitrus_data() },
-            { value: 'plan', label: m.param_source_plan() },
             { value: 'assumption', label: m.param_source_assumption() },
           ]}
         />
@@ -123,7 +117,7 @@ function Assumptions() {
             meta={data.meta}
             errors={errors}
             sourceFilter={origin}
-            defaultOpen={['general', 'street', 'existing', 'on_demand', 'costs']}
+            defaultOpen={['general', 'existing', 'on_demand', 'costs']}
           />
         </fieldset>
       </div>

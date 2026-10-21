@@ -66,7 +66,7 @@ Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `
 | `textile` | `baseline`, `flows`, `waste`, `overview` |
 | `network` | `circuits`, `fleet`, `localities`, `containers` |
 | `datasets` | `quality`, resolver e reabrir alertas |
-| `municipal` | rede **municipal** de contentores (outras frações, não é têxtil): `overview`, `parishes`, `sites`, `containers`, `producers`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
+| `municipal` | rede **municipal** de contentores (indiferenciado, orgânico, seletivo; não é têxtil; base geográfica do modelo): `overview`, `parishes`, `sites`, `containers`, `producers`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
 | `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, `flows`, `sensitivity`), `compare-robustness`, `benchmarks`, `pilot` |
 | `whatif` | criar, aplicar e listar perguntas "E se...?" |
 | `lots`, `triage`, `market`, `brands` | `/lots` (abrir, listar, ler, itens, estado), `/triage` (análise de uma peça), `/market` e reservas, `/brands`; público: `/public/lots/{code}` e `/qr` |
@@ -81,8 +81,8 @@ Um só pedido de leitura para a página inicial; só dados reais da BD ou consta
 
 | Campo | Conteúdo |
 | --- | --- |
-| `gap` | `potential_t` (estimativa: população × 0,7 kg/hab/mês × 12), `collected_t`, `missing_t`, `capture_pct`, `destinations{reuse_t,recycle_t,reject_t}`, `kg_per_inhab_year/month` observados e do potencial, `population`, `parishes_count`, `is_estimate` |
-| `references` | `key`, `label`, `kg_per_inhab_year`, `year`, `scope`, `source_label`, `source_url`, `verified`, `evidence`, `is_estimate`. Guimarães hoje e potencial do plano (este `verified=false`: a fonte pública é o Plano URBACT, p. 30, mas falta a Vitrus confirmar o que mede o 0,7 kg/hab/mês; o texto da fonte no código ainda diz «por localizar»), França 2024 (4,27), UE-27 2020 (4,4), Catalunha 2024 (2,7), Alemanha 2022 (`verified=false`). O web só mostra em público as `verified` |
+| `gap` | `potential_t` (estimativa: têxtil por desviar, população × 1,235 kg/hab/mês × 12 = 43 051 t × 5,4% ≈ 2 324,8 t), `collected_t`, `missing_t`, `capture_pct`, `destinations{reuse_t,recycle_t,reject_t}`, `kg_per_inhab_year/month` observados e do potencial, `population`, `parishes_count`, `is_estimate` |
+| `references` | `key`, `label`, `kg_per_inhab_year`, `year`, `scope`, `source_label`, `source_url`, `verified`, `evidence`, `is_estimate`. Guimarães hoje e têxtil por desviar (14,82 kg/hab/ano = 43 051 t de RSU × 5,4% da APA ÷ 156 830; dados da Vitrus e da APA, estimativa; a leitura de 0,7 kg/hab/mês do plano municipal, se aparecer, é «leitura alternativa, não usada pela Vitrus»), França 2024 (4,27), UE-27 2020 (4,4), Catalunha 2024 (2,7), Alemanha 2022 (`verified=false`). O web só mostra em público as `verified` |
 | `timeline` | `date`, `key`, `status` (`done`/`upcoming`), `days_remaining` (relógio do servidor em UTC, `null` se já passou), `who_pays`, fonte e `verified`: obrigação municipal (1 jan 2025), transposição (17 jun 2027), regimes de RAP (17 abr 2028) |
 | `parishes` | por freguesia (ordenadas por população): `code`, `name`, `population`, `tipau`, `potential_t` (estimativa), `circuits_count`, `localities_count`, `containers_count` (ativos; 0 até 20 out), `area_km2` (BD ou calculada do contorno), `centroid{lat,lon}`, `share_of_population_pct` |
 | `scenario_frontier`, `pareto_ids` | cenários guardados (até 200) com `tonnes_year`, `eur_per_tonne`, `annual_cost_eur`, `capex_eur`, `modes`, `status` (`feasible`/`infeasible`), `objective`, `is_pareto` (não dominado em menos €/t e mais toneladas, só viáveis) |
@@ -95,7 +95,7 @@ Erros no formato `{code, message, details}` com um `ErrorCode` tipado, publicado
 
 ### Rede municipal (`/municipal`)
 
-Os contentores **municipais** (profundidade, superfície, orgânico, verdes; 20 de outubro de 2026) vivem em tabelas próprias e **nunca** se misturam com `containers` (têxteis). Servem de camada de lugares possíveis, produtores B2B e geometria oficial; o contrato de dados está em [Análise dos contentores municipais](../dados/analise-contentores-municipais.md). Código em `features/municipal/` (`router` fino; `service`/`analytics`/`exports` sem FastAPI; `importer` do seed; `http` com ETag; `domain/municipal.py` com as regras puras).
+Os contentores **municipais** (profundidade, superfície, orgânico, verdes; 20 de outubro de 2026) vivem em tabelas próprias e **nunca** se misturam com `containers` (têxteis; vazia, porque não há contentores de têxteis). São a base geográfica: onde o têxtil se perde e onde a viatura já passa; servem de camada de locais de paragem, produtores B2B e geometria oficial; o contrato de dados está em [Análise dos contentores municipais](../dados/analise-contentores-municipais.md). Código em `features/municipal/` (`router` fino; `service`/`analytics`/`exports` sem FastAPI; `importer` do seed; `http` com ETag; `domain/municipal.py` com as regras puras).
 
 | operationId | Rota | O que devolve |
 | --- | --- | --- |
@@ -107,7 +107,7 @@ Os contentores **municipais** (profundidade, superfície, orgânico, verdes; 20 
 | `list_municipal_containers` | `/municipal/containers` | Tabela completa (inclui os 29 pendentes), cursor por `container_uid`, mesmos filtros + `located`, `parish_match`, `brand` |
 | `list_municipal_producers` | `/municipal/producers` | Resumo por tipo (contentores, estabelecimentos distintos, freguesias com mais, hipótese de interesse para têxteis) e locais de produtores |
 | `get_textile_candidate_sites` | `/municipal/textile-candidates` | Candidatos do ETL com chaves de justificação e ordem explícita (`rank_rule`); o `rank` é sempre o global |
-| `get_municipal_gap_ranking` | `/municipal/gap-ranking` | Lacuna por freguesia: **estimativa**, com a regra e os parâmetros (0,7 kg/hab/mês, captura 22,9%) |
+| `get_municipal_gap_ranking` | `/municipal/gap-ranking` | Lacuna por freguesia: **estimativa**, com a regra e os parâmetros (têxtil por desviar, 1,235 kg/hab/mês igual em todas) |
 | `get_municipal_density_benchmark` | `/municipal/density-benchmark` | Densidade do concelho, distribuição (mín., p25, mediana, p75, máx.) entre freguesias e a referência francesa (por verificar) |
 | `export_municipal_sites` | `/municipal/export?format=csv\|xlsx\|geojson&scope=sites\|containers` | Streaming (CSV e GeoJSON por lotes; XLSX construído em memória e enviado em blocos), mesmos filtros |
 | `get_caop_parishes_geojson` | `/municipal/parishes/caop.geojson` | 48 contornos CAOP 2019 com métricas para coroplético |

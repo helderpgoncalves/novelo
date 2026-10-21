@@ -70,7 +70,7 @@ def unsupported_rounded(text: str, facts: Any, also_allowed: str = "") -> set[fl
     """Números do texto sem correspondência nos factos, com tolerância de arredondamento.
 
     Um número escrito com d casas decimais aceita-se se algum facto, arredondado a d casas, der o mesmo valor
-    ("301,3" vem de 301,27; "23" vem de 22,9). `also_allowed` são textos cujos números o utilizador já escreveu.
+    ("301,3" vem de 301,27; "11" vem de 11,47). `also_allowed` são textos cujos números o utilizador já escreveu.
     """
     allowed = fact_numbers(facts) | numbers_in(also_allowed)
     allowed |= {abs(x) for x in allowed}  # "1,92 t a menos" vem de uma diferença de -1,92 calculada pela ferramenta

@@ -102,7 +102,7 @@ export function trustCounts(items: TrustItem[]): Record<TrustStatus, number> {
 }
 
 export interface QuestionInputs {
-  /** Nomes das freguesias com mais potencial por captar, por ordem. */
+  /** Nomes das freguesias com mais têxtil por desviar, por ordem. */
   topParishes: string[];
   /** Meta redonda a um quarto do caminho entre o recolhido e o potencial (t/ano). */
   targetT: number;

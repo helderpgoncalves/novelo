@@ -8,6 +8,7 @@ from novelo.domain.demand import Baseline
 from novelo.domain.vocab import TextileDestination, WeighingMethod
 from novelo.features.network.models import Parish
 from novelo.features.textile.models import TextileEntity, TextileFlow, WasteShare
+from novelo.features.textile.references import KG_PER_INHAB_MONTH, POPULATION_INE_2021
 from novelo.features.textile.schemas import (
     EntityBaseline,
     FlowLink,
@@ -19,8 +20,7 @@ from novelo.features.textile.schemas import (
 )
 
 # População de reserva (INE, Censos 2021) quando a tabela de freguesias ainda não foi semeada.
-FALLBACK_POPULATION = 156_830
-KG_PER_INHAB_MONTH_PLAN = 0.7
+FALLBACK_POPULATION = POPULATION_INE_2021
 PT_KG_PER_INHAB_YEAR = 517  # Portugal continental, 2024
 BASELINE_YEAR = 2025
 
@@ -80,7 +80,7 @@ async def get_baseline(db: AsyncSession, year: int = BASELINE_YEAR) -> TextileBa
     population = await _population(db)
     entities = await _entity_rows(db, year)
     total = sum(e.total_t for e in entities)
-    base = Baseline(total, population, KG_PER_INHAB_MONTH_PLAN)
+    base = Baseline(total, population, KG_PER_INHAB_MONTH)
     return TextileBaseline(
         year=year,
         population=population,
@@ -90,9 +90,9 @@ async def get_baseline(db: AsyncSession, year: int = BASELINE_YEAR) -> TextileBa
         recycle_t=round(sum(e.recycle_t for e in entities), 3),
         reject_t=round(sum(e.reject_t for e in entities), 3),
         kg_per_inhab_month=round(base.observed_kg_per_inhab_month, 3),
-        estimated_demand_t=round(base.demand_t, 1),
+        estimated_demand_t=round(base.generated_t, 1),
         capture_of_demand_pct=round(base.observed_capture_rate * 100, 1),
-        gap_t=round(base.demand_t - total, 1),
+        gap_t=round(base.demand_t, 1),
     )
 
 

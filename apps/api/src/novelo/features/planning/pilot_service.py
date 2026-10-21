@@ -21,11 +21,11 @@ from novelo.features.planning.pilot_schemas import (
 )
 from novelo.features.planning.schemas import ZoneOut
 from novelo.features.textile import service as textile
+from novelo.features.textile.references import KG_PER_INHAB_MONTH
 
 SRC_CENSUS = "INE, Censos 2021"
 SRC_AREA = "INE/CAOP: população / área da freguesia"
 SRC_CIRCUITS = "Vitrus: circuitos atuais"
-SRC_MODEL = "Modelo: população × 0,7 kg/hab/mês (Plano municipal)"
 SRC_COST = "Modelo de custos (pressuposto, estimativa)"
 SRC_REJECT = "Vitrus: destino do recolhido em 2025"
 TIPAU_LABEL = {
@@ -39,6 +39,12 @@ def _n(x: float, decimals: int = 0) -> str:
     """Número em pt-PT: espaço fino nos milhares e vírgula decimal."""
     s = f"{x:,.{decimals}f}"
     return s.replace(",", " ").replace(".", ",")
+
+
+SRC_MODEL = (
+    f"Modelo: população × {_n(KG_PER_INHAB_MONTH, 3)} kg/hab/mês de têxtil que vai para o lixo "
+    "(Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+)
 
 
 def _facts(s: pilot.CandidateScore, z: ZoneOut, demand_t: float) -> list[PilotFact]:

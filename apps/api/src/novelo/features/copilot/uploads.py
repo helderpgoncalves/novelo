@@ -11,15 +11,16 @@ from novelo.core.config import get_settings
 from novelo.features.copilot import attachments as att
 from novelo.features.copilot.models import CopilotAttachment
 from novelo.features.copilot.schemas import AttachmentOut
-from novelo.features.copilot.threads import attachment_out, copilot_model
+from novelo.features.copilot.threads import attachment_out
 from novelo.features.users.models import User
 
 EXTRACT_TIMEOUT_S = 20.0
 
 
-async def model_sees_images(db: AsyncSession, catalog: ModelCatalog) -> bool:
+async def model_sees_images(catalog: ModelCatalog, model: str) -> bool:
+    """O modelo do copiloto aceita imagens? `model` é o mesmo que o agente vai usar (`llm.model_for`)."""
     try:
-        found = (await catalog.snapshot()).models.get(await copilot_model(db))
+        found = (await catalog.snapshot()).models.get(model)
     except Exception:
         return False
     return bool(found and found.supports_image)
@@ -37,7 +38,9 @@ async def _stored(db: AsyncSession, user: User) -> tuple[int, int]:
     return int(count), int(used)
 
 
-async def upload(db: AsyncSession, user: User, files: list[UploadFile], catalog: ModelCatalog) -> list[AttachmentOut]:
+async def upload(
+    db: AsyncSession, user: User, files: list[UploadFile], catalog: ModelCatalog, model: str
+) -> list[AttachmentOut]:
     if not files:
         raise att.AttachmentError("No files received")
     if len(files) > att.MAX_FILES:
@@ -47,7 +50,7 @@ async def upload(db: AsyncSession, user: User, files: list[UploadFile], catalog:
     if stored_count + len(files) > s.copilot_attachments_per_user:
         raise att.AttachmentError(f"Attachment limit reached ({s.copilot_attachments_per_user} files)")
     cap = s.copilot_attachments_max_mb * 1024 * 1024
-    can_see = await model_sees_images(db, catalog)
+    can_see = await model_sees_images(catalog, model)
     rows: list[CopilotAttachment] = []
     images: list[tuple[CopilotAttachment, bytes]] = []
     for f in files:

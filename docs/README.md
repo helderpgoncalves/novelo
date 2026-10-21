@@ -12,7 +12,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | [Critérios de avaliação](projeto/criterios-de-avaliacao.md) | Os 4 critérios e pesos do hackathon, a matriz critério → prova e o que falta ler nas Regras |
 | [Visualizações por página](projeto/visualizacoes-por-pagina.md) | Data storytelling: princípios, 2 a 4 visuais por página com dados e prioridade, a home em detalhe, reaproveitamento na app, no RAP e nos slides, e dependências em falta |
 | [Mentores](projeto/mentores.md) | Lucas Nascimento (Vitrus), Luís Miguel Oliveira (Fibrenamics) e Prof. Paulo Afonso (UMinho): perfis, abordagem e mensagens-tipo. A lista de perguntas atualizada vive em [Perguntas aos orientadores](projeto/perguntas-aos-orientadores.md) |
-| [Perguntas aos orientadores](projeto/perguntas-aos-orientadores.md) | O que perguntar à Vitrus, à Fibrenamics e à organização, derivado dos dados de 20 out: 10 perguntas por impacto e urgência, perguntas por tema, anomalias nos dados, mensagens, guião de 15 minutos, registo de respostas e regra de propagação |
+| [Perguntas aos orientadores](projeto/perguntas-aos-orientadores.md) | O que perguntar à Vitrus, à Fibrenamics e à organização, derivado dos dados de 20 out: 10 perguntas por impacto e urgência, perguntas por tema, anomalias nos dados, mensagens, guião de 15 minutos, registo de respostas (com as de 21 out) e regra de propagação |
 | [Cenários e contingências](projeto/cenarios-e-contingencias.md) | Pitch, dados, mentoria, concorrência, 48 perguntas difíceis do júri, 12 por critério, cenário das Regras e pós-hackathon |
 | [Narrativa do pitch](projeto/narrativa-do-pitch.md) | Storyline em 30 s, 3 min e 5 min, falas, roteiro da demo e objeções, com a fonte de cada número |
 | [Guião de slides](projeto/pitch-slides.md) | Oito slides prontos para o deck |
@@ -56,7 +56,7 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 
 | Documento | Para quê |
 | --- | --- |
-| [Análise dos dados recebidos](dados/analise-dados-recebidos.md) | Fontes, qualidade, limites e onde cada dado se usa |
+| [Análise dos dados recebidos](dados/analise-dados-recebidos.md) | Fontes, qualidade, limites, onde cada dado se usa e as respostas da Vitrus de 21 out 2026 (43 051 t de RSU × 5,4%, sem contentores de têxteis) |
 | [Análise dos contentores municipais](dados/analise-contentores-municipais.md) | Pacote QGIS de 20 out (não é de têxteis): campos, problemas e tratamento, cobertura, produtores, candidatos, CAOP 2019, como abrir no QGIS |
 
 ## Marca

@@ -34,7 +34,8 @@ FRENCH_PERFORMANCE = Benchmark(
     source=(
         "Referência externa indicada pela equipa (França: 4,27 kg/hab/ano recolhidos, 1 ponto por ~1 414 habitantes). "
         "Por verificar: confirmar no relatório anual do eco-organismo francês (Refashion) antes de a citar. "
-        "Entra no modelo só como cenário de comparação, nunca como pressuposto base."
+        "Entra no modelo só como cenário de comparação, nunca como pressuposto base. É uma rede de contentores de "
+        "rua: o único sítio onde o modo `street` entra, como referência (a Vitrus não tem contentores de têxtil)."
     ),
     verified=False,
 )
@@ -106,5 +107,7 @@ async def create_benchmark_scenario(
         budget_eur_year=body.budget_eur_year if body.objective == ScenarioObjective.MAX_TONNES else None,
         target_tonnes=info.target_tonnes,
         params=_preset_params(base, b),
+        # Referência explícita: a densidade do preset é de contentores de rua, por isso todos os modos ficam ligados.
+        default_modes=list(CollectionMode),
     )
     return await service.run_scenario(db, request, user)

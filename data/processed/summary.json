@@ -5,9 +5,11 @@
     "recycle_t": 79.933,
     "reject_t": 42.338,
     "kg_per_inhab_month": 0.16,
-    "estimated_demand_t": 1317.4,
-    "capture_of_demand_pct": 22.9,
-    "gap_t": 1016.1
+    "residual_kg_per_inhab_month": 1.2353,
+    "estimated_demand_t": 2626.0,
+    "capture_of_demand_pct": 11.5,
+    "gap_t": 2324.8,
+    "demand_source": "Vitrus (43 051 t de RSU recolhidas em 2025) e APA (5,4% de têxtil no RSU)"
   },
   "circuits": {
     "circuits": 40,

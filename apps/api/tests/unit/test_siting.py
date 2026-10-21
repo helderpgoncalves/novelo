@@ -2,6 +2,7 @@
 
 import pytest
 
+from novelo.domain import siting
 from novelo.domain.network import Mode, ModeParams, Params
 from novelo.domain.siting import (
     Candidate,
@@ -107,6 +108,22 @@ def test_budget_below_one_site_opens_nothing() -> None:
         objective="max_tonnes", budget_eur_year=100.0,
     )  # fmt: skip
     assert plan.sites == [] and plan.status == "infeasible"
+
+
+def test_solver_without_a_solution_in_time_falls_back_to_the_greedy_plan(monkeypatch: pytest.MonkeyPatch) -> None:
+    # O CP-SAT sem solução no limite de tempo (UNKNOWN) chega como "infeasible"; um orçamento maior nunca pode
+    # dar menos do que nada: usa-se a dica gulosa (o local do meio cobre os 3 pontos: 6 t × 0,5 = 3 t, 206 €).
+    monkeypatch.setattr(siting, "_solve_model", lambda model, limit, seed: (None, "infeasible"))
+    costs = SiteCosts(250.0, 206.0, 26)
+    plan = plan_site_network(
+        DEMAND, CANDS, {"z": 6.0}, {"z": 3000}, costs, params(),
+        capture_rate=0.5, radius_m=250, collections_per_year=26,
+        objective="max_tonnes", budget_eur_year=500.0,
+    )  # fmt: skip
+    assert plan.status == "feasible"
+    assert [s.candidate.id for s in plan.sites] == ["c1"]
+    assert plan.tonnes == pytest.approx(3.0)
+    assert plan.annual_cost_eur == pytest.approx(206.0)
 
 
 def test_km_cost_is_charged_inside_the_budget() -> None:

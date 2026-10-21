@@ -343,7 +343,7 @@ class Harness:
         for a in specs:
             data = _file_bytes(a)
             files.append(UploadFile(io.BytesIO(data), filename=a["name"]))
-        out = await uploads.upload(db, user, files, default_catalog)
+        out = await uploads.upload(db, user, files, default_catalog, self.model)
         return [o.id for o in out]
 
     async def run_turn(

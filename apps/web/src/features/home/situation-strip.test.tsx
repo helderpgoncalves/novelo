@@ -8,10 +8,12 @@ const overview = (date: string | null | undefined) =>
     gap: {
       year: 2025,
       collected_t: 301.3,
-      capture_pct: 22.9,
-      missing_t: 1016,
-      potential_t: 1317,
-      potential_kg_per_inhab_month: 0.7,
+      capture_pct: 11.5,
+      missing_t: 2324.8,
+      potential_t: 2626,
+      potential_kg_per_inhab_month: 1.395,
+      missing_kg_per_inhab_month: 1.235,
+      potential_source_label: 'Vitrus e APA',
     },
     timeline: [{ who_pays: 'producers', date, source_label: 'X', verified: true }],
   }) as unknown as Overview;

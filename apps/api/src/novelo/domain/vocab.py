@@ -154,11 +154,15 @@ class ScenarioStatus(StrEnum):
 
 
 class CollectionMode(StrEnum):
-    """Modos de recolha de têxteis que o simulador compara."""
+    """Modos de recolha de têxteis que o simulador compara.
 
-    EXISTING = "existing"  # ponto em local existente (junta, escola, supermercado)
-    STREET = "street"  # contentor de rua
-    ON_DEMAND = "on_demand"  # recolha a pedido, aproveitando rotas existentes
+    A Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no
+    vocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.
+    """
+
+    EXISTING = "existing"  # local existente, sem contentor novo: entrega assistida ou paragem onde a viatura já passa
+    STREET = "street"  # contentor de rua: só referência
+    ON_DEMAND = "on_demand"  # recolha a pedido, porta a porta, nos circuitos que já existem
 
 
 class Fibre(StrEnum):

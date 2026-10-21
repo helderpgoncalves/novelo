@@ -10,13 +10,13 @@
 
 ---
 
-## O problema: um quarto recolhido, três quartos perdidos
+## O problema: um nono recolhido, o resto no lixo
 
-Em 2025, as entidades que recolhem têxteis em Guimarães apanharam **301,3 toneladas**, ou 0,16 kg por habitante por mês. Com 156 830 habitantes e o valor de referência do plano municipal, o potencial é de cerca de **1 317 toneladas por ano** (estimativa). A recolha atual capta **cerca de 23%**: o resto vai parar ao lixo indiferenciado, que o município paga para tratar, e perde-se matéria-prima que a indústria têxtil do Vale do Ave sabe aproveitar.
+Em 2025, as entidades que recolhem têxteis em Guimarães apanharam **301,3 toneladas**, ou 0,16 kg por habitante por mês. No mesmo ano a Vitrus recolheu **43 051 toneladas** de resíduos urbanos e, segundo a APA, 5,4% disso é têxtil: cerca de **2 324,8 toneladas por ano** que ainda vão para o lixo (estimativa). A recolha atual capta **cerca de 11,5%** do têxtil gerado: o resto vai parar ao lixo indiferenciado, que o município paga para tratar, e perde-se matéria-prima que a indústria têxtil do Vale do Ave sabe aproveitar.
 
 E o tempo conta. Desde 1 de janeiro de 2025 a recolha seletiva de têxteis é obrigatória. A **17 de abril de 2028**, a responsabilidade alargada do produtor passa a pôr os produtores a pagar a recolha e o tratamento, mas **só os custos economicamente eficientes**. Quem não souber o que custa cada tonelada não tem como defender o seu número.
 
-![Menos de um quarto do potencial chega à recolha seletiva: 22,9%, 301,3 t recolhidas em 2025 contra cerca de 1 317 t de potencial, destino do recolhido e rede atual](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-problema.jpg)
+![Cerca de 11,5% do têxtil gerado chega à recolha seletiva: 301,3 t recolhidas em 2025 contra cerca de 2 324,8 t ainda no lixo, destino do recolhido e rede atual](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-problema.jpg)
 
 A pergunta que a Vitrus nos fez:
 
@@ -34,11 +34,12 @@ O Novelo não propõe um equipamento melhor. Responde, com números, a três per
 
 O decisor escolhe um orçamento e uma meta de captura. O otimizador (**OR-Tools**, com CP-SAT para a localização e VRP para as rotas) decide que pontos abrir e que modo serve cada zona:
 
-- **pontos em locais existentes**, com investimento perto de zero;
-- **contentores de rua**, só onde a densidade o justifica;
+- **pontos em locais existentes, sem contentor novo**, com investimento perto de zero;
 - **recolha a pedido** nas zonas dispersas, aproveitando os circuitos que já passam lá, sem quilómetros novos.
 
-Parte da rede real: **40 circuitos, 29 viaturas e 82 localidades** da Vitrus, a população por freguesia do INE, a geometria oficial das 48 freguesias (CAOP) e os **2 751 contentores municipais** entregues a 20 de outubro, usados como pontos candidatos de investimento quase nulo.
+Sem contentores de têxtil: a Vitrus não os quer, porque o têxtil de contentor vem contaminado e perde a reutilização, que é onde está o valor.
+
+Parte da rede real: **40 circuitos, 29 viaturas e 82 localidades** da Vitrus, a população por freguesia do INE, a geometria oficial das 48 freguesias (CAOP) e os **2 751 contentores municipais** (indiferenciado, orgânico e seletivo) entregues a 20 de outubro: mostram onde o têxtil se perde no lixo e onde a viatura já passa, e servem de locais de paragem de investimento quase nulo.
 
 Cada cenário mostra **investimento, custo anual, toneladas desviadas do aterro, €/t e população coberta**, num mapa, e compara-se com outro lado a lado.
 
@@ -79,7 +80,7 @@ Onde ainda não há dado, **dizemo-lo no ecrã**:
 - Os custos unitários são **pressupostos visíveis e etiquetados**, com a origem de cada um.
 - Todo o valor estimado leva a palavra **"estimativa"**.
 - A incerteza é resultado, não nota de rodapé: **análise de tornado e simulação de Monte Carlo** mostram se o plano proposto aguenta, e por quanto, se os pressupostos estiverem errados.
-- O modelo **calibra-se com o que for realmente recolhido**, semana a semana, e a taxa de captura da rede atual reproduz as 301 t de 2025.
+- O modelo **calibra-se com o que for realmente recolhido**, semana a semana. Até lá, as taxas de captura por modo são pressupostos visíveis.
 
 Nenhum número aparece sem fonte nem sem a sua etiqueta.
 
@@ -114,13 +115,13 @@ Propomos à Vitrus um **piloto de 3 meses em duas freguesias**, com indicadores 
 
 **Novelo is the decision tool that designs Guimarães' textile collection network.** Give it a budget and a target; it returns side-by-side scenarios in **euros, tonnes and € per tonne**, built on real data from Vitrus Ambiente, the municipal waste company.
 
-**The problem.** In 2025 Guimarães collected **301.3 tonnes** of textiles. The estimated potential is about **1,317 tonnes a year**, so today's capture is roughly **23%**. From **17 April 2028**, extended producer responsibility will make producers pay for collection and treatment, but only for *cost-efficient* operations. A municipality that cannot say what a tonne costs cannot defend its number.
+**The problem.** In 2025 Guimarães collected **301.3 tonnes** of textiles. Vitrus collected 43,051 tonnes of municipal waste that year and, per the Portuguese Environment Agency, 5.4% of it is textiles: about **2,324.8 tonnes a year** still going to waste (estimate), so today's capture is roughly **11.5%**. From **17 April 2028**, extended producer responsibility will make producers pay for collection and treatment, but only for *cost-efficient* operations. A municipality that cannot say what a tonne costs cannot defend its number.
 
 **What it does.**
 
-- **Network simulator:** an OR-Tools optimiser (CP-SAT for placement, VRP for routes) picks which points to open and which mode serves each area (drop-off at existing venues, street containers or on-demand pickup), starting from the real 40 circuits and 29 vehicles.
+- **Network simulator:** an OR-Tools optimiser (CP-SAT for placement, VRP for routes) picks which points to open and which mode serves each area (drop-off at existing venues with no new container, or on-demand pickup; Vitrus does not want textile bins, because contaminated textiles lose their reuse value), starting from the real 40 circuits and 29 vehicles.
 - **"What if...?" in plain Portuguese:** the optimiser answers with a new scenario. **The AI never does the maths**: every number comes from the optimiser or the database, and a verifier rejects anything else.
-- **Bag to fibre:** photo triage of garment and label, lots with QR code and public passport, and a fibre marketplace for Ave Valley recyclers.
+- **Bag to fibre:** photo triage of garment and label as a quality check at drop-off, lots with QR code and public passport, and a fibre marketplace for Ave Valley recyclers.
 - **One-click EPR report (PDF)** with cost per territory type: the dossier the municipality will need in 2028.
 
 **Rigour.** Real data everywhere. Where data is missing we say so: unit costs are labelled assumptions, every estimate is marked "estimate", and tornado and Monte Carlo analyses show whether the plan holds if the assumptions are wrong.

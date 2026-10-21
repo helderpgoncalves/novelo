@@ -10,14 +10,14 @@ A linha tracejada à esquerda é o agente semanal de operações (secção 7, po
 
 O decisor pergunta em português e recebe um cenário novo, calculado pelo otimizador, com a diferença explicada em números. A IA conduz o modelo matemático; nunca faz contas.
 
-> **Pergunta:** "E se tirarmos os contentores de rua de Serzedelo e passarmos a recolha a pedido?"
+> **Pergunta:** "E se em Serzedelo deixarmos a paragem em local existente e passarmos a recolha a pedido?"
 >
-> **Novelo:** "Entendi: em Serzedelo, retirar contentores de rua e usar recolha a pedido. Resultado: investimento −X €, custo anual −Y €, toneladas captadas −Z t, €/t passa de A para B. Fonte: cenário B2, gerado às 14:32."
+> **Novelo:** "Entendi: em Serzedelo, retirar o ponto em local existente e usar recolha a pedido. Resultado: investimento −X €, custo anual −Y €, toneladas captadas −Z t, €/t passa de A para B. Fonte: cenário B2, gerado às 14:32."
 
 **Como funciona, passo a passo:**
 
 1. O modelo (via OpenRouter, ver [IA](ia.md)) recebe a pergunta, o cenário atual e as listas fechadas de freguesias, modos e parâmetros.
-2. Devolve **só** uma alteração estruturada, `ScenarioDelta`, validada por Pydantic. Exemplo: `{"zones": ["Serzedelo"], "remove_modes": ["street"], "add_modes": ["on_demand"]}`.
+2. Devolve **só** uma alteração estruturada, `ScenarioDelta`, validada por Pydantic. Exemplo: `{"zones": ["Serzedelo"], "remove_modes": ["existing"], "add_modes": ["on_demand"]}`. Os modos por omissão são `existing` e `on_demand`; `street` (contentor de rua) só entra se o utilizador o pedir como referência, porque a Vitrus não quer contentores de têxtil (21 out 2026).
 3. O ecrã mostra "Entendi: ..." antes de correr, para o decisor confirmar ou corrigir.
 4. O OR-Tools corre o cenário novo e devolve os KPIs em JSON.
 5. O modelo escreve a explicação a partir desse JSON.
@@ -41,13 +41,13 @@ Cada peça triada entra num lote; cada lote tem um QR e uma página pública; os
 | Código e QR | Gerado ao abrir o lote no ponto de recolha |
 | Freguesia e ponto | Ponto onde a peça foi entregue |
 | Composição (ex.: 100% algodão) | Lida da etiqueta na triagem |
-| Estado (reutilizável, reciclável, rejeito) | Triagem por foto, confirmável pelo operador |
+| Estado (reutilizável, reciclável, rejeito) | Triagem por foto, confirmável pelo operador: é o controlo de qualidade na entrega (o problema da Vitrus é a contaminação) |
 | Peso | Estimado por tipo de peça no MVP; balança no ponto no piloto |
 | Histórico | Recolhido, triado, reservado, entregue, com data |
 
-**O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o Plano de Guimarães descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
+**O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o plano municipal de Guimarães (contexto público, [F74](../pesquisa/fontes.md)) descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
 
-**A bolsa de fibra.** Uma vista agregada para quem recicla: "algodão 100%, reciclável, 320 kg em 4 lotes, Azurém e Creixomil". O reciclador registado manifesta interesse e o lote fica reservado. Sem preços nem pagamentos no MVP: o valor está em tornar visível material que hoje vai para aterro.
+**A bolsa de fibra (prioridade baixa).** A Vitrus diz que reciclar custa muito mais que a fibra virgem (21 out 2026): o valor está na reutilização, e a bolsa desce na prioridade. Uma vista agregada para quem recicla: "algodão 100%, reciclável, 320 kg em 4 lotes, Azurém e Creixomil". O reciclador registado manifesta interesse e o lote fica reservado. Sem preços nem pagamentos no MVP: o valor está em tornar visível material que hoje vai para aterro.
 
 **Porque importa:** o plano municipal aponta a falta de têxtil limpo e homogéneo como uma das razões para não haver mercado de matérias-primas secundárias. Lotes por fibra são exatamente isso.
 
@@ -112,12 +112,12 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Ecrã | Rota | O que faz |
 | --- | --- | --- |
 | Sala de decisão (Ponto de partida) | `/` | A página que se abre todos os dias, para responder em 10 segundos: onde estamos, quanto falta e o que dá o orçamento. Faixa de situação (301,3 t recolhidas, % do potencial, t por captar e dias até 17 abr 2028, cada um com selo «medido» ou «estimativa»), **mapa de Guimarães em meio-tom** (48 freguesias, camadas potencial por captar, população, contentores municipais «não são de têxteis», circuitos e lacunas de dados; detalhe, simular, perguntar ao Copiloto e mapa completo por freguesia), **controlo de orçamento ao vivo** (interpola a recolha entre os cenários guardados, sem solver nem IA; abre o simulador com o orçamento), «O fio» (potencial → recolhido → destino, com o fio solto), próximos passos por papel com contadores, perguntas sugeridas ao Copiloto, barra de confiança dos dados (medido / estimativa / em falta) e a evidência (manchetes, fontes, entidades, fluxos, composição, freguesias) por baixo da dobra. URL partilhável: `?layer=&parish=&budget=&tab=` |
-| Simulador | `/simulator` | Formulário de orçamento (60 000 € por ano por omissão), meta e restrições; corre o otimizador e mostra os passos. **Rede: «Locais reais» (por omissão) escolhe locais concretos da rede municipal** (raio a pé de 200, 300 ou 500 m; tipo de ponto em local existente ou contentor de rua); «Por freguesia» mantém o modelo por zonas |
+| Simulador | `/simulator` | Formulário de orçamento (60 000 € por ano por omissão), meta e restrições; corre o otimizador e mostra os passos. **Rede: «Locais reais» (por omissão) escolhe locais concretos da rede municipal** (raio a pé de 200, 300 ou 500 m; paragem em local existente, sem contentor novo, por omissão; contentor de rua só como referência); «Por freguesia» mantém o modelo por zonas |
 | Cenários | `/scenarios`, `/scenarios/:id`, `/scenarios/compare` | Lista, resumo, rede, incerteza (tornado e Monte Carlo; só por freguesia), "E se...?", robustez e comparação lado a lado; cenários de referência por *benchmark*. Os cenários por locais reais mostram os locais abertos (rua, freguesia, têxtil e população servida, viatura), o raio de cobertura no mapa e as rotas pelos locais |
 | Validação | `/validation` | O que se consegue testar do modelo com os dados de hoje: triangulação do potencial por habitante e validação cruzada espacial; o que ainda não se testa |
 | Pressupostos | `/assumptions` | Cada parâmetro com valor, unidade e origem; edição só por administradores |
 | Piloto | `/pilot` | Escolhe 2 a 4 freguesias de maior aprendizagem e o piso de sinal em toneladas |
-| Cobertura | `/coverage` | Cobertura a pé dos contentores **de têxteis**; em espera até chegarem as localizações |
+| Cobertura | `/coverage` | Cobertura a pé dos pontos de têxteis. A Vitrus não tem contentores de têxtil (21 out 2026); o ecrã não inventa cobertura |
 | Mapa | `/map` | Freguesias, localidades e camadas municipais (locais, contornos CAOP, produtores) |
 | Rede municipal | `/municipal` | Contentores de **outras frações** (não são de têxteis) em seis separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas (estimativa) e qualidade; exportação CSV, XLSX e GeoJSON. Nomes de produtores só para administradores |
 | Circuitos e localidades | `/circuits`, `/localities` | Os circuitos e as 82 localidades da Vitrus, por tipologia e por frequência |
@@ -145,11 +145,11 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |
 | Tabelas e separadores de nível profissional (`DataTable`, `PageTabs`) | Feito; paginação em blocos, sem virtualização de linhas |
-| Rede municipal (outras frações, não é têxtil): API, ecrã de seis separadores, camadas do mapa, alertas `municipal_*`, exportação e ferramentas do copiloto | Feito |
+| Rede municipal (indiferenciado, orgânico, seletivo; base geográfica do modelo): API, ecrã de seis separadores, camadas do mapa, alertas `municipal_*`, exportação e ferramentas do copiloto | Feito |
 | Copiloto conversacional (SSE tipado, threads, memória, anexos, menções, artefactos, ações com confirmação, página `/chat`, avaliação) | Feito; estado «a correr o otimizador» sem progresso real |
 | Entrada por magic link, entrada por QR (`guest`), Google, emails transacionais | Feito |
 | Páginas de erro, PWA e interface de telemóvel, marca gerada por `just brand` | Feito |
-| Camada e cobertura dos contentores de **têxteis** | Falta: a lista de contentores de têxteis continua por receber |
+| Camada e cobertura dos contentores de **têxteis** | Não se aplica: não há contentores de têxteis (Vitrus, 21 out 2026) |
 | Agente semanal de operações | Não iniciado (fica para depois) |
 
 ## O que fica de fora, de propósito
@@ -162,4 +162,4 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 
 Se o tempo apertar, corta-se por esta ordem: agente semanal (7), copiloto conversacional (6), evidência por marca (5), animação do Sankey (fica estático), bolsa de fibra (fica só o passaporte do lote). **Nunca se cortam:** a comparação de cenários, o "E se...?" e o relatório RAP.
 
-**Fontes:** [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf) (passaporte digital, mercado de matérias-primas secundárias) · [Diretiva 2025/1892, VdA](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/) (prazo da RAP) · [EU Parliament mandates EPR for textiles, AMI](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles) (taxas mais altas para moda rápida)
+**Fontes:** [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf) (passaporte digital, mercado de matérias-primas secundárias; documento do Município/URBACT, não usado pela Vitrus; números do modelo vêm da Vitrus e da APA) · [Diretiva 2025/1892, VdA](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/) (prazo da RAP) · [EU Parliament mandates EPR for textiles, AMI](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles) (taxas mais altas para moda rápida)

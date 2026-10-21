@@ -4,7 +4,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
-ReadingKey = Literal["plan_per_capita", "plan_share_of_residual", "pt_composition"]
+ReadingKey = Literal["vitrus_apa_share_of_rsu", "plan_share_of_residual", "pt_composition", "plan_per_capita"]
+ReadingBasis = Literal["generated", "residual"]
 CountKind = Literal["all", "underground", "surface"]
 
 
@@ -18,9 +19,16 @@ class ValidationBaseline(BaseModel):
 class PotentialReadingOut(BaseModel):
     key: ReadingKey
     kg_per_inhab_year: float
+    basis: ReadingBasis = Field(
+        description="`generated`: têxtil gerado no total; `residual`: têxtil que ainda vai para o lixo (o recolhido "
+        "à parte soma-se para obter o gerado)"
+    )
     implied_capture_pct: float = Field(description="Captura de 2025 se esta leitura do potencial fosse a verdadeira")
-    implied_potential_t: float
-    is_model_base: bool = Field(description="A leitura que o modelo usa por omissão (0,7 kg/hab/mês)")
+    implied_potential_t: float = Field(description="Têxtil gerado (t/ano) que esta leitura implica")
+    is_model_base: bool = Field(description="A leitura que o modelo usa (Vitrus + APA: 43 051 t de RSU × 5,4%)")
+    is_alternative: bool = Field(
+        default=False, description="Leitura publicada mas não usada pela Vitrus; só para triangulação"
+    )
     source: str
 
 

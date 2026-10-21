@@ -102,8 +102,7 @@ def _on_demand_zones(
     out: dict[str, siting.OnDemandZone] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
     for z in zones:
-        allowed = request.constraints.get(z.code)
-        if allowed is not None and CollectionMode.ON_DEMAND not in allowed:
+        if CollectionMode.ON_DEMAND not in request.constraints.get(z.code, request.default_modes):
             continue
         zone = network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days)
         c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
@@ -363,6 +362,7 @@ def _compute_sites(
         modes=summaries,
         depot=[params.depot_lat, params.depot_lon],
         sites=_site_selections(plan, inputs, vehicle_of),
+        default_modes=request.default_modes,
         siting=SitingSummary(
             radius_m=request.site_radius_m,
             site_mode=mode,

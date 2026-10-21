@@ -22,11 +22,11 @@ Recomendamos o TexVitrus. É o único desafio proposto por uma entidade com um p
 
 ## O que já se sabe
 
-Guimarães publicou em novembro de 2025 um Plano de Ação Integrado para a Circularidade Têxtil. É praticamente o caderno de encargos do desafio: toda a equipa deve lê-lo antes do hackathon.
+Guimarães publicou em novembro de 2025 um Plano de Ação Integrado para a Circularidade Têxtil. Serve de contexto público. A 21 de outubro de 2026 a Vitrus disse não o conhecer: os números do modelo vêm da Vitrus e da APA (43 051 t de RSU × 5,4% = 2 324,8 t por ano ainda no lixo, estimativa).
 
 | Tema | O que diz o plano | Porque nos interessa |
 | --- | --- | --- |
-| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Com 156 830 hab. e 315 kg/hab de não triados, são cerca de 1 300 a 2 650 t/ano a ir para o indiferenciado (cálculo nosso) |
+| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Substituído a 21 out pelos valores da Vitrus: 43 051 t de RSU × 5,4% (APA) = 2 324,8 t/ano (cálculo nosso, estimativa) |
 | Território | Ocupação dispersa, 48 freguesias; porta a porta pode ser inviável | O custo está nas zonas dispersas: é aí que se ganha |
 | Fluxo escondido | Microempresas têxteis deitam retalhos no lixo urbano; com menos de 10 trabalhadores não têm mapa de resíduos | Ninguém sabe onde está esse têxtil |
 | Custo operacional | As fibras enrolam-se nas máquinas | Tirar têxtil do indiferenciado poupa dinheiro além do aterro |
@@ -45,15 +45,15 @@ O decisor escolhe um orçamento e uma meta de captura; a ferramenta devolve a re
 
 - **Procura por zona:** população por subsecção (INE, BGRI 2021) × kg/hab × taxa de captura esperada, ajustada com a caracterização do lixo da Vitrus e as rotas onde já se encontrou mais têxtil.
 - **Mistura de modos de recolha**, onde está a poupança:
-    - pontos em locais existentes (juntas, escolas, supermercados, ecocentros), investimento quase zero;
-    - contentores de rua só onde a densidade justifica;
-    - recolha a pedido nas zonas dispersas, aproveitando rotas que já lá passam.
+    - pontos em locais existentes, sem contentor novo (juntas, escolas, ecocentros, paragem nos locais municipais onde a viatura já passa), investimento quase zero;
+    - recolha a pedido nas zonas dispersas, aproveitando rotas que já lá passam;
+    - sem contentores de rua de têxteis: a Vitrus não os quer, porque o têxtil de contentor vem contaminado (21 out 2026).
 - **Otimização:** localização dos pontos (cobertura máxima / p-median) e rotas (VRP), ambas com OR-Tools.
 - **Saída:** "Cenário A: 40 pontos, X € de investimento, Y €/ano de operação, Z t desviadas do aterro, W €/t" contra "Cenário B". O ecrã de comparação lado a lado é o que mostramos em palco.
 
 ### 2. Triagem na entrega, pelo telemóvel
 
-Não é o produto principal, é o momento demo. Uma foto da peça e outra da etiqueta de composição:
+Não é o produto principal: é o **controlo de qualidade na entrega**. O problema da Vitrus é a contaminação, e a foto confirma o estado no momento em que o saco chega. Uma foto da peça e outra da etiqueta de composição:
 
 - um modelo de visão classifica o estado (reutilizável / reciclável / rejeito);
 - OCR da etiqueta lê a composição (ex.: 60% algodão, 40% poliéster) e indica o destino certo. A reciclagem mecânica funciona bem com algodão e lã; misturas com elastano não.
@@ -90,7 +90,7 @@ A stack, o deploy e o plano técnico completos estão no guia de desenvolvimento
 
 ## Fontes
 
-- [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf), Município de Guimarães / URBACT, 25 nov. 2025: dados de resíduos, PAYT, Vitrus, To-Be-Green, operadores e metas.
+- [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf), Município de Guimarães / URBACT, 25 nov. 2025: dados de resíduos, PAYT, Vitrus, To-Be-Green, operadores e metas. Contexto público, não usado pela Vitrus; os números do modelo vêm da Vitrus e da APA.
 - [Diretiva 2025/1892 que altera a Diretiva-Quadro dos Resíduos](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/), VdA, 21 out. 2025: prazo de 17 abr. 2028 para a RAP têxtil e custos cobertos pelos produtores.
 - [Resumo oficial do ato final (Diretiva (UE) 2025/1892)](https://oeil.europarl.europa.eu/oeil/en/procedure-document-summary/pdf?id=1845495), Parlamento Europeu: entrada em vigor a 16 out. 2025.
 - Desafio 5 TexVitrus, slide oficial do Hack4Guimarães 2035: pergunta, pontos de partida, dados disponíveis e mentor.

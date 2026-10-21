@@ -24,6 +24,7 @@ from novelo.ai.verify import fact_numbers
 from novelo.ai.web import ServerTools, WebSearchUnavailableError, sanitize_query, server_tools_from
 from novelo.core.config import get_settings
 from novelo.core.errors import AiBudgetExceededError, AppError, FeatureDisabledError, UpstreamError
+from novelo.domain import pilot
 from novelo.domain.vocab import CollectionMode, ContainerKind, ScenarioObjective
 from novelo.features.copilot import charts
 from novelo.features.copilot import mentions as mention_service
@@ -57,6 +58,7 @@ from novelo.features.reports import service as report_service
 from novelo.features.reports.schemas import ReportRequest
 from novelo.features.reports.texts import PARAM_LABELS
 from novelo.features.textile import service as textile
+from novelo.features.textile.references import POTENTIAL_SOURCE_LABEL
 from novelo.features.users.models import User
 
 log = logging.getLogger("novelo.copilot")
@@ -166,7 +168,9 @@ class PilotArgs(_Args):
     k: int = Field(default=2, ge=2, le=4, description="Nº de freguesias do piloto")
     months: int = Field(default=3, ge=1, le=12)
     modes: list[CollectionMode] = Field(
-        default_factory=lambda: [CollectionMode.STREET, CollectionMode.ON_DEMAND], min_length=1
+        default_factory=lambda: list(pilot.DEFAULT_MODES),
+        min_length=1,
+        description="Modes to test; default existing + on_demand (street only as an explicit reference)",
     )
 
 
@@ -754,8 +758,11 @@ class CopilotTools:
             "reject_t": b.reject_t,
             "kg_per_inhab_month": b.kg_per_inhab_month,
             "estimated_potential_t": b.estimated_demand_t,
+            "potential_meaning": "textile generated = still going to the bin (gap_t) + collected separately",
             "current_capture_pct": b.capture_of_demand_pct,
             "gap_t": b.gap_t,
+            "gap_meaning": "textile still going to the bin (to divert); the scenarios' potential_t",
+            "potential_source": POTENTIAL_SOURCE_LABEL,
             "entities": [{"name": e.entity, "collected_t": e.total_t} for e in b.entities],
             "table": make_table(
                 "Têxtil recolhido por entidade e destino (2025)",
@@ -831,13 +838,13 @@ class CopilotTools:
         constraints, error = self._constraints({}, args.restrictions, await self._zones())
         if error:
             return error
-        target = None
-        if args.target_pct is not None:
-            target = args.target_pct / 100 * (await textile.get_baseline(self.db)).estimated_demand_t
         params: PlanningParams | None = None
         applied: list[dict[str, Any]] = []
         if args.param_changes:
             params, applied = self._changed_params((await planning.get_parameters(self.db)).values, args.param_changes)
+        target = None
+        if args.target_pct is not None:  # % do têxtil por desviar do lixo (o `potential_t` do cenário)
+            target = args.target_pct / 100 * await planning.potential_t(self.db, params)
         request = ScenarioRequest(
             label=f"{COPILOT_PREFIX}{args.label}"[:80],
             objective=args.objective,
@@ -1048,8 +1055,7 @@ class CopilotTools:
         values = _flatten((await planning.get_parameters(self.db)).values.model_dump(mode="json"))
         needle = fold(args.query)
         origin = {
-            "plan": "Plano de Ação para a Circularidade Têxtil de Guimarães",
-            "vitrus_data": "calibrado com dados reais da Vitrus",
+            "vitrus_data": "dados reais da Vitrus (com a APA para o têxtil no RSU)",
             "assumption": "pressuposto da equipa, a validar com a Vitrus (estimativa)",
         }
         hits = []

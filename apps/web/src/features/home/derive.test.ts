@@ -51,7 +51,7 @@ describe('trustItems', () => {
 describe('questionInputs', () => {
   it('usa as freguesias com mais potencial e uma meta redonda', () => {
     const overview = {
-      gap: { collected_t: 301.3, missing_t: 1016 },
+      gap: { collected_t: 301.3, missing_t: 2324.8 },
       parishes: [
         { name: 'A', potential_t: 5 },
         { name: 'B', potential_t: 50 },
@@ -61,7 +61,7 @@ describe('questionInputs', () => {
     } as unknown as Overview;
     const q = questionInputs(overview, 40000);
     expect(q.topParishes).toEqual(['B', 'C', 'A']);
-    expect(q.targetT).toBe(560);
+    expect(q.targetT).toBe(880);
     expect(q.budgetEur).toBe(40000);
   });
 });

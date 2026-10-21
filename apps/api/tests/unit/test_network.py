@@ -120,6 +120,17 @@ def test_allowed_modes_restrict_the_options() -> None:
     assert [o.modes for o in options] == [(Mode.ON_DEMAND,)]
 
 
+def test_default_modes_apply_where_there_is_no_restriction() -> None:
+    # sem rua por omissão: 2 modos dão 3 combinações (existing, on_demand, os dois); a restrição explícita ganha
+    default = (Mode.EXISTING, Mode.ON_DEMAND)
+    options = build_options([URBAN, RURAL], params(), allowed={"rur": {Mode.STREET}}, default_modes=default)
+    by_zone = {z: [o.modes for o in options if o.zone_id == z] for z in ("urb", "rur")}
+    assert by_zone["urb"] == [(Mode.EXISTING,), (Mode.ON_DEMAND,), (Mode.EXISTING, Mode.ON_DEMAND)]
+    assert by_zone["rur"] == [(Mode.STREET,)]
+    assert len(build_options([URBAN], params(), default_modes=default)) == 3
+    assert len(build_options([URBAN], params())) == 7  # omitido = todos os modos: 2³ − 1
+
+
 def test_vrp_splits_by_capacity_and_visits_every_stop() -> None:
     p = params(vehicle_capacity_t=3.0)
     stops = [Stop("a", 41.46, -8.29, 2.0), Stop("b", 41.47, -8.30, 2.0), Stop("c", 41.40, -8.25, 1.0)]

@@ -21,7 +21,7 @@ def target_tonnes(kg_per_inhab_year: float, population: int) -> float:
 
 
 def implied_capture_of_demand(kg_per_inhab_year: float, kg_per_inhab_month: float) -> float:
-    """Fração do têxtil gerado que a meta exige captar: meta anual / (q · 12). Pode exceder 1 (irrealizável)."""
+    """Fração do têxtil por desviar do lixo (q · 12) que a meta exige captar: meta anual / (q · 12). Pode exceder 1."""
     if kg_per_inhab_month <= 0:
         raise ValueError("kg/hab/mês tem de ser positivo")
     return kg_per_inhab_year / (kg_per_inhab_month * MONTHS_PER_YEAR)

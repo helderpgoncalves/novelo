@@ -22,6 +22,17 @@
     "notes": "Semana de 21 a 25/09/2026, sábado 19/09 e domingo 20/09 (fim de semana anterior)."
   },
   {
+    "key": "vitrus_apa_rsu_2025",
+    "title": "RSU recolhido em 2025 e percentagem de têxtil no RSU",
+    "provider": "Vitrus Ambiente (APA)",
+    "file_name": "email do mentor da Vitrus (21/10/2026)",
+    "file_sha256": "d5640af145f429510260e4219fee0965f6d39c51c76a5d4fa966e797641d4b95",
+    "received_on": "2026-10-21",
+    "period_start": "2025-01-01",
+    "period_end": "2025-12-31",
+    "notes": "43 051 t de RSU recolhidas pela Vitrus em 2025; 5,4% é têxtil (estatística da APA, indicada pela Vitrus). Base do têxtil que ainda vai para o lixo (2 324,8 t/ano, estimativa)."
+  },
+  {
     "key": "ine_census_2021",
     "title": "População residente por freguesia (Censos 2021, indicador 0011609)",
     "provider": "INE, I.P.",
@@ -48,7 +59,7 @@
     "title": "Contentores municipais (pacote QGIS) e CAOP 2019",
     "provider": "Vitrus Ambiente",
     "file_name": "data/raw/vitrus-mapa-qgis/",
-    "file_sha256": "2bb1447500384dd108cfe958836ed86c6f65acf572f170dfa58c6d3eee343b05",
+    "file_sha256": "feddd8b06fffcf1a9162a90cf300bcbf58c84ff97c7aceb24db2db97072ccefc",
     "received_on": "2026-10-20",
     "period_start": null,
     "period_end": null,

@@ -35,7 +35,7 @@
   ]
  },
  "rules": {
-  "potential_kg_per_inhab_month": 0.7,
+  "residual_kg_per_inhab_month": 0.525,
   "capture_today_pct": 25.0
  }
 }

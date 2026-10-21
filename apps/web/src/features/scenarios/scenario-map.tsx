@@ -6,7 +6,7 @@ import type { RouteOut, ScenarioResult, SiteSelection, ZoneOut } from '@/client'
 import { BaseMap } from '@/features/map/base-map';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
 import { MODE_COLORS, NO_MODE_COLOR, zonesToGeoJson } from '@/lib/map';
-import { modeLabel } from '@/lib/scenario';
+import { ALL_MODES, modeLabel } from '@/lib/scenario';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
@@ -45,7 +45,11 @@ function routeGeoJson(routes: RouteOut[]) {
   };
 }
 
+// Os locais reais desenham-se a verde floresta, a mesma cor que o contentor de rua (referência) já usava.
 const SITE_COLOR = MODE_COLORS.street;
+
+// Cenários antigos, sem `default_modes`: a legenda mostra os modos oferecidos e os que o resultado usa.
+const MODES_SHOWN = ALL_MODES.filter((mode) => mode !== 'street');
 
 /** Círculo geodésico aproximado (polígono de 48 lados) com o raio em metros, para o raio a pé de cada local. */
 function circlePolygon(lat: number, lon: number, radiusM: number): number[][] {
@@ -323,7 +327,11 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
             </>
           ) : (
             <>
-              {(['street', 'existing', 'on_demand'] as const).map((mode) => (
+              {ALL_MODES.filter(
+                (mode) =>
+                  (result.default_modes ?? MODES_SHOWN).includes(mode) ||
+                  result.allocations.some((x) => x.mode === mode),
+              ).map((mode) => (
                 <li key={mode} className="flex items-center gap-2">
                   <span
                     className="size-2.5 rounded-sm"

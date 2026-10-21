@@ -110,7 +110,7 @@ export function EvidenceTabs({ overview, tab, onTabChange }: EvidenceTabsProps) 
                 <ParishesTable parishes={overview.parishes} />
                 <SourceLine>
                   {m.home_s5_source({
-                    rate: num(overview.gap.potential_kg_per_inhab_month, 1),
+                    rate: num(overview.gap.missing_kg_per_inhab_month, 3),
                   })}
                 </SourceLine>
               </div>

@@ -82,7 +82,7 @@ export function ParishDetail({
           label={m.home_detail_gap()}
           tag={<EstimateTag />}
           value={`${tonnes(gapT, 1)}/ano`}
-          hint={m.home_detail_potential_of({ potential: tonnes(parish.potential_t, 1) })}
+          hint={m.home_detail_potential_of()}
         />
         <Fact
           label={m.home_detail_population()}

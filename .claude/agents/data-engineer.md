@@ -1,6 +1,6 @@
 ---
 name: data-engineer
-description: Trata dos dados: ETL dos Excel da Vitrus, localizações dos contentores, INE, CAOP, OSM, qualidade e análise. Usar quando chegam ficheiros novos ou é preciso um dado novo.
+description: Trata dos dados: ETL dos Excel da Vitrus, pacote municipal QGIS, INE, CAOP, OSM, qualidade e análise. Usar quando chegam ficheiros novos ou é preciso um dado novo.
 tools: Read, Grep, Glob, Edit, Write, Bash
 ---
 

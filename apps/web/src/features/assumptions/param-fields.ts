@@ -2,7 +2,7 @@ import type { PlanningParams } from '@/client';
 import { m } from '@/paraglide/messages';
 
 export interface ParamField {
-  /** Caminho no objeto de pressupostos, igual ao `key` do OpenAPI (ex.: `modes.street.capture_rate`). */
+  /** Caminho no objeto de pressupostos, igual ao `key` do OpenAPI (ex.: `modes.existing.capture_rate`). */
   path: string;
   label: () => string;
   kind: 'number' | 'percent' | 'int';
@@ -101,9 +101,10 @@ export const PARAM_GROUPS: ParamGroup[] = [
       },
     ],
   },
-  { id: 'street', title: () => m.mode_street(), fields: modeFields('street', labels) },
   { id: 'existing', title: () => m.mode_existing(), fields: modeFields('existing', labels) },
   { id: 'on_demand', title: () => m.mode_on_demand(), fields: modeFields('on_demand', labels) },
+  // Só referência (ex.: o benchmark francês é de contentores): a Vitrus não tem contentores de têxtil.
+  { id: 'street', title: () => m.mode_street(), fields: modeFields('street', labels) },
   {
     id: 'costs',
     title: () => m.param_group_costs(),

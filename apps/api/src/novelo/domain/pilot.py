@@ -33,7 +33,8 @@ from novelo.domain.vocab import CollectionMode as Mode
 from novelo.domain.vocab import Tipau
 
 MAX_K = 4
-DEFAULT_MODES = (Mode.STREET, Mode.ON_DEMAND)
+# Local existente e recolha a pedido: a Vitrus não tem contentores de têxtil (`street` só se pedido explicitamente).
+DEFAULT_MODES = (Mode.EXISTING, Mode.ON_DEMAND)
 
 
 @dataclass(frozen=True)

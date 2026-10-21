@@ -170,7 +170,9 @@ function NetworkMapPage() {
           value={formatTonnes(demand, 0)}
           tag={m.common_estimate()}
           tone="primary"
-          hint={m.map_stat_demand_hint()}
+          hint={m.map_stat_demand_hint({
+            kg: formatNumber(population > 0 ? (demand * 1000) / population / 12 : 0, 3),
+          })}
         />
         <StatCell
           label={m.map_stat_localities()}

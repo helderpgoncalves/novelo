@@ -12,7 +12,8 @@ import { K_RANGE, MONTHS_RANGE, PilotForm, type PilotParams } from '@/features/p
 import { PilotResult } from '@/features/pilot/pilot-result';
 import { m } from '@/paraglide/messages';
 
-const DEFAULT_MODES: CollectionMode[] = ['street', 'on_demand'];
+// Os mesmos da API: a Vitrus não tem contentores de têxtil, por isso o piloto testa locais existentes e recolha a pedido.
+const DEFAULT_MODES: CollectionMode[] = ['existing', 'on_demand'];
 
 const searchSchema = z.object({
   k: z.number().int().min(K_RANGE.min).max(K_RANGE.max).optional().catch(undefined),
@@ -35,10 +36,12 @@ export const Route = createFileRoute('/_app/pilot')({
 function PilotPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: Route.fullPath });
+  // Ligações antigas podem trazer `street`: deixou de ser oferecido.
+  const offered = (search.modes ?? []).filter((x) => x !== 'street');
   const params: PilotParams = {
     k: search.k ?? 2,
     months: search.months ?? 3,
-    modes: search.modes ?? DEFAULT_MODES,
+    modes: offered.length > 0 ? offered : DEFAULT_MODES,
     floor: search.floor,
   };
 

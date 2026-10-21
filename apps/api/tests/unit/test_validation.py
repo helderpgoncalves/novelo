@@ -4,6 +4,7 @@ import pytest
 
 from novelo.domain.validation import (
     implied_capture_pct,
+    implied_generated_t,
     leave_one_out,
     pearson,
     potential_reading,
@@ -22,6 +23,18 @@ def test_a_bigger_potential_means_a_smaller_capture() -> None:
     high = potential_reading("b", 23.5, 301.265, 156_830)
     assert high.implied_capture_pct < low.implied_capture_pct
     assert high.implied_capture_pct == pytest.approx(8.17, abs=0.01)
+
+
+def test_a_residual_reading_adds_what_was_collected_separately() -> None:
+    # 43 051 t × 5,4% = 2 324,754 t no lixo; + 301,265 t recolhidas à parte = 2 626,019 t geradas
+    kg = 2_324_754 / 156_830  # 14,8234 kg/hab/ano
+    assert implied_generated_t(301.265, 156_830, kg, "residual") == pytest.approx(2626.019, abs=0.001)
+    assert implied_generated_t(301.265, 156_830, 8.4, "generated") == pytest.approx(1317.372, abs=0.001)
+    # captura: 301,265 ÷ 2 626,019 = 11,47%
+    r = potential_reading("vitrus_apa", kg, 301.265, 156_830, "residual")
+    assert r.basis == "residual" and r.implied_capture_pct == pytest.approx(11.47, abs=0.01)
+    with pytest.raises(ValueError):
+        implied_generated_t(1, 0, kg, "residual")
 
 
 def test_share_reading() -> None:

@@ -22,7 +22,7 @@ test.describe('sala de decisão', () => {
 
     const strip = page.getByRole('region', { name: 'Situação em números' });
     await expect(strip).toContainText('301,3');
-    await expect(strip).toContainText('22,9%');
+    await expect(strip).toContainText('11,5%');
     await expect(strip).toContainText('medido');
     await expect(strip).toContainText('estimativa');
     await expect(strip).toContainText(/\d+\s*dias/);
@@ -63,7 +63,7 @@ test.describe('sala de decisão', () => {
   });
 
   test('o fio, confiança dos dados e próximos passos', async ({ page }) => {
-    await expect(page.getByRole('img', { name: /Do potencial estimado de/ })).toBeVisible();
+    await expect(page.getByRole('img', { name: /Do têxtil gerado, estimado em/ })).toBeVisible();
     const trust = page.locator('#confianca');
     await expect(trust).toContainText('medidos');
     await expect(trust).toContainText('em falta');
@@ -111,9 +111,7 @@ test.describe('sala de decisão', () => {
 
   test('o Copiloto abre com uma pergunta sugerida', async ({ page }) => {
     await page.locator('#passos').scrollIntoViewIfNeeded();
-    await page
-      .getByRole('button', { name: /Que freguesias têm mais potencial por captar/ })
-      .click();
+    await page.getByRole('button', { name: /Que freguesias têm mais têxtil por desviar/ }).click();
     await expect(page.getByRole('dialog')).toBeVisible();
   });
 });

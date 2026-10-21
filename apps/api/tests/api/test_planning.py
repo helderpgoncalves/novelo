@@ -17,20 +17,23 @@ async def test_zones_carry_real_census_population(logged_in: httpx.AsyncClient) 
     assert sum(z["population"] for z in zones) == 156_830  # Censos 2021, INE
     assert all(z["latitude"] and z["longitude"] for z in zones)
     ronfe = next(z for z in zones if z["name"] == "Ronfe")
+    kg = 43_051_000 * 0.054 / 156_830 / 12  # têxtil no lixo por habitante e mês (Vitrus + APA): 1,2353
     assert ronfe["service_days"] >= 3 and ronfe["demand_t"] == pytest.approx(
-        ronfe["population"] * 0.7 * 12 / 1000, abs=0.01
+        ronfe["population"] * kg * 12 / 1000, abs=0.01
     )
+    # a procura total é o têxtil que ainda vai para o lixo: 43 051 t × 5,4% = 2 324,754 t
+    assert sum(z["demand_t"] for z in zones) == pytest.approx(2324.75, abs=0.3)
 
 
 async def test_parameters_are_labelled_by_source(logged_in: httpx.AsyncClient) -> None:
     body = (await logged_in.get(f"{P}/parameters")).json()
     sources = {m["key"]: m["source"] for m in body["meta"]}
-    assert sources["modes.street.capture_rate"] == "vitrus_data"
-    assert sources["kg_per_inhab_month"] == "plan"
+    assert sources["kg_per_inhab_month"] == "vitrus_data"  # 43 051 t de RSU (Vitrus) × 5,4% (APA)
+    assert sources["modes.street.capture_rate"] == "assumption"  # sem calibração: as 301 t são de terceiros
     assert sources["cost_per_km_eur"] == "assumption"
-    street = body["values"]["modes"]["street"]
-    # calibrado: rua a cobrir 80% da população reproduz os 22,9% do potencial que a Vitrus recolhe hoje
-    assert street["capture_rate"] * street["coverage_factor"] == pytest.approx(0.229, abs=0.001)
+    assert set(sources.values()) <= {"vitrus_data", "assumption"}  # o plano municipal já não é fonte
+    # derivado, não escrito à mão: 43 051 000 kg × 0,054 ÷ 156 830 hab ÷ 12 = 1,23528 kg/hab/mês, a 4 casas no ecrã
+    assert body["values"]["kg_per_inhab_month"] == round(43_051_000 * 0.054 / 156_830 / 12, 4) == 1.2353
 
 
 async def test_only_admins_update_parameters(logged_in: httpx.AsyncClient, client: httpx.AsyncClient) -> None:
@@ -114,15 +117,28 @@ async def test_scenario_crud_and_flows(logged_in: httpx.AsyncClient) -> None:
 
 
 async def test_a_network_can_beat_what_vitrus_collects_today(logged_in: httpx.AsyncClient) -> None:
-    """Com orçamento folgado, combinar modos capta mais do que as 301 t de 2025; só de rua, o modelo reproduz-as."""
-    street_only = {z["code"]: ["street"] for z in (await logged_in.get(f"{P}/zones")).json()}
-    mono = (
-        await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=10_000_000, constraints=street_only))
-    ).json()
-    assert mono["tonnes_year"] == pytest.approx(301.3, rel=0.02)  # calibração com os dados reais da Vitrus
+    """Com orçamento folgado, a rede por omissão (sem contentores de têxtil) capta mais do que as 301 t de 2025."""
     mixed = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=10_000_000))).json()
-    assert mixed["tonnes_year"] > mono["tonnes_year"] * 1.2
+    assert mixed["tonnes_year"] > 301.3
+    assert mixed["result"]["kpis"]["potential_t"] == pytest.approx(2324.8, abs=0.3)
     combined = [a for a in mixed["result"]["allocations"] if len(a["modes"]) > 1]
     assert combined and all(
         sum(p["tonnes"] for p in a["parts"]) == pytest.approx(a["tonnes"], abs=0.01) for a in combined
     )
+
+
+async def test_default_modes_exclude_street(logged_in: httpx.AsyncClient) -> None:
+    """A Vitrus não tem contentores de têxtil: por omissão só local existente e recolha a pedido."""
+    s = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=10_000_000))).json()
+    assert s["result"]["default_modes"] == ["existing", "on_demand"]
+    used = {m for a in s["result"]["allocations"] for m in a["modes"]}
+    assert used and "street" not in used and {r["mode"] for r in s["result"]["routes"]} <= {"existing"}
+
+
+async def test_street_only_as_an_explicit_reference(logged_in: httpx.AsyncClient) -> None:
+    body = request_body(budget_eur_year=10_000_000, default_modes=["street"])
+    s = (await logged_in.post(f"{P}/scenarios", json=body)).json()
+    assert {m for a in s["result"]["allocations"] for m in a["modes"]} == {"street"}
+    # ao duplicar/alterar, o cenário repete os modos com que foi feito
+    assert s["result"]["default_modes"] == ["street"]
+    assert (await logged_in.post(f"{P}/scenarios", json={**body, "default_modes": []})).status_code == 422

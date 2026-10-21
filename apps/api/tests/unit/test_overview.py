@@ -27,10 +27,10 @@ def test_days_until() -> None:
     assert days_until(date(2025, 1, 1), date(2026, 10, 19)) is None
 
 
-def test_parish_potential_is_population_times_plan_rate() -> None:
-    # 9 708 hab × 0,7 kg/mês × 12 / 1000 = 81,5472 t/ano
-    assert parish_potential_t(9708, 0.7) == pytest.approx(81.5472)
-    assert parish_potential_t(0, 0.7) == 0
+def test_parish_potential_is_population_times_rate() -> None:
+    # 9 708 hab × 1,25 kg/mês × 12 / 1000 = 145,62 t/ano
+    assert parish_potential_t(9708, 1.25) == pytest.approx(145.62)
+    assert parish_potential_t(0, 1.25) == 0
 
 
 def test_share_pct() -> None:

@@ -41,9 +41,11 @@ class TextileBaseline(BaseModel):
     recycle_t: float
     reject_t: float
     kg_per_inhab_month: float = Field(description="Observado: toneladas recolhidas por habitante e mês")
-    estimated_demand_t: float = Field(description="Estimativa do plano municipal: 0,7 kg/hab/mês")
-    capture_of_demand_pct: float
-    gap_t: float
+    estimated_demand_t: float = Field(
+        description="Estimativa do têxtil gerado: o que vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + total_t"
+    )
+    capture_of_demand_pct: float = Field(description="total_t / estimated_demand_t, em % (estimativa)")
+    gap_t: float = Field(description="Têxtil que ainda vai para o lixo, por desviar (estimativa)")
 
 
 class FlowNode(BaseModel):
@@ -93,18 +95,27 @@ class OverviewDestinations(BaseModel):
 
 
 class OverviewGap(BaseModel):
-    """A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta."""
+    """A lacuna: o têxtil gerado (estimativa Vitrus + APA), o que se recolheu e o que ainda vai para o lixo."""
 
     year: int
-    potential_t: float = Field(description="Estimativa: população × 0,7 kg/hab/mês × 12 (plano municipal)")
+    potential_t: float = Field(
+        description="Estimativa do têxtil gerado: 43 051 t RSU × 5,4% (Vitrus + APA) + recolhido à parte"
+    )
     collected_t: float = Field(description="Dado Vitrus: recolhido em 2025 pelas 4 entidades")
-    missing_t: float = Field(description="potential_t − collected_t")
+    missing_t: float = Field(description="potential_t − collected_t: têxtil que ainda vai para o lixo")
     capture_pct: float = Field(description="collected_t / potential_t, em %")
     destinations: OverviewDestinations = Field(description="Destino observado do recolhido")
     kg_per_inhab_year: float = Field(description="Observado: recolhido por habitante e ano")
     kg_per_inhab_month: float = Field(description="Observado: recolhido por habitante e mês")
-    potential_kg_per_inhab_year: float = Field(description="Estimativa do plano: 0,7 × 12")
-    potential_kg_per_inhab_month: float = Field(description="Estimativa do plano: 0,7")
+    potential_kg_per_inhab_year: float = Field(description="Estimativa: têxtil gerado por habitante e ano")
+    potential_kg_per_inhab_month: float = Field(description="Estimativa: têxtil gerado por habitante e mês")
+    missing_kg_per_inhab_year: float = Field(
+        description="Estimativa: têxtil que ainda vai para o lixo por habitante e ano (43 051 t × 5,4% ÷ população)"
+    )
+    missing_kg_per_inhab_month: float = Field(
+        description="Estimativa: têxtil que ainda vai para o lixo por habitante e mês (base da procura do simulador)"
+    )
+    potential_source_label: str = Field(description="Fonte da estimativa do potencial")
     population: int = Field(description="Soma das freguesias (INE, Censos 2021)")
     parishes_count: int
     potential_is_estimate: bool = Field(default=True, description="O potencial é estimativa; o recolhido não")
@@ -121,7 +132,7 @@ class OverviewReference(BaseModel):
     source_url: str | None
     verified: bool = Field(description="Falso: valor registado mas por verificar; não usar em público")
     evidence: Evidence
-    is_estimate: bool = Field(description="Verdadeiro para o potencial do plano e valores aproximados")
+    is_estimate: bool = Field(description="Verdadeiro para o potencial estimado e valores aproximados")
 
 
 class OverviewMilestone(BaseModel):
@@ -145,7 +156,9 @@ class OverviewParish(BaseModel):
     name: str
     population: int
     tipau: Tipau | None
-    potential_t: float = Field(description="Estimativa: população × 0,7 kg/hab/mês × 12 / 1000")
+    potential_t: float = Field(
+        description="Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (Vitrus + APA) × 12 / 1000"
+    )
     potential_is_estimate: bool = True
     circuits_count: int = Field(description="Circuitos da Vitrus que passam em localidades da freguesia")
     localities_count: int

@@ -153,7 +153,9 @@ async def test_real_package_parishes_gap_and_caop(make_user: MakeUser) -> None:
     assert parishes["total"] == 48 and sum(p["containers"] for p in parishes["items"]) == 2722
     gap = (await user.get(f"{M}/gap-ranking", params={"limit": 5})).json()
     assert [r["name"] for r in gap["items"]][:2] == ["Lordelo", "União das freguesias de Tabuadelo e São Faustino"]
-    assert gap["items"][0]["gap_t_per_candidate_site"] == 25.78 and gap["parameters"]["capture_pct"] == 22.9
+    # Lordelo: 3 979 hab × 14,8234 kg/hab/ano (43 051 t × 5,4% ÷ 156 830) = 58,98 t no lixo, 0 candidatos (÷ 1)
+    assert gap["items"][0]["gap_t_per_candidate_site"] == 58.98 and gap["parameters"]["capture_pct"] == 11.5
+    assert gap["parameters"]["kg_per_inhab_month"] == 1.2353
     caop = (await user.get(f"{M}/parishes/caop.geojson")).json()
     assert len(caop["features"]) == 48 and all(
         f["geometry"]["type"] in {"Polygon", "MultiPolygon"} for f in caop["features"]

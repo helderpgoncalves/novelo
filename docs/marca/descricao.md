@@ -26,19 +26,19 @@ Ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães a
 
 ## Descrição
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil segundo o plano municipal de 2025, acima da média europeia. A partir de 2028, a recolha e o tratamento destes resíduos passam a ser financiados pelos produtores, e os municípios precisam de saber onde recolher, como e a que custo.
+Em 2025 a Vitrus recolheu 43 051 toneladas de resíduos urbanos em Guimarães; segundo a APA, 5,4% é têxtil, cerca de 2 324,8 toneladas por ano que ainda vão para o lixo (estimativa). A partir de 2028, a recolha e o tratamento destes resíduos passam a ser financiados pelos produtores, e os municípios precisam de saber onde recolher, como e a que custo.
 
-O Novelo responde a isso. Cruza população, caracterização do lixo e rede viária para propor onde colocar pontos de recolha, que modo usar em cada zona (pontos em locais existentes, contentores de rua ou recolha a pedido) e que rotas fazer. Cada cenário mostra investimento, custo anual de operação, toneladas desviadas de aterro e custo por tonelada, lado a lado.
+O Novelo responde a isso. Cruza população, caracterização do lixo e rede viária para propor onde colocar pontos de recolha, que modo usar em cada zona (pontos em locais existentes, sem contentor novo, ou recolha a pedido nos circuitos) e que rotas fazer. Cada cenário mostra investimento, custo anual de operação, toneladas desviadas de aterro e custo por tonelada, lado a lado.
 
-O decisor pode perguntar em português ("e se passarmos esta freguesia a recolha a pedido?") e o otimizador responde com um cenário novo, com números verificados. No ponto de entrega, uma fotografia da peça e da etiqueta classifica-a e junta-a a um lote com QR e passaporte; os lotes agregam-se por fibra numa bolsa para os recicladores do Vale do Ave. Um clique gera o relatório que a câmara vai precisar em 2028 para negociar a responsabilidade alargada do produtor.
+O decisor pode perguntar em português ("e se passarmos esta freguesia a recolha a pedido?") e o otimizador responde com um cenário novo, com números verificados. No ponto de entrega, uma fotografia da peça e da etiqueta controla a qualidade, classifica-a e junta-a a um lote com QR e passaporte; os lotes agregam-se por fibra numa bolsa para os recicladores do Vale do Ave. Um clique gera o relatório que a câmara vai precisar em 2028 para negociar a responsabilidade alargada do produtor.
 
 ## Description (EN)
 
-In Guimarães, textiles make up 5.4% of mixed municipal waste according to the 2025 municipal action plan, above the EU average. From 2028, producers will fund textile collection and treatment, and municipalities need to know where to collect, how, and at what cost.
+In 2025 Vitrus collected 43,051 tonnes of municipal waste in Guimarães; according to the Portuguese Environment Agency (APA), 5.4% of it is textiles, about 2,324.8 tonnes a year still going to waste (estimate). From 2028, producers will fund textile collection and treatment, and municipalities need to know where to collect, how, and at what cost.
 
-Novelo answers that. It combines population, waste composition and the road network to propose where to place collection points, which mode fits each area (drop-off at existing venues, street containers or on-demand pickup) and which routes to run. Each scenario shows investment, yearly operating cost, tonnes diverted from landfill and cost per tonne, side by side.
+Novelo answers that. It combines population, waste composition and the road network to propose where to place collection points, which mode fits each area (drop-off at existing venues with no new container, or on-demand pickup on existing rounds) and which routes to run. Each scenario shows investment, yearly operating cost, tonnes diverted from landfill and cost per tonne, side by side.
 
-Decision-makers can ask in plain Portuguese ("what if this parish switched to on-demand pickup?") and the optimiser answers with a new scenario and verified numbers. At drop-off, one photo of the garment and its label classifies it and adds it to a lot with a QR passport; lots are pooled by fibre in a marketplace for Ave Valley recyclers. One click produces the report the municipality will need in 2028 to negotiate extended producer responsibility.
+Decision-makers can ask in plain Portuguese ("what if this parish switched to on-demand pickup?") and the optimiser answers with a new scenario and verified numbers. At drop-off, one photo of the garment and its label checks its quality, classifies it and adds it to a lot with a QR passport; lots are pooled by fibre in a marketplace for Ave Valley recyclers. One click produces the report the municipality will need in 2028 to negotiate extended producer responsibility.
 
 ## Palavras-chave
 

@@ -9,7 +9,7 @@ import { HeroFio } from './hero-fio';
 import { HERO_SKY } from './landing-assets.generated';
 import { CONTAINER } from './layout';
 
-/** Separa o primeiro número com «%» do título («23 %»): vai em itálico verde (Newsreader Display Italic). */
+/** Separa o primeiro número com «%» do título («11,5 %»): vai em itálico verde (Newsreader Display Italic). */
 function splitTitle(title: string): [string, string | null, string] {
   const match = /\d+(?:[.,]\d+)?[\s ]?%/.exec(title);
   if (!match) return [title, null, ''];
@@ -17,9 +17,9 @@ function splitTitle(title: string): [string, string | null, string] {
 }
 
 /**
- * Topo da página: uma pergunta com a resposta por descobrir. O título diz o que ninguém diz («Guimarães recolhe 23 % do têxtil
- * que podia»), o subtítulo promete o método e o objeto do hero é o fio (`HeroFio`): desenha-se do vale ao campanário da Penha,
- * cheio até aos 22,9 % que a Vitrus já recolhe e a tracejado até ao potencial. Os ganchos (a pergunta das toneladas em falta, o
+ * Topo da página: uma pergunta com a resposta por descobrir. O título diz o que ninguém diz («Guimarães recolhe à parte 11,5 % do
+ * têxtil que gera»), o subtítulo promete o método e o objeto do hero é o fio (`HeroFio`): desenha-se do vale ao campanário da Penha,
+ * cheio até aos 11,5 % que a Vitrus já recolhe e a tracejado até ao potencial. Os ganchos (a pergunta das toneladas em falta, o
  * prazo europeu de 17 abr 2028) levam ao «Problema»; o botão primário leva ao «Método». Tudo numa grelha de 12 colunas com uma
  * só margem esquerda, a da barra de navegação. A fotografia é a Penha ao fim do dia (RaquelRosa7, CC BY-SA 4.0), em meio-tom;
  * em ecrã largo é enquadrada para o campanário ficar onde o fio termina. O texto não anima (LCP).

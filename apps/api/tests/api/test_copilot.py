@@ -28,7 +28,7 @@ async def test_run_scenario_creates_a_copilot_scenario_and_a_card(logged_in: htt
     resp = await logged_in.post(C, json=ask("Simula um cenário com 60 mil euros por ano"))
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v3"
+    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v4"
     assert [t["name"] for t in body["tools_used"]] == ["run_scenario"] and body["tools_used"][0]["ok"] is True
     card = body["cards"][0]
     assert card["created_now"] is True and card["label"].startswith("Copilot · ")
@@ -58,7 +58,7 @@ async def test_second_failure_returns_only_cards_with_a_warning(logged_in: httpx
 
 
 async def test_user_numbers_and_rounding_are_accepted(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
-    llm.queue_chat([("get_baseline", {})], "Recolheram-se 301,3 t em 2025, cerca de 23% do potencial.")
+    llm.queue_chat([("get_baseline", {})], "Recolheram-se 301,3 t em 2025, cerca de 11% do têxtil gerado.")
     body = (await logged_in.post(C, json=ask("Quanto recolhemos?"))).json()
     assert body["verified"] is True and body["cards"] == []
     llm.queue_chat("Com os 20 000 € que indicou, ainda não corri nada.")

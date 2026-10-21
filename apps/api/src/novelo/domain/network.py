@@ -19,6 +19,7 @@ forma exata para as 48 freguesias de Guimarães.
 from __future__ import annotations
 
 import math
+from collections.abc import Collection
 from dataclasses import dataclass, field
 from itertools import combinations
 from typing import Literal
@@ -182,11 +183,21 @@ def build_option(zone: Zone, modes: tuple[Mode, ...], params: Params) -> Option:
     )
 
 
-def build_options(zones: list[Zone], params: Params, allowed: dict[str, set[Mode]] | None = None) -> list[Option]:
-    """Todas as combinações de modos por zona. `allowed` restringe os modos (ex.: "só a pedido em Serzedelo")."""
+def build_options(
+    zones: list[Zone],
+    params: Params,
+    allowed: dict[str, set[Mode]] | None = None,
+    default_modes: Collection[Mode] | None = None,
+) -> list[Option]:
+    """Todas as combinações de modos por zona.
+
+    `allowed` restringe os modos por zona (ex.: "só a pedido em Serzedelo"); as zonas sem entrada usam `default_modes`
+    (omitido = todos os modos).
+    """
+    fallback = set(default_modes) if default_modes is not None else set(Mode)
     options = []
     for zone in zones:
-        modes = [m for m in Mode if m in (allowed.get(zone.id, set(Mode)) if allowed else set(Mode))]
+        modes = [m for m in Mode if m in (allowed or {}).get(zone.id, fallback)]
         for size in range(1, len(modes) + 1):
             options += [build_option(zone, combo, params) for combo in combinations(modes, size)]
     return options

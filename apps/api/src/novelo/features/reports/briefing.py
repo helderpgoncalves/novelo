@@ -49,6 +49,10 @@ def build_facts(scenarios: list[ScenarioOut], baseline: TextileBaseline, locale:
             "collected_t": n(baseline.total_t, 1),
             "capture_of_potential_pct": n(baseline.capture_of_demand_pct, 1),
             "estimated_potential_t_per_year": n(baseline.estimated_demand_t, 0),
+            "still_to_divert_t_per_year": n(baseline.gap_t, 0),
+            "potential_source": "Vitrus 2025 RSU × APA textile share (estimate)"
+            if not pt
+            else "RSU da Vitrus em 2025 × percentagem de têxtil da APA (estimativa)",
             "reuse_t": n(baseline.reuse_t, 1),
             "recycle_t": n(baseline.recycle_t, 1),
             "reject_t": n(baseline.reject_t, 1),
@@ -81,12 +85,14 @@ def fallback_text(facts: dict[str, Any]) -> str:
     if facts["language"] == "en":
         return (
             f"In 2025, {collected} t of textiles were collected in Guimarães, {capture}% of the estimated "
-            f'potential of {potential} t per year. Scenario "{name}" captures {tonnes} t per year at {eur_t} €/t, '
+            f"textile generated, {potential} t per year (Vitrus and APA). "
+            f'Scenario "{name}" captures {tonnes} t per year at {eur_t} €/t, '
             f"with an annual cost of {cost} €. Projected values are estimates based on the stated assumptions."
         )
     return (
-        f"Em 2025 recolheram-se {collected} t de têxtil em Guimarães, {capture}% do potencial estimado de "
-        f'{potential} t por ano. O cenário "{name}" capta {tonnes} t por ano a {eur_t} €/t, com um custo anual '
+        f"Em 2025 recolheram-se {collected} t de têxtil em Guimarães, {capture}% do têxtil gerado, estimado em "
+        f"{potential} t por ano (Vitrus e APA). "
+        f'O cenário "{name}" capta {tonnes} t por ano a {eur_t} €/t, com um custo anual '
         f"de {cost} €. Os valores previstos são estimativas assentes nos pressupostos indicados."
     )
 

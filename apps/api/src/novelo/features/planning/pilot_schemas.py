@@ -2,6 +2,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from novelo.domain.pilot import DEFAULT_MODES
 from novelo.domain.vocab import CollectionMode, Tipau
 
 
@@ -9,9 +10,11 @@ class PilotRequest(BaseModel):
     k: int = Field(default=2, ge=2, le=4, description="Número de freguesias do piloto")
     months: int = Field(default=3, ge=1, le=12, description="Duração do piloto em meses")
     modes: list[CollectionMode] = Field(
-        default_factory=lambda: [CollectionMode.STREET, CollectionMode.ON_DEMAND],
+        default=list(DEFAULT_MODES),  # o Pydantic copia a lista em cada pedido
         min_length=1,
-        description="Modos de recolha a testar no piloto",
+        description=(
+            "Modos de recolha a testar no piloto; por omissão `existing` e `on_demand` (`street` só como referência)"
+        ),
     )
     min_tonnes_pilot: float | None = Field(
         default=None,

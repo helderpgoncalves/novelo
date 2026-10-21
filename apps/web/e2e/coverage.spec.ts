@@ -6,14 +6,12 @@ test.describe('cobertura da rede e contentores', () => {
     await login(page);
   });
 
-  test('estado à espera de dados explica que faltam as localizações dos contentores de têxteis', async ({
-    page,
-  }) => {
+  test('estado sem dados explica que a Vitrus não tem contentores de têxtil', async ({ page }) => {
     await page.goto('/pt/coverage');
     await expect(page.getByRole('heading', { level: 1, name: 'Cobertura da rede' })).toBeVisible();
     await expect(
       page.getByRole('heading', {
-        name: /localizações dos contentores de têxteis ainda estão por chegar/,
+        name: /A Vitrus não tem contentores de têxtil/,
       }),
     ).toBeVisible();
     // A referência francesa leva sempre o selo enquanto não estiver verificada.
@@ -52,9 +50,9 @@ test.describe('cobertura da rede e contentores', () => {
     await page.goto('/pt/map');
     await expect(page.getByRole('heading', { level: 1, name: 'Mapa da rede' })).toBeVisible();
     await expect(page.getByText(/Contentores/).first()).toBeVisible();
-    // Sem contentores importados a camada fica desligada e explica porquê.
+    // A Vitrus não tem contentores de têxtil: a camada fica desligada e explica porquê.
     await expect(page.getByRole('switch', { name: /Contentores/ })).toBeDisabled();
-    await expect(page.getByText(/chegam a 20 de outubro/)).toBeVisible();
+    await expect(page.getByText(/esta camada fica vazia/)).toBeVisible();
     await page.waitForTimeout(1500);
     expect(errors).toEqual([]);
   });

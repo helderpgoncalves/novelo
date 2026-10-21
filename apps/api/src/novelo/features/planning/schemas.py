@@ -9,12 +9,15 @@ from novelo.domain.vocab import CollectionMode, ScenarioObjective, ScenarioStatu
 
 Siting = Literal["parish", "sites"]
 
+# Modos oferecidos por omissão: local existente e recolha a pedido. A Vitrus não tem contentores de têxtil nem os quer
+# (contaminação); `street` continua no vocabulário só como referência explícita (ex.: benchmark francês).
+DEFAULT_SCENARIO_MODES: tuple[CollectionMode, ...] = (CollectionMode.EXISTING, CollectionMode.ON_DEMAND)
+
 
 class ParamSource(StrEnum):
     """Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite."""
 
-    PLAN = "plan"  # Plano de Ação para a Circularidade Têxtil de Guimarães
-    VITRUS_DATA = "vitrus_data"  # calibrado com os dados reais da Vitrus
+    VITRUS_DATA = "vitrus_data"  # dados reais da Vitrus (com a APA, para o têxtil no RSU)
     ASSUMPTION = "assumption"  # pressuposto da equipa, a validar com a Vitrus
 
 
@@ -29,7 +32,11 @@ class ModeParams(BaseModel):
 
 
 class PlanningParams(BaseModel):
-    kg_per_inhab_month: float = Field(gt=0, le=5, description="Têxtil gerado por habitante e mês")
+    kg_per_inhab_month: float = Field(
+        gt=0,
+        le=5,
+        description="Têxtil que ainda vai para o lixo por habitante e mês (43 051 t RSU × 5,4%, Vitrus + APA)",
+    )
     modes: dict[CollectionMode, ModeParams]
     cost_per_collection_eur: float = Field(ge=0)
     cost_per_km_eur: float = Field(ge=0)
@@ -87,7 +94,17 @@ class ScenarioRequest(BaseModel):
     target_tonnes: float | None = Field(default=None, ge=0, description="Meta de captura (min_cost)")
     params: PlanningParams | None = Field(default=None, description="Pressupostos; omitido = os do conjunto ativo")
     constraints: dict[str, list[CollectionMode]] = Field(
-        default_factory=dict, description="Modos permitidos por freguesia (código INE); omitido = todos"
+        default_factory=dict,
+        description="Modos permitidos por freguesia (código INE); as freguesias omitidas usam `default_modes`",
+    )
+    default_modes: list[CollectionMode] = Field(
+        default=list(DEFAULT_SCENARIO_MODES),  # o Pydantic copia a lista em cada pedido
+        min_length=1,
+        description=(
+            "Modos permitidos nas freguesias sem restrição em `constraints`. Por omissão `existing` e `on_demand`: a "
+            "Vitrus não tem contentores de têxtil; `street` só como referência explícita. Em `sites` o modo dos locais "
+            "é `site_mode` e isto só decide se a recolha a pedido pode completar a rede"
+        ),
     )
     parent_id: uuid.UUID | None = None
     siting: Siting = Field(
@@ -100,8 +117,11 @@ class ScenarioRequest(BaseModel):
         description="Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)",
     )
     site_mode: CollectionMode = Field(
-        default=CollectionMode.STREET,
-        description="Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)",
+        default=CollectionMode.EXISTING,
+        description=(
+            "Pressupostos de captura e custo usados nos locais: `existing` (paragem com sacos fechados nos locais "
+            "municipais onde a viatura já passa, sem contentor novo) ou `street` (contentor de rua, só referência)"
+        ),
     )
 
     @model_validator(mode="after")
@@ -226,6 +246,10 @@ class ScenarioResult(BaseModel):
     depot: list[float]
     sites: list[SiteSelection] = Field(default_factory=list, description="Locais abertos (só cenários por locais)")
     siting: SitingSummary | None = Field(default=None, description="Preenchido nos cenários por locais")
+    default_modes: list[CollectionMode] = Field(
+        default_factory=lambda: list(CollectionMode),
+        description="Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)",
+    )
 
 
 class ScenarioSummary(BaseModel):
@@ -252,11 +276,12 @@ class ScenarioOut(ScenarioSummary):
     result: ScenarioResult
 
     def siting_options(self) -> dict[str, object]:
-        """Campos de `ScenarioRequest` que repetem a rede por locais ao duplicar ou alterar este cenário."""
+        """Campos de `ScenarioRequest` que repetem os modos e a rede por locais ao duplicar ou alterar este cenário."""
         s = self.result.siting
         if s is None:
-            return {}
+            return {"default_modes": self.result.default_modes}
         return {
+            "default_modes": self.result.default_modes,
             "siting": "sites",
             "site_radius_m": s.radius_m,
             "site_mode": s.site_mode,
