@@ -1211,6 +1211,42 @@ html:has([data-landing]) {
   }
 }
 
+/* Progresso de leitura: 2 px na cor primária no topo da janela, por cima da barra de navegação (ver reading-progress.tsx). */
+.lp-progress {
+  position: fixed;
+  z-index: 50;
+  inset: 0 0 auto;
+  height: 2px;
+  background: var(--primary);
+  transform: scaleX(0);
+  transform-origin: left;
+  pointer-events: none;
+}
+@keyframes lp-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@supports (animation-timeline: scroll()) {
+  .lp-progress {
+    animation: lp-progress linear both;
+    animation-timeline: scroll(root);
+  }
+}
+/* Números que contam: a caixa tem desde o início a largura do valor final (count-up.tsx, hero-count.tsx). */
+.lp-count {
+  display: inline-grid;
+}
+.lp-count > [aria-hidden] {
+  grid-area: 1 / 1;
+}
+.lp-count-ghost {
+  visibility: hidden;
+}
+
 /* «Nesta página» (≥ 1536 px): coluna fixa alinhada com a margem do conteúdo, só depois do hero, com progresso de leitura. */
 .lp-toc {
   display: none;
@@ -1624,6 +1660,16 @@ html:has([data-lp-fonts]) .lp-kicker {
   [data-reveal='shown'] .lp-timeline > li:not(:last-child)::after {
     transition: transform 800ms var(--ease-out) calc(400ms + var(--i, 0) * 500ms);
   }
+  /* Método (≥ lg): a linha desenha-se a velocidade constante e cada passo assenta quando ela lá chega (passos a 0, 25, 50,
+     75 e 100 % da linha; 1400 ms no total). */
+  .lp-pipe[data-reveal='shown'] [data-draw] {
+    transition: stroke-dashoffset 1400ms linear 200ms;
+  }
+  @media (min-width: 1024px) {
+    .lp-pipe[data-reveal='shown'][data-fx='stagger'] [data-s] {
+      transition-delay: calc(150ms + var(--i, 0) * 350ms);
+    }
+  }
   /* Entrada do visual do hero (só opacidade e transform; o texto nunca anima, por causa do LCP). */
   @keyframes lp-rise {
     from {
@@ -1751,15 +1797,15 @@ body:has([data-landing]) {
     transform 900ms var(--ease-out);
 }
 
-/* ---------- Hero: o fio solto ----------
-   Uma pergunta com a resposta por descobrir: o título, um fio que se desenha do vale ao campanário da Penha (cheio até aos 11,5 %
-   que a Vitrus já recolhe, a tracejado até ao potencial) e três marcas com os números. Grelha de 12 colunas e uma só margem
-   esquerda (a da barra de navegação, `--hs-m`). Três arranjos, com as mesmas condições de media que as fontes do <picture>
-   (landing-assets.generated.ts):
-   - telemóvel (< 640 px): a fotografia 4:5 em cima, o título por cima da base dissolvida e o fio na vertical, em baixo do texto;
-   - tablet de pé: o mesmo, com o fio na horizontal por baixo do texto (sem fotografia por trás);
-   - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura, enquadrada por unidades de contentor (`cqw`, `cqh`)
-     para o campanário cair no fim do fio: o fio e a fotografia partilham a mesma geometria, por isso nunca se desencontram. */
+/* ---------- Hero: título, painel dos números e o fio ----------
+   O título e o subtítulo à esquerda; os números num painel no fluxo do texto (`.lp-hsl`), nunca por cima da fotografia; o fio é
+   só gráfico. Grelha de 12 colunas e uma só margem esquerda (a da barra de navegação, `--hs-m`). Três arranjos, com as mesmas
+   condições de media que as fontes do <picture> (landing-assets.generated.ts):
+   - telemóvel (< 640 px): a fotografia 4:5 cobre o primeiro ecrã, o texto assenta na metade de baixo; o painel vem logo a seguir;
+   - tablet de pé: a fotografia em cima, o texto e o painel por baixo (sem fio: o painel leva o fio em miniatura);
+   - largo (>= 640 px e proporção >= 6:5): fotografia 16:10 a toda a largura, presa ao fundo, com o fio a acabar no campanário.
+     O campanário fica a `--hs-reach` (proporcional à largura) do fundo e a grelha do texto reserva essa altura por baixo de si,
+     por isso texto e fio nunca se cruzam, a nenhuma largura nem altura (garantido por e2e/hero-layout.spec.ts). */
 .lp-hs {
   --hs-sky: var(--hero-sky-light, #f4ead9);
   --hs-h: clamp(15rem, 56svh, 40rem);
@@ -1772,7 +1818,7 @@ body:has([data-landing]) {
   min-height: 100svh;
   background-color: var(--background);
   padding-top: calc(var(--hs-h) - 3.75rem);
-  padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  padding-bottom: max(2.5rem, env(safe-area-inset-bottom));
 }
 .dark .lp-hs {
   --hs-sky: var(--hero-sky-dark, #2a2c21);
@@ -1782,6 +1828,7 @@ body:has([data-landing]) {
   z-index: -1;
   inset: 0 0 auto;
   height: var(--hs-h);
+  overflow: clip;
   background-color: var(--hs-sky);
   -webkit-mask-image: linear-gradient(
     to bottom,
@@ -1824,6 +1871,7 @@ body:has([data-landing]) {
   position: relative;
   display: flex;
   flex-direction: column;
+  gap: 2.5rem;
 }
 .lp-hs-copy {
   display: flex;
@@ -1860,7 +1908,7 @@ body:has([data-landing]) {
   white-space: nowrap;
 }
 .lp-hs-lead {
-  max-width: 32rem;
+  max-width: 34rem;
   font-size: clamp(1rem, 0.9rem + 0.5vw, 1.1875rem);
   line-height: 1.5;
   text-wrap: pretty;
@@ -1894,7 +1942,7 @@ body:has([data-landing]) {
   text-decoration-color: currentColor;
 }
 .lp-hs-link:focus-visible,
-.lp-fm-hook:focus-visible {
+.lp-hsl-hook:focus-visible {
   box-shadow: 0 0 0 2px var(--ring);
 }
 /* Gancho de urgência: a data do prazo europeu; a contagem de dias só existe no cliente. */
@@ -1928,32 +1976,244 @@ body:has([data-landing]) {
   align-items: baseline;
   gap: 0.25rem 1.5rem;
 }
+/* Escuro: o céu do pôr do sol é claro por trás do eyebrow e do prazo; um halo denso do tom do papel garante o contraste (AA). */
+.dark .lp-hs-eyebrow-row,
+.dark .lp-hs-eyebrow-row .lp-hs-deadline-compact {
+  text-shadow:
+    0 0 2px var(--background),
+    0 0 6px var(--background),
+    0 0 12px var(--background),
+    0 0 20px color-mix(in oklab, var(--background) 80%, transparent);
+}
+.dark .lp-hs-eyebrow-row .lp-hs-deadline-days {
+  color: color-mix(in oklab, var(--primary) 70%, var(--foreground));
+}
 /* A versão compacta do prazo (data e dias) só existe no hero largo, ao lado do eyebrow. */
 .lp-hs-deadline-compact {
   display: none;
 }
 .lp-hs-after {
-  padding-top: 0;
+  padding-top: 1.75rem;
 }
 
-/* O fio. Por defeito, na vertical (telemóvel): o traço à esquerda, na margem, e as marcas ao lado. */
-.lp-hs-trace {
+/* Painel dos números (livro-razão): papel translúcido com desfoque e uma linha fina, legível sobre a fotografia nos dois temas
+   (AA). Algarismos tabulares; o que falta em destaque, a verde. O fio em miniatura mostra os 11,5 %. */
+.lp-hsl {
+  --hsl-line: color-mix(in oklab, var(--foreground) 13%, transparent);
+  --hsl-paper: color-mix(in oklab, var(--card) 76%, transparent);
   position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 30rem;
+  padding: 1.125rem 1.25rem 0.875rem;
+  border: 1px solid color-mix(in oklab, var(--foreground) 15%, transparent);
+  border-radius: 1.25rem;
+  background: var(--hsl-paper);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  backdrop-filter: blur(18px) saturate(1.15);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #fff 50%, transparent),
+    0 28px 56px -40px color-mix(in oklab, var(--foreground) 60%, transparent);
+  font-variant-numeric: tabular-nums;
+}
+.dark .lp-hsl {
+  --hsl-paper: color-mix(in oklab, var(--background) 72%, transparent);
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklab, #fff 7%, transparent),
+    0 28px 56px -36px rgb(0 0 0 / 0.7);
+}
+.lp-hsl-kicker {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--hsl-line);
+  font: 500 11px/1.3 var(--lp-mono);
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: color-mix(in oklab, var(--foreground) 74%, transparent);
+}
+.lp-hsl-list {
+  display: flex;
+  flex-direction: column;
+}
+.lp-hsl-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: baseline;
+  column-gap: 1rem;
+  row-gap: 0.75rem;
+  padding-block: 0.8125rem;
+  border-bottom: 1px solid var(--hsl-line);
+}
+.lp-hsl-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.3125rem 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.3;
+  color: color-mix(in oklab, var(--foreground) 88%, transparent);
+}
+.lp-hsl-tag {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.1875rem 0.4375rem;
+  border: 1px solid color-mix(in oklab, currentColor 30%, transparent);
+  border-radius: 999px;
+  font: 600 9.5px/1 var(--lp-mono);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+.lp-hsl-tag[data-k='measured'] {
+  color: var(--primary);
+  border-color: color-mix(in oklab, var(--primary) 40%, transparent);
+  background: color-mix(in oklab, var(--primary) 9%, transparent);
+}
+.lp-hsl-v {
+  font-family: 'Newsreader Display', 'Newsreader', Georgia, serif;
+  font-size: 1.625rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  text-align: right;
+  white-space: nowrap;
+}
+.lp-hsl-row[data-k='gap'] {
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 0;
+}
+.lp-hsl-row[data-k='gap'] .lp-hsl-label {
+  font-weight: 500;
+  color: var(--foreground);
+}
+.lp-hsl-row[data-k='gap'] .lp-hsl-v {
+  font-size: clamp(2.75rem, 2.2rem + 1.6vw, 3.5rem);
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: var(--primary);
+}
+/* O fio em miniatura: cheio até `--p` (11,5 %), um nó, tracejado até ao fim e a ponta a desfiar. */
+.lp-hsl-bar {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+.lp-hsl-track {
+  position: relative;
+  display: block;
+  height: 0.875rem;
+  margin-right: 1.125rem;
+}
+.lp-hsl-solid,
+.lp-hsl-dash {
+  position: absolute;
+  top: 50%;
+}
+.lp-hsl-solid {
+  left: 0;
+  width: calc(var(--p) * 100%);
+  height: 3px;
+  margin-top: -1.5px;
+  border-radius: 2px;
+  background: var(--primary);
+  transform-origin: left;
+}
+.lp-hsl-dash {
+  left: calc(var(--p) * 100%);
+  right: 0;
+  height: 1.5px;
+  margin-top: -0.75px;
+  background: repeating-linear-gradient(90deg, var(--primary) 0 6px, transparent 6px 11px);
+}
+.lp-hsl-knot {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--p) * 100%);
+  width: 0.6875rem;
+  height: 0.6875rem;
+  margin: -0.34375rem 0 0 -0.34375rem;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 0 3px var(--card);
+}
+.dark .lp-hsl-knot {
+  box-shadow: 0 0 0 3px var(--background);
+}
+.lp-hsl-fray {
+  position: absolute;
+  top: 50%;
+  left: 100%;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin-top: -0.5625rem;
+  overflow: visible;
+}
+.lp-hsl-fray path {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 1.25px;
+  stroke-linecap: round;
+  stroke-dasharray: 2 2.5;
+  vector-effect: non-scaling-stroke;
+}
+.lp-hsl-share {
+  font: 500 11px/1.3 var(--lp-mono);
+  color: var(--primary);
+}
+.lp-hsl-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.lp-hsl-hook {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--primary) 55%, transparent);
+  text-underline-offset: 0.3em;
+  outline: none;
+}
+.lp-hsl-hook svg {
+  color: var(--primary);
+  transition: transform 220ms var(--ease-out);
+}
+.lp-hsl-hook:hover {
+  text-decoration-color: currentColor;
+}
+.lp-hsl-hook:hover svg {
+  transform: translateX(3px);
+}
+.lp-hsl-src {
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--hsl-line);
+  font: 400 10.5px/1.5 var(--lp-mono);
+  color: color-mix(in oklab, var(--foreground) 76%, transparent);
+  text-wrap: pretty;
+}
+
+/* O fio (só gráfico; só no hero largo). O traço é desenhado num `viewBox` de proporção fixa, sem deformar a curva. */
+.lp-hs-trace {
+  display: none;
 }
 .lp-fio {
   position: relative;
-  height: 14rem;
-  margin: 1rem 0 8rem;
-  padding-left: 1.75rem;
+  aspect-ratio: 1000 / 200;
 }
 .lp-fio-h {
-  display: none;
-}
-.lp-fio-v {
   position: absolute;
-  left: 0;
-  top: 0;
-  width: 0.75rem;
+  inset: 0;
+  width: 100%;
   height: 100%;
   overflow: visible;
 }
@@ -1983,8 +2243,8 @@ body:has([data-landing]) {
 }
 .lp-fio-node {
   position: absolute;
-  left: 0.375rem;
-  top: calc(var(--vy) * 100%);
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
   width: 0.75rem;
   height: 0.75rem;
   margin: -0.375rem 0 0 -0.375rem;
@@ -2001,13 +2261,12 @@ body:has([data-landing]) {
 }
 .lp-fio-fray {
   position: absolute;
-  left: 0.375rem;
-  top: 100%;
-  width: 2.25rem;
-  height: 2.25rem;
+  left: calc(var(--x) * 100%);
+  top: calc(var(--y) * 100%);
+  width: 2.5rem;
+  height: 2.5rem;
   overflow: visible;
-  transform-origin: 5% 50%;
-  transform: translate(-5%, -50%) rotate(84deg);
+  transform: translate(-5%, -50%);
 }
 .lp-fio-fray path {
   fill: none;
@@ -2017,102 +2276,9 @@ body:has([data-landing]) {
   stroke-dasharray: 2.5 3.5;
   vector-effect: non-scaling-stroke;
 }
-.lp-fio-brace {
-  display: none;
-}
-.lp-fm {
-  position: absolute;
-  left: 1.75rem;
-  top: calc(var(--vy) * 100% - 0.9rem);
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-  text-shadow:
-    0 0 0.5rem var(--background),
-    0 0 0.25rem var(--background);
-}
-.lp-fm-body {
-  display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
-}
-.lp-fm-v {
-  font-family: 'Newsreader Display', 'Newsreader', Georgia, serif;
-  font-size: 2rem;
-  font-weight: 500;
-  line-height: 1;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.lp-fm[data-k='gap'] .lp-fm-v {
-  font-size: 2.75rem;
-  color: var(--primary);
-}
-.lp-fm-l {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.25rem 0.5rem;
-  font: 400 11px/1.4 var(--lp-mono);
-  color: color-mix(in oklab, var(--foreground) 94%, transparent);
-}
-.lp-fm-tag {
-  display: inline-flex;
-  align-items: center;
-  margin: 0;
-  padding: 0.1875rem 0.5rem;
-  border: 1px solid color-mix(in oklab, currentColor 28%, transparent);
-  border-radius: 999px;
-  font: 600 10px/1 var(--lp-mono);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-shadow: none;
-}
-.lp-fm-hook {
-  display: block;
-  padding-block: 0.625rem;
-  margin-top: -0.25rem;
-  border-radius: 0.375rem;
-  font-size: 0.9375rem;
-  font-weight: 500;
-  line-height: 1.3;
-  color: var(--foreground);
-  text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--primary) 55%, transparent);
-  text-underline-offset: 0.3em;
-  outline: none;
-}
-.lp-fm-hook:hover {
-  text-decoration-color: currentColor;
-}
-.lp-fm-hook svg {
-  display: inline-block;
-  margin-left: 0.375rem;
-  vertical-align: -0.2em;
-  color: var(--primary);
-}
-.lp-fio-src {
-  position: absolute;
-  left: 0;
-  top: calc(100% + 6rem);
-  width: max-content;
-  max-width: calc(100vw - 3rem);
-  font: 400 11px/1.4 var(--lp-mono);
-  color: color-mix(in oklab, var(--foreground) 86%, transparent);
-  text-shadow:
-    0 0 0.375rem var(--background),
-    0 0 0.375rem var(--background),
-    0 0 0.75rem var(--background);
-}
-.lp-fio-src-est {
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  font-weight: 600;
-}
 
-/* Chegada: o fio desenha-se (1,4 s, uma vez) e cada marca assenta quando o fio lá chega. Só stroke-dashoffset, opacidade e transform. */
+/* Chegada: o fio desenha-se (1,4 s, uma vez); o painel assenta linha a linha e os números contam (HeroCount) quando a linha
+   chega; o fio em miniatura desenha-se a seguir. Só stroke-dashoffset, opacidade, transform e clip-path; o título não anima. */
 @keyframes lp-hs-fade {
   from {
     opacity: 0;
@@ -2123,16 +2289,34 @@ body:has([data-landing]) {
     stroke-dashoffset: 1;
   }
 }
-@keyframes lp-fm-in {
-  from {
-    opacity: 0;
-    transform: translateY(0.5rem);
-  }
-}
 @keyframes lp-fio-pop {
   from {
     opacity: 0;
     scale: 0.3;
+  }
+}
+@keyframes lp-hsl-card {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.985);
+  }
+}
+@keyframes lp-hsl-grow {
+  from {
+    transform: scaleX(0);
+  }
+}
+@keyframes lp-hsl-wipe {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes lp-hs-parallax {
+  to {
+    translate: 0 var(--hs-px, 14svh);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
@@ -2142,21 +2326,44 @@ body:has([data-landing]) {
   .lp-fio-reveal {
     animation: lp-fio-draw 1400ms var(--ease-out) 250ms both;
   }
-  .lp-fm {
-    animation: lp-fm-in 600ms var(--ease-out) var(--d, 0ms) both;
-  }
   .lp-fio-node {
-    animation: lp-fio-pop 400ms var(--ease-out) calc(var(--d, 600ms) - 120ms) both;
+    animation: lp-fio-pop 400ms var(--ease-out) 600ms both;
   }
   .lp-fio-node[data-k='gap'] {
-    --d: 1050ms;
+    animation-delay: 1000ms;
   }
   .lp-fio-fray {
     animation: lp-hs-fade 700ms ease-out 1500ms both;
   }
-  .lp-fio-brace,
-  .lp-fio-src {
-    animation: lp-hs-fade 700ms ease-out 700ms both;
+  .lp-hsl {
+    animation: lp-hsl-card 900ms var(--ease-out) 150ms both;
+  }
+  .lp-hsl-in {
+    animation: lp-rise 700ms var(--ease-out) calc(260ms + var(--i, 0) * 110ms) both;
+  }
+  .lp-hsl-solid {
+    animation: lp-hsl-grow 600ms var(--ease-out) 700ms both;
+  }
+  .lp-hsl-knot {
+    animation: lp-fio-pop 380ms var(--ease-out) 1180ms both;
+  }
+  .lp-hsl-dash {
+    animation: lp-hsl-wipe 1000ms var(--ease-out) 1250ms both;
+  }
+  .lp-hsl-fray {
+    animation: lp-hs-fade 600ms ease-out 2100ms both;
+  }
+}
+/* Parallax da fotografia (e do fio, que tem de acabar sempre no campanário): ligado ao scroll, no compositor. Sem suporte
+   de `animation-timeline` fica parado. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .lp-hs-media picture,
+    .lp-fio {
+      animation: lp-hs-parallax linear both;
+      animation-timeline: scroll(root);
+      animation-range: 0 100svh;
+    }
   }
 }
 
@@ -2170,13 +2377,16 @@ body:has([data-landing]) {
   .lp-hs-eyebrow::before {
     width: 1rem;
   }
+  .lp-hsl {
+    padding-inline: 1rem;
+  }
 }
-/* Telemóvel (< 640 px): o hero é um ecrã inteiro. A fotografia cobre-o de alto a baixo, o texto assenta na metade de baixo
-   sobre um véu da cor do papel, e o hero acaba nos dois botões, na margem. O fio e o prazo vêm logo a seguir, já sem fotografia. */
+/* Telemóvel (< 640 px): o primeiro ecrã é a fotografia com o texto na metade de baixo, sobre um véu da cor do papel, a acabar
+   nos dois botões. O painel dos números e o prazo vêm logo a seguir, já sem fotografia. */
 @media (max-width: 639px) {
   .lp-hs {
+    --hs-px: 10svh;
     padding-top: 0;
-    padding-bottom: 0;
     min-height: 0;
   }
   .lp-hs-media {
@@ -2191,6 +2401,7 @@ body:has([data-landing]) {
   .lp-hs-media::before {
     content: '';
     position: absolute;
+    z-index: 1;
     inset: 0;
     background: linear-gradient(
       to bottom,
@@ -2202,6 +2413,9 @@ body:has([data-landing]) {
     );
   }
   .lp-hs-inner {
+    gap: 0.5rem;
+  }
+  .lp-hs-copy {
     min-height: 100vh;
     min-height: 100svh;
     justify-content: flex-end;
@@ -2223,12 +2437,13 @@ body:has([data-landing]) {
     -webkit-backdrop-filter: blur(6px);
     backdrop-filter: blur(6px);
   }
-  .lp-hs-trace {
-    padding-top: 1rem;
+  /* Fora da fotografia o painel é um cartão de papel simples (sem desfoque, que aqui não tem nada por trás). */
+  .lp-hsl {
+    max-width: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+    background: var(--card);
   }
-}
-.lp-fm[data-k='end'] {
-  top: calc(100% + 1.75rem);
 }
 @media (min-width: 640px) {
   .lp-hs {
@@ -2251,97 +2466,14 @@ body:has([data-landing]) {
     font-size: 11.5px;
     letter-spacing: 0.16em;
   }
-  /* Fio na horizontal: o mesmo viewBox em qualquer largura (proporção fixa, sem deformar a curva). */
-  .lp-fio {
-    height: auto;
-    aspect-ratio: 1000 / 200;
-    margin: 11rem 0 8.5rem;
-    padding-left: 0;
-  }
-  .lp-fio-h {
-    display: block;
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    overflow: visible;
-  }
-  .lp-fio-v {
-    display: none;
-  }
-  .lp-fio-node {
-    left: calc(var(--x) * 100%);
-    top: calc(var(--y) * 100%);
-  }
-  .lp-fio-fray {
-    left: calc(var(--x) * 100%);
-    top: calc(var(--y) * 100%);
-    width: 1.5rem;
-    height: 1.5rem;
-    transform: translate(-5%, -50%);
-  }
-  .lp-fio-brace {
-    position: absolute;
-    left: 0;
-    top: calc(100% + 0.25rem);
-    display: block;
-    width: calc(var(--x) * 100%);
-    height: 0.5rem;
-    border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent);
-    border-top: 0;
-  }
-  .lp-fm {
-    --halo: 0 0 0.75rem var(--background), 0 0 0.25rem var(--background);
-    text-shadow: var(--halo);
-    top: auto;
-    left: auto;
-  }
-  .lp-fm[data-k='solid'] {
-    left: 0;
-    top: calc(100% + 1.25rem);
-  }
-  .lp-fm[data-k='gap'] {
-    left: calc(var(--x) * 100%);
-    bottom: calc((1 - var(--y)) * 100% + 1rem);
-    padding-left: 0.875rem;
-    border-left: 1px solid color-mix(in oklab, var(--primary) 60%, transparent);
-  }
-  .lp-fm[data-k='end'] {
-    top: auto;
-    right: 0;
-    bottom: calc((1 - var(--y)) * 100% + var(--end-up, 5.5rem));
-    align-items: flex-end;
-    text-align: right;
-    padding-right: 0.875rem;
-    border-right: 1px solid color-mix(in oklab, var(--primary) 60%, transparent);
-  }
-  .lp-fm[data-k='end'] .lp-fm-l {
-    justify-content: flex-end;
-  }
-  /* Escuro: o céu do pôr do sol é claro por trás das duas marcas de cima; um halo denso do tom do papel, colado às letras, garante o contraste (AA) sem manchas. */
-  .dark .lp-fm {
-    --halo:
-      0 0 2px var(--background), 0 0 6px var(--background), 0 0 12px var(--background),
-      0 0 18px var(--background), 0 0 26px color-mix(in oklab, var(--background) 80%, transparent);
-  }
-  .lp-fm-v {
-    font-size: 2.25rem;
-  }
-  .lp-fm[data-k='gap'] .lp-fm-v {
-    font-size: clamp(2.5rem, 3.6vw, 3.5rem);
-  }
-  .lp-fio-src {
-    left: 0;
-    top: calc(100% + 5.75rem);
-  }
-  .lp-fm[data-k='gap'] {
-    max-width: 13rem;
-  }
-  .lp-fm[data-k='gap'] .lp-fm-hook {
-    text-wrap: balance;
-  }
   .lp-hs-deadline {
     font-size: 11.5px;
+  }
+  .lp-hsl {
+    padding: 1.375rem 1.5rem 1rem;
+  }
+  .lp-hsl-v {
+    font-size: 1.75rem;
   }
 }
 @media (min-width: 1024px) {
@@ -2350,17 +2482,17 @@ body:has([data-landing]) {
   }
 }
 
-/* Largo: fotografia 16:10 enquadrada pelo contentor. `--hs-bw` é a largura da fotografia (cobre o hero sem cortar o que importa) e
-   o campanário fica a 84,54 % dessa largura e a 55,2 % da sua altura, contados a partir da direita e de baixo. O fio ocupa a
-   largura da margem esquerda até ao campanário e acaba nele. */
+/* Largo: fotografia 16:10 à largura do hero, presa ao fundo (o céu, se sobrar, continua na cor média do céu). O campanário fica
+   a 84,54 % da largura e a `--hs-reach` = (0,28 − `--hs-drop`) × largura do fundo; o fio vai da margem esquerda até ele. A
+   grelha do texto reserva `--hs-reach` por baixo de si: o texto acaba sempre acima da ponta do fio. */
 @media (min-width: 640px) and (min-aspect-ratio: 6/5) {
   .lp-hs {
-    --hs-r: max(calc(9.4vw + 2.5rem), calc(50svh - 22vw + 2.5rem));
-    --end-up: clamp(4.25rem, 9rem - 4vw, 6rem);
+    --hs-drop: 0.04;
+    --hs-px: 16svh;
+    container-type: inline-size;
     background-color: var(--hs-sky);
-    /* Em janelas baixas o hero cresce o que for preciso para o texto nunca tocar no fio. */
-    min-height: max(clamp(34rem, 100svh, 64rem), calc(27vw + 21rem));
-    padding-top: calc(var(--nav-h) + clamp(1rem, 6svh, 4rem));
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + clamp(1rem, 5svh, 3.5rem));
     padding-bottom: 0;
   }
   /* Névoa final: a base da fotografia dissolve-se no papel da secção seguinte. */
@@ -2380,13 +2512,15 @@ body:has([data-landing]) {
     mask-image: none;
   }
   .lp-hs-media picture {
-    --hs-bw: max(100cqw, 160cqh);
     position: absolute;
+    left: 0;
     right: 0;
-    bottom: 0;
-    width: var(--hs-bw);
+    bottom: calc(-1 * var(--hs-drop) * 100cqw);
+    width: 100%;
     height: auto;
     aspect-ratio: 16 / 10;
+    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 16%);
+    mask-image: linear-gradient(to bottom, transparent, #000 16%);
   }
   .lp-hs-media img {
     object-position: center;
@@ -2395,33 +2529,35 @@ body:has([data-landing]) {
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: 1.5rem;
+    row-gap: 2rem;
+    align-items: center;
     align-content: start;
-    padding-bottom: var(--hs-r);
+    padding-bottom: calc((0.28 - var(--hs-drop)) * 100cqw + 3rem);
   }
   /* Véu: uma mancha suave só atrás do texto (nunca uma faixa), com o tom do papel do tema. */
   .lp-hs-inner::before {
     content: '';
     position: absolute;
     z-index: -1;
-    inset: -5rem auto -2rem calc(50% - 50vw);
+    inset: -5rem auto 0 calc(50% - 50vw);
     width: min(86vw, 72rem);
     pointer-events: none;
     background: radial-gradient(
-      ellipse 66% 72% at 36% 46%,
+      ellipse 62% 64% at 34% 38%,
       color-mix(in oklab, var(--background) 80%, transparent) 0,
-      color-mix(in oklab, var(--background) 62%, transparent) 55%,
+      color-mix(in oklab, var(--background) 60%, transparent) 55%,
       transparent 100%
     );
   }
   .lp-hs-copy {
-    grid-column: 1 / 11;
+    grid-column: 1 / -1;
     gap: clamp(0.5rem, 1.8svh, 1.25rem);
   }
   .lp-hs-title {
     font-size: clamp(2.25rem, min(5.2vw, 9.4svh), 5.25rem);
   }
   .lp-hs-lead {
-    max-width: 44rem;
+    max-width: 40rem;
     font-size: clamp(1rem, min(1.3vw, 2.6svh), 1.25rem);
   }
   .lp-hs-ctas {
@@ -2429,6 +2565,9 @@ body:has([data-landing]) {
   }
   .lp-hs-link {
     justify-content: flex-start;
+  }
+  .lp-hsl {
+    grid-column: 1 / span 8;
   }
   .lp-hs-deadline-compact {
     display: block;
@@ -2446,9 +2585,9 @@ body:has([data-landing]) {
   }
   .lp-hs-trace {
     --hs-m: calc((100cqw - min(100cqw, 72rem)) / 2 + var(--hs-gutter));
+    display: block;
     position: absolute;
     inset: 0;
-    z-index: 1;
     width: auto;
     max-width: none;
     margin: 0;
@@ -2457,33 +2596,26 @@ body:has([data-landing]) {
     pointer-events: none;
   }
   .lp-fio {
-    --hs-bw: max(100cqw, 160cqh);
-    --fw: calc(100cqw - 0.1546 * var(--hs-bw) - var(--hs-m));
+    --fw: calc(100cqw - 0.1546 * 100cqw - var(--hs-m));
     position: absolute;
     left: var(--hs-m);
     width: var(--fw);
-    top: calc(100cqh - 0.28 * var(--hs-bw) - 0.006 * var(--fw));
+    top: calc(100cqh - (0.28 - var(--hs-drop)) * 100cqw - 0.006 * var(--fw));
     margin: 0;
   }
-  .lp-fm-hook {
-    pointer-events: auto;
-  }
-  .lp-fio-fray {
-    width: 2.5rem;
-    height: 2.5rem;
-  }
 }
-/* Telemóvel de lado (pouca altura): a fotografia cobre pela largura (o topo, se sobrar, dissolve-se no céu). */
-@media (min-width: 640px) and (min-aspect-ratio: 6/5) and (max-height: 560px) {
-  .lp-hs-media picture {
-    --hs-bw: 100cqw;
+/* Ecrã largo: a cópia nas colunas 1 a 7 e o painel nas 8 a 12, ao lado do título. */
+@media (min-width: 900px) and (min-aspect-ratio: 6/5) {
+  .lp-hs-copy {
+    grid-column: 1 / 8;
   }
-  .lp-fio {
-    --hs-bw: 100cqw;
+  .lp-hs-title {
+    font-size: clamp(2.25rem, min(4.4vw, 8.4svh), 4.5rem);
   }
-  .lp-hs-media {
-    -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%);
-    mask-image: linear-gradient(to bottom, transparent, #000 25%);
+  .lp-hsl {
+    grid-column: 8 / 13;
+    justify-self: end;
+    max-width: 25rem;
   }
 }
 /* Slider do instrumento: alça de 28 px (a caixa de toque continua a ter 44 px de altura) e trilho com o troço preenchido. */

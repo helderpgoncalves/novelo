@@ -73,7 +73,10 @@ export function WhereLost() {
             lead={m.landing_map_lead()}
             className="max-w-none lg:col-span-7"
           />
-          <blockquote className="border-primary border-l-2 pl-5 font-serif text-[1.375rem] text-foreground leading-snug text-pretty sm:text-2xl lg:col-span-5 lg:mb-1">
+          <blockquote
+            data-reveal=""
+            className="border-primary border-l-2 pl-5 font-serif text-[1.375rem] text-foreground leading-snug text-pretty sm:text-2xl lg:col-span-5 lg:mb-1"
+          >
             {m.landing_map_thesis()}
           </blockquote>
         </div>

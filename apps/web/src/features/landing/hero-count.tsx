@@ -42,9 +42,12 @@ export function HeroCount({
   }, [value, delay, duration]);
 
   return (
-    <>
+    <span className="lp-count">
+      <span aria-hidden="true" className="lp-count-ghost">
+        {format(value)}
+      </span>
       <span aria-hidden="true">{format(shown)}</span>
       <span className="sr-only">{format(value)}</span>
-    </>
+    </span>
   );
 }

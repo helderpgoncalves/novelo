@@ -8,6 +8,7 @@ import { LandingFooter } from './footer';
 import { Hero } from './hero';
 import { Evidence } from './lab';
 import { LandingHeader, LandingToc } from './landing-nav';
+import { ReadingProgress } from './reading-progress';
 import { useRevealOnScroll } from './reveal';
 import { References, Rigor, Team } from './rigor';
 import { Method, Problem } from './story';
@@ -24,6 +25,7 @@ export function LandingPage() {
   useRevealOnScroll();
   return (
     <PublicShell width="max-w-6xl" header={<LandingHeader />} footer={<LandingFooter />}>
+      <ReadingProgress />
       <LandingToc />
       <main id="content" data-landing="" data-lp-fonts="" tabIndex={-1} className="outline-none">
         <Hero />
