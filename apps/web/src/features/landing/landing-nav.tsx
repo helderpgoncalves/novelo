@@ -536,6 +536,12 @@ export function LandingToc() {
       if (!el) return;
       el.style.setProperty('--read', String(max > 0 ? Math.min(1, window.scrollY / max) : 0));
       el.dataset.shown = String(window.scrollY > window.innerHeight * 0.7);
+      // Coluna fixa por cima de secções escuras (tom `dark`): adota as cores do que está por baixo, senão o item ativo some.
+      const r = el.getBoundingClientRect();
+      const under = document
+        .elementsFromPoint(r.left + r.width / 2, r.top + r.height / 2)
+        .find((n) => !el.contains(n));
+      el.classList.toggle('dark', Boolean(under?.closest('.dark')));
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);

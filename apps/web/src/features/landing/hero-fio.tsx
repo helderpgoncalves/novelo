@@ -149,7 +149,7 @@ export function HeroFio() {
             <Estimate className="lp-fm-tag" />
           </p>
         </div>
-        <a href="#problema" className="lp-fm-hook">
+        <a href="#mapa" className="lp-fm-hook">
           {m.landing_hero_hook_gap({ tonnes: `${formatNumber(GAP_T)}\u00a0t` })}
           <ArrowRight aria-hidden="true" className="size-4" />
         </a>

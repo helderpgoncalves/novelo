@@ -11,13 +11,14 @@ import { LandingHeader, LandingToc } from './landing-nav';
 import { useRevealOnScroll } from './reveal';
 import { References, Rigor, Team } from './rigor';
 import { Method, Problem } from './story';
+import { WhereLost } from './where-lost';
 
 /**
  * Página inicial pública (sem sessão): é a "Application home page" do ecrã de consentimento da Google, por isso
  * diz o que o Novelo faz, mostra números reais com fonte, tem Entrar/Criar conta e, no rodapé, Privacidade, Termos
  * e contacto. Sem chamadas à API: todos os números são os dos dados recebidos (Regra Zero). Cada secção tem a sua
  * composição (bento, pipeline, instrumento, bento de produto, lista editorial, janela, livro-razão, linha do tempo):
- * problema → método → prova → produto → para quem → Copiloto → rigor → equipa → referências → perguntas → convite.
+ * problema → onde se perde (mapa) → método → prova → produto → para quem → Copiloto → rigor → equipa → referências → perguntas → convite.
  */
 export function LandingPage() {
   useRevealOnScroll();
@@ -27,6 +28,7 @@ export function LandingPage() {
       <main id="content" data-landing="" data-lp-fonts="" tabIndex={-1} className="outline-none">
         <Hero />
         <Problem />
+        <WhereLost />
         <Method />
         <Evidence />
         <Features />

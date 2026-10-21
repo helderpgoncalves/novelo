@@ -1,59 +1,78 @@
 import { Link } from '@tanstack/react-router';
-import { ArrowRight, Factory, Landmark, Plus, Truck } from 'lucide-react';
+import { ArrowRight, Landmark, Plus, Shirt, Truck } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { GithubMark } from '@/components/github-mark';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
-import { REPO_URL } from './facts';
-import { BODY, CONTAINER, Heading, SECTION_Y, Section } from './layout';
+import { FACTS, REPO_URL } from './facts';
+import { BODY, CONTAINER, Heading, MONO, SECTION_Y, Section } from './layout';
 import { sectionNumber } from './sections';
 
-/** Para quem é: lista editorial (nome grande em serifa, texto ao lado) em vez de cartões; o título fica fixo à esquerda. */
+/**
+ * Para quem é: cabeçalho com a prioridade comum (reutilizar antes de reciclar) e três colunas editoriais (ícone, nome em serifa,
+ * texto e o que cada um usa), separadas por fios; em telemóvel empilham.
+ */
 export function Audience() {
   const people = [
-    { icon: Landmark, title: m.landing_aud_council_title(), text: m.landing_aud_council_text() },
-    { icon: Truck, title: m.landing_aud_ops_title(), text: m.landing_aud_ops_text() },
     {
-      icon: Factory,
-      title: m.landing_aud_recyclers_title(),
-      text: m.landing_aud_recyclers_text(),
+      icon: Landmark,
+      title: m.landing_aud_council_title(),
+      text: m.landing_aud_council_text(),
+      tags: m.landing_aud_council_tags(),
+    },
+    {
+      icon: Truck,
+      title: m.landing_aud_ops_title(),
+      text: m.landing_aud_ops_text(),
+      tags: m.landing_aud_ops_tags(),
+    },
+    {
+      icon: Shirt,
+      title: m.landing_aud_reuse_title(),
+      text: m.landing_aud_reuse_text(),
+      tags: m.landing_aud_reuse_tags(),
     },
   ];
   return (
     <Section id="para-quem" className="border-border border-t">
-      <div className={`${CONTAINER} grid gap-12 lg:grid-cols-12 lg:gap-16`}>
+      <div className={`${CONTAINER} flex flex-col gap-10 lg:gap-14`}>
         <Heading
           id="para-quem"
           n={sectionNumber('para-quem')}
-          size="md"
           eyebrow={m.landing_audience_eyebrow()}
           title={m.landing_audience_title()}
-          className="lg:sticky lg:top-28 lg:col-span-5 lg:self-start"
+          lead={m.landing_audience_lead()}
         />
         <ul
           data-reveal=""
           data-fx="stagger"
-          className="flex flex-col divide-y divide-border border-border border-y lg:col-span-7"
+          className="grid border-border border-t md:grid-cols-3 md:divide-x md:divide-border max-md:divide-y max-md:divide-border"
         >
           {people.map((p, i) => (
             <li
               key={p.title}
               data-s=""
               style={{ '--i': i } as CSSProperties}
-              className="lp-aud group grid gap-3 py-8 sm:grid-cols-[3rem_1fr] sm:gap-x-6"
+              className="lp-aud group flex flex-col gap-4 py-8 md:px-7 md:py-9 md:first:pl-0 md:last:pr-0"
             >
-              <p.icon
-                className="size-6 text-primary transition-transform duration-500 group-hover:-translate-y-0.5"
-                strokeWidth={1.5}
-                aria-hidden="true"
-              />
-              <div className="flex flex-col gap-2">
-                <h3 className="font-medium font-serif text-[clamp(1.75rem,1.3rem+1.6vw,2.5rem)] leading-tight tracking-[-0.02em] transition-transform duration-500 group-hover:translate-x-1">
-                  {p.title}
-                </h3>
-                <p className={`${BODY} max-w-xl text-[1.0625rem]`}>{p.text}</p>
-              </div>
+              <span className="flex items-center gap-3">
+                <span className={`${MONO} tabular-nums`}>{String(i + 1).padStart(2, '0')}</span>
+                <p.icon
+                  className="size-6 text-primary transition-transform duration-500 group-hover:-translate-y-0.5"
+                  strokeWidth={1.5}
+                  aria-hidden="true"
+                />
+              </span>
+              <h3 className="font-medium font-serif text-[clamp(1.625rem,1.3rem+1vw,2.125rem)] leading-tight tracking-[-0.02em] text-balance">
+                {p.title}
+              </h3>
+              <p className={`${BODY} text-[1.0625rem]`}>{p.text}</p>
+              <p
+                className={`${MONO} mt-auto border-border border-t border-dashed pt-4 text-foreground/80`}
+              >
+                {p.tags}
+              </p>
             </li>
           ))}
         </ul>
@@ -70,7 +89,10 @@ export function Faq() {
     { q: m.landing_faq_q3(), a: m.landing_faq_a3() },
     { q: m.landing_faq_q4(), a: m.landing_faq_a4() },
     { q: m.landing_faq_q5(), a: m.landing_faq_a5() },
-    { q: m.landing_faq_q6(), a: m.landing_faq_a6({ count: formatNumber(2751) }) },
+    {
+      q: m.landing_faq_q6(),
+      a: m.landing_faq_a6({ count: formatNumber(FACTS.municipalContainers) }),
+    },
   ];
   return (
     <Section id="perguntas" tone="band">

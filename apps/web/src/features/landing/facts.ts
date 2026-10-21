@@ -43,9 +43,27 @@ export const FACTS = {
    * Cenário por freguesia de 60 000 €/ano, rede sem contentores (estimativa, base Vitrus + APA de 21 out 2026):
    * 371,7 t a 124,3 €/t; P10/P50/P90 de 500 amostras (semente 7). docs/engenharia/dados-e-modelo.md, secção 5.
    */
-  scenario60k: { budget: 60000, tonnes: 371.7, eurPerT: 124.3, p10: 97.7, p50: 124.7, p90: 161.1 },
-  /** Pacote municipal e geometria. */
-  municipalContainers: 2751,
+  scenario60k: {
+    budget: 60000,
+    cost: 46192,
+    tonnes: 371.7,
+    eurPerT: 124.3,
+    p10: 97.7,
+    p50: 124.7,
+    p90: 161.1,
+  },
+  /** Cenário base do exemplo do Copiloto: 40 000 €/ano, mesma base e pressupostos (gasta 26 151 €, 314,7 t). */
+  scenarioBase: { budget: 40000, cost: 26151, tonnes: 314.7 },
+  /**
+   * Teto do modelo por freguesia (estimativa, 21 out 2026; docs/engenharia/dados-e-modelo.md, secção 5): sem contentores
+   * (local existente e recolha a pedido, orçamento sem limite) e, só como referência, com o contentor de rua à densidade francesa.
+   */
+  ceilingNoContainersT: 597.7,
+  ceilingWithStreetT: 992.8,
+  /** Pacote municipal (Vitrus, 20 out 2026) e geometria: gerados por scripts/gen-landing-data.mjs a partir de data/processed. */
+  municipalContainers: mapData.municipal.containers,
+  municipalSites: mapData.municipal.sites,
+  municipalDemandSites: mapData.municipal.demandSites,
   parishes: mapData.parishes.length,
   placesLocated: mapData.places.length,
 } as const;
