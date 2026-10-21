@@ -2,7 +2,8 @@
 
 Os locais candidatos são os pontos de recolha municipais que a Vitrus enviou (`municipal_sites`). Cada habitante é
 representado pelos locais públicos da sua freguesia: a procura de uma freguesia reparte-se pelos seus locais públicos
-na proporção do número de contentores que lá estão (os contentores seguem a população: ver `domain/validation.py`).
+na proporção da CAPACIDADE (litros) dos contentores que lá estão (`capacity_weights`; a capacidade segue a população
+melhor do que o número de contentores: R² 0,80 contra 0,76 por freguesia, ver docs/engenharia/dados-e-modelo.md).
 É um proxy, não população por quarteirão (esse dado, o BGRI, não chegou): o resultado leva "estimativa".
 
 Um ponto de procura fica servido se houver um local aberto a menos de `radius_m`. Vários locais a servir a mesma
@@ -19,6 +20,7 @@ locais escolhidos, o orçamento do solver desce até o custo real (fixo + km das
 from __future__ import annotations
 
 import math
+import statistics
 from collections import defaultdict
 from collections.abc import Sequence
 from dataclasses import dataclass, field, replace
@@ -41,7 +43,7 @@ class DemandPoint:
     zone_id: str
     lat: float
     lon: float
-    weight: float  # contentores no local (proxy da população que o usa)
+    weight: float  # litros de contentores no local (proxy da população que o usa)
 
 
 @dataclass(frozen=True)
@@ -59,6 +61,30 @@ class SiteCosts:
     capex_eur: float
     annual_fixed_eur: float  # capex anualizado + recolhas
     collections_year: float
+
+
+def median_capacity_by_kind(containers: Sequence[tuple[str, int | None]]) -> dict[str, float]:
+    """Mediana dos litros conhecidos de cada tipo de contentor (`(tipo, litros ou None)`)."""
+    known: dict[str, list[float]] = defaultdict(list)
+    for kind, litres in containers:
+        if litres is not None:
+            known[kind].append(float(litres))
+    return {kind: statistics.median(values) for kind, values in known.items()}
+
+
+def capacity_weights(containers: Sequence[tuple[str, str, int | None]]) -> dict[str, float]:
+    """Litros por local (`(local, tipo, litros ou None)`).
+
+    Regra para a capacidade desconhecida: a mediana do tipo; se o tipo não tiver nenhum valor conhecido, a mediana de
+    todos os contentores com litros conhecidos (0 se nenhum).
+    """
+    by_kind = median_capacity_by_kind([(kind, litres) for _, kind, litres in containers])
+    known = [float(litres) for _, _, litres in containers if litres is not None]
+    fallback = statistics.median(known) if known else 0.0
+    out: dict[str, float] = defaultdict(float)
+    for site, kind, litres in containers:
+        out[site] += float(litres) if litres is not None else by_kind.get(kind, fallback)
+    return dict(out)
 
 
 def distance_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:

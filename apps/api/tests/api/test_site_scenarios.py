@@ -9,7 +9,10 @@ from typing import Any
 
 import httpx
 import pytest
+from sqlalchemy import update
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.features.municipal.models import MunicipalSite
 from novelo.features.planning import site_service
 
 P = "/api/v1/planning"
@@ -209,3 +212,56 @@ async def test_the_same_request_is_served_from_the_cache(
     await run(operator, label="C", budget_eur_year=4000)  # outro orçamento: volta a calcular
     assert calls == 2
     assert first["id"] != second["id"] and first["result"] == second["result"]
+
+
+# --- Pontos assistidos (escolas) e procura pela capacidade ---------------------------------------------------------
+
+
+@pytest.fixture
+async def school(operator: httpx.AsyncClient, session: AsyncSession) -> httpx.AsyncClient:
+    """O produtor S0000004d (Azurém, a ~140 m de S3) passa a escola: um ponto assistido candidato."""
+    await session.execute(
+        update(MunicipalSite).where(MunicipalSite.site_id == "S0000004d").values(producer_type_keys=["school"])
+    )
+    await session.flush()
+    return operator
+
+
+async def test_staffed_points_are_schools_with_people_and_no_street_container(school: httpx.AsyncClient) -> None:
+    s = await run(school, site_candidates="staffed")
+    siting = s["result"]["siting"]
+    assert (siting["site_candidates"], siting["candidates"], siting["staffed_candidates"]) == ("staffed", 1, 1)
+    (site,) = s["result"]["sites"]
+    assert (site["site_id"], site["kind"], site["producer_types"]) == ("S0000004d", "staffed", ["school"])
+    assert "producer_names" not in site  # nomes de produtores nunca saem num cenário
+    # a escola serve o ponto de procura S3 (Azurém); Aldão fica sem local ao alcance
+    alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
+    assert alloc["030804"]["tonnes"] > 0 and alloc["030801"]["tonnes"] == 0
+
+
+async def test_both_candidate_sets_are_the_default(school: httpx.AsyncClient) -> None:
+    s = await run(school)
+    assert s["result"]["siting"]["site_candidates"] == "both"
+    assert (s["result"]["siting"]["candidates"], s["result"]["siting"]["staffed_candidates"]) == (4, 1)
+    public = await run(school, site_candidates="public", label="Só públicos")
+    assert public["result"]["siting"]["candidates"] == 3 and public["result"]["siting"]["staffed_candidates"] == 0
+
+
+async def test_street_reference_uses_only_public_places(operator: httpx.AsyncClient) -> None:
+    s = await run(operator, site_mode="street")
+    assert s["result"]["siting"]["site_candidates"] == "public"
+    body = {"label": "x", "objective": "max_tonnes", "budget_eur_year": 100, "siting": "sites"}
+    resp = await operator.post(f"{P}/scenarios", json={**body, "site_mode": "street", "site_candidates": "staffed"})
+    assert resp.status_code == 422
+
+
+async def test_demand_splits_by_container_capacity(operator: httpx.AsyncClient) -> None:
+    # 100 m: S1 e S2 (Aldão, a ~139 m) servem só o próprio ponto. Aldão tem 6 100 L em S1 e 1 100 L em S2, por isso
+    # S1 leva 6 100 / 7 200 = 84,72% do têxtil captado em Aldão e S2 15,28% (pela contagem seriam 2/3 e 1/3).
+    s = await run(operator, site_radius_m=100)
+    tonnes = {x["site_id"]: x["tonnes"] for x in s["result"]["sites"]}
+    alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
+    captured = alloc["030801"]["tonnes"]
+    assert tonnes["S0000001a"] == pytest.approx(captured * 6100 / 7200, abs=0.002)
+    assert tonnes["S0000002b"] == pytest.approx(captured * 1100 / 7200, abs=0.002)
+    assert "capacidade" in s["result"]["siting"]["population_proxy"]

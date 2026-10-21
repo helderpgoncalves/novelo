@@ -19,7 +19,8 @@ interface StatCellProps {
   value: string;
   hint?: ReactNode;
   tag?: string;
-  tone?: 'default' | 'primary';
+  /** `muted`: valor ainda por validar (ex.: «Por validar»). */
+  tone?: 'default' | 'primary' | 'muted';
 }
 
 export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCellProps) {
@@ -37,6 +38,7 @@ export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCell
         className={cn(
           'font-medium font-serif text-[1.65rem] tabular-nums leading-none tracking-tight sm:text-4xl',
           tone === 'primary' && 'text-primary',
+          tone === 'muted' && 'text-muted-foreground',
         )}
       >
         {value}

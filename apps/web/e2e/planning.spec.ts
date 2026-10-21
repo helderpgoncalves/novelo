@@ -29,6 +29,12 @@ test.describe('simulador e cenários', () => {
     ).toBeVisible();
     await expect(page.getByText('Dados da Vitrus').first()).toBeVisible();
     await expect(page.getByText('Pressuposto').first()).toBeVisible();
+    // Os valores que ainda não chegaram da Vitrus ficam «por preencher», com a fonte em nota.
+    await expect(page.getByLabel('Custo de tratamento do indiferenciado')).toHaveAttribute(
+      'placeholder',
+      'Por preencher',
+    );
+    await expect(page.getByText(/departamento financeiro/).first()).toBeVisible();
   });
 
   test('calcular um cenário de ponta a ponta e ver o resultado', async ({ page }) => {
@@ -42,6 +48,10 @@ test.describe('simulador e cenários', () => {
     await expect(page.getByText('Face a 2025 e à meta')).toBeVisible();
     await expect(page.getByText('Têxtil captado').first()).toBeVisible();
     await expect(page.getByText('Custo por tonelada').first()).toBeVisible();
+    // Poupança no tratamento: sem o custo de tratamento da Vitrus fica «por validar», nunca um número inventado.
+    await expect(page.getByText('Poupança no tratamento')).toBeVisible();
+    await expect(page.getByText('Por validar').first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Plano de recolha/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();
     await page.getByRole('link', { name: 'Abrir cenário' }).click();
     await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}/);

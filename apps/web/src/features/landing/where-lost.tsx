@@ -1,4 +1,4 @@
-import { MapPin, ScanLine, Truck } from 'lucide-react';
+import { MapPin, Route, ScanLine, School, Truck } from 'lucide-react';
 import { type CSSProperties, lazy, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorState } from '@/components/states';
@@ -55,9 +55,20 @@ export function WhereLost() {
       format: (v: number) => formatNumber(Math.round(v)),
     },
   ] as const;
+  const pap = FACTS.doorToDoor;
   const modes = [
+    [
+      Truck,
+      m.landing_map_mode_pap({
+        n: formatNumber(pap.parishes),
+        people: formatNumber(pap.inhabitants),
+        tonnes: `${formatNumber(pap.tonnes, 1)} t`,
+        km: formatNumber(pap.newKm),
+      }),
+    ],
     [MapPin, m.landing_map_mode_existing()],
-    [Truck, m.landing_map_mode_demand()],
+    [School, m.landing_map_mode_schools({ n: formatNumber(FACTS.schools) })],
+    [Route, m.landing_map_mode_demand()],
     [ScanLine, m.landing_map_mode_quality()],
   ] as const;
   return (

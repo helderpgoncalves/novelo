@@ -1,6 +1,7 @@
 import type { PlanningParams } from '@/client';
 import { getParam, PARAM_GROUPS } from '@/features/assumptions/param-fields';
 import { formatNumber } from '@/lib/format';
+import { m } from '@/paraglide/messages';
 
 /** Os pressupostos exatos com que um cenário foi calculado (só leitura): o cenário é reproduzível. */
 export function ParameterSummary({ params }: { params: PlanningParams }) {
@@ -17,10 +18,14 @@ export function ParameterSummary({ params }: { params: PlanningParams }) {
               return (
                 <div key={f.path} className="flex justify-between gap-4">
                   <dt className="text-muted-foreground">{f.label()}</dt>
-                  <dd className="tabular-nums">
-                    {f.kind === 'percent'
-                      ? `${formatNumber(value * 100, 1)}%`
-                      : `${formatNumber(value, 2)}${f.unit ? ` ${f.unit}` : ''}`}
+                  <dd className={value == null ? 'text-muted-foreground' : 'tabular-nums'}>
+                    {value == null
+                      ? f.nullable
+                        ? m.param_empty()
+                        : m.common_dash()
+                      : f.kind === 'percent'
+                        ? `${formatNumber(value * 100, 1)}%`
+                        : `${formatNumber(value, 2)}${f.unit ? ` ${f.unit}` : ''}`}
                   </dd>
                 </div>
               );

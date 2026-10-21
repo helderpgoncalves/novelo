@@ -10,6 +10,7 @@ from novelo.domain import network, pilot
 from novelo.domain.vocab import Tipau
 from novelo.features.network.models import Parish
 from novelo.features.planning import service
+from novelo.features.planning.params import to_domain_zone
 from novelo.features.planning.pilot_schemas import (
     PilotFact,
     PilotKpiOut,
@@ -148,7 +149,7 @@ def _recommend(
     by_code = {z.code: z for z in zones}
     candidates = [
         pilot.PilotCandidate(
-            network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days),
+            to_domain_zone(z),
             z.tipau,
             areas.get(z.code),
         )

@@ -473,6 +473,29 @@ class MunicipalProducersOut(BaseModel):
     next_cursor: str | None
 
 
+class MunicipalB2BTypeCount(BaseModel):
+    type: ProducerType
+    label: str
+    sites: int
+    containers: int
+
+
+class MunicipalB2BChannelOut(BaseModel):
+    """Canal B2B de têxtil limpo (lares e hotelaria: roupa de cama e toalhas), à parte da rede para os habitantes."""
+
+    names_visible: bool
+    types: list[ProducerType]
+    rationale: str
+    by_type: list[MunicipalB2BTypeCount]
+    by_parish: list[MunicipalParishCount] = Field(description="Locais B2B por freguesia (`containers` = locais)")
+    sites: int
+    tonnes_year: float | None = Field(
+        description="Têxtil por ano do canal; nulo: não há quilos por estabelecimento (a medir no piloto)"
+    )
+    tonnes_note: str
+    items: list[MunicipalProducerSite]
+
+
 # --- Candidatos, lacuna e densidade -------------------------------------------------------------------------------
 
 

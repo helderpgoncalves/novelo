@@ -5,7 +5,8 @@ import { cn } from '@/lib/utils';
 
 interface NumberFieldProps {
   label: string;
-  value: number;
+  /** `null` mostra o campo vazio (com o `placeholder`, ex.: «por preencher»). */
+  value: number | null;
   onChange: (value: number) => void;
   /** Mostra e edita em percentagem (0 a 100); o valor guardado continua a ser a fração (0 a 1). */
   percent?: boolean;
@@ -16,6 +17,7 @@ interface NumberFieldProps {
   hint?: ReactNode;
   badge?: ReactNode;
   error?: string;
+  placeholder?: string;
   className?: string;
 }
 
@@ -32,10 +34,11 @@ export function NumberField({
   hint,
   badge,
   error,
+  placeholder,
   className,
 }: NumberFieldProps) {
   const id = useId();
-  const shown = percent ? Math.round(value * 10000) / 100 : value;
+  const shown = value == null ? null : percent ? Math.round(value * 10000) / 100 : value;
 
   return (
     <div className={cn('space-y-1.5', className)}>
@@ -53,7 +56,8 @@ export function NumberField({
           step={percent ? 1 : step}
           min={percent && min != null ? min * 100 : min}
           max={percent && max != null ? max * 100 : max}
-          value={Number.isFinite(shown) ? shown : ''}
+          value={shown != null && Number.isFinite(shown) ? shown : ''}
+          placeholder={placeholder}
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? `${id}-error` : hint ? `${id}-hint` : undefined}
           className={cn('h-10 tabular-nums', (unit || percent) && 'pr-14')}

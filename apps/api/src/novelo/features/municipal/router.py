@@ -27,6 +27,7 @@ from novelo.features.municipal.filters import ContainerFilters, SiteFilters
 from novelo.features.municipal.http import Cache, StaticCache
 from novelo.features.municipal.schemas import (
     CaopFeatureCollection,
+    MunicipalB2BChannelOut,
     MunicipalCandidatesOut,
     MunicipalContainerPage,
     MunicipalDensityBenchmarkOut,
@@ -280,6 +281,17 @@ async def list_municipal_producers(
     if cache.fresh:
         return cache.not_modified()
     return cache.stamp(await service.list_producers(db, query.filters, limit=limit, cursor=cursor, names=query.names))
+
+
+@router.get("/b2b-channel", response_model=MunicipalB2BChannelOut)
+async def get_b2b_channel(
+    db: Db, user: CurrentUser, cache: Cache, show_names: ShowNames = False
+) -> MunicipalB2BChannelOut | Response:
+    """Canal B2B de têxtil limpo: lares e hotelaria da rede municipal, com contagens. Toneladas: a medir no piloto."""
+    names = access.resolve_names(user.role, show_names)
+    if cache.fresh:
+        return cache.not_modified()
+    return cache.stamp(await service.b2b_channel(db, names=names))
 
 
 @router.get("/textile-candidates", response_model=MunicipalCandidatesOut)

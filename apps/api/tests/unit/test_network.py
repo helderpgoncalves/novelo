@@ -1,3 +1,5 @@
+from dataclasses import replace
+
 import pytest
 
 from novelo.domain.geo import haversine_km
@@ -144,3 +146,23 @@ def test_vrp_splits_by_capacity_and_visits_every_stop() -> None:
 
 def test_vrp_without_stops_is_empty() -> None:
     assert plan_routes([], params()).routes == []
+
+
+def test_on_demand_rides_the_door_to_door_circuit_with_zero_new_km() -> None:
+    # urbana com PAP: 4,536 t -> 4 536 / 25 = 181,44 recolhas; 0 km; custo = 181,44 · 2 € = 362,88 €
+    p = params(pap_cost_per_pickup_eur=2.0)
+    pap = build_option(replace(URBAN, door_to_door=True), (Mode.ON_DEMAND,), p).parts[0]
+    assert pap.km_year == 0.0 and pap.collections_year == pytest.approx(181.44)
+    assert pap.annual_cost_eur == pytest.approx(362.88)
+    # rural com PAP: nem o desvio de 1 dia/semana conta (a viatura já passa à porta)
+    rural = build_option(replace(RURAL, door_to_door=True), (Mode.ON_DEMAND,), p).parts[0]
+    assert rural.km_year == 0.0
+    # mesma captura com e sem PAP: só o custo muda
+    assert pap.capture == build_option(URBAN, (Mode.ON_DEMAND,), p).parts[0].capture
+
+
+def test_door_to_door_pickup_defaults_to_the_cost_of_a_collection() -> None:
+    # sem pressuposto próprio, cada recolha PAP custa o mesmo que uma recolha: 181,44 · 6 € = 1 088,64 €
+    pap = build_option(replace(URBAN, door_to_door=True), (Mode.ON_DEMAND,), params()).parts[0]
+    assert pap.annual_cost_eur == pytest.approx(1088.64)
+    assert params().pap_pickup_eur == 6.0 and params(pap_cost_per_pickup_eur=0.0).pap_pickup_eur == 0.0

@@ -1,9 +1,17 @@
 """Validação do modelo: leituras do potencial e validação cruzada espacial."""
 
+from collections import defaultdict
 from collections.abc import Awaitable, Callable
 
 import httpx
 import pytest
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
+
+from novelo.domain.validation import pearson
+from novelo.features.municipal.models import MunicipalSite
+from novelo.features.network.models import Parish
+from novelo.features.planning import site_service
 
 V = "/api/v1/validation"
 MakeUser = Callable[..., Awaitable[httpx.AsyncClient]]
@@ -50,3 +58,27 @@ async def test_spatial_check_needs_at_least_four_parishes(
     body = (await operator.get(f"{V}/model")).json()
     # a amostra municipal de teste tem 3 freguesias: não se finge uma validação
     assert body["spatial"] == []
+
+
+async def test_demand_weight_by_capacity_follows_population_better_than_by_count(session: AsyncSession) -> None:
+    """1c: a procura por local reparte-se pela capacidade (litros), porque segue melhor a população por freguesia.
+
+    Nos 1 574 pontos de procura (locais públicos com contentores), por freguesia: R² população × litros ≈ 0,80;
+    população × número de contentores ≈ 0,64 (todos os contentores: 0,76, o valor do ecrã «Validação»).
+    """
+    inputs = await site_service.load_site_inputs(session)
+    counts = {k: v for k, v in await session.execute(select(MunicipalSite.site_id, MunicipalSite.containers))}
+    litres: dict[str, float] = defaultdict(float)
+    n: dict[str, float] = defaultdict(float)
+    for d in inputs.demand:
+        litres[d.zone_id] += d.weight
+        n[d.zone_id] += counts[d.id]
+    pop = {k: v for k, v in await session.execute(select(Parish.dicofre, Parish.population))}
+    codes = sorted(c for c in litres if pop.get(c))
+    x = [float(pop[c] or 0) for c in codes]
+    r2_capacity = pearson(x, [litres[c] for c in codes]) ** 2
+    r2_count = pearson(x, [n[c] for c in codes]) ** 2
+    assert len(inputs.demand) == 1574 and len(codes) == 48
+    assert r2_capacity == pytest.approx(0.80, abs=0.01)
+    assert r2_count == pytest.approx(0.64, abs=0.01)
+    assert r2_capacity > r2_count

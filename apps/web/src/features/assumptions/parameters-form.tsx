@@ -3,6 +3,7 @@ import { useState } from 'react';
 import type { ParamMeta, ParamSource, PlanningParams } from '@/client';
 import { NumberField } from '@/components/number-field';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { m } from '@/paraglide/messages';
 import { getParam, PARAM_GROUPS, setParam } from './param-fields';
 import { SourceBadge } from './source-badge';
 
@@ -31,6 +32,7 @@ export function ParametersForm({
 }: ParametersFormProps) {
   const [open, setOpen] = useState<Set<string>>(new Set(defaultOpen));
   const source = new Map(meta.map((x) => [x.key, x.source]));
+  const notes = new Map(meta.map((x) => [x.key, x.note ?? null]));
 
   return (
     <div
@@ -83,13 +85,29 @@ export function ParametersForm({
               >
                 {fields.map((f) => {
                   const origin = source.get(f.path);
+                  const current = getParam(value, f.path);
+                  // A nota (fonte por preencher) aparece enquanto o valor está vazio ou o servidor a manda.
+                  const note =
+                    notes.get(f.path) != null || current == null
+                      ? (f.note?.() ?? notes.get(f.path) ?? undefined)
+                      : undefined;
                   return (
                     <NumberField
                       key={f.path}
                       label={f.label()}
-                      value={getParam(value, f.path)}
+                      value={current}
                       onChange={(v) =>
-                        onChange(setParam(value, f.path, f.kind === 'int' ? Math.round(v) : v))
+                        onChange(
+                          setParam(
+                            value,
+                            f.path,
+                            f.nullable && Number.isNaN(v)
+                              ? null
+                              : f.kind === 'int'
+                                ? Math.round(v)
+                                : v,
+                          ),
+                        )
                       }
                       percent={f.kind === 'percent'}
                       unit={f.unit}
@@ -97,6 +115,8 @@ export function ParametersForm({
                       min={f.min}
                       max={f.max}
                       error={errors[f.path]}
+                      placeholder={f.nullable ? m.param_empty() : undefined}
+                      hint={note}
                       badge={origin ? <SourceBadge source={origin} /> : undefined}
                     />
                   );

@@ -30,6 +30,8 @@ export const Route = createFileRoute('/_app/simulator')({
       .optional()
       .catch(undefined),
     point: z.enum(['existing', 'street']).optional().catch(undefined),
+    /** Candidatos da rede por locais (sem o parâmetro: públicos e escolas). */
+    cand: z.enum(['public', 'staffed', 'both']).optional().catch(undefined),
     ondemand: z.boolean().optional().catch(undefined),
   }),
   loaderDeps: ({ search }) => ({ from: search.from }),
@@ -58,7 +60,8 @@ function seedFrom(scenario: ScenarioOut | null | undefined, defaults: FormSeed):
       scenario.target_tonnes != null && potential > 0
         ? Math.round((scenario.target_tonnes / potential) * 100)
         : defaults.targetPct,
-    params: scenario.params,
+    // Cenários antigos não têm os pressupostos novos: completam-se com os atuais.
+    params: { ...defaults.params, ...scenario.params },
     constraints: scenario.constraints,
     parentId: scenario.id,
     siting: scenario.result.siting ? 'sites' : 'parish',
@@ -69,6 +72,9 @@ function seedFrom(scenario: ScenarioOut | null | undefined, defaults: FormSeed):
         ? 'street'
         : 'existing'
       : defaults.siteMode,
+    siteCandidates: scenario.result.siting
+      ? (scenario.result.siting.site_candidates ?? 'public')
+      : defaults.siteCandidates,
   };
 }
 
@@ -90,6 +96,7 @@ function Simulator() {
     siting: 'sites',
     radiusM: 300,
     siteMode: 'existing',
+    siteCandidates: 'both',
     onDemand: true,
   };
   const fromBase = seedFrom(base, defaults);
@@ -102,6 +109,7 @@ function Simulator() {
     siting: search.net ?? fromBase.siting,
     radiusM: search.radius ?? fromBase.radiusM,
     siteMode: search.point ?? fromBase.siteMode,
+    siteCandidates: search.cand ?? fromBase.siteCandidates,
     onDemand: search.ondemand ?? fromBase.onDemand,
   };
 

@@ -142,3 +142,58 @@ async def test_street_only_as_an_explicit_reference(logged_in: httpx.AsyncClient
     # ao duplicar/alterar, o cenário repete os modos com que foi feito
     assert s["result"]["default_modes"] == ["street"]
     assert (await logged_in.post(f"{P}/scenarios", json={**body, "default_modes": []})).status_code == 422
+
+
+# --- Recolha no circuito porta a porta (PAP) e poupança no tratamento ----------------------------------------------
+
+
+async def test_zones_carry_the_door_to_door_passes_with_a_vehicle(logged_in: httpx.AsyncClient) -> None:
+    zones = {z["name"]: z for z in (await logged_in.get(f"{P}/zones")).json()}
+    # Ronfe: C18, terça, quinta e sábado, viatura 49-GC-79 com 3 pessoas (planeamento de turnos da Vitrus)
+    assert [(p["circuit"], p["weekday"], p["vehicle"], p["crew"]) for p in zones["Ronfe"]["door_to_door"]] == [
+        ("C18", 2, "49-GC-79", 3),
+        ("C18", 4, "49-GC-79", 3),
+        ("C18", 6, "49-GC-79", 3),
+    ]
+    # Lordelo: os circuitos PAP (C22, C23) não têm viatura no planeamento, por isso não há passagem
+    assert zones["Lordelo"]["door_to_door"] == []
+
+
+async def test_textile_never_rides_an_organic_circuit(logged_in: httpx.AsyncClient) -> None:
+    # BIO 1 é porta a porta e tem viatura, mas é de biorresíduos: o têxtil molhar-se-ia. Só indiferenciado.
+    zones = (await logged_in.get(f"{P}/zones")).json()
+    circuits = {p["circuit"] for z in zones for p in z["door_to_door"]}
+    assert circuits and not any(c.startswith("BIO") for c in circuits)
+
+
+async def test_on_demand_rides_the_door_to_door_circuit_without_new_km(logged_in: httpx.AsyncClient) -> None:
+    s = (await logged_in.post(f"{P}/scenarios", json=request_body())).json()
+    zones = {z["code"]: z for z in (await logged_in.get(f"{P}/zones")).json()}
+    plan = s["result"]["collection_plan"]
+    pap = [e for e in plan if e["channel"] == "door_to_door"]
+    assert pap, "com 60 000 €/ano há freguesias servidas no circuito PAP"
+    alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
+    for e in pap:
+        passes = {(p["circuit"], p["weekday"], p["vehicle"]) for p in zones[e["parish_code"]]["door_to_door"]}
+        assert (e["circuit"], e["weekday"], e["vehicle"]) in passes and e["new_km_year"] == 0
+        assert e["kg_per_round"] == pytest.approx(e["tonnes_year"] * 1000 / 52, abs=0.1)
+        assert e["round_kg"] >= e["kg_per_round"] - 0.1
+        assert e["fits_capacity"] is None  # capacidade livre por validar com a Vitrus: não se inventa
+        part = next(x for x in alloc[e["parish_code"]]["parts"] if x["mode"] == "on_demand")
+        assert part["km_year"] == 0 and part["tonnes"] == pytest.approx(e["tonnes_year"], abs=0.002)
+    for e in plan:
+        if e["channel"] == "detour":
+            assert zones[e["parish_code"]]["door_to_door"] == [] and e["circuit"] is None
+
+
+async def test_avoided_treatment_is_pending_until_the_vitrus_cost_arrives(logged_in: httpx.AsyncClient) -> None:
+    body = (await logged_in.get(f"{P}/parameters")).json()
+    assert body["values"]["rsu_treatment_eur_per_t"] is None
+    meta = {m["key"]: m for m in body["meta"]}
+    assert "financeiro" in meta["rsu_treatment_eur_per_t"]["note"]
+    pending = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000))).json()
+    assert pending["result"]["kpis"]["avoided_treatment_eur"] is None  # «por validar»
+    params = {**body["values"], "rsu_treatment_eur_per_t": 50.0}
+    priced = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000, params=params))).json()
+    k = priced["result"]["kpis"]
+    assert k["avoided_treatment_eur"] == pytest.approx(k["tonnes_year"] * 50, abs=0.01)

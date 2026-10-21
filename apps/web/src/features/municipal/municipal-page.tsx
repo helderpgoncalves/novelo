@@ -7,6 +7,7 @@ import { PageTabs } from '@/components/page-tabs';
 import { Button } from '@/components/ui/button';
 import { formatNumber } from '@/lib/format';
 import { m } from '@/paraglide/messages';
+import { B2bTab } from './b2b-tab';
 import { CandidatesTab } from './candidates-tab';
 import { GapsTab } from './gaps-tab';
 import { MunicipalNote } from './note';
@@ -80,6 +81,7 @@ export function MunicipalPage({
             count: overview.sites.textile_candidates,
             content: <CandidatesTab overview={overview} onOpenSite={onSiteChange} />,
           },
+          { id: 'b2b', label: m.mun_tab_b2b(), content: <B2bTab onOpenSite={onSiteChange} /> },
           { id: 'gaps', label: m.mun_tab_gaps(), content: <GapsTab /> },
           {
             id: 'quality',

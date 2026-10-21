@@ -90,19 +90,39 @@ function readCsv(file) {
   return body.filter((r) => r.length === head.length).map((r) => Object.fromEntries(head.map((h, i) => [h, r[i]])));
 }
 const allSites = readCsv('municipal_sites.csv');
-const containersTotal = readCsv('municipal_containers.csv').length;
+const containers = readCsv('municipal_containers.csv');
+const containersTotal = containers.length;
 const byParish = readCsv('municipal_by_parish.csv');
-// Procura por ponto, como o modelo (docs/engenharia/dados-e-modelo.md, secção 8; site_service.py): cada freguesia reparte o
-// têxtil que ainda vai para o lixo (`textile_gap_t_estimate`) pelos seus locais não-produtores com contentores, na proporção
-// do número de contentores. Estimativa.
-const demandSites = allSites.filter((r) => r.site_class !== 'producer' && Number(r.containers) > 0);
+// Procura por ponto, como o modelo (docs/engenharia/dados-e-modelo.md, secção 8; site_service.py, `capacity_weights`): cada
+// freguesia reparte o têxtil que ainda vai para o lixo (`textile_gap_t_estimate`) pelos seus locais não-produtores com
+// contentores, na proporção da CAPACIDADE (litros); litros desconhecidos = mediana do tipo de contentor (sem nenhum valor
+// no tipo: a mediana de todos). Estimativa.
+const median = (xs) => {
+  const v = [...xs].sort((a, b) => a - b);
+  const m = Math.floor(v.length / 2);
+  return v.length === 0 ? 0 : v.length % 2 ? v[m] : (v[m - 1] + v[m]) / 2;
+};
+const knownByKind = new Map();
+for (const c of containers)
+  if (c.capacity_litres !== '') knownByKind.set(c.kind, [...(knownByKind.get(c.kind) ?? []), Number(c.capacity_litres)]);
+const medianByKind = new Map([...knownByKind].map(([k, v]) => [k, median(v)]));
+const medianAll = median(containers.filter((c) => c.capacity_litres !== '').map((c) => Number(c.capacity_litres)));
+const litres = new Map();
+for (const c of containers) {
+  if (!c.site_id) continue;
+  const l = c.capacity_litres !== '' ? Number(c.capacity_litres) : (medianByKind.get(c.kind) ?? medianAll);
+  litres.set(c.site_id, (litres.get(c.site_id) ?? 0) + l);
+}
+const demandSites = allSites.filter(
+  (r) => r.site_class !== 'producer' && Number(r.containers) > 0 && (litres.get(r.site_id) ?? 0) > 0,
+);
 const gapByCaop = new Map(byParish.map((r) => [r.dicofre_caop, Number(r.textile_gap_t_estimate)]));
 const caopToMapId = new Map(byParish.map((r) => [r.dicofre_caop, r.dicofre]));
 const weight = new Map();
-for (const r of demandSites) weight.set(r.parish_dicofre, (weight.get(r.parish_dicofre) ?? 0) + Number(r.containers));
+for (const r of demandSites) weight.set(r.parish_dicofre, (weight.get(r.parish_dicofre) ?? 0) + litres.get(r.site_id));
 const parishIndex = new Map(parishes.map((p, i) => [p.id, i]));
 const pts = demandSites.map((r) => {
-  const t = ((gapByCaop.get(r.parish_dicofre) ?? 0) * Number(r.containers)) / weight.get(r.parish_dicofre);
+  const t = ((gapByCaop.get(r.parish_dicofre) ?? 0) * litres.get(r.site_id)) / weight.get(r.parish_dicofre);
   const pi = parishIndex.get(caopToMapId.get(r.parish_dicofre));
   if (pi === undefined) throw new Error(`freguesia sem geometria: ${r.parish_dicofre}`);
   return { x: px(Number(r.longitude)), y: py(Number(r.latitude)), t, pi };

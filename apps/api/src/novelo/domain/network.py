@@ -58,6 +58,13 @@ class Params:
     piggyback_min_days: int  # dias/semana de circuito para a recolha a pedido "aproveitar" a rota
     vehicle_capacity_t: float
     depot: tuple[float, float]
+    # Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem; 0 km novos).
+    # None = o custo de uma recolha normal (`cost_per_collection_eur`).
+    pap_cost_per_pickup_eur: float | None = None
+
+    @property
+    def pap_pickup_eur(self) -> float:
+        return self.cost_per_collection_eur if self.pap_cost_per_pickup_eur is None else self.pap_cost_per_pickup_eur
 
 
 @dataclass(frozen=True)
@@ -69,6 +76,7 @@ class Zone:
     lon: float
     service_days: int  # dias por semana em que já passa um circuito da Vitrus (0 a 7)
     existing_points: int | None = None  # contentores têxteis ativos já na freguesia (None = sem dados)
+    door_to_door: bool = False  # passa lá um circuito porta a porta com viatura: a recolha a pedido vai nele
 
 
 @dataclass(frozen=True)
@@ -131,16 +139,23 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
 
     if mode == Mode.ON_DEMAND:
         pickups = tonnes * 1000 / params.on_demand_kg_per_pickup
-        piggyback = zone.service_days >= params.piggyback_min_days
-        km = pickups * (params.piggyback_extra_km if piggyback else round_trip)
+        if zone.door_to_door:
+            # (i) No circuito porta a porta: o saco vai na viatura que já passa à porta, 0 km novos.
+            km = 0.0
+            opex = pickups * params.pap_pickup_eur
+        else:
+            # (ii) A pedido com desvio: pequeno desvio onde já passa um circuito, senão ida e volta ao depósito.
+            piggyback = zone.service_days >= params.piggyback_min_days
+            km = pickups * (params.piggyback_extra_km if piggyback else round_trip)
+            opex = pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur
         return ModeCost(
             mode=mode,
             points=0,
             capture=capture,
             population_covered=covered,
             capex_eur=0.0,
-            opex_eur_year=pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur,
-            annual_cost_eur=pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur,
+            opex_eur_year=opex,
+            annual_cost_eur=opex,
             km_year=km,
             collections_year=pickups,
         )

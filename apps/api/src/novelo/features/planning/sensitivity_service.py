@@ -10,7 +10,7 @@ from novelo.domain import network
 from novelo.domain import sensitivity as sens
 from novelo.domain.vocab import CollectionMode
 from novelo.features.planning import service
-from novelo.features.planning.params import params_meta
+from novelo.features.planning.params import params_meta, to_domain_zone
 from novelo.features.planning.schemas import ParamSource, ScenarioOut, ZoneOut
 from novelo.features.planning.sensitivity_schemas import (
     MetricsOut,
@@ -44,12 +44,13 @@ async def load_plan(db: AsyncSession, scenario_id: uuid.UUID) -> tuple[ScenarioO
     zones = {z.code: z for z in await service.load_zone_rows(db, scenario.params.kg_per_inhab_month)}
     if scenario.result.siting is not None:
         return scenario, _site_plan(scenario, zones, dp), dp
+    pap = scenario.result.collection_plan is not None  # cenários antigos: sem o canal porta a porta
     items = []
     for a in scenario.result.allocations:
         if not a.parts:
             continue
         z = zones[a.parish_code]
-        zone = network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days)
+        zone = to_domain_zone(z, door_to_door=pap)
         modes = tuple(p.mode for p in a.parts)
         items.append(sens.PlanItem(zone, modes, sens.calibrate_km_scale(zone, modes, dp, [p.km_year for p in a.parts])))
     if not items:
@@ -73,7 +74,7 @@ def _site_plan(scenario: ScenarioOut, zones: dict[str, ZoneOut], dp: network.Par
         z = zones[a.parish_code]
         site_zones.append(
             sens.SiteZone(
-                network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days),
+                to_domain_zone(z, door_to_door=scenario.result.collection_plan is not None),
                 a.served_share,
                 on_demand,
             )
