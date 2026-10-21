@@ -9,10 +9,11 @@ from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, require_role
 from novelo.core.guest import NotGuest, NotGuestDep, SolverGuard
 from novelo.features.datasets.versioning import PlanningCache
-from novelo.features.planning import service
+from novelo.features.planning import reference, service
 from novelo.features.planning.schemas import (
     ParametersOut,
     PlanningParams,
+    ReferenceScenarioOut,
     ScenarioOut,
     ScenarioRequest,
     ScenarioSummary,
@@ -61,6 +62,14 @@ async def create_scenario(body: ScenarioRequest, user: CurrentUser, db: Db) -> S
 @router.get("/scenarios", response_model=list[ScenarioSummary])
 async def list_scenarios(db: Db) -> list[ScenarioSummary]:
     return await service.list_scenarios(db)
+
+
+@router.get("/scenarios/reference", response_model=list[ReferenceScenarioOut])
+async def list_reference_scenarios(db: Db) -> list[ReferenceScenarioOut]:
+    """Reference scenarios created by the app: 5 by real sites (20 000 to 150 000 €/yr, the budget curve) and 1 by
+    parish at 60 000 €/yr (`onboarding=true`, `reference_key=parish:60000`) with a ready collection plan. The newest
+    per key; `up_to_date=false` while startup recomputes it. Empty until the first background run finishes."""
+    return await reference.list_references(db)
 
 
 @router.get("/scenarios/{scenario_id}", response_model=ScenarioOut)

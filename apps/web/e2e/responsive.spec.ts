@@ -20,7 +20,7 @@ test('em telemóvel a navegação é uma barra de separadores e "Mais" abre a ga
   expect(await noOverflow(page)).toBe(true);
 
   await tabs.getByRole('button', { name: 'Mais secções' }).click();
-  await page.getByRole('link', { name: 'Circuitos atuais' }).click();
+  await page.getByRole('link', { name: 'Circuitos', exact: true }).click();
   await expect(page).toHaveURL(/\/pt\/circuits/);
   await expect(
     page.getByRole('heading', { level: 1, name: 'Circuitos e viaturas atuais' }),

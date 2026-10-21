@@ -369,6 +369,29 @@ class ScenarioSummary(BaseModel):
     siting: Siting = "parish"
     parent_id: uuid.UUID | None
     created_at: datetime
+    reference_key: str | None = Field(
+        default=None,
+        description=(
+            "Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários "
+            "dos utilizadores"
+        ),
+    )
+
+
+ReferenceStaleReason = Literal["model_version", "parameters", "no_collection_plan", "street"]
+
+
+class ReferenceScenarioOut(ScenarioSummary):
+    """Cenário de referência atual (o mais recente de cada chave)."""
+
+    up_to_date: bool = Field(description="Falso enquanto o arranque o recalcula (o antigo fica até haver o novo)")
+    stale_reasons: list[ReferenceStaleReason] = Field(
+        description=(
+            "Porque está desatualizado: versão do modelo, versão dos pressupostos, sem plano de recolha ou contentor "
+            "de rua"
+        )
+    )
+    onboarding: bool = Field(description="O plano por omissão do ecrã inicial e da introdução guiada")
 
 
 class ScenarioOut(ScenarioSummary):

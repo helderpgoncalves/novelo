@@ -66,6 +66,8 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 - **Retenção do copiloto:** `python -m novelo.cli purge-copilot` apaga o que passou do prazo; pode agendar-se uma vez por dia no Coolify (ver [Copiloto](copiloto.md#definições-do-utilizador-vs-definições-do-sistema)).
 - **Rollback:** `git revert` do commit em `main` e novo push. Antes da apresentação, marcar a versão da demo com uma tag (`v1.0-demo`).
 - **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. Tudo o resto reconstrói-se a partir do repositório.
+- **Cenários de referência:** com `SEED_REFERENCE_SCENARIOS=true` (por omissão no `docker-compose.yml`), cada arranque verifica em segundo plano os 6 cenários de referência e recalcula os desatualizados (um processo de cada vez, por tranca do Postgres; 20 a 40 s cada por locais). Depois de um deploy que mude o modelo, sobe `REFERENCE_MODEL_VERSION` em `features/planning/reference.py` (ver [Arquitetura](arquitetura.md#cenários-de-referência)).
+- **Registo aberto:** para um evento, um administrador liga-o com `PATCH /api/v1/admin/settings` (`open_registration`, opcionalmente `approve_pending` para aprovar já os pendentes); fica na base de dados, não é uma variável de ambiente.
 - **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem os custos ou uma caracterização do lixo). A pasta `data/raw` não vai para a imagem.
 
 ## Diagnóstico rápido

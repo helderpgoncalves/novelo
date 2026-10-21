@@ -37,6 +37,7 @@ from novelo.features.auth.models import EmailVerificationToken, PasswordResetTok
 from novelo.features.auth.schemas import password_problem
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.models import EmailDelivery
+from novelo.features.users import open_registration
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
@@ -85,6 +86,7 @@ async def login(db: AsyncSession, email: str, password: str, remember: bool = Tr
         raise AccountInactiveError("Account is inactive")
     if needs_rehash(user.hashed_password):
         user.hashed_password = await hash_password_async(password)
+    await open_registration.auto_approve_if_open(db, user, "password")
     access, refresh = await issue_session(db, user, remember)
     return user, access, refresh
 
@@ -109,8 +111,10 @@ async def register(
     user = await users.create_user(
         db, email=email, password=password, name=name, locale=locale, approval_status="pending"
     )
+    approved = await open_registration.auto_approve_if_open(db, user, "password")
     access, refresh = await issue_session(db, user, remember)
-    await announce_registration(db, sender, user)
+    if not approved:
+        await announce_registration(db, sender, user)
     await send_verification(db, sender, user)
     return user, access, refresh
 
@@ -243,8 +247,9 @@ async def login_with_google(
             raise RegistrationClosedError("Registration is closed")
     if not user.is_active:
         raise AccountInactiveError("Account is inactive")
+    approved = await open_registration.auto_approve_if_open(db, user, "google")
     access, refresh = await issue_session(db, user)
-    if created and sender is not None:
+    if created and not approved and sender is not None:
         await announce_registration(db, sender, user)
     return user, access, refresh
 

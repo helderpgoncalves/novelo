@@ -60,6 +60,7 @@ from novelo.features.auth.schemas import (
     QuickJoinRequest,
     QuickJoinResult,
     RegisterRequest,
+    RegistrationInfo,
     ResetPasswordRequest,
     SignedIn,
     VerifyEmailRequest,
@@ -67,7 +68,7 @@ from novelo.features.auth.schemas import (
 from novelo.features.email_log import monitor
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.schemas import DeliveryStatusOrNone
-from novelo.features.users import approvals, impersonation, invitations, onboarding
+from novelo.features.users import approvals, impersonation, invitations, onboarding, open_registration
 from novelo.features.users import service as users_service
 from novelo.features.users.models import ApprovalStatus, User
 from novelo.features.users.schemas import (
@@ -97,8 +98,8 @@ REFRESH_PATH = cookies.REFRESH_PATH
 
 
 @router.get("/config", response_model=AuthConfig)
-def get_auth_config() -> AuthConfig:
-    """O que o ecrã de entrada precisa de saber: Google ligado? registo aberto?"""
+async def get_auth_config(db: Db) -> AuthConfig:
+    """O que o ecrã de entrada precisa de saber: Google ligado? registo permitido? precisa de aprovação?"""
     s = get_settings()
     return AuthConfig(
         google_enabled=s.google_enabled,
@@ -107,7 +108,15 @@ def get_auth_config() -> AuthConfig:
         quick_join_enabled=s.quick_join_active,
         turnstile_enabled=s.turnstile_enabled,
         turnstile_site_key=s.turnstile_site if s.turnstile_enabled and s.turnstile_secret else None,
+        approval_required=not await open_registration.is_open(db),
     )
+
+
+@router.get("/registration", response_model=RegistrationInfo)
+async def get_registration_info(db: Db) -> RegistrationInfo:
+    """Público (sem sessão): o registo está aberto? Com `open=true` quem se regista entra logo, sem esperar pela
+    aprovação de um administrador. Não expõe mais nada."""
+    return RegistrationInfo(open=get_settings().allow_registration and await open_registration.is_open(db))
 
 
 def _user_agent(request: Request) -> str | None:

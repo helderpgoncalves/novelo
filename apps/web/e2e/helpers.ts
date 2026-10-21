@@ -21,6 +21,14 @@ async function restoreAdminSession(page: Page): Promise<boolean> {
     };
     if (Date.now() - saved.savedAt > SESSION_MAX_AGE_MS) return false;
     await page.context().addCookies(saved.cookies);
+    // A pista de sessão (`novelo_session=1`) é posta pelo cliente ao entrar; sem ela, `/` mostra a landing pública.
+    await page.context().addCookies([
+      {
+        name: 'novelo_session',
+        value: '1',
+        url: process.env.E2E_BASE_URL ?? 'http://localhost:3190',
+      },
+    ]);
     await page.goto('/pt/');
     await expect(page.locator('#content h1').first()).toBeVisible({ timeout: 8_000 });
     return !/\/login/.test(page.url());
@@ -35,7 +43,7 @@ export async function login(page: Page, credentials = ADMIN) {
   if (credentials === ADMIN && (await restoreAdminSession(page))) return;
   await page.goto('/pt/login?method=password');
   await page.getByLabel('Email').fill(credentials.email);
-  await page.getByLabel('Password', { exact: true }).fill(credentials.password);
+  await page.getByLabel('Palavra-passe', { exact: true }).fill(credentials.password);
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page).toHaveURL(/\/pt\/?$/);
   // Espera pelo conteúdo: antes disso o layout ainda está a ser montado e os cliques perdem-se.

@@ -18,7 +18,7 @@ test.describe('sala de decisão', () => {
   test('título e faixa de situação com os números reais, selo e fonte', async ({ page }) => {
     const h1 = page.getByRole('heading', { level: 1 });
     await expect(h1).toContainText('Guimarães recolhe');
-    await expect(h1).toContainText(/Faltam ≈ 1\s?016 t/);
+    await expect(h1).toContainText(/≈ 2\s?325 t por ano ainda vão para o lixo/);
 
     const strip = page.getByRole('region', { name: 'Situação em números' });
     await expect(strip).toContainText('301,3');
@@ -30,9 +30,9 @@ test.describe('sala de decisão', () => {
   });
 
   test('mapa: camada, teclado, detalhe e URL partilhável', async ({ page }) => {
-    const map = page.getByRole('listbox', { name: /Mapa de meio-tom das 48 freguesias/ });
+    const map = page.getByRole('listbox', { name: /Mapa das 48 freguesias de Guimarães/ });
     await expect(map).toBeVisible();
-    await expect(page.getByText('Não existe captura por freguesia')).toBeVisible();
+    await expect(page.getByText('Não existe captura por freguesia').first()).toBeVisible();
 
     await page
       .getByRole('radio', { name: /Contentores municipais \(não são de têxteis\)/ })
@@ -53,13 +53,29 @@ test.describe('sala de decisão', () => {
   test('orçamento: a alça mexe nos números e abre o simulador com o orçamento', async ({
     page,
   }) => {
-    const slider = page.getByRole('slider', { name: 'Orçamento anual' });
+    const slider = page.locator('#orcamento').getByRole('slider');
     await expect(slider).toBeVisible();
     await slider.focus();
     await page.keyboard.press('End');
     await expect(page).toHaveURL(/budget=\d+/);
     const open = page.getByRole('link', { name: 'Abrir no simulador com este orçamento' });
     await expect(open).toHaveAttribute('href', /\/simulator\?.*budget=\d+/);
+  });
+
+  test('o plano sem contentores: porta a porta com 0 km novos, custo com incerteza e o piloto', async ({
+    page,
+  }) => {
+    const plan = page.locator('#plano');
+    await plan.scrollIntoViewIfNeeded();
+    await expect(plan.getByRole('heading', { name: /O plano: sem contentores/ })).toBeVisible();
+    await expect(plan).toContainText(/\d+ freguesias/);
+    await expect(plan).toContainText('0 km novos');
+    // O intervalo P10–P90 vem de um POST (sensibilidade); sem ele fica o custo central e o botão para o calcular.
+    await expect(plan.getByText(/\d+ €\/t/).first()).toBeVisible({ timeout: 20_000 });
+    await expect(plan.getByRole('link', { name: 'Ver o piloto' })).toHaveAttribute(
+      'href',
+      /\/pilot/,
+    );
   });
 
   test('o fio, confiança dos dados e próximos passos', async ({ page }) => {
@@ -122,7 +138,7 @@ test.describe('telemóvel', () => {
     await login(page);
     await page.waitForTimeout(500);
     await noHorizontalOverflow(page);
-    const chip = page.getByRole('radio', { name: 'População' });
+    const chip = page.getByRole('radio', { name: 'População', exact: true });
     const box = await chip.boundingBox();
     expect(box?.height ?? 0).toBeGreaterThanOrEqual(40);
     await page.locator('#orcamento').scrollIntoViewIfNeeded();

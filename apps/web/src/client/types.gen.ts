@@ -534,6 +534,92 @@ export type AllocationPart = {
 };
 
 /**
+ * AppSettingsOut
+ */
+export type AppSettingsOut = {
+    /**
+     * Open Registration
+     *
+     * Registo aberto: quem se regista (password ou Google) ou entra com a conta por aprovar fica logo aprovado, com o papel por omissão (`operator`). Contas recusadas e emails já recusados nunca
+     */
+    open_registration: boolean;
+    /**
+     * Pending Approvals
+     *
+     * Contas à espera de aprovação neste momento
+     */
+    pending_approvals: number;
+    /**
+     * Updated At
+     *
+     * Última alteração; nulo = nunca alterado (valores por omissão)
+     */
+    updated_at: string | null;
+    /**
+     * Updated By Id
+     */
+    updated_by_id: string | null;
+};
+
+/**
+ * AppSettingsUpdate
+ */
+export type AppSettingsUpdate = {
+    /**
+     * Approve Pending
+     *
+     * Aprova também agora as contas `pending` (só com o registo aberto; 409 se ficar fechado). Os emails já recusados ficam à espera. Auditado por conta
+     */
+    approve_pending?: boolean;
+    /**
+     * Open Registration
+     *
+     * Omitido = mantém
+     */
+    open_registration?: boolean | null;
+};
+
+/**
+ * AppSettingsUpdated
+ */
+export type AppSettingsUpdated = {
+    /**
+     * Approved Pending
+     *
+     * Contas pendentes aprovadas por `approve_pending`
+     */
+    approved_pending: number;
+    /**
+     * Open Registration
+     *
+     * Registo aberto: quem se regista (password ou Google) ou entra com a conta por aprovar fica logo aprovado, com o papel por omissão (`operator`). Contas recusadas e emails já recusados nunca
+     */
+    open_registration: boolean;
+    /**
+     * Pending Approvals
+     *
+     * Contas à espera de aprovação neste momento
+     */
+    pending_approvals: number;
+    /**
+     * Skipped Previously Rejected
+     *
+     * Contas pendentes que ficaram à espera porque o email já foi recusado antes
+     */
+    skipped_previously_rejected: number;
+    /**
+     * Updated At
+     *
+     * Última alteração; nulo = nunca alterado (valores por omissão)
+     */
+    updated_at: string | null;
+    /**
+     * Updated By Id
+     */
+    updated_by_id: string | null;
+};
+
+/**
  * ApprovalEmailOut
  *
  * O email que avisa a pessoa do pedido (pendentes) ou da decisão (aprovada/recusada).
@@ -920,7 +1006,7 @@ export type AuthConfig = {
     /**
      * Approval Required
      *
-     * Contas novas (password ou Google) ficam à espera de aprovação de um administrador
+     * Contas novas (password ou Google) ficam à espera de aprovação de um administrador; `false` com o registo aberto (definição `open_registration`)
      */
     approval_required?: boolean;
     /**
@@ -8326,6 +8412,88 @@ export type Readiness = {
 };
 
 /**
+ * ReferenceScenarioOut
+ *
+ * Cenário de referência atual (o mais recente de cada chave).
+ */
+export type ReferenceScenarioOut = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Budget Eur Year
+     */
+    budget_eur_year: number | null;
+    /**
+     * Capex Eur
+     */
+    capex_eur: number;
+    /**
+     * Coverage Pct
+     */
+    coverage_pct: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Eur Per Tonne
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Label
+     */
+    label: string;
+    objective: ScenarioObjective;
+    /**
+     * Onboarding
+     *
+     * O plano por omissão do ecrã inicial e da introdução guiada
+     */
+    onboarding: boolean;
+    /**
+     * Parent Id
+     */
+    parent_id: string | null;
+    /**
+     * Reference Key
+     *
+     * Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores
+     */
+    reference_key?: string | null;
+    /**
+     * Siting
+     */
+    siting?: 'parish' | 'sites';
+    /**
+     * Stale Reasons
+     *
+     * Porque está desatualizado: versão do modelo, versão dos pressupostos, sem plano de recolha ou contentor de rua
+     */
+    stale_reasons: Array<'model_version' | 'parameters' | 'no_collection_plan' | 'street'>;
+    status: ScenarioStatus;
+    /**
+     * Target Tonnes
+     */
+    target_tonnes: number | null;
+    /**
+     * Tonnes Year
+     */
+    tonnes_year: number;
+    /**
+     * Up To Date
+     *
+     * Falso enquanto o arranque o recalcula (o antigo fica até haver o novo)
+     */
+    up_to_date: boolean;
+};
+
+/**
  * ReferenceStandard
  */
 export type ReferenceStandard = {
@@ -8387,6 +8555,20 @@ export type RegisterRequest = {
      * Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot
      */
     website?: string | null;
+};
+
+/**
+ * RegistrationInfo
+ *
+ * Público e mínimo: o ecrã de registo diz «entras logo» quando `open` é verdadeiro.
+ */
+export type RegistrationInfo = {
+    /**
+     * Open
+     *
+     * Registo aberto: quem se regista (password ou Google) entra logo, sem aprovação
+     */
+    open: boolean;
 };
 
 /**
@@ -8895,6 +9077,12 @@ export type ScenarioOut = {
      * Parent Id
      */
     parent_id: string | null;
+    /**
+     * Reference Key
+     *
+     * Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores
+     */
+    reference_key?: string | null;
     result: ScenarioResult;
     /**
      * Siting
@@ -9089,6 +9277,12 @@ export type ScenarioSummary = {
      * Parent Id
      */
     parent_id: string | null;
+    /**
+     * Reference Key
+     *
+     * Cenário de referência criado pela aplicação (`sites:<€/ano>` ou `parish:<€/ano>`); nulo nos cenários dos utilizadores
+     */
+    reference_key?: string | null;
     /**
      * Siting
      */
@@ -11334,6 +11528,128 @@ export type ZoneOut = {
     tipau: Tipau | null;
 };
 
+export type GetAppSettingsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/settings';
+};
+
+export type GetAppSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetAppSettingsError = GetAppSettingsErrors[keyof GetAppSettingsErrors];
+
+export type GetAppSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppSettingsOut;
+};
+
+export type GetAppSettingsResponse = GetAppSettingsResponses[keyof GetAppSettingsResponses];
+
+export type UpdateAppSettingsData = {
+    body: AppSettingsUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/settings';
+};
+
+export type UpdateAppSettingsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateAppSettingsError = UpdateAppSettingsErrors[keyof UpdateAppSettingsErrors];
+
+export type UpdateAppSettingsResponses = {
+    /**
+     * Successful Response
+     */
+    200: AppSettingsUpdated;
+};
+
+export type UpdateAppSettingsResponse = UpdateAppSettingsResponses[keyof UpdateAppSettingsResponses];
+
 export type GetAiCreditsData = {
     body?: never;
     path?: never;
@@ -13252,6 +13568,67 @@ export type RegisterResponses = {
 };
 
 export type RegisterResponse = RegisterResponses[keyof RegisterResponses];
+
+export type GetRegistrationInfoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/registration';
+};
+
+export type GetRegistrationInfoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetRegistrationInfoError = GetRegistrationInfoErrors[keyof GetRegistrationInfoErrors];
+
+export type GetRegistrationInfoResponses = {
+    /**
+     * Successful Response
+     */
+    200: RegistrationInfo;
+};
+
+export type GetRegistrationInfoResponse = GetRegistrationInfoResponses[keyof GetRegistrationInfoResponses];
 
 export type ResendRegistrationEmailData = {
     body?: never;
@@ -19486,6 +19863,69 @@ export type CreateScenarioResponses = {
 };
 
 export type CreateScenarioResponse = CreateScenarioResponses[keyof CreateScenarioResponses];
+
+export type ListReferenceScenariosData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/planning/scenarios/reference';
+};
+
+export type ListReferenceScenariosErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListReferenceScenariosError = ListReferenceScenariosErrors[keyof ListReferenceScenariosErrors];
+
+export type ListReferenceScenariosResponses = {
+    /**
+     * Response List Reference Scenarios
+     *
+     * Successful Response
+     */
+    200: Array<ReferenceScenarioOut>;
+};
+
+export type ListReferenceScenariosResponse = ListReferenceScenariosResponses[keyof ListReferenceScenariosResponses];
 
 export type DeleteScenarioData = {
     body?: never;

@@ -49,10 +49,10 @@ export default defineConfig({
             icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
           },
           {
-            name: 'Cobertura da rede',
-            short_name: 'Cobertura',
-            description: 'Onde a recolha já chega e onde falta',
-            url: '/coverage?source=shortcut',
+            name: 'Mapa',
+            short_name: 'Mapa',
+            description: 'Onde o têxtil se perde no lixo e onde a viatura já passa',
+            url: '/map?source=shortcut',
             icons: [{ src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' }],
           },
           {

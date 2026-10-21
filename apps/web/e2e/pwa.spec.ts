@@ -15,7 +15,7 @@ test('o manifest está completo (id, start_url, atalhos, ícones maskable)', asy
   expect(manifest.display_override).toContain('standalone');
   expect(manifest.categories?.length).toBeGreaterThan(0);
   const urls = (manifest.shortcuts as { url: string }[]).map((s) => s.url.split('?')[0]);
-  expect(urls).toEqual(['/simulator', '/chat', '/coverage', '/triage']);
+  expect(urls).toEqual(['/simulator', '/chat', '/map', '/triage']);
   expect((manifest.icons as { purpose?: string }[]).some((i) => i.purpose === 'maskable')).toBe(
     true,
   );

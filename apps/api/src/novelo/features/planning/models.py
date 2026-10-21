@@ -64,3 +64,7 @@ class Scenario(Base, UuidPkMixin, TimestampMixin):
     created_by_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True
     )
+    # Cenário de referência criado pelo arranque (`planning/reference.py`): chave estável (ex.: `sites:60000`,
+    # `parish:60000`) e a versão do modelo com que foi calculado. Nulo = cenário de um utilizador (nunca se apaga).
+    reference_key: Mapped[str | None] = mapped_column(String(40), index=True)
+    reference_version: Mapped[int | None] = mapped_column(SmallInteger)

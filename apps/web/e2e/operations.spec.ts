@@ -52,17 +52,18 @@ test.describe('lotes, passaporte, bolsa e marcas', () => {
     await anonymous.close();
 
     // Bolsa de fibra: reservar.
-    await page.goto('/pt/market');
+    await page.goto('/pt/lots?tab=market');
     const card = page.getByRole('listitem').filter({ hasText: lot.code });
     await card.getByRole('button', { name: 'Reservar' }).click();
-    await page.getByLabel('Reciclador').fill('Têxtil do Ave, Lda');
+    await page.getByLabel(/Destino/).fill('Têxtil do Ave, Lda');
     await page.getByLabel('Contacto').fill('geral@textildoave.pt');
     await page.getByRole('dialog').getByRole('button', { name: 'Reservar' }).click();
     await expect(page.getByText('Lote reservado')).toBeVisible();
     await expect(card.getByText('Reservado').first()).toBeVisible();
 
     // Marcas: evidência com tamanho da amostra.
-    await page.goto('/pt/brands');
+    await page.getByRole('tab', { name: /Evidência por marca/ }).click();
+    await expect(page).toHaveURL(/tab=brands/);
     await expect(page.getByRole('row', { name: /Zara/ })).toBeVisible();
     await expect(page.getByText(/menos de 30 peças/)).toBeVisible();
   });

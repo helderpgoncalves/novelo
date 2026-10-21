@@ -38,7 +38,13 @@ export function NumberField({
   className,
 }: NumberFieldProps) {
   const id = useId();
-  const shown = value == null ? null : percent ? Math.round(value * 10000) / 100 : value;
+  // Mostra no máximo 4 casas decimais (ex.: 1,2353 kg em vez de 1,2352834279155773); o valor guardado só muda se for editado.
+  const shown =
+    value == null
+      ? null
+      : percent
+        ? Math.round(value * 10000) / 100
+        : Math.round(value * 10000) / 10000;
 
   return (
     <div className={cn('space-y-1.5', className)}>

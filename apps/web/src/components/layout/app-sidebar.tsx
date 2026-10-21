@@ -99,13 +99,14 @@ function SidebarBody({ role, onNavigate }: { role: string; onNavigate?: () => vo
         </Link>
       </div>
       <NavList role={role} onNavigate={onNavigate} />
-      <div className="border-sidebar-border border-t p-4">
-        <p className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
+      <div className="border-sidebar-border border-t px-5 py-4">
+        <p className="font-semibold text-[10px] text-primary uppercase tracking-[0.18em]">
           {m.sidebar_event()}
         </p>
-        <p className="mt-1 text-muted-foreground text-xs leading-relaxed">
+        <p className="mt-1 font-serif text-[15px] text-foreground leading-tight">
           {m.sidebar_challenge()}
         </p>
+        <p className="mt-1 text-[11px] text-muted-foreground leading-snug">{m.sidebar_data()}</p>
       </div>
     </div>
   );

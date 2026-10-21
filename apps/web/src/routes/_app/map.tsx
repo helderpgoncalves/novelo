@@ -1,14 +1,9 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { Layers } from 'lucide-react';
-import { useMemo, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { z } from 'zod';
-import {
-  getCoverageOptions,
-  listContainersOptions,
-  listLocalitiesOptions,
-  listZonesOptions,
-} from '@/client/@tanstack/react-query.gen';
+import { listLocalitiesOptions, listZonesOptions } from '@/client/@tanstack/react-query.gen';
 import { FilterChips } from '@/components/filter-chips';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
@@ -39,7 +34,6 @@ import {
 } from '@/features/municipal/derive';
 import { SiteSheet } from '@/features/municipal/site-sheet';
 import { useMediaQuery } from '@/hooks/use-media-query';
-import { getErrorMessage } from '@/lib/errors';
 import { formatNumber, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
@@ -79,7 +73,6 @@ function NetworkMapPage() {
   const { data: zones } = useSuspenseQuery(listZonesOptions());
   const { data: localities } = useSuspenseQuery(listLocalitiesOptions());
   const [metric, setMetric] = useState<MapMetric>('demand_t');
-  const [showContainers, setShowContainers] = useState(true);
   const [selected, setSelected] = useState<string | null>(search.parish ?? null);
   const [layersOpen, setLayersOpen] = useState(false);
   const desktop = useMediaQuery('(min-width: 1280px)');
@@ -127,21 +120,6 @@ function NetworkMapPage() {
       replace: true,
     });
   const layersPanel = <LayersPanel state={layers} onChange={changeLayers} {...panel} />;
-
-  const containersQuery = useQuery(listContainersOptions({ query: { limit: 1000 } }));
-  const coverageQuery = useQuery(getCoverageOptions({ query: { radius_m: 300 } }));
-  const containers = containersQuery.data?.items ?? [];
-  const containersTotal = containersQuery.data?.total ?? 0;
-  const coverageReady = coverageQuery.data?.state === 'ok';
-  const coverage = useMemo(
-    () =>
-      coverageReady
-        ? Object.fromEntries(
-            (coverageQuery.data?.parishes ?? []).map((p) => [p.parish_code, p.covered_pct]),
-          )
-        : undefined,
-    [coverageReady, coverageQuery.data],
-  );
 
   const population = zones.reduce((s, z) => s + z.population, 0);
   const demand = zones.reduce((s, z) => s + z.demand_t, 0);
@@ -211,9 +189,6 @@ function NetworkMapPage() {
               { value: 'demand_t', label: m.map_layer_demand() },
               { value: 'population', label: m.map_layer_population() },
               { value: 'service_days', label: m.map_layer_service() },
-              ...(coverageReady
-                ? [{ value: 'covered_pct' as const, label: m.mapc_metric_coverage() }]
-                : []),
             ]}
           />
         ) : (
@@ -227,21 +202,6 @@ function NetworkMapPage() {
             />
             {m.map_show_localities()}
           </Label>
-          <Label className="flex min-h-10 items-center gap-2 font-normal text-sm">
-            <Switch
-              checked={showContainers}
-              onCheckedChange={setShowContainers}
-              disabled={containers.length === 0}
-            />
-            {m.mapc_layer()}
-            <span className="text-muted-foreground text-xs tabular-nums">
-              {containersQuery.isPending
-                ? m.mapc_layer_loading()
-                : containers.length > 0
-                  ? m.mapc_layer_count({ count: formatNumber(containers.length) })
-                  : null}
-            </span>
-          </Label>
         </div>
       </div>
 
@@ -251,8 +211,6 @@ function NetworkMapPage() {
           localities={localities}
           metric={metric}
           showLocalities={showLocalities}
-          containers={showContainers ? containers : null}
-          coverage={coverage}
           municipal={municipal}
           selected={selected}
           onSelect={selectParish}
@@ -290,25 +248,6 @@ function NetworkMapPage() {
         onClose={() => selectSite(null)}
         showMapLink={false}
       />
-      {containersQuery.isError ? (
-        <div role="alert" className="flex flex-wrap items-center gap-3 text-sm">
-          <span className="text-destructive">
-            {m.mapc_layer_error()} {getErrorMessage(containersQuery.error)}
-          </span>
-          <Button variant="outline" size="sm" onClick={() => containersQuery.refetch()}>
-            {m.common_retry()}
-          </Button>
-        </div>
-      ) : containersQuery.isSuccess && containers.length === 0 ? (
-        <p className="text-muted-foreground text-xs">{m.map_containers_note()}</p>
-      ) : containersTotal > containers.length ? (
-        <p className="text-muted-foreground text-xs">
-          {m.mapc_layer_truncated({
-            shown: formatNumber(containers.length),
-            total: formatNumber(containersTotal),
-          })}
-        </p>
-      ) : null}
     </Page>
   );
 }

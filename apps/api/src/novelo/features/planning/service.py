@@ -381,7 +381,11 @@ def _summary(row: Scenario) -> ScenarioSummary:
         siting="sites" if row.siting == "sites" else "parish",
         parent_id=row.parent_id,
         created_at=row.created_at,
+        reference_key=row.reference_key,
     )
+
+
+summary_of = _summary
 
 
 def _out(row: Scenario) -> ScenarioOut:
@@ -394,7 +398,14 @@ def _out(row: Scenario) -> ScenarioOut:
     )
 
 
-async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -> ScenarioOut:
+async def run_scenario(
+    db: AsyncSession,
+    request: ScenarioRequest,
+    user: User,
+    *,
+    reference_key: str | None = None,
+    reference_version: int | None = None,
+) -> ScenarioOut:
     stored = await ensure_default_parameters(db)
     params = request.params or PlanningParams.model_validate(stored.values)
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
@@ -430,6 +441,8 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
         siting=request.siting,
         parent_id=request.parent_id,
         created_by_id=user.id,
+        reference_key=reference_key,
+        reference_version=reference_version,
     )
     db.add(row)
     await db.commit()

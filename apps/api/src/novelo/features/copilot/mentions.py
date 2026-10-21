@@ -139,7 +139,7 @@ async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: s
             add(str(rid), title, created.strftime("%d/%m/%Y"), "file-text", "/reports")
     elif kind == MentionType.BRAND:
         for br in (await lots.brands(db)).brands:
-            add(br.brand, br.brand, f"{br.items} {'peças' if pt else 'items'}", "tag", "/brands")
+            add(br.brand, br.brand, f"{br.items} {'peças' if pt else 'items'}", "tag", "/lots?tab=brands")
     elif kind == MentionType.FIBRE:
         for f in Fibre:
             add(
@@ -147,7 +147,7 @@ async def _candidates(db: AsyncSession, user: User, kind: MentionType, locale: s
                 FIBRE_LABELS[locale if locale in FIBRE_LABELS else "pt-PT"][f.value],
                 f.value,
                 "shirt",
-                "/market",
+                "/lots?tab=market",
                 f.value,
             )
     elif kind == MentionType.MUNICIPAL_SITE:

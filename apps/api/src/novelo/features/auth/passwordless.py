@@ -26,6 +26,7 @@ from novelo.features.auth.models import LoginToken
 from novelo.features.auth.schemas import GuestOut, GuestPage
 from novelo.features.copilot.models import CopilotAction, CopilotMessage, CopilotThread
 from novelo.features.email_log import service as email_log
+from novelo.features.users import open_registration
 from novelo.features.users import service as users
 from novelo.features.users.models import User
 
@@ -116,6 +117,7 @@ async def verify_magic_link(db: AsyncSession, token: str) -> tuple[User, str, st
         raise InvalidTokenError("Invalid or expired sign-in link")
     await service.claim_unverified_account(db, user)
     user.email_verified = True  # o link chegou à caixa de correio: provou a posse do email
+    await open_registration.auto_approve_if_open(db, user, "magic_link")
     access, refresh = await service.issue_session(db, user, remember=True)
     return user, access, refresh, safe_next(consumed.next_path)
 
