@@ -230,9 +230,9 @@ test.describe('sessão', () => {
     // Clica-se com a sessão ainda recusada, senão o guarda do login reencaminhava para a app.
     await page.getByRole('link', { name: 'Entrar com palavra-passe' }).click();
     await expect(page).toHaveURL(/method=password/);
-    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Palavra-passe', { exact: true })).toBeVisible();
     await page.getByLabel('Email').fill(ADMIN.email);
-    await page.getByLabel('Password', { exact: true }).fill(ADMIN.password);
+    await page.getByLabel('Palavra-passe', { exact: true }).fill(ADMIN.password);
     await expect(page.getByLabel('Email')).toHaveValue(ADMIN.email);
     // Só agora a sessão volta a existir (senão o guarda do login reencaminhava antes de escrever).
     await page.unroute(FLEET_API);
@@ -255,7 +255,7 @@ test.describe('formulários', () => {
   }) => {
     await page.goto('/pt/register');
     await page.getByLabel('Email').fill(ADMIN.email);
-    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Palavra-passe', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Criar conta' }).click();
     await expect(page.getByText('Já existe uma conta com este email.')).toBeVisible();
     await expect(page.getByLabel('Email')).toBeFocused();

@@ -3718,3 +3718,105 @@ body:has([data-landing]) {
   }
 }
 /* ===== /lp-ft ===== */
+
+/* ---------- Apresentação de primeira visita (features/onboarding/onboarding-story.tsx) ----------
+   Papel, Floresta e meio-tom; Newsreader nos títulos e Geist Mono nas etiquetas e nos dados. Só opacidade e transform; com
+   movimento reduzido tudo aparece já no estado final (nada se perde: os valores estão sempre no texto). */
+.ob-root :is(h2, .font-serif) {
+  font-family: "Newsreader Display", "Newsreader", Georgia, serif;
+  font-optical-sizing: auto;
+}
+.ob-mono {
+  font-family: "Geist Mono Landing", ui-monospace, "SF Mono", Menlo, monospace;
+  font-feature-settings: "zero";
+}
+.ob-kicker {
+  font: 500 11.5px/1.3 "Geist Mono Landing", ui-monospace, "SF Mono", Menlo, monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+/* Textura de meio-tom num canto do palco, longe dos dados (a linguagem dither da marca, sem imagem). */
+.ob-halftone::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.55;
+  background-image: radial-gradient(
+    circle,
+    color-mix(in oklab, var(--primary) 30%, transparent) 0.9px,
+    transparent 1.3px
+  );
+  background-size: 11px 11px;
+  -webkit-mask-image: radial-gradient(ellipse 60% 55% at 100% 0%, #000, transparent 72%);
+  mask-image: radial-gradient(ellipse 60% 55% at 100% 0%, #000, transparent 72%);
+}
+/* Fotografia da antiga fábrica têxtil, em meio-tom, no fundo da coluna dos passos. */
+.ob-rail-photo {
+  --photo-mask: linear-gradient(to top, #000 0%, transparent 55%);
+  --photo-o: 0.55;
+  --photo-pos: 30% 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .ob-root [data-rise] {
+    animation: ob-rise 520ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 90ms);
+  }
+  .ob-waffle [data-cell] {
+    animation: ob-pop 380ms var(--ease-out) both;
+    animation-delay: calc(500ms + var(--i, 0) * 9ms);
+  }
+  .ob-sites [data-ring] {
+    animation: ob-fade 900ms var(--ease-out) both;
+    animation-delay: calc(250ms + var(--r, 0) * 140ms);
+  }
+  .ob-sites [data-draw] {
+    stroke-dasharray: 1;
+    animation: ob-draw 1200ms var(--ease-out) both;
+  }
+  .ob-bar {
+    animation: ob-grow 900ms var(--ease-out) both;
+    animation-delay: calc(400ms + var(--i, 0) * 120ms);
+    transform-origin: left center;
+  }
+  .ob-root [data-step-enter] {
+    animation: ob-enter 360ms var(--ease-out) both;
+  }
+}
+@keyframes ob-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+@keyframes ob-enter {
+  from {
+    opacity: 0;
+    transform: translateX(var(--ob-dir, 16px));
+  }
+}
+@keyframes ob-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+@keyframes ob-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes ob-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+@keyframes ob-grow {
+  from {
+    transform: scaleX(0);
+  }
+}

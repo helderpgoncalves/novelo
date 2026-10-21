@@ -9,7 +9,7 @@ import {
   Truck,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { type CollectionMode, recommendPilot, type ScenarioOut } from '@/client';
+import type { ScenarioOut } from '@/client';
 import {
   getB2bChannelOptions,
   getScenarioOptions,
@@ -26,6 +26,7 @@ import { useSensitivity } from '@/features/scenarios/uncertainty-panel';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { intlTag } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
+import { PILOT_PARAMS, pilotQueryOptions } from './pilot-query';
 import { type PlanChannels, planChannels } from './plan-model';
 import { EYEBROW } from './tags';
 
@@ -320,32 +321,9 @@ function Uncertainty({ scenario }: { scenario: ScenarioOut }) {
   );
 }
 
-// Os mesmos do ecrã do piloto, para partilhar a cache: a Vitrus não tem contentores de têxtil.
-const PILOT_PARAMS = {
-  k: 2,
-  months: 3,
-  modes: ['existing', 'on_demand'] as CollectionMode[],
-  floor: undefined,
-};
-
 /** O próximo passo: o piloto recomendado (freguesias, toneladas, €/t com intervalo e arranque). */
 export function PilotNext() {
-  const pilot = useQuery({
-    queryKey: ['pilot', PILOT_PARAMS],
-    staleTime: Number.POSITIVE_INFINITY,
-    queryFn: async () => {
-      const { data } = await recommendPilot({
-        body: {
-          k: PILOT_PARAMS.k,
-          months: PILOT_PARAMS.months,
-          modes: PILOT_PARAMS.modes,
-          min_tonnes_pilot: null,
-        },
-        throwOnError: true,
-      });
-      return data;
-    },
-  });
+  const pilot = useQuery(pilotQueryOptions());
 
   return (
     <div className="flex flex-col gap-5 rounded-xl bg-primary p-5 text-primary-foreground sm:p-6 lg:flex-row lg:items-center lg:justify-between">

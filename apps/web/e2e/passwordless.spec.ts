@@ -14,9 +14,9 @@ async function joinByQr(page: Page, name: string, email: string, code = CODE) {
 }
 
 const skipTour = async (page: Page) => {
-  const dialog = page.getByRole('dialog');
+  const dialog = page.getByTestId('onboarding-story');
   await expect(dialog).toBeVisible();
-  await dialog.getByRole('button', { name: 'Saltar' }).click();
+  await dialog.getByRole('button', { name: /Saltar/ }).click();
   await expect(dialog).toHaveCount(0);
 };
 
@@ -26,10 +26,10 @@ test.describe('entrada sem palavra-passe', () => {
   }) => {
     await page.goto('/pt/login');
     await expect(page.getByRole('button', { name: 'Receber link de acesso' })).toBeVisible();
-    await expect(page.getByLabel('Password', { exact: true })).toHaveCount(0);
+    await expect(page.getByLabel('Palavra-passe', { exact: true })).toHaveCount(0);
     await page.getByRole('link', { name: 'Entrar com palavra-passe' }).click();
     await expect(page).toHaveURL(/method=password/);
-    await expect(page.getByLabel('Password', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('Palavra-passe', { exact: true })).toBeVisible();
     await page.getByRole('link', { name: 'Receber link por email' }).click();
     await expect(page.getByRole('button', { name: 'Receber link de acesso' })).toBeVisible();
   });
@@ -49,26 +49,24 @@ test.describe('entrada sem palavra-passe', () => {
     await expect(page.getByTestId('join-welcome')).toContainText('Rita');
     await expect(page).toHaveURL(/\/pt\/?$/);
 
-    // Visita guiada: aparece sozinha, mostra números reais e fecha.
-    const dialog = page.getByRole('dialog');
+    // Apresentação: aparece sozinha, mostra números reais da API e fecha.
+    const dialog = page.getByTestId('onboarding-story');
     await expect(dialog).toBeVisible();
-    await expect(dialog.getByText('1,92 kg')).toBeVisible();
-    await expect(dialog.getByText('4,27 kg')).toBeVisible();
-    await dialog.getByRole('button', { name: 'Seguinte' }).click();
-    await dialog.getByRole('button', { name: 'Seguinte' }).click();
-    await dialog.getByRole('button', { name: 'Seguinte' }).click();
+    await expect(dialog.getByText('301,3 t')).toBeVisible();
+    await expect(dialog.getByText('11,5%')).toBeVisible();
+    await page.keyboard.press('End');
     await expect(dialog.getByText(/conta de convidado/i)).toBeVisible();
-    await dialog.getByRole('button', { name: 'Explorar sozinho' }).click();
+    await dialog.getByRole('button', { name: 'Concluir' }).click();
     await expect(dialog).toHaveCount(0);
 
     // Não volta sozinha; volta a pedido.
     await page.reload();
     await expect(page.locator('#content h1').first()).toBeVisible();
-    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(page.getByTestId('onboarding-story')).toHaveCount(0);
     await page.getByRole('button', { name: 'Menu da conta' }).click();
-    await page.getByRole('menuitem', { name: 'Ver visita guiada' }).click();
-    await expect(page.getByRole('dialog')).toBeVisible();
-    await page.getByRole('button', { name: 'Saltar' }).click();
+    await page.getByRole('menuitem', { name: 'Rever a apresentação' }).click();
+    await expect(page.getByTestId('onboarding-story')).toBeVisible();
+    await page.getByRole('button', { name: /Saltar/ }).click();
 
     // Sem administração: nada na navegação e o URL direto explica porquê.
     await expect(page.getByRole('link', { name: 'Utilizadores' })).toHaveCount(0);

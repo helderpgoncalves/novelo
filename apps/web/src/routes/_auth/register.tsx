@@ -1,8 +1,11 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { Info } from 'lucide-react';
+import { DoorOpen, Info } from 'lucide-react';
 import { z } from 'zod';
-import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
+import {
+  getAuthConfigOptions,
+  getRegistrationInfoOptions,
+} from '@/client/@tanstack/react-query.gen';
 import { NoPending } from '@/components/app-loading';
 import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -31,6 +34,10 @@ export const Route = createFileRoute('/_auth/register')({
 function Register() {
   const { next } = Route.useSearch();
   const { data: config } = useSuspenseQuery(getAuthConfigOptions());
+  // Registo aberto (definição do administrador): a conta nova entra logo. A configuração já o reflete; o pedido
+  // público confirma-o sem esperar por ela.
+  const info = useQuery({ ...getRegistrationInfoOptions(), staleTime: 30_000 });
+  const open = info.data?.open ?? config.approval_required === false;
 
   if (!config.registration_open) {
     return (
@@ -49,7 +56,18 @@ function Register() {
   return (
     <div className={AUTH_BLOCKS}>
       <AuthHeading title={m.register_title()} subtitle={m.register_subtitle()} />
-      {config.approval_required !== false && (
+      {open ? (
+        <Alert
+          role="note"
+          data-testid="register-open-notice"
+          className="border-primary/30 bg-primary/[0.06]"
+        >
+          <DoorOpen className="text-primary" />
+          <AlertDescription className="text-foreground">
+            {m.register_open_notice()}
+          </AlertDescription>
+        </Alert>
+      ) : (
         <Alert role="note" data-testid="register-approval-notice">
           <Info />
           <AlertDescription>{m.register_approval_notice()}</AlertDescription>

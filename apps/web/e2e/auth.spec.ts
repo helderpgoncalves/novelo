@@ -20,7 +20,7 @@ test.describe('autenticação', () => {
   test('credenciais erradas mostram o erro traduzido', async ({ page }) => {
     await page.goto('/pt/login?method=password');
     await page.getByLabel('Email').fill(ADMIN.email);
-    await page.getByLabel('Password', { exact: true }).fill('password-errada-1');
+    await page.getByLabel('Palavra-passe', { exact: true }).fill('password-errada-1');
     await page.getByRole('button', { name: 'Entrar' }).click();
     await expect(page.getByRole('alert')).toContainText('Email ou password incorretos.');
   });
@@ -38,7 +38,8 @@ test.describe('autenticação', () => {
     await page.getByRole('button', { name: 'Menu da conta' }).click();
     await page.getByRole('menuitem', { name: 'Terminar sessão' }).click();
     await expect(page).toHaveURL(/\/pt\/login/);
-    await page.goto('/pt/');
+    // Sem sessão, «/» é a landing pública; as páginas da app pedem a entrada.
+    await page.goto('/pt/simulator');
     await expect(page).toHaveURL(/\/pt\/login/);
   });
 
@@ -52,7 +53,7 @@ test.describe('autenticação', () => {
     );
     await page.getByLabel('Nome').fill('Rita Silva');
     await page.getByLabel('Email').fill(email);
-    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Palavra-passe', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Criar conta' }).click();
     await expect(page).toHaveURL(/\/pt\/pending-approval/);
     await expect(page.getByRole('heading', { name: 'A aguardar aprovação' })).toBeVisible();
@@ -76,7 +77,7 @@ test.describe('autenticação', () => {
   test('registo recusa email repetido com mensagem clara', async ({ page }) => {
     await page.goto('/pt/register');
     await page.getByLabel('Email').fill(ADMIN.email);
-    await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+    await page.getByLabel('Palavra-passe', { exact: true }).fill(PASSWORD);
     await page.getByRole('button', { name: 'Criar conta' }).click();
     await expect(page.getByText('Já existe uma conta com este email.')).toBeVisible();
   });
@@ -94,8 +95,8 @@ test.describe('autenticação', () => {
     const mail = await lastEmail(email);
     expect(mail.subject).toMatch(/Redefine a tua password/);
     await page.goto(linkFrom(mail.text));
-    await page.getByLabel('Nova password').fill('outra-password-segura-9');
-    await page.getByLabel('Repete a password').fill('outra-password-segura-9');
+    await page.getByLabel('Nova palavra-passe').fill('outra-password-segura-9');
+    await page.getByLabel('Repete a palavra-passe').fill('outra-password-segura-9');
     await page.getByRole('button', { name: 'Redefinir password' }).click();
     await expect(page).toHaveURL(/\/pt\/login/);
 
@@ -104,8 +105,8 @@ test.describe('autenticação', () => {
 
   test('link de recuperação inválido mostra erro e permite pedir outro', async ({ page }) => {
     await page.goto('/pt/reset-password?token=token-invalido-token-invalido-1234');
-    await page.getByLabel('Nova password').fill(PASSWORD);
-    await page.getByLabel('Repete a password').fill(PASSWORD);
+    await page.getByLabel('Nova palavra-passe').fill(PASSWORD);
+    await page.getByLabel('Repete a palavra-passe').fill(PASSWORD);
     await page.getByRole('button', { name: 'Redefinir password' }).click();
     await expect(page.getByRole('alert')).toContainText('O link é inválido ou expirou');
     await expect(page.getByRole('link', { name: 'Pedir um novo link' })).toBeVisible();

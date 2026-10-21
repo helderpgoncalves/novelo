@@ -1,13 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
-import { listUsersOptions } from '@/client/@tanstack/react-query.gen';
+import { getAppSettingsOptions, listUsersOptions } from '@/client/@tanstack/react-query.gen';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { PageTabs } from '@/components/page-tabs';
 import { AccountsSection } from '@/features/users/accounts-section';
 import { AuditSection } from '@/features/users/audit-section';
 import { InvitationsSection } from '@/features/users/invitations-section';
+import { OpenRegistrationCard } from '@/features/users/open-registration-card';
 import { ForbiddenError } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
@@ -48,7 +49,10 @@ export const Route = createFileRoute('/_app/users')({
     if (user.role !== 'admin') throw new ForbiddenError('admin');
   },
   validateSearch: searchSchema,
-  loader: ({ context: { queryClient } }) => queryClient.ensureQueryData(listUsersOptions()),
+  loader: ({ context: { queryClient } }) => {
+    void queryClient.prefetchQuery(getAppSettingsOptions());
+    return queryClient.ensureQueryData(listUsersOptions());
+  },
   head: () => ({ meta: [{ title: m.title_users() }] }),
   component: Users,
 });
@@ -69,6 +73,10 @@ function Users() {
         eyebrow={m.users_eyebrow()}
         title={m.users_title()}
         description={m.users_description()}
+      />
+      <OpenRegistrationCard
+        users={data}
+        onShowAudit={() => void navigate({ search: { tab: 'audit' }, replace: true })}
       />
       <PageTabs
         label={m.users_tabs_label()}

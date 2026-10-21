@@ -50,7 +50,7 @@ test('login: token por tentativa, cabeçalho e ação, botão bloqueado até hav
   });
   await page.goto('/pt/login?method=password');
   await page.getByLabel('Email').fill('x@example.pt');
-  await page.getByLabel('Password', { exact: true }).fill('qualquer-coisa-123');
+  await page.getByLabel('Palavra-passe', { exact: true }).fill('qualquer-coisa-123');
   const submit = page.getByRole('button', { name: /A verificar|Entrar/ });
   await expect(submit).toBeDisabled();
   await expect(submit).toHaveText(/A verificar/);
@@ -87,7 +87,7 @@ test('login: captcha_failed mostra a mensagem e "Repetir verificação"', async 
   );
   await page.goto('/pt/login?method=password');
   await page.getByLabel('Email').fill('x@example.pt');
-  await page.getByLabel('Password', { exact: true }).fill('qualquer-coisa-123');
+  await page.getByLabel('Palavra-passe', { exact: true }).fill('qualquer-coisa-123');
   await page.getByRole('button', { name: 'Entrar' }).click();
   await expect(page.getByText(/Não foi possível confirmar que és uma pessoa/)).toBeVisible();
   const retry = page.getByRole('button', { name: 'Repetir verificação' });
@@ -120,7 +120,7 @@ test('registo: honeypot invisível vai vazio e a ação é register', async ({ p
   await expect(trap).toHaveAttribute('autocomplete', 'off');
   await expect(trap.locator('xpath=..')).toHaveAttribute('aria-hidden', 'true');
   await page.getByLabel('Email').fill('x@example.pt');
-  await page.getByLabel('Password', { exact: true }).fill('uma-password-segura-123');
+  await page.getByLabel('Palavra-passe', { exact: true }).fill('uma-password-segura-123');
   await page.getByRole('button', { name: 'Criar conta' }).click();
   await expect.poll(() => header).toMatch(/^token-/);
   expect(body.website).toBe('');
