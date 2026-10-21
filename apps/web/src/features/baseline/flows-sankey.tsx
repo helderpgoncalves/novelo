@@ -23,7 +23,10 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
 
   useEffect(() => {
     if (!ref.current) return;
-    const text = resolvedTheme === 'dark' ? '#f1eee6' : '#14211d';
+    const dark = resolvedTheme === 'dark';
+    const text = dark ? '#f1eee6' : '#14211d';
+    // Contorno da cor do cartão: o texto lê-se por cima das ligações.
+    const halo = dark ? '#17231f' : '#faf8f3';
     const nodeName = (n: Flows['nodes'][number]) =>
       n.destination
         ? destinationLabel[n.destination]()
@@ -49,7 +52,7 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
         {
           type: 'sankey',
           left: 4,
-          right: narrow ? 84 : 150,
+          right: narrow ? 92 : 150,
           top: 8,
           bottom: 8,
           nodeWidth: 14,
@@ -70,7 +73,15 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
             value: l.tonnes,
           })),
           lineStyle: { color: 'target', curveness: 0.5, opacity: 0.35 },
-          label: { fontFamily: 'Inter, sans-serif', fontSize: narrow ? 11 : 12, color: text },
+          label: {
+            fontFamily: 'Inter, sans-serif',
+            fontSize: narrow ? 11 : 12,
+            color: text,
+            textBorderColor: halo,
+            textBorderWidth: 3,
+            width: narrow ? 92 : 170,
+            overflow: 'truncate',
+          },
         },
       ],
     });

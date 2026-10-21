@@ -69,11 +69,16 @@ function Market() {
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <SectionTitle>{fibreLabel[entry.fibre]()}</SectionTitle>
               <p className="text-muted-foreground text-sm tabular-nums">
-                {m.market_group_summary({
-                  lots: entry.lots,
-                  kg: formatNumber(entry.weight_kg, 1),
-                  parishes: entry.parishes.join(', ') || m.common_dash(),
-                })}
+                {entry.parishes.length > 0
+                  ? m.market_group_summary({
+                      lots: entry.lots,
+                      kg: formatNumber(entry.weight_kg, 1),
+                      parishes: entry.parishes.join(', '),
+                    })
+                  : m.market_group_summary_short({
+                      lots: entry.lots,
+                      kg: formatNumber(entry.weight_kg, 1),
+                    })}
               </p>
             </div>
             <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">

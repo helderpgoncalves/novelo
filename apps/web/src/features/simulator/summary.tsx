@@ -27,8 +27,38 @@ export interface RunControl {
   pending: boolean;
   elapsed: number;
   onCancel: () => void;
+  /** Rede por locais reais: mostra as fases do cálculo (escolha dos locais, rotas, orçamento). */
+  bySites?: boolean;
   result?: ScenarioOut;
   onSeeResult: () => void;
+}
+
+/** Fases estimadas pelo tempo decorrido (o servidor não envia progresso): o cálculo por locais demora 20 a 40 s. */
+function phaseLabel(run: RunControl): string {
+  if (!run.bySites) return m.simx_running_label();
+  if (run.elapsed < 8) return m.simx_phase_sites();
+  if (run.elapsed < 20) return m.simx_phase_routes();
+  return m.simx_phase_budget();
+}
+
+/** Barra de progresso estimada: sobe depressa e abranda, nunca chega a 100% antes de acabar. */
+function EstimatedBar({ elapsed }: { elapsed: number }) {
+  const pct = Math.round((1 - Math.exp(-elapsed / 18)) * 94);
+  return (
+    <div
+      role="progressbar"
+      aria-label={m.simx_running_label()}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={pct}
+      className="h-1 w-full overflow-hidden rounded-full bg-border"
+    >
+      <div
+        className="h-full rounded-full bg-primary transition-[width] duration-1000 ease-out motion-reduce:transition-none"
+        style={{ width: `${pct}%` }}
+      />
+    </div>
+  );
 }
 
 const ctaLabel = (status: RunStatus) =>
@@ -51,12 +81,15 @@ export function RunButton({
   if (run.pending && compact) {
     return (
       <div className={cn('flex items-center gap-3', className)}>
-        <WorkingState
-          size="sm"
-          title={m.simx_running_label()}
-          elapsed={run.elapsed}
-          className="min-w-0 flex-1 justify-start"
-        />
+        <div className="min-w-0 flex-1 space-y-2">
+          <WorkingState
+            size="sm"
+            title={phaseLabel(run)}
+            elapsed={run.elapsed}
+            className="justify-start"
+          />
+          <EstimatedBar elapsed={run.elapsed} />
+        </div>
         <Button type="button" variant="outline" className="h-11 shrink-0" onClick={run.onCancel}>
           {m.simx_cancel()}
         </Button>
@@ -68,10 +101,11 @@ export function RunButton({
       <div className={cn('space-y-3', className)}>
         <WorkingState
           size="sm"
-          title={m.simx_running_label()}
+          title={phaseLabel(run)}
           elapsed={run.elapsed}
           className="justify-start"
         />
+        <EstimatedBar elapsed={run.elapsed} />
         <Button type="button" variant="outline" className="h-11 w-full" onClick={run.onCancel}>
           {m.simx_cancel()}
         </Button>

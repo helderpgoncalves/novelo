@@ -120,8 +120,8 @@ export function Territory({
   );
 
   return (
-    <div className="grid grid-cols-1 gap-5 lg:grid-cols-12 lg:items-start">
-      <Panel className="p-3 sm:p-5 lg:col-span-7 lg:row-start-1">
+    <div className="grid grid-cols-1 gap-5 xl:grid-cols-12 xl:items-start">
+      <Panel className="p-3 sm:p-5 xl:col-span-7 xl:row-start-1">
         <AsyncBoundary fallback={<MapSkeleton className="lg:h-[40rem]" />}>
           <MapPanel
             overview={overview}
@@ -136,11 +136,11 @@ export function Territory({
         </AsyncBoundary>
       </Panel>
 
-      <Panel id="orcamento" className="scroll-mt-20 lg:col-span-12 lg:row-start-2">
+      <Panel id="orcamento" className="scroll-mt-20 xl:col-span-12 xl:row-start-2">
         {budget}
       </Panel>
 
-      <div className="min-w-0 space-y-5 lg:col-span-5 lg:col-start-8 lg:row-start-1">
+      <div className="min-w-0 space-y-5 xl:col-span-5 xl:col-start-8 xl:row-start-1">
         {wide && detail && <Panel>{detail}</Panel>}
         <ParishTable rows={rows} selected={selected} onSelect={onParishChange} />
       </div>

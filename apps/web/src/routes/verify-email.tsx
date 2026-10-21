@@ -6,6 +6,7 @@ import { z } from 'zod';
 import { getMeOptions, verifyEmailMutation } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { getErrorMessage } from '@/lib/errors';
 import { queryClient } from '@/lib/query-client';
@@ -40,8 +41,9 @@ function VerifyEmail() {
 
   return (
     <div className="grid min-h-dvh place-items-center px-6">
-      <div className="absolute top-4 right-4">
+      <div className="absolute top-[max(1rem,env(safe-area-inset-top))] right-[max(1rem,env(safe-area-inset-right))] flex items-center gap-1">
         <LanguageSwitcher />
+        <ThemeToggle />
       </div>
       <div className="w-full max-w-sm space-y-6 text-center">
         <BrandLogo className="mx-auto h-9" />

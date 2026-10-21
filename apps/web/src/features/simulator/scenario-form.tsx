@@ -376,6 +376,7 @@ export function ScenarioForm({
     pending: running,
     elapsed,
     onCancel: cancel,
+    bySites: siting === 'sites',
     result: scenario,
     onSeeResult: () => jumpTo('result'),
   };

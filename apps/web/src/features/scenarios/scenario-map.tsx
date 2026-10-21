@@ -111,6 +111,24 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
   const activeSite = bySites
     ? sites.find((s) => s.site_id === (pinnedSite ?? hoverSite))
     : undefined;
+  // O "zoom" só pode ser a entrada de um interpolate de topo: o realce do local ativo fica em cada paragem.
+  const stop = (radius: number): ExpressionSpecification => [
+    'case',
+    ['==', ['get', 'id'], activeSite?.site_id ?? ''],
+    8,
+    radius,
+  ];
+  const siteRadius: ExpressionSpecification = [
+    'interpolate',
+    ['linear'],
+    ['zoom'],
+    10,
+    stop(2.5),
+    13,
+    stop(4.5),
+    16,
+    stop(6.5),
+  ];
 
   return (
     <div className={cn('relative', className)}>
@@ -186,12 +204,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 type="circle"
                 paint={{
                   // Menores ao afastar o zoom, para continuarem legíveis com centenas de locais.
-                  'circle-radius': [
-                    'case',
-                    ['==', ['get', 'id'], activeSite?.site_id ?? ''],
-                    8,
-                    ['interpolate', ['linear'], ['zoom'], 10, 2.5, 13, 4.5, 16, 6.5],
-                  ],
+                  'circle-radius': siteRadius,
                   'circle-color': [
                     'case',
                     ['==', ['get', 'precision'], 'approximate'],

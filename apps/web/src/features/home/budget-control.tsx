@@ -81,11 +81,11 @@ export function BudgetControl({
           <div className="space-y-1.5">
             <p className="font-medium text-[13px] text-muted-foreground">{m.home_budget_label()}</p>
             <p
-              className="font-medium font-serif text-[2.75rem] tabular-nums leading-none tracking-tight"
+              className="font-medium font-serif text-[2.75rem] tabular-nums lg:max-xl:text-4xl leading-none tracking-tight"
               aria-live="polite"
             >
               {eur(value)}
-              <span className="ml-1.5 font-sans text-base text-muted-foreground">
+              <span className="ml-1.5 whitespace-nowrap font-sans text-base text-muted-foreground">
                 {m.home_budget_per_year()}
               </span>
             </p>

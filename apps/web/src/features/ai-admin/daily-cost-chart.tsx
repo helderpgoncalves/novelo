@@ -67,25 +67,27 @@ export function DailyCostChart({ days }: { days: UsageDay[] }) {
         aria-label={m.aiadm_chart_label()}
         className="h-64 w-full sm:h-72"
       />
-      <table className="sr-only">
-        <caption>{m.aiadm_chart_label()}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{m.aiadm_col_day()}</th>
-            <th scope="col">{m.aiadm_col_cost()}</th>
-            <th scope="col">{m.aiadm_col_calls()}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {days.map((d) => (
-            <tr key={d.day}>
-              <th scope="row">{formatDate(d.day, 'short')}</th>
-              <td>{formatUsd(d.cost_usd)}</td>
-              <td>{d.calls}</td>
+      <div className="sr-only">
+        <table>
+          <caption>{m.aiadm_chart_label()}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{m.aiadm_col_day()}</th>
+              <th scope="col">{m.aiadm_col_cost()}</th>
+              <th scope="col">{m.aiadm_col_calls()}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {days.map((d) => (
+              <tr key={d.day}>
+                <th scope="row">{formatDate(d.day, 'short')}</th>
+                <td>{formatUsd(d.cost_usd)}</td>
+                <td>{d.calls}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

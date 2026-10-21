@@ -107,23 +107,25 @@ export function HBarChart({
         style={{ height: Math.max(80, items.length * ROW_PX + 8) }}
         className="w-full"
       />
-      <table className="sr-only">
-        <caption>{ariaLabel}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{labelHeader}</th>
-            <th scope="col">{valueHeader}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((i) => (
-            <tr key={i.label}>
-              <th scope="row">{i.label}</th>
-              <td>{format(i.value)}</td>
+      <div className="sr-only">
+        <table>
+          <caption>{ariaLabel}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{labelHeader}</th>
+              <th scope="col">{valueHeader}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {items.map((i) => (
+              <tr key={i.label}>
+                <th scope="row">{i.label}</th>
+                <td>{format(i.value)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

@@ -90,7 +90,7 @@ export function PublicShell({
               <BrandLogo className="h-8" />
             </Link>
             {nav && <div className="hidden flex-1 justify-center lg:flex">{nav}</div>}
-            <div className="ml-auto flex items-center gap-1 lg:ml-0">
+            <div className={`ml-auto flex items-center gap-1 ${nav ? 'lg:ml-0' : ''}`}>
               {actions}
               <div className="flex items-center [&_button]:size-11">
                 <LanguageSwitcher />

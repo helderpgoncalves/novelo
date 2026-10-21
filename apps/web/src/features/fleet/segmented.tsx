@@ -43,7 +43,11 @@ export function Segmented<T extends string>({
             className={cn(
               'relative flex cursor-pointer items-center justify-center whitespace-nowrap rounded-md font-medium text-xs transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ring has-[:focus-visible]:outline-offset-1',
               fill ? 'min-w-0 flex-1 px-1' : 'px-3',
-              size === 'lg' ? 'min-h-12 py-1' : size === 'md' ? 'h-8' : 'h-7',
+              size === 'lg'
+                ? 'min-h-12 py-1'
+                : size === 'md'
+                  ? 'h-8 pointer-coarse:h-10'
+                  : 'h-7 pointer-coarse:h-10',
               active
                 ? 'bg-background text-foreground shadow-sm ring-1 ring-foreground/10'
                 : 'text-muted-foreground hover:text-foreground',

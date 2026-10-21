@@ -72,7 +72,7 @@ export function LanguageSwitcher({
             'rounded-[8px] text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-transparent',
             showLabel
               ? 'h-9 gap-2'
-              : 'size-9 font-medium font-mono text-[0.8125rem] tracking-wider',
+              : 'size-10 pointer-fine:size-9 font-medium font-mono text-[0.8125rem] tracking-wider',
           )}
           aria-label={m.language_switch()}
         >
