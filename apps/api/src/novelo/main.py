@@ -1,5 +1,6 @@
 """Application factory. Todas as rotas vivem sob /api/v1."""
 
+import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 
@@ -28,6 +29,7 @@ from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
 from novelo.features.municipal.router import router as municipal_router
 from novelo.features.network.router import router as network_router
+from novelo.features.planning import reference
 from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
@@ -50,7 +52,10 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     warn_if_email_unavailable()
     async with SessionLocal() as db:
         await auth_service.seed_admin(db)
+    task = asyncio.create_task(reference.seed_in_background()) if get_settings().seed_reference_scenarios else None
     yield
+    if task is not None:
+        task.cancel()
 
 
 def create_app() -> FastAPI:

@@ -943,6 +943,18 @@
             "title": "Population",
             "type": "integer"
           },
+          "served_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Cenários por locais: fração da procura da freguesia com um local aberto ao alcance (0 a 1)",
+            "title": "Served Share"
+          },
           "tonnes": {
             "title": "Tonnes",
             "type": "number"

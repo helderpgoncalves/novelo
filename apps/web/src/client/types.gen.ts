@@ -493,6 +493,12 @@ export type Allocation = {
      */
     population: number;
     /**
+     * Served Share
+     *
+     * Cenários por locais: fração da procura da freguesia com um local aberto ao alcance (0 a 1)
+     */
+    served_share?: number | null;
+    /**
      * Tonnes
      */
     tonnes: number;

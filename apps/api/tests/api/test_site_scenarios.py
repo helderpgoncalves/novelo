@@ -10,6 +10,8 @@ from typing import Any
 import httpx
 import pytest
 
+from novelo.features.planning import site_service
+
 P = "/api/v1/planning"
 MakeUser = Callable[..., Awaitable[httpx.AsyncClient]]
 
@@ -152,3 +154,48 @@ async def test_the_default_point_is_the_street_container_calibrated_with_2025(op
     alloc = {a["parish_code"]: a for a in out["result"]["allocations"]}
     capture = out["params"]["modes"]["street"]["capture_rate"]
     assert alloc["030801"]["tonnes"] == pytest.approx(alloc["030801"]["demand_t"] * capture, abs=0.002)
+
+
+async def test_sensitivity_reproduces_the_site_scenario(operator: httpx.AsyncClient) -> None:
+    s = await run(operator, site_on_demand=True, budget_eur_year=20000)
+    resp = await operator.post(f"{P}/scenarios/{s['id']}/sensitivity", json={})
+    assert resp.status_code == 200, resp.text
+    out = resp.json()
+    # com os pressupostos centrais a reavaliação reproduz os KPIs gravados
+    assert out["base"]["tonnes"] == pytest.approx(s["tonnes_year"], rel=0.005)
+    assert out["base"]["annual_cost_eur"] == pytest.approx(s["annual_cost_eur"], rel=0.01)
+    assert out["eur_per_tonne"]["p10"] < out["eur_per_tonne"]["p50"] < out["eur_per_tonne"]["p90"]
+    keys = {b["key"] for b in out["tornado"]}
+    assert "modes.existing.capture_rate" in keys and "modes.on_demand.capture_rate" in keys
+    assert "modes.existing.people_per_point" not in keys
+
+
+async def test_robustness_compares_a_site_scenario_with_a_parish_one(operator: httpx.AsyncClient) -> None:
+    a = await run(operator, label="Locais", budget_eur_year=20000)
+    b = (
+        await operator.post(
+            f"{P}/scenarios", json={"label": "Freguesias", "objective": "max_tonnes", "budget_eur_year": 20000}
+        )
+    ).json()
+    resp = await operator.get(f"{P}/compare-robustness", params={"recommended_id": a["id"], "alternative_id": b["id"]})
+    assert resp.status_code == 200, resp.text
+
+
+async def test_the_same_request_is_served_from_the_cache(
+    operator: httpx.AsyncClient, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    site_service._cache.clear()
+    calls = 0
+    real = site_service._compute_sites
+
+    def counting(*args: Any) -> Any:
+        nonlocal calls
+        calls += 1
+        return real(*args)
+
+    monkeypatch.setattr(site_service, "_compute_sites", counting)
+    first = await run(operator, label="A")
+    second = await run(operator, label="B")  # só o nome muda
+    await run(operator, label="C", budget_eur_year=4000)  # outro orçamento: volta a calcular
+    assert calls == 2
+    assert first["id"] != second["id"] and first["result"] == second["result"]

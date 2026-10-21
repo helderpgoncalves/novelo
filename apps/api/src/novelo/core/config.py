@@ -30,6 +30,8 @@ class Settings(BaseSettings):
 
     environment: Literal["development", "production"] = Field("development", alias="APP_ENV")
     log_level: str = Field("info", alias="LOG_LEVEL")
+    # Cria, uma só vez e em segundo plano, os cenários de referência por locais reais (sala de decisão e demo).
+    seed_reference_scenarios: bool = Field(False, alias="SEED_REFERENCE_SCENARIOS")
 
     database_url: str = Field("postgresql+asyncpg://novelo:novelo@localhost:5590/novelo", alias="DATABASE_URL")
     data_dir: Path = Field(_REPO_ROOT / "data" / "processed", alias="DATA_DIR")

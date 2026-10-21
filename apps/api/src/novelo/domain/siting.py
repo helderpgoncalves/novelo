@@ -400,6 +400,9 @@ class SitePlan:
     iterations: int = 1
     on_demand: dict[str, OnDemandZone] = field(default_factory=dict)  # freguesias com recolha a pedido ligada
     zone_tonnes_on_demand: dict[str, float] = field(default_factory=dict)
+    zone_served_share: dict[str, float] = field(
+        default_factory=dict
+    )  # fração da procura da freguesia servida por locais
 
     @property
     def on_demand_cost_eur(self) -> float:
@@ -456,6 +459,7 @@ def evaluate(
     served_by_site: dict[int, int] = defaultdict(int)
     zone_t: dict[str, float] = defaultdict(float)
     zone_od_t: dict[str, float] = defaultdict(float)
+    zone_served: dict[str, float] = defaultdict(float)
     zone_pop: dict[str, float] = defaultdict(float)
     for i, j in enumerate(owner):
         d = demand[i]
@@ -467,6 +471,7 @@ def evaluate(
         pop_zone = zone_population.get(d.zone_id, 0) * d.weight / total_w[d.zone_id] if total_w[d.zone_id] else 0.0
         pop = pop_zone if j is not None else pop_zone * f_o
         if j is not None:
+            zone_served[d.zone_id] += d.weight / total_w[d.zone_id] if total_w[d.zone_id] else 0.0
             t_by_site[j] += site_t
             pop_by_site[j] += pop_zone
             served_by_site[j] += 1
@@ -505,6 +510,7 @@ def evaluate(
         zone_population_covered=dict(zone_pop),
         on_demand=dict(od),
         zone_tonnes_on_demand=dict(zone_od_t),
+        zone_served_share=dict(zone_served),
     )
 
 

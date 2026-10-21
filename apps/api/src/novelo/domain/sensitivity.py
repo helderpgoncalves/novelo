@@ -26,7 +26,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Any, Literal
 
-from novelo.domain.network import ModeParams, Params, Zone, build_option
+from novelo.domain.network import ModeParams, Params, Zone, build_option, mode_cost, zone_demand_t
 from novelo.domain.vocab import CollectionMode as Mode
 
 DEFAULT_SWING = 0.3
@@ -63,6 +63,33 @@ class PlanItem:
     zone: Zone
     modes: tuple[Mode, ...]
     km_scale: tuple[float, ...]  # um por modo; 1.0 = estimativa radial
+
+
+@dataclass(frozen=True)
+class SiteZone:
+    """Uma freguesia de um plano por locais: fração da procura com local aberto ao alcance e recolha a pedido."""
+
+    zone: Zone
+    served_share: float  # 0 a 1
+    on_demand: bool
+
+
+@dataclass(frozen=True)
+class SitePlan:
+    """Plano por locais reais já otimizado (locais, rotas e freguesias com recolha a pedido), para reavaliar sem solver.
+
+    Os locais e as rotas ficam fixos: o que muda com os pressupostos é a captura, o custo de cada recolha e os km.
+    Por freguesia, com `a` = fração servida por locais e `z` = recolha a pedido ligada:
+
+      têxtil = D · (c_s·a + c_o·z − c_s·c_o·a·z)            (união dos dois canais, como no otimizador)
+      custo  = locais · (capex/N + recolhas · c_recolha) + km das rotas · c_km + custo da recolha a pedido
+    """
+
+    mode: Mode
+    zones: tuple[SiteZone, ...]
+    sites: int
+    km_per_round: float  # soma dos km das rotas, com o desvio de estrada de `base_detour`
+    base_detour: float
 
 
 @dataclass(frozen=True)
@@ -188,8 +215,13 @@ def apply_factors(params: Params, factors: Mapping[str, float]) -> Params:
     return out
 
 
-def sensitive_keys(items: Sequence[PlanItem], params: Params) -> list[str]:
+Plan = Sequence[PlanItem] | SitePlan
+
+
+def sensitive_keys(items: Plan, params: Params) -> list[str]:
     """Parâmetros que podem mexer no resultado deste plano: só os dos modos usados e com valor não nulo."""
+    if isinstance(items, SitePlan):
+        return _site_keys(items, params)
     used = {m for it in items for m in it.modes}
     keys = list(GLOBAL_KEYS)
     for mode in Mode:  # ordem fixa do enum: determinismo
@@ -203,8 +235,10 @@ def sensitive_keys(items: Sequence[PlanItem], params: Params) -> list[str]:
 # --- Avaliação do plano (sem solver) -----------------------------------------------------------------------------
 
 
-def evaluate_plan(items: Sequence[PlanItem], params: Params) -> Metrics:
+def evaluate_plan(items: Plan, params: Params) -> Metrics:
     """Toneladas e custo anual de um plano fixo. Mesmas fórmulas do otimizador (`network.build_option`)."""
+    if isinstance(items, SitePlan):
+        return evaluate_site_plan(items, params)
     tonnes = 0.0
     cost = 0.0
     for it in items:
@@ -214,6 +248,43 @@ def evaluate_plan(items: Sequence[PlanItem], params: Params) -> Metrics:
             extra_km_cost = part.km_year * (scale - 1) * params.cost_per_km_eur
             cost += part.capex_eur / params.modes[part.mode].lifetime_years + part.opex_eur_year + extra_km_cost
     return Metrics(tonnes, cost)
+
+
+def _site_keys(plan: SitePlan, params: Params) -> list[str]:
+    on_demand = any(z.on_demand for z in plan.zones)
+    keys = [
+        "kg_per_inhab_month",
+        "cost_per_collection_eur",
+        "cost_per_km_eur",
+        "detour_factor",
+        *[f"modes.{plan.mode.value}.{n}" for n in ("capture_rate", "capex_per_point_eur", "lifetime_years")],
+        f"modes.{plan.mode.value}.collections_per_year",
+    ]
+    if on_demand:
+        keys += ["on_demand_kg_per_pickup", "piggyback_extra_km", *[f"modes.on_demand.{n}" for n in ON_DEMAND_KEYS]]
+    return [k for k in keys if get_value(params, k) != 0]
+
+
+def evaluate_site_plan(plan: SitePlan, params: Params) -> Metrics:
+    """Toneladas e custo anual de um plano por locais fixo (ver `SitePlan`)."""
+    mp = params.modes[plan.mode]
+    c_s = mp.capture_rate
+    tonnes = 0.0
+    od_cost = 0.0
+    for sz in plan.zones:
+        demand = zone_demand_t(sz.zone, params)
+        a = sz.served_share
+        if sz.on_demand:
+            od = mode_cost(sz.zone, Mode.ON_DEMAND, params)
+            tonnes += demand * (c_s * a + od.capture - c_s * od.capture * a)
+            od_cost += od.annual_cost_eur
+        else:
+            tonnes += demand * c_s * a
+    fixed = plan.sites * (
+        mp.capex_per_point_eur / mp.lifetime_years + mp.collections_per_year * params.cost_per_collection_eur
+    )
+    km_year = plan.km_per_round * params.detour_factor / plan.base_detour * mp.collections_per_year
+    return Metrics(tonnes, fixed + km_year * params.cost_per_km_eur + od_cost)
 
 
 def calibrate_km_scale(
@@ -228,7 +299,7 @@ def calibrate_km_scale(
 
 
 def tornado(
-    items: Sequence[PlanItem], params: Params, swing: float = DEFAULT_SWING, keys: Sequence[str] | None = None
+    items: Plan, params: Params, swing: float = DEFAULT_SWING, keys: Sequence[str] | None = None
 ) -> list[TornadoBar]:
     """Varia cada parâmetro ±`swing` (um de cada vez) e ordena por impacto em €/t (maior primeiro)."""
     if not 0 < swing < 1:
@@ -272,7 +343,7 @@ def sample_factors(keys: Sequence[str], n: int, seed: int, swing: float = DEFAUL
 
 
 def monte_carlo(
-    items: Sequence[PlanItem],
+    items: Plan,
     params: Params,
     *,
     n: int = DEFAULT_SAMPLES,
@@ -311,9 +382,9 @@ def _criterion_value(m: Metrics, criterion: Criterion) -> float | None:
 
 
 def robustness(
-    recommended: Sequence[PlanItem],
+    recommended: Plan,
     recommended_params: Params,
-    alternative: Sequence[PlanItem],
+    alternative: Plan,
     alternative_params: Params,
     *,
     n: int = DEFAULT_SAMPLES,

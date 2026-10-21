@@ -4,7 +4,10 @@ O resultado usa o mesmo contrato dos cenários por freguesia (alocações, rotas
 relatório e mapa funcionam sem mudanças; `result.sites` e `result.siting` trazem o que é próprio desta rede.
 """
 
-from collections import defaultdict
+import hashlib
+import json
+import threading
+from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
 
 from sqlalchemy import select
@@ -184,7 +187,7 @@ def _allocations(
                 Allocation(
                     parish_code=z.code, parish_name=z.name, population=z.population, demand_t=z.demand_t, mode=None,
                     modes=[], parts=[], points=0, tonnes=0, covered_population=0, capex_eur=0, annual_cost_eur=0,
-                    km_year=0,
+                    km_year=0, served_share=0.0,
                 )
             )  # fmt: skip
             continue
@@ -229,12 +232,62 @@ def _allocations(
                 capex_eur=round(sum(p.capex_eur for p in parts), 2),
                 annual_cost_eur=round(sum(p.annual_cost_eur for p in parts), 2),
                 km_year=round(sum(p.km_year for p in parts), 1),
+                served_share=round(plan.zone_served_share.get(z.code, 0.0), 6),
             )
         )
     return out
 
 
+CACHE_SIZE = 32
+_cache: OrderedDict[str, tuple[ScenarioResult, str]] = OrderedDict()
+_cache_lock = threading.Lock()
+_key_locks: dict[str, threading.Lock] = {}
+
+
+def _cache_key(
+    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+) -> str:
+    """Identifica um cálculo: os mesmos dados, pressupostos e pedido (sem o nome) dão o mesmo cenário."""
+    body = {
+        "request": request.model_dump(mode="json", exclude={"label", "parent_id"}),
+        "params": params.model_dump(mode="json"),
+        "baseline": round(baseline_t, 3),
+        "zones": [(z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude) for z in zones],
+        "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
+        "candidates": [(c.id, c.zone_id) for c in inputs.candidates],
+    }
+    return hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
+
+
 def compute_sites(
+    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+) -> tuple[ScenarioResult, str]:
+    """Simulador por locais com cache em memória: o mesmo pedido sobre os mesmos dados não volta ao solver.
+
+    Pedidos iguais em simultâneo esperam pelo primeiro (um só cálculo). O resultado é uma cópia profunda.
+    """
+    key = _cache_key(zones, params, request, baseline_t, inputs)
+    with _cache_lock:
+        hit = _cache.get(key)
+        if hit is not None:
+            _cache.move_to_end(key)
+            return hit[0].model_copy(deep=True), hit[1]
+        lock = _key_locks.setdefault(key, threading.Lock())
+    with lock:
+        with _cache_lock:
+            hit = _cache.get(key)
+        if hit is None:
+            hit = _compute_sites(zones, params, request, baseline_t, inputs)
+            with _cache_lock:
+                _cache[key] = hit
+                while len(_cache) > CACHE_SIZE:
+                    _cache.popitem(last=False)
+        with _cache_lock:
+            _key_locks.pop(key, None)
+    return hit[0].model_copy(deep=True), hit[1]
+
+
+def _compute_sites(
     zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador por locais (sem base de dados)."""
