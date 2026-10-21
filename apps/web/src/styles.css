@@ -1627,20 +1627,6 @@ html:has([data-lp-fonts]) .lp-kicker {
       transform: translateY(14px);
     }
   }
-  @keyframes lp-hint {
-    0%,
-    100% {
-      transform: translateY(0);
-      opacity: 0.5;
-    }
-    50% {
-      transform: translateY(6px);
-      opacity: 1;
-    }
-  }
-  .lp-hint {
-    animation: lp-hint 2.2s ease-in-out 3;
-  }
   /* Desenho dos traços dos diagramas ao entrar (pathLength normalizado a 1). */
   .lp-draw [data-draw] {
     stroke-dasharray: 1;
@@ -1764,7 +1750,7 @@ body:has([data-landing]) {
      para o campanário cair no fim do fio: o fio e a fotografia partilham a mesma geometria, por isso nunca se desencontram. */
 .lp-hs {
   --hs-sky: var(--hero-sky-light, #f4ead9);
-  --hs-h: clamp(13rem, 42svh, 36rem);
+  --hs-h: clamp(13rem, 44svh, 36rem);
   position: relative;
   isolation: isolate;
   overflow: clip;
@@ -1934,9 +1920,9 @@ body:has([data-landing]) {
 }
 .lp-fio {
   position: relative;
-  height: 15rem;
-  margin: 1.5rem 0 3.5rem;
-  padding-left: 2rem;
+  height: 14rem;
+  margin: 1rem 0 8rem;
+  padding-left: 1.75rem;
 }
 .lp-fio-h {
   display: none;
@@ -1945,7 +1931,7 @@ body:has([data-landing]) {
   position: absolute;
   left: 0;
   top: 0;
-  width: 1.5rem;
+  width: 0.75rem;
   height: 100%;
   overflow: visible;
 }
@@ -1975,7 +1961,7 @@ body:has([data-landing]) {
 }
 .lp-fio-node {
   position: absolute;
-  left: 0.75rem;
+  left: 0.375rem;
   top: calc(var(--vy) * 100%);
   width: 0.75rem;
   height: 0.75rem;
@@ -1993,13 +1979,13 @@ body:has([data-landing]) {
 }
 .lp-fio-fray {
   position: absolute;
-  left: 0.75rem;
+  left: 0.375rem;
   top: 100%;
   width: 2.25rem;
   height: 2.25rem;
   overflow: visible;
   transform-origin: 5% 50%;
-  transform: rotate(78deg) translate(-5%, -50%);
+  transform: translate(-5%, -50%) rotate(84deg);
 }
 .lp-fio-fray path {
   fill: none;
@@ -2014,7 +2000,7 @@ body:has([data-landing]) {
 }
 .lp-fm {
   position: absolute;
-  left: 2rem;
+  left: 1.75rem;
   top: calc(var(--vy) * 100% - 0.9rem);
   display: flex;
   flex-direction: column;
@@ -2048,7 +2034,7 @@ body:has([data-landing]) {
   align-items: center;
   gap: 0.25rem 0.5rem;
   font: 400 11px/1.4 var(--lp-mono);
-  color: color-mix(in oklab, var(--foreground) 86%, transparent);
+  color: color-mix(in oklab, var(--foreground) 94%, transparent);
 }
 .lp-fm-tag {
   display: inline-flex;
@@ -2087,12 +2073,16 @@ body:has([data-landing]) {
 }
 .lp-fio-src {
   position: absolute;
-  left: 2rem;
-  top: calc(100% + 2.25rem);
+  left: 0;
+  top: calc(100% + 6rem);
   width: max-content;
   max-width: calc(100vw - 3rem);
   font: 400 11px/1.4 var(--lp-mono);
   color: color-mix(in oklab, var(--foreground) 86%, transparent);
+  text-shadow:
+    0 0 0.375rem var(--background),
+    0 0 0.375rem var(--background),
+    0 0 0.75rem var(--background);
 }
 .lp-fio-src-est {
   text-transform: uppercase;
@@ -2148,6 +2138,18 @@ body:has([data-landing]) {
   }
 }
 
+/* Telemóvel baixo (375 x 667): a fotografia encolhe para o primeiro número do fio caber na primeira dobra. */
+@media (max-width: 639px) and (max-height: 720px) {
+  .lp-hs {
+    --hs-h: clamp(12rem, 34svh, 36rem);
+  }
+  .lp-hs-ctas {
+    padding-top: 0.25rem;
+  }
+}
+.lp-fm[data-k='end'] {
+  top: calc(100% + 1.75rem);
+}
 @media (min-width: 640px) {
   .lp-hs {
     --hs-h: clamp(24rem, 52svh, 44rem);
@@ -2173,7 +2175,7 @@ body:has([data-landing]) {
   .lp-fio {
     height: auto;
     aspect-ratio: 1000 / 200;
-    margin: 7.5rem 0 8.5rem;
+    margin: 11rem 0 8.5rem;
     padding-left: 0;
   }
   .lp-fio-h {
@@ -2194,6 +2196,8 @@ body:has([data-landing]) {
   .lp-fio-fray {
     left: calc(var(--x) * 100%);
     top: calc(var(--y) * 100%);
+    width: 1.5rem;
+    height: 1.5rem;
     transform: translate(-5%, -50%);
   }
   .lp-fio-brace {
@@ -2223,8 +2227,9 @@ body:has([data-landing]) {
     border-left: 1px solid color-mix(in oklab, var(--primary) 60%, transparent);
   }
   .lp-fm[data-k='end'] {
+    top: auto;
     right: 0;
-    bottom: calc((1 - var(--y)) * 100% + 4.25rem);
+    bottom: calc((1 - var(--y)) * 100% + var(--end-up, 5.5rem));
     align-items: flex-end;
     text-align: right;
     padding-right: 0.875rem;
@@ -2233,11 +2238,17 @@ body:has([data-landing]) {
   .lp-fm[data-k='end'] .lp-fm-l {
     justify-content: flex-end;
   }
+  /* Escuro: o céu do pôr do sol é claro por trás das duas marcas de cima; um halo denso do tom do papel, colado às letras, garante o contraste (AA) sem manchas. */
+  .dark .lp-fm {
+    --halo:
+      0 0 2px var(--background), 0 0 6px var(--background), 0 0 12px var(--background),
+      0 0 18px var(--background), 0 0 26px color-mix(in oklab, var(--background) 80%, transparent);
+  }
   .lp-fm-v {
     font-size: 2.25rem;
   }
   .lp-fm[data-k='gap'] .lp-fm-v {
-    font-size: 3.25rem;
+    font-size: clamp(2.5rem, 3.6vw, 3.5rem);
   }
   .lp-fio-src {
     left: 0;
@@ -2265,6 +2276,7 @@ body:has([data-landing]) {
 @media (min-width: 640px) and (min-aspect-ratio: 6/5) {
   .lp-hs {
     --hs-r: max(calc(9.4vw + 2.5rem), calc(50svh - 22vw + 2.5rem));
+    --end-up: 4.25rem;
     background-color: var(--hs-sky);
     min-height: clamp(34rem, 100svh, 64rem);
     padding-top: calc(var(--nav-h) + clamp(1rem, 6svh, 4rem));
@@ -2365,6 +2377,10 @@ body:has([data-landing]) {
   }
   .lp-fm-hook {
     pointer-events: auto;
+  }
+  .lp-fio-fray {
+    width: 2.5rem;
+    height: 2.5rem;
   }
 }
 /* Telemóvel de lado (pouca altura): a fotografia cobre pela largura (o topo, se sobrar, dissolve-se no céu). */
