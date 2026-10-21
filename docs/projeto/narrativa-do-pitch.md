@@ -20,7 +20,7 @@ flowchart LR
 | --- | --- | --- |
 | 1. Gancho | Prender a atenção | "A roupa que deitamos fora acaba quase toda no lixo, e Guimarães pode recolher mais do dobro." |
 | 2. Problema | Tornar a dor concreta | A recolha é obrigatória desde 2025 e ninguém a financia ainda. |
-| 3. Tensão | Mostrar porque é difícil | Mais contentores não resolve: custa, enche-se de lixo, e a indústria não quer sacos misturados. |
+| 3. Tensão | Mostrar porque é difícil | Mais contentores não resolve: custa, enche-se de lixo e contamina o têxtil, e a Vitrus não os quer. O valor está na reutilização. |
 | 4. Solução | Apresentar o Novelo | Uma ferramenta que decide onde, como e a que custo, do saco ao fio. |
 | 5. Prova | Mostrar a funcionar | Demo ao vivo, com um jurado a fazer uma pergunta. |
 | 6. Impacto | Dizer o que muda | Menos custo por tonelada, e um dossiê para 2028. |
@@ -88,7 +88,7 @@ Apenas estes. Todos têm estado **Dado Vitrus**, **Primária**, **Secundária** 
 
 **O enunciado do desafio fala em 73% a 80%** dos têxteis descartados em aterro ou incineração (C25, sem fonte indicada). O júri leu esse texto. Mede outra coisa que o nosso 72% (indiferenciado, AEA, C10): se alguém o citar, dizer "segundo o enunciado" e que o nosso número é o da AEA, com fonte. Não os misturar no mesmo slide.
 
-**Não levar ao palco** até verificação: 5,4% (A10), "4 de 27" (A11), 0,7 kg e 1 317 t como facto (A8; só como "potencial do plano municipal, por confirmar"), qualquer preço, e a exatidão da triagem (D4).
+**Não levar ao palco** até verificação: "4 de 27" (A11), o 0,7 kg e as 1 317 t do plano municipal (já não usados), qualquer preço, e a exatidão da triagem (D4). O 5,4% pode ir a palco com a fonte: APA, indicado pela Vitrus, sobre 43 051 t de RSU (A10, A16); as 2 324,8 t sempre com "estimativa".
 
 ## Versão de 30 segundos (elevador)
 
@@ -120,7 +120,7 @@ Falas por slide. A coluna "Fonte no rodapé" é o que aparece em letra pequena.
 | 3 | 0:45 a 1:00 | Guimarães recolhe menos de metade do que a França recolheria | "Guimarães recolheu 301 toneladas: 1,9 quilos por habitante. A França recolhe 4,27: à nossa escala, cerca de 670 toneladas. Em Sintra estão a retirar contentores." | 1,9 (A2), 4,27 (C1), 670 (C14), Sintra (C21) | Vitrus, INE; Refashion 2024 |
 | 4 | 1:00 a 3:00 | **Demo**: do orçamento ao relatório, em dois minutos | Ver [roteiro da demo](#roteiro-da-demo) | números do cenário | — |
 | 5 | 3:00 a 3:30 | A IA conduz o otimizador; nunca faz contas | "A pergunta entra em português, o modelo devolve uma alteração estruturada, o otimizador calcula, e um verificador rejeita qualquer número que não esteja no resultado. Se a IA falhar, o simulador e o relatório continuam a funcionar." | — | — |
-| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 5,5% (C17) só se A8 estiver verificado | Público/Lusa 2024 |
+| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 9,7% (C17) com "estimativa" | Público/Lusa 2024 |
 | 7 | 3:55 a 4:20 | Em 2028 quem provar o custo eficiente negoceia com os produtores | "A diretiva só aceita o custo economicamente eficiente e transparente. O relatório RAP do Novelo dá esse custo por tipo de território." | art. 22.º-A n.º 12 (B6) | Diretiva (UE) 2025/1892 |
 | 8 | 4:20 a 5:00 | Peço um piloto de três meses em duas freguesias | Frase-âncora com os números do cenário B, o pedido concreto, a replicabilidade e o roadmap (ver [o fecho](#o-fecho-slide-8-40-s-serve-a-continuidade)). | X t, Y €/t (cenário) | Cenário B, estimativa |
 
@@ -130,8 +130,8 @@ A demo é a prova. Cada passo responde a uma afirmação.
 
 | Passo | O que se faz | Afirmação que prova | Critério e tempo | Estado da funcionalidade (19 out) |
 | --- | --- | --- | --- | --- |
-| 1 | Abrir o **ponto de partida**: 301,3 t, 22,9% de captura, destino 59,4% / 26,5% / 14,1% | "Usamos os dados reais da Vitrus" | Viabilidade, 15 s | Feito |
-| 2 | **Mapa**: freguesias e (quando chegarem) contentores e lacuna de cobertura | "Mostramos onde falta" | Impacto (extra) | Mapa feito; **camada de contentores em construção** |
+| 1 | Abrir o **ponto de partida**: 301,3 t, 11,5% de captura (estimativa), destino 59,4% / 26,5% / 14,1% | "Usamos os dados reais da Vitrus" | Viabilidade, 15 s | Feito |
+| 2 | **Mapa**: freguesias, contentores municipais (onde o têxtil se perde) e lacuna por freguesia | "Mostramos onde falta" | Impacto (extra) | Mapa feito |
 | 3 | **Simulador**: cenário A (só rua) e cenário B (modos combinados) com o mesmo orçamento; comparar €/t, toneladas e investimento | "O menor investimento e o menor custo" | Impacto, 30 s | Feito |
 | 4 | **Cenário de desempenho francês** (4,27 kg/hab) | "Quanto custaria chegar à França" | Impacto (extra) | **Em construção** |
 | 5 | **Sensibilidade**: o cenário B aguenta ±30% nos custos | "Os custos são pressupostos e mesmo assim a decisão não muda" | Viabilidade, 25 s | **Em construção** |

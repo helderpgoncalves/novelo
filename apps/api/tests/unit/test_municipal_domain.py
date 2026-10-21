@@ -73,14 +73,16 @@ def test_grid_cluster_stops_at_street_zoom_and_rejects_negative() -> None:
 
 
 def test_gap_estimate_by_hand() -> None:
-    # 3 000 hab · 0,7 kg/mês · 12 / 1000 = 25,2 t; com 25% de captura: 18,9 t; 2 candidatos: 9,45 t cada
-    g = dom.gap_estimate(3000, 2, 0.7, 0.25)
-    assert (round(g.potential_t, 2), round(g.gap_t, 2), round(g.t_per_candidate, 2)) == (25.2, 18.9, 9.45)
-    zero = dom.gap_estimate(3000, 0, 0.7, 0.25)  # sem candidatos divide por 1
-    assert round(zero.t_per_candidate, 2) == 18.9
+    # lacuna: 3 000 hab · 1,25 kg/mês · 12 / 1000 = 45 t; potencial: 45 ÷ (1 − 0,25) = 60 t; 2 candidatos: 22,5 t cada
+    g = dom.gap_estimate(3000, 2, 1.25, 0.25)
+    assert (round(g.potential_t, 2), round(g.gap_t, 2), round(g.t_per_candidate, 2)) == (60.0, 45.0, 22.5)
+    zero = dom.gap_estimate(3000, 0, 1.25, 0.25)  # sem candidatos divide por 1
+    assert round(zero.t_per_candidate, 2) == 45.0
 
 
-@pytest.mark.parametrize(("args"), [(-1, 0, 0.7, 0.2), (10, -1, 0.7, 0.2), (10, 1, 0, 0.2), (10, 1, 0.7, 1.5)])
+@pytest.mark.parametrize(
+    ("args"), [(-1, 0, 0.7, 0.2), (10, -1, 0.7, 0.2), (10, 1, 0, 0.2), (10, 1, 0.7, 1.5), (10, 1, 0.7, 1.0)]
+)
 def test_gap_estimate_validates(args: tuple[int, int, float, float]) -> None:
     with pytest.raises(ValueError):
         dom.gap_estimate(*args)
@@ -92,12 +94,14 @@ def test_gap_estimate_reproduces_the_etl_columns_for_all_48_parishes() -> None:
     with Path(path).open(encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))
     assert len(rows) == 48
-    capture = 301.27 / (156_830 * 0.7 * 12 / 1000)  # captura atual do concelho: 22,87%
+    kg = 43_051_000 * 0.054 / 156_830 / 12  # têxtil no lixo por habitante e mês (Vitrus + APA): 1,2353
+    capture = 301.266 / (43_051 * 0.054 + 301.266)  # captura atual do concelho: 11,47%
     for r in rows:
-        g = dom.gap_estimate(int(r["population"]), int(r["candidate_sites"]), 0.7, capture)
+        g = dom.gap_estimate(int(r["population"]), int(r["candidate_sites"]), kg, capture)
         assert abs(g.potential_t - float(r["textile_potential_t_estimate"])) <= 0.05, r["name"]
         assert abs(g.gap_t - float(r["textile_gap_t_estimate"])) <= 0.05, r["name"]
         assert abs(g.t_per_candidate - float(r["gap_t_per_candidate_site"])) <= 0.01, r["name"]
+    assert sum(float(r["textile_gap_t_estimate"]) for r in rows) == pytest.approx(2324.75, abs=0.5)
 
 
 # --- candidatos -------------------------------------------------------------------------------------------------

@@ -24,7 +24,8 @@ function at(point: { x: number; y: number }, vy: number): CSSProperties {
 
 /**
  * O fio solto: um fio que se desenha ao carregar, do vale (esquerda) ao campanário da Penha, com o troço cheio até
- * 22,9 % do comprimento (o que a Vitrus recolhe: 301,3 t de ≈ 1 317 t) e o resto a tracejado (o que falta captar), um nó
+ * 11,5 % do comprimento (o que a Vitrus recolhe: 301,3 t de ≈ 2 626 t gerados) e o resto a tracejado (o que ainda vai
+ * para o lixo), um nó
  * onde acaba o cheio e um fio a desfiar na ponta. Três marcas leem-se sobre o fio: o medido, o que falta (em destaque) e o
  * potencial. Em telemóvel o mesmo fio corre na vertical. SVG inline, só `stroke-dashoffset`, opacidade e transform.
  */

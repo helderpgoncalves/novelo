@@ -57,15 +57,36 @@ function AssumptionsTable() {
       status: 'measured',
     },
     {
+      key: 'rsu',
+      param: m.landing_row_rsu(),
+      value: formatTonnes(FACTS.rsuT, 0),
+      source: (
+        <>
+          {m.landing_row_rsu_src()}
+          <Cite n={4} />
+        </>
+      ),
+      status: 'measured',
+    },
+    {
       key: 'q',
       param: m.landing_row_q(),
-      value: m.landing_row_q_val(),
+      value: formatPercent(FACTS.textileShareOfRsuPct),
       source: (
         <>
           {m.landing_row_q_src()}
           <Cite n={1} />
         </>
       ),
+      status: 'estimate',
+    },
+    {
+      key: 'residual',
+      param: m.landing_row_residual(),
+      value: `≈ ${formatTonnes(FACTS.residualT)}`,
+      source: m.landing_row_residual_src({
+        kg: formatNumber(FACTS.residualKgPerInhabMonth, 3),
+      }),
       status: 'estimate',
     },
     {
@@ -83,11 +104,11 @@ function AssumptionsTable() {
       status: 'estimate',
     },
     {
-      key: 'street',
+      key: 'containers',
       param: m.landing_row_street(),
-      value: formatPercent(FACTS.streetCapturePct),
+      value: formatNumber(0),
       source: m.landing_row_street_src(),
-      status: 'calibrated',
+      status: 'measured',
     },
     {
       key: 'detour',
@@ -125,9 +146,9 @@ function AssumptionsTable() {
     {
       key: 'ceiling',
       param: m.landing_row_ceiling(),
-      value: m.landing_row_ceiling_val(),
+      value: '—',
       source: m.landing_row_ceiling_src(),
-      status: 'estimate',
+      status: 'validating',
     },
   ];
   const cell = 'block px-5 py-0.5 md:table-cell md:px-5 md:py-3.5';

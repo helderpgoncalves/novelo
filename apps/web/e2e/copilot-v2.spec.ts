@@ -439,7 +439,8 @@ test.describe('painel ⌘K', () => {
   test('uma pergunta da página inicial abre o painel e é enviada', async ({ page }) => {
     await login(page, user);
     await page
-      .getByRole('button', { name: 'Que freguesias têm mais potencial por captar?' })
+      .getByRole('button', { name: /Que freguesias têm mais têxtil por desviar/ })
+      .first()
       .click();
     const panel = page.getByRole('dialog', { name: 'Copiloto Novelo' });
     await expect(panel).toBeVisible();

@@ -73,16 +73,15 @@ describe('layerValues', () => {
   ];
   const ctx = {
     parishes: ps,
-    capturePct: 25,
     areaKm2: new Map([
       ['a', 2],
       ['b', 4],
     ]),
     municipalContainers: new Map([['b', 8]]),
   };
-  it('potencial por captar = potencial × (1 − captura), em t/ano', () => {
-    expect(parishGapT(ps[1] as OverviewParish, 25)).toBeCloseTo(7.5, 9);
-    expect(layerValues('gap', ctx).get('b')).toBeCloseTo(7.5, 9);
+  it('por desviar = o têxtil que ainda vai para o lixo (potential_t da API), em t/ano', () => {
+    expect(parishGapT(ps[1] as OverviewParish)).toBeCloseTo(10, 9);
+    expect(layerValues('gap', ctx).get('b')).toBeCloseTo(10, 9);
   });
   it('freguesia sem valor válido fica fora (sem dados)', () => {
     expect(layerValues('gap', ctx).has('c')).toBe(false);

@@ -24,14 +24,14 @@ from pathlib import Path
 import openpyxl
 
 import containers  # mesmo diretório (scripts/etl); `uv run` põe-no no sys.path
+import textile_base as base  # base do têxtil gerado (Vitrus + APA), um só sítio no ETL
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW = ROOT / "data" / "raw"
 OUT = ROOT / "data" / "processed"
 
-POPULATION = 156_830  # Censos 2021 (INE), soma das 48 freguesias; é a mesma população que a API usa
-KG_PER_INHAB_MONTH = 0.7  # Plano de Ação: têxtil no indiferenciado
-MONTHS = 12
+POPULATION = base.POPULATION
+MONTHS = base.MONTHS
 
 TYPOLOGY = {
     "Orgânicos": "organic",
@@ -140,7 +140,8 @@ def textile_flows() -> dict:
             )
     _write_csv("textile_flows.csv", rows)
     total = sum(r["tonnes"] for r in rows)
-    demand_t = POPULATION * KG_PER_INHAB_MONTH * MONTHS / 1000
+    # Têxtil gerado = o que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + o recolhido à parte.
+    demand_t = base.generated_t(total)
     by_dest = {
         d: round(sum(r["tonnes"] for r in rows if r["destination"] == d), 3) for d in ("reuse", "recycle", "reject")
     }
@@ -148,9 +149,11 @@ def textile_flows() -> dict:
         "total_t": round(total, 3),
         **{f"{d}_t": v for d, v in by_dest.items()},
         "kg_per_inhab_month": round(total * 1000 / POPULATION / MONTHS, 3),
+        "residual_kg_per_inhab_month": round(base.KG_PER_INHAB_MONTH, 4),
         "estimated_demand_t": round(demand_t, 1),
-        "capture_of_demand_pct": round(total / demand_t * 100, 1),
+        "capture_of_demand_pct": round(base.capture(total) * 100, 1),
         "gap_t": round(demand_t - total, 1),
+        "demand_source": base.SOURCE_LABEL,
     }
 
 
@@ -367,6 +370,26 @@ def sources() -> None:
             "notes": "Semana de 21 a 25/09/2026, sábado 19/09 e domingo 20/09 (fim de semana anterior).",
         },
     ]
+    # Valores comunicados por email (sem ficheiro): a impressão digital é a dos próprios valores.
+    vitrus_apa = json.dumps(
+        {"rsu_t": base.VITRUS_RSU_2025_T, "textile_share": base.APA_TEXTILE_SHARE_OF_RSU}, sort_keys=True
+    )
+    manifest.append(
+        {
+            "key": "vitrus_apa_rsu_2025",
+            "title": "RSU recolhido em 2025 e percentagem de têxtil no RSU",
+            "provider": "Vitrus Ambiente (APA)",
+            "file_name": "email do mentor da Vitrus (21/10/2026)",
+            "file_sha256": hashlib.sha256(vitrus_apa.encode()).hexdigest(),
+            "received_on": "2026-10-21",
+            "period_start": "2025-01-01",
+            "period_end": "2025-12-31",
+            "notes": (
+                "43 051 t de RSU recolhidas pela Vitrus em 2025; 5,4% é têxtil (estatística da APA, indicada pela "
+                "Vitrus). Base do têxtil que ainda vai para o lixo (2 324,8 t/ano, estimativa)."
+            ),
+        }
+    )
     public = RAW / "public"
     if (public / "parishes.geojson").exists():
         digest = hashlib.sha256(

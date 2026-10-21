@@ -4,6 +4,7 @@ import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
 const LABEL: Record<PotentialReadingOut['key'], () => string> = {
+  vitrus_apa_share_of_rsu: () => m.validation_reading_vitrus_apa_share_of_rsu(),
   plan_per_capita: () => m.validation_reading_plan_per_capita(),
   plan_share_of_residual: () => m.validation_reading_plan_share_of_residual(),
   pt_composition: () => m.validation_reading_pt_composition(),
@@ -13,7 +14,11 @@ const LABEL: Record<PotentialReadingOut['key'], () => string> = {
 export function ReadingsChart({ data }: { data: ModelValidationOut }) {
   const observed = data.baseline.observed_kg_per_inhab_year;
   const top = Math.max(...data.readings.map((r) => r.kg_per_inhab_year), observed);
-  const maxCapture = Math.max(...data.readings.map((r) => r.implied_capture_pct));
+  // As leituras alternativas (não usadas pela Vitrus) mostram-se, mas não definem o teto da frase.
+  const used = data.readings.filter((r) => !r.is_alternative);
+  const maxCapture = Math.max(
+    ...(used.length > 0 ? used : data.readings).map((r) => r.implied_capture_pct),
+  );
   const at = (kg: number) => `${(kg / top) * 100}%`;
 
   return (
@@ -31,6 +36,11 @@ export function ReadingsChart({ data }: { data: ModelValidationOut }) {
                 {r.is_model_base && (
                   <span className="ml-2 font-normal text-muted-foreground text-xs">
                     {m.validation_reading_base()}
+                  </span>
+                )}
+                {r.is_alternative && (
+                  <span className="ml-2 font-normal text-muted-foreground text-xs">
+                    {m.validation_reading_alternative()}
                   </span>
                 )}
               </p>

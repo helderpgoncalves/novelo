@@ -557,11 +557,17 @@ def plan_site_network(
                 budget_eur=budget, target_tonnes=target_tonnes, time_limit_s=limit, hint=hint,
                 hint_on_demand=hint_od,
             )  # fmt: skip
+            if budget is not None and h.status == "infeasible" and (hint or hint_od):
+                # Com orçamento, abrir nada é sempre válido: "infeasible" aqui é o CP-SAT sem solução no tempo dado.
+                # A dica (gulosa ou a volta anterior) é uma solução; o custo real decide depois se cabe no orçamento.
+                return tuple(hint), {z: od_zones[z] for z in hint_od}, "feasible"
             return h.sites, {z: od_zones[z] for z in h.on_demand}, h.status
         c = solve_coverage(
             tonnes, near, site_cost, objective, budget_eur=budget, target_tonnes=target_tonnes,
             time_limit_s=limit, hint=hint,
         )  # fmt: skip
+        if budget is not None and c.status == "infeasible" and hint:
+            return tuple(hint), {}, "feasible"  # idem: sem solução no tempo dado, fica a dica
         return c.chosen, {}, c.status
 
     def build(chosen: Sequence[int], od: dict[str, OnDemandZone], route_s: int) -> SitePlan:
@@ -608,7 +614,10 @@ def plan_site_network(
                 break
             solver_budget += slack * 0.9
         else:
-            solver_budget -= (cost - budget_eur_year) * 1.02
+            # Corta a partir do custo que o solver viu para ESTA solução (pode estar bem abaixo do orçamento do solver):
+            # cortar só ao orçamento devolvia a mesma solução e o cenário acabava "infeasible" com dinheiro de sobra.
+            seen = len(chosen) * costs.annual_fixed_eur + sum(v.cost_eur for v in od.values())
+            solver_budget = min(solver_budget, seen) - (cost - budget_eur_year) * 1.02 - 0.005 * budget_eur_year
         if solver_budget <= 0:
             break
     return best if best is not None else empty

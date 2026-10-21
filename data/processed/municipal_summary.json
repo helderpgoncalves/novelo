@@ -4,28 +4,28 @@
   "inputs": [
     {
       "file": "Contentores de Profundidade.txt",
-      "bytes": 43493,
-      "sha256": "1cbd4edf8b215ff2292c4917a8c0632cd204f1508a30c79324bd29716a79dac0"
+      "bytes": 42899,
+      "sha256": "c9b40b202b50d7d5bcb6774b16c5e6783d7f373ac52a2883d9e28ab49dce71da"
     },
     {
       "file": "Contentores de Superfície.txt",
-      "bytes": 46452,
-      "sha256": "8c39c5c918afbe242a4277407d82a166cd5dcfbc1286d7d6bdd28c72b41a8158"
+      "bytes": 45656,
+      "sha256": "ff716706d41eae249a3267fc64cf1329892d5ae7bfbfc4bd5ab7696c8da0236b"
     },
     {
       "file": "Contentores Orgânico - Coletivo.txt",
-      "bytes": 37130,
-      "sha256": "3c758945b11ab3c74566a50c9782e5669284ec72dc4e81318fc6410edcbff4f8"
+      "bytes": 36732,
+      "sha256": "ea1a8851b5562931692417908b9970cd7387817e851b7ec31458a44004a73667"
     },
     {
       "file": "Contentores Orgânico - Tipologia.txt",
-      "bytes": 78945,
-      "sha256": "1e3d95db452d42e882268fe16a6c502f53be8dfa790b23e7badd0145db008a0d"
+      "bytes": 78021,
+      "sha256": "ad0d9c5975f8f2eac7d9662f7599e17e749ea99e749723d5d5a1e9891a5fd038"
     },
     {
       "file": "Contentores Resíduos Verdes.txt",
-      "bytes": 4089,
-      "sha256": "4518aef32fce6acbd8434fbf530822a4eec6eb8a990fec1bebbdd4b8eb136b44"
+      "bytes": 4042,
+      "sha256": "e677cf079dedae2fec636071c39ec54f5e3328f98043587d351a1093ede3f28b"
     },
     {
       "file": "Informação/Cont_AAD_CAOP2019/Cont_AAD_CAOP2019.shp",
@@ -836,81 +836,81 @@
       {
         "rank": 1,
         "name": "Lordelo",
-        "gap_t": 25.8,
+        "gap_t": 59.0,
         "candidate_sites": 1,
-        "gap_t_per_candidate_site": 25.78,
+        "gap_t_per_candidate_site": 58.98,
         "population": 3979
       },
       {
         "rank": 2,
         "name": "União das freguesias de Tabuadelo e São Faustino",
-        "gap_t": 15.6,
+        "gap_t": 35.8,
         "candidate_sites": 0,
-        "gap_t_per_candidate_site": 15.65,
+        "gap_t_per_candidate_site": 35.8,
         "population": 2415
       },
       {
         "rank": 3,
         "name": "União das freguesias de Serzedo e Calvos",
-        "gap_t": 14.7,
+        "gap_t": 33.5,
         "candidate_sites": 0,
-        "gap_t_per_candidate_site": 14.66,
+        "gap_t_per_candidate_site": 33.55,
         "population": 2263
       },
       {
         "rank": 4,
         "name": "Infantas",
-        "gap_t": 11.3,
+        "gap_t": 25.8,
         "candidate_sites": 0,
-        "gap_t_per_candidate_site": 11.27,
+        "gap_t_per_candidate_site": 25.79,
         "population": 1740
       },
       {
         "rank": 5,
         "name": "União das freguesias de Abação e Gémeos",
-        "gap_t": 17.4,
+        "gap_t": 39.8,
         "candidate_sites": 3,
-        "gap_t_per_candidate_site": 5.79,
+        "gap_t_per_candidate_site": 13.25,
         "population": 2682
       },
       {
         "rank": 6,
         "name": "Ronfe",
-        "gap_t": 29.1,
+        "gap_t": 66.6,
         "candidate_sites": 10,
-        "gap_t_per_candidate_site": 2.91,
+        "gap_t_per_candidate_site": 6.66,
         "population": 4496
       },
       {
         "rank": 7,
         "name": "União das freguesias de Atães e Rendufe",
-        "gap_t": 16.7,
+        "gap_t": 38.2,
         "candidate_sites": 6,
-        "gap_t_per_candidate_site": 2.78,
+        "gap_t_per_candidate_site": 6.37,
         "population": 2579
       },
       {
         "rank": 8,
         "name": "Candoso (São Martinho)",
-        "gap_t": 8.0,
+        "gap_t": 18.3,
         "candidate_sites": 3,
-        "gap_t_per_candidate_site": 2.67,
+        "gap_t_per_candidate_site": 6.1,
         "population": 1234
       },
       {
         "rank": 9,
         "name": "Moreira de Cónegos",
-        "gap_t": 30.1,
+        "gap_t": 68.9,
         "candidate_sites": 14,
-        "gap_t_per_candidate_site": 2.15,
+        "gap_t_per_candidate_site": 4.92,
         "population": 4651
       },
       {
         "rank": 10,
         "name": "Silvares",
-        "gap_t": 14.6,
+        "gap_t": 33.4,
         "candidate_sites": 7,
-        "gap_t_per_candidate_site": 2.08,
+        "gap_t_per_candidate_site": 4.76,
         "population": 2250
       }
     ]
@@ -936,8 +936,9 @@
     ],
     "simplify_tolerance_m": 5.0,
     "projected_crs": "EPSG:3763",
-    "potential_kg_per_inhab_month": 0.7,
-    "capture_today_pct": 22.9
+    "residual_kg_per_inhab_month": 1.2353,
+    "demand_source": "Vitrus (43 051 t de RSU recolhidas em 2025) e APA (5,4% de têxtil no RSU)",
+    "capture_today_pct": 11.5
   },
   "alerts": 25,
   "outputs": [

@@ -1819,10 +1819,10 @@
           },
           "density_mode": {
             "$ref": "#/components/schemas/CollectionMode",
-            "description": "Modo a que a densidade se aplica"
+            "description": "Modo a que a densidade se aplica (`street` no preset francês: só como referência)"
           },
           "implied_capture_pct": {
-            "description": "Fração do potencial (0,7 kg/hab/mês) que a meta exige captar",
+            "description": "Fração do têxtil que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) que a meta exige",
             "title": "Implied Capture Pct",
             "type": "number"
           },
@@ -1846,7 +1846,7 @@
             "type": "number"
           },
           "observed_capture_pct": {
-            "description": "Captura atual da Vitrus (22,9%)",
+            "description": "Captura atual: recolhido em 2025 ÷ têxtil gerado (estimativa)",
             "title": "Observed Capture Pct",
             "type": "number"
           },
@@ -2702,7 +2702,7 @@
         "type": "object"
       },
       "CollectionMode": {
-        "description": "Modos de recolha de têxteis que o simulador compara.",
+        "description": "Modos de recolha de têxteis que o simulador compara.\n\nA Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no\nvocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.",
         "enum": [
           "existing",
           "street",
@@ -9938,11 +9938,12 @@
       "MunicipalGapParameters": {
         "properties": {
           "capture_pct": {
-            "description": "Captura média atual do concelho (301,3 t ÷ 1 317 t), igual em todas",
+            "description": "Captura média atual do concelho (recolhido em 2025 ÷ têxtil gerado), igual em todas",
             "title": "Capture Pct",
             "type": "number"
           },
           "kg_per_inhab_month": {
+            "description": "Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: 43 051 t RSU × 5,4%)",
             "title": "Kg Per Inhab Month",
             "type": "number"
           },
@@ -10630,12 +10631,12 @@
             "type": "integer"
           },
           "textile_gap_t": {
-            "description": "Estimativa: potencial × (1 − captura média do concelho)",
+            "description": "Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (43 051 t RSU × 5,4%) × 12",
             "title": "Textile Gap T",
             "type": "number"
           },
           "textile_potential_t": {
-            "description": "Estimativa: 0,7 kg/hab/mês × população × 12",
+            "description": "Estimativa do têxtil gerado: lacuna ÷ (1 − captura média do concelho)",
             "title": "Textile Potential T",
             "type": "number"
           }
@@ -11809,7 +11810,7 @@
         "type": "object"
       },
       "OverviewGap": {
-        "description": "A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.",
+        "description": "A lacuna: o têxtil gerado (estimativa Vitrus + APA), o que se recolheu e o que ainda vai para o lixo.",
         "properties": {
           "capture_pct": {
             "description": "collected_t / potential_t, em %",
@@ -11841,8 +11842,18 @@
             "title": "Kg Per Inhab Year",
             "type": "number"
           },
+          "missing_kg_per_inhab_month": {
+            "description": "Estimativa: têxtil que ainda vai para o lixo por habitante e mês (base da procura do simulador)",
+            "title": "Missing Kg Per Inhab Month",
+            "type": "number"
+          },
+          "missing_kg_per_inhab_year": {
+            "description": "Estimativa: têxtil que ainda vai para o lixo por habitante e ano (43 051 t × 5,4% ÷ população)",
+            "title": "Missing Kg Per Inhab Year",
+            "type": "number"
+          },
           "missing_t": {
-            "description": "potential_t − collected_t",
+            "description": "potential_t − collected_t: têxtil que ainda vai para o lixo",
             "title": "Missing T",
             "type": "number"
           },
@@ -11862,17 +11873,22 @@
             "type": "boolean"
           },
           "potential_kg_per_inhab_month": {
-            "description": "Estimativa do plano: 0,7",
+            "description": "Estimativa: têxtil gerado por habitante e mês",
             "title": "Potential Kg Per Inhab Month",
             "type": "number"
           },
           "potential_kg_per_inhab_year": {
-            "description": "Estimativa do plano: 0,7 × 12",
+            "description": "Estimativa: têxtil gerado por habitante e ano",
             "title": "Potential Kg Per Inhab Year",
             "type": "number"
           },
+          "potential_source_label": {
+            "description": "Fonte da estimativa do potencial",
+            "title": "Potential Source Label",
+            "type": "string"
+          },
           "potential_t": {
-            "description": "Estimativa: população × 0,7 kg/hab/mês × 12 (plano municipal)",
+            "description": "Estimativa do têxtil gerado: 43 051 t RSU × 5,4% (Vitrus + APA) + recolhido à parte",
             "title": "Potential T",
             "type": "number"
           },
@@ -11892,6 +11908,9 @@
           "kg_per_inhab_month",
           "potential_kg_per_inhab_year",
           "potential_kg_per_inhab_month",
+          "missing_kg_per_inhab_year",
+          "missing_kg_per_inhab_month",
+          "potential_source_label",
           "population",
           "parishes_count"
         ],
@@ -12094,7 +12113,7 @@
             "type": "boolean"
           },
           "potential_t": {
-            "description": "Estimativa: população × 0,7 kg/hab/mês × 12 / 1000",
+            "description": "Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (Vitrus + APA) × 12 / 1000",
             "title": "Potential T",
             "type": "number"
           },
@@ -12160,7 +12179,7 @@
             "type": "string"
           },
           "is_estimate": {
-            "description": "Verdadeiro para o potencial do plano e valores aproximados",
+            "description": "Verdadeiro para o potencial estimado e valores aproximados",
             "title": "Is Estimate",
             "type": "boolean"
           },
@@ -12300,7 +12319,6 @@
       "ParamSource": {
         "description": "Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.",
         "enum": [
-          "plan",
           "vitrus_data",
           "assumption"
         ],
@@ -12924,7 +12942,11 @@
             "title": "Min Tonnes Pilot"
           },
           "modes": {
-            "description": "Modos de recolha a testar no piloto",
+            "default": [
+              "existing",
+              "on_demand"
+            ],
+            "description": "Modos de recolha a testar no piloto; por omissão `existing` e `on_demand` (`street` só como referência)",
             "items": {
               "$ref": "#/components/schemas/CollectionMode"
             },
@@ -13087,7 +13109,7 @@
             "type": "number"
           },
           "kg_per_inhab_month": {
-            "description": "Têxtil gerado por habitante e mês",
+            "description": "Têxtil que ainda vai para o lixo por habitante e mês (43 051 t RSU × 5,4%, Vitrus + APA)",
             "exclusiveMinimum": 0.0,
             "maximum": 5.0,
             "title": "Kg Per Inhab Month",
@@ -13232,25 +13254,42 @@
       },
       "PotentialReadingOut": {
         "properties": {
+          "basis": {
+            "description": "`generated`: têxtil gerado no total; `residual`: têxtil que ainda vai para o lixo (o recolhido à parte soma-se para obter o gerado)",
+            "enum": [
+              "generated",
+              "residual"
+            ],
+            "title": "Basis",
+            "type": "string"
+          },
           "implied_capture_pct": {
             "description": "Captura de 2025 se esta leitura do potencial fosse a verdadeira",
             "title": "Implied Capture Pct",
             "type": "number"
           },
           "implied_potential_t": {
+            "description": "Têxtil gerado (t/ano) que esta leitura implica",
             "title": "Implied Potential T",
             "type": "number"
           },
+          "is_alternative": {
+            "default": false,
+            "description": "Leitura publicada mas não usada pela Vitrus; só para triangulação",
+            "title": "Is Alternative",
+            "type": "boolean"
+          },
           "is_model_base": {
-            "description": "A leitura que o modelo usa por omissão (0,7 kg/hab/mês)",
+            "description": "A leitura que o modelo usa (Vitrus + APA: 43 051 t de RSU × 5,4%)",
             "title": "Is Model Base",
             "type": "boolean"
           },
           "key": {
             "enum": [
-              "plan_per_capita",
+              "vitrus_apa_share_of_rsu",
               "plan_share_of_residual",
-              "pt_composition"
+              "pt_composition",
+              "plan_per_capita"
             ],
             "title": "Key",
             "type": "string"
@@ -13267,6 +13306,7 @@
         "required": [
           "key",
           "kg_per_inhab_year",
+          "basis",
           "implied_capture_pct",
           "implied_potential_t",
           "is_model_base",
@@ -14637,9 +14677,22 @@
               },
               "type": "array"
             },
-            "description": "Modos permitidos por freguesia (código INE); omitido = todos",
+            "description": "Modos permitidos por freguesia (código INE); as freguesias omitidas usam `default_modes`",
             "title": "Constraints",
             "type": "object"
+          },
+          "default_modes": {
+            "default": [
+              "existing",
+              "on_demand"
+            ],
+            "description": "Modos permitidos nas freguesias sem restrição em `constraints`. Por omissão `existing` e `on_demand`: a Vitrus não tem contentores de têxtil; `street` só como referência explícita. Em `sites` o modo dos locais é `site_mode` e isto só decide se a recolha a pedido pode completar a rede",
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "minItems": 1,
+            "title": "Default Modes",
+            "type": "array"
           },
           "label": {
             "maxLength": 80,
@@ -14675,8 +14728,8 @@
           },
           "site_mode": {
             "$ref": "#/components/schemas/CollectionMode",
-            "default": "street",
-            "description": "Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)"
+            "default": "existing",
+            "description": "Pressupostos de captura e custo usados nos locais: `existing` (paragem com sacos fechados nos locais municipais onde a viatura já passa, sem contentor novo) ou `street` (contentor de rua, só referência)"
           },
           "site_on_demand": {
             "default": true,
@@ -14730,6 +14783,14 @@
               "$ref": "#/components/schemas/Allocation"
             },
             "title": "Allocations",
+            "type": "array"
+          },
+          "default_modes": {
+            "description": "Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)",
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Default Modes",
             "type": "array"
           },
           "depot": {
@@ -16285,6 +16346,7 @@
       "TextileBaseline": {
         "properties": {
           "capture_of_demand_pct": {
+            "description": "total_t / estimated_demand_t, em % (estimativa)",
             "title": "Capture Of Demand Pct",
             "type": "number"
           },
@@ -16296,11 +16358,12 @@
             "type": "array"
           },
           "estimated_demand_t": {
-            "description": "Estimativa do plano municipal: 0,7 kg/hab/mês",
+            "description": "Estimativa do têxtil gerado: o que vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + total_t",
             "title": "Estimated Demand T",
             "type": "number"
           },
           "gap_t": {
+            "description": "Têxtil que ainda vai para o lixo, por desviar (estimativa)",
             "title": "Gap T",
             "type": "number"
           },

@@ -39,7 +39,6 @@ from novelo.features.planning.whatif_service import resolve_parishes
 from novelo.features.reports import service as report_service
 from novelo.features.reports.models import Report
 from novelo.features.reports.schemas import ReportRequest
-from novelo.features.textile import service as textile
 from novelo.features.users.models import User
 
 EXPIRES_MIN = 10
@@ -350,7 +349,7 @@ async def e_create(ctx: Ctx, p: CreateScenarioP) -> tuple[dict[str, Any], dict[s
     constraints = await _restrictions(ctx, p.restrictions)
     target = None
     if p.target_pct is not None:
-        target = p.target_pct / 100 * (await textile.get_baseline(ctx.db)).estimated_demand_t
+        target = p.target_pct / 100 * await planning.potential_t(ctx.db)  # % do têxtil por desviar do lixo
     req = ScenarioRequest(
         label=f"{COPILOT_PREFIX}{p.label}"[:80], objective=p.objective,
         budget_eur_year=p.budget_eur_year if p.objective == ScenarioObjective.MAX_TONNES else None,

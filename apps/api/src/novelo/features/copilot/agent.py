@@ -2,7 +2,7 @@
 """O copiloto em streaming: um pedido -> eventos tipados (SSE).
 
 Camadas do prompt (da mais estável para a mais volátil):
-  1. regras (copilot_v3.md)  2. persona + memória + perfil, CONGELADAS por conversa (preserva o prompt cache)
+  1. regras (copilot_v4.md)  2. persona + memória + perfil, CONGELADAS por conversa (preserva o prompt cache)
   3. histórico  4. bloco [context] do pedido (ecrã, menções, anexos, ações recentes, memo) + a pergunta.
 
 Se o verificador rejeitar o texto depois de transmitido, emite-se `retract` e o texto reescrito. Se o cliente desligar,
@@ -159,7 +159,7 @@ class _Run:
         self.trace: list[dict[str, Any]] = []
         self.extra_facts: list[Any] = [*turn.page_facts, *(m.facts for m in turn.mentions)]
         self.usage0 = len(getattr(llm, "usage", []))
-        self.prompt_version = "v3"
+        self.prompt_version = load("copilot")[1]  # a versão em vigor, já no evento `start`
         self.model = ""
         self.emitted_cards: set[uuid.UUID] = set()
         self.recalled = False

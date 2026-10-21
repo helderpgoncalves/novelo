@@ -32,7 +32,14 @@ import { ParametersForm } from '@/features/assumptions/parameters-form';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
-import { MODES, modeHint, modeLabel, objectiveHint, objectiveLabel } from '@/lib/scenario';
+import {
+  ALL_MODES,
+  MODES,
+  modeHint,
+  modeLabel,
+  objectiveHint,
+  objectiveLabel,
+} from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 import { type Constraints, ConstraintsEditor } from './constraints-editor';
 import { FormSection } from './form-section';
@@ -51,7 +58,8 @@ const OBJECTIVES: ScenarioObjective[] = ['max_tonnes', 'min_cost'];
 const BUDGET_MAX = 200_000;
 const RADII = [200, 300, 500] as const;
 type Siting = NonNullable<ScenarioRequest['siting']>;
-const SITE_MODES: Extract<CollectionMode, 'existing' | 'street'>[] = ['street', 'existing'];
+/** `existing` por omissão; `street` só como referência explícita (a Vitrus não usa contentores de têxtil). */
+type SiteMode = Extract<CollectionMode, 'existing' | 'street'>;
 const snapRadius = (r: number): number =>
   RADII.reduce((best, x) => (Math.abs(x - r) < Math.abs(best - r) ? x : best), 300 as number);
 type SectionId = 'goal' | 'assumptions' | 'options';
@@ -67,7 +75,7 @@ export interface FormSeed {
   /** Rede a desenhar: locais reais da rede municipal ou freguesias. */
   siting: Siting;
   radiusM: number;
-  siteMode: Extract<CollectionMode, 'existing' | 'street'>;
+  siteMode: SiteMode;
   /** Completar a rede com recolha a pedido nas freguesias onde compensa. */
   onDemand: boolean;
 }
@@ -98,8 +106,13 @@ function matchesRequest(s: ScenarioOut, r: ScenarioRequest): boolean {
       (siting.radius_m === r.site_radius_m &&
         siting.site_mode === r.site_mode &&
         (siting.on_demand ?? true) === (r.site_on_demand ?? true)));
+  // Cenários antigos, sem o campo, permitiam todos os modos.
+  const sameModes =
+    stable([...(s.result.default_modes ?? ALL_MODES)].sort()) ===
+    stable([...(r.default_modes ?? MODES)].sort());
   return (
     sameNetwork &&
+    sameModes &&
     s.objective === r.objective &&
     (s.budget_eur_year ?? null) === (r.budget_eur_year ?? null) &&
     Math.abs((s.target_tonnes ?? 0) - (r.target_tonnes ?? 0)) < 0.002 &&
@@ -137,7 +150,11 @@ export function ScenarioForm({
   const population = useMemo(() => zones.reduce((sum, z) => sum + z.population, 0), [zones]);
   const potential = (population * params.kg_per_inhab_month * 12) / 1000;
   const targetTonnes = (targetPct / 100) * potential;
+  // `potential` é o têxtil que ainda vai para o lixo (a procura do modelo); o recolhido à parte em 2025 soma-se para
+  // obter o gerado. O marcador mostra onde caem as toneladas de 2025 na escala da meta.
   const baselinePct = potential > 0 ? (baselineTonnes / potential) * 100 : 0;
+  const generated = potential + baselineTonnes;
+  const generatedPct = generated > 0 ? (baselineTonnes / generated) * 100 : 0;
 
   const paramErrors = validateParams(params);
   const paramErrorCount = Object.keys(paramErrors).length;
@@ -166,6 +183,7 @@ export function ScenarioForm({
       target_tonnes: objective === 'min_cost' ? Math.round(targetTonnes * 1000) / 1000 : null,
       params,
       constraints,
+      default_modes: MODES,
       parent_id: seed.parentId ?? null,
       siting,
       site_radius_m: radiusM,
@@ -493,7 +511,7 @@ export function ScenarioForm({
               ) : (
                 <NumericControl
                   label={m.sim_target()}
-                  help={m.simx_help_target({ kg: formatNumber(params.kg_per_inhab_month, 1) })}
+                  help={m.simx_help_target({ kg: formatNumber(params.kg_per_inhab_month, 3) })}
                   value={targetPct}
                   onChange={setTargetPct}
                   unit="%"
@@ -514,7 +532,7 @@ export function ScenarioForm({
               <p className="text-muted-foreground text-xs">
                 {m.simx_reference_2025({
                   tonnes: formatTonnes(baselineTonnes, 1),
-                  pct: formatPercent(baselinePct, 1),
+                  pct: formatPercent(generatedPct, 1),
                 })}
               </p>
 
@@ -623,7 +641,7 @@ export function ScenarioForm({
   );
 }
 
-const siteModeLabel: Record<(typeof SITE_MODES)[number], () => string> = {
+const siteModeLabel: Record<SiteMode, () => string> = {
   existing: () => m.site_mode_existing(),
   street: () => m.site_mode_street(),
 };
@@ -633,8 +651,8 @@ interface NetworkControlProps {
   onSitingChange: (v: Siting) => void;
   radiusM: number;
   onRadiusChange: (v: number) => void;
-  siteMode: (typeof SITE_MODES)[number];
-  onSiteModeChange: (v: (typeof SITE_MODES)[number]) => void;
+  siteMode: SiteMode;
+  onSiteModeChange: (v: SiteMode) => void;
   onDemand: boolean;
   onOnDemandChange: (v: boolean) => void;
 }
@@ -702,12 +720,22 @@ function NetworkControl({
                 </ul>
               </HelpHint>
             </div>
-            <Segmented
-              label={m.site_mode_aria()}
-              value={siteMode}
-              onChange={onSiteModeChange}
-              options={SITE_MODES.map((o) => ({ value: o, label: siteModeLabel[o]() }))}
-            />
+            <p className="flex min-h-10 items-center gap-2 rounded-lg border bg-muted/40 px-3 text-sm">
+              <ModeDot mode={siteMode} /> {siteModeLabel[siteMode]()}
+            </p>
+            <div className="flex items-center justify-between gap-3">
+              <Label
+                htmlFor="site-street-reference"
+                className="min-h-10 flex-1 items-center font-normal text-muted-foreground text-sm"
+              >
+                {m.site_mode_street_toggle()}
+              </Label>
+              <Switch
+                id="site-street-reference"
+                checked={siteMode === 'street'}
+                onCheckedChange={(v) => onSiteModeChange(v ? 'street' : 'existing')}
+              />
+            </div>
           </div>
           <div className="flex items-center justify-between gap-3">
             <Label htmlFor="site-on-demand" className="min-h-10 flex-1 items-center text-sm">
@@ -725,7 +753,7 @@ function NetworkControl({
   );
 }
 
-/** Os três modos de recolha: números-chave dos pressupostos atuais, em linhas compactas. */
+/** Os modos oferecidos (local existente e a pedido): números-chave dos pressupostos atuais, em linhas compactas. */
 function ModesOverview({ params, zones }: { params: PlanningParams; zones: ZoneOut[] }) {
   const withContainers = zones
     .filter((z) => (z.existing_containers ?? 0) > 0)
@@ -738,7 +766,7 @@ function ModesOverview({ params, zones }: { params: PlanningParams; zones: ZoneO
         <h3 className="font-medium text-sm">{m.sim_step_modes()}</h3>
         <HelpHint label={m.sim_step_modes()}>{m.simx_help_modes()}</HelpHint>
       </div>
-      <ul className="grid grid-cols-1 gap-2 md:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-2 md:grid-cols-2">
         {MODES.map((mode) => {
           const p = params.modes[mode];
           if (!p) return null;

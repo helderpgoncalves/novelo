@@ -137,11 +137,12 @@ async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx
     assert {p["label"] for p in after} == {"Locais 1", "Locais 2"}
 
 
-async def test_the_default_point_is_the_street_container_calibrated_with_2025(operator: httpx.AsyncClient) -> None:
+async def test_the_default_point_is_an_existing_place_without_a_new_container(operator: httpx.AsyncClient) -> None:
+    """A Vitrus não tem contentores de têxtil: por omissão os locais são paragens onde a viatura já passa."""
     resp = await operator.post(
         f"{P}/scenarios",
         json={
-            "label": "Rua",
+            "label": "Local existente",
             "objective": "max_tonnes",
             "budget_eur_year": 5000,
             "siting": "sites",
@@ -150,9 +151,18 @@ async def test_the_default_point_is_the_street_container_calibrated_with_2025(op
     )
     assert resp.status_code == 201
     out = resp.json()
-    assert out["result"]["siting"]["site_mode"] == "street"
+    assert out["result"]["siting"]["site_mode"] == "existing"
+    assert {m["mode"] for m in out["result"]["modes"]} == {"existing"}
     alloc = {a["parish_code"]: a for a in out["result"]["allocations"]}
-    capture = out["params"]["modes"]["street"]["capture_rate"]
+    capture = out["params"]["modes"]["existing"]["capture_rate"]
+    assert alloc["030801"]["tonnes"] == pytest.approx(alloc["030801"]["demand_t"] * capture, abs=0.002)
+
+
+async def test_street_sites_only_when_asked_as_a_reference(operator: httpx.AsyncClient) -> None:
+    s = await run(operator, site_mode="street")
+    assert s["result"]["siting"]["site_mode"] == "street"
+    alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
+    capture = s["params"]["modes"]["street"]["capture_rate"]
     assert alloc["030801"]["tonnes"] == pytest.approx(alloc["030801"]["demand_t"] * capture, abs=0.002)
 
 

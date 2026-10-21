@@ -43,6 +43,7 @@ import re
 import sqlite3
 import statistics
 import struct
+import sys
 import unicodedata
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field
@@ -57,6 +58,9 @@ from pyproj import Transformer
 from shapely.geometry import Point, mapping, shape
 from shapely.geometry.base import BaseGeometry
 from shapely.ops import unary_union
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # também quando carregado por caminho (testes)
+import textile_base  # noqa: E402  (base do têxtil gerado: um só sítio no ETL)
 
 ROOT = Path(__file__).resolve().parents[2]
 RAW_PACKAGE = ROOT / "data" / "raw" / "vitrus-mapa-qgis"
@@ -79,10 +83,10 @@ LINK_RADIUS_M = 15.0  # raio para ligar o orgânico coletivo ao contentor de rua
 COVERAGE_RADII_M = (200, 300, 500)
 SIMPLIFY_TOLERANCE_M = 5.0  # simplificação do contorno CAOP para a web
 SUSPECT_DISTANCE_M = 1000.0  # freguesia declarada a mais disto do ponto: coordenada ou nome suspeitos
-POTENTIAL_KG_PER_INHAB_MONTH = 0.7  # mesmo pressuposto de build_processed.py
+# Têxtil que ainda vai para o lixo por habitante (Vitrus + APA: 43 051 t RSU × 5,4%), de textile_base.py.
+RESIDUAL_KG_PER_INHAB_MONTH = textile_base.KG_PER_INHAB_MONTH  # 1,2353
 TEXTILE_COLLECTED_T = 301.266  # 2025, 4 entidades (summary.json)
-POPULATION_TOTAL = 156_830
-CAPTURE_TODAY = TEXTILE_COLLECTED_T / (POPULATION_TOTAL * POTENTIAL_KG_PER_INHAB_MONTH * 12 / 1000)  # 22,9%
+CAPTURE_TODAY = textile_base.capture(TEXTILE_COLLECTED_T)  # 11,47%
 
 KINDS = ("underground", "surface", "platform", "organic_collective", "organic_producer", "green_waste")
 PUBLIC_KINDS = {"underground", "surface", "platform", "organic_collective", "green_waste"}
@@ -850,8 +854,9 @@ def analyse(data: dict[str, Any]) -> dict[str, Any]:
         types = Counter(r["producer_type_key"] for r in rows if r["producer_type_key"])
         pop = p.population or 0
         area_km2 = p.geom.area / 1_000_000
-        potential_t = pop * POTENTIAL_KG_PER_INHAB_MONTH * 12 / 1000
-        gap_t = potential_t * (1 - CAPTURE_TODAY)
+        # Lacuna = têxtil que ainda vai para o lixo; potencial = lacuna + recolhido (captura média do concelho).
+        gap_t = pop * RESIDUAL_KG_PER_INHAB_MONTH * textile_base.MONTHS / 1000
+        potential_t = gap_t / (1 - CAPTURE_TODAY)
         nn_vals = [s["nn_distance_m"] for s in ppublic if s["nn_distance_m"] != ""]
         by_parish.append(
             {
@@ -1551,7 +1556,8 @@ def build_summary(
             "coverage_radii_m": list(COVERAGE_RADII_M),
             "simplify_tolerance_m": SIMPLIFY_TOLERANCE_M,
             "projected_crs": "EPSG:3763",
-            "potential_kg_per_inhab_month": POTENTIAL_KG_PER_INHAB_MONTH,
+            "residual_kg_per_inhab_month": round(RESIDUAL_KG_PER_INHAB_MONTH, 4),
+            "demand_source": textile_base.SOURCE_LABEL,
             "capture_today_pct": round(100 * CAPTURE_TODAY, 1),
         },
         "alerts": len(alerts),

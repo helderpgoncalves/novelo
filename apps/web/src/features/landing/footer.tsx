@@ -205,7 +205,7 @@ export function LandingFooter() {
             <li>{m.footer_partner_vitrus()}</li>
             <li>{m.footer_partner_texvitrus()}</li>
             <li>{m.footer_partner_ine()}</li>
-            <li>{m.footer_partner_urbact()}</li>
+            <li>{m.footer_partner_apa()}</li>
           </ul>
         </div>
 

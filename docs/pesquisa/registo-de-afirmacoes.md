@@ -17,14 +17,17 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A5 | O destino de duas entidades é estimado por percentagem | Nova Etapa e Vitrus (percentagens de relatórios) | `dados_textil.xlsx` | Dado Vitrus (diz-se "estimativa") | 5 |
 | A6 | Circuitos, viaturas, localidades | 40 circuitos, 29 viaturas, 82 localidades (71 geocodificadas) | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 4 |
 | A7 | Circuitos sem viatura atribuída | 9 | idem | Dado Vitrus | demo |
-| A8 | Potencial do plano municipal | 0,7 kg/hab/mês ≈ 1 317 t/ano | Plano municipal × INE | **Por verificar**: fonte pública localizada a 20 out (Plano de Ação Integrado, URBACT, p. 30, F74, citando Perebynos et al. 2023, F75); falta confirmar com a Vitrus se o 0,7 é o têxtil que fica no indiferenciado ou a geração total, e o ano (resumo do estudo: dados de 2016). Cálculo para as 1 317 t. Ver [Q6](../projeto/perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | 2 |
-| A9 | Captura atual face ao potencial | 22,9% | 301,3 ÷ 1 317 | Cálculo | 2 |
-| A10 | Têxtil no indiferenciado | 5,4% | Plano municipal | **Por verificar**: o Plano de Ação Integrado (F74, p. 30) dá 5,4% em Guimarães contra 4,7% na Europa e cerca de 4% em Portugal; documentos públicos citam cerca de 5% e uma declaração fala em cerca de 11%; usar "cerca de 5%" só depois de confirmar o ano e o âmbito (Q6) | 2 |
+| A8 | Têxtil que ainda vai para o lixo (procura do modelo) | 2 324,8 t/ano = 1,235 kg/hab/mês | 43 051 t de RSU (A16) × 5,4% (A10) ÷ 156 830 ÷ 12 | Cálculo sobre dados da Vitrus e da APA (**estimativa**). Até 21 out era 0,7 kg/hab/mês ≈ 1 317 t do Plano de Ação Integrado (F74); a Vitrus não conhece esse plano e o valor deixou de se usar | 2 |
+| A9 | Captura atual | 11,5% | 301,27 ÷ (2 324,754 + 301,27) = 301,27 ÷ 2 626,024 | Cálculo (**estimativa**). Antes: 22,9% (301,3 ÷ 1 317, base antiga) | 2 |
+| A10 | Têxtil no RSU | 5,4% | APA, indicado pela Vitrus (mentor, 21 out 2026) | Dado Vitrus (valor da APA aplicado ao RSU de Guimarães). O mesmo 5,4% aparece no Plano de Ação Integrado (F74, p. 30), que a Vitrus não usa; a Vitrus diz também "± 5% do indiferenciado" pela APA | 2 |
 | A11 | 4 de 27 operadores licenciados valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar**: o Plano (F74, p. 32) fala em 27 operadores com licença LER 04 em Guimarães e sete concelhos vizinhos, 4 deles com reciclagem ou valorização (R3 e R5); LER 04 é resíduo industrial, pelo que não prova pós-consumo | 6 |
-| A12 | Total de têxtil no indiferenciado por ano | 1 300 a 2 650 t | Cálculo nosso (315 kg/hab de indiferenciado × 5,4%, ver [proposta](../projeto/proposta.md)) | Cálculo (depende de A10) | não usar até A10 |
+| A12 | Total de têxtil gerado por ano | 2 626,0 t | 2 324,8 t (A8) + 301,3 t (A1) | Cálculo (**estimativa**). Substitui o intervalo antigo de 1 300 a 2 650 t (315 kg/hab × 5,4%, plano municipal) | 2 |
 | A13 | Doze alertas de qualidade nos dados dos circuitos | 12 | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 7 |
-| A14 | Localizações dos contentores **de têxteis** | por receber (a 20 out chegou só o pacote municipal, ver G1) | Vitrus | Por obter | 4 |
-| A15 | Custos por recolha, quilómetro e contentor | por receber | Vitrus | Por obter (pressuposto até lá) | 4 |
+| A14 | Contentores **de têxteis** | não existem; a Vitrus não os quer (contaminação dificulta a reutilização) | Vitrus (mentor, 21 out 2026) | Dado Vitrus | 4 |
+| A15 | Custos por recolha, quilómetro e contentor | por receber: pedidos ao departamento financeiro a 21 out (não estão no site) | Vitrus | Por obter (pressuposto até lá) | 4 |
+| A16 | RSU recolhido pela Vitrus em 2025 | 43 051 t | Vitrus (mentor, 21 out 2026) | Dado Vitrus | 2 |
+| A17 | Reciclar têxtil é muito mais caro que fibra virgem | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus (opinião do operador, sem número) | 6 |
+| A18 | O pacote QGIS traz contentores de indiferenciado, orgânico e recolha seletiva; não há dados de deposição de têxtil por contentor | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus | |
 
 ## B. Regulação
 
@@ -67,7 +70,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | C14 | Guimarães com a recolha francesa teria cerca de 670 t | 4,27 × 156 830 | A3 e C1 | Cálculo | 3 |
 | C15 | Cenário francês = 2,2 vezes a recolha de hoje | 670 ÷ 301,3 | A1 e C14 | Cálculo | 3 |
 | C16 | Sasia recicla cerca de 2 000 t por mês, pré-consumo | 2 000 t/mês | [F23], [F24] | Secundária | 6 |
-| C17 | O potencial de Guimarães é cerca de 5,5% da capacidade anual da Sasia | 1 317 ÷ 24 000 | A8 e C16 | Cálculo (depende de A8) | 6 |
+| C17 | O têxtil por desviar em Guimarães é cerca de 9,7% da capacidade anual da Sasia | 2 324,8 ÷ 24 000 | A8 e C16 | Cálculo (depende de A8; antes 5,5% com 1 317 t) | 6 |
 | C18 | Wippytex trabalha com 30 municípios, 3 000 t em 2023 | 30; 3 000 t | [F23] | Secundária | não usar |
 | C19 | Humana Portugal 2024 | 3 835 t, 1 088 contentores | [F27] | Secundária | 6 |
 | C20 | Humana Portugal 2025 | 3 919 t, 653 contentores | [F28] | **Por verificar** | não usar |
@@ -123,7 +126,7 @@ Referências F41 a F60 em [Fontes](fontes.md#mentores-fibrenamics-e-hackathon). 
 | M9 | Cerca de 39% de denim pós-consumo reciclado chega à resistência térmica-alvo num não tecido | 39% | [F52] | Primária (investigação, via pesquisa) | Só em conversa |
 | M10 | A Sasia participa em projetos de isolamento acústico (construção e automóvel) | qualitativo | [F53] | Secundária | Conversa |
 | M11 | Lucas Nascimento é doutorando/doutorado em Gestão e Tratamento de Resíduos (UMinho) e investigador da Vitrus | — | [F56], utilizador | Secundária + indicado pelo utilizador | Perfil |
-| M12 | A Vitrus participa em dois projetos europeus de circularidade de comércio e serviços não alimentares, incluindo têxteis (URBACT Let's Go Circular e Circular Ecosystems) | 2 | [F17], [F18] | Secundária; **projetos exatos por confirmar** | Conversa com o Lucas |
+| M12 | A Vitrus participa em dois projetos europeus de circularidade de comércio e serviços não alimentares, incluindo têxteis (URBACT Let's Go Circular e Circular Ecosystems) | 2 | [F17], [F18] | Secundária; **projetos exatos por confirmar**. A 21 out o Lucas disse não conhecer o Plano de Ação Integrado (URBACT) | Conversa com o Lucas |
 | M13 | Guimarães e a Vitrus ganharam um lugar no Horizon Europe (periASTY, missão de cidades neutras em carbono) | 1.º de 3 | [F58] | Secundária; não é de resíduos | Não usar |
 | M14 | A campanha nas escolas recolheu cerca de 3 t em mais de 30 escolas, destino To Be Green | 3 t; 30 | [F57], [F19] | Secundária | Conversa |
 | M15 | Paulo Afonso, do Departamento de Produção e Sistemas, é investigador em custos, avaliação de investimentos, modelos de negócio e logística (SLOTS) | — | [F54], [F55] | Primária (instituição); o enunciado [F62] confirma-o como mentor "para qualquer desafio", mas **a identificação da pessoa continua por inferência** | Perfil |
@@ -137,17 +140,17 @@ Nada deste bloco é de têxteis. Ver [Análise dos contentores municipais](../da
 
 | # | Afirmação | Valor | Fonte | Estado | Slide |
 | --- | --- | --- | --- | --- | --- |
-| G1 | A Vitrus enviou os contentores municipais de outras frações; a lista de contentores de têxteis continua por chegar | 5 ficheiros, 2 754 linhas | `data/raw/vitrus-mapa-qgis/` | Dado Vitrus | demo |
+| G1 | A Vitrus enviou os contentores municipais de outras frações (indiferenciado, orgânico, seletivo); não há contentores de têxteis (A14) | 5 ficheiros, 2 754 linhas | `data/raw/vitrus-mapa-qgis/` | Dado Vitrus | demo |
 | G2 | Contentores aceites e localizados | 2 751 aceites, 2 722 localizados, 29 sem coordenadas, 3 rejeitados | ETL `municipal_containers.py` | Dado Vitrus (contagem nossa) | |
 | G3 | Contentores enterrados por marca | 591: molok 488, bluebee 66, greenbee 37 (e 2 plataformas) | idem | Dado Vitrus | |
 | G4 | Capacidade dos enterrados | 17 de 3 m³ e 574 de 5 m³ (mais 2 plataformas de 5 m³) | idem; compatível com [F63] | Dado Vitrus | |
-| G5 | Locais (coordenadas iguais a 5 casas) e candidatos a têxteis | 2 026 locais; 1 187 com contentor de rua, 837 com coordenada precisa | idem | Cálculo (critério nosso) | |
+| G5 | Locais (coordenadas iguais a 5 casas) e candidatos a paragem para têxteis (sem contentor novo) | 2 026 locais; 1 187 com contentor de rua, 837 com coordenada precisa | idem | Cálculo (critério nosso) | |
 | G6 | Densidade | 17,4 contentores e 10,0 locais públicos por 1 000 hab. | 2 722 e 1 574 ÷ 156 830 | Cálculo | |
 | G7 | Cobertura da área a 200, 300 e 500 m de um local público | 31,4%, 47,8%, 70,9% | idem, CAOP 2019 | Cálculo (cobertura de área, não de população) | |
 | G8 | Freguesia declarada igual à do polígono | 2 354 de 2 670 (88,2%); 79 a mais de 1 km | idem | Cálculo | |
 | G9 | Área das 48 freguesias | 24 099,97 ha (241,0 km²) | CAOP 2019 (`AREA_T_Ha`) | Dado Vitrus (CAOP) | |
 | G10 | Contornos OSM da app falham 3 uniões e têm 1 minúscula | 44 utilizáveis de 48 | comparação com CAOP 2019 | Cálculo | |
-| G11 | Lacuna de têxtil por freguesia | Lordelo 25,8 t/ano; ordenação por t por candidato | 0,7 kg/hab/mês, captura média 22,9% | **Estimativa** (sem têxtil por freguesia) | |
+| G11 | Lacuna de têxtil por freguesia | Lordelo 59,0 t/ano (3 979 hab. × 14,82 kg); ordenação por t por candidato | 1,235 kg/hab/mês igual em todas as freguesias | **Estimativa** (sem têxtil por freguesia); igual a `municipal_summary.json` | |
 | G12 | Blue Bee, Green Bee e Red Bee são contentores enterrados da Lasso, de 3 e 5 m³ | | [F63] [F64] | Primária do fabricante | |
 | G13 | Molok é semienterrado com 1,3, 3 e 5 m³ | | [F65] | Secundária (excertos) | |
 | G14 | CAOP2025 aprovada a 28 jan 2026 | | [F66] | Primária | |
@@ -156,5 +159,5 @@ Nada deste bloco é de têxteis. Ver [Análise dos contentores municipais](../da
 
 1. Ao verificar algo numa fonte primária, muda o estado e acrescenta a ligação.
 2. Se um número no slide mudar, muda a linha **antes** do slide.
-3. Quando a Vitrus enviar contentores de têxteis e custos (A14, A15), acrescenta linhas **A16 em diante** com os valores e a data de receção.
+3. Quando a Vitrus enviar os custos (A15), acrescenta linhas **A19 em diante** com os valores e a data de receção.
 4. No dia 25 de outubro, imprime esta tabela e confirma cada linha com "slide" preenchido.

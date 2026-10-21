@@ -2,9 +2,22 @@
 
 Lista única do que o Novelo precisa de perguntar à **Vitrus Ambiente** (Lucas Nascimento), à **Fibrenamics** (Luís Miguel Oliveira), à **organização do Hack4Guimarães** e, no que toca ao modelo, ao **Prof. Paulo Afonso**. Cada pergunta nasce de um número, de um ficheiro ou de uma lacuna dos dados que a equipa tem. Está pronta para levar a uma reunião e para copiar para uma mensagem.
 
-Escrito a **20 de outubro de 2026** (terça-feira), no dia em que chegou o pacote QGIS da Vitrus. Nada deste documento foi enviado. Os perfis e as mensagens-tipo dos mentores continuam em [Mentores](mentores.md); as respostas ao júri, em [Perguntas do júri](perguntas-do-juri.md).
+Escrito a **20 de outubro de 2026** (terça-feira), no dia em que chegou o pacote QGIS da Vitrus. As primeiras respostas da Vitrus chegaram a 21 de outubro (ver abaixo). Os perfis e as mensagens-tipo dos mentores continuam em [Mentores](mentores.md); as respostas ao júri, em [Perguntas do júri](perguntas-do-juri.md).
 
 > **Nota de rigor.** Todo o número tem fonte (ficheiro em `data/`, registo de afirmações ou [Fontes](../pesquisa/fontes.md)) ou a palavra "estimativa" ou "cálculo". Onde a pesquisa de hoje encontrou algo que muda um pressuposto, está dito. Nada aqui é uma resposta: são hipóteses de ação para cada resposta possível.
+
+> **Atualização de 21 de outubro de 2026.** O Lucas (Vitrus) respondeu por email a Q2, Q4, Q6 e, em parte, Q8. Resumo em [Respostas de 21 de outubro](#respostas-de-21-de-outubro-de-2026) e no [registo de respostas](#8-registo-de-respostas). Os números deste documento que usavam 0,7 kg/hab/mês (1 317,4 t, 22,9%, 18,6%) ficam como histórico; a base em uso é 43 051 t de RSU × 5,4% (APA) = 2 324,8 t por desviar, captura de 11,5% (estimativa).
+
+## Respostas de 21 de outubro de 2026
+
+| Pergunta | Resposta da Vitrus | O que muda no Novelo |
+| --- | --- | --- |
+| [Q2](#q2-a-lista-de-contentores-de-têxteis) Contentores de têxteis | **Não existem** e a Vitrus não os quer: o têxtil de contentor tem muitas contaminações, o que dificulta a reutilização. A reciclagem é muito mais cara que a fibra virgem | Rede proposta sem contentores: local existente sem contentor novo (`existing`) e recolha a pedido nos circuitos (`on_demand`). `street` só como referência (benchmark francês). Sai a calibração da rua (28,6%). Bolsa de fibra desce na prioridade; triagem por foto passa a controlo de qualidade na entrega |
+| [Q4](#q4-custos-unitários-e-vida-útil) Custos | Não estão no site; o mentor vai pedi-los ao departamento financeiro | Continuam pressupostos em `params.py`, com a mesma variação de ±30% |
+| [Q6](#q6-o-que-significam-07-kghabmês-e-54) Potencial | O mentor não conhece o Plano de Ação Integrado. A Vitrus usa a estatística da APA e os seus valores: em 2025 recolheu **43 051 t de RSU**; contar **5,4%** de têxtil | Procura = 43 051 × 0,054 = **2 324,8 t/ano** por desviar (1,235 kg/hab/mês); gerado 2 626,0 t; captura **11,5%** (estimativa). O plano deixa de ser fonte de números |
+| [Q8](#q8-os-contentores-municipais-e-o-seu-uso-para-têxteis) Contentores municipais | O pacote junta todos os contentores de indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície. Não há dados de deposição de têxtil por contentor; pela APA, cerca de 5% do indiferenciado é têxtil | Os contentores municipais são a base geográfica: onde o têxtil se perde e onde a viatura já passa. Nenhum recebe têxtil; a paragem com sacos fechados é pressuposto |
+
+Decisão do Hélder: sem contentores de têxtil; os contentores municipais são a base de toda a geografia. Detalhe em [Respostas da Vitrus de 21 out 2026](../dados/analise-dados-recebidos.md#respostas-da-vitrus-de-21-out-2026).
 
 ## Como usar
 
@@ -26,7 +39,7 @@ Códigos: **V** Vitrus (Lucas), **F** Fibrenamics (Luís Miguel), **O** organiza
 | Por entidade | Ultriplo 134,130 t (44,5%); H Sarah Trading 118,632 t (39,4%); Nova Etapa 42,883 t (14,2%); Vitrus 5,620 t (1,9%) | `data/processed/textile_flows.csv` |
 | Destino | Reutilização 179,0 t (59,4%); reciclagem 79,9 t (26,5%); rejeito 42,3 t (14,1%) | `data/processed/summary.json`; registo A4 |
 | População | 156 830 habitantes em 48 freguesias | INE, Censos 2021 (`parishes.csv`); registo A3 |
-| Potencial e captura | 1 317,4 t/ano (0,7 kg/hab/mês) e 22,9% | Plano municipal × INE (cálculo); registo A8, A9 |
+| Potencial e captura | 2 324,8 t/ano por desviar (43 051 t de RSU × 5,4%), gerado 2 626,0 t, captura 11,5% (estimativa) | Vitrus e APA, 21 out (cálculo); registo A8, A9. Antes: 1 317,4 t e 22,9% (plano municipal, já não usado) |
 | Circuitos e frota | 40 circuitos (9 sem viatura), 29 viaturas (2 nunca atribuídas), 101 turnos por semana, 82 localidades (71 geocodificadas), 12 alertas | `Circuitos_Viaturas_Guimaraes.xlsx`; `summary.json` |
 | Contentores municipais (**não são de têxteis**) | 2 754 linhas, 2 751 aceites, 2 722 localizados, 2 026 locais, 17,4 por 1 000 hab., 1 187 locais candidatos | `data/processed/municipal_summary.json`; [análise](../dados/analise-contentores-municipais.md) |
 | Cobertura de área a 200, 300 e 500 m | 31,4%, 47,8% e 70,9% (só locais públicos) | `municipal_summary.json` |
@@ -35,13 +48,15 @@ Códigos: **V** Vitrus (Lucas), **F** Fibrenamics (Luís Miguel), **O** organiza
 
 ### O que falta
 
-1. A **lista dos contentores de têxteis** (`summary.json`: `containers.status = awaiting_data`, `files = []`).
-2. **Custos unitários** e capacidade das viaturas (`params.py`: 6,0 € por recolha, 1,1 € por km, 1 200 € por contentor de rua, 4,0 t por viatura; tudo pressuposto).
+1. ~~A lista dos contentores de têxteis~~: não existem (Vitrus, 21 out).
+2. **Custos unitários** e capacidade das viaturas (`params.py`: 6,0 € por recolha, 1,1 € por km, 1 200 € por contentor de rua, só para a referência, 4,0 t por viatura; tudo pressuposto). Pedidos ao departamento financeiro da Vitrus a 21 out.
 3. O texto das **Regras** do hackathon (E6, E7 no registo) e a **autorização** de uso público dos dados.
 4. A **caracterização local do indiferenciado**: a folha `RSU` do ficheiro da Vitrus traz Portugal (têxteis 4,55%, sanitários 9,1%) e Europa, não Guimarães.
 5. Têxtil **por freguesia ou por ponto** (só existe o total de 301,3 t), preços por fração e critérios de lote.
 
-### Descoberta de hoje: a fonte do plano municipal é pública
+### Descoberta de 20 de outubro: a fonte do plano municipal é pública
+
+> **Ultrapassado a 21 de outubro.** A Vitrus não conhece este plano; os números do modelo vêm da Vitrus e da APA. O parágrafo fica como histórico.
 
 O registo dava a fonte dos 5,4% e dos 0,7 kg/hab/mês como "não localizada". Está no **Plano de Ação Integrado para a Circularidade Têxtil de Guimarães** (URBACT, 25/11/2025) [F74]: p. 30 (5,4% do indiferenciado e 0,7 kg de têxtil "nos RSU por mês per capita", citando Perebynos et al. 2023 [F75]) e p. 32 (27 operadores com licença para resíduos têxteis LER 04 em Guimarães e sete concelhos vizinhos, quatro deles com reciclagem ou valorização). Isto resolve a pergunta "de onde vem" e abre outra, mais importante: **o que mede o 0,7**. Se for o têxtil que fica no indiferenciado, a geração total é pelo menos 1 618,6 t (1 317,4 + 301,3) e a captura de 2025 é 18,6% em vez de 22,9% (cálculo, estimativa). Ver [Q6](#q6-o-que-significam-07-kghabmês-e-54).
 
@@ -52,11 +67,11 @@ Pontuação = impacto × urgência, de 1 a 5 cada (**estimativa da equipa, subje
 | # | Pergunta | Imp. | Urg. | Pont. | A quem | Prazo |
 | --- | --- | :-: | :-: | :-: | --- | --- |
 | [Q1](#q1-autorização-de-uso-dos-dados-e-do-nome) | Podemos usar os dados e o nome da Vitrus em público, e o que fica agregado? | 5 | 5 | 25 | V (cópia O) | 21 |
-| [Q2](#q2-a-lista-de-contentores-de-têxteis) | Quando chega a lista de contentores de têxteis, e com que campos? | 5 | 5 | 25 | V | 21 |
+| [Q2](#q2-a-lista-de-contentores-de-têxteis) | Quando chega a lista de contentores de têxteis, e com que campos? **Respondida: não existem** | 5 | 5 | 25 | V | 21 |
 | [Q3](#q3-regras-pitch-e-submissão-de-23-de-outubro) | Texto das Regras, formato do pitch e conteúdo da submissão de 23 out, 17h30 | 5 | 5 | 25 | O (cópia V) | 21 |
 | [Q4](#q4-custos-unitários-e-vida-útil) | Custos por recolha, km, hora de equipa e contentor, e vida útil | 5 | 4 | 20 | V | 22 |
 | [Q5](#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais) | É possível recolher têxteis nos circuitos e viaturas atuais, e com que capacidade? | 5 | 4 | 20 | V | 22 |
-| [Q6](#q6-o-que-significam-07-kghabmês-e-54) | O que medem os 0,7 kg/hab/mês e os 5,4%, e de que ano? | 5 | 4 | 20 | V, M | 21 |
+| [Q6](#q6-o-que-significam-07-kghabmês-e-54) | O que medem os 0,7 kg/hab/mês e os 5,4%, e de que ano? **Respondida: 5,4% × 43 051 t** | 5 | 4 | 20 | V, M | 21 |
 | [Q7](#q7-como-foi-medido-o-destino-e-a-que-preço) | Como foi medido o destino por entidade, e a que preço? | 4 | 4 | 16 | V | 22 |
 | [Q8](#q8-os-contentores-municipais-e-o-seu-uso-para-têxteis) | Que fração são Profundidade e Superfície, e pode haver têxtil nesses locais? | 4 | 4 | 16 | V | 22 |
 | [Q9](#q9-fibrenamics-critérios-de-lote-destino-de-baixo-valor-e-papel) | Fibrenamics: critérios de lote, destino de baixo valor e papel no desafio | 4 | 3 | 12 | F (cópia O) | 22 |
@@ -84,6 +99,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 **A quem · prazo.** V (Lucas), com cópia à organização (O) para o repositório. **21.**
 
 ### Q2. A lista de contentores de têxteis
+
+> **Respondida a 21 de outubro de 2026.** Não há contentores de têxteis e a Vitrus não os quer (contaminação). Nenhuma das opções abaixo se aplica: a calibração da rua saiu e a rede proposta é sem contentores. O cartão fica como histórico.
 
 > **Pergunta.** Quando recebemos a lista dos contentores de têxteis de todas as entidades (Ultriplo, H Sarah Trading, Nova Etapa, Vitrus, escolas)? Em que formato, com que campos (coordenadas, tipo, capacidade, operador, data de instalação) e a que data se refere?
 
@@ -115,6 +132,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 
 ### Q4. Custos unitários e vida útil
 
+> **Resposta parcial a 21 de outubro de 2026.** Os custos não estão no site; o mentor vai pedi-los ao departamento financeiro. Até lá vale o valor assumido abaixo. O custo por contentor só interessa ao cenário de referência.
+
 > **Pergunta.** Qual o custo por recolha, por quilómetro, por hora de equipa (motorista e tripulantes) e por contentor (compra, instalação, lavagem, manutenção)? Qual a vida útil? Qual o custo atual de recolha, triagem e destino por tonelada de têxtil, mesmo aproximado? Ordens de grandeza servem.
 
 **Porque perguntamos.** `params.py` usa 6,0 € por recolha, 1,1 € por km, 1 200 € por contentor de rua (10 anos), 250 € em local existente (5 anos) e 26 recolhas por ano, **tudo pressuposto**. Há 41 turnos com 3 tripulantes e 40 com 2 (`shifts.csv`), por isso o custo de equipa pesa. Sem estes valores os €/t são estimativa (A15).
@@ -144,6 +163,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 **A quem · prazo.** V. **22.**
 
 ### Q6. O que significam 0,7 kg/hab/mês e 5,4%
+
+> **Respondida a 21 de outubro de 2026.** O mentor não conhece o Plano de Ação Integrado. A Vitrus recolheu 43 051 t de RSU em 2025 e indica 5,4% de têxtil (APA). Nova procura: 43 051 × 0,054 = 2 324,8 t/ano por desviar; com as 301,3 t recolhidas à parte, gerado 2 626,0 t e captura 11,5% (estimativa). Nenhuma das opções A, B ou C se aplica tal como estava; o cartão fica como histórico.
 
 > **Pergunta.** Os 0,7 kg/hab/mês e os 5,4% do Plano de Ação Integrado (URBACT, 25/11/2025, citando Perebynos et al. 2023) são o têxtil que ainda vai no indiferenciado, ou a geração total? Incluem têxteis sanitários? De que ano e de que campanha de caracterização vêm? Existe uma mais recente, por zona ou circuito?
 
@@ -182,6 +203,8 @@ O resumo do estudo diz que os dados de composição física são de **2016**, do
 **A quem · prazo.** V. **22.**
 
 ### Q8. Os contentores municipais e o seu uso para têxteis
+
+> **Respondida em parte a 21 de outubro de 2026.** O pacote junta indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície; não há deposição de têxtil por contentor. Têxtil nos contentores: não (a Vitrus não quer contentores de têxtil). Os 1 187 locais ficam como pontos de paragem sem contentor novo (modo `existing`); a opção C («rede em contentores novos») deixa de existir. Falta a fração de cada contentor de Profundidade e Superfície e quem recolhe os ecopontos.
 
 > **Pergunta.** Os 593 contentores de Profundidade e os 793 de Superfície são de indiferenciado, recicláveis ou misto? Quais são os ecopontos de vidro, papel e embalagens, e quem os recolhe, a Vitrus ou a Resinorte? Pode haver têxtil nestes locais (acesso de camião, licença) e em que tipo de contentor?
 
@@ -241,7 +264,7 @@ Pesquisa de 20 de outubro de 2026; fontes em [Fontes](../pesquisa/fontes.md) (F6
 | O presidente da APA diz que é urgente avançar com uma entidade gestora e que nem todos os municípios têm circuito de têxteis (24 de setembro de 2026) | [F72] | B7 |
 | Até 2025, o têxtil em contentores de rua não era tratado como resíduo (intenção de reutilizar); hoje convivem a recolha para reutilização e a obrigação municipal de recolha de resíduos têxteis (vogal da APA, 12 de março de 2026) | [F73] | R9, B9 |
 | A **Humana** retirou 256 contentores de vários municípios por já não aceitar pagar taxa de ocupação ou contrapartida para um serviço que passou a ser obrigação municipal; recolheu 3 919 t em 25 concelhos em 2025 e fica com 826 contentores | [F76] | T3, R7 |
-| Plano de Ação Integrado de Guimarães: 5,4% e 0,7 kg; 315 kg de indiferenciado por habitante em 2023; 27 operadores LER 04, quatro com R3 ou R5; Ação 1 de cerca de 5 M€; meta de +30%; contentores em 88 escolas; Resinorte na recolha seletiva fora dos semienterrados | [F74] | Q6, Q8, Q10 |
+| Plano de Ação Integrado de Guimarães (documento do Município/URBACT, não usado pela Vitrus; números do modelo vêm da Vitrus e da APA): 5,4% e 0,7 kg; 315 kg de indiferenciado por habitante em 2023; 27 operadores LER 04, quatro com R3 ou R5; Ação 1 de cerca de 5 M€; meta de +30%; contentores em 88 escolas; Resinorte na recolha seletiva fora dos semienterrados | [F74] | Q6, Q8, Q10 |
 | Os enterrados sob gestão da Vitrus têm 3 000 e 5 000 L (excerto de pesquisa), compatível com 17 de 3 m³ e 574 de 5 m³ no pacote; a Câmara anunciou em março de 2026 mais de 300 ecopontos (excerto de pesquisa) | [F77], [F80] | M1, R4 |
 
 **Benchmarks para ancorar números** (não são promessas):
@@ -271,7 +294,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | T5 | V · 22 | O que conta como "rejeito"? Porque é a Vitrus 56,9% (5,62 t) e as outras 10,0% a 14,5%? Quem fez a amostra e quando? | Rejeito total 42,3 t = 14,1%; Vitrus 3,197 t de 5,620 t | Se é amostra pequena ou escolar: etiqueta metodológica e não usar para o piloto. Se é geral: subir a taxa de rejeito usada no piloto (hoje 14,1%) |
 | T6 | V · 25 | Podem enviar os três relatórios de origem (Ultriplo 2025, Nova Etapa, To Be Green) e o ficheiro "Sarah Trading Destinos"? | O xlsx cita-os como fonte, mas não os traz | Se sim: `data/raw/` e rever método por mês e por destino |
 | T7 | V · 25 | Qual a composição da recolha: roupa, calçado, têxteis-lar; adulto e criança; peso médio por peça? | O passaporte usa 0,415 kg por peça (pressuposto) | Se há medição: substituir os pesos por tipo no passaporte e no piso de sinal (1,71 t) |
-| T8 | V, M · 21 | Ver [Q6](#q6-o-que-significam-07-kghabmês-e-54): o que medem os 0,7 kg/hab/mês e os 5,4% | Três medidas entre 8,4 e cerca de 25 kg/hab/ano | Ver Q6 |
+| T8 | V, M · 21 | Ver [Q6](#q6-o-que-significam-07-kghabmês-e-54): o que medem os 0,7 kg/hab/mês e os 5,4% | Três medidas entre 8,4 e cerca de 25 kg/hab/ano | **Respondida a 21 out**: 5,4% × 43 051 t de RSU (14,8 kg/hab/ano) |
 | T9 | V · 21 | O que a Vitrus entende por "caracterização do lixo indiferenciado com a fração têxtil"? Existe a de Guimarães? | A folha `RSU` é de Portugal (517 kg/hab.ano, 2024) e da Europa, não do concelho | Se existe: substituir a folha; se não: dizer "nacional" no ecrã |
 | T10 | V · 25 | A folha `RSU` tem cinco pontos por explicar: Europa soma 97,8%, Portugal 99,21%, "Têxteis sanitários" 9,1% (o dobro de 4,55%), e duas células sem rótulo ("5 ton" e 0,408). Qual o significado? | `waste_composition.csv` | Se erro de digitação: corrigir o ETL; se real: nota na análise |
 | T11 | V · 25 | A recolha inclui calçado? Em que quantidade, e com que destino? | A diretiva cobre calçado (anexo IV-C); o ficheiro não distingue | Se sim: categoria "calçado" no passaporte e no modelo |
@@ -279,6 +302,8 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | T13 | V · pós | As 5,62 t da Vitrus são a campanha das escolas? A notícia fala de cerca de 3 t em mais de 30 escolas [F57] e o plano de 88 escolas [F74] | Vitrus = 1,9% do total, rejeito 56,9% | Se sim: modo "instituições" e Sankey de valorização local (mantas, sacos) |
 
 ### 4.2 Rede de contentores de têxteis
+
+> **Respondida a 21 de outubro de 2026:** não há contentores de têxteis. R1 a R4 e R6 a R9 deixam de se aplicar; R5 e R10 (operadores externos, rotas e km) continuam válidas para as 301,3 t recolhidas à parte.
 
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
@@ -352,7 +377,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
-| F1 | V, M · pós | Têm toneladas de têxtil por **contentor ou ponto, por mês**? | Hoje a lacuna por freguesia assume 22,9% igual em todas | Se sim: calibração por zona e lacuna real em vez de estimativa |
+| F1 | V, M · pós | Têm toneladas de têxtil por **contentor ou ponto, por mês**? | Hoje a lacuna por freguesia assume o mesmo têxtil por habitante em todas (1,235 kg/hab/mês) | Se sim: calibração por zona e lacuna real em vez de estimativa |
 | F2 | V, M · pós | Têm a população por quarteirão (BGRI) ou por lugar? | A cobertura de 31,4%, 47,8% e 70,9% é de **área**, não de pessoas | Se sim: cobertura de população; senão manter "área" |
 | F3 | V, M · pós | Têm uma estimativa de população por freguesia mais recente do que os Censos 2021? | Os rácios por 1 000 hab. e a lacuna usam 2021; o plano cita 156 277 habitantes (INE, 2022) [F74] | Se sim: trocar `population` em `parishes.csv` com o ano indicado |
 | F4 | M · pós | Usam indicadores de rendimento, idade ou tipo de alojamento por freguesia no planeamento? (hipótese: explicam diferenças de captura) | Só há TIPAU: 36 freguesias predominantemente urbanas, 11 medianamente urbanas e 1 rural (`parishes.csv`) | Se sim: segundo fator de procura além do TIPAU; senão manter |
@@ -419,7 +444,7 @@ A lista completa está em [Mentores](mentores.md#prof-paulo-afonso-uminho-produ�
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
 | P1 | P · 21 | Para cobertura, o raio de 300 m por **área** (47,8%) é defensável quando falta a população por quarteirão? | Pergunta F2 (BGRI em falta) | Se não: cobertura ponderada por população das freguesias |
-| P2 | P · 21 | A lacuna por freguesia, com captura igual de 22,9% em todas, é uma aproximação aceitável? | 48 freguesias; sem têxtil por freguesia | Se não: mostrar só ranking de potencial |
+| P2 | P · 21 | A lacuna por freguesia, com o mesmo têxtil por habitante em todas (5,4% do RSU), é uma aproximação aceitável? | 48 freguesias; sem têxtil por freguesia | Se não: mostrar só ranking de potencial |
 | P3 | P · 21 | Como tratar 350 locais com coordenada aproximada (±100 m) e 79 coordenadas suspeitas na otimização? | Alertas municipais 7 e 18 | Se pede: simulação com ruído posicional |
 | P4 | P · 21 | O piso de 1,71 t em 3 meses (2 freguesias × 2 modos, efeito de desenho 2) é razoável? | `pilot.py` | Se não: rever o piso |
 | P5 | P · 21 | Que método de custeio devemos usar quando os custos da Vitrus chegarem em partes? | [Q4](#q4-custos-unitários-e-vida-útil) | Se TDABC ou TCO: nota metodológica |
@@ -483,8 +508,8 @@ Cada linha justifica uma pergunta. As contas são nossas e repetíveis a partir 
 
 | # | Anomalia | Números | Efeito se ficar por resolver | Pergunta |
 | --- | --- | --- | --- | --- |
-| 35 | 0,7 kg e 5,4% × 315 kg não coincidem | 8,4 contra 17,0 kg/hab/ano; 1 317,4 contra 2 667,7 t | Potencial incerto por um fator 2 (cálculo) | Q6 |
-| 36 | Dados de caracterização de 2016 | Resumo de Perebynos et al. 2023 [F75], excerto de pesquisa | Valor com 10 anos em 2026 | Q6 |
+| 35 | 0,7 kg e 5,4% × 315 kg não coincidem | 8,4 contra 17,0 kg/hab/ano; 1 317,4 contra 2 667,7 t | Resolvida a 21 out: o modelo deixou o plano e usa 5,4% × 43 051 t (Vitrus e APA) | Q6 |
+| 36 | Dados de caracterização de 2016 | Resumo de Perebynos et al. 2023 [F75], excerto de pesquisa | Deixou de pesar: o plano já não é fonte do modelo | Q6 |
 | 37 | Freguesias e população | O plano diz 55 freguesias e 156 277 habitantes (INE, 2022); a CAOP tem 48 e o INE (Censos 2021) 156 830 | Diferença de 553 hab. (0,35%, cálculo) | M7 |
 | 38 | Meta de +30% com dois anos | "até 2025" e "até 2026" no mesmo plano | Sem base nem data | B4 |
 | 39 | "27 operadores" não é só Guimarães | 27 operadores LER 04 em Guimarães e sete concelhos vizinhos; 4 com reciclagem ou valorização | A11 deve dizer "região", e LER 04 é resíduo industrial | O5 |
@@ -497,6 +522,8 @@ Cada linha justifica uma pergunta. As contas são nossas e repetíveis a partir 
 Todas em pt-PT, sem afirmar nada que ainda não foi ouvido. Se a mensagem de 19 de outubro ao Lucas já foi enviada, usar esta como seguimento.
 
 ### 6.1 Vitrus Ambiente (Lucas Nascimento)
+
+> As perguntas 2, 3 (custos) e 5 já tiveram resposta a 21 de outubro ([resumo](#respostas-de-21-de-outubro-de-2026)). Num seguimento, retirá-las e perguntar só o que falta.
 
 **E-mail**
 
@@ -603,13 +630,13 @@ Preencher durante a reunião ou na hora seguinte. Uma linha por resposta; ver a 
 | ID | Pergunta (curta) | Quem respondeu | Data e canal | Resposta literal | Unidade, ano, fonte | Público? | Atualizar | Feito (data, commit) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Q1 | Uso público dos dados e do nome | | | | | | | |
-| Q2 | Lista de contentores de têxteis | | | | | | | |
+| Q2 | Lista de contentores de têxteis | Lucas (Vitrus) | 21 out, email | "A Vitrus não possui contentores de têxtil e não tem interesse em possuir"; têxtil de contentor muito contaminado; reciclagem muito mais cara que fibra virgem | | | Modelo, docs, skills | 21 out (sem commit) |
 | Q3 | Regras, pitch, submissão | | | | | | | |
-| Q4 | Custos unitários e vida útil | | | | | | | |
+| Q4 | Custos unitários e vida útil | Lucas (Vitrus) | 21 out, email | Vai pedir ao departamento financeiro; não estão no site | | | Nada (pressupostos) | |
 | Q5 | Têxteis nos circuitos atuais | | | | | | | |
-| Q6 | O que medem 0,7 e 5,4% | | | | | | | |
+| Q6 | O que medem 0,7 e 5,4% | Lucas (Vitrus) | 21 out, email | Não conhece o plano; RSU recolhido em 2025: 43 051 t; contar 5,4% de têxtil | t, 2025, Vitrus + APA | | Procura, registo A8 a A10, docs | 21 out (sem commit) |
 | Q7 | Medição do destino e preços | | | | | | | |
-| Q8 | Fração municipal e têxtil nos locais | | | | | | | |
+| Q8 | Fração municipal e têxtil nos locais | Lucas (Vitrus) | 21 out, email | QGIS com indiferenciado, orgânico e recolha seletiva (enterrados ou superfície); sem dados de deposição de têxtil; APA: cerca de 5% do indiferenciado é têxtil | | | Análise municipal, modelo | 21 out (sem commit) |
 | Q9 | Fibrenamics: lote, baixo valor, papel | | | | | | | |
 | Q10 | Êxito, orçamento, piloto | | | | | | | |
 | | | | | | | | | |
@@ -675,7 +702,7 @@ Numeração em [Fontes](../pesquisa/fontes.md): **F59, F61, F62, F66** (hackatho
 | F71 | APA, "Têxtil: Responsabilidade Alargada do Produtor", sessão de 8 de outubro de 2026 |
 | F72 | Jornal T, "APA quer setor têxtil preparado para nova responsabilidade sobre os resíduos" (24 de setembro de 2026) |
 | F73 | Ambiente Online, "Desafios e oportunidades do novo fluxo dos têxteis", Ana Cristina Carrola, APA (12 de março de 2026) |
-| F74 | Município de Guimarães e URBACT, Plano de Ação Integrado para a Circularidade Têxtil (25/11/2025) |
+| F74 | Município de Guimarães e URBACT, Plano de Ação Integrado para a Circularidade Têxtil (25/11/2025). Documento do Município/URBACT, não usado pela Vitrus; os números do modelo vêm da Vitrus e da APA |
 | F75 | Perebynos, Sepúlveda e Ribeiro (2023), estudo sobre têxteis no indiferenciado em Guimarães |
 | F76 | Portugal Têxtil, "Humana deixa de recolher têxtil em várias cidades" (2026) |
 | F77 | Câmara Municipal de Guimarães, "Equipamentos de deposição" (excerto de pesquisa) |

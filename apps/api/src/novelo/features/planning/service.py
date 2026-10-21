@@ -139,6 +139,12 @@ async def list_zones(db: AsyncSession) -> list[ZoneOut]:
     return await load_zone_rows(db, params.values.kg_per_inhab_month)
 
 
+async def potential_t(db: AsyncSession, params: PlanningParams | None = None) -> float:
+    """Têxtil por desviar do lixo (t/ano) com os pressupostos dados ou os ativos: o `potential_t` dos cenários."""
+    p = params or (await get_parameters(db)).values
+    return round(sum(z.demand_t for z in await load_zone_rows(db, p.kg_per_inhab_month)), 1)
+
+
 # --- Cenários ---
 
 
@@ -157,7 +163,7 @@ def compute(
         for z in zones
     ]
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
-    options = network.build_options(dzones, dp, allowed or None)
+    options = network.build_options(dzones, dp, allowed or None, request.default_modes)
 
     solved = network.solve(
         options,
@@ -299,7 +305,12 @@ def compute(
         if any(m in a.modes for a in allocations)
     ]
     result = ScenarioResult(
-        kpis=kpis, allocations=allocations, routes=routes, modes=modes, depot=[params.depot_lat, params.depot_lon]
+        kpis=kpis,
+        allocations=allocations,
+        routes=routes,
+        modes=modes,
+        depot=[params.depot_lat, params.depot_lon],
+        default_modes=request.default_modes,
     )
     return result, solved.status
 

@@ -49,6 +49,7 @@ from novelo.features.municipal.schemas import (
     MunicipalStreamCount,
     MunicipalTextileReference,
 )
+from novelo.features.textile.references import KG_PER_INHAB_MONTH
 
 OVERVIEW_ESTIMATES = MunicipalEstimateNote(
     fields=["coverage", "sites.textile_candidates", "density.public_sites_per_1000_hab"],
@@ -267,7 +268,7 @@ async def gap_ranking(db: AsyncSession, *, limit: int | None) -> MunicipalGapRan
     return MunicipalGapRankingOut(
         rule=dom.GAP_RULE_PT,
         parameters=MunicipalGapParameters(
-            kg_per_inhab_month=float(rules.get("potential_kg_per_inhab_month", 0.7)),
+            kg_per_inhab_month=float(rules.get("residual_kg_per_inhab_month", round(KG_PER_INHAB_MONTH, 4))),
             capture_pct=float(rules.get("capture_today_pct", 0.0)),
         ),
         caveat=(

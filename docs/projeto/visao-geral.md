@@ -28,16 +28,17 @@ O Novelo acompanha o têxtil **do saco ao fio**: planeia a rede de recolha ao me
 | --- | --- | --- |
 | **Simulador da rede** | Estima o têxtil por zona e escolhe onde pôr pontos, que modo usar e que rotas fazer | Cenários com investimento, custo anual, toneladas e €/t lado a lado |
 | **"E se...?"** | O decisor pergunta em português ("e se passarmos Serzedelo a recolha a pedido?") e o otimizador responde com um cenário novo | A IA conduz um modelo matemático; todos os números são verificados, nenhum é inventado |
-| **Triagem e lote com passaporte** | Uma foto da peça e da etiqueta dá estado, composição e marca; a peça entra num lote com QR | Rastreabilidade de cada saco, alinhada com o futuro Passaporte Digital do Produto |
-| **Bolsa de fibra** | Lotes agregados por fibra ("algodão 100%, 320 kg") visíveis para os recicladores do Vale do Ave | Liga a recolha municipal à indústria têxtil local |
+| **Triagem e lote com passaporte** | Controlo de qualidade na entrega: uma foto da peça e da etiqueta dá estado, composição e marca; a peça entra num lote com QR | Rastreabilidade de cada saco, alinhada com o futuro Passaporte Digital do Produto |
+| **Bolsa de fibra** | Lotes agregados por fibra ("algodão 100%, 320 kg") visíveis para os recicladores do Vale do Ave | Liga a recolha municipal à indústria têxtil local. Prioridade baixa: reciclar custa mais que a fibra virgem (Vitrus) |
 | **Fluxo do saco ao fio** | Um Sankey mostra as toneladas de cada freguesia até ao destino final | Onde se perde valor, num relance |
 | **Relatório RAP num clique** | PDF com custo por tonelada por tipo de território, toneladas por fibra e marcas mais encontradas | A resposta a "quem paga isto?" com dados do próprio concelho |
 
-**Três modos de recolha, combinados por zona.** A poupança está em não usar o mesmo modo em todo o lado:
+**Dois modos de recolha, sem contentores, combinados por zona.** A Vitrus não tem nem quer contentores de têxtil (21 de outubro de 2026): o têxtil de contentor vem contaminado e perde a reutilização. A poupança está em usar o que já existe:
 
-1. **Pontos em locais existentes** (juntas, escolas, supermercados, ecocentros): investimento quase nulo.
-2. **Contentores de rua**: só onde a densidade justifica.
-3. **Recolha a pedido**: nas zonas dispersas, aproveitando rotas que já lá passam.
+1. **Local existente, sem contentor novo** (juntas, escolas, ecocentros, ou paragem nos locais municipais onde a viatura já passa, com sacos fechados recolhidos no momento): investimento quase nulo.
+2. **Recolha a pedido**: porta a porta, nos circuitos que já lá passam.
+
+O contentor de rua fica só como referência, para comparar com o modelo francês.
 
 ## Como funciona
 
@@ -64,11 +65,11 @@ O Novelo transforma uma obrigação legal num plano com preço. É útil já par
 2. **Copiloto de operações:** um agente que todas as semanas recalibra o modelo com os lotes reais, volta a otimizar e propõe alterações, sempre com aprovação humana.
 3. **Escala:** levar o modelo a outros municípios e às entidades gestoras da RAP, com os dados abertos de cada concelho.
 
-Em aberto: custos unitários reais da Vitrus, a localização dos contentores de têxteis e quem os opera, e o que medem os 0,7 kg/hab/mês do plano. São as primeiras perguntas ao mentor ([lista completa](perguntas-aos-orientadores.md)).
+Respondido a 21 de outubro: não há contentores de têxteis, e a procura passa a ser 43 051 t de RSU × 5,4% (APA) = 2 324,8 t por ano que ainda vão para o lixo (estimativa; captura atual 11,5%). Em aberto: custos unitários reais da Vitrus, pedidos ao departamento financeiro ([lista completa](perguntas-aos-orientadores.md)).
 
 ## Fontes
 
-- [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf), Município de Guimarães / URBACT, nov. 2025
+- [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf), Município de Guimarães / URBACT, nov. 2025 (contexto público; não usado pela Vitrus; os números do modelo vêm da Vitrus e da APA)
 - [Diretiva 2025/1892 que altera a Diretiva-Quadro dos Resíduos](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/), VdA, out. 2025
 - [Resumo oficial do ato final, Diretiva (UE) 2025/1892](https://oeil.europarl.europa.eu/oeil/en/procedure-document-summary/pdf?id=1845495), Parlamento Europeu
 - [EU Parliament mandates EPR for textiles](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles), AMI, set. 2025

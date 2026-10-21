@@ -17,7 +17,8 @@ const STYLE_DARK =
 
 export const baseStyle = (dark: boolean): string => (dark ? STYLE_DARK : STYLE_LIGHT);
 
-// Cores dos modos de recolha: Floresta (rua), Areia (locais existentes), Floresta clara (a pedido).
+// Cores dos modos de recolha: Areia (locais existentes), Floresta clara (a pedido), Floresta (contentor, só
+// referência; também a cor dos locais reais no mapa do cenário).
 export const MODE_COLORS: Record<CollectionMode, string> = {
   street: '#2e6b57',
   existing: '#c4a06a',

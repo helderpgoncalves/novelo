@@ -110,7 +110,7 @@ export function HomePage({ role, search, onSearch }: HomePageProps) {
           <p className={EYEBROW}>{m.home_eyebrow({ year: gap.year })}</p>
           <h1 className="max-w-3xl text-balance font-medium text-[1.7rem] leading-[1.12] tracking-tight sm:text-4xl">
             {m.home_headline({
-              pct: pct(gap.capture_pct, 0),
+              pct: pct(gap.capture_pct, 1),
               missing: num(gap.missing_t, 0),
             })}
           </h1>
@@ -157,7 +157,7 @@ export function HomePage({ role, search, onSearch }: HomePageProps) {
                 curve={curve}
                 initial={initial}
                 collectedT={gap.collected_t}
-                potentialT={gap.potential_t}
+                potentialT={gap.missing_t}
                 onCommit={commit}
               />
             }

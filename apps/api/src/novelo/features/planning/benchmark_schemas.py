@@ -10,14 +10,18 @@ class BenchmarkOut(BaseModel):
     label: str
     kg_per_inhab_year: float = Field(description="Meta de recolha de têxtil (kg/hab/ano)")
     people_per_point: int = Field(description="Densidade: 1 ponto por cada N habitantes")
-    density_mode: CollectionMode = Field(description="Modo a que a densidade se aplica")
+    density_mode: CollectionMode = Field(
+        description="Modo a que a densidade se aplica (`street` no preset francês: só como referência)"
+    )
     source: str
     verified: bool = Field(description="Falso: referência externa por confirmar na fonte original")
     # Consequências com os dados e pressupostos atuais (cada número vem do INE, da Vitrus ou do modelo):
     population: int = Field(description="Habitantes (INE, Censos 2021) das freguesias com dados")
     target_tonnes: float = Field(description="Meta em t/ano: kg/hab/ano × população")
-    implied_capture_pct: float = Field(description="Fração do potencial (0,7 kg/hab/mês) que a meta exige captar")
-    observed_capture_pct: float = Field(description="Captura atual da Vitrus (22,9%)")
+    implied_capture_pct: float = Field(
+        description="Fração do têxtil que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) que a meta exige"
+    )
+    observed_capture_pct: float = Field(description="Captura atual: recolhido em 2025 ÷ têxtil gerado (estimativa)")
     observed_kg_per_inhab_year: float = Field(description="Recolhido em 2025 / habitantes (dados da Vitrus)")
     current_people_per_point: int = Field(description="Densidade atual do pressuposto para o mesmo modo")
     max_capturable_t: float = Field(description="Teto do modelo com todos os modos ligados e a densidade do preset")

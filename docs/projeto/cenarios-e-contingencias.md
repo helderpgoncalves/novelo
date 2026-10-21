@@ -4,7 +4,7 @@ Tudo o que pode correr bem ou mal entre 19 e 28 de outubro, com **o sinal de avi
 
 Escrito a 19 de outubro de 2026. Dono: **H** = Hélder Gonçalves, **F** = Flávio Fernandes, **HF** = ambos. Probabilidade (qualitativa, da nossa experiência e do contexto, **não calculada**): **Alta**, **Média**, **Baixa**.
 
-Estado das funcionalidades novas a 20 de outubro: copiloto de IA, painel de IA, sensibilidade e robustez, cenário francês, recomendador de piloto e resolvedor de alertas **estão feitos e testados**; a cobertura de contentores espera as localizações dos contentores de têxteis; a ferramenta de avaliação da triagem existe mas **ainda não correu** (sem imagens com verdade-terreno). Só entram na demo as que estiverem ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
+Estado das funcionalidades novas a 20 de outubro: copiloto de IA, painel de IA, sensibilidade e robustez, cenário francês, recomendador de piloto e resolvedor de alertas **estão feitos e testados**; a cobertura de contentores deixou de se aplicar (a Vitrus não tem contentores de têxteis, 21 de outubro); a ferramenta de avaliação da triagem existe mas **ainda não correu** (sem imagens com verdade-terreno). Só entram na demo as que estiverem ensaiadas a 25 de outubro; ver a [ordem de corte](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro).
 
 O prazo de submissão na plataforma é **23 de outubro às 17h30**; depois, nada se edita. O júri é designado pela organização, com especialistas nas áreas temáticas e sem votação pública. Os projetos são avaliados por quatro critérios ponderados (inovação 25%, viabilidade 25%, impacto 30%, apresentação e continuidade 20%); ver [Critérios de avaliação](criterios-de-avaliacao.md).
 
@@ -170,7 +170,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 
 | # | Pergunta | Resposta (20 s) | Evidência a abrir |
 | --- | --- | --- | --- |
-| 1 | Porque não pôr contentores em todo o lado? | Custa em contentores e recolhas onde há pouco têxtil; Sintra está a retirar centenas e há sinais de saturação. Pomos o investimento onde a densidade o justifica e usamos o a pedido nas zonas dispersas | Simulador, cenário B; slide de 2028 |
+| 1 | Porque não pôr contentores em todo o lado? | A Vitrus não quer: o têxtil de contentor vem contaminado e perde a reutilização. Também custa em contentores e recolhas onde há pouco têxtil; Sintra está a retirar centenas. Propomos paragem em locais onde a viatura já passa e recolha a pedido nos circuitos | Simulador, cenário B; slide de 2028 |
 | 2 | Qual é a vossa estimativa mais frágil? | Os custos unitários: a Vitrus ainda não os enviou. Mostramos o intervalo e os pressupostos que mais mexem | "Pressupostos" e separador de incerteza (feito) |
 | 3 | Os números são reais? | Os de partida, sim: 301,3 t, destino de cada tonelada, 40 circuitos e 29 viaturas são da Vitrus; a população é do INE. As toneladas por cenário são estimativas e dizemo-lo no ecrã | Ponto de partida; Qualidade dos dados |
 | 4 | Quem paga isto? | Hoje o município, sozinho. A partir de 17 de abril de 2028, os produtores, mas só custos "economicamente eficientes". Alguém tem de calcular esse custo; é o que fazemos | Relatório RAP; slide de 2028 |
@@ -205,7 +205,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 
 | # | Pergunta | Resposta (20 s) | Evidência a abrir |
 | --- | --- | --- | --- |
-| 26 | De onde vêm os 5,4% e os 0,7 kg por habitante? | Do Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025, p. 30), que é público. O que ainda não sabemos é o que os 0,7 kg medem (têxtil que fica no indiferenciado ou geração total) nem o ano dos dados; por isso o potencial de 1 317 t leva sempre "estimativa" e perguntámos à Vitrus (Q6) | Registo A8 e A10 |
+| 26 | De onde vêm os 5,4% e o têxtil por habitante? | Da Vitrus e da APA: a Vitrus recolheu 43 051 t de resíduos urbanos em 2025 e indicou-nos 5,4% de têxtil, a média da APA. Dá cerca de 2 324,8 t por ano ainda no lixo, 1,235 kg por habitante por mês, sempre com "estimativa". Não usamos o plano municipal: a Vitrus não o usa | Registo A8, A10 e A16 |
 | 27 | Como sabem o custo por quilómetro? | Pressuposto assinalado; vamos substituí-lo pelo da Vitrus; mostramos a sensibilidade para ver quanto importa | Pressupostos; tornado (feito) |
 | 28 | Como validam o modelo? | Valores calculados à mão nos testes, semente fixa, comparação com dados observados e revisão por um mentor da UMinho (a pedir) | Testes e documento de dados e modelo |
 | 29 | Porque assumem 1,3 de desvio nas rotas? | É um pressuposto de distância por estrada; podemos usar rotas reais (OSRM) quando houver tempo | Pressupostos |
@@ -215,7 +215,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | 33 | O piloto tem tamanho para medir alguma coisa? | Sim: o piso de sinal é 1,71 t em 3 meses (cerca de 1 032 peças por célula e freguesia, efeito de desenho 2), e a recomendação respeita-o; os pressupostos são nossos | Piloto (feito) |
 | 34 | Porque Gondar e Arosa e Castelões? | Misturam urbano e rural, têm circuitos existentes e densidade contrastante; é a recomendação do modelo, não uma decisão final | Piloto (feito) |
 | 35 | Os 12 alertas dos dados: o que fizeram? | Mostramos cada um com o motivo e uma sugestão de resolução da IA que **só um humano aplica** | Qualidade dos dados; resolvedor (feito) |
-| 36 | Têm dados de contentores? | A 20 de outubro chegou o inventário **municipal** (2 751 contentores de outras frações, 2 026 locais), já na app e no mapa, como candidatos e produtores B2B. A lista de contentores **de têxteis** continua por receber; o importador está testado e a cobertura calcula-se quando chegar | Mapa e cobertura (feito) |
+| 36 | Têm dados de contentores? | A 20 de outubro chegou o inventário **municipal** (2 751 contentores de indiferenciado, orgânico e seletivo, 2 026 locais), já na app e no mapa. É a nossa base geográfica: onde o têxtil se perde e onde a viatura já passa. Contentores **de têxteis** não há, e a Vitrus não os quer (contaminação) | Mapa e rede por locais (feito) |
 | 37 | Ignoram os ecopontos de Guimarães? | Os ecopontos (296 novos) não mencionam têxteis nas fontes que vimos; falta confirmar | Fontes (F16) |
 
 ### E.4 Indústria, mercado e impacto

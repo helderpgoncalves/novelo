@@ -97,6 +97,16 @@ Antes de afinar qualquer critério, precisamos do texto das Regras. **Quem pergu
 3. **1:15 a 1:45**: bolsa de fibra e evidência por marca. "Queremos que o lote chegue a quem o sabe valorizar."
 4. **1:45 a 2:00**: a pergunta: "O que falta neste passaporte para ser útil à Fibrenamics?"
 
+### Respostas de 21 de outubro de 2026
+
+O Lucas respondeu por email a três pontos. Detalhe e números em [Perguntas aos orientadores](perguntas-aos-orientadores.md#respostas-de-21-de-outubro-de-2026).
+
+| Tema | Resposta | O que muda |
+| --- | --- | --- |
+| Contentores de têxteis | A Vitrus não os tem nem quer ter: o têxtil de contentor vem contaminado e perde a reutilização; a reciclagem é muito mais cara que a fibra virgem. O pacote QGIS traz indiferenciado, orgânico e seletivo | Rede sem contentores (local existente + recolha a pedido nos circuitos). Os contentores municipais são a base geográfica. Bolsa de fibra desce na prioridade; triagem por foto passa a controlo de qualidade na entrega |
+| Custos | Vai pedi-los ao departamento financeiro; não estão no site | Continuam pressupostos |
+| Plano de Ação Integrado | Não o conhece. A Vitrus usa a APA e os seus valores: 43 051 t de RSU em 2025, 5,4% de têxtil | Procura = 2 324,8 t/ano por desviar; captura 11,5% (estimativa) |
+
 ### Perguntas, por ordem de impacto
 
 Lista consolidada para o Luís Miguel: [Q9](perguntas-aos-orientadores.md#q9-fibrenamics-critérios-de-lote-destino-de-baixo-valor-e-papel) e [operação](perguntas-aos-orientadores.md#48-operação-lote-triagem-e-recicladores). A tabela abaixo fica como ponto de partida.
@@ -161,8 +171,8 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 | Desbloqueio | Ligação |
 | --- | --- |
 | **Custos unitários** | Troca os pressupostos por dados e dá peso ao €/t |
-| **Plano municipal** | Fonte dos 5,4%, 0,7 kg/hab/mês e "4 de 27" (A8, A10, A11) |
-| **Contentores e depósito** | Mapa, cobertura e VRP |
+| **Base da procura** | Respondido a 21 out: 43 051 t de RSU × 5,4% (APA). O Lucas não conhece o plano municipal; "4 de 27" (A11) continua por verificar |
+| **Depósito** | VRP (contentores de têxteis: não existem, 21 out) |
 | **Preços e contratos das frações** | Receita e €/t |
 | **Texto das Regras, duração do pitch e formato das perguntas** | Guião final e revisão da matriz de critérios |
 | **Projetos europeus** | Posicionamento pós-hackathon |
@@ -176,9 +186,11 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 
 > Olá Lucas. Somos o Hélder e o Flávio. Já pusemos os vossos dados (301,3 t, 40 circuitos, 29 viaturas) num simulador que compara cenários de recolha em €/t. Para trocar os nossos pressupostos pelos vossos números precisamos de **cinco coisas**: custo por recolha, por km e por contentor; localização do depósito; a fonte do plano municipal (5,4% e 0,7 kg/hab/mês); o texto das Regras do hackathon (o detalhe de cada critério); e se podemos usar os dados em público. Pode ser por escrito, se for mais fácil.
 
+> Mensagem de 20 de outubro, já respondida em parte a 21 (custos pedidos ao financeiro; plano municipal substituído por 43 051 t × 5,4%). Num seguimento, pedir só o depósito, as Regras e a autorização.
+
 **Dois minutos no telemóvel:**
 
-1. **0:00 a 0:30**: "Ponto de partida" com os números dele (301,3 t, 22,9% do potencial).
+1. **0:00 a 0:30**: "Ponto de partida" com os números dele (301,3 t; 43 051 t de RSU × 5,4% = 2 324,8 t ainda no lixo; captura 11,5%, estimativa).
 2. **0:30 a 1:15**: "Circuitos" e "Frota": "são os vossos circuitos; só o que falta são custos".
 3. **1:15 a 1:45**: simulador: dois cenários, €/t, investimento. "Os custos aqui são pressupostos assinalados."
 4. **1:45 a 2:00**: ecrã "Qualidade dos dados": "encontrámos 12 alertas no vosso ficheiro; estas são as perguntas."
@@ -189,10 +201,10 @@ Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perg
 
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |
-| 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
-| 2 | **Plano municipal:** o que medem os 0,7 kg/hab/mês e os 5,4% (têxtil que fica no indiferenciado ou geração total) e de que ano? | A fonte foi localizada a 20 out: Plano de Ação Integrado (URBACT), p. 30 e p. 32; o significado do 0,7 e o ano (dados de 2016, segundo o resumo do estudo) por confirmar (A8, A10, A11). Ver [Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | Passam de "por verificar" a "verificado"; entram (ou não) em slide |
+| 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15). **21 out:** o Lucas vai pedi-los ao departamento financeiro (não estão no site) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
+| 2 | **Plano municipal:** o que medem os 0,7 kg/hab/mês e os 5,4% (têxtil que fica no indiferenciado ou geração total) e de que ano? | **Respondida a 21 out:** o Lucas não conhece o plano; a Vitrus recolheu 43 051 t de RSU em 2025 e indica 5,4% de têxtil (APA). Ver [Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | Procura de 2 324,8 t/ano por desviar e captura de 11,5% (estimativa); o plano sai das fontes do modelo |
 | 3 | **Texto das Regras**: detalhe de cada um dos quatro critérios, duração do pitch, formato da demo e das perguntas, e quem avalia. Ver a [pergunta comum](#pergunta-comum-às-regras-e-ao-formato). | Os pesos são públicos (E4); o detalhe não (E6, M16) | Afinamos o guião e o tempo |
-| 4 | **Contentores de têxteis:** onde está a lista, formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | A 20 de outubro chegou só o inventário **municipal** (outras frações), não o de têxteis | ETL de têxteis (`containers.py`) pronto; decidimos o tratamento de "sem tipo" |
+| 4 | **Contentores de têxteis:** onde está a lista, formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | **Respondida a 21 out:** a Vitrus não tem contentores de têxtil nem os quer (contaminação dificulta a reutilização) | Rede sem contentores: local existente e recolha a pedido; contentor de rua só como referência |
 | 5 | **Depósito:** de onde saem os circuitos e onde se descarrega? | O VRP assume o centro de Guimarães | Parametrizamos o ponto de partida |
 | 6 | **Preço por fração** e contratos (Ultriplo, H Sarah, Nova Etapa): quanto recebem por reutilização, reciclagem e quanto custa o rejeito? | A receita é pressuposto | Receita real no €/t e na sensibilidade |
 | 7 | **Rejeito:** como foi medida a amostra de 5,6 t e os 56,9% de rejeito da Vitrus? | Distorce o destino observado | Etiqueta metodológica e eventual calibração |
@@ -210,9 +222,9 @@ Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perg
 
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |
-| 17 | **Lista de contentores de têxteis:** quando chega e em que formato? | O pacote só traz as outras frações | Ligamos a rede de têxteis e comparamos com os locais municipais |
-| 18 | **Que fração é cada ficheiro?** Profundidade e Superfície são indiferenciado, recicláveis ou misto? **Quais são os ecopontos de recicláveis** (vidro, papel, embalagens)? | Os ficheiros não dizem; `stream = desconhecido` em 1 386 contentores | Escolhemos candidatos a têxteis junto de ecopontos reais |
-| 19 | **Frequência de recolha** e custo por esvaziamento (enterrado vs superfície) | Estimar o ganho de pôr têxtil nos mesmos locais | Custo de recolha por modo no simulador |
+| 17 | **Lista de contentores de têxteis:** quando chega e em que formato? | **Respondida a 21 out:** não existem | Os locais municipais passam a ser a base geográfica |
+| 18 | **Que fração é cada ficheiro?** Profundidade e Superfície são indiferenciado, recicláveis ou misto? **Quais são os ecopontos de recicláveis** (vidro, papel, embalagens)? | **Em parte a 21 out:** o pacote junta indiferenciado, orgânico e seletivo; falta a fração por contentor | Escolhemos locais de paragem onde o têxtil se perde |
+| 19 | **Frequência de recolha** e custo por esvaziamento (enterrado vs superfície) | Estimar o custo de uma paragem para sacos de têxtil nos mesmos locais | Custo de recolha por modo no simulador |
 | 20 | O que é uma **"plataforma"** e o que quer dizer a `Quantidade` dos resíduos verdes? | 2 e 46 linhas ambíguas | Corrigimos a contagem de unidades |
 | 21 | As freguesias **Lordelo, Infantas, Tabuadelo e São Faustino, Serzedo e Calvos** estão completas no inventário? | Têm 2,0 a 4,0 contentores por 1 000 hab., contra 17,4 no concelho | Distinguimos "sem dados" de "sem contentores" |
 | 22 | **Capacidade da Tipologia** em litros? Os 10 L são 110 L? **Data** do inventário e versão da **CAOP** a usar? | Unidade assumida; projeto QGIS de maio de 2025 | Confirmamos as capacidades e o código das 5 uniões |

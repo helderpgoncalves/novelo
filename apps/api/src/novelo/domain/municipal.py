@@ -115,9 +115,10 @@ def grid_cluster(points: Iterable[GeoPoint], zoom: int, cell_px: int = 64) -> li
 # --- lacuna estimada por freguesia -------------------------------------------------------------------------------
 
 GAP_RULE_PT = (
-    "Estimativa: potencial = 0,7 kg/hab/mês × população (INE) × 12; lacuna = potencial × (1 − captura atual do "
-    "concelho, igual em todas as freguesias); dividida pelos locais candidatos (no mínimo 1) dá toneladas por "
-    "candidato; ordena-se do maior para o menor. Não há têxtil recolhido por freguesia."
+    "Estimativa: lacuna = têxtil que ainda vai para o lixo = população (INE) × kg/hab/mês × 12, com o kg/hab/mês "
+    "de 43 051 t de RSU da Vitrus em 2025 × 5,4% de têxtil (APA); potencial = lacuna ÷ (1 − captura atual do "
+    "concelho, igual em todas as freguesias); a lacuna dividida pelos locais candidatos (no mínimo 1) dá toneladas "
+    "por candidato; ordena-se do maior para o menor. Não há têxtil recolhido por freguesia."
 )
 
 
@@ -131,13 +132,17 @@ class GapEstimate:
 def gap_estimate(
     population: int, candidate_sites: int, kg_per_inhab_month: float, capture_fraction: float
 ) -> GapEstimate:
-    """Lacuna anual de têxtil (t) de uma freguesia e o seu peso por local candidato. Estimativa, ver `GAP_RULE_PT`."""
+    """Lacuna anual de têxtil (t) de uma freguesia e o seu peso por local candidato. Estimativa, ver `GAP_RULE_PT`.
+
+    `kg_per_inhab_month` é o têxtil que ainda vai para o lixo por habitante; o potencial junta-lhe o recolhido à parte,
+    estimado com a captura média do concelho: potencial = lacuna ÷ (1 − captura).
+    """
     if population < 0 or candidate_sites < 0:
         raise ValueError("population and candidate sites must not be negative")
-    if kg_per_inhab_month <= 0 or not 0 <= capture_fraction <= 1:
-        raise ValueError("kg per inhabitant must be positive and capture must be a fraction")
-    potential = population * kg_per_inhab_month * MONTHS_PER_YEAR / 1000
-    gap = potential * (1 - capture_fraction)
+    if kg_per_inhab_month <= 0 or not 0 <= capture_fraction < 1:
+        raise ValueError("kg per inhabitant must be positive and capture must be a fraction below 1")
+    gap = population * kg_per_inhab_month * MONTHS_PER_YEAR / 1000
+    potential = gap / (1 - capture_fraction)
     return GapEstimate(potential, gap, gap / max(1, candidate_sites))
 
 

@@ -8,23 +8,23 @@ import { stripUnion } from './choropleth';
 import { parishGapT } from './map-model';
 import { num, tonnes } from './safe';
 
-/** Linha da tabela: a freguesia com o potencial por captar já calculado. */
+/** Linha da tabela: a freguesia com o têxtil por desviar. */
 export interface TopRow {
   parish: OverviewParish;
   gapT: number;
   density: number | null;
 }
 
-/** Freguesias com o potencial por captar e a densidade; é o que a tabela ordena. */
-export function topRows(parishes: OverviewParish[], capturePct: number): TopRow[] {
+/** Freguesias com o têxtil por desviar e a densidade; é o que a tabela ordena. */
+export function topRows(parishes: OverviewParish[]): TopRow[] {
   return parishes.map((parish) => ({
     parish,
-    gapT: parishGapT(parish, capturePct),
+    gapT: parishGapT(parish),
     density: parish.area_km2 && parish.area_km2 > 0 ? parish.population / parish.area_km2 : null,
   }));
 }
 
-/** Freguesias ordenadas por potencial por captar, da maior para a menor (valores inválidos no fim). */
+/** Freguesias ordenadas por têxtil por desviar, da maior para a menor (valores inválidos no fim). */
 export function sortByGap(rows: TopRow[]): TopRow[] {
   const v = (r: TopRow) => (Number.isFinite(r.gapT) ? r.gapT : Number.NEGATIVE_INFINITY);
   return [...rows].sort((a, b) => v(b) - v(a) || a.parish.name.localeCompare(b.parish.name));
@@ -40,7 +40,7 @@ interface ParishTableProps {
 }
 
 /**
- * «Top freguesias por potencial por captar»: a mesma informação do mapa em lista, ordenável e pesquisável. Clicar no
+ * «Top freguesias por têxtil por desviar»: a mesma informação do mapa em lista, ordenável e pesquisável. Clicar no
  * nome (ou «Ver no mapa») seleciona a freguesia, que o mapa realça e abre no detalhe.
  */
 export function ParishTable({ rows, selected, onSelect, className }: ParishTableProps) {

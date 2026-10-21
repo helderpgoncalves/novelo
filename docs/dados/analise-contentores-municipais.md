@@ -2,13 +2,13 @@
 
 Recebido a **20 de outubro de 2026**. Fica em `data/raw/vitrus-mapa-qgis/` (só leitura, versionado no Git). `just etl` produz os ficheiros `municipal_*` e `caop_guimaraes.geojson` em `data/processed/`. Os números abaixo vêm de `data/processed/municipal_summary.json`; se o ETL mudar, este documento muda no mesmo commit.
 
-> **Nada neste pacote é de têxteis.** São os contentores **municipais** das outras frações (profundidade, superfície, orgânico, resíduos verdes). A lista de contentores de têxteis **continua por chegar**. As duas redes nunca se misturam: `scripts/etl/containers.py` (têxteis, `containers.csv`) fica intacto; este pacote tem o seu próprio ETL (`scripts/etl/municipal_containers.py`) e os seus próprios ficheiros (`municipal_*`).
+> **Nada neste pacote é de têxteis.** São os contentores **municipais** de indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície (Vitrus, 21 de outubro de 2026). **Não há contentores de têxteis**: a Vitrus não os tem nem os quer, porque o têxtil de contentor vem contaminado e perde a reutilização. Este pacote é, por isso, a **base geográfica** do modelo: mostra onde o têxtil se perde no lixo e onde a viatura já passa. Tem o seu próprio ETL (`scripts/etl/municipal_containers.py`) e os seus próprios ficheiros (`municipal_*`); `containers.py` fica só por compatibilidade.
 
 ## Para que serve
 
 | Uso | Como |
 | --- | --- |
-| 1. Pontos candidatos para contentores de têxteis | 1 187 locais com contentor de rua (profundidade, superfície ou plataforma), 837 com coordenada precisa. Pôr têxtil onde já há recolha municipal pode aproveitar acesso de camião e licenciamento existentes (a validar com a Vitrus) |
+| 1. Locais candidatos (sem contentor novo) e procura por local | 1 187 locais com contentor municipal de rua (profundidade, superfície ou plataforma), 837 com coordenada precisa. São onde a viatura já passa: uma paragem para recolher sacos fechados no momento não precisa de contentor nem de km novos (pressuposto). A procura de cada freguesia reparte-se por eles na proporção dos contentores |
 | 2. Produtores com potencial têxtil | 922 contentores de orgânico de 6 tipos de produtor (restauração, escolas, estabelecimentos, grandes produtores, lares, hotelaria): recolha dedicada B2B (uniformes, roupa de cama, toalhas) |
 | 3. Geometria oficial das freguesias | CAOP 2019 completa para as 48 freguesias (o OSM da app falha 3 e tem 1 minúscula) |
 | 4. Referência de densidade | 17,4 contentores e 10,0 locais públicos por 1 000 habitantes; cobertura por distância |
@@ -48,7 +48,7 @@ Os 5 `.txt` são UTF-8 com CRLF e tabulações, sem aspas. IDs únicos em cada f
 
 **Molok, Blue Bee, Green Bee.** São contentores de deposição **enterrados** (profundidade) ou **semienterrados**, para reduzir o volume visível e o número de recolhas. A **Molok** (finlandesa) fabrica o semienterrado: cerca de 60% do contentor fica no subsolo, a cuba interior é de polietileno de alta densidade e existe em 1,3, 3 e 5 m³; fornecedores portugueses dizem que a necessidade de recolha desce até 90% face ao contentor de superfície comum [F65]. **Blue Bee, Green Bee e Red Bee** são a gama de contentores enterrados da **Lasso** (grupo Sopsa), em betão armado pré-fabricado C40/50, nas capacidades de **3 m³ e 5 m³**; o Green Bee tem altura total enterrada de 2,02 m (3 m³) e 2,76 m (5 m³) e a cuba pesa cerca de 3 e 4 toneladas [F63] [F64]. O ficheiro confirma isto: as capacidades são só 3 m³ (17) e 5 m³ (576), nunca 1,3 m³. **Plataforma** (2 casos) é o único tipo cujo significado os dados não explicam: pode ser uma plataforma de elevação do enterrado; fica por confirmar. O contentor de **superfície de 1 100 L** é o contentor de rodas corrente; 80, 360 e 1 100 L são as capacidades habituais dos contentores de rodas do orgânico.
 
-**O que estes contentores implicam para os têxteis.** Hipótese nossa, a validar com a Vitrus: um enterrado de 5 m³ é desenhado para resíduo urbano comum e **não serve para têxtil** sem adaptação (o têxtil reutilizável não deve ser compactado nem molhado). O interesse do pacote é o **local** (acesso de camião e de utente já existente, licença municipal já dada), não o equipamento. Os 1 187 candidatos são pontos, não contentores.
+**O que estes contentores implicam para os têxteis.** Confirmado em parte pela Vitrus a 21 de outubro (o têxtil de contentor vem contaminado e perde a reutilização): um enterrado de 5 m³ é desenhado para resíduo urbano comum e **não serve para têxtil** sem adaptação (o têxtil reutilizável não deve ser compactado nem molhado). O interesse do pacote é o **local** (acesso de camião e de utente já existente, licença municipal já dada), não o equipamento. Os 1 187 candidatos são pontos, não contentores: a viatura para, recolhe os sacos fechados e segue.
 
 **CAOP.** Carta Administrativa Oficial de Portugal, da Direção-Geral do Território (DGT). Regista a delimitação oficial de distritos, concelhos e freguesias, em PT-TM06/ETRS89. A DGT publica versões anuais; a mais recente é a **CAOP2025**, aprovada a 28 de janeiro de 2026 (Aviso n.º 3502/2026/2) [F66]. O pacote traz a **CAOP 2019**. `AAD` quer dizer, muito provavelmente, "Área Administrativa" (a DGT publica o continente como "Área Administrativa (Polígonos)"), e "Cont" é Continente. Cada polígono tem `TAA` e `Dicofre` [F67]. Os 48 códigos de freguesia do INE (Censos 2021) coincidem com os da CAOP 2019 (43 diretamente, 5 por nome), por isso a CAOP 2019 serve para este fim; **não verificámos a CAOP2025** e a versão a usar deve ser confirmada (pergunta 9).
 
@@ -183,28 +183,30 @@ Vizinho mais próximo entre locais públicos (m): mediana 74, média 112, quarti
 
 A lógica para têxteis (hipótese nossa, a validar): **hotelaria e lares** geram roupa de cama e toalhas em volume e já são clientes B2B; **escolas** já têm campanha de têxteis com a Vitrus (cerca de 3 t em mais de 30 escolas [F57]); **grandes produtores** (hospital, universidade) geram fardamento. A restauração tem pouco têxtil reutilizável. Os 12 grandes produtores e os 9 de hotelaria são o primeiro alvo: poucos contactos, volume alto.
 
-### Candidatos a pontos de têxteis
+### Locais candidatos para recolha de têxteis
 
-Não há fração "reciclável" nem "ecoponto" nos dados, por isso **não** se pode escolher "os ecopontos". O critério (`textile_candidate`) é: local público com pelo menos um contentor de rua (profundidade, superfície ou plataforma). Dá 1 187 locais; 837 com coordenada precisa (os 350 aproximados exigem confirmação no terreno) e 589 com contentor enterrado. `candidate_reason` diz porquê (enterrado, orgânico coletivo a menos de 15 m, 3 ou mais contentores, coordenada aproximada). **É uma lista de lugares possíveis, não de recomendados**: a escolha depende de espaço, tráfego e dos pontos de têxteis que a Vitrus já tem (por receber).
+Não há fração "reciclável" nem "ecoponto" nos dados, por isso **não** se pode escolher "os ecopontos". O critério (`textile_candidate`) é: local público com pelo menos um contentor de rua (profundidade, superfície ou plataforma). Dá 1 187 locais; 837 com coordenada precisa (os 350 aproximados exigem confirmação no terreno) e 589 com contentor enterrado. `candidate_reason` diz porquê (enterrado, orgânico coletivo a menos de 15 m, 3 ou mais contentores, coordenada aproximada). **É uma lista de lugares possíveis, não de recomendados**: a escolha depende de espaço, tráfego e da passagem da viatura. Nenhum recebe contentor de têxtil: o modo é paragem em local existente ou recolha a pedido.
 
 ### Ranking de freguesias com mais lacuna (estimativa)
 
-Não há têxtil recolhido por freguesia (só o total de 301,3 t). Por isso a lacuna por freguesia é **estimativa**: potencial (0,7 kg/hab/mês × população INE) menos a captura média do concelho (22,9%), igual em todas. Divide-se pelo número de locais candidatos (+ 1 se houver zero) e ordena-se: toneladas por candidato.
+Não há têxtil recolhido nem deposição de têxtil por freguesia (só o total de 301,3 t). Por isso a lacuna por freguesia é **estimativa**: o têxtil que ainda vai para o lixo, população INE × 1,235 kg/hab/mês × 12 (43 051 t de RSU × 5,4% da APA, repartidas por habitante). Divide-se pelo número de locais candidatos (+ 1 se houver zero) e ordena-se: toneladas por candidato.
+
+Valores com a nova base (21 de outubro de 2026): população × 14,82 kg/hab/ano, iguais aos de `data/processed/municipal_summary.json` regenerado. A ordem não muda face à base antiga, porque o fator é o mesmo em todas as freguesias.
 
 | # | Freguesia | População | Lacuna (t/ano, estimativa) | Locais candidatos | t por candidato |
 | ---: | --- | ---: | ---: | ---: | ---: |
-| 1 | Lordelo | 3 979 | 25,8 | 1 | 25,8 |
-| 2 | Tabuadelo e São Faustino | 2 415 | 15,6 | 0 | 15,6 |
-| 3 | Serzedo e Calvos | 2 263 | 14,7 | 0 | 14,7 |
-| 4 | Infantas | 1 740 | 11,3 | 0 | 11,3 |
-| 5 | Abação e Gémeos | 2 682 | 17,4 | 3 | 5,8 |
-| 6 | Ronfe | 4 496 | 29,1 | 10 | 2,9 |
-| 7 | Atães e Rendufe | 2 579 | 16,7 | 6 | 2,8 |
-| 8 | Candoso (São Martinho) | 1 234 | 8,0 | 3 | 2,7 |
-| 9 | Moreira de Cónegos | 4 651 | 30,1 | 14 | 2,1 |
-| 10 | Silvares | 2 250 | 14,6 | 7 | 2,1 |
+| 1 | Lordelo | 3 979 | 59,0 | 1 | 59,0 |
+| 2 | Tabuadelo e São Faustino | 2 415 | 35,8 | 0 | 35,8 |
+| 3 | Serzedo e Calvos | 2 263 | 33,5 | 0 | 33,5 |
+| 4 | Infantas | 1 740 | 25,8 | 0 | 25,8 |
+| 5 | Abação e Gémeos | 2 682 | 39,8 | 3 | 13,3 |
+| 6 | Ronfe | 4 496 | 66,6 | 10 | 6,7 |
+| 7 | Atães e Rendufe | 2 579 | 38,2 | 6 | 6,4 |
+| 8 | Candoso (São Martinho) | 1 234 | 18,3 | 3 | 6,1 |
+| 9 | Moreira de Cónegos | 4 651 | 68,9 | 14 | 4,9 |
+| 10 | Silvares | 2 250 | 33,4 | 7 | 4,8 |
 
-As quatro primeiras são as mesmas com poucos registos: **são as freguesias onde o pacote não ajuda** (ou o ficheiro está incompleto, ou não há recolha de rua), e onde os pontos novos teriam de ser de raiz. Os rácios usam população de 2021, não a atual.
+As quatro primeiras são as mesmas com poucos registos: **são as freguesias onde o pacote não ajuda** (ou o ficheiro está incompleto, ou não há recolha de rua), e onde a recolha a pedido nos circuitos é a opção natural. Os rácios usam população de 2021, não a atual.
 
 ## CAOP 2019, OSM e a versão atual
 
@@ -219,19 +221,19 @@ Diferenças 2019 vs atual: Guimarães não teve fusões nem desagregações de f
 
 ## Limites
 
-- Os contentores **não são de têxteis**; nada aqui diz quantos têxteis se recolhem nem onde.
-- A fração de enterrados e de superfície é desconhecida; "recicláveis" ou "indiferenciados" não se podem afirmar.
+- Os contentores **não são de têxteis**; nada aqui diz quantos têxteis se recolhem nem onde. Não há dados de deposição de têxtil por contentor (Vitrus, 21 de outubro).
+- A Vitrus confirmou que o pacote junta indiferenciado, orgânico e seletivo, mas não há campo com a fração de cada contentor de profundidade ou superfície.
 - A data de referência do inventário não consta (o projeto QGIS é de maio de 2025). Pode haver contentores novos ou removidos.
 - Cobertura e vizinho são de **área**; sem população por quarteirão não há cobertura de pessoas.
 - Coordenadas de 3 casas (509 contentores) e freguesias declaradas erradas (79 a mais de 1 km) enfraquecem as contas locais; as contagens por freguesia usam o polígono, que depende da coordenada.
 - Locais agrupados a 5 casas fundem contentores de ruas diferentes quando a coordenada é aproximada (o caso das escolas com 11 superfícies).
 - Capacidades dos produtores sem unidade (assumidas em litros). `Quantidade` dos verdes por esclarecer.
-- A lacuna por freguesia é **estimativa** com captura média igual para todas.
+- A lacuna por freguesia é **estimativa**: o mesmo têxtil por habitante em todas as freguesias.
 
 ## Perguntas para a Vitrus e para o Lucas
 
-1. **Lista de contentores de têxteis:** quando chega, em que formato, e com que operador?
-2. **Fração de cada ficheiro:** Profundidade e Superfície são indiferenciado, reciclável ou misto? Quais são os ecopontos de recicláveis (vidro, papel, embalagens)?
+1. ~~**Lista de contentores de têxteis**~~: respondida a 21 de outubro. Não existem e a Vitrus não os quer.
+2. **Fração de cada ficheiro:** respondida em parte a 21 de outubro (indiferenciado, orgânico e seletivo). Falta saber a fração de cada contentor de Profundidade e Superfície.
 3. **`plataforma`** (2 casos): que equipamento é?
 4. **Frequência de recolha** de cada tipo e custo por esvaziamento (enterrado vs superfície) para dimensionar o ganho de usar os mesmos locais.
 5. **Resíduos verdes, `Quantidade`:** é o número de contentores no local?

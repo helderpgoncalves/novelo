@@ -2,12 +2,15 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain.validation import (
+    Basis,
     SpatialCheck,
+    implied_generated_t,
     leave_one_out,
     potential_reading,
     share_reading,
 )
 from novelo.features.municipal.models import MunicipalParishStat
+from novelo.features.textile import references
 from novelo.features.textile import service as textile
 from novelo.features.validation.schemas import (
     CountKind,
@@ -20,25 +23,34 @@ from novelo.features.validation.schemas import (
     ZoneCheckOut,
 )
 
-# Leituras publicadas do têxtil gerado por habitante. Todas são estimativas de terceiros; nenhuma é medida local.
-PLAN_KG_PER_MONTH = textile.KG_PER_INHAB_MONTH_PLAN  # 0,7 (URBACT, p. 30)
+# Leituras do têxtil por habitante. A base do modelo é a da Vitrus (43 051 t de RSU × 5,4% de têxtil, APA); as outras
+# são publicadas por terceiros e servem só para triangular. Nenhuma é medida local.
+MODEL_RESIDUAL_KG_PER_INHAB_YEAR = references.KG_PER_INHAB_MONTH * 12  # 14,82: têxtil que ainda vai para o lixo
+PLAN_KG_PER_MONTH = references.PLAN_KG_PER_INHAB_MONTH  # 0,7: leitura alternativa, não usada pela Vitrus
 PLAN_RESIDUAL_KG_PER_INHAB_YEAR = 315  # indiferenciado por habitante, mesmo plano
 PLAN_TEXTILE_SHARE_OF_RESIDUAL_PCT = 5.4
 PT_TEXTILE_SHARE_PCT = 4.55  # composição dos RSU em Portugal (folha RSU de dados_textil.xlsx, EEA)
 FRANCE_KG_PER_INHAB_YEAR = 4.27  # Refashion; por verificar (registo de afirmações C1)
 WORST_ZONES = 8
+MODEL_BASE: ReadingKey = "vitrus_apa_share_of_rsu"
+ALTERNATIVES: frozenset[ReadingKey] = frozenset({"plan_per_capita", "plan_share_of_residual"})
 
 SOURCES: dict[ReadingKey, str] = {
-    "plan_per_capita": (
-        "Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025), p. 30: "
-        "0,7 kg por habitante e por mês."
+    "vitrus_apa_share_of_rsu": (
+        "Vitrus (mentor, 21/10/2026): 43 051 t de RSU recolhidas em 2025, das quais 5,4% são têxtil (estatística da "
+        "APA). É o têxtil que ainda vai para o lixo; o recolhido à parte soma-se."
     ),
     "plan_share_of_residual": (
-        "Mesmo plano: 5,4% de têxtil no indiferenciado × 315 kg de indiferenciado por habitante e por ano."
+        "Leitura alternativa, não usada pela Vitrus: Plano de Ação Integrado para a Circularidade Têxtil de Guimarães "
+        "(URBACT, 25/11/2025), 5,4% de têxtil no indiferenciado × 315 kg de indiferenciado por habitante e por ano."
     ),
     "pt_composition": (
         "Composição dos RSU em Portugal (4,55% de têxteis, sem sanitários) × 517 kg por habitante e por ano "
         "(Portugal continental, 2024), folha RSU de dados_textil.xlsx."
+    ),
+    "plan_per_capita": (
+        "Leitura alternativa, não usada pela Vitrus: Plano de Ação Integrado para a Circularidade Têxtil de Guimarães "
+        "(URBACT, 25/11/2025), p. 30: 0,7 kg por habitante e por mês."
     ),
 }
 
@@ -93,25 +105,37 @@ async def model_validation(db: AsyncSession) -> ModelValidationOut:
     ).all()
     observed_per_year = base.total_t * 1000 / base.population
 
-    plan = PLAN_KG_PER_MONTH * 12
-    values: list[tuple[ReadingKey, float]] = [
-        ("plan_per_capita", plan),
-        ("plan_share_of_residual", share_reading(PLAN_RESIDUAL_KG_PER_INHAB_YEAR, PLAN_TEXTILE_SHARE_OF_RESIDUAL_PCT)),
-        ("pt_composition", share_reading(textile.PT_KG_PER_INHAB_YEAR, PT_TEXTILE_SHARE_PCT)),
+    values: list[tuple[ReadingKey, float, Basis]] = [
+        ("vitrus_apa_share_of_rsu", MODEL_RESIDUAL_KG_PER_INHAB_YEAR, "residual"),
+        (
+            "plan_share_of_residual",
+            share_reading(PLAN_RESIDUAL_KG_PER_INHAB_YEAR, PLAN_TEXTILE_SHARE_OF_RESIDUAL_PCT),
+            "residual",
+        ),
+        ("pt_composition", share_reading(textile.PT_KG_PER_INHAB_YEAR, PT_TEXTILE_SHARE_PCT), "generated"),
+        ("plan_per_capita", PLAN_KG_PER_MONTH * 12, "generated"),
     ]
     readings: list[PotentialReadingOut] = []
-    for key, kg in values:
-        r = potential_reading(key, kg, base.total_t, base.population)
+    for key, kg, basis in values:
+        r = potential_reading(key, kg, base.total_t, base.population, basis)
         readings.append(
             PotentialReadingOut(
                 key=key,
                 kg_per_inhab_year=round(kg, 2),
+                basis=basis,
                 implied_capture_pct=round(r.implied_capture_pct, 1),
-                implied_potential_t=round(kg * base.population / 1000, 1),
-                is_model_base=key == "plan_per_capita",
+                implied_potential_t=round(implied_generated_t(base.total_t, base.population, kg, basis), 1),
+                is_model_base=key == MODEL_BASE,
+                is_alternative=key in ALTERNATIVES,
                 source=SOURCES[key],
             )
         )
+    # Têxtil gerado por habitante e ano na base do modelo (por desviar + recolhido): referência para a França.
+    model_generated_per_inhab_year = (
+        implied_generated_t(base.total_t, base.population, MODEL_RESIDUAL_KG_PER_INHAB_YEAR, "residual")
+        * 1000
+        / base.population
+    )
 
     spatial: list[SpatialCheckOut] = []
     if len(rows) >= 4:
@@ -134,7 +158,7 @@ async def model_validation(db: AsyncSession) -> ModelValidationOut:
         readings=readings,
         france=FranceReference(
             kg_per_inhab_year=FRANCE_KG_PER_INHAB_YEAR,
-            capture_of_model_base_pct=round(FRANCE_KG_PER_INHAB_YEAR / plan * 100, 1),
+            capture_of_model_base_pct=round(FRANCE_KG_PER_INHAB_YEAR / model_generated_per_inhab_year * 100, 1),
             source="Refashion, via registo de afirmações C1 (fonte secundária, por verificar).",
         ),
         spatial=spatial,

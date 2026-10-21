@@ -6,11 +6,11 @@ Respostas curtas, para dizer em 20 segundos cada. Quem responde a cada tema fica
 
 **"A Vitrus não pode simplesmente pôr contentores em todo o lado?"**
 
-Pode, mas paga contentores e recolhas onde quase não há têxtil. O território é disperso: o próprio plano municipal diz que o porta a porta pode não compensar. O Novelo põe investimento só onde a densidade o justifica.
+A Vitrus não quer: o têxtil de contentor vem contaminado e perde a reutilização, que é onde está o valor (reciclar custa mais que a fibra virgem). E um contentor custa e é recolhido mesmo onde quase não há têxtil. O Novelo propõe uma rede sem contentores: paragem em locais onde a viatura já passa e recolha a pedido nos circuitos que existem.
 
 **"Os números são reais?"**
 
-Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; os 5,4% de têxtil no indiferenciado e os 0,7 kg por habitante por mês vêm do Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (Município de Guimarães / URBACT, 25/11/2025, p. 30, que cita Perebynos et al. 2023). Falta confirmar com a Vitrus o que os 0,7 kg medem e de que ano são os dados ([Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)), por isso o potencial de 1 317 t é sempre apresentado como estimativa. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
+Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; as 43 051 t de resíduos urbanos recolhidas em 2025 vêm da Vitrus e os 5,4% de têxtil vêm da APA, valor que a própria Vitrus nos indicou a 21 de outubro ([Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)). Daí as cerca de 2 324,8 t por ano que ainda vão para o lixo e a captura de 11,5%, sempre apresentadas como estimativa. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
 
 **"Quem paga isto?"**
 

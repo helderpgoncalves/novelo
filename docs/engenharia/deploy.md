@@ -66,7 +66,7 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 - **Retenção do copiloto:** `python -m novelo.cli purge-copilot` apaga o que passou do prazo; pode agendar-se uma vez por dia no Coolify (ver [Copiloto](copiloto.md#definições-do-utilizador-vs-definições-do-sistema)).
 - **Rollback:** `git revert` do commit em `main` e novo push. Antes da apresentação, marcar a versão da demo com uma tag (`v1.0-demo`).
 - **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. Tudo o resto reconstrói-se a partir do repositório.
-- **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem as localizações dos contentores de têxteis). A pasta `data/raw` não vai para a imagem.
+- **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem os custos ou uma caracterização do lixo). A pasta `data/raw` não vai para a imagem.
 
 ## Diagnóstico rápido
 

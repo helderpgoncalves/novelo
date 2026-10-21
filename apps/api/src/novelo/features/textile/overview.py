@@ -31,9 +31,9 @@ from novelo.features.textile.models import TextileFlow, WasteShare
 from novelo.features.textile.references import (
     EXTERNAL_REFERENCES,
     FRANCE_KEY,
+    KG_PER_INHAB_MONTH,
     MILESTONES,
-    PLAN_KG_PER_INHAB_MONTH,
-    PLAN_SOURCE_LABEL,
+    POTENTIAL_SOURCE_LABEL,
 )
 from novelo.features.textile.schemas import (
     FrontierPoint,
@@ -58,23 +58,28 @@ _SOURCE_KIND = {
     "vitrus_circuits_2026_09": "operator",
     "ine_census_2021": "public_statistics",
     "osm_nominatim": "public_geodata",
+    "vitrus_apa_rsu_2025": "operator",
 }
 _GEOCODED_SOURCE = "osm_nominatim"
 
 
 def _gap(base: TextileBaseline, parishes_count: int) -> OverviewGap:
-    potential = base.estimated_demand_t
+    potential = base.estimated_demand_t  # gerado = por desviar + recolhido
+    per_inhab_month = potential * 1000 / base.population / MONTHS if base.population else 0.0
     return OverviewGap(
         year=base.year,
         potential_t=potential,
         collected_t=base.total_t,
-        missing_t=round(potential - base.total_t, 1),
+        missing_t=base.gap_t,  # o que ainda vai para o lixo: 43 051 t × 5,4%
         capture_pct=base.capture_of_demand_pct,
         destinations=OverviewDestinations(reuse_t=base.reuse_t, recycle_t=base.recycle_t, reject_t=base.reject_t),
         kg_per_inhab_year=round(base.kg_per_inhab_month * MONTHS, 2),
         kg_per_inhab_month=base.kg_per_inhab_month,
-        potential_kg_per_inhab_year=round(PLAN_KG_PER_INHAB_MONTH * MONTHS, 2),
-        potential_kg_per_inhab_month=PLAN_KG_PER_INHAB_MONTH,
+        potential_kg_per_inhab_year=round(per_inhab_month * MONTHS, 2),
+        potential_kg_per_inhab_month=round(per_inhab_month, 3),
+        missing_kg_per_inhab_year=round(KG_PER_INHAB_MONTH * MONTHS, 2),
+        missing_kg_per_inhab_month=round(KG_PER_INHAB_MONTH, 3),
+        potential_source_label=POTENTIAL_SOURCE_LABEL,
         population=base.population,
         parishes_count=parishes_count,
     )
@@ -95,15 +100,15 @@ def _references(gap: OverviewGap) -> list[OverviewReference]:
             is_estimate=False,
         ),
         OverviewReference(
-            key="guimaraes_plan_potential",
-            label="Potencial do plano municipal",
+            key="guimaraes_potential",
+            label="Têxtil gerado em Guimarães (estimativa)",
             kg_per_inhab_year=gap.potential_kg_per_inhab_year,
             year=gap.year,
             scope="municipality",
-            source_label=PLAN_SOURCE_LABEL,
+            source_label=f"{POTENTIAL_SOURCE_LABEL}; cálculo nosso",
             source_url=None,
-            verified=False,
-            evidence="unverified",
+            verified=True,
+            evidence="dado_vitrus",
             is_estimate=True,
         ),
     ]
@@ -182,7 +187,7 @@ async def _parishes(db: AsyncSession) -> list[OverviewParish]:
                 name=p.name,
                 population=pop,
                 tipau=p.tipau,
-                potential_t=round(parish_potential_t(pop, PLAN_KG_PER_INHAB_MONTH), 2),
+                potential_t=round(parish_potential_t(pop, KG_PER_INHAB_MONTH), 2),
                 circuits_count=circuits.get(p.id, 0),
                 localities_count=localities.get(p.id, 0),
                 containers_count=containers.get(p.id, 0),

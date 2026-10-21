@@ -1,19 +1,25 @@
 """Pressupostos por omissão do simulador e a origem de cada um.
 
-Dados reais (população INE, circuitos e captura observada da Vitrus) entram no modelo por outra via; aqui ficam
-os números que a Vitrus ainda não forneceu (custos unitários), marcados como `assumption` até serem validados.
+Dados reais (população INE, circuitos, RSU recolhido pela Vitrus e percentagem de têxtil da APA) entram no modelo por
+outra via ou derivam-se aqui; o resto são números que a Vitrus ainda não forneceu (custos unitários, capturas por modo),
+marcados como `assumption` até serem validados.
 """
 
 from novelo.domain import network
 from novelo.domain.vocab import CollectionMode
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams
+from novelo.features.textile.references import KG_PER_INHAB_MONTH
 
-# Calibração com os dados da Vitrus: em 2025 recolheram-se 301,3 t de um potencial de 1 317,4 t (22,9%).
-# O contentor de rua serve 80% da população; a taxa de captura de quem é servido que reproduz as 301 t é
-# 22,9% / 80% = 28,6%. Assim, uma rede só de rua em todo o concelho dá, no modelo, o que a Vitrus recolhe hoje.
-OBSERVED_CAPTURE_OF_DEMAND = 0.229
+# Procura: têxtil que ainda vai para o lixo, 43 051 t de RSU × 5,4% (Vitrus + APA) ÷ 156 830 hab ÷ 12 = 1,2353
+# kg/hab/mês. Derivado em `features/textile/references.py`; não se escreve à mão.
+# Arredondado a 4 casas para o ecrã de pressupostos (1,2353): o potencial continua 2 324,8 t.
+DEFAULT_KG_PER_INHAB_MONTH = round(KG_PER_INHAB_MONTH, 4)
+
+# Contentor de rua: a Vitrus não tem contentores de têxtil nem os quer (contaminação). O modo fica só como referência
+# (ex.: o benchmark francês, que é de contentores) e nunca entra por omissão. Os valores são pressupostos: a antiga
+# calibração com as 301 t de 2025 deixou de fazer sentido, porque essas toneladas são recolhidas por terceiros.
+STREET_CAPTURE_RATE = 0.286
 STREET_COVERAGE = 0.8
-STREET_CAPTURE_RATE = round(OBSERVED_CAPTURE_OF_DEMAND / STREET_COVERAGE, 3)
 
 # Centro de Guimarães como depósito, até a Vitrus indicar o seu (pergunta ao mentor, dia 1).
 DEPOT_LAT, DEPOT_LON = 41.4425, -8.2918
@@ -21,7 +27,7 @@ DEPOT_LAT, DEPOT_LON = 41.4425, -8.2918
 
 def default_params() -> PlanningParams:
     return PlanningParams(
-        kg_per_inhab_month=0.7,
+        kg_per_inhab_month=DEFAULT_KG_PER_INHAB_MONTH,
         modes={
             CollectionMode.EXISTING: ModeParams(
                 capture_rate=0.18,
@@ -79,9 +85,9 @@ def _mode_meta(mode: str, rate_source: ParamSource) -> list[ParamMeta]:
 
 def params_meta() -> list[ParamMeta]:
     return [
-        ParamMeta(key="kg_per_inhab_month", unit="kg/hab/mês", source=ParamSource.PLAN),
+        ParamMeta(key="kg_per_inhab_month", unit="kg/hab/mês", source=ParamSource.VITRUS_DATA),
         *_mode_meta("existing", ParamSource.ASSUMPTION),
-        *_mode_meta("street", ParamSource.VITRUS_DATA),
+        *_mode_meta("street", ParamSource.ASSUMPTION),
         *_mode_meta("on_demand", ParamSource.ASSUMPTION),
         ParamMeta(key="cost_per_collection_eur", unit="€", source=ParamSource.ASSUMPTION),
         ParamMeta(key="cost_per_km_eur", unit="€/km", source=ParamSource.ASSUMPTION),

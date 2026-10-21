@@ -9,7 +9,7 @@ test.describe('dados reais da Vitrus', () => {
   test('ponto de partida mostra os números reais', async ({ page }) => {
     const strip = page.locator('dl').first();
     await expect(strip).toContainText('301,3 t');
-    await expect(strip).toContainText('22,9%');
+    await expect(strip).toContainText('11,5%');
     await expect(strip).toContainText('0,16 kg');
     await expect(page.getByRole('img', { name: /Fluxo de têxtil/ })).toBeVisible();
     await expect(page.getByRole('row', { name: /Ultriplo/ })).toContainText('134,1 t');

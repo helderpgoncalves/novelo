@@ -189,7 +189,7 @@ export function Fio({ gap }: { gap: OverviewGap }) {
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
         <EstimateTag />
         <SourceLine className="min-w-0 flex-1">
-          {m.home_fio_source({ rate: num(gap.potential_kg_per_inhab_month, 1) })}
+          {m.home_fio_source({ source: gap.potential_source_label })}
         </SourceLine>
       </div>
       <details className="group rounded-lg ring-1 ring-foreground/10">

@@ -32,7 +32,7 @@ function Kicker({ children }: { children: ReactNode }) {
 }
 
 /**
- * O problema, em bento assimétrico: um cartão grande com o número que importa (22,9 % do potencial, estimativa) e a
+ * O problema, em bento assimétrico: um cartão grande com o número que importa (11,5 % do têxtil gerado, estimativa) e a
  * diretiva europeia, e três pequenos com factos e fontes (remissões [n] para as Referências).
  */
 export function Problem() {
@@ -101,7 +101,7 @@ export function Problem() {
               <div>
                 <dt className={MONO}>{m.landing_gap_potential()}</dt>
                 <dd className="mt-1 font-medium font-serif text-3xl tabular-nums">
-                  {m.landing_gap_potential_value({ value: formatTonnes(1317, 0) })}
+                  {m.landing_gap_potential_value({ value: formatTonnes(FACTS.potentialT, 0) })}
                 </dd>
               </div>
             </dl>
@@ -370,7 +370,8 @@ export function Method() {
               <Cite n={4} />
             </p>
             <p className="border-border border-t pt-5 font-mono text-foreground text-lg tabular-nums sm:text-xl">
-              {formatPercent(FACTS.capturePct)} ÷ 80 % = {formatPercent(FACTS.streetCapturePct)}
+              {formatTonnes(FACTS.rsuT, 0)} × {formatPercent(FACTS.textileShareOfRsuPct)} ≈{' '}
+              {formatTonnes(FACTS.residualT)}
             </p>
           </div>
         </div>

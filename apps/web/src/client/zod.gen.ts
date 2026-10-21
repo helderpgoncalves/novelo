@@ -483,6 +483,9 @@ export const zCircuitStatus = z.enum([
  * CollectionMode
  *
  * Modos de recolha de têxteis que o simulador compara.
+ *
+ * A Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no
+ * vocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.
  */
 export const zCollectionMode = z.enum([
     'existing',
@@ -2576,7 +2579,7 @@ export const zOverviewDestinations = z.object({
 /**
  * OverviewGap
  *
- * A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.
+ * A lacuna: o têxtil gerado (estimativa Vitrus + APA), o que se recolheu e o que ainda vai para o lixo.
  */
 export const zOverviewGap = z.object({
     capture_pct: z.number(),
@@ -2585,12 +2588,15 @@ export const zOverviewGap = z.object({
     is_estimate: z.boolean().optional().default(true),
     kg_per_inhab_month: z.number(),
     kg_per_inhab_year: z.number(),
+    missing_kg_per_inhab_month: z.number(),
+    missing_kg_per_inhab_year: z.number(),
     missing_t: z.number(),
     parishes_count: z.int(),
     population: z.int(),
     potential_is_estimate: z.boolean().optional().default(true),
     potential_kg_per_inhab_month: z.number(),
     potential_kg_per_inhab_year: z.number(),
+    potential_source_label: z.string(),
     potential_t: z.number(),
     year: z.int()
 });
@@ -2699,11 +2705,7 @@ export const zCopilotStreamRequest = z.object({
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export const zParamSource = z.enum([
-    'plan',
-    'vitrus_data',
-    'assumption'
-]);
+export const zParamSource = z.enum(['vitrus_data', 'assumption']);
 
 /**
  * ParamMeta
@@ -2968,7 +2970,7 @@ export const zPilotKpiOut = z.object({
 export const zPilotRequest = z.object({
     k: z.int().gte(2).lte(4).optional().default(2),
     min_tonnes_pilot: z.number().gte(0).nullish(),
-    modes: z.array(zCollectionMode).min(1).optional(),
+    modes: z.array(zCollectionMode).min(1).optional().default(['existing', 'on_demand']),
     months: z.int().gte(1).lte(12).optional().default(3),
     n_samples: z.int().gte(50).lte(5000).optional().default(500),
     seed: z.int().optional().default(7),
@@ -3043,13 +3045,16 @@ export const zPointGeometry = z.object({
  * PotentialReadingOut
  */
 export const zPotentialReadingOut = z.object({
+    basis: z.enum(['generated', 'residual']),
     implied_capture_pct: z.number(),
     implied_potential_t: z.number(),
+    is_alternative: z.boolean().optional().default(false),
     is_model_base: z.boolean(),
     key: z.enum([
-        'plan_per_capita',
+        'vitrus_apa_share_of_rsu',
         'plan_share_of_residual',
-        'pt_composition'
+        'pt_composition',
+        'plan_per_capita'
     ]),
     kg_per_inhab_year: z.number(),
     source: z.string()
@@ -3578,11 +3583,12 @@ export const zScenarioRename = z.object({
 export const zScenarioRequest = z.object({
     budget_eur_year: z.number().gte(0).nullish(),
     constraints: z.record(z.string(), z.array(zCollectionMode)).optional(),
+    default_modes: z.array(zCollectionMode).min(1).optional().default(['existing', 'on_demand']),
     label: z.string().min(1).max(80),
     objective: zScenarioObjective,
     params: zPlanningParams.nullish(),
     parent_id: z.uuid().nullish(),
-    site_mode: zCollectionMode.optional().default('street'),
+    site_mode: zCollectionMode.optional().default('existing'),
     site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
@@ -3897,6 +3903,7 @@ export const zSitingSummary = z.object({
  */
 export const zScenarioResult = z.object({
     allocations: z.array(zAllocation),
+    default_modes: z.array(zCollectionMode).optional(),
     depot: z.array(z.number()),
     kpis: zKpis,
     modes: z.array(zModeSummary),

@@ -13,6 +13,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.adapters.openrouter import OpenRouterClient
 from novelo.ai.catalog import ModelCatalog, get_catalog
 from novelo.ai.catalog import catalog as default_catalog
+from novelo.ai.tasks import AiTask
 from novelo.core.database import SessionLocal, get_db
 from novelo.core.deps import CurrentUser, NotImpersonating
 from novelo.core.errors import FeatureDisabledError
@@ -538,10 +539,12 @@ async def upload_copilot_attachments(
     user: CurrentUser,
     db: Db,
     catalog: Catalog,
+    llm: Llm,
     files: Annotated[list[UploadFile], File(description="Até 5 ficheiros, 10 MB cada")],
 ) -> list[AttachmentOut]:
     """Imagens, PDF, CSV/XLSX, TXT/MD/JSON. O ficheiro é validado pelo conteúdo e descartado: guarda-se só o texto extraído."""
-    return await uploads.upload(db, user, files, catalog)
+    # O mesmo modelo que o agente vai usar nesta conversa: o aviso "não vê imagens" bate certo com a resposta.
+    return await uploads.upload(db, user, files, catalog, llm.model_for(AiTask.COPILOT))
 
 
 @router.get("/mentions", response_model=MentionsOut)

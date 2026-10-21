@@ -17,23 +17,22 @@ import {
 import { sectionNumber } from './sections';
 
 const MIN_T = FACTS.collectedT;
-const MAX_T = 1500;
+// Até ao têxtil gerado (estimativa ≈ 2 626 t), arredondado para cima.
+const MAX_T = 2700;
 const THUMB = 28;
 const pct = (t: number) => ((t - MIN_T) / (MAX_T - MIN_T)) * 100;
 /** Posição exata sob o centro da alça (o trilho nativo deixa meia alça em cada ponta). */
 const underThumb = (p: number) => `calc(${p}% + ${(0.5 - p / 100) * THUMB}px)`;
 
-type Zone = 'now' | 'model' | 'above' | 'cap';
+type Zone = 'now' | 'above' | 'cap';
 function zoneOf(t: number): Zone {
   if (t < MIN_T + 8) return 'now';
-  if (t <= FACTS.ceilingT) return 'model';
   if (t <= FACTS.potentialT) return 'above';
   return 'cap';
 }
 const zoneText = (z: Zone) =>
   ({
     now: m.landing_sim_zone_now(),
-    model: m.landing_sim_zone_model(),
     above: m.landing_sim_zone_above(),
     cap: m.landing_sim_zone_cap(),
   })[z];
@@ -142,7 +141,6 @@ function Instrument() {
   const zone = zoneOf(target);
   const bars: { id: string; label: string; value: number; status: Status }[] = [
     { id: 'now', label: m.landing_sim_mark_now(), value: FACTS.collectedT, status: 'measured' },
-    { id: 'model', label: m.landing_sim_mark_model(), value: FACTS.ceilingT, status: 'estimate' },
     { id: 'fr', label: m.landing_sim_mark_fr(), value: FACTS.franceT, status: 'unverified' },
     {
       id: 'pot',

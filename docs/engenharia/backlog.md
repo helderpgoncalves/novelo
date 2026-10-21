@@ -24,9 +24,8 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 
 | Prioridade | Tarefa | Estado |
 | --- | --- | --- |
-| Alta | Localizações dos contentores **de têxteis** (o pacote de 20/10 foi só o municipal): colocar em `data/raw`, correr `just etl`, popular `containers`, mostrar a camada no mapa, calcular a cobertura e usá-los como pontos de partida do simulador | Por receber |
-| Alta | Custos unitários (recolha, quilómetro, contentor, vida útil) da Vitrus para trocar os pressupostos por dados | Por pedir |
-| Alta | Saber o que mede o 0,7 kg/hab/mês (pergunta Q6): decide se a captura de 2025 é 22,9% ou cerca de 18,6% | Por pedir |
+| Alta | Aplicar as respostas da Vitrus de 21/10: procura = 43 051 t × 5,4% (2 324,8 t por desviar), modos por omissão `existing` e `on_demand` (`street` só referência), sem calibração da rua, sem receita de reciclagem; recalcular cenários de referência, sensibilidade, teto francês e a tabela dos locais reais em [Dados e modelo](dados-e-modelo.md) | Em curso |
+| Alta | Custos unitários (recolha, quilómetro, vida útil) da Vitrus para trocar os pressupostos por dados | Pedidos ao departamento financeiro a 21/10 |
 | Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` (a CAOP 2019 já traz os oficiais) | Por validar |
 | Média | Confirmar o depósito real da Vitrus (hoje o centro de Guimarães) | Por pedir |
 | Média | Medir a exatidão da triagem (`just eval-triage` com 30 ou mais peças com verdade-terreno) | Por fazer |

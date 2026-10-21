@@ -71,7 +71,6 @@ export function SituationStrip({ overview }: { overview: Overview }) {
           tag={<EstimateTag />}
           source={m.home_strip_capture_src({
             potential: tonnes(gap.potential_t, 0),
-            rate: num(gap.potential_kg_per_inhab_month, 1),
           })}
           emphasis
         />
@@ -80,7 +79,10 @@ export function SituationStrip({ overview }: { overview: Overview }) {
           value={num(gap.missing_t, 0)}
           unit="t/ano"
           tag={<EstimateTag />}
-          source={m.home_strip_missing_src()}
+          source={m.home_strip_missing_src({
+            rate: num(gap.missing_kg_per_inhab_month, 3),
+            source: gap.potential_source_label,
+          })}
           emphasis
         />
         <Cell

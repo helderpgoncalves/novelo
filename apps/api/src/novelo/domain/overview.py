@@ -34,7 +34,7 @@ def days_until(target: date, today: date) -> int | None:
 
 
 def parish_potential_t(population: int, kg_per_inhab_month: float) -> float:
-    """Potencial de uma freguesia em t/ano: população × kg/hab/mês × 12 / 1000 (estimativa do plano municipal)."""
+    """Têxtil por desviar de uma freguesia em t/ano: população × kg/hab/mês × 12 / 1000 (estimativa)."""
     return yearly_demand_t(population, kg_per_inhab_month)
 
 

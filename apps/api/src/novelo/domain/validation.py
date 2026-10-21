@@ -17,28 +17,48 @@ import math
 import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass
+from typing import Literal
 
 MONTHS_PER_YEAR = 12
 
 
+Basis = Literal["generated", "residual"]
+
+
 @dataclass(frozen=True)
 class PotentialReading:
-    """Uma leitura do têxtil gerado por habitante, com a captura de 2025 que ela implica."""
+    """Uma leitura do têxtil por habitante, com a captura de 2025 que ela implica.
+
+    `basis="generated"`: a leitura é o têxtil gerado no total. `basis="residual"`: é o têxtil que ainda vai para o lixo
+    (uma parte do RSU/indiferenciado); o recolhido à parte está fora do lixo e soma-se para obter o gerado.
+    """
 
     key: str
     kg_per_inhab_year: float
     implied_capture_pct: float
+    basis: Basis = "generated"
 
 
 def implied_capture_pct(collected_t: float, population: int, kg_per_inhab_year: float) -> float:
-    """Captura (%) se o potencial fosse `kg_per_inhab_year` por habitante e por ano."""
+    """Captura (%) se o têxtil gerado fosse `kg_per_inhab_year` por habitante e por ano."""
     if population <= 0 or kg_per_inhab_year <= 0:
         raise ValueError("população e potencial têm de ser positivos")
     return collected_t * 1000 / (population * kg_per_inhab_year) * 100
 
 
-def potential_reading(key: str, kg_per_inhab_year: float, collected_t: float, population: int) -> PotentialReading:
-    return PotentialReading(key, kg_per_inhab_year, implied_capture_pct(collected_t, population, kg_per_inhab_year))
+def implied_generated_t(collected_t: float, population: int, kg_per_inhab_year: float, basis: Basis) -> float:
+    """Têxtil gerado (t/ano) que a leitura implica: a própria leitura, ou o que vai para o lixo + o recolhido."""
+    if population <= 0 or kg_per_inhab_year <= 0:
+        raise ValueError("população e potencial têm de ser positivos")
+    in_reading = population * kg_per_inhab_year / 1000
+    return in_reading + collected_t if basis == "residual" else in_reading
+
+
+def potential_reading(
+    key: str, kg_per_inhab_year: float, collected_t: float, population: int, basis: Basis = "generated"
+) -> PotentialReading:
+    generated = implied_generated_t(collected_t, population, kg_per_inhab_year, basis)
+    return PotentialReading(key, kg_per_inhab_year, collected_t / generated * 100, basis)
 
 
 def share_reading(total_kg_per_inhab_year: float, share_pct: float) -> float:

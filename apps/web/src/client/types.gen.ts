@@ -972,13 +972,13 @@ export type BenchmarkOut = {
      */
     current_people_per_point: number;
     /**
-     * Modo a que a densidade se aplica
+     * Modo a que a densidade se aplica (`street` no preset francês: só como referência)
      */
     density_mode: CollectionMode;
     /**
      * Implied Capture Pct
      *
-     * Fração do potencial (0,7 kg/hab/mês) que a meta exige captar
+     * Fração do têxtil que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) que a meta exige
      */
     implied_capture_pct: number;
     /**
@@ -1006,7 +1006,7 @@ export type BenchmarkOut = {
     /**
      * Observed Capture Pct
      *
-     * Captura atual da Vitrus (22,9%)
+     * Captura atual: recolhido em 2025 ÷ têxtil gerado (estimativa)
      */
     observed_capture_pct: number;
     /**
@@ -1551,6 +1551,9 @@ export type CircuitsSummary = {
  * CollectionMode
  *
  * Modos de recolha de têxteis que o simulador compara.
+ *
+ * A Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no
+ * vocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.
  */
 export type CollectionMode = 'existing' | 'street' | 'on_demand';
 
@@ -5655,11 +5658,13 @@ export type MunicipalGapParameters = {
     /**
      * Capture Pct
      *
-     * Captura média atual do concelho (301,3 t ÷ 1 317 t), igual em todas
+     * Captura média atual do concelho (recolhido em 2025 ÷ têxtil gerado), igual em todas
      */
     capture_pct: number;
     /**
      * Kg Per Inhab Month
+     *
+     * Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: 43 051 t RSU × 5,4%)
      */
     kg_per_inhab_month: number;
     /**
@@ -6126,13 +6131,13 @@ export type MunicipalParishOut = {
     /**
      * Textile Gap T
      *
-     * Estimativa: potencial × (1 − captura média do concelho)
+     * Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (43 051 t RSU × 5,4%) × 12
      */
     textile_gap_t: number;
     /**
      * Textile Potential T
      *
-     * Estimativa: 0,7 kg/hab/mês × população × 12
+     * Estimativa do têxtil gerado: lacuna ÷ (1 − captura média do concelho)
      */
     textile_potential_t: number;
 };
@@ -6849,7 +6854,7 @@ export type OverviewDestinations = {
 /**
  * OverviewGap
  *
- * A lacuna: o que o plano municipal estima gerar, o que se recolheu e o que falta.
+ * A lacuna: o têxtil gerado (estimativa Vitrus + APA), o que se recolheu e o que ainda vai para o lixo.
  */
 export type OverviewGap = {
     /**
@@ -6887,9 +6892,21 @@ export type OverviewGap = {
      */
     kg_per_inhab_year: number;
     /**
+     * Missing Kg Per Inhab Month
+     *
+     * Estimativa: têxtil que ainda vai para o lixo por habitante e mês (base da procura do simulador)
+     */
+    missing_kg_per_inhab_month: number;
+    /**
+     * Missing Kg Per Inhab Year
+     *
+     * Estimativa: têxtil que ainda vai para o lixo por habitante e ano (43 051 t × 5,4% ÷ população)
+     */
+    missing_kg_per_inhab_year: number;
+    /**
      * Missing T
      *
-     * potential_t − collected_t
+     * potential_t − collected_t: têxtil que ainda vai para o lixo
      */
     missing_t: number;
     /**
@@ -6911,19 +6928,25 @@ export type OverviewGap = {
     /**
      * Potential Kg Per Inhab Month
      *
-     * Estimativa do plano: 0,7
+     * Estimativa: têxtil gerado por habitante e mês
      */
     potential_kg_per_inhab_month: number;
     /**
      * Potential Kg Per Inhab Year
      *
-     * Estimativa do plano: 0,7 × 12
+     * Estimativa: têxtil gerado por habitante e ano
      */
     potential_kg_per_inhab_year: number;
     /**
+     * Potential Source Label
+     *
+     * Fonte da estimativa do potencial
+     */
+    potential_source_label: string;
+    /**
      * Potential T
      *
-     * Estimativa: população × 0,7 kg/hab/mês × 12 (plano municipal)
+     * Estimativa do têxtil gerado: 43 051 t RSU × 5,4% (Vitrus + APA) + recolhido à parte
      */
     potential_t: number;
     /**
@@ -7066,7 +7089,7 @@ export type OverviewParish = {
     /**
      * Potential T
      *
-     * Estimativa: população × 0,7 kg/hab/mês × 12 / 1000
+     * Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (Vitrus + APA) × 12 / 1000
      */
     potential_t: number;
     /**
@@ -7101,7 +7124,7 @@ export type OverviewReference = {
     /**
      * Is Estimate
      *
-     * Verdadeiro para o potencial do plano e valores aproximados
+     * Verdadeiro para o potencial estimado e valores aproximados
      */
     is_estimate: boolean;
     /**
@@ -7202,7 +7225,7 @@ export type ParamMeta = {
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export type ParamSource = 'plan' | 'vitrus_data' | 'assumption';
+export type ParamSource = 'vitrus_data' | 'assumption';
 
 /**
  * ParametersOut
@@ -7600,7 +7623,7 @@ export type PilotRequest = {
     /**
      * Modes
      *
-     * Modos de recolha a testar no piloto
+     * Modos de recolha a testar no piloto; por omissão `existing` e `on_demand` (`street` só como referência)
      */
     modes?: Array<CollectionMode>;
     /**
@@ -7717,7 +7740,7 @@ export type PlanningParams = {
     /**
      * Kg Per Inhab Month
      *
-     * Têxtil gerado por habitante e mês
+     * Têxtil que ainda vai para o lixo por habitante e mês (43 051 t RSU × 5,4%, Vitrus + APA)
      */
     kg_per_inhab_month: number;
     /**
@@ -7798,6 +7821,12 @@ export type PointGeometry = {
  */
 export type PotentialReadingOut = {
     /**
+     * Basis
+     *
+     * `generated`: têxtil gerado no total; `residual`: têxtil que ainda vai para o lixo (o recolhido à parte soma-se para obter o gerado)
+     */
+    basis: 'generated' | 'residual';
+    /**
      * Implied Capture Pct
      *
      * Captura de 2025 se esta leitura do potencial fosse a verdadeira
@@ -7805,18 +7834,26 @@ export type PotentialReadingOut = {
     implied_capture_pct: number;
     /**
      * Implied Potential T
+     *
+     * Têxtil gerado (t/ano) que esta leitura implica
      */
     implied_potential_t: number;
     /**
+     * Is Alternative
+     *
+     * Leitura publicada mas não usada pela Vitrus; só para triangulação
+     */
+    is_alternative?: boolean;
+    /**
      * Is Model Base
      *
-     * A leitura que o modelo usa por omissão (0,7 kg/hab/mês)
+     * A leitura que o modelo usa (Vitrus + APA: 43 051 t de RSU × 5,4%)
      */
     is_model_base: boolean;
     /**
      * Key
      */
-    key: 'plan_per_capita' | 'plan_share_of_residual' | 'pt_composition';
+    key: 'vitrus_apa_share_of_rsu' | 'plan_share_of_residual' | 'pt_composition' | 'plan_per_capita';
     /**
      * Kg Per Inhab Year
      */
@@ -8690,11 +8727,17 @@ export type ScenarioRequest = {
     /**
      * Constraints
      *
-     * Modos permitidos por freguesia (código INE); omitido = todos
+     * Modos permitidos por freguesia (código INE); as freguesias omitidas usam `default_modes`
      */
     constraints?: {
         [key: string]: Array<CollectionMode>;
     };
+    /**
+     * Default Modes
+     *
+     * Modos permitidos nas freguesias sem restrição em `constraints`. Por omissão `existing` e `on_demand`: a Vitrus não tem contentores de têxtil; `street` só como referência explícita. Em `sites` o modo dos locais é `site_mode` e isto só decide se a recolha a pedido pode completar a rede
+     */
+    default_modes?: Array<CollectionMode>;
     /**
      * Label
      */
@@ -8709,7 +8752,7 @@ export type ScenarioRequest = {
      */
     parent_id?: string | null;
     /**
-     * Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)
+     * Pressupostos de captura e custo usados nos locais: `existing` (paragem com sacos fechados nos locais municipais onde a viatura já passa, sem contentor novo) ou `street` (contentor de rua, só referência)
      */
     site_mode?: CollectionMode;
     /**
@@ -8746,6 +8789,12 @@ export type ScenarioResult = {
      * Allocations
      */
     allocations: Array<Allocation>;
+    /**
+     * Default Modes
+     *
+     * Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)
+     */
+    default_modes?: Array<CollectionMode>;
     /**
      * Depot
      */
@@ -9661,6 +9710,8 @@ export type TestModelRequest = {
 export type TextileBaseline = {
     /**
      * Capture Of Demand Pct
+     *
+     * total_t / estimated_demand_t, em % (estimativa)
      */
     capture_of_demand_pct: number;
     /**
@@ -9670,11 +9721,13 @@ export type TextileBaseline = {
     /**
      * Estimated Demand T
      *
-     * Estimativa do plano municipal: 0,7 kg/hab/mês
+     * Estimativa do têxtil gerado: o que vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + total_t
      */
     estimated_demand_t: number;
     /**
      * Gap T
+     *
+     * Têxtil que ainda vai para o lixo, por desviar (estimativa)
      */
     gap_t: number;
     /**

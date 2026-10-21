@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from datetime import date
 from typing import Literal
 
+from novelo.domain.demand import kg_per_inhab_month, share_of_tonnes_t
+
 Evidence = Literal["dado_vitrus", "primary", "secondary", "unverified"]
 ReferenceScope = Literal["municipality", "region", "country", "eu"]
 WhoPays = Literal["municipality", "producers"]
@@ -75,10 +77,18 @@ EXTERNAL_REFERENCES: tuple[ExternalReference, ...] = (
     ),
 )
 
-# Potencial do plano municipal: 0,7 kg/hab/mês (fonte pública: Plano de Ação Integrado para a
-# Circularidade Têxtil de Guimarães, URBACT, 25/11/2025).
+# Base do têxtil por desviar do lixo: o único sítio da API com estes números (o ETL tem o seu em
+# scripts/etl/textile_base.py). Fonte: Vitrus, email do mentor de 21 out 2026: em 2025 a Vitrus recolheu 43 051 t de
+# RSU e, pela estatística da APA, 5,4% do RSU é têxtil. O recolhido à parte (301,3 t em 2025) fica fora do RSU.
+VITRUS_RSU_2025_T = 43_051
+APA_TEXTILE_SHARE_OF_RSU = 0.054
+POPULATION_INE_2021 = 156_830  # Censos 2021 (INE), soma das 48 freguesias
+TEXTILE_IN_RSU_T = share_of_tonnes_t(VITRUS_RSU_2025_T, APA_TEXTILE_SHARE_OF_RSU)  # 2 324,754 t/ano, estimativa
+KG_PER_INHAB_MONTH = kg_per_inhab_month(TEXTILE_IN_RSU_T, POPULATION_INE_2021)  # 1,2353 kg/hab/mês, estimativa
+POTENTIAL_SOURCE_LABEL = "Vitrus (43 051 t de RSU recolhidas em 2025) e APA (5,4% de têxtil no RSU)"
+
+# Leitura alternativa, NÃO usada pela Vitrus (o mentor não conhece o plano): só na triangulação da validação.
 PLAN_KG_PER_INHAB_MONTH = 0.7
-PLAN_SOURCE_LABEL = "Plano de Ação Integrado para a Circularidade Têxtil de Guimarães (URBACT, 25/11/2025)"
 FRANCE_KEY = "france_2024"
 
 

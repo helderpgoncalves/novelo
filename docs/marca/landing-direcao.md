@@ -87,7 +87,7 @@ Fundo alterna Linho (claro) → faixa dither suave → Linho; **uma** secção e
 | --- | --- | --- | --- | --- |
 | 1 | Hero | Linho + hero dither | Narrativa acima | Altura `min-height: 100svh`, texto à esquerda |
 | 2 | Números | Linho | Quatro números em Newsreader 500 tabulares, etiqueta mono, fonte | Os mesmos de hoje (`Proof`) |
-| 3 | Problema | Linho | Parágrafo-manifesto de 3 frases, número grande «22,9%» (captura atual) | `text-wrap: balance` |
+| 3 | Problema | Linho | Parágrafo-manifesto de 3 frases, número grande «11,5%» (captura atual, estimativa: 301,3 t de 2 626,0 t geradas) | `text-wrap: balance` |
 | 4 | Como funciona | foto «fábrica» (cartão) | 3 passos numerados 01, 02, 03 (mono): orçamento e meta; cenários; decisão | Símbolo em pontos como marcador |
 | 5 | Produto | Linho | Captura real do simulador (claro e escuro, WebP/AVIF) em moldura simples | Sem *mockup* de aparelho |
 | 6 | Funcionalidades | Linho | Grelha 2×3, título serif curto + uma linha | Sem ícones genéricos |
@@ -240,7 +240,7 @@ Componente: `apps/web/src/components/photos.tsx` (`HeroPicture`); CSS: bloco «H
   fotografia 16:10 a toda a largura, texto à esquerda sobre o céu, cartão com o número no canto da floresta (só ≥ 1024 px e até 2:1);
   *empilhado* (telemóvel e tablet de pé): fotografia 4:5 com o campanário da Penha logo abaixo da barra, texto na metade de baixo (polegar), véu curto (5,5 rem)
   só atrás do texto, pico e encostas vivos.
-- Primeiro ecrã em telemóvel: barra, pico, eyebrow, título (≤ 4 linhas, itálico verde), subtítulo curto (`landing_lead_short`), um botão primário («Ver a demo ao vivo»), ligações discretas («Criar conta», «Ver o código») e a linha de prova (301,3 t, 22,9% estimativa). Cabe em 375 × 667.
+- Primeiro ecrã em telemóvel: barra, pico, eyebrow, título (≤ 4 linhas, itálico verde), subtítulo curto (`landing_lead_short`), um botão primário («Ver a demo ao vivo»), ligações discretas («Criar conta», «Ver o código») e a linha de prova (301,3 t, 11,5% estimativa). Cabe em 375 × 667.
 - LCP: `fetchpriority="high"`, sem lazy, cor do céu como fundo, `preload` por `prefers-color-scheme` e media (campo `preload` do `manifest.json`).
 - Escuro: véu à esquerda no ecrã largo (texto claro sobre o flanco dourado); claro: só em ecrãs menos largos que 17:10.
 - Sem parallax, sem véu de pontos, sem canvas: a fotografia só tem o fade de chegada e o texto só o escalonamento do que está sob o título.

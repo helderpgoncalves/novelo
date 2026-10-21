@@ -20,7 +20,7 @@ Consultado a 19 de outubro de 2026. Fontes em [Fontes](fontes.md).
 1. A Sasia diz-se "relativamente preparada" para o aumento de volume, mas "o grande volume de pós-consumo não chegará de imediato", e as câmaras é que triam: **o trabalho da empresa só muda na fase de reciclagem** [F23].
 2. O Wippytex admite: "não sabemos se vamos conseguir reciclar toda esta quantidade de têxtil" [F23].
 
-**Cálculo nosso, para dimensionar:** 2 000 t por mês são 24 000 t por ano. O potencial anual do plano municipal de Guimarães (≈ 1 317 t) é **cerca de 5,5%** dessa capacidade. A capacidade não é o gargalo; é a **qualidade e a homogeneidade** do que chega.
+**Cálculo nosso, para dimensionar:** 2 000 t por mês são 24 000 t por ano. O têxtil que Guimarães ainda deita ao lixo (≈ 2 324,8 t por ano, 43 051 t de RSU × 5,4%, estimativa) é **cerca de 9,7%** dessa capacidade (2 324,8 ÷ 24 000). A capacidade não é o gargalo; é a **qualidade e a homogeneidade** do que chega. E a Vitrus diz que reciclar custa muito mais que a fibra virgem (21 out 2026): o valor está na reutilização.
 
 **Limite técnico da reciclagem mecânica:** uma fonte de recicladores refere que só entram cerca de 15 a 20% de fibra reciclada num fio sem perda de qualidade [F36]. Por isso os lotes de uma só fibra valem mais.
 
@@ -51,9 +51,9 @@ A [Fibrenamics](https://fibrenamics.com) [F41] é o centro de inovação em mate
 | Têxtil recolhido por 4 entidades em 2025 | 301,3 t | Dados da Vitrus | Dado Vitrus |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Dados da Vitrus | Dado Vitrus |
 | Só 4 de 27 operadores licenciados na zona valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** com a Vitrus; fonte pública: Plano de Ação Integrado (URBACT), p. 32 [F74] |
-| Têxtil no indiferenciado | 5,4% | Plano municipal | **Por verificar**: documentos públicos da câmara citam cerca de 5%, e uma declaração do diretor de ambiente fala em cerca de 11% da composição física, o que pode ser outra métrica |
+| Têxtil no RSU | 5,4% | APA, indicado pela Vitrus (21 out 2026) | Dado Vitrus. Aplica-se às 43 051 t de RSU de 2025. Uma declaração do diretor de ambiente fala em cerca de 11% da composição física, o que pode ser outra métrica |
 | Preço a que a Vitrus vende cada fração | n/d | Perguntar | Por obter |
-| Custos de recolha, quilómetro e contentor | n/d | Perguntar | Por obter |
+| Custos de recolha, quilómetro e contentor | n/d | Pedidos ao departamento financeiro da Vitrus (21 out) | Por obter |
 
 ## Segunda mão e economia social
 
@@ -66,7 +66,7 @@ A [Fibrenamics](https://fibrenamics.com) [F41] é o centro de inovação em mate
 | Guimarães, escolas | Cerca de 3 t recolhidas em mais de 30 escolas, com a Vitrus, o município e o Laboratório da Paisagem; o material segue para a To Be Green | Mais Guimarães, Guimarães Digital [F19] | Verificado (secundária) |
 | Mercado de segunda mão, preço por tonelada | Fardos de grau A do Reino Unido a 300 a 700 USD por tonelada em listagens de fornecedores | Global Sources (pesquisa) | Por verificar, não usar |
 
-**Leitura:** a recolha em contentores de rua tem sinais de saturação e de problemas de gestão (Sintra, Humana). Isso apoia a tese do Novelo: **mais contentores não é a resposta**; é preciso pôr cada recurso onde compensa e provar o custo.
+**Leitura:** a recolha em contentores de rua tem sinais de saturação e de problemas de gestão (Sintra, Humana), e a Vitrus não quer contentores de têxtil porque o que lá entra vem contaminado (21 out 2026). Isso apoia a tese do Novelo: **mais contentores não é a resposta**; é preciso pôr cada recurso onde compensa e provar o custo.
 
 Também vale perceber a posição das entidades de economia social, que o artigo 22.º-C da diretiva protege: têm direito a manter pontos de recolha próprios e a tratamento preferencial. Devem ser **parceiros** na rede de Guimarães, não concorrentes. O Novelo pode representar um parceiro social como um modo de recolha adicional com os seus próprios pontos.
 
@@ -82,7 +82,7 @@ Também vale perceber a posição das entidades de economia social, que o artigo
 | 6 | **CITEVE** | Parecer sobre o passaporte do lote e a classificação por fibra; ligação ao RegioGreenTex | Validação técnica e rede |
 | 7 | **Humana** ou outra entidade de economia social | Como se articula com um novo ponto de recolha; dados de triagem | Parceiro e dados reais |
 | 8 | **Wippytex** | Como trabalham com 30 municípios; o que pedem às câmaras | Boa prática |
-| 9 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil (fonte pública já localizada, [F74]); confirmar o que mede o 0,7 kg e o ano da caracterização de onde vêm os 5,4% (Q6) | Fonte do plano e legitimidade |
+| 9 | **Município de Guimarães / Let's Go Circular** | Plano de ação de circularidade têxtil ([F74], contexto público; a Vitrus não o usa e o modelo também não, desde 21 out) | Legitimidade e articulação com o município |
 | 10 | **Resinorte** | Gestão de ecopontos; articulação com a Vitrus | Rede existente |
 | 11 | **To Be Green** | Destino atual do têxtil das escolas | Caso local |
 
@@ -92,6 +92,6 @@ Guião de perguntas por interlocutor: [Estratégia para ganhar](../projeto/mento
 
 - **Ecopontos:** cerca de 300 novos até maio de 2026 (296), o que desce o rácio de 220 para cerca de 150 habitantes por ecoponto, com a Vitrus, a Resinorte e o município. **Os têxteis não são mencionados** [F16]. A gestão dos ecopontos é da Resinorte e o município só valida os locais [F17].
 - **PAYT:** Guimarães foi o primeiro e único município do país a aplicar a tarifação por quantidade de resíduos a toda a população [F17].
-- **Plano de circularidade:** o projeto URBACT "Let's Go Circular" e o "Circular Ecosystems" preparam um plano de ação para a circularidade têxtil de Guimarães, com a Vitrus entre os participantes [F18]. Não foi possível confirmar se o plano já foi publicado.
+- **Plano de circularidade:** o projeto URBACT "Let's Go Circular" e o "Circular Ecosystems" preparam um plano de ação para a circularidade têxtil de Guimarães, com a Vitrus entre os participantes [F18]. O plano foi publicado a 25/11/2025 ([F74]); a Vitrus diz não o conhecer (21 out 2026) e os números do modelo vêm da Vitrus e da APA.
 - **Meta nacional:** o PAPERSU 2030 refere um aumento gradual até 65% em peso em 2035, dos quais pelo menos 15% de preparação para reutilização de têxteis, EEE, móveis e outros [F17].
 - **Capital Verde Europeia 2026:** Guimarães tem visibilidade e interesse em casos exemplares [F16].

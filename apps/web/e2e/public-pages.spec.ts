@@ -9,7 +9,7 @@ test.describe('páginas públicas (sem sessão)', () => {
     await expect(page).toHaveURL(/\/pt\/?$/);
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Novelo');
     await expect(page.getByText('301,3 t')).toBeVisible();
-    await expect(page.getByText('22,9%')).toBeVisible();
+    await expect(page.getByText('11,5%')).toBeVisible();
     await expect(page.getByText('1,92 vs 4,27')).toBeVisible();
     await expect(page.getByText('estimativa', { exact: true }).first()).toBeVisible();
     await expect(page.getByRole('link', { name: 'Criar conta' })).toBeVisible();

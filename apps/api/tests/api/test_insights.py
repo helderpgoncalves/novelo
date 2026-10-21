@@ -118,8 +118,9 @@ async def test_benchmarks_expose_assumptions_source_and_consequences(api: httpx.
     assert "verificar" in b["source"] and "Refashion" in b["source"]
     assert b["population"] == 156_830  # Censos 2021, INE
     assert b["target_tonnes"] == pytest.approx(156_830 * 4.27 / 1000, abs=0.1)
-    assert b["implied_capture_pct"] == pytest.approx(4.27 / 8.4 * 100, abs=0.1)  # 50,8% do potencial
-    assert b["observed_capture_pct"] == pytest.approx(22.9, abs=0.1)
+    # 4,27 ÷ 14,8234 (têxtil no lixo por habitante e ano, 43 051 t × 5,4% ÷ 156 830) = 28,8%
+    assert b["implied_capture_pct"] == pytest.approx(28.8, abs=0.05)
+    assert b["observed_capture_pct"] == pytest.approx(11.5, abs=0.05)  # 301,27 ÷ 2 626,0
     assert b["observed_kg_per_inhab_year"] == pytest.approx(301.3 * 1000 / 156_830, abs=0.05)  # ~1,92 kg/hab/ano
     assert b["current_people_per_point"] == 1500
     assert b["reachable"] == (b["target_tonnes"] <= b["max_capturable_t"])
@@ -137,6 +138,7 @@ async def test_benchmark_scenario_reuses_create_scenario(api: httpx.AsyncClient)
     assert s["params"]["modes"]["existing"]["people_per_point"] == 4000  # os outros modos não mudam
     assert s["target_tonnes"] == pytest.approx(b["target_tonnes"])
     assert s["result"]["kpis"]["annual_cost_eur"] <= 90_000 * 1.02
+    assert s["result"]["default_modes"] == ["existing", "street", "on_demand"]  # rua só aqui, como referência
 
     by_target = (await api.post(f"{P}/benchmarks/french_performance/scenario", json={"label": "Meta FR"})).json()
     assert by_target["objective"] == "min_cost"
@@ -153,7 +155,7 @@ async def test_pilot_recommends_two_parishes_with_numbers_from_the_data(api: htt
     assert resp.status_code == 200
     out = resp.json()
     assert out["k"] == 2 and out["months"] == 3 and len(out["zones"]) == 2
-    assert out["modes"] == ["street", "on_demand"] and out["estimate"] is True
+    assert out["modes"] == ["existing", "on_demand"] and out["estimate"] is True  # sem contentores de têxtil
 
     for z in out["zones"]:
         facts = {f["key"]: f for f in z["facts"]}

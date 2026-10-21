@@ -28,14 +28,13 @@ if TYPE_CHECKING:
     from novelo.features.copilot.tools import CopilotTools
 
 ORIGIN = {
-    "plan": "Plano de Ação para a Circularidade Têxtil de Guimarães",
-    "vitrus_data": "Calibrado com dados reais da Vitrus",
+    "vitrus_data": "Dados reais da Vitrus (com a APA para o têxtil no RSU)",
     "assumption": "Pressuposto da equipa, a validar com a Vitrus (estimativa)",
 }
 
 
 class AssumptionsArgs(_A):
-    source: Literal["plan", "vitrus_data", "assumption"] | None = Field(
+    source: Literal["vitrus_data", "assumption"] | None = Field(
         default=None, description="Filtrar pela origem do pressuposto"
     )
 
@@ -93,12 +92,12 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
         ("origin", "Fonte", "text", None),
         ("key", "Chave", "text", None),
     ]
-    by_source = {s: sum(1 for r in rows if r["source"] == s) for s in ("plan", "vitrus_data", "assumption")}
+    by_source = {s: sum(1 for r in rows if r["source"] == s) for s in ("vitrus_data", "assumption")}
     return {
         "version": params.version,
         "count": len(rows),
         "count_by_source": by_source,
-        "note": "assumption = estimate to validate with Vitrus; vitrus_data = calibrated with real data",
+        "note": "assumption = estimate to validate with Vitrus; vitrus_data = from Vitrus real data (and APA)",
         "table": make_table(
             "Pressupostos do simulador", "Parâmetros ativos (versão guardada)", cols, rows, estimate=True
         ),

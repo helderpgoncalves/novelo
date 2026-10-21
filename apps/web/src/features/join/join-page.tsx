@@ -19,6 +19,7 @@ import {
   storeLastEmail,
 } from '@/features/auth/passwordless';
 import { HoneypotField, readHoneypot, useTurnstile } from '@/features/auth/use-turnstile';
+import { CAPTURE_PCT, COLLECTED_T, RESIDUAL_T } from '@/features/landing/numbers';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatPercent, formatTonnes } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
@@ -40,12 +41,12 @@ const rise = (i: number): { className: string; style: CSSProperties } => ({
   style: { '--i': i } as CSSProperties,
 });
 
-// Números reais da Vitrus (docs/dados): 301,3 t recolhidas em 2025, captura ≈ 22,9 %, potencial ≈ 1 317 t/ano.
+// Números da Vitrus (recolhido em 2025) e estimativa Vitrus + APA (têxtil que ainda vai para o lixo), de uma só fonte.
 function Stats() {
   const items = [
-    [formatTonnes(301.3), m.join_stat_collected()],
-    [formatPercent(22.9), m.join_stat_capture()],
-    [`≈ ${formatTonnes(1317, 0)}`, m.join_stat_potential()],
+    [formatTonnes(COLLECTED_T), m.join_stat_collected()],
+    [formatPercent(CAPTURE_PCT), m.join_stat_capture()],
+    [`≈ ${formatTonnes(RESIDUAL_T, 0)}`, m.join_stat_potential()],
   ] as const;
   return (
     <dl

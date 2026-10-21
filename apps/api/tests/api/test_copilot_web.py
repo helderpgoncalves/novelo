@@ -137,7 +137,7 @@ async def test_queries_with_personal_data_or_novelo_figures_are_blocked(
     llm.queue_rounds(
         {"tools": [("web_search", {"query": "ana@vitrus.pt recolha têxtil"})]},
         {"tools": [("get_baseline", {})]},
-        {"tools": [("web_search", {"query": "captura 22,9 por cento têxtil comparação"})]},
+        {"tools": [("web_search", {"query": "captura 11,5 por cento têxtil comparação"})]},
         {"text": ["Não pesquisei na web."]},
     )
     events = await stream(logged_in, S, body("Compara com outras cidades"))

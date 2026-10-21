@@ -39,7 +39,7 @@ function MapPanel({
   onSelect: (code: string | null) => void;
   fallbackCode: string | null;
 }) {
-  const { gap, parishes } = overview;
+  const { parishes } = overview;
   const { data: caop } = useSuspenseQuery(getCaopParishesGeojsonOptions());
   const model = useMemo(() => buildMapModel(caop.features), [caop]);
   const municipalContainers = useMemo(
@@ -55,11 +55,10 @@ function MapPanel({
     () =>
       layerValues(layer, {
         parishes,
-        capturePct: gap.capture_pct,
         areaKm2,
         municipalContainers,
       }),
-    [layer, parishes, gap.capture_pct, areaKm2, municipalContainers],
+    [layer, parishes, areaKm2, municipalContainers],
   );
   return (
     <DecisionMap
@@ -77,7 +76,7 @@ function MapPanel({
 }
 
 /**
- * O mapa, a lista das freguesias com mais potencial por captar (a mesma informação para quem lê melhor em lista), o
+ * O mapa, a lista das freguesias com mais têxtil por desviar (a mesma informação para quem lê melhor em lista), o
  * detalhe da freguesia escolhida e o orçamento. Em telemóvel: mapa, orçamento, lista; o detalhe abre numa folha.
  */
 export function Territory({
@@ -90,14 +89,11 @@ export function Territory({
   coveredNote,
   budget,
 }: TerritoryProps) {
-  const { gap, parishes } = overview;
+  const { parishes } = overview;
   const wide = useMediaQuery('(min-width: 1024px)');
   // Mesmo pedido que o mapa (a cache junta-os): aqui só serve para contar contentores municipais no detalhe.
   const caop = useQuery(getCaopParishesGeojsonOptions());
-  const rows = useMemo(
-    () => sortByGap(topRows(parishes, gap.capture_pct)),
-    [parishes, gap.capture_pct],
-  );
+  const rows = useMemo(() => sortByGap(topRows(parishes)), [parishes]);
   const byCode = useMemo(() => new Map(rows.map((r) => [r.parish.code, r])), [rows]);
   const caopProps = useMemo(
     () => new Map((caop.data?.features ?? []).map((f) => [f.properties.dicofre, f.properties])),

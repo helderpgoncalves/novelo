@@ -13,11 +13,11 @@ Os projetos são avaliados por quatro critérios ponderados: **inovação e orig
 | # | Tempo | Slide | Critério | O que se diz |
 | --- | --- | --- | --- | --- |
 | 1 | 0:00 a 0:20 | Capa Novelo | Apresentação | "Na Europa, cerca de 72% dos têxteis descartados vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro, ao menor custo." |
-| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar. (O 5,4% de têxtil no indiferenciado só se diz com a fonte, o Plano URBACT p. 30, e a ressalva de que falta a Vitrus confirmar o âmbito: A10, Q6.) |
+| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025 e sem entidade gestora; em abril de 2028 os produtores passam a pagar. Em 2025 a Vitrus recolheu 43 051 t de resíduos urbanos; 5,4% é têxtil (APA): cerca de 2 324,8 t por ano ainda no lixo, captura de 11,5% (estimativa; A8 a A10, A16). |
 | 3 | 0:45 a 1:00 | A referência | Impacto | Guimarães recolhe 1,9 kg por habitante, a França 4,27. "Respondemos com números, não com contentores." |
 | 4 | 1:00 a 3:00 | **Demo ao vivo** | Viabilidade, impacto e inovação (40 s cada) | Cenários A e B; um jurado faz uma pergunta "E se...?"; uma peça real vai do saco ao lote com QR; relatório RAP num clique. Guião detalhado em [Demo e entrega](../engenharia/demo-e-entrega.md) e [roteiro](narrativa-do-pitch.md#roteiro-da-demo). |
 | 5 | 3:00 a 3:30 | Como funciona | Viabilidade | O diagrama do saco ao fio, e a regra de ouro: a IA conduz o otimizador, nunca inventa números. Sem IA, o resto funciona. |
-| 6 | 3:30 a 3:55 | Do saco ao fio | Inovação | Lotes com passaporte e bolsa de fibra: a indústria tem capacidade, faltam lotes limpos. |
+| 6 | 3:30 a 3:55 | Do saco ao fio | Inovação | Controlo de qualidade na entrega e lotes com passaporte: o valor está na reutilização (têxtil limpo e seco), porque reciclar custa mais que a fibra virgem (Vitrus). A bolsa de fibra fica em segundo plano. |
 | 7 | 3:55 a 4:20 | 2028 | Impacto | Quem paga hoje (o município) e em 2028 (os produtores, só o custo eficiente); replicável com dados abertos. |
 | 8 | 4:20 a 5:00 | Fecho e pedido | Continuidade | A frase-âncora com os números do cenário escolhido; o pedido: um piloto de 3 meses em duas freguesias; replicabilidade e roadmap depois de 26 de outubro. |
 | 9 | fora do tempo | Apoio | Os quatro | [Checklist critério e prova](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova), para as perguntas. |

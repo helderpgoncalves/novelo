@@ -13,7 +13,7 @@ import { ScenarioMap } from '@/features/scenarios/scenario-map';
 import { SitesTable } from '@/features/scenarios/sites-table';
 import { SitingOverview } from '@/features/scenarios/siting-overview';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
-import { modeLabel } from '@/lib/scenario';
+import { ALL_MODES, modeLabel } from '@/lib/scenario';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { allocationsToCsv, downloadCsv } from './export-csv';
@@ -266,6 +266,11 @@ function Why({ scenario }: { scenario: ScenarioOut }) {
           {m.simx_why_title()}
         </h3>
         <p className="text-muted-foreground text-sm">{m.simx_why_text()}</p>
+        <p className="text-muted-foreground text-xs">
+          {m.simx_allowed_modes({
+            modes: (result.default_modes ?? ALL_MODES).map((mode) => modeLabel[mode]()).join(' · '),
+          })}
+        </p>
       </div>
       {reasons.length > 0 && (
         <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed marker:text-primary">

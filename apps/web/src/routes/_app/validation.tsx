@@ -37,6 +37,8 @@ function Validation() {
   if (error || !data) return <ErrorState error={error} onRetry={() => void refetch()} />;
 
   const captures = data.readings.map((r) => r.implied_capture_pct);
+  // A leitura principal (Vitrus + APA); as outras só triangulam.
+  const base = data.readings.find((r) => r.is_model_base);
   const all = data.spatial.find((c) => c.kind === 'all');
   const underground = data.spatial.find((c) => c.kind === 'underground');
   const surface = data.spatial.find((c) => c.kind === 'surface');
@@ -58,8 +60,11 @@ function Validation() {
         />
         <StatCell
           label={m.validation_stat_capture()}
-          value={`${formatNumber(Math.min(...captures), 1)} a ${formatPercent(Math.max(...captures), 1)}`}
-          hint={m.validation_stat_capture_hint()}
+          value={formatPercent(base?.implied_capture_pct ?? Math.min(...captures), 1)}
+          hint={m.validation_stat_capture_hint({
+            min: formatNumber(Math.min(...captures), 1),
+            max: formatPercent(Math.max(...captures), 1),
+          })}
           tag={m.common_estimate()}
           tone="primary"
         />

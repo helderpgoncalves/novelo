@@ -460,8 +460,8 @@ async def test_textile_candidates_filters_keep_the_global_rank(operator: httpx.A
 async def test_gap_ranking_states_the_rule_and_is_an_estimate(operator: httpx.AsyncClient) -> None:
     body = (await operator.get(f"{M}/gap-ranking")).json()
     assert body["is_estimate"] is True and "Estimativa" in body["rule"] and "captura atual" in body["rule"]
-    assert body["parameters"] == {"kg_per_inhab_month": 0.7, "capture_pct": 25.0, "months_per_year": 12}
-    # Azurém 18,9/1; Lordelo 3,276/max(1,0) = 3,28; Aldão 6,3/2 = 3,15
+    assert body["parameters"] == {"kg_per_inhab_month": 0.525, "capture_pct": 25.0, "months_per_year": 12}
+    # lacuna = hab × 0,525 × 12 / 1000: Azurém 18,9/1; Lordelo 3,276/max(1,0) = 3,28; Aldão 6,3/2 = 3,15
     assert [(r["rank"], r["name"], r["gap_t_per_candidate_site"]) for r in body["items"]] == [
         (1, "Azurém", 18.9), (2, "Lordelo", 3.28), (3, "Aldão", 3.15),
     ]  # fmt: skip
