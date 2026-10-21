@@ -7,7 +7,8 @@ import { storage } from '@/features/auth/passwordless';
  * a pessoa ficou, para retomar. O pedido de abertura e o passo atual vivem aqui para sobreviverem à navegação.
  */
 const seenKey = (userId: string) => `novelo.tour.seen.${userId}`;
-const progressKey = (userId: string) => `novelo.tour.progress.${userId}`;
+// `story`: a apresentação de seis passos (o progresso da visita antiga, com outros passos, não se retoma).
+const progressKey = (userId: string) => `novelo.story.progress.${userId}`;
 const PENDING_KEY = 'novelo.tour.pending';
 
 export const hasSeenTour = (userId: string): boolean => storage.read(seenKey(userId)) === '1';
@@ -55,8 +56,12 @@ export interface AutoOpenUser {
   impersonation?: { active?: boolean } | null;
 }
 
-/** Contas que chegam de um convite, QR ou link por email veem a introdução mesmo sem o sinal de registo. */
-const ARRIVED_VIA = new Set(['quick_join', 'invited', 'magic_link']);
+/**
+ * Contas que chegam de um convite, QR, link por email ou Google (com o registo aberto entram logo) veem a introdução mesmo
+ * sem o sinal de registo. A palavra-passe não: as contas dos testes e do administrador semeado entram assim e nunca a veem
+ * sozinhas (um teste pede-a com o sinal de registo, ver `markTourPending`).
+ */
+const ARRIVED_VIA = new Set(['quick_join', 'invited', 'magic_link', 'google']);
 
 /**
  * Abre sozinha à primeira utilização: ainda não vista no servidor (nem no cache local) e a conta é nova

@@ -126,13 +126,13 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Triagem, lotes, bolsa, marcas | `/triage`, `/lots`, `/market`, `/brands` | Funcionalidades 2 e 5 |
 | Relatório RAP | `/reports` | Funcionalidade 3 |
 | Copiloto | `/chat` | Funcionalidade 6 |
-| Utilizadores | `/users` | Contas, convidados do evento (entrada por QR) e cartaz do QR para imprimir. **Registo aberto** (`open_registration`, `GET/PATCH /admin/settings`): quem se regista ou entra com a conta por aprovar fica logo aprovado (para o júri), com auditoria; opção de aprovar já os pendentes; nunca contas ou emails recusados. Só administradores |
+| Utilizadores | `/users` | Contas, convidados do evento (entrada por QR) e cartaz do QR para imprimir. **Registo aberto** (`open_registration`, `GET/PATCH /admin/settings`): quem se regista ou entra com a conta por aprovar fica logo aprovado (para o júri), com auditoria; opção de aprovar já os pendentes; nunca contas ou emails recusados. Cartão no topo de `/users` com confirmação ao ligar; o registo e a entrada dizem «Entras logo, sem esperar aprovação» quando está aberto. Só administradores |
 | IA | `/admin/ai` | Modelo e limites por tarefa, orçamento, custos e avaliação da triagem. Só administradores |
 | Conta | `/account` | Perfil, língua, tema, sessões, password |
 | Entrada | `/login`, `/join`, `/magic-link`, `/verify-email`, `/privacy` | Magic link (principal), password, Google, entrada de evento por QR, confirmação de email e texto de privacidade |
 | Passaporte | `/passport/:código` | Público, sem sessão: o que o QR do lote abre |
 
-**Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, visita guiada na primeira entrada, `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
+**Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, apresentação de seis passos na primeira entrada (o impacto com os números da API), `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
 
 ## Estado de implementação
 

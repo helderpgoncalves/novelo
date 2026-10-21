@@ -26,7 +26,7 @@ test.describe('idioma e tema', () => {
   }) => {
     await page.goto('/en/login?method=password');
     await page.getByLabel('Email').fill('admin@heldergoncalves.io');
-    await page.getByLabel('Password', { exact: true }).fill('wrong-password-1');
+    await page.getByLabel('Palavra-passe', { exact: true }).fill('wrong-password-1');
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page.getByRole('alert')).toContainText('Wrong email or password.');
   });

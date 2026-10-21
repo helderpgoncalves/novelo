@@ -10,6 +10,7 @@ type Msg = () => string;
 
 const ACTION_LABELS: Record<string, Msg> = {
   user_approve: () => m.audit_action_user_approve(),
+  user_auto_approve: () => m.audit_action_user_auto_approve(),
   user_reject: () => m.audit_action_user_reject(),
   user_role_change: () => m.audit_action_user_role_change(),
   user_activate: () => m.audit_action_user_activate(),
@@ -22,6 +23,7 @@ const ACTION_LABELS: Record<string, Msg> = {
   impersonation_start: () => m.audit_action_impersonation_start(),
   impersonation_stop: () => m.audit_action_impersonation_stop(),
   impersonation_write: () => m.audit_action_impersonation_write(),
+  settings_update: () => m.audit_action_settings_update(),
 };
 
 /** Ações conhecidas, agrupadas como o filtro as mostra (o prefixo com ponto filtra o grupo todo). */
@@ -32,6 +34,7 @@ export const AUDIT_GROUPS: { prefix: string; label: Msg; all: Msg; actions: stri
     all: () => m.audit_prefix_user(),
     actions: [
       'user.approve',
+      'user.auto_approve',
       'user.reject',
       'user.role_change',
       'user.activate',
@@ -50,6 +53,12 @@ export const AUDIT_GROUPS: { prefix: string; label: Msg; all: Msg; actions: stri
     label: () => m.audit_group_impersonation(),
     all: () => m.audit_prefix_impersonation(),
     actions: ['impersonation.start', 'impersonation.stop', 'impersonation.write'],
+  },
+  {
+    prefix: 'settings.',
+    label: () => m.audit_group_settings(),
+    all: () => m.audit_prefix_settings(),
+    actions: ['settings.update'],
   },
 ];
 
@@ -75,6 +84,9 @@ const DETAIL_LABELS: Record<string, Msg> = {
   had_password: () => m.audit_detail_had_password(),
   google_linked: () => m.audit_detail_google_linked(),
   with_password: () => m.audit_detail_with_password(),
+  approve_pending: () => m.audit_detail_approve_pending(),
+  via: () => m.audit_detail_via(),
+  note: () => m.audit_detail_note(),
 };
 
 const ROLES = new Set(['admin', 'operator', 'guest']);
@@ -84,7 +96,9 @@ function detailValue(key: string, value: string | number | boolean): string {
   if (typeof value === 'number') return String(value);
   if (['role', 'from', 'to', 'target_role'].includes(key) && ROLES.has(value))
     return roleLabel(value as Role);
-  if (key === 'joined_via') return originLabel(value as Parameters<typeof originLabel>[0]);
+  if (key === 'via' && value === 'bulk') return m.audit_via_bulk();
+  if (key === 'joined_via' || key === 'via')
+    return originLabel(value as Parameters<typeof originLabel>[0]);
   if (key === 'locale' && value in LOCALE_LABELS) return LOCALE_LABELS[value as Locale];
   if (key === 'expires_at' && !Number.isNaN(Date.parse(value))) return formatDateTime(value);
   return value;
@@ -114,6 +128,15 @@ export function auditSummary(entry: AuditEntryOut): string {
   if (entry.action === 'user.role_change' && str('from') && str('to')) {
     return `${detailValue('from', str('from') ?? '')} → ${detailValue('to', str('to') ?? '')}`;
   }
+  if (entry.action === 'settings.update') {
+    const change = d.open_registration as { from?: unknown; to?: unknown } | undefined;
+    if (typeof change?.from === 'boolean' && typeof change.to === 'boolean') {
+      const state = (on: boolean) => (on ? m.open_reg_on() : m.open_reg_off());
+      return m.audit_summary_open_registration({ from: state(change.from), to: state(change.to) });
+    }
+  }
+  if (entry.action === 'user.auto_approve' && str('role'))
+    return detailValue('role', str('role') ?? '');
   if (entry.action === 'user.approve' && str('role')) return detailValue('role', str('role') ?? '');
   if (entry.action.startsWith('invitation.') && str('role'))
     return detailValue('role', str('role') ?? '');

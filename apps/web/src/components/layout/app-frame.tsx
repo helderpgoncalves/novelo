@@ -9,7 +9,7 @@ import { PullToRefresh } from '@/components/pull-to-refresh';
 import { RouteSkeleton } from '@/components/skeletons';
 import { VerifyEmailBanner } from '@/features/auth/verify-email-banner';
 import { ImpersonationBanner } from '@/features/impersonation/impersonation-banner';
-import { OnboardingTour } from '@/features/onboarding/onboarding-tour';
+import { OnboardingGate } from '@/features/onboarding/onboarding-gate';
 import { StarterChecklist } from '@/features/onboarding/starter-checklist';
 import { EmailAlertsBanner } from '@/features/users/email-alerts-banner';
 import { useKeyboardOpen } from '@/hooks/use-keyboard-open';
@@ -58,8 +58,9 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
           <main
             id="content"
             ref={mainRef}
+            tabIndex={-1}
             className={cn(
-              'flex-1',
+              'flex-1 outline-none',
               fullBleed
                 ? 'flex min-h-0 flex-col overflow-hidden'
                 : 'overflow-y-auto overscroll-y-contain',
@@ -75,7 +76,7 @@ export function AppFrame({ user, children }: { user: MeOut; children?: ReactNode
           </main>
           {showTabBar && <TabBar onMore={() => setMenuOpen(true)} />}
           <StarterChecklist user={user} />
-          <OnboardingTour user={user} />
+          <OnboardingGate user={user} />
         </div>
       </div>
     </div>

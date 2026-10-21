@@ -17,7 +17,7 @@ async function registerViaUi(page: import('@playwright/test').Page, email: strin
   await page.goto('/pt/register');
   await page.getByLabel('Nome').fill(name);
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
+  await page.getByLabel('Palavra-passe', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Criar conta' }).click();
   await expect(page).toHaveURL(/\/pt\/pending-approval/);
 }

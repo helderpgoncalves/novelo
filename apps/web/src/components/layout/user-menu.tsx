@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
-import { Download, Eye, LogOut, Route as RouteIcon, Star, UserRound } from 'lucide-react';
+import { Download, Eye, LogOut, Presentation, Star, UserRound } from 'lucide-react';
 import { useState } from 'react';
 import type { MeOut } from '@/client';
 import { logoutMutation } from '@/client/@tanstack/react-query.gen';
@@ -19,7 +19,7 @@ import {
 import { UserAvatar } from '@/components/user-chip';
 import { useEndImpersonation } from '@/features/impersonation/impersonation-banner';
 import { useImpersonation } from '@/features/impersonation/use-impersonation';
-import { stepsFor } from '@/features/onboarding/steps';
+import { STORY_TOTAL } from '@/features/onboarding/story-model';
 import { canResumeTour, openTour, readTourProgress } from '@/features/onboarding/tour-store';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { REPO_URL } from '@/lib/links';
@@ -106,20 +106,20 @@ export function UserMenu({ user }: { user: MeOut }) {
           <DropdownMenuItem onSelect={() => navigate({ to: '/account' })}>
             <UserRound /> {m.user_menu_account()}
           </DropdownMenuItem>
-          {/* Pequeno atraso: o menu devolve o foco ao botão ao fechar; só depois a introdução o toma. */}
-          {canResumeTour(user.id, stepsFor(user.role).length) && (
+          {/* Pequeno atraso: o menu devolve o foco ao botão ao fechar; só depois a apresentação o toma. */}
+          {canResumeTour(user.id, STORY_TOTAL) && (
             <DropdownMenuItem
               onSelect={() =>
                 window.setTimeout(() => openTour(readTourProgress(user.id)), TOUR_OPEN_DELAY_MS)
               }
             >
-              <RouteIcon /> {m.user_menu_tour_resume()}
+              <Presentation /> {m.user_menu_story_resume()}
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
             onSelect={() => window.setTimeout(() => openTour(0), TOUR_OPEN_DELAY_MS)}
           >
-            <RouteIcon /> {m.user_menu_tour()}
+            <Presentation /> {m.user_menu_story()}
           </DropdownMenuItem>
           {(canInstall || needsIosSteps) && (
             <DropdownMenuItem onSelect={canInstall ? () => void install() : () => setIosHelp(true)}>

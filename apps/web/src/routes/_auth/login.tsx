@@ -1,8 +1,11 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { KeyRound, Mail } from 'lucide-react';
 import { z } from 'zod';
-import { getAuthConfigOptions } from '@/client/@tanstack/react-query.gen';
+import {
+  getAuthConfigOptions,
+  getRegistrationInfoOptions,
+} from '@/client/@tanstack/react-query.gen';
 import { NoPending } from '@/components/app-loading';
 import { Button } from '@/components/ui/button';
 import {
@@ -59,13 +62,24 @@ function Login() {
   const { data: config } = useSuspenseQuery(getAuthConfigOptions());
   const usePassword = method === 'password' || !config.magic_link_enabled;
 
+  // Registo aberto: quem ainda não tem conta sabe que entra logo (sem esperar pela aprovação de um administrador).
+  const info = useQuery({ ...getRegistrationInfoOptions(), staleTime: 30_000 });
+  const openRegistration = info.data?.open ?? config.approval_required === false;
+
   const createAccount = config.registration_open && (
-    <AuthSwitch>
-      {m.login_no_account()}
-      <Link to="/register" search={{ next }} className={authLinkClass}>
-        {m.login_create_account()}
-      </Link>
-    </AuthSwitch>
+    <div className="space-y-2">
+      <AuthSwitch>
+        {m.login_no_account()}
+        <Link to="/register" search={{ next }} className={authLinkClass}>
+          {m.login_create_account()}
+        </Link>
+      </AuthSwitch>
+      {openRegistration && (
+        <p data-testid="login-open-notice" className="text-center text-muted-foreground text-sm">
+          {m.login_open_notice()}
+        </p>
+      )}
+    </div>
   );
 
   // Alternativas ao método principal. `methods` (divisor, Google e o outro método) entra no mesmo grupo de ação do
