@@ -1914,7 +1914,14 @@ body:has([data-landing]) {
 .lp-hs-deadline-days[data-ready='true'] {
   animation: lp-hs-fade 500ms ease-out both;
 }
-.lp-hs-deadline-copy {
+.lp-hs-eyebrow-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 1.5rem;
+}
+/* A versão compacta do prazo (data e dias) só existe no hero largo, ao lado do eyebrow. */
+.lp-hs-deadline-compact {
   display: none;
 }
 .lp-hs-after {
@@ -2341,9 +2348,10 @@ body:has([data-landing]) {
 @media (min-width: 640px) and (min-aspect-ratio: 6/5) {
   .lp-hs {
     --hs-r: max(calc(9.4vw + 2.5rem), calc(50svh - 22vw + 2.5rem));
-    --end-up: 4.25rem;
+    --end-up: clamp(4.25rem, 9rem - 4vw, 6rem);
     background-color: var(--hs-sky);
-    min-height: clamp(34rem, 100svh, 64rem);
+    /* Em janelas baixas o hero cresce o que for preciso para o texto nunca tocar no fio. */
+    min-height: max(clamp(34rem, 100svh, 64rem), calc(27vw + 21rem));
     padding-top: calc(var(--nav-h) + clamp(1rem, 6svh, 4rem));
     padding-bottom: 0;
   }
@@ -2398,13 +2406,14 @@ body:has([data-landing]) {
     );
   }
   .lp-hs-copy {
-    grid-column: 1 / 9;
+    grid-column: 1 / 11;
     gap: clamp(0.5rem, 1.8svh, 1.25rem);
   }
   .lp-hs-title {
     font-size: clamp(2.25rem, min(5.2vw, 9.4svh), 5.25rem);
   }
   .lp-hs-lead {
+    max-width: 44rem;
     font-size: clamp(1rem, min(1.3vw, 2.6svh), 1.25rem);
   }
   .lp-hs-ctas {
@@ -2413,8 +2422,16 @@ body:has([data-landing]) {
   .lp-hs-link {
     justify-content: flex-start;
   }
-  .lp-hs-deadline-copy {
+  .lp-hs-deadline-compact {
     display: block;
+    max-width: none;
+    white-space: nowrap;
+    text-shadow:
+      0 0 0.75rem var(--background),
+      0 0 0.25rem var(--background);
+  }
+  .lp-hs-deadline-compact .lp-hs-deadline-date {
+    font-weight: 600;
   }
   .lp-hs-after {
     display: none;
