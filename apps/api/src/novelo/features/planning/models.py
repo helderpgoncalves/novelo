@@ -33,6 +33,7 @@ class Scenario(Base, UuidPkMixin, TimestampMixin):
         enum_check("objective", ScenarioObjective),
         enum_check("status", ScenarioStatus),
         CheckConstraint("budget_eur_year IS NULL OR budget_eur_year >= 0", name="budget_non_negative"),
+        CheckConstraint("siting IN ('parish', 'sites')", name="siting"),
         Index("ix_scenarios_created_at", "created_at"),  # listas e home ordenam por data, mais recentes primeiro
     )
 
@@ -55,6 +56,8 @@ class Scenario(Base, UuidPkMixin, TimestampMixin):
     coverage_pct: Mapped[Decimal] = mapped_column(Numeric(5, 2))
     # Modos de recolha com pelo menos uma freguesia (derivado de `result.modes`): a home não abre o JSON todo.
     modes: Mapped[list[str]] = mapped_column(JSONB, default=list, server_default=text("'[]'::jsonb"))
+    # `parish`: por freguesia; `sites`: escolhe locais reais da rede municipal (derivado de `result.siting`).
+    siting: Mapped[str] = mapped_column(String(10), default="parish", server_default="parish")
     parent_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("scenarios.id", ondelete="SET NULL"), index=True
     )

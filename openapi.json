@@ -14529,6 +14529,15 @@
           "result": {
             "$ref": "#/components/schemas/ScenarioResult"
           },
+          "siting": {
+            "default": "parish",
+            "enum": [
+              "parish",
+              "sites"
+            ],
+            "title": "Siting",
+            "type": "string"
+          },
           "solver_status": {
             "enum": [
               "optimal",
@@ -14656,6 +14665,12 @@
             "$ref": "#/components/schemas/CollectionMode",
             "default": "existing",
             "description": "Pressupostos de captura e custo usados nos locais (`existing` ou `street`)"
+          },
+          "site_on_demand": {
+            "default": true,
+            "description": "Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)",
+            "title": "Site On Demand",
+            "type": "boolean"
           },
           "site_radius_m": {
             "default": 300,
@@ -14831,6 +14846,15 @@
               }
             ],
             "title": "Parent Id"
+          },
+          "siting": {
+            "default": "parish",
+            "enum": [
+              "parish",
+              "sites"
+            ],
+            "title": "Siting",
+            "type": "string"
           },
           "status": {
             "$ref": "#/components/schemas/ScenarioStatus"
@@ -15558,6 +15582,18 @@
           },
           "demand_points": {
             "title": "Demand Points",
+            "type": "integer"
+          },
+          "on_demand": {
+            "default": false,
+            "description": "A recolha a pedido podia completar a rede",
+            "title": "On Demand",
+            "type": "boolean"
+          },
+          "on_demand_zones": {
+            "default": 0,
+            "description": "Freguesias onde a recolha a pedido foi ligada",
+            "title": "On Demand Zones",
             "type": "integer"
           },
           "opened": {

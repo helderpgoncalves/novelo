@@ -20,7 +20,14 @@ async def operator(municipal: None, make_user: MakeUser) -> httpx.AsyncClient:
 
 
 async def run(operator: httpx.AsyncClient, **extra: Any) -> dict[str, Any]:
-    body = {"label": "Por locais", "objective": "max_tonnes", "budget_eur_year": 5000, "siting": "sites", **extra}
+    body = {
+        "label": "Por locais",
+        "objective": "max_tonnes",
+        "budget_eur_year": 5000,
+        "siting": "sites",
+        "site_on_demand": False,
+        **extra,
+    }
     resp = await operator.post(f"{P}/scenarios", json=body)
     assert resp.status_code == 201, resp.text
     return resp.json()  # type: ignore[no-any-return]
@@ -89,3 +96,25 @@ async def test_the_default_is_still_the_parish_model(operator: httpx.AsyncClient
     )
     assert resp.status_code == 201
     assert resp.json()["result"]["sites"] == [] and resp.json()["result"]["siting"] is None
+
+
+async def test_the_list_tells_site_scenarios_apart(operator: httpx.AsyncClient) -> None:
+    await run(operator)
+    listed = (await operator.get(f"{P}/scenarios")).json()
+    assert [s["siting"] for s in listed] == ["sites"]
+
+
+async def test_on_demand_completes_the_site_network(operator: httpx.AsyncClient) -> None:
+    sites_only = await run(operator)
+    hybrid = await run(operator, site_on_demand=True, budget_eur_year=20000, label="Locais e a pedido")
+    r = hybrid["result"]
+    assert r["siting"]["on_demand"] is True and r["siting"]["on_demand_zones"] > 0
+    # a recolha a pedido só acrescenta têxtil (os canais captam de forma independente) dentro do mesmo orçamento
+    assert hybrid["tonnes_year"] > sites_only["tonnes_year"]
+    assert hybrid["annual_cost_eur"] <= 20000
+    modes = {m["mode"] for m in r["modes"]}
+    assert modes == {"existing", "on_demand"}
+    alloc = {a["parish_code"]: a for a in r["allocations"]}
+    # Lordelo não tem local ao alcance, mas a recolha a pedido chega lá
+    assert alloc["030828"]["tonnes"] > 0 and alloc["030828"]["modes"] == ["on_demand"]
+    assert sum(a["tonnes"] for a in r["allocations"]) == pytest.approx(r["kpis"]["tonnes_year"], abs=0.01)

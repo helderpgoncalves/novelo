@@ -317,6 +317,7 @@ def _summary(row: Scenario) -> ScenarioSummary:
         annual_cost_eur=float(row.annual_cost_eur),
         eur_per_tonne=float(row.eur_per_tonne) if row.eur_per_tonne is not None else None,
         coverage_pct=float(row.coverage_pct),
+        siting="sites" if row.siting == "sites" else "parish",
         parent_id=row.parent_id,
         created_at=row.created_at,
     )
@@ -365,6 +366,7 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
         annual_cost_eur=Decimal(str(kpis.annual_cost_eur)),
         eur_per_tonne=Decimal(str(kpis.eur_per_tonne)) if kpis.eur_per_tonne is not None else None,
         coverage_pct=Decimal(str(kpis.coverage_pct)),
+        siting=request.siting,
         parent_id=request.parent_id,
         created_by_id=user.id,
     )

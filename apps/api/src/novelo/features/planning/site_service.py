@@ -10,7 +10,7 @@ from dataclasses import dataclass
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from novelo.domain import siting
+from novelo.domain import network, siting
 from novelo.domain.vocab import CollectionMode, SiteClass
 from novelo.features.municipal.models import MunicipalSite
 from novelo.features.planning.params import to_domain_params
@@ -90,53 +90,36 @@ async def load_site_inputs(db: AsyncSession) -> SiteInputs:
     return SiteInputs(demand, candidates, meta)
 
 
-def compute_sites(
-    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
-) -> tuple[ScenarioResult, str]:
-    """Núcleo puro do simulador por locais (sem base de dados)."""
-    dp = to_domain_params(params)
-    mode: CollectionMode = request.site_mode
-    mp = params.modes[mode]
-    costs = siting.SiteCosts(
-        capex_eur=mp.capex_per_point_eur,
-        annual_fixed_eur=mp.capex_per_point_eur / mp.lifetime_years
-        + mp.collections_per_year * params.cost_per_collection_eur,
-        collections_year=mp.collections_per_year,
-    )
-    # Restrições por freguesia: se o modo dos locais não é permitido lá, os seus locais deixam de ser candidatos.
-    blocked = {code for code, modes in request.constraints.items() if mode not in modes}
-    candidates = [c for c in inputs.candidates if c.zone_id not in blocked]
-    zone_by_code = {z.code: z for z in zones}
-    known = set(zone_by_code)
-    demand = [d for d in inputs.demand if d.zone_id in known]
-    candidates = [c for c in candidates if c.zone_id in known]
+def _on_demand_zones(
+    zones: list[ZoneOut], params: PlanningParams, dp: network.Params, request: ScenarioRequest
+) -> dict[str, siting.OnDemandZone]:
+    """Recolha a pedido por freguesia, com o custo do modelo por zonas (aproveita os circuitos que já passam)."""
+    if not request.site_on_demand:
+        return {}
+    out: dict[str, siting.OnDemandZone] = {}
+    coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
+    for z in zones:
+        allowed = request.constraints.get(z.code)
+        if allowed is not None and CollectionMode.ON_DEMAND not in allowed:
+            continue
+        zone = network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days)
+        c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
+        out[z.code] = siting.OnDemandZone(z.code, c.capture, coverage, c.annual_cost_eur, c.km_year)
+    return out
 
-    plan = siting.plan_site_network(
-        demand,
-        candidates,
-        {z.code: z.demand_t for z in zones},
-        {z.code: z.population for z in zones},
-        costs,
-        dp,
-        capture_rate=mp.capture_rate,
-        radius_m=request.site_radius_m,
-        collections_per_year=mp.collections_per_year,
-        objective=request.objective.value,
-        budget_eur_year=request.budget_eur_year,
-        target_tonnes=request.target_tonnes,
-        time_limit_s=float(params.solver_time_limit_s),
-    )
 
-    freq = max(mp.collections_per_year, 1.0)
+def _routes_out(
+    plan: siting.SitePlan, mode: CollectionMode, candidates: list[siting.Candidate], inputs: SiteInputs, freq: float
+) -> tuple[list[RouteOut], dict[str, int]]:
     vehicle_of: dict[str, int] = {}
-    routes: list[RouteOut] = []
+    cand_by_id = {c.id: c for c in candidates}
     site_tonnes = {s.candidate.id: s.tonnes for s in plan.sites}
+    routes: list[RouteOut] = []
     for r in plan.routes:
         stops = []
         for site_id in r.stops:
             vehicle_of[site_id] = r.vehicle
-            m = inputs.meta[site_id]
-            cand = next(c for c in candidates if c.id == site_id)
+            m, cand = inputs.meta[site_id], cand_by_id[site_id]
             stops.append(
                 RouteStop(
                     parish_code=cand.zone_id,
@@ -158,39 +141,46 @@ def compute_sites(
                 path=[[lat, lon] for lat, lon in r.path],
             )
         )
+    return routes, vehicle_of
 
-    sites = sorted(
-        (
+
+def _site_selections(plan: siting.SitePlan, inputs: SiteInputs, vehicle_of: dict[str, int]) -> list[SiteSelection]:
+    out = []
+    for s in plan.sites:
+        m = inputs.meta[s.candidate.id]
+        out.append(
             SiteSelection(
                 site_id=s.candidate.id,
                 latitude=s.candidate.lat,
                 longitude=s.candidate.lon,
                 parish_code=s.candidate.zone_id,
-                parish_name=inputs.meta[s.candidate.id].parish_name,
-                street=inputs.meta[s.candidate.id].street,
-                containers=inputs.meta[s.candidate.id].containers,
-                coord_precision="approximate" if inputs.meta[s.candidate.id].precision == "approximate" else "precise",
+                parish_name=m.parish_name,
+                street=m.street,
+                containers=m.containers,
+                coord_precision="approximate" if m.precision == "approximate" else "precise",
                 tonnes=round(s.tonnes, 3),
                 population_covered=round(s.population_covered),
                 served_points=s.served_points,
                 vehicle=vehicle_of.get(s.candidate.id),
             )
-            for s in plan.sites
-        ),
-        key=lambda x: -x.tonnes,
-    )
+        )
+    return sorted(out, key=lambda x: -x.tonnes)
 
+
+def _allocations(
+    zones: list[ZoneOut], plan: siting.SitePlan, costs: siting.SiteCosts, mode: CollectionMode, params: PlanningParams
+) -> list[Allocation]:
     points_by_zone: dict[str, int] = defaultdict(int)
     for s in plan.sites:
         points_by_zone[s.candidate.zone_id] += 1
     n_sites = len(plan.sites)
-    capex_site = costs.capex_eur
-    allocations: list[Allocation] = []
+    out: list[Allocation] = []
     for z in zones:
         pts = points_by_zone.get(z.code, 0)
         t = plan.zone_tonnes.get(z.code, 0.0)
-        if pts == 0 and t <= 0:
-            allocations.append(
+        od = plan.on_demand.get(z.code)
+        if pts == 0 and t <= 0 and od is None:
+            out.append(
                 Allocation(
                     parish_code=z.code, parish_name=z.name, population=z.population, demand_t=z.demand_t, mode=None,
                     modes=[], parts=[], points=0, tonnes=0, covered_population=0, capex_eur=0, annual_cost_eur=0,
@@ -198,36 +188,95 @@ def compute_sites(
                 )
             )  # fmt: skip
             continue
-        km = plan.km_year * pts / n_sites if n_sites else 0.0
-        cost = pts * costs.annual_fixed_eur + km * params.cost_per_km_eur
-        part = AllocationPart(
-            mode=mode,
-            points=pts,
-            tonnes=round(t, 3),
-            capex_eur=round(pts * capex_site, 2),
-            annual_cost_eur=round(cost, 2),
-            km_year=round(km, 1),
-        )
-        allocations.append(
+        parts: list[AllocationPart] = []
+        od_t = plan.zone_tonnes_on_demand.get(z.code, 0.0) if od else 0.0
+        if pts or t - od_t > 0:
+            km = plan.km_year * pts / n_sites if n_sites else 0.0
+            parts.append(
+                AllocationPart(
+                    mode=mode,
+                    points=pts,
+                    tonnes=round(t - od_t, 3),
+                    capex_eur=round(pts * costs.capex_eur, 2),
+                    annual_cost_eur=round(pts * costs.annual_fixed_eur + km * params.cost_per_km_eur, 2),
+                    km_year=round(km, 1),
+                )
+            )
+        if od is not None:
+            parts.append(
+                AllocationPart(
+                    mode=CollectionMode.ON_DEMAND,
+                    points=0,
+                    tonnes=round(od_t, 3),
+                    capex_eur=0,
+                    annual_cost_eur=round(od.cost_eur, 2),
+                    km_year=round(od.km_year, 1),
+                )
+            )
+        parts.sort(key=lambda p: -p.tonnes)
+        out.append(
             Allocation(
                 parish_code=z.code,
                 parish_name=z.name,
                 population=z.population,
                 demand_t=z.demand_t,
-                mode=mode,
-                modes=[mode],
-                parts=[part],
+                mode=parts[0].mode,
+                modes=[p.mode for p in parts],
+                parts=parts,
                 points=pts,
                 tonnes=round(t, 3),
                 covered_population=round(plan.zone_population_covered.get(z.code, 0.0)),
-                capex_eur=part.capex_eur,
-                annual_cost_eur=part.annual_cost_eur,
-                km_year=part.km_year,
+                capex_eur=round(sum(p.capex_eur for p in parts), 2),
+                annual_cost_eur=round(sum(p.annual_cost_eur for p in parts), 2),
+                km_year=round(sum(p.km_year for p in parts), 1),
             )
         )
+    return out
 
+
+def compute_sites(
+    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+) -> tuple[ScenarioResult, str]:
+    """Núcleo puro do simulador por locais (sem base de dados)."""
+    dp = to_domain_params(params)
+    mode: CollectionMode = request.site_mode
+    mp = params.modes[mode]
+    costs = siting.SiteCosts(
+        capex_eur=mp.capex_per_point_eur,
+        annual_fixed_eur=mp.capex_per_point_eur / mp.lifetime_years
+        + mp.collections_per_year * params.cost_per_collection_eur,
+        collections_year=mp.collections_per_year,
+    )
+    # Restrições por freguesia: se o modo dos locais não é permitido lá, os seus locais deixam de ser candidatos.
+    blocked = {code for code, modes in request.constraints.items() if mode not in modes}
+    known = {z.code for z in zones}
+    demand = [d for d in inputs.demand if d.zone_id in known]
+    candidates = [c for c in inputs.candidates if c.zone_id in known and c.zone_id not in blocked]
+
+    plan = siting.plan_site_network(
+        demand,
+        candidates,
+        {z.code: z.demand_t for z in zones},
+        {z.code: z.population for z in zones},
+        costs,
+        dp,
+        capture_rate=mp.capture_rate,
+        radius_m=request.site_radius_m,
+        collections_per_year=mp.collections_per_year,
+        objective=request.objective.value,
+        budget_eur_year=request.budget_eur_year,
+        target_tonnes=request.target_tonnes,
+        on_demand=_on_demand_zones(zones, params, dp, request),
+        time_limit_s=float(params.solver_time_limit_s),
+    )
+
+    freq = max(mp.collections_per_year, 1.0)
+    routes, vehicle_of = _routes_out(plan, mode, candidates, inputs, freq)
+    allocations = _allocations(zones, plan, costs, mode, params)
+
+    n_sites = len(plan.sites)
     total_pop = sum(z.population for z in zones)
-    capex = n_sites * capex_site
+    capex = n_sites * costs.capex_eur
     annual = plan.annual_cost_eur
     kpis = Kpis(
         capex_eur=round(capex, 2),
@@ -237,26 +286,30 @@ def compute_sites(
         eur_per_tonne=round(annual / plan.tonnes, 2) if plan.tonnes > 0 else None,
         coverage_pct=round(plan.population_covered / total_pop * 100, 1) if total_pop else 0.0,
         points=n_sites,
-        km_year=round(plan.km_year, 1),
+        km_year=round(plan.km_year + sum(z.km_year for z in plan.on_demand.values()), 1),
         potential_t=round(sum(z.demand_t for z in zones), 1),
         baseline_observed_t=round(baseline_t, 1),
     )
-    summary = [
-        ModeSummary(
-            mode=mode,
-            zones=sum(1 for a in allocations if a.parts),
-            points=n_sites,
-            tonnes=round(plan.tonnes, 3),
-            annual_cost_eur=round(annual, 2),
-        )
-    ]
+    summaries = []
+    for m in (mode, CollectionMode.ON_DEMAND):
+        parts = [(a, p) for a in allocations for p in a.parts if p.mode == m]
+        if parts:
+            summaries.append(
+                ModeSummary(
+                    mode=m,
+                    zones=len(parts),
+                    points=sum(p.points for _, p in parts),
+                    tonnes=round(sum(p.tonnes for _, p in parts), 3),
+                    annual_cost_eur=round(sum(p.annual_cost_eur for _, p in parts), 2),
+                )
+            )
     result = ScenarioResult(
         kpis=kpis,
         allocations=allocations,
         routes=routes,
-        modes=summary if n_sites else [],
+        modes=summaries,
         depot=[params.depot_lat, params.depot_lon],
-        sites=sites,
+        sites=_site_selections(plan, inputs, vehicle_of),
         siting=SitingSummary(
             radius_m=request.site_radius_m,
             site_mode=mode,
@@ -264,6 +317,8 @@ def compute_sites(
             demand_points=len(demand),
             served_points=plan.served_points,
             opened=n_sites,
+            on_demand=request.site_on_demand,
+            on_demand_zones=len(plan.on_demand),
             solver_iterations=plan.iterations,
             population_proxy=POPULATION_PROXY,
         ),

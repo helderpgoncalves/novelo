@@ -95,6 +95,10 @@ class ScenarioRequest(BaseModel):
         description="`parish`: por freguesia (modelo por zonas); `sites`: escolhe locais reais da rede municipal",
     )
     site_radius_m: int = Field(default=300, ge=100, le=1000, description="Distância a pé que um local serve (`sites`)")
+    site_on_demand: bool = Field(
+        default=True,
+        description="Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)",
+    )
     site_mode: CollectionMode = Field(
         default=CollectionMode.EXISTING,
         description="Pressupostos de captura e custo usados nos locais (`existing` ou `street`)",
@@ -204,6 +208,8 @@ class SitingSummary(BaseModel):
     demand_points: int
     served_points: int
     opened: int
+    on_demand: bool = Field(default=False, description="A recolha a pedido podia completar a rede")
+    on_demand_zones: int = Field(default=0, description="Freguesias onde a recolha a pedido foi ligada")
     solver_iterations: int
     population_proxy: str
 
@@ -230,6 +236,7 @@ class ScenarioSummary(BaseModel):
     annual_cost_eur: float
     eur_per_tonne: float | None
     coverage_pct: float
+    siting: Siting = "parish"
     parent_id: uuid.UUID | None
     created_at: datetime
 
@@ -245,4 +252,9 @@ class ScenarioOut(ScenarioSummary):
         s = self.result.siting
         if s is None:
             return {}
-        return {"siting": "sites", "site_radius_m": s.radius_m, "site_mode": s.site_mode}
+        return {
+            "siting": "sites",
+            "site_radius_m": s.radius_m,
+            "site_mode": s.site_mode,
+            "site_on_demand": s.on_demand,
+        }
