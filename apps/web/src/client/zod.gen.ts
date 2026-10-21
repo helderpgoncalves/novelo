@@ -520,6 +520,7 @@ export const zAllocation = z.object({
     parts: z.array(zAllocationPart),
     points: z.int(),
     population: z.int(),
+    served_share: z.number().nullish(),
     tonnes: z.number()
 });
 

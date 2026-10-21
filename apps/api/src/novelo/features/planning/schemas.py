@@ -153,6 +153,10 @@ class Allocation(BaseModel):
     capex_eur: float
     annual_cost_eur: float
     km_year: float
+    served_share: float | None = Field(
+        default=None,
+        description="Cenários por locais: fração da procura da freguesia com um local aberto ao alcance (0 a 1)",
+    )
 
 
 class RouteStop(BaseModel):

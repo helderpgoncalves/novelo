@@ -8,9 +8,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from novelo.core.errors import ConflictError
 from novelo.domain import network
 from novelo.domain import sensitivity as sens
+from novelo.domain.vocab import CollectionMode
 from novelo.features.planning import service
 from novelo.features.planning.params import params_meta
-from novelo.features.planning.schemas import ParamSource, ScenarioOut
+from novelo.features.planning.schemas import ParamSource, ScenarioOut, ZoneOut
 from novelo.features.planning.sensitivity_schemas import (
     MetricsOut,
     QuantilesOut,
@@ -36,17 +37,13 @@ def _quantiles(q: sens.Quantiles) -> QuantilesOut:
     return QuantilesOut(p10=q.p10, p50=q.p50, p90=q.p90)
 
 
-async def load_plan(
-    db: AsyncSession, scenario_id: uuid.UUID
-) -> tuple[ScenarioOut, list[sens.PlanItem], network.Params]:
-    """O plano de um cenário gravado (freguesias e modos escolhidos) com os km calibrados pelas rotas reais."""
+async def load_plan(db: AsyncSession, scenario_id: uuid.UUID) -> tuple[ScenarioOut, sens.Plan, network.Params]:
+    """O plano de um cenário gravado (freguesias e modos, ou locais e rotas) com os km calibrados pelas rotas reais."""
     scenario = await service.get_scenario(db, scenario_id)
-    if scenario.result.siting is not None:
-        raise ConflictError(
-            "A sensibilidade ainda só existe para cenários por freguesia: este cenário escolhe locais reais"
-        )
     dp = service._domain_params(scenario.params)
     zones = {z.code: z for z in await service.load_zone_rows(db, scenario.params.kg_per_inhab_month)}
+    if scenario.result.siting is not None:
+        return scenario, _site_plan(scenario, zones, dp), dp
     items = []
     for a in scenario.result.allocations:
         if not a.parts:
@@ -60,8 +57,38 @@ async def load_plan(
     return scenario, items, dp
 
 
+def _site_plan(scenario: ScenarioOut, zones: dict[str, ZoneOut], dp: network.Params) -> sens.SitePlan:
+    result = scenario.result
+    summary = result.siting
+    assert summary is not None
+    if not result.sites and not any(CollectionMode.ON_DEMAND in a.modes for a in result.allocations):
+        raise ConflictError("Scenario has no plan (infeasible): nothing to evaluate")
+    site_zones = []
+    for a in result.allocations:
+        if a.served_share is None:
+            raise ConflictError("Scenario was computed before the sensitivity existed: calculate it again")
+        on_demand = CollectionMode.ON_DEMAND in a.modes
+        if a.served_share <= 0 and not on_demand:
+            continue
+        z = zones[a.parish_code]
+        site_zones.append(
+            sens.SiteZone(
+                network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days),
+                a.served_share,
+                on_demand,
+            )
+        )
+    return sens.SitePlan(
+        mode=summary.site_mode,
+        zones=tuple(site_zones),
+        sites=len(result.sites),
+        km_per_round=sum(r.km for r in result.routes),
+        base_detour=dp.detour_factor,
+    )
+
+
 def _sensitivity(
-    scenario_id: uuid.UUID, items: list[sens.PlanItem], dp: network.Params, body: SensitivityRequest
+    scenario_id: uuid.UUID, items: sens.Plan, dp: network.Params, body: SensitivityRequest
 ) -> SensitivityOut:
     meta = {m.key: m for m in params_meta()}
     bars = sens.tornado(items, dp, body.swing)
