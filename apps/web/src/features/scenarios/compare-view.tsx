@@ -2,7 +2,6 @@ import { Link } from '@tanstack/react-router';
 import type { ScenarioOut, ZoneOut } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Section } from '@/components/page';
-import { Panel } from '@/components/panel';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
@@ -168,8 +167,6 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
   const networkName = (s: ScenarioOut) =>
     s.result.siting ? m.site_compare_network_sites() : m.site_compare_network_parish();
   const mixedNetworks = Boolean(a.result.siting) !== Boolean(b.result.siting);
-  // A robustez (Monte Carlo) só existe entre cenários por freguesia: a API recusa os por locais.
-  const robustnessAvailable = !a.result.siting && !b.result.siting;
 
   return (
     <div className="space-y-8 sm:space-y-12">
@@ -217,15 +214,7 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
           <p className="text-muted-foreground text-xs">{m.compare_note()}</p>
         </div>
         <div className="lg:col-span-4">
-          {robustnessAvailable ? (
-            <RobustnessCard a={a} b={b} />
-          ) : (
-            <Panel title={m.rob_title()}>
-              <p className="text-muted-foreground text-sm leading-relaxed">
-                {m.site_rob_unavailable()}
-              </p>
-            </Panel>
-          )}
+          <RobustnessCard a={a} b={b} />
         </div>
       </div>
 

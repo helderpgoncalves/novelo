@@ -52,7 +52,7 @@ export function ThemeToggle({ variant = 'menu' }: { variant?: 'menu' | 'inline' 
         <Button
           variant="ghost"
           size="icon"
-          className="size-9 rounded-[8px] text-muted-foreground hover:bg-transparent hover:text-foreground dark:hover:bg-transparent"
+          className="size-10 rounded-[8px] text-muted-foreground hover:bg-transparent hover:text-foreground pointer-fine:size-9 dark:hover:bg-transparent"
           aria-label={m.theme_toggle()}
         >
           <Icon className="size-[1.125rem]" strokeWidth={1.5} />

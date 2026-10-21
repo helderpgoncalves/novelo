@@ -278,17 +278,15 @@ function Why({ scenario }: { scenario: ScenarioOut }) {
       <Panel className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="font-medium">{m.simx_deeper_title()}</p>
         <div className="flex flex-wrap gap-2">
-          {!result.siting && (
-            <Button asChild variant="outline" className="h-10">
-              <Link
-                to="/scenarios/$scenarioId"
-                params={{ scenarioId: scenario.id }}
-                search={{ tab: 'uncertainty' }}
-              >
-                {m.simx_open_uncertainty()}
-              </Link>
-            </Button>
-          )}
+          <Button asChild variant="outline" className="h-10">
+            <Link
+              to="/scenarios/$scenarioId"
+              params={{ scenarioId: scenario.id }}
+              search={{ tab: 'uncertainty' }}
+            >
+              {m.simx_open_uncertainty()}
+            </Link>
+          </Button>
           <Button asChild variant="outline" className="h-10">
             <Link
               to="/scenarios/$scenarioId"

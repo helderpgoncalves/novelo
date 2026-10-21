@@ -121,32 +121,34 @@ export function LoadChart({ load, fleetSize }: { load: SlotLoad[]; fleetSize: nu
   return (
     <>
       <div ref={ref} role="img" aria-label={m.fl_chart_label()} className="h-64 w-full sm:h-72" />
-      <table className="sr-only">
-        <caption>{m.fl_chart_label()}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{m.fl_csv_day()}</th>
-            {SHIFTS.map((s) => (
-              <th key={s} scope="col">
-                {shiftLabel[s]()}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {DAYS.map((d) => (
-            <tr key={d}>
-              <th scope="row">{weekdayLong(d)}</th>
+      <div className="sr-only">
+        <table>
+          <caption>{m.fl_chart_label()}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{m.fl_csv_day()}</th>
               {SHIFTS.map((s) => (
-                <td key={s}>
-                  {formatNumber(find(d, s)?.vehicles ?? 0)} (
-                  {formatPercent((find(d, s)?.rate ?? 0) * 100, 0)})
-                </td>
+                <th key={s} scope="col">
+                  {shiftLabel[s]()}
+                </th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {DAYS.map((d) => (
+              <tr key={d}>
+                <th scope="row">{weekdayLong(d)}</th>
+                {SHIFTS.map((s) => (
+                  <td key={s}>
+                    {formatNumber(find(d, s)?.vehicles ?? 0)} (
+                    {formatPercent((find(d, s)?.rate ?? 0) * 100, 0)})
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 }

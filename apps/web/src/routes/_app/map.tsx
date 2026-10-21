@@ -82,7 +82,18 @@ function NetworkMapPage() {
   const [showContainers, setShowContainers] = useState(true);
   const [selected, setSelected] = useState<string | null>(search.parish ?? null);
   const [layersOpen, setLayersOpen] = useState(false);
-  const desktop = useMediaQuery('(min-width: 1024px)');
+  const desktop = useMediaQuery('(min-width: 1280px)');
+  const detailRef = useRef<HTMLDivElement>(null);
+  // Em ecrã estreito o detalhe da freguesia fica por baixo do mapa: traz-se à vista ao escolher uma.
+  const selectParish = (code: string | null) => {
+    setSelected(code);
+    if (code && !desktop) {
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      requestAnimationFrame(() =>
+        detailRef.current?.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'nearest' }),
+      );
+    }
+  };
 
   const preset = search.preset ?? 'textile';
   const layers = layersFromSearch(search);
@@ -137,13 +148,13 @@ function NetworkMapPage() {
   const located = localities.filter((l) => l.latitude != null).length;
 
   return (
-    <Page>
+    <Page className="flex flex-col gap-5 space-y-0 sm:gap-7 sm:space-y-0">
       <PageHeader
         eyebrow={m.map_eyebrow()}
         title={m.map_title()}
         description={m.map_description()}
       />
-      <StatStrip>
+      <StatStrip className="max-lg:order-last">
         <StatCell
           label={m.map_stat_parishes()}
           value={formatNumber(zones.length)}
@@ -232,7 +243,7 @@ function NetworkMapPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-12">
         <NetworkMap
           zones={zones}
           localities={localities}
@@ -242,10 +253,10 @@ function NetworkMapPage() {
           coverage={coverage}
           municipal={municipal}
           selected={selected}
-          onSelect={setSelected}
-          className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:h-[34rem] lg:col-span-9 lg:h-[42rem]"
+          onSelect={selectParish}
+          className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:h-[34rem] xl:col-span-9 lg:h-[38rem] xl:h-[42rem] [@media(max-height:500px)]:h-[calc(100dvh-8rem)] xl:[@media(max-height:500px)]:h-[calc(100dvh-8rem)]"
         />
-        <div className="space-y-4 lg:col-span-3">
+        <div ref={detailRef} className="space-y-4 xl:col-span-3">
           {desktop && (
             <section
               aria-label={m.mapm_panel_title()}

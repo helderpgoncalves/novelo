@@ -1,9 +1,6 @@
-import { Link } from '@tanstack/react-router';
 import { Info } from 'lucide-react';
 import type { SiteSelection, SitingSummary } from '@/client';
-import { Panel } from '@/components/panel';
 import { StatCell, StatStrip } from '@/components/stat-strip';
-import { Button } from '@/components/ui/button';
 import { formatMetres, formatNumber, formatPercent } from '@/lib/format';
 import { m } from '@/paraglide/messages';
 
@@ -69,18 +66,5 @@ export function SitingOverview({
         </span>
       </p>
     </div>
-  );
-}
-
-/** Nos cenários por locais não há sensibilidade (a API devolve 409): explica-se em vez de mostrar um painel vazio. */
-export function SitingUncertaintyNote({ scenarioId }: { scenarioId: string }) {
-  return (
-    <Panel title={m.site_unc_title()} description={m.site_unc_text()}>
-      <Button asChild variant="outline" className="h-10">
-        <Link to="/scenarios/$scenarioId" params={{ scenarioId }} search={{ tab: 'whatif' }}>
-          {m.site_unc_open_whatif()}
-        </Link>
-      </Button>
-    </Panel>
   );
 }

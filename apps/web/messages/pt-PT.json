@@ -450,6 +450,9 @@
   "objective_min_cost_hint": "Cumpre uma meta de captura ao menor custo anual.",
   "map_eyebrow": "Dados do INE e do OpenStreetMap",
   "map_title": "Mapa da rede de Guimarães",
+  "map_gesture_hint": "Usa dois dedos para mover o mapa",
+  "map_gesture_hint_ctrl": "Usa Ctrl + scroll para ampliar o mapa",
+  "map_gesture_hint_cmd": "Usa ⌘ + scroll para ampliar o mapa",
   "map_description": "As freguesias com a população dos Censos 2021 e a procura de têxtil estimada, e as localidades onde a Vitrus já tem circuitos.",
   "map_aria": "Mapa das freguesias de Guimarães",
   "map_layer": "Camada do mapa",
@@ -767,6 +770,7 @@
   "market_empty_title": "A bolsa está vazia",
   "market_empty_text": "Fecha um lote na triagem para ele aparecer aqui.",
   "market_group_summary": "{lots} lotes · {kg} kg · {parishes}",
+  "market_group_summary_short": "{lots} lotes · {kg} kg",
   "market_reserve": "Reservar",
   "market_reserved": "Lote reservado",
   "market_reserved_label": "Reservado",
@@ -4182,7 +4186,7 @@
   "site_note_estimate": "Estimativa: depende de a Vitrus confirmar que se pode juntar têxtil aos locais municipais.",
   "site_kpi_opened": "Locais abertos",
   "site_kpi_opened_hint": "de {n} candidatos públicos",
-  "site_kpi_served": "Cobertura por locais",
+  "site_kpi_served": "Pontos servidos por locais",
   "site_kpi_served_hint": "{served} de {total} pontos de procura a menos do raio a pé de um local",
   "site_kpi_radius": "Raio a pé",
   "site_kpi_radius_hint": "Distância máxima de um ponto ao local aberto mais próximo",
@@ -4224,5 +4228,8 @@
   "site_kpi_opened_on_demand": "Recolha a pedido em {n} freguesias",
   "site_od_label": "Completar com recolha a pedido",
   "site_od_help": "Aproveita os circuitos da Vitrus que já passam, sem contentores. O otimizador liga-a só nas freguesias onde compensa.",
-  "site_sum_on_demand": "com recolha a pedido"
+  "site_sum_on_demand": "com recolha a pedido",
+  "simx_phase_sites": "A escolher os locais",
+  "simx_phase_routes": "A planear as rotas",
+  "simx_phase_budget": "A ajustar ao orçamento"
 }

@@ -450,6 +450,9 @@
   "objective_min_cost_hint": "Meets a capture target at the lowest annual cost.",
   "map_eyebrow": "INE and OpenStreetMap data",
   "map_title": "Guimarães network map",
+  "map_gesture_hint": "Use two fingers to move the map",
+  "map_gesture_hint_ctrl": "Use Ctrl + scroll to zoom the map",
+  "map_gesture_hint_cmd": "Use ⌘ + scroll to zoom the map",
   "map_description": "Parishes with Census 2021 population and estimated textile demand, and the localities Vitrus already serves.",
   "map_aria": "Map of Guimarães parishes",
   "map_layer": "Map layer",
@@ -767,6 +770,7 @@
   "market_empty_title": "The exchange is empty",
   "market_empty_text": "Close a lot in sorting for it to appear here.",
   "market_group_summary": "{lots} lots · {kg} kg · {parishes}",
+  "market_group_summary_short": "{lots} lots · {kg} kg",
   "market_reserve": "Reserve",
   "market_reserved": "Lot reserved",
   "market_reserved_label": "Reserved",
@@ -4182,7 +4186,7 @@
   "site_note_estimate": "Estimate: it depends on Vitrus confirming that textiles can be added to the municipal sites.",
   "site_kpi_opened": "Sites opened",
   "site_kpi_opened_hint": "of {n} public candidates",
-  "site_kpi_served": "Coverage by sites",
+  "site_kpi_served": "Points served by sites",
   "site_kpi_served_hint": "{served} of {total} demand points within walking radius of a site",
   "site_kpi_radius": "Walking radius",
   "site_kpi_radius_hint": "Maximum distance from a point to the nearest open site",
@@ -4224,5 +4228,8 @@
   "site_kpi_opened_on_demand": "On-demand collection in {n} parishes",
   "site_od_label": "Complete with on-demand collection",
   "site_od_help": "Uses the Vitrus circuits that already pass by, without containers. The optimiser turns it on only in the parishes where it pays off.",
-  "site_sum_on_demand": "with on-demand collection"
+  "site_sum_on_demand": "with on-demand collection",
+  "simx_phase_sites": "Choosing the sites",
+  "simx_phase_routes": "Planning the routes",
+  "simx_phase_budget": "Fitting the budget"
 }

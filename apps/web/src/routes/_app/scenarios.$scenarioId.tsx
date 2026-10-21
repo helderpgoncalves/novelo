@@ -26,7 +26,7 @@ import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
 import { SitesTable } from '@/features/scenarios/sites-table';
-import { SitingOverview, SitingUncertaintyNote } from '@/features/scenarios/siting-overview';
+import { SitingOverview } from '@/features/scenarios/siting-overview';
 import { UncertaintyPanel } from '@/features/scenarios/uncertainty-panel';
 import { WhatIfPanel } from '@/features/whatif/whatif-panel';
 import { formatEur, formatTonnes } from '@/lib/format';
@@ -188,11 +188,7 @@ function ScenarioPage() {
           {
             id: 'uncertainty',
             label: tabLabel.uncertainty(),
-            content: result.siting ? (
-              <SitingUncertaintyNote scenarioId={scenario.id} />
-            ) : (
-              <UncertaintyPanel scenario={scenario} />
-            ),
+            content: <UncertaintyPanel scenario={scenario} />,
           },
           {
             id: 'whatif',

@@ -26,7 +26,7 @@ export function RowActionsMenu<T>({
         <button
           type="button"
           aria-label={m.dt_row_actions({ row: label })}
-          className="flex size-9 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground data-[state=open]:bg-muted"
+          className="flex size-9 pointer-coarse:size-10 items-center justify-center rounded-md text-muted-foreground hover:bg-muted hover:text-foreground data-[state=open]:bg-muted"
         >
           <MoreHorizontal className="size-4" />
         </button>

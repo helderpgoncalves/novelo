@@ -9,11 +9,14 @@ import MapGL, {
   NavigationControl,
   ScaleControl,
 } from 'react-map-gl/maplibre';
+import { m } from '@/paraglide/messages';
 
 // O MapLibre 6 procura o worker ao lado do seu bundle (assets/maplibre-gl-worker.mjs), mas o Vite não o emite: em
 // produção o nginx devolvia o index.html e dava "Worker failed to load". Com `?url` o Vite copia o ficheiro para
 // assets/ e o worker é servido do mesmo domínio (cumpre `worker-src 'self'`, sem blob: nem unsafe-eval).
 setWorkerUrl(maplibreWorkerUrl);
+
+const COARSE = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
 
 interface BaseMapProps {
   children?: ReactNode;
@@ -50,6 +53,13 @@ export function BaseMap({
         cursor={interactiveLayerIds?.length ? 'pointer' : undefined}
         style={{ width: '100%', height: '100%' }}
         reuseMaps
+        // Em ecrãs tácteis o mapa não prende o scroll da página: mover com um dedo desloca a página, com dois o mapa.
+        cooperativeGestures={COARSE}
+        locale={{
+          'CooperativeGesturesHandler.MobileHelpText': m.map_gesture_hint(),
+          'CooperativeGesturesHandler.WindowsHelpText': m.map_gesture_hint_ctrl(),
+          'CooperativeGesturesHandler.MacHelpText': m.map_gesture_hint_cmd(),
+        }}
       >
         <NavigationControl position="top-right" showCompass={false} />
         <ScaleControl position="bottom-left" unit="metric" />

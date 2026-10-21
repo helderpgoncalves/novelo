@@ -6,6 +6,7 @@ import { getPassportOptions } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline, LotStateBadge } from '@/features/lots/lot-parts';
 import { formatNumber, formatPercent } from '@/lib/format';
@@ -49,14 +50,17 @@ function PassportPage() {
   });
 
   return (
-    <div className="min-h-dvh bg-background">
-      <header className="mx-auto flex max-w-3xl items-center justify-between px-4 py-5">
-        <Link to="/" aria-label="Novelo">
+    <div className="min-h-dvh bg-background pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+      <header className="mx-auto flex max-w-3xl items-center justify-between px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-5">
+        <Link to="/" aria-label="Novelo" className="flex min-h-11 items-center rounded-sm">
           <BrandLogo className="h-7" />
         </Link>
-        <LanguageSwitcher />
+        <div className="flex items-center gap-1">
+          <LanguageSwitcher />
+          <ThemeToggle />
+        </div>
       </header>
-      <main className="mx-auto max-w-3xl space-y-8 px-4 pb-16">
+      <main className="mx-auto max-w-3xl space-y-8 px-4 pb-[max(4rem,env(safe-area-inset-bottom))]">
         {isPending && (
           <div className="grid place-items-center py-24" aria-busy="true">
             <BrandSpinner className="size-7" />

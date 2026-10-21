@@ -235,6 +235,10 @@ html[data-tabbar] {
     a[data-slot='button'] {
       min-height: 2.5rem;
     }
+    /* Controlos do mapa (zoom): também 40px de largura. */
+    .maplibregl-ctrl-group button {
+      min-width: 2.5rem;
+    }
     /* Caixas, rádios e interruptores mantêm o desenho, mas ganham uma área de toque maior. */
     [role='checkbox'],
     [role='radio'],

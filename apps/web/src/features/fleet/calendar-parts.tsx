@@ -234,7 +234,7 @@ export function IssueSummary({
                 aria-pressed={focus === i.focus}
                 onClick={() => onFocus(focus === i.focus ? undefined : i.focus)}
                 className={cn(
-                  'inline-flex h-8 items-center gap-1.5 rounded-full border px-3 text-xs transition-colors',
+                  'inline-flex h-8 items-center gap-1.5 rounded-full border px-3 pointer-coarse:h-10 text-xs transition-colors',
                   focus === i.focus
                     ? 'border-primary bg-primary/10 font-medium text-primary'
                     : 'bg-card text-foreground hover:bg-muted',
