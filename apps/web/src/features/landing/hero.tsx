@@ -42,7 +42,10 @@ export function Hero() {
       </div>
       <div className={`${CONTAINER} lp-hs-inner`}>
         <div className="lp-hs-copy">
-          <p className="lp-hs-eyebrow">{m.landing_eyebrow()}</p>
+          <div className="lp-hs-eyebrow-row">
+            <p className="lp-hs-eyebrow">{m.landing_eyebrow()}</p>
+            <HeroDeadline compact className="lp-hs-deadline-compact" />
+          </div>
           <h1 id="landing-title" className="lp-hs-title">
             <span className="sr-only">Novelo: </span>
             {before}
@@ -65,7 +68,6 @@ export function Hero() {
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
           </div>
-          <HeroDeadline className="lp-hs-deadline-copy lp-hs-stagger" />
         </div>
       </div>
       <div className={`${CONTAINER} lp-hs-trace`}>

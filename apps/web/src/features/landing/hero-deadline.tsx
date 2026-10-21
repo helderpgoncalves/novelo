@@ -14,9 +14,10 @@ export function daysUntilDeadline(now: Date = new Date()): number {
 
 /**
  * Gancho de urgência: a data do prazo do regime europeu de responsabilidade do produtor têxtil e, só no cliente, a
- * contagem de dias. O que faltar de data nunca é inventado: vem da diretiva citada no texto «O problema».
+ * contagem de dias. O que faltar de data nunca é inventado: vem da diretiva citada no texto «O problema». A versão `compact`
+ * (só data e dias) vive na linha do eyebrow do hero largo, onde nunca cruza o fio.
  */
-export function HeroDeadline({ className }: { className?: string }) {
+export function HeroDeadline({ className, compact }: { className?: string; compact?: boolean }) {
   const [days, setDays] = useState<number | null>(null);
   useEffect(() => {
     const left = daysUntilDeadline();
@@ -27,7 +28,7 @@ export function HeroDeadline({ className }: { className?: string }) {
       <time dateTime="2028-04-17" className="lp-hs-deadline-date">
         {m.landing_hero_deadline_date()}
       </time>
-      <span className="lp-hs-deadline-text">{m.landing_hero_deadline_text()}</span>
+      {!compact && <span className="lp-hs-deadline-text">{m.landing_hero_deadline_text()}</span>}
       <span className="lp-hs-deadline-days" data-ready={days !== null}>
         {days !== null && m.landing_hero_deadline_days({ days: formatNumber(days) })}
       </span>
