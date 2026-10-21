@@ -46,6 +46,37 @@ export function Problem() {
     { id: 'vehicles', value: FACTS.vehicles, label: m.landing_net_vehicles() },
     { id: 'places', value: FACTS.places, label: m.landing_net_places() },
   ] as const;
+  const ledger = [
+    { id: 'rsu', op: '', label: m.landing_ledger_rsu(), value: formatTonnes(FACTS.rsuT, 0) },
+    {
+      id: 'share',
+      op: '×',
+      label: m.landing_ledger_share(),
+      value: formatPercent(FACTS.textileShareOfRsuPct),
+    },
+    {
+      id: 'residual',
+      op: '=',
+      label: m.landing_ledger_residual(),
+      value: formatTonnes(FACTS.residualT),
+      total: true,
+      estimate: true,
+    },
+    {
+      id: 'collected',
+      op: '+',
+      label: m.landing_ledger_collected({ count: formatNumber(FACTS.entities) }),
+      value: formatTonnes(FACTS.collectedT),
+    },
+    {
+      id: 'potential',
+      op: '=',
+      label: m.landing_ledger_potential(),
+      value: formatTonnes(FACTS.potentialT),
+      total: true,
+      estimate: true,
+    },
+  ];
   return (
     <Section id="problema">
       <div className={`${CONTAINER} flex flex-col gap-12 lg:gap-16`}>
@@ -91,20 +122,42 @@ export function Problem() {
             >
               <span style={{ width: `${FACTS.capturePct}%` }} />
             </div>
-            <dl className="grid grid-cols-2 gap-6 text-sm">
-              <div>
-                <dt className={MONO}>{m.landing_gap_collected()}</dt>
-                <dd className="mt-1 font-medium font-serif text-3xl tabular-nums">
-                  {formatTonnes(FACTS.collectedT)}
-                </dd>
-              </div>
-              <div>
-                <dt className={MONO}>{m.landing_gap_potential()}</dt>
-                <dd className="mt-1 font-medium font-serif text-3xl tabular-nums">
-                  {m.landing_gap_potential_value({ value: formatTonnes(FACTS.potentialT, 0) })}
-                </dd>
-              </div>
-            </dl>
+            <div className="relative rounded-2xl border border-border bg-card/90 p-5 sm:p-6">
+              <p className="lp-kicker">{m.landing_ledger_label()}</p>
+              <dl className="mt-3 flex flex-col">
+                {ledger.map((row) => (
+                  <div
+                    key={row.id}
+                    className={cn(
+                      'grid grid-cols-[1.25rem_1fr_auto] items-baseline gap-x-2 py-2.5 sm:gap-x-3',
+                      row.total && 'border-border border-t',
+                    )}
+                  >
+                    <span aria-hidden="true" className="font-mono text-muted-foreground text-sm">
+                      {row.op}
+                    </span>
+                    <dt
+                      className={cn(
+                        'text-pretty text-sm leading-snug sm:text-[0.9375rem]',
+                        row.total ? 'font-medium text-foreground' : 'text-muted-foreground',
+                      )}
+                    >
+                      {row.label}
+                      {row.estimate && <Estimate className="text-muted-foreground" />}
+                    </dt>
+                    <dd
+                      className={cn(
+                        'text-right font-medium font-serif tabular-nums leading-none',
+                        row.total ? 'text-2xl sm:text-[1.75rem]' : 'text-xl',
+                        row.id === 'residual' && 'text-primary',
+                      )}
+                    >
+                      {row.value}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
             <p className="relative mt-auto border-primary border-l-2 pl-5 text-pretty text-[0.9375rem] leading-relaxed sm:text-base">
               {m.landing_problem_directive()}
               <Cite n={2} />

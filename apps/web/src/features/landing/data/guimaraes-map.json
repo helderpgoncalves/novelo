@@ -411,5 +411,6 @@
     [338, 461],
     [563, 770],
     [329, 545]
-  ]
+  ],
+  "municipal": { "sites": 2026, "demandSites": 1574, "containers": 2751 }
 }

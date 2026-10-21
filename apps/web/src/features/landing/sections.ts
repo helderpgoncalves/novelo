@@ -3,6 +3,7 @@ import { m } from '@/paraglide/messages';
 /** Ligações do topo (ecrã largo). `xl`: só a partir de 1280 px, para a barra respirar a 1024 px. */
 export function navItems(): { id: string; label: string; xl?: boolean }[] {
   return [
+    { id: 'mapa', label: m.landing_nav_map() },
     { id: 'metodo', label: m.landing_nav_method() },
     { id: 'prova', label: m.landing_nav_proof() },
     { id: 'produto', label: m.landing_nav_product() },
@@ -15,6 +16,7 @@ export function navItems(): { id: string; label: string; xl?: boolean }[] {
 /** Secções da página, pela ordem em que aparecem. A numeração só serve a etiqueta mono dos cabeçalhos; a navegação não a mostra. */
 const NUMBERED = [
   'problema',
+  'mapa',
   'metodo',
   'prova',
   'produto',
@@ -34,6 +36,7 @@ export function sectionNumber(id: NumberedSection): string {
 
 const TOC_LABEL: Record<NumberedSection, () => string> = {
   problema: () => m.landing_problem_eyebrow(),
+  mapa: () => m.landing_nav_map(),
   metodo: () => m.landing_nav_method(),
   prova: () => m.landing_nav_proof(),
   produto: () => m.landing_nav_product(),
@@ -52,6 +55,7 @@ export function tocItems(): { id: NumberedSection; label: string }[] {
 /** Cada secção observada e o item do topo a que pertence (a pílula fica no grupo). */
 export const SECTION_GROUP: Record<string, string> = {
   problema: 'problema',
+  mapa: 'mapa',
   metodo: 'metodo',
   prova: 'prova',
   produto: 'produto',

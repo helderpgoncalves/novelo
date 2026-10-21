@@ -24,8 +24,8 @@ import { FACTS } from './facts';
  * já completa. Os números são os da Regra Zero: ver `copilot-demo.ts`.
  */
 
-/** Custos do cenário base: exemplo de `docs/engenharia/copiloto.md` (Base, 44 288 €/ano). */
-const BASE_COST_EUR = 44288;
+/** Custo anual do cenário base (40 000 €/ano de orçamento), calculado pelo otimizador: `FACTS.scenarioBase`. */
+const BASE_COST_EUR = FACTS.scenarioBase.cost;
 const T = {
   question: 0.3,
   think: 0.8,
@@ -177,8 +177,8 @@ export function CopilotChat() {
     { label: m.landing_cp_step_3(), Icon: Cpu },
     { label: m.landing_cp_step_4(), Icon: ShieldCheck },
   ];
-  const costNow = formatEur(s60.budget);
-  const delta = `+${formatEur(s60.budget - BASE_COST_EUR)}`;
+  const costNow = formatEur(s60.cost);
+  const delta = `+${formatEur(s60.cost - BASE_COST_EUR)}`;
   const eurT = `${formatNumber(s60.eurPerT, 1)} €/t`;
   const range = `${formatNumber(s60.p10, 1)} – ${formatNumber(s60.p90, 1)} €/t`;
   const thinkEnd = T.steps[3].e;
@@ -300,7 +300,10 @@ export function CopilotChat() {
                   <i className="lp-cp-track">
                     <i
                       className="lp-cp-fill lp-cp-grow"
-                      style={vars({ width: '100%', '--d': `${T.bars + 0.15}s` })}
+                      style={vars({
+                        width: `${(s60.cost / s60.budget) * 100}%`,
+                        '--d': `${T.bars + 0.15}s`,
+                      })}
                     />
                   </i>
                   <b>{costNow}</b>

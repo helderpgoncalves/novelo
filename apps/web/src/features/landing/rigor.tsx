@@ -2,6 +2,7 @@ import { ArrowUpRight, Check, TriangleAlert, X } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { GithubMark } from '@/components/github-mark';
 import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
+import { intlTag } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { FACTS, QUALITY, REF_LINKS, REPO_URL } from './facts';
@@ -14,6 +15,7 @@ import {
   Heading,
   MONO,
   Section,
+  STAT,
   type Status,
   StatusBadge,
 } from './layout';
@@ -146,9 +148,9 @@ function AssumptionsTable() {
     {
       key: 'ceiling',
       param: m.landing_row_ceiling(),
-      value: '—',
-      source: m.landing_row_ceiling_src(),
-      status: 'validating',
+      value: m.landing_row_ceiling_val({ value: formatTonnes(FACTS.ceilingNoContainersT) }),
+      source: m.landing_row_ceiling_src({ street: formatTonnes(FACTS.ceilingWithStreetT) }),
+      status: 'estimate',
     },
   ];
   const cell = 'block px-5 py-0.5 md:table-cell md:px-5 md:py-3.5';
@@ -233,6 +235,16 @@ export function Rigor() {
     [m.landing_feat_roles_title(), m.landing_feat_roles_text()],
   ] as const;
   const not = [m.landing_not_1(), m.landing_not_2(), m.landing_not_3(), m.landing_not_4()];
+  const tests = [
+    { id: 'api', value: QUALITY.api, label: m.landing_quality_api() },
+    { id: 'web', value: QUALITY.web, label: m.landing_quality_web() },
+  ];
+  const checkedOn = new Intl.DateTimeFormat(intlTag(), {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(`${QUALITY.date}T00:00:00Z`));
   const limits = [
     m.landing_limit_1(),
     m.landing_limit_2(),
@@ -253,12 +265,12 @@ export function Rigor() {
         <div data-reveal="" data-fx="stagger" className="grid gap-4 lg:grid-cols-2 lg:gap-5">
           <section
             aria-labelledby="rigor-yes"
-            className={cn(CARD, 'flex flex-col border-primary/30 bg-accent/60 p-7 sm:p-9')}
+            className={cn(CARD, 'flex flex-col gap-0 border-primary/30 bg-accent/60 p-7 sm:p-9')}
           >
             <h3 id="rigor-yes" className="lp-kicker text-primary">
               {m.landing_rigor_yes_title()}
             </h3>
-            <ul className="mt-6 flex flex-1 flex-col justify-between gap-6">
+            <ul className="mt-5 flex flex-col gap-5">
               {yes.map(([title, text], i) => (
                 <LedgerRow
                   key={title}
@@ -273,6 +285,26 @@ export function Rigor() {
                 />
               ))}
             </ul>
+            <div
+              data-s=""
+              style={stagger(yes.length)}
+              className="mt-auto flex flex-col gap-4 border-primary/25 border-t pt-6 lg:pt-7"
+            >
+              <h4 className="lp-kicker">{m.landing_quality_title()}</h4>
+              <dl className="grid grid-cols-2 gap-4">
+                {tests.map((t) => (
+                  <div key={t.id} className="flex flex-col gap-1.5">
+                    <dd className={cn(STAT, 'order-1 text-4xl sm:text-5xl')}>
+                      {formatNumber(t.value)}
+                    </dd>
+                    <dt className="order-2 text-muted-foreground text-sm">{t.label}</dt>
+                  </div>
+                ))}
+              </dl>
+              <p className={MONO}>
+                {m.landing_quality_checked({ date: checkedOn })} · {m.landing_quality_stack()}
+              </p>
+            </div>
           </section>
           <div className="flex flex-col gap-4 lg:gap-5">
             <section
@@ -282,7 +314,7 @@ export function Rigor() {
               <h3 id="rigor-no" className="lp-kicker">
                 {m.landing_not_title()}
               </h3>
-              <ul className="mt-6 flex flex-col gap-6">
+              <ul className="mt-5 flex flex-col gap-5">
                 {not.map((t, i) => (
                   <LedgerRow
                     key={t}
@@ -327,32 +359,31 @@ export function Rigor() {
           </div>
         </div>
         <AssumptionsTable />
-        <div data-reveal="" data-fx="stagger" className="grid gap-4 lg:grid-cols-2 lg:gap-5">
-          <div data-s="" style={stagger(0)} className={cn(CARD, 'flex flex-col gap-3 p-7')}>
-            <h3 className="text-xl">{m.landing_quality_title()}</h3>
-            <p className={BODY}>
-              {m.landing_quality_tests({
-                api: formatNumber(QUALITY.api),
-                web: formatNumber(QUALITY.web),
-                date: QUALITY.date,
-              })}
-            </p>
-            <p className={MONO}>{m.landing_quality_stack()}</p>
-          </div>
-          <div data-s="" style={stagger(1)} className={cn(CARD, 'flex flex-col gap-3 p-7')}>
+        <div
+          data-reveal=""
+          className={cn(
+            CARD,
+            'flex flex-col gap-4 p-7 sm:p-9 lg:flex-row lg:items-center lg:justify-between lg:gap-12',
+          )}
+        >
+          <div className="flex flex-col gap-3">
             <h3 className="text-xl">{m.landing_cite_title()}</h3>
-            <p className={`${MONO} text-pretty text-foreground`}>{m.landing_cite_text()}</p>
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex min-h-11 items-center gap-2 self-start rounded-sm font-medium text-primary text-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <GithubMark className="size-4" />
-              {m.landing_cite_repo()}: github.com/helderpgoncalves/novelo
-              <ArrowUpRight className="size-4" aria-hidden="true" />
-            </a>
+            <p className={`${MONO} max-w-2xl text-pretty text-foreground`}>
+              {m.landing_cite_text()}
+            </p>
           </div>
+          <a
+            href={REPO_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex min-h-11 min-w-0 max-w-full items-center gap-2 self-start rounded-sm font-medium text-primary text-sm outline-none hover:underline focus-visible:ring-2 focus-visible:ring-ring lg:shrink-0 lg:self-center"
+          >
+            <GithubMark className="size-4 shrink-0" />
+            <span className="min-w-0 [overflow-wrap:anywhere]">
+              {m.landing_cite_repo()}: github.com/helderpgoncalves/novelo
+            </span>
+            <ArrowUpRight className="size-4 shrink-0" aria-hidden="true" />
+          </a>
         </div>
       </div>
     </Section>

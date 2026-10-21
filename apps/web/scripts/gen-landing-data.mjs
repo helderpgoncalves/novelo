@@ -1,8 +1,11 @@
 // Gera os dados estáticos da landing a partir de data/processed (geometria das freguesias e localidades) e do repositório
 // (contagem de testes). O resultado é versionado em src/features/landing/data/: o build do web não precisa da API nem de
 // data/. Correr à mão quando os dados ou o número de testes mudarem: `node scripts/gen-landing-data.mjs`.
+// Gera três ficheiros: guimaraes-map.json (freguesias, localidades e totais municipais, importado já), guimaraes-sites.json
+// (os locais públicos com o têxtil estimado, carregado só quando o mapa se aproxima) e quality.json (testes).
 import { execSync } from 'node:child_process';
-import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const repo = new URL('../../../', import.meta.url).pathname;
@@ -64,18 +67,77 @@ const places = readFileSync(join(repo, 'data/processed/localities_geo.csv'), 'ut
   .map((l) => l.split(','))
   .filter((c) => c[1] && c[2])
   .map((c) => [px(Number(c[2])), py(Number(c[1]))]);
-writeFileSync(join(out, 'guimaraes-map.json'), `${JSON.stringify({ width: W, height: H, parishes, places })}\n`);
 
-// ---- Testes: contagem de funções de teste (API) e de casos (web).
-const walk = (dir, accept) =>
-  readdirSync(dir).flatMap((n) => {
-    if (['node_modules', '__pycache__', '.venv', 'dist'].includes(n)) return [];
-    const p = join(dir, n);
-    return statSync(p).isDirectory() ? walk(p, accept) : accept(p) ? [p] : [];
-  });
-const count = (files, re) => files.reduce((s, f) => s + (readFileSync(f, 'utf8').match(re) ?? []).length, 0);
-const api = count(walk(join(repo, 'apps/api/tests'), (p) => p.endsWith('.py')), /^\s*(?:async )?def test_/gm);
-const web = count(walk(join(repo, 'apps/web/src'), (p) => /\.test\.tsx?$/.test(p)), /^\s*(?:it|test)(?:\.each\([^)]*\))?\(/gm);
+// ---- Locais municipais (Vitrus, 20 out 2026): onde o têxtil se perde no lixo e onde a viatura já passa.
+// CSV com aspas (nomes de produtores e ruas com vírgulas): leitor mínimo RFC 4180.
+function readCsv(file) {
+  const text = readFileSync(join(repo, 'data/processed', file), 'utf8');
+  const rows = [];
+  let row = [], cell = '', quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (quoted) {
+      if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+      else if (ch === '"') quoted = false;
+      else cell += ch;
+    } else if (ch === '"') quoted = true;
+    else if (ch === ',') { row.push(cell); cell = ''; }
+    else if (ch === '\n') { row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = ''; }
+    else cell += ch;
+  }
+  if (cell || row.length) { row.push(cell); rows.push(row); }
+  const [head, ...body] = rows;
+  return body.filter((r) => r.length === head.length).map((r) => Object.fromEntries(head.map((h, i) => [h, r[i]])));
+}
+const allSites = readCsv('municipal_sites.csv');
+const containersTotal = readCsv('municipal_containers.csv').length;
+const byParish = readCsv('municipal_by_parish.csv');
+// Procura por ponto, como o modelo (docs/engenharia/dados-e-modelo.md, secção 8; site_service.py): cada freguesia reparte o
+// têxtil que ainda vai para o lixo (`textile_gap_t_estimate`) pelos seus locais não-produtores com contentores, na proporção
+// do número de contentores. Estimativa.
+const demandSites = allSites.filter((r) => r.site_class !== 'producer' && Number(r.containers) > 0);
+const gapByCaop = new Map(byParish.map((r) => [r.dicofre_caop, Number(r.textile_gap_t_estimate)]));
+const caopToMapId = new Map(byParish.map((r) => [r.dicofre_caop, r.dicofre]));
+const weight = new Map();
+for (const r of demandSites) weight.set(r.parish_dicofre, (weight.get(r.parish_dicofre) ?? 0) + Number(r.containers));
+const parishIndex = new Map(parishes.map((p, i) => [p.id, i]));
+const pts = demandSites.map((r) => {
+  const t = ((gapByCaop.get(r.parish_dicofre) ?? 0) * Number(r.containers)) / weight.get(r.parish_dicofre);
+  const pi = parishIndex.get(caopToMapId.get(r.parish_dicofre));
+  if (pi === undefined) throw new Error(`freguesia sem geometria: ${r.parish_dicofre}`);
+  return { x: px(Number(r.longitude)), y: py(Number(r.latitude)), t, pi };
+});
+// Centro da onda de entrada: centroide dos locais pesado pelo têxtil (cai no centro da cidade). Dez anéis por distância.
+const tSum = pts.reduce((s, p) => s + p.t, 0);
+const cx = pts.reduce((s, p) => s + p.x * p.t, 0) / tSum;
+const cy = pts.reduce((s, p) => s + p.y * p.t, 0) / tSum;
+const dist = (p) => Math.hypot(p.x - cx, p.y - cy);
+const maxD = Math.max(...pts.map(dist));
+// Menos têxtil primeiro: os pontos maiores ficam por cima.
+pts.sort((a, b) => a.t - b.t);
+const sitesOut = {
+  center: [Math.round(cx), Math.round(cy)],
+  // [x, y, têxtil em décimos de tonelada por ano, índice da freguesia em guimaraes-map.json, anel 0-9]
+  points: pts.map((p) => [p.x, p.y, Math.max(1, Math.round(p.t * 10)), p.pi, Math.min(9, Math.floor((dist(p) / maxD) * 10))]),
+  // Por freguesia (mesma ordem de guimaraes-map.json): têxtil por desviar (décimos de t) e locais com procura.
+  parishes: parishes.map((p) => {
+    const row = byParish.find((r) => r.dicofre === p.id);
+    return [Math.round(Number(row.textile_gap_t_estimate) * 10), pts.filter((q) => q.pi === parishIndex.get(p.id)).length];
+  }),
+};
+writeFileSync(join(out, 'guimaraes-sites.json'), `${JSON.stringify(sitesOut)}\n`);
+const municipal = { sites: allSites.length, demandSites: demandSites.length, containers: containersTotal };
+writeFileSync(join(out, 'guimaraes-map.json'), `${JSON.stringify({ width: W, height: H, parishes, places, municipal })}\n`);
+
+
+// ---- Testes: os números que os próprios executores contam (pytest recolhe os parametrizados; o Vitest corre os casos).
+const api = Number(/(\d+) tests? collected/.exec(
+  execSync('uv run pytest --collect-only -q', { cwd: join(repo, 'apps/api'), encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }),
+)?.[1]);
+const vitestOut = join(tmpdir(), `novelo-vitest-${process.pid}.json`);
+execSync(`pnpm exec vitest run --reporter=json --outputFile=${vitestOut}`, { cwd: join(repo, 'apps/web'), stdio: 'ignore' });
+const web = JSON.parse(readFileSync(vitestOut, 'utf8')).numTotalTests;
+if (!api || !web) throw new Error('contagem de testes falhou');
 const date = execSync('date +%Y-%m-%d').toString().trim();
 writeFileSync(join(out, 'quality.json'), `${JSON.stringify({ api, web, date })}\n`);
-console.log({ parishes: parishes.length, places: places.length, size: [W, H], api, web, date });
+console.log({ parishes: parishes.length, places: places.length, ...municipal, points: pts.length, bytes: JSON.stringify(sitesOut).length, size: [W, H], api, web, date });

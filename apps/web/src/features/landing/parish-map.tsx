@@ -60,8 +60,10 @@ export function ParishMap({
       </g>
       {places && (
         <g data-fade="" fill="var(--dither-gold)" stroke="var(--background)" strokeWidth="1.5">
-          {MAP.places.map(([x, y]) => (
-            <circle key={`${x}-${y}`} cx={x} cy={y} r="6" />
+          {MAP.places.map(([x, y], i) => (
+            // Há localidades com as mesmas coordenadas arredondadas: a chave é a posição na lista (estática).
+            // biome-ignore lint/suspicious/noArrayIndexKey: lista estática gerada, nunca reordenada.
+            <circle key={i} cx={x} cy={y} r="6" />
           ))}
         </g>
       )}

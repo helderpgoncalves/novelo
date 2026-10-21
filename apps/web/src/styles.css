@@ -1647,6 +1647,14 @@ html:has([data-lp-fonts]) .lp-kicker {
   .lp-draw[data-in='true'] [data-fade] {
     opacity: 1;
   }
+  /* Mapa dos locais: os pontos entram em dez ondas a partir do centro da cidade (`--r` = anel de distância). */
+  .lp-sites [data-ring] {
+    opacity: 0;
+    transition: opacity 900ms var(--ease-out) calc(450ms + var(--r, 0) * 130ms);
+  }
+  .lp-sites[data-in='true'] [data-ring] {
+    opacity: 1;
+  }
   /* Cursor de escrita do Copiloto. */
   @keyframes lp-caret {
     50% {

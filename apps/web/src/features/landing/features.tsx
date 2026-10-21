@@ -343,12 +343,15 @@ type Card = {
   /** Âncora da página (`#id`) ou `/register`. */
   to: string;
   art: ReactNode;
+  /** Etiqueta mono por cima do título (destaque). */
+  kicker?: string;
   wide?: boolean;
   className?: string;
 };
 
 /**
- * Produto, em bento de 4 colunas por 3 linhas (dois cartões largos): cada cartão tem um micro-visual próprio e uma
+ * Produto, em bento de 4 colunas por 3 linhas (dois cartões largos: o simulador e a triagem por foto, o controlo de qualidade
+ * na entrega que responde à contaminação; a bolsa de fibra vem depois, porque a reutilização vem primeiro): cada cartão tem um micro-visual próprio e uma
  * microinteração ao passar o rato (só com rato; em toque ficam estáticos), e liga à secção ou ao registo.
  */
 export function Features() {
@@ -376,6 +379,16 @@ export function Features() {
       art: <WhatIfArt />,
     },
     {
+      key: 'triage',
+      title: m.landing_feat_triage_title(),
+      text: m.landing_feat_triage_text(),
+      to: '/register',
+      art: <TriageArt />,
+      kicker: m.landing_feat_triage_kicker(),
+      wide: true,
+      className: 'border-primary/30 bg-accent/60',
+    },
+    {
       key: 'map',
       title: m.landing_feat_map_title(),
       text: m.landing_feat_map_text(),
@@ -395,14 +408,7 @@ export function Features() {
       text: m.landing_feat_lots_text(),
       to: '/register',
       art: <LotsArt />,
-      className: 'bg-accent/60',
-    },
-    {
-      key: 'exchange',
-      title: m.landing_feat_exchange_title(),
-      text: m.landing_feat_exchange_text(),
-      to: '/register',
-      art: <ExchangeArt />,
+      className: 'bg-secondary/40',
     },
     {
       key: 'brands',
@@ -420,11 +426,11 @@ export function Features() {
       className: 'bg-secondary/60',
     },
     {
-      key: 'triage',
-      title: m.landing_feat_triage_title(),
-      text: m.landing_feat_triage_text(),
+      key: 'exchange',
+      title: m.landing_feat_exchange_title(),
+      text: m.landing_feat_exchange_text(),
       to: '/register',
-      art: <TriageArt />,
+      art: <ExchangeArt />,
     },
     {
       key: 'pwa',
@@ -432,7 +438,6 @@ export function Features() {
       text: m.landing_feat_pwa_text(),
       to: '/register',
       art: <PwaArt />,
-      wide: true,
       className: 'bg-primary/10',
     },
   ];
@@ -470,7 +475,7 @@ export function Features() {
                 data-s=""
                 style={{ '--i': i } as CSSProperties}
                 className={cn(
-                  'lp-card group flex flex-col gap-5 overflow-hidden rounded-[1.375rem] border border-border bg-card p-6',
+                  'lp-card group flex flex-col gap-5 overflow-hidden rounded-[1.375rem] border border-border bg-card p-6 text-foreground',
                   c.wide && 'sm:col-span-2 sm:flex-row sm:items-center sm:gap-10',
                   c.className,
                 )}
@@ -484,6 +489,7 @@ export function Features() {
                   {c.art}
                 </div>
                 <div className={cn('flex flex-1 flex-col gap-2', c.wide && 'sm:order-1')}>
+                  {c.kicker && <p className="lp-kicker text-primary">{c.kicker}</p>}
                   <h3 className={cn('text-xl leading-snug', c.wide && 'sm:text-3xl')}>{c.title}</h3>
                   <p className={`${BODY} text-[0.9375rem]`}>{c.text}</p>
                   {anchor ? (

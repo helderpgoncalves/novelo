@@ -18,6 +18,10 @@ E o tempo conta. Desde 1 de janeiro de 2025 a recolha seletiva de têxteis é ob
 
 ![Cerca de 11,5% do têxtil gerado chega à recolha seletiva: 301,3 t recolhidas em 2025 contra cerca de 2 324,8 t ainda no lixo, destino do recolhido e rede atual](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-problema.jpg)
 
+O têxtil perde-se no lixo comum, nos mesmos locais por onde a viatura da Vitrus já passa todos os dias. O mapa mostra os 1 574 locais públicos com contentores municipais (indiferenciado, orgânico e seletivo) e o têxtil que se estima perder em cada um.
+
+![Onde se perdem as 2 325 t por ano: mapa de Guimarães com os locais municipais onde a viatura já passa, tamanho pelo têxtil por desviar (estimativa), e as freguesias com mais têxtil por desviar](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-mapa.png)
+
 A pergunta que a Vitrus nos fez:
 
 > Como criar um serviço de recolha seletiva de têxteis pós-consumo que garanta material reutilizável e reciclável, com o menor investimento e o menor custo de operação?
@@ -69,7 +73,7 @@ Um **PDF pronto para a câmara**, com custo por tipo de território (tipologia d
 
 ## Rigor: dados reais e honestidade sobre a incerteza
 
-![Como o Novelo decide, passo a passo: dados, procura calibrada com o recolhido, otimizador CP-SAT e VRP, cenários em euros, toneladas e €/t, copiloto com verificador de números](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-metodo.png)
+![Como o Novelo decide, passo a passo: dados, procura a partir dos resíduos da Vitrus e da APA, otimizador CP-SAT e VRP, cenários em euros, toneladas e €/t, copiloto com verificador de números](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-metodo.png)
 
 ![Dos dados abertos a cenários com preço; o terreno corrige o modelo](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/diagrama-como-funciona.png)
 
