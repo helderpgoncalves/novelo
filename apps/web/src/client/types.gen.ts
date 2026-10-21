@@ -8703,7 +8703,7 @@ export type ScenarioRequest = {
      */
     parent_id?: string | null;
     /**
-     * Pressupostos de captura e custo usados nos locais (`existing` ou `street`)
+     * Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)
      */
     site_mode?: CollectionMode;
     /**

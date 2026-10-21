@@ -14663,8 +14663,8 @@
           },
           "site_mode": {
             "$ref": "#/components/schemas/CollectionMode",
-            "default": "existing",
-            "description": "Pressupostos de captura e custo usados nos locais (`existing` ou `street`)"
+            "default": "street",
+            "description": "Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)"
           },
           "site_on_demand": {
             "default": true,

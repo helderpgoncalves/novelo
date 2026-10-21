@@ -100,8 +100,8 @@ class ScenarioRequest(BaseModel):
         description="Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)",
     )
     site_mode: CollectionMode = Field(
-        default=CollectionMode.EXISTING,
-        description="Pressupostos de captura e custo usados nos locais (`existing` ou `street`)",
+        default=CollectionMode.STREET,
+        description="Pressupostos de captura e custo usados nos locais (`street`, calibrado com 2025, ou `existing`)",
     )
 
     @model_validator(mode="after")

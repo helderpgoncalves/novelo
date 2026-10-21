@@ -14,6 +14,9 @@ export interface SummaryData {
   valueText: string;
   potentialText: string;
   locationsText: string;
+  networkText: string;
+  /** Nota por baixo do botão: muda com a rede escolhida. */
+  runNote: string;
   restrictionsText: string;
   assumptionsText: string;
   problems: string[];
@@ -114,6 +117,7 @@ export function SummaryPanel({ data, run }: { data: SummaryData; run: RunControl
         <Row label={m.sim_summary_potential()}>
           {data.potentialText} <EstimateTag label={m.common_estimate()} />
         </Row>
+        <Row label={m.site_net_label()}>{data.networkText}</Row>
         <Row label={m.simx_sum_locations()}>{data.locationsText}</Row>
         <Row label={m.sim_summary_constraints()}>{data.restrictionsText}</Row>
         <Row label={m.sim_summary_assumptions()}>{data.assumptionsText}</Row>
@@ -165,7 +169,7 @@ export function SummaryPanel({ data, run }: { data: SummaryData; run: RunControl
       )}
 
       <RunButton run={run} hint />
-      {!run.pending && <p className="text-muted-foreground text-xs">{m.simx_run_note()}</p>}
+      {!run.pending && <p className="text-muted-foreground text-xs">{data.runNote}</p>}
     </Panel>
   );
 }
