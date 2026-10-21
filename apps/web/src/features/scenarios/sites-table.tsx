@@ -12,6 +12,12 @@ const precisionLabel: Record<SiteSelection['coord_precision'], () => string> = {
 
 const streetOf = (s: SiteSelection) => s.street ?? m.site_street_unknown();
 
+type SiteKind = NonNullable<SiteSelection['kind']>;
+const kindLabel: Record<SiteKind, () => string> = {
+  public: () => m.site_kind_public(),
+  staffed: () => m.site_kind_staffed(),
+};
+
 /** Locais abertos de um cenário por locais reais: o que cada um serve, em quantidades estimadas. */
 export function SitesTable({ sites }: { sites: SiteSelection[] }) {
   const rows = useMemo(() => [...sites].sort((x, y) => y.tonnes - x.tonnes), [sites]);
@@ -25,6 +31,22 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
       cell: (s) => (
         <span className={s.street ? undefined : 'text-muted-foreground'}>{streetOf(s)}</span>
       ),
+    },
+    {
+      id: 'kind',
+      header: m.site_col_kind(),
+      searchable: false,
+      value: (s) => s.kind ?? 'public',
+      exportValue: (s) => kindLabel[s.kind ?? 'public'](),
+      filter: { format: (v) => kindLabel[v as SiteKind]() },
+      cell: (s) =>
+        s.kind === 'staffed' ? (
+          <Badge variant="outline" className="border-areia/70 bg-areia/15 font-medium">
+            {kindLabel.staffed()}
+          </Badge>
+        ) : (
+          <span className="text-muted-foreground">{kindLabel.public()}</span>
+        ),
     },
     {
       id: 'parish',

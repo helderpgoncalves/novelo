@@ -40,20 +40,29 @@ export const FACTS = {
   recycling: 26.5,
   reject: 14.1,
   /**
-   * Cenário por freguesia de 60 000 €/ano, rede sem contentores (estimativa, base Vitrus + APA de 21 out 2026):
-   * 371,7 t a 124,3 €/t; P10/P50/P90 de 500 amostras (semente 7). docs/engenharia/dados-e-modelo.md, secção 5.
+   * Cenário por freguesia de 60 000 €/ano, rede sem contentores, recolha a pedido no circuito porta a porta onde há
+   * (estimativa, base Vitrus + APA de 21 out 2026): gasta 47 795 €, 396,2 t a 120,6 €/t; P10/P50/P90 de 500 amostras
+   * (semente 7). docs/engenharia/dados-e-modelo.md, secções 5 e 8.
    */
   scenario60k: {
     budget: 60000,
-    cost: 46192,
-    tonnes: 371.7,
-    eurPerT: 124.3,
-    p10: 97.7,
-    p50: 124.7,
-    p90: 161.1,
+    cost: 47795,
+    tonnes: 396.2,
+    eurPerT: 120.6,
+    p10: 96.9,
+    p50: 122.5,
+    p90: 154.7,
   },
-  /** Cenário base do exemplo do Copiloto: 40 000 €/ano, mesma base e pressupostos (gasta 26 151 €, 314,7 t). */
-  scenarioBase: { budget: 40000, cost: 26151, tonnes: 314.7 },
+  /** Cenário base do exemplo do Copiloto: 40 000 €/ano, mesma base e pressupostos (gasta 27 961 €, 323,8 t). */
+  scenarioBase: { budget: 40000, cost: 27961, tonnes: 323.8 },
+  /**
+   * Recolha no circuito porta a porta (estimativa, 21 out 2026; docs/engenharia/dados-e-modelo.md, secção 9): freguesias
+   * com passagem de um circuito PAP de indiferenciado com viatura no planeamento de turnos da Vitrus, os seus habitantes
+   * (INE) e o têxtil que o cenário de 60 000 €/ano lá recolhe, sem km novos.
+   */
+  doorToDoor: { parishes: 19, inhabitants: 61597, tonnes: 128.7, newKm: 0 },
+  /** Escolas do pacote municipal (`producer_types`), candidatas a pontos com pessoas (pontos assistidos). */
+  schools: 86,
   /**
    * Teto do modelo por freguesia (estimativa, 21 out 2026; docs/engenharia/dados-e-modelo.md, secção 5): sem contentores
    * (local existente e recolha a pedido, orçamento sem limite) e, só como referência, com o contentor de rua à densidade francesa.

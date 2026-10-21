@@ -3,6 +3,7 @@ export const MUNICIPAL_TABS = [
   'parishes',
   'sites',
   'candidates',
+  'b2b',
   'gaps',
   'quality',
 ] as const;

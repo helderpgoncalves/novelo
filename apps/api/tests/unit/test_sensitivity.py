@@ -8,6 +8,8 @@ Fixture: duas freguesias de 1 000 habitantes no depósito (0 km radiais), q = 1 
   Plano: 12 t, 1 860 €/ano, 155 €/t.
 """
 
+from dataclasses import replace
+
 import pytest
 
 from novelo.domain.network import Mode, ModeParams, Params, Zone
@@ -211,3 +213,15 @@ def test_robustness_by_tonnes_criterion() -> None:
 def test_robustness_pairs_the_samples_and_is_reproducible() -> None:
     first = robustness(PLAN, params(), [A, B], params(), n=100, seed=5, swing=0.5)
     assert first == robustness(PLAN, params(), [A, B], params(), n=100, seed=5, swing=0.5)
+
+
+def test_door_to_door_pickup_cost_enters_only_where_the_plan_rides_a_pap_circuit() -> None:
+    # B no circuito PAP: 240 recolhas · 5 € (= custo de uma recolha, sem pressuposto próprio), 0 km -> 1 200 €/ano
+    pap = PlanItem(replace(B.zone, door_to_door=True), B.modes, (1.0,))
+    p = params()
+    assert evaluate_plan([A, pap], p).annual_cost_eur == pytest.approx(300.0 + 1200.0)
+    assert "pap_cost_per_pickup_eur" not in sensitive_keys(PLAN, p)
+    assert "pap_cost_per_pickup_eur" in sensitive_keys([A, pap], p)
+    # o tornado mexe no custo PAP: +30% -> 240 · 6,5 = 1 560 €; −30% -> 240 · 3,5 = 840 €
+    bar = next(b for b in tornado([A, pap], p) if b.key == "pap_cost_per_pickup_eur")
+    assert (bar.low.annual_cost_eur, bar.high.annual_cost_eur) == (pytest.approx(1140.0), pytest.approx(1860.0))

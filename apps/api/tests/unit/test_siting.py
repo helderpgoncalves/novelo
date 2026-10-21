@@ -10,6 +10,8 @@ from novelo.domain.siting import (
     OnDemandZone,
     SiteCosts,
     SitePlan,
+    capacity_weights,
+    median_capacity_by_kind,
     neighbours,
     plan_site_network,
     point_tonnes,
@@ -183,3 +185,17 @@ def test_hybrid_with_only_the_on_demand_budget() -> None:
     assert plan.sites == [] and set(plan.on_demand) == {"z"}
     assert plan.tonnes == pytest.approx(1.5)
     assert plan.population_covered == pytest.approx(3000 * 0.6)
+
+
+def test_capacity_weights_impute_unknown_litres_with_the_median_of_the_type() -> None:
+    containers = [
+        ("s1", "surface", 1100),
+        ("s1", "underground", 5000),
+        ("s2", "surface", None),  # mediana de surface (800, 1100, 1100) = 1 100
+        ("s2", "surface", 800),
+        ("s3", "surface", 1100),
+        ("s3", "platform", None),  # tipo sem nenhum valor: mediana de todos (800, 1100, 1100, 5000) = 1 100
+    ]
+    assert median_capacity_by_kind([(k, c) for _, k, c in containers]) == {"surface": 1100.0, "underground": 5000.0}
+    assert capacity_weights(containers) == {"s1": 6100.0, "s2": 1900.0, "s3": 2200.0}
+    assert capacity_weights([("s", "surface", None)]) == {"s": 0.0}

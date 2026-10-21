@@ -2,13 +2,13 @@ import { Link } from '@tanstack/react-router';
 import { forwardRef, useEffect, useMemo } from 'react';
 import type { ScenarioOut, ZoneOut } from '@/client';
 import { EstimateTag, Panel } from '@/components/panel';
-import { StatCell, StatStrip } from '@/components/stat-strip';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
+import { CollectionPlanSection } from '@/features/scenarios/collection-plan-section';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
-import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
+import { ScenarioKpis, ScenarioSecondaryKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
 import { SitesTable } from '@/features/scenarios/sites-table';
 import { SitingOverview } from '@/features/scenarios/siting-overview';
@@ -36,9 +36,6 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
   const { result } = scenario;
   const { kpis } = result;
   const infeasible = scenario.status === 'infeasible';
-  const capturePct = kpis.potential_t > 0 ? (kpis.tonnes_year / kpis.potential_t) * 100 : 0;
-  const baselinePct =
-    kpis.potential_t > 0 ? (kpis.baseline_observed_t / kpis.potential_t) * 100 : 0;
 
   return (
     <section
@@ -100,19 +97,7 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
 
       <div className="space-y-3">
         <ScenarioKpis kpis={kpis} bySites={Boolean(result.siting)} />
-        <StatStrip className="lg:grid-cols-2">
-          <StatCell
-            label={m.simx_kpi_capture()}
-            value={formatPercent(capturePct, 1)}
-            tag={m.common_estimate()}
-            hint={m.simx_kpi_capture_hint({ baseline: formatPercent(baselinePct, 1) })}
-          />
-          <StatCell
-            label={m.simx_kpi_routes()}
-            value={formatNumber(result.routes.length)}
-            hint={m.simx_kpi_routes_hint({ km: `${formatNumber(kpis.km_year)} km` })}
-          />
-        </StatStrip>
+        <ScenarioSecondaryKpis kpis={kpis} routes={result.routes.length} />
       </div>
 
       {result.siting && <SitingOverview siting={result.siting} sites={result.sites ?? []} />}
@@ -127,6 +112,8 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
           className="h-[22rem] overflow-hidden rounded-lg ring-1 ring-foreground/10 sm:h-[30rem] lg:h-[34rem]"
         />
       </Panel>
+
+      <CollectionPlanSection plan={result.collection_plan} scenarioId={scenario.id} />
 
       <Why scenario={scenario} />
 

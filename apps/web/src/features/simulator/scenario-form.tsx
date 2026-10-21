@@ -60,6 +60,9 @@ const RADII = [200, 300, 500] as const;
 type Siting = NonNullable<ScenarioRequest['siting']>;
 /** `existing` por omissão; `street` só como referência explícita (a Vitrus não usa contentores de têxtil). */
 type SiteMode = Extract<CollectionMode, 'existing' | 'street'>;
+/** Candidatos da rede por locais: públicos (contentores municipais), escolas (pontos assistidos) ou ambos. */
+export type SiteCandidates = NonNullable<ScenarioRequest['site_candidates']>;
+const SITE_CANDIDATES: SiteCandidates[] = ['both', 'public', 'staffed'];
 const snapRadius = (r: number): number =>
   RADII.reduce((best, x) => (Math.abs(x - r) < Math.abs(best - r) ? x : best), 300 as number);
 type SectionId = 'goal' | 'assumptions' | 'options';
@@ -76,6 +79,7 @@ export interface FormSeed {
   siting: Siting;
   radiusM: number;
   siteMode: SiteMode;
+  siteCandidates: SiteCandidates;
   /** Completar a rede com recolha a pedido nas freguesias onde compensa. */
   onDemand: boolean;
 }
@@ -105,6 +109,8 @@ function matchesRequest(s: ScenarioOut, r: ScenarioRequest): boolean {
     (!siting ||
       (siting.radius_m === r.site_radius_m &&
         siting.site_mode === r.site_mode &&
+        // Cenários antigos, sem o campo, só tinham locais públicos.
+        (siting.site_candidates ?? 'public') === (r.site_candidates ?? 'both') &&
         (siting.on_demand ?? true) === (r.site_on_demand ?? true)));
   // Cenários antigos, sem o campo, permitiam todos os modos.
   const sameModes =
@@ -139,6 +145,9 @@ export function ScenarioForm({
   const [siting, setSiting] = useState<Siting>(seed.siting);
   const [radiusM, setRadiusM] = useState(snapRadius(seed.radiusM));
   const [siteMode, setSiteMode] = useState(seed.siteMode);
+  const [siteCandidates, setSiteCandidates] = useState(seed.siteCandidates);
+  // Com o contentor de rua (só referência) os candidatos são sempre os públicos: uma escola não tem contentor de rua.
+  const candidates: SiteCandidates = siteMode === 'street' ? 'public' : siteCandidates;
   const [onDemand, setOnDemand] = useState(seed.onDemand);
   const [submitted, setSubmitted] = useState(false);
   const [open, setOpen] = useState<Set<SectionId>>(new Set(['goal']));
@@ -188,6 +197,7 @@ export function ScenarioForm({
       siting,
       site_radius_m: radiusM,
       site_mode: siteMode,
+      site_candidates: candidates,
       site_on_demand: onDemand,
     }),
     [
@@ -201,6 +211,7 @@ export function ScenarioForm({
       siting,
       radiusM,
       siteMode,
+      candidates,
       onDemand,
     ],
   );
@@ -223,13 +234,25 @@ export function ScenarioForm({
           net: siting,
           radius: siting === 'sites' ? (radiusM as 200 | 300 | 500) : undefined,
           point: siting === 'sites' ? siteMode : undefined,
+          cand: siting === 'sites' && siteCandidates !== 'both' ? siteCandidates : undefined,
           ondemand: siting === 'sites' ? onDemand : undefined,
         }),
         replace: true,
       });
     }, 400);
     return () => window.clearTimeout(id);
-  }, [objective, budget, targetPct, label, siting, radiusM, siteMode, onDemand, navigate]);
+  }, [
+    objective,
+    budget,
+    targetPct,
+    label,
+    siting,
+    radiusM,
+    siteMode,
+    siteCandidates,
+    onDemand,
+    navigate,
+  ]);
 
   const create = useMutation({
     mutationFn: async (body: ScenarioRequest) => {
@@ -374,7 +397,7 @@ export function ScenarioForm({
         ? `${m.site_sum_sites({
             radius: String(radiusM),
             mode: siteModeLabel[siteMode]().toLowerCase(),
-          })}${onDemand ? ` · ${m.site_sum_on_demand()}` : ''}`
+          })} · ${candidatesLabel[candidates]()}${onDemand ? ` · ${m.site_sum_on_demand()}` : ''}`
         : m.site_sum_parish(),
     runNote:
       siting === 'sites'
@@ -543,6 +566,8 @@ export function ScenarioForm({
                 onRadiusChange={setRadiusM}
                 siteMode={siteMode}
                 onSiteModeChange={setSiteMode}
+                siteCandidates={siteCandidates}
+                onSiteCandidatesChange={setSiteCandidates}
                 onDemand={onDemand}
                 onOnDemandChange={setOnDemand}
               />
@@ -646,6 +671,12 @@ const siteModeLabel: Record<SiteMode, () => string> = {
   street: () => m.site_mode_street(),
 };
 
+const candidatesLabel: Record<SiteCandidates, () => string> = {
+  both: () => m.site_cand_both(),
+  public: () => m.site_cand_public(),
+  staffed: () => m.site_cand_staffed(),
+};
+
 interface NetworkControlProps {
   siting: Siting;
   onSitingChange: (v: Siting) => void;
@@ -653,6 +684,8 @@ interface NetworkControlProps {
   onRadiusChange: (v: number) => void;
   siteMode: SiteMode;
   onSiteModeChange: (v: SiteMode) => void;
+  siteCandidates: SiteCandidates;
+  onSiteCandidatesChange: (v: SiteCandidates) => void;
   onDemand: boolean;
   onOnDemandChange: (v: boolean) => void;
 }
@@ -665,6 +698,8 @@ function NetworkControl({
   onRadiusChange,
   siteMode,
   onSiteModeChange,
+  siteCandidates,
+  onSiteCandidatesChange,
   onDemand,
   onOnDemandChange,
 }: NetworkControlProps) {
@@ -708,6 +743,30 @@ function NetworkControl({
                 label: m.site_radius_value({ n: String(r) }),
               }))}
             />
+          </div>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <span className="font-medium text-sm">{m.site_cand_label()}</span>
+              <HelpHint label={m.site_cand_label()}>
+                <ul className="space-y-2">
+                  <li>{m.site_cand_help_public()}</li>
+                  <li>{m.site_cand_help_staffed()}</li>
+                  <li className="text-muted-foreground">{m.site_cand_help_both()}</li>
+                </ul>
+              </HelpHint>
+            </div>
+            {siteMode === 'street' ? (
+              <p className="flex min-h-10 items-center rounded-lg border bg-muted/40 px-3 text-muted-foreground text-sm">
+                {m.site_cand_street_note()}
+              </p>
+            ) : (
+              <Segmented
+                label={m.site_cand_aria()}
+                value={siteCandidates}
+                onChange={onSiteCandidatesChange}
+                options={SITE_CANDIDATES.map((c) => ({ value: c, label: candidatesLabel[c]() }))}
+              />
+            )}
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between gap-2">

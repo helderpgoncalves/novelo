@@ -9,6 +9,7 @@ import { MODE_COLORS, NO_MODE_COLOR, zonesToGeoJson } from '@/lib/map';
 import { ALL_MODES, modeLabel } from '@/lib/scenario';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
+import { doorToDoorByParish, planWeekday } from './collection-plan';
 
 interface ScenarioMapProps {
   zones: ZoneOut[];
@@ -47,6 +48,11 @@ function routeGeoJson(routes: RouteOut[]) {
 
 // Os locais reais desenham-se a verde floresta, a mesma cor que o contentor de rua (referência) já usava.
 const SITE_COLOR = MODE_COLORS.street;
+// Escolas (pontos assistidos): areia com contorno de tinta, para se distinguirem dos locais públicos.
+const STAFFED_FILL = '#c4a06a';
+const STAFFED_STROKE = '#14211d';
+// Freguesias no circuito porta a porta: contorno grosso a tinta.
+const PAP_LINE = '#14211d';
 
 // Cenários antigos, sem `default_modes`: a legenda mostra os modos oferecidos e os que o resultado usa.
 const MODES_SHOWN = ALL_MODES.filter((mode) => mode !== 'street');
@@ -68,7 +74,7 @@ function sitesGeoJson(sites: SiteSelection[], radiusM: number) {
       type: 'FeatureCollection' as const,
       features: sites.map((s) => ({
         type: 'Feature' as const,
-        properties: { id: s.site_id, precision: s.coord_precision },
+        properties: { id: s.site_id, precision: s.coord_precision, kind: s.kind ?? 'public' },
         geometry: { type: 'Point' as const, coordinates: [s.longitude, s.latitude] },
       })),
     },
@@ -98,12 +104,17 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
   const sites = result.sites ?? [];
   const siting = result.siting;
   const bySites = Boolean(siting) && sites.length > 0;
+  const pap = useMemo(() => doorToDoorByParish(result.collection_plan), [result.collection_plan]);
+  const hasStaffed = sites.some((s) => s.kind === 'staffed');
   const extra = useMemo(
     () =>
       Object.fromEntries(
-        result.allocations.map((a) => [a.parish_code, { mode: a.mode ?? 'none' }]),
+        result.allocations.map((a) => [
+          a.parish_code,
+          { mode: a.mode ?? 'none', pap: pap.has(a.parish_code) },
+        ]),
       ),
-    [result.allocations],
+    [result.allocations, pap],
   );
   const geojson = useMemo(() => zonesToGeoJson(zones, extra), [zones, extra]);
   const routes = useMemo(() => routeGeoJson(result.routes), [result.routes]);
@@ -112,6 +123,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
     [siting, result.sites],
   );
   const hovered = bySites ? undefined : result.allocations.find((a) => a.parish_code === hoverCode);
+  const hoveredPap = hovered ? pap.get(hovered.parish_code) : undefined;
   const activeSite = bySites
     ? sites.find((s) => s.site_id === (pinnedSite ?? hoverSite))
     : undefined;
@@ -173,6 +185,14 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
             type="line"
             paint={{ 'line-color': '#14211d', 'line-opacity': 0.35, 'line-width': 0.8 }}
           />
+          {pap.size > 0 && (
+            <Layer
+              id="alloc-pap"
+              type="line"
+              filter={['==', ['get', 'pap'], true]}
+              paint={{ 'line-color': PAP_LINE, 'line-opacity': 0.9, 'line-width': 2.4 }}
+            />
+          )}
         </Source>
         {showRoutes && (
           <Source id="routes" type="geojson" data={routes}>
@@ -211,12 +231,19 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                   'circle-radius': siteRadius,
                   'circle-color': [
                     'case',
+                    ['==', ['get', 'kind'], 'staffed'],
+                    STAFFED_FILL,
                     ['==', ['get', 'precision'], 'approximate'],
                     '#ffffff',
                     SITE_COLOR,
                   ],
-                  'circle-stroke-color': SITE_COLOR,
-                  'circle-stroke-width': 2,
+                  'circle-stroke-color': [
+                    'case',
+                    ['==', ['get', 'kind'], 'staffed'],
+                    STAFFED_STROKE,
+                    SITE_COLOR,
+                  ],
+                  'circle-stroke-width': ['case', ['==', ['get', 'kind'], 'staffed'], 2.5, 2],
                 }}
               />
             </Source>
@@ -245,6 +272,14 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
               {m.unit_year_short()} · {m.scenario_points({ count: hovered.points })}
             </p>
           )}
+          {hoveredPap?.circuit && (
+            <p className="font-medium text-primary text-xs">
+              {m.plan_map_tooltip({
+                circuit: hoveredPap.circuit,
+                day: planWeekday(hoveredPap.weekday) ?? '',
+              })}
+            </p>
+          )}
         </div>
       )}
 
@@ -259,6 +294,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
             {activeSite.street ?? m.site_street_unknown()}
           </p>
           <p className="text-muted-foreground text-xs">
+            {activeSite.kind === 'staffed' && `${m.site_kind_staffed()} · `}
             {activeSite.parish_name}
             {activeSite.coord_precision === 'approximate' &&
               ` · ${m.site_precision_approximate().toLowerCase()}`}
@@ -296,8 +332,18 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                   style={{ background: SITE_COLOR, borderColor: SITE_COLOR }}
                   aria-hidden="true"
                 />
-                {m.site_map_open()}
+                {hasStaffed ? m.site_kind_public() : m.site_map_open()}
               </li>
+              {hasStaffed && (
+                <li className="flex items-center gap-2">
+                  <span
+                    className="size-3 rounded-full border-[2.5px]"
+                    style={{ background: STAFFED_FILL, borderColor: STAFFED_STROKE }}
+                    aria-hidden="true"
+                  />
+                  {m.site_map_staffed()}
+                </li>
+              )}
               {sites.some((s) => s.coord_precision === 'approximate') && (
                 <li className="flex items-center gap-2">
                   <span
@@ -324,6 +370,16 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 />
                 {m.site_map_no_site()}
               </li>
+              {pap.size > 0 && (
+                <li className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-3 rounded-[3px] border-2"
+                    style={{ borderColor: PAP_LINE }}
+                    aria-hidden="true"
+                  />
+                  {m.site_map_pap()}
+                </li>
+              )}
             </>
           ) : (
             <>
@@ -349,6 +405,16 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 />
                 {m.mode_none()}
               </li>
+              {pap.size > 0 && (
+                <li className="flex items-center gap-2">
+                  <span
+                    className="h-2.5 w-3 rounded-[3px] border-2"
+                    style={{ borderColor: PAP_LINE }}
+                    aria-hidden="true"
+                  />
+                  {m.site_map_pap()}
+                </li>
+              )}
             </>
           )}
         </ul>

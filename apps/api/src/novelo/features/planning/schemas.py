@@ -5,9 +5,12 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
-from novelo.domain.vocab import CollectionMode, ScenarioObjective, ScenarioStatus, Tipau
+from novelo.domain.vocab import CollectionMode, ProducerType, ScenarioObjective, ScenarioStatus, Tipau
 
 Siting = Literal["parish", "sites"]
+# Candidatos da rede por locais: `public` (locais de contentores municipais na rua), `staffed` (pontos assistidos:
+# escolas, sem contentor de rua; caixa ou saco no interior), `both`.
+SiteCandidates = Literal["public", "staffed", "both"]
 
 # Modos oferecidos por omissão: local existente e recolha a pedido. A Vitrus não tem contentores de têxtil nem os quer
 # (contaminação); `street` continua no vocabulário só como referência explícita (ex.: benchmark francês).
@@ -48,6 +51,28 @@ class PlanningParams(BaseModel):
     depot_lat: float = Field(ge=-90, le=90)
     depot_lon: float = Field(ge=-180, le=180)
     solver_time_limit_s: int = Field(ge=1, le=120)
+    # Campos novos (21 out 2026) com valor por omissão: os pressupostos e cenários já guardados continuam válidos.
+    pap_cost_per_pickup_eur: float = Field(
+        default=6.0,
+        ge=0,
+        description=(
+            "Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem, 0 km "
+            "novos). Pressuposto: igual ao custo de uma recolha até a Vitrus dar o tempo de paragem"
+        ),
+    )
+    pap_free_capacity_kg: float | None = Field(
+        default=None,
+        ge=0,
+        description="Capacidade livre para têxtil por ronda numa viatura porta a porta (kg); nulo = por validar",
+    )
+    rsu_treatment_eur_per_t: float | None = Field(
+        default=None,
+        ge=0,
+        description=(
+            "Custo de tratamento do indiferenciado por tonelada (Vitrus, departamento financeiro, pedido a 21 out "
+            "2026); nulo = por preencher, e a poupança no tratamento aparece «por validar»"
+        ),
+    )
 
     @model_validator(mode="after")
     def _all_modes_present(self) -> Self:
@@ -61,6 +86,7 @@ class ParamMeta(BaseModel):
     key: str = Field(description="Caminho do parâmetro, ex.: `modes.street.capture_rate`")
     unit: str
     source: ParamSource
+    note: str | None = Field(default=None, description="Fonte em texto, quando o valor ainda está por preencher")
 
 
 class ParametersOut(BaseModel):
@@ -68,6 +94,15 @@ class ParametersOut(BaseModel):
     version: int
     meta: list[ParamMeta]
     updated_at: datetime
+
+
+class DoorToDoorPass(BaseModel):
+    """Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia."""
+
+    circuit: str
+    weekday: int = Field(ge=1, le=7, description="1 = segunda ... 7 = domingo")
+    vehicle: str | None = Field(description="Matrícula no planeamento de turnos desse dia")
+    crew: int | None = Field(description="Tripulação no planeamento de turnos desse dia")
 
 
 class ZoneOut(BaseModel):
@@ -85,6 +120,13 @@ class ZoneOut(BaseModel):
     )
     localities: list[str]
     geometry: dict[str, object] | None
+    door_to_door: list[DoorToDoorPass] = Field(
+        default_factory=list,
+        description=(
+            "Passagens dos circuitos porta a porta com viatura no planeamento: onde há, a recolha a pedido vai no "
+            "circuito sem km novos"
+        ),
+    )
 
 
 class ScenarioRequest(BaseModel):
@@ -116,6 +158,16 @@ class ScenarioRequest(BaseModel):
         default=True,
         description="Completa a rede de locais com recolha a pedido nas freguesias onde compensa (`sites`)",
     )
+    site_candidates: SiteCandidates = Field(
+        default="both",
+        description=(
+            "Candidatos da rede por locais: `both` (por omissão: o que dá mais toneladas e menor €/t), `staffed` "
+            "(pontos assistidos: escolas, com pessoas, sem contentor de rua) ou `public` (locais de contentores "
+            "municipais na rua, onde a viatura para e recolhe sacos fechados). Os pontos assistidos usam os "
+            "pressupostos do modo `existing`; com `site_mode = street` (só referência) os candidatos são sempre os "
+            "públicos"
+        ),
+    )
     site_mode: CollectionMode = Field(
         default=CollectionMode.EXISTING,
         description=(
@@ -132,6 +184,11 @@ class ScenarioRequest(BaseModel):
             raise ValueError("target_tonnes is required for min_cost")
         if self.site_mode == CollectionMode.ON_DEMAND:
             raise ValueError("site_mode must be existing or street")
+        if self.site_candidates != "public" and self.site_mode != CollectionMode.EXISTING:
+            # Um ponto assistido não tem contentor de rua: com `street` (só referência) os candidatos são os públicos.
+            if "site_candidates" in self.model_fields_set:
+                raise ValueError("staffed points use site_mode existing (a staffed point has no street container)")
+            self.site_candidates = "public"
         return self
 
 
@@ -146,6 +203,13 @@ class Kpis(BaseModel):
     km_year: float
     potential_t: float
     baseline_observed_t: float = Field(description="Recolhido em 2025 (dados da Vitrus)")
+    avoided_treatment_eur: float | None = Field(
+        default=None,
+        description=(
+            "Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» "
+            "(o custo por tonelada ainda não chegou da Vitrus)"
+        ),
+    )
 
 
 class AllocationPart(BaseModel):
@@ -210,6 +274,12 @@ class SiteSelection(BaseModel):
     """Um local aberto num cenário por locais, com o que serve."""
 
     site_id: str
+    kind: Literal["public", "staffed"] = Field(
+        default="public", description="`staffed`: ponto assistido (escola), sem contentor de rua"
+    )
+    producer_types: list[ProducerType] = Field(
+        default_factory=list, description="Tipos de produtor no local (pontos assistidos); nunca os nomes"
+    )
     latitude: float
     longitude: float
     parish_code: str
@@ -228,7 +298,9 @@ class SitingSummary(BaseModel):
 
     radius_m: int
     site_mode: CollectionMode
+    site_candidates: SiteCandidates = Field(default="public", description="Cenários antigos, sem o campo: `public`")
     candidates: int
+    staffed_candidates: int = Field(default=0, description="Dos candidatos, quantos são pontos assistidos")
     demand_points: int
     served_points: int
     opened: int
@@ -236,6 +308,29 @@ class SitingSummary(BaseModel):
     on_demand_zones: int = Field(default=0, description="Freguesias onde a recolha a pedido foi ligada")
     solver_iterations: int
     population_proxy: str
+
+
+class CollectionPlanEntry(BaseModel):
+    """Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio."""
+
+    parish_code: str
+    parish_name: str
+    channel: Literal["door_to_door", "detour"] = Field(
+        description="`door_to_door`: no circuito PAP que já passa; `detour`: a pedido, com km de desvio"
+    )
+    circuit: str | None = Field(description="Circuito PAP escolhido (dia com menos carga de têxtil)")
+    circuits: list[str] = Field(default_factory=list, description="Todos os circuitos PAP com viatura na freguesia")
+    weekday: int | None = Field(description="Dia fixo do saco à porta: 1 = segunda ... 7 = domingo")
+    vehicle: str | None
+    crew: int | None
+    new_km_year: float = Field(description="Km novos por ano (0 no circuito PAP)")
+    tonnes_year: float = Field(description="Têxtil por este canal (estimativa)")
+    pickups_year: float = Field(description="Recolhas por ano (t × 1000 / kg por recolha)")
+    kg_per_round: float | None = Field(description="Têxtil por ronda semanal no circuito (só PAP)")
+    round_kg: float | None = Field(description="Têxtil da ronda (circuito, dia) somando as freguesias que lá caem")
+    fits_capacity: bool | None = Field(
+        description="A ronda cabe na viatura? Nulo = por validar (capacidade livre ainda sem valor da Vitrus)"
+    )
 
 
 class ScenarioResult(BaseModel):
@@ -249,6 +344,13 @@ class ScenarioResult(BaseModel):
     default_modes: list[CollectionMode] = Field(
         default_factory=lambda: list(CollectionMode),
         description="Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)",
+    )
+    collection_plan: list[CollectionPlanEntry] | None = Field(
+        default=None,
+        description=(
+            "Freguesias com recolha a pedido e o canal: circuito porta a porta (circuito, dia, viatura, 0 km novos) "
+            "ou a pedido com desvio. Nulo nos cenários calculados antes de 21 out 2026"
+        ),
     )
 
 
@@ -283,6 +385,7 @@ class ScenarioOut(ScenarioSummary):
         return {
             "default_modes": self.result.default_modes,
             "siting": "sites",
+            "site_candidates": s.site_candidates,
             "site_radius_m": s.radius_m,
             "site_mode": s.site_mode,
             "site_on_demand": s.on_demand,

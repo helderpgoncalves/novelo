@@ -19,6 +19,8 @@ export function SitingOverview({
     siting.demand_points > 0 ? (siting.served_points / siting.demand_points) * 100 : 0;
   const onDemand = siting.on_demand === true;
   const population = sites.reduce((sum, s) => sum + s.population_covered, 0);
+  const staffed = sites.filter((s) => s.kind === 'staffed').length;
+  const withStaffed = staffed > 0 || (siting.site_candidates ?? 'public') !== 'public';
   return (
     <div className="space-y-3">
       <StatStrip>
@@ -29,6 +31,14 @@ export function SitingOverview({
           hint={
             <>
               {m.site_kpi_opened_hint({ n: formatNumber(siting.candidates) })}
+              {withStaffed && (
+                <span className="block">
+                  {m.site_kpi_opened_kinds({
+                    public: formatNumber(sites.length - staffed),
+                    staffed: formatNumber(staffed),
+                  })}
+                </span>
+              )}
               {onDemand && (
                 <span className="block">
                   {m.site_kpi_opened_on_demand({ n: formatNumber(siting.on_demand_zones ?? 0) })}

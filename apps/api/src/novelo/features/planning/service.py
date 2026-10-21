@@ -3,6 +3,7 @@
 import asyncio
 import uuid
 from collections import defaultdict
+from collections.abc import Sequence
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -10,16 +11,28 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import defer, selectinload
 
 from novelo.core.errors import NotFoundError
-from novelo.domain import network
+from novelo.domain import door_to_door, network
 from novelo.domain.demand import yearly_demand_t
-from novelo.domain.vocab import CollectionMode, ContainerKind, ContainerStatus, ScenarioStatus, TextileDestination
-from novelo.features.network.models import Circuit, Container, Locality, Parish
+from novelo.domain.vocab import (
+    CollectionMode,
+    CollectionType,
+    ContainerKind,
+    ContainerStatus,
+    DayGroup,
+    ScenarioStatus,
+    Shift,
+    TextileDestination,
+    Typology,
+)
+from novelo.features.network.models import Circuit, Container, Locality, Parish, ShiftAssignment, Vehicle
 from novelo.features.planning import site_service
+from novelo.features.planning.collection_plan import build_collection_plan
 from novelo.features.planning.models import ParameterSet, Scenario
-from novelo.features.planning.params import default_params, params_meta, to_domain_params
+from novelo.features.planning.params import default_params, params_meta, to_domain_params, to_domain_zone
 from novelo.features.planning.schemas import (
     Allocation,
     AllocationPart,
+    DoorToDoorPass,
     Kpis,
     ModeSummary,
     ParametersOut,
@@ -94,6 +107,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
     for c in circuits:
         for cl in c.localities:
             days_by_locality[cl.locality_id] = max(days_by_locality.get(cl.locality_id, 0), len(c.days))
+    passes_by_locality = await _door_to_door_passes(db, circuits)
     # Contentores têxteis ativos por freguesia (vazio até chegarem as localizações da Vitrus).
     container_counts = await db.execute(
         select(Container.parish_id, func.count())
@@ -115,6 +129,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
         if p.latitude is None or p.longitude is None or p.population is None:
             continue
         locs = by_parish.get(p.id, [])
+        passes = {(x.circuit, x.weekday): x for loc in locs for x in passes_by_locality.get(loc.id, [])}
         zones.append(
             ZoneOut(
                 code=p.dicofre,
@@ -129,9 +144,44 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 existing_containers=containers_by_parish.get(p.id, 0),
                 localities=sorted(loc.name for loc in locs),
                 geometry=p.geometry,
+                door_to_door=[passes[k] for k in sorted(passes, key=lambda k: (k[1], k[0]))],
             )
         )
     return zones
+
+
+SHIFT_ORDER = {Shift.MORNING: 0, Shift.AFTERNOON: 1, Shift.NIGHT: 2}
+
+
+async def _door_to_door_passes(db: AsyncSession, circuits: Sequence[Circuit]) -> dict[uuid.UUID, list[DoorToDoorPass]]:
+    """Passagens semanais dos circuitos porta a porta COM viatura no planeamento de turnos, por localidade.
+
+    Só circuitos de indiferenciado: o têxtil numa viatura de biorresíduos (orgânico) molha-se e perde o valor de
+    reutilização, que é a contaminação que a Vitrus quer evitar.
+    """
+    rows = (
+        await db.execute(
+            select(ShiftAssignment.circuit_id, ShiftAssignment.day_group, ShiftAssignment.shift, Vehicle.plate,
+                   ShiftAssignment.crew_size)
+            .join(Vehicle, Vehicle.id == ShiftAssignment.vehicle_id)
+            .where(ShiftAssignment.circuit_id.is_not(None))
+        )
+    ).all()  # fmt: skip
+    crewing: dict[uuid.UUID, list[door_to_door.Crewing]] = defaultdict(list)
+    for circuit_id, group, shift, plate, crew in rows:
+        if circuit_id is not None:
+            entry = door_to_door.Crewing(DayGroup(group).value, SHIFT_ORDER[Shift(shift)], plate, crew)
+            crewing[circuit_id].append(entry)
+    out: dict[uuid.UUID, list[DoorToDoorPass]] = defaultdict(list)
+    for c in circuits:
+        if c.collection_type != CollectionType.DOOR_TO_DOOR or c.typology != Typology.UNDIFFERENTIATED:
+            continue
+        passes = door_to_door.circuit_passes(c.code, [d.weekday for d in c.days], crewing.get(c.id, []))
+        for cl in c.localities:
+            out[cl.locality_id] += [
+                DoorToDoorPass(circuit=x.circuit, weekday=x.weekday, vehicle=x.vehicle, crew=x.crew) for x in passes
+            ]
+    return out
 
 
 async def list_zones(db: AsyncSession) -> list[ZoneOut]:
@@ -156,12 +206,7 @@ def compute(
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs."""
     dp = _domain_params(params)
-    dzones = [
-        network.Zone(
-            z.code, z.name, z.population, z.latitude, z.longitude, z.service_days, z.existing_containers or None
-        )
-        for z in zones
-    ]
+    dzones = [to_domain_zone(z, existing_points=True) for z in zones]
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
     options = network.build_options(dzones, dp, allowed or None, request.default_modes)
 
@@ -292,7 +337,11 @@ def compute(
         km_year=round(sum(a.km_year for a in allocations), 1),
         potential_t=round(sum(z.demand_t for z in zones), 1),
         baseline_observed_t=round(baseline_t, 1),
+        avoided_treatment_eur=site_service.avoided_treatment(tonnes, params),
     )
+    on_demand = {
+        a.parish_code: (x.tonnes, x.km_year) for a in allocations for x in a.parts if x.mode == CollectionMode.ON_DEMAND
+    }
     modes = [
         ModeSummary(
             mode=m,
@@ -311,6 +360,7 @@ def compute(
         modes=modes,
         depot=[params.depot_lat, params.depot_lon],
         default_modes=request.default_modes,
+        collection_plan=build_collection_plan(zones, on_demand, params),
     )
     return result, solved.status
 

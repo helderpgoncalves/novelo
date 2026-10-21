@@ -44,6 +44,8 @@ from novelo.features.municipal.schemas import (
     CaopFeature,
     CaopFeatureCollection,
     CaopProps,
+    MunicipalB2BChannelOut,
+    MunicipalB2BTypeCount,
     MunicipalCandidateOut,
     MunicipalCandidatesOut,
     MunicipalContainerPage,
@@ -486,4 +488,61 @@ async def textile_candidates(
         total_precise=total_precise,
         items=items,
         next_cursor=encode_cursor(nxt) if nxt < len(ids) else None,
+    )
+
+
+# --- Canal B2B ---------------------------------------------------------------------------------------------------
+
+B2B_TYPES = (ProducerType.CARE_HOME, ProducerType.HOSPITALITY)
+B2B_RATIONALE = (
+    "Lares e hotelaria trocam roupa de cama e toalhas em volume: têxtil limpo e seco, o que tem valor de reutilização "
+    "(59,4% do têxtil recolhido em 2025 foi reutilizado; a reciclagem custa mais do que a fibra virgem). Recolha "
+    "combinada com cada estabelecimento, à parte da rede para os habitantes."
+)
+B2B_TONNES_NOTE = "A medir no piloto: não há quilos de têxtil por estabelecimento, por isso não se estimam toneladas."
+
+
+async def b2b_channel(db: AsyncSession, *, names: bool) -> MunicipalB2BChannelOut:
+    """Locais reais de lares e hotelaria (pacote municipal), com contagens. Sem nomes, salvo admin que os peça."""
+    S = MunicipalSite
+    keys = [t.value for t in B2B_TYPES]
+    rows = list((await db.execute(select(S).where(S.producer_type_keys.overlap(keys)).order_by(S.site_id))).scalars())
+    by_type = []
+    for t in B2B_TYPES:
+        hits = [s for s in rows if t.value in s.producer_type_keys]
+        by_type.append(
+            MunicipalB2BTypeCount(
+                type=t, label=PRODUCER_TYPE_LABELS[t], sites=len(hits), containers=sum(s.containers for s in hits)
+            )
+        )
+    per_parish: dict[tuple[str | None, str], int] = defaultdict(int)
+    for s in rows:
+        per_parish[(s.parish_dicofre, s.parish_name or "—")] += 1
+    return MunicipalB2BChannelOut(
+        names_visible=names,
+        types=list(B2B_TYPES),
+        rationale=B2B_RATIONALE,
+        by_type=by_type,
+        by_parish=[
+            MunicipalParishCount(dicofre=code, name=name, containers=n)
+            for (code, name), n in sorted(per_parish.items(), key=lambda kv: (-kv[1], kv[0][1]))
+        ],
+        sites=len(rows),
+        tonnes_year=None,
+        tonnes_note=B2B_TONNES_NOTE,
+        items=[
+            MunicipalProducerSite(
+                site_id=s.site_id,
+                latitude=s.latitude,
+                longitude=s.longitude,
+                parish_dicofre=s.parish_dicofre,
+                parish_name=s.parish_name,
+                producer_types=[ProducerType(p) for p in s.producer_type_keys],
+                containers=s.containers,
+                capacity_litres_total=s.capacity_litres_total,
+                coord_precision=s.coord_precision,
+                producer_names=list(s.producer_names) if names else None,
+            )
+            for s in rows
+        ],
     )

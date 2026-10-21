@@ -1558,6 +1558,90 @@ export type CircuitsSummary = {
 export type CollectionMode = 'existing' | 'street' | 'on_demand';
 
 /**
+ * CollectionPlanEntry
+ *
+ * Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio.
+ */
+export type CollectionPlanEntry = {
+    /**
+     * Channel
+     *
+     * `door_to_door`: no circuito PAP que já passa; `detour`: a pedido, com km de desvio
+     */
+    channel: 'door_to_door' | 'detour';
+    /**
+     * Circuit
+     *
+     * Circuito PAP escolhido (dia com menos carga de têxtil)
+     */
+    circuit: string | null;
+    /**
+     * Circuits
+     *
+     * Todos os circuitos PAP com viatura na freguesia
+     */
+    circuits?: Array<string>;
+    /**
+     * Crew
+     */
+    crew: number | null;
+    /**
+     * Fits Capacity
+     *
+     * A ronda cabe na viatura? Nulo = por validar (capacidade livre ainda sem valor da Vitrus)
+     */
+    fits_capacity: boolean | null;
+    /**
+     * Kg Per Round
+     *
+     * Têxtil por ronda semanal no circuito (só PAP)
+     */
+    kg_per_round: number | null;
+    /**
+     * New Km Year
+     *
+     * Km novos por ano (0 no circuito PAP)
+     */
+    new_km_year: number;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Pickups Year
+     *
+     * Recolhas por ano (t × 1000 / kg por recolha)
+     */
+    pickups_year: number;
+    /**
+     * Round Kg
+     *
+     * Têxtil da ronda (circuito, dia) somando as freguesias que lá caem
+     */
+    round_kg: number | null;
+    /**
+     * Tonnes Year
+     *
+     * Têxtil por este canal (estimativa)
+     */
+    tonnes_year: number;
+    /**
+     * Vehicle
+     */
+    vehicle: string | null;
+    /**
+     * Weekday
+     *
+     * Dia fixo do saco à porta: 1 = segunda ... 7 = domingo
+     */
+    weekday: number | null;
+};
+
+/**
  * CollectionType
  */
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
@@ -3015,6 +3099,36 @@ export type DnsCheck = {
 };
 
 /**
+ * DoorToDoorPass
+ *
+ * Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.
+ */
+export type DoorToDoorPass = {
+    /**
+     * Circuit
+     */
+    circuit: string;
+    /**
+     * Crew
+     *
+     * Tripulação no planeamento de turnos desse dia
+     */
+    crew: number | null;
+    /**
+     * Vehicle
+     *
+     * Matrícula no planeamento de turnos desse dia
+     */
+    vehicle: string | null;
+    /**
+     * Weekday
+     *
+     * 1 = segunda ... 7 = domingo
+     */
+    weekday: number;
+};
+
+/**
  * EffectiveTask
  */
 export type EffectiveTask = {
@@ -4287,6 +4401,12 @@ export type Kpis = {
      */
     annual_cost_eur: number;
     /**
+     * Avoided Treatment Eur
+     *
+     * Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» (o custo por tonelada ainda não chegou da Vitrus)
+     */
+    avoided_treatment_eur?: number | null;
+    /**
      * Baseline Observed T
      *
      * Recolhido em 2025 (dados da Vitrus)
@@ -5234,6 +5354,73 @@ export type ModelValidationOut = {
      * Spatial
      */
     spatial: Array<SpatialCheckOut>;
+};
+
+/**
+ * MunicipalB2BChannelOut
+ *
+ * Canal B2B de têxtil limpo (lares e hotelaria: roupa de cama e toalhas), à parte da rede para os habitantes.
+ */
+export type MunicipalB2bChannelOut = {
+    /**
+     * By Parish
+     *
+     * Locais B2B por freguesia (`containers` = locais)
+     */
+    by_parish: Array<MunicipalParishCount>;
+    /**
+     * By Type
+     */
+    by_type: Array<MunicipalB2bTypeCount>;
+    /**
+     * Items
+     */
+    items: Array<MunicipalProducerSite>;
+    /**
+     * Names Visible
+     */
+    names_visible: boolean;
+    /**
+     * Rationale
+     */
+    rationale: string;
+    /**
+     * Sites
+     */
+    sites: number;
+    /**
+     * Tonnes Note
+     */
+    tonnes_note: string;
+    /**
+     * Tonnes Year
+     *
+     * Têxtil por ano do canal; nulo: não há quilos por estabelecimento (a medir no piloto)
+     */
+    tonnes_year: number | null;
+    /**
+     * Types
+     */
+    types: Array<ProducerType>;
+};
+
+/**
+ * MunicipalB2BTypeCount
+ */
+export type MunicipalB2bTypeCount = {
+    /**
+     * Containers
+     */
+    containers: number;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Sites
+     */
+    sites: number;
+    type: ProducerType;
 };
 
 /**
@@ -7213,6 +7400,12 @@ export type ParamMeta = {
      * Caminho do parâmetro, ex.: `modes.street.capture_rate`
      */
     key: string;
+    /**
+     * Note
+     *
+     * Fonte em texto, quando o valor ainda está por preencher
+     */
+    note?: string | null;
     source: ParamSource;
     /**
      * Unit
@@ -7754,6 +7947,18 @@ export type PlanningParams = {
      */
     on_demand_kg_per_pickup: number;
     /**
+     * Pap Cost Per Pickup Eur
+     *
+     * Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem, 0 km novos). Pressuposto: igual ao custo de uma recolha até a Vitrus dar o tempo de paragem
+     */
+    pap_cost_per_pickup_eur?: number;
+    /**
+     * Pap Free Capacity Kg
+     *
+     * Capacidade livre para têxtil por ronda numa viatura porta a porta (kg); nulo = por validar
+     */
+    pap_free_capacity_kg?: number | null;
+    /**
      * Piggyback Extra Km
      *
      * Desvio médio quando já passa um circuito
@@ -7765,6 +7970,12 @@ export type PlanningParams = {
      * Dias/semana de circuito para aproveitar a rota
      */
     piggyback_min_days: number;
+    /**
+     * Rsu Treatment Eur Per T
+     *
+     * Custo de tratamento do indiferenciado por tonelada (Vitrus, departamento financeiro, pedido a 21 out 2026); nulo = por preencher, e a poupança no tratamento aparece «por validar»
+     */
+    rsu_treatment_eur_per_t?: number | null;
     /**
      * Solver Time Limit S
      */
@@ -8752,6 +8963,12 @@ export type ScenarioRequest = {
      */
     parent_id?: string | null;
     /**
+     * Site Candidates
+     *
+     * Candidatos da rede por locais: `both` (por omissão: o que dá mais toneladas e menor €/t), `staffed` (pontos assistidos: escolas, com pessoas, sem contentor de rua) ou `public` (locais de contentores municipais na rua, onde a viatura para e recolhe sacos fechados). Os pontos assistidos usam os pressupostos do modo `existing`; com `site_mode = street` (só referência) os candidatos são sempre os públicos
+     */
+    site_candidates?: 'public' | 'staffed' | 'both';
+    /**
      * Pressupostos de captura e custo usados nos locais: `existing` (paragem com sacos fechados nos locais municipais onde a viatura já passa, sem contentor novo) ou `street` (contentor de rua, só referência)
      */
     site_mode?: CollectionMode;
@@ -8789,6 +9006,12 @@ export type ScenarioResult = {
      * Allocations
      */
     allocations: Array<Allocation>;
+    /**
+     * Collection Plan
+     *
+     * Freguesias com recolha a pedido e o canal: circuito porta a porta (circuito, dia, viatura, 0 km novos) ou a pedido com desvio. Nulo nos cenários calculados antes de 21 out 2026
+     */
+    collection_plan?: Array<CollectionPlanEntry> | null;
     /**
      * Default Modes
      *
@@ -9261,6 +9484,12 @@ export type SiteSelection = {
      */
     coord_precision: 'precise' | 'approximate';
     /**
+     * Kind
+     *
+     * `staffed`: ponto assistido (escola), sem contentor de rua
+     */
+    kind?: 'public' | 'staffed';
+    /**
      * Latitude
      */
     latitude: number;
@@ -9280,6 +9509,12 @@ export type SiteSelection = {
      * Population Covered
      */
     population_covered: number;
+    /**
+     * Producer Types
+     *
+     * Tipos de produtor no local (pontos assistidos); nunca os nomes
+     */
+    producer_types?: Array<ProducerType>;
     /**
      * Served Points
      */
@@ -9348,11 +9583,23 @@ export type SitingSummary = {
      * Served Points
      */
     served_points: number;
+    /**
+     * Site Candidates
+     *
+     * Cenários antigos, sem o campo: `public`
+     */
+    site_candidates?: 'public' | 'staffed' | 'both';
     site_mode: CollectionMode;
     /**
      * Solver Iterations
      */
     solver_iterations: number;
+    /**
+     * Staffed Candidates
+     *
+     * Dos candidatos, quantos são pontos assistidos
+     */
+    staffed_candidates?: number;
 };
 
 /**
@@ -11033,6 +11280,12 @@ export type ZoneOut = {
      * Demand T
      */
     demand_t: number;
+    /**
+     * Door To Door
+     *
+     * Passagens dos circuitos porta a porta com viatura no planeamento: onde há, a recolha a pedido vai no circuito sem km novos
+     */
+    door_to_door?: Array<DoorToDoorPass>;
     /**
      * Existing Containers
      *
@@ -17016,6 +17269,74 @@ export type ReserveLotResponses = {
 };
 
 export type ReserveLotResponse = ReserveLotResponses[keyof ReserveLotResponses];
+
+export type GetB2bChannelData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Show Names
+         *
+         * Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.
+         */
+        show_names?: boolean;
+    };
+    url: '/api/v1/municipal/b2b-channel';
+};
+
+export type GetB2bChannelErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetB2bChannelError = GetB2bChannelErrors[keyof GetB2bChannelErrors];
+
+export type GetB2bChannelResponses = {
+    /**
+     * Successful Response
+     */
+    200: MunicipalB2bChannelOut;
+};
+
+export type GetB2bChannelResponse = GetB2bChannelResponses[keyof GetB2bChannelResponses];
 
 export type ListMunicipalContainersData = {
     body?: never;

@@ -39,7 +39,8 @@ def ids(items: list[dict[str, Any]], key: str = "site_id") -> list[str]:
 
 async def test_every_route_requires_a_session(client: httpx.AsyncClient, municipal: None) -> None:
     for path in ("/overview", "/parishes", "/parishes/030801", "/sites", "/sites/geojson", "/containers", "/producers",
-                 "/textile-candidates", "/gap-ranking", "/density-benchmark", "/export", "/parishes/caop.geojson"):  # fmt: skip
+                 "/textile-candidates", "/gap-ranking", "/density-benchmark", "/export", "/parishes/caop.geojson",
+                 "/b2b-channel"):  # fmt: skip
         resp = await client.get(M + path)
         assert resp.status_code == 401, path
         assert resp.json()["code"] == "unauthenticated"
@@ -527,3 +528,28 @@ async def test_export_xlsx_and_geojson(operator: httpx.AsyncClient) -> None:
     empty = await operator.get(f"{M}/export", params={"kind": "platform"})
     assert empty.status_code == 200 and empty.content == "﻿".encode()
     assert (await operator.get(f"{M}/export", params={"format": "pdf"})).status_code == 422
+
+
+# --- canal B2B (lares e hotelaria) --------------------------------------------------------------------------------
+
+
+async def test_b2b_channel_lists_real_sites_without_names_or_invented_tonnes(operator: httpx.AsyncClient) -> None:
+    body = (await operator.get(f"{M}/b2b-channel")).json()
+    # Na amostra só S0000005e (Azurém, Hotelaria, 2 contentores) é B2B; o restaurante não entra.
+    assert body["types"] == ["care_home", "hospitality"]
+    assert body["sites"] == 1 and ids(body["items"]) == ["S0000005e"]
+    assert {t["type"]: (t["sites"], t["containers"]) for t in body["by_type"]} == {
+        "care_home": (0, 0),
+        "hospitality": (1, 2),
+    }
+    assert body["by_parish"] == [{"dicofre": "030804", "name": "Azurém", "containers": 1}]
+    assert body["tonnes_year"] is None and "piloto" in body["tonnes_note"]
+    assert body["names_visible"] is False and body["items"][0]["producer_names"] is None
+    raw = (await operator.get(f"{M}/b2b-channel")).text
+    assert not any(secret in raw for secret in SECRETS)
+    assert (await operator.get(f"{M}/b2b-channel?show_names=true")).status_code == 403
+
+
+async def test_b2b_channel_shows_names_only_to_an_admin_who_asks(admin: httpx.AsyncClient) -> None:
+    body = (await admin.get(f"{M}/b2b-channel?show_names=true")).json()
+    assert body["names_visible"] is True and body["items"][0]["producer_names"] == ["Hotel Teste"]

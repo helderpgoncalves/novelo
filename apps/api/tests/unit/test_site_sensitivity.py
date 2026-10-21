@@ -1,5 +1,7 @@
 """Reavaliação de um plano por locais reais: valores calculados à mão (sem solver)."""
 
+from dataclasses import replace
+
 import pytest
 
 from novelo.domain import sensitivity as sens
@@ -57,3 +59,12 @@ def test_tornado_and_monte_carlo_work_on_a_site_plan() -> None:
     assert mc.eur_per_tonne.p10 < mc.eur_per_tonne.p50 < mc.eur_per_tonne.p90
     assert mc.eur_per_tonne.p10 < mc.base.eur_per_tonne < mc.eur_per_tonne.p90  # type: ignore[operator]
     assert sens.monte_carlo(plan(km=10.0), p, n=200, seed=7).eur_per_tonne == mc.eur_per_tonne
+
+
+def test_site_plan_adds_the_pap_cost_key_only_with_a_pap_parish() -> None:
+    pap = sens.SitePlan(
+        Mode.STREET, (sens.SiteZone(replace(URBAN, door_to_door=True), 0.5, True),), sites=3, km_per_round=0.0,
+        base_detour=1.3,
+    )  # fmt: skip
+    assert "pap_cost_per_pickup_eur" in sens.sensitive_keys(pap, params())
+    assert "pap_cost_per_pickup_eur" not in sens.sensitive_keys(plan(on_demand=True), params())

@@ -18,12 +18,13 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { FlowsSankey } from '@/features/baseline/flows-sankey';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
+import { CollectionPlanSection } from '@/features/scenarios/collection-plan-section';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ParameterSummary } from '@/features/scenarios/parameter-summary';
 import { RoutesTable } from '@/features/scenarios/routes-table';
 import { ScenarioActions } from '@/features/scenarios/scenario-actions';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
-import { ScenarioKpis } from '@/features/scenarios/scenario-kpis';
+import { ScenarioKpis, ScenarioSecondaryKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
 import { SitesTable } from '@/features/scenarios/sites-table';
 import { SitingOverview } from '@/features/scenarios/siting-overview';
@@ -95,6 +96,7 @@ function ScenarioPage() {
 
       <div className="space-y-4">
         <ScenarioKpis kpis={result.kpis} bySites={Boolean(result.siting)} />
+        <ScenarioSecondaryKpis kpis={result.kpis} routes={result.routes.length} />
         {result.siting && <SitingOverview siting={result.siting} sites={result.sites ?? []} />}
         <ScenarioAnchor scenario={scenario} />
       </div>
@@ -120,6 +122,13 @@ function ScenarioPage() {
                   description={m.scenario_modes_description()}
                 >
                   <ModeSummaryCards modes={result.modes} totalTonnes={result.kpis.tonnes_year} />
+                </Section>
+                <Section title={m.plan_title()} description={m.plan_description()}>
+                  <CollectionPlanSection
+                    plan={result.collection_plan}
+                    scenarioId={scenario.id}
+                    heading={false}
+                  />
                 </Section>
                 <Section
                   title={m.scenario_flows_title()}

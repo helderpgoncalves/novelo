@@ -9,14 +9,17 @@ import json
 import threading
 from collections import OrderedDict, defaultdict
 from dataclasses import dataclass
+from typing import Literal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import network, siting
-from novelo.domain.vocab import CollectionMode, SiteClass
-from novelo.features.municipal.models import MunicipalSite
-from novelo.features.planning.params import to_domain_params
+from novelo.domain.costs import avoided_treatment_eur
+from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
+from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
+from novelo.features.planning.collection_plan import build_collection_plan
+from novelo.features.planning.params import to_domain_params, to_domain_zone
 from novelo.features.planning.schemas import (
     Allocation,
     AllocationPart,
@@ -27,15 +30,21 @@ from novelo.features.planning.schemas import (
     RouteStop,
     ScenarioRequest,
     ScenarioResult,
+    SiteCandidates,
     SiteSelection,
     SitingSummary,
     ZoneOut,
 )
 
 POPULATION_PROXY = (
-    "A população de cada freguesia reparte-se pelos seus locais públicos na proporção dos contentores municipais que "
-    "lá estão (estimativa: não há população por quarteirão)."
+    "A população de cada freguesia reparte-se pelos seus locais públicos na proporção da capacidade (litros) dos "
+    "contentores municipais que lá estão; capacidade desconhecida = mediana do tipo de contentor (estimativa: não há "
+    "população por quarteirão)."
 )
+
+# Pontos assistidos: locais com pessoas onde o têxtil se entrega no interior (caixa ou saco), sem contentor de rua.
+# As escolas da rede municipal (produtores de orgânico); os lares ficam no canal B2B (roupa de cama e toalhas).
+STAFFED_TYPES = (ProducerType.SCHOOL,)
 
 
 @dataclass(frozen=True)
@@ -44,6 +53,8 @@ class SiteMeta:
     containers: int
     precision: str
     parish_name: str
+    kind: Literal["public", "staffed"] = "public"
+    producer_types: tuple[ProducerType, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -52,9 +63,26 @@ class SiteInputs:
     candidates: list[siting.Candidate]
     meta: dict[str, SiteMeta]
 
+    def candidates_for(self, which: SiteCandidates) -> list[siting.Candidate]:
+        if which == "both":
+            return list(self.candidates)
+        return [c for c in self.candidates if self.meta[c.id].kind == which]
+
 
 async def load_site_inputs(db: AsyncSession) -> SiteInputs:
-    """Pontos de procura (locais públicos) e candidatos (`textile_candidate`) do pacote municipal de 20 de outubro."""
+    """Pontos de procura (locais públicos, pesados pela capacidade) e candidatos do pacote municipal de 20 de outubro:
+    públicos (`textile_candidate`) e assistidos (escolas)."""
+    litres = siting.capacity_weights(
+        [
+            (site_id, str(getattr(kind, "value", kind)), cap)
+            for site_id, kind, cap in await db.execute(
+                select(MunicipalContainer.site_id, MunicipalContainer.kind, MunicipalContainer.capacity_litres).where(
+                    MunicipalContainer.site_id.is_not(None)
+                )
+            )
+            if site_id is not None
+        ]
+    )
     rows = (
         await db.execute(
             select(
@@ -68,6 +96,7 @@ async def load_site_inputs(db: AsyncSession) -> SiteInputs:
                 MunicipalSite.textile_candidate,
                 MunicipalSite.coord_precision,
                 MunicipalSite.streets,
+                MunicipalSite.producer_type_keys,
             )
             .where(MunicipalSite.parish_code.is_not(None))
             .order_by(MunicipalSite.site_id)
@@ -80,17 +109,27 @@ async def load_site_inputs(db: AsyncSession) -> SiteInputs:
         code = r.parish_code
         if code is None:
             continue
-        if r.site_class != SiteClass.PRODUCER and r.containers > 0:
-            demand.append(siting.DemandPoint(r.site_id, code, r.latitude, r.longitude, float(r.containers)))
-        if r.textile_candidate:
+        if r.site_class != SiteClass.PRODUCER and r.containers > 0 and litres.get(r.site_id, 0.0) > 0:
+            demand.append(siting.DemandPoint(r.site_id, code, r.latitude, r.longitude, litres[r.site_id]))
+        types = tuple(ProducerType(t) for t in r.producer_type_keys or ())
+        staffed = any(t in STAFFED_TYPES for t in types)
+        if r.textile_candidate or staffed:
             candidates.append(siting.Candidate(r.site_id, code, r.latitude, r.longitude))
             meta[r.site_id] = SiteMeta(
                 street=r.streets[0] if r.streets else None,
                 containers=r.containers,
                 precision=str(getattr(r.coord_precision, "value", r.coord_precision)),
                 parish_name=r.parish_name or code,
+                kind="public" if r.textile_candidate else "staffed",
+                producer_types=types if staffed and not r.textile_candidate else (),
             )
     return SiteInputs(demand, candidates, meta)
+
+
+def avoided_treatment(tonnes: float, params: PlanningParams) -> float | None:
+    """Poupança no tratamento do indiferenciado; nula («por validar») até a Vitrus dar o custo por tonelada."""
+    value = avoided_treatment_eur(tonnes, params.rsu_treatment_eur_per_t)
+    return None if value is None else round(value, 2)
 
 
 def _on_demand_zones(
@@ -104,7 +143,7 @@ def _on_demand_zones(
     for z in zones:
         if CollectionMode.ON_DEMAND not in request.constraints.get(z.code, request.default_modes):
             continue
-        zone = network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days)
+        zone = to_domain_zone(z)
         c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
         out[z.code] = siting.OnDemandZone(z.code, c.capture, coverage, c.annual_cost_eur, c.km_year)
     return out
@@ -153,6 +192,8 @@ def _site_selections(plan: siting.SitePlan, inputs: SiteInputs, vehicle_of: dict
         out.append(
             SiteSelection(
                 site_id=s.candidate.id,
+                kind=m.kind,
+                producer_types=list(m.producer_types),
                 latitude=s.candidate.lat,
                 longitude=s.candidate.lon,
                 parish_code=s.candidate.zone_id,
@@ -252,8 +293,9 @@ def _cache_key(
         "params": params.model_dump(mode="json"),
         "baseline": round(baseline_t, 3),
         "zones": [(z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude) for z in zones],
+        "pap": [(z.code, [(p.circuit, p.weekday, p.vehicle) for p in z.door_to_door]) for z in zones],
         "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
-        "candidates": [(c.id, c.zone_id) for c in inputs.candidates],
+        "candidates": [(c.id, c.zone_id, inputs.meta[c.id].kind) for c in inputs.candidates],
     }
     return hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -303,7 +345,9 @@ def _compute_sites(
     blocked = {code for code, modes in request.constraints.items() if mode not in modes}
     known = {z.code for z in zones}
     demand = [d for d in inputs.demand if d.zone_id in known]
-    candidates = [c for c in inputs.candidates if c.zone_id in known and c.zone_id not in blocked]
+    candidates = [
+        c for c in inputs.candidates_for(request.site_candidates) if c.zone_id in known and c.zone_id not in blocked
+    ]
 
     plan = siting.plan_site_network(
         demand,
@@ -341,7 +385,9 @@ def _compute_sites(
         km_year=round(plan.km_year + sum(z.km_year for z in plan.on_demand.values()), 1),
         potential_t=round(sum(z.demand_t for z in zones), 1),
         baseline_observed_t=round(baseline_t, 1),
+        avoided_treatment_eur=avoided_treatment(plan.tonnes, params),
     )
+    on_demand = {code: (plan.zone_tonnes_on_demand.get(code, 0.0), z.km_year) for code, z in plan.on_demand.items()}
     summaries = []
     for m in (mode, CollectionMode.ON_DEMAND):
         parts = [(a, p) for a in allocations for p in a.parts if p.mode == m]
@@ -363,10 +409,13 @@ def _compute_sites(
         depot=[params.depot_lat, params.depot_lon],
         sites=_site_selections(plan, inputs, vehicle_of),
         default_modes=request.default_modes,
+        collection_plan=build_collection_plan(zones, on_demand, params),
         siting=SitingSummary(
             radius_m=request.site_radius_m,
             site_mode=mode,
+            site_candidates=request.site_candidates,
             candidates=len(candidates),
+            staffed_candidates=sum(1 for c in candidates if inputs.meta[c.id].kind == "staffed"),
             demand_points=len(demand),
             served_points=plan.served_points,
             opened=n_sites,

@@ -557,6 +557,28 @@ export const zCaptureScale = z.object({
 });
 
 /**
+ * CollectionPlanEntry
+ *
+ * Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio.
+ */
+export const zCollectionPlanEntry = z.object({
+    channel: z.enum(['door_to_door', 'detour']),
+    circuit: z.string().nullable(),
+    circuits: z.array(z.string()).optional(),
+    crew: z.int().nullable(),
+    fits_capacity: z.boolean().nullable(),
+    kg_per_round: z.number().nullable(),
+    new_km_year: z.number(),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    pickups_year: z.number(),
+    round_kg: z.number().nullable(),
+    tonnes_year: z.number(),
+    vehicle: z.string().nullable(),
+    weekday: z.int().nullable()
+});
+
+/**
  * CollectionType
  */
 export const zCollectionType = z.enum([
@@ -1121,6 +1143,18 @@ export const zDnsCheck = z.object({
         'fail',
         'unknown'
     ])
+});
+
+/**
+ * DoorToDoorPass
+ *
+ * Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.
+ */
+export const zDoorToDoorPass = z.object({
+    circuit: z.string(),
+    crew: z.int().nullable(),
+    vehicle: z.string().nullable(),
+    weekday: z.int().gte(1).lte(7)
 });
 
 /**
@@ -1796,6 +1830,7 @@ export const zKpiItem = z.object({
  */
 export const zKpis = z.object({
     annual_cost_eur: z.number(),
+    avoided_treatment_eur: z.number().nullish(),
     baseline_observed_t: z.number(),
     capex_eur: z.number(),
     coverage_pct: z.number(),
@@ -2712,6 +2747,7 @@ export const zParamSource = z.enum(['vitrus_data', 'assumption']);
  */
 export const zParamMeta = z.object({
     key: z.string(),
+    note: z.string().nullish(),
     source: zParamSource,
     unit: z.string()
 });
@@ -3004,8 +3040,11 @@ export const zPlanningParams = z.object({
     kg_per_inhab_month: z.number().gt(0).lte(5),
     modes: z.record(z.string(), zModeParams),
     on_demand_kg_per_pickup: z.number().gt(0),
+    pap_cost_per_pickup_eur: z.number().gte(0).optional().default(6),
+    pap_free_capacity_kg: z.number().gte(0).nullish(),
     piggyback_extra_km: z.number().gte(0),
     piggyback_min_days: z.int().gte(1).lte(7),
+    rsu_treatment_eur_per_t: z.number().gte(0).nullish(),
     solver_time_limit_s: z.int().gte(1).lte(120),
     vehicle_capacity_t: z.number().gt(0)
 });
@@ -3073,6 +3112,16 @@ export const zProducerType = z.enum([
 ]);
 
 /**
+ * MunicipalB2BTypeCount
+ */
+export const zMunicipalB2bTypeCount = z.object({
+    containers: z.int(),
+    label: z.string(),
+    sites: z.int(),
+    type: zProducerType
+});
+
+/**
  * MunicipalContainerOut
  */
 export const zMunicipalContainerOut = z.object({
@@ -3132,6 +3181,23 @@ export const zMunicipalProducerSite = z.object({
     producer_names: z.array(z.string()).nullable(),
     producer_types: z.array(zProducerType),
     site_id: z.string()
+});
+
+/**
+ * MunicipalB2BChannelOut
+ *
+ * Canal B2B de têxtil limpo (lares e hotelaria: roupa de cama e toalhas), à parte da rede para os habitantes.
+ */
+export const zMunicipalB2bChannelOut = z.object({
+    by_parish: z.array(zMunicipalParishCount),
+    by_type: z.array(zMunicipalB2bTypeCount),
+    items: z.array(zMunicipalProducerSite),
+    names_visible: z.boolean(),
+    rationale: z.string(),
+    sites: z.int(),
+    tonnes_note: z.string(),
+    tonnes_year: z.number().nullable(),
+    types: z.array(zProducerType)
 });
 
 /**
@@ -3588,6 +3654,11 @@ export const zScenarioRequest = z.object({
     objective: zScenarioObjective,
     params: zPlanningParams.nullish(),
     parent_id: z.uuid().nullish(),
+    site_candidates: z.enum([
+        'public',
+        'staffed',
+        'both'
+    ]).optional().default('both'),
     site_mode: zCollectionMode.optional().default('existing'),
     site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
@@ -3868,11 +3939,13 @@ export const zSiteFeatureCollection = z.object({
 export const zSiteSelection = z.object({
     containers: z.int(),
     coord_precision: z.enum(['precise', 'approximate']),
+    kind: z.enum(['public', 'staffed']).optional().default('public'),
     latitude: z.number(),
     longitude: z.number(),
     parish_code: z.string(),
     parish_name: z.string(),
     population_covered: z.number(),
+    producer_types: z.array(zProducerType).optional(),
     served_points: z.int(),
     site_id: z.string(),
     street: z.string().nullable(),
@@ -3894,8 +3967,14 @@ export const zSitingSummary = z.object({
     population_proxy: z.string(),
     radius_m: z.int(),
     served_points: z.int(),
+    site_candidates: z.enum([
+        'public',
+        'staffed',
+        'both'
+    ]).optional().default('public'),
     site_mode: zCollectionMode,
-    solver_iterations: z.int()
+    solver_iterations: z.int(),
+    staffed_candidates: z.int().optional().default(0)
 });
 
 /**
@@ -3903,6 +3982,7 @@ export const zSitingSummary = z.object({
  */
 export const zScenarioResult = z.object({
     allocations: z.array(zAllocation),
+    collection_plan: z.array(zCollectionPlanEntry).nullish(),
     default_modes: z.array(zCollectionMode).optional(),
     depot: z.array(z.number()),
     kpis: zKpis,
@@ -5328,6 +5408,7 @@ export const zModelValidationOut = z.object({
 export const zZoneOut = z.object({
     code: z.string(),
     demand_t: z.number(),
+    door_to_door: z.array(zDoorToDoorPass).optional(),
     existing_containers: z.int().optional().default(0),
     geometry: z.record(z.string(), z.unknown()).nullable(),
     latitude: z.number(),
@@ -6123,6 +6204,15 @@ export const zReserveLotPath = z.object({
  * Successful Response
  */
 export const zReserveLotResponse = zLotDetail;
+
+export const zGetB2bChannelQuery = z.object({
+    show_names: z.boolean().optional().default(false)
+});
+
+/**
+ * Successful Response
+ */
+export const zGetB2bChannelResponse = zMunicipalB2bChannelOut;
 
 export const zListMunicipalContainersQuery = z.object({
     limit: z.int().gte(1).lte(500).optional().default(100),

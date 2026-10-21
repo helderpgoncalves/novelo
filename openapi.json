@@ -2711,6 +2711,150 @@
         "title": "CollectionMode",
         "type": "string"
       },
+      "CollectionPlanEntry": {
+        "description": "Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio.",
+        "properties": {
+          "channel": {
+            "description": "`door_to_door`: no circuito PAP que já passa; `detour`: a pedido, com km de desvio",
+            "enum": [
+              "door_to_door",
+              "detour"
+            ],
+            "title": "Channel",
+            "type": "string"
+          },
+          "circuit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Circuito PAP escolhido (dia com menos carga de têxtil)",
+            "title": "Circuit"
+          },
+          "circuits": {
+            "description": "Todos os circuitos PAP com viatura na freguesia",
+            "items": {
+              "type": "string"
+            },
+            "title": "Circuits",
+            "type": "array"
+          },
+          "crew": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Crew"
+          },
+          "fits_capacity": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A ronda cabe na viatura? Nulo = por validar (capacidade livre ainda sem valor da Vitrus)",
+            "title": "Fits Capacity"
+          },
+          "kg_per_round": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil por ronda semanal no circuito (só PAP)",
+            "title": "Kg Per Round"
+          },
+          "new_km_year": {
+            "description": "Km novos por ano (0 no circuito PAP)",
+            "title": "New Km Year",
+            "type": "number"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "pickups_year": {
+            "description": "Recolhas por ano (t × 1000 / kg por recolha)",
+            "title": "Pickups Year",
+            "type": "number"
+          },
+          "round_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil da ronda (circuito, dia) somando as freguesias que lá caem",
+            "title": "Round Kg"
+          },
+          "tonnes_year": {
+            "description": "Têxtil por este canal (estimativa)",
+            "title": "Tonnes Year",
+            "type": "number"
+          },
+          "vehicle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Vehicle"
+          },
+          "weekday": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Dia fixo do saco à porta: 1 = segunda ... 7 = domingo",
+            "title": "Weekday"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "channel",
+          "circuit",
+          "weekday",
+          "vehicle",
+          "crew",
+          "new_km_year",
+          "tonnes_year",
+          "pickups_year",
+          "kg_per_round",
+          "round_kg",
+          "fits_capacity"
+        ],
+        "title": "CollectionPlanEntry",
+        "type": "object"
+      },
       "CollectionType": {
         "enum": [
           "door_to_door",
@@ -5183,6 +5327,54 @@
         "title": "DnsCheck",
         "type": "object"
       },
+      "DoorToDoorPass": {
+        "description": "Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.",
+        "properties": {
+          "circuit": {
+            "title": "Circuit",
+            "type": "string"
+          },
+          "crew": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tripulação no planeamento de turnos desse dia",
+            "title": "Crew"
+          },
+          "vehicle": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Matrícula no planeamento de turnos desse dia",
+            "title": "Vehicle"
+          },
+          "weekday": {
+            "description": "1 = segunda ... 7 = domingo",
+            "maximum": 7.0,
+            "minimum": 1.0,
+            "title": "Weekday",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "circuit",
+          "weekday",
+          "vehicle",
+          "crew"
+        ],
+        "title": "DoorToDoorPass",
+        "type": "object"
+      },
       "EffectiveTask": {
         "properties": {
           "fallback_model": {
@@ -7505,6 +7697,18 @@
             "title": "Annual Cost Eur",
             "type": "number"
           },
+          "avoided_treatment_eur": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» (o custo por tonelada ainda não chegou da Vitrus)",
+            "title": "Avoided Treatment Eur"
+          },
           "baseline_observed_t": {
             "description": "Recolhido em 2025 (dados da Vitrus)",
             "title": "Baseline Observed T",
@@ -9195,6 +9399,108 @@
           "cannot_test"
         ],
         "title": "ModelValidationOut",
+        "type": "object"
+      },
+      "MunicipalB2BChannelOut": {
+        "description": "Canal B2B de têxtil limpo (lares e hotelaria: roupa de cama e toalhas), à parte da rede para os habitantes.",
+        "properties": {
+          "by_parish": {
+            "description": "Locais B2B por freguesia (`containers` = locais)",
+            "items": {
+              "$ref": "#/components/schemas/MunicipalParishCount"
+            },
+            "title": "By Parish",
+            "type": "array"
+          },
+          "by_type": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalB2BTypeCount"
+            },
+            "title": "By Type",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/MunicipalProducerSite"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "names_visible": {
+            "title": "Names Visible",
+            "type": "boolean"
+          },
+          "rationale": {
+            "title": "Rationale",
+            "type": "string"
+          },
+          "sites": {
+            "title": "Sites",
+            "type": "integer"
+          },
+          "tonnes_note": {
+            "title": "Tonnes Note",
+            "type": "string"
+          },
+          "tonnes_year": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil por ano do canal; nulo: não há quilos por estabelecimento (a medir no piloto)",
+            "title": "Tonnes Year"
+          },
+          "types": {
+            "items": {
+              "$ref": "#/components/schemas/ProducerType"
+            },
+            "title": "Types",
+            "type": "array"
+          }
+        },
+        "required": [
+          "names_visible",
+          "types",
+          "rationale",
+          "by_type",
+          "by_parish",
+          "sites",
+          "tonnes_year",
+          "tonnes_note",
+          "items"
+        ],
+        "title": "MunicipalB2BChannelOut",
+        "type": "object"
+      },
+      "MunicipalB2BTypeCount": {
+        "properties": {
+          "containers": {
+            "title": "Containers",
+            "type": "integer"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "sites": {
+            "title": "Sites",
+            "type": "integer"
+          },
+          "type": {
+            "$ref": "#/components/schemas/ProducerType"
+          }
+        },
+        "required": [
+          "type",
+          "label",
+          "sites",
+          "containers"
+        ],
+        "title": "MunicipalB2BTypeCount",
         "type": "object"
       },
       "MunicipalCandidateOut": {
@@ -12300,6 +12606,18 @@
             "title": "Key",
             "type": "string"
           },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fonte em texto, quando o valor ainda está por preencher",
+            "title": "Note"
+          },
           "source": {
             "$ref": "#/components/schemas/ParamSource"
           },
@@ -13130,6 +13448,26 @@
             "title": "On Demand Kg Per Pickup",
             "type": "number"
           },
+          "pap_cost_per_pickup_eur": {
+            "default": 6.0,
+            "description": "Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem, 0 km novos). Pressuposto: igual ao custo de uma recolha até a Vitrus dar o tempo de paragem",
+            "minimum": 0.0,
+            "title": "Pap Cost Per Pickup Eur",
+            "type": "number"
+          },
+          "pap_free_capacity_kg": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Capacidade livre para têxtil por ronda numa viatura porta a porta (kg); nulo = por validar",
+            "title": "Pap Free Capacity Kg"
+          },
           "piggyback_extra_km": {
             "description": "Desvio médio quando já passa um circuito",
             "minimum": 0.0,
@@ -13142,6 +13480,19 @@
             "minimum": 1.0,
             "title": "Piggyback Min Days",
             "type": "integer"
+          },
+          "rsu_treatment_eur_per_t": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo de tratamento do indiferenciado por tonelada (Vitrus, departamento financeiro, pedido a 21 out 2026); nulo = por preencher, e a poupança no tratamento aparece «por validar»",
+            "title": "Rsu Treatment Eur Per T"
           },
           "solver_time_limit_s": {
             "maximum": 120.0,
@@ -14726,6 +15077,17 @@
             ],
             "title": "Parent Id"
           },
+          "site_candidates": {
+            "default": "both",
+            "description": "Candidatos da rede por locais: `both` (por omissão: o que dá mais toneladas e menor €/t), `staffed` (pontos assistidos: escolas, com pessoas, sem contentor de rua) ou `public` (locais de contentores municipais na rua, onde a viatura para e recolhe sacos fechados). Os pontos assistidos usam os pressupostos do modo `existing`; com `site_mode = street` (só referência) os candidatos são sempre os públicos",
+            "enum": [
+              "public",
+              "staffed",
+              "both"
+            ],
+            "title": "Site Candidates",
+            "type": "string"
+          },
           "site_mode": {
             "$ref": "#/components/schemas/CollectionMode",
             "default": "existing",
@@ -14784,6 +15146,21 @@
             },
             "title": "Allocations",
             "type": "array"
+          },
+          "collection_plan": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/CollectionPlanEntry"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesias com recolha a pedido e o canal: circuito porta a porta (circuito, dia, viatura, 0 km novos) ou a pedido com desvio. Nulo nos cenários calculados antes de 21 out 2026",
+            "title": "Collection Plan"
           },
           "default_modes": {
             "description": "Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)",
@@ -15572,6 +15949,16 @@
             "title": "Coord Precision",
             "type": "string"
           },
+          "kind": {
+            "default": "public",
+            "description": "`staffed`: ponto assistido (escola), sem contentor de rua",
+            "enum": [
+              "public",
+              "staffed"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
           "latitude": {
             "title": "Latitude",
             "type": "number"
@@ -15591,6 +15978,14 @@
           "population_covered": {
             "title": "Population Covered",
             "type": "number"
+          },
+          "producer_types": {
+            "description": "Tipos de produtor no local (pontos assistidos); nunca os nomes",
+            "items": {
+              "$ref": "#/components/schemas/ProducerType"
+            },
+            "title": "Producer Types",
+            "type": "array"
           },
           "served_points": {
             "title": "Served Points",
@@ -15685,11 +16080,28 @@
             "title": "Served Points",
             "type": "integer"
           },
+          "site_candidates": {
+            "default": "public",
+            "description": "Cenários antigos, sem o campo: `public`",
+            "enum": [
+              "public",
+              "staffed",
+              "both"
+            ],
+            "title": "Site Candidates",
+            "type": "string"
+          },
           "site_mode": {
             "$ref": "#/components/schemas/CollectionMode"
           },
           "solver_iterations": {
             "title": "Solver Iterations",
+            "type": "integer"
+          },
+          "staffed_candidates": {
+            "default": 0,
+            "description": "Dos candidatos, quantos são pontos assistidos",
+            "title": "Staffed Candidates",
             "type": "integer"
           }
         },
@@ -18493,6 +18905,14 @@
           "demand_t": {
             "title": "Demand T",
             "type": "number"
+          },
+          "door_to_door": {
+            "description": "Passagens dos circuitos porta a porta com viatura no planeamento: onde há, a recolha a pedido vai no circuito sem km novos",
+            "items": {
+              "$ref": "#/components/schemas/DoorToDoorPass"
+            },
+            "title": "Door To Door",
+            "type": "array"
           },
           "existing_containers": {
             "default": 0,
@@ -31128,6 +31548,142 @@
         "summary": "Reserve Lot",
         "tags": [
           "lots"
+        ]
+      }
+    },
+    "/api/v1/municipal/b2b-channel": {
+      "get": {
+        "description": "Canal B2B de têxtil limpo: lares e hotelaria da rede municipal, com contagens. Toneladas: a medir no piloto.",
+        "operationId": "get_b2b_channel",
+        "parameters": [
+          {
+            "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+            "in": "query",
+            "name": "show_names",
+            "required": false,
+            "schema": {
+              "default": false,
+              "description": "Incluir nomes de estabelecimentos. Só admin; qualquer outro papel recebe 403. Por omissão não.",
+              "title": "Show Names",
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MunicipalB2BChannelOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get B2B Channel",
+        "tags": [
+          "municipal"
         ]
       }
     },

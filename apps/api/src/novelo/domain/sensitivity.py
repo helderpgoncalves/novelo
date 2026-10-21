@@ -52,6 +52,8 @@ MODE_KEYS = (
     "collections_per_year",
 )
 ON_DEMAND_KEYS = ("capture_rate", "coverage_factor")
+# Custo de uma recolha no circuito porta a porta: só entra se o plano tiver recolha a pedido numa freguesia com PAP.
+PAP_KEY = "pap_cost_per_pickup_eur"
 
 Criterion = Literal["eur_per_tonne", "annual_cost_eur", "tonnes"]
 
@@ -176,6 +178,8 @@ def get_value(params: Params, key: str) -> float:
     if key.startswith("modes."):
         _, mode, field_name = key.split(".")
         return float(getattr(params.modes[Mode(mode)], field_name))
+    if key == PAP_KEY:
+        return params.pap_pickup_eur  # None no pressuposto = o custo de uma recolha normal
     return float(getattr(params, key))
 
 
@@ -229,6 +233,8 @@ def sensitive_keys(items: Plan, params: Params) -> list[str]:
             continue
         names = ON_DEMAND_KEYS if mode == Mode.ON_DEMAND else MODE_KEYS
         keys += [f"modes.{mode.value}.{n}" for n in names]
+    if any(it.zone.door_to_door and Mode.ON_DEMAND in it.modes for it in items):
+        keys.append(PAP_KEY)
     return [k for k in keys if get_value(params, k) != 0]
 
 
@@ -262,6 +268,8 @@ def _site_keys(plan: SitePlan, params: Params) -> list[str]:
     ]
     if on_demand:
         keys += ["on_demand_kg_per_pickup", "piggyback_extra_km", *[f"modes.on_demand.{n}" for n in ON_DEMAND_KEYS]]
+    if any(z.on_demand and z.zone.door_to_door for z in plan.zones):
+        keys.append(PAP_KEY)
     return [k for k in keys if get_value(params, k) != 0]
 
 

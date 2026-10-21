@@ -5,10 +5,11 @@ from dataclasses import dataclass
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.errors import NotFoundError
-from novelo.domain import benchmarks, network
+from novelo.domain import benchmarks
 from novelo.domain.vocab import CollectionMode, ScenarioObjective
 from novelo.features.planning import service
 from novelo.features.planning.benchmark_schemas import BenchmarkOut, BenchmarkScenarioRequest
+from novelo.features.planning.params import to_domain_zone
 from novelo.features.planning.schemas import PlanningParams, ScenarioOut, ScenarioRequest
 from novelo.features.textile import service as textile
 from novelo.features.users.models import User
@@ -64,7 +65,7 @@ async def _describe(db: AsyncSession, b: Benchmark) -> BenchmarkOut:
     baseline = await textile.get_baseline(db)
     population = sum(z.population for z in zones)
     dp = service._domain_params(params)
-    dzones = [network.Zone(z.code, z.name, z.population, z.latitude, z.longitude, z.service_days) for z in zones]
+    dzones = [to_domain_zone(z) for z in zones]
     target = benchmarks.target_tonnes(b.kg_per_inhab_year, population)
     ceiling = benchmarks.max_capturable_t(dzones, dp)
     return BenchmarkOut(

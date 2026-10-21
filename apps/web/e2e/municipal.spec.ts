@@ -43,6 +43,18 @@ test.describe('rede municipal de contentores', () => {
     await expect(page.getByText('estimativa', { exact: false }).first()).toBeVisible();
   });
 
+  test('canal B2B mostra lares e hotelaria reais, sem nomes e sem toneladas inventadas', async ({
+    page,
+  }) => {
+    await page.goto('/pt/municipal?tab=b2b');
+    await expect(page.getByText('Lares e hotelaria: têxtil limpo, à parte')).toBeVisible();
+    await expect(page.getByText('A medir no piloto')).toBeVisible();
+    await expect(page.getByText('Lares', { exact: true })).toBeVisible();
+    await expect(page.getByText('Hotelaria', { exact: true }).first()).toBeVisible();
+    // Os nomes são privados: só aparecem a um admin que os pede.
+    await expect(page.getByRole('columnheader', { name: 'Nome' })).toHaveCount(0);
+  });
+
   test('lacunas e qualidade carregam sem erros', async ({ page }) => {
     await page.goto('/pt/municipal?tab=gaps');
     await expect(page.getByText('Onde falta mais')).toBeVisible();
@@ -91,6 +103,8 @@ test.describe('rede municipal de contentores', () => {
   });
 
   test('a navegação leva à rede municipal', async ({ page }) => {
+    // A raiz `/pt/` é a página pública; a navegação lateral vive dentro da aplicação.
+    await page.goto('/pt/simulator');
     await page.getByRole('link', { name: 'Rede municipal' }).first().click();
     await expect(page).toHaveURL(/\/pt\/municipal/);
   });

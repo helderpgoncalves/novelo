@@ -117,7 +117,7 @@ function Assumptions() {
             meta={data.meta}
             errors={errors}
             sourceFilter={origin}
-            defaultOpen={['general', 'existing', 'on_demand', 'costs']}
+            defaultOpen={['general', 'existing', 'on_demand', 'costs', 'on_demand_ops']}
           />
         </fieldset>
       </div>

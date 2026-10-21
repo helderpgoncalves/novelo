@@ -1,6 +1,6 @@
 import pytest
 
-from novelo.domain.costs import annual_cost_eur, eur_per_tonne
+from novelo.domain.costs import annual_cost_eur, avoided_treatment_eur, eur_per_tonne
 from novelo.domain.demand import Baseline, kg_per_inhab_month, share_of_tonnes_t, yearly_demand_t
 from novelo.features.textile import references
 
@@ -41,3 +41,10 @@ def test_annual_cost_and_eur_per_tonne() -> None:
     assert cost == pytest.approx(1300)
     assert eur_per_tonne(cost, 10) == pytest.approx(130)
     assert eur_per_tonne(cost, 0) is None
+
+
+def test_avoided_treatment_waits_for_the_vitrus_cost() -> None:
+    assert avoided_treatment_eur(396.3, None) is None  # «por validar»: nunca um valor inventado
+    assert avoided_treatment_eur(400.0, 50.0) == pytest.approx(20_000.0)  # 400 t × 50 €/t
+    with pytest.raises(ValueError):
+        avoided_treatment_eur(-1.0, 50.0)

@@ -10,6 +10,10 @@ export interface ParamField {
   step?: number;
   min?: number;
   max?: number;
+  /** Aceita «por preencher» (nulo): o valor ainda não chegou da Vitrus e o modelo trata-o como por validar. */
+  nullable?: boolean;
+  /** Fonte em texto quando o valor está por preencher (tradução da `note` do OpenAPI). */
+  note?: () => string;
 }
 
 export interface ParamGroup {
@@ -126,6 +130,16 @@ export const PARAM_GROUPS: ParamGroup[] = [
         min: 0,
       },
       {
+        path: 'rsu_treatment_eur_per_t',
+        label: () => m.param_rsu_treatment(),
+        kind: 'number',
+        unit: '€/t',
+        step: 1,
+        min: 0,
+        nullable: true,
+        note: () => m.param_rsu_treatment_note(),
+      },
+      {
         path: 'detour_factor',
         label: () => m.param_detour_factor(),
         kind: 'number',
@@ -163,6 +177,24 @@ export const PARAM_GROUPS: ParamGroup[] = [
         unit: m.param_unit_days_week(),
         min: 1,
         max: 7,
+      },
+      {
+        path: 'pap_cost_per_pickup_eur',
+        label: () => m.param_pap_cost_per_pickup(),
+        kind: 'number',
+        unit: '€',
+        step: 0.5,
+        min: 0,
+      },
+      {
+        path: 'pap_free_capacity_kg',
+        label: () => m.param_pap_free_capacity(),
+        kind: 'number',
+        unit: 'kg',
+        step: 10,
+        min: 0,
+        nullable: true,
+        note: () => m.param_pap_free_capacity_note(),
       },
     ],
   },
@@ -208,14 +240,23 @@ export const PARAM_GROUPS: ParamGroup[] = [
   },
 ];
 
-export function getParam(params: PlanningParams, path: string): number {
-  return path
+/** Valor de um pressuposto; nulo quando está por preencher (ou quando um cenário antigo não tem o campo). */
+export function getParam(params: PlanningParams, path: string): number | null {
+  const value = path
     .split('.')
-    .reduce<unknown>((acc, key) => (acc as Record<string, unknown>)[key], params) as number;
+    .reduce<unknown>(
+      (acc, key) => (acc == null ? undefined : (acc as Record<string, unknown>)[key]),
+      params,
+    );
+  return typeof value === 'number' ? value : null;
 }
 
-/** Devolve uma cópia dos pressupostos com um valor alterado (imutável). */
-export function setParam(params: PlanningParams, path: string, value: number): PlanningParams {
+/** Devolve uma cópia dos pressupostos com um valor alterado (imutável); `null` só nos campos que o aceitam. */
+export function setParam(
+  params: PlanningParams,
+  path: string,
+  value: number | null,
+): PlanningParams {
   const keys = path.split('.');
   const clone = structuredClone(params) as unknown as Record<string, unknown>;
   let cursor = clone;
@@ -224,7 +265,7 @@ export function setParam(params: PlanningParams, path: string, value: number): P
   return clone as unknown as PlanningParams;
 }
 
-/** Erros de intervalo por campo, para mostrar antes de enviar. */
+/** Erros de intervalo por campo, para mostrar antes de enviar. Os campos que aceitam nulo podem ficar vazios. */
 export function validateParams(params: PlanningParams): Record<string, string> {
   const errors: Record<string, string> = {};
   for (const group of PARAM_GROUPS) {
@@ -232,7 +273,9 @@ export function validateParams(params: PlanningParams): Record<string, string> {
       const v = getParam(params, f.path);
       const lo = f.min;
       const hi = f.max;
-      if (!Number.isFinite(v)) errors[f.path] = m.validation_number_required();
+      if (v == null) {
+        if (!f.nullable) errors[f.path] = m.validation_number_required();
+      } else if (!Number.isFinite(v)) errors[f.path] = m.validation_number_required();
       else if (lo != null && v < lo)
         errors[f.path] = m.validation_number_min({ min: f.kind === 'percent' ? lo * 100 : lo });
       else if (hi != null && v > hi)

@@ -7,7 +7,7 @@ marcados como `assumption` até serem validados.
 
 from novelo.domain import network
 from novelo.domain.vocab import CollectionMode
-from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams
+from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams, ZoneOut
 from novelo.features.textile.references import KG_PER_INHAB_MONTH
 
 # Procura: têxtil que ainda vai para o lixo, 43 051 t de RSU × 5,4% (Vitrus + APA) ÷ 156 830 hab ÷ 12 = 1,2353
@@ -20,6 +20,11 @@ DEFAULT_KG_PER_INHAB_MONTH = round(KG_PER_INHAB_MONTH, 4)
 # calibração com as 301 t de 2025 deixou de fazer sentido, porque essas toneladas são recolhidas por terceiros.
 STREET_CAPTURE_RATE = 0.286
 STREET_COVERAGE = 0.8
+
+# Recolha no circuito porta a porta (PAP): o saco vai na viatura que já passa à porta, sem km novos. O custo de cada
+# recolha é o tempo extra de paragem, que a Vitrus ainda não deu: até lá, o mesmo valor de uma recolha normal
+# (`cost_per_collection_eur`), um teto conservador, porque a viatura já para nessa porta.
+PAP_COST_PER_PICKUP_EUR = 6.0
 
 # Centro de Guimarães como depósito, até a Vitrus indicar o seu (pergunta ao mentor, dia 1).
 DEPOT_LAT, DEPOT_LON = 41.4425, -8.2918
@@ -67,6 +72,9 @@ def default_params() -> PlanningParams:
         depot_lat=DEPOT_LAT,
         depot_lon=DEPOT_LON,
         solver_time_limit_s=20,
+        pap_cost_per_pickup_eur=PAP_COST_PER_PICKUP_EUR,
+        pap_free_capacity_kg=None,  # por validar com a Vitrus: espaço livre para sacos de têxtil na viatura PAP
+        rsu_treatment_eur_per_t=None,  # pedido ao departamento financeiro da Vitrus a 21 out 2026
     )
 
 
@@ -99,6 +107,19 @@ def params_meta() -> list[ParamMeta]:
         ParamMeta(key="depot_lat", unit="°", source=ParamSource.ASSUMPTION),
         ParamMeta(key="depot_lon", unit="°", source=ParamSource.ASSUMPTION),
         ParamMeta(key="solver_time_limit_s", unit="s", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="pap_cost_per_pickup_eur", unit="€", source=ParamSource.ASSUMPTION),
+        ParamMeta(
+            key="pap_free_capacity_kg",
+            unit="kg",
+            source=ParamSource.ASSUMPTION,
+            note="Por validar com a Vitrus: espaço livre para sacos de têxtil numa ronda porta a porta.",
+        ),
+        ParamMeta(
+            key="rsu_treatment_eur_per_t",
+            unit="€/t",
+            source=ParamSource.VITRUS_DATA,
+            note="Vitrus, departamento financeiro (pedido a 21 out 2026); por preencher.",
+        ),
     ]
 
 
@@ -114,4 +135,19 @@ def to_domain_params(p: PlanningParams) -> network.Params:
         piggyback_min_days=p.piggyback_min_days,
         vehicle_capacity_t=p.vehicle_capacity_t,
         depot=(p.depot_lat, p.depot_lon),
+        pap_cost_per_pickup_eur=p.pap_cost_per_pickup_eur,
+    )
+
+
+def to_domain_zone(z: ZoneOut, *, existing_points: bool = False, door_to_door: bool = True) -> network.Zone:
+    """Freguesia para o domínio. `door_to_door=False` reproduz cenários calculados antes do canal porta a porta."""
+    return network.Zone(
+        z.code,
+        z.name,
+        z.population,
+        z.latitude,
+        z.longitude,
+        z.service_days,
+        (z.existing_containers or None) if existing_points else None,
+        door_to_door=door_to_door and bool(z.door_to_door),
     )

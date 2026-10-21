@@ -66,7 +66,7 @@ Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `
 | `textile` | `baseline`, `flows`, `waste`, `overview` |
 | `network` | `circuits`, `fleet`, `localities`, `containers` |
 | `datasets` | `quality`, resolver e reabrir alertas |
-| `municipal` | rede **municipal** de contentores (indiferenciado, orgânico, seletivo; não é têxtil; base geográfica do modelo): `overview`, `parishes`, `sites`, `containers`, `producers`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
+| `municipal` | rede **municipal** de contentores (indiferenciado, orgânico, seletivo; não é têxtil; base geográfica do modelo): `overview`, `parishes`, `sites`, `containers`, `producers`, `b2b-channel`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
 | `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, `flows`, `sensitivity`), `compare-robustness`, `benchmarks`, `pilot` |
 | `whatif` | criar, aplicar e listar perguntas "E se...?" |
 | `lots`, `triage`, `market`, `brands` | `/lots` (abrir, listar, ler, itens, estado), `/triage` (análise de uma peça), `/market` e reservas, `/brands`; público: `/public/lots/{code}` e `/qr` |
@@ -108,6 +108,7 @@ Os contentores **municipais** (profundidade, superfície, orgânico, verdes; 20 
 | `list_municipal_producers` | `/municipal/producers` | Resumo por tipo (contentores, estabelecimentos distintos, freguesias com mais, hipótese de interesse para têxteis) e locais de produtores |
 | `get_textile_candidate_sites` | `/municipal/textile-candidates` | Candidatos do ETL com chaves de justificação e ordem explícita (`rank_rule`); o `rank` é sempre o global |
 | `get_municipal_gap_ranking` | `/municipal/gap-ranking` | Lacuna por freguesia: **estimativa**, com a regra e os parâmetros (têxtil por desviar, 1,235 kg/hab/mês igual em todas) |
+| `get_b2b_channel` | `/municipal/b2b-channel` | Canal B2B de têxtil limpo: lares e hotelaria (locais reais, contagens por tipo e freguesia), sem nomes salvo admin com `show_names=true`; `tonnes_year` nulo, «a medir no piloto» |
 | `get_municipal_density_benchmark` | `/municipal/density-benchmark` | Densidade do concelho, distribuição (mín., p25, mediana, p75, máx.) entre freguesias e a referência francesa (por verificar) |
 | `export_municipal_sites` | `/municipal/export?format=csv\|xlsx\|geojson&scope=sites\|containers` | Streaming (CSV e GeoJSON por lotes; XLSX construído em memória e enviado em blocos), mesmos filtros |
 | `get_caop_parishes_geojson` | `/municipal/parishes/caop.geojson` | 48 contornos CAOP 2019 com métricas para coroplético |
