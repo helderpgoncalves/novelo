@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field, model_validator
 
 from novelo.domain.vocab import CollectionMode, ScenarioObjective, ScenarioStatus, Tipau
 
+Siting = Literal["parish", "sites"]
+
 
 class ParamSource(StrEnum):
     """Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite."""
@@ -88,6 +90,15 @@ class ScenarioRequest(BaseModel):
         default_factory=dict, description="Modos permitidos por freguesia (código INE); omitido = todos"
     )
     parent_id: uuid.UUID | None = None
+    siting: Siting = Field(
+        default="parish",
+        description="`parish`: por freguesia (modelo por zonas); `sites`: escolhe locais reais da rede municipal",
+    )
+    site_radius_m: int = Field(default=300, ge=100, le=1000, description="Distância a pé que um local serve (`sites`)")
+    site_mode: CollectionMode = Field(
+        default=CollectionMode.EXISTING,
+        description="Pressupostos de captura e custo usados nos locais (`existing` ou `street`)",
+    )
 
     @model_validator(mode="after")
     def _objective_inputs(self) -> Self:
@@ -95,6 +106,8 @@ class ScenarioRequest(BaseModel):
             raise ValueError("budget_eur_year is required for max_tonnes")
         if self.objective == ScenarioObjective.MIN_COST and self.target_tonnes is None:
             raise ValueError("target_tonnes is required for min_cost")
+        if self.site_mode == CollectionMode.ON_DEMAND:
+            raise ValueError("site_mode must be existing or street")
         return self
 
 
@@ -144,6 +157,8 @@ class RouteStop(BaseModel):
     latitude: float
     longitude: float
     load_t: float
+    site_id: str | None = Field(default=None, description="Local da rede municipal (cenários por locais)")
+    label: str | None = Field(default=None, description="Rua do local (cenários por locais)")
 
 
 class RouteOut(BaseModel):
@@ -163,12 +178,44 @@ class ModeSummary(BaseModel):
     annual_cost_eur: float
 
 
+class SiteSelection(BaseModel):
+    """Um local aberto num cenário por locais, com o que serve."""
+
+    site_id: str
+    latitude: float
+    longitude: float
+    parish_code: str
+    parish_name: str
+    street: str | None
+    containers: int = Field(description="Contentores municipais que já lá estão (outras frações)")
+    coord_precision: Literal["precise", "approximate"]
+    tonnes: float = Field(description="Têxtil dos pontos cujo local aberto mais próximo é este (estimativa)")
+    population_covered: float
+    served_points: int
+    vehicle: int | None = Field(description="Viatura da rota que o visita")
+
+
+class SitingSummary(BaseModel):
+    """Como foi escolhida a rede por locais e o que não se sabe."""
+
+    radius_m: int
+    site_mode: CollectionMode
+    candidates: int
+    demand_points: int
+    served_points: int
+    opened: int
+    solver_iterations: int
+    population_proxy: str
+
+
 class ScenarioResult(BaseModel):
     kpis: Kpis
     allocations: list[Allocation]
     routes: list[RouteOut]
     modes: list[ModeSummary]
     depot: list[float]
+    sites: list[SiteSelection] = Field(default_factory=list, description="Locais abertos (só cenários por locais)")
+    siting: SitingSummary | None = Field(default=None, description="Preenchido nos cenários por locais")
 
 
 class ScenarioSummary(BaseModel):
@@ -192,3 +239,10 @@ class ScenarioOut(ScenarioSummary):
     params: PlanningParams
     constraints: dict[str, list[CollectionMode]]
     result: ScenarioResult
+
+    def siting_options(self) -> dict[str, object]:
+        """Campos de `ScenarioRequest` que repetem a rede por locais ao duplicar ou alterar este cenário."""
+        s = self.result.siting
+        if s is None:
+            return {}
+        return {"siting": "sites", "site_radius_m": s.radius_m, "site_mode": s.site_mode}

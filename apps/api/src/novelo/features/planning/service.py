@@ -14,8 +14,9 @@ from novelo.domain import network
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.vocab import CollectionMode, ContainerKind, ContainerStatus, ScenarioStatus, TextileDestination
 from novelo.features.network.models import Circuit, Container, Locality, Parish
+from novelo.features.planning import site_service
 from novelo.features.planning.models import ParameterSet, Scenario
-from novelo.features.planning.params import default_params, params_meta
+from novelo.features.planning.params import default_params, params_meta, to_domain_params
 from novelo.features.planning.schemas import (
     Allocation,
     AllocationPart,
@@ -141,19 +142,7 @@ async def list_zones(db: AsyncSession) -> list[ZoneOut]:
 # --- Cenários ---
 
 
-def _domain_params(p: PlanningParams) -> network.Params:
-    return network.Params(
-        kg_per_inhab_month=p.kg_per_inhab_month,
-        modes={m: network.ModeParams(**mp.model_dump()) for m, mp in p.modes.items()},
-        cost_per_collection_eur=p.cost_per_collection_eur,
-        cost_per_km_eur=p.cost_per_km_eur,
-        detour_factor=p.detour_factor,
-        on_demand_kg_per_pickup=p.on_demand_kg_per_pickup,
-        piggyback_extra_km=p.piggyback_extra_km,
-        piggyback_min_days=p.piggyback_min_days,
-        vehicle_capacity_t=p.vehicle_capacity_t,
-        depot=(p.depot_lat, p.depot_lon),
-    )
+_domain_params = to_domain_params
 
 
 def compute(
@@ -349,7 +338,13 @@ async def run_scenario(db: AsyncSession, request: ScenarioRequest, user: User) -
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
     # CP-SAT e VRP são CPU síncrono (até `solver_time_limit_s`): fora do event loop, com dados puros (sem sessão).
-    result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t)
+    if request.siting == "sites":
+        inputs = await site_service.load_site_inputs(db)
+        result, solver_status = await asyncio.to_thread(
+            site_service.compute_sites, zones, params, request, baseline.total_t, inputs
+        )
+    else:
+        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t)
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis

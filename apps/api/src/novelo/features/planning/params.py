@@ -4,6 +4,7 @@ Dados reais (população INE, circuitos e captura observada da Vitrus) entram no
 os números que a Vitrus ainda não forneceu (custos unitários), marcados como `assumption` até serem validados.
 """
 
+from novelo.domain import network
 from novelo.domain.vocab import CollectionMode
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams
 
@@ -93,3 +94,18 @@ def params_meta() -> list[ParamMeta]:
         ParamMeta(key="depot_lon", unit="°", source=ParamSource.ASSUMPTION),
         ParamMeta(key="solver_time_limit_s", unit="s", source=ParamSource.ASSUMPTION),
     ]
+
+
+def to_domain_params(p: PlanningParams) -> network.Params:
+    return network.Params(
+        kg_per_inhab_month=p.kg_per_inhab_month,
+        modes={m: network.ModeParams(**mp.model_dump()) for m, mp in p.modes.items()},
+        cost_per_collection_eur=p.cost_per_collection_eur,
+        cost_per_km_eur=p.cost_per_km_eur,
+        detour_factor=p.detour_factor,
+        on_demand_kg_per_pickup=p.on_demand_kg_per_pickup,
+        piggyback_extra_km=p.piggyback_extra_km,
+        piggyback_min_days=p.piggyback_min_days,
+        vehicle_capacity_t=p.vehicle_capacity_t,
+        depot=(p.depot_lat, p.depot_lon),
+    )

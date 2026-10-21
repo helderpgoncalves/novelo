@@ -232,6 +232,7 @@ async def apply(db: AsyncSession, llm: OpenRouterClient, user: User, run_id: uui
         params=params,
         constraints=constraints,
         parent_id=base.id,
+        **base.siting_options(),
     )
 
     new = await planning.run_scenario(db, request, user)

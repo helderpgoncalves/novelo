@@ -3437,11 +3437,13 @@ export const zRobustnessOut = z.object({
  * RouteStop
  */
 export const zRouteStop = z.object({
+    label: z.string().nullish(),
     latitude: z.number(),
     load_t: z.number(),
     longitude: z.number(),
     parish_code: z.string(),
-    parish_name: z.string()
+    parish_name: z.string(),
+    site_id: z.string().nullish()
 });
 
 /**
@@ -3579,51 +3581,16 @@ export const zScenarioRequest = z.object({
     objective: zScenarioObjective,
     params: zPlanningParams.nullish(),
     parent_id: z.uuid().nullish(),
+    site_mode: zCollectionMode.optional().default('existing'),
+    site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
+    siting: z.enum(['parish', 'sites']).optional().default('parish'),
     target_tonnes: z.number().gte(0).nullish()
-});
-
-/**
- * ScenarioResult
- */
-export const zScenarioResult = z.object({
-    allocations: z.array(zAllocation),
-    depot: z.array(z.number()),
-    kpis: zKpis,
-    modes: z.array(zModeSummary),
-    routes: z.array(zRouteOut)
 });
 
 /**
  * ScenarioStatus
  */
 export const zScenarioStatus = z.enum(['computed', 'infeasible']);
-
-/**
- * ScenarioOut
- */
-export const zScenarioOut = z.object({
-    annual_cost_eur: z.number(),
-    budget_eur_year: z.number().nullable(),
-    capex_eur: z.number(),
-    constraints: z.record(z.string(), z.array(zCollectionMode)),
-    coverage_pct: z.number(),
-    created_at: z.iso.datetime(),
-    eur_per_tonne: z.number().nullable(),
-    id: z.uuid(),
-    label: z.string(),
-    objective: zScenarioObjective,
-    params: zPlanningParams,
-    parent_id: z.uuid().nullable(),
-    result: zScenarioResult,
-    solver_status: z.enum([
-        'optimal',
-        'feasible',
-        'infeasible'
-    ]),
-    status: zScenarioStatus,
-    target_tonnes: z.number().nullable(),
-    tonnes_year: z.number()
-});
 
 /**
  * ScenarioSummary
@@ -3882,6 +3849,82 @@ export const zSiteFeatureCollection = z.object({
     total_sites: z.int(),
     type: z.literal('FeatureCollection').optional().default('FeatureCollection'),
     zoom: z.int().nullable()
+});
+
+/**
+ * SiteSelection
+ *
+ * Um local aberto num cenário por locais, com o que serve.
+ */
+export const zSiteSelection = z.object({
+    containers: z.int(),
+    coord_precision: z.enum(['precise', 'approximate']),
+    latitude: z.number(),
+    longitude: z.number(),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    population_covered: z.number(),
+    served_points: z.int(),
+    site_id: z.string(),
+    street: z.string().nullable(),
+    tonnes: z.number(),
+    vehicle: z.int().nullable()
+});
+
+/**
+ * SitingSummary
+ *
+ * Como foi escolhida a rede por locais e o que não se sabe.
+ */
+export const zSitingSummary = z.object({
+    candidates: z.int(),
+    demand_points: z.int(),
+    opened: z.int(),
+    population_proxy: z.string(),
+    radius_m: z.int(),
+    served_points: z.int(),
+    site_mode: zCollectionMode,
+    solver_iterations: z.int()
+});
+
+/**
+ * ScenarioResult
+ */
+export const zScenarioResult = z.object({
+    allocations: z.array(zAllocation),
+    depot: z.array(z.number()),
+    kpis: zKpis,
+    modes: z.array(zModeSummary),
+    routes: z.array(zRouteOut),
+    sites: z.array(zSiteSelection).optional(),
+    siting: zSitingSummary.nullish()
+});
+
+/**
+ * ScenarioOut
+ */
+export const zScenarioOut = z.object({
+    annual_cost_eur: z.number(),
+    budget_eur_year: z.number().nullable(),
+    capex_eur: z.number(),
+    constraints: z.record(z.string(), z.array(zCollectionMode)),
+    coverage_pct: z.number(),
+    created_at: z.iso.datetime(),
+    eur_per_tonne: z.number().nullable(),
+    id: z.uuid(),
+    label: z.string(),
+    objective: zScenarioObjective,
+    params: zPlanningParams,
+    parent_id: z.uuid().nullable(),
+    result: zScenarioResult,
+    solver_status: z.enum([
+        'optimal',
+        'feasible',
+        'infeasible'
+    ]),
+    status: zScenarioStatus,
+    target_tonnes: z.number().nullable(),
+    tonnes_year: z.number()
 });
 
 /**

@@ -14143,6 +14143,18 @@
       },
       "RouteStop": {
         "properties": {
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Rua do local (cenários por locais)",
+            "title": "Label"
+          },
           "latitude": {
             "title": "Latitude",
             "type": "number"
@@ -14162,6 +14174,18 @@
           "parish_name": {
             "title": "Parish Name",
             "type": "string"
+          },
+          "site_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Local da rede municipal (cenários por locais)",
+            "title": "Site Id"
           }
         },
         "required": [
@@ -14628,6 +14652,29 @@
             ],
             "title": "Parent Id"
           },
+          "site_mode": {
+            "$ref": "#/components/schemas/CollectionMode",
+            "default": "existing",
+            "description": "Pressupostos de captura e custo usados nos locais (`existing` ou `street`)"
+          },
+          "site_radius_m": {
+            "default": 300,
+            "description": "Distância a pé que um local serve (`sites`)",
+            "maximum": 1000.0,
+            "minimum": 100.0,
+            "title": "Site Radius M",
+            "type": "integer"
+          },
+          "siting": {
+            "default": "parish",
+            "description": "`parish`: por freguesia (modelo por zonas); `sites`: escolhe locais reais da rede municipal",
+            "enum": [
+              "parish",
+              "sites"
+            ],
+            "title": "Siting",
+            "type": "string"
+          },
           "target_tonnes": {
             "anyOf": [
               {
@@ -14681,6 +14728,25 @@
             },
             "title": "Routes",
             "type": "array"
+          },
+          "sites": {
+            "description": "Locais abertos (só cenários por locais)",
+            "items": {
+              "$ref": "#/components/schemas/SiteSelection"
+            },
+            "title": "Sites",
+            "type": "array"
+          },
+          "siting": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SitingSummary"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Preenchido nos cenários por locais"
           }
         },
         "required": [
@@ -15391,6 +15457,144 @@
           "containers"
         ],
         "title": "SiteFeatureProps",
+        "type": "object"
+      },
+      "SiteSelection": {
+        "description": "Um local aberto num cenário por locais, com o que serve.",
+        "properties": {
+          "containers": {
+            "description": "Contentores municipais que já lá estão (outras frações)",
+            "title": "Containers",
+            "type": "integer"
+          },
+          "coord_precision": {
+            "enum": [
+              "precise",
+              "approximate"
+            ],
+            "title": "Coord Precision",
+            "type": "string"
+          },
+          "latitude": {
+            "title": "Latitude",
+            "type": "number"
+          },
+          "longitude": {
+            "title": "Longitude",
+            "type": "number"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "population_covered": {
+            "title": "Population Covered",
+            "type": "number"
+          },
+          "served_points": {
+            "title": "Served Points",
+            "type": "integer"
+          },
+          "site_id": {
+            "title": "Site Id",
+            "type": "string"
+          },
+          "street": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Street"
+          },
+          "tonnes": {
+            "description": "Têxtil dos pontos cujo local aberto mais próximo é este (estimativa)",
+            "title": "Tonnes",
+            "type": "number"
+          },
+          "vehicle": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Viatura da rota que o visita",
+            "title": "Vehicle"
+          }
+        },
+        "required": [
+          "site_id",
+          "latitude",
+          "longitude",
+          "parish_code",
+          "parish_name",
+          "street",
+          "containers",
+          "coord_precision",
+          "tonnes",
+          "population_covered",
+          "served_points",
+          "vehicle"
+        ],
+        "title": "SiteSelection",
+        "type": "object"
+      },
+      "SitingSummary": {
+        "description": "Como foi escolhida a rede por locais e o que não se sabe.",
+        "properties": {
+          "candidates": {
+            "title": "Candidates",
+            "type": "integer"
+          },
+          "demand_points": {
+            "title": "Demand Points",
+            "type": "integer"
+          },
+          "opened": {
+            "title": "Opened",
+            "type": "integer"
+          },
+          "population_proxy": {
+            "title": "Population Proxy",
+            "type": "string"
+          },
+          "radius_m": {
+            "title": "Radius M",
+            "type": "integer"
+          },
+          "served_points": {
+            "title": "Served Points",
+            "type": "integer"
+          },
+          "site_mode": {
+            "$ref": "#/components/schemas/CollectionMode"
+          },
+          "solver_iterations": {
+            "title": "Solver Iterations",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "radius_m",
+          "site_mode",
+          "candidates",
+          "demand_points",
+          "served_points",
+          "opened",
+          "solver_iterations",
+          "population_proxy"
+        ],
+        "title": "SitingSummary",
         "type": "object"
       },
       "SlotCount": {
