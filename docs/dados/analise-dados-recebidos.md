@@ -73,6 +73,20 @@ O mentor respondeu por email a três perguntas. As respostas mudam a base da pro
 
 **O que isto diz à rede.** O valor está na reutilização: têxtil limpo e seco. Um contentor na rua junta chuva e lixo. Por isso o modelo oferece só `existing` (entrega em locais com pessoas, ou paragem nos locais municipais onde a viatura já passa, com sacos fechados recolhidos no momento) e `on_demand` (porta a porta nos circuitos). A triagem por foto passa a ser controlo de qualidade na entrega. A bolsa de fibra desce na prioridade.
 
+## Verificação em fontes públicas (22 out 2026)
+
+Antes de perguntar à Vitrus, procurámos o que já é público. Pedimos confirmação no email de 22 de outubro; até lá **o modelo não muda** (segue a indicação do mentor: 43 051 t × 5,4%).
+
+| Ponto | O que encontrámos | Fonte | Efeito |
+| --- | --- | --- | --- |
+| Origem dos 5,4% | Média por circuito do estudo do Laboratório da Paisagem e da CM Guimarães sobre a caracterização de 2016 (23 circuitos; a mediana é 4,5%). É a mesma fonte dos 0,7 kg/hab/mês | Perebynos, Sepúlveda e Ribeiro, *Waste Disposal & Sustainable Energy*, 2023, p. 5 | Não é um valor da APA; a APA dá 5,86% para o indiferenciado nacional em 2025 (RARU 2025, p. 24) |
+| 43 051 t | São 84,0% do indiferenciado recolhido no concelho | Vitrus, Relatório e Contas 2025, p. 8 | Com o concelho todo seriam cerca de 51 250 t e 2 768 t de têxtil (cálculo nosso). A procura do modelo é, por isso, **conservadora** |
+| Tratamento do indiferenciado | Guimarães entrega à Resinorte; tarifa de 65,64 €/t em 2024 e 2025; taxa de gestão de resíduos de 40 €/t em 2026 para aterro | RARU 2024, p. 147; tarifários e R&C 2025 da Resinorte; tabela APA 2026 | Base para a poupança no tratamento, que fica "por validar" até a Vitrus confirmar quem paga e quanto |
+| Depósito | Estaleiro Operacional na Rua das Lameiras, Polvoreira | vitrusambiente.pt/contactos | O modelo ainda usa o centro de Guimarães (pressuposto) até confirmação |
+| Quem recolhe têxteis | A To Be Green recolhe nos contentores das escolas (RRRCICLO); H Sarah, Ultriplo e Nova Etapa trabalham com contentores próprios noutros concelhos | Plano URBACT, pp. 56–57; EWWR; protocolos municipais | Explica a qualidade por entidade (9,2% a 72,9% de reutilização); por confirmar em Guimarães |
+
+Relatório completo da pesquisa, com páginas e citações, guardado fora do repositório durante o hackathon; resumo no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
+
 ## Onde se usa cada dado
 
 | Dado | Ecrã ou função |
