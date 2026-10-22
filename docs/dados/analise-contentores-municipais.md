@@ -125,7 +125,7 @@ Os 5 ficheiros concentram-se na cidade e nas freguesias urbanas: **Oliveira, Sã
 | Infantas (1 740) | 7 (4,0) | 2 | 11,9% |
 | Ronfe (4 496) | 22 (4,9) | 12 | 32,3% |
 
-As quatro primeiras linhas (Lordelo, Serzedo e Calvos, Tabuadelo e São Faustino, Infantas) quase não têm registos e merecem uma pergunta: ou os ficheiros estão incompletos nelas, ou a recolha é porta a porta (PAP) e não há contentores de rua. Os circuitos que a Vitrus enviou classificam muitas localidades como `door_to_door`, mas apenas 61 das 82 localidades têm freguesia atribuída, por isso não confirmámos.
+As quatro primeiras linhas (Lordelo, Serzedo e Calvos, Tabuadelo e São Faustino, Infantas) quase não têm registos e merecem uma pergunta: ou os ficheiros estão incompletos nelas, ou a recolha é porta a porta (PAP) e não há contentores de rua. Desde 22 out 2026, 79 das 82 localidades dos circuitos têm freguesia (CAOP 2019; ver [Dados e modelo](../engenharia/dados-e-modelo.md#fontes-de-dados)). Das quatro, só Lordelo aparece nos circuitos: no C6 (moloks) e no C22 e C23, porta a porta mas sem viatura no planeamento de turnos. Serzedo e Calvos, Tabuadelo e São Faustino e Infantas não têm nenhuma localidade nos circuitos. A pergunta mantém-se.
 
 ### Capacidade
 

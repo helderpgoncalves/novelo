@@ -21,7 +21,7 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 1. **Dados reais em todo o lado:** 301,3 t, destino de cada tonelada, 40 circuitos, 29 viaturas, população do INE.
 2. **Honestidade sobre a incerteza:** os custos unitários ainda são pressupostos; mostramos o intervalo e o que mais pesa (feito: tornado e Monte Carlo).
 3. **IA com disciplina:** conduz o otimizador e **nunca faz contas**; um verificador rejeita números inventados.
-4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes", determinados com as autoridades locais (art. 22.º-A, n.º 7 e 12), e exige cobertura do território todo por população, densidade, volume previsto e proximidade (art. 22.º-C, n.º 9, b)).
+4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes", determinados com as autoridades locais (art. 22.º-A, n.º 7 e 12), e exige cobertura do território todo por população, densidade, volume previsto e proximidade, sem se limitar às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o: no de 60 000 €/ano, 68,8% da população servida fora das freguesias urbanas, contra 76,0% nas urbanas (estimativa).
 5. **Cadeia completa, do saco ao fio:** recolha, triagem, lote com passaporte, bolsa de fibra, relatório RAP.
 6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (feito).
 
@@ -38,9 +38,9 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 | Parte da pergunta | O que significa | Como respondemos |
 | --- | --- | --- |
 | "serviço de recolha seletiva" | Um serviço, não um equipamento | Rede de modos combináveis: locais existentes onde a viatura já passa, sem contentor novo, e recolha a pedido nos circuitos porta a porta |
-| "garanta material reutilizável e reciclável" | Qualidade à entrada | Triagem assistida e lotes por composição e estado |
+| "garanta material reutilizável e reciclável" | Qualidade à entrada | Triagem assistida e lotes por composição e estado; toneladas reutilizáveis em cada cenário, porque a qualidade depende de quem recolhe (em 2025, 72,9% de reutilização na Ultriplo, 9,2% no têxtil recolhido pela Vitrus; A19) |
 | "menor investimento" | CAPEX | Sem contentores de têxtil: locais existentes sem contentor novo; recolha a pedido nos circuitos atuais, sem km novos |
-| "menor custo de operação" | OPEX | Otimizador de rotas sobre circuitos e viaturas atuais |
+| "menor custo de operação" | OPEX | Otimizador de rotas sobre circuitos e viaturas atuais; numa tarde de dia útil cerca de 15 das 29 viaturas não têm circuito, plano B para o saco não ir no compactador (a validar com a Vitrus; A20) |
 | "menor" (as duas coisas) | Comparar | Simulador com orçamento, cenários e €/t |
 | "dados disponíveis" | Usá-los | Todos usados; não há contentores de têxteis (Vitrus, 21 out); caracterização: 5,4% da APA indicado pela Vitrus |
 
@@ -201,7 +201,7 @@ Do primeiro a sair ao último. Mantém a [ordem de corte](#calendário-dia-a-dia
 | **Interface profissional, mobile-first, pt/en, PWA** | Demo credível em qualquer ecrã | Feito |
 | **Cobertura de contentores e lacuna face à referência francesa** | Um número que o júri nunca viu | Deixou de se aplicar: não há contentores de têxteis (21 out); fica a rede por locais reais |
 | **Sensibilidade e robustez** (tornado, P10/P50/P90) | Transforma a falta de custos em argumento | Em integração |
-| **Cenário de referência francês** | Meta externa; mostra a distância (meta 669,7 t, teto do modelo 562,6 t) | Em integração |
+| **Cenário de referência francês** | Meta externa; mostra a distância (meta 669,7 t, teto do modelo sem contentores 597,7 t, estimativa) | Em integração |
 | **Recomendador de piloto** (Gondar e a União de Arosa e Castelões; piso de sinal 1,71 t) | O pedido final | Em integração |
 | **Copiloto de IA com ferramentas** | Conduz o simulador em conversa | Em integração |
 | **Painel de IA** (modelo por funcionalidade, custos e orçamento via OpenRouter; `openai/gpt-6-luna` por defeito) | Controlo de custo e troca de modelo | Em integração |
@@ -223,7 +223,10 @@ Cada afirmação do pitch tem de ter **evidência a abrir** e **fonte**. Se a li
 | "O custo tem de ser economicamente eficiente e é determinado com as autoridades locais" (7) | Relatório RAP | EUR-Lex art. 22.º-A n.º 7 e 12 | Primária |
 | "A rede tem de cobrir o território todo, não só as zonas rendíveis" (3, 7) | Cobertura | EUR-Lex art. 22.º-C n.º 9, b) | Primária |
 | "A França recolhe 4,27 kg/hab; nós 1,92" (3) | Cenário francês | Imprensa citando a Refashion [F10] | **Por verificar** na fonte primária |
-| "A meta francesa seria 669,7 t; o teto do modelo é 562,6 t" (3) | Cenários de referência | Cálculo nosso | Cálculo (depende da França) |
+| "A meta francesa seria 669,7 t; sem contentores, o teto do modelo é 597,7 t" (3) | Cenários de referência | Cálculo nosso (H6) | Cálculo (depende da França) |
+| "A qualidade depende de quem recolhe: 72,9% de reutilização na Ultriplo, 9,2% no têxtil recolhido pela Vitrus" (6) | Sankey e KPI de toneladas reutilizáveis | Dados da Vitrus (A19) | Dado Vitrus (Vitrus e Nova Etapa por percentagem de relatório) |
+| "Fora das freguesias urbanas o cenário serve 68,8% da população, contra 76,0%" (7) | Separador Cobertura do cenário | Cálculo nosso (H4); art. 22.º-C n.º 9, b) | Cálculo (estimativa) |
+| "Numa tarde de dia útil, cerca de 15 das 29 viaturas não têm circuito" (Q&A) | Frota e turnos | Planeamento de turnos da Vitrus (A20) | Dado Vitrus; uso para têxteis por validar |
 | "Os pressupostos que mais pesam são estes" (4) | Tornado | Modelo | Estimativa |
 | "A Sasia recicla cerca de 2 000 t/mês, quase tudo pré-consumo" (6) | Slide da indústria | Jornal de Negócios [F53] | Secundária |
 | "Os lotes por composição são o que falta" (6) | Passaporte e bolsa de fibra | Plano municipal (por verificar); recicladores | Hipótese |

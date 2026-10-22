@@ -41,30 +41,43 @@ export const FACTS = {
   reject: 14.1,
   /**
    * Cenário por freguesia de 60 000 €/ano, rede sem contentores, recolha a pedido no circuito porta a porta onde há
-   * (estimativa, base Vitrus + APA de 21 out 2026): gasta 47 795 €, 396,2 t a 120,6 €/t; P10/P50/P90 de 500 amostras
-   * (semente 7). docs/engenharia/dados-e-modelo.md, secções 5 e 8.
+   * (estimativa, base Vitrus + APA, recalculado a 22 out 2026): gasta 47 839 €, 396,5 t a 120,6 €/t; P10/P50/P90 de 500
+   * amostras (semente 7). docs/engenharia/dados-e-modelo.md, secções 5 e 8.
    */
   scenario60k: {
     budget: 60000,
-    cost: 47795,
-    tonnes: 396.2,
+    cost: 47839,
+    tonnes: 396.5,
     eurPerT: 120.6,
     p10: 96.9,
     p50: 122.5,
     p90: 154.7,
   },
-  /** Cenário base do exemplo do Copiloto: 40 000 €/ano, mesma base e pressupostos (gasta 27 961 €, 323,8 t). */
-  scenarioBase: { budget: 40000, cost: 27961, tonnes: 323.8 },
+  /** Cenário base do exemplo do Copiloto: 40 000 €/ano, mesma base e pressupostos (gasta 27 709 €, 323,9 t). */
+  scenarioBase: { budget: 40000, cost: 27709, tonnes: 323.9 },
   /**
-   * Recolha no circuito porta a porta (estimativa, 21 out 2026; docs/engenharia/dados-e-modelo.md, secção 9): freguesias
-   * com passagem de um circuito PAP de indiferenciado com viatura no planeamento de turnos da Vitrus, os seus habitantes
-   * (INE) e o têxtil que o cenário de 60 000 €/ano lá recolhe, sem km novos.
+   * Têxtil reutilizável do cenário de 60 000 €/ano (estimativa, 22 out 2026): toneladas × quota de reutilização de 2025
+   * (59,4% nas 4 entidades; 50,0% a 72,9% nas entidades com pesagem) e custo ÷ reutilizável. KPIs `reusable_t*` e
+   * `eur_per_reusable_t` do cenário; os €/t baixo e alto são o custo ÷ `reusable_t_high` / `_low`.
    */
-  doorToDoor: { parishes: 19, inhabitants: 61597, tonnes: 128.7, newKm: 0 },
+  reusable60k: {
+    tonnes: 235.6,
+    low: 198.3,
+    high: 288.9,
+    eurPerT: 203.1,
+    eurPerTLow: 165.6,
+    eurPerTHigh: 241.3,
+  },
+  /**
+   * Recolha no circuito porta a porta (estimativa, 22 out 2026; docs/engenharia/dados-e-modelo.md, secção 9): freguesias
+   * com passagem de um circuito PAP de indiferenciado com viatura no planeamento de turnos da Vitrus, os seus habitantes
+   * (INE) e o têxtil que o cenário de 60 000 €/ano lá recolhe no circuito, sem km novos (em 20 delas).
+   */
+  doorToDoor: { parishes: 22, inhabitants: 67349, inScenario: 20, tonnes: 129.3, newKm: 0 },
   /** Escolas do pacote municipal (`producer_types`), candidatas a pontos com pessoas (pontos assistidos). */
   schools: 86,
   /**
-   * Teto do modelo por freguesia (estimativa, 21 out 2026; docs/engenharia/dados-e-modelo.md, secção 5): sem contentores
+   * Teto do modelo por freguesia (estimativa, 22 out 2026; docs/engenharia/dados-e-modelo.md, secção 5): sem contentores
    * (local existente e recolha a pedido, orçamento sem limite) e, só como referência, com o contentor de rua à densidade francesa.
    */
   ceilingNoContainersT: 597.7,

@@ -40,7 +40,7 @@ Códigos: **V** Vitrus (Lucas), **F** Fibrenamics (Luís Miguel), **O** organiza
 | Destino | Reutilização 179,0 t (59,4%); reciclagem 79,9 t (26,5%); rejeito 42,3 t (14,1%) | `data/processed/summary.json`; registo A4 |
 | População | 156 830 habitantes em 48 freguesias | INE, Censos 2021 (`parishes.csv`); registo A3 |
 | Potencial e captura | 2 324,8 t/ano por desviar (43 051 t de RSU × 5,4%), gerado 2 626,0 t, captura 11,5% (estimativa) | Vitrus e APA, 21 out (cálculo); registo A8, A9. Antes: 1 317,4 t e 22,9% (plano municipal, já não usado) |
-| Circuitos e frota | 40 circuitos (9 sem viatura), 29 viaturas (2 nunca atribuídas), 101 turnos por semana, 82 localidades (71 geocodificadas), 12 alertas | `Circuitos_Viaturas_Guimaraes.xlsx`; `summary.json` |
+| Circuitos e frota | 40 circuitos (9 sem viatura), 29 viaturas (2 nunca atribuídas), 101 turnos por semana, 82 localidades (79 com freguesia CAOP 2019 desde 22 out; antes 71 geocodificadas), 12 alertas | `Circuitos_Viaturas_Guimaraes.xlsx`; `summary.json` |
 | Contentores municipais (**não são de têxteis**) | 2 754 linhas, 2 751 aceites, 2 722 localizados, 2 026 locais, 17,4 por 1 000 hab., 1 187 locais candidatos | `data/processed/municipal_summary.json`; [análise](../dados/analise-contentores-municipais.md) |
 | Cobertura de área a 200, 300 e 500 m | 31,4%, 47,8% e 70,9% (só locais públicos) | `municipal_summary.json` |
 | Geometria | CAOP 2019, 48 freguesias, 24 099,97 ha (241,0 km²) | pacote da Vitrus, 20 out |

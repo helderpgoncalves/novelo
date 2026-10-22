@@ -46,7 +46,7 @@ O decisor escolhe um orçamento e uma meta de captura; a ferramenta devolve a re
 - **Procura por zona:** população por subsecção (INE, BGRI 2021) × kg/hab × taxa de captura esperada, ajustada com a caracterização do lixo da Vitrus e as rotas onde já se encontrou mais têxtil.
 - **Mistura de modos de recolha**, onde está a poupança:
     - pontos em locais existentes, sem contentor novo (juntas, escolas, ecocentros, paragem nos locais municipais onde a viatura já passa), investimento quase zero;
-    - recolha a pedido nas zonas dispersas, aproveitando rotas que já lá passam;
+    - recolha a pedido nas zonas dispersas, aproveitando rotas que já lá passam; o saco não pode ir no compactador, e numa tarde de dia útil cerca de 15 das 29 viaturas não têm circuito (planeamento de turnos da Vitrus): plano B a validar com a Vitrus (tipo de caixa, equipa);
     - sem contentores de rua de têxteis: a Vitrus não os quer, porque o têxtil de contentor vem contaminado (21 out 2026).
 - **Otimização:** localização dos pontos (cobertura máxima / p-median) e rotas (VRP), ambas com OR-Tools.
 - **Saída:** "Cenário A: 40 pontos, X € de investimento, Y €/ano de operação, Z t desviadas do aterro, W €/t" contra "Cenário B". O ecrã de comparação lado a lado é o que mostramos em palco.
@@ -58,7 +58,7 @@ Não é o produto principal: é o **controlo de qualidade na entrega**. O proble
 - um modelo de visão classifica o estado (reutilizável / reciclável / rejeito);
 - OCR da etiqueta lê a composição (ex.: 60% algodão, 40% poliéster) e indica o destino certo. A reciclagem mecânica funciona bem com algodão e lã; misturas com elastano não.
 
-Alimenta dados de qualidade por ponto de recolha, que hoje ninguém tem. Diferencia-nos da To-Be-Green porque é triagem para o operador, não para o cidadão.
+Alimenta dados de qualidade por ponto de recolha, que hoje ninguém tem. E a qualidade varia muito com quem recolhe: em 2025 a Ultriplo reutilizou 72,9% e o têxtil recolhido pela Vitrus 9,2%, com 56,9% de rejeito (dados da Vitrus; registo A19). Por isso cada cenário mostra também as toneladas reutilizáveis e o € por tonelada reutilizável (estimativa). Diferencia-nos da To-Be-Green porque é triagem para o operador, não para o cidadão.
 
 ### 3. Incentivo e ligação à indústria (slides, pouco código)
 

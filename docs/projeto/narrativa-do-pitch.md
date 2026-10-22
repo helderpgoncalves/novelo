@@ -83,7 +83,9 @@ Apenas estes. Todos têm estado **Dado Vitrus**, **Primária**, **Secundária** 
 | **1 jan 2025** obrigação municipal; **17 abr 2028** regimes de RAP criados | Prazos | B1, B4, B17 | "Desde 1 de janeiro de 2025 paga o município. Até abril de 2028 tem de existir a RAP, e os produtores pagam as peças postas à venda a partir daí." |
 | **"economicamente eficiente"** e "transparente" | Porque o custo importa | B6 | "A diretiva só deixa cobrar o custo eficiente, determinado de forma transparente, e as autoridades locais estão na mesa." |
 | **59,4% / 26,5% / 14,1%** | Para onde vai | A4 | "Hoje, cerca de 59% do que se recolhe é reutilizado." (dizer "estimativa" para duas das entidades, A5) |
-| **2 000 t/mês** Sasia (e **5,5%**) | A indústria tem capacidade | C16 (C17 só depois de A8 verificado) | "A indústria do Vale do Ave tem capacidade, sobretudo para pré-consumo; o que lhe falta são lotes limpos de pós-consumo." |
+| **72,9%** contra **9,2%** de reutilização | A qualidade depende de quem recolhe | A19 | "Em 2025, a Ultriplo reutilizou 72,9% do que recolheu; o têxtil recolhido pela Vitrus, 9,2%. Por isso medimos toneladas reutilizáveis, estimativa." |
+| **68,8%** contra **76,0%** da população servida | A rede não fica só onde é barato | B8, H4 | "Fora das freguesias urbanas, o cenário serve 68,8% das pessoas; nas urbanas, 76,0%. Estimativa." |
+| **2 000 t/mês** Sasia (e **9,7%**, estimativa) | A indústria tem capacidade | C16, C17 | "A indústria do Vale do Ave tem capacidade, sobretudo para pré-consumo; o que lhe falta são lotes limpos de pós-consumo." |
 | **X t por ano a Y € por tonelada** | Frase-âncora | cenário B | Preencher a 22 de outubro com os números calculados |
 
 **O enunciado do desafio fala em 73% a 80%** dos têxteis descartados em aterro ou incineração (C25, sem fonte indicada). O júri leu esse texto. Mede outra coisa que o nosso 72% (indiferenciado, AEA, C10): se alguém o citar, dizer "segundo o enunciado" e que o nosso número é o da AEA, com fonte. Não os misturar no mesmo slide.
@@ -120,8 +122,8 @@ Falas por slide. A coluna "Fonte no rodapé" é o que aparece em letra pequena.
 | 3 | 0:45 a 1:00 | Guimarães recolhe menos de metade do que a França recolheria | "Guimarães recolheu 301 toneladas: 1,9 quilos por habitante. A França recolhe 4,27: à nossa escala, cerca de 670 toneladas. Em Sintra estão a retirar contentores." | 1,9 (A2), 4,27 (C1), 670 (C14), Sintra (C21) | Vitrus, INE; Refashion 2024 |
 | 4 | 1:00 a 3:00 | **Demo**: do orçamento ao relatório, em dois minutos | Ver [roteiro da demo](#roteiro-da-demo) | números do cenário | — |
 | 5 | 3:00 a 3:30 | A IA conduz o otimizador; nunca faz contas | "A pergunta entra em português, o modelo devolve uma alteração estruturada, o otimizador calcula, e um verificador rejeita qualquer número que não esteja no resultado. Se a IA falhar, o simulador e o relatório continuam a funcionar." | — | — |
-| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 9,7% (C17) com "estimativa" | Público/Lusa 2024 |
-| 7 | 3:55 a 4:20 | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número | "A diretiva só aceita o custo economicamente eficiente, determinado de forma transparente entre os intervenientes, e entre eles estão as autoridades locais. A entidade gestora não pode recusar o município. O relatório RAP do Novelo dá esse custo por tipo de território." | art. 22.º-A n.º 7 e 12 (B6); art. 22.º-C n.º 10 (B18) | Diretiva (UE) 2025/1892, art. 22.º-A e 22.º-C |
+| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. E a qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%. Por isso cada cenário mostra toneladas reutilizáveis. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 9,7% (C17) com "estimativa"; 72,9% e 9,2% (A19); reutilizáveis (H1) | Público/Lusa 2024; Vitrus, destinos de 2025 |
+| 7 | 3:55 a 4:20 | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número | "A diretiva só aceita o custo economicamente eficiente, determinado de forma transparente entre os intervenientes, e entre eles estão as autoridades locais. A entidade gestora não pode recusar o município. O relatório RAP do Novelo dá esse custo por tipo de território." | art. 22.º-A n.º 7 e 12 (B6); art. 22.º-C n.º 10 (B18); se sobrar tempo, a matriz de cobertura: 68,8% contra 76,0% (B8, H4) | Diretiva (UE) 2025/1892, art. 22.º-A e 22.º-C |
 | 8 | 4:20 a 5:00 | Peço um piloto de três meses em duas freguesias | Frase-âncora com os números do cenário B, o pedido concreto, a replicabilidade e o roadmap (ver [o fecho](#o-fecho-slide-8-40-s-serve-a-continuidade)). | X t, Y €/t (cenário) | Cenário B, estimativa |
 
 ## Roteiro da demo
@@ -162,7 +164,10 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 | Objeção | Resposta | Registo |
 | --- | --- | --- |
 | "Os custos são inventados." | "São pressupostos visíveis no ecrã, e mostramos que a recomendação aguenta uma variação de 30%. A primeira coisa que pedimos à Vitrus são os custos reais." | A15 |
-| "A França é outro contexto." | "Por isso é referência, não meta. Mostramos também o potencial do plano municipal como teto, e deixamos o piloto medir o que é realista." | C1, C14 |
+| "A França é outro contexto." | "Por isso é referência, não meta. Sem contentores, o nosso modelo chega a cerca de 598 toneladas por ano, abaixo das 670 francesas, estimativa. O piloto mede o que é realista." | C1, C14, H6 |
+| "Mais toneladas não é mais lixo?" | "Por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%, com 56,9% de rejeito. No cenário de 60 000 euros, são 235,6 toneladas reutilizáveis por ano, a 203 euros por tonelada reutilizável, estimativa." | A19, H1, H2 |
+| "Só vão onde é barato?" | "Não. A diretiva pede uma rede que não se limite às zonas rendíveis. Fora das freguesias urbanas, o cenário serve 68,8% da população, contra 76,0% nas urbanas, a um custo por tonelada mais alto. Está no separador Cobertura." | B8, H4 |
+| "O saco não vai parar ao compactador?" | "Não pode ir. Plano B: numa tarde de dia útil, cerca de 15 das 29 viaturas não têm circuito no planeamento de turnos da Vitrus. Se o tipo de caixa e a equipa servirem, uma delas leva os sacos à parte. É a primeira coisa a validar com a Vitrus." | A20 |
 | "Quem paga isto hoje?" | "O município, sozinho. A APA confirma que ainda não há entidade gestora. A diretiva só obriga os regimes a existir em abril de 2028, e mesmo então só cobrem as peças postas à venda a partir daí." | B11, B12, B17 |
 | "O que acontece em 2028?" | "Os produtores pagam o custo eficiente das peças que põem à venda depois da lei nacional; as antigas continuam a pesar no município, uma parte que vai descendo. A leitura exata confirmamos com a APA. O custo eficiente determina-se com as autoridades locais, e a entidade gestora não pode recusar o município: quem tiver o custo medido por tipo de território negoceia melhor." | B6, B17, B18 |
 | "Não vão competir com a economia social?" | "A diretiva protege os pontos de recolha da economia social. São parceiros: no Novelo entram como um modo de recolha com os seus próprios pontos." | B10 |
@@ -175,7 +180,8 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 
 ## O que não dizer
 
-- "Os 5,4% do lixo indiferenciado de Guimarães são têxteis" (por verificar, A10).
+- "Os 5,4% do lixo indiferenciado de Guimarães são têxteis" (é a percentagem da APA aplicada ao RSU de Guimarães, não uma caracterização local; dizer "segundo a APA", A10).
+- "Há viaturas livres para os têxteis" (há cerca de 15 sem circuito numa tarde de dia útil, mas se servem está por validar com a Vitrus, A20).
 - "A diretiva fixa metas de recolha de têxteis" (falso, B14).
 - "Em 2028 os produtores passam a pagar a recolha" (incompleto: pagam a das peças postas à venda depois da lei nacional, B17).
 - "A diretiva de 2025 proíbe incinerar o têxtil recolhido" (a proibição vem de 2018, B27).

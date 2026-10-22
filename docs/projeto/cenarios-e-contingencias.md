@@ -113,7 +113,7 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 | --- | --- | --- | --- | --- |
 | **A Vitrus corrige um número** (por exemplo, 301,3 t) | Baixa | Email ou comentário do mentor | Atualizar `data/raw` apenas se o ficheiro novo for oficial; correr `just etl` e o *seed*; atualizar o [registo](../pesquisa/registo-de-afirmacoes.md) e os slides | F |
 | **O plano municipal chega com números diferentes** (por exemplo, 11% em vez de 5,4%) | Média | Documento recebido | Ficar com o do documento oficial; recalcular A10, A12; reescrever o slide do problema; manter o hook europeu dos 72% [F7] | H |
-| **A contagem de localidades diverge** (82 nos dados, 93 em documentos antigos) | Baixa | Pergunta do júri | Dizer "82 com pelo menos um circuito, 71 geocodificadas" e abrir o ficheiro de origem | F |
+| **A contagem de localidades diverge** (82 nos dados, 93 em documentos antigos) | Baixa | Pergunta do júri | Dizer "82 com pelo menos um circuito, 79 com freguesia" e abrir o ficheiro de origem | F |
 | **A população muda** (outra fonte que não o INE 2021) | Baixa | Pergunta | Usar o INE (Censos 2021, 156 830) e dizer a data | F |
 | **A diretiva é citada com outra redação** | Baixa | Jurado jurista | Mostrar os artigos no EUR-Lex; só usar as datas marcadas "Primária"; **não** afirmar metas de recolha | H |
 
@@ -209,7 +209,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | 27 | Como sabem o custo por quilómetro? | Pressuposto assinalado; vamos substituí-lo pelo da Vitrus; mostramos a sensibilidade para ver quanto importa | Pressupostos; tornado (feito) |
 | 28 | Como validam o modelo? | Valores calculados à mão nos testes, semente fixa, comparação com dados observados e revisão por um mentor da UMinho (a pedir) | Testes e documento de dados e modelo |
 | 29 | Porque assumem 1,3 de desvio nas rotas? | É um pressuposto de distância por estrada; podemos usar rotas reais (OSRM) quando houver tempo | Pressupostos |
-| 30 | A meta francesa é alcançável? | Não com os pressupostos atuais: o teto do modelo é 562,6 t contra 669,7 t. Usamo-la como referência e mostramos a distância | Cenários de referência (feito) |
+| 30 | A meta francesa é alcançável? | Sem contentores, não com os pressupostos atuais: o teto do modelo é 597,7 t contra 669,7 t (estimativa, 22 out 2026). Só com o contentor de rua, que a Vitrus não quer, o modelo passa a meta. Usamo-la como referência e mostramos a distância | Cenários de referência (feito) |
 | 31 | Porque a França é o benchmark? | É o sistema mais maduro e com dados públicos; os números vêm de imprensa e estão marcados por verificar; usamo-los como referência, não como promessa | Benchmarks internacionais |
 | 32 | O que acontece se os custos forem 30% mais altos? | Mostramos no tornado e no intervalo: a recomendação aguenta ou muda; é para isso que serve | Incerteza (feito) |
 | 33 | O piloto tem tamanho para medir alguma coisa? | Sim: o piso de sinal é 1,71 t em 3 meses (cerca de 1 032 peças por célula e freguesia, efeito de desenho 2), e a recomendação respeita-o; os pressupostos são nossos | Piloto (feito) |

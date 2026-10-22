@@ -19,12 +19,17 @@ import { Switch } from '@/components/ui/switch';
 import { FlowsSankey } from '@/features/baseline/flows-sankey';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
 import { CollectionPlanSection } from '@/features/scenarios/collection-plan-section';
+import { CoveragePanel } from '@/features/scenarios/coverage-panel';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ParameterSummary } from '@/features/scenarios/parameter-summary';
 import { RoutesTable } from '@/features/scenarios/routes-table';
 import { ScenarioActions } from '@/features/scenarios/scenario-actions';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
-import { ScenarioKpis, ScenarioSecondaryKpis } from '@/features/scenarios/scenario-kpis';
+import {
+  ScenarioKpis,
+  ScenarioReusable,
+  ScenarioSecondaryKpis,
+} from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
 import { SitesTable } from '@/features/scenarios/sites-table';
 import { SitingOverview } from '@/features/scenarios/siting-overview';
@@ -34,7 +39,7 @@ import { formatEur, formatTonnes } from '@/lib/format';
 import { objectiveLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 
-const TABS = ['summary', 'network', 'uncertainty', 'whatif'] as const;
+const TABS = ['summary', 'network', 'coverage', 'uncertainty', 'whatif'] as const;
 type TabId = (typeof TABS)[number];
 
 export const Route = createFileRoute('/_app/scenarios/$scenarioId')({
@@ -55,6 +60,7 @@ export const Route = createFileRoute('/_app/scenarios/$scenarioId')({
 const tabLabel: Record<TabId, () => string> = {
   summary: () => m.scn_tab_summary(),
   network: () => m.scn_tab_network(),
+  coverage: () => m.scn_tab_coverage(),
   uncertainty: () => m.scn_tab_uncertainty(),
   whatif: () => m.scn_tab_whatif(),
 };
@@ -101,7 +107,7 @@ function ScenarioPage() {
       </div>
 
       <PageTabs
-        // Em telemóvel os quatro separadores cabem sem rolar (menos folga lateral em cada um).
+        // Em telemóvel, menos folga lateral em cada separador; os que não cabem rolam dentro da barra (com esbatido).
         className="max-sm:[&_[role=tab]]:px-2!"
         label={m.rw_tabs_label()}
         value={tab}
@@ -119,6 +125,7 @@ function ScenarioPage() {
             content: (
               <>
                 <ScenarioSecondaryKpis kpis={result.kpis} routes={result.routes.length} />
+                <ScenarioReusable kpis={result.kpis} />
                 <Section
                   title={m.scenario_modes_title()}
                   description={m.scenario_modes_description()}
@@ -204,6 +211,11 @@ function ScenarioPage() {
                 </Section>
               </>
             ),
+          },
+          {
+            id: 'coverage',
+            label: tabLabel.coverage(),
+            content: <CoveragePanel scenarioId={scenario.id} />,
           },
           {
             id: 'uncertainty',

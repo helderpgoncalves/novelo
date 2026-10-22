@@ -15,7 +15,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A3 | População de Guimarães | 156 830 | INE, Censos 2021 (soma das 48 freguesias) | Primária (INE, ficheiro do projeto) | 2 |
 | A4 | Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | `dados_textil.xlsx` | Dado Vitrus | 5 |
 | A5 | O destino de duas entidades é estimado por percentagem | Nova Etapa e Vitrus (percentagens de relatórios) | `dados_textil.xlsx` | Dado Vitrus (diz-se "estimativa") | 5 |
-| A6 | Circuitos, viaturas, localidades | 40 circuitos, 29 viaturas, 82 localidades (71 geocodificadas) | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 4 |
+| A6 | Circuitos, viaturas, localidades | 40 circuitos, 29 viaturas, 82 localidades (79 com freguesia CAOP 2019 desde 22 out 2026; antes 71 geocodificadas e 61 com freguesia) | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 4 |
 | A7 | Circuitos sem viatura atribuída | 9 | idem | Dado Vitrus | demo |
 | A8 | Têxtil que ainda vai para o lixo (procura do modelo) | 2 324,8 t/ano = 1,235 kg/hab/mês | 43 051 t de RSU (A16) × 5,4% (A10) ÷ 156 830 ÷ 12 | Cálculo sobre dados da Vitrus e da APA (**estimativa**). Até 21 out era 0,7 kg/hab/mês ≈ 1 317 t do Plano de Ação Integrado (F74); a Vitrus não conhece esse plano e o valor deixou de se usar | 2 |
 | A9 | Captura atual | 11,5% | 301,27 ÷ (2 324,754 + 301,27) = 301,27 ÷ 2 626,024 | Cálculo (**estimativa**). Antes: 22,9% (301,3 ÷ 1 317, base antiga) | 2 |
@@ -28,6 +28,8 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A16 | RSU recolhido pela Vitrus em 2025 | 43 051 t | Vitrus (mentor, 21 out 2026) | Dado Vitrus | 2 |
 | A17 | Reciclar têxtil é muito mais caro que fibra virgem | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus (opinião do operador, sem número) | 6 |
 | A18 | O pacote QGIS traz contentores de indiferenciado, orgânico e recolha seletiva; não há dados de deposição de têxtil por contentor | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus | |
+| A19 | A qualidade depende de quem recolhe: reutilização em 2025 por entidade | Ultriplo 72,9% (97,7 ÷ 134,1 t); H Sarah Trading 50,0% (59,3 ÷ 118,6 t); Nova Etapa 50%; Vitrus 9,2%, com 56,9% de rejeito (5,6 t) | `dados_textil.xlsx` (`textile_flows.csv`): Ultriplo e Sarah com kg por destino; Nova Etapa e Vitrus com percentagens de relatório (a da Vitrus é da To Be Green) | Dado Vitrus. Nova Etapa e Vitrus dizem-se "estimativa"; a divisão da Sarah é redonda (50/37/13) e pode ser percentagem ([Q7](../projeto/perguntas-aos-orientadores.md#q7-como-foi-medido-o-destino-e-a-que-preço)); a amostra da Vitrus é pequena (1,9% do total) | 6 |
+| A20 | Viaturas sem circuito numa tarde de dia útil | cerca de 15 das 29 (14 com turno à tarde, de segunda a sexta; inclui as 2 nunca atribuídas) | `Circuitos_Viaturas_Guimaraes.xlsx` (`shifts.csv`), semana de 21 a 25 set 2026 | Dado Vitrus (contagem nossa). Se servem para levar o têxtil à parte do compactador (tipo de caixa, equipa) está **por validar com a Vitrus** ([Q5](../projeto/perguntas-aos-orientadores.md#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais), V5, V10) | só em conversa |
 
 ## B. Regulação
 
@@ -166,9 +168,23 @@ Nada deste bloco é de têxteis. Ver [Análise dos contentores municipais](../da
 | G13 | Molok é semienterrado com 1,3, 3 e 5 m³ | | [F65] | Secundária (excertos) | |
 | G14 | CAOP2025 aprovada a 28 jan 2026 | | [F66] | Primária | |
 
+## H. Cenários do Novelo (22 out 2026)
+
+Saem do otimizador com os pressupostos ativos por omissão (custos da Vitrus por receber, A15): são sempre **estimativa**. Método e tabelas em [Dados e modelo](../engenharia/dados-e-modelo.md). Modelo de referência versão 3 (localidades na freguesia CAOP 2019, têxtil reutilizável).
+
+| # | Afirmação | Valor | Fonte | Estado | Slide |
+| --- | --- | --- | --- | --- | --- |
+| H1 | Têxtil reutilizável no cenário por freguesia de 60 000 €/ano | 235,6 t/ano (198,3 a 288,9 t) de 396,5 t | 396,5 t × 59,4% (A4); intervalo com 50,0% e 72,9% (A19) | Cálculo (**estimativa**). Aplicar a mesma quota a todos os modos é pressuposto: não há qualidade por canal | 6 |
+| H2 | € por tonelada reutilizável, mesmo cenário | 203,1 € (165,6 a 241,3 €) | 47 839 € ÷ 235,6 t | Cálculo (**estimativa**) | só em conversa |
+| H3 | Cenário por freguesia de 60 000 €/ano | gasta 47 839 €; 396,5 t a 120,6 €/t (P10 96,9, P50 122,5, P90 154,7); 75,0% da população servida | [Dados e modelo](../engenharia/dados-e-modelo.md#3-otimização), sensibilidade com 500 amostras e ±30% | Cálculo (**estimativa**). A 21 out: 47 795 € e 396,2 t | 4 |
+| H4 | Matriz de cobertura por tipo de território (art. 22.º-C, n.º 9, b)), mesmo cenário | APU: 36 freguesias, 135 460 hab., 76,0% servida, 344,3 t, 39 182 €, 113,8 €/t. AMU: 11, 20 671 hab., 69,1%, 50,7 t, 8 284 €, 163,6 €/t. APR: 1, 699 hab., 59,9%, 1,6 t, 373 €, 240,0 €/t. Fora das urbanas 68,8% contra 76,0% (razão 0,905) | `GET /planning/scenarios/{id}/coverage`; [Dados e modelo, secção 10](../engenharia/dados-e-modelo.md#10-matriz-de-cobertura-diretiva-20251892); TIPAU do INE | Cálculo (**estimativa**). A APR é uma só freguesia (Arosa e Castelões) | 7 |
+| H5 | Freguesias com passagem porta a porta de indiferenciado com viatura | 22 de 48 (67 349 hab.); 20 no cenário de 60 000 €/ano, com 129,3 t e 0 km novos | Circuitos e turnos da Vitrus (A6) com as localidades na freguesia CAOP 2019 | Cálculo sobre Dado Vitrus (as toneladas são **estimativa**). A 21 out: 19 freguesias (61 597 hab.), 128,7 t | 4 |
+| H6 | Teto do modelo sem contentores (orçamento sem limite) | 597,7 t/ano a 138 866 € (232,3 €/t), abaixo da referência francesa de 669,7 t (C14) | [Dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês) | Cálculo (**estimativa**). A 21 out: 147 490 €; numa versão anterior do modelo, 562,6 t | 3 |
+
 ## Como atualizar este registo
 
 1. Ao verificar algo numa fonte primária, muda o estado e acrescenta a ligação.
 2. Se um número no slide mudar, muda a linha **antes** do slide.
-3. Quando a Vitrus enviar os custos (A15), acrescenta linhas **A19 em diante** com os valores e a data de receção.
-4. No dia 25 de outubro, imprime esta tabela e confirma cada linha com "slide" preenchido.
+3. Quando a Vitrus enviar os custos (A15), acrescenta linhas **A21 em diante** com os valores e a data de receção.
+4. Quando um cenário do modelo mudar, atualiza a secção H com a data e o valor anterior.
+5. No dia 25 de outubro, imprime esta tabela e confirma cada linha com "slide" preenchido.

@@ -97,10 +97,10 @@ flowchart LR
 | **Critério e peso** | Inovação e originalidade (25%), 25 s |
 | **Título** | A indústria tem capacidade; faltam lotes limpos |
 | **Visual** | Lote com QR e composição ao lado do passaporte; ao lado, "Sasia ≈ 2 000 t/mês, pré-consumo" |
-| **Número** | 2 000 t por mês, sobretudo pré-consumo (C16). A comparação com o potencial de Guimarães (5,5%) só se A8 estiver verificado |
-| **Nota do orador** | "A foto não vê a fibra; a etiqueta sim. O operador confirma." Dizer a exatidão medida se existir (D4). |
-| **Rodapé** | Público/Lusa, dez 2024; avaliação da triagem do Novelo |
-| **Registo** | C16, D3, D4 |
+| **Número** | 2 000 t por mês, sobretudo pré-consumo (C16). A comparação com o têxtil por desviar de Guimarães (9,7%, C17) só com "estimativa" |
+| **Nota do orador** | "A foto não vê a fibra; a etiqueta sim. O operador confirma." "A qualidade depende de quem recolhe: em 2025, 72,9% reutilizado na Ultriplo, 9,2% no têxtil recolhido pela Vitrus. Por isso medimos toneladas reutilizáveis." Dizer a exatidão medida se existir (D4). |
+| **Rodapé** | Público/Lusa, dez 2024; Vitrus, destinos de 2025; avaliação da triagem do Novelo |
+| **Registo** | C16, C17, D3, D4, A19, H1 |
 
 ### 7. 2028 · 3:55 a 4:20
 
@@ -110,9 +110,9 @@ flowchart LR
 | **Título** | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número |
 | **Visual** | Captura do relatório RAP: custo por tipo de território (predominantemente urbana, mediamente urbana, predominantemente rural) |
 | **Número** | "economicamente eficiente" (artigo 22.º-A, n.º 12) e "As autoridades locais" (n.º 7, d)) |
-| **Nota do orador** | O custo eficiente é determinado "entre os intervenientes relevantes", e a lei nomeia as autoridades locais; a entidade gestora não pode recusar o município (artigo 22.º-C, n.º 10). As peças antigas continuam a pesar na câmara durante anos: mais uma razão para medir o custo. Menciona a economia social como parceira. |
-| **Rodapé** | Diretiva (UE) 2025/1892, artigo 22.º-A, n.º 7, 11 e 12; artigo 22.º-C, n.º 10 |
-| **Registo** | B6, B10, B17, B18 |
+| **Nota do orador** | O custo eficiente é determinado "entre os intervenientes relevantes", e a lei nomeia as autoridades locais; a entidade gestora não pode recusar o município (artigo 22.º-C, n.º 10). As peças antigas continuam a pesar na câmara durante anos: mais uma razão para medir o custo. Menciona a economia social como parceira. Se houver tempo: a rede não fica só onde é barato (art. 22.º-C, n.º 9, b)); fora das freguesias urbanas o cenário serve 68,8% da população, contra 76,0% nas urbanas (estimativa, separador Cobertura). |
+| **Rodapé** | Diretiva (UE) 2025/1892, artigo 22.º-A, n.º 7, 11 e 12; artigo 22.º-C, n.º 9, b) e n.º 10 |
+| **Registo** | B6, B8, B10, B17, B18, H4 |
 
 ### 8. Pedido · 4:20 a 5:00
 
@@ -147,7 +147,7 @@ Fora dos cinco minutos. Cola-se no fim do deck e abre-se nas perguntas ou se sob
 ## Checklist final do deck
 
 - [ ] Cada número do deck tem linha no [registo](../pesquisa/registo-de-afirmacoes.md) com estado Dado Vitrus, Primária, Secundária ou Cálculo.
-- [ ] Nenhum número "Por verificar" aparece (5,4%, 4 de 27, 228 €, 304 €, Humana 2025, Catalunha 75 €).
+- [ ] Nenhum número "Por verificar" aparece (4 de 27, 228 €, 304 €, Humana 2025, Catalunha 75 €). O 5,4% só com a fonte (APA, indicado pela Vitrus; A10).
 - [ ] X e Y da frase-âncora preenchidos com o cenário B de 22 de outubro.
 - [ ] Rodapés de fonte em todos os slides.
 - [ ] Vídeo de 60 s e PDF RAP guardados fora da rede.

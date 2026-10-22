@@ -152,6 +152,19 @@ function AssumptionsTable() {
       source: m.landing_row_ceiling_src({ street: formatTonnes(FACTS.ceilingWithStreetT) }),
       status: 'estimate',
     },
+    {
+      key: 'reusable',
+      param: m.landing_row_reusable(),
+      value: `≈ ${formatTonnes(FACTS.reusable60k.tonnes, 0)}`,
+      source: m.landing_row_reusable_src({
+        tonnes: formatTonnes(FACTS.scenario60k.tonnes),
+        share: formatPercent(FACTS.reuse),
+        low: formatTonnes(FACTS.reusable60k.low),
+        high: formatTonnes(FACTS.reusable60k.high),
+        eur: `${formatNumber(FACTS.reusable60k.eurPerT, 1)} €/t`,
+      }),
+      status: 'estimate',
+    },
   ];
   const cell = 'block px-5 py-0.5 md:table-cell md:px-5 md:py-3.5';
   return (

@@ -64,6 +64,7 @@ export function WhereLost() {
         people: formatNumber(pap.inhabitants),
         tonnes: `${formatNumber(pap.tonnes, 1)} t`,
         km: formatNumber(pap.newKm),
+        inScenario: formatNumber(pap.inScenario),
       }),
     ],
     [MapPin, m.landing_map_mode_existing()],
