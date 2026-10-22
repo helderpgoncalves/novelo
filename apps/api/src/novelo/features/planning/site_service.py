@@ -15,12 +15,18 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import network, siting
-from novelo.domain.costs import avoided_treatment_eur
+from novelo.domain.costs import avoided_treatment_eur, net_cost_eur
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.reuse import ReuseShares, reusable
 from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
 from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
-from novelo.features.planning.collection_plan import build_collection_plan
+from novelo.features.planning.collection_plan import (
+    ChannelLoad,
+    FleetFigures,
+    build_collection_plan,
+    fleet_figures,
+    with_vehicle_share,
+)
 from novelo.features.planning.params import to_domain_params, to_domain_zone
 from novelo.features.planning.schemas import (
     Allocation,
@@ -129,9 +135,27 @@ async def load_site_inputs(db: AsyncSession) -> SiteInputs:
 
 
 def avoided_treatment(tonnes: float, params: PlanningParams) -> float | None:
-    """Poupança no tratamento do indiferenciado; nula («por validar») até a Vitrus dar o custo por tonelada."""
+    """Tratamento do indiferenciado evitado (105,64 €/t, Vitrus); nulo sem custo por tonelada."""
     value = avoided_treatment_eur(tonnes, params.rsu_treatment_eur_per_t)
     return None if value is None else round(value, 2)
+
+
+def cost_kpis(
+    tonnes: float, annual_cost_eur: float, params: PlanningParams, vehicles: FleetFigures
+) -> dict[str, float | int | None]:
+    """Tratamento evitado, custo líquido e viatura dedicada: os mesmos campos nos dois simuladores."""
+    avoided = avoided_treatment_eur(tonnes, params.rsu_treatment_eur_per_t)
+    net = net_cost_eur(annual_cost_eur, avoided)
+    return {
+        "avoided_treatment_eur": None if avoided is None else round(avoided, 2),
+        "net_annual_cost_eur": None if net is None else round(net, 2),
+        "net_eur_per_tonne": round(net / tonnes, 2) if net is not None and tonnes > 0 else None,
+        "vehicles": vehicles.vehicles,
+        "vehicle_days_week": round(vehicles.days_per_week, 2),
+        "vehicle_hours_year": round(vehicles.hours_year, 1),
+        "vehicle_capex_eur": round(vehicles.capex_eur, 2),
+        "vehicle_annual_eur": round(vehicles.annual_eur, 2),
+    }
 
 
 def reuse_kpis(tonnes: float, annual_cost_eur: float, shares: ReuseShares | None) -> dict[str, float | None]:
@@ -157,7 +181,7 @@ def reuse_kpis(tonnes: float, annual_cost_eur: float, shares: ReuseShares | None
 def _on_demand_zones(
     zones: list[ZoneOut], params: PlanningParams, dp: network.Params, request: ScenarioRequest
 ) -> dict[str, siting.OnDemandZone]:
-    """Recolha a pedido por freguesia, com o custo do modelo por zonas (aproveita os circuitos que já passam)."""
+    """Recolha a pedido por freguesia, com o custo do modelo por zonas (ronda da viatura dedicada a cada N semanas)."""
     if not request.site_on_demand:
         return {}
     out: dict[str, siting.OnDemandZone] = {}
@@ -167,7 +191,10 @@ def _on_demand_zones(
             continue
         zone = to_domain_zone(z)
         c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
-        out[z.code] = siting.OnDemandZone(z.code, c.capture, coverage, c.annual_cost_eur, c.km_year)
+        out[z.code] = siting.OnDemandZone(
+            z.code, c.capture, coverage, c.annual_cost_eur, c.km_year, c.hours_year, c.collections_year, c.rounds_year,
+            c.trips_per_round,
+        )  # fmt: skip
     return out
 
 
@@ -300,6 +327,29 @@ def _allocations(
     return out
 
 
+def _channel_loads(
+    allocations: list[Allocation], plan: siting.SitePlan, mode: CollectionMode, collections_per_year: float
+) -> list[ChannelLoad]:
+    """O que a viatura dedicada faz em cada freguesia: paragens nos locais (km das rotas repartidos pelos locais) e
+    rondas porta a porta (do modelo por zonas)."""
+    out: list[ChannelLoad] = []
+    for a in allocations:
+        for p in a.parts:
+            if p.mode == CollectionMode.ON_DEMAND:
+                od = plan.on_demand[a.parish_code]
+                out.append(
+                    ChannelLoad(
+                        a.parish_code, p.mode, p.tonnes, od.km_year, od.stops_year, od.rounds_year, od.trips_per_round
+                    )
+                )
+            else:
+                out.append(
+                    ChannelLoad(a.parish_code, p.mode, p.tonnes, p.km_year, p.points * collections_per_year,
+                                collections_per_year)
+                )  # fmt: skip
+    return out
+
+
 CACHE_SIZE = 32
 _cache: OrderedDict[str, tuple[ScenarioResult, str]] = OrderedDict()
 _cache_lock = threading.Lock()
@@ -320,8 +370,9 @@ def _cache_key(
         "params": params.model_dump(mode="json"),
         "baseline": round(baseline_t, 3),
         "reuse": None if reuse is None else (reuse.central, reuse.low, reuse.high),
-        "zones": [(z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude) for z in zones],
-        "pap": [(z.code, [(p.circuit, p.weekday, p.vehicle) for p in z.door_to_door]) for z in zones],
+        "zones": [
+            (z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude, z.area_km2) for z in zones
+        ],
         "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
         "candidates": [(c.id, c.zone_id, inputs.meta[c.id].kind) for c in inputs.candidates],
     }
@@ -410,11 +461,12 @@ def _compute_sites(
 
     n_sites = len(plan.sites)
     total_pop = sum(z.population for z in zones)
-    capex = n_sites * costs.capex_eur
+    vehicles = fleet_figures(plan.hours_year, dp)
+    capex = n_sites * costs.capex_eur + vehicles.capex_eur
     annual = plan.annual_cost_eur
     kpis = Kpis(
         capex_eur=round(capex, 2),
-        opex_eur_year=round(annual - capex / mp.lifetime_years, 2),
+        opex_eur_year=round(annual - n_sites * costs.capex_eur / mp.lifetime_years - vehicles.annual_eur, 2),
         annual_cost_eur=round(annual, 2),
         tonnes_year=round(plan.tonnes, 3),
         eur_per_tonne=round(annual / plan.tonnes, 2) if plan.tonnes > 0 else None,
@@ -423,10 +475,11 @@ def _compute_sites(
         km_year=round(plan.km_year + sum(z.km_year for z in plan.on_demand.values()), 1),
         potential_t=round(zones_potential_t([z.population for z in zones], params.kg_per_inhab_month), 1),
         baseline_observed_t=round(baseline_t, 1),
-        avoided_treatment_eur=avoided_treatment(plan.tonnes, params),
+        **cost_kpis(plan.tonnes, annual, params, vehicles),
         **reuse_kpis(plan.tonnes, annual, reuse),
     )
-    on_demand = {code: (plan.zone_tonnes_on_demand.get(code, 0.0), z.km_year) for code, z in plan.on_demand.items()}
+    loads = _channel_loads(allocations, plan, mode, mp.collections_per_year)
+    allocations = with_vehicle_share(allocations, loads, dp, vehicles)
     summaries = []
     for m in (mode, CollectionMode.ON_DEMAND):
         parts = [(a, p) for a in allocations for p in a.parts if p.mode == m]
@@ -448,7 +501,7 @@ def _compute_sites(
         depot=[params.depot_lat, params.depot_lon],
         sites=_site_selections(plan, inputs, vehicle_of),
         default_modes=request.default_modes,
-        collection_plan=build_collection_plan(zones, on_demand, params),
+        collection_plan=build_collection_plan(zones, loads, routes, dp, vehicles.vehicles),
         siting=SitingSummary(
             radius_m=request.site_radius_m,
             site_mode=mode,

@@ -15,7 +15,7 @@ const row = (i: number) => ({ '--i': i }) as CSSProperties;
 
 /**
  * Livro-razão do hero: os três números do problema num painel no fluxo do texto (nunca por cima da fotografia, nunca preso
- * à geometria do campanário). Gerado (estimativa), recolhido à parte em 2025 (medido) com o fio em miniatura a 11,5 %, e o
+ * à geometria do campanário). Gerado (estimativa), recolhido à parte em 2025 (medido) com o fio em miniatura a 9,1 %, e o
  * que ainda vai para o lixo em destaque, com a ligação para o mapa. Fonte por baixo. Os valores finais estão sempre no HTML
  * (o contado é `aria-hidden`); a entrada é só opacidade e transform.
  */
@@ -84,8 +84,8 @@ export function HeroLedger() {
         </a>
         <p className="lp-hsl-src">
           {m.landing_hero_ledger_source({
-            rsu: formatTonnes(FACTS.rsuT, 0),
-            share: formatPercent(FACTS.textileShareOfRsuPct),
+            rsu: formatTonnes(FACTS.rsuT, 1),
+            share: formatPercent(FACTS.textileShareOfRsuPct, 2),
           })}
         </p>
       </div>

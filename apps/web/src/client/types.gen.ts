@@ -1064,7 +1064,7 @@ export type BenchmarkOut = {
     /**
      * Implied Capture Pct
      *
-     * Fração do têxtil que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) que a meta exige
+     * Fração do têxtil que ainda vai para o lixo (≈ 51 250,6 t de indiferenciado do concelho × 5,86%, Vitrus + APA) que a meta exige
      */
     implied_capture_pct: number;
     /**
@@ -1646,49 +1646,37 @@ export type CollectionMode = 'existing' | 'street' | 'on_demand';
 /**
  * CollectionPlanEntry
  *
- * Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio.
+ * Uma freguesia e um canal no plano da viatura dedicada ao têxtil (nova, de caixa fechada, sem compactação).
  */
 export type CollectionPlanEntry = {
     /**
-     * Channel
-     *
-     * `door_to_door`: no circuito PAP que já passa; `detour`: a pedido, com km de desvio
+     * `on_demand`: saco fechado à porta numa ronda da viatura dedicada; `existing`: paragem nos locais (sacos fechados); `street`: contentor de rua (só referência)
      */
-    channel: 'door_to_door' | 'detour';
+    channel: CollectionMode;
     /**
-     * Circuit
+     * Every Weeks
      *
-     * Circuito PAP escolhido (dia com menos carga de têxtil)
+     * Uma ronda a cada N semanas
      */
-    circuit: string | null;
+    every_weeks: number;
     /**
-     * Circuits
+     * Hours Year
      *
-     * Todos os circuitos PAP com viatura na freguesia
+     * Horas por ano da viatura dedicada neste canal
      */
-    circuits?: Array<string>;
-    /**
-     * Crew
-     */
-    crew: number | null;
-    /**
-     * Fits Capacity
-     *
-     * A ronda cabe na viatura? Nulo = por validar (capacidade livre ainda sem valor da Vitrus)
-     */
-    fits_capacity: boolean | null;
+    hours_year: number;
     /**
      * Kg Per Round
      *
-     * Têxtil por ronda semanal no circuito (só PAP)
+     * Têxtil por ronda (estimativa)
      */
-    kg_per_round: number | null;
+    kg_per_round: number;
     /**
-     * New Km Year
+     * Km Year
      *
-     * Km novos por ano (0 no circuito PAP)
+     * Km por ano da viatura dedicada neste canal
      */
-    new_km_year: number;
+    km_year: number;
     /**
      * Parish Code
      */
@@ -1698,17 +1686,17 @@ export type CollectionPlanEntry = {
      */
     parish_name: string;
     /**
-     * Pickups Year
+     * Rounds Year
      *
-     * Recolhas por ano (t × 1000 / kg por recolha)
+     * Rondas por ano
      */
-    pickups_year: number;
+    rounds_year: number;
     /**
-     * Round Kg
+     * Stops Year
      *
-     * Têxtil da ronda (circuito, dia) somando as freguesias que lá caem
+     * Sacos à porta ou paragens nos locais por ano
      */
-    round_kg: number | null;
+    stops_year: number;
     /**
      * Tonnes Year
      *
@@ -1716,13 +1704,21 @@ export type CollectionPlanEntry = {
      */
     tonnes_year: number;
     /**
-     * Vehicle
+     * Trips Per Round
+     *
+     * Viagens ao estaleiro numa ronda porta a porta (carga acima da capacidade); nulo nos locais
      */
-    vehicle: string | null;
+    trips_per_round: number | null;
+    /**
+     * Vehicle
+     *
+     * Viatura dedicada (1, 2, ...) que faz a ronda
+     */
+    vehicle: number | null;
     /**
      * Weekday
      *
-     * Dia fixo do saco à porta: 1 = segunda ... 7 = domingo
+     * Dia de recolha (1 = segunda ... 5 = sexta); nulo sem horas
      */
     weekday: number | null;
 };
@@ -3044,7 +3040,7 @@ export type CoverageParish = {
      *
      * Canais do cenário na freguesia
      */
-    channels: Array<'door_to_door' | 'detour' | 'on_demand' | 'existing' | 'street'>;
+    channels: Array<'on_demand' | 'existing' | 'street'>;
     /**
      * Covered Population
      *
@@ -3072,7 +3068,7 @@ export type CoverageParish = {
     /**
      * Door To Door Days Week
      *
-     * Acessibilidade: dias/semana com passagem de circuito porta a porta de indiferenciado com viatura
+     * Acessibilidade da rede atual: dias/semana com passagem de circuito porta a porta de indiferenciado (a recolha de têxtil é feita pela viatura dedicada)
      */
     door_to_door_days_week: number;
     /**
@@ -3098,7 +3094,7 @@ export type CoverageParish = {
     /**
      * Service Days
      *
-     * Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura
+     * Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks)
      */
     service_days: number;
     /**
@@ -3383,7 +3379,7 @@ export type DoorToDoorPass = {
     /**
      * Vehicle
      *
-     * Matrícula no planeamento de turnos desse dia
+     * Matrícula no planeamento de turnos desse dia (nula: sem linha na folha)
      */
     vehicle: string | null;
     /**
@@ -4669,7 +4665,7 @@ export type Kpis = {
     /**
      * Avoided Treatment Eur
      *
-     * Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» (o custo por tonelada ainda não chegou da Vitrus)
+     * Tratamento de indiferenciado evitado: toneladas × `rsu_treatment_eur_per_t` (105,64 €/t, Vitrus). Nulo sem custo de tratamento (cenários antigos)
      */
     avoided_treatment_eur?: number | null;
     /**
@@ -4702,6 +4698,18 @@ export type Kpis = {
      * Km Year
      */
     km_year: number;
+    /**
+     * Net Annual Cost Eur
+     *
+     * Custo líquido para o município: custo anual − tratamento evitado (estimativa). Nulo sem custo de tratamento
+     */
+    net_annual_cost_eur?: number | null;
+    /**
+     * Net Eur Per Tonne
+     *
+     * Custo líquido ÷ toneladas: € por tonelada que o município paga mesmo (estimativa)
+     */
+    net_eur_per_tonne?: number | null;
     /**
      * Opex Eur Year
      */
@@ -4754,6 +4762,36 @@ export type Kpis = {
      * Tonnes Year
      */
     tonnes_year: number;
+    /**
+     * Vehicle Annual Eur
+     *
+     * Viaturas anualizadas pela vida útil (incluído em `annual_cost_eur`)
+     */
+    vehicle_annual_eur?: number | null;
+    /**
+     * Vehicle Capex Eur
+     *
+     * Investimento nas viaturas dedicadas (incluído em `capex_eur`)
+     */
+    vehicle_capex_eur?: number | null;
+    /**
+     * Vehicle Days Week
+     *
+     * Dias de viatura por semana: horas por ano ÷ 52 ÷ horas por turno (5 = uma cheia)
+     */
+    vehicle_days_week?: number | null;
+    /**
+     * Vehicle Hours Year
+     *
+     * Horas por ano da viatura dedicada
+     */
+    vehicle_hours_year?: number | null;
+    /**
+     * Vehicles
+     *
+     * Viaturas dedicadas necessárias: ⌈horas por ano ÷ horas de uma viatura⌉
+     */
+    vehicles?: number | null;
 };
 
 /**
@@ -6159,7 +6197,7 @@ export type MunicipalGapParameters = {
     /**
      * Kg Per Inhab Month
      *
-     * Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: 43 051 t RSU × 5,4%)
+     * Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: ≈ 51 250,6 t de indiferenciado do concelho × 5,86%)
      */
     kg_per_inhab_month: number;
     /**
@@ -6626,7 +6664,7 @@ export type MunicipalParishOut = {
     /**
      * Textile Gap T
      *
-     * Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (43 051 t RSU × 5,4%) × 12
+     * Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (≈ 51 250,6 t de indiferenciado do concelho × 5,86%) × 12
      */
     textile_gap_t: number;
     /**
@@ -7401,7 +7439,7 @@ export type OverviewGap = {
     /**
      * Missing Kg Per Inhab Year
      *
-     * Estimativa: têxtil que ainda vai para o lixo por habitante e ano (43 051 t × 5,4% ÷ população)
+     * Estimativa: têxtil que ainda vai para o lixo por habitante e ano (≈ 51 250,6 t × 5,86% ÷ população)
      */
     missing_kg_per_inhab_year: number;
     /**
@@ -7447,7 +7485,7 @@ export type OverviewGap = {
     /**
      * Potential T
      *
-     * Estimativa do têxtil gerado: 43 051 t RSU × 5,4% (Vitrus + APA) + recolhido à parte
+     * Estimativa do têxtil gerado: ≈ 51 250,6 t de indiferenciado do concelho × 5,86% (Vitrus + APA) + recolhido à parte
      */
     potential_t: number;
     /**
@@ -8224,6 +8262,8 @@ export type PilotZoneOut = {
 export type PlanningParams = {
     /**
      * Cost Per Collection Eur
+     *
+     * Custo de uma recolha: paragem num local ou saco à porta (tripulação e tempo)
      */
     cost_per_collection_eur: number;
     /**
@@ -8245,9 +8285,15 @@ export type PlanningParams = {
      */
     detour_factor: number;
     /**
+     * Door Stop Minutes
+     *
+     * Minutos por saco recolhido à porta
+     */
+    door_stop_minutes?: number;
+    /**
      * Kg Per Inhab Month
      *
-     * Têxtil que ainda vai para o lixo por habitante e mês (43 051 t RSU × 5,4%, Vitrus + APA)
+     * Têxtil que ainda vai para o lixo por habitante e mês (indiferenciado do concelho 51 250,6 t × 5,86%, Vitrus + APA)
      */
     kg_per_inhab_month: number;
     /**
@@ -8257,47 +8303,61 @@ export type PlanningParams = {
         [key in CollectionMode]?: ModeParams;
     };
     /**
+     * On Demand Every Weeks
+     *
+     * Recolha a pedido: uma ronda da viatura dedicada por freguesia a cada N semanas
+     */
+    on_demand_every_weeks?: number;
+    /**
      * On Demand Kg Per Pickup
      */
     on_demand_kg_per_pickup: number;
     /**
-     * Pap Cost Per Pickup Eur
-     *
-     * Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem, 0 km novos). Pressuposto: igual ao custo de uma recolha até a Vitrus dar o tempo de paragem
-     */
-    pap_cost_per_pickup_eur?: number;
-    /**
-     * Pap Free Capacity Kg
-     *
-     * Capacidade livre para têxtil por ronda numa viatura porta a porta (kg); nulo = por validar
-     */
-    pap_free_capacity_kg?: number | null;
-    /**
-     * Piggyback Extra Km
-     *
-     * Desvio médio quando já passa um circuito
-     */
-    piggyback_extra_km: number;
-    /**
-     * Piggyback Min Days
-     *
-     * Dias/semana de circuito para aproveitar a rota
-     */
-    piggyback_min_days: number;
-    /**
      * Rsu Treatment Eur Per T
      *
-     * Custo de tratamento do indiferenciado por tonelada (Vitrus, departamento financeiro, pedido a 21 out 2026); nulo = por preencher, e a poupança no tratamento aparece «por validar»
+     * Custo de tratamento do indiferenciado por tonelada: 40 €/t de taxa de gestão de resíduos (TGR) + 65,64 €/t da Resinorte = 105,64 €/t (Vitrus, 22 out 2026); nulo = sem poupança no tratamento
      */
     rsu_treatment_eur_per_t?: number | null;
+    /**
+     * Shift Hours
+     *
+     * Horas úteis de um turno da viatura (5 dias por semana)
+     */
+    shift_hours?: number;
+    /**
+     * Site Stop Minutes
+     *
+     * Minutos por paragem num local (ponto existente)
+     */
+    site_stop_minutes?: number;
     /**
      * Solver Time Limit S
      */
     solver_time_limit_s: number;
     /**
      * Vehicle Capacity T
+     *
+     * Carga útil da viatura dedicada ao têxtil (t)
      */
     vehicle_capacity_t: number;
+    /**
+     * Vehicle Capex Eur
+     *
+     * Preço de uma viatura nova de caixa fechada, sem compactação (€, sem IVA)
+     */
+    vehicle_capex_eur?: number;
+    /**
+     * Vehicle Lifetime Years
+     *
+     * Vida útil da viatura para anualizar o preço
+     */
+    vehicle_lifetime_years?: number;
+    /**
+     * Vehicle Speed Kmh
+     *
+     * Velocidade média da viatura em recolha (km/h)
+     */
+    vehicle_speed_kmh?: number;
 };
 
 /**
@@ -8372,7 +8432,7 @@ export type PotentialReadingOut = {
     /**
      * Is Model Base
      *
-     * A leitura que o modelo usa (Vitrus + APA: 43 051 t de RSU × 5,4%)
+     * A leitura que o modelo usa (Vitrus + APA: ≈ 51 250,6 t de indiferenciado do concelho × 5,86%)
      */
     is_model_base: boolean;
     /**
@@ -9459,7 +9519,7 @@ export type ScenarioResult = {
     /**
      * Collection Plan
      *
-     * Freguesias com recolha a pedido e o canal: circuito porta a porta (circuito, dia, viatura, 0 km novos) ou a pedido com desvio. Nulo nos cenários calculados antes de 21 out 2026
+     * Plano da viatura dedicada ao têxtil: por freguesia e canal, dia, viatura, rondas, kg por ronda, km e horas. Nulo nos cenários calculados antes de 22 out 2026 (saco nos circuitos PAP, que a Vitrus excluiu)
      */
     collection_plan?: Array<CollectionPlanEntry> | null;
     /**
@@ -10424,7 +10484,7 @@ export type TextileBaseline = {
     /**
      * Estimated Demand T
      *
-     * Estimativa do têxtil gerado: o que vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + total_t
+     * Estimativa do têxtil gerado: o que vai para o lixo (≈ 51 250,6 t de indiferenciado do concelho × 5,86%, Vitrus + APA) + total_t
      */
     estimated_demand_t: number;
     /**
@@ -11729,6 +11789,12 @@ export type ZoneCheckOut = {
  */
 export type ZoneOut = {
     /**
+     * Area Km2
+     *
+     * Área da freguesia (CAOP 2019): volta da viatura dedicada porta a porta
+     */
+    area_km2?: number | null;
+    /**
      * Code
      */
     code: string;
@@ -11739,7 +11805,7 @@ export type ZoneOut = {
     /**
      * Door To Door
      *
-     * Passagens dos circuitos porta a porta com viatura no planeamento: onde há, a recolha a pedido vai no circuito sem km novos
+     * Passagens dos circuitos porta a porta de indiferenciado (a rede atual). Não levam têxtil: o saco estraga-se na compactadora (Vitrus, 22 out 2026)
      */
     door_to_door?: Array<DoorToDoorPass>;
     /**
@@ -11781,7 +11847,7 @@ export type ZoneOut = {
     /**
      * Service Days
      *
-     * Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura no planeamento de turnos; decide o desvio da recolha a pedido. Orgânico não conta
+     * Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks); orgânico não conta. Hábito de recolha em dias fixos (critério do piloto)
      */
     service_days: number;
     /**

@@ -38,6 +38,7 @@ from novelo.features.textile.references import (
     MILESTONES,
     POTENTIAL_SOURCE_LABEL,
     VITRUS_RSU_2025_T,
+    VITRUS_SHARE_OF_MUNICIPAL_RSU,
 )
 from novelo.features.textile.schemas import (
     FrontierPoint,
@@ -68,7 +69,7 @@ _SOURCE_KIND = {
 _GEOCODED_SOURCE = "osm_nominatim"
 # Fontes sem tabela própria: valores comunicados por email (contam-se os valores, não linhas).
 _REFERENCE_VALUES: dict[str, tuple[float, ...]] = {
-    "vitrus_apa_rsu_2025": (VITRUS_RSU_2025_T, APA_TEXTILE_SHARE_OF_RSU),
+    "vitrus_apa_rsu_2025": (VITRUS_RSU_2025_T, VITRUS_SHARE_OF_MUNICIPAL_RSU, APA_TEXTILE_SHARE_OF_RSU),
 }
 
 
@@ -79,7 +80,7 @@ def _gap(base: TextileBaseline, parishes_count: int) -> OverviewGap:
         year=base.year,
         potential_t=potential,
         collected_t=base.total_t,
-        missing_t=base.gap_t,  # o que ainda vai para o lixo: 43 051 t × 5,4%
+        missing_t=base.gap_t,  # o que ainda vai para o lixo: 51 250,6 t × 5,86%
         capture_pct=base.capture_of_demand_pct,
         destinations=OverviewDestinations(reuse_t=base.reuse_t, recycle_t=base.recycle_t, reject_t=base.reject_t),
         kg_per_inhab_year=round(base.kg_per_inhab_month * MONTHS, 2),

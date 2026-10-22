@@ -44,7 +44,7 @@ def _n(x: float, decimals: int = 0) -> str:
 
 SRC_MODEL = (
     f"Modelo: população × {_n(KG_PER_INHAB_MONTH, 3)} kg/hab/mês de têxtil que vai para o lixo "
-    "(Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+    "(Vitrus e APA: ≈ 51 250,6 t de indiferenciado do concelho em 2025 × 5,86%)"
 )
 
 
@@ -68,11 +68,7 @@ def _rationale(sel: pilot.PilotSelection, months: int, zones: dict[str, ZoneOut]
         z = zones[c.zone.id]
         tipau = TIPAU_LABEL.get(c.tipau) if c.tipau else None
         dens = f", {_n(c.density)} hab/km²" if c.density is not None else ""
-        circuit = (
-            f"circuito {z.service_days} dia(s)/semana"
-            if z.service_days
-            else "sem circuito da Vitrus (a pedido custa km novos)"
-        )
+        circuit = f"circuito {z.service_days} dia(s)/semana" if z.service_days else "sem circuito da Vitrus"
         parts.append(
             f"{z.name}: {_n(z.population)} hab{dens}"
             f"{f', {tipau}' if tipau else ''}, {circuit}, arranque de {_n(s.startup_cost_eur)} € em {months} meses."
@@ -172,8 +168,11 @@ def _recommend(
     )
     units = {"tonnes": "t", "eur_per_tonne": "€/t", "reject_rate_pct": "%"}
     basis = {
-        "tonnes": f"Procura (INE × Plano municipal) × captura dos modos, em {body.months} meses (estimativa)",
-        "eur_per_tonne": "Custo anual do modelo / toneladas anuais, intervalo por Monte Carlo (estimativa)",
+        "tonnes": f"Procura (INE × Vitrus + APA) × captura dos modos, em {body.months} meses (estimativa)",
+        "eur_per_tonne": (
+            "Custo anual do modelo / toneladas anuais, sem o preço da viatura dedicada (é da rede inteira), intervalo "
+            "por Monte Carlo (estimativa)"
+        ),
         "reject_rate_pct": "Taxa observada em 2025 (14,1% rejeito) com a mesma incerteza ± (estimativa)",
     }
     w = sel.weights

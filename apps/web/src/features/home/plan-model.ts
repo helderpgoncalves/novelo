@@ -1,39 +1,36 @@
 import type { ScenarioOut } from '@/client';
+import { summarizePlan } from '@/features/scenarios/collection-plan';
 
 export interface PlanChannels {
-  /** Saco fechado no circuito porta a porta de indiferenciado que já passa. */
-  doorToDoor: { parishes: number; tonnes: number; newKm: number; circuits: number };
-  /** Locais existentes onde a viatura já passa (sem contentor novo). */
+  /** Saco fechado à porta, numa ronda da viatura nova de têxtil (sem compactação). */
+  doorBag: { parishes: number; tonnes: number; km: number; everyWeeks: number | null };
+  /** Locais onde já há contentores municipais e escolas (sem contentor novo), na mesma viatura. */
   existing: { points: number; zones: number; tonnes: number };
-  /** Recolha a pedido com desvio, onde não há circuito porta a porta. */
-  detour: { parishes: number; tonnes: number; kmYear: number };
+  /** A viatura dedicada: quantas, dias por semana e investimento (nulos nos cenários antigos). */
+  vehicle: { vehicles: number; daysPerWeek: number; capexEur: number };
 }
 
-/** Resume o plano de recolha de um cenário pelos canais da rede sem contentores. Só soma o que a API devolve. */
+/** Resume o plano da viatura dedicada de um cenário pelos canais da rede sem contentores. Só soma o que a API devolve. */
 export function planChannels(scenario: Pick<ScenarioOut, 'result'>): PlanChannels {
-  const plan = scenario.result.collection_plan ?? [];
-  const pap = plan.filter((p) => p.channel === 'door_to_door');
-  const detour = plan.filter((p) => p.channel === 'detour');
+  const plan = summarizePlan(scenario.result.collection_plan ?? []);
   const existing = scenario.result.modes.find((x) => x.mode === 'existing');
-  const sum = <T>(rows: T[], f: (r: T) => number) => rows.reduce((s, r) => s + f(r), 0);
+  const { kpis } = scenario.result;
   return {
-    doorToDoor: {
-      parishes: pap.length,
-      tonnes: sum(pap, (p) => p.tonnes_year),
-      newKm: sum(pap, (p) => p.new_km_year),
-      circuits: new Set(
-        pap.flatMap((p) => (p.circuits?.length ? p.circuits : p.circuit ? [p.circuit] : [])),
-      ).size,
+    doorBag: {
+      parishes: plan.doorBag.parishes,
+      tonnes: plan.doorBag.tonnes,
+      km: plan.doorBag.km,
+      everyWeeks: plan.everyWeeks,
     },
     existing: {
       points: existing?.points ?? 0,
       zones: existing?.zones ?? 0,
       tonnes: existing?.tonnes ?? 0,
     },
-    detour: {
-      parishes: detour.length,
-      tonnes: sum(detour, (p) => p.tonnes_year),
-      kmYear: sum(detour, (p) => p.new_km_year),
+    vehicle: {
+      vehicles: kpis.vehicles ?? 0,
+      daysPerWeek: kpis.vehicle_days_week ?? 0,
+      capexEur: kpis.vehicle_capex_eur ?? 0,
     },
   };
 }

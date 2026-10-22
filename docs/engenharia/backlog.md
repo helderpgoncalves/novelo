@@ -24,8 +24,9 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 
 | Prioridade | Tarefa | Estado |
 | --- | --- | --- |
-| Alta | Aplicar as respostas da Vitrus de 21/10: procura = 43 051 t × 5,4% (2 324,8 t por desviar), modos por omissão `existing` e `on_demand` (`street` só referência), sem calibração da rua, sem receita de reciclagem; recalcular cenários de referência, sensibilidade, teto francês e a tabela dos locais reais em [Dados e modelo](dados-e-modelo.md) | Em curso |
-| Alta | Custos unitários (recolha, quilómetro, vida útil) da Vitrus para trocar os pressupostos por dados | Pedidos ao departamento financeiro a 21/10 |
+| Alta | Aplicar as respostas da Vitrus de 22/10: saco fora do compactador e viatura de têxtil nova, sem compactação (sai o "0 km novos" e o plano B das viaturas livres); procura = 51 250,6 t × 5,86% (≈ 3 003,3 t); tratamento evitado 105,64 €/t; depósito na Rua das Lameiras, Polvoreira; recalcular cenários, sensibilidade, cobertura e piloto, e preencher os números da narrativa | Em curso |
+| Alta | Aplicar as respostas da Vitrus de 21/10 (base da procura substituída a 22/10): procura = 43 051 t × 5,4% (2 324,8 t por desviar), modos por omissão `existing` e `on_demand` (`street` só referência), sem calibração da rua, sem receita de reciclagem; recalcular cenários de referência, sensibilidade, teto francês e a tabela dos locais reais em [Dados e modelo](dados-e-modelo.md) | Em curso |
+| Alta | Custos por hora e por quilómetro das viaturas da Vitrus para trocar os pressupostos por dados | Pedidos ao departamento financeiro a 21/10; ainda por chegar a 22/10 |
 | Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` (a CAOP 2019 já traz os oficiais) | Por validar |
 | Média | Confirmar o depósito real da Vitrus (hoje o centro de Guimarães) | Por pedir |
 | Média | Medir a exatidão da triagem (`just eval-triage` com 30 ou mais peças com verdade-terreno) | Por fazer |

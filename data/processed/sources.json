@@ -23,14 +23,14 @@
   },
   {
     "key": "vitrus_apa_rsu_2025",
-    "title": "RSU recolhido em 2025 e percentagem de têxtil no RSU",
+    "title": "Indiferenciado do concelho em 2025 e percentagem de têxtil no indiferenciado",
     "provider": "Vitrus Ambiente (APA)",
-    "file_name": "email do mentor da Vitrus (21/10/2026)",
-    "file_sha256": "d5640af145f429510260e4219fee0965f6d39c51c76a5d4fa966e797641d4b95",
-    "received_on": "2026-10-21",
+    "file_name": "email do mentor da Vitrus (22/10/2026)",
+    "file_sha256": "cd7a103f9aeeb7dfbeaf7ad5ba58ae0ab16c2396141743e911652936610ad77d",
+    "received_on": "2026-10-22",
     "period_start": "2025-01-01",
     "period_end": "2025-12-31",
-    "notes": "43 051 t de RSU recolhidas pela Vitrus em 2025; 5,4% é têxtil (estatística da APA, indicada pela Vitrus). Base do têxtil que ainda vai para o lixo (2 324,8 t/ano, estimativa)."
+    "notes": "43 050,5 t de indiferenciado recolhidas pela Vitrus em 2025, 84,0% do concelho (R&C 2025, p. 8): concelho ≈ 51 250,6 t; 5,86% é têxtil (APA, RARU 2025, p. 24), indicado pela Vitrus. Base do têxtil que ainda vai para o lixo (≈ 3 003,3 t/ano, estimativa)."
   },
   {
     "key": "ine_census_2021",

@@ -37,7 +37,9 @@ log = logging.getLogger(__name__)
 # passam a contar), dias de serviço só de indiferenciado com viatura e toneladas reutilizáveis nos KPIs (22 out 2026).
 # 4: potencial (`potential_t`) da população total e do kg sem arredondar, 2 324,8 t como 43 051 t × 5,4%, em vez da
 # soma das procuras por freguesia arredondadas (2 324,7 t); procura por freguesia a 4 casas (22 out 2026).
-REFERENCE_MODEL_VERSION = 4
+# 5: viatura dedicada ao têxtil (o saco não vai na compactadora do porta a porta), procura do concelho (51 250,6 t ×
+# 5,86%), tratamento de 105,64 €/t, estaleiro de Polvoreira e custo líquido nos KPIs (Vitrus, 22 out 2026).
+REFERENCE_MODEL_VERSION = 5
 REFERENCE_BUDGETS_EUR = (20_000, 40_000, 60_000, 100_000, 150_000)
 PARISH_BUDGET_EUR = 60_000
 LOCK_KEY = 74_2026_21  # tranca consultiva (arbitrária, fixa)

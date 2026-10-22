@@ -42,7 +42,8 @@ class TextileBaseline(BaseModel):
     reject_t: float
     kg_per_inhab_month: float = Field(description="Observado: toneladas recolhidas por habitante e mês")
     estimated_demand_t: float = Field(
-        description="Estimativa do têxtil gerado: o que vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + total_t"
+        description="Estimativa do têxtil gerado: o que vai para o lixo (≈ 51 250,6 t de indiferenciado do concelho "
+        "× 5,86%, Vitrus + APA) + total_t"
     )
     capture_of_demand_pct: float = Field(description="total_t / estimated_demand_t, em % (estimativa)")
     gap_t: float = Field(description="Têxtil que ainda vai para o lixo, por desviar (estimativa)")
@@ -99,7 +100,8 @@ class OverviewGap(BaseModel):
 
     year: int
     potential_t: float = Field(
-        description="Estimativa do têxtil gerado: 43 051 t RSU × 5,4% (Vitrus + APA) + recolhido à parte"
+        description="Estimativa do têxtil gerado: ≈ 51 250,6 t de indiferenciado do concelho × 5,86% (Vitrus + APA) "
+        "+ recolhido à parte"
     )
     collected_t: float = Field(description="Dado Vitrus: recolhido em 2025 pelas 4 entidades")
     missing_t: float = Field(description="potential_t − collected_t: têxtil que ainda vai para o lixo")
@@ -110,7 +112,8 @@ class OverviewGap(BaseModel):
     potential_kg_per_inhab_year: float = Field(description="Estimativa: têxtil gerado por habitante e ano")
     potential_kg_per_inhab_month: float = Field(description="Estimativa: têxtil gerado por habitante e mês")
     missing_kg_per_inhab_year: float = Field(
-        description="Estimativa: têxtil que ainda vai para o lixo por habitante e ano (43 051 t × 5,4% ÷ população)"
+        description="Estimativa: têxtil que ainda vai para o lixo por habitante e ano (≈ 51 250,6 t × 5,86% ÷ "
+        "população)"
     )
     missing_kg_per_inhab_month: float = Field(
         description="Estimativa: têxtil que ainda vai para o lixo por habitante e mês (base da procura do simulador)"

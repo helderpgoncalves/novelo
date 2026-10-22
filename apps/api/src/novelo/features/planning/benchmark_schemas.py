@@ -19,7 +19,8 @@ class BenchmarkOut(BaseModel):
     population: int = Field(description="Habitantes (INE, Censos 2021) das freguesias com dados")
     target_tonnes: float = Field(description="Meta em t/ano: kg/hab/ano × população")
     implied_capture_pct: float = Field(
-        description="Fração do têxtil que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) que a meta exige"
+        description="Fração do têxtil que ainda vai para o lixo (≈ 51 250,6 t de indiferenciado do concelho × 5,86%, "
+        "Vitrus + APA) que a meta exige"
     )
     observed_capture_pct: float = Field(description="Captura atual: recolhido em 2025 ÷ têxtil gerado (estimativa)")
     observed_kg_per_inhab_year: float = Field(description="Recolhido em 2025 / habitantes (dados da Vitrus)")

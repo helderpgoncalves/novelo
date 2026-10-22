@@ -57,6 +57,28 @@ const METRICS: Metric[] = [
     format: formatEur,
     better: 'down',
   },
+  // Tratamento evitado e custo líquido (Vitrus, 22 out 2026): nulos nos cenários antigos.
+  {
+    key: 'avoided',
+    label: () => m.kpi_avoided(),
+    get: (s) => s.result.kpis.avoided_treatment_eur ?? null,
+    format: formatEur,
+    better: 'up',
+  },
+  {
+    key: 'net',
+    label: () => m.kpi_net_cost(),
+    get: (s) => s.result.kpis.net_annual_cost_eur ?? null,
+    format: formatEur,
+    better: 'down',
+  },
+  {
+    key: 'net_eur_t',
+    label: () => m.kpi_net_eur_per_tonne(),
+    get: (s) => s.result.kpis.net_eur_per_tonne ?? null,
+    format: (v) => `${formatNumber(v, 0)} €/t`,
+    better: 'down',
+  },
   {
     key: 'capex',
     label: () => m.kpi_capex(),
@@ -70,6 +92,20 @@ const METRICS: Metric[] = [
     get: (s) => s.result.kpis.coverage_pct,
     format: (v) => formatPercent(v),
     better: 'up',
+  },
+  {
+    key: 'vehicles',
+    label: () => m.kpi_vehicles(),
+    get: (s) => s.result.kpis.vehicles ?? null,
+    format: (v) => formatNumber(v),
+    better: 'down',
+  },
+  {
+    key: 'vehicle_days',
+    label: () => m.kpi_vehicle_days(),
+    get: (s) => s.result.kpis.vehicle_days_week ?? null,
+    format: (v) => formatNumber(v, 1),
+    better: 'none',
   },
   {
     key: 'points',
@@ -94,7 +130,15 @@ const METRICS: Metric[] = [
   },
 ];
 
-const OPTIONAL = new Set(['reusable', 'eur_reusable']);
+const OPTIONAL = new Set([
+  'reusable',
+  'eur_reusable',
+  'avoided',
+  'net',
+  'net_eur_t',
+  'vehicles',
+  'vehicle_days',
+]);
 
 function Delta({ metric, a, b }: { metric: Metric; a: number | null; b: number | null }) {
   if (a == null || b == null)

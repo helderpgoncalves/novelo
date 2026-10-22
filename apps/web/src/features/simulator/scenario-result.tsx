@@ -113,7 +113,11 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
         />
       </Panel>
 
-      <CollectionPlanSection plan={result.collection_plan} scenarioId={scenario.id} />
+      <CollectionPlanSection
+        plan={result.collection_plan}
+        kpis={result.kpis}
+        scenarioId={scenario.id}
+      />
 
       <Why scenario={scenario} />
 

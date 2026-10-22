@@ -1,47 +1,34 @@
-import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { CalendarClock, Info, RefreshCw, Route as RouteIcon, Truck } from 'lucide-react';
+import { Info, MapPin, RefreshCw, ShoppingBag, Truck } from 'lucide-react';
 import { useMemo } from 'react';
-import type { CollectionPlanEntry } from '@/client';
-import { getFleetOptions, listCircuitsOptions } from '@/client/@tanstack/react-query.gen';
+import type { CollectionPlanEntry, Kpis } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { EstimateTag } from '@/components/panel';
 import { EmptyState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
-import { buildOccurrences, loadBySlot, weekdayAfternoonIdle } from '@/features/fleet/schedule';
-import { formatKg, formatNumber, formatTonnes } from '@/lib/format';
-import { formatDate } from '@/lib/i18n';
+import { formatEur, formatKg, formatNumber, formatTonnes } from '@/lib/format';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
-import {
-  type FitsState,
-  fitsState,
-  type PlanChannel,
-  planWeekdayTitle,
-  summarizePlan,
-} from './collection-plan';
+import { type PlanChannel, planWeekdayTitle, summarizePlan } from './collection-plan';
 
 const channelLabel: Record<PlanChannel, () => string> = {
-  door_to_door: () => m.plan_channel_pap(),
-  detour: () => m.plan_channel_detour(),
+  on_demand: () => m.plan_channel_on_demand(),
+  existing: () => m.plan_channel_existing(),
+  street: () => m.plan_channel_street(),
 };
 
-const fitsLabel: Record<FitsState, () => string> = {
-  yes: () => m.plan_fits_yes(),
-  no: () => m.plan_fits_no(),
-  unknown: () => m.plan_fits_unknown(),
-  na: () => m.common_dash(),
+/** Na tabela a coluna já se chama «Canal»: o selo é curto; filtros, exportação e cartão usam o nome completo. */
+const channelShort: Record<PlanChannel, () => string> = {
+  on_demand: () => m.plan_channel_on_demand_short(),
+  existing: () => m.plan_channel_existing_short(),
+  street: () => m.plan_channel_street_short(),
 };
 
 const dash = <span className="text-muted-foreground">{m.common_dash()}</span>;
 
-/** Na tabela a coluna já se chama «Canal»: o selo é curto; filtros, exportação e cartão usam o nome completo. */
-const channelShort: Record<PlanChannel, () => string> = {
-  door_to_door: () => m.plan_channel_pap_short(),
-  detour: () => m.plan_channel_detour(),
-};
+const everyLabel = (weeks: number) =>
+  weeks <= 1 ? m.plan_every_week() : m.plan_every_weeks({ n: formatNumber(weeks) });
 
 function ChannelBadge({ channel }: { channel: PlanChannel }) {
   return (
@@ -49,7 +36,7 @@ function ChannelBadge({ channel }: { channel: PlanChannel }) {
       variant="outline"
       className={cn(
         'h-auto py-0.5 font-medium leading-snug',
-        channel === 'door_to_door'
+        channel === 'on_demand'
           ? 'border-primary/40 bg-primary/10 text-primary'
           : 'border-areia/70 bg-areia/15 text-foreground/85',
       )}
@@ -66,6 +53,8 @@ function ChannelBadge({ channel }: { channel: PlanChannel }) {
 
 interface CollectionPlanSectionProps {
   plan: CollectionPlanEntry[] | null | undefined;
+  /** KPIs do cenário: viaturas dedicadas, dias por semana e investimento. */
+  kpis?: Kpis;
   /** Cenário de origem, para recalcular os cenários antigos (sem plano) no simulador. */
   scenarioId: string;
   /** Título da secção (h3 no resultado do simulador; o detalhe usa o `Section` da página). */
@@ -73,11 +62,13 @@ interface CollectionPlanSectionProps {
 }
 
 /**
- * Plano de recolha a pedido por freguesia: no circuito porta a porta que já passa (saco fechado num dia fixo, 0 km
- * novos) ou a pedido com desvio. Tudo vem do resultado do otimizador; as toneladas são estimativas.
+ * Plano da viatura nova de têxtil (caixa fechada, sem compactação): por freguesia e canal, o dia, a viatura, a
+ * frequência, os kg por ronda e os km. O saco não vai no camião do lixo (Vitrus, 22 out 2026). Tudo vem do otimizador;
+ * as toneladas são estimativas e os tempos e custos da viatura pressupostos.
  */
 export function CollectionPlanSection({
   plan,
+  kpis,
   scenarioId,
   heading = true,
 }: CollectionPlanSectionProps) {
@@ -107,15 +98,16 @@ export function CollectionPlanSection({
       ) : plan.length === 0 ? (
         <EmptyState title={m.plan_empty_title()} description={m.plan_empty_text()} />
       ) : (
-        <PlanBody plan={plan} />
+        <PlanBody plan={plan} kpis={kpis} />
       )}
     </section>
   );
 }
 
-function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
+function PlanBody({ plan, kpis }: { plan: CollectionPlanEntry[]; kpis?: Kpis }) {
   const summary = useMemo(() => summarizePlan(plan), [plan]);
-  const { doorToDoor, detour } = summary;
+  const { doorBag, sites } = summary;
+  const vehicles = kpis?.vehicles ?? summary.vehicles;
 
   const columns: Column<CollectionPlanEntry>[] = [
     {
@@ -138,13 +130,6 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
       full: true,
     },
     {
-      id: 'circuit',
-      header: m.plan_col_circuit(),
-      value: (e) => e.circuit,
-      filter: true,
-      cell: (e) => (e.circuit ? <span className="font-medium">{e.circuit}</span> : dash),
-    },
-    {
       id: 'weekday',
       header: m.plan_col_day(),
       type: 'number',
@@ -155,11 +140,24 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
       cell: (e) => planWeekdayTitle(e.weekday) ?? dash,
     },
     {
+      id: 'every',
+      header: m.plan_col_every(),
+      type: 'number',
+      value: (e) => e.every_weeks,
+      exportValue: (e) => everyLabel(e.every_weeks),
+      filter: { format: (v) => everyLabel(Number(v)) },
+      searchable: false,
+      cell: (e) => everyLabel(e.every_weeks),
+    },
+    {
       id: 'vehicle',
       header: m.plan_col_vehicle(),
+      type: 'number',
       value: (e) => e.vehicle,
-      filter: true,
-      cell: (e) => (e.vehicle ? <span className="tabular-nums">{e.vehicle}</span> : dash),
+      exportValue: (e) => (e.vehicle == null ? null : m.plan_vehicle_n({ n: e.vehicle })),
+      filter: { format: (v) => m.plan_vehicle_n({ n: Number(v) }) },
+      searchable: false,
+      cell: (e) => (e.vehicle == null ? dash : m.plan_vehicle_n({ n: e.vehicle })),
     },
     {
       id: 'tonnes',
@@ -182,92 +180,61 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
       filter: 'range',
       format: (n) => formatKg(n, 0),
       value: (e) => e.kg_per_round,
-      cell: (e) =>
-        e.kg_per_round == null ? (
-          dash
-        ) : (
-          <span
-            className="tabular-nums"
-            title={
-              e.round_kg != null && e.circuit
-                ? m.plan_round_hint({
-                    circuit: e.circuit,
-                    day: planWeekdayTitle(e.weekday) ?? '',
-                    kg: formatKg(e.round_kg, 0),
-                  })
-                : undefined
-            }
-          >
-            {formatKg(e.kg_per_round, 0)}
-          </span>
-        ),
+      cell: (e) => <span className="tabular-nums">{formatKg(e.kg_per_round, 0)}</span>,
     },
     {
-      id: 'fits',
-      header: m.plan_col_fits(),
-      // «Não se aplica» (a pedido com desvio) fica vazio: o cartão em telemóvel esconde o campo.
-      value: (e) => (fitsState(e) === 'na' ? null : fitsState(e)),
-      exportValue: (e) => fitsLabel[fitsState(e)](),
-      filter: { format: (v) => fitsLabel[v as FitsState]() },
-      searchable: false,
-      cell: (e) => {
-        const state = fitsState(e);
-        if (state === 'na') return dash;
-        return (
-          <span
-            className={cn(
-              'font-medium',
-              state === 'yes' && 'text-primary',
-              state === 'no' && 'text-destructive',
-              state === 'unknown' && 'text-muted-foreground',
-            )}
-            title={state === 'unknown' ? m.plan_fits_unknown_hint() : undefined}
-          >
-            {fitsLabel[state]()}
-          </span>
-        );
-      },
-    },
-    {
-      id: 'new_km',
-      header: m.plan_col_new_km(),
+      id: 'km',
+      header: m.plan_col_km(),
       type: 'number',
       align: 'right',
       searchable: false,
       aggregate: 'sum',
       format: (n) => `${formatNumber(n)} km`,
-      value: (e) => e.new_km_year,
-      cell: (e) => <span className="tabular-nums">{formatNumber(e.new_km_year)} km</span>,
+      value: (e) => e.km_year,
+      cell: (e) => <span className="tabular-nums">{formatNumber(e.km_year)} km</span>,
+    },
+    {
+      id: 'hours',
+      header: m.plan_col_hours(),
+      type: 'number',
+      align: 'right',
+      searchable: false,
+      aggregate: 'sum',
+      format: (n) => `${formatNumber(n)} h`,
+      value: (e) => e.hours_year,
+      cell: (e) => <span className="tabular-nums">{formatNumber(e.hours_year)} h</span>,
       defaultHidden: true,
     },
     {
-      id: 'pickups',
-      header: m.plan_col_pickups(),
+      id: 'stops',
+      header: m.plan_col_stops(),
       type: 'number',
       align: 'right',
       searchable: false,
       aggregate: 'sum',
       format: (n) => formatNumber(n),
-      value: (e) => e.pickups_year,
-      cell: (e) => <span className="tabular-nums">{formatNumber(e.pickups_year)}</span>,
+      value: (e) => e.stops_year,
+      cell: (e) => <span className="tabular-nums">{formatNumber(e.stops_year)}</span>,
       defaultHidden: true,
     },
     {
-      id: 'circuits',
-      header: m.plan_col_circuits(),
-      value: (e) => (e.circuits ?? []).join(', '),
-      filter: 'text',
-      cell: (e) => ((e.circuits ?? []).length ? (e.circuits ?? []).join(', ') : dash),
-      defaultHidden: true,
-    },
-    {
-      id: 'crew',
-      header: m.plan_col_crew(),
+      id: 'rounds',
+      header: m.plan_col_rounds(),
       type: 'number',
       align: 'right',
       searchable: false,
-      value: (e) => e.crew,
-      cell: (e) => (e.crew == null ? dash : formatNumber(e.crew)),
+      value: (e) => e.rounds_year,
+      cell: (e) => <span className="tabular-nums">{formatNumber(e.rounds_year)}</span>,
+      defaultHidden: true,
+    },
+    {
+      id: 'trips',
+      header: m.plan_col_trips(),
+      type: 'number',
+      align: 'right',
+      searchable: false,
+      value: (e) => e.trips_per_round,
+      cell: (e) => (e.trips_per_round == null ? dash : formatNumber(e.trips_per_round)),
       defaultHidden: true,
     },
   ];
@@ -275,122 +242,74 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
   return (
     <div className="space-y-3">
       <ul className="grid gap-2 sm:grid-cols-2">
-        {doorToDoor.parishes > 0 && (
-          <li className="flex gap-3 rounded-xl bg-primary/8 p-3.5 ring-1 ring-primary/25">
+        {vehicles > 0 && (
+          <li
+            className="flex gap-3 rounded-xl bg-primary/8 p-3.5 ring-1 ring-primary/25 sm:col-span-2"
+            data-testid="plan-vehicle"
+          >
             <Truck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
-            <p className="font-medium text-sm leading-snug" data-testid="plan-summary-pap">
-              {m.plan_summary_pap({
-                n: formatNumber(doorToDoor.parishes),
-                tonnes: formatTonnes(doorToDoor.tonnes, 1),
-                km: formatNumber(doorToDoor.newKm),
+            <div className="min-w-0 space-y-0.5 text-sm leading-snug">
+              <p className="font-medium">{m.plan_vehicle_title()}</p>
+              <p className="text-pretty">
+                {vehicles > 1
+                  ? m.plan_vehicle_many({
+                      n: formatNumber(vehicles),
+                      days: formatNumber(kpis?.vehicle_days_week ?? 0, 1),
+                      hours: formatNumber(kpis?.vehicle_hours_year ?? 0),
+                      capex: formatEur(kpis?.vehicle_capex_eur ?? 0),
+                    })
+                  : m.plan_vehicle_one({
+                      days: formatNumber(kpis?.vehicle_days_week ?? 0, 1),
+                      hours: formatNumber(kpis?.vehicle_hours_year ?? 0),
+                      capex: formatEur(kpis?.vehicle_capex_eur ?? 0),
+                    })}
+              </p>
+            </div>
+          </li>
+        )}
+        {doorBag.parishes > 0 && (
+          <li className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10">
+            <ShoppingBag className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
+            <p className="font-medium text-sm leading-snug" data-testid="plan-summary-door">
+              {m.plan_summary_door({
+                n: formatNumber(doorBag.parishes),
+                tonnes: formatTonnes(doorBag.tonnes, 1),
+                every: everyLabel(summary.everyWeeks ?? 2),
+                km: formatNumber(doorBag.km),
               })}
             </p>
           </li>
         )}
-        {detour.parishes > 0 && (
+        {sites.parishes > 0 && (
           <li className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10">
-            <RouteIcon
-              className="mt-0.5 size-4 shrink-0 text-muted-foreground"
-              aria-hidden="true"
-            />
-            <p className="font-medium text-sm leading-snug" data-testid="plan-summary-detour">
-              {m.plan_summary_detour({
-                n: formatNumber(detour.parishes),
-                tonnes: formatTonnes(detour.tonnes, 1),
-                km: formatNumber(detour.newKm),
+            <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+            <p className="font-medium text-sm leading-snug" data-testid="plan-summary-sites">
+              {m.plan_summary_sites({
+                n: formatNumber(sites.parishes),
+                tonnes: formatTonnes(sites.tonnes, 1),
+                km: formatNumber(sites.km),
               })}
             </p>
           </li>
         )}
       </ul>
-      {summary.maxRoundKg != null && (
-        <p className="flex gap-2 text-muted-foreground text-xs leading-relaxed">
-          <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
-          <span>
-            {summary.roundsOver > 0
-              ? m.plan_capacity_over({ n: formatNumber(summary.roundsOver) })
-              : summary.roundsUnknown > 0
-                ? m.plan_capacity_unknown({ kg: formatKg(summary.maxRoundKg, 0) })
-                : m.plan_capacity_ok({ kg: formatKg(summary.maxRoundKg, 0) })}{' '}
-            {m.plan_note()}
-          </span>
-        </p>
-      )}
-      <PlanB />
+      <p className="flex gap-2 text-muted-foreground text-xs leading-relaxed">
+        <Info className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />
+        <span>{m.plan_note()}</span>
+      </p>
       <DataTable
         id="collection-plan"
         exportName="cenario-plano-de-recolha"
         caption={m.plan_title()}
         columns={columns}
         rows={plan}
-        getRowId={(e) => e.parish_code}
+        getRowId={(e) => `${e.parish_code}:${e.channel}`}
         searchLabel={m.plan_search()}
         pageSize={10}
         initialSort={{ id: 'tonnes', desc: true }}
         selectable={false}
         empty={<EmptyState title={m.plan_empty_title()} description={m.plan_empty_text()} />}
       />
-    </div>
-  );
-}
-
-/**
- * Plano B sem compactador: uma volta dedicada ao têxtil à tarde (sem esmagar o saco). Quantas viaturas ficam sem
- * circuito em todas as tardes de segunda a sexta, contado do planeamento de turnos da Vitrus (o mesmo da página Frota).
- * Sem custo: a Vitrus ainda não deu o custo de uma volta nem o tipo de caixa.
- */
-function PlanB() {
-  const fleet = useQuery(getFleetOptions());
-  const circuits = useQuery(listCircuitsOptions());
-  const idle = useMemo(() => {
-    if (!fleet.data || !circuits.data) return undefined;
-    const occs = buildOccurrences(fleet.data.vehicles, circuits.data.circuits);
-    const size = fleet.data.vehicles.length;
-    return weekdayAfternoonIdle(loadBySlot(occs, size), size);
-  }, [fleet.data, circuits.data]);
-
-  if (fleet.isError || circuits.isError)
-    return (
-      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs">
-        {m.plan_b_error()}
-        <Button
-          variant="outline"
-          size="sm"
-          className="h-10"
-          onClick={() => {
-            void fleet.refetch();
-            void circuits.refetch();
-          }}
-        >
-          {m.common_retry()}
-        </Button>
-      </p>
-    );
-  if (idle === undefined) return <Skeleton className="h-16 w-full rounded-xl" />;
-  if (idle === null) return null;
-
-  const { period_start: start, period_end: end } = fleet.data ?? {};
-  const source =
-    start && end
-      ? m.plan_b_source({
-          period: m.fleet_period({ start: formatDate(start), end: formatDate(end) }),
-        })
-      : m.plan_b_source_plain();
-  return (
-    <div
-      className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10"
-      data-testid="plan-b"
-    >
-      <CalendarClock className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
-      <div className="min-w-0 space-y-1 text-sm leading-snug">
-        <p className="font-medium">{m.plan_b_title()}</p>
-        <p className="text-pretty">
-          {idle > 0
-            ? m.plan_b_text({ n: formatNumber(idle), source })
-            : m.plan_b_text_none({ source })}
-        </p>
-        <p className="text-muted-foreground text-xs">{m.plan_b_validate()}</p>
-      </div>
     </div>
   );
 }

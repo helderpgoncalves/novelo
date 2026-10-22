@@ -1,4 +1,4 @@
-import { MapPin, Route, ScanLine, School, Truck } from 'lucide-react';
+import { MapPin, ScanLine, School, Truck } from 'lucide-react';
 import { type CSSProperties, lazy, Suspense } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorState } from '@/components/states';
@@ -31,7 +31,7 @@ function MapSkeleton() {
 }
 
 /**
- * O momento do mapa: onde se perdem as ≈ 2 325 t por ano (estimativa). Cabeçalho dividido (título e tese), uma faixa de
+ * O momento do mapa: onde se perdem as ≈ 3 003 t por ano (estimativa). Cabeçalho dividido (título e tese), uma faixa de
  * números (locais, contentores, nenhum contentor novo, têxtil por desviar) e o mapa dos locais reais com a lista das freguesias.
  */
 export function WhereLost() {
@@ -55,21 +55,12 @@ export function WhereLost() {
       format: (v: number) => formatNumber(Math.round(v)),
     },
   ] as const;
-  const pap = FACTS.doorToDoor;
+  // A viatura de têxtil nova (sem compactação) é o único meio: o saco não pode ir no compactador do porta a porta e não
+  // há viaturas livres à tarde (Vitrus, 22 out 2026).
   const modes = [
-    [
-      Truck,
-      m.landing_map_mode_pap({
-        n: formatNumber(pap.parishes),
-        people: formatNumber(pap.inhabitants),
-        tonnes: `${formatNumber(pap.tonnes, 1)} t`,
-        km: formatNumber(pap.newKm),
-        inScenario: formatNumber(pap.inScenario),
-      }),
-    ],
+    [Truck, m.landing_map_mode_vehicle()],
     [MapPin, m.landing_map_mode_existing()],
     [School, m.landing_map_mode_schools({ n: formatNumber(FACTS.schools) })],
-    [Route, m.landing_map_mode_demand()],
     [ScanLine, m.landing_map_mode_quality()],
   ] as const;
   return (

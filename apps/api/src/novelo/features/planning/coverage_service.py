@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import coverage_matrix as cm
-from novelo.domain.vocab import CollectionMode, Tipau
+from novelo.domain.vocab import Tipau
 from novelo.features.municipal.models import MunicipalParishStat
 from novelo.features.planning import service
 from novelo.features.planning.coverage_schemas import (
@@ -16,20 +16,12 @@ from novelo.features.planning.coverage_schemas import (
     CoverageParish,
     ScenarioCoverage,
 )
-from novelo.features.planning.schemas import Allocation, CollectionPlanEntry
+from novelo.features.planning.schemas import Allocation
 
 
-def _channels(a: Allocation, plan: dict[str, CollectionPlanEntry] | None) -> list[CoverageChannel]:
-    out: list[CoverageChannel] = []
-    for part in a.parts:
-        if part.mode == CollectionMode.ON_DEMAND:
-            entry = plan.get(a.parish_code) if plan is not None else None
-            out.append(entry.channel if entry is not None else "on_demand")
-        elif part.mode == CollectionMode.EXISTING:
-            out.append("existing")
-        else:
-            out.append("street")
-    return out
+def _channels(a: Allocation) -> list[CoverageChannel]:
+    """Canais do cenário na freguesia: todos feitos pela viatura dedicada (o modo de cada parte)."""
+    return [part.mode.value for part in a.parts]
 
 
 def _group(g: cm.GroupFigures) -> CoverageGroup:
@@ -54,12 +46,6 @@ async def scenario_coverage(db: AsyncSession, scenario_id: uuid.UUID) -> Scenari
             select(MunicipalParishStat.dicofre, MunicipalParishStat.area_km2, MunicipalParishStat.cover_pct_300m)
         )
     }
-    plan = (
-        {e.parish_code: e for e in scenario.result.collection_plan}
-        if scenario.result.collection_plan is not None
-        else None
-    )
-
     rows: list[CoverageParish] = []
     figures: list[cm.ParishFigures] = []
     for a in scenario.result.allocations:
@@ -80,7 +66,7 @@ async def scenario_coverage(db: AsyncSession, scenario_id: uuid.UUID) -> Scenari
                 door_to_door_days_week=len({p.weekday for p in z.door_to_door}) if z is not None else 0,
                 service_days=z.service_days if z is not None else 0,
                 modes=a.modes,
-                channels=_channels(a, plan),
+                channels=_channels(a),
                 tonnes=a.tonnes,
                 covered_population=a.covered_population,
                 covered_share=round(a.covered_population / a.population, 4) if a.population else 0.0,

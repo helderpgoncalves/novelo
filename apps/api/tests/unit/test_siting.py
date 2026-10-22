@@ -41,8 +41,6 @@ def params() -> Params:
         cost_per_km_eur=0.0,  # sem km: o custo é só o fixo, fácil de verificar à mão
         detour_factor=1.3,
         on_demand_kg_per_pickup=25.0,
-        piggyback_extra_km=1.5,
-        piggyback_min_days=2,
         vehicle_capacity_t=4.0,
         depot=(LAT, LON),
     )

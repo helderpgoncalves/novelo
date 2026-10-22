@@ -1,48 +1,40 @@
 import { afterEach, describe, expect, it } from 'vitest';
 import type { CollectionPlanEntry } from '@/client';
 import { overwriteGetLocale } from '@/paraglide/runtime';
-import {
-  doorToDoorByParish,
-  fitsState,
-  planWeekday,
-  planWeekdayTitle,
-  summarizePlan,
-} from './collection-plan';
+import { doorBagByParish, planWeekday, planWeekdayTitle, summarizePlan } from './collection-plan';
 
 afterEach(() => overwriteGetLocale(() => 'pt-PT'));
 
-const pap = (over: Partial<CollectionPlanEntry> = {}): CollectionPlanEntry => ({
+/** Saco fechado à porta, numa ronda da viatura dedicada a cada 2 semanas. */
+const door = (over: Partial<CollectionPlanEntry> = {}): CollectionPlanEntry => ({
   parish_code: '030813',
   parish_name: 'Creixomil',
-  channel: 'door_to_door',
-  circuit: 'C14',
-  circuits: ['C14'],
+  channel: 'on_demand',
   weekday: 1,
-  vehicle: 'BD-86-EN',
-  crew: 3,
-  new_km_year: 0,
-  tonnes_year: 20.1,
-  pickups_year: 1340,
-  kg_per_round: 386.5,
-  round_kg: 386.5,
-  fits_capacity: null,
+  vehicle: 1,
+  every_weeks: 2,
+  rounds_year: 26,
+  trips_per_round: 1,
+  stops_year: 1040,
+  tonnes_year: 26,
+  kg_per_round: 1000,
+  km_year: 400,
+  hours_year: 50,
   ...over,
 });
 
-const detour = (over: Partial<CollectionPlanEntry> = {}): CollectionPlanEntry => ({
-  ...pap(),
+/** Paragens nos locais (pontos existentes). */
+const site = (over: Partial<CollectionPlanEntry> = {}): CollectionPlanEntry => ({
+  ...door(),
   parish_code: '030807',
   parish_name: 'Brito',
-  channel: 'detour',
-  circuit: null,
-  circuits: [],
-  weekday: null,
-  vehicle: null,
-  crew: null,
-  new_km_year: 120.5,
+  channel: 'existing',
+  trips_per_round: null,
+  stops_year: 52,
   tonnes_year: 4,
-  kg_per_round: null,
-  round_kg: null,
+  kg_per_round: 153.8,
+  km_year: 120.5,
+  hours_year: 12,
   ...over,
 });
 
@@ -71,61 +63,37 @@ describe('planWeekday', () => {
   });
 });
 
-describe('fitsState', () => {
-  it('nulo é «por validar» no circuito porta a porta e não se aplica com desvio', () => {
-    expect(fitsState(pap())).toBe('unknown');
-    expect(fitsState(pap({ fits_capacity: true }))).toBe('yes');
-    expect(fitsState(pap({ fits_capacity: false }))).toBe('no');
-    expect(fitsState(detour())).toBe('na');
-  });
-});
-
 describe('summarizePlan', () => {
-  it('soma por canal só a partir do resultado', () => {
+  it('soma por canal só a partir do resultado e conta cada freguesia uma vez', () => {
     const plan = [
-      pap(),
-      pap({ parish_code: '030838', parish_name: 'Ponte', weekday: 2, tonnes_year: 13.8 }),
-      pap({ parish_code: '030810', parish_name: 'Caldelas', circuit: 'C11', tonnes_year: 13.1 }),
-      detour(),
-      detour({ parish_code: '030812', new_km_year: 79.5, tonnes_year: 2.5 }),
+      door(),
+      door({ parish_code: '030838', parish_name: 'Ponte', weekday: 2, tonnes_year: 13.8 }),
+      door({ parish_code: '030810', vehicle: 2, tonnes_year: 13.2 }),
+      site(),
+      site({ parish_code: '030813', km_year: 79.5, tonnes_year: 2.5 }),
     ];
     const s = summarizePlan(plan);
-    expect(s.doorToDoor.parishes).toBe(3);
-    expect(s.doorToDoor.tonnes).toBeCloseTo(47, 6);
-    expect(s.doorToDoor.newKm).toBe(0);
-    expect(s.detour).toEqual({ parishes: 2, tonnes: 6.5, newKm: 200 });
+    expect(s.doorBag.parishes).toBe(3);
+    expect(s.doorBag.tonnes).toBeCloseTo(53, 6);
+    expect(s.doorBag.km).toBe(1200);
+    expect(s.sites).toEqual({ parishes: 2, tonnes: 6.5, km: 200, hours: 24 });
+    expect(s.everyWeeks).toBe(2);
+    expect(s.vehicles).toBe(2);
   });
 
-  it('a ronda mais carregada e as rondas por validar contam cada (circuito, dia) uma vez', () => {
-    const plan = [
-      pap({ round_kg: 500, fits_capacity: null }),
-      pap({ parish_code: 'x', round_kg: 500, fits_capacity: null }),
-      pap({ parish_code: 'y', weekday: 2, round_kg: 4200, fits_capacity: false }),
-      pap({ parish_code: 'z', circuit: 'C11', round_kg: 100, fits_capacity: true }),
-    ];
-    const s = summarizePlan(plan);
-    expect(s.maxRoundKg).toBe(4200);
-    expect(s.roundsUnknown).toBe(1);
-    expect(s.roundsOver).toBe(1);
-  });
-
-  it('plano vazio ou só com desvio: sem rondas', () => {
-    expect(summarizePlan([]).maxRoundKg).toBeNull();
-    const s = summarizePlan([detour()]);
-    expect(s.doorToDoor.parishes).toBe(0);
-    expect(s.maxRoundKg).toBeNull();
+  it('plano vazio ou só com locais: sem porta a porta', () => {
+    expect(summarizePlan([]).everyWeeks).toBeNull();
+    const s = summarizePlan([site()]);
+    expect(s.doorBag.parishes).toBe(0);
+    expect(s.everyWeeks).toBeNull();
   });
 });
 
-describe('doorToDoorByParish', () => {
-  it('só as freguesias no circuito porta a porta, por código', () => {
-    const map = doorToDoorByParish([pap(), detour()]);
+describe('doorBagByParish', () => {
+  it('só as freguesias com saco à porta, por código', () => {
+    const map = doorBagByParish([door(), site()]);
     expect([...map.keys()]).toEqual(['030813']);
-    expect(map.get('030813')?.circuit).toBe('C14');
-  });
-
-  it('cenários antigos (sem plano) dão um mapa vazio', () => {
-    expect(doorToDoorByParish(null).size).toBe(0);
-    expect(doorToDoorByParish(undefined).size).toBe(0);
+    expect(map.get('030813')?.weekday).toBe(1);
+    expect(doorBagByParish(null).size).toBe(0);
   });
 });

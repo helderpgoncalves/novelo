@@ -26,7 +26,8 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, replace
 from typing import Any, Literal
 
-from novelo.domain.network import ModeParams, Params, Zone, build_option, mode_cost, zone_demand_t
+from novelo.domain import fleet
+from novelo.domain.network import ModeParams, Params, Zone, build_option, mode_cost, part_hours, zone_demand_t
 from novelo.domain.vocab import CollectionMode as Mode
 
 DEFAULT_SWING = 0.3
@@ -40,8 +41,11 @@ GLOBAL_KEYS = (
     "cost_per_km_eur",
     "detour_factor",
     "on_demand_kg_per_pickup",
-    "piggyback_extra_km",
 )
+# Viatura dedicada: entra sempre que o plano recolhe alguma coisa (as horas só mudam o número de viaturas, em degraus).
+VEHICLE_KEYS = ("vehicle_capex_eur", "vehicle_lifetime_years")
+# Só com recolha a pedido: a frequência das rondas e a capacidade mudam os km de cada ronda porta a porta.
+ON_DEMAND_ROUND_KEYS = ("on_demand_every_weeks", "vehicle_capacity_t")
 # Por modo: o modo a pedido não tem pontos, vida útil nem frequência, só captura e cobertura.
 MODE_KEYS = (
     "capture_rate",
@@ -52,8 +56,6 @@ MODE_KEYS = (
     "collections_per_year",
 )
 ON_DEMAND_KEYS = ("capture_rate", "coverage_factor")
-# Custo de uma recolha no circuito porta a porta: só entra se o plano tiver recolha a pedido numa freguesia com PAP.
-PAP_KEY = "pap_cost_per_pickup_eur"
 
 Criterion = Literal["eur_per_tonne", "annual_cost_eur", "tonnes"]
 
@@ -85,6 +87,7 @@ class SitePlan:
 
       têxtil = D · (c_s·a + c_o·z − c_s·c_o·a·z)            (união dos dois canais, como no otimizador)
       custo  = locais · (capex/N + recolhas · c_recolha) + km das rotas · c_km + custo da recolha a pedido
+               + viaturas dedicadas · capex/vida útil
     """
 
     mode: Mode
@@ -178,8 +181,6 @@ def get_value(params: Params, key: str) -> float:
     if key.startswith("modes."):
         _, mode, field_name = key.split(".")
         return float(getattr(params.modes[Mode(mode)], field_name))
-    if key == PAP_KEY:
-        return params.pap_pickup_eur  # None no pressuposto = o custo de uma recolha normal
     return float(getattr(params, key))
 
 
@@ -194,6 +195,8 @@ def _clamp(key: str, value: float) -> float:
         return min(value, 5.0)
     if name == "people_per_point":
         return float(max(1, round(value)))
+    if name in {"on_demand_every_weeks", "vehicle_lifetime_years", "vehicle_capacity_t"}:
+        return max(value, 1e-3)
     return value
 
 
@@ -233,9 +236,16 @@ def sensitive_keys(items: Plan, params: Params) -> list[str]:
             continue
         names = ON_DEMAND_KEYS if mode == Mode.ON_DEMAND else MODE_KEYS
         keys += [f"modes.{mode.value}.{n}" for n in names]
-    if any(it.zone.door_to_door and Mode.ON_DEMAND in it.modes for it in items):
-        keys.append(PAP_KEY)
+    if Mode.ON_DEMAND in used:
+        keys += ON_DEMAND_ROUND_KEYS
+    if used:
+        keys += VEHICLE_KEYS
     return [k for k in keys if get_value(params, k) != 0]
+
+
+def _vehicle_cost(hours_year: float, params: Params) -> float:
+    """Viaturas dedicadas que as horas pedem, anualizadas (0 sem recolha)."""
+    return fleet.vehicles_needed(hours_year, params.shift_hours) * params.vehicle_annual_eur
 
 
 # --- Avaliação do plano (sem solver) -----------------------------------------------------------------------------
@@ -247,13 +257,15 @@ def evaluate_plan(items: Plan, params: Params) -> Metrics:
         return evaluate_site_plan(items, params)
     tonnes = 0.0
     cost = 0.0
+    hours = 0.0
     for it in items:
         option = build_option(it.zone, it.modes, params)
         tonnes += option.tonnes
         for part, scale in zip(option.parts, it.km_scale, strict=True):
             extra_km_cost = part.km_year * (scale - 1) * params.cost_per_km_eur
             cost += part.capex_eur / params.modes[part.mode].lifetime_years + part.opex_eur_year + extra_km_cost
-    return Metrics(tonnes, cost)
+            hours += part_hours(part.mode, part.km_year * scale, part.collections_year, params)
+    return Metrics(tonnes, cost + _vehicle_cost(hours, params))
 
 
 def _site_keys(plan: SitePlan, params: Params) -> list[str]:
@@ -267,9 +279,8 @@ def _site_keys(plan: SitePlan, params: Params) -> list[str]:
         f"modes.{plan.mode.value}.collections_per_year",
     ]
     if on_demand:
-        keys += ["on_demand_kg_per_pickup", "piggyback_extra_km", *[f"modes.on_demand.{n}" for n in ON_DEMAND_KEYS]]
-    if any(z.on_demand and z.zone.door_to_door for z in plan.zones):
-        keys.append(PAP_KEY)
+        keys += ["on_demand_kg_per_pickup", *[f"modes.on_demand.{n}" for n in ON_DEMAND_KEYS], *ON_DEMAND_ROUND_KEYS]
+    keys += VEHICLE_KEYS
     return [k for k in keys if get_value(params, k) != 0]
 
 
@@ -279,6 +290,7 @@ def evaluate_site_plan(plan: SitePlan, params: Params) -> Metrics:
     c_s = mp.capture_rate
     tonnes = 0.0
     od_cost = 0.0
+    hours = 0.0
     for sz in plan.zones:
         demand = zone_demand_t(sz.zone, params)
         a = sz.served_share
@@ -286,13 +298,17 @@ def evaluate_site_plan(plan: SitePlan, params: Params) -> Metrics:
             od = mode_cost(sz.zone, Mode.ON_DEMAND, params)
             tonnes += demand * (c_s * a + od.capture - c_s * od.capture * a)
             od_cost += od.annual_cost_eur
+            hours += od.hours_year
         else:
             tonnes += demand * c_s * a
     fixed = plan.sites * (
         mp.capex_per_point_eur / mp.lifetime_years + mp.collections_per_year * params.cost_per_collection_eur
     )
     km_year = plan.km_per_round * params.detour_factor / plan.base_detour * mp.collections_per_year
-    return Metrics(tonnes, fixed + km_year * params.cost_per_km_eur + od_cost)
+    hours += fleet.hours(
+        km_year, plan.sites * mp.collections_per_year, params.vehicle_speed_kmh, params.site_stop_minutes
+    )
+    return Metrics(tonnes, fixed + km_year * params.cost_per_km_eur + od_cost + _vehicle_cost(hours, params))
 
 
 def calibrate_km_scale(

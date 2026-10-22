@@ -10,10 +10,10 @@ async def test_textile_baseline_matches_excel_totals(logged_in: httpx.AsyncClien
     by_name = {e["entity"]: e for e in body["entities"]}
     assert by_name["Ultriplo"]["method"] == "weighed"
     assert by_name["Nova Etapa"]["method"] == "percentage"
-    # gerado = 43 051 t × 5,4% (Vitrus + APA) + 301,27 t = 2 626,0 t; captura 301,27 ÷ 2 626,0 = 11,5%
-    assert body["estimated_demand_t"] == pytest.approx(2626.0, abs=0.1)
-    assert body["gap_t"] == pytest.approx(2324.8, abs=0.1)  # o que ainda vai para o lixo
-    assert body["capture_of_demand_pct"] == pytest.approx(11.5, abs=0.05)
+    # gerado = 51 250,6 t × 5,86% (Vitrus + APA) + 301,27 t = 3 304,6 t; captura 301,27 ÷ 3 304,6 = 9,1%
+    assert body["estimated_demand_t"] == pytest.approx(3304.6, abs=0.1)
+    assert body["gap_t"] == pytest.approx(3003.3, abs=0.1)  # o que ainda vai para o lixo
+    assert body["capture_of_demand_pct"] == pytest.approx(9.1, abs=0.05)
 
 
 async def test_observed_flows_conserve_mass(logged_in: httpx.AsyncClient) -> None:

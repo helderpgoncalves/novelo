@@ -43,8 +43,14 @@ export function ScenarioKpis({ kpis, bySites = false }: { kpis: Kpis; bySites?: 
         tag={m.common_estimate()}
         hint={
           bySites
-            ? m.kpi_capex_hint_sites({ points: kpis.points })
-            : m.kpi_capex_hint({ points: kpis.points })
+            ? m.kpi_capex_hint_sites({
+                points: kpis.points,
+                vehicles: formatEur(kpis.vehicle_capex_eur ?? 0),
+              })
+            : m.kpi_capex_hint({
+                points: kpis.points,
+                vehicles: formatEur(kpis.vehicle_capex_eur ?? 0),
+              })
         }
       />
     </StatStrip>
@@ -52,16 +58,18 @@ export function ScenarioKpis({ kpis, bySites = false }: { kpis: Kpis; bySites?: 
 }
 
 /**
- * Segunda linha: captura sobre o têxtil no lixo, rotas e a poupança no tratamento do indiferenciado. A poupança fica
- * «por validar» enquanto a Vitrus não der o custo de tratamento por tonelada (nunca um número inventado).
+ * Segunda linha: captura sobre o têxtil no lixo, a viatura dedicada, o tratamento evitado (105,64 €/t, Vitrus) e o
+ * custo líquido para o município. Nos cenários antigos (sem viatura ou sem custo de tratamento) os campos ficam «—».
  */
 export function ScenarioSecondaryKpis({ kpis, routes }: { kpis: Kpis; routes: number }) {
   const capturePct = kpis.potential_t > 0 ? (kpis.tonnes_year / kpis.potential_t) * 100 : 0;
   const baselinePct =
     kpis.potential_t > 0 ? (kpis.baseline_observed_t / kpis.potential_t) * 100 : 0;
   const avoided = kpis.avoided_treatment_eur;
+  const net = kpis.net_annual_cost_eur;
+  const vehicles = kpis.vehicles;
   return (
-    <StatStrip className="lg:grid-cols-3">
+    <StatStrip className="lg:grid-cols-4">
       <StatCell
         label={m.simx_kpi_capture()}
         value={formatPercent(capturePct, 1)}
@@ -69,9 +77,24 @@ export function ScenarioSecondaryKpis({ kpis, routes }: { kpis: Kpis; routes: nu
         hint={m.simx_kpi_capture_hint({ baseline: formatPercent(baselinePct, 1) })}
       />
       <StatCell
-        label={m.simx_kpi_routes()}
-        value={formatNumber(routes)}
-        hint={m.simx_kpi_routes_hint({ km: `${formatNumber(kpis.km_year)} km` })}
+        label={m.kpi_vehicles()}
+        value={
+          vehicles == null
+            ? m.common_dash()
+            : vehicles === 1
+              ? m.kpi_vehicles_value_one()
+              : m.kpi_vehicles_value_many({ n: formatNumber(vehicles) })
+        }
+        tag={vehicles == null ? undefined : m.common_estimate()}
+        hint={
+          vehicles == null
+            ? m.kpi_vehicles_legacy_hint()
+            : m.kpi_vehicles_hint({
+                days: formatNumber(kpis.vehicle_days_week ?? 0, 1),
+                trips: formatNumber(routes),
+                km: `${formatNumber(kpis.km_year)} km`,
+              })
+        }
       />
       <StatCell
         label={m.kpi_avoided()}
@@ -79,6 +102,22 @@ export function ScenarioSecondaryKpis({ kpis, routes }: { kpis: Kpis; routes: nu
         tone={avoided == null ? 'muted' : 'default'}
         tag={avoided == null ? undefined : m.common_estimate()}
         hint={avoided == null ? m.kpi_avoided_pending_hint() : m.kpi_avoided_hint()}
+      />
+      <StatCell
+        label={m.kpi_net_cost()}
+        value={net == null ? m.common_dash() : formatEur(net)}
+        tone={net == null ? 'muted' : 'primary'}
+        tag={net == null ? undefined : m.common_estimate()}
+        hint={
+          net == null
+            ? m.kpi_avoided_pending_hint()
+            : m.kpi_net_cost_hint({
+                eurt:
+                  kpis.net_eur_per_tonne == null
+                    ? m.common_dash()
+                    : `${formatNumber(kpis.net_eur_per_tonne, 0)} €/t`,
+              })
+        }
       />
     </StatStrip>
   );

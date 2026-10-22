@@ -24,12 +24,21 @@ def eur_per_tonne(annual_cost: float, tonnes: float) -> float | None:
 
 
 def avoided_treatment_eur(tonnes: float, treatment_eur_per_t: float | None) -> float | None:
-    """Poupança no tratamento de indiferenciado: cada tonelada desviada deixa de ser tratada como lixo.
+    """Tratamento de indiferenciado evitado: cada tonelada desviada deixa de ser tratada como lixo.
 
-    None enquanto o custo por tonelada não chegar da Vitrus: o KPI fica «por validar», nunca com um valor inventado.
+    Com 105,64 €/t (40 €/t TGR + 65,64 €/t Resinorte, Vitrus 22 out 2026). None sem custo por tonelada: nunca um
+    valor inventado.
     """
     if treatment_eur_per_t is None:
         return None
     if tonnes < 0 or treatment_eur_per_t < 0:
         raise ValueError("toneladas e custo por tonelada não podem ser negativos")
     return tonnes * treatment_eur_per_t
+
+
+def net_cost_eur(annual_cost: float, avoided_treatment: float | None) -> float | None:
+    """Custo líquido para o município: custo anual − tratamento evitado (None sem custo de tratamento).
+
+    Pode ser negativo: o tratamento evitado paga mais do que a recolha custa.
+    """
+    return None if avoided_treatment is None else annual_cost - avoided_treatment

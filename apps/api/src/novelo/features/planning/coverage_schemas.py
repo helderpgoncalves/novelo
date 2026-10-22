@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field
 from novelo.domain.vocab import CollectionMode, Tipau
 from novelo.features.planning.schemas import Siting
 
-# Como o têxtil chega ao circuito numa freguesia: no circuito porta a porta (0 km novos), a pedido com desvio, a pedido
-# sem plano de recolha (cenários anteriores a 21 out 2026), local existente ou contentor de rua (só referência).
-CoverageChannel = Literal["door_to_door", "detour", "on_demand", "existing", "street"]
+# Como o têxtil sai de uma freguesia, sempre na viatura dedicada: saco fechado à porta (a pedido), paragem num local
+# existente ou contentor de rua (só referência). O canal é o modo.
+CoverageChannel = Literal["on_demand", "existing", "street"]
 
 
 class CoverageParish(BaseModel):
@@ -32,10 +32,13 @@ class CoverageParish(BaseModel):
         )
     )
     door_to_door_days_week: int = Field(
-        description="Acessibilidade: dias/semana com passagem de circuito porta a porta de indiferenciado com viatura"
+        description=(
+            "Acessibilidade da rede atual: dias/semana com passagem de circuito porta a porta de indiferenciado "
+            "(a recolha de têxtil é feita pela viatura dedicada)"
+        )
     )
     service_days: int = Field(
-        description="Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura"
+        description="Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks)"
     )
     modes: list[CollectionMode] = Field(description="Modos do cenário na freguesia (vazio = sem recolha)")
     channels: list[CoverageChannel] = Field(description="Canais do cenário na freguesia")

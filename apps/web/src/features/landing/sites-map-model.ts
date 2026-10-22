@@ -1,5 +1,5 @@
 /**
- * Modelo do mapa «Onde se perdem as 2 325 t»: lê o JSON compacto gerado por `scripts/gen-landing-data.mjs` e dá as escalas do
+ * Modelo do mapa «Onde se perdem as 3 003 t»: lê o JSON compacto gerado por `scripts/gen-landing-data.mjs` e dá as escalas do
  * desenho. Funções puras (testadas); o componente só desenha.
  */
 

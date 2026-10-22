@@ -94,14 +94,15 @@ def test_gap_estimate_reproduces_the_etl_columns_for_all_48_parishes() -> None:
     with Path(path).open(encoding="utf-8", newline="") as fh:
         rows = list(csv.DictReader(fh))
     assert len(rows) == 48
-    kg = 43_051_000 * 0.054 / 156_830 / 12  # têxtil no lixo por habitante e mês (Vitrus + APA): 1,2353
-    capture = 301.266 / (43_051 * 0.054 + 301.266)  # captura atual do concelho: 11,47%
+    textile_t = 43_050.5 / 0.84 * 0.0586  # têxtil no lixo do concelho (Vitrus + APA): 3 003,28 t
+    kg = textile_t * 1000 / 156_830 / 12  # por habitante e mês: 1,5958
+    capture = 301.266 / (textile_t + 301.266)  # captura atual do concelho: 9,12%
     for r in rows:
         g = dom.gap_estimate(int(r["population"]), int(r["candidate_sites"]), kg, capture)
         assert abs(g.potential_t - float(r["textile_potential_t_estimate"])) <= 0.05, r["name"]
         assert abs(g.gap_t - float(r["textile_gap_t_estimate"])) <= 0.05, r["name"]
         assert abs(g.t_per_candidate - float(r["gap_t_per_candidate_site"])) <= 0.01, r["name"]
-    assert sum(float(r["textile_gap_t_estimate"]) for r in rows) == pytest.approx(2324.75, abs=0.5)
+    assert sum(float(r["textile_gap_t_estimate"]) for r in rows) == pytest.approx(3003.28, abs=0.5)
 
 
 # --- candidatos -------------------------------------------------------------------------------------------------

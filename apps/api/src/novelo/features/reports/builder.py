@@ -149,14 +149,14 @@ async def build_rap(
     assumptions = [
         {
             "label": labels_map[k],
-            # kg/hab/mês com 4 casas, como no ecrã de pressupostos (1,2353; a 2 casas lia-se «1,24»).
+            # kg/hab/mês com 5 casas, como no ecrã de pressupostos (1,59583; a 2 casas lia-se «1,60»).
             "value": f.pct(v * 100)
             if "rate" in k or "coverage" in k
-            else f.num(v, 4 if k == "kg_per_inhab_month" else 2),
+            else f.num(v, 5 if k == "kg_per_inhab_month" else 2),
             "origin": origin.get(k, ""),
         }
         for k, v in flat.items()
-        if k in labels_map
+        if k in labels_map and v is not None
     ]
     sources = [
         {

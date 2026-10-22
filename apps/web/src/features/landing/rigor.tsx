@@ -59,21 +59,33 @@ function AssumptionsTable() {
       status: 'measured',
     },
     {
-      key: 'rsu',
-      param: m.landing_row_rsu(),
-      value: formatTonnes(FACTS.rsuT, 0),
+      key: 'vitrusRsu',
+      param: m.landing_row_vitrus_rsu(),
+      value: formatTonnes(FACTS.vitrusRsuT, 1),
       source: (
         <>
-          {m.landing_row_rsu_src()}
+          {m.landing_row_vitrus_rsu_src()}
           <Cite n={4} />
         </>
       ),
       status: 'measured',
     },
     {
+      key: 'rsu',
+      param: m.landing_row_rsu(),
+      value: `≈ ${formatTonnes(FACTS.rsuT, 1)}`,
+      source: (
+        <>
+          {m.landing_row_rsu_src()}
+          <Cite n={4} />
+        </>
+      ),
+      status: 'estimate',
+    },
+    {
       key: 'q',
       param: m.landing_row_q(),
-      value: formatPercent(FACTS.textileShareOfRsuPct),
+      value: formatPercent(FACTS.textileShareOfRsuPct, 2),
       source: (
         <>
           {m.landing_row_q_src()}
@@ -104,6 +116,18 @@ function AssumptionsTable() {
       value: formatPercent(FACTS.capturePct),
       source: m.landing_row_capture_src(),
       status: 'estimate',
+    },
+    {
+      key: 'treatment',
+      param: m.landing_row_treatment(),
+      value: `${formatNumber(FACTS.treatmentEurPerT, 2)} €/t`,
+      source: (
+        <>
+          {m.landing_row_treatment_src()}
+          <Cite n={4} />
+        </>
+      ),
+      status: 'measured',
     },
     {
       key: 'containers',

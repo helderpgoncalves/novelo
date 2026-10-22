@@ -180,7 +180,7 @@ async def test_reference_endpoint_lists_current_with_onboarding(
 
 
 async def test_parish_reference_runs_the_real_model(session: AsyncSession) -> None:
-    """O cenário por freguesia do ecrã inicial sai do otimizador real com o plano de recolha porta a porta."""
+    """O cenário por freguesia do ecrã inicial sai do otimizador real com o plano da viatura dedicada."""
     await _admin(session)
     spec = next(s for s in reference.SPECS if s.key == reference.ONBOARDING_KEY)
     out = await reference.refresh(session, [spec])
@@ -189,4 +189,5 @@ async def test_parish_reference_runs_the_real_model(session: AsyncSession) -> No
     assert ref.reference_key == "parish:60000" and ref.up_to_date and ref.onboarding
     assert ref.label == "Referência · por freguesia · 60 000 €/ano" and ref.annual_cost_eur <= 60_000 + 1
     full = await service.get_scenario(session, ref.id)
-    assert full.result.collection_plan and any(e.channel == "door_to_door" for e in full.result.collection_plan)
+    assert full.result.collection_plan and any(e.channel == "on_demand" for e in full.result.collection_plan)
+    assert full.result.kpis.vehicles and full.result.kpis.net_annual_cost_eur is not None

@@ -230,7 +230,8 @@ class MunicipalParishOut(BaseModel):
         description="Estimativa do têxtil gerado: lacuna ÷ (1 − captura média do concelho)"
     )
     textile_gap_t: float = Field(
-        description="Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (43 051 t RSU × 5,4%) × 12"
+        description="Estimativa do têxtil que ainda vai para o lixo: população × kg/hab/mês (≈ 51 250,6 t de "
+        "indiferenciado do concelho × 5,86%) × 12"
     )
     gap_t_per_candidate_site: float = Field(description="Estimativa: lacuna ÷ max(1, locais candidatos)")
     gap_rank: int = Field(description="1 = mais toneladas de lacuna por local candidato (estimativa)")
@@ -536,7 +537,8 @@ class MunicipalGapRow(BaseModel):
 
 class MunicipalGapParameters(BaseModel):
     kg_per_inhab_month: float = Field(
-        description="Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: 43 051 t RSU × 5,4%)"
+        description="Têxtil que ainda vai para o lixo por habitante e mês (Vitrus + APA: ≈ 51 250,6 t de "
+        "indiferenciado do concelho × 5,86%)"
     )
     capture_pct: float = Field(
         description="Captura média atual do concelho (recolhido em 2025 ÷ têxtil gerado), igual em todas"

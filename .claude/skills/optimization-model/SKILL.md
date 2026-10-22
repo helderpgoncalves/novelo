@@ -7,9 +7,9 @@ description: Procura de têxtil, modelo de custos, otimização de localização
 
 Fonte das fórmulas: `docs/engenharia/dados-e-modelo.md`. Código em `apps/api/src/novelo/domain/` (funções puras).
 
-- **Procura:** `D_z = P_z · q · 12` (q = 1,235 kg/hab/mês = 43 051 t RSU × 5,4% APA / 156 830 hab. / 12: têxtil que ainda vai para o lixo; total 2 324,8 t). **Captado:** `C_z = D_z · c_m`.
-- **Dados reais:** a captura atual é 11,5% (301,27 t / 2 626,0 t gerados; estimativa). As 301 t são de terceiros, por isso não há contentor que as reproduza: a calibração antiga do modo `street` saiu e a taxa por modo (`c_m`) é pressuposto escrito, com níveis baixo/médio/alto visíveis no ecrã.
-- **Modos:** por omissão só `existing` (local existente, sem contentor novo) e `on_demand` (a pedido nos circuitos). `street` fica no enum só como referência explícita (benchmark francês). A Vitrus não quer contentores de têxtil (contaminação).
+- **Procura:** `D_z = P_z · q · 12` (q ≈ 1,596 kg/hab/mês = 43 050,5 t ÷ 0,840 × 5,86% APA / 156 830 hab. / 12: têxtil que ainda vai para o lixo; total ≈ 3 003,3 t; base de 22 out 2026). **Captado:** `C_z = D_z · c_m`.
+- **Dados reais:** a captura atual é ≈ 9,1% (301,27 t / 3 304,6 t gerados; estimativa). Cada tonelada desviada evita 105,64 €/t de tratamento em aterro (Vitrus, 22 out). O saco não pode ir no compactador e não há viaturas livres (Vitrus, 22 out): a recolha é feita por uma viatura de têxtil nova, sem compactação, com partida do Estaleiro da Rua das Lameiras (Polvoreira). As 301 t são de terceiros, por isso não há contentor que as reproduza: a calibração antiga do modo `street` saiu e a taxa por modo (`c_m`) é pressuposto escrito, com níveis baixo/médio/alto visíveis no ecrã.
+- **Modos:** por omissão só `existing` (local existente, sem contentor novo) e `on_demand` (saco à porta num dia fixo, recolhido pela viatura de têxtil nova; nunca no compactador). `street` fica no enum só como referência explícita (benchmark francês). A Vitrus não quer contentores de têxtil (contaminação).
 - **Receita:** a reciclagem custa mais que a fibra virgem; não contar receita de reciclagem. O valor está na reutilização.
 - **Custo:** `capex/N + recolhas·c_recolha + km·c_km`; `€/t = custo anual / toneladas`. Custos unitários pedem-se à Vitrus: até chegarem, ficam em `params.yaml` marcados "pressuposto" com fonte.
 - **MIP (localização + modo):** maximizar toneladas com orçamento ou minimizar custo para uma meta. Zona servida só com ponto dentro da distância a pé do modo.

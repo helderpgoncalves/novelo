@@ -22,7 +22,7 @@ test.describe('sala de decisão', () => {
 
     const strip = page.getByRole('region', { name: 'Situação em números' });
     await expect(strip).toContainText('301,3');
-    await expect(strip).toContainText('11,5%');
+    await expect(strip).toContainText('9,1%');
     await expect(strip).toContainText('medido');
     await expect(strip).toContainText('estimativa');
     await expect(strip).toContainText(/\d+\s*dias/);
@@ -62,14 +62,16 @@ test.describe('sala de decisão', () => {
     await expect(open).toHaveAttribute('href', /\/simulator\?.*budget=\d+/);
   });
 
-  test('o plano sem contentores: porta a porta com 0 km novos, custo com incerteza e o piloto', async ({
+  test('o plano sem contentores: viatura nova de têxtil, saco à porta, custo com incerteza e o piloto', async ({
     page,
   }) => {
     const plan = page.locator('#plano');
     await plan.scrollIntoViewIfNeeded();
     await expect(plan.getByRole('heading', { name: /O plano: sem contentores/ })).toBeVisible();
     await expect(plan).toContainText(/\d+ freguesias/);
-    await expect(plan).toContainText('0 km novos');
+    await expect(plan).toContainText('Viatura nova de têxtil, sem compactação');
+    await expect(plan).toContainText('Saco fechado à porta');
+    await expect(plan).toContainText('Custo líquido para o município');
     // O intervalo P10–P90 vem de um POST (sensibilidade); sem ele fica o custo central e o botão para o calcular.
     await expect(plan.getByText(/\d+ €\/t/).first()).toBeVisible({ timeout: 20_000 });
     await expect(plan.getByRole('link', { name: 'Ver o piloto' })).toHaveAttribute(

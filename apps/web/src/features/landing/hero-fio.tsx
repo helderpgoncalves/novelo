@@ -13,8 +13,8 @@ function at(point: { x: number; y: number }): CSSProperties {
 }
 
 /**
- * O fio solto, só gráfico: desenha-se ao carregar, do vale (esquerda) ao campanário da Penha, com o troço cheio até 11,5 % do
- * comprimento (o que a Vitrus recolhe: 301,3 t de ≈ 2 626 t gerados), o resto a tracejado (o que ainda vai para o lixo), um nó
+ * O fio solto, só gráfico: desenha-se ao carregar, do vale (esquerda) ao campanário da Penha, com o troço cheio até 9,1 % do
+ * comprimento (o que a Vitrus recolhe: 301,3 t de ≈ 3 305 t gerados), o resto a tracejado (o que ainda vai para o lixo), um nó
  * onde acaba o cheio e um fio a desfiar na ponta. Sem texto por cima da fotografia: os números estão no painel do hero
  * (`HeroLedger`); aqui só a descrição para leitores de ecrã. Em telemóvel e tablet de pé não aparece (o painel leva o fio em
  * miniatura). SVG inline, só `stroke-dashoffset`, opacidade e transform.

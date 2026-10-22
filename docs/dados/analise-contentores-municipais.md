@@ -2,13 +2,13 @@
 
 Recebido a **20 de outubro de 2026**. Fica em `data/raw/vitrus-mapa-qgis/` (só leitura, versionado no Git). `just etl` produz os ficheiros `municipal_*` e `caop_guimaraes.geojson` em `data/processed/`. Os números abaixo vêm de `data/processed/municipal_summary.json`; se o ETL mudar, este documento muda no mesmo commit.
 
-> **Nada neste pacote é de têxteis.** São os contentores **municipais** de indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície (Vitrus, 21 de outubro de 2026). **Não há contentores de têxteis**: a Vitrus não os tem nem os quer, porque o têxtil de contentor vem contaminado e perde a reutilização. Este pacote é, por isso, a **base geográfica** do modelo: mostra onde o têxtil se perde no lixo e onde a viatura já passa. Tem o seu próprio ETL (`scripts/etl/municipal_containers.py`) e os seus próprios ficheiros (`municipal_*`); `containers.py` fica só por compatibilidade.
+> **Nada neste pacote é de têxteis.** São os contentores **municipais** de indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície (Vitrus, 21 de outubro de 2026). **Não há contentores de têxteis**: a Vitrus não os tem nem os quer, porque o têxtil de contentor vem contaminado e perde a reutilização. Este pacote é, por isso, a **base geográfica** do modelo: mostra onde o têxtil se perde no lixo e onde a viatura de têxtil pode parar. Tem o seu próprio ETL (`scripts/etl/municipal_containers.py`) e os seus próprios ficheiros (`municipal_*`); `containers.py` fica só por compatibilidade.
 
 ## Para que serve
 
 | Uso | Como |
 | --- | --- |
-| 1. Locais candidatos (sem contentor novo) e procura por local | 1 187 locais com contentor municipal de rua (profundidade, superfície ou plataforma), 837 com coordenada precisa. São onde a viatura já passa: uma paragem para recolher sacos fechados no momento não precisa de contentor nem de km novos (pressuposto). A procura de cada freguesia reparte-se por eles na proporção dos contentores |
+| 1. Locais candidatos (sem contentor novo) e procura por local | 1 187 locais com contentor municipal de rua (profundidade, superfície ou plataforma), 837 com coordenada precisa. São paragens possíveis para a viatura de têxtil nova (a 22 out a Vitrus disse que o saco não pode ir no compactador): uma paragem para recolher sacos fechados no momento não precisa de contentor (pressuposto). A procura de cada freguesia reparte-se por eles na proporção dos contentores |
 | 2. Produtores com potencial têxtil | 922 contentores de orgânico de 6 tipos de produtor (restauração, escolas, estabelecimentos, grandes produtores, lares, hotelaria): recolha dedicada B2B (uniformes, roupa de cama, toalhas) |
 | 3. Geometria oficial das freguesias | CAOP 2019 completa para as 48 freguesias (o OSM da app falha 3 e tem 1 minúscula) |
 | 4. Referência de densidade | 17,4 contentores e 10,0 locais públicos por 1 000 habitantes; cobertura por distância |
@@ -185,28 +185,28 @@ A lógica para têxteis (hipótese nossa, a validar): **hotelaria e lares** gera
 
 ### Locais candidatos para recolha de têxteis
 
-Não há fração "reciclável" nem "ecoponto" nos dados, por isso **não** se pode escolher "os ecopontos". O critério (`textile_candidate`) é: local público com pelo menos um contentor de rua (profundidade, superfície ou plataforma). Dá 1 187 locais; 837 com coordenada precisa (os 350 aproximados exigem confirmação no terreno) e 589 com contentor enterrado. `candidate_reason` diz porquê (enterrado, orgânico coletivo a menos de 15 m, 3 ou mais contentores, coordenada aproximada). **É uma lista de lugares possíveis, não de recomendados**: a escolha depende de espaço, tráfego e da passagem da viatura. Nenhum recebe contentor de têxtil: o modo é paragem em local existente ou recolha a pedido.
+Não há fração "reciclável" nem "ecoponto" nos dados, por isso **não** se pode escolher "os ecopontos". O critério (`textile_candidate`) é: local público com pelo menos um contentor de rua (profundidade, superfície ou plataforma). Dá 1 187 locais; 837 com coordenada precisa (os 350 aproximados exigem confirmação no terreno) e 589 com contentor enterrado. `candidate_reason` diz porquê (enterrado, orgânico coletivo a menos de 15 m, 3 ou mais contentores, coordenada aproximada). **É uma lista de lugares possíveis, não de recomendados**: a escolha depende de espaço, tráfego e da passagem da viatura. Nenhum recebe contentor de têxtil: o modo é paragem da viatura de têxtil em local existente.
 
 ### Ranking de freguesias com mais lacuna (estimativa)
 
-Não há têxtil recolhido nem deposição de têxtil por freguesia (só o total de 301,3 t). Por isso a lacuna por freguesia é **estimativa**: o têxtil que ainda vai para o lixo, população INE × 1,235 kg/hab/mês × 12 (43 051 t de RSU × 5,4% da APA, repartidas por habitante). Divide-se pelo número de locais candidatos (+ 1 se houver zero) e ordena-se: toneladas por candidato.
+Não há têxtil recolhido nem deposição de têxtil por freguesia (só o total de 301,3 t). Por isso a lacuna por freguesia é **estimativa**: o têxtil que ainda vai para o lixo, população INE × 1,596 kg/hab/mês × 12 (51 250,6 t de indiferenciado do concelho × 5,86% da APA, repartidas por habitante). Divide-se pelo número de locais candidatos (+ 1 se houver zero) e ordena-se: toneladas por candidato.
 
-Valores com a nova base (21 de outubro de 2026): população × 14,82 kg/hab/ano, iguais aos de `data/processed/municipal_summary.json` regenerado. A ordem não muda face à base antiga, porque o fator é o mesmo em todas as freguesias.
+Valores com a base de 22 de outubro de 2026: população × 19,15 kg/hab/ano (cálculo nosso; confirmar com `data/processed/municipal_summary.json` depois de `just etl`). A ordem não muda face às bases antigas, porque o fator é o mesmo em todas as freguesias.
 
 | # | Freguesia | População | Lacuna (t/ano, estimativa) | Locais candidatos | t por candidato |
 | ---: | --- | ---: | ---: | ---: | ---: |
-| 1 | Lordelo | 3 979 | 59,0 | 1 | 59,0 |
-| 2 | Tabuadelo e São Faustino | 2 415 | 35,8 | 0 | 35,8 |
-| 3 | Serzedo e Calvos | 2 263 | 33,5 | 0 | 33,5 |
-| 4 | Infantas | 1 740 | 25,8 | 0 | 25,8 |
-| 5 | Abação e Gémeos | 2 682 | 39,8 | 3 | 13,3 |
-| 6 | Ronfe | 4 496 | 66,6 | 10 | 6,7 |
-| 7 | Atães e Rendufe | 2 579 | 38,2 | 6 | 6,4 |
-| 8 | Candoso (São Martinho) | 1 234 | 18,3 | 3 | 6,1 |
-| 9 | Moreira de Cónegos | 4 651 | 68,9 | 14 | 4,9 |
-| 10 | Silvares | 2 250 | 33,4 | 7 | 4,8 |
+| 1 | Lordelo | 3 979 | 76,2 | 1 | 76,2 |
+| 2 | Tabuadelo e São Faustino | 2 415 | 46,2 | 0 | 46,2 |
+| 3 | Serzedo e Calvos | 2 263 | 43,3 | 0 | 43,3 |
+| 4 | Infantas | 1 740 | 33,3 | 0 | 33,3 |
+| 5 | Abação e Gémeos | 2 682 | 51,4 | 3 | 17,1 |
+| 6 | Ronfe | 4 496 | 86,1 | 10 | 8,6 |
+| 7 | Atães e Rendufe | 2 579 | 49,4 | 6 | 8,2 |
+| 8 | Candoso (São Martinho) | 1 234 | 23,6 | 3 | 7,9 |
+| 9 | Moreira de Cónegos | 4 651 | 89,1 | 14 | 6,4 |
+| 10 | Silvares | 2 250 | 43,1 | 7 | 6,2 |
 
-As quatro primeiras são as mesmas com poucos registos: **são as freguesias onde o pacote não ajuda** (ou o ficheiro está incompleto, ou não há recolha de rua), e onde a recolha a pedido nos circuitos é a opção natural. Os rácios usam população de 2021, não a atual.
+As quatro primeiras são as mesmas com poucos registos: **são as freguesias onde o pacote não ajuda** (ou o ficheiro está incompleto, ou não há recolha de rua), e onde o saco à porta, recolhido pela viatura de têxtil, é a opção natural. Os rácios usam população de 2021, não a atual.
 
 ## CAOP 2019, OSM e a versão atual
 

@@ -135,6 +135,7 @@ function ScenarioPage() {
                 <Section title={m.plan_title()} description={m.plan_description()}>
                   <CollectionPlanSection
                     plan={result.collection_plan}
+                    kpis={result.kpis}
                     scenarioId={scenario.id}
                     heading={false}
                   />

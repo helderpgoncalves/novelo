@@ -78,14 +78,28 @@ EXTERNAL_REFERENCES: tuple[ExternalReference, ...] = (
 )
 
 # Base do têxtil por desviar do lixo: o único sítio da API com estes números (o ETL tem o seu em
-# scripts/etl/textile_base.py). Fonte: Vitrus, email do mentor de 21 out 2026: em 2025 a Vitrus recolheu 43 051 t de
-# RSU e, pela estatística da APA, 5,4% do RSU é têxtil. O recolhido à parte (301,3 t em 2025) fica fora do RSU.
-VITRUS_RSU_2025_T = 43_051
-APA_TEXTILE_SHARE_OF_RSU = 0.054
+# scripts/etl/textile_base.py). Fontes indicadas pela Vitrus a 22 out 2026 (mentor):
+# - indiferenciado recolhido pela Vitrus em 2025: 43 050,5 t, que são 84,0% do indiferenciado do concelho (Vitrus,
+#   Relatório e Contas 2025, p. 8); o concelho todo é 43 050,5 ÷ 0,840 ≈ 51 250,6 t (cálculo);
+# - têxtil no indiferenciado: 5,86% (APA, RARU 2025, p. 24, indiferenciado nacional de 2025).
+# O recolhido à parte (301,3 t em 2025) fica fora do indiferenciado. Nada disto se escreve à mão: deriva-se aqui.
+VITRUS_RSU_2025_T = 43_050.5
+VITRUS_SHARE_OF_MUNICIPAL_RSU = 0.840
+MUNICIPAL_RSU_2025_T = VITRUS_RSU_2025_T / VITRUS_SHARE_OF_MUNICIPAL_RSU  # 51 250,6 t, estimativa
+APA_TEXTILE_SHARE_OF_RSU = 0.0586
 POPULATION_INE_2021 = 156_830  # Censos 2021 (INE), soma das 48 freguesias
-TEXTILE_IN_RSU_T = share_of_tonnes_t(VITRUS_RSU_2025_T, APA_TEXTILE_SHARE_OF_RSU)  # 2 324,754 t/ano, estimativa
-KG_PER_INHAB_MONTH = kg_per_inhab_month(TEXTILE_IN_RSU_T, POPULATION_INE_2021)  # 1,2353 kg/hab/mês, estimativa
-POTENTIAL_SOURCE_LABEL = "Vitrus (43 051 t de RSU recolhidas em 2025) e APA (5,4% de têxtil no RSU)"
+TEXTILE_IN_RSU_T = share_of_tonnes_t(MUNICIPAL_RSU_2025_T, APA_TEXTILE_SHARE_OF_RSU)  # 3 003,3 t/ano, estimativa
+KG_PER_INHAB_MONTH = kg_per_inhab_month(TEXTILE_IN_RSU_T, POPULATION_INE_2021)  # 1,5958 kg/hab/mês, estimativa
+POTENTIAL_SOURCE_LABEL = (
+    "Vitrus (43 050,5 t de indiferenciado em 2025, 84,0% do concelho: R&C 2025) e APA (5,86% de têxtil no "
+    "indiferenciado: RARU 2025)"
+)
+
+# Custo de tratamento do indiferenciado (Vitrus, 22 out 2026): taxa de gestão de resíduos (TGR) de aterro 40 €/t mais
+# a tarifa da Resinorte 65,64 €/t. Cada tonelada desviada do lixo poupa este valor.
+LANDFILL_TAX_EUR_PER_T = 40.0
+RESINORTE_GATE_FEE_EUR_PER_T = 65.64
+RSU_TREATMENT_EUR_PER_T = LANDFILL_TAX_EUR_PER_T + RESINORTE_GATE_FEE_EUR_PER_T  # 105,64 €/t
 
 # Leitura alternativa, NÃO usada pela Vitrus (o mentor não conhece o plano): só na triangulação da validação.
 PLAN_KG_PER_INHAB_MONTH = 0.7

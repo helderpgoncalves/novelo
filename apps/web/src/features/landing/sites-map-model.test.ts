@@ -15,7 +15,7 @@ describe('mapa dos locais', () => {
     const sites = parseSites(raw);
     expect(sites).toHaveLength(FACTS.municipalDemandSites);
     const total = sites.reduce((s, x) => s + x.t, 0);
-    // Arredondamento a 0,1 t por local: a soma fica a menos de 1% das 2 324,8 t.
+    // Arredondamento a 0,1 t por local: a soma fica a menos de 1% das ≈ 3 003,3 t.
     expect(Math.abs(total - FACTS.residualT) / FACTS.residualT).toBeLessThan(0.01);
   });
 

@@ -21,11 +21,12 @@ sobre os dados reais da Vitrus, e acompanha cada saco de roupa até à fábrica,
 
 ## O problema
 
-Em 2025 a Vitrus recolheu 43 051 t de resíduos urbanos em Guimarães. Segundo a APA, 5,4% disso é têxtil: cerca de 2 324,8 t por ano que vão para o lixo (estimativa).
+Em 2025 Guimarães deitou cerca de 51 250 t ao lixo indiferenciado (a Vitrus recolheu 43 050,5 t, 84,0% do total). Segundo a APA, 5,86% disso é têxtil: cerca de 3 003 t por ano que vão para o lixo (estimativa), a 105,64 € de tratamento por tonelada (Vitrus).
 A recolha seletiva de têxteis é obrigatória desde 1 de janeiro de 2025 e, até 17 de abril de 2028, cada Estado-Membro tem de criar um regime em que os produtores
 pagam a recolha, a triagem e a reciclagem das peças postas à venda a partir da lei nacional (Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14); o têxtil que já está
 nas casas continua anos a pesar no município. O concelho tem 156 830 habitantes (INE, Censos 2021) dispersos por 48 freguesias, o que
 encarece o porta a porta. Contentores de têxtil também não são resposta: a Vitrus não os tem nem os quer, porque o têxtil de contentor chega contaminado e perde a reutilização.
+O saco também não pode ir no camião do lixo (a compactação estraga-o) e não há viaturas livres: a Vitrus indica um meio novo de recolha, uma viatura de têxtil sem compactação.
 
 A pergunta da Vitrus é simples: **como recolher mais têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?**
 O Novelo responde com a camada de decisão: onde investir, que modo de recolha usar em cada zona e quanto custa cada tonelada.
@@ -40,16 +41,20 @@ depende de um pressuposto leva "estimativa". Nada é inventado: sem fonte, não 
 | Têxtil recolhido em 2025 (4 entidades) | **301,3 t**, 0,16 kg por habitante e mês (1,92 kg por habitante e ano) | Vitrus (`dados_textil.xlsx`); duas das quatro entidades enviaram percentagens, não quilos, por isso o destino é em parte estimativa |
 | População do concelho | **156 830** habitantes em 48 freguesias | INE, Censos 2021 (soma das freguesias) |
 | Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus |
-| Rede atual | 40 circuitos, 29 viaturas, 82 localidades, 101 turnos por semana | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`, semana de 21 a 25/09/2026) |
-| RSU recolhido pela Vitrus em 2025 | **43 051 t** | Vitrus (resposta do mentor, 21/10/2026) |
-| Têxtil que ainda vai para o lixo | **≈ 2 324,8 t por ano** = 1,235 kg/hab/mês (43 051 × 5,4%) | **Estimativa**; 5,4% de têxtil no RSU vem da APA, indicado pela Vitrus |
-| Têxtil gerado | **≈ 2 626,0 t por ano** (2 324,8 + 301,3) | **Estimativa** |
-| Captura atual | **≈ 11,5%**; faltam cerca de **2 324,8 t** | **Estimativa** (301,3 ÷ 2 626,0) |
+| Rede atual | 40 circuitos, 29 viaturas, 82 localidades, 101 turnos por semana; nenhuma viatura livre à tarde | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`, semana de 21 a 25/09/2026; resposta do mentor, 22/10/2026) |
+| Indiferenciado recolhido pela Vitrus em 2025 | **43 050,5 t**, 84,0% do concelho | Vitrus, Relatório e Contas 2025, p. 8 |
+| Indiferenciado do concelho | **≈ 51 250,6 t** (43 050,5 ÷ 0,840) | **Estimativa** |
+| Têxtil que ainda vai para o lixo | **≈ 3 003,3 t por ano** = 1,596 kg/hab/mês (51 250,6 × 5,86%) | **Estimativa**; 5,86% de têxtil no indiferenciado vem da APA (RARU 2025, p. 24), base indicada pela Vitrus |
+| Têxtil gerado | **≈ 3 304,6 t por ano** (3 003,3 + 301,3) | **Estimativa** |
+| Captura atual | **≈ 9,1%**; faltam cerca de **3 003,3 t** | **Estimativa** (301,3 ÷ 3 304,6) |
+| Tratamento do indiferenciado em aterro | **105,64 €/t** (40 €/t de taxa de gestão de resíduos + 65,64 €/t da Resinorte) | Vitrus (resposta do mentor, 22/10/2026); custo evitado por tonelada desviada |
+| Depósito | Estaleiro Operacional da Rua das Lameiras, Polvoreira | Vitrus (22/10/2026) |
 | Referência francesa | 4,27 kg/hab/ano contra 1,92 em Guimarães; meta equivalente de 669,7 t | França: Refashion, fonte secundária, **por verificar**; o resto é cálculo |
 
-**Porque mudou a base (21/10/2026).** Usávamos 0,7 kg/hab/mês de um plano municipal (≈ 1 317 t, captura 22,9%). A Vitrus não conhece esse plano e indicou
-os seus próprios números: 43 051 t de RSU e 5,4% de têxtil (APA). As 301,3 t foram recolhidas à parte, fora do RSU, por isso os 5,4% são o têxtil que
-ainda se perde ([respostas da Vitrus](docs/dados/analise-dados-recebidos.md#respostas-da-vitrus-de-21-out-2026)). O ecrã mostra sempre "estimativa".
+**Porque mudou a base, duas vezes.** Usávamos 0,7 kg/hab/mês de um plano municipal (≈ 1 317 t, captura 22,9%), que a Vitrus não conhece. A 21/10/2026 a Vitrus
+indicou 43 051 t × 5,4% (≈ 2 324,8 t, 11,5%). A 22/10/2026 reviu a base: 5,86% (APA, 2025) sobre o indiferenciado do concelho todo, e não só os 84,0% que recolhe.
+As 301,3 t foram recolhidas à parte, fora do indiferenciado, por isso os 5,86% são o têxtil que ainda se perde
+([respostas da Vitrus](docs/dados/analise-dados-recebidos.md#respostas-da-vitrus-de-22-out-2026)). O ecrã mostra sempre "estimativa".
 
 ## O que o Novelo faz
 
@@ -58,7 +63,7 @@ Uma história, do saco ao fio: planear a rede, decidir em linguagem natural, seg
 | Funcionalidade | Onde | Em resumo |
 | --- | --- | --- |
 | **Ponto de partida** | `/` | Os números reais de 2025, a lacuna para o potencial, o destino do recolhido, a comparação com referências e o relógio regulatório |
-| **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, modos e rotas. Otimizador OR-Tools: CP-SAT escolhe pontos e modos, VRP faz as rotas, combinando paragem em local existente (sem contentor novo) e recolha a pedido nos circuitos que já passam. O contentor de rua só entra como referência |
+| **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, modos e rotas. Otimizador OR-Tools: CP-SAT escolhe pontos e modos, VRP faz as rotas, para uma viatura de têxtil nova, sem compactação, que parte do depósito de Polvoreira: saco fechado à porta num dia fixo e paragem em local existente (sem contentor novo). O contentor de rua só entra como referência |
 | **Cenários e comparação** | `/scenarios` | Cada cenário guarda investimento, custo anual, toneladas, €/t, cobertura e toneladas reutilizáveis (estimativa, com a quota de reutilização de 2025); compara-se lado a lado, com fluxos, referência francesa, robustez e incerteza (tornado e Monte Carlo P10/P50/P90). A fronteira de Pareto aparece no ponto de partida. O separador Cobertura dá a matriz por freguesia e tipo de território da diretiva (art. 22.º-C, n.º 9, b)) |
 | **Pressupostos** | `/assumptions` | Cada parâmetro com valor, unidade e origem (Vitrus, plano, pressuposto da equipa) |
 | **Piloto de 3 meses** | `/pilot` | Escolhe 2 a 4 freguesias de maior valor de aprendizagem e calcula o piso de sinal: toneladas mínimas para medir o rejeito |
@@ -71,7 +76,7 @@ Uma história, do saco ao fio: planear a rede, decidir em linguagem natural, seg
 | **Evidência por marca** | `/brands` | Quilos por marca e composição, com o tamanho da amostra |
 | **Relatório RAP/EPR em PDF** | `/reports` | Custo por tipo de território (TIPAU), toneladas por fibra e destino, cenários, método e fontes |
 | **Mapa da rede** | `/map` | Freguesias (CAOP 2019), localidades e camadas dos contentores municipais (não há contentores de têxtil) |
-| **Rede municipal** | `/municipal` | 2 751 contentores municipais de indiferenciado, orgânico e seletivo (**não são de têxteis**) em 6 separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas e qualidade. São a base geográfica: onde o têxtil se perde no lixo e onde a viatura já passa |
+| **Rede municipal** | `/municipal` | 2 751 contentores municipais de indiferenciado, orgânico e seletivo (**não são de têxteis**) em 6 separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas e qualidade. São a base geográfica: onde o têxtil se perde no lixo e onde a viatura de têxtil pode parar |
 | **Dados da Vitrus** | `/circuits`, `/fleet`, `/localities`, `/data-quality` | Circuitos, localidades e alertas de qualidade; a Frota tem calendário da semana tipo (por viatura ou circuito, conflitos reais, exportação `.ics`), mapa e visão geral |
 | **Entrada e contas** | `/login`, `/join` | Login por **magic link** (principal), password ou Google; entrada de evento por **QR** como convidado; confirmação de email; administração de utilizadores e convidados |
 | **Administração de IA** | `/admin/ai` | Modelo por tarefa, reserva, limites, orçamento mensal e custos |
@@ -112,8 +117,9 @@ Ver [IA](docs/engenharia/ia.md) e [Copiloto](docs/engenharia/copiloto.md).
 | --- | --- | --- |
 | **Vitrus Ambiente** | Têxtil recolhido em 2025 por entidade e destino; circuitos, viaturas, localidades e turnos | Recebido, em uso |
 | **Vitrus Ambiente, pacote QGIS de 20/10/2026** | 2 751 contentores **municipais** (indiferenciado, orgânico, seletivo), 2 026 locais e a CAOP 2019 | Recebido; base geográfica do modelo |
-| **Vitrus Ambiente, 21/10/2026** | 43 051 t de RSU em 2025; 5,4% de têxtil (APA); não há contentores de têxtil | Recebido, em uso |
-| **Vitrus Ambiente** | Custos por recolha e quilómetro (pedidos ao departamento financeiro) | **Por receber** |
+| **Vitrus Ambiente, 21/10/2026** | Não há contentores de têxtil; 43 051 t × 5,4% (base substituída a 22/10) | Recebido |
+| **Vitrus Ambiente, 22/10/2026** | Saco fora do compactador e viatura de têxtil nova; nenhuma viatura livre à tarde; 105,64 €/t de tratamento; depósito em Polvoreira; 5,86% (APA) sobre o indiferenciado do concelho (R&C 2025: 43 050,5 t = 84,0%) | Recebido, em uso |
+| **Vitrus Ambiente** | Custos por hora e por quilómetro das viaturas (pedidos ao departamento financeiro) | **Por receber** |
 | **INE** | População por freguesia (Censos 2021) e tipologia TIPAU | Em uso |
 | **CAOP** | Contornos das freguesias (2019, no pacote da Vitrus) | Em uso |
 | **OpenStreetMap** | Localidades geocodificadas dos circuitos (Nominatim) | Em uso (69 das 82; mais 10 no centro da freguesia CAOP pelo nome; 79 com freguesia) |
@@ -272,7 +278,7 @@ Hélder Gonçalves e Flávio Fernandes. O Hack4Guimarães 2035 avalia quatro cri
 | --- | --- | --- |
 | Inovação e originalidade | 25% | IA que conduz o otimizador sem fazer contas; do saco ao fio numa só ferramenta |
 | Viabilidade técnica | 25% | Em produção, dados reais, pressupostos à vista, testes e contrato verificado |
-| Impacto e relevância | 30% | 301,3 t reais, 2 324,8 t estimadas ainda no lixo, RAP criada até abril de 2028 |
+| Impacto e relevância | 30% | 301,3 t reais, 3 003,3 t estimadas ainda no lixo, 105,64 € de tratamento evitado por tonelada, RAP criada até abril de 2028 |
 | Apresentação e potencial de continuidade | 20% | Demo de dois minutos e pedido de um piloto de 3 meses em duas freguesias |
 
 Submissão até 23 de outubro às 17h30; pitches a 26 de outubro.
@@ -283,8 +289,9 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 
 | Limitação | Efeito | Próximo passo |
 | --- | --- | --- |
-| Sem custos unitários da Vitrus (recolha, quilómetro, vida útil) | €/t e custos dependem de pressupostos; mostramos o intervalo (P10-P90) | Pedidos ao departamento financeiro da Vitrus; substituir em `/assumptions` |
-| 5,4% de têxtil no RSU é uma média da APA, não uma caracterização local | Procura de 2 324,8 t e captura de 11,5% são estimativa | Caracterização do lixo por circuito |
+| Sem custos da Vitrus por hora e por quilómetro (nem da viatura de têxtil nova) | €/t e custos dependem de pressupostos; mostramos o intervalo (P10-P90) | Pedidos ao departamento financeiro da Vitrus; substituir em `/assumptions` |
+| 5,86% de têxtil no indiferenciado é a média nacional da APA, não uma caracterização local | Procura de 3 003,3 t e captura de 9,1% são estimativa | Caracterização do lixo por circuito |
+| Sem quilos por mês (sazonalidade) | Modelo anual | A Vitrus só os partilha com o município |
 | Taxas de captura por modo sem dados locais | Todas são pressuposto (já não há contentor de rua para calibrar) | Piloto de 3 meses |
 | Exatidão da triagem por foto por medir | Sem verdade-terreno | `just eval-triage` com 30 ou mais peças |
 | Distâncias em linha reta com fator de desvio 1,3 | Rotas aproximadas; a variável `OSRM_URL` existe mas **não há cliente OSRM** | Integrar um motor de rotas |

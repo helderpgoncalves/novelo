@@ -86,15 +86,15 @@ export function pickSitesReference<T extends RefLike>(
 
 export interface PlanLine {
   parish: string;
-  circuit: string;
   weekday: number;
-  vehicle: string;
+  everyWeeks: number;
+  vehicle: number;
   tonnes: number;
 }
 
 /**
- * As linhas reais «Freguesia · circuito · dia · viatura» do porta a porta, das que mais têxtil desviam (empate: nome).
- * Só entram as que têm circuito, dia e viatura: nada se completa à mão.
+ * As linhas reais «Freguesia · dia · a cada N semanas · viatura» do saco à porta na viatura dedicada, das que mais
+ * têxtil desviam (empate: nome). Só entram as que têm dia e viatura: nada se completa à mão.
  */
 export function planLines(
   plan: readonly CollectionPlanEntry[] | null | undefined,
@@ -102,8 +102,8 @@ export function planLines(
 ): PlanLine[] {
   return (plan ?? [])
     .filter(
-      (p): p is CollectionPlanEntry & { circuit: string; weekday: number; vehicle: string } =>
-        p.channel === 'door_to_door' && !!p.circuit && p.weekday != null && !!p.vehicle,
+      (p): p is CollectionPlanEntry & { weekday: number; vehicle: number } =>
+        p.channel === 'on_demand' && p.weekday != null && p.vehicle != null,
     )
     .sort(
       (a, b) => b.tonnes_year - a.tonnes_year || a.parish_name.localeCompare(b.parish_name, 'pt'),
@@ -111,8 +111,8 @@ export function planLines(
     .slice(0, limit)
     .map((p) => ({
       parish: p.parish_name,
-      circuit: p.circuit,
       weekday: p.weekday,
+      everyWeeks: p.every_weeks,
       vehicle: p.vehicle,
       tonnes: p.tonnes_year,
     }));
@@ -120,7 +120,7 @@ export function planLines(
 
 /**
  * Pontos de uma grelha de 100 que representam uma percentagem: os inteiros cheios e, se sobrar, um ponto a meio.
- * Ex.: 11,5% → 11 cheios e 1 a meio.
+ * Ex.: 9,1% → 9 cheios e 1 a 10%.
  */
 export function waffle(pct: number, cells = 100): { full: number; partial: number } {
   const value = Math.min(Math.max(Number.isFinite(pct) ? pct : 0, 0), 100) * (cells / 100);

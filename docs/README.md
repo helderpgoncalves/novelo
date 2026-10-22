@@ -57,7 +57,7 @@ Tudo o que o pitch afirma assenta aqui. Nenhum número vai para um slide sem lin
 
 | Documento | Para quê |
 | --- | --- |
-| [Análise dos dados recebidos](dados/analise-dados-recebidos.md) | Fontes, qualidade, limites, onde cada dado se usa e as respostas da Vitrus de 21 out 2026 (43 051 t de RSU × 5,4%, sem contentores de têxteis) |
+| [Análise dos dados recebidos](dados/analise-dados-recebidos.md) | Fontes, qualidade, limites, onde cada dado se usa e as respostas da Vitrus de 21 e 22 out 2026 (sem contentores de têxteis; saco fora do compactador e viatura de têxtil nova; 5,86% sobre o indiferenciado do concelho; tratamento a 105,64 €/t) |
 | [Análise dos contentores municipais](dados/analise-contentores-municipais.md) | Pacote QGIS de 20 out (não é de têxteis): campos, problemas e tratamento, cobertura, produtores, candidatos, CAOP 2019, como abrir no QGIS |
 
 ## Marca

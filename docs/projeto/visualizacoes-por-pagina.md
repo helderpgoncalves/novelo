@@ -11,7 +11,7 @@ Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; códi
 **Porque parece aborrecido e confuso (diagnóstico, hipótese).**
 
 1. **22 páginas no menu, sem percurso.** Todas pedem atenção por igual. O júri não sabe por onde começar nem em que ordem ver a prova.
-2. **Tabelas à frente, conclusões escondidas.** Os ecrãs de dados abrem com quadros e KPIs soltos. A conclusão (por exemplo, "só captamos 11,5% do têxtil que se gera") tem de ser deduzida.
+2. **Tabelas à frente, conclusões escondidas.** Os ecrãs de dados abrem com quadros e KPIs soltos. A conclusão (por exemplo, "só captamos 9,1% do têxtil que se gera") tem de ser deduzida.
 3. **Sem referência nem incerteza à vista.** Um número sem "comparado com quê" não diz nada. Os pressupostos e os intervalos existem na API, mas não estão no primeiro olhar.
 4. **Sem home que conte a história.** O ponto de partida é um painel, não um argumento. A história (problema, tensão, relógio de 2028, solução, prova) só existe no pitch.
 
@@ -27,7 +27,7 @@ Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; códi
 
 | # | Entrega | Critério que sobe | Esforço |
 | --- | --- | --- | --- |
-| 1 | Alinhar a procura (2 324,8 t por desviar, 43 051 t × 5,4%) em toda a API e no ecrã ([D02](#5-dependências-de-dados-e-api-em-falta)) | Impacto, viabilidade | S |
+| 1 | Alinhar a procura (3 003,3 t por desviar, 51 250,6 t × 5,86%) em toda a API e no ecrã ([D02](#5-dependências-de-dados-e-api-em-falta)) | Impacto, viabilidade | S |
 | 2 | Home pública com gancho, captura e relógio ([secção 3](#3-a-home-em-detalhe)) | Apresentação, impacto | M |
 | 3 | Cascata "301 t → X t" no detalhe do cenário | Impacto | M |
 | 4 | Intervalo P10–P90 e tornado com origem dos pressupostos à vista | Viabilidade | S |
@@ -45,9 +45,9 @@ Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão 
 | Têxtil recolhido em 2025 | 301,3 t | Vitrus (`dados_textil.xlsx`), registo A1 | Dado Vitrus |
 | População | 156 830 habitantes, 48 freguesias | INE, Censos 2021, registo A3 | Primária |
 | Recolha por habitante | 0,16 kg/hab/mês = 1,92 kg/hab/ano | 301,3 t ÷ 156 830 (A2) | Cálculo |
-| Têxtil ainda no lixo (por captar) | ≈ 2 324,8 t/ano (1,235 kg/hab/mês) | 43 051 t de RSU (Vitrus) × 5,4% (APA), registo A8 | Cálculo, estimativa |
-| Têxtil gerado | ≈ 2 626,0 t/ano | 2 324,8 + 301,3 (A12) | Cálculo, estimativa |
-| Captura atual | 11,5% | 301,3 ÷ 2 626,0 (A9) | Cálculo, estimativa |
+| Têxtil ainda no lixo (por captar) | ≈ 3 003,3 t/ano (1,596 kg/hab/mês) | 51 250,6 t de indiferenciado do concelho (Vitrus) × 5,86% (APA), registo A8 | Cálculo, estimativa |
+| Têxtil gerado | ≈ 3 304,6 t/ano | 3 003,3 + 301,3 (A12) | Cálculo, estimativa |
+| Captura atual | 9,1% | 301,3 ÷ 3 304,6 (A9) | Cálculo, estimativa |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus, registo A4 (duas entidades estimadas, A5) | Dado Vitrus |
 | Operação atual | 40 circuitos, 29 viaturas, 82 localidades (79 com freguesia CAOP 2019), 101 turnos, 9 circuitos sem viatura, 2 viaturas nunca atribuídas | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`), registo A6, A7 | Dado Vitrus |
 | Alertas de qualidade | 12 | Vitrus, registo A13 | Dado Vitrus |
@@ -71,8 +71,8 @@ Um decisor (a câmara, a Vitrus, o júri) não lê gráficos: **procura uma resp
 | # | Princípio | Origem | Regra no Novelo | Teste de 10 segundos |
 | --- | --- | --- | --- | --- |
 | 1 | **Uma mensagem por visual** | Knaflic: começar pela audiência e pelo que ela deve fazer; escolher o gráfico depois [R2] | Cada visual responde a uma só pergunta e acaba numa grandeza de impacto (t, €/t, cobertura) | Alguém lê o título e diz a conclusão sem olhar para o gráfico |
-| 2 | **Título-conclusão** | Prática de redações como o FT e o OWID: o título afirma, o subtítulo explica [R3] [R4] | Título = frase com número ("Captamos 11,5% do têxtil"); subtítulo = o que se mede e o ano; nunca "Gráfico de captura" | O título contém um verbo e um número |
-| 3 | **Comparar com algo** | Tufte: "Compared to what?" [R1] | Todo o valor leva uma referência: têxtil gerado (2 626 t), França (4,27 kg/hab), cenário A, limiar, ano anterior | Há uma linha, uma marca ou uma sombra de referência |
+| 2 | **Título-conclusão** | Prática de redações como o FT e o OWID: o título afirma, o subtítulo explica [R3] [R4] | Título = frase com número ("Captamos 9,1% do têxtil"); subtítulo = o que se mede e o ano; nunca "Gráfico de captura" | O título contém um verbo e um número |
+| 3 | **Comparar com algo** | Tufte: "Compared to what?" [R1] | Todo o valor leva uma referência: têxtil gerado (3 305 t), França (4,27 kg/hab), cenário A, limiar, ano anterior | Há uma linha, uma marca ou uma sombra de referência |
 | 4 | **Anotar no gráfico** | Knaflic: focar a atenção com cor e anotações [R2] | Máximo de três anotações por visual, junto ao ponto, em Inter 13 px; a seta aponta o que mudou | Não é preciso procurar a legenda |
 | 5 | **Retirar tinta inútil** | Tufte: razão dados-tinta e *chartjunk* [R1] [R5] | Sem grelhas pesadas, sem 3D, sem sombras, sem legendas se a rotulagem direta couber | Apagar um elemento não muda a leitura |
 | 6 | **Pequenos múltiplos para comparar** | Tufte: mesmas escalas e eixos, vistas lado a lado [R1] [R6] | Comparar freguesias, modos e cenários com painéis iguais, não com cores a mais num só gráfico | Os painéis partilham a escala |
@@ -154,21 +154,21 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | --- | --- |
 | **Objetivo / pergunta do júri** | "Qual é o problema e que dados reais o provam?" |
 | **Critérios** | Impacto (30%), viabilidade (dados reais) |
-| **Mensagem** | "Guimarães recolheu 301,3 t em 2025. Ficaram no lixo cerca de 2 324,8 t: captamos 11,5%." |
+| **Mensagem** | "Guimarães recolheu 301,3 t em 2025. Ficaram no lixo cerca de 3 003,3 t: captamos 9,1%." |
 | **Prioridade / esforço** | **P0** / M |
 
 | # | Visual | Tipo | Dados | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | **Captura face ao potencial**: barra única, 11,5% cheia a Tinta, o resto hachurado ("≈ 2 324,8 t ainda no lixo"), marca da meta francesa (669,7 t, "referência, por verificar") | Bullet | `GET /textile/baseline` (`total_t`, `estimated_demand_t`, `capture_of_demand_pct`); meta de `GET /planning/benchmarks` | Parcial (`capture-bar`), D02 |
+| 1 | **Captura face ao potencial**: barra única, 9,1% cheia a Tinta, o resto hachurado ("≈ 3 003,3 t ainda no lixo"), marca da meta francesa (669,7 t, "referência, por verificar") | Bullet | `GET /textile/baseline` (`total_t`, `estimated_demand_t`, `capture_of_demand_pct`); meta de `GET /planning/benchmarks` | Parcial (`capture-bar`), D02 |
 | 2 | **Para onde vai cada tonelada**: entidades → reutilização, reciclagem, rejeito; fios das duas entidades estimadas a tracejado | Sankey | `GET /textile/flows` | Existe (`flows-sankey`) |
 | 3 | **Composição do indiferenciado**: onde está o têxtil que não recolhemos | Barra empilhada a 100% | `GET /textile/waste` | Existe (`waste-composition`) |
 | 4 | **Recolha por entidade e método**: pesado contra percentagem | Lollipop ordenado | `EntityBaseline.method` em `GET /textile/baseline` | Parcial (tabela) |
 
-- **Momento "uau":** a barra de captura enche até 11,5% e o resto aparece hachurado com "≈ 2 324,8 t ainda no lixo". Dez segundos para perceber o problema.
+- **Momento "uau":** a barra de captura enche até 9,1% e o resto aparece hachurado com "≈ 3 003,3 t ainda no lixo". Dez segundos para perceber o problema.
 - **Interações:** passar o rato num destino do Sankey destaca as entidades de origem e filtra a tabela (cross-highlight); clicar numa entidade mostra o método (pesado ou estimado) e a origem do ficheiro.
 - **Estado vazio inteligente:** "Os ficheiros da Vitrus ainda não foram importados" com botão "Correr importação" para administradores; para os restantes, "Dados em atualização. Última importação: [data]".
-- **Microcópia:** título "Captamos 11,5% do têxtil que Guimarães produz". Subtítulo "301,3 t recolhidas em 2025; ≈ 2 324,8 t ainda no lixo (43 051 t de RSU × 5,4% da APA, estimativa)".
-- **Não pôr:** cinco KPIs sem hierarquia; a tabela de entidades à frente (vai para o separador); o 5,4% do indiferenciado (por verificar, A10).
+- **Microcópia:** título "Captamos 9,1% do têxtil que Guimarães produz". Subtítulo "301,3 t recolhidas em 2025; ≈ 3 003,3 t ainda no lixo (51 250,6 t de indiferenciado do concelho × 5,86% da APA, estimativa)".
+- **Não pôr:** cinco KPIs sem hierarquia; a tabela de entidades à frente (vai para o separador); os 5,86% do indiferenciado sem a fonte (APA, A10).
 
 #### 2.2.2 Mapa (`/map`)
 
@@ -217,9 +217,9 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 | | |
 | --- | --- |
-| **Pergunta do júri** | "A operação existente aguenta recolha a pedido sem km novos?" |
+| **Pergunta do júri** | "O que faz hoje a operação da Vitrus?" (contexto: a 22 out a Vitrus disse que o têxtil não pode ir nestes circuitos nem há viaturas livres à tarde) |
 | **Critérios** | Viabilidade, impacto |
-| **Mensagem** | "40 circuitos já passam por 82 localidades; 9 não têm viatura atribuída." |
+| **Mensagem** | "40 circuitos já passam por 82 localidades." (Os 9 "sem viatura" eram um erro da folha de turnos, Vitrus, 22 out.) |
 | **Prioridade / esforço** | P1 / S |
 
 | # | Visual | Tipo | Dados | Estado |
@@ -228,7 +228,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | 2 | **Circuitos por tipologia**, com a parte sem viatura | Barra empilhada | `CircuitsSummary` | Existe (`typology-summary`) |
 | 3 | **Localidades candidatas a recolha a pedido** (≥ 2 passagens por semana, parâmetro `piggyback_min_days`) | Pontos sobre mapa | `GET /network/localities` (`days_per_week`) | Novo |
 
-- **Momento "uau":** acender no mapa as localidades onde o camião já passa duas vezes por semana: "aqui a recolha a pedido não custa km novos".
+- ~~**Momento "uau":** acender no mapa as localidades onde o camião já passa duas vezes por semana: "aqui a recolha a pedido não custa km novos".~~ Invalidado a 22 out: o saco não pode ir no compactador (registo A21).
 - **Interações:** clicar num circuito destaca as suas localidades no mapa; filtro por tipologia partilhado com Frota e Localidades.
 - **Estado vazio:** "Sem circuitos importados" com ligação à Qualidade dos dados.
 - **Não pôr:** a tabela completa à frente (vai para "Ver dados").
@@ -309,7 +309,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 - **Momento "uau":** arrastar o orçamento e ver o ponto deslizar na fronteira, o mapa e os €/t responderem em menos de um segundo (resultados pré-calculados numa grelha com `SOLVER_TIME_LIMIT_S`; fora da grelha, "a calcular" com tempo máximo à vista).
 - **Interações:** controlo de orçamento com teclas de seta; botão "Comparar com o cenário A"; restrições avançadas num painel fechado.
-- **Estado vazio / erro:** "Define um orçamento para ver o resultado". Objetivo inviável: "A meta está acima do teto do modelo sem contentores (597,7 t). Experimenta fixar o orçamento."
+- **Estado vazio / erro:** "Define um orçamento para ver o resultado". Objetivo inviável: "A meta está acima do teto do modelo sem contentores (772,1 t). Experimenta fixar o orçamento."
 - **Microcópia:** botão "Calcular o melhor plano"; aviso "Custos unitários: pressupostos até a Vitrus enviar os reais".
 - **Não pôr:** doze campos à frente; "solver status" em linguagem técnica (traduzir: "ótimo", "melhor encontrado em 20 s").
 
@@ -623,7 +623,7 @@ A rota `/` passa a ser uma **home pública e de leitura**, que conta a história
 
 ```mermaid
 flowchart LR
-    A["1. Gancho<br/>301,3 t"] --> B["2. Problema<br/>11,5% do têxtil"]
+    A["1. Gancho<br/>301,3 t"] --> B["2. Problema<br/>9,1% do têxtil"]
     B --> C["3. Tensão<br/>1,92 contra 4,27 kg/hab"]
     C --> D["4. Relógio<br/>543 dias até 17 abr 2028"]
     D --> E["5. Solução<br/>de 301 t a X t"]
@@ -634,8 +634,8 @@ flowchart LR
 | # | Secção | Título-conclusão | Visual | Dados | Fonte |
 | --- | --- | --- | --- | --- | --- |
 | 1 | **Gancho** | "Recolhemos 301 toneladas de têxtil em 2025." Subtítulo: "1,92 kg por habitante, por ano." | Contador grande (Newsreader) + símbolo de três fios | 301,3 t; 156 830 hab. | Vitrus; INE (A1, A2, A3) |
-| 2 | **Problema** | "Era cerca de um nono do têxtil que Guimarães gera." | Barra de captura 11,5% + barra de destino 59,4 / 26,5 / 14,1% | 2 324,8 t; 11,5%; destino | A8, A9 (estimativa), A4 |
-| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo sem contentores 597,7 t (estimativa, 22 out 2026) contra a meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
+| 2 | **Problema** | "Era cerca de um em cada onze quilos do têxtil que Guimarães gera." | Barra de captura 9,1% + barra de destino 59,4 / 26,5 / 14,1% | 3 003,3 t; 9,1%; destino | A8, A9 (estimativa), A4 |
+| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo sem contentores 772,1 t (estimativa, 22 out 2026) acima da meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
 | 4 | **Relógio regulatório** | "Desde 2025 paga o município. Em 543 dias a RAP tem de existir, e só cobre as peças postas à venda a partir daí." | Linha do tempo 1 jan 2025 → hoje → 17 abr 2028; depois, a faixa do município vai clareando (sem número: a idade das peças não se conhece) | Datas | Diretiva 2008/98/CE e RGGR [F81] [F69]; Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] [F2] |
 | 5 | **Solução** | "Novelo diz onde investir, como recolher e quanto custa cada tonelada." | Cascata 301,3 t → [X] t, com intervalo de €/t | Cenário B | Otimizador (estimativa) |
 | 6 | **Prova** | "Aberto, não prometido." | Três cartões: QR do lote, verificador de números, relatório RAP | Lote de demonstração (com selo), cenário B | Produto |
@@ -662,16 +662,16 @@ Grelha de 12 colunas, largura útil de 1200 px, margens de 120 px. Secções com
 │                                                                    ↓ Role                    │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 2 PROBLEMA                                                                            (80vh) │
-│   Era cerca de um nono do têxtil que Guimarães gera.                                         │
+│   Era cerca de um em cada onze quilos do têxtil que Guimarães gera.                          │
 │   ██████████▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒   │
-│   301,3 t (11,5%)            ≈ 2 324,8 t ainda no lixo (gerado ≈ 2 626 t, estimativa)        │
+│   301,3 t (9,1%)             ≈ 3 003,3 t ainda no lixo (gerado ≈ 3 305 t, estimativa)        │
 │   Destino do que recolhemos:  ████ Reutilização 59,4% │ ███ Reciclagem 26,5% │ ▌Rejeito 14,1%│
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 3 TENSÃO                                                                              (80vh) │
 │   Mais contentores não chegam.            ┌────────────────────────────────────────────┐     │
 │   Sem custo por tonelada a conta          │ Guimarães   ██████ 1,92 kg/hab/ano         │     │
 │   não fecha.                              │ França      ██████████████ 4,27 (por verificar)    │
-│                                           │ Meta 669,7 t ┊ teto do modelo 597,7 t      │     │
+│                                           │ Meta 669,7 t ┊ teto do modelo 772,1 t      │     │
 │                                           └────────────────────────────────────────────┘     │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 4 RELÓGIO                                                                             (80vh) │
@@ -724,11 +724,11 @@ Coluna única, margens de 20 px, barra de CTA fixa em baixo (56 px). Números gr
 │ Fonte: Vitrus; INE ⓘ       │
 │            ↓               │
 ├────────────────────────────┤
-│ Era cerca de um nono do    │
-│ têxtil que se gera.        │
+│ Era cerca de um em cada    │
+│ onze quilos que se geram.  │
 │ ███▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒   │
-│ 301,3 t · 11,5%            │
-│ ≈ 2 325 t ainda no lixo    │
+│ 301,3 t · 9,1%             │
+│ ≈ 3 003 t ainda no lixo    │
 │ Destino: 59,4 reutiliz.    │
 │ 26,5 reciclagem 14,1 rejeit│
 ├────────────────────────────┤
@@ -770,7 +770,7 @@ Princípio: **animar só quando o movimento revela uma relação ou uma ordem**.
 | Animação | O que revela | Duração e gatilho | Em movimento reduzido | Esforço |
 | --- | --- | --- | --- | --- |
 | **Contador** 0 → 301,3 t | A grandeza do ponto de partida | 1,2 s, uma vez, ao entrar no ecrã | Valor final | S |
-| **Enchimento da barra de captura** até 11,5% | A fração que captamos; depois o resto hachurado aparece | 0,8 s, uma vez | Barra final | S |
+| **Enchimento da barra de captura** até 9,1% | A fração que captamos; depois o resto hachurado aparece | 0,8 s, uma vez | Barra final | S |
 | **Fios do símbolo** a desenhar-se | A marca (três fios, abertos em cima) | 1,5 s, uma vez, no gancho | Símbolo final | S |
 | **Revelação da cascata** | Cada degrau (+locais existentes, +a pedido) é um modo de recolha; a ordem é a ordem do raciocínio | 0,4 s por degrau, ligada ao *scroll* | Cascata completa | M |
 | **Relógio regulatório** | Distância entre hoje e 17 de abril de 2028: a linha avança de 1 de janeiro de 2025 até hoje; o número de dias muda **uma vez por dia**, sem segundos a contar | 1,5 s, uma vez | Estado final | S |
@@ -796,7 +796,7 @@ Um visual construído **uma vez**, com dados e título-conclusão num só módul
 | Visual | App | Relatório RAP (secção) | Slide | Formato de exportação | Esforço |
 | --- | --- | --- | --- | --- | --- |
 | Contador 301,3 t | Home, Ponto de partida | Resumo | 1, 2 | Número em SVG de texto | S |
-| Bullet de captura 11,5% | Home, Ponto de partida | Resumo | 2 | SVG | S |
+| Bullet de captura 9,1% | Home, Ponto de partida | Resumo | 2 | SVG | S |
 | Sankey do saco ao fio | Ponto de partida, Triagem | Material recolhido | 4, 5 | SVG | M |
 | 1,92 contra 4,27 kg/hab | Home, Cobertura | Resumo (nota de referência) | 3 | SVG | S |
 | Cascata 301 → [T] t | Detalhe do cenário, Home | Resumo | 4, 8 | SVG | M |
@@ -829,7 +829,7 @@ Cada linha diz o que falta, onde, e se **bloqueia um P0**. Os campos já existen
 | ID | Visual que depende | O que falta | Onde | Bloqueia P0? | Esforço |
 | --- | --- | --- | --- | --- | --- |
 | **D01** | Home | Endpoint **público** agregado (301,3 t, 156 830 hab., destino, potencial, número de circuitos, viaturas, localidades, freguesias). Hoje todas as rotas de dados exigem sessão | API nova, `GET /public/story` | **Sim** | S |
-| **D02** | Ponto de partida, Home, Cobertura | **Harmonizar a procura** com a nova base (21 out 2026): 43 051 t × 5,4% = 2 324,8 t por desviar, derivada de constantes num só sítio no ETL e na API (antes havia 1 312,7 t na API e 1 317 t nos docs) | ETL / `dados-e-modelo.md` | **Sim** (o júri compara números) | S |
+| **D02** | Ponto de partida, Home, Cobertura | **Harmonizar a procura** com a nova base (22 out 2026): 51 250,6 t × 5,86% ≈ 3 003,3 t por desviar, derivada de constantes num só sítio no ETL e na API (antes havia 1 312,7 t na API e 1 317 t nos docs) | ETL / `dados-e-modelo.md` | **Sim** (o júri compara números) | S |
 | **D03** | Simulador (fronteira) | Curva orçamento → toneladas: grelha pré-calculada de orçamentos com sementes fixas, ou endpoint | API, `POST /planning/frontier` | Não (P1) | L |
 | **D04** | Simulador (cascata de custos) | Separar o custo anual em investimento anualizado, recolhas e quilómetros. Hoje há `capex_eur`, `opex_eur_year` e `km_year` | `Kpis` / `domain/costs.py` | Não | S |
 | **D05** | Detalhe do cenário (cascata de toneladas) | Confirmar se `tonnes_year` **inclui** as 301,3 t atuais; sem isso a cascata engana. Contribuição incremental por modo | `ScenarioResult.modes` | **Sim** | S |
@@ -891,7 +891,7 @@ Antes de dar um visual por pronto, todos têm de ser "sim":
 - **Radar, mostradores semicirculares, 3D, torta com mais de quatro fatias:** não servem nenhuma pergunta do júri.
 - **Animação decorativa:** partículas, *parallax*, carrosséis automáticos.
 - **Gráficos em Utilizadores e Conta:** não sobem nenhum critério.
-- **Números sem fonte** e **percentagens do plano municipal por verificar** (5,4%, "4 de 27") em qualquer visual de página pública.
+- **Números sem fonte** e **percentagens do plano municipal por verificar** ("4 de 27") em qualquer visual de página pública.
 
 ---
 

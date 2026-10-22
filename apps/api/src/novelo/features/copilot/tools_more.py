@@ -213,7 +213,8 @@ async def explain_scenario_difference(box: "CopilotTools", args: ScenarioDiffArg
     rows = []
     for code in sorted(set(pa) | set(pb)):
         x, y = pa.get(code), pb.get(code)
-        ta, tb = (x.tonnes if x else 0.0), (y.tonnes if y else 0.0)
+        # a 2 casas, como na tabela: a diferença mostrada é a das duas colunas mostradas
+        ta, tb = round(x.tonnes if x else 0.0, 2), round(y.tonnes if y else 0.0, 2)
         ca, cb = (x.annual_cost_eur if x else 0.0), (y.annual_cost_eur if y else 0.0)
         mode_a = x.mode.value if x and x.mode else None
         mode_b = y.mode.value if y and y.mode else None
