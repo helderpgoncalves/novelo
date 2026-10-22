@@ -53,9 +53,9 @@ Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão 
 | Alertas de qualidade | 12 | Vitrus, registo A13 | Dado Vitrus |
 | Referência francesa | 4,27 kg/hab/ano; 1 ponto por 1 414 habitantes | Refashion via imprensa, registo C1, C2 | **Por verificar** (secundária) |
 | Meta francesa e teto do modelo | 669,7 t; 562,6 t (107,1 t de distância) | Cálculo nosso ([dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês)) | Cálculo, depende da França |
-| Obrigação do município | Desde 1 de janeiro de 2025 | Diretiva (UE) 2025/1892 e RGGR [F1] [F2] | Primária |
-| RAP em Portugal | 17 de abril de 2028 | Diretiva (UE) 2025/1892 [F1] | Primária |
-| Dias até 17 de abril de 2028 | 546 (a 19 de outubro de 2026); 539 (a 26 de outubro) | Cálculo | Cálculo |
+| Obrigação do município | Desde 1 de janeiro de 2025 | Diretiva 2008/98/CE, art. 11.º, n.º 1 (alterada pela Diretiva (UE) 2018/851) e RGGR, art. 36.º [F81] [F69] [F2]; **não** vem da Diretiva (UE) 2025/1892 | Primária |
+| Prazo para criar a RAP em Portugal | 17 de abril de 2028; cobre as peças postas à venda a partir da lei nacional, o mais tardar dessa data | Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] (registo B4, B17) | Primária; leitura do n.º 11 a confirmar com a APA |
+| Dias até 17 de abril de 2028 | 543 (a 22 de outubro de 2026); 539 (a 26 de outubro). Mede o prazo para o regime existir, não o dia em que os produtores pagam tudo | Cálculo | Cálculo |
 | Exemplo de €/t | 122,7 €/t; P10 92,5, P50 123,8, P90 164,7 (cenário de 60 000 €/ano) | Modelo ([dados e modelo](../engenharia/dados-e-modelo.md#sensibilidade-tornado-e-monte-carlo)) | **Estimativa** |
 | Piso de sinal do piloto | 1,71 t em 3 meses (2 freguesias × 2 modos) | Modelo (`domain/pilot.py`) | **Estimativa** |
 | Cenário B: X t a Y €/t | por preencher a 22 de outubro | Otimizador | **Estimativa** |
@@ -305,7 +305,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | --- | --- | --- | --- | --- |
 | 1 | **Fronteira orçamento → toneladas** com o ponto atual a deslizar e o "joelho" assinalado ("a partir daqui cada 10 000 € rende menos") | Linha com ponto | Novo `POST /planning/frontier` ou grelha pré-calculada (20 a 200 mil €), D03 | Novo |
 | 2 | **Para onde vai o dinheiro**: investimento anualizado + recolhas + quilómetros | Cascata | `Kpis` (`capex_eur`, `opex_eur_year`, `km_year`), D04 | Parcial |
-| 3 | **Toneladas por modo** (existentes, rua, a pedido) | Barras horizontais com `ModeSummary` | `ScenarioResult.modes` | Existe (`mode-summary`) |
+| 3 | **Toneladas por modo** (locais existentes, a pedido; rua só como referência) | Barras horizontais com `ModeSummary` | `ScenarioResult.modes` | Existe (`mode-summary`) |
 
 - **Momento "uau":** arrastar o orçamento e ver o ponto deslizar na fronteira, o mapa e os €/t responderem em menos de um segundo (resultados pré-calculados numa grelha com `SOLVER_TIME_LIMIT_S`; fora da grelha, "a calcular" com tempo máximo à vista).
 - **Interações:** controlo de orçamento com teclas de seta; botão "Comparar com o cenário A"; restrições avançadas num painel fechado.
@@ -343,12 +343,12 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 | # | Visual | Tipo | Dados | Estado |
 | --- | --- | --- | --- | --- |
-| 1 | **De 301,3 t para [T] t**: hoje, mais rua, mais pontos existentes, mais a pedido | Cascata | `Kpis.baseline_observed_t`, `ModeSummary.tonnes`, D05 | Novo |
+| 1 | **De 301,3 t para [T] t**: hoje, mais locais existentes sem contentor novo, mais recolha a pedido nos circuitos | Cascata | `Kpis.baseline_observed_t`, `ModeSummary.tonnes`, D05 | Novo |
 | 2 | **Quão certo é o €/t**: P10–P50–P90 numa linha, com o limiar e `prob_below_threshold` | Intervalo | `POST /planning/scenarios/{id}/sensitivity` (`eur_per_tonne`, `QuantilesOut`) | Existe (`uncertainty-panel`) |
 | 3 | **O que mais pesa**: barras do tornado, cor pela origem (plano, Vitrus, pressuposto), "3 dos 5 maiores são pressupostos sem dado" | Tornado | `tornado[]` (`swing_eur_per_tonne`, `source`) | Existe (`tornado-chart`) |
 | 4 | **Mapa do cenário e fluxo previsto** | Coroplético + Sankey | `allocations`, `GET /planning/scenarios/{id}/flows` | Existe (`scenario-map`) |
 
-- **Momento "uau":** a cascata revela-se degrau a degrau (301 → +rua → +pontos → +a pedido) e termina no intervalo. É o slide 4 da demo.
+- **Momento "uau":** a cascata revela-se degrau a degrau (301 → +locais existentes → +a pedido) e termina no intervalo. É o slide 4 da demo.
 - **Interações:** passar o rato numa barra do tornado mostra "se este pressuposto subir 30%, o €/t passa de [A] para [B]"; clicar numa freguesia no mapa destaca a linha da tabela de alocações; *brush* sobre o intervalo escolhe o limiar.
 - **Estado vazio / em cálculo:** "O otimizador está a trabalhar (máximo [N] s)". Sem sensibilidade: botão "Calcular incerteza (500 amostras)".
 - **Microcópia:** "Estimativa: custos unitários são pressupostos até a Vitrus enviar os reais."
@@ -528,7 +528,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | --- | --- | --- | --- | --- |
 | 1 | **Pré-visualização do PDF**, página a página | Miniaturas | `POST /reports/rap`, D13 | Novo |
 | 2 | **€/t por tipo de território** (urbano, mediamente urbano, rural) com intervalo | Pontos com barras de erro | Dados do relatório (TIPAU) | Parcial (só no PDF, em tabela) |
-| 3 | **Quem paga em 2028**: hoje o município paga sozinho; depois, só custos economicamente eficientes | Diagrama de dois estados | Texto jurídico (art. 22.º-A n.º 12), sem números | Novo (P1) |
+| 3 | **Quem paga em 2028**: hoje o município paga sozinho; com a RAP, os produtores pagam o custo eficiente das peças postas à venda a partir da lei nacional e o município uma parte que vai descendo; o custo eficiente fixa-se com as autoridades locais | Diagrama de três estados | Texto jurídico (art. 22.º-A n.º 7, 11 e 12), sem números | Novo (P1) |
 
 - **Momento "uau":** um clique, e o PDF desenha-se página a página; ao lado, o `sha256` e a data dos parâmetros: reproduzível.
 - **Estado vazio:** "Ainda não geraste nenhum relatório" com botão "Gerar com o cenário B".
@@ -625,7 +625,7 @@ A rota `/` passa a ser uma **home pública e de leitura**, que conta a história
 flowchart LR
     A["1. Gancho<br/>301,3 t"] --> B["2. Problema<br/>11,5% do têxtil"]
     B --> C["3. Tensão<br/>1,92 contra 4,27 kg/hab"]
-    C --> D["4. Relógio<br/>546 dias até 17 abr 2028"]
+    C --> D["4. Relógio<br/>543 dias até 17 abr 2028"]
     D --> E["5. Solução<br/>de 301 t a X t"]
     E --> F["6. Prova<br/>QR, verificador, RAP"]
     F --> G["7. CTA<br/>Piloto de 3 meses"]
@@ -636,7 +636,7 @@ flowchart LR
 | 1 | **Gancho** | "Recolhemos 301 toneladas de têxtil em 2025." Subtítulo: "1,92 kg por habitante, por ano." | Contador grande (Newsreader) + símbolo de três fios | 301,3 t; 156 830 hab. | Vitrus; INE (A1, A2, A3) |
 | 2 | **Problema** | "Era cerca de um nono do têxtil que Guimarães gera." | Barra de captura 11,5% + barra de destino 59,4 / 26,5 / 14,1% | 2 324,8 t; 11,5%; destino | A8, A9 (estimativa), A4 |
 | 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo 562,6 t contra a meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
-| 4 | **Relógio regulatório** | "Desde 2025 paga o município. Em 546 dias entram os produtores, mas só pagam custos eficientes." | Linha do tempo 1 jan 2025 → hoje → 17 abr 2028 | Datas | Diretiva (UE) 2025/1892 [F1] [F2] |
+| 4 | **Relógio regulatório** | "Desde 2025 paga o município. Em 543 dias a RAP tem de existir, e só cobre as peças postas à venda a partir daí." | Linha do tempo 1 jan 2025 → hoje → 17 abr 2028; depois, a faixa do município vai clareando (sem número: a idade das peças não se conhece) | Datas | Diretiva 2008/98/CE e RGGR [F81] [F69]; Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] [F2] |
 | 5 | **Solução** | "Novelo diz onde investir, como recolher e quanto custa cada tonelada." | Cascata 301,3 t → [X] t, com intervalo de €/t | Cenário B | Otimizador (estimativa) |
 | 6 | **Prova** | "Aberto, não prometido." | Três cartões: QR do lote, verificador de números, relatório RAP | Lote de demonstração (com selo), cenário B | Produto |
 | 7 | **CTA** | "Pedimos três meses e duas freguesias." | Botões: "Abrir o simulador" e "Ver o relatório RAP"; linha do piloto (piso de 1,71 t, estimativa) | `PilotOut` | Modelo |
@@ -675,16 +675,16 @@ Grelha de 12 colunas, largura útil de 1200 px, margens de 120 px. Secções com
 │                                           └────────────────────────────────────────────┘     │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 4 RELÓGIO                                                                             (80vh) │
-│   Em 546 dias entram os produtores. Só pagam custos economicamente eficientes.               │
+│   Em 543 dias a RAP tem de existir. Os produtores pagam o custo eficiente das peças novas.   │
 │   1 jan 2025 ●━━━━━━━━━━━━━━━━━━━━ hoje ◉ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ─ ● 17 abr 2028        │
-│   obrigação do município              546 dias                      RAP em Portugal          │
-│   Quem prova o custo eficiente? Novelo.        Fonte: Diretiva (UE) 2025/1892, art. 22.º-A   │
+│   obrigação do município              543 dias                      RAP criada               │
+│   Quem prova o custo eficiente? Novelo.   Fonte: Dir. (UE) 2025/1892, art. 22.º-A n.º 11, 14 │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 5 SOLUÇÃO                                                                             (90vh) │
 │   Onde investir, como recolher e quanto custa cada tonelada.                                 │
 │   ┌─────────────────────────────────────────┐   ┌─────────────────────────────────────┐   │
 │   │ Cascata (t):                            │   │ €/t [Y] (estimativa)                │   │
-│   │ hoje 301,3 ▌+rua ▌+pontos ▌+a pedido    │   │ P10 ────●──── P90                   │   │
+│   │ hoje 301,3 ▌+existentes ▌+a pedido      │   │ P10 ────●──── P90                   │   │
 │   │ = [X] t                                 │   │ ex.: 92,5 … 123,8 … 164,7           │   │
 │   └─────────────────────────────────────────┘   └─────────────────────────────────────┘   │
 │   Orçamento [━━━━●━━━━] 60 000 €/ano        [Experimentar no simulador]                      │
@@ -738,17 +738,17 @@ Coluna única, margens de 20 px, barra de CTA fixa em baixo (56 px). Números gr
 │ França    ████▌ 4,27 *     │
 │ * por verificar            │
 ├────────────────────────────┤
-│ Em 546 dias entram os      │
-│ produtores.                │
+│ Em 543 dias a RAP tem de   │
+│ existir (peças novas).     │
 │ ● 1 jan 2025               │
 │ ┃  obrigação do município  │
 │ ◉ hoje                     │
-│ ┊  546 dias                │
+│ ┊  543 dias                │
 │ ● 17 abr 2028  RAP         │
 ├────────────────────────────┤
 │ Onde investir e quanto     │
 │ custa cada tonelada.       │
-│ 301 ▐ +rua ▐ +pontos ▐     │
+│ 301 ▐ +existentes ▐        │
 │ +a pedido = [X] t          │
 │ [Y] €/t · estimativa       │
 ├────────────────────────────┤
@@ -772,7 +772,7 @@ Princípio: **animar só quando o movimento revela uma relação ou uma ordem**.
 | **Contador** 0 → 301,3 t | A grandeza do ponto de partida | 1,2 s, uma vez, ao entrar no ecrã | Valor final | S |
 | **Enchimento da barra de captura** até 11,5% | A fração que captamos; depois o resto hachurado aparece | 0,8 s, uma vez | Barra final | S |
 | **Fios do símbolo** a desenhar-se | A marca (três fios, abertos em cima) | 1,5 s, uma vez, no gancho | Símbolo final | S |
-| **Revelação da cascata** | Cada degrau (+rua, +pontos, +a pedido) é um modo de recolha; a ordem é a ordem do raciocínio | 0,4 s por degrau, ligada ao *scroll* | Cascata completa | M |
+| **Revelação da cascata** | Cada degrau (+locais existentes, +a pedido) é um modo de recolha; a ordem é a ordem do raciocínio | 0,4 s por degrau, ligada ao *scroll* | Cascata completa | M |
 | **Relógio regulatório** | Distância entre hoje e 17 de abril de 2028: a linha avança de 1 de janeiro de 2025 até hoje; o número de dias muda **uma vez por dia**, sem segundos a contar | 1,5 s, uma vez | Estado final | S |
 | **Fio do Sankey que engrossa** (triagem) | Cada peça confirmada contribui para o fluxo | 0,6 s por peça, funcional | Sem animação, valor atualizado | M |
 | **Intervalo P10–P90 a abrir** a partir do valor central | Quanto se pode enganar | 0,6 s, uma vez | Intervalo final | S |

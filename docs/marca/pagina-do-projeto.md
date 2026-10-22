@@ -14,7 +14,7 @@
 
 Em 2025, as entidades que recolhem têxteis em Guimarães apanharam **301,3 toneladas**, ou 0,16 kg por habitante por mês. No mesmo ano a Vitrus recolheu **43 051 toneladas** de resíduos urbanos e, segundo a APA, 5,4% disso é têxtil: cerca de **2 324,8 toneladas por ano** que ainda vão para o lixo (estimativa). A recolha atual capta **cerca de 11,5%** do têxtil gerado: o resto vai parar ao lixo indiferenciado, que o município paga para tratar, e perde-se matéria-prima que a indústria têxtil do Vale do Ave sabe aproveitar.
 
-E o tempo conta. Desde 1 de janeiro de 2025 a recolha seletiva de têxteis é obrigatória. A **17 de abril de 2028**, a responsabilidade alargada do produtor passa a pôr os produtores a pagar a recolha e o tratamento, mas **só os custos economicamente eficientes**. Quem não souber o que custa cada tonelada não tem como defender o seu número.
+E o tempo conta. Desde 1 de janeiro de 2025 a recolha seletiva de têxteis é obrigatória. Até **17 de abril de 2028**, cada Estado-Membro tem de criar a responsabilidade alargada do produtor para têxteis. Os produtores pagam a recolha e o tratamento das peças postas à venda a partir da lei nacional, e **só os custos economicamente eficientes**; o têxtil que já está nas casas continua anos a pesar no município. Esse custo determina-se com as autoridades locais à mesa. Quem não souber o que custa cada tonelada não tem como defender o seu número.
 
 ![Cerca de 11,5% do têxtil gerado chega à recolha seletiva: 301,3 t recolhidas em 2025 contra cerca de 2 324,8 t ainda no lixo, destino do recolhido e rede atual](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-problema.jpg)
 
@@ -119,7 +119,7 @@ Propomos à Vitrus um **piloto de 3 meses em duas freguesias**, com indicadores 
 
 **Novelo is the decision tool that designs Guimarães' textile collection network.** Give it a budget and a target; it returns side-by-side scenarios in **euros, tonnes and € per tonne**, built on real data from Vitrus Ambiente, the municipal waste company.
 
-**The problem.** In 2025 Guimarães collected **301.3 tonnes** of textiles. Vitrus collected 43,051 tonnes of municipal waste that year and, per the Portuguese Environment Agency, 5.4% of it is textiles: about **2,324.8 tonnes a year** still going to waste (estimate), so today's capture is roughly **11.5%**. From **17 April 2028**, extended producer responsibility will make producers pay for collection and treatment, but only for *cost-efficient* operations. A municipality that cannot say what a tonne costs cannot defend its number.
+**The problem.** In 2025 Guimarães collected **301.3 tonnes** of textiles. Vitrus collected 43,051 tonnes of municipal waste that year and, per the Portuguese Environment Agency, 5.4% of it is textiles: about **2,324.8 tonnes a year** still going to waste (estimate), so today's capture is roughly **11.5%**. By **17 April 2028**, every Member State must set up extended producer responsibility for textiles. Producers will pay for collecting and treating items first sold after the national law takes effect, and only the *cost-efficient* amount; textiles already in people's homes will weigh on the municipality for years. Local authorities sit at the table where that cost is set. A municipality that cannot say what a tonne costs cannot defend its number.
 
 **What it does.**
 

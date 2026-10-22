@@ -13,8 +13,8 @@
 
 Em Guimarães, 5,4% do lixo indiferenciado é têxtil, segundo o plano municipal (p. 30), acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1 300 e 2 650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa; o intervalo vem de duas leituras do plano, ver a pergunta Q6 em [Perguntas aos orientadores](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54)).
 
-- **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025, e o município fixou a meta de aumentar a recolha seletiva em 30%.
-- **A conta muda em 2028.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a ter, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem.
+- **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025 (Diretiva 2008/98/CE alterada em 2018 e RGGR), paga só pelo município, e o município fixou a meta de aumentar a recolha seletiva em 30%.
+- **A conta muda a partir de 2028, devagar.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a criar, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem. Mas só das peças postas à venda depois da lei nacional, o mais tardar depois dessa data (art. 22.º-A, n.º 11): o têxtil que já está nas casas continua anos sem produtor que pague. O custo eficiente é determinado com as autoridades locais (n.º 7 e 12). Leitura a confirmar com a APA ([enquadramento](../pesquisa/enquadramento-regulatorio.md)).
 - **O território torna-o caro.** Guimarães tem 156 830 habitantes em 48 freguesias com ocupação dispersa. O porta a porta pode não compensar, e colocar contentores ao acaso também não.
 - **Ninguém tem os dados.** A triagem é manual, as microempresas têxteis deitam retalhos no lixo urbano sem registo, e só 4 dos 27 operadores licenciados na zona reciclam ou valorizam têxteis (plano municipal, p. 32; por confirmar).
 
@@ -48,7 +48,7 @@ Cada entrega triada no terreno devolve dados reais de quantidade e qualidade, e 
 
 ## Impacto e porquê agora
 
-O Novelo transforma uma obrigação legal num plano com preço. É útil já para a câmara e, a partir de 2028, para quem vai pagar a recolha.
+O Novelo transforma uma obrigação legal num plano com preço. É útil já para a câmara e, com a RAP, para a mesa onde produtores, entidade gestora e câmara fixam o custo eficiente.
 
 | Para quem | O que resolve |
 | --- | --- |
