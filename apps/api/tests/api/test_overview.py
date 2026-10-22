@@ -71,6 +71,10 @@ async def test_overview_highlights_and_sources(session: AsyncSession) -> None:
     textile = next(s for s in out.data_sources if s.key == "vitrus_textile_2025")
     assert set(textile.methods) == {"weighed", "percentage"} and textile.rows > 0
     assert next(s for s in out.data_sources if s.key == "ine_census_2021").rows == 48
+    rsu = next(s for s in out.data_sources if s.key == "vitrus_apa_rsu_2025")
+    assert (rsu.kind, rsu.rows, rsu.rows_unit) == ("operator", 2, "values")  # 43 051 t e 5,4%
+    municipal = next(s for s in out.data_sources if s.key == "vitrus_municipal_containers_2026_10")
+    assert (municipal.kind, municipal.rows, municipal.rows_unit) == ("operator", 2751, "rows")
 
 
 async def test_overview_frontier_marks_pareto(logged_in: httpx.AsyncClient) -> None:

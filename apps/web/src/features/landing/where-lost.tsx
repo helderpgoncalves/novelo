@@ -95,7 +95,7 @@ export function WhereLost() {
         <dl
           data-reveal=""
           data-fx="stagger"
-          className="grid grid-cols-3 divide-x divide-border border-border border-y"
+          className="grid grid-cols-1 divide-y divide-border border-border border-y min-[380px]:grid-cols-3 min-[380px]:divide-x min-[380px]:divide-y-0"
         >
           {stats.map((s, i) => (
             <div
@@ -103,8 +103,9 @@ export function WhereLost() {
               data-s=""
               style={{ '--i': i } as CSSProperties}
               className={cn(
-                'flex flex-col gap-2 py-5 sm:py-7',
-                i === 0 ? 'pr-3 sm:pr-6' : 'px-3 sm:px-6',
+                // Abaixo de 380 px, uma linha por número (número e rótulo lado a lado): três colunas não cabem.
+                'grid grid-cols-[6.5rem_1fr] items-baseline gap-3 py-4 min-[380px]:flex min-[380px]:flex-col min-[380px]:gap-2 min-[380px]:py-5 sm:py-7',
+                i === 0 ? 'min-[380px]:pr-3 sm:pr-6' : 'min-[380px]:px-3 sm:px-6',
               )}
             >
               <dd className={cn(STAT, 'order-1 text-[2rem] sm:text-5xl lg:text-6xl')}>

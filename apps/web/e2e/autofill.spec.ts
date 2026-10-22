@@ -15,5 +15,5 @@ test('entrar com campos preenchidos automaticamente (sem eventos)', async ({ pag
   });
   await page.getByRole('button', { name: 'Entrar', exact: true }).click();
   await expect(page.getByText('Indica o email')).toHaveCount(0);
-  await expect(page.getByText('Indica a password')).toHaveCount(0);
+  await expect(page.getByText('Indica a palavra-passe')).toHaveCount(0);
 });

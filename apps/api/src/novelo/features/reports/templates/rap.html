@@ -25,6 +25,9 @@
   section { page-break-inside: auto; margin-bottom: 9mm; }
   h2 { font-size: 20pt; margin-bottom: 3mm; page-break-after: avoid; }
   h3 { font-size: 12pt; margin: 6mm 0 2mm; page-break-after: avoid; }
+  /* Título de secção nunca sozinho no fundo de uma página: rótulo, título e entrada seguem com o que vem a seguir. */
+  .eyebrow, p.lead { break-after: avoid; page-break-after: avoid; }
+  section.keep { break-inside: avoid; page-break-inside: avoid; }
   .eyebrow { font: 600 7.5pt Inter; letter-spacing: .18em; text-transform: uppercase; color: var(--floresta); margin-bottom: 1.5mm; }
   p.lead { color: var(--pedra); margin: 0 0 4mm; max-width: 150mm; }
   .kpis { display: grid; grid-template-columns: repeat(4, 1fr); border: .3mm solid var(--linha); border-radius: 2.5mm; overflow: hidden; margin: 4mm 0 6mm; }
@@ -40,12 +43,19 @@
   td { padding: 1.8mm 2mm; border-bottom: .2mm solid var(--linha); vertical-align: top; }
   td.n, th.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
   tr.total td { font-weight: 600; border-top: .4mm solid var(--tinta); border-bottom: 0; }
-  .bar { height: 2.4mm; background: #ECE7DC; border-radius: 2mm; overflow: hidden; display: flex; width: 38mm; }
+  /* A barra ocupa a sua coluna (largura fixa) e nunca a percentagem ao lado: com 38 mm fixos numa tabela automática
+     a célula encolhia e a barra passava por cima da coluna «Reutilização». */
+  th.barcell, td.barcell { width: 30mm; }
+  .bar { height: 2.4mm; background: #ECE7DC; border-radius: 2mm; overflow: hidden; display: flex; width: 100%; margin-top: 1mm; }
   .bar i { display: block; height: 100%; }
   p.brief { margin: 0 0 1.5mm; max-width: 160mm; }
   .note { font-size: 7.5pt; color: var(--pedra); }
   .method { background: #FAF8F3; border: .3mm solid var(--linha); border-radius: 2.5mm; padding: 4mm; font-size: 8.5pt; }
   .small td, .small th { font-size: 7.6pt; }
+  /* Até 3 cenários lado a lado: colunas de largura fixa e nomes a quebrar linha, para nunca sair da página. */
+  table.compare { table-layout: fixed; }
+  table.compare th:first-child { width: 42mm; }
+  table.compare th.n { white-space: normal; letter-spacing: .06em; }
 </style>
 </head>
 <body>
@@ -100,10 +110,10 @@
   <h2>{{ t.s_material }}</h2>
   <p class="lead">{{ t.material_lead }}</p>
   <table>
-    <thead><tr><th>{{ t.col_entity }}</th><th class="n">{{ t.col_collected }}</th><th></th><th class="n">{{ t.col_reuse }}</th><th class="n">{{ t.col_recycle }}</th><th class="n">{{ t.col_reject }}</th><th>{{ t.col_data }}</th></tr></thead>
+    <thead><tr><th>{{ t.col_entity }}</th><th class="n">{{ t.col_collected }}</th><th class="barcell"></th><th class="n">{{ t.col_reuse }}</th><th class="n">{{ t.col_recycle }}</th><th class="n">{{ t.col_reject }}</th><th>{{ t.col_data }}</th></tr></thead>
     <tbody>
-    {% for e in entities %}<tr><td>{{ e.entity }}</td><td class="n">{{ e.total }}</td><td><div class="bar"><i style="width:{{ e.reuse_pct_raw }}%;background:#2E6B57"></i><i style="width:{{ e.recycle_pct_raw }}%;background:#7FB39C"></i><i style="width:{{ e.reject_pct_raw }}%;background:#C4A06A"></i></div></td><td class="n">{{ e.reuse_pct }}</td><td class="n">{{ e.recycle_pct }}</td><td class="n">{{ e.reject_pct }}</td><td>{{ t[e.method] }}</td></tr>{% endfor %}
-    <tr class="total"><td>{{ t.total }}</td><td class="n">{{ collected_t }}</td><td></td><td class="n">{{ totals.reuse }}</td><td class="n">{{ totals.recycle }}</td><td class="n">{{ totals.reject }}</td><td></td></tr>
+    {% for e in entities %}<tr><td>{{ e.entity }}</td><td class="n">{{ e.total }}</td><td class="barcell"><div class="bar"><i style="width:{{ e.reuse_pct_raw }}%;background:#2E6B57"></i><i style="width:{{ e.recycle_pct_raw }}%;background:#7FB39C"></i><i style="width:{{ e.reject_pct_raw }}%;background:#C4A06A"></i></div></td><td class="n">{{ e.reuse_pct }}</td><td class="n">{{ e.recycle_pct }}</td><td class="n">{{ e.reject_pct }}</td><td>{{ t[e.method] }}</td></tr>{% endfor %}
+    <tr class="total"><td>{{ t.total }}</td><td class="n">{{ collected_t }}</td><td class="barcell"></td><td class="n">{{ totals.reuse }}</td><td class="n">{{ totals.recycle }}</td><td class="n">{{ totals.reject }}</td><td></td></tr>
     </tbody>
   </table>
   <h3>{{ t.lots_title }}</h3>
@@ -113,11 +123,11 @@
   {% else %}<p class="note">{{ t.lots_none }}</p>{% endif %}
 </section>
 
-<section>
+<section class="keep">
   <div class="eyebrow">{{ t.s_scenarios }}</div>
   <h2>{{ t.s_scenarios }}</h2>
   <p class="lead">{{ t.scenarios_lead }}</p>
-  <table>
+  <table class="compare">
     <thead><tr><th>{{ t.col_metric }}</th>{% for s in scenarios %}<th class="n">{{ s.label }}</th>{% endfor %}</tr></thead>
     <tbody>
     {% for row in comparison %}<tr><td>{{ row.label }}</td>{% for v in row.cells %}<td class="n">{{ v }}</td>{% endfor %}</tr>{% endfor %}
@@ -131,7 +141,7 @@
   {% if brands %}
   <p class="lead">{{ t.brands_lead.format(n=brand_sample) }}</p>
   <table><thead><tr><th>{{ t.col_brand }}</th><th class="n">{{ t.col_items }}</th><th class="n">{{ t.col_kg }}</th><th class="n">{{ t.col_share }}</th><th>{{ t.col_fibre }}</th></tr></thead>
-  <tbody>{% for b in brands %}<tr><td>{{ b.brand }}</td><td class="n">{{ b.items }}</td><td class="n">{{ b.kg }}</td><td class="n">{{ b.share }}</td><td>{{ b.fibre }}</td></tr>{% endfor %}</tbody></table>
+  <tbody>{% for b in brands %}<tr><td>{{ b.brand }}</td><td class="n">{{ b.n_items }}</td><td class="n">{{ b.kg }}</td><td class="n">{{ b.share }}</td><td>{{ b.fibre }}</td></tr>{% endfor %}</tbody></table>
   {% else %}<p class="lead">{{ t.brands_none }}</p>{% endif %}
 </section>
 

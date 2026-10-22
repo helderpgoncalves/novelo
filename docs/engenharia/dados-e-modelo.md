@@ -245,7 +245,7 @@ O modelo por freguesia (secções 1 a 3) decide **que modo** serve cada freguesi
 | Rede | Gasta | Têxtil | €/t | Reutilizável | Locais | Cobertura |
 | --- | --- | --- | --- | --- | --- | --- |
 | Por freguesia (local existente e recolha a pedido) | 47 839 € | 396,5 t | 120,6 | 235,6 t | 55 pontos + 20 freguesias no circuito PAP | 75,0% |
-| Locais reais, públicos e escolas (`both`, por omissão), 300 m | 59 416 € | 416,8 t | 142,6 | 247,6 t | 154 públicos + 8 escolas + 13 freguesias a pedido | 85,2% |
+| Locais reais, públicos e escolas (`both`, por omissão), 300 m | 59 599 € | 417,7 t | 142,7 | 248,2 t | 154 públicos + 8 escolas + 13 freguesias a pedido | 85,5% |
 | Locais reais, públicos e escolas (`both`, por omissão), 500 m | 59 571 € | 481,0 t | 123,9 | 285,8 t | 114 públicos + 10 escolas + 14 freguesias a pedido | 93,4% |
 | Locais reais, só públicos, 300 m | 59 571 € | 412,6 t | 144,4 | 245,1 t | 157 locais + 14 freguesias a pedido | 83,5% |
 | Locais reais, só públicos, 500 m | 59 805 € | 471,4 t | 126,9 | 280,1 t | 116 locais + 17 freguesias a pedido | 89,4% |

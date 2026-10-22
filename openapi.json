@@ -12563,9 +12563,18 @@
             "type": "string"
           },
           "rows": {
-            "description": "Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, ...)",
+            "description": "Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, contentores municipais, ...)",
             "title": "Rows",
             "type": "integer"
+          },
+          "rows_unit": {
+            "description": "`rows`: linhas importadas; `values`: valores de referência comunicados sem ficheiro (ex.: RSU)",
+            "enum": [
+              "rows",
+              "values"
+            ],
+            "title": "Rows Unit",
+            "type": "string"
           }
         },
         "required": [
@@ -12576,7 +12585,8 @@
           "period_start",
           "period_end",
           "methods",
-          "rows"
+          "rows",
+          "rows_unit"
         ],
         "title": "OverviewDataSource",
         "type": "object"

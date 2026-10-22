@@ -39,7 +39,8 @@ async function mockTurnstile(page: Page, delayMs = 50) {
 test('login: token por tentativa, cabeçalho e ação, botão bloqueado até haver token', async ({
   page,
 }) => {
-  await mockTurnstile(page, 600);
+  // 2 s por token: dá tempo para ver o botão bloqueado e o spinner (que só aparece depois de 400 ms de espera).
+  await mockTurnstile(page, 2000);
   const seen: (string | undefined)[] = [];
   await page.route('**/api/v1/auth/login', (route: Route) => {
     seen.push(route.request().headers()['x-turnstile-token']);
@@ -51,9 +52,11 @@ test('login: token por tentativa, cabeçalho e ação, botão bloqueado até hav
   await page.goto('/pt/login?method=password');
   await page.getByLabel('Email').fill('x@example.pt');
   await page.getByLabel('Palavra-passe', { exact: true }).fill('qualquer-coisa-123');
-  const submit = page.getByRole('button', { name: /A verificar|Entrar/ });
+  const submit = page.getByRole('button', { name: 'Entrar' });
+  // Sem token o botão fica bloqueado; se a espera passa dos 400 ms mostra só um spinner discreto (aria-busy), sem
+  // trocar o texto («A verificar…» piscava em cada entrada).
   await expect(submit).toBeDisabled();
-  await expect(submit).toHaveText(/A verificar/);
+  await expect(submit).toHaveAttribute('aria-busy', 'true');
   await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
 
   await page.getByRole('button', { name: 'Entrar' }).click();
@@ -168,8 +171,8 @@ test('repor password: sem widget nem cabeçalho de captcha, o botão não espera
   });
   await page.goto('/pt/reset-password?token=token-invalido-token-invalido-1234');
   await expect(page.getByTestId('turnstile-field')).toHaveCount(0);
-  await page.getByLabel('Nova password').fill('uma-password-segura-123');
-  await page.getByLabel('Repete a password').fill('uma-password-segura-123');
+  await page.getByLabel('Nova palavra-passe').fill('uma-password-segura-123');
+  await page.getByLabel('Repete a palavra-passe').fill('uma-password-segura-123');
   const submit = page.getByRole('button', { name: 'Redefinir password' });
   await expect(submit).toBeEnabled();
   await submit.click();

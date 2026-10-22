@@ -1,24 +1,36 @@
 import { expect, test } from '@playwright/test';
-import { login } from './helpers';
+import { adminApi, login } from './helpers';
 
 test.describe('idioma e tema', () => {
   test('mudar para inglês muda a interface e o URL, e persiste na conta', async ({ page }) => {
     await login(page);
-    await page.getByRole('button', { name: 'Mudar idioma' }).click();
-    await page.getByRole('menuitemradio', { name: 'English' }).click();
-    await expect(page).toHaveURL(/\/en\/?$/);
-    await expect(page.getByRole('heading', { level: 1, name: /Guimarães collects/ })).toBeVisible();
-    await expect(page.locator('dl').first()).toContainText('301.3 t');
-    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+    try {
+      await page.getByRole('button', { name: 'Mudar idioma' }).click();
+      await page.getByRole('menuitemradio', { name: 'English' }).click();
+      await expect(page).toHaveURL(/\/en\/?$/);
+      await expect(
+        page.getByRole('heading', { level: 1, name: /Guimarães collects/ }),
+      ).toBeVisible();
+      await expect(page.getByRole('region', { name: 'Situation in numbers' })).toContainText(
+        '301.3',
+      );
+      await expect(page.locator('html')).toHaveAttribute('lang', 'en');
 
-    // Um novo contexto sem preferência local segue a preferência guardada na conta.
-    await page.reload();
-    await expect(page.getByRole('heading', { level: 1, name: /Guimarães collects/ })).toBeVisible();
+      // Um novo contexto sem preferência local segue a preferência guardada na conta.
+      await page.reload();
+      await expect(
+        page.getByRole('heading', { level: 1, name: /Guimarães collects/ }),
+      ).toBeVisible();
 
-    // Volta a português para não afetar os outros testes.
-    await page.getByRole('button', { name: 'Change language' }).click();
-    await page.getByRole('menuitemradio', { name: 'Português' }).click();
-    await expect(page).toHaveURL(/\/pt\/?$/);
+      await page.getByRole('button', { name: 'Change language' }).click();
+      await page.getByRole('menuitemradio', { name: 'Português' }).click();
+      await expect(page).toHaveURL(/\/pt\/?$/);
+    } finally {
+      // Volta sempre a português (mesmo se o teste falhar a meio): a conta do admin é partilhada pelos outros testes.
+      const admin = await adminApi();
+      await admin.patch('/api/v1/auth/me', { data: { locale: 'pt-PT' } });
+      await admin.dispose();
+    }
   });
 
   test('erros do servidor aparecem em inglês quando a interface está em inglês', async ({
@@ -26,7 +38,7 @@ test.describe('idioma e tema', () => {
   }) => {
     await page.goto('/en/login?method=password');
     await page.getByLabel('Email').fill('admin@heldergoncalves.io');
-    await page.getByLabel('Palavra-passe', { exact: true }).fill('wrong-password-1');
+    await page.getByLabel('Password', { exact: true }).fill('wrong-password-1');
     await page.getByRole('button', { name: 'Sign in' }).click();
     await expect(page.getByRole('alert')).toContainText('Wrong email or password.');
   });

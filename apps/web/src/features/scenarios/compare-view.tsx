@@ -104,17 +104,20 @@ function Delta({ metric, a, b }: { metric: Metric; a: number | null; b: number |
   const good = metric.better === 'none' ? null : metric.better === 'up' ? diff > 0 : diff < 0;
   const pct = a !== 0 ? (diff / Math.abs(a)) * 100 : null;
   return (
+    // A percentagem vai por baixo da diferença: lado a lado, a coluna ficava tão larga que saía da tabela a 1440 px.
     <span
       className={cn(
-        'font-medium tabular-nums',
+        'inline-flex flex-col items-end font-medium tabular-nums leading-tight',
         good === true && 'text-primary',
         good === false && 'text-destructive',
       )}
     >
-      {diff > 0 ? '+' : '−'}
-      {metric.format(Math.abs(diff))}
+      <span>
+        {diff > 0 ? '+' : '−'}
+        {metric.format(Math.abs(diff))}
+      </span>
       {pct != null && (
-        <span className="ml-1 font-normal text-muted-foreground text-xs">
+        <span className="font-normal text-muted-foreground text-xs">
           ({diff > 0 ? '+' : '−'}
           {formatNumber(Math.abs(pct), 0)}%)
         </span>
@@ -134,6 +137,8 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
       id: 'metric',
       header: m.compare_metric(),
       primary: true,
+      // O nome do indicador pode quebrar linha: sem isto a tabela não cabia ao lado da robustez a 1440 px.
+      className: 'min-w-32 whitespace-normal',
       cell: (x) => x.label(),
     },
     ...[a, b].map(
@@ -148,7 +153,7 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
             <span className="md:hidden">
               {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
             </span>
-            <span className="hidden min-w-36 max-w-56 whitespace-normal md:block">
+            <span className="hidden min-w-28 max-w-48 whitespace-normal md:block">
               <span className="eyebrow block">
                 {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
               </span>

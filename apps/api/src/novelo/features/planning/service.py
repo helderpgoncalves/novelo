@@ -12,6 +12,7 @@ from sqlalchemy.orm import defer, selectinload
 
 from novelo.core.errors import NotFoundError
 from novelo.domain import door_to_door, network
+from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.reuse import EntityReuse, ReuseShares, reuse_shares
 from novelo.domain.vocab import (
@@ -139,7 +140,8 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 name=p.name,
                 population=p.population,
                 population_year=p.population_year,
-                demand_t=round(yearly_demand_t(p.population, kg_per_inhab_month), 2),
+                # 4 casas: a soma das 48 freguesias (rodapé da cobertura) fica 2 324,8 t; a 2 casas dava 2 324,7.
+                demand_t=round(yearly_demand_t(p.population, kg_per_inhab_month), 4),
                 latitude=float(p.latitude),
                 longitude=float(p.longitude),
                 tipau=p.tipau,
@@ -200,7 +202,8 @@ async def list_zones(db: AsyncSession) -> list[ZoneOut]:
 async def potential_t(db: AsyncSession, params: PlanningParams | None = None) -> float:
     """Têxtil por desviar do lixo (t/ano) com os pressupostos dados ou os ativos: o `potential_t` dos cenários."""
     p = params or (await get_parameters(db)).values
-    return round(sum(z.demand_t for z in await load_zone_rows(db, p.kg_per_inhab_month)), 1)
+    zones = await load_zone_rows(db, p.kg_per_inhab_month)
+    return round(zones_potential_t([z.population for z in zones], p.kg_per_inhab_month), 1)
 
 
 # --- Cenários ---
@@ -357,7 +360,7 @@ def compute(
         coverage_pct=round(sum(a.covered_population for a in allocations) / total_pop * 100, 1) if total_pop else 0.0,
         points=sum(a.points for a in allocations),
         km_year=round(sum(a.km_year for a in allocations), 1),
-        potential_t=round(sum(z.demand_t for z in zones), 1),
+        potential_t=round(zones_potential_t([z.population for z in zones], params.kg_per_inhab_month), 1),
         baseline_observed_t=round(baseline_t, 1),
         avoided_treatment_eur=site_service.avoided_treatment(tonnes, params),
         **site_service.reuse_kpis(tonnes, annual, reuse),

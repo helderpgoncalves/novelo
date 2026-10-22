@@ -185,11 +185,12 @@ test.describe('verifica o teu email: quando o email não sai', () => {
     ).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Verifica o teu email' })).toHaveCount(0);
     await expect(problem).toContainText(email);
-    // Saídas: tentar de novo, outro email, palavra-passe e suporte (sem o endereço no HTML).
+    // Saídas: tentar de novo, outro email, palavra-passe e suporte (o botão de suporte não põe o endereço no HTML;
+    // o contacto legal do rodapé, «Contacto», é outra coisa e mostra-o de propósito).
     await expect(problem.getByRole('button', { name: 'Tentar de novo' })).toBeVisible();
     await expect(problem.getByRole('link', { name: 'Entrar com palavra-passe' })).toBeVisible();
     await expect(problem.getByRole('button', { name: 'Escrever ao suporte' })).toBeVisible();
-    expect(await page.content()).not.toContain('novelo@heldergoncalves.io');
+    expect(await problem.innerHTML()).not.toContain('novelo@heldergoncalves.io');
 
     // Tentar de novo: agora sai, e passa ao ecrã de sucesso.
     await problem.getByRole('button', { name: 'Tentar de novo' }).click();

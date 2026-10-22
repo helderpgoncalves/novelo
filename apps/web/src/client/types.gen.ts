@@ -7323,9 +7323,15 @@ export type OverviewDataSource = {
     /**
      * Rows
      *
-     * Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, ...)
+     * Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, contentores municipais, ...)
      */
     rows: number;
+    /**
+     * Rows Unit
+     *
+     * `rows`: linhas importadas; `values`: valores de referência comunicados sem ficheiro (ex.: RSU)
+     */
+    rows_unit: 'rows' | 'values';
 };
 
 /**

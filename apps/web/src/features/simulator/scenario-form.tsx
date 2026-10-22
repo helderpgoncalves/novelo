@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from '@tanstack/react-router';
+import { useNavigate, useRouter } from '@tanstack/react-router';
 import { ChevronDown } from 'lucide-react';
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
@@ -135,6 +135,7 @@ export function ScenarioForm({
   resultId,
 }: ScenarioFormProps) {
   const navigate = useNavigate({ from: '/simulator' });
+  const router = useRouter();
   const queryClient = useQueryClient();
   const [label, setLabel] = useState(seed.label);
   const [objective, setObjective] = useState<ScenarioObjective>(seed.objective);
@@ -224,6 +225,10 @@ export function ScenarioForm({
       return;
     }
     const id = window.setTimeout(() => {
+      // Se entretanto se clicou numa ligação (ex.: «Ver incerteza»), a página antiga ainda está montada enquanto a
+      // nova carrega: escrever agora na URL cancelava essa navegação e voltava ao simulador.
+      const { location, status } = router.state;
+      if (status === 'pending' || !/\/simulator\/?$/.test(location.pathname)) return;
       navigate({
         search: (prev) => ({
           ...prev,
@@ -252,6 +257,7 @@ export function ScenarioForm({
     siteCandidates,
     onDemand,
     navigate,
+    router,
   ]);
 
   const create = useMutation({

@@ -39,3 +39,4 @@ apps/web/playwright-report/
 .cache/
 apps/web/.gen-check/
 scripts/brand/cache/
+apps/web/.tanstack/

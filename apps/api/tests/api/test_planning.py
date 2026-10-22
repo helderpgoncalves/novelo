@@ -22,7 +22,9 @@ async def test_zones_carry_real_census_population(logged_in: httpx.AsyncClient) 
         ronfe["population"] * kg * 12 / 1000, abs=0.01
     )
     # a procura total é o têxtil que ainda vai para o lixo: 43 051 t × 5,4% = 2 324,754 t
-    assert sum(z["demand_t"] for z in zones) == pytest.approx(2324.75, abs=0.3)
+    # (com a procura por freguesia a 4 casas, a soma mostra-se 2 324,8 t como a referência, não 2 324,7)
+    assert sum(z["demand_t"] for z in zones) == pytest.approx(2324.754, abs=0.04)  # q a 4 casas (1,2353) dá 2 324,785
+    assert round(sum(z["demand_t"] for z in zones), 1) == 2324.8
 
 
 async def test_parameters_are_labelled_by_source(logged_in: httpx.AsyncClient) -> None:
@@ -120,7 +122,8 @@ async def test_a_network_can_beat_what_vitrus_collects_today(logged_in: httpx.As
     """Com orçamento folgado, a rede por omissão (sem contentores de têxtil) capta mais do que as 301 t de 2025."""
     mixed = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=10_000_000))).json()
     assert mixed["tonnes_year"] > 301.3
-    assert mixed["result"]["kpis"]["potential_t"] == pytest.approx(2324.8, abs=0.3)
+    # 43 051 t × 5,4% = 2 324,754 t: da população total, não da soma das procuras por freguesia arredondadas (2 324,7).
+    assert mixed["result"]["kpis"]["potential_t"] == 2324.8
     combined = [a for a in mixed["result"]["allocations"] if len(a["modes"]) > 1]
     assert combined and all(
         sum(p["tonnes"] for p in a["parts"]) == pytest.approx(a["tonnes"], abs=0.01) for a in combined

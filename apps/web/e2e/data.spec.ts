@@ -7,13 +7,22 @@ test.describe('dados reais da Vitrus', () => {
   });
 
   test('ponto de partida mostra os números reais', async ({ page }) => {
-    const strip = page.locator('dl').first();
-    await expect(strip).toContainText('301,3 t');
+    // Faixa de situação: o recolhido (medido), a captura e o que ainda vai para o lixo por habitante (estimativas).
+    const strip = page.getByRole('region', { name: 'Situação em números' });
+    await expect(strip).toContainText('301,3');
     await expect(strip).toContainText('11,5%');
-    await expect(strip).toContainText('0,16 kg');
+    await expect(strip).toContainText('1,235 kg por habitante e mês');
+    // Evidência por baixo da dobra: entidades (pesadas e por percentagem) e o fluxo por destino.
+    const proofs = page.locator('#provas');
+    await proofs.scrollIntoViewIfNeeded();
+    await expect(proofs.getByRole('row', { name: /Ultriplo/ })).toContainText('134,1 t');
+    await expect(proofs.getByRole('row', { name: /Nova Etapa/ })).toContainText('estimativa');
+    // Origem dos dados: os contentores do pacote QGIS e os valores do RSU contam (nunca «0 linhas» nem «outra fonte»).
+    await expect(proofs.getByText(/2\s?751 linhas importadas/)).toBeVisible();
+    await expect(proofs.getByText('2 valores de referência')).toBeVisible();
+    await expect(proofs.getByText('Outra fonte')).toHaveCount(0);
+    await proofs.getByRole('tab', { name: 'Para onde vai o que se recolhe' }).click();
     await expect(page.getByRole('img', { name: /Fluxo de têxtil/ })).toBeVisible();
-    await expect(page.getByRole('row', { name: /Ultriplo/ })).toContainText('134,1 t');
-    await expect(page.getByRole('row', { name: /Nova Etapa/ })).toContainText('estimativa');
   });
 
   test('circuitos: pesquisa, filtro, ordenação, colunas e paginação', async ({ page }) => {
@@ -112,12 +121,16 @@ test.describe('dados reais da Vitrus', () => {
     await expect(
       page.getByRole('row', { name: /admin@heldergoncalves.io|Administrador/ }).first(),
     ).toBeVisible();
-    // O próprio administrador não pode alterar a sua conta.
-    await expect(
-      page
-        .getByRole('row', { name: /Administrador/ })
-        .first()
-        .getByRole('button', { name: 'Desativar' }),
-    ).toBeDisabled();
+    // O próprio administrador não pode alterar a sua conta: o diálogo explica porquê e não oferece desativar.
+    await page
+      .getByRole('row', { name: /Administrador/ })
+      .first()
+      .getByRole('button', { name: /^Ações de Administrador/ })
+      .click();
+    await page.getByRole('menuitem', { name: 'Desativar' }).click();
+    const dialog = page.getByRole('alertdialog');
+    await expect(dialog).toContainText('Não podes fazer isto à tua própria conta.');
+    await expect(dialog.getByRole('button', { name: 'Desativar' })).toHaveCount(0);
+    await dialog.getByRole('button', { name: 'Fechar' }).click();
   });
 });

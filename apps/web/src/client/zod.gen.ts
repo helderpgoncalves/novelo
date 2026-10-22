@@ -5437,7 +5437,8 @@ export const zOverviewDataSource = z.object({
     period_end: z.iso.date().nullable(),
     period_start: z.iso.date().nullable(),
     provider: z.string(),
-    rows: z.int()
+    rows: z.int(),
+    rows_unit: z.enum(['rows', 'values'])
 });
 
 /**

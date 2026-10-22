@@ -1,8 +1,8 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { CheckCheck, ExternalLink, ScanLine, Truck } from 'lucide-react';
-import { useState } from 'react';
 import { toast } from 'sonner';
+import { z } from 'zod';
 import type { Fibre, GarmentType, GetLotQrData, LotItemOut, TextileDestination } from '@/client';
 import {
   changeLotStateMutation,
@@ -27,7 +27,11 @@ import { fibreLabel, garmentLabel, lotStateLabel } from '@/lib/lots';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
+const LOT_TABS = ['items', 'history'] as const;
+
 export const Route = createFileRoute('/_app/lots/$code')({
+  // Separador ativo na URL (partilhável): `?tab=history`.
+  validateSearch: z.object({ tab: z.enum(LOT_TABS).optional().catch(undefined) }),
   staticData: { skeleton: 'detail' },
   loader: ({ context: { queryClient }, params }) =>
     queryClient.ensureQueryData(getLotOptions({ path: { code: params.code } })),
@@ -37,7 +41,8 @@ export const Route = createFileRoute('/_app/lots/$code')({
 
 function LotPage() {
   const { code } = Route.useParams();
-  const [tab, setTab] = useState<'items' | 'history'>('items');
+  const { tab = 'items' } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const queryClient = useQueryClient();
   const { data: lot } = useSuspenseQuery(getLotOptions({ path: { code } }));
   const qr = client.buildUrl<GetLotQrData>({
@@ -115,17 +120,21 @@ function LotPage() {
         />
         <StatCell
           label={m.lot_stat_destination()}
-          value={`${formatNumber(lot.reuse_kg, 1)} kg`}
+          // Mesmas casas que o peso (0,55 kg nos dois, nunca 0,55 kg ao lado de 0,6 kg) e também estimativa.
+          value={`${formatNumber(lot.reuse_kg, 2)} kg`}
+          tag={m.common_estimate()}
           hint={m.lot_stat_destination_hint({
-            reuse: formatNumber(lot.reuse_kg, 1),
-            recycle: formatNumber(lot.recycle_kg, 1),
-            reject: formatNumber(lot.reject_kg, 1),
+            reuse: formatNumber(lot.reuse_kg, 2),
+            recycle: formatNumber(lot.recycle_kg, 2),
+            reject: formatNumber(lot.reject_kg, 2),
           })}
         />
       </StatStrip>
 
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-        <aside className="space-y-4 self-start lg:col-span-4 xl:col-span-3">
+      {/* Etiqueta e composição ao lado da tabela só a partir de 2xl: até lá, por cima, em duas colunas. Lado a lado a
+          1440 px a tabela das peças (6 colunas) não cabia e a «Confiança» ficava cortada. */}
+      <div className="grid grid-cols-1 gap-6 2xl:grid-cols-12">
+        <aside className="grid grid-cols-1 items-start gap-4 self-start sm:grid-cols-2 2xl:col-span-3 2xl:grid-cols-1">
           <Panel className="space-y-4 text-center print:ring-0">
             <img src={qr} alt={m.lot_qr_alt({ code: lot.code })} className="mx-auto size-44" />
             <p className="font-medium font-serif text-xl tracking-widest">{lot.code}</p>
@@ -145,27 +154,31 @@ function LotPage() {
               </a>
             </Button>
           </Panel>
-          <Panel className="space-y-3 print:hidden">
-            <h2 className="text-lg">{m.lot_composition_title()}</h2>
-            <CompositionBar composition={lot.composition} />
-          </Panel>
-          {lot.reservation && (
-            <Panel className="space-y-1 text-sm print:hidden">
-              <p className="eyebrow">{m.lot_reservation_title()}</p>
-              <p className="font-medium">{lot.reservation.recycler_name}</p>
-              <p className="text-muted-foreground">{lot.reservation.contact}</p>
-              {lot.reservation.note && (
-                <p className="text-muted-foreground">{lot.reservation.note}</p>
-              )}
+          <div className="space-y-4">
+            <Panel className="space-y-3 print:hidden">
+              <h2 className="text-lg">{m.lot_composition_title()}</h2>
+              <CompositionBar composition={lot.composition} />
             </Panel>
-          )}
+            {lot.reservation && (
+              <Panel className="space-y-1 text-sm print:hidden">
+                <p className="eyebrow">{m.lot_reservation_title()}</p>
+                <p className="font-medium">{lot.reservation.recycler_name}</p>
+                <p className="text-muted-foreground">{lot.reservation.contact}</p>
+                {lot.reservation.note && (
+                  <p className="text-muted-foreground">{lot.reservation.note}</p>
+                )}
+              </Panel>
+            )}
+          </div>
         </aside>
 
-        <div className="min-w-0 lg:col-span-8 xl:col-span-9 print:hidden">
+        <div className="min-w-0 2xl:col-span-9 print:hidden">
           <PageTabs
             label={m.rw_tabs_label()}
             value={tab}
-            onValueChange={(next) => setTab(next)}
+            onValueChange={(next) =>
+              void navigate({ search: { tab: next === 'items' ? undefined : next }, replace: true })
+            }
             tabs={[
               {
                 id: 'items',
@@ -257,7 +270,7 @@ const itemColumns: Column<LotItemOut>[] = [
     align: 'right',
     value: (i) => i.estimated_weight_g,
     searchable: false,
-    cell: (i) => `${i.estimated_weight_g} g`,
+    cell: (i) => `${formatNumber(i.estimated_weight_g)} g`,
   },
   {
     id: 'confidence',

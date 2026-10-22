@@ -1,5 +1,6 @@
 import { type CSSProperties, useId, useRef, useState } from 'react';
 import { formatNumber, formatPercent, formatTonnes } from '@/lib/format';
+import { formatDate } from '@/lib/i18n';
 import { useInViewOnce } from '@/lib/motion';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
@@ -259,9 +260,9 @@ function Instrument() {
                 <dd className="font-medium font-serif text-3xl tabular-nums leading-none sm:text-4xl">
                   {r.value}
                 </dd>
-                <dt className={MONO}>
+                <dt className={cn(MONO, 'flex flex-wrap items-center gap-x-1.5 gap-y-1')}>
                   {r.label}
-                  {r.estimate && <Estimate className="ml-1.5" />}
+                  {r.estimate && <Estimate className="ml-0" />}
                 </dt>
               </div>
             ))}
@@ -274,7 +275,9 @@ function Instrument() {
             {m.landing_fan_title()}
             <Estimate className="ml-2" />
           </p>
-          <p className={cn(MONO, 'text-pretty')}>{m.landing_fan_caption()}</p>
+          <p className={cn(MONO, 'text-pretty')}>
+            {m.landing_fan_caption({ date: formatDate(FACTS.scenario60k.computedOn, 'long') })}
+          </p>
         </div>
         <div className="lg:col-span-7">
           <FanChart />

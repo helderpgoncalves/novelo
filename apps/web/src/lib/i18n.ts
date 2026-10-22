@@ -42,7 +42,7 @@ const NO_DATE = '—';
  */
 export const formatDate = (
   value: string | Date | null | undefined,
-  style: 'short' | 'medium' = 'medium',
+  style: 'short' | 'medium' | 'long' = 'medium',
 ): string => {
   if (value == null || value === '') return NO_DATE;
   const dayOnly = typeof value === 'string' && DATE_ONLY.test(value);

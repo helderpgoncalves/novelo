@@ -56,19 +56,23 @@ export function drawMarker(shape: MarkerShape, color: string): ImageData | null 
 
 const isMarker = (id: string) => id.startsWith(PREFIX);
 
-/** Gera os marcadores à medida que o estilo os pede (também depois de trocar o tema, que recarrega o estilo). */
+/**
+ * Gera os marcadores à medida que o estilo os pede (também depois de trocar o tema, que recarrega o estilo). Com o
+ * MapLibre 6 tem de ser o `setMissingStyleImageResolver`: um ouvinte de `styleimagemissing` já não resolve o pedido em
+ * curso (o ícone faltava no primeiro desenho e a consola avisava «Image "mun:..." could not be loaded»).
+ */
 export function registerMarkerImages(map: MaplibreMap): () => void {
-  const onMissing = (e: { id: string }) => {
-    if (!isMarker(e.id) || map.hasImage(e.id)) return;
-    const [, shape, color] = e.id.split(':');
+  const resolve = (id: string) => {
+    if (!isMarker(id) || map.hasImage(id)) return;
+    const [, shape, color] = id.split(':');
     if (!shape || !color) return;
     const data = drawMarker(shape as MarkerShape, color);
     if (!data) return;
     const meta: Partial<StyleImageMetadata> = { pixelRatio: RATIO };
-    map.addImage(e.id, data, meta);
+    map.addImage(id, data, meta);
   };
-  map.on('styleimagemissing', onMissing);
+  map.setMissingStyleImageResolver(resolve);
   return () => {
-    map.off('styleimagemissing', onMissing);
+    map.setMissingStyleImageResolver(null);
   };
 }

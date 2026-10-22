@@ -108,7 +108,7 @@ export function ColumnHeader<T>({
           }}
           aria-keyshortcuts="ArrowDown"
           className={cn(
-            '-ml-2 inline-flex h-8 items-center gap-1.5 rounded-md px-2 font-medium hover:bg-muted',
+            '-ml-2 inline-flex min-h-8 items-center gap-1.5 rounded-md px-2 py-0.5 font-medium hover:bg-muted',
             truncate && 'min-w-0',
             right && '-mr-2 ml-0 flex-row-reverse',
           )}

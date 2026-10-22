@@ -51,17 +51,25 @@ export async function login(page: Page, credentials = ADMIN) {
 }
 
 /** Último email enviado a um endereço (caixa de saída de desenvolvimento da API). */
-export async function lastEmail(to: string): Promise<{ subject: string; text: string }> {
+/**
+ * O email mais recente para `to`. Com `subject`, espera pelo primeiro cujo assunto lhe corresponda: os emails saem em
+ * segundo plano, por isso um email anterior (ex.: «Confirma o teu email») pode ser o último durante uns instantes.
+ */
+export async function lastEmail(
+  to: string,
+  subject?: RegExp,
+): Promise<{ subject: string; text: string }> {
   const api = await request.newContext({
     baseURL: process.env.E2E_API_URL ?? 'http://localhost:8190',
   });
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 40; i++) {
     const res = await api.get('/api/v1/dev/emails', { params: { to } });
     const emails = (await res.json()) as { subject: string; text: string }[];
-    if (emails[0]) return emails[0];
+    const found = subject ? emails.find((e) => subject.test(e.subject)) : emails[0];
+    if (found) return found;
     await new Promise((r) => setTimeout(r, 250));
   }
-  throw new Error(`Nenhum email para ${to}`);
+  throw new Error(`Nenhum email para ${to}${subject ? ` com o assunto ${subject}` : ''}`);
 }
 
 export const linkFrom = (text: string): string => {
