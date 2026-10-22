@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.7
 # Produção: build do Vite e servir com nginx. Contexto de build = raiz do repositório.
-FROM node:22-slim AS build
+FROM node:25-slim AS build
 ENV PNPM_HOME=/pnpm PATH=/pnpm:$PATH
 RUN corepack enable
 WORKDIR /repo
