@@ -7,7 +7,7 @@ import { type Locale, switchLocale } from '@/lib/i18n';
 export function useSwitchLanguage(signedIn: boolean) {
   const save = useMutation(updateMeMutation());
   // Em impersonação a API recusa mexer na conta de outra pessoa: o idioma muda só neste navegador.
-  const impersonating = useImpersonation().active;
+  const impersonating = useImpersonation(signedIn).active;
   return async (locale: Locale) => {
     if (signedIn && !impersonating) {
       try {

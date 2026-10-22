@@ -40,6 +40,21 @@ const channelsText = (p: CoverageParish) =>
  * Separador «Cobertura»: a matriz do art. 22.º-C, n.º 9, alínea b) da Diretiva (UE) 2025/1892 para o cenário. Por TIPAU,
  * o indicador fora/dentro das zonas urbanas e a tabela por freguesia. Todos os números vêm da API (cenário e base de dados).
  */
+/**
+ * Cabeçalho que pode quebrar linha («Volume / previsto»): com os cabeçalhos numa só linha a tabela da cobertura passava
+ * da largura do ecrã a 1440 px e cortava «Dias porta a porta».
+ */
+function WrapHead({ children, title }: { children: string; title?: string }) {
+  return (
+    <span
+      title={title}
+      className="inline-block min-w-16 whitespace-normal text-right leading-tight"
+    >
+      {children}
+    </span>
+  );
+}
+
 export function CoveragePanel({ scenarioId }: { scenarioId: string }) {
   const query = useQuery(getScenarioCoverageOptions({ path: { scenario_id: scenarioId } }));
   const data = query.data;
@@ -214,7 +229,7 @@ function ParishTable({
   const columns: Column<CoverageParish>[] = [
     {
       id: 'parish',
-      className: 'min-w-40 whitespace-normal',
+      className: 'min-w-36 whitespace-normal',
       header: m.scov_col_parish(),
       primary: true,
       pinned: 'left',
@@ -263,6 +278,8 @@ function ParishTable({
       searchable: false,
       filter: 'range',
       format: (n) => `${formatNumber(n)} hab/km²`,
+      // Escondidas por omissão (menu Colunas): com dez colunas a tabela rolava na horizontal a 1440 px.
+      defaultHidden: true,
       value: (p) => p.density_hab_km2,
       cell: (p) =>
         p.density_hab_km2 == null ? (
@@ -273,7 +290,8 @@ function ParishTable({
     },
     {
       id: 'demand',
-      header: m.scov_col_demand(),
+      label: m.scov_col_demand(),
+      header: <WrapHead>{m.scov_col_demand()}</WrapHead>,
       type: 'number',
       align: 'right',
       searchable: false,
@@ -291,6 +309,7 @@ function ParishTable({
       searchable: false,
       filter: 'range',
       format: (n) => formatPercent(n, 0),
+      defaultHidden: true,
       value: (p) => p.area_within_300m_pct,
       cell: (p) =>
         p.area_within_300m_pct == null ? (
@@ -302,7 +321,7 @@ function ParishTable({
     {
       id: 'pap_days',
       label: m.scov_col_pap_days(),
-      header: <span title={m.scov_col_pap_days()}>{m.scov_col_pap_days_short()}</span>,
+      header: <WrapHead title={m.scov_col_pap_days()}>{m.scov_col_pap_days_short()}</WrapHead>,
       type: 'number',
       align: 'right',
       searchable: false,
@@ -313,13 +332,14 @@ function ParishTable({
     {
       id: 'channels',
       header: m.scov_col_channels(),
+      className: 'min-w-32 whitespace-normal',
       value: (p) => channelsText(p),
       filter: true,
       cell: (p) =>
         coverageChannels(p).length === 0 ? (
           <span className="text-muted-foreground">{m.scov_channel_none()}</span>
         ) : (
-          <span className="flex flex-wrap gap-1 md:flex-nowrap md:whitespace-nowrap">
+          <span className="flex flex-wrap gap-1">
             {coverageChannels(p).map((c) => (
               <Badge
                 key={c}
@@ -340,7 +360,8 @@ function ParishTable({
     },
     {
       id: 'tonnes',
-      header: m.scov_col_tonnes(),
+      label: m.scov_col_tonnes(),
+      header: <WrapHead>{m.scov_col_tonnes()}</WrapHead>,
       type: 'number',
       align: 'right',
       searchable: false,
@@ -351,7 +372,8 @@ function ParishTable({
     },
     {
       id: 'served',
-      header: m.scov_col_served(),
+      label: m.scov_col_served(),
+      header: <WrapHead>{m.scov_col_served()}</WrapHead>,
       type: 'number',
       align: 'right',
       searchable: false,

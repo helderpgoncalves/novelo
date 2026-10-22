@@ -196,4 +196,4 @@ async def test_emails_follow_the_account_language(
     assert patched.json()["locale"] == "pt-PT"
     outbox.sent.clear()
     await client.post(f"{AUTH}/forgot-password", json={"email": "a@b.pt", "locale": "en"})
-    assert outbox.sent[0]["subject"] == "Redefine a tua password · Novelo"  # a preferência da conta tem prioridade
+    assert outbox.sent[0]["subject"] == "Redefine a tua palavra-passe · Novelo"  # a preferência da conta tem prioridade

@@ -245,13 +245,15 @@ export function Problem() {
             className={cn(CARD, 'flex flex-col gap-4 p-6 lg:col-span-5')}
           >
             <Kicker>{m.landing_impact_eyebrow()}</Kicker>
-            <dl className="grid grid-cols-3 gap-3">
+            <dl className="grid grid-cols-3 gap-2 sm:gap-3">
               {network.map((n) => (
                 <div key={n.id} className="flex flex-col gap-1.5">
                   <dd className={cn(STAT, 'order-1 text-4xl sm:text-5xl')}>
                     <CountUp value={n.value} format={(v) => formatNumber(Math.round(v))} />
                   </dd>
-                  <dt className="order-2 text-muted-foreground text-sm">{n.label}</dt>
+                  <dt className="order-2 break-words text-[13px] text-muted-foreground sm:text-sm">
+                    {n.label}
+                  </dt>
                 </div>
               ))}
             </dl>

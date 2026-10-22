@@ -22,14 +22,14 @@ test.describe('autenticação', () => {
     await page.getByLabel('Email').fill(ADMIN.email);
     await page.getByLabel('Palavra-passe', { exact: true }).fill('password-errada-1');
     await page.getByRole('button', { name: 'Entrar' }).click();
-    await expect(page.getByRole('alert')).toContainText('Email ou password incorretos.');
+    await expect(page.getByRole('alert')).toContainText('Email ou palavra-passe incorretos.');
   });
 
   test('validação dos campos acontece no cliente, em português', async ({ page }) => {
     await page.goto('/pt/login?method=password');
     await page.getByRole('button', { name: 'Entrar' }).click();
     await expect(page.getByText('Indica o teu email')).toBeVisible();
-    await expect(page.getByText('Indica a password')).toBeVisible();
+    await expect(page.getByText('Indica a palavra-passe')).toBeVisible();
   });
 
   test('entrar, ver a app e terminar sessão', async ({ page }) => {
@@ -93,11 +93,11 @@ test.describe('autenticação', () => {
     await expect(page.getByText('Verifica o teu email')).toBeVisible();
 
     const mail = await lastEmail(email);
-    expect(mail.subject).toMatch(/Redefine a tua password/);
+    expect(mail.subject).toMatch(/Redefine a tua palavra-passe/);
     await page.goto(linkFrom(mail.text));
     await page.getByLabel('Nova palavra-passe').fill('outra-password-segura-9');
     await page.getByLabel('Repete a palavra-passe').fill('outra-password-segura-9');
-    await page.getByRole('button', { name: 'Redefinir password' }).click();
+    await page.getByRole('button', { name: 'Redefinir palavra-passe' }).click();
     await expect(page).toHaveURL(/\/pt\/login/);
 
     await login(page, { email, password: 'outra-password-segura-9' });
@@ -107,7 +107,7 @@ test.describe('autenticação', () => {
     await page.goto('/pt/reset-password?token=token-invalido-token-invalido-1234');
     await page.getByLabel('Nova palavra-passe').fill(PASSWORD);
     await page.getByLabel('Repete a palavra-passe').fill(PASSWORD);
-    await page.getByRole('button', { name: 'Redefinir password' }).click();
+    await page.getByRole('button', { name: 'Redefinir palavra-passe' }).click();
     await expect(page.getByRole('alert')).toContainText('O link é inválido ou expirou');
     await expect(page.getByRole('link', { name: 'Pedir um novo link' })).toBeVisible();
   });

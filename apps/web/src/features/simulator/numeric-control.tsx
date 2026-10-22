@@ -110,8 +110,9 @@ export function NumericControl({
             className="h-10 pr-16 text-right font-medium tabular-nums"
             onFocus={(e) => {
               setFocused(true);
-              // Ao editar, mostra o número sem separadores de milhares.
-              setText(Number.isFinite(value) ? String(value).replace('.', ',') : '');
+              // Seleciona tudo sem mudar o texto: trocar «60 000» por «60000» aqui fazia o React reescrever o valor
+              // depois da seleção, e o que se escrevia a seguir (Tab + número) era acrescentado ao fim
+              // («60 000» + «45000»). `parse` já ignora os espaços dos milhares.
               e.currentTarget.select();
             }}
             onBlur={() => {

@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { useId } from 'react';
 import { z } from 'zod';
 import {
   getScenarioOptions,
@@ -54,11 +55,14 @@ function Picker({
   onChange: (id: string) => void;
 }) {
   const { data } = useSuspenseQuery(listScenariosOptions());
+  const id = useId();
   return (
     <div className="min-w-56 flex-1 space-y-1.5">
-      <p className="font-medium text-sm">{label}</p>
+      <p id={id} className="font-medium text-sm">
+        {label}
+      </p>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="h-10 w-full">
+        <SelectTrigger className="h-10 w-full" aria-labelledby={id}>
           <SelectValue placeholder={m.compare_pick()} />
         </SelectTrigger>
         <SelectContent>

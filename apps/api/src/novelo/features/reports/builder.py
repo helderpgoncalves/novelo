@@ -3,7 +3,7 @@
 
 import hashlib
 from collections import defaultdict
-from datetime import UTC, datetime
+from datetime import UTC, date, datetime
 from pathlib import Path
 from typing import Any
 
@@ -52,6 +52,9 @@ class Formatter:
 
     def pct(self, value: float, digits: int = 1) -> str:
         return f"{self.num(value, digits)}%"
+
+    def date(self, value: date) -> str:
+        return value.strftime("%d/%m/%Y" if self.pt else "%Y-%m-%d")
 
 
 def _territory_rows(
@@ -146,7 +149,10 @@ async def build_rap(
     assumptions = [
         {
             "label": labels_map[k],
-            "value": f.pct(v * 100) if "rate" in k or "coverage" in k else f.num(v, 2),
+            # kg/hab/mês com 4 casas, como no ecrã de pressupostos (1,2353; a 2 casas lia-se «1,24»).
+            "value": f.pct(v * 100)
+            if "rate" in k or "coverage" in k
+            else f.num(v, 4 if k == "kg_per_inhab_month" else 2),
             "origin": origin.get(k, ""),
         }
         for k, v in flat.items()
@@ -155,7 +161,7 @@ async def build_rap(
     sources = [
         {
             "title": s.title, "file": s.file_name, "provider": s.provider,
-            "period": f"{s.period_start} – {s.period_end}" if s.period_start and s.period_end else "-",
+            "period": f"{f.date(s.period_start)} – {f.date(s.period_end)}" if s.period_start and s.period_end else "-",
         }
         for s in (await db.execute(select(DataSource).order_by(DataSource.received_on))).scalars()
     ]  # fmt: skip
@@ -170,7 +176,7 @@ async def build_rap(
         capture_pct=f.num(baseline.capture_of_demand_pct, 1),
         best_eur_t=f"{f.num(best)} €/t" if best else "-",
         brands=[
-            {"brand": b.brand, "items": b.items, "kg": f.num(b.weight_kg, 2), "share": f.pct(b.share_pct), "fibre": _FIBRES[locale][b.top_fibre.value]}
+            {"brand": b.brand, "n_items": b.items, "kg": f.num(b.weight_kg, 2), "share": f.pct(b.share_pct), "fibre": _FIBRES[locale][b.top_fibre.value]}
             for b in brands.brands[:12]
         ],
         brand_sample=brands.sample_items, assumptions=assumptions, sources=sources,

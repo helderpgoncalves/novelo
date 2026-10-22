@@ -1,7 +1,7 @@
 import pytest
 
 from novelo.domain.costs import annual_cost_eur, avoided_treatment_eur, eur_per_tonne
-from novelo.domain.demand import Baseline, kg_per_inhab_month, share_of_tonnes_t, yearly_demand_t
+from novelo.domain.demand import Baseline, kg_per_inhab_month, potential_t, share_of_tonnes_t, yearly_demand_t
 from novelo.features.textile import references
 
 
@@ -48,3 +48,12 @@ def test_avoided_treatment_waits_for_the_vitrus_cost() -> None:
     assert avoided_treatment_eur(400.0, 50.0) == pytest.approx(20_000.0)  # 400 t × 50 €/t
     with pytest.raises(ValueError):
         avoided_treatment_eur(-1.0, 50.0)
+
+
+def test_potential_uses_total_population_not_rounded_zone_sums() -> None:
+    # 43 051 t × 5,4% = 2 324,754 t em 156 830 hab: q = 2 324 754 kg / 156 830 / 12 = 1,23528... kg/hab/mês.
+    kg = 2_324_754 / 156_830 / 12
+    pops = [78_415, 78_415]
+    assert potential_t(pops, kg) == pytest.approx(2324.754, abs=1e-6)
+    assert round(potential_t(pops, kg), 1) == 2324.8
+    assert potential_t([], kg) == 0

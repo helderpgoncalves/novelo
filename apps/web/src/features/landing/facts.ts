@@ -45,6 +45,8 @@ export const FACTS = {
    * amostras (semente 7). docs/engenharia/dados-e-modelo.md, secções 5 e 8.
    */
   scenario60k: {
+    /** Dia em que estes números foram recalculados (a legenda da Fig. 3 mostra-o; nunca escrito à mão na mensagem). */
+    computedOn: '2026-10-22',
     budget: 60000,
     cost: 47839,
     tonnes: 396.5,

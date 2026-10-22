@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import network, siting
 from novelo.domain.costs import avoided_treatment_eur
+from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.reuse import ReuseShares, reusable
 from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
 from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
@@ -420,7 +421,7 @@ def _compute_sites(
         coverage_pct=round(plan.population_covered / total_pop * 100, 1) if total_pop else 0.0,
         points=n_sites,
         km_year=round(plan.km_year + sum(z.km_year for z in plan.on_demand.values()), 1),
-        potential_t=round(sum(z.demand_t for z in zones), 1),
+        potential_t=round(zones_potential_t([z.population for z in zones], params.kg_per_inhab_month), 1),
         baseline_observed_t=round(baseline_t, 1),
         avoided_treatment_eur=avoided_treatment(plan.tonnes, params),
         **reuse_kpis(plan.tonnes, annual, reuse),

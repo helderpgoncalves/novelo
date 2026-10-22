@@ -86,8 +86,12 @@ test.describe('acesso', () => {
       await expect(page.getByRole('tab', { name: new RegExp(name) })).toBeVisible();
     }
     await expect(page.getByRole('tab')).toHaveCount(3);
-    // Sem cartões de resumo: o conteúdo começa logo nos separadores.
-    await expect(page.getByText('Por aprovar', { exact: true })).toHaveCount(0);
+    // Sem cartões de resumo: o conteúdo começa logo nos separadores. «Por aprovar» só aparece como estado nas linhas
+    // da tabela (a conta acabada de criar está por aprovar), nunca num cartão por cima dela.
+    const pendingText = page.getByText('Por aprovar', { exact: true }).filter({ visible: true });
+    const inTable = page.getByRole('table').getByText('Por aprovar', { exact: true });
+    await expect(inTable.first()).toBeVisible();
+    expect(await pendingText.count()).toBe(await inTable.filter({ visible: true }).count());
     // O separador ativo vive no URL.
     await page.getByRole('tab', { name: /Auditoria/ }).click();
     await expect(page).toHaveURL(/tab=audit/);
@@ -147,8 +151,16 @@ test.describe('acesso', () => {
     expect(res.ok()).toBeTruthy();
     await api.dispose();
     await login(page);
+    // O convite está no separador Convites (ainda não é uma conta): procura-o lá.
     await page.goto('/pt/users?tab=invitations');
-    await rowAction(page, invited, /^Ver emails deste convite/);
+    await page
+      .getByRole('searchbox', { name: /Pesquisar por nome/ })
+      .first()
+      .fill(invited);
+    const row = page.getByRole('row', { name: new RegExp(invited.replace(/[.+]/g, '\\$&')) });
+    await expect(row).toBeVisible();
+    await row.getByRole('button', { name: /^Ações de/ }).click();
+    await page.getByRole('menuitem', { name: /^Ver emails deste convite/ }).click();
     await expect(page).toHaveURL(/view=emails/);
     await expect(page).toHaveURL(/q=/);
     await expect(page.getByRole('searchbox', { name: 'Email do destinatário' })).toHaveValue(
@@ -202,7 +214,7 @@ test.describe('convites', () => {
     await expect(guest).not.toHaveURL(/token=/);
     await shot(guest, 'accept-invite');
 
-    await guest.getByRole('button', { name: 'Entrar sem password' }).click();
+    await guest.getByRole('button', { name: 'Entrar sem palavra-passe' }).click();
     await expect(guest).toHaveURL(/\/pt\/?$/, { timeout: 15_000 });
     await expect(guest.locator('#content h1').first()).toBeVisible();
 

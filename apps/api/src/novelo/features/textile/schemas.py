@@ -189,7 +189,12 @@ class OverviewDataSource(BaseModel):
     period_start: date | None
     period_end: date | None
     methods: list[WeighingMethod] = Field(description="Só no têxtil: `weighed` e/ou `percentage`")
-    rows: int = Field(description="Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, ...)")
+    rows: int = Field(
+        description="Linhas importadas desta fonte (fluxos, circuitos, turnos, freguesias, contentores municipais, ...)"
+    )
+    rows_unit: Literal["rows", "values"] = Field(
+        description="`rows`: linhas importadas; `values`: valores de referência comunicados sem ficheiro (ex.: RSU)"
+    )
 
 
 class OverviewHighlight(BaseModel):

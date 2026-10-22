@@ -76,7 +76,7 @@ test.describe('aprovação de contas', () => {
     await expect(adminPage.getByText('foi aprovada')).toBeVisible();
 
     // O email chega e a página da pessoa abre a app sozinha.
-    const mail = await lastEmail(email);
+    const mail = await lastEmail(email, /aprovada/i);
     expect(mail.subject).toMatch(/aprovada/i);
     await expect(person.getByRole('heading', { name: /Aprovado! Bem-vindo/ })).toBeVisible({
       timeout: 45_000,

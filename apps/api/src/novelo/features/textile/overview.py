@@ -16,6 +16,8 @@ from novelo.domain.overview import days_until, pareto_ids, parish_potential_t, s
 from novelo.domain.parish_area import geometry_area_km2
 from novelo.domain.vocab import CollectionMode, ContainerStatus, ScenarioStatus, WasteCategory, WasteScope
 from novelo.features.datasets.models import DataSource
+from novelo.features.municipal.importer import MUNICIPAL_SOURCE
+from novelo.features.municipal.models import MunicipalContainer
 from novelo.features.network.models import (
     Circuit,
     CircuitLocality,
@@ -29,11 +31,13 @@ from novelo.features.planning.models import Scenario
 from novelo.features.textile import service
 from novelo.features.textile.models import TextileFlow, WasteShare
 from novelo.features.textile.references import (
+    APA_TEXTILE_SHARE_OF_RSU,
     EXTERNAL_REFERENCES,
     FRANCE_KEY,
     KG_PER_INHAB_MONTH,
     MILESTONES,
     POTENTIAL_SOURCE_LABEL,
+    VITRUS_RSU_2025_T,
 )
 from novelo.features.textile.schemas import (
     FrontierPoint,
@@ -59,8 +63,13 @@ _SOURCE_KIND = {
     "ine_census_2021": "public_statistics",
     "osm_nominatim": "public_geodata",
     "vitrus_apa_rsu_2025": "operator",
+    MUNICIPAL_SOURCE: "operator",
 }
 _GEOCODED_SOURCE = "osm_nominatim"
+# Fontes sem tabela própria: valores comunicados por email (contam-se os valores, não linhas).
+_REFERENCE_VALUES: dict[str, tuple[float, ...]] = {
+    "vitrus_apa_rsu_2025": (VITRUS_RSU_2025_T, APA_TEXTILE_SHARE_OF_RSU),
+}
 
 
 def _gap(base: TextileBaseline, parishes_count: int) -> OverviewGap:
@@ -248,7 +257,17 @@ async def _frontier(db: AsyncSession) -> tuple[list[FrontierPoint], list[Any]]:
 async def _data_sources(db: AsyncSession) -> list[OverviewDataSource]:
     sources = (await db.execute(select(DataSource).order_by(DataSource.received_on, DataSource.key))).scalars().all()
     rows: dict[Any, int] = defaultdict(int)
-    for model in (TextileFlow, WasteShare, Circuit, ShiftAssignment, Parish, Container, FleetCapacity):
+    # Do pacote QGIS contam-se os contentores (uma linha por contentor); locais e estatísticas são derivados deles.
+    for model in (
+        TextileFlow,
+        WasteShare,
+        Circuit,
+        ShiftAssignment,
+        Parish,
+        Container,
+        FleetCapacity,
+        MunicipalContainer,
+    ):
         for source_id, n in (await db.execute(select(model.source_id, func.count()).group_by(model.source_id))).all():
             if source_id is not None:
                 rows[source_id] += int(n)
@@ -261,6 +280,7 @@ async def _data_sources(db: AsyncSession) -> list[OverviewDataSource]:
     out = []
     for s in sources:
         n = rows[s.id] + (geocoded if s.key == _GEOCODED_SOURCE else 0)
+        values = _REFERENCE_VALUES.get(s.key)
         out.append(
             OverviewDataSource(
                 key=s.key,
@@ -270,7 +290,8 @@ async def _data_sources(db: AsyncSession) -> list[OverviewDataSource]:
                 period_start=s.period_start,
                 period_end=s.period_end,
                 methods=sorted(methods.get(s.id, [])),
-                rows=n,
+                rows=len(values) if values is not None and n == 0 else n,
+                rows_unit="values" if values is not None and n == 0 else "rows",
             )
         )
     return out

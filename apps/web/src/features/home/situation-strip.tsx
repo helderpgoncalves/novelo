@@ -34,12 +34,13 @@ function Cell({ label, value, unit, tag, source, emphasis }: CellProps) {
       <p className="font-medium text-[13px] text-muted-foreground leading-snug">{label}</p>
       <p
         className={cn(
-          'font-medium font-serif text-[2rem] tabular-nums leading-none tracking-tight sm:text-[2.5rem]',
+          // A unidade passa para baixo do número quando não cabe (2 325 t/ano a 320 px).
+          'flex flex-wrap items-baseline gap-x-1.5 gap-y-1 font-medium font-serif text-[2rem] tabular-nums leading-none tracking-tight sm:text-[2.5rem]',
           emphasis && 'text-primary',
         )}
       >
         {value}
-        {unit && <span className="ml-1.5 font-sans text-base text-muted-foreground">{unit}</span>}
+        {unit && <span className="font-sans text-base text-muted-foreground">{unit}</span>}
       </p>
       <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5">{tag}</div>
       <p className="text-muted-foreground text-xs leading-snug">{source}</p>
