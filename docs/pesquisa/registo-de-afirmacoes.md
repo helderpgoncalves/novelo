@@ -2,7 +2,7 @@
 
 **Regra: nenhum número vai para um slide, para a demo ou para o relatório sem uma linha aqui.** Se a linha estiver em "Por verificar", o número não se usa em público; se for "Pressuposto nosso" ou "Cálculo nosso", diz-se com essa palavra.
 
-Datas de consulta: **2026-10-19**, salvo indicação. As fontes F1 a F62 estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
+Datas de consulta: **2026-10-19**, salvo indicação (a secção B foi revista a 22 out 2026, com a diretiva lida integralmente). As fontes estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
 
 Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
 
@@ -33,22 +33,33 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 
 | # | Afirmação | Valor | Fonte | Estado | Slide |
 | --- | --- | --- | --- | --- | --- |
-| B1 | Municípios operacionalizam a recolha seletiva de têxteis desde 1 jan 2025 | 1 jan 2025 | APA [F2] | Primária | 2 |
+| B1 | Municípios operacionalizam a recolha seletiva de têxteis desde 1 jan 2025 | 1 jan 2025 | Diretiva 2008/98/CE, art. 11.º, n.º 1 (de 2018) [F81]; RGGR, art. 36.º [F69]; APA [F2]. **Não** vem da Diretiva (UE) 2025/1892 | Primária | 2 |
 | B2 | Diretiva (UE) 2025/1892 publicada no JOUE | 26 set 2025 | APA [F2], EUR-Lex [F1] | Primária | 2 |
 | B3 | Prazo de transposição | 17 jun 2027 | EUR-Lex art. 2.º [F1], APA [F2] | Primária | 2 |
-| B4 | Regimes de RAP de têxteis a funcionar | até 17 abr 2028 | EUR-Lex [F1], APA [F2] | Primária | 2, 6 |
-| B5 | Os produtores cobrem recolha, transporte, triagem, reutilização e reciclagem | art. 22.º-A n.º 8 | [F1] | Primária | 6 |
-| B6 | Os custos têm de ser "economicamente eficientes" e determinados de forma transparente | art. 22.º-A n.º 12 | [F1] | Primária | 6 |
-| B7 | Os Estados-Membros **podem** fazer os produtores pagar os têxteis no indiferenciado | art. 22.º-A n.º 9 | [F1] | Primária | só em conversa |
-| B8 | A rede de recolha deve cobrir todo o território, não só as zonas rentáveis | art. 11.º e considerando 36 | [F1], [F2] | Primária | 3, 6 |
+| B4 | Regimes de RAP de têxteis criados ("asseguram a previsão dos regimes") | até 17 abr 2028 | art. 22.º-A, n.º 14 [F1], APA [F2] | Primária. **Não** é a data em que os produtores passam a pagar tudo (ver B17) | 2, 7 |
+| B5 | Os produtores cobrem recolha, transporte, triagem, preparação para reutilização, reciclagem e eliminação, mais estudo de composição, informação, dados e relatórios, e investigação; custo líquido das receitas de reutilização | art. 22.º-A n.º 8, alíneas a) a e); art. 22.º-C n.º 5, b) | [F1] | Primária | 7 |
+| B6 | Os custos têm de ser "economicamente eficientes" e determinados "de forma transparente entre os intervenientes relevantes", entre os quais "As autoridades locais" | art. 22.º-A n.º 12 e n.º 7, d) | [F1] | Primária | 7 |
+| B7 | Os Estados-Membros **podem** fazer os produtores pagar, parcial ou totalmente, a recolha e gestão dos têxteis no indiferenciado | art. 22.º-A n.º 9 (só os custos do n.º 8, alínea a)) | [F1] | Primária | só em conversa |
+| B8 | A rede de recolha deve cobrir todo o território, tendo em conta população, densidade, volume previsto, acessibilidade e proximidade, sem se limitar às zonas rendíveis | art. 22.º-C n.º 9, b) (vinculativo); também art. 11.º, n.º 1 e considerando 36 | [F1], [F2] | Primária | 3, 7 |
 | B9 | A triagem dá prioridade à reutilização e à triagem local | art. 22.º-D n.º 5, considerando 48 | [F1] | Primária | 5 |
 | B10 | A economia social pode manter pontos de recolha próprios | art. 22.º-C n.º 11 | [F1] | Primária | 6 |
 | B11 | Portugal ainda não tem entidade gestora nem regime de RAP de têxteis aprovado | "ainda não se encontra aprovado o fluxo" (APA, dez 2025) | [F2] | Primária (dezembro de 2025); reconfirmada a 8 out 2026: a APA diz que o modelo nacional, as entidades gestoras e os valores estão por definir (F71) | 2 |
 | B12 | O município assume sozinho o custo desde 2025 | posição da ZERO e da ANMP | [F5], [F6] | Secundária | 2 |
 | B13 | Projeto-piloto da APED, financiado pelo Fundo Ambiental | 450 000 € | APA [F2] | Primária | não usar |
-| B14 | A diretiva fixa metas de recolha de têxteis | **não**: só pede à Comissão que avalie a viabilidade (considerando 59) | [F1] | Primária | **não afirmar metas** |
-| B15 | A obrigação aplica-se às microempresas só a partir de | 17 abr 2029 | [F3] | Secundária | não usar |
+| B14 | A diretiva fixa metas de recolha de têxteis | **não**: a Comissão avalia a possibilidade de metas até 31 dez 2029 | art. 41.º-A, b) [F1] (fundamentado no considerando 59) | Primária | **não afirmar metas** |
+| B15 | Os artigos 22.º-A a 22.º-D aplicam-se a empresas com menos de 10 empregados e volume de negócios e balanço anual até 2 M€ só a partir de | 17 abr 2029 | art. 41.º (parágrafo aditado pelo art. 1.º, ponto 12) [F1]; também [F3] | Primária | só em conversa |
 | B16 | Passaporte digital e proibição de destruir invendidos | datas divergem | blogues [F20] | **Por verificar** | não usar |
+| B17 | Os produtores cobrem os custos só dos produtos postos no mercado pela primeira vez depois da lei de transposição, ou o mais tardar depois de 17 abr 2028; o têxtil já nas casas continua sem produtor que pague durante anos | art. 22.º-A n.º 11 (n.º 10 só para quem já tinha RAP a 16 out 2025); considerando 31 ("não se apliquem retroativamente") | [F1] | Primária quanto ao texto; **leitura por confirmar com a APA ou um jurista**. Sem número sobre a idade das peças | 2, 7 |
+| B18 | A OCRP não pode recusar a participação de autoridades públicas locais no sistema de recolha | art. 22.º-C n.º 10 | [F1] | Primária | 7 |
+| B19 | O sistema de recolha mantém um aumento sustentado da recolha seletiva e uma diminuição correspondente de têxteis no indiferenciado | art. 22.º-C n.º 9, c) | [F1] | Primária | 7 |
+| B20 | Recolha com frequência adaptada à área e ao volume | art. 22.º-C n.º 8, b) | [F1] | Primária | só em conversa |
+| B21 | Estudo da composição do indiferenciado pelo Estado: o primeiro até 1 jan 2026, depois de cinco em cinco anos, com resultados públicos | art. 22.º-D n.º 6 (NUTS 2 só no considerando 36) | [F1] | Primária | só em conversa |
+| B22 | Os produtores **têm de** entregar as obrigações a uma OCRP autorizada (entidade gestora) | art. 22.º-C n.º 1 e 2 | [F1] | Primária | só em conversa |
+| B23 | Os vendedores à distância de fora do país são produtores; as plataformas em linha só verificam o registo e pedem uma autocertificação | art. 3.º, ponto 4-B, d); art. 22.º-A n.º 13 | [F1] | Primária | não usar |
+| B24 | Só o operador de reutilização ou a economia social podem avaliar no ponto de recolha e tirar a peça do estatuto de resíduo; um operador de resíduos como a Vitrus não | art. 22.º-D n.º 3 | [F1] | Primária | só em conversa |
+| B25 | Registo por fardo nas transferências de usados: tipo de vestuário, tamanho, cor, sexo, composição, nome e endereço de quem triou | art. 22.º-D n.º 9 | [F1] | Primária | 5 (o passaporte "vai no sentido de", não "cumpre") |
+| B26 | Reporte anual por peso: apto para reutilização, preparação para reutilização e reciclagem, outras operações | art. 22.º-C n.º 12 (economia social) e n.º 18 e 20 (OCRP); art. 37.º n.º 3 | [F1] | Primária | só em conversa |
+| B27 | O recolhido seletivamente para reutilização e reciclagem não é incinerado nem aterrado | Diretiva 2008/98/CE art. 10.º n.º 4; Diretiva 1999/31/CE art. 5.º n.º 3, f) (ambas de 2018). **Não** está na 2025/1892 | [F81], [F82] | Primária (consolidado) | só em conversa |
 
 ## C. Benchmarks e mercado
 

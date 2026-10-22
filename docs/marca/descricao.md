@@ -26,7 +26,7 @@ Ferramenta de decisão que desenha a rede de recolha de têxteis de Guimarães a
 
 ## Descrição
 
-Em 2025 a Vitrus recolheu 43 051 toneladas de resíduos urbanos em Guimarães; segundo a APA, 5,4% é têxtil, cerca de 2 324,8 toneladas por ano que ainda vão para o lixo (estimativa). A partir de 2028, a recolha e o tratamento destes resíduos passam a ser financiados pelos produtores, e os municípios precisam de saber onde recolher, como e a que custo.
+Em 2025 a Vitrus recolheu 43 051 toneladas de resíduos urbanos em Guimarães; segundo a APA, 5,4% é têxtil, cerca de 2 324,8 toneladas por ano que ainda vão para o lixo (estimativa). Até 2028 nasce a responsabilidade alargada do produtor: os produtores passam a financiar a recolha e o tratamento das peças postas à venda a partir daí, e o município continua a pagar o resto durante anos. Os municípios precisam de saber onde recolher, como e a que custo.
 
 O Novelo responde a isso. Cruza população, caracterização do lixo e rede viária para propor onde colocar pontos de recolha, que modo usar em cada zona (pontos em locais existentes, sem contentor novo, ou recolha a pedido nos circuitos) e que rotas fazer. Cada cenário mostra investimento, custo anual de operação, toneladas desviadas de aterro e custo por tonelada, lado a lado.
 
@@ -34,7 +34,7 @@ O decisor pode perguntar em português ("e se passarmos esta freguesia a recolha
 
 ## Description (EN)
 
-In 2025 Vitrus collected 43,051 tonnes of municipal waste in Guimarães; according to the Portuguese Environment Agency (APA), 5.4% of it is textiles, about 2,324.8 tonnes a year still going to waste (estimate). From 2028, producers will fund textile collection and treatment, and municipalities need to know where to collect, how, and at what cost.
+In 2025 Vitrus collected 43,051 tonnes of municipal waste in Guimarães; according to the Portuguese Environment Agency (APA), 5.4% of it is textiles, about 2,324.8 tonnes a year still going to waste (estimate). By 2028 extended producer responsibility arrives: producers will fund collection and treatment of items first sold from then on, while the municipality keeps paying for the rest for years. Municipalities need to know where to collect, how, and at what cost.
 
 Novelo answers that. It combines population, waste composition and the road network to propose where to place collection points, which mode fits each area (drop-off at existing venues with no new container, or on-demand pickup on existing rounds) and which routes to run. Each scenario shows investment, yearly operating cost, tonnes diverted from landfill and cost per tonne, side by side.
 

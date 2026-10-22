@@ -109,8 +109,11 @@ class Milestone:
 _APA_FAQ = "https://apambiente.pt/sites/default/files/_Residuos/FluxosEspecificosResiduos/Texteis/perguntas-frequentes_texteis.pdf"
 _EURLEX = "https://eur-lex.europa.eu/legal-content/PT/TXT/HTML/?uri=OJ:L_202501892"
 
-# Quem paga: até aos regimes de RAP o município paga sozinho (APA: sem entidade gestora nem regime aprovado, B11);
-# depois os produtores, só até ao custo economicamente eficiente (art. 22.º-A n.º 8 e 12, B5 e B6).
+# Quem paga: até aos regimes de RAP o município paga sozinho (APA: sem entidade gestora nem regime aprovado, B11).
+# Depois, os produtores pagam o custo economicamente eficiente (art. 22.º-A n.º 8 e 12, B5 e B6), mas só das peças
+# postas à venda após a transposição ou, o mais tardar, após 17 abr 2028 (n.º 11, B17); as antigas continuam no
+# município. "producers" marca o início dessa fase, não o fim do custo municipal.
+# A obrigação de 1 jan 2025 vem da Diretiva 2008/98/CE (alterada em 2018) e do RGGR, não da 2025/1892 (B1).
 MILESTONES: tuple[Milestone, ...] = (
     Milestone(  # B1
         key="municipal_obligation",
@@ -133,7 +136,7 @@ MILESTONES: tuple[Milestone, ...] = (
         date=date(2028, 4, 17),
         who_pays="producers",
         evidence="primary",
-        source_label="Diretiva (UE) 2025/1892, art. 22.º-A; APA",
+        source_label="Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14; APA",
         source_url=_EURLEX,
     ),
 )

@@ -39,7 +39,7 @@ A coluna "o que o júri procura" é **hipótese** até lermos as Regras. A matri
 | --- | --- | --- | --- | --- |
 | **Inovação e originalidade** (25%) | Ideia não óbvia; IA com sentido; ligação nova entre peças | A IA conduz o otimizador e um verificador rejeita números; do saco ao fio numa só ferramenta | Slides 5 e 6; "E se...?" e lote com QR | **7** |
 | **Viabilidade técnica** (25%) | Funciona; dados reais; pressupostos à vista | Produção, 301,3 t, 40 circuitos, 29 viaturas; pressupostos visíveis; testes | Slide 5; ponto de partida e sensibilidade | **6** |
-| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta | 301,3 t; destino 59,4 / 26,5 / 14,1%; obrigação desde 2025 e RAP em abril de 2028; X t a Y €/t (estimativa) | Slides 1 a 3 e 7; cenário A contra B; relatório RAP | **6** |
+| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta | 301,3 t; destino 59,4 / 26,5 / 14,1%; obrigação desde 2025 e RAP criada até abril de 2028 (cobre as peças novas); X t a Y €/t (estimativa) | Slides 1 a 3 e 7; cenário A contra B; relatório RAP | **6** |
 | **Apresentação e potencial de continuidade** (20%) | História clara, demo sem falhas; plano depois do hackathon | Narrativa, demo mínima, plano B; pedido do piloto de 3 meses | Slides 1, 8 e 9 | **5** |
 | **Nota ponderada** | | | | **6,05** (alvo 7,75 a 25 de outubro) |
 

@@ -44,7 +44,7 @@ export interface EprDeadline {
   verified: boolean;
 }
 
-/** O marco em que os produtores passam a pagar, com os dias contados na hora (não os do servidor, que podem ficar velhos na cache). */
+/** O prazo da RAP têxtil (daí em diante os produtores pagam as peças novas), com os dias contados na hora (não os do servidor, que podem ficar velhos na cache). */
 export function eprDeadline(timeline: OverviewMilestone[], now: Date = new Date()): EprDeadline {
   const epr = pickEprMilestone(timeline ?? []);
   // Uma data vazia ou inválida da API não derruba a faixa: recai no prazo conhecido.

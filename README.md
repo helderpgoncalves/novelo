@@ -22,8 +22,9 @@ sobre os dados reais da Vitrus, e acompanha cada saco de roupa até à fábrica,
 ## O problema
 
 Em 2025 a Vitrus recolheu 43 051 t de resíduos urbanos em Guimarães. Segundo a APA, 5,4% disso é têxtil: cerca de 2 324,8 t por ano que vão para o lixo (estimativa).
-A recolha seletiva de têxteis é obrigatória desde 1 de janeiro de 2025 e, até 17 de abril de 2028, cada Estado-Membro tem de ter um regime em que os produtores
-pagam a recolha, a triagem e a reciclagem (Diretiva (UE) 2025/1892). O concelho tem 156 830 habitantes (INE, Censos 2021) dispersos por 48 freguesias, o que
+A recolha seletiva de têxteis é obrigatória desde 1 de janeiro de 2025 e, até 17 de abril de 2028, cada Estado-Membro tem de criar um regime em que os produtores
+pagam a recolha, a triagem e a reciclagem das peças postas à venda a partir da lei nacional (Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14); o têxtil que já está
+nas casas continua anos a pesar no município. O concelho tem 156 830 habitantes (INE, Censos 2021) dispersos por 48 freguesias, o que
 encarece o porta a porta. Contentores de têxtil também não são resposta: a Vitrus não os tem nem os quer, porque o têxtil de contentor chega contaminado e perde a reutilização.
 
 A pergunta da Vitrus é simples: **como recolher mais têxtil reutilizável e reciclável com o menor investimento e o menor custo de operação?**
@@ -271,7 +272,7 @@ Hélder Gonçalves e Flávio Fernandes. O Hack4Guimarães 2035 avalia quatro cri
 | --- | --- | --- |
 | Inovação e originalidade | 25% | IA que conduz o otimizador sem fazer contas; do saco ao fio numa só ferramenta |
 | Viabilidade técnica | 25% | Em produção, dados reais, pressupostos à vista, testes e contrato verificado |
-| Impacto e relevância | 30% | 301,3 t reais, 2 324,8 t estimadas ainda no lixo, RAP em abril de 2028 |
+| Impacto e relevância | 30% | 301,3 t reais, 2 324,8 t estimadas ainda no lixo, RAP criada até abril de 2028 |
 | Apresentação e potencial de continuidade | 20% | Demo de dois minutos e pedido de um piloto de 3 meses em duas freguesias |
 
 Submissão até 23 de outubro às 17h30; pitches a 26 de outubro.

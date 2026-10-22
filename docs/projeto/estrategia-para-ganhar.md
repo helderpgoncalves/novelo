@@ -14,14 +14,14 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 
 **O que a Vitrus perguntou.** Como criar uma recolha seletiva de têxteis pós-consumo que garanta material reutilizável e reciclável, com o menor investimento e o menor custo de operação.
 
-**O que respondemos.** Não um contentor melhor, mas **a camada de decisão** que diz, com números, onde investir, que modo de recolha usar em cada zona e quanto custa cada tonelada; que entrega ao lote um passaporte para o reciclador; e que dá ao município o dossiê de custo eficiente para reclamar aos produtores quando a responsabilidade alargada começar, a **17 de abril de 2028**.
+**O que respondemos.** Não um contentor melhor, mas **a camada de decisão** que diz, com números, onde investir, que modo de recolha usar em cada zona e quanto custa cada tonelada; que entrega ao lote um passaporte para o reciclador; e que dá ao município o dossiê de custo eficiente para levar à mesa com produtores e entidade gestora quando a responsabilidade alargada começar (o regime tem de existir até **17 de abril de 2028** e cobre as peças postas à venda a partir da lei nacional).
 
 **Porque pode ganhar.**
 
 1. **Dados reais em todo o lado:** 301,3 t, destino de cada tonelada, 40 circuitos, 29 viaturas, população do INE.
 2. **Honestidade sobre a incerteza:** os custos unitários ainda são pressupostos; mostramos o intervalo e o que mais pesa (feito: tornado e Monte Carlo).
 3. **IA com disciplina:** conduz o otimizador e **nunca faz contas**; um verificador rejeita números inventados.
-4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes" e exige cobertura do território todo.
+4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes", determinados com as autoridades locais (art. 22.º-A, n.º 7 e 12), e exige cobertura do território todo por população, densidade, volume previsto e proximidade (art. 22.º-C, n.º 9, b)).
 5. **Cadeia completa, do saco ao fio:** recolha, triagem, lote com passaporte, bolsa de fibra, relatório RAP.
 6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (feito).
 
@@ -37,9 +37,9 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 
 | Parte da pergunta | O que significa | Como respondemos |
 | --- | --- | --- |
-| "serviço de recolha seletiva" | Um serviço, não um equipamento | Rede de modos combináveis (rua, pontos existentes, a pedido) |
+| "serviço de recolha seletiva" | Um serviço, não um equipamento | Rede de modos combináveis: locais existentes onde a viatura já passa, sem contentor novo, e recolha a pedido nos circuitos porta a porta |
 | "garanta material reutilizável e reciclável" | Qualidade à entrada | Triagem assistida e lotes por composição e estado |
-| "menor investimento" | CAPEX | Pontos onde a densidade o justifica; a pedido sem km novos |
+| "menor investimento" | CAPEX | Sem contentores de têxtil: locais existentes sem contentor novo; recolha a pedido nos circuitos atuais, sem km novos |
 | "menor custo de operação" | OPEX | Otimizador de rotas sobre circuitos e viaturas atuais |
 | "menor" (as duas coisas) | Comparar | Simulador com orçamento, cenários e €/t |
 | "dados disponíveis" | Usá-los | Todos usados; não há contentores de têxteis (Vitrus, 21 out); caracterização: 5,4% da APA indicado pela Vitrus |
@@ -123,7 +123,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 | --- | --- | --- | --- | --- | --- |
 | **Inovação e originalidade** (25%) | Uma ideia que não seja a solução óbvia (a app do cidadão, mais contentores); IA com sentido; uma ligação nova entre peças | A IA conduz o otimizador e um verificador rejeita números fora do resultado; a cadeia do saco ao fio numa só ferramenta: decisão da rede, lote com passaporte e QR, bolsa de fibra, relatório RAP ([funcionalidades](../engenharia/features.md)) | Slides 5 e 6; demo: "E se...?" (passo 6) e lote com QR (passo 8) | "Isto já existe?": cada peça existe isolada, e a nossa pesquisa de concorrência não é exaustiva | Dizer a novidade como **ligação**, não como tecnologia; mostrar o verificador a recusar um número; ter uma frase de comparação. **Não investir mais engenharia aqui** |
 | **Viabilidade técnica** (25%) | Funciona a sério; usa dados reais; os pressupostos estão à vista; sabe-se o que acontece quando falha | Em produção ([novelo.helder.si](https://novelo.helder.si)); dados da Vitrus (301,3 t, 40 circuitos, 29 viaturas) e do INE; pressupostos visíveis; domínio testado com valores calculados à mão; 12 alertas de qualidade dos dados | Slide 5; demo: ponto de partida (passo 1) e sensibilidade (passo 5); plano B | Custos unitários ainda são pressupostos; sensibilidade, piloto e copiloto já na app (a ensaiar com o guião); exatidão da triagem por medir | E2E verde em tudo o que entra; mostrar intervalo e tornado; "estamos a medir" com protocolo; cenários pré-calculados |
-| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); 2 324,8 t/ano ainda no lixo (43 051 t de RSU × 5,4%, Vitrus e APA) e captura de 11,5% (cálculo, estimativa); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP em 17 abr 2028; **cenário B: X t/ano a Y €/t (estimativa, por preencher a 22 out)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | X e Y por preencher; custos da Vitrus por chegar; 5,4% é média da APA, não caracterização local; sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
+| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); 2 324,8 t/ano ainda no lixo (43 051 t de RSU × 5,4%, Vitrus e APA) e captura de 11,5% (cálculo, estimativa); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP criada até 17 abr 2028 (cobre as peças novas, B17); **cenário B: X t/ano a Y €/t (estimativa, por preencher a 22 out)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | X e Y por preencher; custos da Vitrus por chegar; 5,4% é média da APA, não caracterização local; sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
 | **Apresentação e potencial de continuidade** (20%) | História clara, tempo cumprido, demo sem falhas; um plano para depois do hackathon, parceiros, replicação, sustentabilidade | Narrativa em sete passos; demo mínima de cinco passos; plano B; pedido do piloto (duas freguesias, 3 meses, KPIs, piso de sinal de 1,71 t, estimativa); repositório público, propriedade dos autores [F59] | Slides 1 e 8; slide de apoio 9 ("critério → prova"); QR lido no telemóvel de um jurado | Deck por fazer; duração e formato por confirmar; nenhum parceiro confirmou o piloto; modelo de sustentabilidade é hipótese | Três ensaios a 25 out; mensagem à Vitrus e à Fibrenamics com o pedido; roadmap pós-26 out com datas; replicação dita com prova (dados abertos) |
 
 ### Autoavaliação honesta
@@ -219,9 +219,9 @@ Cada afirmação do pitch tem de ter **evidência a abrir** e **fonte**. Se a li
 | "Recolhemos 301,3 t em 2025, 0,16 kg/hab/mês" (2) | Ponto de partida | Dados da Vitrus; INE | Dado Vitrus + cálculo |
 | "59,4% reutilização, 26,5% reciclagem, 14,1% rejeito" (5) | Sankey | Dados da Vitrus | Dado Vitrus (duas entidades estimadas) |
 | "72% dos têxteis vão para o indiferenciado na Europa" (2) | Slide com fonte | AEA [F7] | Primária |
-| "Desde 2025 o município é obrigado; os produtores só em abril de 2028" (2) | Slide de 2028 | APA, EUR-Lex [F1] [F2] | Primária |
-| "O custo tem de ser economicamente eficiente" (7) | Relatório RAP | EUR-Lex art. 22.º-A n.º 12 | Primária |
-| "A rede tem de cobrir o território todo" (3, 7) | Cobertura | EUR-Lex art. 11.º | Primária |
+| "Desde 2025 o município é obrigado e paga; a RAP tem de existir até abril de 2028 e cobre as peças postas à venda a partir daí" (2) | Slide de 2028 | APA, EUR-Lex art. 22.º-A n.º 11 e 14 [F1] [F2] (B17) | Primária; leitura do n.º 11 a confirmar com a APA |
+| "O custo tem de ser economicamente eficiente e é determinado com as autoridades locais" (7) | Relatório RAP | EUR-Lex art. 22.º-A n.º 7 e 12 | Primária |
+| "A rede tem de cobrir o território todo, não só as zonas rendíveis" (3, 7) | Cobertura | EUR-Lex art. 22.º-C n.º 9, b) | Primária |
 | "A França recolhe 4,27 kg/hab; nós 1,92" (3) | Cenário francês | Imprensa citando a Refashion [F10] | **Por verificar** na fonte primária |
 | "A meta francesa seria 669,7 t; o teto do modelo é 562,6 t" (3) | Cenários de referência | Cálculo nosso | Cálculo (depende da França) |
 | "Os pressupostos que mais pesam são estes" (4) | Tornado | Modelo | Estimativa |
@@ -328,7 +328,7 @@ gantt
 
 - "Sabemos dizer quanto custa cada tonelada e como baixar esse custo."
 - "A IA conduz o otimizador; nunca faz contas."
-- "O município paga hoje; em 2028 deixa de pagar sozinho, mas só custos eficientes. Alguém tem de os provar."
+- "O município paga hoje. Com a RAP, os produtores pagam o custo eficiente das peças novas, e a lei põe a câmara na mesa onde se fixa esse custo. Alguém tem de o provar."
 - "Os custos unitários ainda são pressupostos; aqui está o que mais pesa."
 - "Pedimos duas freguesias, três meses."
 
@@ -337,6 +337,7 @@ gantt
 - Um número que não esteja no [registo](../pesquisa/registo-de-afirmacoes.md).
 - Que a IA "identifica a fibra" ou "substitui a triagem".
 - Que a diretiva fixa metas de recolha de têxteis.
+- Que em 2028 os produtores passam a pagar toda a recolha (só as peças postas à venda depois da lei nacional).
 - "Validado pela Fibrenamics/Universidade/Vitrus" antes de ouvir e escrever o que disseram.
 - Que a meta francesa é uma promessa.
 - Que uma funcionalidade "em integração" está pronta sem a ter ensaiado.

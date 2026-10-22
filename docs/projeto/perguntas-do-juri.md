@@ -14,7 +14,7 @@ Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonela
 
 **"Quem paga isto?"**
 
-Hoje, o município. A partir de 2028, os produtores, através da responsabilidade alargada do produtor. Em ambos os casos alguém precisa de saber o custo por tonelada, e é isso que o Novelo calcula.
+Hoje, o município, sozinho. A responsabilidade alargada do produtor tem de existir até 17 de abril de 2028, mas os produtores só pagam o custo eficiente das peças postas à venda depois da lei nacional (Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11). O têxtil que já está nas casas continua anos a pesar no município; a leitura exata confirmamos com a APA. Esse custo eficiente determina-se com as autoridades locais (n.º 7 e 12). Em todos os casos alguém precisa de saber o custo por tonelada, e é isso que o Novelo calcula.
 
 ## Sobre a tecnologia
 

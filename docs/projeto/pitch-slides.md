@@ -47,12 +47,12 @@ flowchart LR
 | | |
 | --- | --- |
 | **Critério e peso** | Impacto e relevância (30%), 25 s |
-| **Título** | A recolha é obrigatória desde 2025 e ninguém a paga ainda |
-| **Visual** | Linha do tempo horizontal: 1 jan 2025 (município obrigado) · 17 jun 2027 (transposição) · **17 abr 2028 (produtores pagam)**. Faixa a vermelho entre 2025 e 2028: "paga o município" |
+| **Título** | A recolha é obrigatória desde 2025 e o município paga-a sozinho |
+| **Visual** | Linha do tempo horizontal: 1 jan 2025 (município obrigado) · 17 jun 2027 (transposição) · **17 abr 2028 (regime criado; os produtores pagam as peças postas à venda a partir daí)**. Faixa a vermelho entre 2025 e 2028: "paga o município"; depois, a faixa vai clareando: "as peças antigas ainda pesam no município" |
 | **Número** | 17 de abril de 2028 |
-| **Nota do orador** | "Não há entidade gestora nem regime aprovado, diz a APA." Não digas "metas". |
-| **Rodapé** | APA, FAQ têxteis, dez 2025; Diretiva (UE) 2025/1892 |
-| **Registo** | B1, B4, B11, B12 |
+| **Nota do orador** | "Não há entidade gestora nem regime aprovado, diz a APA." Não digas "metas". Não digas "em 2028 os produtores pagam a recolha": pagam a das peças vendidas pela primeira vez depois da lei nacional (o mais tardar 17 abr 2028). Leitura a confirmar com a APA. |
+| **Rodapé** | APA, FAQ têxteis, dez 2025; Diretiva 2008/98/CE, art. 11.º (2018) e RGGR; Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 |
+| **Registo** | B1, B4, B11, B12, B17 |
 
 ### 3. Referência · 0:45 a 1:00
 
@@ -107,12 +107,12 @@ flowchart LR
 | | |
 | --- | --- |
 | **Critério e peso** | Impacto e relevância (30%), 25 s |
-| **Título** | Em 2028, quem provar o custo eficiente negoceia com os produtores |
+| **Título** | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número |
 | **Visual** | Captura do relatório RAP: custo por tipo de território (predominantemente urbana, mediamente urbana, predominantemente rural) |
-| **Número** | "economicamente eficiente" (artigo 22.º-A, n.º 12) |
-| **Nota do orador** | A diretiva só deixa cobrar o custo eficiente e transparente: é o que o relatório mostra. Menciona a economia social como parceira. |
-| **Rodapé** | Diretiva (UE) 2025/1892, artigos 22.º-A e 22.º-C |
-| **Registo** | B6, B10 |
+| **Número** | "economicamente eficiente" (artigo 22.º-A, n.º 12) e "As autoridades locais" (n.º 7, d)) |
+| **Nota do orador** | O custo eficiente é determinado "entre os intervenientes relevantes", e a lei nomeia as autoridades locais; a entidade gestora não pode recusar o município (artigo 22.º-C, n.º 10). As peças antigas continuam a pesar na câmara durante anos: mais uma razão para medir o custo. Menciona a economia social como parceira. |
+| **Rodapé** | Diretiva (UE) 2025/1892, artigo 22.º-A, n.º 7, 11 e 12; artigo 22.º-C, n.º 10 |
+| **Registo** | B6, B10, B17, B18 |
 
 ### 8. Pedido · 4:20 a 5:00
 

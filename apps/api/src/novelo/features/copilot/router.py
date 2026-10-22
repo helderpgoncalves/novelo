@@ -263,7 +263,7 @@ async def get_copilot_event_schema() -> CopilotEventCatalog:
                     label="Diretiva (UE) 2025/1892",
                     ref="https://eur-lex.europa.eu/eli/dir/2025/1892/oj",
                     domain="eur-lex.europa.eu",
-                    excerpt="Os Estados-Membros estabelecem regimes de responsabilidade alargada do produtor para os têxteis...",
+                    excerpt="Os Estados-Membros asseguram a previsão dos regimes de responsabilidade alargada do produtor [...] até 17 de abril de 2028",
                     external=True,
                 ),
             ]

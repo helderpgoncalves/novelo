@@ -6,7 +6,7 @@ Bibliografia numerada usada em todo o dossier. **Primária** é o documento ofic
 
 | N.º | Fonte | Tipo | Notas |
 | --- | --- | --- | --- |
-| F1 | [Diretiva (UE) 2025/1892, EUR-Lex (PT)](https://eur-lex.europa.eu/legal-content/PT/TXT/HTML/?uri=OJ:L_202501892) | Primária | Lida por extração automática: artigos 2.º, 3.º, 11.º, 22.º-A, 22.º-C, 22.º-D, anexo IV-C, considerandos 26, 30, 36, 39 a 41, 48 e 59. Confirmar redação antes de citar |
+| F1 | [Diretiva (UE) 2025/1892, EUR-Lex (PT)](https://eur-lex.europa.eu/legal-content/PT/TXT/HTML/?uri=OJ:L_202501892) | Primária | Lida integralmente a 22 out 2026 a partir do Jornal Oficial, via Serviço das Publicações ([Cellar](http://publications.europa.eu/resource/celex/32025L1892)): 60 considerandos, artigos 1.º a 4.º (incluindo 22.º-A a 22.º-D, 37.º, 41.º e 41.º-A) e anexo IV-C. Versão inglesa usada para confirmar os números citados |
 | F2 | [APA, Perguntas frequentes: produtos têxteis, têxteis e calçado (v1.0, dez 2025)](https://apambiente.pt/sites/default/files/_Residuos/FluxosEspecificosResiduos/Texteis/perguntas-frequentes_texteis.pdf) | Primária | Lida página a página (7 páginas) |
 | F3 | [Cuatrecasas, Nova diretiva da UE sobre resíduos têxteis e alimentares](https://www.cuatrecasas.com/pt/portugal/publico-1/art/nova-diretiva-residuos-texteis-alimentares) e [versão inglesa](https://www.cuatrecasas.com/en/spain/public-law/art/eu-directive-textile-food-waste-developments) | Secundária | Prazos e microempresas (2029) |
 | F4 | [Público, Municípios obrigados à recolha seletiva de têxteis a partir de 1 de janeiro (17 dez 2024)](https://www.publico.pt/2024/12/17/azul/noticia/municipios-obrigados-recolha-selectiva-texteis-mobiliario-residuos-perigosos-partir-1-janeiro-2116005) | Secundária | |
@@ -122,6 +122,15 @@ Consultas a **20 de outubro de 2026**, para as [Perguntas aos orientadores](../p
 | F78 | [BOG-EC, Resíduos têxteis: um ano depois da entrada em vigor da recolha seletiva obrigatória](https://bog-ec.pt/residuos-texteis-um-ano-depois-da-entrada-em-vigor-da-recolha-seletiva-obrigatoria/) | Secundária | Cerca de 275 mil t no indiferenciado em 2024 (cerca de 25 kg por habitante), sem metodologia; ainda sem dados nacionais consolidados de 2025 |
 | F79 | [Diário da República, Decreto-Lei 81/2025, de 22 de maio](https://diariodarepublica.pt/dr/detalhe/decreto-lei/81-2025-918999081) | Primária, **só sumário** | Altera o RGGR e completa a transposição da Diretiva (UE) 2018/851 |
 | F80 | [Terras do Homem, Guimarães reforça reciclagem com mais de 300 ecopontos (16 mar 2026)](https://terrasdohomem.pt/2026/03/16/guimaraes-reforca-reciclagem-com-mais-de-300-ecopontos-e-leva-recolha-de-biorresiduos-a-mais-22-mil-vimaranenses/) | Secundária, **só excerto de pesquisa** | Mais de 300 ecopontos; se incluem têxteis, por confirmar |
+
+## Leitura integral da diretiva (22 de outubro de 2026)
+
+Consultas a **22 de outubro de 2026**, para rever o [Enquadramento regulatório](enquadramento-regulatorio.md). Os textos consolidados "não têm qualquer efeito jurídico" (aviso do próprio documento); num slide, citar o ato de origem.
+
+| N.º | Fonte | Tipo | Notas |
+| --- | --- | --- | --- |
+| F81 | [Diretiva 2008/98/CE (Diretiva-Quadro dos Resíduos), texto consolidado a 16 out 2025](https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:02008L0098-20251016) | Primária (consolidado), lida | Art. 10.º, n.º 4 (o recolhido para reutilização e reciclagem "não são incinerados") e art. 11.º, n.º 1 (recolha seletiva de têxteis até 1 jan 2025), ambos introduzidos pela Diretiva (UE) 2018/851; art. 8.º-A |
+| F82 | [Diretiva 1999/31/CE (aterros), texto consolidado a 4 jul 2018](https://eur-lex.europa.eu/legal-content/PT/TXT/?uri=CELEX:01999L0031-20180704) | Primária (consolidado), lida | Art. 5.º, n.º 3, alínea f): o recolhido seletivamente para reutilização e reciclagem não é aceite em aterro; introduzido pela Diretiva (UE) 2018/850 |
 
 ## Dados do projeto
 
