@@ -9,7 +9,8 @@ from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser, require_role
 from novelo.core.guest import NotGuest, NotGuestDep, SolverGuard
 from novelo.features.datasets.versioning import PlanningCache
-from novelo.features.planning import reference, service
+from novelo.features.planning import coverage_service, reference, service
+from novelo.features.planning.coverage_schemas import ScenarioCoverage
 from novelo.features.planning.schemas import (
     ParametersOut,
     PlanningParams,
@@ -92,3 +93,11 @@ async def delete_scenario(scenario_id: uuid.UUID, _: NotGuest, db: Db) -> Respon
 async def get_scenario_flows(scenario_id: uuid.UUID, db: Db) -> Flows:
     """Fluxo previsto do cenário: freguesia, modo de recolha e destino, em toneladas."""
     return await service.scenario_flows(db, scenario_id)
+
+
+@router.get("/scenarios/{scenario_id}/coverage", response_model=ScenarioCoverage)
+async def get_scenario_coverage(scenario_id: uuid.UUID, db: Db) -> ScenarioCoverage:
+    """Matriz de cobertura (art. 22.º-C, n.º 9, b) da Diretiva 2025/1892): por freguesia, densidade, volume previsto,
+    proximidade e acessibilidade, canais e população servida; por TIPAU, população servida, toneladas e €/t; e a
+    cobertura fora das freguesias urbanas face às urbanas (a rede não se limita às zonas rendíveis)."""
+    return await coverage_service.scenario_coverage(db, scenario_id)

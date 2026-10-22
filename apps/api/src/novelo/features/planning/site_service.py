@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import network, siting
 from novelo.domain.costs import avoided_treatment_eur
+from novelo.domain.reuse import ReuseShares, reusable
 from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
 from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
 from novelo.features.planning.collection_plan import build_collection_plan
@@ -130,6 +131,26 @@ def avoided_treatment(tonnes: float, params: PlanningParams) -> float | None:
     """Poupança no tratamento do indiferenciado; nula («por validar») até a Vitrus dar o custo por tonelada."""
     value = avoided_treatment_eur(tonnes, params.rsu_treatment_eur_per_t)
     return None if value is None else round(value, 2)
+
+
+def reuse_kpis(tonnes: float, annual_cost_eur: float, shares: ReuseShares | None) -> dict[str, float | None]:
+    """Campos de têxtil reutilizável dos KPIs (vazio sem quotas: os campos ficam nulos). Igual nos dois simuladores."""
+    if shares is None:
+        return {}
+    r = reusable(tonnes, annual_cost_eur, shares)
+
+    def opt(value: float | None, places: int) -> float | None:
+        return None if value is None else round(value, places)
+
+    return {
+        "reuse_share": round(shares.central, 4),
+        "reuse_share_low": opt(shares.low, 4),
+        "reuse_share_high": opt(shares.high, 4),
+        "reusable_t": round(r.tonnes, 3),
+        "reusable_t_low": opt(r.tonnes_low, 3),
+        "reusable_t_high": opt(r.tonnes_high, 3),
+        "eur_per_reusable_t": opt(r.eur_per_tonne, 2),
+    }
 
 
 def _on_demand_zones(
@@ -285,13 +306,19 @@ _key_locks: dict[str, threading.Lock] = {}
 
 
 def _cache_key(
-    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+    zones: list[ZoneOut],
+    params: PlanningParams,
+    request: ScenarioRequest,
+    baseline_t: float,
+    inputs: SiteInputs,
+    reuse: ReuseShares | None,
 ) -> str:
     """Identifica um cálculo: os mesmos dados, pressupostos e pedido (sem o nome) dão o mesmo cenário."""
     body = {
         "request": request.model_dump(mode="json", exclude={"label", "parent_id"}),
         "params": params.model_dump(mode="json"),
         "baseline": round(baseline_t, 3),
+        "reuse": None if reuse is None else (reuse.central, reuse.low, reuse.high),
         "zones": [(z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude) for z in zones],
         "pap": [(z.code, [(p.circuit, p.weekday, p.vehicle) for p in z.door_to_door]) for z in zones],
         "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
@@ -301,13 +328,18 @@ def _cache_key(
 
 
 def compute_sites(
-    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+    zones: list[ZoneOut],
+    params: PlanningParams,
+    request: ScenarioRequest,
+    baseline_t: float,
+    inputs: SiteInputs,
+    reuse: ReuseShares | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Simulador por locais com cache em memória: o mesmo pedido sobre os mesmos dados não volta ao solver.
 
     Pedidos iguais em simultâneo esperam pelo primeiro (um só cálculo). O resultado é uma cópia profunda.
     """
-    key = _cache_key(zones, params, request, baseline_t, inputs)
+    key = _cache_key(zones, params, request, baseline_t, inputs, reuse)
     with _cache_lock:
         hit = _cache.get(key)
         if hit is not None:
@@ -318,7 +350,7 @@ def compute_sites(
         with _cache_lock:
             hit = _cache.get(key)
         if hit is None:
-            hit = _compute_sites(zones, params, request, baseline_t, inputs)
+            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse)
             with _cache_lock:
                 _cache[key] = hit
                 while len(_cache) > CACHE_SIZE:
@@ -329,7 +361,12 @@ def compute_sites(
 
 
 def _compute_sites(
-    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float, inputs: SiteInputs
+    zones: list[ZoneOut],
+    params: PlanningParams,
+    request: ScenarioRequest,
+    baseline_t: float,
+    inputs: SiteInputs,
+    reuse: ReuseShares | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador por locais (sem base de dados)."""
     dp = to_domain_params(params)
@@ -386,6 +423,7 @@ def _compute_sites(
         potential_t=round(sum(z.demand_t for z in zones), 1),
         baseline_observed_t=round(baseline_t, 1),
         avoided_treatment_eur=avoided_treatment(plan.tonnes, params),
+        **reuse_kpis(plan.tonnes, annual, reuse),
     )
     on_demand = {code: (plan.zone_tonnes_on_demand.get(code, 0.0), z.km_year) for code, z in plan.on_demand.items()}
     summaries = []

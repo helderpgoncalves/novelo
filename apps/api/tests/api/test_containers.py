@@ -70,7 +70,8 @@ async def test_list_containers_filters_and_assigns_parish(logged_in: httpx.Async
 
 
 async def test_coverage_by_parish_hand_checked(logged_in: httpx.AsyncClient, imported: Path) -> None:
-    # Azurém (9 089 hab.): 2 localidades no mesmo ponto, a 479 m do contentor TESTE-001 (e a 583 m do TESTE-002)
+    # Azurém (9 089 hab.): 3 localidades. "Azurém" e "Azúrem" no mesmo ponto, a 479 m do contentor TESTE-001 (e a
+    # 583 m do TESTE-002); "Senhora da Conceição" (na CAOP 2019 em Azurém) a 1 198 m do TESTE-001 e 1 186 m do TESTE-002
     wide = (await logged_in.get(f"{NETWORK}/coverage", params={"radius_m": 500})).json()
     assert wide["state"] == "ok" and wide["kind"] == "textile"
     assert (wide["containers"], wide["containers_total"]) == (3, 6)  # têxteis ativos / todos
@@ -80,7 +81,7 @@ async def test_coverage_by_parish_hand_checked(logged_in: httpx.AsyncClient, imp
     assert azurem["population"] == 9089 and azurem["containers"] == 2
     assert azurem["containers_per_1000"] == 0.22  # 2 · 1000 / 9 089
     assert azurem["nearest_container_m"] == 479
-    assert (azurem["covered_pct"], azurem["covered_population"]) == (100.0, 9089)
+    assert (azurem["covered_pct"], azurem["covered_population"]) == (66.7, 6059)  # 2 de 3 pontos: 9 089 × 2/3
     assert (azurem["reference_points"], azurem["gap_points"]) == (6, 4)  # 9 089 / 1 414 = 6,4
     assert len(wide["parishes"]) == 48
 

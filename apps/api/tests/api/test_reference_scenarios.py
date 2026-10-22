@@ -98,11 +98,16 @@ async def test_refresh_replaces_stale_references_and_keeps_user_scenarios(
     version = (await service.ensure_default_parameters(session)).version
     legacy = _row(reference.label_for(20_000), admin, plan=False, site_mode="street")  # modelo antigo, sem marca
     fresh = _row(
-        reference.label_for(40_000), admin, budget=40_000, key="sites:40000", version=2, params_version=version
+        reference.label_for(40_000),
+        admin,
+        budget=40_000,
+        key="sites:40000",
+        version=reference.REFERENCE_MODEL_VERSION,
+        params_version=version,
     )
     street = _row(
-        reference.label_for(60_000), admin, budget=60_000, key="sites:60000", version=2, params_version=version,
-        site_mode="street",
+        reference.label_for(60_000), admin, budget=60_000, key="sites:60000", version=reference.REFERENCE_MODEL_VERSION,
+        params_version=version, site_mode="street",
     )  # fmt: skip
     mine = _row(reference.label_for(20_000), operator)  # o mesmo rótulo, mas de um utilizador
     child = _row("Variação do antigo", operator)

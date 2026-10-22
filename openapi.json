@@ -5036,6 +5036,281 @@
         "title": "CopilotWebSearchEvent",
         "type": "object"
       },
+      "CoverageEquity": {
+        "description": "Não limitado às zonas rendíveis: cobertura fora das freguesias predominantemente urbanas vs dentro.",
+        "properties": {
+          "non_urban_covered_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "% da população servida nas AMU e APR",
+            "title": "Non Urban Covered Pct"
+          },
+          "non_urban_population": {
+            "description": "Habitantes nas freguesias AMU e APR",
+            "title": "Non Urban Population",
+            "type": "integer"
+          },
+          "non_urban_vs_urban": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "% servida nas AMU e APR ÷ % servida nas APU (1 = a mesma cobertura; nulo se não se puder dividir)",
+            "title": "Non Urban Vs Urban"
+          },
+          "urban_covered_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "% da população servida nas APU",
+            "title": "Urban Covered Pct"
+          },
+          "urban_population": {
+            "description": "Habitantes nas freguesias predominantemente urbanas (APU)",
+            "title": "Urban Population",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "urban_population",
+          "urban_covered_pct",
+          "non_urban_population",
+          "non_urban_covered_pct",
+          "non_urban_vs_urban"
+        ],
+        "title": "CoverageEquity",
+        "type": "object"
+      },
+      "CoverageGroup": {
+        "description": "Soma de um grupo de freguesias (uma TIPAU, ou o concelho no total).",
+        "properties": {
+          "annual_cost_eur": {
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "covered_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "População servida ÷ população, em % (nulo sem população)",
+            "title": "Covered Pct"
+          },
+          "covered_population": {
+            "title": "Covered Population",
+            "type": "number"
+          },
+          "eur_per_tonne": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo anual ÷ toneladas (nulo com 0 t)",
+            "title": "Eur Per Tonne"
+          },
+          "parishes": {
+            "title": "Parishes",
+            "type": "integer"
+          },
+          "population": {
+            "title": "Population",
+            "type": "integer"
+          },
+          "tipau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tipau"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nulo no total do concelho e nas freguesias sem TIPAU"
+          },
+          "tonnes": {
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "tipau",
+          "parishes",
+          "population",
+          "covered_population",
+          "covered_pct",
+          "tonnes",
+          "annual_cost_eur",
+          "eur_per_tonne"
+        ],
+        "title": "CoverageGroup",
+        "type": "object"
+      },
+      "CoverageParish": {
+        "description": "Uma freguesia na matriz de cobertura: território, procura, proximidade e o que o cenário lá faz.",
+        "properties": {
+          "annual_cost_eur": {
+            "description": "Custo anual do cenário na freguesia",
+            "title": "Annual Cost Eur",
+            "type": "number"
+          },
+          "area_km2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Área da freguesia na CAOP 2019 (km²); nulo sem o pacote municipal",
+            "title": "Area Km2"
+          },
+          "area_within_300m_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Proximidade: % da ÁREA da freguesia a ≤ 300 m de um local de contentores municipais (pacote QGIS da Vitrus, CAOP 2019), onde a viatura já para. É área, não população (não há população por quarteirão)",
+            "title": "Area Within 300M Pct"
+          },
+          "channels": {
+            "description": "Canais do cenário na freguesia",
+            "items": {
+              "enum": [
+                "door_to_door",
+                "detour",
+                "on_demand",
+                "existing",
+                "street"
+              ],
+              "type": "string"
+            },
+            "title": "Channels",
+            "type": "array"
+          },
+          "covered_population": {
+            "description": "População servida no cenário (estimativa)",
+            "title": "Covered Population",
+            "type": "number"
+          },
+          "covered_share": {
+            "description": "População servida ÷ população (0 a 1)",
+            "title": "Covered Share",
+            "type": "number"
+          },
+          "demand_t": {
+            "description": "Volume previsto: têxtil por desviar do lixo, t/ano (procura do modelo, estimativa)",
+            "title": "Demand T",
+            "type": "number"
+          },
+          "density_hab_km2": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Habitantes por km² (população ÷ área CAOP)",
+            "title": "Density Hab Km2"
+          },
+          "door_to_door_days_week": {
+            "description": "Acessibilidade: dias/semana com passagem de circuito porta a porta de indiferenciado com viatura",
+            "title": "Door To Door Days Week",
+            "type": "integer"
+          },
+          "modes": {
+            "description": "Modos do cenário na freguesia (vazio = sem recolha)",
+            "items": {
+              "$ref": "#/components/schemas/CollectionMode"
+            },
+            "title": "Modes",
+            "type": "array"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "population": {
+            "description": "Habitantes (INE, Censos 2021)",
+            "title": "Population",
+            "type": "integer"
+          },
+          "service_days": {
+            "description": "Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura",
+            "title": "Service Days",
+            "type": "integer"
+          },
+          "tipau": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Tipau"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Tipologia de áreas urbanas do INE (APU, AMU, APR)"
+          },
+          "tonnes": {
+            "description": "Têxtil captado por ano no cenário (estimativa)",
+            "title": "Tonnes",
+            "type": "number"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "tipau",
+          "population",
+          "area_km2",
+          "density_hab_km2",
+          "demand_t",
+          "area_within_300m_pct",
+          "door_to_door_days_week",
+          "service_days",
+          "modes",
+          "channels",
+          "tonnes",
+          "covered_population",
+          "covered_share",
+          "annual_cost_eur"
+        ],
+        "title": "CoverageParish",
+        "type": "object"
+      },
       "CoverageState": {
         "enum": [
           "ok",
@@ -7853,6 +8128,18 @@
             "title": "Coverage Pct",
             "type": "number"
           },
+          "eur_per_reusable_t": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Custo anual ÷ `reusable_t`: € por tonelada reutilizável (estimativa)",
+            "title": "Eur Per Reusable T"
+          },
           "eur_per_tonne": {
             "anyOf": [
               {
@@ -7879,6 +8166,78 @@
           "potential_t": {
             "title": "Potential T",
             "type": "number"
+          },
+          "reusable_t": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil reutilizável por ano: toneladas × `reuse_share` (estimativa)",
+            "title": "Reusable T"
+          },
+          "reusable_t_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil reutilizável por ano com `reuse_share_high` (estimativa)",
+            "title": "Reusable T High"
+          },
+          "reusable_t_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Têxtil reutilizável por ano com `reuse_share_low` (estimativa)",
+            "title": "Reusable T Low"
+          },
+          "reuse_share": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quota de reutilização observada em 2025 nas 4 entidades (reutilização ÷ recolhido, 0 a 1), aplicada igual a todos os modos: não há dado de qualidade por canal (estimativa)",
+            "title": "Reuse Share"
+          },
+          "reuse_share_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Maior quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)",
+            "title": "Reuse Share High"
+          },
+          "reuse_share_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Menor quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)",
+            "title": "Reuse Share Low"
           },
           "tonnes_year": {
             "title": "Tonnes Year",
@@ -15139,6 +15498,60 @@
         "title": "ScenarioCardSpec",
         "type": "object"
       },
+      "ScenarioCoverage": {
+        "description": "Matriz de cobertura do cenário por freguesia e por TIPAU (art. 22.º-C, n.º 9, b) da Diretiva 2025/1892:\ndimensão e densidade da população, volume previsto, acessibilidade e proximidade, sem se limitar às zonas\nrendíveis). Os números vêm do cenário e da base de dados; a rede atual (circuitos, contentores) é a de hoje.",
+        "properties": {
+          "by_tipau": {
+            "items": {
+              "$ref": "#/components/schemas/CoverageGroup"
+            },
+            "title": "By Tipau",
+            "type": "array"
+          },
+          "equity": {
+            "$ref": "#/components/schemas/CoverageEquity"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "parishes": {
+            "description": "Por freguesia, por TIPAU (APU, AMU, APR) e população",
+            "items": {
+              "$ref": "#/components/schemas/CoverageParish"
+            },
+            "title": "Parishes",
+            "type": "array"
+          },
+          "scenario_id": {
+            "format": "uuid",
+            "title": "Scenario Id",
+            "type": "string"
+          },
+          "siting": {
+            "enum": [
+              "parish",
+              "sites"
+            ],
+            "title": "Siting",
+            "type": "string"
+          },
+          "total": {
+            "$ref": "#/components/schemas/CoverageGroup"
+          }
+        },
+        "required": [
+          "scenario_id",
+          "label",
+          "siting",
+          "parishes",
+          "by_tipau",
+          "total",
+          "equity"
+        ],
+        "title": "ScenarioCoverage",
+        "type": "object"
+      },
       "ScenarioObjective": {
         "enum": [
           "max_tonnes",
@@ -19287,7 +19700,7 @@
             "title": "Population Year"
           },
           "service_days": {
-            "description": "Dias/semana com algum circuito da Vitrus a passar",
+            "description": "Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura no planeamento de turnos; decide o desvio da recolha a pedido. Orgânico não conta",
             "title": "Service Days",
             "type": "integer"
           },
@@ -37940,6 +38353,140 @@
           }
         },
         "summary": "Rename Scenario",
+        "tags": [
+          "planning"
+        ]
+      }
+    },
+    "/api/v1/planning/scenarios/{scenario_id}/coverage": {
+      "get": {
+        "description": "Matriz de cobertura (art. 22.º-C, n.º 9, b) da Diretiva 2025/1892): por freguesia, densidade, volume previsto,\nproximidade e acessibilidade, canais e população servida; por TIPAU, população servida, toneladas e €/t; e a\ncobertura fora das freguesias urbanas face às urbanas (a rede não se limita às zonas rendíveis).",
+        "operationId": "get_scenario_coverage",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "scenario_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Scenario Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScenarioCoverage"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Scenario Coverage",
         "tags": [
           "planning"
         ]

@@ -2934,6 +2934,186 @@ export type CopilotWebSearchEvent = {
 };
 
 /**
+ * CoverageEquity
+ *
+ * Não limitado às zonas rendíveis: cobertura fora das freguesias predominantemente urbanas vs dentro.
+ */
+export type CoverageEquity = {
+    /**
+     * Non Urban Covered Pct
+     *
+     * % da população servida nas AMU e APR
+     */
+    non_urban_covered_pct: number | null;
+    /**
+     * Non Urban Population
+     *
+     * Habitantes nas freguesias AMU e APR
+     */
+    non_urban_population: number;
+    /**
+     * Non Urban Vs Urban
+     *
+     * % servida nas AMU e APR ÷ % servida nas APU (1 = a mesma cobertura; nulo se não se puder dividir)
+     */
+    non_urban_vs_urban: number | null;
+    /**
+     * Urban Covered Pct
+     *
+     * % da população servida nas APU
+     */
+    urban_covered_pct: number | null;
+    /**
+     * Urban Population
+     *
+     * Habitantes nas freguesias predominantemente urbanas (APU)
+     */
+    urban_population: number;
+};
+
+/**
+ * CoverageGroup
+ *
+ * Soma de um grupo de freguesias (uma TIPAU, ou o concelho no total).
+ */
+export type CoverageGroup = {
+    /**
+     * Annual Cost Eur
+     */
+    annual_cost_eur: number;
+    /**
+     * Covered Pct
+     *
+     * População servida ÷ população, em % (nulo sem população)
+     */
+    covered_pct: number | null;
+    /**
+     * Covered Population
+     */
+    covered_population: number;
+    /**
+     * Eur Per Tonne
+     *
+     * Custo anual ÷ toneladas (nulo com 0 t)
+     */
+    eur_per_tonne: number | null;
+    /**
+     * Parishes
+     */
+    parishes: number;
+    /**
+     * Population
+     */
+    population: number;
+    /**
+     * Nulo no total do concelho e nas freguesias sem TIPAU
+     */
+    tipau: Tipau | null;
+    /**
+     * Tonnes
+     */
+    tonnes: number;
+};
+
+/**
+ * CoverageParish
+ *
+ * Uma freguesia na matriz de cobertura: território, procura, proximidade e o que o cenário lá faz.
+ */
+export type CoverageParish = {
+    /**
+     * Annual Cost Eur
+     *
+     * Custo anual do cenário na freguesia
+     */
+    annual_cost_eur: number;
+    /**
+     * Area Km2
+     *
+     * Área da freguesia na CAOP 2019 (km²); nulo sem o pacote municipal
+     */
+    area_km2: number | null;
+    /**
+     * Area Within 300M Pct
+     *
+     * Proximidade: % da ÁREA da freguesia a ≤ 300 m de um local de contentores municipais (pacote QGIS da Vitrus, CAOP 2019), onde a viatura já para. É área, não população (não há população por quarteirão)
+     */
+    area_within_300m_pct: number | null;
+    /**
+     * Channels
+     *
+     * Canais do cenário na freguesia
+     */
+    channels: Array<'door_to_door' | 'detour' | 'on_demand' | 'existing' | 'street'>;
+    /**
+     * Covered Population
+     *
+     * População servida no cenário (estimativa)
+     */
+    covered_population: number;
+    /**
+     * Covered Share
+     *
+     * População servida ÷ população (0 a 1)
+     */
+    covered_share: number;
+    /**
+     * Demand T
+     *
+     * Volume previsto: têxtil por desviar do lixo, t/ano (procura do modelo, estimativa)
+     */
+    demand_t: number;
+    /**
+     * Density Hab Km2
+     *
+     * Habitantes por km² (população ÷ área CAOP)
+     */
+    density_hab_km2: number | null;
+    /**
+     * Door To Door Days Week
+     *
+     * Acessibilidade: dias/semana com passagem de circuito porta a porta de indiferenciado com viatura
+     */
+    door_to_door_days_week: number;
+    /**
+     * Modes
+     *
+     * Modos do cenário na freguesia (vazio = sem recolha)
+     */
+    modes: Array<CollectionMode>;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Population
+     *
+     * Habitantes (INE, Censos 2021)
+     */
+    population: number;
+    /**
+     * Service Days
+     *
+     * Dias/semana com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura
+     */
+    service_days: number;
+    /**
+     * Tipologia de áreas urbanas do INE (APU, AMU, APR)
+     */
+    tipau: Tipau | null;
+    /**
+     * Tonnes
+     *
+     * Têxtil captado por ano no cenário (estimativa)
+     */
+    tonnes: number;
+};
+
+/**
  * CoverageState
  */
 export type CoverageState = 'ok' | 'awaiting_data';
@@ -4509,6 +4689,12 @@ export type Kpis = {
      */
     coverage_pct: number;
     /**
+     * Eur Per Reusable T
+     *
+     * Custo anual ÷ `reusable_t`: € por tonelada reutilizável (estimativa)
+     */
+    eur_per_reusable_t?: number | null;
+    /**
      * Eur Per Tonne
      */
     eur_per_tonne: number | null;
@@ -4528,6 +4714,42 @@ export type Kpis = {
      * Potential T
      */
     potential_t: number;
+    /**
+     * Reusable T
+     *
+     * Têxtil reutilizável por ano: toneladas × `reuse_share` (estimativa)
+     */
+    reusable_t?: number | null;
+    /**
+     * Reusable T High
+     *
+     * Têxtil reutilizável por ano com `reuse_share_high` (estimativa)
+     */
+    reusable_t_high?: number | null;
+    /**
+     * Reusable T Low
+     *
+     * Têxtil reutilizável por ano com `reuse_share_low` (estimativa)
+     */
+    reusable_t_low?: number | null;
+    /**
+     * Reuse Share
+     *
+     * Quota de reutilização observada em 2025 nas 4 entidades (reutilização ÷ recolhido, 0 a 1), aplicada igual a todos os modos: não há dado de qualidade por canal (estimativa)
+     */
+    reuse_share?: number | null;
+    /**
+     * Reuse Share High
+     *
+     * Maior quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)
+     */
+    reuse_share_high?: number | null;
+    /**
+     * Reuse Share Low
+     *
+     * Menor quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)
+     */
+    reuse_share_low?: number | null;
     /**
      * Tonnes Year
      */
@@ -9025,6 +9247,40 @@ export type ScenarioCardSpec = {
 };
 
 /**
+ * ScenarioCoverage
+ *
+ * Matriz de cobertura do cenário por freguesia e por TIPAU (art. 22.º-C, n.º 9, b) da Diretiva 2025/1892:
+ * dimensão e densidade da população, volume previsto, acessibilidade e proximidade, sem se limitar às zonas
+ * rendíveis). Os números vêm do cenário e da base de dados; a rede atual (circuitos, contentores) é a de hoje.
+ */
+export type ScenarioCoverage = {
+    /**
+     * By Tipau
+     */
+    by_tipau: Array<CoverageGroup>;
+    equity: CoverageEquity;
+    /**
+     * Label
+     */
+    label: string;
+    /**
+     * Parishes
+     *
+     * Por freguesia, por TIPAU (APU, AMU, APR) e população
+     */
+    parishes: Array<CoverageParish>;
+    /**
+     * Scenario Id
+     */
+    scenario_id: string;
+    /**
+     * Siting
+     */
+    siting: 'parish' | 'sites';
+    total: CoverageGroup;
+};
+
+/**
  * ScenarioObjective
  */
 export type ScenarioObjective = 'max_tonnes' | 'min_cost';
@@ -11519,7 +11775,7 @@ export type ZoneOut = {
     /**
      * Service Days
      *
-     * Dias/semana com algum circuito da Vitrus a passar
+     * Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks) com viatura no planeamento de turnos; decide o desvio da recolha a pedido. Orgânico não conta
      */
     service_days: number;
     /**
@@ -20124,6 +20380,72 @@ export type RenameScenarioResponses = {
 };
 
 export type RenameScenarioResponse = RenameScenarioResponses[keyof RenameScenarioResponses];
+
+export type GetScenarioCoverageData = {
+    body?: never;
+    path: {
+        /**
+         * Scenario Id
+         */
+        scenario_id: string;
+    };
+    query?: never;
+    url: '/api/v1/planning/scenarios/{scenario_id}/coverage';
+};
+
+export type GetScenarioCoverageErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetScenarioCoverageError = GetScenarioCoverageErrors[keyof GetScenarioCoverageErrors];
+
+export type GetScenarioCoverageResponses = {
+    /**
+     * Successful Response
+     */
+    200: ScenarioCoverage;
+};
+
+export type GetScenarioCoverageResponse = GetScenarioCoverageResponses[keyof GetScenarioCoverageResponses];
 
 export type GetScenarioFlowsData = {
     body?: never;

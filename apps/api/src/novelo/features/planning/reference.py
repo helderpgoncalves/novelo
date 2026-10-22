@@ -33,8 +33,9 @@ log = logging.getLogger(__name__)
 
 # Sobe sempre que o modelo muda de forma que os cenários guardados deixam de representar a proposta atual.
 # 1 (implícito, sem coluna): contentor de rua e procura de 0,7 kg/hab/mês. 2: rede sem contentores, procura
-# Vitrus + APA e plano de recolha porta a porta (21 out 2026).
-REFERENCE_MODEL_VERSION = 2
+# Vitrus + APA e plano de recolha porta a porta (21 out 2026). 3: localidades na freguesia CAOP 2019 (o C7 e outras
+# passam a contar), dias de serviço só de indiferenciado com viatura e toneladas reutilizáveis nos KPIs (22 out 2026).
+REFERENCE_MODEL_VERSION = 3
 REFERENCE_BUDGETS_EUR = (20_000, 40_000, 60_000, 100_000, 150_000)
 PARISH_BUDGET_EUR = 60_000
 LOCK_KEY = 74_2026_21  # tranca consultiva (arbitrária, fixa)

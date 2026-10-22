@@ -13,6 +13,7 @@ from sqlalchemy.orm import defer, selectinload
 from novelo.core.errors import NotFoundError
 from novelo.domain import door_to_door, network
 from novelo.domain.demand import yearly_demand_t
+from novelo.domain.reuse import EntityReuse, ReuseShares, reuse_shares
 from novelo.domain.vocab import (
     CollectionMode,
     CollectionType,
@@ -23,6 +24,7 @@ from novelo.domain.vocab import (
     Shift,
     TextileDestination,
     Typology,
+    WeighingMethod,
 )
 from novelo.features.network.models import Circuit, Container, Locality, Parish, ShiftAssignment, Vehicle
 from novelo.features.planning import site_service
@@ -46,7 +48,7 @@ from novelo.features.planning.schemas import (
     ZoneOut,
 )
 from novelo.features.textile import service as textile
-from novelo.features.textile.schemas import FlowLink, FlowNode, Flows
+from novelo.features.textile.schemas import FlowLink, FlowNode, Flows, TextileBaseline
 from novelo.features.users.models import User
 
 DEFAULT_SET_NAME = "Pressupostos da equipa"
@@ -97,17 +99,17 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
         (await db.execute(select(Parish).where(Parish.population.is_not(None)).order_by(Parish.name))).scalars().all()
     )
     localities = (await db.execute(select(Locality).where(Locality.parish_id.is_not(None)))).scalars().all()
-    # Dias por semana com serviço: o máximo entre os circuitos que passam em localidades da freguesia.
-    days_by_locality: dict[uuid.UUID, int] = {}
     circuits = (
         (await db.execute(select(Circuit).options(selectinload(Circuit.days), selectinload(Circuit.localities))))
         .scalars()
         .all()
     )
-    for c in circuits:
-        for cl in c.localities:
-            days_by_locality[cl.locality_id] = max(days_by_locality.get(cl.locality_id, 0), len(c.days))
-    passes_by_locality = await _door_to_door_passes(db, circuits)
+    # Passagens de indiferenciado com viatura: as porta a porta são o canal PAP; todas (moloks também) dão os dias
+    # de serviço que decidem o desvio da recolha a pedido. Orgânico nunca (o têxtil molha-se).
+    undifferentiated = await _undifferentiated_passes(db, circuits)
+    passes_by_locality = {
+        loc: [p for kind, p in items if kind == CollectionType.DOOR_TO_DOOR] for loc, items in undifferentiated.items()
+    }
     # Contentores têxteis ativos por freguesia (vazio até chegarem as localizações da Vitrus).
     container_counts = await db.execute(
         select(Container.parish_id, func.count())
@@ -130,6 +132,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
             continue
         locs = by_parish.get(p.id, [])
         passes = {(x.circuit, x.weekday): x for loc in locs for x in passes_by_locality.get(loc.id, [])}
+        served = [door_to_door.Pass(x.circuit, x.weekday) for loc in locs for _, x in undifferentiated.get(loc.id, [])]
         zones.append(
             ZoneOut(
                 code=p.dicofre,
@@ -140,7 +143,7 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 latitude=float(p.latitude),
                 longitude=float(p.longitude),
                 tipau=p.tipau,
-                service_days=max((days_by_locality.get(loc.id, 0) for loc in locs), default=0),
+                service_days=door_to_door.weekdays_served(served),
                 existing_containers=containers_by_parish.get(p.id, 0),
                 localities=sorted(loc.name for loc in locs),
                 geometry=p.geometry,
@@ -153,11 +156,14 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
 SHIFT_ORDER = {Shift.MORNING: 0, Shift.AFTERNOON: 1, Shift.NIGHT: 2}
 
 
-async def _door_to_door_passes(db: AsyncSession, circuits: Sequence[Circuit]) -> dict[uuid.UUID, list[DoorToDoorPass]]:
-    """Passagens semanais dos circuitos porta a porta COM viatura no planeamento de turnos, por localidade.
+async def _undifferentiated_passes(
+    db: AsyncSession, circuits: Sequence[Circuit]
+) -> dict[uuid.UUID, list[tuple[CollectionType, DoorToDoorPass]]]:
+    """Passagens semanais dos circuitos de indiferenciado (porta a porta e moloks) COM viatura no planeamento de turnos,
+    por localidade, com o tipo de recolha do circuito.
 
-    Só circuitos de indiferenciado: o têxtil numa viatura de biorresíduos (orgânico) molha-se e perde o valor de
-    reutilização, que é a contaminação que a Vitrus quer evitar.
+    Só indiferenciado: o têxtil numa viatura de biorresíduos (orgânico) molha-se e perde o valor de reutilização, que é
+    a contaminação que a Vitrus quer evitar. Sem viatura nesse grupo de dias, não há passagem.
     """
     rows = (
         await db.execute(
@@ -172,14 +178,16 @@ async def _door_to_door_passes(db: AsyncSession, circuits: Sequence[Circuit]) ->
         if circuit_id is not None:
             entry = door_to_door.Crewing(DayGroup(group).value, SHIFT_ORDER[Shift(shift)], plate, crew)
             crewing[circuit_id].append(entry)
-    out: dict[uuid.UUID, list[DoorToDoorPass]] = defaultdict(list)
+    out: dict[uuid.UUID, list[tuple[CollectionType, DoorToDoorPass]]] = defaultdict(list)
     for c in circuits:
-        if c.collection_type != CollectionType.DOOR_TO_DOOR or c.typology != Typology.UNDIFFERENTIATED:
+        if c.typology != Typology.UNDIFFERENTIATED:
             continue
         passes = door_to_door.circuit_passes(c.code, [d.weekday for d in c.days], crewing.get(c.id, []))
+        kind = c.collection_type
         for cl in c.localities:
             out[cl.locality_id] += [
-                DoorToDoorPass(circuit=x.circuit, weekday=x.weekday, vehicle=x.vehicle, crew=x.crew) for x in passes
+                (kind, DoorToDoorPass(circuit=x.circuit, weekday=x.weekday, vehicle=x.vehicle, crew=x.crew))
+                for x in passes
             ]
     return out
 
@@ -198,11 +206,25 @@ async def potential_t(db: AsyncSession, params: PlanningParams | None = None) ->
 # --- Cenários ---
 
 
+def reuse_shares_of(baseline: TextileBaseline) -> ReuseShares | None:
+    """Quotas de reutilização observadas (central e intervalo das entidades pesadas), dos fluxos de têxtil na base."""
+    return reuse_shares(
+        [
+            EntityReuse(e.entity, e.reuse_t, e.total_t, weighed=e.method == WeighingMethod.WEIGHED)
+            for e in baseline.entities
+        ]
+    )
+
+
 _domain_params = to_domain_params
 
 
 def compute(
-    zones: list[ZoneOut], params: PlanningParams, request: ScenarioRequest, baseline_t: float
+    zones: list[ZoneOut],
+    params: PlanningParams,
+    request: ScenarioRequest,
+    baseline_t: float,
+    reuse: ReuseShares | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs."""
     dp = _domain_params(params)
@@ -338,6 +360,7 @@ def compute(
         potential_t=round(sum(z.demand_t for z in zones), 1),
         baseline_observed_t=round(baseline_t, 1),
         avoided_treatment_eur=site_service.avoided_treatment(tonnes, params),
+        **site_service.reuse_kpis(tonnes, annual, reuse),
     )
     on_demand = {
         a.parish_code: (x.tonnes, x.km_year) for a in allocations for x in a.parts if x.mode == CollectionMode.ON_DEMAND
@@ -410,14 +433,15 @@ async def run_scenario(
     params = request.params or PlanningParams.model_validate(stored.values)
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
+    reuse = reuse_shares_of(baseline)
     # CP-SAT e VRP são CPU síncrono (até `solver_time_limit_s`): fora do event loop, com dados puros (sem sessão).
     if request.siting == "sites":
         inputs = await site_service.load_site_inputs(db)
         result, solver_status = await asyncio.to_thread(
-            site_service.compute_sites, zones, params, request, baseline.total_t, inputs
+            site_service.compute_sites, zones, params, request, baseline.total_t, inputs, reuse
         )
     else:
-        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t)
+        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t, reuse)
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis
