@@ -167,6 +167,11 @@ async def test_resend_verification_sends_new_link(client: httpx.AsyncClient, out
 async def test_update_profile_and_logout_all(logged_in: httpx.AsyncClient) -> None:
     resp = await logged_in.patch(f"{AUTH}/me", json={"name": "  Ana Silva "})
     assert resp.json()["name"] == "Ana Silva"
+    # Mudar só o idioma (o seletor de idioma) não apaga o nome; `null` explícito apaga.
+    only_locale = await logged_in.patch(f"{AUTH}/me", json={"locale": "en"})
+    assert only_locale.json()["name"] == "Ana Silva" and only_locale.json()["locale"] == "en"
+    cleared = await logged_in.patch(f"{AUTH}/me", json={"name": None})
+    assert cleared.json()["name"] is None
     assert (await logged_in.post(f"{AUTH}/logout-all")).status_code == 204
     assert (await logged_in.post(f"{AUTH}/refresh")).status_code == 401
 

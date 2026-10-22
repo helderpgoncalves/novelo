@@ -394,15 +394,21 @@ export function ThreadList({
                     const busy = generating.has(t.id);
                     const fresh = !busy && unread.has(t.id);
                     return (
-                      <li key={t.id} className="relative" data-testid="copilot-thread-item">
+                      // Linha em flex: o botão da conversa acaba onde começa o das opções (nenhum fica por baixo do
+                      // outro); o fundo de hover e de selecionada é da linha inteira.
+                      <li
+                        key={t.id}
+                        className={cn(
+                          'flex items-center rounded-lg transition-colors hover:bg-muted/60',
+                          t.id === selectedId && 'bg-primary/10 hover:bg-primary/10',
+                        )}
+                        data-testid="copilot-thread-item"
+                      >
                         <button
                           type="button"
                           onClick={() => onSelect(t.id)}
                           aria-current={t.id === selectedId ? 'true' : undefined}
-                          className={cn(
-                            'flex min-h-14 w-full flex-col items-start justify-center gap-0.5 rounded-lg px-3 py-2 pr-11 text-left transition-colors hover:bg-muted/60 focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2',
-                            t.id === selectedId && 'bg-primary/10 hover:bg-primary/10',
-                          )}
+                          className="flex min-h-14 min-w-0 flex-1 flex-col items-start justify-center gap-0.5 rounded-lg py-2 pr-1 pl-3 text-left focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2"
                         >
                           <span className="flex w-full items-center gap-2">
                             {t.pinned && (
@@ -457,7 +463,7 @@ export function ThreadList({
                             <Button
                               variant="ghost"
                               size="icon"
-                              className="-translate-y-1/2 absolute top-1/2 right-1 size-10 text-muted-foreground md:size-8"
+                              className="mr-1 size-10 shrink-0 text-muted-foreground md:size-8"
                               aria-label={m.chat_thread_menu({
                                 title: t.title || m.chat_untitled(),
                               })}

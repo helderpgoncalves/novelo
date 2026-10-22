@@ -81,9 +81,11 @@ test.describe('telemóvel 390 px', () => {
     await box.press('Enter');
     const spin = page.getByTestId('brand-spinner').first();
     await expect(spin).toBeVisible();
-    expect(await spin.evaluate((el) => getComputedStyle(el).animationName)).toBe(
-      'brand-spin-pulse',
-    );
+    // Lido de novo a cada tentativa: o indicador pode ser remontado quando a resposta começa a chegar e um nó já
+    // desligado do DOM devolve estilos vazios.
+    await expect
+      .poll(() => spin.evaluate((el) => getComputedStyle(el).animationName))
+      .toBe('brand-spin-pulse');
     await expect(page.getByTestId('copilot-assistant-message').last()).toHaveAttribute(
       'data-state',
       'complete',

@@ -318,8 +318,13 @@ async def verify_email(db: AsyncSession, token: str) -> None:
     await db.commit()
 
 
-async def update_profile(db: AsyncSession, user: User, name: str | None, locale: str | None) -> User:
-    user.name = name.strip() if name and name.strip() else None
+async def update_profile(
+    db: AsyncSession, user: User, name: str | None, locale: str | None, *, name_given: bool = True
+) -> User:
+    """Atualiza o nome e o idioma. Sem `name` no pedido (`name_given=False`) o nome fica: mudar só o idioma
+    não o apaga. `name` vazio ou `null` explícito limpa-o."""
+    if name_given:
+        user.name = name.strip() if name and name.strip() else None
     if locale:
         user.locale = locale
     await db.commit()

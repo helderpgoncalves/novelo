@@ -38,6 +38,8 @@ test.describe('simulador e cenários', () => {
   });
 
   test('calcular um cenário de ponta a ponta e ver o resultado', async ({ page }) => {
+    // Otimizador a sério (até SOLVER_TIME_LIMIT_S) e, com chave do OpenRouter, o «E se...?» com o modelo real.
+    test.setTimeout(150_000);
     await page.goto('/pt/simulator');
     await page.getByLabel('Nome do cenário').fill('Cenário E2E');
     await page.getByRole('textbox', { name: 'Orçamento anual' }).fill('45000');
@@ -60,10 +62,11 @@ test.describe('simulador e cenários', () => {
     await expect(page.locator('canvas.maplibregl-canvas').first()).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();
     await page.getByRole('tab', { name: 'E se...?' }).click();
-    // E se...?: sem chave do OpenRouter a IA está desligada e diz porquê.
+    // E se...?: sem chave do OpenRouter a IA está desligada e diz porquê; com chave, o modelo real responde com o
+    // que entendeu («Entendi: …», ver prompts/whatif_v2.md), o que pode levar dezenas de segundos.
     await page.getByLabel('A tua pergunta').fill('E se Serzedelo passar a recolha a pedido?');
     await page.getByRole('button', { name: 'Perguntar' }).click();
-    await expect(page.getByText(/está desligado|Entendi/).first()).toBeVisible();
+    await expect(page.getByText(/está desligado|Entendi/).first()).toBeVisible({ timeout: 60_000 });
   });
 
   test('comparar dois cenários mostra as diferenças', async ({ page }) => {

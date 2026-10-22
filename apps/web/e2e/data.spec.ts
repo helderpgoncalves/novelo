@@ -123,9 +123,9 @@ test.describe('dados reais da Vitrus', () => {
     ).toBeVisible();
     // O próprio administrador não pode alterar a sua conta: o diálogo explica porquê e não oferece desativar.
     await page
-      .getByRole('row', { name: /Administrador/ })
+      .getByRole('row', { name: /admin@heldergoncalves\.io/ })
       .first()
-      .getByRole('button', { name: /^Ações de Administrador/ })
+      .getByRole('button', { name: /^Ações de / })
       .click();
     await page.getByRole('menuitem', { name: 'Desativar' }).click();
     const dialog = page.getByRole('alertdialog');

@@ -41,3 +41,12 @@ export function useAutofillSync<T extends FieldValues>(
 
   return sync;
 }
+
+/**
+ * Props de um campo não controlado: o React nunca reescreve `value` no DOM. Num campo controlado, qualquer re-render
+ * (por exemplo, quando chega a configuração ou outro pedido da página) repõe o valor do formulário (ainda vazio) e
+ * apaga o que o gestor de palavras-passe lá pôs antes de `sync` o copiar.
+ */
+export function uncontrolled<F extends { value: string }>({ value, ...field }: F) {
+  return { ...field, defaultValue: value };
+}
