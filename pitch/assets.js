@@ -16,8 +16,8 @@ function mapSvg({ dark, containers, network }) {
   for (const p of geo.parishes) {
     let fill = 'none';
     let op = 0;
-    if (network && p.papInScenario) { fill = dark ? C.florestaClara : C.floresta; op = 0.85; }
-    else if (network && p.mode === 'existing') { fill = C.areia; op = 0.8; }
+    if (network && p.onDemand) { fill = dark ? C.florestaClara : C.floresta; op = 0.85; }
+    else if (network && p.existing) { fill = C.areia; op = 0.8; }
     s += `<path d="${p.d}" fill="${fill}" fill-opacity="${op}" stroke="${stroke}" stroke-width="1.4" stroke-linejoin="round"/>`;
   }
   if (containers) {
