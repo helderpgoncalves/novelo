@@ -6,7 +6,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 
 | Documento | Para quê |
 | --- | --- |
-| [Visão geral](projeto/visao-geral.md) | A página pública do projeto: problema, resposta, produto com capturas, critérios do júri e próximo passo (pronta a colar na TAIKAI) |
+| [Visão geral](projeto/visao-geral.md) | A página pública do projeto: problema, resposta, produto com capturas, o que já está provado e próximo passo (pronta a colar na TAIKAI) |
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
 | [Estratégia para ganhar](projeto/estrategia-para-ganhar.md) | Documento mestre: resumo executivo, decisores, arquitetura da prova, calendário 19 a 28 out, checklist, riscos e métricas |
 | [Critérios de avaliação](projeto/criterios-de-avaliacao.md) | Os 4 critérios e pesos do hackathon, a matriz critério → prova e o que falta ler nas Regras |

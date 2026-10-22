@@ -13,12 +13,12 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Autenticação | Magic link (principal), password, Google, confirmação de email, recuperar password, "manter sessão iniciada", entrada por QR com papel `guest` e limites, cartaz do QR, administração de utilizadores e convidados, 4 emails transacionais com pré-visualização |
 | Planeamento | Otimizador (CP-SAT e VRP), três modos combináveis, cenários, comparação, pressupostos com origem, tornado e Monte Carlo, robustez, referência francesa, piloto com piso de sinal; simulador redesenhado |
 | "E se...?" | `ScenarioDelta`, confirmação, explicação e verificador de números |
-| Copiloto | SSE tipado, 46 ferramentas, threads, memória, anexos, `@menções`, artefactos, ações com confirmação e auditoria, página `/chat`, avaliação com 78 casos |
+| Copiloto | SSE tipado, 52 ferramentas, threads, memória, anexos, `@menções`, artefactos, ações com confirmação e auditoria, página `/chat`, avaliação com 155 casos |
 | Operação | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra, evidência por marca |
 | Relatório | PDF RAP com custo por tipo de território (WeasyPrint) e histórico |
 | Web | Mapa, todos os ecrãs de dados, Frota refeita (calendário da semana tipo, `.ics`), pt/en, claro/escuro, PWA mobile-first com barra de separadores, páginas de erro, visita guiada, `DataTable` e `PageTabs` completos |
 | Marca | Geometria única, `just brand` (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) e `just check-brand` |
-| Qualidade | 536 testes pytest, 157 Vitest e 162 Playwright |
+| Qualidade | 1 054 testes pytest, 432 Vitest e Playwright em 36 ficheiros (22 out 2026) |
 
 ## Falta
 
