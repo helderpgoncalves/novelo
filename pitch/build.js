@@ -41,8 +41,8 @@ pres.author = 'Hélder Gonçalves e Flávio Fernandes';
 pres.subject = 'Desafio 5 TexVitrus: recolha seletiva de têxteis em Guimarães';
 const C = pres.SchemeColor;
 
-// Testes da última verificação completa (`just check` e `just e2e-full`, 22 out 2026).
-const TESTS = { api: '1 035', web: '436', e2e: '201' };
+// `just check` de 22 out 2026 (verde) e `just eval-copilot` (155 perguntas ao modelo real, 100% dos números verificados).
+const TESTS = { api: '1 037', web: '437', evals: '155' };
 
 const W = 13.333;
 const M = 0.6; // margem
@@ -379,7 +379,7 @@ pres.addSection({ title: 'Pitch (5 minutos)' });
   s.addText('O COPILOTO', { placeholder: 'eyebrow' });
   s.addText('A IA conduz o otimizador. Nunca faz contas', { placeholder: 'title' });
   const flow = [
-    ['Pergunta em português', '«E se passássemos Serzedelo a recolha a pedido?»'],
+    ['Pergunta em português', '«E se o orçamento fosse 80 000 € por ano?»'],
     ['Alteração estruturada', 'O modelo devolve JSON validado; não calcula nada.'],
     ['Otimizador', 'CP-SAT e VRP recalculam o cenário.'],
     ['Verificador', 'Rejeita qualquer número que não exista no resultado.'],
@@ -520,8 +520,8 @@ pres.addSection({ title: 'Apoio (perguntas do júri)' });
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 2.35, w: 3.9, h: 2.55, rectRadius: 0.1, fill: { color: '1B2A25' }, line: { color: '2F4A40', width: 0.75 }, objectName: `Bloco ${t}` });
     s.addText([{ text: t, options: { fontFace: THEME.headFontFace, fontSize: 20, color: C.accent2, breakLine: true } }, { text: d, options: { fontSize: 13, color: C.accent5 } }], { x: x + 0.25, y: 2.55, w: 3.4, h: 2.25, fontFace: THEME.bodyFontFace, margin: 0, valign: 'top', paraSpaceAfter: 8, isTextBox: true, objectName: `Texto ${t}` });
   });
-  [[TESTS.api, 'testes da API'], [TESTS.web, 'testes da web'], [TESTS.e2e, 'testes de ponta a ponta no browser']].forEach(([v, l], i) => {
-    s.addText([{ text: v, options: { fontFace: THEME.headFontFace, fontSize: 30, color: C.accent2 } }, { text: `  ${l}`, options: { fontSize: 13, color: C.accent5 } }], { x: M + i * 4.1, y: 5.15, w: 3.9, h: 0.6, fontFace: THEME.bodyFontFace, margin: 0, valign: 'middle', isTextBox: true, objectName: `Testes ${l}` });
+  [[TESTS.api, 'testes da API'], [TESTS.web, 'testes da web'], [TESTS.evals, 'perguntas de avaliação ao copiloto, 100% dos números verificados']].forEach(([v, l], i) => {
+    s.addText([{ text: v, options: { fontFace: THEME.headFontFace, fontSize: 30, color: C.accent2 } }, { text: `  ${l}`, options: { fontSize: 13, color: C.accent5 } }], { x: M + i * 4.1, y: 5.05, w: 3.9, h: 0.95, fontFace: THEME.bodyFontFace, margin: 0, valign: 'middle', isTextBox: true, objectName: `Testes ${l}` });
   });
   s.addText([{ text: 'novelo.helder.si', options: { bold: true, color: C.accent3 } }, { text: '   ·   github.com/helderpgoncalves/novelo', options: { color: C.accent5 } }], { x: M, y: 6.2, w: W - 2 * M, h: 0.45, fontFace: THEME.bodyFontFace, fontSize: 16, margin: 0, isTextBox: true, objectName: 'Ligações' });
   s.addNotes('Se perguntarem pela qualidade: a verificação completa (lint, tipos, testes da API com os limites reais do solver, testes da web, marca e contrato) corre antes de cada entrega, e há testes de ponta a ponta no browser.');
@@ -535,7 +535,7 @@ pres.addSection({ title: 'Apoio (perguntas do júri)' });
   const video = path.join(__dirname, 'assets', 'novelo-16x9-deck.mp4');
   if (fs.existsSync(video)) {
     const vw = 8.6;
-    s.addMedia({ type: 'video', path: video, cover: A('video-capa.png'), x: (W - vw) / 2, y: 2.25, w: vw, h: (vw * 9) / 16, objectName: 'Vídeo do Novelo' });
+    s.addMedia({ type: 'video', path: video, cover: `data:image/png;base64,${fs.readFileSync(A('video-capa.png')).toString('base64')}`, x: (W - vw) / 2, y: 2.25, w: vw, h: (vw * 9) / 16, objectName: 'Vídeo do Novelo' });
   }
   s.addNotes('Se a demo ao vivo falhar (rede, API), passar este vídeo e o PDF RAP pré-gerado.');
 }

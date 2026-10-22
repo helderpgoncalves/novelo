@@ -5,11 +5,12 @@ import { num } from '../format';
 import { useLayout } from '../layout';
 import { C, FONT } from '../theme';
 
-// Contagens da última verificação completa (`just check` e `just e2e-full`, 22 out 2026).
+// `just check` de 22 out 2026 (testes da API e da web, verdes) e `just eval-copilot` (155 perguntas ao modelo real,
+// 100% dos números verificados; docs/engenharia/avaliacao-copiloto.md).
 const STATS = [
-  { v: 1035, l: 'testes da API' },
-  { v: 436, l: 'testes da web' },
-  { v: 201, l: 'testes de ponta a ponta' },
+  { v: 1037, l: 'testes da API' },
+  { v: 437, l: 'testes da web' },
+  { v: 155, l: 'perguntas de avaliação ao copiloto, 100% dos números verificados' },
 ];
 
 /** 12. Rigor: nenhum número sem fonte, e testado. */
@@ -29,7 +30,7 @@ export function Rigor({ dur }: { dur: number }) {
         </div>
         <div style={{ display: 'flex', flexDirection: portrait ? 'column' : 'row', gap: portrait ? 40 : 100, marginTop: portrait ? 80 : 70 }}>
           {STATS.map((s, i) => (
-            <div key={s.l} style={rise(f, 30 + i * 10)}>
+            <div key={s.l} style={{ ...rise(f, 30 + i * 10), maxWidth: portrait ? undefined : 470 }}>
               <div style={{ font: `500 ${portrait ? 110 : 104}px/1 ${FONT.title}`, color: C.areia, fontVariantNumeric: 'tabular-nums lining-nums' }}>
                 {num(interpolate(f, [30 + i * 10, 80 + i * 10], [0, s.v], { ...clamp, easing: easeOut }))}
               </div>
