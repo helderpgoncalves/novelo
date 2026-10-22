@@ -7,8 +7,8 @@ FACTS: dict[str, Any] = {
     "baseline_2025": {
         "year": 2025,
         "collected_t": "301,3",
-        "capture_of_potential_pct": "11,5",
-        "estimated_potential_t_per_year": "2 626",
+        "capture_of_generated_pct": "11,5",
+        "estimated_generated_t_per_year": "2 626",
         "still_to_divert_t_per_year": "2 325",
         "reuse_t": "179,0",
         "recycle_t": "79,9",

@@ -59,7 +59,12 @@ test.describe('conversa em streaming', () => {
     await expect(page.getByTestId('copilot-thinking')).toBeVisible();
     await expect(stopButton(page)).toBeVisible();
     await expect(page.locator('[data-slot="skeleton"]')).toHaveCount(0);
-    await expect(page.getByText('Quanto têxtil se recolheu em 2025?').first()).toBeVisible();
+    // A pergunta aparece na conversa (o título provisório do cabeçalho repete-a, escondido no desktop).
+    await expect(
+      page
+        .getByTestId('copilot-user-message')
+        .filter({ hasText: 'Quanto têxtil se recolheu em 2025?' }),
+    ).toBeVisible();
 
     const reply = await waitForAnswer(page);
     // O selo «verificado» já não existe: só o aviso «Números por verificar» aparece, e só quando é o caso.
@@ -422,7 +427,10 @@ test.describe('histórico e conversas', () => {
     await renamed.getByRole('button', { name: /Opções de/ }).click();
     await page.getByRole('menuitem', { name: 'Arquivar' }).click();
     await expect(renamed).toHaveCount(0);
+    // O interruptor das arquivadas vive no popover de filtros, ao lado da pesquisa.
+    await page.getByRole('button', { name: 'Filtros', exact: true }).click();
     await page.getByRole('switch', { name: 'Arquivadas' }).click();
+    await page.keyboard.press('Escape');
     await expect(items.filter({ hasText: 'Conversa E2E renomeada' })).toBeVisible();
 
     await items
@@ -502,10 +510,11 @@ test.describe('rolar e acessibilidade', () => {
     await ask(page, 'Compara o custo por tonelada de todos os cenários.');
     const thinking = page.getByTestId('copilot-thinking');
     await expect(thinking).toBeVisible();
-    const name = await thinking
-      .locator('span[aria-hidden="true"] > span')
-      .first()
-      .evaluate((el) => getComputedStyle(el).animationName);
+    // A frase que roda troca de elemento a cada fase: lê-se o estilo numa só avaliação, dentro do indicador.
+    const name = await thinking.evaluate((el) => {
+      const phrase = el.querySelector(':scope > span[aria-hidden="true"]');
+      return phrase ? getComputedStyle(phrase).animationName : 'missing';
+    });
     expect(name).toBe('none');
     await waitForAnswer(page);
   });

@@ -16,6 +16,15 @@ const toStrings = (value: unknown): Record<string, string> => {
   return out;
 };
 
+/** «Cenário A» já diz que é um cenário: não se escreve «Cenário Cenário A». */
+export function scenarioLabel(name: string | undefined): string {
+  const plain = m.cp_page_scenario_plain();
+  if (!name) return plain;
+  return name.toLocaleLowerCase().startsWith(plain.toLocaleLowerCase())
+    ? name
+    : m.cp_page_scenario({ name });
+}
+
 /** O ecrã atual como o servidor o entende: padrão da rota (`/scenarios/$scenarioId`), parâmetros e filtros. */
 export function usePageContext() {
   const router = useRouter();
@@ -128,8 +137,7 @@ export function usePageInfo(): PageInfo {
   });
   if (!context) return { context: null, label: null };
   if (scenarioId) {
-    const name = scenario.data?.label;
-    return { context, label: name ? m.cp_page_scenario({ name }) : m.cp_page_scenario_plain() };
+    return { context, label: scenarioLabel(scenario.data?.label) };
   }
   return { context, label: ROUTE_LABEL[context.route]?.() ?? m.cp_page_unknown() };
 }

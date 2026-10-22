@@ -145,6 +145,11 @@ def server_tools_from(s: Settings, *, search: bool, fetch: bool) -> ServerTools:
 # ruff: noqa: PLR0911
 
 
+def _is_identifier(digits: str) -> bool:
+    """Telefone, NIF ou cartão; uma sequência de anos («novidades 2025 2026») não é um identificador."""
+    return not all(_YEAR.match(t) for t in digits.lstrip("+").split())
+
+
 def sanitize_query(
     query: str, *, forbidden_terms: tuple[str, ...] = (), internal_numbers: frozenset[float] = frozenset()
 ) -> tuple[str | None, str | None]:
@@ -157,7 +162,7 @@ def sanitize_query(
         return None, "too_long"
     if _EMAIL.search(q) or _URL_CREDENTIALS.search(q):
         return None, "personal_data"
-    if _UUID.search(q) or _LONG_DIGITS.search(q) or _SECRET.search(q):
+    if _UUID.search(q) or _SECRET.search(q) or any(_is_identifier(m.group()) for m in _LONG_DIGITS.finditer(q)):
         return None, "identifier_or_secret"
     folded = q.casefold()
     if any(t and t.casefold() in folded for t in forbidden_terms if len(t) >= 3):

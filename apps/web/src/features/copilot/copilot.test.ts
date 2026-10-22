@@ -342,3 +342,14 @@ describe('gráfico circular', () => {
     expect(slices[0]?.share).toBeCloseTo(0.75);
   });
 });
+
+describe('etiqueta do ecrã atual', () => {
+  it('não repete «Cenário» quando o nome já o traz', async () => {
+    const { scenarioLabel } = await import('./page-context');
+    const { m } = await import('@/paraglide/messages');
+    const plain = m.cp_page_scenario_plain();
+    expect(scenarioLabel(`${plain} A`)).toBe(`${plain} A`);
+    expect(scenarioLabel('Robusto B')).toBe(m.cp_page_scenario({ name: 'Robusto B' }));
+    expect(scenarioLabel(undefined)).toBe(plain);
+  });
+});

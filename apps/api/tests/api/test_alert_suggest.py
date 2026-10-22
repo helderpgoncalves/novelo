@@ -33,7 +33,7 @@ async def test_suggestion_is_verified_and_never_applied(logged_in: httpx.AsyncCl
     out = resp.json()
     assert out["source"] == "model" and out["verified"] is True and out["applied"] is False
     assert out["action"] == "confirm_with_vitrus" and out["suggested_status"] == "open"  # estado vem da ação
-    assert out["prompt_version"] == "v1" and out["alert_id"] == alert["id"]
+    assert out["prompt_version"] == "v2" and out["alert_id"] == alert["id"]
     after = await first_alert(logged_in)
     assert after["status"] == alert["status"] and after["resolution_note"] == alert["resolution_note"]  # nada mudou
 

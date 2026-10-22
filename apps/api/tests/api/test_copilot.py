@@ -82,6 +82,18 @@ async def test_what_if_derives_a_scenario_from_the_base(logged_in: httpx.AsyncCl
     assert any(c["scenario_id"] == base["id"] and not c["created_now"] for c in body["cards"])
 
 
+async def test_what_if_with_the_modes_the_parish_already_has_creates_nothing(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    base = await make(logged_in, "Base", 60000)
+    same = [{"parish": "Serzedelo", "allowed_modes": ["on_demand", "existing"]}]  # = os modos por omissão
+    llm.queue_chat([("what_if", {"scenario_id": base["id"], "set_modes": same})], "Isso já é o que o cenário permite.")
+    body = (await logged_in.post(C, json=ask("E se Serzedelo for a pedido?", scenario_id=base["id"]))).json()
+    assert body["tools_used"] == [{"name": "what_if", "ok": False}]
+    assert not any(c["created_now"] for c in body["cards"])
+    assert len((await logged_in.get(f"{P}/scenarios")).json()) == 1
+
+
 async def test_unknown_parish_creates_nothing(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
     step = ("run_scenario", {**RUN[1], "restrictions": [{"parish": "Serzedelu", "allowed_modes": ["on_demand"]}]})
     llm.queue_chat([step], "Não encontrei essa freguesia; quis dizer Serzedelo?")

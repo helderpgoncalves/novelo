@@ -27,6 +27,7 @@ import { WorkingState } from '@/components/working-state';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
+import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
 import { PhotoInput } from './photo-input';
 import { ReviewForm } from './review-form';
@@ -225,7 +226,10 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
               disabled={!itemPhoto || analyse.isPending}
               onClick={() =>
                 itemPhoto &&
-                analyse.mutate({ body: { item_photo: itemPhoto, label_photo: labelPhoto } })
+                analyse.mutate({
+                  body: { item_photo: itemPhoto, label_photo: labelPhoto },
+                  query: { locale: getLocale() },
+                })
               }
             >
               <ScanLine />

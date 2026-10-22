@@ -29,6 +29,7 @@ from novelo.ai.web import WebCitation, WebSearchResult, WebSearchUnavailableErro
 from novelo.core.config import get_settings
 from novelo.core.database import Base
 from novelo.core.errors import AppError, UpstreamError
+from novelo.domain.vocab import LotState
 from novelo.features.copilot import actions as action_service
 from novelo.features.copilot import models as _copilot_models  # noqa: F401
 from novelo.features.copilot import threads, uploads, user_settings
@@ -295,6 +296,8 @@ class Harness:
                             estimated_weight_g=200,
                         ),
                     )
+                    if i == 0:  # a bolsa de fibra só mostra lotes triados: um fica triado, o outro aberto
+                        await lots.change_state(db, admin, lot.code, LotState.SORTED)
             self.lot_codes = [x.code for x in await lots.list_lots(db, None, None, None)]
             from novelo.features.datasets import service as datasets  # noqa: PLC0415
 

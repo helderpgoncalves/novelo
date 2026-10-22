@@ -51,10 +51,15 @@ def _data_url(data: bytes) -> str:
 
 
 async def analyse(
-    client: OpenRouterClient, item_photo: bytes, label_photo: bytes | None, model: str | None = None
+    client: OpenRouterClient,
+    item_photo: bytes,
+    label_photo: bytes | None,
+    model: str | None = None,
+    locale: str = "pt-PT",
 ) -> TriageResult:
     system, version = load("triage")
     content: list[dict[str, object]] = [
+        {"type": "text", "text": f"Language for `notes`: {locale}."},
         {"type": "text", "text": "Photo 1: the garment."},
         {"type": "image_url", "image_url": {"url": _data_url(item_photo)}},
     ]

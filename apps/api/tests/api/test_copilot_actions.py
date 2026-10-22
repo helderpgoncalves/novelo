@@ -288,6 +288,15 @@ async def test_form_flow_proposes_without_the_model(logged_in: httpx.AsyncClient
         f"{C}/actions", json={"type": "duplicate_scenario", "params": {"scenario_id": base["id"], "extra": 1}}
     )
     assert bad.status_code == 400 and "Invalid parameters" in bad.json()["message"]
+    # Campos vazios copiados de run_scenario (`param_changes: []`) não fazem falhar a proposta.
+    copied = await logged_in.post(
+        f"{C}/actions",
+        json={
+            "type": "create_scenario",
+            "params": {"label": "X", "objective": "max_tonnes", "budget_eur_year": 45000, "param_changes": []},
+        },
+    )
+    assert copied.status_code == 201, copied.text
     unknown = await logged_in.post(
         f"{C}/actions", json={"type": "resolve_alert", "params": {"alert_id": str(uuid.uuid4())}}
     )
