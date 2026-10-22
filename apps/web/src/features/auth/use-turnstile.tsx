@@ -62,6 +62,8 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
   const [reason, setReason] = useState<'widget' | 'api'>('widget');
   const reasonRef = useRef<'widget' | 'api'>('widget');
   const tokenRef = useRef<string | null>(null);
+  // Último token enviado à API: um erro de captcha refere-se a ele, não ao token novo que o reset já possa ter trazido.
+  const sentRef = useRef<string | null>(null);
 
   const store = useCallback((value: string | null) => {
     tokenRef.current = value;
@@ -71,6 +73,7 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
   const consume = useCallback(() => {
     const current = tokenRef.current;
     if (!current) return undefined;
+    sentRef.current = current;
     store(null);
     reasonRef.current = 'widget';
     setPhase('verifying');
@@ -87,7 +90,9 @@ export function useTurnstile(action: TurnstileAction): TurnstileGate {
     (error: unknown) => {
       const code = getErrorCode(error);
       if (code && CAPTCHA_CODES.includes(code)) {
-        store(null);
+        // Só se descarta o token que falhou. O `consume` já pediu outro; se chegou antes da resposta (rede lenta),
+        // apagá-lo deixava o botão bloqueado até carregar em «Repetir verificação».
+        if (tokenRef.current === sentRef.current) store(null);
         reasonRef.current = 'api';
         setReason('api');
         setPhase('error');

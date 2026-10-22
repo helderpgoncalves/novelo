@@ -1,9 +1,12 @@
 import { expect, test } from '@playwright/test';
-import { adminApi, login } from './helpers';
+import { createApprovedUser, deleteByEmail, login, uniqueEmail } from './helpers';
 
 test.describe('idioma e tema', () => {
   test('mudar para inglês muda a interface e o URL, e persiste na conta', async ({ page }) => {
-    await login(page);
+    // Conta própria: o idioma fica guardado na conta e o login aplica-o. Com a do admin, partilhada pelos testes em
+    // paralelo, um login noutro worker durante este teste ia parar a /en/.
+    const user = await createApprovedUser(uniqueEmail('idioma'));
+    await login(page, user);
     try {
       await page.getByRole('button', { name: 'Mudar idioma' }).click();
       await page.getByRole('menuitemradio', { name: 'English' }).click();
@@ -26,10 +29,7 @@ test.describe('idioma e tema', () => {
       await page.getByRole('menuitemradio', { name: 'Português' }).click();
       await expect(page).toHaveURL(/\/pt\/?$/);
     } finally {
-      // Volta sempre a português (mesmo se o teste falhar a meio): a conta do admin é partilhada pelos outros testes.
-      const admin = await adminApi();
-      await admin.patch('/api/v1/auth/me', { data: { locale: 'pt-PT' } });
-      await admin.dispose();
+      await deleteByEmail(user.email);
     }
   });
 
