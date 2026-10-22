@@ -28,7 +28,9 @@ test.describe('Páginas reorganizadas', () => {
   test('pressupostos filtram por origem', async ({ page }) => {
     await page.goto('/pt/assumptions');
     await page.getByRole('button', { name: 'Dados da Vitrus', exact: true }).click();
-    await expect(page.getByText('Taxa de captura').first()).toBeVisible();
+    // Dados da Vitrus: o têxtil no lixo por habitante (Vitrus + APA); os custos e taxas de captura são pressupostos.
+    await expect(page.getByText('Têxtil no lixo por habitante e mês').first()).toBeVisible();
+    await expect(page.getByText('Taxa de captura')).toHaveCount(0);
     await expect(page.getByText('Investimento por ponto')).toHaveCount(0);
   });
 

@@ -193,6 +193,17 @@ html[data-tabbar] {
   }
 }
 
+/* «Primeiros passos» flutua no canto: o fim de cada página ganha folga para nunca ficar tapado por ele e, com uma
+   barra de ações presa ao fundo (telemóvel), o botão sobe para cima dela em vez de cobrir «Guardar». */
+html:has([data-testid='starter-checklist']) #content > div:last-child {
+  padding-bottom: 5.5rem;
+}
+@media (max-width: 1023.98px) {
+  html:has([data-sticky-actions]) [data-testid='starter-checklist'] {
+    bottom: calc(var(--tabbar-h, 0px) + 5rem);
+  }
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;

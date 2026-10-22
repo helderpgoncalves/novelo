@@ -15,6 +15,7 @@ export function StickyActions({
 }) {
   return (
     <div
+      data-sticky-actions=""
       className={cn(
         'sticky bottom-0 z-20 -mx-4 border-border/60 border-t bg-background/95 px-4 pt-3 pb-3 backdrop-blur sm:-mx-6 sm:px-6 lg:static lg:mx-0 lg:border-0 lg:bg-transparent lg:p-0 lg:backdrop-blur-none',
         className,

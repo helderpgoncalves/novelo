@@ -124,24 +124,31 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
         id: i === 0 ? 'a' : 'b',
         label: s.label,
         align: 'right',
+        // Telemóvel (cartão): só «Cenário A/B», o nome já está no seletor; tabela: o nome a quebrar linha, sem empurrar
+        // as colunas da diferença para fora do ecrã.
         header: (
-          <span className="block">
-            <span className="eyebrow block">
+          <>
+            <span className="md:hidden">
               {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
             </span>
-            <Link
-              to="/scenarios/$scenarioId"
-              params={{ scenarioId: s.id }}
-              className="font-medium font-serif text-base normal-case tracking-normal hover:underline"
-            >
-              {s.label}
-            </Link>
-            {s.result.siting && (
-              <span className="mt-1 block">
-                <NetworkBadge />
+            <span className="hidden min-w-36 max-w-56 whitespace-normal md:block">
+              <span className="eyebrow block">
+                {i === 0 ? m.compare_scenario_a() : m.compare_scenario_b()}
               </span>
-            )}
-          </span>
+              <Link
+                to="/scenarios/$scenarioId"
+                params={{ scenarioId: s.id }}
+                className="font-medium font-serif text-base normal-case leading-snug tracking-normal hover:underline"
+              >
+                {s.label}
+              </Link>
+              {s.result.siting && (
+                <span className="mt-1 block">
+                  <NetworkBadge />
+                </span>
+              )}
+            </span>
+          </>
         ),
         cell: (x) => {
           const v = x.get(s);
@@ -157,12 +164,33 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
     },
   ];
 
-  const kpiDelta = (key: string) => {
+  /** Diferença B − A de um indicador e, por baixo, se B é melhor ou pior (a cor só reforça, o texto diz). */
+  const kpiDelta = (key: string): { value: string; hint: string } => {
     const metric = METRICS.find((x) => x.key === key);
     const va = metric?.get(a);
     const vb = metric?.get(b);
-    return metric && va != null && vb != null ? signed(vb - va, metric.format) : m.common_dash();
+    if (!metric || va == null || vb == null)
+      return { value: m.common_dash(), hint: m.compare_delta_hint() };
+    const diff = vb - va;
+    if (Math.abs(diff) < 1e-9) return { value: '=', hint: m.compare_delta_same() };
+    const pct =
+      va !== 0
+        ? `${diff > 0 ? '+' : '−'}${formatNumber(Math.abs((diff / va) * 100), 0)}%`
+        : signed(diff, metric.format);
+    const good = metric.better === 'up' ? diff > 0 : diff < 0;
+    return {
+      value: signed(diff, metric.format),
+      hint:
+        metric.better === 'none'
+          ? m.compare_delta_hint()
+          : good
+            ? m.compare_delta_better({ pct })
+            : m.compare_delta_worse({ pct }),
+    };
   };
+  const tonnes = kpiDelta('tonnes');
+  const eurT = kpiDelta('eur_t');
+  const annual = kpiDelta('annual');
 
   const networkName = (s: ScenarioOut) =>
     s.result.siting ? m.site_compare_network_sites() : m.site_compare_network_parish();
@@ -180,23 +208,21 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
       <StatStrip className="lg:grid-cols-3">
         <StatCell
           label={m.compare_delta_of({ label: m.kpi_tonnes() })}
-          value={kpiDelta('tonnes')}
-          tone="primary"
+          value={tonnes.value}
           tag={m.common_estimate()}
-          hint={m.compare_delta_hint()}
+          hint={tonnes.hint}
         />
         <StatCell
           label={m.compare_delta_of({ label: m.kpi_eur_per_tonne() })}
-          value={kpiDelta('eur_t')}
-          tone="primary"
+          value={eurT.value}
           tag={m.common_estimate()}
-          hint={m.compare_delta_hint()}
+          hint={eurT.hint}
         />
         <StatCell
           label={m.compare_delta_of({ label: m.kpi_annual_cost() })}
-          value={kpiDelta('annual')}
+          value={annual.value}
           tag={m.common_estimate()}
-          hint={m.compare_delta_hint()}
+          hint={annual.hint}
         />
       </StatStrip>
 

@@ -196,8 +196,12 @@ export function registerView(surface: Surface, getKey: () => string): () => void
   };
 }
 
+const CHAT_PATH = /^(?:\/[a-z]{2}(?:-[A-Z]{2})?)?\/chat(?:\/|$)/;
+
 const pageShowsChat = () => {
-  if (typeof window === 'undefined' || !window.location.pathname.startsWith('/chat')) return false;
+  // O caminho traz o prefixo do idioma (`/pt/chat`): sem o ignorar, a página nunca contava como «à vista» e cada
+  // resposta (ou erro) aparecia também num aviso por cima do campo.
+  if (typeof window === 'undefined' || !CHAT_PATH.test(window.location.pathname)) return false;
   const tab = new URLSearchParams(window.location.search).get('tab');
   return !tab || tab === 'chat';
 };

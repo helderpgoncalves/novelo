@@ -67,7 +67,10 @@ test.describe('planeamento: incerteza, robustez, referência e piloto', () => {
     const b = await createScenario(page, 'Robusto B', 20000);
     await page.goto(`/pt/scenarios/compare?a=${a.id}&b=${b.id}`);
     await expect(page.getByRole('heading', { name: 'Robustez da comparação' })).toBeVisible();
-    await expect(page.getByText(/das amostras, Robusto A é melhor do que Robusto B/)).toBeVisible({
+    // A frase fala sempre do vencedor (A ou B), com a percentagem dele.
+    await expect(
+      page.getByText(/das amostras, Robusto [AB] é melhor do que Robusto [AB]/),
+    ).toBeVisible({
       timeout: 30_000,
     });
   });
@@ -85,14 +88,14 @@ test.describe('planeamento: incerteza, robustez, referência e piloto', () => {
     await expect(page.getByRole('button', { name: 'Criar e calcular' })).toBeVisible();
   });
 
-  test('piloto: resultado real com intervalos, fontes e piso de sinal', async ({ page }) => {
+  test('piloto: resultado real com intervalos, fontes e mínimo de têxtil', async ({ page }) => {
     await page.goto('/pt/pilot');
     await expect(page.getByRole('heading', { level: 1, name: 'Piloto' })).toBeVisible();
     await expect(page.getByText('Têxtil no piloto')).toBeVisible({ timeout: 30_000 });
-    await expect(page.getByText(/P10 a P90/).first()).toBeVisible();
+    await expect(page.getByText(/8 em cada 10 casos/).first()).toBeVisible();
     await expect(page.getByRole('heading', { name: '2 freguesias escolhidas' })).toBeVisible();
     await expect(page.getByText('Pontuação de aprendizagem')).toBeVisible();
-    await page.getByRole('button', { name: 'A conta do piso, passo a passo' }).click();
+    await page.getByRole('button', { name: 'A conta do mínimo, passo a passo' }).click();
     await expect(page.getByRole('cell', { name: 'Rejeito observado' })).toBeVisible();
 
     await page.getByLabel('Freguesias').fill('3');

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { z } from 'zod';
 import {
@@ -94,14 +94,15 @@ function ScenarioPage() {
         </Alert>
       )}
 
+      {/* Por cima dos separadores só o essencial: os quatro números e a frase-âncora. O resto vive no separador. */}
       <div className="space-y-4">
         <ScenarioKpis kpis={result.kpis} bySites={Boolean(result.siting)} />
-        <ScenarioSecondaryKpis kpis={result.kpis} routes={result.routes.length} />
-        {result.siting && <SitingOverview siting={result.siting} sites={result.sites ?? []} />}
         <ScenarioAnchor scenario={scenario} />
       </div>
 
       <PageTabs
+        // Em telemóvel os quatro separadores cabem sem rolar (menos folga lateral em cada um).
+        className="max-sm:[&_[role=tab]]:px-2!"
         label={m.rw_tabs_label()}
         value={tab}
         onValueChange={(next) =>
@@ -117,6 +118,7 @@ function ScenarioPage() {
             contentClassName: 'space-y-8',
             content: (
               <>
+                <ScenarioSecondaryKpis kpis={result.kpis} routes={result.routes.length} />
                 <Section
                   title={m.scenario_modes_title()}
                   description={m.scenario_modes_description()}
@@ -139,13 +141,19 @@ function ScenarioPage() {
                   </Panel>
                 </Section>
                 <Collapsible className="rounded-xl bg-card ring-1 ring-foreground/10">
-                  <CollapsibleTrigger className="flex min-h-12 w-full items-center justify-between gap-3 px-5 py-3 text-left font-medium text-sm">
-                    {m.scenario_params_title()}
-                    <span className="text-muted-foreground text-xs">
-                      {m.scenario_params_description()}
+                  <CollapsibleTrigger className="group flex min-h-12 w-full items-center gap-3 rounded-xl px-4 py-3 text-left outline-offset-[-2px] sm:px-5">
+                    <span className="min-w-0 flex-1 space-y-0.5">
+                      <span className="block font-medium text-sm">{m.scenario_params_title()}</span>
+                      <span className="block text-pretty text-muted-foreground text-xs">
+                        {m.scenario_params_description()}
+                      </span>
                     </span>
+                    <ChevronDown
+                      className="size-4 shrink-0 text-muted-foreground transition-transform group-data-[state=open]:rotate-180"
+                      aria-hidden="true"
+                    />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="px-5 pb-5">
+                  <CollapsibleContent className="px-4 pb-5 sm:px-5">
                     <ParameterSummary params={scenario.params} />
                   </CollapsibleContent>
                 </Collapsible>
@@ -158,6 +166,9 @@ function ScenarioPage() {
             contentClassName: 'space-y-8',
             content: (
               <>
+                {result.siting && (
+                  <SitingOverview siting={result.siting} sites={result.sites ?? []} />
+                )}
                 <Section
                   title={m.scenario_map_title()}
                   description={

@@ -160,12 +160,20 @@ function NetworkMapPage() {
       </StatStrip>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <FilterChips<Preset>
-          legend={m.mapm_presets()}
-          value={activePreset}
-          onChange={(v) => v && choosePreset(v)}
-          options={PRESET_IDS.map((id) => ({ value: id, label: presetLabel[id]() }))}
-        />
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <span
+            className="font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
+            aria-hidden="true"
+          >
+            {m.mapm_presets()}
+          </span>
+          <FilterChips<Preset>
+            legend={m.mapm_presets()}
+            value={activePreset}
+            onChange={(v) => v && choosePreset(v)}
+            options={PRESET_IDS.map((id) => ({ value: id, label: presetLabel[id]() }))}
+          />
+        </div>
         {!desktop && (
           <Button
             variant="outline"
@@ -181,16 +189,24 @@ function NetworkMapPage() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         {layers.fill === 'textile' ? (
-          <FilterChips<MapMetric>
-            legend={m.map_layer()}
-            value={metric}
-            onChange={(v) => setMetric(v ?? 'demand_t')}
-            options={[
-              { value: 'demand_t', label: m.map_layer_demand() },
-              { value: 'population', label: m.map_layer_population() },
-              { value: 'service_days', label: m.map_layer_service() },
-            ]}
-          />
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span
+              className="font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
+              aria-hidden="true"
+            >
+              {m.map_layer()}
+            </span>
+            <FilterChips<MapMetric>
+              legend={m.map_layer()}
+              value={metric}
+              onChange={(v) => setMetric(v ?? 'demand_t')}
+              options={[
+                { value: 'demand_t', label: m.map_layer_demand() },
+                { value: 'population', label: m.map_layer_population() },
+                { value: 'service_days', label: m.map_layer_service() },
+              ]}
+            />
+          </div>
         ) : (
           <p className="text-muted-foreground text-xs">{m.mapm_fill_active()}</p>
         )}
@@ -214,7 +230,7 @@ function NetworkMapPage() {
           municipal={municipal}
           selected={selected}
           onSelect={selectParish}
-          className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:h-[34rem] xl:col-span-9 lg:h-[38rem] xl:h-[42rem] [@media(max-height:500px)]:h-[calc(100dvh-8rem)] xl:[@media(max-height:500px)]:h-[calc(100dvh-8rem)]"
+          className="h-[28rem] overflow-hidden rounded-xl ring-1 ring-foreground/10 sm:h-[34rem] xl:sticky xl:top-0 xl:col-span-9 xl:self-start lg:h-[38rem] xl:h-[42rem] [@media(max-height:500px)]:h-[calc(100dvh-8rem)] xl:[@media(max-height:500px)]:h-[calc(100dvh-8rem)]"
         />
         <div ref={detailRef} className="space-y-4 xl:col-span-3">
           {desktop && (

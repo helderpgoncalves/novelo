@@ -32,7 +32,6 @@ export function SpatialSummary({ checks }: { checks: SpatialCheckOut[] }) {
       header: m.validation_r2(),
       align: 'right',
       type: 'number',
-      badge: true,
       value: (c) => c.r2,
       format: (v) => formatNumber(v, 2),
       cell: (c) => <span className="font-medium tabular-nums">{formatNumber(c.r2, 2)}</span>,
@@ -114,7 +113,6 @@ export function WorstZones({ zones }: { zones: ZoneCheckOut[] }) {
       header: m.validation_error(),
       align: 'right',
       type: 'number',
-      badge: true,
       value: (z) => z.pct_error,
       format: (v) => formatPercent(v, 0),
       cell: (z) => (

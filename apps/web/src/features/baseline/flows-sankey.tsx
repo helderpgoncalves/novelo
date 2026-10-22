@@ -16,6 +16,7 @@ import { DESTINATIONS } from './destination';
 echarts.use([SankeyChart, TooltipComponent, CanvasRenderer]);
 
 const ENTITY_SHADES = ['#2e6b57', '#5e6b66', '#7fb39c', '#8a9a93'];
+const UNION = /^União das freguesias de\s+/i;
 
 export function FlowsSankey({ flows, className }: { flows: Flows; className?: string }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -60,6 +61,8 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
           emphasis: { focus: 'adjacency' },
           data: flows.nodes.map((n) => ({
             name: nodeName(n),
+            // Modos e destinos são poucos e altos: o nome quebra em linhas em vez de ser cortado.
+            ...(n.column > 0 && { label: { overflow: 'break', lineHeight: narrow ? 13 : 15 } }),
             itemStyle: {
               color:
                 (n.mode ? MODE_COLORS[n.mode] : undefined) ??
@@ -79,6 +82,9 @@ export function FlowsSankey({ flows, className }: { flows: Flows; className?: st
             color: text,
             textBorderColor: halo,
             textBorderWidth: 3,
+            // «União das freguesias de X» passa a «UF X» (cortado, só se lia «União das freg…»); o nome inteiro
+            // fica no tooltip (passar o rato ou tocar no nó).
+            formatter: (p: { name: string }) => p.name.replace(UNION, 'UF '),
             width: narrow ? 92 : 170,
             overflow: 'truncate',
           },

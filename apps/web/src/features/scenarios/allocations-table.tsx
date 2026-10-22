@@ -3,6 +3,7 @@ import type { Allocation } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { ModeBadges } from '@/components/mode-badge';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
+import { ALL_MODES } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 
 export function AllocationsTable({ allocations }: { allocations: Allocation[] }) {
@@ -14,6 +15,7 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
       id: 'parish',
       header: m.alloc_parish(),
       primary: true,
+      className: 'min-w-44 whitespace-normal',
       cell: (a) => a.parish_name,
       value: (a) => a.parish_name,
     },
@@ -23,7 +25,12 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
       badge: true,
       sortable: false,
       value: (a) => a.modes.join(' '),
-      cell: (a) => <ModeBadges modes={a.modes} />,
+      // Sempre pela mesma ordem, para a coluna se ler de cima a baixo.
+      cell: (a) => (
+        <ModeBadges
+          modes={[...a.modes].sort((x, y) => ALL_MODES.indexOf(x) - ALL_MODES.indexOf(y))}
+        />
+      ),
     },
     {
       id: 'population',
@@ -48,12 +55,12 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
     {
       id: 'tonnes',
       aggregate: 'sum',
-      format: (n) => formatTonnes(n, 2),
+      format: (n) => formatTonnes(n, 1),
       value: (a) => a.tonnes,
       searchable: false,
       header: m.alloc_tonnes(),
       align: 'right',
-      cell: (a) => active(a, formatTonnes(a.tonnes, 2)),
+      cell: (a) => active(a, formatTonnes(a.tonnes, 1)),
     },
     {
       id: 'capex',
@@ -97,6 +104,7 @@ export function AllocationsTable({ allocations }: { allocations: Allocation[] })
       caption={m.alloc_parish()}
       searchLabel={m.scenario_search_parish()}
       pageSize={10}
+      selectable={false}
     />
   );
 }

@@ -76,6 +76,8 @@ export interface DataTableProps<T> {
   title?: ReactNode;
   /** `auto` mostra a barra de ferramentas só quando a tabela é grande o suficiente. */
   controls?: 'auto' | 'always' | 'never';
+  /** Sem altura máxima no ecrã largo: tabelas curtas (ex.: um top 10) mostram-se inteiras, sem scroll interno. */
+  unbounded?: boolean;
   pageSize?: number;
   initialSort?: SortState | SortState[];
   searchLabel?: string;
@@ -137,6 +139,7 @@ export function DataTable<T>({
   caption,
   title,
   controls = 'auto',
+  unbounded = false,
   pageSize = 10,
   initialSort,
   searchLabel,
@@ -764,7 +767,10 @@ export function DataTable<T>({
               const next = e.currentTarget.scrollLeft > 2;
               if (next !== scrolledX) setScrolledX(next);
             }}
-            className="dt-scroller hidden max-h-[max(24rem,calc(100dvh-14rem))] overflow-auto md:block"
+            className={cn(
+              'dt-scroller hidden overflow-auto md:block',
+              !unbounded && 'max-h-[max(24rem,calc(100dvh-14rem))]',
+            )}
           >
             <table
               ref={tableRef}

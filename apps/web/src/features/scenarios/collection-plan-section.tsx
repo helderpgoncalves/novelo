@@ -200,7 +200,8 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
     {
       id: 'fits',
       header: m.plan_col_fits(),
-      value: (e) => fitsState(e),
+      // «Não se aplica» (a pedido com desvio) fica vazio: o cartão em telemóvel esconde o campo.
+      value: (e) => (fitsState(e) === 'na' ? null : fitsState(e)),
       exportValue: (e) => fitsLabel[fitsState(e)](),
       filter: { format: (v) => fitsLabel[v as FitsState]() },
       searchable: false,

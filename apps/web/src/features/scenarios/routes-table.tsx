@@ -5,6 +5,8 @@ import { formatNumber, formatTonnes } from '@/lib/format';
 import { modeLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
 
+const stopNames = (r: RouteOut) => r.stops.map((s) => s.label ?? s.parish_name);
+
 export function RoutesTable({ routes }: { routes: RouteOut[] }) {
   const columns: Column<RouteOut>[] = [
     {
@@ -26,10 +28,17 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
       id: 'stops',
       header: m.route_stops(),
       full: true,
-      value: (r) => r.stops.map((s) => s.label ?? s.parish_name).join(' '),
+      value: (r) => stopNames(r).join(' '),
       sortable: false,
       className: 'max-w-md whitespace-normal text-muted-foreground',
-      cell: (r) => r.stops.map((s) => s.label ?? s.parish_name).join(' → '),
+      // Uma ronda pode ter centenas de paragens: na linha só a contagem, a primeira e a última; a lista toda no detalhe.
+      cell: (r) => {
+        const names = stopNames(r);
+        const first = names[0];
+        const last = names[names.length - 1];
+        if (!first || !last || names.length <= 3) return names.join(' → ');
+        return m.route_stops_summary({ n: formatNumber(names.length), first, last });
+      },
     },
     {
       id: 'load',
@@ -60,6 +69,16 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
       rows={routes}
       getRowId={(r) => `${r.mode}-${r.vehicle}`}
       caption={m.route_vehicle()}
+      renderExpanded={(r) =>
+        r.stops.length > 3 ? (
+          <ol className="max-h-96 list-decimal gap-8 space-y-0.5 overflow-y-auto pl-6 text-muted-foreground text-sm marker:tabular-nums sm:columns-2 lg:columns-3">
+            {stopNames(r).map((name, i) => (
+              // biome-ignore lint/suspicious/noArrayIndexKey: a mesma rua pode repetir-se na ronda
+              <li key={i}>{name}</li>
+            ))}
+          </ol>
+        ) : null
+      }
       empty={
         <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
           {m.route_none()}

@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link, useNavigate, useRouter } from '@tanstack/react-router';
-import { GitCompareArrows, Pencil, SlidersHorizontal, Trash2 } from 'lucide-react';
+import { GitCompareArrows, MoreHorizontal, Pencil, SlidersHorizontal, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { ScenarioOut } from '@/client';
@@ -28,6 +28,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { useIsGuest } from '@/features/auth/use-current-user';
 import { getErrorMessage } from '@/lib/errors';
@@ -39,6 +45,9 @@ export function ScenarioActions({ scenario }: { scenario: ScenarioOut }) {
   const router = useRouter();
   const [renaming, setRenaming] = useState(false);
   const [label, setLabel] = useState(scenario.label);
+  const [deleting, setDeleting] = useState(false);
+  // Convidados não apagam: a opção fica visível mas desligada, com a razão no título.
+  const guest = useIsGuest();
 
   const rename = useMutation({
     ...renameScenarioMutation(),
@@ -62,11 +71,9 @@ export function ScenarioActions({ scenario }: { scenario: ScenarioOut }) {
     onError: (error) => toast.error(getErrorMessage(error)),
   });
 
+  // Duas ações à vista (as que levam a outro ecrã) e as de gestão num menu: em telemóvel cabem numa linha.
   return (
     <>
-      <Button variant="outline" className="h-10 gap-2" onClick={() => setRenaming(true)}>
-        <Pencil /> {m.scenario_rename()}
-      </Button>
       <Button asChild variant="outline" className="h-10 gap-2">
         <Link to="/simulator" search={{ from: scenario.id }}>
           <SlidersHorizontal /> {m.scenario_adjust()}
@@ -77,11 +84,53 @@ export function ScenarioActions({ scenario }: { scenario: ScenarioOut }) {
           <GitCompareArrows /> {m.scenario_compare()}
         </Link>
       </Button>
-      <DeleteScenario
-        label={scenario.label}
-        pending={remove.isPending}
-        onConfirm={() => remove.mutate({ path: { scenario_id: scenario.id } })}
-      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            className="size-10"
+            aria-label={m.dt_row_actions({ row: scenario.label })}
+          >
+            <MoreHorizontal />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="min-w-48">
+          <DropdownMenuItem className="min-h-10" onSelect={() => setRenaming(true)}>
+            <Pencil /> {m.scenario_rename()}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="min-h-10 text-destructive focus:text-destructive"
+            disabled={guest}
+            onSelect={() => setDeleting(true)}
+          >
+            <Trash2 />
+            <span className="flex flex-col">
+              {m.scenario_delete()}
+              {guest && <span className="text-muted-foreground text-xs">{m.guest_blocked()}</span>}
+            </span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+      <AlertDialog open={deleting} onOpenChange={setDeleting}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {m.scenario_delete_title({ label: scenario.label })}
+            </AlertDialogTitle>
+            <AlertDialogDescription>{m.scenario_delete_description()}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{m.common_cancel()}</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={remove.isPending}
+              onClick={() => remove.mutate({ path: { scenario_id: scenario.id } })}
+            >
+              {m.scenario_delete()}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <Dialog open={renaming} onOpenChange={setRenaming}>
         <DialogContent>
@@ -111,58 +160,6 @@ export function ScenarioActions({ scenario }: { scenario: ScenarioOut }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </>
-  );
-}
-
-function DeleteScenario({
-  label,
-  pending,
-  onConfirm,
-}: {
-  label: string;
-  pending: boolean;
-  onConfirm: () => void;
-}) {
-  const [open, setOpen] = useState(false);
-  const guest = useIsGuest();
-  if (guest) {
-    // Convidados não apagam: o botão fica visível mas desligado, com a razão à mão (título e leitores de ecrã).
-    return (
-      <Button
-        variant="ghost"
-        className="h-10 gap-2"
-        disabled
-        title={m.guest_blocked()}
-        aria-label={`${m.scenario_delete()}. ${m.guest_blocked()}`}
-      >
-        <Trash2 /> {m.scenario_delete()}
-      </Button>
-    );
-  }
-  return (
-    <>
-      <Button
-        variant="ghost"
-        className="h-10 gap-2 text-destructive hover:bg-destructive/10 hover:text-destructive"
-        onClick={() => setOpen(true)}
-      >
-        <Trash2 /> {m.scenario_delete()}
-      </Button>
-      <AlertDialog open={open} onOpenChange={setOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>{m.scenario_delete_title({ label })}</AlertDialogTitle>
-            <AlertDialogDescription>{m.scenario_delete_description()}</AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>{m.common_cancel()}</AlertDialogCancel>
-            <AlertDialogAction disabled={pending} onClick={onConfirm}>
-              {m.scenario_delete()}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </>
   );
 }

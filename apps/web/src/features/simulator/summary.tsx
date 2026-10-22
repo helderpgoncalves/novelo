@@ -210,8 +210,8 @@ export function SummaryPanel({ data, run }: { data: SummaryData; run: RunControl
 
 function MiniKpi({ label, value }: { label: string; value: string }) {
   return (
-    <div className="min-w-0 rounded-lg bg-muted/60 px-1 py-2">
-      <dt className="truncate text-[10px] text-muted-foreground">{label}</dt>
+    <div className="flex min-w-0 flex-col justify-between gap-1 rounded-lg bg-muted/60 px-1.5 py-2">
+      <dt className="text-balance text-[10px] text-muted-foreground leading-tight">{label}</dt>
       <dd className="font-medium font-serif text-base tabular-nums">{value}</dd>
     </div>
   );
@@ -234,10 +234,13 @@ export function SummaryBar({ data, run }: { data: SummaryData; run: RunControl }
   return (
     <div className="flex items-center gap-3">
       <div className="min-w-0 flex-1 space-y-1">
-        <p className="truncate font-medium text-sm tabular-nums">{data.valueText}</p>
+        <p className="truncate font-medium text-sm tabular-nums" title={data.valueText}>
+          {data.valueText}
+        </p>
         <p className="flex items-center gap-2">
           {run.status !== 'draft' && <StatusChip status={run.status} className="shrink-0" />}
           <span
+            title={detail}
             className={cn(
               'min-w-0 truncate text-xs',
               problem ? 'text-destructive' : 'text-muted-foreground',

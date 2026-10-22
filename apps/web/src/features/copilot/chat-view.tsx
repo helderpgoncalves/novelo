@@ -50,6 +50,9 @@ export function ChatView({
   const composer = useRef<ComposerHandle>(null);
   const stickRef = useRef(true);
   const [stick, setStick] = useState(true);
+  // Sem mensagens não há fim a seguir: o estado vazio lê-se de cima (em telemóvel não cabe todo e ficava cortado).
+  const hasMessagesRef = useRef(messages.length > 0);
+  hasMessagesRef.current = messages.length > 0;
   const [dragging, setDragging] = useState(false);
   const ui = useCopilotUi();
   const [announce, setAnnounce] = useState('');
@@ -69,7 +72,7 @@ export function ChatView({
     const el = content.current;
     if (!el) return;
     const observer = new ResizeObserver(() => {
-      if (stickRef.current) scrollToEnd();
+      if (stickRef.current && hasMessagesRef.current) scrollToEnd();
     });
     observer.observe(el);
     return () => observer.disconnect();

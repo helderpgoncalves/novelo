@@ -46,7 +46,7 @@ export function FormSection({
               </span>
               <span
                 className={cn(
-                  'mt-0.5 block truncate font-normal text-sm',
+                  'mt-0.5 block text-pretty font-normal text-sm',
                   invalid ? 'text-destructive' : 'text-muted-foreground',
                 )}
               >

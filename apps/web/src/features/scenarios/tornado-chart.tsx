@@ -92,9 +92,9 @@ export function TornadoChart({
                 {from != null && to != null ? (
                   <>
                     <span className="font-medium">
-                      {formatNumber(bar.swing_eur_per_tonne, 0)} €/t
+                      {m.sens_tornado_swing({ value: eur(bar.swing_eur_per_tonne) })}
                     </span>
-                    <span className="block text-muted-foreground text-xs">
+                    <span className="text-muted-foreground text-xs max-md:ml-2 md:block">
                       {eur(from)} – {eur(to)}
                     </span>
                   </>
@@ -124,7 +124,7 @@ export function TornadoChart({
         {sorted.length > COLLAPSED_ROWS && (
           <button
             type="button"
-            className="min-h-10 rounded-md px-2 font-medium text-foreground underline-offset-4 hover:underline"
+            className="min-h-10 rounded-md px-2 font-medium text-foreground underline-offset-4 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
             onClick={() => setAll((v) => !v)}
           >
             {all ? m.sens_show_top({ n: COLLAPSED_ROWS }) : m.sens_show_all({ n: sorted.length })}

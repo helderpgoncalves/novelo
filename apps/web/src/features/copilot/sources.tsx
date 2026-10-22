@@ -81,7 +81,7 @@ export function SourcesPanel({ message }: { message: Pick<ChatMessage, 'sources'
       {internal.length > 0 && (
         <section className="space-y-1.5">
           {web.length > 0 && (
-            <h3 className="font-medium text-[11px] text-muted-foreground uppercase tracking-wide">
+            <h3 className="font-medium font-sans text-[11px] text-muted-foreground uppercase tracking-wide">
               {m.chat_sources_internal()}
             </h3>
           )}
@@ -109,7 +109,7 @@ export function SourcesPanel({ message }: { message: Pick<ChatMessage, 'sources'
       )}
       {web.length > 0 && (
         <section className="space-y-1.5" data-testid="copilot-web-sources">
-          <h3 className="flex items-center gap-1.5 font-medium text-[11px] text-muted-foreground uppercase tracking-wide">
+          <h3 className="flex items-center gap-1.5 font-medium font-sans text-[11px] text-muted-foreground uppercase tracking-wide">
             <Globe className="size-3" strokeWidth={1.75} aria-hidden="true" />
             {m.chat_sources_external({ count: web.length })}
           </h3>

@@ -25,8 +25,9 @@ interface StatCellProps {
 
 export function StatCell({ label, value, hint, tag, tone = 'default' }: StatCellProps) {
   return (
-    <div className="flex min-w-0 flex-col gap-1 bg-card p-3.5 sm:p-4">
-      <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.14em] sm:tracking-[0.18em]">
+    // Subgrelha de 3 linhas (rótulo, valor, nota): na mesma fila, os valores alinham mesmo quando um rótulo dá duas linhas.
+    <div className="row-span-3 grid min-w-0 grid-rows-subgrid content-start gap-y-1 bg-card p-3.5 sm:p-4">
+      <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 self-start font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.14em] sm:tracking-[0.18em]">
         {label}
         {tag && (
           <span className="rounded-full bg-areia/25 px-1.5 py-px font-semibold text-[9px] text-foreground/80">
