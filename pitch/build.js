@@ -446,16 +446,19 @@ pres.addSection({ title: 'Pitch' });
   s.addText('Cada quilo com origem, destino e passaporte', { placeholder: 'title' });
   const steps = [
     ['triagem.png', '1 · Triagem por foto', 'A IA sugere fibra, estado e marca a partir da etiqueta; o operador confirma.'],
-    ['lote.png', '2 · Lote com QR', 'Composição, peso e histórico de cada lote.'],
-    ['m-passport.png', '3 · Passaporte público', 'Quem recebe lê o QR no telemóvel.'],
-    ['p-1.png', '4 · Relatório RAP', 'Um PDF para a mesa onde se fixa o custo eficiente.'],
+    ['lote.png', '2 · Lote com QR', 'Composição, peso e histórico de cada lote (lote de demonstração).'],
+    ['passaporte.png', '3 · Passaporte', 'Quem recebe lê o QR no telemóvel.'],
+    ['p-1.png', '4 · Relatório RAP', 'Um PDF para a mesa do custo eficiente.'],
   ].filter(([f]) => fs.existsSync(A(f)));
-  const colW = (W - 2 * M - (steps.length - 1) * 0.3) / steps.length;
+  // larguras à medida de cada imagem: duas capturas largas, o telemóvel e a página A4 (somam a largura útil)
+  const widths = [3.5, 3.5, 1.95, 2.28];
+  let x = M;
   steps.forEach(([file, title, text], i) => {
-    const x = M + i * (colW + 0.3);
+    const colW = widths[i] ?? 2.8;
     const r = fit(file, colW, 3.3);
-    image(s, file, { x: x + (colW - r.w) / 2, y: 2.3 + (3.3 - r.h) / 2, w: r.w, h: r.h, name: title });
-    s.addText([{ text: title, options: { bold: true, color: C.text1, breakLine: true } }, { text, options: { color: C.accent4, fontSize: 12 } }], { x, y: 5.8, w: colW, h: 0.95, fontFace: THEME.bodyFontFace, fontSize: 14, margin: 0, valign: 'top', isTextBox: true, objectName: `Passo ${title}` });
+    image(s, file, { x: x + (colW - r.w) / 2, y: 2.3 + (3.3 - r.h), w: r.w, h: r.h, name: title });
+    s.addText([{ text: title, options: { bold: true, color: C.text1, breakLine: true } }, { text, options: { color: C.accent4, fontSize: 12 } }], { x, y: 5.85, w: colW, h: 0.95, fontFace: THEME.bodyFontFace, fontSize: 14, margin: 0, valign: 'top', isTextBox: true, objectName: `Passo ${title}` });
+    x += colW + 0.3;
   });
   talk(s, {
     time: '4:05–4:20',

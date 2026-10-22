@@ -11,7 +11,7 @@ export const SCENES = [
   { id: 'pivot', bars: 4, bg: 'light' },
   { id: 'network', bars: 5, bg: 'dark' },
   { id: 'results', bars: 5, bg: 'light' },
-  { id: 'montage', bars: 12, bg: 'light' },
+  { id: 'montage', bars: 15, bg: 'light' },
   { id: 'criteria', bars: 3, bg: 'light' },
   { id: 'rigor', bars: 2, bg: 'dark' },
   { id: 'close', bars: 4, bg: 'dark' },

@@ -59,7 +59,10 @@ async function crop(src, out, { top, height, left = 0, width, scale = 2 }) {
   await crop('app/scenario-desktop-content.png', 'saco-ao-fio.png', { top: 2470, height: 440 });
   await crop('app/coverage-desktop-content.png', 'cobertura.png', { top: 600, height: 700 });
   await crop('app/uncertainty-desktop-content.png', 'incerteza.png', { top: 620, height: 1250 });
-  await crop('app/lot-desktop-content.png', 'lote.png', { top: 0, height: 930 });
+  // Operação: triagem real com o modelo da OpenRouter e o lote de demonstração NOV-PGTV2Z (fotografias de licença livre).
+  await sharp(path.join(V, 'public/shots/ops/lot-desktop.png')).extract({ left: 512, top: 160, width: 2368, height: 1640 }).png().toFile(path.join(OUT, 'lote.png'));
+  await sharp(path.join(V, 'public/shots/ops/triage-desktop.png')).extract({ left: 590, top: 170, width: 2290, height: 1600 }).png().toFile(path.join(OUT, 'triagem.png'));
+  fs.copyFileSync(path.join(V, 'public/shots/ops/passport-mobile.png'), path.join(OUT, 'passaporte.png'));
   for (const f of ['copilot-panel.png', 'copilot-desktop.png', 'm-passport.png', 'p-1.png', 'p-2.png', 'p-3.png', 'hero-light.png']) {
     fs.copyFileSync(path.join(V, 'public/shots', f), path.join(OUT, f));
   }
@@ -71,7 +74,7 @@ async function crop(src, out, { top, height, left = 0, width, scale = 2 }) {
   if (fs.existsSync(video)) {
     const { execFileSync } = require('node:child_process');
     execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', video, '-c:v', 'libx264', '-crf', '26', '-preset', 'slow', '-vf', 'scale=1600:-2', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', path.join(OUT, 'novelo-16x9-deck.mp4')]);
-    execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '119', '-i', video, '-frames:v', '1', '-vf', 'scale=1600:-2', path.join(OUT, 'video-capa.png')]);
+    execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '131', '-i', video, '-frames:v', '1', '-vf', 'scale=1600:-2', path.join(OUT, 'video-capa.png')]);
     console.log('vídeo do deck');
   }
   console.log('ok');

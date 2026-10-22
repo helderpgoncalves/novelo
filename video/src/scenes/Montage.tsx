@@ -17,7 +17,7 @@ type Shot = {
   sub: string;
   desktop?: Move;
   mobile?: Move;
-  special?: 'lot' | 'report' | 'copilot';
+  special?: 'triage' | 'lot' | 'report' | 'copilot';
 };
 
 // Posições medidas na stack de dev (1440 × 900 e 390 × 844), 22 out 2026.
@@ -65,7 +65,8 @@ export const SHOTS: Shot[] = [
     mobile: { shot: 'uncertainty-mobile', url: '', scroll: [[0, 940], [36, 950], [80, 1800]] },
   },
   { eyebrow: 'Perguntar', title: 'Pergunta em português. Responde o otimizador.', sub: 'A IA nunca faz contas: um verificador rejeita qualquer número que não venha da origem.', special: 'copilot' },
-  { eyebrow: 'Operar', title: 'Do saco ao lote, com passaporte.', sub: 'Triagem por foto confirmada pelo operador; lote com QR e passaporte público para quem recebe.', special: 'lot' },
+  { eyebrow: 'Operar', title: 'Na entrega, a etiqueta diz a fibra.', sub: 'A IA sugere tipo, estado, fibra e marca; o operador confirma. Lote de demonstração, com fotografias de licença livre.', special: 'triage' },
+  { eyebrow: 'Operar', title: 'Do saco ao lote, com passaporte.', sub: 'Cada lote leva um QR: composição, peso e estado, abertos no telemóvel de quem recebe.', special: 'lot' },
   { eyebrow: 'Prestar contas', title: 'O relatório RAP, num clique.', sub: 'Custo por tipo de território, toneladas por destino, marcas e fontes: o dossiê para a mesa onde se fixa o custo.', special: 'report' },
 ];
 
@@ -107,24 +108,33 @@ function ShotView({ shot, dur, index }: { shot: Shot; dur: number; index: number
         </div>
       </BrowserChrome>
     );
+  } else if (shot.special === 'triage') {
+    // Triagem real na stack de dev com o modelo da OpenRouter: calças Wisent e a etiqueta (80% algodão, 20% poliéster).
+    stage = portrait ? (
+      <PhoneChrome width={frameW * 1.064}>
+        <Img src={staticFile('shots/ops/triage-mobile.png')} style={{ width: frameW, display: 'block', transform: 'none' }} />
+      </PhoneChrome>
+    ) : (
+      <BrowserChrome width={frameW} url="/pt/triage">
+        <div style={{ width: frameW, height: frameW * 0.625, overflow: 'hidden' }}>
+          <Img src={staticFile('shots/ops/triage-desktop.png')} style={{ width: frameW, display: 'block', transform: `scale(${kf(f, [[16, 1], [72, 1.38]])})`, transformOrigin: '52% 26%' }} />
+        </div>
+      </BrowserChrome>
+    );
   } else if (shot.special === 'lot') {
     const phoneW = portrait ? 520 : 330;
     stage = (
       <div style={{ position: 'relative', width: portrait ? width - pad * 2 : frameW, height: portrait ? 1100 : 820 }}>
-        {portrait ? (
-          <div style={{ position: 'absolute', left: 0, top: 30 }}>
-            <PhoneChrome width={480}>
-              <AppScreen shot="lot-mobile" width={480 / 1.064} scroll={kf(f, [[10, 0], [80, 300]])} />
-            </PhoneChrome>
-          </div>
-        ) : (
-          <BrowserChrome width={1000} url="/pt/lots/NOV-M9Z34P">
-            <AppScreen shot="lot-desktop" width={1000} scroll={kf(f, [[10, 0], [80, 60]])} />
+        {portrait ? null : (
+          <BrowserChrome width={1000} url="/pt/lots/NOV-PGTV2Z">
+            <div style={{ width: 1000, height: 625, overflow: 'hidden' }}>
+              <Img src={staticFile('shots/ops/lot-desktop.png')} style={{ width: 1000, display: 'block', transform: `scale(${kf(f, [[10, 1], [80, 1.12]])})`, transformOrigin: '40% 30%' }} />
+            </div>
           </BrowserChrome>
         )}
-        <div style={{ position: 'absolute', right: portrait ? 0 : -10, bottom: portrait ? 0 : 0, transform: `translateY(${(1 - prog(f, 16, 20)) * 80}px)`, opacity: prog(f, 16, 14) }}>
+        <div style={{ position: 'absolute', right: portrait ? (width - pad * 2 - phoneW) / 2 : -10, bottom: portrait ? 0 : 0, transform: `translateY(${(1 - prog(f, 16, 20)) * 80}px)`, opacity: prog(f, 16, 14) }}>
           <PhoneChrome width={phoneW}>
-            <Img src={staticFile('shots/m-passport.png')} style={{ width: phoneW / 1.064, display: 'block' }} />
+            <Img src={staticFile('shots/ops/passport-mobile.png')} style={{ width: phoneW / 1.064, display: 'block' }} />
           </PhoneChrome>
         </div>
       </div>
