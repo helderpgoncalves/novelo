@@ -1,6 +1,6 @@
 ![Novelo: recolha seletiva de têxteis, desenhada ao menor custo](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/banner-projeto.png)
 
-# Quase 9 em cada 10 quilos de têxtil de Guimarães acabam no lixo. O Novelo desenha a recolha que os traz de volta: uma viatura nova só para o têxtil, sem um único contentor novo.
+# Mais de 9 em cada 10 quilos de têxtil de Guimarães acabam no lixo. O Novelo desenha a recolha que os traz de volta: uma viatura nova só para o têxtil, sem um único contentor novo.
 
 **Novelo é a ferramenta de decisão que desenha a rede de recolha seletiva de têxteis de Guimarães ao menor custo.** Entram um orçamento e uma meta. Saem cenários comparáveis em **euros, toneladas, toneladas reutilizáveis e €/tonelada**, calculados por um otimizador sobre os dados reais da Vitrus Ambiente: o lixo que recolhe, o custo de o tratar e os 2 751 contentores municipais.
 
@@ -213,7 +213,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 
 ## In English
 
-**Nearly 9 in 10 kilos of Guimarães' textiles end up in the bin. Novelo designs the collection that brings them back: one new vehicle just for textiles, and not a single new container.**
+**More than 9 in 10 kilos of Guimarães' textiles end up in the bin. Novelo designs the collection that brings them back: one new vehicle just for textiles, and not a single new container.**
 
 Novelo is a decision tool that designs Guimarães' separate textile collection at the lowest cost. Give it a budget or a target; it returns scenarios in **euros, tonnes, reusable tonnes and € per tonne**, computed by an optimiser (OR-Tools CP-SAT and VRP) on real data from Vitrus Ambiente, the municipal waste company.
 
