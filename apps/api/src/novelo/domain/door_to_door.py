@@ -117,3 +117,8 @@ def fits(load_kg: float, free_capacity_kg: float | None, vehicle_capacity_kg: fl
     if free_capacity_kg is not None:
         return load_kg <= free_capacity_kg
     return False if load_kg > vehicle_capacity_kg else None
+
+
+def weekdays_served(passes: Iterable[Pass]) -> int:
+    """Dias da semana (0 a 7) com pelo menos uma passagem: os dias distintos, não a soma das passagens."""
+    return len({p.weekday for p in passes})

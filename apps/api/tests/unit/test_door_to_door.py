@@ -10,6 +10,7 @@ from novelo.domain.door_to_door import (
     kg_per_round,
     pickups_per_year,
     round_loads,
+    weekdays_served,
 )
 
 
@@ -61,3 +62,12 @@ def test_capacity_check_never_invents_a_free_capacity() -> None:
     assert fits(200, 250, 4000) is True
     assert fits(300, None, 4000) is None  # capacidade livre por validar: não se sabe
     assert fits(5000, None, 4000) is False  # acima da capacidade total da viatura não cabe de certeza
+
+
+def test_weekdays_served_counts_distinct_days() -> None:
+    # moloks C1 de segunda a domingo e PAP C7 à terça, quinta e sábado: 7 dias distintos, não 10 passagens
+    molok = [Pass("C1", d) for d in range(1, 8)]
+    pap = [Pass("C7", 2), Pass("C7", 4), Pass("C7", 6)]
+    assert weekdays_served(molok + pap) == 7
+    assert weekdays_served([*pap, Pass("C9", 1), Pass("C9", 3)]) == 5  # 2, 4, 6 + 1, 3
+    assert weekdays_served([]) == 0

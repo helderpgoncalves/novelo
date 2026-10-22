@@ -1,6 +1,6 @@
 # /// script
 # requires-python = ">=3.12"
-# dependencies = ["openpyxl>=3.1", "pyproj>=3.6"]
+# dependencies = ["numpy>=1.26", "openpyxl>=3.1", "pyproj>=3.6", "pyshp>=2.3", "shapely>=2.0"]
 # ///
 """Converte os Excel recebidos da Vitrus em ficheiros limpos em data/processed/.
 
@@ -24,6 +24,8 @@ from pathlib import Path
 import openpyxl
 
 import containers  # mesmo diretório (scripts/etl); `uv run` põe-no no sys.path
+import locality_parishes  # freguesia CAOP e coordenadas das localidades dos circuitos
+import municipal_containers  # leitura da CAOP 2019 do pacote QGIS (o mesmo contorno oficial)
 import textile_base as base  # base do têxtil gerado (Vitrus + APA), um só sítio no ETL
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -327,17 +329,54 @@ def geography() -> dict:
     ]
     _write_csv("parishes.csv", sorted(parish_rows, key=lambda r: r["dicofre"]))
     located = json.loads((public / "localities_geocoded.json").read_text(encoding="utf-8"))
-    locality_rows = [
-        {
-            "locality": x["locality"],
-            "latitude": x["lat"] or "",
-            "longitude": x["lon"] or "",
-            "dicofre": x["dicofre"] or "",
-        }
-        for x in located
-    ]
+    caop = municipal_containers.RAW_PACKAGE
+    if (caop / f"{municipal_containers.CAOP_STEM}.shp").exists():
+        # Freguesia pela CAOP 2019 (oficial): correções explícitas pelo nome e ponto-em-polígono (locality_parishes.py).
+        found, _ = municipal_containers.load_parishes(caop, OUT / "parishes.csv")
+        shapes = [
+            locality_parishes.ParishShape(p.code, p.name, municipal_containers.to_wgs84(p.geom, 7))
+            for p in found
+            if p.code
+        ]
+        locality_rows = locality_parishes.resolve(located, shapes)
+    else:  # sem o pacote QGIS: o ponto-em-polígono do Nominatim sobre os contornos OSM (fetch_public_data.py)
+        locality_rows = [
+            {
+                "locality": x["locality"],
+                "latitude": x["lat"] or "",
+                "longitude": x["lon"] or "",
+                "dicofre": x["dicofre"] or "",
+                "parish_method": "point_osm" if x["dicofre"] else locality_parishes.UNRESOLVED,
+                "coord_method": locality_parishes.COORDS_NOMINATIM if x["lat"] is not None else "",
+                "note": "",
+            }
+            for x in located
+        ]
     _write_csv("localities_geo.csv", locality_rows)
-    return {"parishes": len(parish_rows), "localities_located": sum(1 for r in locality_rows if r["latitude"] != "")}
+    with (OUT / "localities.csv").open(encoding="utf-8", newline="") as fh:
+        circuits_of = {r["locality"]: r["circuits"] for r in csv.DictReader(fh)}
+    _append_alerts(locality_parishes.alerts(locality_rows, circuits_of, first_id=GEO_ALERT_FIRST_ID))
+    by_method: dict[str, int] = defaultdict(int)
+    for r in locality_rows:
+        by_method[r["parish_method"]] += 1
+    return {
+        "parishes": len(parish_rows),
+        "localities_located": sum(1 for r in locality_rows if r["latitude"] != ""),
+        "localities_with_parish": sum(1 for r in locality_rows if r["dicofre"] != ""),
+        "localities_by_method": dict(sorted(by_method.items())),
+        "localities_unresolved": sorted(r["locality"] for r in locality_rows if not r["dicofre"]),
+    }
+
+
+# Alertas gerados pelo ETL (geocodificação) começam no 101: os da folha Alertas do Excel ficam com os seus números.
+GEO_ALERT_FIRST_ID = 101
+
+
+def _append_alerts(extra: list[dict]) -> None:
+    path = OUT / "data_alerts.csv"
+    with path.open(encoding="utf-8", newline="") as fh:
+        rows = [r for r in csv.DictReader(fh) if int(r["id"]) < GEO_ALERT_FIRST_ID]
+    _write_csv("data_alerts.csv", rows + extra)
 
 
 def sources() -> None:
@@ -416,7 +455,11 @@ def sources() -> None:
                 "received_on": "2026-10-19",
                 "period_start": None,
                 "period_end": None,
-                "notes": "Geocodificação Nominatim. Algumas localidades dos circuitos (ex.: 'Ruas Estreitas') não são lugares e ficam sem coordenadas.",
+                "notes": (
+                    "Geocodificação Nominatim. A freguesia de cada localidade vem da CAOP 2019 (correções explícitas "
+                    "pelo nome em scripts/etl/locality_parishes.py, senão ponto-em-polígono); as que não são lugares "
+                    "(ex.: 'Ruas Estreitas') ficam por resolver e entram nos alertas."
+                ),
             },
         ]
     OUT.mkdir(parents=True, exist_ok=True)

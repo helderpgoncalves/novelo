@@ -52,7 +52,7 @@
     "received_on": "2026-10-19",
     "period_start": null,
     "period_end": null,
-    "notes": "Geocodificação Nominatim. Algumas localidades dos circuitos (ex.: 'Ruas Estreitas') não são lugares e ficam sem coordenadas."
+    "notes": "Geocodificação Nominatim. A freguesia de cada localidade vem da CAOP 2019 (correções explícitas pelo nome em scripts/etl/locality_parishes.py, senão ponto-em-polígono); as que não são lugares (ex.: 'Ruas Estreitas') ficam por resolver e entram nos alertas."
   },
   {
     "key": "vitrus_municipal_containers_2026_10",

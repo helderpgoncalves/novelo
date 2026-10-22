@@ -265,3 +265,11 @@ async def test_demand_splits_by_container_capacity(operator: httpx.AsyncClient) 
     assert tonnes["S0000001a"] == pytest.approx(captured * 6100 / 7200, abs=0.002)
     assert tonnes["S0000002b"] == pytest.approx(captured * 1100 / 7200, abs=0.002)
     assert "capacidade" in s["result"]["siting"]["population_proxy"]
+
+
+async def test_site_scenarios_carry_the_reusable_tonnes(operator: httpx.AsyncClient) -> None:
+    k = (await run(operator))["result"]["kpis"]
+    # a mesma quota observada dos cenários por freguesia: 178,9948 / 301,2661 t reutilizadas em 2025
+    assert k["reusable_t"] == pytest.approx(k["tonnes_year"] * 178.9948 / 301.2661, abs=0.01)
+    assert k["reusable_t_low"] == pytest.approx(k["tonnes_year"] * 0.5, abs=0.01)  # Sarah: 59,316 / 118,632
+    assert k["eur_per_reusable_t"] == pytest.approx(k["annual_cost_eur"] / k["reusable_t"], rel=1e-3)

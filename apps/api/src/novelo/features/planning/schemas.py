@@ -114,7 +114,12 @@ class ZoneOut(BaseModel):
     latitude: float
     longitude: float
     tipau: Tipau | None = Field(description="Tipologia de áreas urbanas do INE")
-    service_days: int = Field(description="Dias/semana com algum circuito da Vitrus a passar")
+    service_days: int = Field(
+        description=(
+            "Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks) com "
+            "viatura no planeamento de turnos; decide o desvio da recolha a pedido. Orgânico não conta"
+        )
+    )
     existing_containers: int = Field(
         default=0, description="Contentores têxteis ativos já na freguesia (0 se ainda não há localizações)"
     )
@@ -209,6 +214,34 @@ class Kpis(BaseModel):
             "Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» "
             "(o custo por tonelada ainda não chegou da Vitrus)"
         ),
+    )
+    # Têxtil reutilizável (22 out 2026). Opcionais: os cenários guardados antes continuam válidos (nulo = sem cálculo).
+    reuse_share: float | None = Field(
+        default=None,
+        description=(
+            "Quota de reutilização observada em 2025 nas 4 entidades (reutilização ÷ recolhido, 0 a 1), aplicada igual "
+            "a todos os modos: não há dado de qualidade por canal (estimativa)"
+        ),
+    )
+    reuse_share_low: float | None = Field(
+        default=None,
+        description="Menor quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)",
+    )
+    reuse_share_high: float | None = Field(
+        default=None,
+        description="Maior quota de reutilização entre as entidades com kg exatos por destino (0 a 1, estimativa)",
+    )
+    reusable_t: float | None = Field(
+        default=None, description="Têxtil reutilizável por ano: toneladas × `reuse_share` (estimativa)"
+    )
+    reusable_t_low: float | None = Field(
+        default=None, description="Têxtil reutilizável por ano com `reuse_share_low` (estimativa)"
+    )
+    reusable_t_high: float | None = Field(
+        default=None, description="Têxtil reutilizável por ano com `reuse_share_high` (estimativa)"
+    )
+    eur_per_reusable_t: float | None = Field(
+        default=None, description="Custo anual ÷ `reusable_t`: € por tonelada reutilizável (estimativa)"
     )
 
 

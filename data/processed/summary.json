@@ -25,7 +25,18 @@
   },
   "geography": {
     "parishes": 48,
-    "localities_located": 71
+    "localities_located": 79,
+    "localities_with_parish": 79,
+    "localities_by_method": {
+      "name_caop": 18,
+      "point_caop": 61,
+      "unresolved": 3
+    },
+    "localities_unresolved": [
+      "Ruas Estreitas",
+      "Selho Ruas Estreitas",
+      "São Torcato Rua Estreitas Vermil Creixomil (5ª)"
+    ]
   },
   "containers": {
     "status": "awaiting_data",

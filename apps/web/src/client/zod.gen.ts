@@ -1095,6 +1095,19 @@ export const zCopilotWebSearchEvent = z.object({
 });
 
 /**
+ * CoverageEquity
+ *
+ * Não limitado às zonas rendíveis: cobertura fora das freguesias predominantemente urbanas vs dentro.
+ */
+export const zCoverageEquity = z.object({
+    non_urban_covered_pct: z.number().nullable(),
+    non_urban_population: z.int(),
+    non_urban_vs_urban: z.number().nullable(),
+    urban_covered_pct: z.number().nullable(),
+    urban_population: z.int()
+});
+
+/**
  * CoverageState
  */
 export const zCoverageState = z.enum(['ok', 'awaiting_data']);
@@ -1864,11 +1877,18 @@ export const zKpis = z.object({
     baseline_observed_t: z.number(),
     capex_eur: z.number(),
     coverage_pct: z.number(),
+    eur_per_reusable_t: z.number().nullish(),
     eur_per_tonne: z.number().nullable(),
     km_year: z.number(),
     opex_eur_year: z.number(),
     points: z.int(),
     potential_t: z.number(),
+    reusable_t: z.number().nullish(),
+    reusable_t_high: z.number().nullish(),
+    reusable_t_low: z.number().nullish(),
+    reuse_share: z.number().nullish(),
+    reuse_share_high: z.number().nullish(),
+    reuse_share_low: z.number().nullish(),
     tonnes_year: z.number()
 });
 
@@ -4524,6 +4544,52 @@ export const zTipau = z.enum([
 ]);
 
 /**
+ * CoverageGroup
+ *
+ * Soma de um grupo de freguesias (uma TIPAU, ou o concelho no total).
+ */
+export const zCoverageGroup = z.object({
+    annual_cost_eur: z.number(),
+    covered_pct: z.number().nullable(),
+    covered_population: z.number(),
+    eur_per_tonne: z.number().nullable(),
+    parishes: z.int(),
+    population: z.int(),
+    tipau: zTipau.nullable(),
+    tonnes: z.number()
+});
+
+/**
+ * CoverageParish
+ *
+ * Uma freguesia na matriz de cobertura: território, procura, proximidade e o que o cenário lá faz.
+ */
+export const zCoverageParish = z.object({
+    annual_cost_eur: z.number(),
+    area_km2: z.number().nullable(),
+    area_within_300m_pct: z.number().nullable(),
+    channels: z.array(z.enum([
+        'door_to_door',
+        'detour',
+        'on_demand',
+        'existing',
+        'street'
+    ])),
+    covered_population: z.number(),
+    covered_share: z.number(),
+    demand_t: z.number(),
+    density_hab_km2: z.number().nullable(),
+    door_to_door_days_week: z.int(),
+    modes: z.array(zCollectionMode),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    population: z.int(),
+    service_days: z.int(),
+    tipau: zTipau.nullable(),
+    tonnes: z.number()
+});
+
+/**
  * OverviewParish
  */
 export const zOverviewParish = z.object({
@@ -4565,6 +4631,23 @@ export const zPilotOut = z.object({
     signal_floor: zSignalFloorOut,
     startup_cost_eur: z.number(),
     zones: z.array(zPilotZoneOut)
+});
+
+/**
+ * ScenarioCoverage
+ *
+ * Matriz de cobertura do cenário por freguesia e por TIPAU (art. 22.º-C, n.º 9, b) da Diretiva 2025/1892:
+ * dimensão e densidade da população, volume previsto, acessibilidade e proximidade, sem se limitar às zonas
+ * rendíveis). Os números vêm do cenário e da base de dados; a rede atual (circuitos, contentores) é a de hoje.
+ */
+export const zScenarioCoverage = z.object({
+    by_tipau: z.array(zCoverageGroup),
+    equity: zCoverageEquity,
+    label: z.string(),
+    parishes: z.array(zCoverageParish),
+    scenario_id: z.uuid(),
+    siting: z.enum(['parish', 'sites']),
+    total: zCoverageGroup
 });
 
 /**
@@ -6634,6 +6717,15 @@ export const zRenameScenarioPath = z.object({
  * Successful Response
  */
 export const zRenameScenarioResponse = zScenarioSummary;
+
+export const zGetScenarioCoveragePath = z.object({
+    scenario_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetScenarioCoverageResponse = zScenarioCoverage;
 
 export const zGetScenarioFlowsPath = z.object({
     scenario_id: z.uuid()
