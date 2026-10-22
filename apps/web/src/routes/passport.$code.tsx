@@ -6,9 +6,11 @@ import { getPassportOptions } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
 import { BrandLogo, BrandSpinner } from '@/components/brand-logo';
 import { LanguageSwitcher } from '@/components/language-switcher';
+import { ErrorState } from '@/components/states';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline, LotStateBadge } from '@/features/lots/lot-parts';
+import { getErrorCode } from '@/lib/errors';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
 import { fibreLabel } from '@/lib/lots';
@@ -43,7 +45,14 @@ export const Route = createFileRoute('/passport/$code')({
 
 function PassportPage() {
   const { code } = Route.useParams();
-  const { data: passport, isPending, isError } = useQuery(getPassportOptions({ path: { code } }));
+  const {
+    data: passport,
+    isPending,
+    error,
+    refetch,
+  } = useQuery(getPassportOptions({ path: { code } }));
+  // Só um 404 é «lote não encontrado»; sem rede ou com o limite de pedidos atingido mostra-se o erro e tentar de novo.
+  const notFound = getErrorCode(error) === 'not_found';
   const qr = client.buildUrl<GetLotQrData>({
     url: '/api/v1/public/lots/{code}/qr',
     path: { code },
@@ -67,7 +76,8 @@ function PassportPage() {
             <span className="sr-only">{m.common_loading()}</span>
           </div>
         )}
-        {isError && (
+        {error && !notFound && <ErrorState error={error} onRetry={() => refetch()} />}
+        {notFound && (
           <div className="space-y-4 rounded-xl border border-dashed p-10 text-center">
             <SearchX className="mx-auto size-8 text-muted-foreground" aria-hidden="true" />
             <h1 className="text-3xl">{m.passport_not_found_title()}</h1>
@@ -92,26 +102,33 @@ function PassportPage() {
               </p>
             </div>
 
-            <dl className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border sm:grid-cols-3">
+            {/* No telemóvel peso e peças lado a lado e a fibra por baixo: o essencial cabe no primeiro ecrã. */}
+            <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border sm:grid-cols-3">
               <div className="space-y-1 bg-card p-5">
-                <dt className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
+                <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
                   {m.lot_stat_weight()}
+                  {/* Peso médio por tipo de peça (pressuposto): estimativa, como na página do lote. */}
+                  <span className="rounded-full bg-areia/25 px-1.5 py-px text-[9px] text-foreground/80">
+                    {m.common_estimate()}
+                  </span>
                 </dt>
-                <dd className="font-medium font-serif text-4xl tabular-nums">
-                  {formatNumber(passport.weight_kg, 1)} kg
+                <dd className="font-medium font-serif text-3xl tabular-nums sm:text-4xl">
+                  {formatNumber(passport.weight_kg, 2)} kg
                 </dd>
               </div>
               <div className="space-y-1 bg-card p-5">
                 <dt className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
                   {m.lot_stat_items()}
                 </dt>
-                <dd className="font-medium font-serif text-4xl tabular-nums">{passport.items}</dd>
+                <dd className="font-medium font-serif text-3xl tabular-nums sm:text-4xl">
+                  {passport.items}
+                </dd>
               </div>
-              <div className="space-y-1 bg-card p-5">
+              <div className="col-span-2 space-y-1 bg-card p-5 sm:col-span-1">
                 <dt className="font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
                   {m.passport_dominant()}
                 </dt>
-                <dd className="font-medium font-serif text-4xl">
+                <dd className="font-medium font-serif text-3xl sm:text-4xl">
                   {fibreLabel[passport.dominant_fibre]()}
                 </dd>
               </div>
@@ -125,7 +142,7 @@ function PassportPage() {
 
             <section className="space-y-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
               <h2 className="text-xl">{m.passport_destination()}</h2>
-              <ul className="grid gap-3 text-sm sm:grid-cols-3">
+              <ul className="grid grid-cols-3 gap-3 text-sm">
                 {(['reuse', 'recycle', 'reject'] as const).map((d) => (
                   <li key={d} className="space-y-0.5">
                     <p className="text-muted-foreground text-xs">{destinationLabel[d]()}</p>
@@ -154,7 +171,7 @@ function PassportPage() {
               <img
                 src={qr}
                 alt={m.lot_qr_alt({ code: passport.code })}
-                className="size-40 place-self-center"
+                className="size-40 place-self-center rounded-lg"
               />
             </div>
             <p className="text-muted-foreground text-xs">{m.passport_privacy()}</p>

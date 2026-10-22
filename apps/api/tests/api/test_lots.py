@@ -2,7 +2,9 @@ import base64
 
 import httpx
 import pytest
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.features.lots import service as lots_service
 from novelo.features.lots.schemas import CompositionPart, TriageAnalysis
 from tests.conftest import FakeLlm
 
@@ -62,6 +64,7 @@ async def test_lot_lifecycle_and_public_passport(logged_in: httpx.AsyncClient) -
     assert "reservation" not in passport and "created_by" not in str(passport)
     qr = await anonymous.get(f"/api/v1/public/lots/{code}/qr")
     assert qr.headers["content-type"] == "image/svg+xml" and b"<svg" in qr.content
+    assert b'fill="#fff"' in qr.content  # fundo branco: o QR lê-se também no tema escuro
     assert (await anonymous.get("/api/v1/public/lots/NOV-NAOEXI")).status_code == 404
     assert (await anonymous.get("/api/v1/lots")).status_code == 401  # a lista é privada
 
@@ -72,7 +75,7 @@ async def test_composition_must_add_up_to_100(logged_in: httpx.AsyncClient) -> N
     assert (await logged_in.post(f"/api/v1/lots/{code}/items", json=bad)).status_code == 422
 
 
-async def test_market_reservation_and_brand_evidence(logged_in: httpx.AsyncClient) -> None:
+async def test_market_reservation_and_brand_evidence(logged_in: httpx.AsyncClient, session: AsyncSession) -> None:
     code = await open_lot(logged_in)
     await logged_in.post(f"/api/v1/lots/{code}/items", json=ITEM)
     # Só lotes triados aparecem na bolsa e podem ser reservados.
@@ -96,6 +99,12 @@ async def test_market_reservation_and_brand_evidence(logged_in: httpx.AsyncClien
     assert (await logged_in.post(f"/api/v1/lots/{code}/state", json={"state": "collected"})).json()[
         "code"
     ] == "conflict"  # só avança
+
+    # Entregue sai da bolsa, mas continua a contar como lote triado no relatório RAP.
+    market = (await logged_in.get("/api/v1/market")).json()
+    assert all(i["code"] != code for e in market for i in e["items"])
+    sorted_lots = await lots_service.market(session, None, lots_service.SORTED_STATES)
+    assert any(i.code == code for e in sorted_lots for i in e.items)
 
     brands = (await logged_in.get("/api/v1/brands")).json()
     zara = next(b for b in brands["brands"] if b["brand"] == "Zara")
@@ -121,7 +130,7 @@ async def test_triage_analyses_photos_without_storing_them(logged_in: httpx.Asyn
     assert resp.status_code == 200, resp.text
     body = resp.json()
     assert body["analysis"]["brand"] == "Mango" and body["dominant_fibre"] == "cotton"
-    assert body["estimated_weight_g"] == 200 and body["prompt_version"] == "v2"  # peso calculado no servidor
+    assert body["estimated_weight_g"] == 200 and body["prompt_version"] == "v3"  # peso calculado no servidor
     sent = llm.calls[0]["user"]
     assert isinstance(sent, list) and sum(1 for p in sent if p["type"] == "image_url") == 2  # type: ignore[index]
     assert "notes`: pt-PT" in sent[0]["text"]  # type: ignore[index]  # a nota vem na língua do ecrã

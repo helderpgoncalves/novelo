@@ -40,6 +40,16 @@ test.describe('lotes, passaporte, bolsa e marcas', () => {
     await page.getByRole('button', { name: 'Fechar lote' }).click();
     await expect(page.getByText('Estado do lote atualizado')).toBeVisible();
 
+    // «Imprimir etiqueta»: na impressão fica a etiqueta (QR, código e resumo) e sai o resto da página.
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.getByRole('img', { name: `QR do lote ${lot.code}` })).toBeVisible();
+    await expect(page.getByText('2 peças · 0,55 kg')).toBeVisible();
+    await expect(page.getByRole('tab', { name: /Peças do lote/ })).toBeHidden();
+    await page.emulateMedia({ media: 'screen' });
+    // O QR traz fundo branco: lê-se também no tema escuro.
+    const qr = await page.request.get(`/api/v1/public/lots/${lot.code}/qr`);
+    expect(await qr.text()).toContain('fill="#fff"');
+
     // Passaporte público: abre sem sessão.
     const browser = page.context().browser();
     if (!browser) throw new Error('browser indisponível');
@@ -49,6 +59,9 @@ test.describe('lotes, passaporte, bolsa e marcas', () => {
     await expect(pub.getByRole('heading', { level: 1, name: lot.code })).toBeVisible();
     await expect(pub.getByText('Marcas mais frequentes')).toBeVisible();
     await expect(pub.getByText('Zara (')).toBeVisible();
+    // Mesmo peso que a página do lote (0,55 kg, nunca 0,6 kg) e marcado como estimativa.
+    await expect(pub.getByText('0,55 kg')).toBeVisible();
+    await expect(pub.getByText('estimativa')).toBeVisible();
     await anonymous.close();
 
     // Bolsa de fibra: reservar.
@@ -65,7 +78,13 @@ test.describe('lotes, passaporte, bolsa e marcas', () => {
     await page.getByRole('tab', { name: /Evidência por marca/ }).click();
     await expect(page).toHaveURL(/tab=brands/);
     await expect(page.getByRole('row', { name: /Zara/ })).toBeVisible();
-    await expect(page.getByText(/menos de 30 peças/)).toBeVisible();
+    // O aviso de amostra pequena aparece só abaixo de 30 peças (a base de dev acumula as triagens de cada corrida).
+    const { sample_items } = (await (await page.request.get('/api/v1/brands')).json()) as {
+      sample_items: number;
+    };
+    const warning = page.getByText(/menos de 30 peças/);
+    if (sample_items < 30) await expect(warning).toBeVisible();
+    else await expect(warning).toBeHidden();
   });
 
   test('triagem sem modelo mostra o estado e deixa abrir lotes', async ({ page }) => {

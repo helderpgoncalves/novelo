@@ -13,6 +13,43 @@ interface PhotoInputProps {
   removeLabel: string;
 }
 
+/** URL temporário para pré-visualizar uma foto local (libertado quando a foto muda). */
+function usePreview(file: File | null): string | null {
+  const [preview, setPreview] = useState<string | null>(null);
+  useEffect(() => {
+    if (!file) return setPreview(null);
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  return preview;
+}
+
+/** As fotos analisadas ficam à vista enquanto o operador confirma a sugestão (lado a lado no telemóvel). */
+export function PhotoThumbs({ photos }: { photos: { file: File | null; label: string }[] }) {
+  const shown = photos.filter((p) => p.file);
+  if (shown.length === 0) return null;
+  return (
+    <div className="grid grid-cols-2 gap-3 self-start md:grid-cols-1">
+      {shown.map((p) => (
+        <Thumb key={p.label} file={p.file} label={p.label} />
+      ))}
+    </div>
+  );
+}
+
+function Thumb({ file, label }: { file: File | null; label: string }) {
+  const preview = usePreview(file);
+  return (
+    <figure className="space-y-1.5">
+      <div className="aspect-square overflow-hidden rounded-xl bg-muted/40 ring-1 ring-foreground/10 md:aspect-[3/4]">
+        {preview && <img src={preview} alt={label} className="size-full object-cover" />}
+      </div>
+      <figcaption className="text-muted-foreground text-xs">{label}</figcaption>
+    </figure>
+  );
+}
+
 /** Botão grande para fotografar (abre a câmara no telemóvel) com pré-visualização. */
 export function PhotoInput({
   label,
@@ -23,14 +60,7 @@ export function PhotoInput({
   removeLabel,
 }: PhotoInputProps) {
   const id = useId();
-  const [preview, setPreview] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!value) return setPreview(null);
-    const url = URL.createObjectURL(value);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [value]);
+  const preview = usePreview(value);
 
   return (
     <div className="space-y-2">

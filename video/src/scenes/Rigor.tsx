@@ -8,7 +8,7 @@ import { C, FONT } from '../theme';
 // `just check` de 22 out 2026 (testes da API e da web, verdes) e `just eval-copilot` (155 perguntas ao modelo real,
 // 100% dos números verificados; docs/engenharia/avaliacao-copiloto.md).
 const STATS = [
-  { v: 1042, l: 'testes da API' },
+  { v: 1054, l: 'testes da API' },
   { v: 432, l: 'testes da web' },
   { v: 155, l: 'perguntas de avaliação ao copiloto, 100% dos números verificados' },
 ];

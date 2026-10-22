@@ -67,7 +67,7 @@ pres.subject = 'Desafio 5 TexVitrus: recolha seletiva de têxteis em Guimarães'
 const C = pres.SchemeColor;
 
 // `just check` de 22 out 2026 (verde) e `just eval-copilot` (155 perguntas ao modelo real, 100% dos números verificados).
-const TESTS = { api: '1 042', web: '432', evals: '155' };
+const TESTS = { api: '1 054', web: '432', evals: '155' };
 
 const W = 13.333;
 const M = 0.6; // margem

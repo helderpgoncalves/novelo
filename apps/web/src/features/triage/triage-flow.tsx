@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
 import { PackagePlus, ScanLine } from 'lucide-react';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { LotItemIn, LotSummary, ZoneOut } from '@/client';
 import {
@@ -29,7 +29,7 @@ import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
 import { m } from '@/paraglide/messages';
-import { PhotoInput } from './photo-input';
+import { PhotoInput, PhotoThumbs } from './photo-input';
 import { ReviewForm } from './review-form';
 
 interface TriageFlowProps {
@@ -64,7 +64,20 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
-  const analyse = useMutation(analyseGarmentMutation());
+  const review = useRef<HTMLDivElement>(null);
+  const analyse = useMutation({
+    ...analyseGarmentMutation(),
+    // No telemóvel o botão «Analisar» fica no fundo: a confirmação abre no topo, com as fotos à vista.
+    // Rola só a área de conteúdo: `scrollIntoView` rolava também o documento e escondia o cabeçalho no telemóvel.
+    onSuccess: () =>
+      requestAnimationFrame(() => {
+        const el = review.current;
+        const scroller = el?.closest('main');
+        if (!el || !scroller) return;
+        const offset = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+        scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + offset - 16) });
+      }),
+  });
   const confirm = useMutation({
     ...addLotItemMutation(),
     onSuccess: async () => {
@@ -97,7 +110,9 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
                 {openLots.map((l) => (
                   <SelectItem key={l.code} value={l.code}>
                     {l.code} · {l.parish_name ?? m.lot_no_parish()} ·{' '}
-                    {m.lot_items_count({ count: l.items })}
+                    {l.items === 1
+                      ? m.lot_items_count_one()
+                      : m.lot_items_count({ count: l.items })}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -179,20 +194,28 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
         <FormAlert message={analyse.isError && !aiOff ? getErrorMessage(analyse.error) : null} />
 
         {analyse.data ? (
-          <Panel className="space-y-4 sm:p-6">
+          <Panel ref={review} className="space-y-4 sm:p-6">
             <SectionTitle>{m.triage_review_title()}</SectionTitle>
-            <ReviewForm
-              result={analyse.data}
-              pending={confirm.isPending}
-              onDiscard={() => {
-                analyse.reset();
-                setItemPhoto(null);
-                setLabelPhoto(null);
-              }}
-              onConfirm={(item: LotItemIn) =>
-                confirm.mutate({ path: { code: lot.code }, body: item })
-              }
-            />
+            <div className="grid gap-5 md:grid-cols-[minmax(0,13rem)_minmax(0,1fr)]">
+              <PhotoThumbs
+                photos={[
+                  { file: itemPhoto, label: m.triage_photo_item() },
+                  { file: labelPhoto, label: m.triage_photo_label() },
+                ]}
+              />
+              <ReviewForm
+                result={analyse.data}
+                pending={confirm.isPending}
+                onDiscard={() => {
+                  analyse.reset();
+                  setItemPhoto(null);
+                  setLabelPhoto(null);
+                }}
+                onConfirm={(item: LotItemIn) =>
+                  confirm.mutate({ path: { code: lot.code }, body: item })
+                }
+              />
+            </div>
           </Panel>
         ) : (
           <Panel className="space-y-5 sm:p-6">

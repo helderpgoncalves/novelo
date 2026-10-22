@@ -138,8 +138,9 @@ async def build_rap(
     ]  # fmt: skip
     totals = {k: f.pct(getattr(baseline, f"{k}_t") / baseline.total_t * 100) for k in ("reuse", "recycle", "reject")}
 
-    market = await lots.market(db, None)
-    fibres = [{"fibre": _FIBRES[locale][m.fibre.value], "lots": m.lots, "kg": f.num(m.weight_kg, 1)} for m in market]
+    # Todos os lotes triados, também os já entregues (saem da bolsa, mas continuam a ser evidência para a RAP).
+    market = await lots.market(db, None, lots.SORTED_STATES)
+    fibres = [{"fibre": _FIBRES[locale][m.fibre.value], "lots": m.lots, "kg": f.num(m.weight_kg, 2)} for m in market]
     brands = await lots.brands(db)
 
     first = scenarios[0]

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import type { MarketEntry } from '@/client';
 import { getFibreMarketOptions } from '@/client/@tanstack/react-query.gen';
 import { SectionTitle } from '@/components/page';
 import { CardSkeleton, StatStripSkeleton } from '@/components/skeletons';
@@ -12,6 +13,20 @@ import { fibreLabel } from '@/lib/lots';
 import { m } from '@/paraglide/messages';
 import { CompositionBar, LotStateBadge } from './lot-parts';
 import { PilotEmpty } from './pilot-empty';
+
+/** «2 lotes · 1,25 kg · Azurém»: o peso com as mesmas casas que o lote e o passaporte (nunca 0,6 kg ao lado de 0,55 kg). */
+function groupSummary(entry: MarketEntry): string {
+  const kg = formatNumber(entry.weight_kg, 2);
+  const parishes = entry.parishes.join(', ');
+  if (entry.lots === 1) {
+    return parishes
+      ? m.market_group_summary_one({ kg, parishes })
+      : m.market_group_summary_short_one({ kg });
+  }
+  return parishes
+    ? m.market_group_summary({ lots: entry.lots, kg, parishes })
+    : m.market_group_summary_short({ lots: entry.lots, kg });
+}
 
 /** Bolsa de fibra: os lotes triados por fibra. Reutilização primeiro; o que não se reutiliza segue para reciclagem. */
 export function MarketTab() {
@@ -53,7 +68,7 @@ export function MarketTab() {
         />
         <StatCell
           label={m.market_stat_weight()}
-          value={`${formatNumber(totalKg, 1)} kg`}
+          value={`${formatNumber(totalKg, 2)} kg`}
           tag={m.common_estimate()}
           tone="primary"
           hint={m.market_stat_weight_hint()}
@@ -68,18 +83,7 @@ export function MarketTab() {
         <section key={entry.fibre} className="space-y-4">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <SectionTitle>{fibreLabel[entry.fibre]()}</SectionTitle>
-            <p className="text-muted-foreground text-sm tabular-nums">
-              {entry.parishes.length > 0
-                ? m.market_group_summary({
-                    lots: entry.lots,
-                    kg: formatNumber(entry.weight_kg, 1),
-                    parishes: entry.parishes.join(', '),
-                  })
-                : m.market_group_summary_short({
-                    lots: entry.lots,
-                    kg: formatNumber(entry.weight_kg, 1),
-                  })}
-            </p>
+            <p className="text-muted-foreground text-sm tabular-nums">{groupSummary(entry)}</p>
           </div>
           <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
             {entry.items.map((lot) => (
@@ -92,7 +96,7 @@ export function MarketTab() {
                   <LotStateBadge state={lot.state} />
                 </div>
                 <p className="text-muted-foreground text-xs tabular-nums">
-                  {lot.parish_name ?? m.lot_no_parish()} · {formatNumber(lot.weight_kg, 1)} kg
+                  {lot.parish_name ?? m.lot_no_parish()} · {formatNumber(lot.weight_kg, 2)} kg
                 </p>
                 <CompositionBar composition={lot.composition} />
                 <div className="flex gap-2 pt-1">
