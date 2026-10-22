@@ -86,7 +86,7 @@ Na triagem, a foto da etiqueta dá também a marca, quando está visível. O Nov
 
 Uma conversa em streaming (`/chat`, ou o painel em qualquer ecrã com `⌘K` / `Ctrl+K`) que sabe o que o decisor está a ver. Pede-se em português ("compara o Base com o Ambicioso e mostra o €/t") e o copiloto responde em poucas frases, com o gráfico ou a tabela e a fonte dos dados.
 
-- **46 ferramentas tipadas** chamam os mesmos services da app: cenários, "E se...?", sensibilidade, piloto, rede, lotes, bolsa, marcas, alertas, rede municipal e custos de IA.
+- **52 ferramentas tipadas** (mais a pesquisa web, se ligada) chamam os mesmos services da app: cenários, "E se...?", sensibilidade, piloto, rede, lotes, bolsa, marcas, alertas, rede municipal e custos de IA.
 - **Nunca faz contas:** gráficos e tabelas são construídos pelo servidor; o verificador retira e reescreve um texto com números sem origem.
 - **Ações com confirmação:** o copiloto só propõe (criar ou apagar um cenário, resolver um alerta, abrir ou reservar um lote, mudar um pressuposto); só o clique executa, com as permissões da pessoa. Fica auditado e, quando reversível, pode ser desfeito.
 - **Memória, anexos e menções:** duas notas pequenas por utilizador, editáveis e exportáveis; imagens, PDF, folhas de cálculo e texto como contexto; `@freguesia`, `@cenário`, `@local` e o ecrã atual.

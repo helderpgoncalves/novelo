@@ -126,7 +126,9 @@ Os custos por hora e por km das viaturas ainda não chegaram do financeiro da Vi
 
 ### Decidir em português: o copiloto que nunca faz contas
 
-O decisor pergunta como falaria a um colega: *"e se passássemos Serzedelo a recolha a pedido?"*. O copiloto percebe a pergunta, corre o otimizador e explica a diferença.
+O decisor pergunta como falaria a um colega: *"E se o orçamento anual passar de 40 000 € para 60 000 €?"*. O copiloto percebe a pergunta, corre o otimizador e explica a diferença: com 60 000 €/ano, 445,8 t a 102,8 €/t, mais 18 919 € do que o cenário de 40 000 € (estimativas).
+
+Testado com o modelo real: a *"E se o orçamento fosse 80 000 € por ano?"*, o copiloto correu o otimizador e respondeu **510,1 t por ano, 66 240 € de custo anual, cerca de 130 €/t** (estimativas). Na avaliação com o modelo real, **146 de 155 perguntas** passaram e **100% dos números** foram verificados contra a origem.
 
 **A IA nunca faz contas.** Só traduz a pergunta num pedido estruturado. Todos os números vêm do otimizador ou da base de dados, e um **verificador rejeita qualquer número que não esteja na origem**. Sem IA, tudo o resto funciona.
 
@@ -134,11 +136,15 @@ O decisor pergunta como falaria a um colega: *"e se passássemos Serzedelo a rec
 
 ### Operar: do saco ao lote, com passaporte
 
-- **Controlo de qualidade na entrega:** uma foto da peça e da etiqueta sugere o estado, a fibra e a marca; o operador confirma.
+- **Controlo de qualidade na entrega:** uma foto da peça e outra da etiqueta sugerem o tipo, o estado, a fibra e a marca; o operador confirma ou corrige. As fotos não são guardadas.
 - **Lote com QR e passaporte público:** origem, composição, peso e histórico, lidos com o telemóvel por quem recebe. São quase os campos que a diretiva vai pedir por fardo exportado (art. 22.º-D, n.º 9).
 - **Bolsa de fibra** para os recicladores do Vale do Ave, para o que não se pode reutilizar.
 
-![Lote com código QR e o passaporte público que o recetor abre no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-rastreio.png)
+Testámos a triagem com o modelo real e fotos de licença aberta (Wikimedia Commons e Flickr). **Com a etiqueta legível, a composição saiu certa em todas as peças**: 80% algodão e 20% poliéster, 100% lã, 55% acrílico e 45% algodão, 100% nylon, 100% poliéster, com 86% a 97% de confiança. Só com a foto da peça, a fibra fica "desconhecida": o modelo não adivinha, e é a foto da etiqueta que dá a fibra. Ainda não há um conjunto de peças com verdade-terreno para medir a exatidão em percentagem.
+
+![Triagem de umas calças de ganga: a etiqueta «80% cotton, 20% polyester» lida com 97% de confiança, no computador e no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-triagem.png)
+
+![O lote de teste NOV-PGTV2Z: 4 peças, 1,4 kg (estimativa), com QR, composição e o passaporte público que o recetor abre no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-rastreio.png)
 
 ### Prestar contas: o relatório RAP num clique
 
@@ -150,16 +156,22 @@ Um **PDF pronto para a câmara**, com o custo por tipo de território (tipologia
 
 Aplicação instalável, em português e inglês, tema claro e escuro, pensada primeiro para o telemóvel. Quem entra pela primeira vez vê uma história de seis passos, do problema ao piloto.
 
-![O primeiro passo da história que o júri vê ao entrar: cerca de 3 003 t de têxtil por ano ainda vão para o lixo em Guimarães](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-onboarding.png)
+![O primeiro passo da história que se vê ao entrar: cerca de 3 003 t de têxtil por ano ainda vão para o lixo em Guimarães](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-onboarding.png)
 
 ![Três ecrãs no telemóvel: a página de entrada, o resumo de um cenário e o mapa](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-telemovel.png)
 
 ---
 
-## 5. Como respondemos aos critérios do júri
+## 5. O que já está provado
 
-| Critério | Peso | O que construímos | Onde se vê |
-| --- | :---: | --- | --- |
+| | O que construímos | Onde se vê |
+| --- | --- | --- |
+| **Impacto** | +445,8 t por ano desviadas do lixo, 264,9 t reutilizáveis, captura de 9,1% para cerca de 22,6%; 47 093 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
+| **Inovação** | Uma rede **sem contentores**: uma só viatura de têxtil nova, o saco à porta e os locais que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, triagem, passaporte |
+| **Viabilidade** | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 500 €: 42 500 € na viatura e o resto em 60 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
+| **Continuidade** | Uma história de seis passos para quem entra pela primeira vez; um piloto de 3 meses desenhado pelo próprio Novelo; replicável em qualquer município com dados abertos | [novelo.helder.si](https://novelo.helder.si) |
+
+--- | :---: | --- | --- |
 | **Impacto e relevância** | 30% | +445,8 t por ano desviadas do lixo, 264,9 t reutilizáveis, captura de 9,1% para cerca de 22,6%; 47 093 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
 | **Inovação e originalidade** | 25% | Uma rede **sem contentores**: uma só viatura de têxtil nova, o saco à porta e os locais que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, passaporte |
 | **Viabilidade técnica** | 25% | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 500 €: 42 500 € na viatura e o resto em 60 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
@@ -202,7 +214,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 - **Web:** React, Vite, TanStack Router e Query, Tailwind v4 e shadcn/ui; aplicação instalável (PWA), pt-PT e inglês, acessibilidade AA.
 - **API:** FastAPI (Python 3.12), PostgreSQL, **OR-Tools** (CP-SAT para a localização, VRP para as rotas); contrato OpenAPI com o cliente TypeScript gerado.
 - **IA, identificada e limitada:** o copiloto e a triagem usam modelos via **OpenRouter** e devolvem JSON validado, nunca fazem contas, e um verificador rejeita números fora da origem. No desenvolvimento usámos **Claude Code** e **GLM (Z.ai)** como assistentes de programação.
-- **Qualidade:** 1 054 testes da API e 432 testes da web, verdes em cada entrega; testes de ponta a ponta no browser; e uma avaliação do copiloto com o modelo real, 155 perguntas, 100% dos números verificados.
+- **Qualidade:** 1 054 testes da API e 432 testes da web, verdes em cada entrega; testes de ponta a ponta no browser; uma avaliação do copiloto com o modelo real, 155 perguntas, 146 aprovadas e 100% dos números verificados; e a triagem testada com o modelo real em fotos de licença aberta.
 - **Em produção** em [novelo.helder.si](https://novelo.helder.si) (Coolify, Docker), com **código aberto** em [GitHub](https://github.com/helderpgoncalves/novelo).
 
 ## Equipa

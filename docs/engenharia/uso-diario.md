@@ -179,7 +179,7 @@ Sem executar nada: lê-se no backlog 536 pytest, 157 Vitest e 162 Playwright. La
 ### 6.5 Documentação desatualizada
 
 - `docs/engenharia/testes.md:21-23`: `TEMPOS` por preencher.
-- `docs/engenharia/backlog.md` diz "46 ferramentas" no Copiloto e 536/157/162 testes: reconfirmar depois de cada marco (a lista `tools.py` tem mais de 50 entradas em `_STATUS`).
+- As contagens de ferramentas do copiloto (52 a 22 out 2026) e de testes no `backlog.md` e no `README.md`: reconfirmar depois de cada marco.
 - `docs/engenharia/emails.md` descreve os emails; falta a secção do ecrã de administração quando existir.
 - Este documento deve entrar no índice `docs/README.md`.
 

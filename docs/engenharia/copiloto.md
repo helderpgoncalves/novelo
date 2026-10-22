@@ -19,7 +19,7 @@ flowchart LR
     subgraph API["API (FastAPI)"]
         P[Preparar: ownership, menções,<br/>anexos, linha do ecrã]
         A[Agente em streaming]
-        T[(Ferramentas tipadas<br/>46: dados, UI, ações, memória)]
+        T[(Ferramentas tipadas<br/>52: dados, UI, ações, memória)]
         V[Verificador de números]
         P --> A
         A <--> T

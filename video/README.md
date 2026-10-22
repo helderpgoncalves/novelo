@@ -1,6 +1,6 @@
 # Vídeo de apresentação
 
-O vídeo do Novelo, com 2 minutos e 4 segundos, em **16:9 (1920 × 1080)** e **9:16 (1080 × 1920)**. Feito em [Remotion](https://www.remotion.dev): cada cena é React, e os números, o mapa e os ecrãs vêm dos dados reais.
+O vídeo do Novelo, com 2 minutos e 14 segundos, em **16:9 (1920 × 1080)** e **9:16 (1080 × 1920)**. Feito em [Remotion](https://www.remotion.dev): cada cena é React, e os números, o mapa e os ecrãs vêm dos dados reais.
 
 ## O que mostra
 
@@ -12,11 +12,11 @@ O vídeo do Novelo, com 2 minutos e 4 segundos, em **16:9 (1920 × 1080)** e **9
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus |
 | A lei | 1 jan 2025, transposição a 17 jun 2027, RAP a 17 abr 2028 | Diretiva (UE) 2025/1892 |
 | Onde se perde | 48 freguesias (CAOP 2019) e os contentores municipais, no mapa | Pacote QGIS da Vitrus |
-| 24 h | A Vitrus não quer contentores; a rede deixou de os ter | Mentor da Vitrus, 21 out 2026 |
-| A rede | Porta a porta, locais existentes, rotas e escolas, do cenário de 60 000 €/ano | Otimizador, API de dev |
-| Resultado | 396,5 t, 120,6 €/t, 235,6 t reutilizáveis, 13 750 €; curva de custo | Cenários de referência |
-| Produto | 9 ecrãs reais da app, com scroll e zoom, incluindo uma troca real com o copiloto | `scripts/capture.mjs` |
-| Critérios | Os 4 critérios do júri com a prova | `docs/projeto/visao-geral.md` |
+| A viragem | Contentores de têxtil, não; nem no camião do lixo; a rede refeita em 24 h, com uma viatura de têxtil nova | Mentor da Vitrus, 21 e 22 out 2026 |
+| A rede | A viatura de têxtil a partir de Polvoreira, o saco à porta, os locais existentes e as escolas, do cenário de 60 000 €/ano | Otimizador, API de dev |
+| Resultado | 445,8 t, 102,8 €/t, 264,9 t reutilizáveis, uma viatura de 42 500 €; o tratamento evitado (47 093 €, a 105,64 €/t) contra o custo (45 828 €); curva de custo (estimativas) | Cenários de referência v5, Vitrus |
+| Produto | 10 ecrãs reais da app, com scroll e zoom: uma troca real com o copiloto, a triagem de uma peça, o lote com QR e o relatório RAP | `scripts/capture.mjs`, `public/shots/ops` |
+| Em resumo | Impacto, inovação, viabilidade e continuidade, cada um com a prova | `docs/projeto/visao-geral.md` |
 | Rigor e pedido | Testes, produção e o piloto de 3 meses | `just check` |
 
 A banda sonora é original e sintetizada por `scripts/music.py`, a 100 BPM, na mesma grelha das cenas. Não usa amostras nem música de terceiros.
