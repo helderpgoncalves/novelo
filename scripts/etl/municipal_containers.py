@@ -83,8 +83,8 @@ LINK_RADIUS_M = 15.0  # raio para ligar o orgânico coletivo ao contentor de rua
 COVERAGE_RADII_M = (200, 300, 500)
 SIMPLIFY_TOLERANCE_M = 5.0  # simplificação do contorno CAOP para a web
 SUSPECT_DISTANCE_M = 1000.0  # freguesia declarada a mais disto do ponto: coordenada ou nome suspeitos
-# Têxtil que ainda vai para o lixo por habitante (Vitrus + APA: 43 051 t RSU × 5,4%), de textile_base.py.
-RESIDUAL_KG_PER_INHAB_MONTH = textile_base.KG_PER_INHAB_MONTH  # 1,2353
+# Têxtil que ainda vai para o lixo por habitante (Vitrus + APA: 51 250,6 t × 5,86%), de textile_base.py.
+RESIDUAL_KG_PER_INHAB_MONTH = textile_base.KG_PER_INHAB_MONTH  # 1,5958
 TEXTILE_COLLECTED_T = 301.266  # 2025, 4 entidades (summary.json)
 CAPTURE_TODAY = textile_base.capture(TEXTILE_COLLECTED_T)  # 11,47%
 

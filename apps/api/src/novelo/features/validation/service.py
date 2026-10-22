@@ -23,9 +23,9 @@ from novelo.features.validation.schemas import (
     ZoneCheckOut,
 )
 
-# Leituras do têxtil por habitante. A base do modelo é a da Vitrus (43 051 t de RSU × 5,4% de têxtil, APA); as outras
-# são publicadas por terceiros e servem só para triangular. Nenhuma é medida local.
-MODEL_RESIDUAL_KG_PER_INHAB_YEAR = references.KG_PER_INHAB_MONTH * 12  # 14,82: têxtil que ainda vai para o lixo
+# Leituras do têxtil por habitante. A base do modelo é a da Vitrus e da APA (51 250,6 t de indiferenciado × 5,86%); as
+# outras são publicadas por terceiros e servem só para triangular. Nenhuma é medida local.
+MODEL_RESIDUAL_KG_PER_INHAB_YEAR = references.KG_PER_INHAB_MONTH * 12  # 19,15: têxtil que ainda vai para o lixo
 PLAN_KG_PER_MONTH = references.PLAN_KG_PER_INHAB_MONTH  # 0,7: leitura alternativa, não usada pela Vitrus
 PLAN_RESIDUAL_KG_PER_INHAB_YEAR = 315  # indiferenciado por habitante, mesmo plano
 PLAN_TEXTILE_SHARE_OF_RESIDUAL_PCT = 5.4
@@ -37,8 +37,9 @@ ALTERNATIVES: frozenset[ReadingKey] = frozenset({"plan_per_capita", "plan_share_
 
 SOURCES: dict[ReadingKey, str] = {
     "vitrus_apa_share_of_rsu": (
-        "Vitrus (mentor, 21/10/2026): 43 051 t de RSU recolhidas em 2025, das quais 5,4% são têxtil (estatística da "
-        "APA). É o têxtil que ainda vai para o lixo; o recolhido à parte soma-se."
+        "Vitrus (mentor, 22/10/2026): 43 050,5 t de indiferenciado recolhidas pela Vitrus em 2025, 84,0% do concelho "
+        "(R&C 2025, p. 8), logo 51 250,6 t no concelho, das quais 5,86% são têxtil (APA, RARU 2025, p. 24). É o têxtil "
+        "que ainda vai para o lixo; o recolhido à parte soma-se."
     ),
     "plan_share_of_residual": (
         "Leitura alternativa, não usada pela Vitrus: Plano de Ação Integrado para a Circularidade Têxtil de Guimarães "

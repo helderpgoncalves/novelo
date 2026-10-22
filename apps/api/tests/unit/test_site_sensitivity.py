@@ -1,14 +1,12 @@
 """Reavaliação de um plano por locais reais: valores calculados à mão (sem solver)."""
 
-from dataclasses import replace
-
 import pytest
 
 from novelo.domain import sensitivity as sens
 from novelo.domain.network import Mode, Zone, mode_cost
 from tests.unit.test_network import params
 
-URBAN = Zone("urb", "Urbana", 10_000, 41.4425, -8.2918, service_days=7)  # no depósito: 0 km
+URBAN = Zone("urb", "Urbana", 10_000, 41.4425, -8.2918, service_days=7)  # no estaleiro dos testes: 0 km
 
 
 def plan(on_demand: bool = False, km: float = 0.0) -> sens.SitePlan:
@@ -61,10 +59,11 @@ def test_tornado_and_monte_carlo_work_on_a_site_plan() -> None:
     assert sens.monte_carlo(plan(km=10.0), p, n=200, seed=7).eur_per_tonne == mc.eur_per_tonne
 
 
-def test_site_plan_adds_the_pap_cost_key_only_with_a_pap_parish() -> None:
-    pap = sens.SitePlan(
-        Mode.STREET, (sens.SiteZone(replace(URBAN, door_to_door=True), 0.5, True),), sites=3, km_per_round=0.0,
-        base_detour=1.3,
-    )  # fmt: skip
-    assert "pap_cost_per_pickup_eur" in sens.sensitive_keys(pap, params())
-    assert "pap_cost_per_pickup_eur" not in sens.sensitive_keys(plan(on_demand=True), params())
+def test_site_plan_pays_the_dedicated_vehicle() -> None:
+    # 3 locais · 26 recolhas · 10 min = 13 h; 0 km; 1 viatura de 8 000 € em 8 anos = 1 000 €/ano
+    p = params(vehicle_capex_eur=8000.0)
+    assert sens.evaluate_plan(plan(), p).annual_cost_eur == pytest.approx(828.0 + 1000.0)
+    assert "vehicle_capex_eur" in sens.sensitive_keys(plan(), p)
+    # turnos de 0,001 h (0,26 h/ano por viatura): ⌈13 ÷ 0,26⌉ = 50 viaturas
+    many = sens.evaluate_plan(plan(), params(vehicle_capex_eur=8000.0, shift_hours=0.001))
+    assert many.annual_cost_eur == pytest.approx(828.0 + 50_000.0)

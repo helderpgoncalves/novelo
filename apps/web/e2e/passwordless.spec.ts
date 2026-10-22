@@ -53,7 +53,7 @@ test.describe('entrada sem palavra-passe', () => {
     const dialog = page.getByTestId('onboarding-story');
     await expect(dialog).toBeVisible();
     await expect(dialog.getByText('301,3 t')).toBeVisible();
-    await expect(dialog.getByText('11,5%')).toBeVisible();
+    await expect(dialog.getByText('9,1%')).toBeVisible();
     await page.keyboard.press('End');
     await expect(dialog.getByText(/conta de convidado/i)).toBeVisible();
     await dialog.getByRole('button', { name: 'Concluir' }).click();

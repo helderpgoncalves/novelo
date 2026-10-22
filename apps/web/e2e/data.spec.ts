@@ -10,8 +10,8 @@ test.describe('dados reais da Vitrus', () => {
     // Faixa de situação: o recolhido (medido), a captura e o que ainda vai para o lixo por habitante (estimativas).
     const strip = page.getByRole('region', { name: 'Situação em números' });
     await expect(strip).toContainText('301,3');
-    await expect(strip).toContainText('11,5%');
-    await expect(strip).toContainText('1,235 kg por habitante e mês');
+    await expect(strip).toContainText('9,1%');
+    await expect(strip).toContainText('1,596 kg por habitante e mês');
     // Evidência por baixo da dobra: entidades (pesadas e por percentagem) e o fluxo por destino.
     const proofs = page.locator('#provas');
     await proofs.scrollIntoViewIfNeeded();

@@ -48,14 +48,14 @@ Os projetos são avaliados por quatro critérios ponderados ([Critérios de aval
 | --- | --- | --- | --- |
 | **Inovação e originalidade** | "Não encontrámos quem ligue, numa só ferramenta, a decisão da rede, o lote até à fábrica e o dossiê de 2028. E a IA conduz o otimizador: nunca faz contas." | Um jurado faz a pergunta "E se...?" (passo 6); o QR do lote lido no telemóvel do jurado (passo 8) | A afirmação de ausência vem da nossa pesquisa, que não é exaustiva: dizer "não encontrámos" |
 | **Viabilidade técnica** | "Corre hoje com os dados reais da Vitrus. Os custos ainda são pressupostos, estão à vista, e mostramos o que muda se variarem." | Ponto de partida com 301,3 t (passo 1); sensibilidade (passo 5) | A1, A15 |
-| **Impacto e relevância** | "Com o cenário B, Guimarães desvia X toneladas por ano a Y euros por tonelada, estimativa. Hoje paga o município. Com a RAP, os produtores pagam o custo eficiente das peças novas, e a lei põe a câmara na mesa onde esse custo se fixa." | Cenário A contra B (passo 3); relatório RAP em PDF (passo 10) | A1, B4, B6, B17; cenário B |
+| **Impacto e relevância** | "Com 60 000 euros por ano, uma só viatura nova e nenhum contentor, Guimarães desvia 445,8 toneladas por ano a 102,8 euros por tonelada, e o tratamento evitado paga a operação, estimativa. Hoje paga o município. Com a RAP, os produtores pagam o custo eficiente das peças novas, e a lei põe a câmara na mesa onde esse custo se fixa." | Cenário A contra B (passo 3); relatório RAP em PDF (passo 10) | A1, B4, B6, B17; cenário B |
 | **Apresentação e continuidade** | "Pedimos duas freguesias e três meses. Medimos toneladas, euros por tonelada e rejeito, e trocamos pressupostos por dados." | Slide 8: as duas freguesias no mapa e os três KPIs (passo 11, se integrado) | Piloto: estimativa |
 
 ### O fecho (slide 8, 40 s) serve a continuidade
 
 | Tempo | O que se diz | Estado |
 | --- | --- | --- |
-| 4:20 a 4:30 | A frase-âncora com X e Y, "estimativa" | Preencher a 22 out |
+| 4:20 a 4:30 | A frase-âncora (445,8 t a 102,8 €/t; 47 093 € de tratamento evitado), "estimativa" | Preenchido a 22 out (H3, H10) |
 | 4:30 a 4:45 | **O pedido:** piloto de três meses em duas freguesias, com três KPIs (toneladas, € por tonelada, taxa de rejeito) e um piso de sinal para que a medição valha | Piloto recomendado (já na app) |
 | 4:45 a 4:55 | **Replicabilidade e roadmap depois de 26 de outubro:** "A base são dados abertos e os dados do operador; outro município precisa dos seus. Depois de hoje: feedback, plano de três meses em 48 horas, piloto, e pressupostos trocados por dados medidos." | Roadmap é **proposta nossa**, não aprovada por ninguém; replicabilidade **não testada** noutro município |
 | 4:55 a 5:00 | Agradecer à Vitrus, ao município e à organização, e parar | — |
@@ -68,7 +68,7 @@ A mesma tabela está no [slide de apoio 9](pitch-slides.md#9-slide-de-apoio-chec
 
 - [ ] **Inovação (25%)**: frase dita; "E se...?" feito por um jurado; QR lido no telemóvel do jurado.
 - [ ] **Viabilidade (25%)**: frase dita; ponto de partida e sensibilidade abertos; E2E verde na véspera.
-- [ ] **Impacto (30%)**: frase dita; X e Y preenchidos e iguais em slide, demo, vídeo e relatório; relatório RAP aberto.
+- [ ] **Impacto (30%)**: frase dita; 445,8 t e 102,8 €/t iguais em slide, demo, vídeo e relatório; relatório RAP aberto.
 - [ ] **Apresentação e continuidade (20%)**: pedido do piloto dito; roadmap e replicabilidade ditos; cinco minutos ou menos em três ensaios.
 
 ## Os números que vão ao palco
@@ -84,13 +84,14 @@ Apenas estes. Todos têm estado **Dado Vitrus**, **Primária**, **Secundária** 
 | **"economicamente eficiente"** e "transparente" | Porque o custo importa | B6 | "A diretiva só deixa cobrar o custo eficiente, determinado de forma transparente, e as autoridades locais estão na mesa." |
 | **59,4% / 26,5% / 14,1%** | Para onde vai | A4 | "Hoje, cerca de 59% do que se recolhe é reutilizado." (dizer "estimativa" para duas das entidades, A5) |
 | **72,9%** contra **9,2%** de reutilização | A qualidade depende de quem recolhe | A19 | "Em 2025, a Ultriplo reutilizou 72,9% do que recolheu; o têxtil recolhido pela Vitrus, 9,2%. Por isso medimos toneladas reutilizáveis, estimativa." |
-| **68,8%** contra **76,0%** da população servida | A rede não fica só onde é barato | B8, H4 | "Fora das freguesias urbanas, o cenário serve 68,8% das pessoas; nas urbanas, 76,0%. Estimativa." |
-| **2 000 t/mês** Sasia (e **9,7%**, estimativa) | A indústria tem capacidade | C16, C17 | "A indústria do Vale do Ave tem capacidade, sobretudo para pré-consumo; o que lhe falta são lotes limpos de pós-consumo." |
-| **X t por ano a Y € por tonelada** | Frase-âncora | cenário B | Preencher a 22 de outubro com os números calculados |
+| **60,2%** contra **73,9%** da população servida | A rede não fica só onde é barato | B8, H4 | "Fora das freguesias urbanas, o cenário serve 60,2% das pessoas; nas urbanas, 73,9%. Estimativa." Se perguntarem: a única freguesia rural, Arosa e Castelões, fica sem serviço com 60 000 euros, e é uma das duas do piloto. |
+| **2 000 t/mês** Sasia (e **12,5%**, estimativa) | A indústria tem capacidade | C16, C17 | "A indústria do Vale do Ave tem capacidade, sobretudo para pré-consumo; o que lhe falta são lotes limpos de pós-consumo." |
+| **105,64 €** de tratamento poupados por tonelada desviada do lixo | A rede paga parte do seu custo | A25 (Vitrus) | "Cada tonelada que tiramos do lixo deixa de pagar 105,64 euros de aterro, segundo a Vitrus. A rede paga parte do seu próprio custo." |
+| **445,8 t por ano a 102,8 € por tonelada** | Frase-âncora | H3, H10 | "Com 60 000 euros por ano, a rede desvia 445,8 toneladas a 102,8 euros por tonelada, e os 47 093 euros de tratamento evitado pagam a operação. Estimativa." |
 
 **O enunciado do desafio fala em 73% a 80%** dos têxteis descartados em aterro ou incineração (C25, sem fonte indicada). O júri leu esse texto. Mede outra coisa que o nosso 72% (indiferenciado, AEA, C10): se alguém o citar, dizer "segundo o enunciado" e que o nosso número é o da AEA, com fonte. Não os misturar no mesmo slide.
 
-**Não levar ao palco** até verificação: "4 de 27" (A11), o 0,7 kg e as 1 317 t do plano municipal (já não usados), qualquer preço, e a exatidão da triagem (D4). O 5,4% pode ir a palco com a fonte: APA, indicado pela Vitrus, sobre 43 051 t de RSU (A10, A16); as 2 324,8 t sempre com "estimativa".
+**Não levar ao palco** até verificação: "4 de 27" (A11), o 0,7 kg e as 1 317 t do plano municipal (já não usados), qualquer preço, e a exatidão da triagem (D4). O 5,86% pode ir a palco com a fonte: APA, 2025, indicado pela Vitrus, sobre o indiferenciado do concelho todo (A10, A24); as cerca de 3 003 t sempre com "estimativa". A base de 21 out (5,4%, 2 324,8 t, 11,5%) já não se usa.
 
 ## Versão de 30 segundos (elevador)
 
@@ -122,9 +123,9 @@ Falas por slide. A coluna "Fonte no rodapé" é o que aparece em letra pequena.
 | 3 | 0:45 a 1:00 | Guimarães recolhe menos de metade do que a França recolheria | "Guimarães recolheu 301 toneladas: 1,9 quilos por habitante. A França recolhe 4,27: à nossa escala, cerca de 670 toneladas. Em Sintra estão a retirar contentores." | 1,9 (A2), 4,27 (C1), 670 (C14), Sintra (C21) | Vitrus, INE; Refashion 2024 |
 | 4 | 1:00 a 3:00 | **Demo**: do orçamento ao relatório, em dois minutos | Ver [roteiro da demo](#roteiro-da-demo) | números do cenário | — |
 | 5 | 3:00 a 3:30 | A IA conduz o otimizador; nunca faz contas | "A pergunta entra em português, o modelo devolve uma alteração estruturada, o otimizador calcula, e um verificador rejeita qualquer número que não esteja no resultado. Se a IA falhar, o simulador e o relatório continuam a funcionar." | — | — |
-| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. E a qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%. Por isso cada cenário mostra toneladas reutilizáveis. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 9,7% (C17) com "estimativa"; 72,9% e 9,2% (A19); reutilizáveis (H1) | Público/Lusa 2024; Vitrus, destinos de 2025 |
-| 7 | 3:55 a 4:20 | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número | "A diretiva só aceita o custo economicamente eficiente, determinado de forma transparente entre os intervenientes, e entre eles estão as autoridades locais. A entidade gestora não pode recusar o município. O relatório RAP do Novelo dá esse custo por tipo de território." | art. 22.º-A n.º 7 e 12 (B6); art. 22.º-C n.º 10 (B18); se sobrar tempo, a matriz de cobertura: 68,8% contra 76,0% (B8, H4) | Diretiva (UE) 2025/1892, art. 22.º-A e 22.º-C |
-| 8 | 4:20 a 5:00 | Peço um piloto de três meses em duas freguesias | Frase-âncora com os números do cenário B, o pedido concreto, a replicabilidade e o roadmap (ver [o fecho](#o-fecho-slide-8-40-s-serve-a-continuidade)). | X t, Y €/t (cenário) | Cenário B, estimativa |
+| 6 | 3:30 a 3:55 | Do saco ao fio: lotes limpos para a indústria | "A indústria tem capacidade. O que lhe falta são lotes homogéneos. E a qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%. Por isso cada cenário mostra toneladas reutilizáveis. Cada peça entra num lote com passaporte, composição e estado, e a bolsa de fibra liga-o a quem recicla." | Sasia 2 000 t/mês (C16); a comparação de 12,5% (C17) com "estimativa"; 72,9% e 9,2% (A19); reutilizáveis (H1) | Público/Lusa 2024; Vitrus, destinos de 2025 |
+| 7 | 3:55 a 4:20 | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número | "A diretiva só aceita o custo economicamente eficiente, determinado de forma transparente entre os intervenientes, e entre eles estão as autoridades locais. A entidade gestora não pode recusar o município. O relatório RAP do Novelo dá esse custo por tipo de território." | art. 22.º-A n.º 7 e 12 (B6); art. 22.º-C n.º 10 (B18); se sobrar tempo, a matriz de cobertura: 60,2% contra 73,9% (B8, H4) | Diretiva (UE) 2025/1892, art. 22.º-A e 22.º-C |
+| 8 | 4:20 a 5:00 | Peço um piloto de três meses em duas freguesias | Frase-âncora com os números do cenário B, o pedido concreto, a replicabilidade e o roadmap (ver [o fecho](#o-fecho-slide-8-40-s-serve-a-continuidade)). | 445,8 t, 102,8 €/t (H3) | Cenário B, estimativa |
 
 ## Roteiro da demo
 
@@ -132,7 +133,7 @@ A demo é a prova. Cada passo responde a uma afirmação.
 
 | Passo | O que se faz | Afirmação que prova | Critério e tempo | Estado da funcionalidade (19 out) |
 | --- | --- | --- | --- | --- |
-| 1 | Abrir o **ponto de partida**: 301,3 t, 11,5% de captura (estimativa), destino 59,4% / 26,5% / 14,1% | "Usamos os dados reais da Vitrus" | Viabilidade, 15 s | Feito |
+| 1 | Abrir o **ponto de partida**: 301,3 t, 9,1% de captura (estimativa), destino 59,4% / 26,5% / 14,1% | "Usamos os dados reais da Vitrus" | Viabilidade, 15 s | Feito |
 | 2 | **Mapa**: freguesias, contentores municipais (onde o têxtil se perde) e lacuna por freguesia | "Mostramos onde falta" | Impacto (extra) | Mapa feito |
 | 3 | **Simulador**: cenário A (só rua) e cenário B (modos combinados) com o mesmo orçamento; comparar €/t, toneladas e investimento | "O menor investimento e o menor custo" | Impacto, 30 s | Feito |
 | 4 | **Cenário de desempenho francês** (4,27 kg/hab) | "Quanto custaria chegar à França" | Impacto (extra) | **Em construção** |
@@ -153,7 +154,7 @@ Escolher **uma** para abrir e **uma** para fechar.
 | Para | Frase | Condição |
 | --- | --- | --- |
 | Abrir | "Na Europa, 72% dos têxteis vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro." | C10 verificado |
-| Fechar (com números) | "Com o cenário B, Guimarães desvia **X toneladas por ano** do aterro a **Y euros por tonelada**, sem comprar um contentor nas zonas dispersas." | Preencher X e Y a 22 out; dizer "estimativa" |
+| Fechar (com números) | "Com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia **445,8 toneladas por ano** do aterro a **102,8 euros por tonelada**, e o tratamento evitado paga a operação." | Dizer "estimativa" (H3, H10) |
 | Fechar (curta) | "Sabemos quanto custa cada tonelada de têxtil tirada do aterro, e como baixar esse custo." | Sempre |
 | Para o júri da Vitrus | "Não vos trazemos mais contentores. Trazemos a decisão sobre quais, onde e a que custo." | Sempre |
 
@@ -164,10 +165,11 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 | Objeção | Resposta | Registo |
 | --- | --- | --- |
 | "Os custos são inventados." | "São pressupostos visíveis no ecrã, e mostramos que a recomendação aguenta uma variação de 30%. A primeira coisa que pedimos à Vitrus são os custos reais." | A15 |
-| "A França é outro contexto." | "Por isso é referência, não meta. Sem contentores, o nosso modelo chega a cerca de 598 toneladas por ano, abaixo das 670 francesas, estimativa. O piloto mede o que é realista." | C1, C14, H6 |
-| "Mais toneladas não é mais lixo?" | "Por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%, com 56,9% de rejeito. No cenário de 60 000 euros, são 235,6 toneladas reutilizáveis por ano, a 203 euros por tonelada reutilizável, estimativa." | A19, H1, H2 |
-| "Só vão onde é barato?" | "Não. A diretiva pede uma rede que não se limite às zonas rendíveis. Fora das freguesias urbanas, o cenário serve 68,8% da população, contra 76,0% nas urbanas, a um custo por tonelada mais alto. Está no separador Cobertura." | B8, H4 |
-| "O saco não vai parar ao compactador?" | "Não pode ir. Plano B: numa tarde de dia útil, cerca de 15 das 29 viaturas não têm circuito no planeamento de turnos da Vitrus. Se o tipo de caixa e a equipa servirem, uma delas leva os sacos à parte. É a primeira coisa a validar com a Vitrus." | A20 |
+| "A França é outro contexto." | "Por isso é referência, não meta. Mesmo sem contentores, o modelo chega às 670 toneladas francesas com um orçamento entre 100 000 e 150 000 euros por ano; o teto é de cerca de 772 toneladas, com duas viaturas, estimativa. O piloto mede o que é realista." | C1, C14, H6 |
+| "Mais toneladas não é mais lixo?" | "Por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025, a Ultriplo reutilizou 72,9%; o têxtil recolhido pela Vitrus, 9,2%, com 56,9% de rejeito. No cenário de 60 000 euros, são 264,9 toneladas reutilizáveis por ano, a 173 euros por tonelada reutilizável, estimativa." | A19, H1, H2 |
+| "Só vão onde é barato?" | "Não. A diretiva pede uma rede que não se limite às zonas rendíveis. Fora das freguesias urbanas, o cenário serve 60,2% da população, contra 73,9% nas urbanas. Mostramos também o que falta: Arosa e Castelões, a única rural, fica sem serviço com este orçamento, e é uma das duas freguesias do piloto recomendado. Está no separador Cobertura." | B8, H4 |
+| "O saco não vai parar ao compactador?" | "Não. Perguntámos à Vitrus: no compactador estraga-se, e não há viaturas livres à tarde. Por isso propomos o que a Vitrus indicou, uma viatura de têxtil nova, sem compactação, que recolhe o saco à porta e nos locais que já existem." | A21, A22, A28 |
+| "Uma viatura nova não é investimento a mais?" | "É uma viatura, nenhum contentor. E cada tonelada que sai do lixo poupa 105,64 euros de tratamento: a rede paga parte do seu custo. Os custos da viatura ainda são pressupostos, e mostramos o intervalo." | A23, A25 |
 | "Quem paga isto hoje?" | "O município, sozinho. A APA confirma que ainda não há entidade gestora. A diretiva só obriga os regimes a existir em abril de 2028, e mesmo então só cobrem as peças postas à venda a partir daí." | B11, B12, B17 |
 | "O que acontece em 2028?" | "Os produtores pagam o custo eficiente das peças que põem à venda depois da lei nacional; as antigas continuam a pesar no município, uma parte que vai descendo. A leitura exata confirmamos com a APA. O custo eficiente determina-se com as autoridades locais, e a entidade gestora não pode recusar o município: quem tiver o custo medido por tipo de território negoceia melhor." | B6, B17, B18 |
 | "Não vão competir com a economia social?" | "A diretiva protege os pontos de recolha da economia social. São parceiros: no Novelo entram como um modo de recolha com os seus próprios pontos." | B10 |
@@ -180,8 +182,10 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 
 ## O que não dizer
 
-- "Os 5,4% do lixo indiferenciado de Guimarães são têxteis" (é a percentagem da APA aplicada ao RSU de Guimarães, não uma caracterização local; dizer "segundo a APA", A10).
-- "Há viaturas livres para os têxteis" (há cerca de 15 sem circuito numa tarde de dia útil, mas se servem está por validar com a Vitrus, A20).
+- "Os 5,86% do lixo indiferenciado de Guimarães são têxteis" (é a média nacional da APA aplicada a Guimarães, não uma caracterização local; dizer "segundo a APA", A10).
+- "Há viaturas livres para os têxteis" ou "sem viaturas novas" (falso: a Vitrus disse a 22 out que estão em uso à tarde, A20, A22).
+- "O saco vai no camião do porta a porta" ou "0 km novos" (falso: a compactação estraga o saco, A21).
+- "A rede paga-se a si própria" (só em parte: o tratamento evitado, 105,64 €/t, cobre parte do custo; dizer "em parte", A25).
 - "A diretiva fixa metas de recolha de têxteis" (falso, B14).
 - "Em 2028 os produtores passam a pagar a recolha" (incompleto: pagam a das peças postas à venda depois da lei nacional, B17).
 - "A diretiva de 2025 proíbe incinerar o têxtil recolhido" (a proibição vem de 2018, B27).
@@ -191,7 +195,7 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 
 ## Preparação
 
-1. **22 out:** preencher X e Y da frase-âncora com o cenário B calculado; atualizar o registo. Rascunhar o texto da submissão com os mesmos números.
+1. **22 out:** frase-âncora preenchida com o cenário recomendado do modelo revisto (445,8 t a 102,8 €/t; registo H3 e H10). Rascunhar o texto da submissão com os mesmos números.
 2. **23 out:** **submeter até às 17h30 (fecho rígido; depois não se edita nada)**, com as ferramentas de IA identificadas; slides em rascunho com rodapés de fonte; confirmar C10, B11 e A8 nas fontes primárias.
 3. **24 out:** vídeo de 60 s da demo e relatório RAP pré-gerado (plano B).
 4. **25 out:** três ensaios cronometrados; o registo impresso; um colega faz de júri e faz as perguntas da tabela de objeções.

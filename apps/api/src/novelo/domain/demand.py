@@ -18,14 +18,17 @@ def yearly_demand_t(population: int, kg_per_inhab_month: float) -> float:
 def potential_t(populations: list[int], kg_per_inhab_month: float) -> float:
     """Têxtil por desviar no concelho (t/ano), da população total e do kg sem arredondar.
 
-    Não é a soma das procuras por zona já arredondadas (48 × até 0,005 t de erro): 156 830 hab × 1,23528 kg × 12 dá
-    2 324,754 t, igual a 43 051 t × 5,4%, enquanto a soma arredondada dava 2 324,73 t.
+    Não é a soma das procuras por zona já arredondadas (48 × até 0,005 t de erro): 156 830 hab × 1,59583 kg × 12 dá
+    ≈ 3 003,3 t, igual a 43 050,5 t ÷ 0,840 × 5,86%.
     """
     return yearly_demand_t(sum(populations), kg_per_inhab_month)
 
 
 def share_of_tonnes_t(total_t: float, share: float) -> float:
-    """Parte (`share`, fração 0 a 1) de um total em toneladas: ex.: têxtil no RSU = 43 051 × 0,054 = 2 324,754 t."""
+    """Parte (`share`, fração 0 a 1) de um total em toneladas.
+
+    Ex.: têxtil no indiferenciado do concelho = 51 250,6 × 0,0586 ≈ 3 003,3 t.
+    """
     if total_t < 0 or not 0 <= share <= 1:
         raise ValueError("o total não pode ser negativo e a parte é uma fração entre 0 e 1")
     return total_t * share

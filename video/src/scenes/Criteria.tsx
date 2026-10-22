@@ -2,12 +2,14 @@ import { AbsoluteFill, useCurrentFrame } from 'remotion';
 import { fadeOut, prog, rise } from '../anim';
 import { Eyebrow, Title } from '../components/Type';
 import { useLayout } from '../layout';
+import { num } from '../format';
+import { K } from '../numbers';
 import { C, FONT } from '../theme';
 
 const ROWS = [
-  { w: '30%', name: 'Impacto e relevância', proof: '+396,5 t por ano fora do lixo, 235,6 t reutilizáveis, e todo o território, não só onde rende (estimativas).' },
-  { w: '25%', name: 'Inovação e originalidade', proof: 'Uma rede sem contentores, sobre os circuitos que já existem. IA que conduz o otimizador e nunca inventa um número.' },
-  { w: '25%', name: 'Viabilidade técnica', proof: 'Dados reais da Vitrus, otimizador OR-Tools, incerteza calculada. Em produção, com código aberto.' },
+  { w: '30%', name: 'Impacto e relevância', proof: `+${num(K.tonnes_year, 1)} t por ano fora do lixo, ${num(K.reusable_t, 1)} t reutilizáveis; a poupança no tratamento paga a operação (estimativas).` },
+  { w: '25%', name: 'Inovação e originalidade', proof: 'Uma rede sem contentores, com uma viatura só para o têxtil. IA que conduz o otimizador e nunca inventa um número.' },
+  { w: '25%', name: 'Viabilidade técnica', proof: 'Dados e respostas reais da Vitrus, otimizador OR-Tools, incerteza calculada. Em produção, com código aberto.' },
   { w: '20%', name: 'Apresentação e continuidade', proof: 'Um piloto de 3 meses em duas freguesias, desenhado pelo próprio Novelo. Replicável em qualquer município.' },
 ];
 

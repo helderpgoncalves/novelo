@@ -17,25 +17,31 @@ async def test_zones_carry_real_census_population(logged_in: httpx.AsyncClient) 
     assert sum(z["population"] for z in zones) == 156_830  # Censos 2021, INE
     assert all(z["latitude"] and z["longitude"] for z in zones)
     ronfe = next(z for z in zones if z["name"] == "Ronfe")
-    kg = 43_051_000 * 0.054 / 156_830 / 12  # têxtil no lixo por habitante e mês (Vitrus + APA): 1,2353
+    kg = 43_050_500 / 0.84 * 0.0586 / 156_830 / 12  # têxtil no lixo por habitante e mês (Vitrus + APA): 1,5958
     assert ronfe["service_days"] >= 3 and ronfe["demand_t"] == pytest.approx(
         ronfe["population"] * kg * 12 / 1000, abs=0.01
     )
-    # a procura total é o têxtil que ainda vai para o lixo: 43 051 t × 5,4% = 2 324,754 t
-    # (com a procura por freguesia a 4 casas, a soma mostra-se 2 324,8 t como a referência, não 2 324,7)
-    assert sum(z["demand_t"] for z in zones) == pytest.approx(2324.754, abs=0.04)  # q a 4 casas (1,2353) dá 2 324,785
-    assert round(sum(z["demand_t"] for z in zones), 1) == 2324.8
+    # a procura total é o têxtil que ainda vai para o lixo: 51 250,6 t × 5,86% = 3 003,285 t
+    # (com q a 5 casas, 1,59583, a soma dá 3 003,288 t e mostra-se 3 003,3 t como a referência)
+    assert sum(z["demand_t"] for z in zones) == pytest.approx(3003.285, abs=0.04)
+    assert round(sum(z["demand_t"] for z in zones), 1) == 3003.3
+    # área de (quase) todas as freguesias: a volta da viatura dedicada porta a porta
+    assert sum(1 for z in zones if z["area_km2"]) >= 44
 
 
 async def test_parameters_are_labelled_by_source(logged_in: httpx.AsyncClient) -> None:
     body = (await logged_in.get(f"{P}/parameters")).json()
     sources = {m["key"]: m["source"] for m in body["meta"]}
-    assert sources["kg_per_inhab_month"] == "vitrus_data"  # 43 051 t de RSU (Vitrus) × 5,4% (APA)
+    assert sources["kg_per_inhab_month"] == "vitrus_data"  # 51 250,6 t de indiferenciado (Vitrus) × 5,86% (APA)
+    assert sources["rsu_treatment_eur_per_t"] == "vitrus_data"  # 40 €/t TGR + 65,64 €/t Resinorte
+    assert sources["depot_lat"] == "vitrus_data"  # estaleiro de Polvoreira
+    assert sources["vehicle_capex_eur"] == "assumption"  # viatura dedicada: preço de um concurso público
     assert sources["modes.street.capture_rate"] == "assumption"  # sem calibração: as 301 t são de terceiros
     assert sources["cost_per_km_eur"] == "assumption"
     assert set(sources.values()) <= {"vitrus_data", "assumption"}  # o plano municipal já não é fonte
-    # derivado, não escrito à mão: 43 051 000 kg × 0,054 ÷ 156 830 hab ÷ 12 = 1,23528 kg/hab/mês, a 4 casas no ecrã
-    assert body["values"]["kg_per_inhab_month"] == round(43_051_000 * 0.054 / 156_830 / 12, 4) == 1.2353
+    # derivado, não escrito à mão: 43 050 500 kg ÷ 0,84 × 0,0586 ÷ 156 830 hab ÷ 12 = 1,59583 kg/hab/mês (5 casas)
+    assert body["values"]["kg_per_inhab_month"] == round(43_050_500 / 0.84 * 0.0586 / 156_830 / 12, 5) == 1.59583
+    assert body["values"]["rsu_treatment_eur_per_t"] == pytest.approx(105.64)
 
 
 async def test_only_admins_update_parameters(logged_in: httpx.AsyncClient, client: httpx.AsyncClient) -> None:
@@ -82,7 +88,9 @@ async def test_constraints_force_the_mode(logged_in: httpx.AsyncClient) -> None:
         f"{P}/scenarios", json=request_body(budget_eur_year=500000, constraints={serzedelo: ["on_demand"]})
     )
     alloc = next(a for a in resp.json()["result"]["allocations"] if a["parish_code"] == serzedelo)
-    assert alloc["modes"] == ["on_demand"] and alloc["capex_eur"] == 0
+    # sem pontos: o único investimento é a parte da viatura dedicada que lhe cabe (pelas horas)
+    assert alloc["modes"] == ["on_demand"] and alloc["points"] == 0
+    assert alloc["capex_eur"] < 42_500 * resp.json()["result"]["kpis"]["vehicles"]
 
 
 async def test_min_cost_and_infeasible_target(logged_in: httpx.AsyncClient) -> None:
@@ -122,8 +130,8 @@ async def test_a_network_can_beat_what_vitrus_collects_today(logged_in: httpx.As
     """Com orçamento folgado, a rede por omissão (sem contentores de têxtil) capta mais do que as 301 t de 2025."""
     mixed = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=10_000_000))).json()
     assert mixed["tonnes_year"] > 301.3
-    # 43 051 t × 5,4% = 2 324,754 t: da população total, não da soma das procuras por freguesia arredondadas (2 324,7).
-    assert mixed["result"]["kpis"]["potential_t"] == 2324.8
+    # 156 830 hab × 1,59583 kg × 12 = 3 003,29 t: da população total, não da soma das procuras arredondadas.
+    assert mixed["result"]["kpis"]["potential_t"] == 3003.3
     combined = [a for a in mixed["result"]["allocations"] if len(a["modes"]) > 1]
     assert combined and all(
         sum(p["tonnes"] for p in a["parts"]) == pytest.approx(a["tonnes"], abs=0.01) for a in combined
@@ -147,10 +155,10 @@ async def test_street_only_as_an_explicit_reference(logged_in: httpx.AsyncClient
     assert (await logged_in.post(f"{P}/scenarios", json={**body, "default_modes": []})).status_code == 422
 
 
-# --- Recolha no circuito porta a porta (PAP) e poupança no tratamento ----------------------------------------------
+# --- Rede atual, viatura dedicada ao têxtil e tratamento evitado (22 out 2026) ---------------------------------------
 
 
-async def test_zones_carry_the_door_to_door_passes_with_a_vehicle(logged_in: httpx.AsyncClient) -> None:
+async def test_zones_carry_the_door_to_door_passes(logged_in: httpx.AsyncClient) -> None:
     zones = {z["name"]: z for z in (await logged_in.get(f"{P}/zones")).json()}
     # Ronfe: C18, terça, quinta e sábado, viatura 49-GC-79 com 3 pessoas (planeamento de turnos da Vitrus)
     assert [(p["circuit"], p["weekday"], p["vehicle"], p["crew"]) for p in zones["Ronfe"]["door_to_door"]] == [
@@ -158,27 +166,27 @@ async def test_zones_carry_the_door_to_door_passes_with_a_vehicle(logged_in: htt
         ("C18", 4, "49-GC-79", 3),
         ("C18", 6, "49-GC-79", 3),
     ]
-    # Lordelo: os circuitos PAP (C22, C23) não têm viatura no planeamento, por isso não há passagem
-    assert zones["Lordelo"]["door_to_door"] == []
+    # Lordelo: C22 e C23 sem viatura na folha de turnos, mas circulam (a folha tem erros, Vitrus 22 out 2026)
+    lordelo = zones["Lordelo"]["door_to_door"]
+    assert {p["circuit"] for p in lordelo} == {"C22", "C23"} and all(p["vehicle"] is None for p in lordelo)
 
 
 async def test_textile_never_rides_an_organic_circuit(logged_in: httpx.AsyncClient) -> None:
-    # BIO 1 é porta a porta e tem viatura, mas é de biorresíduos: o têxtil molhar-se-ia. Só indiferenciado.
+    # BIO 1 é porta a porta e tem viatura, mas é de biorresíduos: não conta como passagem de indiferenciado.
     zones = (await logged_in.get(f"{P}/zones")).json()
     circuits = {p["circuit"] for z in zones for p in z["door_to_door"]}
     assert circuits and not any(c.startswith("BIO") for c in circuits)
 
 
-async def test_service_days_count_only_undifferentiated_circuits_with_a_vehicle(logged_in: httpx.AsyncClient) -> None:
-    """Os dias de serviço (desvio da recolha a pedido) vêm só de indiferenciado com viatura no planeamento de turnos."""
+async def test_service_days_count_every_undifferentiated_circuit_day(logged_in: httpx.AsyncClient) -> None:
+    """Dias de serviço: todos os dias dos circuitos de indiferenciado, com ou sem viatura na folha de turnos."""
     zones = {z["name"]: z for z in (await logged_in.get(f"{P}/zones")).json()}
-    # Ronfe: C4 (moloks, segunda a sábado, 69-TJ-24) ∪ C18 (PAP, terça, quinta e sábado, 49-GC-79) = 6 dias distintos
+    # Ronfe: C4 (moloks, segunda a sábado) ∪ C18 (PAP, terça, quinta e sábado) = 6 dias distintos
     assert zones["Ronfe"]["service_days"] == 6
-    # Centro histórico: só o BIO 1 (orgânico, 7 dias com viatura) passa lá; o têxtil não vai em orgânico
+    # Centro histórico: só o BIO 1 (orgânico) passa lá
     assert zones["União das freguesias de Oliveira, São Paio e São Sebastião"]["service_days"] == 0
-    # Pinheiro: só o C22 (PAP de indiferenciado, 6 dias no ficheiro de circuitos) e sem viatura no planeamento
-    assert zones["Pinheiro"]["service_days"] == 0
-    # C7 (PAP, terça, quinta e sábado, 60-93-ZG): Donim e Briteiros Santo Estêvão, atribuídas pelo nome na CAOP 2019
+    # Pinheiro: o C22 (PAP de indiferenciado, segunda a sábado) conta, embora sem viatura na folha de turnos
+    assert zones["Pinheiro"]["service_days"] == 6
     donim = zones["União das freguesias de Briteiros Santo Estêvão e Donim"]
     assert donim["service_days"] == 3
     assert [(p["circuit"], p["weekday"], p["vehicle"]) for p in donim["door_to_door"]] == [
@@ -188,37 +196,46 @@ async def test_service_days_count_only_undifferentiated_circuits_with_a_vehicle(
     ]
 
 
-async def test_on_demand_rides_the_door_to_door_circuit_without_new_km(logged_in: httpx.AsyncClient) -> None:
+async def test_the_dedicated_vehicle_does_all_the_collection(logged_in: httpx.AsyncClient) -> None:
+    """Nenhum canal usa a compactadora: o plano é da viatura dedicada, com rondas, km e horas próprios."""
     s = (await logged_in.post(f"{P}/scenarios", json=request_body())).json()
-    zones = {z["code"]: z for z in (await logged_in.get(f"{P}/zones")).json()}
+    k = s["result"]["kpis"]
     plan = s["result"]["collection_plan"]
-    pap = [e for e in plan if e["channel"] == "door_to_door"]
-    assert pap, "com 60 000 €/ano há freguesias servidas no circuito PAP"
+    assert plan and {e["channel"] for e in plan} <= {"existing", "on_demand"}
+    assert k["vehicles"] >= 1 and k["vehicle_capex_eur"] == pytest.approx(42_500 * k["vehicles"])
+    assert k["vehicle_annual_eur"] == pytest.approx(42_500 / 8 * k["vehicles"])
+    assert k["capex_eur"] >= k["vehicle_capex_eur"]
+    assert k["vehicle_days_week"] == pytest.approx(k["vehicle_hours_year"] / 52 / 7, abs=0.01)
+    assert k["vehicle_hours_year"] == pytest.approx(sum(e["hours_year"] for e in plan), abs=1.0)
     alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
-    for e in pap:
-        passes = {(p["circuit"], p["weekday"], p["vehicle"]) for p in zones[e["parish_code"]]["door_to_door"]}
-        assert (e["circuit"], e["weekday"], e["vehicle"]) in passes and e["new_km_year"] == 0
-        assert e["kg_per_round"] == pytest.approx(e["tonnes_year"] * 1000 / 52, abs=0.1)
-        assert e["round_kg"] >= e["kg_per_round"] - 0.1
-        assert e["fits_capacity"] is None  # capacidade livre por validar com a Vitrus: não se inventa
-        part = next(x for x in alloc[e["parish_code"]]["parts"] if x["mode"] == "on_demand")
-        assert part["km_year"] == 0 and part["tonnes"] == pytest.approx(e["tonnes_year"], abs=0.002)
+    # a soma das freguesias (com a parte da viatura) bate com o custo anual do cenário
+    assert sum(a["annual_cost_eur"] for a in alloc.values()) == pytest.approx(k["annual_cost_eur"], abs=1.0)
     for e in plan:
-        if e["channel"] == "detour":
-            assert zones[e["parish_code"]]["door_to_door"] == [] and e["circuit"] is None
+        assert e["vehicle"] in range(1, k["vehicles"] + 1) and e["weekday"] in range(1, 6)
+        if e["channel"] == "on_demand":
+            # uma ronda a cada 2 semanas: 26 por ano; os km e as horas são da viatura dedicada, nunca 0
+            assert (e["every_weeks"], e["rounds_year"]) == (2.0, 26.0) and e["trips_per_round"] >= 1
+            assert e["kg_per_round"] == pytest.approx(e["tonnes_year"] * 1000 / 26, abs=0.1)
+            assert e["km_year"] > 0 and e["hours_year"] > 0
+            part = next(x for x in alloc[e["parish_code"]]["parts"] if x["mode"] == "on_demand")
+            assert part["km_year"] == pytest.approx(e["km_year"], abs=0.1)
 
 
-async def test_avoided_treatment_is_pending_until_the_vitrus_cost_arrives(logged_in: httpx.AsyncClient) -> None:
+async def test_avoided_treatment_and_net_cost_use_the_vitrus_landfill_cost(logged_in: httpx.AsyncClient) -> None:
     body = (await logged_in.get(f"{P}/parameters")).json()
-    assert body["values"]["rsu_treatment_eur_per_t"] is None
     meta = {m["key"]: m for m in body["meta"]}
-    assert "financeiro" in meta["rsu_treatment_eur_per_t"]["note"]
-    pending = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000))).json()
-    assert pending["result"]["kpis"]["avoided_treatment_eur"] is None  # «por validar»
-    params = {**body["values"], "rsu_treatment_eur_per_t": 50.0}
-    priced = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000, params=params))).json()
-    k = priced["result"]["kpis"]
-    assert k["avoided_treatment_eur"] == pytest.approx(k["tonnes_year"] * 50, abs=0.01)
+    assert "Resinorte" in meta["rsu_treatment_eur_per_t"]["note"]
+    k = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000))).json()["result"]["kpis"]
+    # 105,64 €/t (40 TGR + 65,64 Resinorte) por tonelada desviada; líquido = custo anual − tratamento evitado
+    assert k["avoided_treatment_eur"] == pytest.approx(k["tonnes_year"] * 105.64, abs=0.01)
+    assert k["net_annual_cost_eur"] == pytest.approx(k["annual_cost_eur"] - k["avoided_treatment_eur"], abs=0.01)
+    assert k["net_eur_per_tonne"] == pytest.approx(k["net_annual_cost_eur"] / k["tonnes_year"], abs=0.01)
+    params = {**body["values"], "rsu_treatment_eur_per_t": None}
+    none = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=20000, params=params))).json()
+    assert (
+        none["result"]["kpis"]["avoided_treatment_eur"] is None
+        and none["result"]["kpis"]["net_annual_cost_eur"] is None
+    )
 
 
 # --- Têxtil reutilizável e matriz de cobertura (22 out 2026) ---------------------------------------------------------
@@ -248,17 +265,16 @@ async def test_coverage_matrix_by_parish_and_tipau(logged_in: httpx.AsyncClient,
     aldao = rows["Aldão"]
     assert (aldao["area_km2"], aldao["density_hab_km2"], aldao["area_within_300m_pct"]) == (2.0, 639.0, 60.0)
     assert rows["Ronfe"]["area_km2"] is None and rows["Ronfe"]["density_hab_km2"] is None  # fora da amostra
-    # acessibilidade: Ronfe tem o C18 (PAP) 3 dias e, com o C4 (moloks), 6 dias de indiferenciado; Lordelo nenhum
+    # acessibilidade: Ronfe tem o C18 (PAP) 3 dias e, com o C4 (moloks), 6 dias de indiferenciado; Lordelo, C22 e C23
+    # (segunda a sábado: a folha de turnos não lhes dá viatura, mas circulam)
     assert (rows["Ronfe"]["door_to_door_days_week"], rows["Ronfe"]["service_days"]) == (3, 6)
-    assert rows["Lordelo"]["door_to_door_days_week"] == 0
-    # canais = os do plano de recolha do cenário
-    plan = {e["parish_code"]: e["channel"] for e in s["result"]["collection_plan"]}
+    assert rows["Lordelo"]["door_to_door_days_week"] == 6
+    # canais = os modos do cenário (todos na viatura dedicada)
     alloc = {a["parish_code"]: a for a in s["result"]["allocations"]}
     for r in rows.values():
         a = alloc[r["parish_code"]]
         assert r["demand_t"] == a["demand_t"] and r["tonnes"] == a["tonnes"] and r["modes"] == a["modes"]
-        if "on_demand" in a["modes"]:
-            assert plan[r["parish_code"]] in r["channels"]
+        assert r["channels"] == a["modes"]
         assert r["covered_share"] == pytest.approx(a["covered_population"] / a["population"], abs=1e-4)
     # por TIPAU: somas das freguesias; o total bate com os KPIs do cenário
     groups = {g["tipau"]: g for g in body["by_tipau"]}

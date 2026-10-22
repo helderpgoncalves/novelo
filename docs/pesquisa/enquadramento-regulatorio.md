@@ -83,7 +83,7 @@ A 22 de outubro de 2026 faltam 238 dias para a transposição e 543 para 17 de a
 - **Não há metas quantitativas de recolha ou reutilização de têxteis.** O art. 41.º-A manda a Comissão avaliar, "Até 31 de dezembro de 2029", entre outros: a) se a RAP cobre os custos, incluindo uma contribuição dos operadores de reutilização comercial; b) "A possibilidade de fixar metas de prevenção, recolha, preparação para reutilização e reciclagem"; c) "A possibilidade de introduzir a triagem prévia de resíduos urbanos indiferenciados" [F1]. O considerando 59 fundamenta este artigo.
 - A Indústria & Ambiente [F9] refere metas "face à média anual de 2021 a 2023", mas isso corresponde às metas de **resíduos alimentares** (artigo 9.º-A, n.º 4: menos 10% no fabrico e menos 30% per capita no retalho e nas casas). Não confundir nos slides.
 - **Estudo de composição (art. 22.º-D, n.º 6):** "Até 1 de janeiro de 2026 e, posteriormente, de cinco em cinco anos", os Estados-Membros estudam a composição do indiferenciado para saber a percentagem de têxteis. Com base nisso, as autoridades podem exigir à OCRP "medidas corretivas para ampliar a respetiva rede de pontos de recolha". Os resultados são públicos. O nível "pelo menos NUTS 2" está só no considerando 36. O custo do estudo é dos produtores (art. 22.º-A, n.º 8, b)) [F1].
-- O 5,4% que o Novelo usa é uma média nacional da APA, não uma caracterização do lixo de Guimarães ([Dados e modelo](../engenharia/dados-e-modelo.md)). Um estudo deste tipo, feito pelo Estado e com valor para o Norte, substituiria esse número. **Perguntar à APA** se o estudo de 1 de janeiro de 2026 foi feito e se o 5,4% vem dele.
+- Os 5,86% que o Novelo usa (desde 22 out 2026, indicados pela Vitrus) são a média nacional da APA para o indiferenciado em 2025 (RARU 2025, p. 24), não uma caracterização do lixo de Guimarães ([Dados e modelo](../engenharia/dados-e-modelo.md)). Um estudo deste tipo, feito pelo Estado e com valor para o Norte, substituiria esse número. **Perguntar à APA** se o estudo de 1 de janeiro de 2026 foi feito e se os 5,86% vêm dele.
 
 ## O que o Novelo mostra para cada artigo
 
@@ -91,9 +91,9 @@ A 22 de outubro de 2026 faltam 238 dias para a transposição e 543 para 17 de a
 | --- | --- | --- |
 | 22.º-A, n.º 8 e 12 | Custos cobertos; custo "economicamente eficiente", determinado com as autoridades locais | €/t por cenário e por tipo de território (estimativa) e o relatório RAP em PDF com o método e as fontes |
 | 22.º-C, n.º 9, b) | Cobertura de todo o território por população, densidade, volume previsto, acessibilidade e proximidade | Matriz de cobertura no separador **Cobertura** de cada cenário (`GET /planning/scenarios/{id}/coverage`, 22 out 2026): por freguesia, população, densidade, volume previsto, proximidade (área a ≤ 300 m de um local municipal), acessibilidade (dias de porta a porta com viatura) e canal de recolha; por tipo de território (TIPAU), população servida, toneladas e €/t. No cenário por freguesia de 60 000 €/ano (estimativa): predominantemente urbanas (APU), 36 freguesias, 135 460 hab., 76,0% servida, 344,3 t, 39 182 €, 113,8 €/t; mediamente urbanas (AMU), 11, 20 671 hab., 69,1%, 50,7 t, 8 284 €, 163,6 €/t; predominantemente rural (APR), 1, 699 hab., 59,9%, 1,6 t, 373 €, 240,0 €/t. Fora das urbanas serve 68,8% da população, contra 76,0% nas urbanas, a um €/t mais alto: a rede não fica só onde a tonelada sai mais barata ([Dados e modelo](../engenharia/dados-e-modelo.md#10-matriz-de-cobertura-diretiva-20251892)) |
-| 22.º-C, n.º 9, c) | Aumento sustentado da recolha seletiva e diminuição correspondente no indiferenciado | Linha de base: 2 324,8 t/ano de têxtil no indiferenciado (estimativa: 43 051 t de RSU da Vitrus × 5,4% da APA) e as toneladas que cada cenário tira daí |
+| 22.º-C, n.º 9, c) | Aumento sustentado da recolha seletiva e diminuição correspondente no indiferenciado | Linha de base: ≈ 3 003,3 t/ano de têxtil no indiferenciado (estimativa: 51 250,6 t de indiferenciado do concelho × 5,86% da APA) e as toneladas que cada cenário tira daí, a 105,64 € de tratamento evitado por tonelada (Vitrus) |
 | 22.º-D, n.º 9 | Registo por fardo: tipo, tamanho, cor, sexo, composição, quem triou | Passaporte do lote com QR: composição, peso, destino e histórico. Vai no sentido do registo; ainda não tem tipo de vestuário, tamanho, cor, sexo nem o endereço do triador |
-| 22.º-C, n.º 12 e 18 | Peso recolhido, dividido em reutilização, reciclagem e outras operações | Divisão das 301,3 t de 2025: 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito (dados da Vitrus). Por cenário, as toneladas reutilizáveis com intervalo (estimativa; no de 60 000 €/ano, 235,6 t, de 198,3 a 288,9 t) |
+| 22.º-C, n.º 12 e 18 | Peso recolhido, dividido em reutilização, reciclagem e outras operações | Divisão das 301,3 t de 2025: 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito (dados da Vitrus). Por cenário, as toneladas reutilizáveis com intervalo (estimativa; no de 60 000 €/ano, 264,9 t, de 222,9 a 324,8 t) |
 
 O detalhe de cada funcionalidade está em [Funcionalidades](../engenharia/features.md).
 
@@ -121,7 +121,7 @@ O Regulamento de Ecodesign para Produtos Sustentáveis (ESPR) prevê passaporte 
 | --- | --- |
 | Quem paga a recolha das peças postas à venda antes da transposição (art. 22.º-A, n.º 11) | APA; jurista |
 | Se a derrogação dos 80% do art. 8.º-A, n.º 4 vale para a RAP têxtil | APA; jurista |
-| Se Portugal fez o estudo de composição de 1 jan 2026 e se o 5,4% vem dele | APA |
+| Se Portugal fez o estudo de composição de 1 jan 2026 e se os 5,86% vêm dele | APA |
 | Posição do Governo sobre o art. 22.º-A, n.º 9 (indiferenciado) na transposição | APA, ANMP |
 | Se já há projeto de decreto-lei de RAP de têxteis em Portugal | Diário da República e [APA](https://apambiente.pt) (têxteis, RAP) |
 | Quem será o candidato a entidade gestora (Sociedade Ponto Verde, Novo Verde, Valorsul e outras) | Notícias e APA; perguntar ao mentor da Vitrus |

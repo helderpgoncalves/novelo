@@ -110,7 +110,7 @@ flowchart LR
 | **Título** | A lei põe a câmara na mesa onde se fixa o custo; o Novelo leva o número |
 | **Visual** | Captura do relatório RAP: custo por tipo de território (predominantemente urbana, mediamente urbana, predominantemente rural) |
 | **Número** | "economicamente eficiente" (artigo 22.º-A, n.º 12) e "As autoridades locais" (n.º 7, d)) |
-| **Nota do orador** | O custo eficiente é determinado "entre os intervenientes relevantes", e a lei nomeia as autoridades locais; a entidade gestora não pode recusar o município (artigo 22.º-C, n.º 10). As peças antigas continuam a pesar na câmara durante anos: mais uma razão para medir o custo. Menciona a economia social como parceira. Se houver tempo: a rede não fica só onde é barato (art. 22.º-C, n.º 9, b)); fora das freguesias urbanas o cenário serve 68,8% da população, contra 76,0% nas urbanas (estimativa, separador Cobertura). |
+| **Nota do orador** | O custo eficiente é determinado "entre os intervenientes relevantes", e a lei nomeia as autoridades locais; a entidade gestora não pode recusar o município (artigo 22.º-C, n.º 10). As peças antigas continuam a pesar na câmara durante anos: mais uma razão para medir o custo. Menciona a economia social como parceira. Se houver tempo: a rede não fica só onde é barato (art. 22.º-C, n.º 9, b)); fora das freguesias urbanas o cenário serve 60,2% da população, contra 73,9% nas urbanas (estimativa, separador Cobertura). |
 | **Rodapé** | Diretiva (UE) 2025/1892, artigo 22.º-A, n.º 7, 11 e 12; artigo 22.º-C, n.º 9, b) e n.º 10 |
 | **Registo** | B6, B8, B10, B17, B18, H4 |
 
@@ -121,10 +121,10 @@ flowchart LR
 | **Critério e peso** | Apresentação e potencial de continuidade (20%), 40 s |
 | **Título** | Peço um piloto de três meses em duas freguesias |
 | **Visual** | As duas freguesias recomendadas no mapa, três KPIs (toneladas, €/t, taxa de rejeito) e uma linha do tempo: 26 a 28 out feedback · 48 h plano · 3 meses piloto · depois dados medidos |
-| **Número** | A frase-âncora: "X toneladas por ano a Y € por tonelada" |
+| **Número** | A frase-âncora: "445,8 toneladas por ano a 102,8 € por tonelada; o tratamento evitado (47 093 €) paga a operação". Piloto: Aldão e Arosa e Castelões, piso de 1,71 t em 3 meses, previsão de 2,43 t |
 | **Nota do orador** | Frase-âncora, pedido, replicabilidade ("outro município precisa dos seus dados", ainda não testado) e roadmap pós-26 out (proposta nossa). Parceiros só como "em conversa" se já falámos. Agradece e para. |
-| **Rodapé** | Cenário B, estimativa a validar no piloto |
-| **Registo** | cenário B; recomendador de piloto (em construção) |
+| **Rodapé** | Cenário de 60 000 €/ano, estimativa a validar no piloto (registo H3, H10, H13) |
+| **Registo** | H3, H10, H13 |
 
 ### 9. Slide de apoio: checklist critério e prova
 
@@ -141,14 +141,14 @@ Fora dos cinco minutos. Cola-se no fim do deck e abre-se nas perguntas ou se sob
 | --- | --- | --- |
 | **Inovação e originalidade (25%)** | A IA conduz o otimizador e o verificador recusa números inventados; do saco ao fio num lote com QR | "E se...?" (passo 6) e lote (passo 8) |
 | **Viabilidade técnica (25%)** | Dados reais da Vitrus; custos como pressupostos à vista com intervalo; produção e plano B | Ponto de partida (passo 1) e sensibilidade (passo 5) |
-| **Impacto e relevância (30%)** | X t por ano a Y €/t (estimativa); quem paga hoje e em 2028 | Cenário A contra B (passo 3) e relatório RAP (passo 10) |
+| **Impacto e relevância (30%)** | 445,8 t por ano a 102,8 €/t, com 47 093 € de tratamento evitado (estimativa); quem paga hoje e em 2028 | Cenário A contra B (passo 3) e relatório RAP (passo 10) |
 | **Apresentação e potencial de continuidade (20%)** | Pedido do piloto de 3 meses com KPIs; replicabilidade; roadmap pós-26 out | Slide 8 |
 
 ## Checklist final do deck
 
 - [ ] Cada número do deck tem linha no [registo](../pesquisa/registo-de-afirmacoes.md) com estado Dado Vitrus, Primária, Secundária ou Cálculo.
-- [ ] Nenhum número "Por verificar" aparece (4 de 27, 228 €, 304 €, Humana 2025, Catalunha 75 €). O 5,4% só com a fonte (APA, indicado pela Vitrus; A10).
-- [ ] X e Y da frase-âncora preenchidos com o cenário B de 22 de outubro.
+- [ ] Nenhum número "Por verificar" aparece (4 de 27, 228 €, 304 €, Humana 2025, Catalunha 75 €). O 5,86% só com a fonte (APA, RARU 2025, indicado pela Vitrus; A10). Nenhum slide diz "0 km novos", "sem viaturas novas" ou "saco no camião do porta a porta" (A21, A22).
+- [ ] Frase-âncora com 445,8 t e 102,8 €/t (cenário de 60 000 €/ano, modelo de 22 de outubro) igual em slide, demo e vídeo.
 - [ ] Rodapés de fonte em todos os slides.
 - [ ] Vídeo de 60 s e PDF RAP guardados fora da rede.
 - [ ] Os passos "em construção" só aparecem na demo se ensaiados a 25 de outubro.

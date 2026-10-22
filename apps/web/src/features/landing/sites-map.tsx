@@ -37,7 +37,7 @@ function Dots({ sites }: { sites: readonly Site[] }) {
 }
 
 /**
- * «Onde se perdem as 2 325 t»: as 48 freguesias (CAOP 2019) e os 1 574 locais públicos com contentores municipais, cada um do
+ * «Onde se perdem as 3 003 t»: as 48 freguesias (CAOP 2019) e os 1 574 locais públicos com contentores municipais, cada um do
  * tamanho do têxtil estimado que lá se perde (a procura da freguesia repartida pelos contentores, como no modelo). Os pontos
  * entram em ondas a partir do centro da cidade (só com movimento permitido). Ao lado, as freguesias por têxtil por desviar:
  * escolher uma realça-a no mapa; a lista completa é o equivalente acessível do mapa. SVG puro, sem bibliotecas de mapas;

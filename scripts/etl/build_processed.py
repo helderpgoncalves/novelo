@@ -142,7 +142,7 @@ def textile_flows() -> dict:
             )
     _write_csv("textile_flows.csv", rows)
     total = sum(r["tonnes"] for r in rows)
-    # Têxtil gerado = o que ainda vai para o lixo (43 051 t RSU × 5,4%, Vitrus + APA) + o recolhido à parte.
+    # Têxtil gerado = o que ainda vai para o lixo (51 250,6 t × 5,86%, Vitrus + APA) + o recolhido à parte.
     demand_t = base.generated_t(total)
     by_dest = {
         d: round(sum(r["tonnes"] for r in rows if r["destination"] == d), 3) for d in ("reuse", "recycle", "reject")
@@ -411,21 +411,27 @@ def sources() -> None:
     ]
     # Valores comunicados por email (sem ficheiro): a impressão digital é a dos próprios valores.
     vitrus_apa = json.dumps(
-        {"rsu_t": base.VITRUS_RSU_2025_T, "textile_share": base.APA_TEXTILE_SHARE_OF_RSU}, sort_keys=True
+        {
+            "rsu_t": base.VITRUS_RSU_2025_T,
+            "vitrus_share": base.VITRUS_SHARE_OF_MUNICIPAL_RSU,
+            "textile_share": base.APA_TEXTILE_SHARE_OF_RSU,
+        },
+        sort_keys=True,
     )
     manifest.append(
         {
             "key": "vitrus_apa_rsu_2025",
-            "title": "RSU recolhido em 2025 e percentagem de têxtil no RSU",
+            "title": "Indiferenciado do concelho em 2025 e percentagem de têxtil no indiferenciado",
             "provider": "Vitrus Ambiente (APA)",
-            "file_name": "email do mentor da Vitrus (21/10/2026)",
+            "file_name": "email do mentor da Vitrus (22/10/2026)",
             "file_sha256": hashlib.sha256(vitrus_apa.encode()).hexdigest(),
-            "received_on": "2026-10-21",
+            "received_on": "2026-10-22",
             "period_start": "2025-01-01",
             "period_end": "2025-12-31",
             "notes": (
-                "43 051 t de RSU recolhidas pela Vitrus em 2025; 5,4% é têxtil (estatística da APA, indicada pela "
-                "Vitrus). Base do têxtil que ainda vai para o lixo (2 324,8 t/ano, estimativa)."
+                "43 050,5 t de indiferenciado recolhidas pela Vitrus em 2025, 84,0% do concelho (R&C 2025, p. 8): "
+                "concelho ≈ 51 250,6 t; 5,86% é têxtil (APA, RARU 2025, p. 24), indicado pela Vitrus. Base do têxtil "
+                "que ainda vai para o lixo (≈ 3 003,3 t/ano, estimativa)."
             ),
         }
     )

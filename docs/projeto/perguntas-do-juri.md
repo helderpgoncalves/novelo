@@ -6,11 +6,11 @@ Respostas curtas, para dizer em 20 segundos cada. Quem responde a cada tema fica
 
 **"A Vitrus não pode simplesmente pôr contentores em todo o lado?"**
 
-A Vitrus não quer: o têxtil de contentor vem contaminado e perde a reutilização, que é onde está o valor (reciclar custa mais que a fibra virgem). E um contentor custa e é recolhido mesmo onde quase não há têxtil. O Novelo propõe uma rede sem contentores: paragem em locais onde a viatura já passa e recolha a pedido nos circuitos que existem.
+A Vitrus não quer: o têxtil de contentor vem contaminado e perde a reutilização, que é onde está o valor (reciclar custa mais que a fibra virgem). E um contentor custa e é recolhido mesmo onde quase não há têxtil. O Novelo propõe uma rede sem contentores: uma viatura de têxtil nova, sem compactação, recolhe o saco fechado à porta num dia fixo por freguesia e para nos locais municipais que já existem e nas escolas.
 
 **"Os números são reais?"**
 
-Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; as 43 051 t de resíduos urbanos recolhidas em 2025 vêm da Vitrus e os 5,4% de têxtil vêm da APA, valor que a própria Vitrus nos indicou a 21 de outubro ([Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)). Daí as cerca de 2 324,8 t por ano que ainda vão para o lixo e a captura de 11,5%, sempre apresentadas como estimativa. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
+Os dados de partida sim: as 301,3 t recolhidas em 2025, o destino de cada tonelada, os 40 circuitos e 29 viaturas vêm da Vitrus; a população (156 830) vem do INE; as 43 050,5 t de indiferenciado recolhidas em 2025 e a parte do concelho que representam (84,0%) vêm do Relatório e Contas 2025 da Vitrus; os 5,86% de têxtil vêm da APA (2025), base que a própria Vitrus nos indicou a 22 de outubro ([Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54), [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)). Daí as cerca de 3 003 t por ano que ainda vão para o lixo e a captura de 9,1%, sempre apresentadas como estimativa. O custo de tratamento, 105,64 €/t, também é da Vitrus. As toneladas por cenário são estimativas do nosso modelo, e dizemos isso no ecrã. O piloto existe para as confirmar.
 
 **"Quem paga isto?"**
 
@@ -18,15 +18,19 @@ Hoje, o município, sozinho. A responsabilidade alargada do produtor tem de exis
 
 **"Mais toneladas garantem material reutilizável?"**
 
-Não, e por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025 a Ultriplo reutilizou 72,9% do que recolheu e a H Sarah Trading 50,0% (kg por destino), a Nova Etapa 50% (relatório) e o têxtil recolhido pela Vitrus 9,2%, com 56,9% de rejeito (relatório da To Be Green, 5,6 t). No cenário de 60 000 €/ano são 235,6 t reutilizáveis por ano, entre 198,3 e 288,9 t, a 203,1 € por tonelada reutilizável (estimativa; [registo](../pesquisa/registo-de-afirmacoes.md), A19, H1 e H2).
+Não, e por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025 a Ultriplo reutilizou 72,9% do que recolheu e a H Sarah Trading 50,0% (kg por destino), a Nova Etapa 50% (relatório) e o têxtil recolhido pela Vitrus 9,2%, com 56,9% de rejeito (relatório da To Be Green, 5,6 t). No cenário de 60 000 €/ano são 264,9 t reutilizáveis por ano, entre 222,9 e 324,8 t, a 173,0 € por tonelada reutilizável (estimativa; [registo](../pesquisa/registo-de-afirmacoes.md), A19, H1 e H2).
 
 **"A rede só vai onde a tonelada é barata?"**
 
-Não. A diretiva pede uma rede que não se limite às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o por tipo de território: no cenário de 60 000 €/ano, fora das freguesias urbanas fica servida 68,8% da população, contra 76,0% nas urbanas, a um €/t mais alto (estimativa; H4).
+Não. A diretiva pede uma rede que não se limite às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o por tipo de território: no cenário de 60 000 €/ano, fora das freguesias urbanas fica servida 60,2% da população, contra 73,9% nas urbanas (estimativa; H4). Dizemos também o que falta: Arosa e Castelões, a única freguesia predominantemente rural, fica sem serviço neste orçamento; é uma das duas freguesias do piloto recomendado.
 
 **"O saco de têxtil não acaba no compactador?"**
 
-Não pode: no compactador, o saco mistura-se com o lixo e perde a reutilização, a contaminação que a Vitrus quer evitar. No planeamento de turnos que a Vitrus nos deu (semana de 21 a 25 de setembro de 2026), numa tarde de dia útil cerca de 15 das 29 viaturas não têm circuito. É um plano B: uma delas pode levar os sacos à parte. Falta validar com a Vitrus se o tipo de caixa e a equipa servem (A20).
+Não. Perguntámos à Vitrus a 22 de outubro: o saco iria para a caixa de compactação e estragava-se, e cabine, gancho ou caixa lateral também não são possíveis. Um compactador também não pode fazer uma volta só de têxtil, por contaminação, e não há viaturas livres à tarde. Por isso a rede usa o que a Vitrus indicou: uma viatura de têxtil nova, sem compactação (registo A21, A22, A28).
+
+**"Uma viatura nova não contraria o 'menor investimento'?"**
+
+É uma viatura e nenhum contentor, contra um contentor por ponto em todo o concelho. A viatura custa 42 500 € (5 312,50 € por ano em 8 anos; concurso público de Vila Nova de Gaia para uma viatura de caixa fechada). E cada tonelada que sai do lixo deixa de pagar 105,64 € de tratamento em aterro (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). Com 60 000 €/ano, a rede custa 45 828 € por ano, viatura incluída, e o tratamento evitado é de 47 093 €: paga a operação (estimativa; H3, H10). Os custos por hora e por km da viatura ainda são pressupostos, à vista e com intervalo (registo A23, A25).
 
 ## Sobre a tecnologia
 

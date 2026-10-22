@@ -40,17 +40,19 @@ def _quantiles(q: sens.Quantiles) -> QuantilesOut:
 async def load_plan(db: AsyncSession, scenario_id: uuid.UUID) -> tuple[ScenarioOut, sens.Plan, network.Params]:
     """O plano de um cenário gravado (freguesias e modos, ou locais e rotas) com os km calibrados pelas rotas reais."""
     scenario = await service.get_scenario(db, scenario_id)
+    if scenario.result.kpis.vehicles is None:
+        # Antes de 22 out 2026 o saco ia na compactadora do porta a porta (0 km): o modelo de agora não o reproduz.
+        raise ConflictError("Scenario was computed before the dedicated textile vehicle: calculate it again")
     dp = service._domain_params(scenario.params)
     zones = {z.code: z for z in await service.load_zone_rows(db, scenario.params.kg_per_inhab_month)}
     if scenario.result.siting is not None:
         return scenario, _site_plan(scenario, zones, dp), dp
-    pap = scenario.result.collection_plan is not None  # cenários antigos: sem o canal porta a porta
     items = []
     for a in scenario.result.allocations:
         if not a.parts:
             continue
         z = zones[a.parish_code]
-        zone = to_domain_zone(z, door_to_door=pap)
+        zone = to_domain_zone(z)
         modes = tuple(p.mode for p in a.parts)
         items.append(sens.PlanItem(zone, modes, sens.calibrate_km_scale(zone, modes, dp, [p.km_year for p in a.parts])))
     if not items:
@@ -72,13 +74,7 @@ def _site_plan(scenario: ScenarioOut, zones: dict[str, ZoneOut], dp: network.Par
         if a.served_share <= 0 and not on_demand:
             continue
         z = zones[a.parish_code]
-        site_zones.append(
-            sens.SiteZone(
-                to_domain_zone(z, door_to_door=scenario.result.collection_plan is not None),
-                a.served_share,
-                on_demand,
-            )
-        )
+        site_zones.append(sens.SiteZone(to_domain_zone(z), a.served_share, on_demand))
     return sens.SitePlan(
         mode=summary.site_mode,
         zones=tuple(site_zones),

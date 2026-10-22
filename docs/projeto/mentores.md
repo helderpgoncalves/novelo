@@ -105,7 +105,21 @@ O Lucas respondeu por email a três pontos. Detalhe e números em [Perguntas aos
 | --- | --- | --- |
 | Contentores de têxteis | A Vitrus não os tem nem quer ter: o têxtil de contentor vem contaminado e perde a reutilização; a reciclagem é muito mais cara que a fibra virgem. O pacote QGIS traz indiferenciado, orgânico e seletivo | Rede sem contentores (local existente + recolha a pedido nos circuitos). Os contentores municipais são a base geográfica. Bolsa de fibra desce na prioridade; triagem por foto passa a controlo de qualidade na entrega |
 | Custos | Vai pedi-los ao departamento financeiro; não estão no site | Continuam pressupostos |
-| Plano de Ação Integrado | Não o conhece. A Vitrus usa a APA e os seus valores: 43 051 t de RSU em 2025, 5,4% de têxtil | Procura = 2 324,8 t/ano por desviar; captura 11,5% (estimativa) |
+| Plano de Ação Integrado | Não o conhece. A Vitrus usa a APA e os seus valores: 43 051 t de RSU em 2025, 5,4% de têxtil | Procura = 2 324,8 t/ano por desviar; captura 11,5% (estimativa). Substituída a 22 out (abaixo) |
+
+### Respostas de 22 de outubro de 2026
+
+Detalhe em [Perguntas aos orientadores](perguntas-aos-orientadores.md#respostas-de-22-de-outubro-de-2026).
+
+| Tema | Resposta | O que muda |
+| --- | --- | --- |
+| Saco no camião do porta a porta | Não pode: estraga-se na caixa de compactação; cabine, gancho ou caixa lateral também não. Um compactador não faz volta só de têxtil (contaminação). Saída: "aquisição de um meio novo de recolha" | A rede passa a ter uma viatura de têxtil nova, sem compactação |
+| Viaturas livres à tarde | Não há: a folha de turnos tinha um erro | Cai o plano B das viaturas paradas |
+| Custos das viaturas | O financeiro ainda não os enviou | Continuam pressupostos |
+| Tratamento do indiferenciado | 40 €/t de TGR + 65,64 €/t da Resinorte = 105,64 €/t | Tratamento evitado por tonelada desviada |
+| Depósito | Estaleiro Operacional da Rua das Lameiras, Polvoreira | Origem das rotas |
+| Base da procura | 5,86% (APA, 2025) sobre o indiferenciado do concelho todo | ≈ 3 003,3 t/ano por desviar; captura ≈ 9,1% (estimativa) |
+| Sazonalidade | Os quilos por mês só se partilham com o município | Modelo anual |
 
 ### Perguntas, por ordem de impacto
 
@@ -164,15 +178,15 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 | Gere projetos e **otimiza recursos** | O Novelo é literalmente otimização de recursos: abrir com €/t e investimento evitado |
 | Formação em resíduos | Rigor técnico: fontes, estimativas rotuladas, método claro |
 | Responsável por projetos europeus | Falar em **reporte, KPIs e evidência**: o relatório RAP e o piloto são linguagem dele |
-| Vitrus precisa de uma resposta operacional | Mostrar que usamos **as rotas e viaturas reais**, sem km novos |
+| Vitrus precisa de uma resposta operacional | Mostrar que seguimos a resposta dele: **uma viatura de têxtil nova**, o depósito de Polvoreira e o tratamento evitado (105,64 €/t) |
 
 ### O que pode desbloquear
 
 | Desbloqueio | Ligação |
 | --- | --- |
 | **Custos unitários** | Troca os pressupostos por dados e dá peso ao €/t |
-| **Base da procura** | Respondido a 21 out: 43 051 t de RSU × 5,4% (APA). O Lucas não conhece o plano municipal; "4 de 27" (A11) continua por verificar |
-| **Depósito** | VRP (contentores de têxteis: não existem, 21 out) |
+| **Base da procura** | Respondido a 22 out: indiferenciado do concelho todo × 5,86% (APA, 2025). O Lucas não conhece o plano municipal; "4 de 27" (A11) continua por verificar |
+| **Depósito** | Respondido a 22 out: Estaleiro da Rua das Lameiras, Polvoreira (VRP) |
 | **Preços e contratos das frações** | Receita e €/t |
 | **Texto das Regras, duração do pitch e formato das perguntas** | Guião final e revisão da matriz de critérios |
 | **Projetos europeus** | Posicionamento pós-hackathon |
@@ -186,12 +200,12 @@ Estas quatro servem os critérios que ele mais influencia. Seguem a numeração 
 
 > Olá Lucas. Somos o Hélder e o Flávio. Já pusemos os vossos dados (301,3 t, 40 circuitos, 29 viaturas) num simulador que compara cenários de recolha em €/t. Para trocar os nossos pressupostos pelos vossos números precisamos de **cinco coisas**: custo por recolha, por km e por contentor; localização do depósito; a fonte do plano municipal (5,4% e 0,7 kg/hab/mês); o texto das Regras do hackathon (o detalhe de cada critério); e se podemos usar os dados em público. Pode ser por escrito, se for mais fácil.
 
-> Mensagem de 20 de outubro, já respondida em parte a 21 (custos pedidos ao financeiro; plano municipal substituído por 43 051 t × 5,4%). Num seguimento, pedir só o depósito, as Regras e a autorização.
+> Mensagem de 20 de outubro, já respondida em parte a 21 (custos pedidos ao financeiro; plano municipal substituído por 43 051 t × 5,4%, e a 22 por 5,86% sobre o indiferenciado do concelho; depósito respondido a 22). Num seguimento, pedir só o depósito, as Regras e a autorização.
 
 **Dois minutos no telemóvel:**
 
-1. **0:00 a 0:30**: "Ponto de partida" com os números dele (301,3 t; 43 051 t de RSU × 5,4% = 2 324,8 t ainda no lixo; captura 11,5%, estimativa).
-2. **0:30 a 1:15**: "Circuitos" e "Frota": "são os vossos circuitos; só o que falta são custos".
+1. **0:00 a 0:30**: "Ponto de partida" com os números dele (301,3 t; 51 250,6 t de indiferenciado do concelho × 5,86% ≈ 3 003 t ainda no lixo; captura 9,1%, estimativa).
+2. **0:30 a 1:15**: o plano de recolha da viatura de têxtil nova, a partir de Polvoreira, e o tratamento evitado (105,64 €/t): "seguimos a vossa resposta; só faltam os custos da viatura".
 3. **1:15 a 1:45**: simulador: dois cenários, €/t, investimento. "Os custos aqui são pressupostos assinalados."
 4. **1:45 a 2:00**: ecrã "Qualidade dos dados": "encontrámos 12 alertas no vosso ficheiro; estas são as perguntas."
 
@@ -202,7 +216,7 @@ Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perg
 | # | Pergunta | Porquê perguntamos | O que fazemos com a resposta |
 | --- | --- | --- | --- |
 | 1 | **Custos unitários:** custo por recolha, por quilómetro, por hora de equipa e por contentor (compra, instalação, lavagem, manutenção). | Sem eles os €/t são estimativa (A15). **21 out:** o Lucas vai pedi-los ao departamento financeiro (não estão no site) | Substituímos `params.py`; passamos a dizer "dados da Vitrus" |
-| 2 | **Plano municipal:** o que medem os 0,7 kg/hab/mês e os 5,4% (têxtil que fica no indiferenciado ou geração total) e de que ano? | **Respondida a 21 out:** o Lucas não conhece o plano; a Vitrus recolheu 43 051 t de RSU em 2025 e indica 5,4% de têxtil (APA). Ver [Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | Procura de 2 324,8 t/ano por desviar e captura de 11,5% (estimativa); o plano sai das fontes do modelo |
+| 2 | **Plano municipal:** o que medem os 0,7 kg/hab/mês e os 5,4% (têxtil que fica no indiferenciado ou geração total) e de que ano? | **Respondida a 21 out:** o Lucas não conhece o plano; a Vitrus recolheu 43 051 t de RSU em 2025 e indica 5,4% de têxtil (APA). Ver [Q6](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) | Procura de 2 324,8 t/ano por desviar e captura de 11,5% (estimativa); o plano sai das fontes do modelo. **22 out:** base revista para 5,86% sobre o concelho todo (≈ 3 003,3 t, 9,1%) |
 | 3 | **Texto das Regras**: detalhe de cada um dos quatro critérios, duração do pitch, formato da demo e das perguntas, e quem avalia. Ver a [pergunta comum](#pergunta-comum-às-regras-e-ao-formato). | Os pesos são públicos (E4); o detalhe não (E6, M16) | Afinamos o guião e o tempo |
 | 4 | **Contentores de têxteis:** onde está a lista, formato do ficheiro, que tipos e estados existem, operador, e política de colocação. | **Respondida a 21 out:** a Vitrus não tem contentores de têxtil nem os quer (contaminação dificulta a reutilização) | Rede sem contentores: local existente e recolha a pedido; contentor de rua só como referência |
 | 5 | **Depósito:** de onde saem os circuitos e onde se descarrega? | O VRP assume o centro de Guimarães | Parametrizamos o ponto de partida |
@@ -211,7 +225,7 @@ Lista consolidada para o Lucas, com os números dos dados de 20 out: [as 10 perg
 | 8 | **Restrições operacionais:** turnos, motoristas, sábados, viaturas partilhadas, janelas horárias. | O otimizador não deve propor o inviável | Restrições no modelo e no "E se...?" |
 | 9 | Os **9 circuitos sem viatura, as 2 viaturas nunca atribuídas e os 12 alertas**: confirma o significado? | Resolver alertas com base certa | Fechamos alertas no ecrã com nota da Vitrus |
 | 10 | Quais são os **dois projetos europeus de circularidade** (Let's Go Circular, Circular Ecosystems?) e o Novelo pode alimentar o plano de ação têxtil? | M12 é hipótese | Posicionamento pós-hackathon e fonte para o plano de circularidade |
-| 11 | **Piloto:** a Vitrus estaria disponível para 3 meses em duas freguesias? Preferem outras que não Gondar e Arosa e Castelões? | O recomendador escolhe pela aprendizagem (já na app) | Ajustamos a recomendação ao que é operacionalmente possível |
+| 11 | **Piloto:** a Vitrus estaria disponível para 3 meses em duas freguesias? Preferem outras que não Aldão e Arosa e Castelões? | O recomendador escolhe pela aprendizagem (já na app) | Ajustamos a recomendação ao que é operacionalmente possível |
 | 12 | Sabem **quem será a entidade gestora** e em que ponto está a RAP têxtil em Portugal? | APA em dez 2025: nada aprovado (B11) | Frase do slide de 2028 e relatório RAP |
 | 13 | Que **outros dados** existem: caracterização do indiferenciado por freguesia, tarifa de aterro/incineração, reclamações, volumes por circuito? | Custo evitado e procura por zona | Novas linhas no modelo e na cobertura |
 | 14 | Que **KPI** usam hoje para o custo por tonelada de têxtil? | Falar na linguagem deles | Alinhamos definições (custo total vs marginal) |

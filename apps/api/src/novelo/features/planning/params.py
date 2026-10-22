@@ -1,19 +1,21 @@
 """Pressupostos por omissão do simulador e a origem de cada um.
 
-Dados reais (população INE, circuitos, RSU recolhido pela Vitrus e percentagem de têxtil da APA) entram no modelo por
-outra via ou derivam-se aqui; o resto são números que a Vitrus ainda não forneceu (custos unitários, capturas por modo),
-marcados como `assumption` até serem validados.
+Dados reais (população INE, circuitos, indiferenciado da Vitrus e percentagem de têxtil da APA, estaleiro e custo de
+tratamento) entram no modelo por outra via ou derivam-se aqui; o resto são números que a Vitrus ainda não forneceu
+(custos unitários, capturas por modo, viatura dedicada), marcados como `assumption` até serem validados.
 """
 
 from novelo.domain import network
 from novelo.domain.vocab import CollectionMode
+from novelo.features.planning import assumptions as a
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams, ZoneOut
 from novelo.features.textile.references import KG_PER_INHAB_MONTH
 
-# Procura: têxtil que ainda vai para o lixo, 43 051 t de RSU × 5,4% (Vitrus + APA) ÷ 156 830 hab ÷ 12 = 1,2353
-# kg/hab/mês. Derivado em `features/textile/references.py`; não se escreve à mão.
-# Arredondado a 4 casas para o ecrã de pressupostos (1,2353): o potencial continua 2 324,8 t.
-DEFAULT_KG_PER_INHAB_MONTH = round(KG_PER_INHAB_MONTH, 4)
+# Procura: têxtil que ainda vai para o lixo, 51 250,6 t de indiferenciado do concelho × 5,86% (Vitrus + APA) ÷ 156 830
+# hab ÷ 12 = 1,5958 kg/hab/mês. Derivado em `features/textile/references.py`; não se escreve à mão.
+# Arredondado a 5 casas para o ecrã de pressupostos (1,59583): o potencial continua 3 003,3 t (a 4 casas, 1,5958,
+# daria 3 003,2 t).
+DEFAULT_KG_PER_INHAB_MONTH = round(KG_PER_INHAB_MONTH, 5)
 
 # Contentor de rua: a Vitrus não tem contentores de têxtil nem os quer (contaminação). O modo fica só como referência
 # (ex.: o benchmark francês, que é de contentores) e nunca entra por omissão. Os valores são pressupostos: a antiga
@@ -21,13 +23,9 @@ DEFAULT_KG_PER_INHAB_MONTH = round(KG_PER_INHAB_MONTH, 4)
 STREET_CAPTURE_RATE = 0.286
 STREET_COVERAGE = 0.8
 
-# Recolha no circuito porta a porta (PAP): o saco vai na viatura que já passa à porta, sem km novos. O custo de cada
-# recolha é o tempo extra de paragem, que a Vitrus ainda não deu: até lá, o mesmo valor de uma recolha normal
-# (`cost_per_collection_eur`), um teto conservador, porque a viatura já para nessa porta.
-PAP_COST_PER_PICKUP_EUR = 6.0
-
-# Centro de Guimarães como depósito, até a Vitrus indicar o seu (pergunta ao mentor, dia 1).
-DEPOT_LAT, DEPOT_LON = 41.4425, -8.2918
+# Estaleiro e viatura dedicada: valores e fontes em `assumptions.py` (Vitrus, 22 out 2026: o saco de têxtil não pode
+# ir na compactadora do porta a porta; a recolha é feita por uma viatura nova, a partir do estaleiro de Polvoreira).
+DEPOT_LAT, DEPOT_LON = a.DEPOT_LAT, a.DEPOT_LON
 
 
 def default_params() -> PlanningParams:
@@ -66,15 +64,18 @@ def default_params() -> PlanningParams:
         cost_per_km_eur=1.1,
         detour_factor=1.3,
         on_demand_kg_per_pickup=25.0,
-        piggyback_extra_km=1.5,
-        piggyback_min_days=2,
-        vehicle_capacity_t=4.0,
+        vehicle_capacity_t=a.VEHICLE_CAPACITY_T,
         depot_lat=DEPOT_LAT,
         depot_lon=DEPOT_LON,
         solver_time_limit_s=20,
-        pap_cost_per_pickup_eur=PAP_COST_PER_PICKUP_EUR,
-        pap_free_capacity_kg=None,  # por validar com a Vitrus: espaço livre para sacos de têxtil na viatura PAP
-        rsu_treatment_eur_per_t=None,  # pedido ao departamento financeiro da Vitrus a 21 out 2026
+        on_demand_every_weeks=a.ON_DEMAND_EVERY_WEEKS,
+        vehicle_capex_eur=a.VEHICLE_CAPEX_EUR,
+        vehicle_lifetime_years=a.VEHICLE_LIFETIME_YEARS,
+        vehicle_speed_kmh=a.VEHICLE_SPEED_KMH,
+        door_stop_minutes=a.DOOR_STOP_MINUTES,
+        site_stop_minutes=a.SITE_STOP_MINUTES,
+        shift_hours=a.SHIFT_HOURS,
+        rsu_treatment_eur_per_t=a.TREATMENT_EUR_PER_T,  # 40 €/t TGR + 65,64 €/t Resinorte (Vitrus, 22 out 2026)
     )
 
 
@@ -101,24 +102,35 @@ def params_meta() -> list[ParamMeta]:
         ParamMeta(key="cost_per_km_eur", unit="€/km", source=ParamSource.ASSUMPTION),
         ParamMeta(key="detour_factor", unit="x", source=ParamSource.ASSUMPTION),
         ParamMeta(key="on_demand_kg_per_pickup", unit="kg", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="piggyback_extra_km", unit="km", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="piggyback_min_days", unit="dias/semana", source=ParamSource.VITRUS_DATA),
-        ParamMeta(key="vehicle_capacity_t", unit="t", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="depot_lat", unit="°", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="depot_lon", unit="°", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="solver_time_limit_s", unit="s", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="pap_cost_per_pickup_eur", unit="€", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="on_demand_every_weeks", unit="semanas", source=ParamSource.ASSUMPTION),
         ParamMeta(
-            key="pap_free_capacity_kg",
-            unit="kg",
+            key="vehicle_capex_eur",
+            unit="€",
             source=ParamSource.ASSUMPTION,
-            note="Por validar com a Vitrus: espaço livre para sacos de têxtil numa ronda porta a porta.",
+            note=(
+                "Viatura nova de caixa fechada, sem compactação: 42 500 € sem IVA, adjudicação de um pesado de "
+                "mercadorias com caixa fechada, Município de Vila Nova de Gaia (TED 72690-2025, lote VII)."
+            ),
         ),
+        ParamMeta(key="vehicle_lifetime_years", unit="anos", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="vehicle_capacity_t", unit="t", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="vehicle_speed_kmh", unit="km/h", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="door_stop_minutes", unit="min", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="site_stop_minutes", unit="min", source=ParamSource.ASSUMPTION),
+        ParamMeta(key="shift_hours", unit="h", source=ParamSource.ASSUMPTION),
+        ParamMeta(
+            key="depot_lat",
+            unit="°",
+            source=ParamSource.VITRUS_DATA,
+            note="Estaleiro Operacional da Vitrus, Rua das Lameiras, Polvoreira (Vitrus, 22 out 2026).",
+        ),
+        ParamMeta(key="depot_lon", unit="°", source=ParamSource.VITRUS_DATA),
+        ParamMeta(key="solver_time_limit_s", unit="s", source=ParamSource.ASSUMPTION),
         ParamMeta(
             key="rsu_treatment_eur_per_t",
             unit="€/t",
             source=ParamSource.VITRUS_DATA,
-            note="Vitrus, departamento financeiro (pedido a 21 out 2026); por preencher.",
+            note="40 €/t TGR + 65,64 €/t Resinorte, Vitrus 22 out 2026.",
         ),
     ]
 
@@ -131,16 +143,20 @@ def to_domain_params(p: PlanningParams) -> network.Params:
         cost_per_km_eur=p.cost_per_km_eur,
         detour_factor=p.detour_factor,
         on_demand_kg_per_pickup=p.on_demand_kg_per_pickup,
-        piggyback_extra_km=p.piggyback_extra_km,
-        piggyback_min_days=p.piggyback_min_days,
         vehicle_capacity_t=p.vehicle_capacity_t,
         depot=(p.depot_lat, p.depot_lon),
-        pap_cost_per_pickup_eur=p.pap_cost_per_pickup_eur,
+        on_demand_every_weeks=float(p.on_demand_every_weeks),
+        vehicle_capex_eur=p.vehicle_capex_eur,
+        vehicle_lifetime_years=p.vehicle_lifetime_years,
+        vehicle_speed_kmh=p.vehicle_speed_kmh,
+        door_stop_minutes=p.door_stop_minutes,
+        site_stop_minutes=p.site_stop_minutes,
+        shift_hours=p.shift_hours,
     )
 
 
-def to_domain_zone(z: ZoneOut, *, existing_points: bool = False, door_to_door: bool = True) -> network.Zone:
-    """Freguesia para o domínio. `door_to_door=False` reproduz cenários calculados antes do canal porta a porta."""
+def to_domain_zone(z: ZoneOut, *, existing_points: bool = False) -> network.Zone:
+    """Freguesia para o domínio, com a área (volta da viatura dedicada porta a porta)."""
     return network.Zone(
         z.code,
         z.name,
@@ -149,5 +165,5 @@ def to_domain_zone(z: ZoneOut, *, existing_points: bool = False, door_to_door: b
         z.longitude,
         z.service_days,
         (z.existing_containers or None) if existing_points else None,
-        door_to_door=door_to_door and bool(z.door_to_door),
+        area_km2=z.area_km2,
     )

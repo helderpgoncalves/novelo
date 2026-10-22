@@ -18,8 +18,8 @@ import {
 import { sectionNumber } from './sections';
 
 const MIN_T = FACTS.collectedT;
-// Até ao têxtil gerado (estimativa ≈ 2 626 t), arredondado para cima.
-const MAX_T = 2700;
+// Até ao têxtil gerado (estimativa ≈ 3 305 t), arredondado para cima à centena (3 400 t): sobra uma faixa acima do teto.
+const MAX_T = Math.ceil(FACTS.potentialT / 100) * 100;
 const THUMB = 28;
 const pct = (t: number) => ((t - MIN_T) / (MAX_T - MIN_T)) * 100;
 /** Posição exata sob o centro da alça (o trilho nativo deixa meia alça em cada ponta). */

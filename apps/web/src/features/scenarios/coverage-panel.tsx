@@ -15,8 +15,6 @@ import { m } from '@/paraglide/messages';
 import { type CoverageChannel, coverageChannels } from './coverage';
 
 const channelLabel: Record<CoverageChannel, () => string> = {
-  door_to_door: () => m.scov_channel_pap(),
-  detour: () => m.plan_channel_detour(),
   on_demand: () => m.scov_channel_on_demand(),
   existing: () => m.scov_channel_existing(),
   street: () => m.scov_channel_street(),
@@ -346,7 +344,7 @@ function ParishTable({
                 variant="outline"
                 className={cn(
                   'h-auto py-0.5 font-medium leading-snug',
-                  c === 'door_to_door'
+                  c === 'on_demand'
                     ? 'border-primary/40 bg-primary/10 text-primary'
                     : 'border-areia/70 bg-areia/15 text-foreground/85',
                 )}

@@ -3,10 +3,11 @@ import { daysUntilDeadline } from './hero-deadline';
 import { CAPTURED, FIO_MARKS, FIO_W, fioPointAt, GAP_MID, GAP_T } from './hero-fio-model';
 
 describe('fio do hero', () => {
-  it('o troço cheio acaba aos 11,5 % (301,3 t de ≈ 2 626 t gerados) e ≈ 2 325 t ainda vão para o lixo', () => {
-    expect(CAPTURED).toBeCloseTo(0.1147, 3);
-    expect(GAP_T).toBe(2325);
-    expect(GAP_MID).toBeCloseTo(0.5574, 3);
+  it('o troço cheio acaba aos 9,1 % (301,3 t de ≈ 3 305 t gerados) e ≈ 3 003 t ainda vão para o lixo', () => {
+    // 43 050,5 ÷ 0,840 × 5,86 % = 3 003,28 t; 301,27 ÷ (3 003,28 + 301,27) = 0,0912.
+    expect(CAPTURED).toBeCloseTo(0.0912, 3);
+    expect(GAP_T).toBe(3003);
+    expect(GAP_MID).toBeCloseTo(0.5456, 3);
   });
 
   it('as marcas seguem o fio da esquerda para a direita e a ponta fecha o viewBox', () => {
@@ -18,9 +19,10 @@ describe('fio do hero', () => {
   });
 
   it('a fração é por comprimento de arco, não por largura', () => {
-    // O fio começa quase plano e ondula: 11,5 % do comprimento cai perto de 11,9 % da largura, não nos 11,5 %.
-    expect(FIO_MARKS.solid.x / FIO_W).toBeGreaterThan(0.116);
-    expect(FIO_MARKS.solid.x / FIO_W).toBeLessThan(0.13);
+    // O fio começa quase plano e ondula: 9,1 % do comprimento cai perto de 9,4 % da largura, não nos 9,1 %.
+    expect(FIO_MARKS.solid.x / FIO_W).toBeGreaterThan(CAPTURED);
+    expect(FIO_MARKS.solid.x / FIO_W).toBeGreaterThan(0.092);
+    expect(FIO_MARKS.solid.x / FIO_W).toBeLessThan(0.11);
   });
 });
 

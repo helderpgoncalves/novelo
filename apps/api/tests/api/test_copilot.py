@@ -58,7 +58,7 @@ async def test_second_failure_returns_only_cards_with_a_warning(logged_in: httpx
 
 
 async def test_user_numbers_and_rounding_are_accepted(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
-    llm.queue_chat([("get_baseline", {})], "Recolheram-se 301,3 t em 2025, cerca de 11% do têxtil gerado.")
+    llm.queue_chat([("get_baseline", {})], "Recolheram-se 301,3 t em 2025, cerca de 9% do têxtil gerado.")
     body = (await logged_in.post(C, json=ask("Quanto recolhemos?"))).json()
     assert body["verified"] is True and body["cards"] == []
     llm.queue_chat("Com os 20 000 € que indicou, ainda não corri nada.")

@@ -589,22 +589,21 @@ export const zCaptureScale = z.object({
 /**
  * CollectionPlanEntry
  *
- * Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio.
+ * Uma freguesia e um canal no plano da viatura dedicada ao têxtil (nova, de caixa fechada, sem compactação).
  */
 export const zCollectionPlanEntry = z.object({
-    channel: z.enum(['door_to_door', 'detour']),
-    circuit: z.string().nullable(),
-    circuits: z.array(z.string()).optional(),
-    crew: z.int().nullable(),
-    fits_capacity: z.boolean().nullable(),
-    kg_per_round: z.number().nullable(),
-    new_km_year: z.number(),
+    channel: zCollectionMode,
+    every_weeks: z.number(),
+    hours_year: z.number(),
+    kg_per_round: z.number(),
+    km_year: z.number(),
     parish_code: z.string(),
     parish_name: z.string(),
-    pickups_year: z.number(),
-    round_kg: z.number().nullable(),
+    rounds_year: z.number(),
+    stops_year: z.number(),
     tonnes_year: z.number(),
-    vehicle: z.string().nullable(),
+    trips_per_round: z.int().nullable(),
+    vehicle: z.int().nullable(),
     weekday: z.int().nullable()
 });
 
@@ -1880,6 +1879,8 @@ export const zKpis = z.object({
     eur_per_reusable_t: z.number().nullish(),
     eur_per_tonne: z.number().nullable(),
     km_year: z.number(),
+    net_annual_cost_eur: z.number().nullish(),
+    net_eur_per_tonne: z.number().nullish(),
     opex_eur_year: z.number(),
     points: z.int(),
     potential_t: z.number(),
@@ -1889,7 +1890,12 @@ export const zKpis = z.object({
     reuse_share: z.number().nullish(),
     reuse_share_high: z.number().nullish(),
     reuse_share_low: z.number().nullish(),
-    tonnes_year: z.number()
+    tonnes_year: z.number(),
+    vehicle_annual_eur: z.number().nullish(),
+    vehicle_capex_eur: z.number().nullish(),
+    vehicle_days_week: z.number().nullish(),
+    vehicle_hours_year: z.number().nullish(),
+    vehicles: z.int().nullish()
 });
 
 /**
@@ -3087,16 +3093,19 @@ export const zPlanningParams = z.object({
     depot_lat: z.number().gte(-90).lte(90),
     depot_lon: z.number().gte(-180).lte(180),
     detour_factor: z.number().gte(1).lte(3),
+    door_stop_minutes: z.number().gte(0).lte(30).optional().default(2),
     kg_per_inhab_month: z.number().gt(0).lte(5),
     modes: z.record(z.string(), zModeParams),
+    on_demand_every_weeks: z.int().gte(1).lte(8).optional().default(2),
     on_demand_kg_per_pickup: z.number().gt(0),
-    pap_cost_per_pickup_eur: z.number().gte(0).optional().default(6),
-    pap_free_capacity_kg: z.number().gte(0).nullish(),
-    piggyback_extra_km: z.number().gte(0),
-    piggyback_min_days: z.int().gte(1).lte(7),
-    rsu_treatment_eur_per_t: z.number().gte(0).nullish(),
+    rsu_treatment_eur_per_t: z.number().gte(0).nullish().default(105.64),
+    shift_hours: z.number().gt(0).lte(12).optional().default(7),
+    site_stop_minutes: z.number().gte(0).lte(60).optional().default(10),
     solver_time_limit_s: z.int().gte(1).lte(120),
-    vehicle_capacity_t: z.number().gt(0)
+    vehicle_capacity_t: z.number().gt(0),
+    vehicle_capex_eur: z.number().gte(0).optional().default(42500),
+    vehicle_lifetime_years: z.number().gt(0).lte(30).optional().default(8),
+    vehicle_speed_kmh: z.number().gt(0).lte(90).optional().default(30)
 });
 
 /**
@@ -4569,8 +4578,6 @@ export const zCoverageParish = z.object({
     area_km2: z.number().nullable(),
     area_within_300m_pct: z.number().nullable(),
     channels: z.array(z.enum([
-        'door_to_door',
-        'detour',
         'on_demand',
         'existing',
         'street'
@@ -5562,6 +5569,7 @@ export const zModelValidationOut = z.object({
  * ZoneOut
  */
 export const zZoneOut = z.object({
+    area_km2: z.number().nullish(),
     code: z.string(),
     demand_t: z.number(),
     door_to_door: z.array(zDoorToDoorPass).optional(),

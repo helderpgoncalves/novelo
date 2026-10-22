@@ -189,16 +189,18 @@ for b in section("map"):
     groove(b, kick_on=True, hats=True, bass_on=True, chord=c)
 add(riser(BAR * 1.0), bar_t(start_bar["pivot"] - 1), 0.45)
 
-# 7. Viragem: um compasso quase em silêncio (a Vitrus disse não), depois a resposta abre em Ré maior.
+# 7. Viragem: dois compassos quase em silêncio (contentores não; camião do lixo também não), depois a resposta abre.
 p0 = start_bar["pivot"]
-add(pad([59, 62, 66], BAR * 1.5, attack=0.3), bar_t(p0), 0.35)
+add(pad([59, 62, 66], BAR * 1.2, attack=0.3), bar_t(p0), 0.35)
 add(bell(71), bar_t(p0) + BEAT * 2, 0.22)
-for i, b in enumerate(range(p0 + 1, p0 + 3)):
+add(pad([59, 64, 67], BAR * 1.2, attack=0.3), bar_t(p0 + 1), 0.35)
+add(bell(69), bar_t(p0 + 1) + BEAT * 2, 0.22)
+for i, b in enumerate(range(p0 + 2, p0 + 4)):
     c = [G, A][i]
     add(pad(c[1], BAR), bar_t(b), 0.5)
     arp(c, b, 8, 0.18)
     add(bass(c[0] + 12, BAR * 0.9), bar_t(b), 0.35)
-add(riser(BAR * 0.5), bar_t(p0 + 2.5), 0.35)
+add(riser(BAR * 0.5), bar_t(p0 + 3.5), 0.35)
 
 # 8-11. Rede, resultados, produto e critérios: groove completo em Ré maior (I-V-vi-IV); melodia de sino no produto.
 MELODY = [[78, None, 76, 74], [73, None, 76, None], [74, None, 71, 73], [74, None, None, None]]

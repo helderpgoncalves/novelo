@@ -32,7 +32,7 @@ function Kicker({ children }: { children: ReactNode }) {
 }
 
 /**
- * O problema, em bento assimétrico: um cartão grande com o número que importa (11,5 % do têxtil gerado, estimativa) e a
+ * O problema, em bento assimétrico: um cartão grande com o número que importa (9,1 % do têxtil gerado, estimativa) e a
  * diretiva europeia, e três pequenos com factos e fontes (remissões [n] para as Referências).
  */
 export function Problem() {
@@ -55,12 +55,12 @@ export function Problem() {
     total?: boolean;
     estimate?: boolean;
   }[] = [
-    { id: 'rsu', op: '', label: m.landing_ledger_rsu(), value: formatTonnes(FACTS.rsuT, 0) },
+    { id: 'rsu', op: '', label: m.landing_ledger_rsu(), value: formatTonnes(FACTS.rsuT, 1) },
     {
       id: 'share',
       op: '×',
       label: m.landing_ledger_share(),
-      value: formatPercent(FACTS.textileShareOfRsuPct),
+      value: formatPercent(FACTS.textileShareOfRsuPct, 2),
     },
     {
       id: 'residual',
@@ -443,7 +443,7 @@ export function Method() {
               <Cite n={4} />
             </p>
             <p className="border-border border-t pt-5 font-mono text-foreground text-lg tabular-nums sm:text-xl">
-              {formatTonnes(FACTS.rsuT, 0)} × {formatPercent(FACTS.textileShareOfRsuPct)} ≈{' '}
+              {formatTonnes(FACTS.rsuT, 1)} × {formatPercent(FACTS.textileShareOfRsuPct, 2)} ≈{' '}
               {formatTonnes(FACTS.residualT)}
             </p>
           </div>

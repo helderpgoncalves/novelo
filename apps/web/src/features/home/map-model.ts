@@ -129,7 +129,7 @@ export interface LayerContext {
 }
 
 /**
- * Têxtil que ainda vai para o lixo numa freguesia (t/ano). A API já o dá em `potential_t` (população × 43 051 t × 5,4%
+ * Têxtil que ainda vai para o lixo numa freguesia (t/ano). A API já o dá em `potential_t` (população × 51 250,6 t × 5,86%
  * ÷ população do concelho, Vitrus + APA): o recolhido à parte não entra, por isso não se desconta a captura. Estimativa.
  */
 export const parishGapT = (p: OverviewParish): number => p.potential_t;

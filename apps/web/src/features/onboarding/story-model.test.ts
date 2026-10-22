@@ -107,38 +107,38 @@ describe('apresentação: cenário de referência', () => {
 });
 
 const entry = (p: Partial<CollectionPlanEntry>): CollectionPlanEntry => ({
-  channel: 'door_to_door',
-  circuit: 'C1',
-  crew: 3,
-  fits_capacity: null,
+  channel: 'on_demand',
+  every_weeks: 2,
+  hours_year: 30,
   kg_per_round: 100,
-  new_km_year: 0,
+  km_year: 200,
   parish_code: '0',
   parish_name: 'X',
-  pickups_year: 10,
-  round_kg: 100,
+  rounds_year: 26,
+  stops_year: 104,
   tonnes_year: 1,
-  vehicle: 'AA-00-AA',
+  trips_per_round: 1,
+  vehicle: 1,
   weekday: 1,
   ...p,
 });
 
 describe('apresentação: linhas do plano', () => {
-  it('só porta a porta completas, das que mais desviam, até ao limite', () => {
+  it('só o saco à porta com dia e viatura, das que mais desviam, até ao limite', () => {
     const plan = [
-      entry({ parish_name: 'Ponte', tonnes_year: 13.85, circuit: 'C14', weekday: 2 }),
-      entry({ parish_name: 'Creixomil', tonnes_year: 20.1, circuit: 'C14', vehicle: 'BD-86-EN' }),
-      entry({ parish_name: 'Sem viatura', tonnes_year: 99, vehicle: null }),
-      entry({ parish_name: 'Desvio', tonnes_year: 50, channel: 'detour' }),
+      entry({ parish_name: 'Ponte', tonnes_year: 13.85, weekday: 2 }),
+      entry({ parish_name: 'Creixomil', tonnes_year: 20.1, weekday: 3 }),
+      entry({ parish_name: 'Sem dia', tonnes_year: 99, weekday: null }),
+      entry({ parish_name: 'Locais', tonnes_year: 50, channel: 'existing' }),
       entry({ parish_name: 'Caldelas', tonnes_year: 13.05 }),
       entry({ parish_name: 'Brito', tonnes_year: 9.9 }),
     ];
     expect(planLines(plan).map((l) => l.parish)).toEqual(['Creixomil', 'Ponte', 'Caldelas']);
     expect(planLines(plan)[0]).toEqual({
       parish: 'Creixomil',
-      circuit: 'C14',
-      weekday: 1,
-      vehicle: 'BD-86-EN',
+      weekday: 3,
+      everyWeeks: 2,
+      vehicle: 1,
       tonnes: 20.1,
     });
     expect(planLines(null)).toEqual([]);

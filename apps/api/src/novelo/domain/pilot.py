@@ -4,7 +4,7 @@ Valor de aprendizagem de um conjunto de k freguesias = soma ponderada de quatro 
 
   tipau      amplitude urbano-rural: (TIPAU mais rural − mais urbano) / 2, com APU = 0, AMU = 1, APR = 2
   density    contraste de densidade populacional: (ln d_max − ln d_min) do conjunto / o mesmo de todos os candidatos
-  coverage   média de min(dias/semana de circuito, mínimo p/ aproveitar a rota) / mínimo: recolha sem km novos
+  coverage   média de min(dias/semana de circuito de indiferenciado / 2, 1): hábito de pôr o lixo em dias fixos
   cost       média de 1 − (arranque − mín) / (máx − mín): arranque barato
 
 Arranque de uma freguesia = Σ modos (investimento + operação de `months` meses), do modelo de custos.
@@ -33,6 +33,10 @@ from novelo.domain.vocab import CollectionMode as Mode
 from novelo.domain.vocab import Tipau
 
 MAX_K = 4
+# Dias por semana de circuito de indiferenciado a partir dos quais a freguesia conta como «com hábito de recolha em dias
+# fixos» (pressuposto da equipa). Antes era o mínimo para a recolha a pedido aproveitar a rota; a Vitrus excluiu esse
+# aproveitamento a 22 out 2026 (o saco não vai na compactadora), por isso o critério passou a ser o hábito.
+HABIT_DAYS = 2
 # Local existente e recolha a pedido: a Vitrus não tem contentores de têxtil (`street` só se pedido explicitamente).
 DEFAULT_MODES = (Mode.EXISTING, Mode.ON_DEMAND)
 
@@ -140,7 +144,7 @@ def score_candidates(
     return [
         CandidateScore(
             candidate=c,
-            coverage=min(c.zone.service_days / params.piggyback_min_days, 1.0),
+            coverage=min(c.zone.service_days / HABIT_DAYS, 1.0),
             startup_cost_eur=s,
             cost_score=1.0 if hi == lo else 1 - (s - lo) / (hi - lo),
             pilot_tonnes=build_option(c.zone, tuple(modes), params).tonnes * months / 12,
@@ -248,7 +252,9 @@ def forecast_pilot(
     if not 0 <= reject_share <= 1:
         raise ValueError("a taxa de rejeito tem de estar entre 0 e 1")
     items = [PlanItem(s.candidate.zone, tuple(modes), (1.0,) * len(modes)) for s in selection.chosen]
-    mc = monte_carlo(items, params, n=n, seed=seed, swing=swing)
+    # Sem o preço da viatura dedicada: é da rede inteira (um piloto de poucas freguesias pode alugar uma carrinha).
+    # Com a viatura toda às costas de duas freguesias o €/t do piloto diria pouco sobre o €/t da rede.
+    mc = monte_carlo(items, replace(params, vehicle_capex_eur=0.0), n=n, seed=seed, swing=swing)
     scale = months / 12
     rejects = [min(1.0, reject_share * f["reject_rate"]) for f in sample_factors(["reject_rate"], n, seed, swing)]
     kpis = (

@@ -23,14 +23,17 @@ e `data/processed/` (gerado por `just etl`). Análise e limites em `docs/dados/a
 | Facto | Valor | Onde se usa |
 | --- | --- | --- |
 | Têxtil recolhido em 2025 (4 entidades) | 301,3 t = 0,16 kg/hab/mês, recolhido à parte (fora do RSU) | Ponto de partida |
-| RSU recolhido pela Vitrus em 2025 | 43 051 t (Vitrus, 21 out 2026) | Base da procura |
-| Têxtil por desviar (43 051 t × 5,4% da APA) | ≈ 2 324,8 t/ano = 1,235 kg/hab/mês (estimativa) | Procura do modelo; gerado ≈ 2 626,0 t, captura atual ≈ 11,5% |
+| Indiferenciado do concelho em 2025 | ≈ 51 250,6 t = 43 050,5 t da Vitrus ÷ 0,840 (a Vitrus recolhe 84,0%; R&C 2025 da Vitrus, p. 8; 22 out 2026) | Base da procura |
+| Têxtil por desviar (51 250,6 t × 5,86% da APA, RARU 2025, p. 24) | ≈ 3 003,3 t/ano = 1,596 kg/hab/mês (estimativa) | Procura do modelo; gerado ≈ 3 304,6 t, captura atual ≈ 9,1% (cerca de 9 em cada 10 kg vão para o lixo) |
 | Destino do recolhido | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Sankey observado; receita só da reutilização (reciclar custa mais que fibra virgem) |
-| Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 82 localidades | Recolha a pedido sem km novos |
-| Contentores municipais (indiferenciado, orgânico, seletivo) | **chegaram a 20 out 2026** em `data/raw/vitrus-mapa-qgis/`: 2 751 contentores, 2 026 locais, CAOP 2019; ETL `municipal_containers.py` → `data/processed/municipal_*` | Base geográfica: onde o têxtil se perde no lixo e onde a viatura já passa; locais candidatos, produtores B2B, freguesias, densidade |
-| Contentores de têxteis | **não existem** e a Vitrus não os quer (contaminação estraga a reutilização; 21 out 2026) | Rede proposta sem contentores: local existente sem contentor novo (`existing`) + recolha a pedido nos circuitos (`on_demand`) |
+| Tratamento do indiferenciado (aterro) | 105,64 €/t = 40 €/t de TGR + 65,64 €/t de tarifa da Resinorte (Vitrus, 22 out 2026) | Custo evitado por tonelada desviada do lixo |
+| Circuitos e viaturas atuais | 40 circuitos, 29 viaturas, 82 localidades; **nenhuma viatura livre à tarde** (a folha de turnos tem um erro; Vitrus, 22 out 2026) | Contexto; o saco **não pode** ir no compactador do porta a porta nem há volta de têxtil num compactador (contaminação) |
+| Depósito | Estaleiro Operacional da Rua das Lameiras, Polvoreira (Vitrus, 22 out 2026) | Origem e fim das rotas |
+| Custos horários e por km das viaturas | por receber (o financeiro da Vitrus ainda não os enviou, 22 out 2026) | Pressupostos com "estimativa" |
+| Contentores municipais (indiferenciado, orgânico, seletivo) | **chegaram a 20 out 2026** em `data/raw/vitrus-mapa-qgis/`: 2 751 contentores, 2 026 locais, CAOP 2019; ETL `municipal_containers.py` → `data/processed/municipal_*` | Base geográfica: onde o têxtil se perde no lixo; locais candidatos, produtores B2B, freguesias, densidade |
+| Contentores de têxteis | **não existem** e a Vitrus não os quer (contaminação estraga a reutilização; 21 out 2026) | Rede proposta sem contentores, servida por **uma viatura nova de têxtil, sem compactação** (o "meio novo de recolha" que a Vitrus indicou): saco fechado à porta num dia fixo por freguesia + locais municipais existentes e escolas, sem contentor novo |
 
-A base antiga (0,7 kg/hab/mês, 1 317 t, 22,9%, Plano de Ação Integrado/URBACT) já não se usa: a Vitrus não conhece esse plano.
+Bases antigas que já não se usam: 0,7 kg/hab/mês, 1 317 t, 22,9% (Plano de Ação Integrado/URBACT, que a Vitrus não conhece) e 43 051 t × 5,4% = 2 324,8 t, 11,5%, 1,235 kg (21 out 2026, substituída a 22 out). Também deixou de valer o "plano B" de viaturas livres à tarde.
 
 Nunca inventar um valor: ou vem dos dados, ou está em `docs/engenharia/dados-e-modelo.md` como pressuposto
 com fonte, ou leva a etiqueta "estimativa" no ecrã.

@@ -116,7 +116,8 @@ def grid_cluster(points: Iterable[GeoPoint], zoom: int, cell_px: int = 64) -> li
 
 GAP_RULE_PT = (
     "Estimativa: lacuna = têxtil que ainda vai para o lixo = população (INE) × kg/hab/mês × 12, com o kg/hab/mês "
-    "de 43 051 t de RSU da Vitrus em 2025 × 5,4% de têxtil (APA); potencial = lacuna ÷ (1 − captura atual do "
+    "de ≈ 51 250,6 t de indiferenciado do concelho em 2025 × 5,86% de têxtil (APA); potencial = lacuna ÷ (1 − "
+    "captura atual do "
     "concelho, igual em todas as freguesias); a lacuna dividida pelos locais candidatos (no mínimo 1) dá toneladas "
     "por candidato; ordena-se do maior para o menor. Não há têxtil recolhido por freguesia."
 )

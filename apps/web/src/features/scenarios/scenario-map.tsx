@@ -10,7 +10,7 @@ import { ALL_MODES, modeLabel } from '@/lib/scenario';
 import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
-import { doorToDoorByParish, planWeekday } from './collection-plan';
+import { doorBagByParish, planWeekday } from './collection-plan';
 
 interface ScenarioMapProps {
   zones: ZoneOut[];
@@ -107,7 +107,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
   const sites = result.sites ?? [];
   const siting = result.siting;
   const bySites = Boolean(siting) && sites.length > 0;
-  const pap = useMemo(() => doorToDoorByParish(result.collection_plan), [result.collection_plan]);
+  const pap = useMemo(() => doorBagByParish(result.collection_plan), [result.collection_plan]);
   const hasStaffed = sites.some((s) => s.kind === 'staffed');
   const extra = useMemo(
     () =>
@@ -282,11 +282,11 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
               {m.unit_year_short()} · {m.scenario_points({ count: hovered.points })}
             </p>
           )}
-          {hoveredPap?.circuit && (
+          {hoveredPap && hoveredPap.weekday != null && (
             <p className="font-medium text-primary text-xs">
               {m.plan_map_tooltip({
-                circuit: hoveredPap.circuit,
                 day: planWeekday(hoveredPap.weekday) ?? '',
+                weeks: formatNumber(hoveredPap.every_weeks),
               })}
             </p>
           )}

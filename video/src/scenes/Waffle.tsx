@@ -4,11 +4,11 @@ import { Body, Estimate, Source, Title } from '../components/Type';
 import { useLayout } from '../layout';
 import { C, FONT } from '../theme';
 
-// 301,27 t recolhidas ÷ 2 626,0 t geradas = 11,47% ≈ 23 em 200 pontos (cada ponto ≈ 13,1 t).
+// 301,27 t recolhidas ÷ (3 003,3 + 301,27) t geradas = 9,1% ≈ 18 em 200 pontos (cada ponto ≈ 16,5 t).
 const TOTAL = 200;
-const COLLECTED = 23;
+const COLLECTED = 18;
 
-/** 3. Quase 9 em cada 10 quilos acabam no lixo: 200 pontos, 23 recolhidos à parte. */
+/** 3. Mais de 9 em cada 10 quilos acabam no lixo: 200 pontos, 18 recolhidos à parte. */
 export function Waffle({ dur }: { dur: number }) {
   const f = useCurrentFrame();
   const { width, portrait, pad } = useLayout();
@@ -32,10 +32,10 @@ export function Waffle({ dur }: { dur: number }) {
       >
         <div style={{ flex: portrait ? undefined : '0 0 760px' }}>
           <div style={rise(f, 0)}>
-            <Title size={portrait ? 88 : 84}>Quase 9 em cada 10 quilos acabam no lixo.</Title>
+            <Title size={portrait ? 88 : 84}>Mais de 9 em cada 10 quilos acabam no lixo.</Title>
           </div>
           <div style={{ ...rise(f, 70), marginTop: portrait ? 36 : 54, display: 'flex', alignItems: 'baseline', gap: 22 }}>
-            <span style={{ font: `500 ${portrait ? 150 : 140}px/1 ${FONT.title}`, color: C.floresta, letterSpacing: '-0.02em' }}>11,5%</span>
+            <span style={{ font: `500 ${portrait ? 150 : 140}px/1 ${FONT.title}`, color: C.floresta, letterSpacing: '-0.02em' }}>9,1%</span>
             <Estimate size={18} />
           </div>
           <div style={{ ...rise(f, 80), marginTop: 12 }}>
@@ -67,7 +67,7 @@ export function Waffle({ dur }: { dur: number }) {
         </div>
       </div>
       <Source style={{ left: pad, right: pad, bottom: portrait ? 120 : 64, opacity: prog(f, 90, 12), maxWidth: width - pad * 2 }}>
-        Vitrus Ambiente, 2025 (301,3 t recolhidas à parte); 2 324,8 t por desviar. Captura = 301,3 ÷ 2 626,0 t geradas. Cada ponto ≈ 13 t.
+        Vitrus Ambiente, 2025 (301,3 t recolhidas à parte); ≈ 3 003,3 t por desviar. Captura = 301,3 ÷ 3 304,6 t geradas. Cada ponto ≈ 16,5 t.
       </Source>
     </AbsoluteFill>
   );

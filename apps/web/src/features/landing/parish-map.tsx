@@ -9,7 +9,7 @@ const DOT_R = [0.9, 2.1, 3.3, 4.5, 5.7] as const;
 /**
  * Mapa das 48 freguesias de Guimarães (CAOP 2019) em SVG: geometria oficial simplificada e densidade populacional
  * (INE ÷ área CAOP, em quintis) desenhada em meio-tom, a linguagem dither da marca. Contorno que se desenha ao
- * entrar e, opcionalmente, as 71 localidades com coordenadas. Sem bibliotecas de mapas.
+ * entrar e, opcionalmente, as localidades com coordenadas. Sem bibliotecas de mapas.
  */
 export function ParishMap({
   places = false,

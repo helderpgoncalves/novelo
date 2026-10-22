@@ -35,7 +35,7 @@ def body(message: str = "Quanto recolhemos?", **extra: Any) -> dict[str, Any]:
 async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
     llm.queue_rounds(
         {"tools": [("get_baseline", {})]},
-        {"text": ["Recolheram-se ", "301,3 t em 2025, ", "cerca de 11% do têxtil gerado."]},
+        {"text": ["Recolheram-se ", "301,3 t em 2025, ", "cerca de 9% do têxtil gerado."]},
     )
     resp = await logged_in.post(S, json=body())
     assert resp.headers["x-accel-buffering"] == "no" and "no-cache" in resp.headers["cache-control"]
@@ -70,7 +70,7 @@ async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: h
         "warning": None,
         "external_numbers": [],
     }
-    assert text_of(events) == "Recolheram-se 301,3 t em 2025, cerca de 11% do têxtil gerado."
+    assert text_of(events) == "Recolheram-se 301,3 t em 2025, cerca de 9% do têxtil gerado."
     usage = next(e for e in events if e["type"] == "usage")
     assert usage["tokens"] == 2 * 1050 and usage["cost_usd"] == pytest.approx(0.0008)
     assert (

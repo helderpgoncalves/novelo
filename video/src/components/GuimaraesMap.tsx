@@ -13,7 +13,7 @@ export type MapState = {
   outline: number;
   /** 0..1: contentores municipais acesos (onda a partir do centro) */
   containers: number;
-  /** 0..1: freguesias com porta a porta no cenário pintadas */
+  /** 0..1: freguesias com saco à porta (recolha a pedido) pintadas */
   pap: number;
   /** 0..1: freguesias servidas em local existente pintadas */
   existing: number;
@@ -46,8 +46,8 @@ export function GuimaraesMap({ s, width }: { s: MapState; width: number }) {
   const fillFor = (p: Parish, i: number) => {
     const stagger = (i / geo.parishes.length) * 0.5;
     const local = (v: number) => interpolate(v, [stagger, stagger + 0.5], [0, 1], clamp);
-    if (p.papInScenario && s.pap > 0) return { fill: dark ? C.florestaClara : C.floresta, op: local(s.pap) * 0.85 };
-    if (p.mode === 'existing' && s.existing > 0) return { fill: C.areia, op: local(s.existing) * 0.8 };
+    if (p.onDemand && s.pap > 0) return { fill: dark ? C.florestaClara : C.floresta, op: local(s.pap) * 0.85 };
+    if (p.existing && s.existing > 0) return { fill: C.areia, op: local(s.existing) * 0.8 };
     return { fill: 'transparent', op: 0 };
   };
 

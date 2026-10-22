@@ -20,7 +20,7 @@ Consultado a 19 de outubro de 2026. Fontes em [Fontes](fontes.md).
 1. A Sasia diz-se "relativamente preparada" para o aumento de volume, mas "o grande volume de pós-consumo não chegará de imediato", e as câmaras é que triam: **o trabalho da empresa só muda na fase de reciclagem** [F23].
 2. O Wippytex admite: "não sabemos se vamos conseguir reciclar toda esta quantidade de têxtil" [F23].
 
-**Cálculo nosso, para dimensionar:** 2 000 t por mês são 24 000 t por ano. O têxtil que Guimarães ainda deita ao lixo (≈ 2 324,8 t por ano, 43 051 t de RSU × 5,4%, estimativa) é **cerca de 9,7%** dessa capacidade (2 324,8 ÷ 24 000). A capacidade não é o gargalo; é a **qualidade e a homogeneidade** do que chega. E a Vitrus diz que reciclar custa muito mais que a fibra virgem (21 out 2026): o valor está na reutilização.
+**Cálculo nosso, para dimensionar:** 2 000 t por mês são 24 000 t por ano. O têxtil que Guimarães ainda deita ao lixo (≈ 3 003,3 t por ano, 51 250,6 t de indiferenciado do concelho × 5,86%, estimativa) é **cerca de 12,5%** dessa capacidade (3 003,3 ÷ 24 000). A capacidade não é o gargalo; é a **qualidade e a homogeneidade** do que chega. E a Vitrus diz que reciclar custa muito mais que a fibra virgem (21 out 2026): o valor está na reutilização.
 
 **Limite técnico da reciclagem mecânica:** uma fonte de recicladores refere que só entram cerca de 15 a 20% de fibra reciclada num fio sem perda de qualidade [F36]. Por isso os lotes de uma só fibra valem mais.
 
@@ -51,9 +51,10 @@ A [Fibrenamics](https://fibrenamics.com) [F41] é o centro de inovação em mate
 | Têxtil recolhido por 4 entidades em 2025 | 301,3 t | Dados da Vitrus | Dado Vitrus |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Dados da Vitrus | Dado Vitrus |
 | Só 4 de 27 operadores licenciados na zona valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar** com a Vitrus; fonte pública: Plano de Ação Integrado (URBACT), p. 32 [F74] |
-| Têxtil no RSU | 5,4% | APA, indicado pela Vitrus (21 out 2026) | Dado Vitrus. Aplica-se às 43 051 t de RSU de 2025. Uma declaração do diretor de ambiente fala em cerca de 11% da composição física, o que pode ser outra métrica |
+| Têxtil no indiferenciado | 5,86% | APA, RARU 2025, p. 24, indicado pela Vitrus (22 out 2026) | Primária. Aplica-se ao indiferenciado do concelho todo (≈ 51 250,6 t em 2025); antes 5,4% sobre 43 051 t (21 out). Uma declaração do diretor de ambiente fala em cerca de 11% da composição física, o que pode ser outra métrica |
 | Preço a que a Vitrus vende cada fração | n/d | Perguntar | Por obter |
-| Custos de recolha, quilómetro e contentor | n/d | Pedidos ao departamento financeiro da Vitrus (21 out) | Por obter |
+| Custos por hora e por quilómetro das viaturas | n/d | Pedidos ao departamento financeiro da Vitrus (21 out; ainda por chegar a 22 out) | Por obter |
+| Tratamento do indiferenciado em aterro | 105,64 €/t (40 €/t de TGR + 65,64 €/t da Resinorte) | Vitrus (22 out 2026) | Dado Vitrus |
 
 ## Segunda mão e economia social
 

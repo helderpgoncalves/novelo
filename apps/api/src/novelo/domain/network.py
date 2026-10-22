@@ -5,7 +5,11 @@ Fórmulas e pressupostos: docs/engenharia/dados-e-modelo.md.
   procura da zona         D_z = P_z · q · 12 / 1000                (t/ano)
   têxtil captado          C_z,m = D_z · c_m · f_m                  (t/ano)
   custo anual da opção    capex/N + recolhas · c_recolha + km · c_km
+  viatura dedicada        ⌈horas ÷ horas de uma viatura⌉ · (capex da viatura ÷ vida útil)
   custo por tonelada      custo anual total / toneladas captadas
+
+Toda a recolha é feita por uma viatura NOVA, dedicada ao têxtil e sem compactação, a partir do estaleiro (Vitrus,
+22 out 2026: o saco não pode ir na compactadora do porta a porta). Ver `domain/fleet.py`.
 
 Cada zona (freguesia) escolhe uma COMBINAÇÃO de modos (ou nenhum). Os canais captam de forma independente,
 por isso o têxtil captado por uma combinação S é
@@ -13,7 +17,7 @@ por isso o têxtil captado por uma combinação S é
   C_z,S = D_z · (1 − Π_{m∈S} (1 − c_m · f_m))
 
 e os custos somam. É um problema de escolha múltipla com orçamento, que o CP-SAT do OR-Tools resolve de
-forma exata para as 48 freguesias de Guimarães.
+forma exata para as 48 freguesias de Guimarães, com o número de viaturas dedicadas como variável inteira.
 """
 
 from __future__ import annotations
@@ -27,12 +31,14 @@ from typing import Literal
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 from ortools.sat.python import cp_model
 
+from novelo.domain import fleet
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.geo import haversine_km
 from novelo.domain.vocab import CollectionMode as Mode
 
 SCALE_T = 1000  # toneladas -> quilogramas inteiros no solver
 SCALE_EUR = 100  # euros -> cêntimos inteiros no solver
+SCALE_H = 100  # horas -> centésimas de hora no solver
 
 
 @dataclass(frozen=True)
@@ -43,28 +49,35 @@ class ModeParams:
     people_per_point: int  # 1 ponto por cada N habitantes (mínimo `min_points`)
     min_points: int
     lifetime_years: float
-    collections_per_year: float  # recolhas por ano de cada ponto (ou pedidos médios, no modo a pedido)
+    collections_per_year: float  # recolhas por ano de cada ponto (o modo a pedido usa `on_demand_every_weeks`)
 
 
 @dataclass(frozen=True)
 class Params:
     kg_per_inhab_month: float
     modes: dict[Mode, ModeParams]
-    cost_per_collection_eur: float  # custo de uma recolha num ponto (tripulação e tempo)
+    cost_per_collection_eur: float  # custo de uma recolha num ponto ou de um saco à porta (tripulação e tempo)
     cost_per_km_eur: float
     detour_factor: float  # estrada real / linha reta
     on_demand_kg_per_pickup: float
-    piggyback_extra_km: float  # desvio médio quando já passa um circuito
-    piggyback_min_days: int  # dias/semana de circuito para a recolha a pedido "aproveitar" a rota
-    vehicle_capacity_t: float
+    vehicle_capacity_t: float  # carga útil da viatura dedicada
     depot: tuple[float, float]
-    # Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem; 0 km novos).
-    # None = o custo de uma recolha normal (`cost_per_collection_eur`).
-    pap_cost_per_pickup_eur: float | None = None
+    # Viatura dedicada ao têxtil, sem compactação (Vitrus, 22 out 2026). Valores por omissão = sem viatura a pagar,
+    # para os testes de fórmulas; os pressupostos do simulador vêm de `features/planning/params.py`.
+    on_demand_every_weeks: float = 2.0  # uma ronda porta a porta por freguesia a cada N semanas
+    vehicle_capex_eur: float = 0.0
+    vehicle_lifetime_years: float = 8.0
+    vehicle_speed_kmh: float = 30.0
+    door_stop_minutes: float = 2.0  # paragem para levar um saco à porta
+    site_stop_minutes: float = 10.0  # paragem num local (ponto existente ou contentor)
+    shift_hours: float = 7.0  # horas úteis de um turno da viatura
 
     @property
-    def pap_pickup_eur(self) -> float:
-        return self.cost_per_collection_eur if self.pap_cost_per_pickup_eur is None else self.pap_cost_per_pickup_eur
+    def vehicle_annual_eur(self) -> float:
+        return fleet.annuity_eur(self.vehicle_capex_eur, self.vehicle_lifetime_years)
+
+    def stop_minutes(self, mode: Mode) -> float:
+        return self.door_stop_minutes if mode == Mode.ON_DEMAND else self.site_stop_minutes
 
 
 @dataclass(frozen=True)
@@ -74,9 +87,9 @@ class Zone:
     population: int
     lat: float
     lon: float
-    service_days: int  # dias por semana em que já passa um circuito da Vitrus (0 a 7)
+    service_days: int  # dias por semana em que já passa um circuito de indiferenciado da Vitrus (0 a 7)
     existing_points: int | None = None  # contentores têxteis ativos já na freguesia (None = sem dados)
-    door_to_door: bool = False  # passa lá um circuito porta a porta com viatura: a recolha a pedido vai nele
+    area_km2: float | None = None  # área da freguesia (CAOP 2019): volta da viatura porta a porta
 
 
 @dataclass(frozen=True)
@@ -91,7 +104,10 @@ class ModeCost:
     opex_eur_year: float  # recolhas + km (estimativa radial, usada na escolha)
     annual_cost_eur: float  # capex anualizado + opex
     km_year: float
-    collections_year: float
+    collections_year: float  # paragens por ano: recolhas nos pontos ou sacos à porta
+    hours_year: float = 0.0  # horas da viatura dedicada
+    rounds_year: float = 0.0  # rondas por ano (todas as paragens da zona numa ronda)
+    trips_per_round: int = 0  # viagens ao estaleiro numa ronda (carga acima da capacidade)
 
 
 @dataclass(frozen=True)
@@ -119,15 +135,24 @@ class Option:
     def km_year(self) -> float:
         return sum(p.km_year for p in self.parts)
 
+    @property
+    def hours_year(self) -> float:
+        return sum(p.hours_year for p in self.parts)
+
 
 def zone_demand_t(zone: Zone, params: Params) -> float:
     return yearly_demand_t(zone.population, params.kg_per_inhab_month)
 
 
 def radial_km(zone: Zone, params: Params) -> float:
-    """Ida e volta ao depósito, em estrada (linha reta x desvio)."""
+    """Ida e volta ao estaleiro, em estrada (linha reta x desvio)."""
     d = haversine_km(params.depot[0], params.depot[1], zone.lat, zone.lon)
     return 2 * d * params.detour_factor
+
+
+def part_hours(mode: Mode, km_year: float, stops_year: float, params: Params) -> float:
+    """Horas por ano da viatura dedicada num canal: km ÷ velocidade + paragens · minutos ÷ 60."""
+    return fleet.hours(km_year, stops_year, params.vehicle_speed_kmh, params.stop_minutes(mode))
 
 
 def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
@@ -138,16 +163,16 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
     round_trip = radial_km(zone, params)
 
     if mode == Mode.ON_DEMAND:
+        # Saco fechado à porta, recolhido pela viatura dedicada numa ronda por freguesia a cada N semanas.
         pickups = tonnes * 1000 / params.on_demand_kg_per_pickup
-        if zone.door_to_door:
-            # (i) No circuito porta a porta: o saco vai na viatura que já passa à porta, 0 km novos.
-            km = 0.0
-            opex = pickups * params.pap_pickup_eur
-        else:
-            # (ii) A pedido com desvio: pequeno desvio onde já passa um circuito, senão ida e volta ao depósito.
-            piggyback = zone.service_days >= params.piggyback_min_days
-            km = pickups * (params.piggyback_extra_km if piggyback else round_trip)
-            opex = pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur
+        rounds = fleet.rounds_per_year(params.on_demand_every_weeks) if tonnes > 0 else 0.0
+        trips = 0
+        km = 0.0
+        if rounds:
+            trips = fleet.trips_per_round(tonnes * 1000 / rounds, params.vehicle_capacity_t * 1000)
+            tour = fleet.tour_km(pickups / rounds, zone.area_km2, params.detour_factor)
+            km = rounds * (trips * round_trip + tour)
+        opex = pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur
         return ModeCost(
             mode=mode,
             points=0,
@@ -158,6 +183,9 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
             annual_cost_eur=opex,
             km_year=km,
             collections_year=pickups,
+            hours_year=part_hours(mode, km, pickups, params),
+            rounds_year=rounds,
+            trips_per_round=trips,
         )
 
     if mode == Mode.EXISTING and zone.existing_points:
@@ -179,6 +207,9 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
         annual_cost_eur=capex / mp.lifetime_years + opex,
         km_year=km,
         collections_year=collections,
+        hours_year=part_hours(mode, km, collections, params),
+        rounds_year=mp.collections_per_year,
+        trips_per_round=1 if mp.collections_per_year > 0 else 0,
     )
 
 
@@ -218,6 +249,18 @@ def build_options(
     return options
 
 
+@dataclass(frozen=True)
+class FleetCost:
+    """Viaturas dedicadas no MIP: custo anual de cada uma e horas úteis por ano."""
+
+    annual_eur_per_vehicle: float
+    hours_per_vehicle_year: float
+
+
+def fleet_cost(params: Params) -> FleetCost:
+    return FleetCost(params.vehicle_annual_eur, fleet.hours_per_vehicle_year(params.shift_hours))
+
+
 Objective = Literal["max_tonnes", "min_cost"]
 
 
@@ -226,6 +269,7 @@ class SolveResult:
     chosen: list[Option]
     status: Literal["optimal", "feasible", "infeasible"]
     objective: Objective
+    vehicles: int = 0  # viaturas dedicadas que o MIP pagou (as horas reais, depois do VRP, podem pedir menos)
 
 
 def solve(
@@ -236,11 +280,16 @@ def solve(
     target_tonnes: float | None = None,
     time_limit_s: float = 20.0,
     seed: int = 7,
+    vehicles: FleetCost | None = None,
 ) -> SolveResult:
     """Escolhe no máximo um modo por zona.
 
     - `max_tonnes`: maximiza as toneladas com custo anual total <= `budget_eur_year`.
     - `min_cost`: minimiza o custo anual total garantindo toneladas >= `target_tonnes`.
+
+    Com `vehicles`, o número de viaturas dedicadas `V` é uma variável inteira: as horas das opções escolhidas cabem em
+    `V · horas de uma viatura`, há pelo menos uma viatura logo que se recolha alguma coisa, e o custo soma `V · custo
+    anual de uma viatura`.
     """
     model = cp_model.CpModel()
     pick = {i: model.new_bool_var(f"x{i}") for i in range(len(options))}
@@ -254,6 +303,18 @@ def solve(
     cost = [round(o.annual_cost_eur * SCALE_EUR) for o in options]
     total_t = sum(tonnes[i] * pick[i] for i in pick)
     total_c = sum(cost[i] * pick[i] for i in pick)
+
+    v_var: cp_model.IntVar | None = None
+    if vehicles is not None and options:
+        h_unit = max(1, round(vehicles.hours_per_vehicle_year * SCALE_H))
+        by_zone_max = sum(max(options[i].hours_year for i in idx) for idx in by_zone.values())
+        upper = max(1, math.ceil(by_zone_max * SCALE_H / h_unit))
+        v_var = model.new_int_var(0, upper, "vehicles")
+        hours = [round(o.hours_year * SCALE_H) for o in options]
+        model.add(sum(hours[i] * pick[i] for i in pick) <= h_unit * v_var)
+        for var in pick.values():
+            model.add(v_var >= 1).only_enforce_if(var)
+        total_c = total_c + round(vehicles.annual_eur_per_vehicle * SCALE_EUR) * v_var
 
     if objective == "max_tonnes":
         if budget_eur_year is None:
@@ -276,7 +337,8 @@ def solve(
     if status not in (cp_model.OPTIMAL, cp_model.FEASIBLE):
         return SolveResult([], "infeasible", objective)
     chosen = [options[i] for i in pick if solver.value(pick[i])]
-    return SolveResult(chosen, "optimal" if status == cp_model.OPTIMAL else "feasible", objective)
+    n_vehicles = int(solver.value(v_var)) if v_var is not None else 0
+    return SolveResult(chosen, "optimal" if status == cp_model.OPTIMAL else "feasible", objective, n_vehicles)
 
 
 # --- Rotas (VRP) -----------------------------------------------------------------------------------------------
@@ -312,9 +374,15 @@ def plan_routes(
     max_vehicles: int = 6,
     time_limit_s: int = 5,
 ) -> RoutePlan:
-    """VRP com capacidade: quantos camiões e que ordem, minimizando os quilómetros de uma ronda."""
+    """VRP com capacidade: quantas viagens e que ordem, minimizando os quilómetros de uma ronda.
+
+    Cada "veículo" do VRP é uma viagem a partir do estaleiro (a mesma viatura dedicada pode fazer várias, em dias
+    diferentes); há sempre viagens suficientes para a carga da ronda.
+    """
     if not stops:
         return RoutePlan([], 0.0)
+    total_load = sum(s.load_t for s in stops)
+    max_vehicles = max(max_vehicles, math.ceil(total_load / params.vehicle_capacity_t) + 2)
     nodes = [(params.depot[0], params.depot[1]), *[(s.lat, s.lon) for s in stops]]
     # Distâncias em metros inteiros (o solver só trabalha com inteiros), com o desvio da estrada.
     dist = [[round(haversine_km(a[0], a[1], b[0], b[1]) * params.detour_factor * 1000) for b in nodes] for a in nodes]

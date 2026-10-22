@@ -11,9 +11,9 @@ Consultado a 19 de outubro de 2026. Fontes em [Fontes](fontes.md).
 | Têxtil recolhido em 2025 (4 entidades) | 301,3 t | Dado Vitrus |
 | População | 156 830 habitantes | INE, Censos 2021 (soma das freguesias) |
 | Recolha por habitante | **1,92 kg/hab/ano** (0,16 kg/hab/mês) | Cálculo nosso: 301 300 kg ÷ 156 830 |
-| Têxtil que ainda vai para o lixo | ≈ 2 324,8 t/ano = 14,82 kg/hab/ano | Cálculo nosso: 43 051 t de RSU (Vitrus) × 5,4% (APA, indicado pela Vitrus); estimativa (ver [registo](registo-de-afirmacoes.md), A8) |
-| Têxtil gerado | ≈ 2 626,0 t/ano = 16,74 kg/hab/ano | Cálculo nosso: 2 324,8 + 301,3; estimativa |
-| Captura atual | 11,5% | Cálculo nosso: 301,3 ÷ 2 626,0; estimativa |
+| Têxtil que ainda vai para o lixo | ≈ 3 003,3 t/ano = 19,15 kg/hab/ano | Cálculo nosso: 51 250,6 t de indiferenciado do concelho (Vitrus) × 5,86% (APA, indicado pela Vitrus a 22 out 2026); estimativa (ver [registo](registo-de-afirmacoes.md), A8) |
+| Têxtil gerado | ≈ 3 304,6 t/ano = 21,07 kg/hab/ano | Cálculo nosso: 3 003,3 + 301,3; estimativa |
+| Captura atual | 9,1% | Cálculo nosso: 301,3 ÷ 3 304,6; estimativa |
 
 ## Tabela comparativa
 
@@ -40,7 +40,7 @@ Contas nossas, sobre números verificados, para mostrar a ordem de grandeza (nã
 | Catalunha | 2,7 | ≈ 423 | + 122 t |
 | França 2024 | 4,27 | **≈ 670** | **+ 369 t (2,2 vezes)** |
 | UE-27 média | 4,4 | ≈ 690 | + 389 t |
-| Têxtil gerado (Vitrus e APA, estimativa) | 16,74 | ≈ 2 626 | + 2 324,8 t |
+| Têxtil gerado (Vitrus e APA, estimativa) | 21,07 | ≈ 3 305 | + 3 003,3 t |
 
 Com a densidade francesa (1 ponto por 1 414 habitantes), Guimarães teria **cerca de 111 pontos de recolha de têxteis** (156 830 ÷ 1 414). Não há parque de contentores de têxteis para comparar: a Vitrus não os tem nem os quer (21 de outubro de 2026), porque o têxtil de contentor vem contaminado. A referência francesa é de contentores; serve para comparar a ambição em kg/hab, não para copiar o modelo.
 

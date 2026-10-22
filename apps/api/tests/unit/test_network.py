@@ -1,4 +1,4 @@
-from dataclasses import replace
+import math
 
 import pytest
 
@@ -11,11 +11,12 @@ from novelo.domain.network import (
     Zone,
     build_option,
     build_options,
+    fleet_cost,
     plan_routes,
     solve,
 )
 
-DEPOT = (41.4425, -8.2918)  # Guimarães
+DEPOT = (41.4425, -8.2918)  # ponto de referência dos testes (o estaleiro real está em Polvoreira)
 
 
 def params(**overrides: object) -> Params:
@@ -30,15 +31,13 @@ def params(**overrides: object) -> Params:
         "cost_per_km_eur": 1.1,
         "detour_factor": 1.3,
         "on_demand_kg_per_pickup": 25.0,
-        "piggyback_extra_km": 1.5,
-        "piggyback_min_days": 2,
         "vehicle_capacity_t": 4.0,
         "depot": DEPOT,
     }
     return Params(**{**base, **overrides})  # type: ignore[arg-type]
 
 
-URBAN = Zone("urb", "Urbana", 10_000, 41.4425, -8.2918, service_days=7)  # no depósito: 0 km
+URBAN = Zone("urb", "Urbana", 10_000, 41.4425, -8.2918, service_days=7, area_km2=4.0)  # no estaleiro: 0 km
 RURAL = Zone("rur", "Rural", 1_000, 41.5025, -8.2918, service_days=1)  # ~6,67 km a norte
 
 
@@ -73,15 +72,61 @@ def test_combined_modes_capture_independently_and_costs_add_up() -> None:
     assert combo.modes == (Mode.STREET, Mode.ON_DEMAND)
 
 
-def test_on_demand_piggybacks_only_where_a_circuit_already_passes() -> None:
-    p = params()
+def test_on_demand_is_a_round_of_the_dedicated_vehicle_every_n_weeks() -> None:
+    p = params()  # uma ronda a cada 2 semanas: 26 rondas por ano
     urban = build_option(URBAN, (Mode.ON_DEMAND,), p).parts[0]
+    # urbana: 84 · 0,09 · 0,6 = 4,536 t -> 181,44 sacos/ano, 6,97846 por ronda; 174,46 kg por ronda: 1 viagem
+    # volta na freguesia = 0,7124 · √(6,97846 · 4 km²) · 1,3 = 4,89307 km; ida e volta 0 (no estaleiro)
+    assert (urban.rounds_year, urban.trips_per_round) == (26.0, 1)
+    assert urban.km_year == pytest.approx(26 * 0.7124 * (181.44 / 26 * 4.0) ** 0.5 * 1.3)
+    assert urban.km_year == pytest.approx(127.22, abs=0.01)
+    # custo = 181,44 sacos · 6 € + 127,22 km · 1,1 € = 1 088,64 + 139,94 = 1 228,58 €
+    assert urban.annual_cost_eur == pytest.approx(1088.64 + urban.km_year * 1.1)
+    # horas = 127,22 km ÷ 30 km/h + 181,44 sacos · 2 min ÷ 60 = 4,2407 + 6,048 = 10,289 h
+    assert urban.hours_year == pytest.approx(urban.km_year / 30 + 6.048)
+    # rural, sem área: só a ida e volta (2 · 6,6717 km · 1,3 = 17,346 km) em cada uma das 26 rondas
     rural = build_option(RURAL, (Mode.ON_DEMAND,), p).parts[0]
-    # urbana: 84 · 0,09 · 0,6 = 4,536 t -> 181,44 pedidos, 1,5 km cada
-    assert urban.km_year == pytest.approx(181.44 * 1.5)
-    # rural (1 dia/semana < 2): viagem dedicada, ida e volta ~13,34 km x 1,3 de desvio
-    assert rural.km_year / rural.collections_year == pytest.approx(2 * 6.6717 * 1.3, rel=0.01)
+    assert rural.km_year == pytest.approx(26 * 2 * 6.6717 * 1.3, rel=1e-3)
     assert rural.capex_eur == 0 and urban.capex_eur == 0
+
+
+def test_on_demand_round_above_capacity_goes_back_to_the_depot() -> None:
+    # rural: 0,4536 t / 26 rondas = 17,45 kg por ronda; com 10 kg de capacidade são 2 viagens por ronda
+    one = build_option(RURAL, (Mode.ON_DEMAND,), params()).parts[0]
+    two = build_option(RURAL, (Mode.ON_DEMAND,), params(vehicle_capacity_t=0.01)).parts[0]
+    assert (one.trips_per_round, two.trips_per_round) == (1, 2)
+    assert two.km_year == pytest.approx(2 * one.km_year)
+
+
+def test_rounds_every_four_weeks_halve_the_km() -> None:
+    # 13 rondas em vez de 26: a ida e volta conta metade das vezes (a volta na freguesia cresce com √2 por ronda)
+    two = build_option(RURAL, (Mode.ON_DEMAND,), params()).parts[0]
+    four = build_option(RURAL, (Mode.ON_DEMAND,), params(on_demand_every_weeks=4.0)).parts[0]
+    assert four.rounds_year == 13.0 and four.km_year == pytest.approx(two.km_year / 2)
+    assert four.collections_year == two.collections_year  # os mesmos sacos
+
+
+def test_site_hours_use_the_site_stop_minutes() -> None:
+    # local existente na urbana: ceil(10 000 / 4 000) = 3 pontos · 26 = 78 paragens · 10 min = 13 h; 0 km
+    existing = build_option(URBAN, (Mode.EXISTING,), params()).parts[0]
+    assert existing.hours_year == pytest.approx(13.0)
+
+
+def test_the_dedicated_vehicle_is_paid_once_the_network_collects_anything() -> None:
+    p = params(vehicle_capex_eur=8000.0, vehicle_lifetime_years=8.0)  # 1 000 €/ano por viatura
+    options = build_options([URBAN, RURAL], p)
+    fleet = fleet_cost(p)
+    assert (fleet.annual_eur_per_vehicle, fleet.hours_per_vehicle_year) == (1000.0, 7 * 5 * 52)
+    # 900 € não chegam para a viatura: não se recolhe nada
+    assert solve(options, "max_tonnes", budget_eur_year=900.0, vehicles=fleet).chosen == []
+    # sem limite: uma viatura chega (as horas ficam muito abaixo de 1 820 h)
+    unlimited = solve(options, "max_tonnes", budget_eur_year=1e9, vehicles=fleet)
+    assert unlimited.vehicles == 1 and sum(o.hours_year for o in unlimited.chosen) < 1820
+    # com turnos de 6 minutos (26 h/ano por viatura) as horas pedem mais viaturas: ⌈horas ÷ 26⌉
+    short = fleet_cost(params(vehicle_capex_eur=8000.0, shift_hours=0.1))
+    many = solve(options, "max_tonnes", budget_eur_year=1e9, vehicles=short)
+    hours = sum(o.hours_year for o in many.chosen)
+    assert many.vehicles == math.ceil(hours / 26)
 
 
 def test_max_tonnes_respects_the_budget_and_prefers_cheaper_tonnes() -> None:
@@ -146,23 +191,3 @@ def test_vrp_splits_by_capacity_and_visits_every_stop() -> None:
 
 def test_vrp_without_stops_is_empty() -> None:
     assert plan_routes([], params()).routes == []
-
-
-def test_on_demand_rides_the_door_to_door_circuit_with_zero_new_km() -> None:
-    # urbana com PAP: 4,536 t -> 4 536 / 25 = 181,44 recolhas; 0 km; custo = 181,44 · 2 € = 362,88 €
-    p = params(pap_cost_per_pickup_eur=2.0)
-    pap = build_option(replace(URBAN, door_to_door=True), (Mode.ON_DEMAND,), p).parts[0]
-    assert pap.km_year == 0.0 and pap.collections_year == pytest.approx(181.44)
-    assert pap.annual_cost_eur == pytest.approx(362.88)
-    # rural com PAP: nem o desvio de 1 dia/semana conta (a viatura já passa à porta)
-    rural = build_option(replace(RURAL, door_to_door=True), (Mode.ON_DEMAND,), p).parts[0]
-    assert rural.km_year == 0.0
-    # mesma captura com e sem PAP: só o custo muda
-    assert pap.capture == build_option(URBAN, (Mode.ON_DEMAND,), p).parts[0].capture
-
-
-def test_door_to_door_pickup_defaults_to_the_cost_of_a_collection() -> None:
-    # sem pressuposto próprio, cada recolha PAP custa o mesmo que uma recolha: 181,44 · 6 € = 1 088,64 €
-    pap = build_option(replace(URBAN, door_to_door=True), (Mode.ON_DEMAND,), params()).parts[0]
-    assert pap.annual_cost_eur == pytest.approx(1088.64)
-    assert params().pap_pickup_eur == 6.0 and params(pap_cost_per_pickup_eur=0.0).pap_pickup_eur == 0.0

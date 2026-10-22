@@ -1,13 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import {
-  ArrowRight,
-  Building2,
-  FlaskConical,
-  MapPin,
-  Route as RouteIcon,
-  Truck,
-} from 'lucide-react';
+import { ArrowRight, Building2, FlaskConical, MapPin, ShoppingBag, Truck } from 'lucide-react';
 import type { ReactNode } from 'react';
 import type { ScenarioOut } from '@/client';
 import {
@@ -64,8 +57,8 @@ function useReferenceScenarioId() {
 const eurPerTonne = (v: number) => `${formatNumber(v, 0)} €/t`;
 
 /**
- * O plano num relance: o cenário de referência sem contentores (porta a porta onde o circuito já passa, locais
- * existentes, a pedido), o que custa com incerteza e o próximo passo (o piloto). Todos os números vêm da API.
+ * O plano num relance: o cenário de referência sem contentores, com uma viatura nova de têxtil (saco fechado à porta,
+ * locais existentes), o que custa com incerteza e o próximo passo (o piloto). Todos os números vêm da API.
  */
 export function PlanStory() {
   const ref = useReferenceScenarioId();
@@ -148,12 +141,17 @@ function PlanBody({ scenario }: { scenario: ScenarioOut }) {
               <dt className="text-muted-foreground text-xs">{m.home_plan_capex()}</dt>
               <dd className="font-medium tabular-nums">{formatEur(kpis.capex_eur)}</dd>
             </div>
-            <div>
-              <dt className="text-muted-foreground text-xs">{m.home_plan_new_km()}</dt>
-              <dd className="font-medium tabular-nums">
-                {m.home_plan_new_km_value({ km: formatNumber(channels.doorToDoor.newKm, 0) })}
-              </dd>
-            </div>
+            {kpis.net_annual_cost_eur != null && (
+              <div>
+                <dt className="text-muted-foreground text-xs">{m.home_plan_net()}</dt>
+                <dd className="font-medium tabular-nums">
+                  {m.home_plan_net_value({
+                    eur: formatEur(kpis.net_annual_cost_eur),
+                    eurt: kpis.net_eur_per_tonne != null ? eurPerTonne(kpis.net_eur_per_tonne) : '',
+                  })}
+                </dd>
+              </div>
+            )}
           </dl>
           <div className="flex flex-wrap gap-2">
             <Button asChild className="h-10 gap-2">
@@ -174,19 +172,39 @@ function PlanBody({ scenario }: { scenario: ScenarioOut }) {
 
 function Channels({ channels }: { channels: PlanChannels }) {
   const b2b = useQuery({ ...getB2bChannelOptions(), staleTime: 10 * 60_000 });
-  const { doorToDoor, existing, detour } = channels;
+  const { doorBag, existing, vehicle } = channels;
   return (
     <ul className="space-y-3">
-      <Channel
-        icon={<Truck className="size-4" aria-hidden="true" />}
-        highlight
-        title={m.home_plan_pap_title()}
-        value={m.home_plan_pap_value({
-          n: doorToDoor.parishes,
-          tonnes: formatTonnes(doorToDoor.tonnes, 0),
-        })}
-        text={m.home_plan_pap_text({ circuits: doorToDoor.circuits })}
-      />
+      {vehicle.vehicles > 0 && (
+        <Channel
+          icon={<Truck className="size-4" aria-hidden="true" />}
+          highlight
+          title={m.home_plan_vehicle_title()}
+          value={
+            vehicle.vehicles > 1
+              ? m.home_plan_vehicle_value_many({
+                  n: vehicle.vehicles,
+                  days: formatNumber(vehicle.daysPerWeek, 1),
+                })
+              : m.home_plan_vehicle_value_one({ days: formatNumber(vehicle.daysPerWeek, 1) })
+          }
+          text={m.home_plan_vehicle_text({ capex: formatEur(vehicle.capexEur) })}
+        />
+      )}
+      {doorBag.parishes > 0 && (
+        <Channel
+          icon={<ShoppingBag className="size-4" aria-hidden="true" />}
+          title={m.home_plan_pap_title()}
+          value={m.home_plan_pap_value({
+            n: doorBag.parishes,
+            tonnes: formatTonnes(doorBag.tonnes, 0),
+          })}
+          text={m.home_plan_pap_text({
+            weeks: formatNumber(doorBag.everyWeeks ?? 2),
+            km: `${formatNumber(doorBag.km, 0)} km`,
+          })}
+        />
+      )}
       {existing.points > 0 && (
         <Channel
           icon={<MapPin className="size-4" aria-hidden="true" />}
@@ -196,17 +214,6 @@ function Channels({ channels }: { channels: PlanChannels }) {
             tonnes: formatTonnes(existing.tonnes, 0),
           })}
           text={m.home_plan_existing_text()}
-        />
-      )}
-      {detour.parishes > 0 && (
-        <Channel
-          icon={<RouteIcon className="size-4" aria-hidden="true" />}
-          title={m.home_plan_detour_title()}
-          value={m.home_plan_detour_value({
-            n: detour.parishes,
-            tonnes: formatTonnes(detour.tonnes, 0),
-          })}
-          text={m.home_plan_detour_text()}
         />
       )}
       {b2b.data && b2b.data.sites > 0 && (

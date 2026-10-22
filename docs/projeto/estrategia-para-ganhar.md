@@ -21,11 +21,11 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 1. **Dados reais em todo o lado:** 301,3 t, destino de cada tonelada, 40 circuitos, 29 viaturas, população do INE.
 2. **Honestidade sobre a incerteza:** os custos unitários ainda são pressupostos; mostramos o intervalo e o que mais pesa (feito: tornado e Monte Carlo).
 3. **IA com disciplina:** conduz o otimizador e **nunca faz contas**; um verificador rejeita números inventados.
-4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes", determinados com as autoridades locais (art. 22.º-A, n.º 7 e 12), e exige cobertura do território todo por população, densidade, volume previsto e proximidade, sem se limitar às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o: no de 60 000 €/ano, 68,8% da população servida fora das freguesias urbanas, contra 76,0% nas urbanas (estimativa).
+4. **Tese regulatória sólida:** hoje o município paga sozinho; a diretiva só admite custos "economicamente eficientes", determinados com as autoridades locais (art. 22.º-A, n.º 7 e 12), e exige cobertura do território todo por população, densidade, volume previsto e proximidade, sem se limitar às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o: no de 60 000 €/ano, 60,2% da população servida fora das freguesias urbanas, contra 73,9% nas urbanas (estimativa).
 5. **Cadeia completa, do saco ao fio:** recolha, triagem, lote com passaporte, bolsa de fibra, relatório RAP.
 6. **Pedido concreto:** piloto de 3 meses em duas freguesias com KPIs e piso de sinal (feito).
 
-**O que ainda nos falta** (por ordem): custos unitários da Vitrus (pedidos ao departamento financeiro a 21 de outubro); o texto das Regras (os quatro critérios e pesos já são conhecidos, falta o detalhe de cada um); uma frase de um reciclador; exatidão medida da triagem. Resolvido a 21 de outubro: a procura passa a 43 051 t de RSU × 5,4% (APA) = 2 324,8 t por ano ainda no lixo (estimativa), e não há contentores de têxteis (a Vitrus não os quer).
+**O que ainda nos falta** (por ordem): custos por hora e por km das viaturas (pedidos ao departamento financeiro a 21 de outubro, ainda por chegar a 22); o texto das Regras (os quatro critérios e pesos já são conhecidos, falta o detalhe de cada um); uma frase de um reciclador; exatidão medida da triagem. Resolvido a 21 de outubro: não há contentores de têxteis (a Vitrus não os quer). Resolvido a 22 de outubro: a procura passa ao indiferenciado do concelho todo × 5,86% (APA) ≈ 3 003 t por ano ainda no lixo (estimativa); o saco não pode ir no compactador e não há viaturas livres, por isso a rede usa uma viatura de têxtil nova; o tratamento evitado vale 105,64 €/t; o depósito é em Polvoreira.
 
 **A única regra que não se pode violar:** nenhum número vai para o palco sem estar no [registo](../pesquisa/registo-de-afirmacoes.md) com o seu estado.
 
@@ -37,12 +37,12 @@ Documento mestre para o Hack4Guimarães 2035 (Desafio 5, TexVitrus). Escrito a 1
 
 | Parte da pergunta | O que significa | Como respondemos |
 | --- | --- | --- |
-| "serviço de recolha seletiva" | Um serviço, não um equipamento | Rede de modos combináveis: locais existentes onde a viatura já passa, sem contentor novo, e recolha a pedido nos circuitos porta a porta |
+| "serviço de recolha seletiva" | Um serviço, não um equipamento | Uma viatura de têxtil nova, sem compactação: saco fechado à porta num dia fixo por freguesia e paragens nos locais municipais e nas escolas, sem contentor novo |
 | "garanta material reutilizável e reciclável" | Qualidade à entrada | Triagem assistida e lotes por composição e estado; toneladas reutilizáveis em cada cenário, porque a qualidade depende de quem recolhe (em 2025, 72,9% de reutilização na Ultriplo, 9,2% no têxtil recolhido pela Vitrus; A19) |
-| "menor investimento" | CAPEX | Sem contentores de têxtil: locais existentes sem contentor novo; recolha a pedido nos circuitos atuais, sem km novos |
-| "menor custo de operação" | OPEX | Otimizador de rotas sobre circuitos e viaturas atuais; numa tarde de dia útil cerca de 15 das 29 viaturas não têm circuito, plano B para o saco não ir no compactador (a validar com a Vitrus; A20) |
+| "menor investimento" | CAPEX | Sem contentores de têxtil: uma só viatura nova (o "meio novo de recolha" que a Vitrus indicou) e locais existentes, sem contentor novo |
+| "menor custo de operação" | OPEX | Otimizador de rotas para a viatura de têxtil, a partir do depósito de Polvoreira; o tratamento evitado (105,64 €/t, Vitrus; A25) paga parte da operação |
 | "menor" (as duas coisas) | Comparar | Simulador com orçamento, cenários e €/t |
-| "dados disponíveis" | Usá-los | Todos usados; não há contentores de têxteis (Vitrus, 21 out); caracterização: 5,4% da APA indicado pela Vitrus |
+| "dados disponíveis" | Usá-los | Todos usados; não há contentores de têxteis (Vitrus, 21 out); caracterização: 5,86% da APA (2025) indicado pela Vitrus (22 out) |
 
 **Os três caminhos sugeridos são a mesma cadeia**, não alternativas:
 
@@ -123,7 +123,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 | --- | --- | --- | --- | --- | --- |
 | **Inovação e originalidade** (25%) | Uma ideia que não seja a solução óbvia (a app do cidadão, mais contentores); IA com sentido; uma ligação nova entre peças | A IA conduz o otimizador e um verificador rejeita números fora do resultado; a cadeia do saco ao fio numa só ferramenta: decisão da rede, lote com passaporte e QR, bolsa de fibra, relatório RAP ([funcionalidades](../engenharia/features.md)) | Slides 5 e 6; demo: "E se...?" (passo 6) e lote com QR (passo 8) | "Isto já existe?": cada peça existe isolada, e a nossa pesquisa de concorrência não é exaustiva | Dizer a novidade como **ligação**, não como tecnologia; mostrar o verificador a recusar um número; ter uma frase de comparação. **Não investir mais engenharia aqui** |
 | **Viabilidade técnica** (25%) | Funciona a sério; usa dados reais; os pressupostos estão à vista; sabe-se o que acontece quando falha | Em produção ([novelo.helder.si](https://novelo.helder.si)); dados da Vitrus (301,3 t, 40 circuitos, 29 viaturas) e do INE; pressupostos visíveis; domínio testado com valores calculados à mão; 12 alertas de qualidade dos dados | Slide 5; demo: ponto de partida (passo 1) e sensibilidade (passo 5); plano B | Custos unitários ainda são pressupostos; sensibilidade, piloto e copiloto já na app (a ensaiar com o guião); exatidão da triagem por medir | E2E verde em tudo o que entra; mostrar intervalo e tornado; "estamos a medir" com protocolo; cenários pré-calculados |
-| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); 2 324,8 t/ano ainda no lixo (43 051 t de RSU × 5,4%, Vitrus e APA) e captura de 11,5% (cálculo, estimativa); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP criada até 17 abr 2028 (cobre as peças novas, B17); **cenário B: X t/ano a Y €/t (estimativa, por preencher a 22 out)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | X e Y por preencher; custos da Vitrus por chegar; 5,4% é média da APA, não caracterização local; sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
+| **Impacto e relevância** (30%) | Problema real e grande; quem beneficia; resposta à pergunta ("menor investimento e menor custo de operação") | 301,3 t = 0,16 kg/hab/mês (dados Vitrus, INE); ≈ 3 003 t/ano ainda no lixo (51 250,6 t de indiferenciado do concelho × 5,86%, Vitrus e APA) e captura de 9,1% (cálculo, estimativa); 105,64 €/t de tratamento evitado (Vitrus); destino 59,4% / 26,5% / 14,1%; obrigação desde 1 jan 2025 e RAP criada até 17 abr 2028 (cobre as peças novas, B17); **cenário de 60 000 €/ano: 445,8 t/ano a 102,8 €/t, e 47 093 € de tratamento evitado que pagam a operação (estimativa, H3, H10)** | Slides 1 a 3 e 7; demo: cenário A contra B (passo 3) e relatório RAP (passo 10) | Custos das viaturas da Vitrus por chegar; 5,86% é média nacional da APA, não caracterização local; sem medição no terreno | Fechar A e B e a frase-âncora a 22 out; dizer **quem paga em 2028**; mostrar o intervalo; propor o piloto com KPIs |
 | **Apresentação e potencial de continuidade** (20%) | História clara, tempo cumprido, demo sem falhas; um plano para depois do hackathon, parceiros, replicação, sustentabilidade | Narrativa em sete passos; demo mínima de cinco passos; plano B; pedido do piloto (duas freguesias, 3 meses, KPIs, piso de sinal de 1,71 t, estimativa); repositório público, propriedade dos autores [F59] | Slides 1 e 8; slide de apoio 9 ("critério → prova"); QR lido no telemóvel de um jurado | Deck por fazer; duração e formato por confirmar; nenhum parceiro confirmou o piloto; modelo de sustentabilidade é hipótese | Três ensaios a 25 out; mensagem à Vitrus e à Fibrenamics com o pedido; roadmap pós-26 out com datas; replicação dita com prova (dados abertos) |
 
 ### Autoavaliação honesta
@@ -134,7 +134,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 | --- | --- | --- | --- | --- | --- | --- |
 | Inovação e originalidade | 25% | **7** | 1,75 | A cadeia ligada e o verificador distinguem-nos; mas as peças existem isoladas e não temos prova externa de novidade | 7 | 1,75 |
 | Viabilidade técnica | 25% | **6** | 1,50 | Produto no ar com dados reais; mas custos são pressupostos, a triagem não tem exatidão medida e há 162 testes ponta a ponta que ainda têm de ser ensaiados com o guião da demo | 8 | 2,00 |
-| Impacto e relevância | 30% | **6** | 1,80 | Problema e prazos com fonte primária; mas X e Y não estão preenchidos, faltam custos da Vitrus e o potencial do plano municipal está por verificar | 8 | 2,40 |
+| Impacto e relevância | 30% | **6** | 1,80 | Problema e prazos com fonte primária; frase-âncora preenchida a 22 out (445,8 t a 102,8 €/t, estimativa), mas faltam os custos das viaturas da Vitrus e o potencial do plano municipal está por verificar | 8 | 2,40 |
 | Apresentação e continuidade | 20% | **5** | 1,00 | Narrativa e guião escritos; mas o deck não existe, a demo não foi ensaiada, o formato é desconhecido e nenhum parceiro confirmou o piloto | 8 | 1,60 |
 | **Nota ponderada** | 100% | | **6,05** | | | **7,75** |
 
@@ -142,7 +142,7 @@ A leitura "o que o júri procura" é **hipótese** até lermos as Regras. Os res
 
 **As três maiores lacunas** (por ganho ponderado):
 
-1. **Impacto sem número-âncora:** X toneladas a Y €/t por preencher e sem custos reais da Vitrus. É o critério que mais pesa.
+1. **Impacto com número-âncora ainda estimado:** 445,8 t a 102,8 €/t (preenchido a 22 out), mas sem custos reais das viaturas da Vitrus. É o critério que mais pesa.
 2. **Continuidade sem parceiro confirmado e sem deck ensaiado:** o piloto é o nosso pedido, mas ninguém da Vitrus, da Fibrenamics ou da UMinho o confirmou.
 3. **Viabilidade apoiada em funcionalidades por integrar:** sensibilidade, piloto recomendado e triagem medida só contam se tiverem E2E verde a 25 de outubro.
 
@@ -152,7 +152,7 @@ Impacto (30%) e viabilidade (25%) somam 55% da nota. A inovação vale 25%, a me
 
 | Ordem | Critério | O que fazer primeiro |
 | --- | --- | --- |
-| 1 | Impacto e relevância (30%) | Cenários A, B e francês fechados; frase-âncora com X e Y; custo por tonelada com intervalo; "quem paga em 2028" no relatório RAP |
+| 1 | Impacto e relevância (30%) | Cenários A, B e francês fechados; frase-âncora com 445,8 t e 102,8 €/t; custo por tonelada com intervalo; "quem paga em 2028" no relatório RAP |
 | 2 | Apresentação e continuidade (20%) | Maior margem (de 5 para 8) e custo baixo: deck, vídeo, três ensaios, pedido do piloto por escrito |
 | 3 | Viabilidade técnica (25%) | E2E verde; sensibilidade à vista; protocolo de medição da triagem; plano B testado |
 | 4 | Inovação e originalidade (25%) | Manter. Só polir o que já aparece na demo ("E se...?", QR) |
@@ -201,8 +201,8 @@ Do primeiro a sair ao último. Mantém a [ordem de corte](#calendário-dia-a-dia
 | **Interface profissional, mobile-first, pt/en, PWA** | Demo credível em qualquer ecrã | Feito |
 | **Cobertura de contentores e lacuna face à referência francesa** | Um número que o júri nunca viu | Deixou de se aplicar: não há contentores de têxteis (21 out); fica a rede por locais reais |
 | **Sensibilidade e robustez** (tornado, P10/P50/P90) | Transforma a falta de custos em argumento | Em integração |
-| **Cenário de referência francês** | Meta externa; mostra a distância (meta 669,7 t, teto do modelo sem contentores 597,7 t, estimativa) | Em integração |
-| **Recomendador de piloto** (Gondar e a União de Arosa e Castelões; piso de sinal 1,71 t) | O pedido final | Em integração |
+| **Cenário de referência francês** | Meta externa; mostra o caminho (meta 669,7 t, alcançável sem contentores entre 100 000 e 150 000 €/ano; teto do modelo sem contentores 772,1 t, estimativa) | Em integração |
+| **Recomendador de piloto** (Aldão e a União de Arosa e Castelões; piso de sinal 1,71 t, previsão 2,43 t) | O pedido final | Em integração |
 | **Copiloto de IA com ferramentas** | Conduz o simulador em conversa | Em integração |
 | **Painel de IA** (modelo por funcionalidade, custos e orçamento via OpenRouter; `openai/gpt-6-luna` por defeito) | Controlo de custo e troca de modelo | Em integração |
 | **Triagem com avaliação medida** | "Medimos", não "prometemos" | Em integração |
@@ -223,10 +223,11 @@ Cada afirmação do pitch tem de ter **evidência a abrir** e **fonte**. Se a li
 | "O custo tem de ser economicamente eficiente e é determinado com as autoridades locais" (7) | Relatório RAP | EUR-Lex art. 22.º-A n.º 7 e 12 | Primária |
 | "A rede tem de cobrir o território todo, não só as zonas rendíveis" (3, 7) | Cobertura | EUR-Lex art. 22.º-C n.º 9, b) | Primária |
 | "A França recolhe 4,27 kg/hab; nós 1,92" (3) | Cenário francês | Imprensa citando a Refashion [F10] | **Por verificar** na fonte primária |
-| "A meta francesa seria 669,7 t; sem contentores, o teto do modelo é 597,7 t" (3) | Cenários de referência | Cálculo nosso (H6) | Cálculo (depende da França) |
+| "A meta francesa seria 669,7 t; sem contentores, o modelo chega lá entre 100 000 e 150 000 €/ano, e o teto é 772,1 t" (3) | Cenários de referência | Cálculo nosso (H6) | Cálculo (depende da França) |
 | "A qualidade depende de quem recolhe: 72,9% de reutilização na Ultriplo, 9,2% no têxtil recolhido pela Vitrus" (6) | Sankey e KPI de toneladas reutilizáveis | Dados da Vitrus (A19) | Dado Vitrus (Vitrus e Nova Etapa por percentagem de relatório) |
-| "Fora das freguesias urbanas o cenário serve 68,8% da população, contra 76,0%" (7) | Separador Cobertura do cenário | Cálculo nosso (H4); art. 22.º-C n.º 9, b) | Cálculo (estimativa) |
-| "Numa tarde de dia útil, cerca de 15 das 29 viaturas não têm circuito" (Q&A) | Frota e turnos | Planeamento de turnos da Vitrus (A20) | Dado Vitrus; uso para têxteis por validar |
+| "Fora das freguesias urbanas o cenário serve 60,2% da população, contra 73,9%" (7) | Separador Cobertura do cenário | Cálculo nosso (H4); art. 22.º-C n.º 9, b) | Cálculo (estimativa) |
+| ~~"Numa tarde de dia útil, cerca de 15 das 29 viaturas não têm circuito"~~ | — | A20 | **Falso** (Vitrus, 22 out): erro na folha de turnos. Não dizer |
+| "Cada tonelada que sai do lixo poupa 105,64 € de tratamento" | Impacto | Vitrus (A25) | Dado Vitrus |
 | "Os pressupostos que mais pesam são estes" (4) | Tornado | Modelo | Estimativa |
 | "A Sasia recicla cerca de 2 000 t/mês, quase tudo pré-consumo" (6) | Slide da indústria | Jornal de Negócios [F53] | Secundária |
 | "Os lotes por composição são o que falta" (6) | Passaporte e bolsa de fibra | Plano municipal (por verificar); recicladores | Hipótese |
@@ -279,7 +280,7 @@ gantt
 - [ ] **Submetido na TAIKAI até 23 de outubro às 17h30**, com as ferramentas de IA identificadas e uma etiqueta Git da versão submetida
 - [ ] Inscrição confirmada; texto das Regras colado em [Critérios de avaliação](criterios-de-avaliacao.md#colar-aqui-o-texto-das-regras); duração e formato do pitch e das perguntas confirmados
 - [ ] Cada critério tem uma frase e uma prova na demo (ver o [slide de apoio](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova))
-- [ ] Cenários A, B e francês calculados; frase-âncora com X e Y preenchidos
+- [x] Cenários A, B e francês calculados; frase-âncora preenchida (445,8 t a 102,8 €/t, 22 out)
 - [ ] Registo de afirmações impresso, com "slide" preenchido e nada "por verificar" em slide
 - [ ] Cinco perguntas "E se..." de reserva testadas, com respostas em cache
 - [ ] Triagem medida (matriz de confusão) **ou** frase "estamos a medir"
@@ -297,7 +298,7 @@ gantt
 | # | Risco | Gravidade | Probabilidade | Resposta | Dono |
 | --- | --- | --- | --- | --- | --- |
 | 1 | Os custos unitários da Vitrus não chegam | Alta | Alta | Intervalo e tornado; dizer "estimativa"; pedir hoje | H |
-| 2 | O júri pergunta pelos 5,4% e "4 de 27" | Alta | Média | 5,4%: valor da APA indicado pela Vitrus, aplicado às 43 051 t de RSU de 2025. "4 de 27" vem só do plano municipal (contexto público, não usado pela Vitrus): sem confirmação não vai a slide | H |
+| 2 | O júri pergunta pelos 5,86% e "4 de 27" | Alta | Média | 5,86%: média nacional da APA (2025) indicada pela Vitrus, aplicada ao indiferenciado do concelho todo (≈ 51 250,6 t). "4 de 27" vem só do plano municipal (contexto público, não usado pela Vitrus): sem confirmação não vai a slide | H |
 | 3 | Prometer demasiado ("a IA substitui a triagem", metas na diretiva) | Alta | Média | Lista "o que nunca dizer"; revisão do registo | HF |
 | 4 | Funcionalidade nova quebra na demo | Média | Média | Regra de corte; cenários pré-calculados | HF |
 | 5 | IA indisponível (saldo, chave, latência) | Média | Média | Orçamento e modelo de reserva; vídeo; sem IA o resto funciona | F |
@@ -357,6 +358,6 @@ As perguntas completas, por ordem de impacto, para o **Lucas Nascimento**, o **L
 | **Fibrenamics** | Ver [Mentores](mentores.md#luís-miguel-oliveira-fibrenamics) | Critérios do lote; destino de baixo valor |
 | **Humana** ou outra entidade de economia social | "Como articulam novos pontos municipais com os vossos? Têm dados de triagem?" | Parceria e dados reais |
 | **Wippytex** | "Como trabalham com 30 municípios e o que pedem às câmaras?" | Boas práticas |
-| **Município / Let's Go Circular** | "Há uma caracterização do lixo de Guimarães mais recente que a média da APA?" | Procura por zona em vez de 5,4% igual em todas |
+| **Município / Let's Go Circular** | "Há uma caracterização do lixo de Guimarães mais recente que a média da APA?" | Procura por zona em vez de 5,86% igual em todas |
 
 Mais contexto em [Indústria e mercado](../pesquisa/industria-e-mercado.md).

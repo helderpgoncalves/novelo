@@ -3,6 +3,8 @@ import { clamp, kf, prog, rise } from '../anim';
 import { AppScreen, BrowserChrome, PhoneChrome } from '../components/AppScreen';
 import { Body, Eyebrow, Title } from '../components/Type';
 import { useLayout } from '../layout';
+import { num } from '../format';
+import { COVER_OTHER, COVER_URBAN, MC } from '../numbers';
 import { C } from '../theme';
 
 type Key = Array<[number, number]>;
@@ -30,35 +32,35 @@ export const SHOTS: Shot[] = [
   {
     eyebrow: 'Decidir',
     title: 'A rede no mapa, com as rotas.',
-    sub: 'Recolha a pedido no circuito porta a porta e paragens em locais existentes, a partir do depósito.',
-    desktop: { shot: 'sim-desktop', url: '/pt/simulator', scroll: [[0, 1990], [90, 2010]], cx: [[10, 720], [90, 850]], cy: [[10, 450], [90, 420]], z: [[10, 1], [90, 1.32]] },
-    mobile: { shot: 'sim-mobile', url: '', scroll: [[0, 2380], [40, 2530]] },
+    sub: 'Paragens em locais existentes e o saco à porta onde compensa, com a viatura de têxtil.',
+    desktop: { shot: 'sim-desktop', url: '/pt/simulator', scroll: [[0, 2010], [90, 2030]], cx: [[10, 720], [90, 850]], cy: [[10, 450], [90, 420]], z: [[10, 1], [90, 1.32]] },
+    mobile: { shot: 'sim-mobile', url: '', scroll: [[0, 2450], [40, 2600]] },
   },
   {
     eyebrow: 'Decidir',
-    title: 'Circuito, dia, viatura e quilos por ronda.',
-    sub: 'Zero quilómetros novos no porta a porta. E um plano B: numa tarde de dia útil há pelo menos 15 viaturas sem circuito.',
-    desktop: { shot: 'scenario-desktop', url: '/pt/scenarios/…', scroll: [[0, 1100], [40, 1300]], cx: [[40, 720], [86, 700]], cy: [[40, 450], [86, 420]], z: [[40, 1], [86, 1.3]] },
-    mobile: { shot: 'scenario-mobile', url: '', scroll: [[0, 1950], [50, 2190]] },
+    title: 'O plano da viatura: dia, ronda e quilos.',
+    sub: 'Freguesia a freguesia, a partir do estaleiro de Polvoreira, com a capacidade da viatura.',
+    desktop: { shot: 'scenario-desktop', url: '/pt/scenarios/…', scroll: [[0, 1120], [40, 1320]], cx: [[40, 720], [86, 700]], cy: [[40, 450], [86, 420]], z: [[40, 1], [86, 1.3]] },
+    mobile: { shot: 'scenario-mobile', url: '', scroll: [[0, 2030], [50, 2270]] },
   },
   {
     eyebrow: 'Decidir',
     title: 'Só conta o que se pode reutilizar.',
     sub: 'Toneladas reutilizáveis e custo por tonelada reutilizável, em cada cenário, com o intervalo entre entidades.',
-    desktop: { shot: 'scenario-desktop', url: '/pt/scenarios/…', scroll: [[0, 560], [40, 740]], cx: [[40, 720], [86, 700]], cy: [[40, 450], [86, 290]], z: [[40, 1], [86, 1.32]] },
-    mobile: { shot: 'scenario-mobile', url: '', scroll: [[0, 1000], [40, 1235]] },
+    desktop: { shot: 'scenario-desktop', url: '/pt/scenarios/…', scroll: [[0, 580], [40, 760]], cx: [[40, 720], [86, 700]], cy: [[40, 450], [86, 290]], z: [[40, 1], [86, 1.32]] },
+    mobile: { shot: 'scenario-mobile', url: '', scroll: [[0, 1080], [40, 1310]] },
   },
   {
     eyebrow: 'Provar',
     title: 'A cobertura que a diretiva exige.',
-    sub: '76,0% da população servida nas freguesias urbanas e 68,8% fora delas (art. 22.º-C, n.º 9, b); estimativa).',
+    sub: `${num(COVER_URBAN, 1)}% da população servida nas freguesias urbanas e ${num(COVER_OTHER, 1)}% fora delas (art. 22.º-C, n.º 9, b); estimativa).`,
     desktop: { shot: 'coverage-desktop', url: '/pt/scenarios/…?tab=coverage', scroll: [[0, 560], [50, 590], [92, 940]] },
     mobile: { shot: 'coverage-mobile', url: '', scroll: [[0, 930], [44, 940], [86, 1460]] },
   },
   {
     eyebrow: 'Provar',
     title: 'E se os pressupostos estiverem errados?',
-    sub: 'Tornado e 500 simulações: em 8 de cada 10, o custo fica entre 96,9 e 154,7 €/t.',
+    sub: `Tornado e 500 simulações: em 8 de cada 10, o custo fica entre ${num(MC.p10, 1)} e ${num(MC.p90, 1)} €/t.`,
     desktop: { shot: 'uncertainty-desktop', url: '/pt/scenarios/…?tab=uncertainty', scroll: [[0, 580], [36, 600], [80, 1050]] },
     mobile: { shot: 'uncertainty-mobile', url: '', scroll: [[0, 940], [36, 950], [80, 1800]] },
   },

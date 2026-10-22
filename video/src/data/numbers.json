@@ -1,0 +1,1767 @@
+{
+ "source": "API de dev, cenário parish:60000 (2026-10-22T17:04:06.642915Z)",
+ "scenario60": {
+  "id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "budget": 60000,
+  "kpis": {
+   "capex_eur": 57500,
+   "opex_eur_year": 37515.71,
+   "annual_cost_eur": 45828.21,
+   "tonnes_year": 445.784,
+   "eur_per_tonne": 102.8,
+   "coverage_pct": 72.1,
+   "points": 60,
+   "km_year": 6976.3,
+   "potential_t": 3003.3,
+   "baseline_observed_t": 301.3,
+   "avoided_treatment_eur": 47092.62,
+   "net_annual_cost_eur": -1264.41,
+   "net_eur_per_tonne": -2.84,
+   "vehicles": 1,
+   "vehicle_days_week": 1.67,
+   "vehicle_hours_year": 606.3,
+   "vehicle_capex_eur": 42500,
+   "vehicle_annual_eur": 5312.5,
+   "reuse_share": 0.5941,
+   "reuse_share_low": 0.5,
+   "reuse_share_high": 0.7286,
+   "reusable_t": 264.859,
+   "reusable_t_low": 222.892,
+   "reusable_t_high": 324.781,
+   "eur_per_reusable_t": 173.03
+  },
+  "modes": [
+   {
+    "mode": "existing",
+    "zones": 45,
+    "points": 60,
+    "tonnes": 366.285,
+    "annual_cost_eur": 21897.37
+   },
+   {
+    "mode": "on_demand",
+    "zones": 4,
+    "points": 0,
+    "tonnes": 79.498,
+    "annual_cost_eur": 23930.86
+   }
+  ]
+ },
+ "curve": [
+  {
+   "budget": 20000,
+   "tonnes": 257.233,
+   "cost": 16102.32,
+   "eurPerT": 62.6
+  },
+  {
+   "budget": 40000,
+   "tonnes": 378.522,
+   "cost": 26908.65,
+   "eurPerT": 71.09
+  },
+  {
+   "budget": 60000,
+   "tonnes": 445.784,
+   "cost": 45828.21,
+   "eurPerT": 102.8
+  },
+  {
+   "budget": 100000,
+   "tonnes": 571.247,
+   "cost": 85859.6,
+   "eurPerT": 150.3
+  },
+  {
+   "budget": 150000,
+   "tonnes": 695.44,
+   "cost": 129336.03,
+   "eurPerT": 185.98
+  }
+ ],
+ "coverage": {
+  "scenario_id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "label": "Referência · por freguesia · 60 000 €/ano",
+  "siting": "parish",
+  "parishes": [
+   {
+    "parish_code": "030813",
+    "parish_name": "Creixomil",
+    "tipau": "apu",
+    "population": 9708,
+    "area_km2": 3.007,
+    "density_hab_km2": 3228.5,
+    "demand_t": 185.9078,
+    "area_within_300m_pct": 84.9,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "on_demand",
+     "existing"
+    ],
+    "channels": [
+     "on_demand",
+     "existing"
+    ],
+    "tonnes": 47.797,
+    "covered_population": 8543,
+    "covered_share": 0.88,
+    "annual_cost_eur": 8425.22
+   },
+   {
+    "parish_code": "030804",
+    "parish_name": "Azurém",
+    "tipau": "apu",
+    "population": 9089,
+    "area_km2": 2.9,
+    "density_hab_km2": 3134.1,
+    "demand_t": 174.054,
+    "area_within_300m_pct": 95.5,
+    "door_to_door_days_week": 0,
+    "service_days": 7,
+    "modes": [
+     "on_demand",
+     "existing"
+    ],
+    "channels": [
+     "on_demand",
+     "existing"
+    ],
+    "tonnes": 44.749,
+    "covered_population": 7998,
+    "covered_share": 0.88,
+    "annual_cost_eur": 8159.12
+   },
+   {
+    "parish_code": "0308U4",
+    "parish_name": "União das freguesias de Oliveira, São Paio e São Sebastião",
+    "tipau": "apu",
+    "population": 7830,
+    "area_km2": 1.555,
+    "density_hab_km2": 5035.4,
+    "demand_t": 149.9442,
+    "area_within_300m_pct": 100,
+    "door_to_door_days_week": 0,
+    "service_days": 0,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 18.893,
+    "covered_population": 5481,
+    "covered_share": 0.7,
+    "annual_cost_eur": 569.98
+   },
+   {
+    "parish_code": "030838",
+    "parish_name": "Ponte",
+    "tipau": "apu",
+    "population": 6687,
+    "area_km2": 6.011,
+    "density_hab_km2": 1112.5,
+    "demand_t": 128.0558,
+    "area_within_300m_pct": 84.6,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 16.135,
+    "covered_population": 4681,
+    "covered_share": 0.7,
+    "annual_cost_eur": 659.23
+   },
+   {
+    "parish_code": "030808",
+    "parish_name": "Caldelas",
+    "tipau": "apu",
+    "population": 6304,
+    "area_km2": 2.694,
+    "density_hab_km2": 2340,
+    "demand_t": 120.7213,
+    "area_within_300m_pct": 97.7,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 15.211,
+    "covered_population": 4413,
+    "covered_share": 0.7,
+    "annual_cost_eur": 727.04
+   },
+   {
+    "parish_code": "030854",
+    "parish_name": "Selho (São Jorge)",
+    "tipau": "apu",
+    "population": 5923,
+    "area_km2": 5.202,
+    "density_hab_km2": 1138.6,
+    "demand_t": 113.4252,
+    "area_within_300m_pct": 50.9,
+    "door_to_door_days_week": 0,
+    "service_days": 0,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 14.292,
+    "covered_population": 4146,
+    "covered_share": 0.7,
+    "annual_cost_eur": 626.93
+   },
+   {
+    "parish_code": "030815",
+    "parish_name": "Fermentões",
+    "tipau": "apu",
+    "population": 5739,
+    "area_km2": 3.756,
+    "density_hab_km2": 1528,
+    "demand_t": 109.9016,
+    "area_within_300m_pct": 87.3,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 13.848,
+    "covered_population": 4017,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 604.88
+   },
+   {
+    "parish_code": "030871",
+    "parish_name": "Urgezes",
+    "tipau": "apu",
+    "population": 5517,
+    "area_km2": 3.315,
+    "density_hab_km2": 1664.3,
+    "demand_t": 105.6503,
+    "area_within_300m_pct": 88.7,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "on_demand",
+     "existing"
+    ],
+    "channels": [
+     "on_demand",
+     "existing"
+    ],
+    "tonnes": 27.163,
+    "covered_population": 4855,
+    "covered_share": 0.88,
+    "annual_cost_eur": 4970.94
+   },
+   {
+    "parish_code": "030812",
+    "parish_name": "Costa",
+    "tipau": "apu",
+    "population": 5396,
+    "area_km2": 4.711,
+    "density_hab_km2": 1145.4,
+    "demand_t": 103.3332,
+    "area_within_300m_pct": 71,
+    "door_to_door_days_week": 6,
+    "service_days": 7,
+    "modes": [
+     "on_demand",
+     "existing"
+    ],
+    "channels": [
+     "on_demand",
+     "existing"
+    ],
+    "tonnes": 26.567,
+    "covered_population": 4748,
+    "covered_share": 0.8799,
+    "annual_cost_eur": 5119.24
+   },
+   {
+    "parish_code": "030807",
+    "parish_name": "Brito",
+    "tipau": "apu",
+    "population": 4774,
+    "area_km2": 5.903,
+    "density_hab_km2": 808.7,
+    "demand_t": 91.4219,
+    "area_within_300m_pct": 35.2,
+    "door_to_door_days_week": 3,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 11.519,
+    "covered_population": 3342,
+    "covered_share": 0.7,
+    "annual_cost_eur": 669.2
+   },
+   {
+    "parish_code": "030831",
+    "parish_name": "Moreira de Cónegos",
+    "tipau": "apu",
+    "population": 4651,
+    "area_km2": 4.725,
+    "density_hab_km2": 984.3,
+    "demand_t": 89.0665,
+    "area_within_300m_pct": 54.4,
+    "door_to_door_days_week": 6,
+    "service_days": 7,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 11.222,
+    "covered_population": 3256,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 634.29
+   },
+   {
+    "parish_code": "030840",
+    "parish_name": "Ronfe",
+    "tipau": "apu",
+    "population": 4496,
+    "area_km2": 5.021,
+    "density_hab_km2": 895.4,
+    "demand_t": 86.0982,
+    "area_within_300m_pct": 32.3,
+    "door_to_door_days_week": 3,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 10.848,
+    "covered_population": 3147,
+    "covered_share": 0.7,
+    "annual_cost_eur": 694.15
+   },
+   {
+    "parish_code": "030830",
+    "parish_name": "Mesão Frio",
+    "tipau": "apu",
+    "population": 4159,
+    "area_km2": 4.13,
+    "density_hab_km2": 1007,
+    "demand_t": 79.6447,
+    "area_within_300m_pct": 82.9,
+    "door_to_door_days_week": 0,
+    "service_days": 7,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 10.035,
+    "covered_population": 2911,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 610.13
+   },
+   {
+    "parish_code": "030828",
+    "parish_name": "Lordelo",
+    "tipau": "apu",
+    "population": 3979,
+    "area_km2": 5.018,
+    "density_hab_km2": 792.9,
+    "demand_t": 76.1977,
+    "area_within_300m_pct": 13.3,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 9.601,
+    "covered_population": 2785,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 460.85
+   },
+   {
+    "parish_code": "0308U2",
+    "parish_name": "União das freguesias de Candoso São Tiago e Mascotelos",
+    "tipau": "apu",
+    "population": 3808,
+    "area_km2": 3.86,
+    "density_hab_km2": 986.5,
+    "demand_t": 72.923,
+    "area_within_300m_pct": 60,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 9.188,
+    "covered_population": 2666,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 297.7
+   },
+   {
+    "parish_code": "030837",
+    "parish_name": "Polvoreira",
+    "tipau": "apu",
+    "population": 3545,
+    "area_km2": 3.295,
+    "density_hab_km2": 1075.9,
+    "demand_t": 67.8866,
+    "area_within_300m_pct": 81.6,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 8.554,
+    "covered_population": 2482,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 264.95
+   },
+   {
+    "parish_code": "030866",
+    "parish_name": "Serzedelo",
+    "tipau": "apu",
+    "population": 3418,
+    "area_km2": 5.139,
+    "density_hab_km2": 665.1,
+    "demand_t": 65.4546,
+    "area_within_300m_pct": 64.7,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 8.247,
+    "covered_population": 2393,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 390.68
+   },
+   {
+    "parish_code": "030887",
+    "parish_name": "União das freguesias de Sande Vila Nova e Sande São Clemente",
+    "tipau": "apu",
+    "population": 3307,
+    "area_km2": 7.253,
+    "density_hab_km2": 455.9,
+    "demand_t": 63.3289,
+    "area_within_300m_pct": 50.9,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 7.979,
+    "covered_population": 2315,
+    "covered_share": 0.7,
+    "annual_cost_eur": 476.25
+   },
+   {
+    "parish_code": "0308U1",
+    "parish_name": "União das freguesias de Airão Santa Maria, Airão São João e Vermil",
+    "tipau": "apu",
+    "population": 3213,
+    "area_km2": 7.483,
+    "density_hab_km2": 429.4,
+    "demand_t": 61.5288,
+    "area_within_300m_pct": 48.2,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 7.753,
+    "covered_population": 2249,
+    "covered_share": 0.7,
+    "annual_cost_eur": 521.78
+   },
+   {
+    "parish_code": "030875",
+    "parish_name": "União das freguesias de Abação e Gémeos",
+    "tipau": "apu",
+    "population": 2682,
+    "area_km2": 6.734,
+    "density_hab_km2": 398.3,
+    "demand_t": 51.3602,
+    "area_within_300m_pct": 20.9,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 6.471,
+    "covered_population": 1877,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 327.44
+   },
+   {
+    "parish_code": "030832",
+    "parish_name": "Nespereira",
+    "tipau": "apu",
+    "population": 2594,
+    "area_km2": 3.688,
+    "density_hab_km2": 703.4,
+    "demand_t": 49.675,
+    "area_within_300m_pct": 31,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 6.259,
+    "covered_population": 1816,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 309.31
+   },
+   {
+    "parish_code": "030821",
+    "parish_name": "Gondar",
+    "tipau": "apu",
+    "population": 2581,
+    "area_km2": 2.509,
+    "density_hab_km2": 1028.7,
+    "demand_t": 49.426,
+    "area_within_300m_pct": 47.3,
+    "door_to_door_days_week": 0,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 6.228,
+    "covered_population": 1807,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 394.53
+   },
+   {
+    "parish_code": "030882",
+    "parish_name": "União das freguesias de Conde e Gandarela",
+    "tipau": "apu",
+    "population": 2464,
+    "area_km2": 3.642,
+    "density_hab_km2": 676.6,
+    "demand_t": 47.1855,
+    "area_within_300m_pct": 54.3,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.945,
+    "covered_population": 1725,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 356.6
+   },
+   {
+    "parish_code": "030823",
+    "parish_name": "Guardizela",
+    "tipau": "apu",
+    "population": 2447,
+    "area_km2": 3.976,
+    "density_hab_km2": 615.4,
+    "demand_t": 46.86,
+    "area_within_300m_pct": 44.2,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.904,
+    "covered_population": 1713,
+    "covered_share": 0.7,
+    "annual_cost_eur": 413.34
+   },
+   {
+    "parish_code": "030891",
+    "parish_name": "União das freguesias de Tabuadelo e São Faustino",
+    "tipau": "apu",
+    "population": 2415,
+    "area_km2": 5.049,
+    "density_hab_km2": 478.3,
+    "demand_t": 46.2472,
+    "area_within_300m_pct": 11.2,
+    "door_to_door_days_week": 0,
+    "service_days": 0,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.827,
+    "covered_population": 1690,
+    "covered_share": 0.6998,
+    "annual_cost_eur": 321.34
+   },
+   {
+    "parish_code": "030888",
+    "parish_name": "União das freguesias de Selho São Lourenço e Gominhães",
+    "tipau": "apu",
+    "population": 2271,
+    "area_km2": 4.153,
+    "density_hab_km2": 546.8,
+    "demand_t": 43.4896,
+    "area_within_300m_pct": 81.8,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.48,
+    "covered_population": 1590,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 422.45
+   },
+   {
+    "parish_code": "030889",
+    "parish_name": "União das freguesias de Serzedo e Calvos",
+    "tipau": "apu",
+    "population": 2263,
+    "area_km2": 4.504,
+    "density_hab_km2": 502.4,
+    "demand_t": 43.3364,
+    "area_within_300m_pct": 12.5,
+    "door_to_door_days_week": 0,
+    "service_days": 0,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.46,
+    "covered_population": 1584,
+    "covered_share": 0.7,
+    "annual_cost_eur": 398.75
+   },
+   {
+    "parish_code": "030868",
+    "parish_name": "Silvares",
+    "tipau": "apu",
+    "population": 2250,
+    "area_km2": 4.488,
+    "density_hab_km2": 501.3,
+    "demand_t": 43.0874,
+    "area_within_300m_pct": 35.6,
+    "door_to_door_days_week": 3,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.429,
+    "covered_population": 1575,
+    "covered_share": 0.7,
+    "annual_cost_eur": 357.5
+   },
+   {
+    "parish_code": "030858",
+    "parish_name": "Sande (São Martinho)",
+    "tipau": "apu",
+    "population": 2239,
+    "area_km2": 3.304,
+    "density_hab_km2": 677.7,
+    "demand_t": 42.8768,
+    "area_within_300m_pct": 82.2,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.402,
+    "covered_population": 1567,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 513.56
+   },
+   {
+    "parish_code": "030850",
+    "parish_name": "Selho (São Cristóvão)",
+    "tipau": "apu",
+    "population": 2138,
+    "area_km2": 2.664,
+    "density_hab_km2": 802.6,
+    "demand_t": 40.9426,
+    "area_within_300m_pct": 35.8,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 5.159,
+    "covered_population": 1497,
+    "covered_share": 0.7002,
+    "annual_cost_eur": 353.89
+   },
+   {
+    "parish_code": "030806",
+    "parish_name": "Barco",
+    "tipau": "apu",
+    "population": 1439,
+    "area_km2": 3.016,
+    "density_hab_km2": 477.1,
+    "demand_t": 27.5568,
+    "area_within_300m_pct": 78,
+    "door_to_door_days_week": 0,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 3.472,
+    "covered_population": 1007,
+    "covered_share": 0.6998,
+    "annual_cost_eur": 497.56
+   },
+   {
+    "parish_code": "030801",
+    "parish_name": "Aldão",
+    "tipau": "apu",
+    "population": 1278,
+    "area_km2": 1.552,
+    "density_hab_km2": 823.5,
+    "demand_t": 24.4736,
+    "area_within_300m_pct": 77.2,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 3.084,
+    "covered_population": 895,
+    "covered_share": 0.7003,
+    "annual_cost_eur": 397.87
+   },
+   {
+    "parish_code": "030842",
+    "parish_name": "Prazins (Santa Eufémia)",
+    "tipau": "apu",
+    "population": 1267,
+    "area_km2": 2.235,
+    "density_hab_km2": 566.9,
+    "demand_t": 24.263,
+    "area_within_300m_pct": 82.2,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 3.057,
+    "covered_population": 887,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 462.46
+   },
+   {
+    "parish_code": "030857",
+    "parish_name": "Candoso (São Martinho)",
+    "tipau": "apu",
+    "population": 1234,
+    "area_km2": 2.208,
+    "density_hab_km2": 558.9,
+    "demand_t": 23.6311,
+    "area_within_300m_pct": 25.7,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 2.978,
+    "covered_population": 864,
+    "covered_share": 0.7002,
+    "annual_cost_eur": 328.48
+   },
+   {
+    "parish_code": "030835",
+    "parish_name": "Pencelo",
+    "tipau": "apu",
+    "population": 1220,
+    "area_km2": 2.398,
+    "density_hab_km2": 508.8,
+    "demand_t": 23.363,
+    "area_within_300m_pct": 74.6,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 2.944,
+    "covered_population": 854,
+    "covered_share": 0.7,
+    "annual_cost_eur": 393.72
+   },
+   {
+    "parish_code": "030836",
+    "parish_name": "Pinheiro",
+    "tipau": "apu",
+    "population": 1135,
+    "area_km2": 1.933,
+    "density_hab_km2": 587.2,
+    "demand_t": 21.7352,
+    "area_within_300m_pct": 83.3,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 2.739,
+    "covered_population": 794,
+    "covered_share": 0.6996,
+    "annual_cost_eur": 276.85
+   },
+   {
+    "parish_code": "030865",
+    "parish_name": "São Torcato",
+    "tipau": "amu",
+    "population": 3345,
+    "area_km2": 10.385,
+    "density_hab_km2": 322.1,
+    "demand_t": 64.0566,
+    "area_within_300m_pct": 41.7,
+    "door_to_door_days_week": 3,
+    "service_days": 7,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 8.071,
+    "covered_population": 2342,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 468.51
+   },
+   {
+    "parish_code": "030878",
+    "parish_name": "União das freguesias de Atães e Rendufe",
+    "tipau": "amu",
+    "population": 2579,
+    "area_km2": 12.089,
+    "density_hab_km2": 213.3,
+    "demand_t": 49.3877,
+    "area_within_300m_pct": 17.5,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 6.223,
+    "covered_population": 1805,
+    "covered_share": 0.6999,
+    "annual_cost_eur": 468.8
+   },
+   {
+    "parish_code": "0308U5",
+    "parish_name": "União das freguesias de Souto Santa Maria, Souto São Salvador e Gondomar",
+    "tipau": "amu",
+    "population": 2043,
+    "area_km2": 13.869,
+    "density_hab_km2": 147.3,
+    "demand_t": 39.1234,
+    "area_within_300m_pct": 34.5,
+    "door_to_door_days_week": 3,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 4.93,
+    "covered_population": 1430,
+    "covered_share": 0.7,
+    "annual_cost_eur": 520.43
+   },
+   {
+    "parish_code": "030879",
+    "parish_name": "União das freguesias de Briteiros Santo Estêvão e Donim",
+    "tipau": "amu",
+    "population": 2024,
+    "area_km2": 5.938,
+    "density_hab_km2": 340.9,
+    "demand_t": 38.7595,
+    "area_within_300m_pct": 63.3,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 4.884,
+    "covered_population": 1417,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 559.23
+   },
+   {
+    "parish_code": "030885",
+    "parish_name": "União das freguesias de Prazins Santo Tirso e Corvite",
+    "tipau": "amu",
+    "population": 1939,
+    "area_km2": 4.588,
+    "density_hab_km2": 422.6,
+    "demand_t": 37.1318,
+    "area_within_300m_pct": 59.9,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 4.679,
+    "covered_population": 1357,
+    "covered_share": 0.6998,
+    "annual_cost_eur": 430.33
+   },
+   {
+    "parish_code": "030824",
+    "parish_name": "Infantas",
+    "tipau": "amu",
+    "population": 1740,
+    "area_km2": 6.494,
+    "density_hab_km2": 267.9,
+    "demand_t": 33.3209,
+    "area_within_300m_pct": 11.9,
+    "door_to_door_days_week": 0,
+    "service_days": 0,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 4.198,
+    "covered_population": 1218,
+    "covered_share": 0.7,
+    "annual_cost_eur": 384.62
+   },
+   {
+    "parish_code": "030880",
+    "parish_name": "União das freguesias de Briteiros São Salvador e Briteiros Santa Leocádia",
+    "tipau": "amu",
+    "population": 1687,
+    "area_km2": 9.389,
+    "density_hab_km2": 179.7,
+    "demand_t": 32.306,
+    "area_within_300m_pct": 45.3,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 4.071,
+    "covered_population": 1181,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 520.2
+   },
+   {
+    "parish_code": "030886",
+    "parish_name": "União das freguesias de Sande São Lourenço e Balazar",
+    "tipau": "amu",
+    "population": 1584,
+    "area_km2": 6.458,
+    "density_hab_km2": 245.3,
+    "demand_t": 30.3335,
+    "area_within_300m_pct": 49.6,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 3.822,
+    "covered_population": 1109,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 544.96
+   },
+   {
+    "parish_code": "0308U3",
+    "parish_name": "União das freguesias de Leitões, Oleiros e Figueiredo",
+    "tipau": "amu",
+    "population": 1437,
+    "area_km2": 8.977,
+    "density_hab_km2": 160.1,
+    "demand_t": 27.5185,
+    "area_within_300m_pct": 28.6,
+    "door_to_door_days_week": 6,
+    "service_days": 6,
+    "modes": [
+     "existing"
+    ],
+    "channels": [
+     "existing"
+    ],
+    "tonnes": 3.467,
+    "covered_population": 1006,
+    "covered_share": 0.7001,
+    "annual_cost_eur": 522.94
+   },
+   {
+    "parish_code": "030827",
+    "parish_name": "Longos",
+    "tipau": "amu",
+    "population": 1339,
+    "area_km2": 7.236,
+    "density_hab_km2": 185,
+    "demand_t": 25.6418,
+    "area_within_300m_pct": 31.5,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [],
+    "channels": [],
+    "tonnes": 0,
+    "covered_population": 0,
+    "covered_share": 0,
+    "annual_cost_eur": 0
+   },
+   {
+    "parish_code": "030820",
+    "parish_name": "Gonça",
+    "tipau": "amu",
+    "population": 954,
+    "area_km2": 7.026,
+    "density_hab_km2": 135.8,
+    "demand_t": 18.2691,
+    "area_within_300m_pct": 25.7,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [],
+    "channels": [],
+    "tonnes": 0,
+    "covered_population": 0,
+    "covered_share": 0,
+    "annual_cost_eur": 0
+   },
+   {
+    "parish_code": "030877",
+    "parish_name": "União das freguesias de Arosa e Castelões",
+    "tipau": "apr",
+    "population": 699,
+    "area_km2": 5.523,
+    "density_hab_km2": 126.6,
+    "demand_t": 13.3858,
+    "area_within_300m_pct": 56.4,
+    "door_to_door_days_week": 3,
+    "service_days": 3,
+    "modes": [],
+    "channels": [],
+    "tonnes": 0,
+    "covered_population": 0,
+    "covered_share": 0,
+    "annual_cost_eur": 0
+   }
+  ],
+  "by_tipau": [
+   {
+    "tipau": "apu",
+    "parishes": 36,
+    "population": 135460,
+    "covered_population": 100170,
+    "covered_pct": 73.9,
+    "tonnes": 401.439,
+    "annual_cost_eur": 41408.21,
+    "eur_per_tonne": 103.15
+   },
+   {
+    "tipau": "amu",
+    "parishes": 11,
+    "population": 20671,
+    "covered_population": 12865,
+    "covered_pct": 62.2,
+    "tonnes": 44.345,
+    "annual_cost_eur": 4420.02,
+    "eur_per_tonne": 99.67
+   },
+   {
+    "tipau": "apr",
+    "parishes": 1,
+    "population": 699,
+    "covered_population": 0,
+    "covered_pct": 0,
+    "tonnes": 0,
+    "annual_cost_eur": 0,
+    "eur_per_tonne": null
+   }
+  ],
+  "total": {
+   "tipau": null,
+   "parishes": 48,
+   "population": 156830,
+   "covered_population": 113035,
+   "covered_pct": 72.1,
+   "tonnes": 445.784,
+   "annual_cost_eur": 45828.23,
+   "eur_per_tonne": 102.8
+  },
+  "equity": {
+   "urban_population": 135460,
+   "urban_covered_pct": 73.9,
+   "non_urban_population": 21370,
+   "non_urban_covered_pct": 60.2,
+   "non_urban_vs_urban": 0.814
+  }
+ },
+ "sensitivity": {
+  "scenario_id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "swing": 0.3,
+  "n_samples": 500,
+  "seed": 7,
+  "method": "Monte Carlo sobre o plano já otimizado: cada amostra reavalia o modelo de custos com os parâmetros perturbados (distribuição triangular em torno do pressuposto) e não resolve o otimizador de novo. Responde a 'o plano proposto aguenta se os pressupostos estiverem errados?'; reotimizar daria sempre valores mais otimistas.",
+  "base": {
+   "tonnes": 445.78366520724,
+   "annual_cost_eur": 45828.461217599994,
+   "eur_per_tonne": 102.80426313129898
+  },
+  "tornado": [
+   {
+    "key": "modes.existing.coverage_factor",
+    "unit": "%",
+    "source": "assumption",
+    "base_value": 0.7,
+    "low_value": 0.48999999999999994,
+    "high_value": 0.9099999999999999,
+    "low": {
+     "tonnes": 337.6511046670679,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 135.72726576087456
+    },
+    "high": {
+     "tonnes": 553.9162257474122,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 82.73536518227566
+    },
+    "swing_eur_per_tonne": 52.9919005785989,
+    "swing_tonnes": 216.26512108034433,
+    "swing_cost_eur": 0
+   },
+   {
+    "key": "modes.existing.capture_rate",
+    "unit": "%",
+    "source": "assumption",
+    "base_value": 0.18,
+    "low_value": 0.126,
+    "high_value": 0.23399999999999999,
+    "low": {
+     "tonnes": 337.65110466706824,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 135.72726576087442
+    },
+    "high": {
+     "tonnes": 553.9162257474122,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 82.73536518227566
+    },
+    "swing_eur_per_tonne": 52.99190057859876,
+    "swing_tonnes": 216.265121080344,
+    "swing_cost_eur": 0
+   },
+   {
+    "key": "cost_per_collection_eur",
+    "unit": "€",
+    "source": "assumption",
+    "base_value": 6,
+    "low_value": 4.199999999999999,
+    "high_value": 7.800000000000001,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 36875.85185232,
+     "eur_per_tonne": 82.72140666073265
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 54781.07058288,
+     "eur_per_tonne": 122.88711960186534
+    },
+    "swing_eur_per_tonne": 40.16571294113268,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 17905.218730560002
+   },
+   {
+    "key": "kg_per_inhab_month",
+    "unit": "kg/hab/mês",
+    "source": "vitrus_data",
+    "base_value": 1.59583,
+    "low_value": 1.117081,
+    "high_value": 2.0745790000000004,
+    "low": {
+     "tonnes": 312.048565645068,
+     "annual_cost_eur": 39503.27782152258,
+     "eur_per_tonne": 126.59336452920797
+    },
+    "high": {
+     "tonnes": 579.5187647694123,
+     "annual_cost_eur": 52128.03596576697,
+     "eur_per_tonne": 89.95055748800206
+    },
+    "swing_eur_per_tonne": 36.64280704120591,
+    "swing_tonnes": 267.47019912434433,
+    "swing_cost_eur": 12624.758144244392
+   },
+   {
+    "key": "on_demand_kg_per_pickup",
+    "unit": "kg",
+    "source": "assumption",
+    "base_value": 25,
+    "low_value": 17.5,
+    "high_value": 32.5,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 54822.301844283335,
+     "eur_per_tonne": 122.97961123989826
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 40965.924997147085,
+     "eur_per_tonne": 91.89642464378427
+    },
+    "swing_eur_per_tonne": 31.08318659611399,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 13856.37684713625
+   },
+   {
+    "key": "modes.existing.collections_per_year",
+    "unit": "/ano",
+    "source": "assumption",
+    "base_value": 26,
+    "low_value": 18.2,
+    "high_value": 33.800000000000004,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 41299.47821760001,
+     "eur_per_tonne": 92.64466475773698
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 50357.44421760001,
+     "eur_per_tonne": 112.96386150486106
+    },
+    "swing_eur_per_tonne": 20.31919674712408,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 9057.966
+   },
+   {
+    "key": "modes.on_demand.capture_rate",
+    "unit": "%",
+    "source": "assumption",
+    "base_value": 0.25,
+    "low_value": 0.175,
+    "high_value": 0.325,
+    "low": {
+     "tonnes": 423.40704610201215,
+     "annual_cost_eur": 39503.27782152258,
+     "eur_per_tonne": 93.2985839163503
+    },
+    "high": {
+     "tonnes": 468.1602843124681,
+     "annual_cost_eur": 52128.03596576696,
+     "eur_per_tonne": 111.34655739181565
+    },
+    "swing_eur_per_tonne": 18.047973475465355,
+    "swing_tonnes": 44.75323821045595,
+    "swing_cost_eur": 12624.758144244384
+   },
+   {
+    "key": "modes.on_demand.coverage_factor",
+    "unit": "%",
+    "source": "assumption",
+    "base_value": 0.6,
+    "low_value": 0.42,
+    "high_value": 0.78,
+    "low": {
+     "tonnes": 423.40704610201215,
+     "annual_cost_eur": 39503.27782152258,
+     "eur_per_tonne": 93.2985839163503
+    },
+    "high": {
+     "tonnes": 468.1602843124681,
+     "annual_cost_eur": 52128.03596576696,
+     "eur_per_tonne": 111.34655739181565
+    },
+    "swing_eur_per_tonne": 18.047973475465355,
+    "swing_tonnes": 44.75323821045595,
+    "swing_cost_eur": 12624.758144244384
+   },
+   {
+    "key": "cost_per_km_eur",
+    "unit": "€/km",
+    "source": "assumption",
+    "base_value": 1.1,
+    "low_value": 0.77,
+    "high_value": 1.4300000000000002,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 43526.2822176,
+     "eur_per_tonne": 97.63992181580969
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 48130.64021759998,
+     "eur_per_tonne": 107.96860444678826
+    },
+    "swing_eur_per_tonne": 10.328682630978577,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 4604.357999999986
+   },
+   {
+    "key": "modes.existing.people_per_point",
+    "unit": "hab",
+    "source": "assumption",
+    "base_value": 4000,
+    "low_value": 2800,
+    "high_value": 5200,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 48712.46121759999,
+     "eur_per_tonne": 109.2737689142425
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 44592.4612176,
+     "eur_per_tonne": 100.03161779575177
+    },
+    "swing_eur_per_tonne": 9.242151118490725,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 4119.999999999985
+   },
+   {
+    "key": "detour_factor",
+    "unit": "x",
+    "source": "assumption",
+    "base_value": 1.3,
+    "low_value": 1,
+    "high_value": 1.6900000000000002,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 44057.554294523085,
+     "eur_per_tonne": 98.83169288861494
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 48130.64021759999,
+     "eur_per_tonne": 107.96860444678828
+    },
+    "swing_eur_per_tonne": 9.136911558173338,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 4073.0859230769056
+   },
+   {
+    "key": "vehicle_lifetime_years",
+    "unit": "anos",
+    "source": "assumption",
+    "base_value": 8,
+    "low_value": 5.6,
+    "high_value": 10.4,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 48105.24693188571,
+     "eur_per_tonne": 107.91164119825275
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 44602.499679138455,
+     "eur_per_tonne": 100.05413647986235
+    },
+    "swing_eur_per_tonne": 7.857504718390402,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 3502.7472527472564
+   },
+   {
+    "key": "vehicle_capex_eur",
+    "unit": "€",
+    "source": "assumption",
+    "base_value": 42500,
+    "low_value": 29749.999999999996,
+    "high_value": 55250,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 44234.711217599994,
+     "eur_per_tonne": 99.22909848443136
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 47422.211217599994,
+     "eur_per_tonne": 106.37942777816662
+    },
+    "swing_eur_per_tonne": 7.150329293735254,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 3187.5
+   },
+   {
+    "key": "modes.existing.lifetime_years",
+    "unit": "anos",
+    "source": "assumption",
+    "base_value": 5,
+    "low_value": 3.5,
+    "high_value": 6.5,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 47114.17550331428,
+     "eur_per_tonne": 105.68842956910818
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 45136.15352529229,
+     "eur_per_tonne": 101.2512504340171
+    },
+    "swing_eur_per_tonne": 4.437179135091085,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 1978.0219780219923
+   },
+   {
+    "key": "modes.existing.capex_per_point_eur",
+    "unit": "€",
+    "source": "assumption",
+    "base_value": 250,
+    "low_value": 175,
+    "high_value": 325,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 44928.461217599994,
+     "eur_per_tonne": 100.78534662483256
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 46728.461217599994,
+     "eur_per_tonne": 104.8231796377654
+    },
+    "swing_eur_per_tonne": 4.03783301293285,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 1800
+   },
+   {
+    "key": "on_demand_every_weeks",
+    "unit": "semanas",
+    "source": "assumption",
+    "base_value": 2,
+    "low_value": 1.4,
+    "high_value": 2.6,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 46400.778316460826,
+     "eur_per_tonne": 104.08810806221355
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 45500.59151212843,
+     "eur_per_tonne": 102.0687725086914
+    },
+    "swing_eur_per_tonne": 2.019335553522154,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 900.1868043323993
+   },
+   {
+    "key": "vehicle_capacity_t",
+    "unit": "t",
+    "source": "assumption",
+    "base_value": 2,
+    "low_value": 1.4,
+    "high_value": 2.6,
+    "low": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 102.80426313129898
+    },
+    "high": {
+     "tonnes": 445.78366520724,
+     "annual_cost_eur": 45828.461217599994,
+     "eur_per_tonne": 102.80426313129898
+    },
+    "swing_eur_per_tonne": 0,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 0
+   }
+  ],
+  "eur_per_tonne": {
+   "p10": 81.99917825561137,
+   "p50": 104.36819856774487,
+   "p90": 141.31033947586764
+  },
+  "annual_cost_eur": {
+   "p10": 37415.218636354846,
+   "p50": 46013.35766418188,
+   "p90": 56531.83893985521
+  },
+  "tonnes": {
+   "p10": 341.1472043486132,
+   "p50": 439.49094879226664,
+   "p90": 554.7200397546727
+  },
+  "threshold_eur_per_tonne": null,
+  "prob_below_threshold": null,
+  "assumption_share_of_top_drivers": 0.8
+ },
+ "pilot": {
+  "k": 2,
+  "months": 3,
+  "modes": [
+   "existing",
+   "on_demand"
+  ],
+  "zones": [
+   {
+    "parish_code": "030801",
+    "parish_name": "Aldão",
+    "tipau": "apu",
+    "facts": [
+     {
+      "key": "population",
+      "value": 1278,
+      "unit": "hab",
+      "source": "INE, Censos 2021"
+     },
+     {
+      "key": "density",
+      "value": 832,
+      "unit": "hab/km²",
+      "source": "INE/CAOP: população / área da freguesia"
+     },
+     {
+      "key": "service_days",
+      "value": 3,
+      "unit": "dias/semana",
+      "source": "Vitrus: circuitos atuais"
+     },
+     {
+      "key": "demand_t",
+      "value": 24.5,
+      "unit": "t/ano",
+      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+     },
+     {
+      "key": "startup_cost_eur",
+      "value": 739,
+      "unit": "€",
+      "source": "Modelo de custos (pressuposto, estimativa)"
+     }
+    ]
+   },
+   {
+    "parish_code": "030877",
+    "parish_name": "União das freguesias de Arosa e Castelões",
+    "tipau": "apr",
+    "facts": [
+     {
+      "key": "population",
+      "value": 699,
+      "unit": "hab",
+      "source": "INE, Censos 2021"
+     },
+     {
+      "key": "density",
+      "value": 125.9,
+      "unit": "hab/km²",
+      "source": "INE/CAOP: população / área da freguesia"
+     },
+     {
+      "key": "service_days",
+      "value": 3,
+      "unit": "dias/semana",
+      "source": "Vitrus: circuitos atuais"
+     },
+     {
+      "key": "demand_t",
+      "value": 13.4,
+      "unit": "t/ano",
+      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+     },
+     {
+      "key": "startup_cost_eur",
+      "value": 1044,
+      "unit": "€",
+      "source": "Modelo de custos (pressuposto, estimativa)"
+     }
+    ]
+   }
+  ],
+  "score": {
+   "score": 0.8789290940565243,
+   "tipau_diversity": 1,
+   "density_contrast": 0.5098929806588213,
+   "coverage": 1,
+   "cost": 0.8414838231923372,
+   "weight_tipau": 0.25,
+   "weight_density": 0.15,
+   "weight_coverage": 0.3,
+   "weight_cost": 0.3
+  },
+  "kpis": [
+   {
+    "key": "tonnes",
+    "unit": "t",
+    "value": 2.433417493383,
+    "p10": 1.8694700648847982,
+    "p90": 2.9864614638916893,
+    "basis": "Procura (INE × Vitrus + APA) × captura dos modos, em 3 meses (estimativa)"
+   },
+   {
+    "key": "eur_per_tonne",
+    "unit": "€/t",
+    "value": 537.8249155877099,
+    "p10": 423.94712367778294,
+    "p90": 705.8844124113333,
+    "basis": "Custo anual do modelo / toneladas anuais, sem o preço da viatura dedicada (é da rede inteira), intervalo por Monte Carlo (estimativa)"
+   },
+   {
+    "key": "reject_rate_pct",
+    "unit": "%",
+    "value": 14.05302954863808,
+    "p10": 11.559190876105536,
+    "p90": 16.246882473083833,
+    "basis": "Taxa observada em 2025 (14,1% rejeito) com a mesma incerteza ± (estimativa)"
+   }
+  ],
+  "signal_floor": {
+   "min_tonnes_pilot": 1.713,
+   "computed": true,
+   "tonnes_pilot": 2.433,
+   "floor_met": true,
+   "combos_total": 1128,
+   "combos_below_floor": 0,
+   "calculation": [
+    {
+     "key": "reject_share_pct",
+     "value": 14.1,
+     "unit": "%",
+     "source": "Vitrus: destino do recolhido em 2025"
+    },
+    {
+     "key": "half_width_pp",
+     "value": 3,
+     "unit": "p.p.",
+     "source": "Critério: IC útil (pressuposto)"
+    },
+    {
+     "key": "z",
+     "value": 1.96,
+     "unit": "",
+     "source": "IC a 95%"
+    },
+    {
+     "key": "design_effect",
+     "value": 2,
+     "unit": "x",
+     "source": "Ensaio por conglomerados (pressuposto)"
+    },
+    {
+     "key": "pieces_per_cell",
+     "value": 1032,
+     "unit": "peças",
+     "source": "Cálculo (estimativa)"
+    },
+    {
+     "key": "piece_kg",
+     "value": 0.415,
+     "unit": "kg",
+     "source": "Peso médio por tipo de peça (pressuposto)"
+    },
+    {
+     "key": "tonnes_per_cell",
+     "value": 0.428,
+     "unit": "t",
+     "source": "Cálculo (estimativa)"
+    },
+    {
+     "key": "cells",
+     "value": 4,
+     "unit": "freguesia × modo",
+     "source": "k = 2, 2 modos"
+    }
+   ],
+   "explanation": "Para medir a taxa de rejeito (14,1%) com ±3 p.p. (95%) em cada freguesia e modo são precisas 1 032 peças (1,96² × p(1−p) / 0,03² × 2) = 0,428 t por célula; 4 células dão 1,71 t. Das 1 128 combinações, 0 ficam abaixo de 1,71 t em 3 meses e foram descartadas."
+  },
+  "startup_cost_eur": 1783.75,
+  "rationale": [
+   "Aldão: 1 278 hab, 832 hab/km², predominantemente urbana, circuito 3 dia(s)/semana, arranque de 739 € em 3 meses.",
+   "União das freguesias de Arosa e Castelões: 699 hab, 126 hab/km², predominantemente rural, circuito 3 dia(s)/semana, arranque de 1 044 € em 3 meses.",
+   "Cobre territórios diferentes do INE (TIPAU), o que mostra se o resultado depende do contexto.",
+   "Pontuação de aprendizagem 0,88 em 1 (pesos: território 0,25, densidade 0,15, circuitos 0,30, custo 0,30; pressuposto da equipa)."
+  ],
+  "estimate": true
+ }
+}

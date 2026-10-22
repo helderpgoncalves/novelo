@@ -17,21 +17,21 @@ async def test_overview_gap_and_references(logged_in: httpx.AsyncClient) -> None
     body = (await logged_in.get(f"{P}/textile/overview")).json()
     gap = body["gap"]
     assert gap["population"] == 156_830 and gap["parishes_count"] == 48
-    # gerado = 43 051 t × 5,4% (Vitrus + APA) + 301,265 t = 2 324,754 + 301,265 = 2 626,0 t
-    assert gap["potential_t"] == pytest.approx(2626.0, abs=0.1)
+    # gerado = 51 250,6 t × 5,86% (Vitrus + APA) + 301,265 t = 3 003,285 + 301,265 = 3 304,55 t
+    assert gap["potential_t"] == pytest.approx(3304.55, abs=0.1)
     assert gap["collected_t"] == pytest.approx(301.265, abs=0.01)
-    assert gap["missing_t"] == pytest.approx(2324.8, abs=0.05)  # o que ainda vai para o lixo
-    assert gap["capture_pct"] == pytest.approx(11.5, abs=0.05)  # 301,265 ÷ 2 626,0
+    assert gap["missing_t"] == pytest.approx(3003.3, abs=0.05)  # o que ainda vai para o lixo
+    assert gap["capture_pct"] == pytest.approx(9.1, abs=0.05)  # 301,265 ÷ 3 304,55
     assert gap["kg_per_inhab_year"] == pytest.approx(1.92, abs=0.01)  # 301 265 kg ÷ 156 830
-    assert gap["potential_kg_per_inhab_year"] == pytest.approx(16.74, abs=0.01)  # 2 626 000 kg ÷ 156 830
-    assert gap["missing_kg_per_inhab_year"] == pytest.approx(14.82, abs=0.01)  # 2 324 754 kg ÷ 156 830
-    assert gap["missing_kg_per_inhab_month"] == pytest.approx(1.235, abs=0.001)  # 14,8234 ÷ 12
-    assert "APA" in gap["potential_source_label"] and "43 051" in gap["potential_source_label"]
+    assert gap["potential_kg_per_inhab_year"] == pytest.approx(21.07, abs=0.01)  # 3 304 550 kg ÷ 156 830
+    assert gap["missing_kg_per_inhab_year"] == pytest.approx(19.15, abs=0.01)  # 3 003 285 kg ÷ 156 830
+    assert gap["missing_kg_per_inhab_month"] == pytest.approx(1.596, abs=0.001)  # 19,1499 ÷ 12
+    assert "APA" in gap["potential_source_label"] and "43 050,5" in gap["potential_source_label"]
     assert gap["potential_is_estimate"] is True
     refs = {r["key"]: r for r in body["references"]}
     assert refs["france_2024"]["kg_per_inhab_year"] == 4.27 and refs["france_2024"]["verified"]
     assert "guimaraes_plan_potential" not in refs  # o plano municipal deixou de ser fonte de números
-    assert refs["guimaraes_potential"]["kg_per_inhab_year"] == pytest.approx(16.74, abs=0.01)
+    assert refs["guimaraes_potential"]["kg_per_inhab_year"] == pytest.approx(21.07, abs=0.01)
     assert refs["guimaraes_potential"]["is_estimate"] is True
     assert refs["germany_2022"]["verified"] is False
 
@@ -42,7 +42,7 @@ async def test_overview_parishes_sorted_by_population(logged_in: httpx.AsyncClie
     assert [p["population"] for p in parishes] == sorted((p["population"] for p in parishes), reverse=True)
     first = parishes[0]
     assert (first["name"], first["population"]) == ("Creixomil", 9708)
-    assert first["potential_t"] == pytest.approx(143.91, abs=0.01)  # 9 708 × 14,8234 kg/hab/ano / 1000
+    assert first["potential_t"] == pytest.approx(185.91, abs=0.01)  # 9 708 × 19,1499 kg/hab/ano / 1000
     assert first["share_of_population_pct"] == pytest.approx(6.19, abs=0.01)  # 9 708 / 156 830
     assert first["centroid"] is not None and first["area_km2"] and first["area_km2"] > 0
     assert sum(p["share_of_population_pct"] for p in parishes) == pytest.approx(100, abs=0.2)
@@ -72,7 +72,7 @@ async def test_overview_highlights_and_sources(session: AsyncSession) -> None:
     assert set(textile.methods) == {"weighed", "percentage"} and textile.rows > 0
     assert next(s for s in out.data_sources if s.key == "ine_census_2021").rows == 48
     rsu = next(s for s in out.data_sources if s.key == "vitrus_apa_rsu_2025")
-    assert (rsu.kind, rsu.rows, rsu.rows_unit) == ("operator", 2, "values")  # 43 051 t e 5,4%
+    assert (rsu.kind, rsu.rows, rsu.rows_unit) == ("operator", 3, "values")  # 43 050,5 t, 84,0% e 5,86%
     municipal = next(s for s in out.data_sources if s.key == "vitrus_municipal_containers_2026_10")
     assert (municipal.kind, municipal.rows, municipal.rows_unit) == ("operator", 2751, "rows")
 

@@ -10,7 +10,7 @@ import { HeroLedger } from './hero-ledger';
 import { HERO_SKY } from './landing-assets.generated';
 import { CONTAINER } from './layout';
 
-/** Separa o primeiro número com «%» do título («11,5 %»): vai em itálico verde (Newsreader Display Italic). */
+/** Separa o primeiro número com «%» do título («9,1 %»): vai em itálico verde (Newsreader Display Italic). */
 function splitTitle(title: string): [string, string | null, string] {
   const match = /\d+(?:[.,]\d+)?[\s ]?%/.exec(title);
   if (!match) return [title, null, ''];
@@ -18,10 +18,10 @@ function splitTitle(title: string): [string, string | null, string] {
 }
 
 /**
- * Topo da página. O título diz o que ninguém diz («Só 11,5 % do têxtil de Guimarães é recolhido à parte»), o subtítulo diz o
+ * Topo da página. O título diz o que ninguém diz («Só 9,1 % do têxtil de Guimarães é recolhido à parte»), o subtítulo diz o
  * resto e o que o Novelo faz, e os números vivem num painel no fluxo do texto (`HeroLedger`): ao lado da cópia em ecrã largo,
  * por baixo dos botões nos estreitos. Nada de texto por cima da fotografia. O objeto do hero é o fio (`HeroFio`), só gráfico:
- * desenha-se do vale ao campanário da Penha, cheio até aos 11,5 % e a tracejado até ao potencial. A grelha reserva por baixo
+ * desenha-se do vale ao campanário da Penha, cheio até aos 9,1 % e a tracejado até ao potencial. A grelha reserva por baixo
  * do texto a altura do campanário (proporcional à largura), por isso o fio e o texto nunca se cruzam. A fotografia é a Penha
  * ao fim do dia (RaquelRosa7, CC BY-SA 4.0), em meio-tom, com um parallax curto ao rolar. O título não anima (LCP).
  */

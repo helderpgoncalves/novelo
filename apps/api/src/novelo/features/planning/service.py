@@ -27,9 +27,16 @@ from novelo.domain.vocab import (
     Typology,
     WeighingMethod,
 )
+from novelo.features.municipal.models import MunicipalParishStat
 from novelo.features.network.models import Circuit, Container, Locality, Parish, ShiftAssignment, Vehicle
 from novelo.features.planning import site_service
-from novelo.features.planning.collection_plan import build_collection_plan
+from novelo.features.planning.collection_plan import (
+    ChannelLoad,
+    build_collection_plan,
+    fleet_figures,
+    load_hours,
+    with_vehicle_share,
+)
 from novelo.features.planning.models import ParameterSet, Scenario
 from novelo.features.planning.params import default_params, params_meta, to_domain_params, to_domain_zone
 from novelo.features.planning.schemas import (
@@ -105,8 +112,8 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
         .scalars()
         .all()
     )
-    # Passagens de indiferenciado com viatura: as porta a porta são o canal PAP; todas (moloks também) dão os dias
-    # de serviço que decidem o desvio da recolha a pedido. Orgânico nunca (o têxtil molha-se).
+    # Passagens de indiferenciado: as porta a porta são a acessibilidade da matriz de cobertura; todas (moloks também)
+    # dão os dias de serviço (hábito de recolha em dias fixos, no piloto). Orgânico nunca. Não levam têxtil.
     undifferentiated = await _undifferentiated_passes(db, circuits)
     passes_by_locality = {
         loc: [p for kind, p in items if kind == CollectionType.DOOR_TO_DOOR] for loc, items in undifferentiated.items()
@@ -122,6 +129,12 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
         .group_by(Container.parish_id)
     )
     containers_by_parish = {pid: n for pid, n in container_counts.all() if pid is not None}
+    # Área CAOP 2019 de cada freguesia (pacote municipal): volta da viatura dedicada porta a porta.
+    areas = {
+        code: float(area)
+        for code, area in await db.execute(select(MunicipalParishStat.dicofre, MunicipalParishStat.area_km2))
+        if area is not None
+    }
     by_parish: dict[uuid.UUID, list[Locality]] = defaultdict(list)
     for loc in localities:
         if loc.parish_id:
@@ -140,12 +153,14 @@ async def load_zone_rows(db: AsyncSession, kg_per_inhab_month: float) -> list[Zo
                 name=p.name,
                 population=p.population,
                 population_year=p.population_year,
-                # 4 casas: a soma das 48 freguesias (rodapé da cobertura) fica 2 324,8 t; a 2 casas dava 2 324,7.
+                # 4 casas: a soma das 48 freguesias (rodapé da cobertura) fica igual ao potencial (3 003,3 t);
+                # arredondada perderia décimas.
                 demand_t=round(yearly_demand_t(p.population, kg_per_inhab_month), 4),
                 latitude=float(p.latitude),
                 longitude=float(p.longitude),
                 tipau=p.tipau,
                 service_days=door_to_door.weekdays_served(served),
+                area_km2=areas.get(p.dicofre, float(p.area_km2) if p.area_km2 is not None else None),
                 existing_containers=containers_by_parish.get(p.id, 0),
                 localities=sorted(loc.name for loc in locs),
                 geometry=p.geometry,
@@ -161,11 +176,11 @@ SHIFT_ORDER = {Shift.MORNING: 0, Shift.AFTERNOON: 1, Shift.NIGHT: 2}
 async def _undifferentiated_passes(
     db: AsyncSession, circuits: Sequence[Circuit]
 ) -> dict[uuid.UUID, list[tuple[CollectionType, DoorToDoorPass]]]:
-    """Passagens semanais dos circuitos de indiferenciado (porta a porta e moloks) COM viatura no planeamento de turnos,
-    por localidade, com o tipo de recolha do circuito.
+    """Passagens semanais dos circuitos de indiferenciado (porta a porta e moloks) por localidade, com o tipo de
+    recolha do circuito e a viatura do planeamento de turnos quando lá está.
 
-    Só indiferenciado: o têxtil numa viatura de biorresíduos (orgânico) molha-se e perde o valor de reutilização, que é
-    a contaminação que a Vitrus quer evitar. Sem viatura nesse grupo de dias, não há passagem.
+    Só indiferenciado (orgânico não conta). Todos os dias do circuito contam: a Vitrus disse a 22 out 2026 que a folha
+    de turnos tem erros e que os circuitos sem viatura na folha circulam.
     """
     rows = (
         await db.execute(
@@ -241,6 +256,7 @@ def compute(
         budget_eur_year=request.budget_eur_year,
         target_tonnes=request.target_tonnes,
         time_limit_s=params.solver_time_limit_s,
+        vehicles=network.fleet_cost(dp),
     )
     zone_by_code = {z.code: z for z in zones}
 
@@ -292,6 +308,7 @@ def compute(
 
     chosen_by_zone = {o.zone_id: o for o in solved.chosen}
     allocations: list[Allocation] = []
+    channel_loads: list[ChannelLoad] = []
     for z in zones:
         option = chosen_by_zone.get(z.code)
         if option is None:
@@ -317,6 +334,12 @@ def compute(
         for p in option.parts:
             km = p.km_year * km_scale.get(p.mode, 1.0)
             opex = p.opex_eur_year + (km - p.km_year) * params.cost_per_km_eur
+            channel_loads.append(
+                ChannelLoad(
+                    z.code, p.mode, tonnes_by_part[(z.code, p.mode)], km, p.collections_year, p.rounds_year,
+                    p.trips_per_round if p.mode == CollectionMode.ON_DEMAND else None,
+                )
+            )  # fmt: skip
             parts.append(
                 AllocationPart(
                     mode=p.mode,
@@ -348,9 +371,14 @@ def compute(
 
     total_pop = sum(z.population for z in zones)
     tonnes = sum(a.tonnes for a in allocations)
-    capex = sum(a.capex_eur for a in allocations)
-    annual = sum(a.annual_cost_eur for a in allocations)
-    annuity = sum(x.capex_eur / params.modes[x.mode].lifetime_years for a in allocations for x in a.parts)
+    vehicles = fleet_figures(sum(load_hours(ld, dp) for ld in channel_loads), dp)
+    capex = sum(a.capex_eur for a in allocations) + vehicles.capex_eur
+    annual = sum(a.annual_cost_eur for a in allocations) + vehicles.annual_eur
+    annuity = (
+        sum(x.capex_eur / params.modes[x.mode].lifetime_years for a in allocations for x in a.parts)
+        + vehicles.annual_eur
+    )
+    allocations = with_vehicle_share(allocations, channel_loads, dp, vehicles)
     kpis = Kpis(
         capex_eur=round(capex, 2),
         opex_eur_year=round(annual - annuity, 2),
@@ -362,12 +390,9 @@ def compute(
         km_year=round(sum(a.km_year for a in allocations), 1),
         potential_t=round(zones_potential_t([z.population for z in zones], params.kg_per_inhab_month), 1),
         baseline_observed_t=round(baseline_t, 1),
-        avoided_treatment_eur=site_service.avoided_treatment(tonnes, params),
+        **site_service.cost_kpis(tonnes, annual, params, vehicles),
         **site_service.reuse_kpis(tonnes, annual, reuse),
     )
-    on_demand = {
-        a.parish_code: (x.tonnes, x.km_year) for a in allocations for x in a.parts if x.mode == CollectionMode.ON_DEMAND
-    }
     modes = [
         ModeSummary(
             mode=m,
@@ -386,7 +411,7 @@ def compute(
         modes=modes,
         depot=[params.depot_lat, params.depot_lon],
         default_modes=request.default_modes,
-        collection_plan=build_collection_plan(zones, on_demand, params),
+        collection_plan=build_collection_plan(zones, channel_loads, routes, dp, vehicles.vehicles),
     )
     return result, solved.status
 

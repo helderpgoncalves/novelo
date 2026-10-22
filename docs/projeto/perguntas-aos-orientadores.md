@@ -6,7 +6,9 @@ Escrito a **20 de outubro de 2026** (terça-feira), no dia em que chegou o pacot
 
 > **Nota de rigor.** Todo o número tem fonte (ficheiro em `data/`, registo de afirmações ou [Fontes](../pesquisa/fontes.md)) ou a palavra "estimativa" ou "cálculo". Onde a pesquisa de hoje encontrou algo que muda um pressuposto, está dito. Nada aqui é uma resposta: são hipóteses de ação para cada resposta possível.
 
-> **Atualização de 21 de outubro de 2026.** O Lucas (Vitrus) respondeu por email a Q2, Q4, Q6 e, em parte, Q8. Resumo em [Respostas de 21 de outubro](#respostas-de-21-de-outubro-de-2026) e no [registo de respostas](#8-registo-de-respostas). Os números deste documento que usavam 0,7 kg/hab/mês (1 317,4 t, 22,9%, 18,6%) ficam como histórico; a base em uso é 43 051 t de RSU × 5,4% (APA) = 2 324,8 t por desviar, captura de 11,5% (estimativa).
+> **Atualização de 21 de outubro de 2026.** O Lucas (Vitrus) respondeu por email a Q2, Q4, Q6 e, em parte, Q8. Resumo em [Respostas de 21 de outubro](#respostas-de-21-de-outubro-de-2026) e no [registo de respostas](#8-registo-de-respostas). Os números deste documento que usavam 0,7 kg/hab/mês (1 317,4 t, 22,9%, 18,6%) ficam como histórico.
+
+> **Atualização de 22 de outubro de 2026.** O Lucas respondeu a Q4 (de novo), Q5, V2, V4, V5 e V10 e mudou a base de Q6. Resumo em [Respostas de 22 de outubro](#respostas-de-22-de-outubro-de-2026). A base em uso passa a ser o indiferenciado do concelho todo (43 050,5 ÷ 0,840 ≈ 51 250,6 t) × 5,86% (APA, RARU 2025) ≈ 3 003,3 t por desviar, captura de cerca de 9,1% (estimativa). A base de 21 de outubro (43 051 t × 5,4% = 2 324,8 t, 11,5%) fica como histórico.
 
 ## Respostas de 21 de outubro de 2026
 
@@ -18,6 +20,21 @@ Escrito a **20 de outubro de 2026** (terça-feira), no dia em que chegou o pacot
 | [Q8](#q8-os-contentores-municipais-e-o-seu-uso-para-têxteis) Contentores municipais | O pacote junta todos os contentores de indiferenciado, orgânico e recolha seletiva, enterrados ou de superfície. Não há dados de deposição de têxtil por contentor; pela APA, cerca de 5% do indiferenciado é têxtil | Os contentores municipais são a base geográfica: onde o têxtil se perde e onde a viatura já passa. Nenhum recebe têxtil; a paragem com sacos fechados é pressuposto |
 
 Decisão do Hélder: sem contentores de têxtil; os contentores municipais são a base de toda a geografia. Detalhe em [Respostas da Vitrus de 21 out 2026](../dados/analise-dados-recebidos.md#respostas-da-vitrus-de-21-out-2026).
+
+## Respostas de 22 de outubro de 2026
+
+| Pergunta | Resposta da Vitrus | O que muda no Novelo |
+| --- | --- | --- |
+| [Q5](#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais), V10 Saco no camião do porta a porta | **Não pode.** O saco vai para a caixa de compactação e estraga-se; cabine, gancho ou caixa lateral também não são possíveis. A saída é "a aquisição de um meio novo de recolha" | Resposta B de Q5: sai "sem km novos" e o saco no compactador. A rede passa a ter **uma viatura de têxtil nova, sem compactação**: saco fechado à porta num dia fixo por freguesia e paragens nos locais municipais e nas escolas |
+| Q5 Volta só de têxtil num compactador | **Não**, por contaminação | Nenhuma viatura atual serve para têxtil |
+| V4, V5 Viaturas livres à tarde e circuitos sem viatura | **Não há viaturas livres.** A folha de turnos tem um erro: as viaturas estão em uso à tarde, e os circuitos PAP que pareciam sem viatura também a têm | Cai o plano B das "pelo menos 15 viaturas sem circuito numa tarde" (registo A20, A22) |
+| [Q4](#q4-custos-unitários-e-vida-útil) Custos por hora e por km | O financeiro ainda não os enviou | Continuam pressupostos (±30%) |
+| Tratamento do indiferenciado | 40 €/t de taxa de gestão de resíduos + 65,64 €/t da Resinorte = **105,64 €/t** em aterro | Cada tonelada desviada poupa 105,64 €: custo evitado ao lado do custo de cada cenário (registo A25) |
+| V2 Depósito | **Estaleiro Operacional da Rua das Lameiras, Polvoreira** | Origem e fim das rotas (registo A26) |
+| [Q6](#q6-o-que-significam-07-kghabmês-e-54) Base da procura | Usar **5,86%** (APA, RARU 2025, p. 24) sobre o indiferenciado do **concelho todo** (a Vitrus recolhe 84,0%; Relatório e Contas 2025, p. 8) | 43 050,5 ÷ 0,840 ≈ 51 250,6 t; × 5,86% ≈ **3 003,3 t/ano** por desviar (1,596 kg/hab/mês); gerado ≈ 3 304,6 t; captura **≈ 9,1%** (estimativa) |
+| Sazonalidade | Os quilos por mês só se partilham com o município | O modelo continua anual |
+
+Detalhe e contas em [Respostas da Vitrus de 22 out 2026](../dados/analise-dados-recebidos.md#respostas-da-vitrus-de-22-out-2026).
 
 ## Como usar
 
@@ -39,7 +56,7 @@ Códigos: **V** Vitrus (Lucas), **F** Fibrenamics (Luís Miguel), **O** organiza
 | Por entidade | Ultriplo 134,130 t (44,5%); H Sarah Trading 118,632 t (39,4%); Nova Etapa 42,883 t (14,2%); Vitrus 5,620 t (1,9%) | `data/processed/textile_flows.csv` |
 | Destino | Reutilização 179,0 t (59,4%); reciclagem 79,9 t (26,5%); rejeito 42,3 t (14,1%) | `data/processed/summary.json`; registo A4 |
 | População | 156 830 habitantes em 48 freguesias | INE, Censos 2021 (`parishes.csv`); registo A3 |
-| Potencial e captura | 2 324,8 t/ano por desviar (43 051 t de RSU × 5,4%), gerado 2 626,0 t, captura 11,5% (estimativa) | Vitrus e APA, 21 out (cálculo); registo A8, A9. Antes: 1 317,4 t e 22,9% (plano municipal, já não usado) |
+| Potencial e captura | ≈ 3 003,3 t/ano por desviar (51 250,6 t de indiferenciado do concelho × 5,86%), gerado ≈ 3 304,6 t, captura ≈ 9,1% (estimativa) | Vitrus e APA, 22 out (cálculo); registo A8, A9, A24. Antes: 2 324,8 t e 11,5% (21 out) e 1 317,4 t e 22,9% (plano municipal), já não usados |
 | Circuitos e frota | 40 circuitos (9 sem viatura), 29 viaturas (2 nunca atribuídas), 101 turnos por semana, 82 localidades (79 com freguesia CAOP 2019 desde 22 out; antes 71 geocodificadas), 12 alertas | `Circuitos_Viaturas_Guimaraes.xlsx`; `summary.json` |
 | Contentores municipais (**não são de têxteis**) | 2 754 linhas, 2 751 aceites, 2 722 localizados, 2 026 locais, 17,4 por 1 000 hab., 1 187 locais candidatos | `data/processed/municipal_summary.json`; [análise](../dados/analise-contentores-municipais.md) |
 | Cobertura de área a 200, 300 e 500 m | 31,4%, 47,8% e 70,9% (só locais públicos) | `municipal_summary.json` |
@@ -71,7 +88,7 @@ Pontuação = impacto × urgência, de 1 a 5 cada (**estimativa da equipa, subje
 | [Q3](#q3-regras-pitch-e-submissão-de-23-de-outubro) | Texto das Regras, formato do pitch e conteúdo da submissão de 23 out, 17h30 | 5 | 5 | 25 | O (cópia V) | 21 |
 | [Q4](#q4-custos-unitários-e-vida-útil) | Custos por recolha, km, hora de equipa e contentor, e vida útil | 5 | 4 | 20 | V | 22 |
 | [Q5](#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais) | É possível recolher têxteis nos circuitos e viaturas atuais, e com que capacidade? | 5 | 4 | 20 | V | 22 |
-| [Q6](#q6-o-que-significam-07-kghabmês-e-54) | O que medem os 0,7 kg/hab/mês e os 5,4%, e de que ano? **Respondida: 5,4% × 43 051 t** | 5 | 4 | 20 | V, M | 21 |
+| [Q6](#q6-o-que-significam-07-kghabmês-e-54) | O que medem os 0,7 kg/hab/mês e os 5,4%, e de que ano? **Respondida: 5,4% × 43 051 t (21 out); revista a 22 out: 5,86% × indiferenciado do concelho** | 5 | 4 | 20 | V, M | 21 |
 | [Q7](#q7-como-foi-medido-o-destino-e-a-que-preço) | Como foi medido o destino por entidade, e a que preço? | 4 | 4 | 16 | V | 22 |
 | [Q8](#q8-os-contentores-municipais-e-o-seu-uso-para-têxteis) | Que fração são Profundidade e Superfície, e pode haver têxtil nesses locais? | 4 | 4 | 16 | V | 22 |
 | [Q9](#q9-fibrenamics-critérios-de-lote-destino-de-baixo-valor-e-papel) | Fibrenamics: critérios de lote, destino de baixo valor e papel no desafio | 4 | 3 | 12 | F (cópia O) | 22 |
@@ -132,6 +149,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 
 ### Q4. Custos unitários e vida útil
 
+> **22 de outubro de 2026.** Os custos por hora e por km das viaturas ainda não chegaram do financeiro. O custo de tratamento do indiferenciado chegou: 105,64 €/t em aterro (40 €/t de TGR + 65,64 €/t da Resinorte).
+
 > **Resposta parcial a 21 de outubro de 2026.** Os custos não estão no site; o mentor vai pedi-los ao departamento financeiro. Até lá vale o valor assumido abaixo. O custo por contentor só interessa ao cenário de referência.
 
 > **Pergunta.** Qual o custo por recolha, por quilómetro, por hora de equipa (motorista e tripulantes) e por contentor (compra, instalação, lavagem, manutenção)? Qual a vida útil? Qual o custo atual de recolha, triagem e destino por tonelada de têxtil, mesmo aproximado? Ordens de grandeza servem.
@@ -149,6 +168,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 
 ### Q5. Recolher têxteis nos circuitos e viaturas atuais
 
+> **Respondida a 22 de outubro de 2026: opção B.** O saco não pode ir no compactador do porta a porta (estraga-se na caixa de compactação; cabine, gancho ou caixa lateral também não), um compactador não pode fazer uma volta só de têxtil e não há viaturas livres à tarde (a folha de turnos tem um erro). A Vitrus indica "a aquisição de um meio novo de recolha". O Novelo modela uma viatura de têxtil nova, sem compactação, com partida do Estaleiro da Rua das Lameiras (Polvoreira). O "valor assumido" abaixo fica como histórico.
+
 > **Pergunta.** É possível recolher têxteis nos circuitos e viaturas atuais? Em quais (moloks, porta a porta, PAYT, recicláveis), com que caixa e que capacidade em toneladas ou m³ por viatura, com que frequência mínima, e onde se descarrega? Os 9 circuitos sem viatura estão integrados noutros? As viaturas 29-48-XU e 74-HN-36 podiam servir um piloto?
 
 **Porque perguntamos.** A afirmação "recolha a pedido sem km novos" assenta nos circuitos. Dos 40 circuitos, **nenhum é de têxteis** (24 indiferenciados, 7 orgânicos, 3 recicláveis, 1 volumosos, 1 PAYT, 2 de apoio, 2 a confirmar). Dos 18 circuitos porta a porta de indiferenciado, 8 não têm viatura (C8, C12, C15, C20 a C24). O ficheiro não traz capacidade, depósito nem custos; o modelo usa 4,0 t por viatura (pressuposto).
@@ -163,6 +184,8 @@ Cada cartão tem o texto pronto, o motivo (com o dado), o que muda conforme a re
 **A quem · prazo.** V. **22.**
 
 ### Q6. O que significam 0,7 kg/hab/mês e 5,4%
+
+> **Base revista a 22 de outubro de 2026.** A Vitrus indicou 5,86% (APA, RARU 2025, p. 24) sobre o indiferenciado do concelho todo (43 050,5 ÷ 0,840 ≈ 51 250,6 t): ≈ 3 003,3 t/ano por desviar, gerado ≈ 3 304,6 t, captura ≈ 9,1% (estimativa). A resposta de 21 de outubro, abaixo, fica como histórico.
 
 > **Respondida a 21 de outubro de 2026.** O mentor não conhece o Plano de Ação Integrado. A Vitrus recolheu 43 051 t de RSU em 2025 e indica 5,4% de têxtil (APA). Nova procura: 43 051 × 0,054 = 2 324,8 t/ano por desviar; com as 301,3 t recolhidas à parte, gerado 2 626,0 t e captura 11,5% (estimativa). Nenhuma das opções A, B ou C se aplica tal como estava; o cartão fica como histórico.
 
@@ -238,7 +261,7 @@ O resumo do estudo diz que os dados de composição física são de **2016**, do
 
 > **Pergunta.** O que consideram êxito para este desafio, e o que levaria a Vitrus a pilotar três meses em duas freguesias (toneladas, €/t, taxa de rejeito)? Quem decide (Vitrus, Câmara, juntas, Resinorte), com que orçamento e em que prazo? O plano de ação estima cerca de 5 milhões de euros para contentores em todas as freguesias: é esse o teto de referência?
 
-**Porque perguntamos.** O pedido final do pitch é o piloto. O plano municipal (Ação 1) estima "cerca de 5 milhões de euros" e uma meta de **+30% de recolha seletiva**, que aparece como "até 2025" (p. 51) e "até 2026" (p. 67) [F74]. O recomendador sugere Gondar e a União de Arosa e Castelões (recomendação do `POST /planning/pilot`). Arosa e Castelões tem 699 habitantes e 33 contentores municipais, 9 deles com coordenada suspeita.
+**Porque perguntamos.** O pedido final do pitch é o piloto. O plano municipal (Ação 1) estima "cerca de 5 milhões de euros" e uma meta de **+30% de recolha seletiva**, que aparece como "até 2025" (p. 51) e "até 2026" (p. 67) [F74]. O recomendador sugere Aldão e a União de Arosa e Castelões (recomendação do `POST /planning/pilot`, modelo de 22 out; antes, Gondar e Arosa e Castelões): piso de 1,71 t em 3 meses, previsão de 2,43 t, 538 €/t (424 a 706) sem o preço da viatura (estimativa). Arosa e Castelões tem 699 habitantes e 33 contentores municipais, 9 deles com coordenada suspeita.
 
 | Se a resposta for | O Novelo passa a… | Atualizar |
 | --- | --- | --- |
@@ -274,7 +297,7 @@ Pesquisa de 20 de outubro de 2026; fontes em [Fontes](../pesquisa/fontes.md) (F6
 | Guimarães, recolha seletiva de têxteis, 2025 | 1,92 kg/hab/ano | Cálculo (registo A2) |
 | França, 2024 | 4,27 kg/hab | Secundária, por verificar na fonte primária (C1) |
 | UE-27, recolha seletiva, 2020 | 4,4 kg/hab, de cerca de 16 kg gerados | Primária (C8) |
-| Têxteis no indiferenciado: Portugal / Guimarães | cerca de 4% (Deckers 2024) / 5,4% | Plano municipal [F74]; Guimarães por confirmar (Q6) |
+| Têxteis no indiferenciado: Portugal / Guimarães | cerca de 4% (Deckers 2024) / 5,4% | Plano municipal [F74]; desde 22 out o modelo usa os 5,86% da APA (2025), indicados pela Vitrus (Q6) |
 | Estimativas nacionais de resíduos têxteis urbanos | 250 mil t e 22,5 kg por agregado [F72]; 275 mil t e cerca de 25 kg por habitante [F78] | Secundárias e divergentes: **não usar em slide** sem a fonte primária |
 
 ---
@@ -344,15 +367,15 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
 | V1 | V · 22 | Ver [Q5](#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais): têxteis nos circuitos atuais, capacidade e descarga | 0 de 40 circuitos de têxteis | Ver Q5 |
-| V2 | V · 22 | De onde saem os circuitos e onde se descarrega (depósito, compactador de Aldão, Resinorte)? Coordenadas? | Depósito = centro de Guimarães (pressuposto); BIO 5 vai a "Aldão (compactador)" | Se há depósito: `depot_lat/lon` e VRP |
+| V2 | V · 22 | De onde saem os circuitos e onde se descarrega (depósito, compactador de Aldão, Resinorte)? Coordenadas? | Depósito = centro de Guimarães (pressuposto); BIO 5 vai a "Aldão (compactador)" | **Respondida a 22 out:** Estaleiro Operacional da Rua das Lameiras, Polvoreira → `depot_lat/lon` e VRP |
 | V3 | V · 22 | Custos por km, hora, combustível e motoristas | Ver [Q4](#q4-custos-unitários-e-vida-útil) | Ver Q4 |
-| V4 | V · 22 | Os 9 circuitos sem viatura (BIO 5, C8, C12, C15, C20, C21, C22, C23, C24) estão integrados noutros ou faltam no planeamento? | Alerta 1; 8 dos 18 circuitos porta a porta de indiferenciado | Se integrados: mapear; se faltam: a recolha a pedido não conta com eles |
-| V5 | V · 25 | As viaturas 29-48-XU e 74-HN-36 são reserva, oficina ou apoio? Estão livres para um piloto? | Nunca têm circuito; alerta 9 | Se livres: cenário "viatura dedicada" |
+| V4 | V · 22 | Os 9 circuitos sem viatura (BIO 5, C8, C12, C15, C20, C21, C22, C23, C24) estão integrados noutros ou faltam no planeamento? | Alerta 1; 8 dos 18 circuitos porta a porta de indiferenciado | **Respondida a 22 out:** erro da folha; os circuitos PAP têm viatura |
+| V5 | V · 25 | As viaturas 29-48-XU e 74-HN-36 são reserva, oficina ou apoio? Estão livres para um piloto? | Nunca têm circuito; alerta 9 | **Respondida a 22 out:** não há viaturas livres à tarde; a viatura dedicada tem de ser nova |
 | V6 | V · 25 | Em 12 dos 101 turnos a tripulação é 0 (MONSTROS, PAYT noite, LAVAGEM CONTENTORES, C.H, SEM CIRCUITO): erro ou sem equipa? | Os outros: 41 turnos com 3, 40 com 2, 8 com 1 (`shifts.csv`) | Se erro: corrigir `fleet_capacity.csv` e o custo de mão de obra |
 | V7 | V · 25 | Confirmam V1 = AR-93-SQ, V2 = AR-81-SQ, V3 = 60-93-ZG ou AS-75-SG, V4 = AN-50-LT? | Alerta 2: códigos V1 a V4 por trocar por matrículas | Se sim: substituir no ETL e fechar o alerta |
 | V8 | V · 25 | Podem completar localidades e dias de SELETIVO, RECICLAGEM, CARTÃO, MONSTROS, PAYT, CONTENTORES e LAVAGEM? | Alerta 10: têm viaturas mas não localidades nem dias | Se sim: cobertura de recicláveis e apoio no mapa |
 | V9 | V · 25 | Há janelas horárias (centro histórico), limites de ruído, regras de fim de semana ou feriado? Qual a regra de horas de condução? | 7 turnos de noite, 8 ao domingo; folha FERIADOS CHG (04/06/2026) não usada | Se há: restrições no VRP e no "E se...?" |
-| V10 | V · 25 | Viaturas multi-tipologia (60-93-ZG faz C7 e BIO 3 no mesmo turno): lava-se a caixa entre fluxos? Serve para têxtil, que tem de ir seco e sem compactar? | Alerta 8 | Se não serve: requisito de caixa para viatura de têxteis |
+| V10 | V · 25 | Viaturas multi-tipologia (60-93-ZG faz C7 e BIO 3 no mesmo turno): lava-se a caixa entre fluxos? Serve para têxtil, que tem de ir seco e sem compactar? | Alerta 8 | **Respondida a 22 out:** o compactador não serve (estraga o saco; volta só de têxtil contamina) → viatura de têxtil nova, sem compactação |
 | V11 | V · 25 | A semana de 21 a 25/09/2026, o sábado 19/09 e o domingo 20/09 são típicos? O planeamento do fim de semana é da mesma semana? | Alerta 11 | Se típicos: "semana tipo" no modelo |
 | V12 | V · 25 | Têm a lista oficial das 82 localidades com freguesia? | 11 sem coordenadas ("Ruas Estreitas", "Urgezess(5ª)"...) e 21 sem freguesia (61 de 82 ligadas) | Se sim: fecha a ligação circuito → freguesia |
 | V13 | V · 25 | Quilómetros, tempos e toneladas por circuito e por viatura, e pesagens? | O fator de desvio 1,3 e o limite de 20 s são pressupostos | Se sim: calibrar VRP e rotas |
@@ -364,7 +387,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | --- | --- | --- | --- | --- |
 | B1 | V · 22 | Ver [Q4](#q4-custos-unitários-e-vida-útil): custos unitários | `params.py` | Ver Q4 |
 | B2 | V · 22 | De onde vem o orçamento para a rede de têxteis em 2026 e 2027 (Vitrus, Câmara, Fundo Ambiental, FEDER, PRR)? Há teto anual? | A Ação 1 do plano estima cerca de 5 M€ com financiamento misto [F74, p. 65] | Se há teto: valor por omissão do simulador |
-| B3 | V · 22 | O que conta como êxito: toneladas, captura, €/t, cobertura, rejeito máximo? | O pitch precisa de uma frase-âncora com X e Y | Se há metas: KPI do cenário B e do piloto |
+| B3 | V · 22 | O que conta como êxito: toneladas, captura, €/t, cobertura, rejeito máximo? | A frase-âncora do pitch (445,8 t a 102,8 €/t, estimativa) precisa de um termo de comparação | Se há metas: KPI do cenário B e do piloto |
 | B4 | V · 25 | A meta de **+30% de recolha seletiva** é sobre que base e para que ano (2025 ou 2026)? | O plano diz "até 2025" (p. 51) e "até 2026" (p. 67) [F74]; 301,265 × 1,3 = 391,6 t (cálculo) | Se a base é 301,3 t: cenário de referência "meta do plano" a 391,6 t |
 | B5 | V · 22 | Ver [Q10](#q10-êxito-orçamento-e-piloto): o que levaria a Vitrus a pilotar | Pedido final do pitch | Ver Q10 |
 | B6 | V, M · 25 | O custo da recolha seletiva de têxteis já entra na tarifa (art. 36.º, n.º 7 do RGGR)? Qual a tarifa de aterro ou incineração por tonelada, para o custo evitado? | A fórmula de custo em [Dados e modelo](../engenharia/dados-e-modelo.md) não tem custo evitado; o n.º 8 exclui o que ficar sob RAP [F69] | Se sim: custo evitado por t; relatório RAP mostra quando sai da tarifa |
@@ -377,7 +400,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
-| F1 | V, M · pós | Têm toneladas de têxtil por **contentor ou ponto, por mês**? | Hoje a lacuna por freguesia assume o mesmo têxtil por habitante em todas (1,235 kg/hab/mês) | Se sim: calibração por zona e lacuna real em vez de estimativa |
+| F1 | V, M · pós | Têm toneladas de têxtil por **contentor ou ponto, por mês**? | Hoje a lacuna por freguesia assume o mesmo têxtil por habitante em todas (1,596 kg/hab/mês desde 22 out) | Se sim: calibração por zona e lacuna real em vez de estimativa |
 | F2 | V, M · pós | Têm a população por quarteirão (BGRI) ou por lugar? | A cobertura de 31,4%, 47,8% e 70,9% é de **área**, não de pessoas | Se sim: cobertura de população; senão manter "área" |
 | F3 | V, M · pós | Têm uma estimativa de população por freguesia mais recente do que os Censos 2021? | Os rácios por 1 000 hab. e a lacuna usam 2021; o plano cita 156 277 habitantes (INE, 2022) [F74] | Se sim: trocar `population` em `parishes.csv` com o ano indicado |
 | F4 | M · pós | Usam indicadores de rendimento, idade ou tipo de alojamento por freguesia no planeamento? (hipótese: explicam diferenças de captura) | Só há TIPAU: 36 freguesias predominantemente urbanas, 11 medianamente urbanas e 1 rural (`parishes.csv`) | Se sim: segundo fator de procura além do TIPAU; senão manter |
@@ -430,7 +453,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
 | C1 | V · 22 | Ver [Q10](#q10-êxito-orçamento-e-piloto): êxito, orçamento e piloto | Pedido final | Ver Q10 |
-| C2 | V · pós | Gondar e a União de Arosa e Castelões são viáveis? Gondar: 2 581 hab., 16 contentores (6,2 por 1 000 hab.), 14 locais públicos, cobertura a 300 m 47,3%, 0 coordenadas suspeitas. Arosa e Castelões: 699 hab., 33 contentores (47,2), 28 locais públicos, 56,4%, 9 suspeitas, a única freguesia "predominantemente rural" | `municipal_by_parish.csv`; `parishes.csv` | Se não: recomendador com outras (Lordelo é a nº 1 da lacuna estimada, 25,8 t/ano) |
+| C2 | V · pós | Aldão e a União de Arosa e Castelões são viáveis? Aldão: 1 278 hab., 13 contentores (10,2 por 1 000 hab.), 13 locais públicos, cobertura a 300 m 77,2%, 0 coordenadas suspeitas. Arosa e Castelões: 699 hab., 33 contentores (47,2), 28 locais públicos, 56,4%, 9 suspeitas, a única freguesia "predominantemente rural" | `municipal_by_parish.csv`; `parishes.csv` | Se não: recomendador com outras (Lordelo é a nº 1 da lacuna estimada, 76,2 t/ano) |
 | C3 | V, M · pós | Quem são os contactos nas juntas de freguesia, na Resinorte e no Laboratório da Paisagem? Pode apresentar-nos? | O plano lista 55 juntas, Vitrus, Resinorte e To Be Green como partes interessadas [F74] | Se sim: mensagem com referência |
 | C4 | V, F, P · pós | Existe uma candidatura (PRR, FEDER, LIFE, Horizon) onde o Novelo possa entrar? | O plano lista fundos mistos e NetZero Cities [F74] | Se sim: escrever o consórcio; senão "hipótese" |
 | C5 | F, P · pós | Há espaço para uma dissertação ou um projeto sucessor do Lusitano? | Mentores | Se sim: tema e orientador por escrito |
@@ -444,7 +467,7 @@ A lista completa está em [Mentores](mentores.md#prof-paulo-afonso-uminho-produ�
 | ID | Quem · prazo | Pergunta | Dado que a motiva | Respostas → ação |
 | --- | --- | --- | --- | --- |
 | P1 | P · 21 | Para cobertura, o raio de 300 m por **área** (47,8%) é defensável quando falta a população por quarteirão? | Pergunta F2 (BGRI em falta) | Se não: cobertura ponderada por população das freguesias |
-| P2 | P · 21 | A lacuna por freguesia, com o mesmo têxtil por habitante em todas (5,4% do RSU), é uma aproximação aceitável? | 48 freguesias; sem têxtil por freguesia | Se não: mostrar só ranking de potencial |
+| P2 | P · 21 | A lacuna por freguesia, com o mesmo têxtil por habitante em todas (5,86% do indiferenciado), é uma aproximação aceitável? | 48 freguesias; sem têxtil por freguesia | Se não: mostrar só ranking de potencial |
 | P3 | P · 21 | Como tratar 350 locais com coordenada aproximada (±100 m) e 79 coordenadas suspeitas na otimização? | Alertas municipais 7 e 18 | Se pede: simulação com ruído posicional |
 | P4 | P · 21 | O piso de 1,71 t em 3 meses (2 freguesias × 2 modos, efeito de desenho 2) é razoável? | `pilot.py` | Se não: rever o piso |
 | P5 | P · 21 | Que método de custeio devemos usar quando os custos da Vitrus chegarem em partes? | [Q4](#q4-custos-unitários-e-vida-útil) | Se TDABC ou TCO: nota metodológica |
@@ -471,7 +494,7 @@ Cada linha justifica uma pergunta. As contas são nossas e repetíveis a partir 
 
 | # | Anomalia | Números | Efeito se ficar por resolver | Pergunta |
 | --- | --- | --- | --- | --- |
-| 8 | Nenhum circuito é de têxteis | 0 de 40 (24 indiferenciados, 7 orgânicos, 3 recicláveis, 1 volumosos, 1 PAYT, 2 apoio, 2 a confirmar) | "Sem km novos" não está provado | Q5 |
+| 8 | Nenhum circuito é de têxteis | 0 de 40 (24 indiferenciados, 7 orgânicos, 3 recicláveis, 1 volumosos, 1 PAYT, 2 apoio, 2 a confirmar) | "Sem km novos" caiu a 22 out: o saco não pode ir no compactador | Q5 |
 | 9 | Circuitos sem viatura | 9 de 40; 8 de 18 porta a porta de indiferenciado | A recolha a pedido perde base | V4 |
 | 10 | Viaturas nunca atribuídas | 2 de 29 (29-48-XU, 74-HN-36) | Capacidade livre por confirmar | V5 |
 | 11 | Turnos sem tripulação | 12 de 101 | Custo de mão de obra errado | V6 |
@@ -508,7 +531,7 @@ Cada linha justifica uma pergunta. As contas são nossas e repetíveis a partir 
 
 | # | Anomalia | Números | Efeito se ficar por resolver | Pergunta |
 | --- | --- | --- | --- | --- |
-| 35 | 0,7 kg e 5,4% × 315 kg não coincidem | 8,4 contra 17,0 kg/hab/ano; 1 317,4 contra 2 667,7 t | Resolvida a 21 out: o modelo deixou o plano e usa 5,4% × 43 051 t (Vitrus e APA) | Q6 |
+| 35 | 0,7 kg e 5,4% × 315 kg não coincidem | 8,4 contra 17,0 kg/hab/ano; 1 317,4 contra 2 667,7 t | Resolvida a 21 out: o modelo deixou o plano; desde 22 out usa 5,86% × indiferenciado do concelho (Vitrus e APA) | Q6 |
 | 36 | Dados de caracterização de 2016 | Resumo de Perebynos et al. 2023 [F75], excerto de pesquisa | Deixou de pesar: o plano já não é fonte do modelo | Q6 |
 | 37 | Freguesias e população | O plano diz 55 freguesias e 156 277 habitantes (INE, 2022); a CAOP tem 48 e o INE (Censos 2021) 156 830 | Diferença de 553 hab. (0,35%, cálculo) | M7 |
 | 38 | Meta de +30% com dois anos | "até 2025" e "até 2026" no mesmo plano | Sem base nem data | B4 |
@@ -633,8 +656,12 @@ Preencher durante a reunião ou na hora seguinte. Uma linha por resposta; ver a 
 | Q2 | Lista de contentores de têxteis | Lucas (Vitrus) | 21 out, email | "A Vitrus não possui contentores de têxtil e não tem interesse em possuir"; têxtil de contentor muito contaminado; reciclagem muito mais cara que fibra virgem | | | Modelo, docs, skills | 21 out (sem commit) |
 | Q3 | Regras, pitch, submissão | | | | | | | |
 | Q4 | Custos unitários e vida útil | Lucas (Vitrus) | 21 out, email | Vai pedir ao departamento financeiro; não estão no site | | | Nada (pressupostos) | |
-| Q5 | Têxteis nos circuitos atuais | | | | | | | |
+| Q4 | Custos por hora e por km; tratamento | Lucas (Vitrus) | 22 out | Custos das viaturas: o financeiro ainda não os enviou. Tratamento: 40 €/t TGR + 65,64 €/t Resinorte = 105,64 €/t | €/t, 2026, Vitrus | | Registo A23, A25; modelo (custo evitado); docs | 22 out (sem commit) |
+| Q5 | Têxteis nos circuitos atuais | Lucas (Vitrus) | 22 out | O saco não pode ir no compactador do PAP (estraga-se); nem cabine, gancho ou caixa lateral; um compactador não faz volta só de têxtil (contaminação); "aquisição de um meio novo de recolha"; não há viaturas livres à tarde (erro na folha de turnos) | | | Registo A20 a A22, A28; modelo (viatura nova); narrativa, pitch, landing | 22 out (sem commit) |
+| V2 | Depósito | Lucas (Vitrus) | 22 out | Estaleiro Operacional da Rua das Lameiras, Polvoreira | | | Registo A26; VRP | 22 out (sem commit) |
 | Q6 | O que medem 0,7 e 5,4% | Lucas (Vitrus) | 21 out, email | Não conhece o plano; RSU recolhido em 2025: 43 051 t; contar 5,4% de têxtil | t, 2025, Vitrus + APA | | Procura, registo A8 a A10, docs | 21 out (sem commit) |
+| Q6 | Base da procura (revista) | Lucas (Vitrus) | 22 out | Usar 5,86% (APA, RARU 2025, p. 24) sobre o indiferenciado do concelho todo (43 050,5 t ÷ 0,840) | t, 2025, Vitrus R&C + APA | | Registo A8 a A12, A24; procura; docs; landing | 22 out (sem commit) |
+| — | Sazonalidade | Lucas (Vitrus) | 22 out | Os quilos por mês só se partilham com o município | | | Registo A27 | 22 out (sem commit) |
 | Q7 | Medição do destino e preços | | | | | | | |
 | Q8 | Fração municipal e têxtil nos locais | Lucas (Vitrus) | 21 out, email | QGIS com indiferenciado, orgânico e recolha seletiva (enterrados ou superfície); sem dados de deposição de têxtil; APA: cerca de 5% do indiferenciado é têxtil | | | Análise municipal, modelo | 21 out (sem commit) |
 | Q9 | Fibrenamics: lote, baixo valor, papel | | | | | | | |

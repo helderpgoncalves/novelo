@@ -22,14 +22,14 @@ Recomendamos o TexVitrus. É o único desafio proposto por uma entidade com um p
 
 ## O que já se sabe
 
-Guimarães publicou em novembro de 2025 um Plano de Ação Integrado para a Circularidade Têxtil. Serve de contexto público. A 21 de outubro de 2026 a Vitrus disse não o conhecer: os números do modelo vêm da Vitrus e da APA (43 051 t de RSU × 5,4% = 2 324,8 t por ano ainda no lixo, estimativa).
+Guimarães publicou em novembro de 2025 um Plano de Ação Integrado para a Circularidade Têxtil. Serve de contexto público. A 21 de outubro de 2026 a Vitrus disse não o conhecer: os números do modelo vêm da Vitrus e da APA (desde 22 de outubro, 51 250,6 t de indiferenciado do concelho × 5,86% ≈ 3 003 t por ano ainda no lixo, estimativa).
 
 | Tema | O que diz o plano | Porque nos interessa |
 | --- | --- | --- |
-| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Substituído a 21 out pelos valores da Vitrus: 43 051 t de RSU × 5,4% (APA) = 2 324,8 t/ano (cálculo nosso, estimativa) |
+| Quanto têxtil há | 5,4% do lixo indiferenciado (UE 4,7%, PT ~4%), 0,7 kg/hab/mês | Substituído pelos valores da Vitrus e da APA: 51 250,6 t de indiferenciado do concelho × 5,86% ≈ 3 003,3 t/ano (22 out; cálculo nosso, estimativa) |
 | Território | Ocupação dispersa, 48 freguesias; porta a porta pode ser inviável | O custo está nas zonas dispersas: é aí que se ganha |
 | Fluxo escondido | Microempresas têxteis deitam retalhos no lixo urbano; com menos de 10 trabalhadores não têm mapa de resíduos | Ninguém sabe onde está esse têxtil |
-| Custo operacional | As fibras enrolam-se nas máquinas | Tirar têxtil do indiferenciado poupa dinheiro além do aterro |
+| Custo operacional | As fibras enrolam-se nas máquinas | Tirar têxtil do indiferenciado poupa dinheiro além do aterro (o aterro custa 105,64 €/t, Vitrus, 22 out) |
 | Triagem | Ainda manual; automação (NIR) cara e incipiente | Espaço para triagem barata por imagem |
 | Destino de valor | 27 operadores licenciados na zona, só 4 reciclam ou valorizam | Ligação à indústria é um gargalo real |
 | Meta oficial | Serviço público de recolha têxtil, +30% recolha seletiva até 2026: rotas, tipos de contentor, frequência | É literalmente o que nos pedem |
@@ -45,8 +45,8 @@ O decisor escolhe um orçamento e uma meta de captura; a ferramenta devolve a re
 
 - **Procura por zona:** população por subsecção (INE, BGRI 2021) × kg/hab × taxa de captura esperada, ajustada com a caracterização do lixo da Vitrus e as rotas onde já se encontrou mais têxtil.
 - **Mistura de modos de recolha**, onde está a poupança:
-    - pontos em locais existentes, sem contentor novo (juntas, escolas, ecocentros, paragem nos locais municipais onde a viatura já passa), investimento quase zero;
-    - recolha a pedido nas zonas dispersas, aproveitando rotas que já lá passam; o saco não pode ir no compactador, e numa tarde de dia útil cerca de 15 das 29 viaturas não têm circuito (planeamento de turnos da Vitrus): plano B a validar com a Vitrus (tipo de caixa, equipa);
+    - saco fechado à porta num dia fixo por freguesia, recolhido por uma viatura de têxtil nova, sem compactação (o "meio novo de recolha" que a Vitrus indicou a 22 out: o saco não pode ir no compactador e não há viaturas livres);
+    - pontos em locais existentes, sem contentor novo (juntas, escolas, ecocentros, paragem nos locais municipais), servidos pela mesma viatura;
     - sem contentores de rua de têxteis: a Vitrus não os quer, porque o têxtil de contentor vem contaminado (21 out 2026).
 - **Otimização:** localização dos pontos (cobertura máxima / p-median) e rotas (VRP), ambas com OR-Tools.
 - **Saída:** "Cenário A: 40 pontos, X € de investimento, Y €/ano de operação, Z t desviadas do aterro, W €/t" contra "Cenário B". O ecrã de comparação lado a lado é o que mostramos em palco.

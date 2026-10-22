@@ -16,6 +16,8 @@ from novelo.features.municipal.models import MunicipalSite
 from novelo.features.planning import site_service
 
 P = "/api/v1/planning"
+# A viatura dedicada ao têxtil (42 500 € em 8 anos) paga-se logo que a rede recolha alguma coisa.
+VEHICLE = 42_500 / 8
 MakeUser = Callable[..., Awaitable[httpx.AsyncClient]]
 
 
@@ -28,7 +30,7 @@ async def run(operator: httpx.AsyncClient, **extra: Any) -> dict[str, Any]:
     body = {
         "label": "Por locais",
         "objective": "max_tonnes",
-        "budget_eur_year": 5000,
+        "budget_eur_year": 5000 + VEHICLE,
         "siting": "sites",
         "site_mode": "existing",
         "site_on_demand": False,
@@ -62,7 +64,7 @@ async def test_tonnes_are_the_served_share_of_the_parish_demand(operator: httpx.
     assert k["points"] == 2 and k["tonnes_year"] == pytest.approx(
         sum(x["tonnes"] for x in s["result"]["sites"]), abs=0.002
     )
-    assert k["annual_cost_eur"] <= 5000
+    assert k["annual_cost_eur"] <= 5000 + VEHICLE
 
 
 async def test_routes_visit_the_opened_sites(operator: httpx.AsyncClient) -> None:
@@ -129,13 +131,13 @@ async def test_on_demand_completes_the_site_network(operator: httpx.AsyncClient)
 async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx.AsyncClient) -> None:
     parish = (
         await operator.post(
-            f"{P}/scenarios", json={"label": "Freguesias", "objective": "max_tonnes", "budget_eur_year": 5000}
+            f"{P}/scenarios", json={"label": "Freguesias", "objective": "max_tonnes", "budget_eur_year": 5000 + VEHICLE}
         )
     ).json()
-    await run(operator, label="Locais 1", budget_eur_year=2000)
+    await run(operator, label="Locais 1", budget_eur_year=2000 + VEHICLE)
     before = (await operator.get("/api/v1/textile/overview")).json()["scenario_frontier"]
     assert parish["id"] in {p["id"] for p in before}  # com um só cenário por locais, vale tudo
-    await run(operator, label="Locais 2", budget_eur_year=4000)
+    await run(operator, label="Locais 2", budget_eur_year=4000 + VEHICLE)
     after = (await operator.get("/api/v1/textile/overview")).json()["scenario_frontier"]
     assert {p["label"] for p in after} == {"Locais 1", "Locais 2"}
 
@@ -147,7 +149,7 @@ async def test_the_default_point_is_an_existing_place_without_a_new_container(op
         json={
             "label": "Local existente",
             "objective": "max_tonnes",
-            "budget_eur_year": 5000,
+            "budget_eur_year": 5000 + VEHICLE,
             "siting": "sites",
             "site_on_demand": False,
         },
@@ -209,7 +211,7 @@ async def test_the_same_request_is_served_from_the_cache(
     monkeypatch.setattr(site_service, "_compute_sites", counting)
     first = await run(operator, label="A")
     second = await run(operator, label="B")  # só o nome muda
-    await run(operator, label="C", budget_eur_year=4000)  # outro orçamento: volta a calcular
+    await run(operator, label="C", budget_eur_year=4000 + VEHICLE)  # outro orçamento: volta a calcular
     assert calls == 2
     assert first["id"] != second["id"] and first["result"] == second["result"]
 

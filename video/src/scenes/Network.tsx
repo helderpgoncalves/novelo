@@ -8,31 +8,37 @@ import { C, FONT } from '../theme';
 
 const existing = GEO.modes.find((m) => m.mode === 'existing');
 const onDemand = GEO.modes.find((m) => m.mode === 'on_demand');
-const papInScenario = GEO.parishes.filter((p) => p.papInScenario).length;
-const papAll = GEO.parishes.filter((p) => p.pap).length;
 
 const STAGES = [
   {
-    at: 30,
+    at: 24,
     n: '1',
-    title: 'Saco fechado à porta, no dia em que o camião já passa.',
-    stats: [`${papInScenario} freguesias`, `${num(onDemand?.tonnes ?? 0, 1)} t/ano`, '0 km novos'],
-    note: `${papAll} das 48 freguesias têm circuito porta a porta com viatura.`,
+    title: 'Uma viatura só para o têxtil, sem compactação.',
+    stats: ['1 viatura nova', `${GEO.routes.length} circuitos`, `${num(GEO.kpis.km_year)} km/ano`],
+    note: 'O meio novo de recolha que a Vitrus pede, a sair do estaleiro de Polvoreira.',
+    color: C.linho,
+  },
+  {
+    at: 120,
+    n: '2',
+    title: 'Saco fechado à porta, num dia fixo por freguesia.',
+    stats: [`${onDemand?.zones ?? 0} freguesias`, `${num(onDemand?.tonnes ?? 0, 1)} t/ano`],
+    note: 'Limpo e seco, como a reutilização exige.',
     color: C.florestaClara,
   },
   {
-    at: 140,
-    n: '2',
-    title: 'Paragem nos locais por onde a viatura já passa, sem contentor novo.',
-    stats: [`${existing?.points ?? 0} pontos`, `${num(existing?.tonnes ?? 0, 1)} t/ano`, `${GEO.routes.length} circuitos`],
-    note: `${num(GEO.kpis.km_year)} km por ano, a partir do depósito.`,
+    at: 206,
+    n: '3',
+    title: 'Paragem nos locais por onde já se passa, sem contentor novo.',
+    stats: [`${existing?.points ?? 0} pontos`, `${num(existing?.tonnes ?? 0, 1)} t/ano`],
+    note: 'Locais municipais da Vitrus, com o saco entregue em mão.',
     color: C.areia,
   },
   {
-    at: 250,
-    n: '3',
+    at: 282,
+    n: '4',
     title: 'E as escolas, como pontos com pessoas.',
-    stats: [`${GEO.schools.length} escolas`, 'saco entregue em mão'],
+    stats: [`${GEO.schools.length} escolas`],
     note: 'Candidatas na rede por locais reais.',
     color: C.linho,
   },
@@ -46,10 +52,10 @@ export function Network({ dur }: { dur: number }) {
   const s = {
     outline: 1,
     containers: 0,
-    pap: interpolate(f, [30, 90], [0, 1], { ...clamp, easing: easeInOut }),
-    existing: interpolate(f, [140, 200], [0, 1], { ...clamp, easing: easeInOut }),
-    routes: interpolate(f, [160, 250], [0, 1], { ...clamp, easing: easeInOut }),
-    schools: interpolate(f, [250, 300], [0, 1], clamp),
+    routes: interpolate(f, [24, 110], [0, 1], { ...clamp, easing: easeInOut }),
+    pap: interpolate(f, [120, 180], [0, 1], { ...clamp, easing: easeInOut }),
+    existing: interpolate(f, [206, 266], [0, 1], { ...clamp, easing: easeInOut }),
+    schools: interpolate(f, [282, 330], [0, 1], clamp),
   };
   const active = STAGES.reduce((acc, st, i) => (f >= st.at ? i : acc), -1);
   return (
@@ -102,7 +108,7 @@ export function Network({ dur }: { dur: number }) {
         })}
       </div>
       <Source dark style={{ left: pad, right: pad, bottom: portrait ? 120 : 64, opacity: prog(f, 30, 12) }}>
-        Cenário de referência por freguesia, 60 000 €/ano (otimizador Novelo, 22 out 2026, estimativa); circuitos e turnos da Vitrus; INE; CAOP 2019.
+        Cenário de referência por freguesia, 60 000 €/ano (otimizador Novelo, estimativa); depósito e respostas da Vitrus de 22 out 2026; INE; CAOP 2019.
       </Source>
     </AbsoluteFill>
   );

@@ -7,8 +7,8 @@ O vídeo do Novelo, com 2 minutos e 4 segundos, em **16:9 (1920 × 1080)** e **9
 | Cena | Conteúdo | Fonte |
 | --- | --- | --- |
 | Abertura | A Penha em meio-tom da marca | `scripts/brand/base` |
-| O número | 43 051 t × 5,4% = 2 324,8 t por ano no lixo (estimativa) | Vitrus, APA |
-| 9 em cada 10 | 200 pontos, 23 recolhidos à parte (11,5%) | Vitrus |
+| O número | ≈ 51 250,6 t de indiferenciado do concelho × 5,86% ≈ 3 003,3 t por ano no lixo (estimativa) | Vitrus (Relatório e Contas 2025, p. 8), APA (RARU 2025, p. 24) |
+| 9 em cada 10 | 200 pontos, 18 recolhidos à parte (9,1%) | Vitrus, APA (estimativa) |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus |
 | A lei | 1 jan 2025, transposição a 17 jun 2027, RAP a 17 abr 2028 | Diretiva (UE) 2025/1892 |
 | Onde se perde | 48 freguesias (CAOP 2019) e os contentores municipais, no mapa | Pacote QGIS da Vitrus |

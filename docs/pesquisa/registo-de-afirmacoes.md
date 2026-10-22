@@ -4,7 +4,7 @@
 
 Datas de consulta: **2026-10-19**, salvo indicação (a secção B foi revista a 22 out 2026, com a diretiva lida integralmente). As fontes estão em [Fontes](fontes.md). "Slide" refere o [guião de slides](../projeto/pitch-slides.md).
 
-Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
+Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Secundária** (verificado em imprensa ou análise) · **Por verificar** · **Pressuposto** · **Cálculo** (nosso, sobre números verificados) · **Falso** ou **Invalidado** (desmentido por uma fonte; fica como histórico). Ver [significado de cada um](README.md#os-estados-de-cada-afirmação).
 
 ## A. Os nossos dados (Vitrus, INE)
 
@@ -17,19 +17,27 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | A5 | O destino de duas entidades é estimado por percentagem | Nova Etapa e Vitrus (percentagens de relatórios) | `dados_textil.xlsx` | Dado Vitrus (diz-se "estimativa") | 5 |
 | A6 | Circuitos, viaturas, localidades | 40 circuitos, 29 viaturas, 82 localidades (79 com freguesia CAOP 2019 desde 22 out 2026; antes 71 geocodificadas e 61 com freguesia) | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 4 |
 | A7 | Circuitos sem viatura atribuída | 9 | idem | Dado Vitrus | demo |
-| A8 | Têxtil que ainda vai para o lixo (procura do modelo) | 2 324,8 t/ano = 1,235 kg/hab/mês | 43 051 t de RSU (A16) × 5,4% (A10) ÷ 156 830 ÷ 12 | Cálculo sobre dados da Vitrus e da APA (**estimativa**). Até 21 out era 0,7 kg/hab/mês ≈ 1 317 t do Plano de Ação Integrado (F74); a Vitrus não conhece esse plano e o valor deixou de se usar | 2 |
-| A9 | Captura atual | 11,5% | 301,27 ÷ (2 324,754 + 301,27) = 301,27 ÷ 2 626,024 | Cálculo (**estimativa**). Antes: 22,9% (301,3 ÷ 1 317, base antiga) | 2 |
-| A10 | Têxtil no RSU | 5,4% | APA, indicado pela Vitrus (mentor, 21 out 2026) | Dado Vitrus (valor da APA aplicado ao RSU de Guimarães). O mesmo 5,4% aparece no Plano de Ação Integrado (F74, p. 30), que a Vitrus não usa; a Vitrus diz também "± 5% do indiferenciado" pela APA | 2 |
+| A8 | Têxtil que ainda vai para o lixo (procura do modelo) | ≈ 3 003,3 t/ano = 1,596 kg/hab/mês | 51 250,6 t de indiferenciado do concelho (A24) × 5,86% (A10) ÷ 156 830 ÷ 12 | Cálculo sobre dados da Vitrus e da APA (**estimativa**), base indicada pela Vitrus a 22 out. Antes: 2 324,8 t = 43 051 × 5,4% (21 out) e 0,7 kg/hab/mês ≈ 1 317 t do Plano de Ação Integrado (F74), ambos fora de uso | 2 |
+| A9 | Captura atual | ≈ 9,1% | 301,27 ÷ (3 003,285 + 301,27) = 301,27 ÷ 3 304,555 | Cálculo (**estimativa**): cerca de 9 em cada 10 kg vão para o lixo. Antes: 11,5% (base de 21 out) e 22,9% (base do plano) | 2 |
+| A10 | Têxtil no indiferenciado | 5,86% | APA, RARU 2025, p. 24 (média nacional); indicado pela Vitrus a 22 out 2026 | Primária (APA), confirmada pela Vitrus. Antes: 5,4% (21 out), que é a média da caracterização de 2016 (H7), não um valor da APA | 2 |
 | A11 | 4 de 27 operadores licenciados valorizam têxteis | 4 de 27 | Plano municipal | **Por verificar**: o Plano (F74, p. 32) fala em 27 operadores com licença LER 04 em Guimarães e sete concelhos vizinhos, 4 deles com reciclagem ou valorização (R3 e R5); LER 04 é resíduo industrial, pelo que não prova pós-consumo | 6 |
-| A12 | Total de têxtil gerado por ano | 2 626,0 t | 2 324,8 t (A8) + 301,3 t (A1) | Cálculo (**estimativa**). Substitui o intervalo antigo de 1 300 a 2 650 t (315 kg/hab × 5,4%, plano municipal) | 2 |
+| A12 | Total de têxtil gerado por ano | ≈ 3 304,6 t | 3 003,3 t (A8) + 301,3 t (A1) | Cálculo (**estimativa**). Antes: 2 626,0 t (base de 21 out) e o intervalo de 1 300 a 2 650 t do plano municipal | 2 |
 | A13 | Doze alertas de qualidade nos dados dos circuitos | 12 | `Circuitos_Viaturas_Guimaraes.xlsx` | Dado Vitrus | 7 |
 | A14 | Contentores **de têxteis** | não existem; a Vitrus não os quer (contaminação dificulta a reutilização) | Vitrus (mentor, 21 out 2026) | Dado Vitrus | 4 |
-| A15 | Custos por recolha, quilómetro e contentor | por receber: pedidos ao departamento financeiro a 21 out (não estão no site) | Vitrus | Por obter (pressuposto até lá) | 4 |
-| A16 | RSU recolhido pela Vitrus em 2025 | 43 051 t | Vitrus (mentor, 21 out 2026) | Dado Vitrus | 2 |
+| A15 | Custos por hora, por quilómetro e por contentor | por receber: pedidos ao departamento financeiro a 21 out; a 22 out ainda não tinham chegado (A23) | Vitrus | Por obter (pressuposto até lá) | 4 |
+| A16 | Indiferenciado recolhido pela Vitrus em 2025 | 43 050,5 t (43 051 t arredondado) | Vitrus (mentor, 21 out 2026); Relatório e Contas 2025, p. 8 | Dado Vitrus. Desde 22 out é a base do cálculo do concelho (A24), não a procura direta | 2 |
 | A17 | Reciclar têxtil é muito mais caro que fibra virgem | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus (opinião do operador, sem número) | 6 |
 | A18 | O pacote QGIS traz contentores de indiferenciado, orgânico e recolha seletiva; não há dados de deposição de têxtil por contentor | qualitativo | Vitrus (mentor, 21 out 2026) | Dado Vitrus | |
 | A19 | A qualidade depende de quem recolhe: reutilização em 2025 por entidade | Ultriplo 72,9% (97,7 ÷ 134,1 t); H Sarah Trading 50,0% (59,3 ÷ 118,6 t); Nova Etapa 50%; Vitrus 9,2%, com 56,9% de rejeito (5,6 t) | `dados_textil.xlsx` (`textile_flows.csv`): Ultriplo e Sarah com kg por destino; Nova Etapa e Vitrus com percentagens de relatório (a da Vitrus é da To Be Green) | Dado Vitrus. Nova Etapa e Vitrus dizem-se "estimativa"; a divisão da Sarah é redonda (50/37/13) e pode ser percentagem ([Q7](../projeto/perguntas-aos-orientadores.md#q7-como-foi-medido-o-destino-e-a-que-preço)); a amostra da Vitrus é pequena (1,9% do total) | 6 |
-| A20 | Viaturas sem circuito numa tarde de dia útil | cerca de 15 das 29 (14 com turno à tarde, de segunda a sexta; inclui as 2 nunca atribuídas) | `Circuitos_Viaturas_Guimaraes.xlsx` (`shifts.csv`), semana de 21 a 25 set 2026 | Dado Vitrus (contagem nossa). Se servem para levar o têxtil à parte do compactador (tipo de caixa, equipa) está **por validar com a Vitrus** ([Q5](../projeto/perguntas-aos-orientadores.md#q5-recolher-têxteis-nos-circuitos-e-viaturas-atuais), V5, V10) | só em conversa |
+| A20 | Viaturas sem circuito numa tarde de dia útil | ~~cerca de 15 das 29~~ **nenhuma** | Contagem nossa sobre `shifts.csv`; desmentida pela Vitrus a 22 out (A22) | **Falso**: a folha de turnos tem um erro e as viaturas estão em uso à tarde. Não usar o "plano B" | não usar |
+| A21 | O saco de têxtil não pode ir no compactador do porta a porta (vai para a caixa de compactação e estraga-se); cabine, gancho ou caixa lateral também não; um compactador não pode fazer uma volta só de têxtil (contaminação). Saída: "aquisição de um meio novo de recolha" | qualitativo | Vitrus (mentor, 22 out 2026) | Dado Vitrus. Invalida H5 (saco no circuito PAP, 0 km novos) | 4 |
+| A22 | Não há viaturas livres à tarde; os circuitos PAP que pareciam sem viatura também a têm (erro da folha de turnos) | qualitativo | Vitrus (mentor, 22 out 2026) | Dado Vitrus. Invalida A20 e o "sem viaturas novas" | 4 |
+| A23 | Custos por hora e por km das viaturas | por receber | Vitrus (mentor, 22 out 2026) | Por obter: o financeiro ainda não os enviou | 4 |
+| A24 | Indiferenciado do concelho todo em 2025 | ≈ 51 250,6 t | 43 050,5 t (A16) ÷ 0,840 (H8) | Cálculo (**estimativa**) sobre dados da Vitrus; base indicada pela Vitrus a 22 out | 2 |
+| A25 | Custo de tratamento do indiferenciado em aterro | 105,64 €/t = 40 €/t de taxa de gestão de resíduos (TGR) + 65,64 €/t de tarifa da Resinorte | Vitrus (mentor, 22 out 2026) | Dado Vitrus (confirma H9). Cada tonelada desviada do lixo poupa este valor (custo evitado, não receita) | 3, 4 |
+| A26 | Depósito das rotas | Estaleiro Operacional da Rua das Lameiras, Polvoreira | Vitrus (mentor, 22 out 2026) | Dado Vitrus | demo |
+| A27 | Quilos de têxtil por mês (sazonalidade) | só partilhados com o município | Vitrus (mentor, 22 out 2026) | Sem dado; o modelo fica anual | |
+| A28 | Rede proposta: uma viatura de têxtil nova, sem compactação, com o saco fechado à porta num dia fixo por freguesia e paragens nos locais municipais e escolas, sem contentores | qualitativo | Decisão da equipa a partir de A14, A21 e A22 | Pressuposto de desenho; números dos cenários na secção H (versão 5 do modelo) | 4 |
 
 ## B. Regulação
 
@@ -83,7 +91,7 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | C14 | Guimarães com a recolha francesa teria cerca de 670 t | 4,27 × 156 830 | A3 e C1 | Cálculo | 3 |
 | C15 | Cenário francês = 2,2 vezes a recolha de hoje | 670 ÷ 301,3 | A1 e C14 | Cálculo | 3 |
 | C16 | Sasia recicla cerca de 2 000 t por mês, pré-consumo | 2 000 t/mês | [F23], [F24] | Secundária | 6 |
-| C17 | O têxtil por desviar em Guimarães é cerca de 9,7% da capacidade anual da Sasia | 2 324,8 ÷ 24 000 | A8 e C16 | Cálculo (depende de A8; antes 5,5% com 1 317 t) | 6 |
+| C17 | O têxtil por desviar em Guimarães é cerca de 12,5% da capacidade anual da Sasia | 3 003,3 ÷ 24 000 | A8 e C16 | Cálculo (depende de A8; antes 9,7% com 2 324,8 t e 5,5% com 1 317 t) | 6 |
 | C18 | Wippytex trabalha com 30 municípios, 3 000 t em 2023 | 30; 3 000 t | [F23] | Secundária | não usar |
 | C19 | Humana Portugal 2024 | 3 835 t, 1 088 contentores | [F27] | Secundária | 6 |
 | C20 | Humana Portugal 2025 | 3 919 t, 653 contentores | [F28] | **Por verificar** | não usar |
@@ -163,31 +171,35 @@ Nada deste bloco é de têxteis. Ver [Análise dos contentores municipais](../da
 | G8 | Freguesia declarada igual à do polígono | 2 354 de 2 670 (88,2%); 79 a mais de 1 km | idem | Cálculo | |
 | G9 | Área das 48 freguesias | 24 099,97 ha (241,0 km²) | CAOP 2019 (`AREA_T_Ha`) | Dado Vitrus (CAOP) | |
 | G10 | Contornos OSM da app falham 3 uniões e têm 1 minúscula | 44 utilizáveis de 48 | comparação com CAOP 2019 | Cálculo | |
-| G11 | Lacuna de têxtil por freguesia | Lordelo 59,0 t/ano (3 979 hab. × 14,82 kg); ordenação por t por candidato | 1,235 kg/hab/mês igual em todas as freguesias | **Estimativa** (sem têxtil por freguesia); igual a `municipal_summary.json` | |
+| G11 | Lacuna de têxtil por freguesia | Lordelo 59,0 t/ano (3 979 hab. × 14,82 kg, base de 21 out); com a base de 22 out, cerca de 76,2 t (3 979 × 19,15 kg) | kg/hab/mês igual em todas as freguesias (A8) | **Estimativa** (sem têxtil por freguesia); confirmar com `municipal_summary.json` depois de `just etl` | |
 | G12 | Blue Bee, Green Bee e Red Bee são contentores enterrados da Lasso, de 3 e 5 m³ | | [F63] [F64] | Primária do fabricante | |
 | G13 | Molok é semienterrado com 1,3, 3 e 5 m³ | | [F65] | Secundária (excertos) | |
 | G14 | CAOP2025 aprovada a 28 jan 2026 | | [F66] | Primária | |
 
 ## H. Cenários do Novelo (22 out 2026)
 
-Saem do otimizador com os pressupostos ativos por omissão (custos da Vitrus por receber, A15): são sempre **estimativa**. Método e tabelas em [Dados e modelo](../engenharia/dados-e-modelo.md). Modelo de referência versão 3 (localidades na freguesia CAOP 2019, têxtil reutilizável).
+Saem do otimizador com os pressupostos ativos por omissão (custos das viaturas da Vitrus por receber, A15, A23): são sempre **estimativa**. Método e tabelas em [Dados e modelo](../engenharia/dados-e-modelo.md). Modelo de referência versão 5 (22 out 2026): procura de 3 003,3 t (A8), viatura de têxtil nova sem compactação (A21, A28), depósito em Polvoreira (A26) e tratamento evitado a 105,64 €/t (A25). Pressupostos novos do modelo: viatura de 42 500 € sem IVA (concurso de Vila Nova de Gaia para uma viatura de mercadorias de caixa fechada, TED 338951-2024), 8 anos de vida, 2 t de carga, 30 km/h, 2 min por saco à porta, 10 min por paragem num local, ronda do saco à porta de 2 em 2 semanas.
 
 | # | Afirmação | Valor | Fonte | Estado | Slide |
 | --- | --- | --- | --- | --- | --- |
-| H1 | Têxtil reutilizável no cenário por freguesia de 60 000 €/ano | 235,6 t/ano (198,3 a 288,9 t) de 396,5 t | 396,5 t × 59,4% (A4); intervalo com 50,0% e 72,9% (A19) | Cálculo (**estimativa**). Aplicar a mesma quota a todos os modos é pressuposto: não há qualidade por canal | 6 |
-| H2 | € por tonelada reutilizável, mesmo cenário | 203,1 € (165,6 a 241,3 €) | 47 839 € ÷ 235,6 t | Cálculo (**estimativa**) | só em conversa |
-| H3 | Cenário por freguesia de 60 000 €/ano | gasta 47 839 €; 396,5 t a 120,6 €/t (P10 96,9, P50 122,5, P90 154,7); 75,0% da população servida | [Dados e modelo](../engenharia/dados-e-modelo.md#3-otimização), sensibilidade com 500 amostras e ±30% | Cálculo (**estimativa**). A 21 out: 47 795 € e 396,2 t | 4 |
-| H4 | Matriz de cobertura por tipo de território (art. 22.º-C, n.º 9, b)), mesmo cenário | APU: 36 freguesias, 135 460 hab., 76,0% servida, 344,3 t, 39 182 €, 113,8 €/t. AMU: 11, 20 671 hab., 69,1%, 50,7 t, 8 284 €, 163,6 €/t. APR: 1, 699 hab., 59,9%, 1,6 t, 373 €, 240,0 €/t. Fora das urbanas 68,8% contra 76,0% (razão 0,905) | `GET /planning/scenarios/{id}/coverage`; [Dados e modelo, secção 10](../engenharia/dados-e-modelo.md#10-matriz-de-cobertura-diretiva-20251892); TIPAU do INE | Cálculo (**estimativa**). A APR é uma só freguesia (Arosa e Castelões) | 7 |
-| H5 | Freguesias com passagem porta a porta de indiferenciado com viatura | 22 de 48 (67 349 hab.); 20 no cenário de 60 000 €/ano, com 129,3 t e 0 km novos | Circuitos e turnos da Vitrus (A6) com as localidades na freguesia CAOP 2019 | Cálculo sobre Dado Vitrus (as toneladas são **estimativa**). A 21 out: 19 freguesias (61 597 hab.), 128,7 t | 4 |
-| H6 | Teto do modelo sem contentores (orçamento sem limite) | 597,7 t/ano a 138 866 € (232,3 €/t), abaixo da referência francesa de 669,7 t (C14) | [Dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês) | Cálculo (**estimativa**). A 21 out: 147 490 €; numa versão anterior do modelo, 562,6 t | 3 |
-| H7 | Os 5,4% são a média por circuito da caracterização de 2016 (mediana 4,5%), não um valor da APA | 5,4% | Perebynos et al., 2023, p. 5; APA dá 5,86% no indiferenciado nacional em 2025 (RARU 2025, p. 24) | Primária (artigo e RARU). Confirmação pedida à Vitrus a 22 out | não usar a fonte "APA" sem a ressalva |
-| H8 | As 43 051 t da Vitrus são 84,0% do indiferenciado do concelho | 84,0% | Vitrus, Relatório e Contas 2025, p. 8 | Primária. Com o concelho todo, cerca de 2 768 t de têxtil (cálculo nosso, **estimativa**): a procura do modelo é conservadora | só em conversa |
-| H9 | Tarifa da Resinorte para o indiferenciado | 65,64 €/t (2024 e 2025); taxa de gestão de resíduos 40 €/t em 2026 (aterro) | Tarifários e R&C 2025 da Resinorte; tabela de taxas APA 2026 | Primária; quem paga e a tarifa de 2026 por confirmar com a Vitrus | só em conversa |
+| H1 | Têxtil reutilizável no cenário por freguesia de 60 000 €/ano | 264,9 t/ano (222,9 a 324,8 t) de 445,8 t | 445,8 t × 59,4% (A4); intervalo com 50,0% e 72,9% (A19) | Cálculo (**estimativa**). Aplicar a mesma quota a todos os modos é pressuposto: não há qualidade por canal. Antes (modelo de 21 e 22 out, versão 3): 235,6 t | 6 |
+| H2 | € por tonelada reutilizável, mesmo cenário | 173,0 € (141,1 a 205,6 €) | 45 828 € ÷ 264,9 t | Cálculo (**estimativa**). Antes: 203,1 € | só em conversa |
+| H3 | Cenário por freguesia de 60 000 €/ano (recomendado) | gasta 45 828 € por ano (operação 37 516 €); 445,8 t a 102,8 €/t (P10 82,0, P50 104,4, P90 141,3; toneladas P10 341,1, P90 554,7); investimento 57 500 € (viatura de 42 500 €, 5 312,50 € por ano em 8 anos, e 60 pontos); 72,1% da população servida; 6 976 km/ano; 1 viatura, 1,67 dias por semana (606 h/ano); captura de 9,1% para cerca de 22,6% | [Dados e modelo](../engenharia/dados-e-modelo.md#3-otimização), sensibilidade com 500 amostras (semente 7) e ±30% | Cálculo (**estimativa**). Antes: 47 839 € e 396,5 t a 120,6 €/t (saco no compactador, base de 2 324,8 t) | 4 |
+| H4 | Matriz de cobertura por tipo de território (art. 22.º-C, n.º 9, b)), mesmo cenário | 73,9% da população servida nas 36 freguesias predominantemente urbanas (APU); 60,2% nas 12 restantes; Arosa e Castelões, a única APR, com 0% | `GET /planning/scenarios/{id}/coverage`; [Dados e modelo, secção 10](../engenharia/dados-e-modelo.md#10-matriz-de-cobertura-diretiva-20251892); TIPAU do INE | Cálculo (**estimativa**). Antes: 76,0% contra 68,8% | 7 |
+| H5 | Canais no cenário de 60 000 €/ano | paragens em locais existentes: 60 pontos em 45 freguesias, 366,3 t; saco à porta: 4 freguesias, 79,5 t | Mesmo cenário (H3) | Cálculo (**estimativa**). **O saco no circuito PAP com "0 km novos" foi invalidado a 22 out** (A21): antes, 22 de 48 freguesias (67 349 hab.) e 129,3 t | 4 |
+| H6 | Teto do modelo sem contentores (orçamento sem limite) | 772,1 t/ano a 170 623 € (221,0 €/t), com 2 viaturas; 458,8 t reutilizáveis. Acima da referência francesa de 669,7 t (C14), que o modelo alcança entre os 100 000 e os 150 000 €/ano. Com o contentor de rua (só referência): 1 282,6 t a 213 910 € (166,8 €/t) | [Dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês) | Cálculo (**estimativa**). Antes: 597,7 t a 138 866 €, abaixo da referência francesa | 3 |
+| H7 | Os 5,4% são a média por circuito da caracterização de 2016 (mediana 4,5%), não um valor da APA | 5,4% | Perebynos et al., 2023, p. 5; APA dá 5,86% no indiferenciado nacional em 2025 (RARU 2025, p. 24) | Primária (artigo e RARU). **Resolvido a 22 out:** a Vitrus indicou 5,86% (A10) | histórico |
+| H8 | As 43 051 t da Vitrus são 84,0% do indiferenciado do concelho | 84,0% | Vitrus, Relatório e Contas 2025, p. 8 | Primária. **Desde 22 out** a procura usa o concelho todo (A24): 51 250,6 t × 5,86% ≈ 3 003,3 t (**estimativa**) | 2 |
+| H9 | Tarifa da Resinorte para o indiferenciado | 65,64 €/t (2024 e 2025); taxa de gestão de resíduos 40 €/t em 2026 (aterro) | Tarifários e R&C 2025 da Resinorte; tabela de taxas APA 2026 | Primária. **Confirmado pela Vitrus a 22 out** (A25): 105,64 €/t no total | 3, 4 |
+| H10 | Tratamento evitado no cenário de 60 000 €/ano | 47 093 € por ano (445,8 t × 105,64 €/t); custo líquido −1 264 € por ano, ou −2,8 €/t: o tratamento evitado paga a operação | H3 e A25 | Cálculo (**estimativa**) | 4 |
+| H11 | Curva de custo, modelo por freguesia (custo realmente gasto) | 20 000 €: 257,2 t, 16 102 €, 62,6 €/t · 40 000 €: 378,5 t, 26 909 €, 71,1 €/t · 60 000 €: 445,8 t, 45 828 €, 102,8 €/t · 100 000 €: 571,2 t, 85 860 €, 150,3 €/t · 150 000 €: 695,4 t, 129 336 €, 186,0 €/t | Cenários de referência (versão 5) | Cálculo (**estimativa**) | 4 |
+| H12 | Modelo por locais reais (referência) | 20 000 €: 235,7 t, 84,5 €/t (líquido −21,1), 43,6% servida · 40 000 €: 361,4 t, 110,6 (5,0), 66,5% · 60 000 €: 481,9 t, 123,5 (17,9), 87,8% · 100 000 €: 606,1 t, 164,4 (58,8), 89,1% · 150 000 €: 726,3 t, 205,5 (99,9), 91,2% | Cenários de referência (versão 5) | Cálculo (**estimativa**) | só em conversa |
+| H13 | Piloto recomendado | Aldão e Arosa e Castelões; piso de sinal 1,71 t em 3 meses, previsão 2,43 t; 538 €/t (424 a 706), sem o preço da viatura | `/pilot` | Cálculo (**estimativa**) | 8 |
 
 ## Como atualizar este registo
 
 1. Ao verificar algo numa fonte primária, muda o estado e acrescenta a ligação.
 2. Se um número no slide mudar, muda a linha **antes** do slide.
-3. Quando a Vitrus enviar os custos (A15), acrescenta linhas **A21 em diante** com os valores e a data de receção.
+3. Quando a Vitrus enviar os custos (A15, A23), acrescenta linhas **A29 em diante** com os valores e a data de receção.
 4. Quando um cenário do modelo mudar, atualiza a secção H com a data e o valor anterior.
 5. No dia 25 de outubro, imprime esta tabela e confirma cada linha com "slide" preenchido.

@@ -8,7 +8,7 @@ export const SCENES = [
   { id: 'destination', bars: 2, bg: 'light' },
   { id: 'law', bars: 4, bg: 'light' },
   { id: 'map', bars: 3, bg: 'dark' },
-  { id: 'pivot', bars: 3, bg: 'light' },
+  { id: 'pivot', bars: 4, bg: 'light' },
   { id: 'network', bars: 5, bg: 'dark' },
   { id: 'results', bars: 5, bg: 'light' },
   { id: 'montage', bars: 12, bg: 'light' },

@@ -6,6 +6,7 @@ from typing import Literal, Self
 from pydantic import BaseModel, Field, model_validator
 
 from novelo.domain.vocab import CollectionMode, ProducerType, ScenarioObjective, ScenarioStatus, Tipau
+from novelo.features.planning import assumptions as a
 
 Siting = Literal["parish", "sites"]
 # Candidatos da rede por locais: `public` (locais de contentores municipais na rua), `staffed` (pontos assistidos:
@@ -38,39 +39,56 @@ class PlanningParams(BaseModel):
     kg_per_inhab_month: float = Field(
         gt=0,
         le=5,
-        description="Têxtil que ainda vai para o lixo por habitante e mês (43 051 t RSU × 5,4%, Vitrus + APA)",
+        description=(
+            "Têxtil que ainda vai para o lixo por habitante e mês (indiferenciado do concelho 51 250,6 t × 5,86%, "
+            "Vitrus + APA)"
+        ),
     )
     modes: dict[CollectionMode, ModeParams]
-    cost_per_collection_eur: float = Field(ge=0)
+    cost_per_collection_eur: float = Field(
+        ge=0, description="Custo de uma recolha: paragem num local ou saco à porta (tripulação e tempo)"
+    )
     cost_per_km_eur: float = Field(ge=0)
     detour_factor: float = Field(ge=1, le=3, description="Estrada real / linha reta")
     on_demand_kg_per_pickup: float = Field(gt=0)
-    piggyback_extra_km: float = Field(ge=0, description="Desvio médio quando já passa um circuito")
-    piggyback_min_days: int = Field(ge=1, le=7, description="Dias/semana de circuito para aproveitar a rota")
-    vehicle_capacity_t: float = Field(gt=0)
+    vehicle_capacity_t: float = Field(gt=0, description="Carga útil da viatura dedicada ao têxtil (t)")
     depot_lat: float = Field(ge=-90, le=90)
     depot_lon: float = Field(ge=-180, le=180)
     solver_time_limit_s: int = Field(ge=1, le=120)
-    # Campos novos (21 out 2026) com valor por omissão: os pressupostos e cenários já guardados continuam válidos.
-    pap_cost_per_pickup_eur: float = Field(
-        default=6.0,
-        ge=0,
-        description=(
-            "Custo de uma recolha de têxtil no circuito porta a porta que já passa (tempo extra de paragem, 0 km "
-            "novos). Pressuposto: igual ao custo de uma recolha até a Vitrus dar o tempo de paragem"
-        ),
+    # Viatura dedicada (22 out 2026): campos com valor por omissão, para os pressupostos e cenários já guardados
+    # continuarem válidos. A Vitrus confirmou que o saco não pode ir na compactadora do porta a porta.
+    on_demand_every_weeks: int = Field(
+        default=a.ON_DEMAND_EVERY_WEEKS,
+        ge=1,
+        le=8,
+        description="Recolha a pedido: uma ronda da viatura dedicada por freguesia a cada N semanas",
     )
-    pap_free_capacity_kg: float | None = Field(
-        default=None,
+    vehicle_capex_eur: float = Field(
+        default=a.VEHICLE_CAPEX_EUR,
         ge=0,
-        description="Capacidade livre para têxtil por ronda numa viatura porta a porta (kg); nulo = por validar",
+        description="Preço de uma viatura nova de caixa fechada, sem compactação (€, sem IVA)",
+    )
+    vehicle_lifetime_years: float = Field(
+        default=a.VEHICLE_LIFETIME_YEARS, gt=0, le=30, description="Vida útil da viatura para anualizar o preço"
+    )
+    vehicle_speed_kmh: float = Field(
+        default=a.VEHICLE_SPEED_KMH, gt=0, le=90, description="Velocidade média da viatura em recolha (km/h)"
+    )
+    door_stop_minutes: float = Field(
+        default=a.DOOR_STOP_MINUTES, ge=0, le=30, description="Minutos por saco recolhido à porta"
+    )
+    site_stop_minutes: float = Field(
+        default=a.SITE_STOP_MINUTES, ge=0, le=60, description="Minutos por paragem num local (ponto existente)"
+    )
+    shift_hours: float = Field(
+        default=a.SHIFT_HOURS, gt=0, le=12, description="Horas úteis de um turno da viatura (5 dias por semana)"
     )
     rsu_treatment_eur_per_t: float | None = Field(
-        default=None,
+        default=a.TREATMENT_EUR_PER_T,
         ge=0,
         description=(
-            "Custo de tratamento do indiferenciado por tonelada (Vitrus, departamento financeiro, pedido a 21 out "
-            "2026); nulo = por preencher, e a poupança no tratamento aparece «por validar»"
+            "Custo de tratamento do indiferenciado por tonelada: 40 €/t de taxa de gestão de resíduos (TGR) + "
+            "65,64 €/t da Resinorte = 105,64 €/t (Vitrus, 22 out 2026); nulo = sem poupança no tratamento"
         ),
     )
 
@@ -101,7 +119,7 @@ class DoorToDoorPass(BaseModel):
 
     circuit: str
     weekday: int = Field(ge=1, le=7, description="1 = segunda ... 7 = domingo")
-    vehicle: str | None = Field(description="Matrícula no planeamento de turnos desse dia")
+    vehicle: str | None = Field(description="Matrícula no planeamento de turnos desse dia (nula: sem linha na folha)")
     crew: int | None = Field(description="Tripulação no planeamento de turnos desse dia")
 
 
@@ -116,9 +134,12 @@ class ZoneOut(BaseModel):
     tipau: Tipau | None = Field(description="Tipologia de áreas urbanas do INE")
     service_days: int = Field(
         description=(
-            "Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks) com "
-            "viatura no planeamento de turnos; decide o desvio da recolha a pedido. Orgânico não conta"
+            "Dias/semana (distintos) com passagem de um circuito de indiferenciado (porta a porta ou moloks); "
+            "orgânico não conta. Hábito de recolha em dias fixos (critério do piloto)"
         )
+    )
+    area_km2: float | None = Field(
+        default=None, description="Área da freguesia (CAOP 2019): volta da viatura dedicada porta a porta"
     )
     existing_containers: int = Field(
         default=0, description="Contentores têxteis ativos já na freguesia (0 se ainda não há localizações)"
@@ -128,8 +149,8 @@ class ZoneOut(BaseModel):
     door_to_door: list[DoorToDoorPass] = Field(
         default_factory=list,
         description=(
-            "Passagens dos circuitos porta a porta com viatura no planeamento: onde há, a recolha a pedido vai no "
-            "circuito sem km novos"
+            "Passagens dos circuitos porta a porta de indiferenciado (a rede atual). Não levam têxtil: o saco "
+            "estraga-se na compactadora (Vitrus, 22 out 2026)"
         ),
     )
 
@@ -211,9 +232,33 @@ class Kpis(BaseModel):
     avoided_treatment_eur: float | None = Field(
         default=None,
         description=(
-            "Poupança no tratamento de indiferenciado: toneladas × `rsu_treatment_eur_per_t`. Nulo = «por validar» "
-            "(o custo por tonelada ainda não chegou da Vitrus)"
+            "Tratamento de indiferenciado evitado: toneladas × `rsu_treatment_eur_per_t` (105,64 €/t, Vitrus). Nulo "
+            "sem custo de tratamento (cenários antigos)"
         ),
+    )
+    net_annual_cost_eur: float | None = Field(
+        default=None,
+        description=(
+            "Custo líquido para o município: custo anual − tratamento evitado (estimativa). Nulo sem custo de "
+            "tratamento"
+        ),
+    )
+    net_eur_per_tonne: float | None = Field(
+        default=None, description="Custo líquido ÷ toneladas: € por tonelada que o município paga mesmo (estimativa)"
+    )
+    # Viatura dedicada ao têxtil (22 out 2026). Nulos nos cenários calculados antes (recolha nos circuitos PAP).
+    vehicles: int | None = Field(
+        default=None, description="Viaturas dedicadas necessárias: ⌈horas por ano ÷ horas de uma viatura⌉"
+    )
+    vehicle_days_week: float | None = Field(
+        default=None, description="Dias de viatura por semana: horas por ano ÷ 52 ÷ horas por turno (5 = uma cheia)"
+    )
+    vehicle_hours_year: float | None = Field(default=None, description="Horas por ano da viatura dedicada")
+    vehicle_capex_eur: float | None = Field(
+        default=None, description="Investimento nas viaturas dedicadas (incluído em `capex_eur`)"
+    )
+    vehicle_annual_eur: float | None = Field(
+        default=None, description="Viaturas anualizadas pela vida útil (incluído em `annual_cost_eur`)"
     )
     # Têxtil reutilizável (22 out 2026). Opcionais: os cenários guardados antes continuam válidos (nulo = sem cálculo).
     reuse_share: float | None = Field(
@@ -344,26 +389,38 @@ class SitingSummary(BaseModel):
 
 
 class CollectionPlanEntry(BaseModel):
-    """Como a recolha a pedido chega a uma freguesia: no circuito porta a porta (0 km novos) ou a pedido com desvio."""
+    """Uma freguesia e um canal no plano da viatura dedicada ao têxtil (nova, de caixa fechada, sem compactação)."""
 
     parish_code: str
     parish_name: str
-    channel: Literal["door_to_door", "detour"] = Field(
-        description="`door_to_door`: no circuito PAP que já passa; `detour`: a pedido, com km de desvio"
+    channel: CollectionMode = Field(
+        description=(
+            "`on_demand`: saco fechado à porta numa ronda da viatura dedicada; `existing`: paragem nos locais "
+            "(sacos fechados); `street`: contentor de rua (só referência)"
+        )
     )
-    circuit: str | None = Field(description="Circuito PAP escolhido (dia com menos carga de têxtil)")
-    circuits: list[str] = Field(default_factory=list, description="Todos os circuitos PAP com viatura na freguesia")
-    weekday: int | None = Field(description="Dia fixo do saco à porta: 1 = segunda ... 7 = domingo")
-    vehicle: str | None
-    crew: int | None
-    new_km_year: float = Field(description="Km novos por ano (0 no circuito PAP)")
+    weekday: int | None = Field(description="Dia de recolha (1 = segunda ... 5 = sexta); nulo sem horas")
+    vehicle: int | None = Field(description="Viatura dedicada (1, 2, ...) que faz a ronda")
+    every_weeks: float = Field(description="Uma ronda a cada N semanas")
+    rounds_year: float = Field(description="Rondas por ano")
+    trips_per_round: int | None = Field(
+        description="Viagens ao estaleiro numa ronda porta a porta (carga acima da capacidade); nulo nos locais"
+    )
+    stops_year: float = Field(description="Sacos à porta ou paragens nos locais por ano")
     tonnes_year: float = Field(description="Têxtil por este canal (estimativa)")
-    pickups_year: float = Field(description="Recolhas por ano (t × 1000 / kg por recolha)")
-    kg_per_round: float | None = Field(description="Têxtil por ronda semanal no circuito (só PAP)")
-    round_kg: float | None = Field(description="Têxtil da ronda (circuito, dia) somando as freguesias que lá caem")
-    fits_capacity: bool | None = Field(
-        description="A ronda cabe na viatura? Nulo = por validar (capacidade livre ainda sem valor da Vitrus)"
-    )
+    kg_per_round: float = Field(description="Têxtil por ronda (estimativa)")
+    km_year: float = Field(description="Km por ano da viatura dedicada neste canal")
+    hours_year: float = Field(description="Horas por ano da viatura dedicada neste canal")
+
+
+def _drop_legacy_plan(data: object) -> object:
+    """Os planos antigos (saco na viatura PAP, 0 km) já não valem: a Vitrus disse que o saco se estraga na
+    compactadora. Lidos de cenários guardados, ficam nulos e o ecrã pede para recalcular."""
+    if isinstance(data, dict):
+        plan = data.get("collection_plan")
+        if isinstance(plan, list) and any(isinstance(e, dict) and "rounds_year" not in e for e in plan):
+            return {**data, "collection_plan": None}
+    return data
 
 
 class ScenarioResult(BaseModel):
@@ -381,10 +438,15 @@ class ScenarioResult(BaseModel):
     collection_plan: list[CollectionPlanEntry] | None = Field(
         default=None,
         description=(
-            "Freguesias com recolha a pedido e o canal: circuito porta a porta (circuito, dia, viatura, 0 km novos) "
-            "ou a pedido com desvio. Nulo nos cenários calculados antes de 21 out 2026"
+            "Plano da viatura dedicada ao têxtil: por freguesia e canal, dia, viatura, rondas, kg por ronda, km e "
+            "horas. Nulo nos cenários calculados antes de 22 out 2026 (saco nos circuitos PAP, que a Vitrus excluiu)"
         ),
     )
+
+    @model_validator(mode="before")
+    @classmethod
+    def _legacy_plan(cls, data: object) -> object:
+        return _drop_legacy_plan(data)
 
 
 class ScenarioSummary(BaseModel):

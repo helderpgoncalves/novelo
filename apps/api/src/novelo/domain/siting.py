@@ -12,9 +12,11 @@ pessoa não captam duas vezes (cobertura por união, não por canais independent
   têxtil do ponto i       t_i = D_z · (w_i / Σ_z w) · c               (t/ano; c = taxa de captura do modo)
   custo fixo do local j   capex/N + recolhas/ano · c_recolha
   km                      o VRP sobre os locais abertos dá os km de uma ronda; km/ano = rondas · km_ronda
+  viaturas dedicadas      ⌈horas (rotas + recolha a pedido) ÷ horas de uma viatura⌉ · capex/vida útil
 
-O CP-SAT resolve a cobertura máxima com orçamento (ou o custo mínimo para uma meta). Como os km não são lineares nos
-locais escolhidos, o orçamento do solver desce até o custo real (fixo + km das rotas) caber no pedido.
+O CP-SAT resolve a cobertura máxima com orçamento (ou o custo mínimo para uma meta). Como os km e as viaturas não são
+lineares nos locais escolhidos, o orçamento do solver desce até o custo real (fixo + km das rotas + viaturas) caber no
+pedido. A primeira volta já desconta uma viatura (há sempre uma logo que se recolha alguma coisa).
 """
 
 from __future__ import annotations
@@ -28,7 +30,7 @@ from typing import Literal
 
 from ortools.sat.python import cp_model
 
-from novelo.domain import network
+from novelo.domain import fleet, network
 from novelo.domain.geo import haversine_km
 
 SCALE_KG = 1000  # t -> kg inteiros no solver
@@ -304,13 +306,17 @@ def solve_coverage(
 
 @dataclass(frozen=True)
 class OnDemandZone:
-    """Recolha a pedido numa freguesia (o modo que aproveita os circuitos da Vitrus, sem contentores)."""
+    """Recolha a pedido numa freguesia: saco fechado à porta, numa ronda da viatura dedicada (`network.mode_cost`)."""
 
     zone_id: str
     capture: float  # c · f do modo: fração do têxtil da freguesia que capta sozinho
     coverage: float  # fração da população que serve
     cost_eur: float  # custo anual com km (modelo `network.mode_cost`)
     km_year: float
+    hours_year: float = 0.0  # horas da viatura dedicada
+    stops_year: float = 0.0  # sacos por ano
+    rounds_year: float = 0.0
+    trips_per_round: int = 0
 
 
 @dataclass(frozen=True)
@@ -429,6 +435,9 @@ class SitePlan:
     zone_served_share: dict[str, float] = field(
         default_factory=dict
     )  # fração da procura da freguesia servida por locais
+    hours_year: float = 0.0  # horas da viatura dedicada: rotas pelos locais + recolha a pedido
+    vehicles: int = 0  # viaturas dedicadas: ⌈horas ÷ horas de uma viatura⌉
+    vehicle_cost_eur: float = 0.0  # viaturas · capex ÷ vida útil
 
     @property
     def on_demand_cost_eur(self) -> float:
@@ -436,7 +445,7 @@ class SitePlan:
 
     @property
     def annual_cost_eur(self) -> float:
-        return self.fixed_cost_eur + self.cost_km_eur + self.on_demand_cost_eur
+        return self.fixed_cost_eur + self.cost_km_eur + self.on_demand_cost_eur + self.vehicle_cost_eur
 
 
 def assign_to_nearest(
@@ -521,6 +530,9 @@ def evaluate(
         SiteResult(candidates[j], t_by_site.get(j, 0.0), pop_by_site.get(j, 0.0), served_by_site.get(j, 0))
         for j in chosen
     ]
+    hours = fleet.hours(km_year, len(chosen) * collections_per_year, params.vehicle_speed_kmh, params.site_stop_minutes)
+    hours += sum(z.hours_year for z in od.values())
+    vehicles = fleet.vehicles_needed(hours, params.shift_hours)
     return SitePlan(
         sites=sites,
         status="optimal",
@@ -537,6 +549,9 @@ def evaluate(
         on_demand=dict(od),
         zone_tonnes_on_demand=dict(zone_od_t),
         zone_served_share=dict(zone_served),
+        hours_year=hours,
+        vehicles=vehicles,
+        vehicle_cost_eur=vehicles * params.vehicle_annual_eur,
     )
 
 
@@ -611,9 +626,10 @@ def plan_site_network(
 
     if budget_eur_year is None:
         raise ValueError("max_tonnes exige budget_eur_year")
-    # Os km não são lineares nos locais escolhidos: o solver trabalha com o custo fixo e o orçamento do solver sobe ou
-    # desce pela folga ou excesso do custo REAL (fixo + km do VRP) até caber no pedido, sem folga relevante.
-    solver_budget = budget_eur_year
+    # Os km e as viaturas não são lineares nos locais escolhidos: o solver trabalha com o custo fixo e o orçamento do
+    # solver sobe ou desce pela folga ou excesso do custo REAL (fixo + km do VRP + viaturas) até caber no pedido. A
+    # primeira volta desconta logo uma viatura dedicada.
+    solver_budget = budget_eur_year - params.vehicle_annual_eur
     best: SitePlan | None = None
     hint: tuple[int, ...]
     hint_od: frozenset[str] = frozenset()

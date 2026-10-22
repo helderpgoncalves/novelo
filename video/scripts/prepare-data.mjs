@@ -66,7 +66,6 @@ const r1 = (n) => Math.round(n * 10) / 10;
 const pt = (lon, lat) => proj([lon, lat]).map(r1);
 
 const alloc = Object.fromEntries(R.allocations.map((a) => [a.parish_code, a]));
-const papInScenario = new Set(R.collection_plan.filter((c) => c.channel === 'door_to_door').map((c) => c.parish_code));
 
 const parishes = zones.map((z) => {
   const a = alloc[z.code];
@@ -77,8 +76,9 @@ const parishes = zones.map((z) => {
     tipau: z.tipau,
     d: path({ type: 'Feature', geometry: z.geometry }).replace(/(\d+\.\d)\d+/g, '$1'),
     c: pt(...geoCentroid({ type: 'Feature', geometry: z.geometry })),
-    pap: Boolean(z.door_to_door && z.door_to_door.length),
-    papInScenario: papInScenario.has(z.code),
+    // canais do cenário nesta freguesia: saco à porta (on_demand) e/ou paragem em local existente (existing)
+    onDemand: Boolean(a?.modes?.includes('on_demand')),
+    existing: Boolean(a?.modes?.includes('existing')),
     mode: a?.mode ?? null,
     tonnes: a ? Math.round(a.tonnes * 10) / 10 : 0,
   };
@@ -106,8 +106,7 @@ const out = {
   depot,
   kpis: R.kpis,
   modes: R.modes,
-  plan: R.collection_plan.map((c) => ({ parish: c.parish_name, circuit: c.circuit, weekday: c.weekday, vehicle: c.vehicle, t: c.tonnes_year, kg: c.kg_per_round, km: c.new_km_year })),
 };
 writeFileSync(new URL('../src/data/geo.json', import.meta.url), JSON.stringify(out));
 console.log('geo.json', W, H, parishes.length, 'parishes', containers.length, 'containers', schools.length, 'schools', routes.length, 'routes',
-  parishes.filter((p) => p.pap).length, 'pap', parishes.filter((p) => p.papInScenario).length, 'pap in scenario');
+  parishes.filter((p) => p.onDemand).length, 'on demand', parishes.filter((p) => p.existing).length, 'existing');

@@ -42,7 +42,7 @@ pres.subject = 'Desafio 5 TexVitrus: recolha seletiva de têxteis em Guimarães'
 const C = pres.SchemeColor;
 
 // `just check` de 22 out 2026 (verde) e `just eval-copilot` (155 perguntas ao modelo real, 100% dos números verificados).
-const TESTS = { api: '1 037', web: '437', evals: '155' };
+const TESTS = { api: '1 042', web: '432', evals: '155' };
 
 const W = 13.333;
 const M = 0.6; // margem
@@ -130,13 +130,13 @@ pres.addSection({ title: 'Pitch (5 minutos)' });
 {
   const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch (5 minutos)' });
   s.addText('O PROBLEMA', { placeholder: 'eyebrow' });
-  s.addText('Quase 9 em cada 10 quilos de têxtil acabam no lixo', { placeholder: 'title' });
-  s.addText('2 324,8 t', { x: M, y: 2.35, w: 6, h: 1.3, fontFace: THEME.headFontFace, fontSize: 88, color: C.accent1, margin: 0, valign: 'bottom', isTextBox: true, objectName: 'Número principal' });
-  body(s, 'de têxtil por ano no lixo indiferenciado: 43 051 t de RSU recolhidas pela Vitrus em 2025 × 5,4% de têxtil (APA).', { x: M, y: 3.75, w: 5.6, h: 0.8, fontSize: 16, color: C.text1 });
+  s.addText('Mais de 9 em cada 10 quilos de têxtil acabam no lixo', { placeholder: 'title' });
+  s.addText('3 003,3 t', { x: M, y: 2.35, w: 6, h: 1.3, fontFace: THEME.headFontFace, fontSize: 88, color: C.accent1, margin: 0, valign: 'bottom', isTextBox: true, objectName: 'Número principal' });
+  body(s, 'de têxtil por ano no lixo indiferenciado: cerca de 51 250 t de indiferenciado no concelho em 2025 × 5,86% de têxtil (APA).', { x: M, y: 3.75, w: 5.6, h: 0.8, fontSize: 16, color: C.text1 });
   estimate(s, M, 4.65);
   stat(s, { x: M, y: 5.2, w: 2.6, value: '301,3 t', label: 'recolhidas à parte em 2025, por 4 entidades', size: 30 });
-  stat(s, { x: M + 2.9, y: 5.2, w: 2.6, value: '11,5%', label: 'do têxtil gerado chega à recolha seletiva (estimativa)', size: 30, color: C.accent1 });
-  // 200 pontos: 23 recolhidos à parte (11,5%), 177 no lixo. Cada ponto ≈ 13 t.
+  stat(s, { x: M + 2.9, y: 5.2, w: 2.6, value: '9,1%', label: 'do têxtil gerado chega à recolha seletiva (estimativa)', size: 30, color: C.accent1 });
+  // 200 pontos: 18 recolhidos à parte (9,1%), 182 no lixo. Cada ponto ≈ 16,5 t.
   const cols = 20;
   const cell = 0.305;
   const x0 = 6.75;
@@ -144,16 +144,16 @@ pres.addSection({ title: 'Pitch (5 minutos)' });
   for (let i = 0; i < 200; i++) {
     const cx = x0 + (i % cols) * cell;
     const cy = y0 + Math.floor(i / cols) * cell;
-    s.addShape(pres.shapes.OVAL, { x: cx, y: cy, w: cell * 0.74, h: cell * 0.74, fill: { color: i < 23 ? C.accent1 : C.text1, transparency: i < 23 ? 0 : 10 }, line: { type: 'none' }, objectName: `Ponto ${i + 1}` });
+    s.addShape(pres.shapes.OVAL, { x: cx, y: cy, w: cell * 0.74, h: cell * 0.74, fill: { color: i < 18 ? C.accent1 : C.text1, transparency: i < 18 ? 0 : 10 }, line: { type: 'none' }, objectName: `Ponto ${i + 1}` });
   }
   s.addShape(pres.shapes.OVAL, { x: x0, y: y0 + 10 * cell + 0.15, w: 0.17, h: 0.17, fill: { color: C.accent1 }, line: { type: 'none' }, objectName: 'Legenda recolhido' });
   body(s, 'recolhido à parte', { x: x0 + 0.25, y: y0 + 10 * cell + 0.1, w: 1.8, h: 0.3, fontSize: 12 });
   s.addShape(pres.shapes.OVAL, { x: x0 + 2.2, y: y0 + 10 * cell + 0.15, w: 0.17, h: 0.17, fill: { color: C.text1 }, line: { type: 'none' }, objectName: 'Legenda lixo' });
-  body(s, 'no lixo indiferenciado (cada ponto ≈ 13 t)', { x: x0 + 2.45, y: y0 + 10 * cell + 0.1, w: 3.6, h: 0.3, fontSize: 12 });
-  source(s, 'Vitrus Ambiente (RSU e têxtil recolhido em 2025); APA (5,4% de têxtil no RSU, indicado pela Vitrus). Captura = 301,3 ÷ (2 324,8 + 301,3) t.');
+  body(s, 'no lixo indiferenciado (cada ponto ≈ 16,5 t)', { x: x0 + 2.45, y: y0 + 10 * cell + 0.1, w: 3.6, h: 0.3, fontSize: 12 });
+  source(s, 'Vitrus, R&C 2025, p. 8 (43 050,5 t = 84,0% do indiferenciado do concelho) e têxtil recolhido em 2025; APA, RARU 2025, p. 24 (5,86%). Captura = 301,3 ÷ (3 003,3 + 301,3) t.');
   s.addNotes(
-    '«Em 2025 a Vitrus recolheu 43 051 toneladas de lixo indiferenciado. 5,4% é têxtil: são cerca de 2 325 toneladas por ano que vão para aterro. Recolhidas à parte, só 301. Ou seja, 11,5% do que se gera.»\n' +
-      'Dizer «estimativa» uma vez: o 5,4% é a composição média da APA, indicada pela própria Vitrus. A procura é conservadora: as 43 051 t são 84% do indiferenciado do concelho (R&C 2025 da Vitrus).',
+    '«Em 2025 o concelho produziu cerca de 51 250 toneladas de lixo indiferenciado. 5,86% é têxtil: são cerca de 3 000 toneladas por ano que vão para aterro. Recolhidas à parte, só 301. Ou seja, 9,1% do que se gera.»\n' +
+      'Dizer «estimativa» uma vez: os 5,86% são a composição nacional da APA (RARU 2025) e o total do concelho sai do R&C 2025 da Vitrus (as suas 43 050,5 t são 84,0%). Base confirmada pela Vitrus a 22 de outubro.',
   );
 }
 
@@ -254,23 +254,24 @@ pres.addSection({ title: 'Pitch (5 minutos)' });
 // 6. Ouvimos a Vitrus --------------------------------------------------------------------------------
 {
   const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch (5 minutos)' });
-  s.addText('21 DE OUTUBRO', { placeholder: 'eyebrow' });
-  s.addText('Ouvimos a Vitrus e refizemos o modelo em 24 horas', { placeholder: 'title' });
+  s.addText('21 E 22 DE OUTUBRO', { placeholder: 'eyebrow' });
+  s.addText('Ouvimos a Vitrus e refizemos o modelo, duas vezes', { placeholder: 'title' });
   const rows = [
     ['Não tem contentores de têxtil e não os quer: o têxtil de contentor vem contaminado', 'A rede deixou de ter contentores de têxtil'],
-    ['Contem 5,4% de têxtil nas 43 051 t de RSU de 2025', 'A procura passou a 2 324,8 t por ano (estimativa)'],
-    ['A reciclagem é muito mais cara do que a fibra virgem', 'Cada cenário mostra as toneladas reutilizáveis'],
-    ['Os ficheiros QGIS têm todos os contentores', 'Os 2 751 contentores são a base geográfica'],
+    ['O saco estraga-se na caixa compactadora; a solução é um meio novo de recolha', 'Uma viatura só para o têxtil, sem compactação'],
+    ['Não há viaturas livres à tarde', 'Saiu o plano B das viaturas paradas'],
+    ['Usem 5,86% (APA) sobre o indiferenciado do concelho', 'A procura passou a 3 003,3 t por ano (estimativa)'],
+    ['Aterro: 40 €/t de TGR + 65,64 €/t da Resinorte', 'Cada tonelada desviada poupa 105,64 €'],
   ];
   const head = (t) => ({ text: t, options: { bold: true, fontSize: 11, charSpacing: 2, color: C.accent1, fill: { color: 'ECE7DC' } } });
   s.addTable(
     [[head('A VITRUS DISSE'), head('O QUE MUDOU NO NOVELO')], ...rows.map(([a, b]) => [{ text: a, options: { color: C.text1 } }, { text: b, options: { color: C.text1, bold: true } }])],
-    { x: M, y: 2.3, w: 8.6, colW: [4.6, 4.0], fontFace: THEME.bodyFontFace, fontSize: 14, border: { type: 'solid', pt: 0.75, color: HEX.linha }, fill: { color: 'FBF9F4' }, margin: [0.12, 0.16, 0.12, 0.16], valign: 'middle', rowH: [0.45, 0.85, 0.75, 0.75, 0.75], objectName: 'O que mudou' },
+    { x: M, y: 2.3, w: 8.6, colW: [4.6, 4.0], fontFace: THEME.bodyFontFace, fontSize: 14, border: { type: 'solid', pt: 0.75, color: HEX.linha }, fill: { color: 'FBF9F4' }, margin: [0.12, 0.16, 0.12, 0.16], valign: 'middle', rowH: [0.42, 0.72, 0.72, 0.6, 0.72, 0.6], fontSize: 13, objectName: 'O que mudou' },
   );
   s.addText('24 h', { x: 9.7, y: 2.35, w: 3.0, h: 1.5, fontFace: THEME.headFontFace, fontSize: 96, color: C.accent1, margin: 0, align: 'center', valign: 'middle', isTextBox: true, objectName: '24 horas' });
-  body(s, 'Uma rede sem um único contentor novo, sobre os circuitos e as viaturas que já existem.', { x: 9.75, y: 4.0, w: 2.9, h: 1.2, fontSize: 15, color: C.text1, align: 'center' });
-  source(s, 'Email do mentor da Vitrus, 21 out 2026; registo de alterações do repositório.');
-  s.addNotes('«A 21 de outubro o mentor da Vitrus respondeu-nos: não querem contentores de têxtil, porque o têxtil de contentor chega contaminado. Nesse mesmo dia refizemos o modelo: a rede proposta deixou de ter contentores.» Isto mostra que ouvimos o cliente e que o produto é flexível.');
+  body(s, 'Cada resposta da Vitrus entrou no modelo no próprio dia: sem contentores, com uma viatura dedicada.', { x: 9.75, y: 4.0, w: 2.9, h: 1.2, fontSize: 15, color: C.text1, align: 'center' });
+  source(s, 'Emails do mentor da Vitrus, 21 e 22 out 2026; registo de alterações do repositório.');
+  s.addNotes('«A 21 de outubro a Vitrus disse-nos: contentores de têxtil, não. A 22: o saco também não pode ir no camião do lixo, estraga-se na compactadora; o caminho é um meio novo de recolha. De cada vez, refizemos o modelo no próprio dia.» Isto mostra que ouvimos o cliente e que o produto se adapta em horas.');
 }
 
 // 7. A rede -------------------------------------------------------------------------------------------
@@ -491,18 +492,19 @@ pres.addSection({ title: 'Apoio (perguntas do júri)' });
   s.addText('Nenhum número sem fonte', { placeholder: 'title' });
   const rows = [
     ['301,3 t recolhidas em 2025 e destino (59,4 / 26,5 / 14,1%)', 'Vitrus Ambiente', 'Dado'],
-    ['43 051 t de RSU em 2025 e 5,4% de têxtil', 'Vitrus Ambiente (21 out 2026); APA', 'Dado; 2 324,8 t é estimativa'],
+    ['≈ 51 250 t de indiferenciado no concelho e 5,86% de têxtil', 'Vitrus (R&C 2025, p. 8; 22 out 2026); APA (RARU 2025)', 'Dado; 3 003,3 t é estimativa'],
+    ['Tratamento em aterro: 105,64 €/t (40 TGR + 65,64 Resinorte)', 'Vitrus Ambiente (22 out 2026)', 'Dado'],
     ['40 circuitos, 29 viaturas, 101 turnos, 82 localidades', 'Vitrus Ambiente', 'Dado'],
     ['2 751 contentores municipais em 2 026 locais', 'Vitrus Ambiente (pacote QGIS)', 'Dado'],
     ['População e tipologia de cada freguesia', 'INE; CAOP 2019 (DGT)', 'Dado'],
-    ['Custos por recolha e por km, captura por canal', 'Pressupostos da equipa, visíveis no ecrã', 'Por validar com a Vitrus'],
+    ['Custos por recolha e por km, viatura nova, captura por canal', 'Pressupostos da equipa, visíveis no ecrã', 'Por validar com a Vitrus'],
   ];
   const head = (t) => ({ text: t, options: { bold: true, fontSize: 11, charSpacing: 2, color: C.accent1, fill: { color: 'ECE7DC' } } });
   s.addTable([[head('DADO'), head('FONTE'), head('ESTADO')], ...rows.map((r) => r.map((t, i) => ({ text: t, options: { color: i === 2 ? C.accent1 : C.text1, bold: i === 2 } })))], {
     x: M, y: 2.3, w: W - 2 * M, colW: [5.6, 3.9, 2.63], fontFace: THEME.bodyFontFace, fontSize: 12, border: { type: 'solid', pt: 0.75, color: HEX.linha }, fill: { color: 'FBF9F4' }, margin: [0.08, 0.16, 0.08, 0.16], valign: 'middle', rowH: 0.46, objectName: 'Fontes',
   });
-  body(s, 'A procura é conservadora: as 43 051 t da Vitrus são 84,0% do indiferenciado do concelho (Relatório e Contas 2025 da Vitrus, p. 8). Todo o valor estimado leva a palavra «estimativa» no ecrã, e os pressupostos mudam-se no ecrã com recálculo imediato.', { x: M, y: 6.15, w: W - 2 * M, h: 0.8, fontSize: 12 });
-  s.addNotes('O que ainda não sabemos, dizemo-lo: o custo por km da Vitrus, se o saco pode ir no camião compactador, e quanto se poupa no tratamento de cada tonelada que sai do lixo.');
+  body(s, 'Todo o valor estimado leva a palavra «estimativa» no ecrã, e os pressupostos mudam-se no ecrã com recálculo imediato. Os custos por hora e por km da Vitrus ainda não chegaram: são pressupostos.', { x: M, y: 6.15, w: W - 2 * M, h: 0.8, fontSize: 12 });
+  s.addNotes('O que ainda não sabemos, dizemo-lo: o custo por hora e por km das viaturas da Vitrus e o preço final da viatura nova.');
 }
 
 // 16. Como foi feito ---------------------------------------------------------------------------------

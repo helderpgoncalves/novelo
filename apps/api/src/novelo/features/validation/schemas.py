@@ -25,7 +25,9 @@ class PotentialReadingOut(BaseModel):
     )
     implied_capture_pct: float = Field(description="Captura de 2025 se esta leitura do potencial fosse a verdadeira")
     implied_potential_t: float = Field(description="Têxtil gerado (t/ano) que esta leitura implica")
-    is_model_base: bool = Field(description="A leitura que o modelo usa (Vitrus + APA: 43 051 t de RSU × 5,4%)")
+    is_model_base: bool = Field(
+        description="A leitura que o modelo usa (Vitrus + APA: ≈ 51 250,6 t de indiferenciado do concelho × 5,86%)"
+    )
     is_alternative: bool = Field(
         default=False, description="Leitura publicada mas não usada pela Vitrus; só para triangulação"
     )

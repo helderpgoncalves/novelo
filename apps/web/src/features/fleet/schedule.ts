@@ -343,19 +343,6 @@ export function weekTotals(load: SlotLoad[]): WeekTotals {
   };
 }
 
-/**
- * Viaturas sem circuito garantidas em todas as tardes de segunda a sexta: o mínimo, entre os cinco dias, da frota menos
- * as viaturas com circuito nesse turno. `null` sem frota. Serve o «plano B» de uma volta dedicada ao têxtil à tarde.
- */
-export function weekdayAfternoonIdle(load: SlotLoad[], fleetSize: number): number | null {
-  if (fleetSize <= 0) return null;
-  const free = GROUP_DAYS.weekday.map((day) => {
-    const used = load.find((s) => s.day === day && s.shift === 'afternoon')?.vehicles ?? 0;
-    return Math.max(0, fleetSize - used);
-  });
-  return Math.min(...free);
-}
-
 /** Todos os avisos reais, calculados sobre o planeamento completo (não sobre o que está filtrado). */
 export function detectIssues(
   vehicles: VehicleOut[],

@@ -118,9 +118,9 @@ async def test_benchmarks_expose_assumptions_source_and_consequences(api: httpx.
     assert "verificar" in b["source"] and "Refashion" in b["source"]
     assert b["population"] == 156_830  # Censos 2021, INE
     assert b["target_tonnes"] == pytest.approx(156_830 * 4.27 / 1000, abs=0.1)
-    # 4,27 ÷ 14,8234 (têxtil no lixo por habitante e ano, 43 051 t × 5,4% ÷ 156 830) = 28,8%
-    assert b["implied_capture_pct"] == pytest.approx(28.8, abs=0.05)
-    assert b["observed_capture_pct"] == pytest.approx(11.5, abs=0.05)  # 301,27 ÷ 2 626,0
+    # 4,27 ÷ 19,1499 (têxtil no lixo por habitante e ano, 51 250,6 t × 5,86% ÷ 156 830) = 22,3%
+    assert b["implied_capture_pct"] == pytest.approx(22.3, abs=0.05)
+    assert b["observed_capture_pct"] == pytest.approx(9.1, abs=0.05)  # 301,27 ÷ 3 304,6
     assert b["observed_kg_per_inhab_year"] == pytest.approx(301.3 * 1000 / 156_830, abs=0.05)  # ~1,92 kg/hab/ano
     assert b["current_people_per_point"] == 1500
     assert b["reachable"] == (b["target_tonnes"] <= b["max_capturable_t"])
@@ -186,7 +186,7 @@ async def test_pilot_recommends_two_parishes_with_numbers_from_the_data(api: htt
     cells = out["k"] * len(out["modes"])
     assert floor["computed"] and floor["floor_met"] and floor["tonnes_pilot"] >= floor["min_tonnes_pilot"]
     assert floor["min_tonnes_pilot"] == pytest.approx(cells * floor["calculation"][6]["value"], abs=0.01)
-    assert 0 < floor["combos_below_floor"] < floor["combos_total"] == 1128  # C(48, 2)
+    assert 0 <= floor["combos_below_floor"] < floor["combos_total"] == 1128  # C(48, 2)
     assert "descartadas" in floor["explanation"]
 
     free = (await api.post(f"{P}/pilot", json={"min_tonnes_pilot": 0})).json()

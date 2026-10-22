@@ -29,7 +29,7 @@ test.describe('apresentação de primeira visita', () => {
       await expect(story).toContainText('01 / 06');
       // Números da API (o resumo de 2025), nunca escritos à mão.
       await expect(story).toContainText('301,3 t');
-      await expect(story).toContainText('11,5%');
+      await expect(story).toContainText('9,1%');
       await expect(story).toContainText('17 abr 2028');
       // O foco fica no diálogo, no botão principal.
       await expect(story.getByRole('button', { name: 'Seguinte' })).toBeFocused();
@@ -50,9 +50,7 @@ test.describe('apresentação de primeira visita', () => {
       await expect(story).toContainText('A Vitrus não quer contentores de têxtil');
       // O plano vem do cenário de referência (ou diz que ainda está a calcular).
       await expect(
-        story.getByText(
-          /Saco fechado no circuito porta a porta|O plano ainda está a ser calculado/,
-        ),
+        story.getByText(/Saco fechado à porta|O plano ainda está a ser calculado/),
       ).toBeVisible({ timeout: 20_000 });
 
       await page.keyboard.press('ArrowLeft');

@@ -468,7 +468,7 @@ function Computing({ onRetry }: { onRetry: () => void }) {
 }
 
 function PlanChannels({ scenario, b2bSites }: { scenario: ScenarioOut; b2bSites: number | null }) {
-  const { doorToDoor, existing } = planChannels(scenario);
+  const { doorBag, existing } = planChannels(scenario);
   const lines = planLines(scenario.result.collection_plan, 3);
   return (
     <ul className="space-y-3">
@@ -478,9 +478,8 @@ function PlanChannels({ scenario, b2bSites }: { scenario: ScenarioOut; b2bSites:
         icon={<Truck className="size-4" />}
         title={m.story_answer_pap_title()}
         value={m.story_answer_pap_value({
-          n: formatNumber(doorToDoor.parishes),
-          tonnes: formatTonnes(doorToDoor.tonnes, 0),
-          km: formatNumber(doorToDoor.newKm, 0),
+          n: formatNumber(doorBag.parishes),
+          tonnes: formatTonnes(doorBag.tonnes, 0),
         })}
         text={m.story_answer_pap_text()}
       >
@@ -488,12 +487,12 @@ function PlanChannels({ scenario, b2bSites }: { scenario: ScenarioOut; b2bSites:
           <ul aria-label={m.story_answer_lines_label()} className="mt-3 space-y-1.5">
             {lines.map((l) => (
               <li
-                key={`${l.parish}-${l.circuit}`}
+                key={l.parish}
                 aria-label={m.story_answer_line_aria({
                   parish: l.parish,
-                  circuit: l.circuit,
                   day: weekdayShort(l.weekday),
-                  vehicle: l.vehicle,
+                  weeks: formatNumber(l.everyWeeks),
+                  vehicle: formatNumber(l.vehicle),
                   tonnes: formatTonnes(l.tonnes, 1),
                 })}
                 className="ob-mono flex flex-wrap items-baseline gap-x-2 rounded-lg bg-background/70 px-3 py-2 text-[12.5px] ring-1 ring-foreground/10"
@@ -504,15 +503,15 @@ function PlanChannels({ scenario, b2bSites }: { scenario: ScenarioOut; b2bSites:
                 <span aria-hidden="true" className="text-muted-foreground">
                   ·
                 </span>
-                <span>{l.circuit}</span>
-                <span aria-hidden="true" className="text-muted-foreground">
-                  ·
-                </span>
                 <span>{weekdayShort(l.weekday)}</span>
                 <span aria-hidden="true" className="text-muted-foreground">
                   ·
                 </span>
-                <span>{l.vehicle}</span>
+                <span>{m.story_answer_line_every({ weeks: formatNumber(l.everyWeeks) })}</span>
+                <span aria-hidden="true" className="text-muted-foreground">
+                  ·
+                </span>
+                <span>{m.plan_vehicle_n({ n: l.vehicle })}</span>
                 <span className="ml-auto text-muted-foreground tabular-nums">
                   {m.story_where_per_year({ t: formatTonnes(l.tonnes, 1) })}
                 </span>
@@ -692,19 +691,19 @@ function CostCard({ scenario }: { scenario: ScenarioOut }) {
 function MissingFromVitrus({ data }: { data: StoryData }) {
   const v = data.params.data?.values;
   if (!v) return null;
-  const rows: { label: string; value: string | null }[] = [
+  // Custo por km e por recolha: pressupostos até o financeiro da Vitrus os enviar. O tratamento (105,64 €/t) já é
+  // dado da Vitrus (22 out 2026); a viatura dedicada é pressuposto com o preço de um concurso público.
+  const rows: { label: string; value: string | null; vitrus?: boolean }[] = [
     { label: m.story_cost_param_km(), value: `${formatNumber(v.cost_per_km_eur, 2)} €/km` },
-    {
-      label: m.story_cost_param_pickup(),
-      value: v.pap_cost_per_pickup_eur != null ? formatEur(v.pap_cost_per_pickup_eur) : null,
-    },
-    {
-      label: m.story_cost_param_capacity(),
-      value: v.pap_free_capacity_kg != null ? `${formatNumber(v.pap_free_capacity_kg)} kg` : null,
-    },
+    { label: m.story_cost_param_pickup(), value: formatEur(v.cost_per_collection_eur) },
+    { label: m.story_cost_param_vehicle(), value: formatEur(v.vehicle_capex_eur ?? 0) },
     {
       label: m.story_cost_param_treatment(),
-      value: v.rsu_treatment_eur_per_t != null ? eurPerTonne(v.rsu_treatment_eur_per_t) : null,
+      value:
+        v.rsu_treatment_eur_per_t != null
+          ? `${formatNumber(v.rsu_treatment_eur_per_t, 2)} €/t`
+          : null,
+      vitrus: true,
     },
   ];
   return (
@@ -720,7 +719,7 @@ function MissingFromVitrus({ data }: { data: StoryData }) {
             <span className="ob-mono shrink-0 text-right text-[12.5px] tabular-nums">
               {r.value ?? m.story_cost_pending()}
               <span className="ml-1.5 text-muted-foreground">
-                {r.value ? `· ${m.story_cost_assumption()}` : ''}
+                {r.value ? `· ${r.vitrus ? m.story_cost_vitrus() : m.story_cost_assumption()}` : ''}
               </span>
             </span>
           </li>
