@@ -153,7 +153,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 | --- | :---: | --- | --- |
 | **Impacto e relevância** | 30% | +396,5 t por ano desviadas do lixo, 235,6 t reutilizáveis, captura de 11,5% para cerca de 27% (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
 | **Inovação e originalidade** | 25% | Uma rede **sem contentores**, sobre os circuitos e as viaturas que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, passaporte |
-| **Viabilidade técnica** | 25% | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhuma viatura nem contentor novo (o investimento do cenário recomendado é de 13 750 € em 55 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 033 testes da API, 431 da web e 201 de ponta a ponta | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
+| **Viabilidade técnica** | 25% | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhuma viatura nem contentor novo (o investimento do cenário recomendado é de 13 750 € em 55 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 037 testes da API, 437 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
 | **Apresentação e continuidade** | 20% | Uma história de seis passos para quem entra pela primeira vez; um piloto de 3 meses desenhado pelo próprio Novelo; replicável em qualquer município com dados abertos | [novelo.helder.si](https://novelo.helder.si) |
 
 ---
@@ -191,7 +191,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 - **Web:** React, Vite, TanStack Router e Query, Tailwind v4 e shadcn/ui; aplicação instalável (PWA), pt-PT e inglês, acessibilidade AA.
 - **API:** FastAPI (Python 3.12), PostgreSQL, **OR-Tools** (CP-SAT para a localização, VRP para as rotas); contrato OpenAPI com o cliente TypeScript gerado.
 - **IA, identificada e limitada:** o copiloto e a triagem usam modelos via **OpenRouter** e devolvem JSON validado, nunca fazem contas, e um verificador rejeita números fora da origem. No desenvolvimento usámos **Claude Code** e **GLM (Z.ai)** como assistentes de programação.
-- **Qualidade:** 1 033 testes da API, 431 testes da web e 201 testes de ponta a ponta no browser; verificação completa antes de cada entrega.
+- **Qualidade:** 1 037 testes da API e 437 testes da web, verdes em cada entrega; testes de ponta a ponta no browser; e uma avaliação do copiloto com o modelo real, 155 perguntas, 100% dos números verificados.
 - **Em produção** em [novelo.helder.si](https://novelo.helder.si) (Coolify, Docker), com **código aberto** em [GitHub](https://github.com/helderpgoncalves/novelo).
 
 ## Equipa
