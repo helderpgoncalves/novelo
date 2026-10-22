@@ -49,8 +49,8 @@ Todos os modelos passam pelo **OpenRouter** (API compatível com OpenAI), atrav�
 | `whatif` | "E se...?": percebe a pergunta (`ScenarioDelta`) | structured outputs | `whatif_v2.md` (a `v1` fica para auditoria) |
 | `explain` | Explicação do resultado do "E se...?" | structured outputs | `explain_v1.md` |
 | `briefing` | Parágrafo executivo do relatório RAP | structured outputs | `briefing_v1.md` |
-| `alert_resolution` | Proposta de resolução de alertas de qualidade | structured outputs | `alert_resolution_v1.md` |
-| `triage` | Triagem por foto (visão) | imagem + structured outputs | `triage_v1.md` |
+| `alert_resolution` | Proposta de resolução de alertas de qualidade | structured outputs | `alert_resolution_v2.md` |
+| `triage` | Triagem por foto (visão) | imagem + structured outputs | `triage_v2.md` |
 
 **Modelo recomendado: `openai/gpt-6-luna`.** US$ 0,10 por milhão de tokens de entrada, US$ 0,50 por milhão de saída, contexto de 1,05 M, texto e imagem. É o valor por omissão de todas as tarefas, incluindo a visão. `typesafe/jev-router` existe no catálogo mas tem preço dinâmico e escolhe o modelo por baixo; não é default e só serve para ser avaliado (`just eval-triage --models ...`).
 
@@ -118,7 +118,7 @@ O copiloto tem documento próprio: [Copiloto](copiloto.md) (streaming SSE com ev
 - **Alertas de qualidade:** `POST /datasets/alerts/{id}/suggest` (`suggest_alert_resolution`). O modelo propõe ação, justificação e campos a corrigir; só se aceitam valores escritos no próprio alerta e números que existam nele. **Não aplica nada**: quem confirma usa `PATCH /datasets/alerts/{id}` com o estado e a nota sugeridos. Se a proposta inventar valores, devolve-se uma regra determinística (`source: fallback`).
 - **Briefing do relatório RAP:** um parágrafo em pt-PT ou en no resumo do PDF, com números verificados. Sem IA, sem chave ou sem orçamento, usa um texto determinístico; o relatório nunca falha por causa da IA.
 - **"E se...?":** o modelo devolve `ScenarioDelta` com listas fechadas; o ecrã mostra "Entendi: ..." para confirmar; o otimizador corre; o modelo explica; o verificador valida (2.ª falha, só tabela). Pergunta ambígua ou fora das listas: recusa com sugestões.
-- **Triagem por foto:** as fotos são reduzidas, enviadas, processadas e descartadas (**não se guardam**). Ficam só tipo, estado, composição, marca e peso estimado, depois de o operador os confirmar ou corrigir. O peso vem de uma tabela de pesos médios por tipo (pressuposto, "estimativa").
+- **Triagem por foto:** as fotos são reduzidas, enviadas, processadas e descartadas (**não se guardam**). Ficam só tipo, estado, composição, marca e peso estimado, depois de o operador os confirmar ou corrigir. O peso vem de uma tabela de pesos médios por tipo (pressuposto, "estimativa"). A nota curta do modelo vem na língua do ecrã (`POST /triage?locale=pt-PT|en`); a justificação das sugestões de alertas vem em pt-PT, como a pergunta à Vitrus e a nota de resolução.
 
 ## O verificador de números
 

@@ -161,4 +161,5 @@ async def compact_thread(
         m.digested = True
         m.tool_trace = [{k: v for k, v in t.items() if k != "result"} for t in m.tool_trace]
     await db.commit()
+    await db.refresh(thread)  # updated_at é calculado pela base de dados: lê-lo depois sem refresh faria I/O implícito
     return len(old)

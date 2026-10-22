@@ -40168,6 +40168,22 @@
       "post": {
         "description": "Analisa as fotos com o modelo de visão. Não grava nada: o operador confirma e só então a peça entra no lote.",
         "operationId": "analyse_garment",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "required": false,
+            "schema": {
+              "default": "pt-PT",
+              "enum": [
+                "pt-PT",
+                "en"
+              ],
+              "title": "Locale",
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {

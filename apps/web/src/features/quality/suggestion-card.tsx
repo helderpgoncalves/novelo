@@ -67,7 +67,7 @@ export function SuggestionCard({ suggestion: s, applying, onApply, onDismiss }: 
           </span>
         </Row>
         <Row label={m.quality_suggest_justification()}>
-          <span lang="en">{s.justification}</span>
+          <span lang="pt-PT">{s.justification}</span>
         </Row>
         {s.question_for_vitrus && (
           <Row label={m.quality_suggest_question()}>

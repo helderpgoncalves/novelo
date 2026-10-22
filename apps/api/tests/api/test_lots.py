@@ -121,9 +121,10 @@ async def test_triage_analyses_photos_without_storing_them(logged_in: httpx.Asyn
     assert resp.status_code == 200, resp.text
     body = resp.json()
     assert body["analysis"]["brand"] == "Mango" and body["dominant_fibre"] == "cotton"
-    assert body["estimated_weight_g"] == 200 and body["prompt_version"] == "v1"  # peso calculado no servidor
+    assert body["estimated_weight_g"] == 200 and body["prompt_version"] == "v2"  # peso calculado no servidor
     sent = llm.calls[0]["user"]
     assert isinstance(sent, list) and sum(1 for p in sent if p["type"] == "image_url") == 2  # type: ignore[index]
+    assert "notes`: pt-PT" in sent[0]["text"]  # type: ignore[index]  # a nota vem na língua do ecrã
 
 
 async def test_triage_rejects_non_images(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:

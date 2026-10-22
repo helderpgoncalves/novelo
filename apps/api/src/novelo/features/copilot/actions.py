@@ -660,6 +660,9 @@ async def propose(
     d = ACTIONS[type_]
     if forbidden_for(d, ctx.user.role, ctx.user.impersonation is not None):
         raise ForbiddenError("Only administrators can do this")
+    # O modelo copia os argumentos de run_scenario (ex.: `param_changes: []`): campos vazios que a ação não tem
+    # não mudam nada e não devem fazer falhar a proposta; um campo desconhecido com valor continua a ser erro.
+    raw_params = {k: v for k, v in raw_params.items() if k in d.params.model_fields or v not in (None, "", [], {})}
     try:
         params = d.params.model_validate(raw_params)
     except ValidationError as exc:

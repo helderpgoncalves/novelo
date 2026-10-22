@@ -198,3 +198,12 @@ async def test_export_pdf(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
         and resp.headers["content-type"] == "application/pdf"
         and resp.content.startswith(b"%PDF")
     )
+
+
+async def test_compact_route_summarises_the_thread(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
+    tid = (await say(logged_in, llm, "Primeira pergunta sobre Serzedelo"))["thread_id"]
+    await say(logged_in, llm, "Segunda pergunta sobre Azurém", thread_id=tid)
+    resp = await logged_in.post(f"{T}/{tid}/compact")  # o resumo cai no texto fixo se o modelo falso não tiver resposta
+    assert resp.status_code == 200, resp.text
+    body = resp.json()
+    assert body["compacted_messages"] == 2 and body["summary"] and body["thread"]["id"] == tid

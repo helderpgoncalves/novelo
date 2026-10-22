@@ -24,7 +24,12 @@ test.describe('copiloto de IA', () => {
     const panel = page.getByRole('dialog', { name: 'Copiloto Novelo' });
     await panel.getByLabel('Pergunta ao copiloto').fill('Quanto têxtil se recolheu em 2025?');
     await panel.getByLabel('Pergunta ao copiloto').press('Enter');
-    await expect(panel.getByText('Quanto têxtil se recolheu em 2025?')).toBeVisible();
+    // O título provisório do painel repete a pergunta: procura-a na mensagem do utilizador.
+    await expect(
+      panel
+        .getByTestId('copilot-user-message')
+        .filter({ hasText: 'Quanto têxtil se recolheu em 2025?' }),
+    ).toBeVisible();
     await expect(
       panel.getByTestId('copilot-assistant-message').or(panel.getByText(/não respondeu/)),
     ).toBeVisible({ timeout: 90_000 });

@@ -201,7 +201,11 @@ async def preview_persona(llm: OpenRouterClient, body: PersonaPreviewIn) -> Pers
             raise user_settings.InvalidSettingError(
                 f"The custom persona was refused: {security.EXPLANATION[exc.reason]}"
             ) from exc
-    system = persona.render(settings) + "\n\nAnswer the user's sample in at most 2 sentences. Do not use any number."
+    system = persona.render(settings) + (
+        "\n\nContext: Novelo plans textile collection in Guimarães WITHOUT textile containers (existing places with people"
+        " and on-demand pickup on the circuits that already run). Answer the user's sample in at most 2 sentences."
+        " Do not use any number."
+    )
     fallback = CANNED[body.language].get(persona.effective_key(settings), CANNED[body.language]["default"])
     try:
         out = await llm.structured(system=system, user=body.sample, schema=_Preview, task=AiTask.COPILOT_AUX, retries=0)

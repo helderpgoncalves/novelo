@@ -21278,7 +21278,12 @@ export type GetWasteCompositionResponse = GetWasteCompositionResponses[keyof Get
 export type AnalyseGarmentData = {
     body: BodyAnalyseGarment;
     path?: never;
-    query?: never;
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
     url: '/api/v1/triage';
 };
 

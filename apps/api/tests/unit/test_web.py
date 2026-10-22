@@ -106,6 +106,9 @@ def test_internal_novelo_figures_never_leave_in_a_query() -> None:
     assert sanitize_query("captura de 22,9 por cento", internal_numbers=internal) == (None, "internal_number")
     clean, why = sanitize_query("metas de recolha seletiva de têxteis UE 2025", internal_numbers=internal)
     assert clean and why is None  # os anos passam
+    clean, why = sanitize_query("RAP têxtil Portugal novidades 2025 2026", internal_numbers=internal)
+    assert clean and why is None  # vários anos seguidos não são um telefone nem um NIF
+    assert sanitize_query("contacto 2025 912 345 678")[1] == "identifier_or_secret"
 
 
 def test_generic_queries_are_cleaned_not_changed() -> None:

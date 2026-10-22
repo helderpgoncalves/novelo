@@ -11,7 +11,7 @@ description: Features de IA do Novelo via OpenRouter ("E se...?" com ScenarioDel
 - **Triagem por foto = controlo de qualidade na entrega.** O problema da Vitrus é a contaminação (têxtil sujo ou molhado perde a reutilização); a foto confirma o estado no momento em que o saco é entregue.
 - **Modos no "E se...?":** por omissão `existing` e `on_demand`; `street` (contentor de rua) só se o utilizador o pedir como referência. A Vitrus não quer contentores de têxtil.
 - Pergunta ambígua ⇒ perguntar de volta. Fora das listas ⇒ recusa com sugestões.
-- **Prompts** em `ai/prompts/` com versão (`whatif_v2.md`, `explain_v1.md`, `triage_v1.md`); a versão fica guardada em cada resposta.
+- **Prompts** em `ai/prompts/` com versão (`whatif_v2.md`, `explain_v1.md`, `triage_v2.md`); a versão fica guardada em cada resposta.
 - **Testes:** perguntas com delta esperado em `tests/api/test_whatif.py`, sempre com adaptador falso (sem chamar a API real). Detalhe em `docs/engenharia/ia.md`.
 - **Custo e privacidade:** timeout, limite de pedidos por IP em `/whatif` e `/triage`, cache por pergunta+cenário; fotos apagadas após processar; só se guardam marca, composição, estado e peso.
 - Testes com `httpx.MockTransport` (ver `tests/unit/test_openrouter.py`); nunca chamar a API real em testes.

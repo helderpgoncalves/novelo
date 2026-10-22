@@ -6823,6 +6823,10 @@ export const zGetWasteCompositionResponse = zWasteComposition;
 
 export const zAnalyseGarmentBody = zBodyAnalyseGarment;
 
+export const zAnalyseGarmentQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
 /**
  * Successful Response
  */

@@ -24,6 +24,7 @@ from novelo.features.lots.schemas import (
     ReserveRequest,
     TriageResult,
 )
+from novelo.features.users.schemas import Locale
 
 router = APIRouter()
 public_router = APIRouter()
@@ -76,6 +77,7 @@ async def analyse_garment(
     llm: Annotated[OpenRouterClient, Depends(get_llm)],
     item_photo: Annotated[UploadFile, File(description="Foto da peça")],
     label_photo: Annotated[UploadFile | None, File(description="Foto da etiqueta de composição")] = None,
+    locale: Locale = "pt-PT",
 ) -> TriageResult:
     """Analisa as fotos com o modelo de visão. Não grava nada: o operador confirma e só então a peça entra no lote."""
     try:
@@ -83,6 +85,7 @@ async def analyse_garment(
             llm,
             await item_photo.read(triage.MAX_BYTES + 1),
             await label_photo.read(triage.MAX_BYTES + 1) if label_photo else None,
+            locale=locale,
         )
     finally:
         await llm.aclose()

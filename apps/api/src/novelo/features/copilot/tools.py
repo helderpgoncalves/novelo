@@ -917,6 +917,21 @@ class CopilotTools:
         constraints, error = self._constraints(base.constraints, delta.set_modes, await self._zones())
         if error:
             return error
+        # Restringir a freguesia aos modos que já tem (ex.: existing + on_demand, o padrão) não muda nada: correr o
+        # otimizador daria só o ruído do limite de tempo, apresentado como se fosse o efeito da pergunta.
+        defaults = list(base.result.default_modes)
+        unchanged = all(set(modes) == set(base.constraints.get(code, defaults)) for code, modes in constraints.items())
+        if unchanged and not (
+            delta.budget_eur_year is not None
+            or delta.target_pct is not None
+            or delta.capture_scale
+            or args.param_changes
+        ):
+            return {
+                "error": "no_change",
+                "message": "Those parishes already allow exactly these modes, so the scenario would not change. "
+                'For on-demand only use allowed_modes ["on_demand"]; for existing places only use ["existing"].',
+            }
         params: PlanningParams = base.params.model_copy(deep=True)
         if delta.capture_scale:
             mp = params.modes[delta.capture_scale.mode]

@@ -158,8 +158,9 @@ def _facts(
     def fmt(value: float | None, digits: int = 1) -> str | None:
         if value is None:
             return None
-        text = f"{value:.{digits}f}"
-        return text.replace(".", ",") if comma else text
+        if not comma:
+            return f"{value:.{digits}f}"
+        return f"{value:,.{digits}f}".replace(",", " ").replace(".", ",")  # pt-PT: 59 383 e 417,6
 
     def kpis(s: ScenarioOut) -> dict[str, Any]:
         k = s.result.kpis
@@ -174,6 +175,13 @@ def _facts(
 
     return {
         "language": locale,
+        "units": {
+            "tonnes_per_year": "t",
+            "eur_per_tonne": "€/t",
+            "annual_cost_eur": "€",
+            "investment_eur": "€",
+            "coverage_pct": "%",
+        },
         "question": question,
         "change_applied": [{"parish": c["parish_name"], "allowed_modes": c["allowed_modes"]} for c in changes],
         "base_scenario": {"name": base.label, **kpis(base)},

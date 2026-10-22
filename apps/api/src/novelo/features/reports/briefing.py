@@ -47,12 +47,14 @@ def build_facts(scenarios: list[ScenarioOut], baseline: TextileBaseline, locale:
         "baseline_2025": {
             "year": baseline.year,
             "collected_t": n(baseline.total_t, 1),
-            "capture_of_potential_pct": n(baseline.capture_of_demand_pct, 1),
-            "estimated_potential_t_per_year": n(baseline.estimated_demand_t, 0),
+            "capture_of_generated_pct": n(baseline.capture_of_demand_pct, 1),
+            "estimated_generated_t_per_year": n(baseline.estimated_demand_t, 0),
             "still_to_divert_t_per_year": n(baseline.gap_t, 0),
-            "potential_source": "Vitrus 2025 RSU × APA textile share (estimate)"
+            "generated_note": "textile generated = still in the bin (Vitrus 2025 RSU × APA textile share) + collected "
+            "(estimate)"
             if not pt
-            else "RSU da Vitrus em 2025 × percentagem de têxtil da APA (estimativa)",
+            else "têxtil gerado = o que ainda vai no lixo (RSU da Vitrus em 2025 × percentagem de têxtil da APA) + o "
+            "recolhido (estimativa)",
             "reuse_t": n(baseline.reuse_t, 1),
             "recycle_t": n(baseline.recycle_t, 1),
             "reject_t": n(baseline.reject_t, 1),
@@ -75,7 +77,7 @@ def fallback_text(facts: dict[str, Any]) -> str:
     """Sem IA: frases fixas preenchidas só com os factos."""
     b = facts["baseline_2025"]
     first = facts["scenarios"][0]
-    collected, capture, potential = b["collected_t"], b["capture_of_potential_pct"], b["estimated_potential_t_per_year"]
+    collected, capture, potential = b["collected_t"], b["capture_of_generated_pct"], b["estimated_generated_t_per_year"]
     name, tonnes, eur_t, cost = (
         first["name"],
         first["tonnes_per_year"],
