@@ -242,7 +242,8 @@ function Why({ scenario }: { scenario: ScenarioOut }) {
       );
     }
     const idle = result.allocations.filter((a) => a.modes.length === 0).length;
-    if (idle > 0) out.push(m.simx_why_idle({ n: formatNumber(idle) }));
+    if (idle === 1) out.push(m.simx_why_idle_one());
+    else if (idle > 1) out.push(m.simx_why_idle({ n: formatNumber(idle) }));
     return out;
   }, [result]);
 

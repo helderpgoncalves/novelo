@@ -7,7 +7,7 @@ import type { LayerId } from './tabs';
 
 /**
  * Controlo segmentado das camadas: um grupo de escolha única, limpo e sólido. Setas mudam de camada (como um grupo de
- * rádio); em ecrãs estreitos rola na horizontal sem barra visível.
+ * rádio); em telemóvel as seis camadas ficam numa grelha (3 × 2, ou 2 × 3 abaixo de 360 px), todas à vista.
  */
 export function LayerSwitch({
   layer,
@@ -38,7 +38,7 @@ export function LayerSwitch({
       role="radiogroup"
       aria-label={m.home_layers_label()}
       onKeyDown={onKeyDown}
-      className="-mx-1 flex gap-0.5 overflow-x-auto rounded-lg bg-muted p-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+      className="-mx-1 grid grid-cols-3 gap-0.5 rounded-lg bg-muted p-1 max-[359px]:grid-cols-2 sm:flex sm:overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
     >
       {LAYERS.map((l) => {
         const on = l.id === layer;
@@ -54,7 +54,7 @@ export function LayerSwitch({
             tabIndex={on ? 0 : -1}
             onClick={() => onChange(l.id)}
             className={cn(
-              'inline-flex min-h-10 shrink-0 items-center whitespace-nowrap justify-center rounded-md px-3.5 font-medium text-sm outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/60 sm:flex-1',
+              'inline-flex min-h-10 min-w-0 shrink-0 items-center whitespace-nowrap justify-center rounded-md px-2 font-medium text-sm sm:px-3.5 outline-none transition-colors focus-visible:ring-[3px] focus-visible:ring-ring/60 sm:flex-1',
               on
                 ? 'bg-card text-foreground shadow-sm ring-1 ring-foreground/20'
                 : 'text-muted-foreground hover:bg-card/60 hover:text-foreground',

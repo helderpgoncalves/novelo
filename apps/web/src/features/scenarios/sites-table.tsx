@@ -10,6 +10,9 @@ const precisionLabel: Record<SiteSelection['coord_precision'], () => string> = {
   approximate: () => m.site_precision_approximate(),
 };
 
+/** Uma casa decimal; abaixo de 0,1 t, duas, para não mostrar «0 t» num local que serve alguém. */
+const tonnesOf = (t: number) => formatTonnes(t, t > 0 && t < 0.1 ? 2 : 1);
+
 const streetOf = (s: SiteSelection) => s.street ?? m.site_street_unknown();
 
 type SiteKind = NonNullable<SiteSelection['kind']>;
@@ -27,6 +30,7 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
       id: 'street',
       header: m.site_col_street(),
       primary: true,
+      className: 'min-w-44 whitespace-normal',
       value: streetOf,
       cell: (s) => (
         <span className={s.street ? undefined : 'text-muted-foreground'}>{streetOf(s)}</span>
@@ -51,7 +55,7 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
     {
       id: 'parish',
       header: m.site_col_parish(),
-      className: 'text-muted-foreground',
+      className: 'min-w-44 whitespace-normal text-muted-foreground',
       value: (s) => s.parish_name,
       filter: true,
       cell: (s) => s.parish_name,
@@ -71,13 +75,13 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
       id: 'tonnes',
       type: 'number',
       aggregate: 'sum',
-      format: (n) => formatTonnes(n, 2),
+      format: (n) => formatTonnes(n, 1),
       value: (s) => s.tonnes,
       searchable: false,
       badge: true,
       header: m.site_col_tonnes(),
       align: 'right',
-      cell: (s) => formatTonnes(s.tonnes, 2),
+      cell: (s) => <span className="tabular-nums">{tonnesOf(s.tonnes)}</span>,
     },
     {
       id: 'population',
@@ -103,6 +107,8 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
     {
       id: 'precision',
       header: m.site_col_precision(),
+      // No cartão em telemóvel a coordenada aproximada já se vê no mapa; aqui só ocupava espaço.
+      desktopOnly: true,
       searchable: false,
       value: (s) => s.coord_precision,
       filter: { format: (v) => precisionLabel[v as SiteSelection['coord_precision']]() },
@@ -131,6 +137,7 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
       caption={m.site_title()}
       searchLabel={m.site_search()}
       pageSize={10}
+      selectable={false}
       empty={
         <p className="rounded-xl border border-dashed p-8 text-center text-muted-foreground text-sm">
           {m.site_empty()}

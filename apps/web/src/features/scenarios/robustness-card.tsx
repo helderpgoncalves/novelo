@@ -82,8 +82,28 @@ export function RobustnessCard({ a, b }: { a: ScenarioOut; b: ScenarioOut }) {
   );
 }
 
+/**
+ * O servidor mede «A melhor do que B». Quando é B quem ganha na maioria das amostras, a frase e a percentagem viram-se
+ * para o vencedor: «0% das amostras em que A é melhor» lê-se mal; «B é melhor em 100%» diz o mesmo sem esforço.
+ */
 function RobustnessResult({ data, a, b }: { data: RobustnessOut; a: ScenarioOut; b: ScenarioOut }) {
-  const share = data.share_recommended_better * 100;
+  const shareA = data.share_recommended_better * 100;
+  const label = criterionLabel[data.criterion]().toLowerCase();
+  // Sem vitórias e sem vantagem: os dois dão o mesmo valor (ex.: o mesmo cenário dos dois lados).
+  if (shareA === 0 && Math.abs(data.median_advantage) < 1e-9) {
+    return (
+      <p className="text-sm leading-relaxed" aria-live="polite">
+        {m.rob_tie({ criterion: label })}
+      </p>
+    );
+  }
+  const aWins = shareA >= 50;
+  const share = aWins ? shareA : 100 - shareA;
+  const holds = share >= data.min_share * 100;
+  const winner = aWins ? a : b;
+  const loser = aWins ? b : a;
+  // `median_advantage` é positivo quando A ganha: para B troca de sinal.
+  const advantage = aWins ? data.median_advantage : -data.median_advantage;
   return (
     <div className="space-y-4" aria-live="polite">
       <div className="space-y-2">
@@ -91,9 +111,9 @@ function RobustnessResult({ data, a, b }: { data: RobustnessOut; a: ScenarioOut;
         <p className="text-sm leading-relaxed">
           {m.rob_statement({
             share: formatPercent(share, 0),
-            a: a.label,
-            b: b.label,
-            criterion: criterionLabel[data.criterion]().toLowerCase(),
+            a: winner.label,
+            b: loser.label,
+            criterion: label,
           })}
         </p>
       </div>
@@ -102,23 +122,25 @@ function RobustnessResult({ data, a, b }: { data: RobustnessOut; a: ScenarioOut;
         <Badge
           variant="outline"
           className={
-            data.holds
-              ? 'gap-1.5 border-primary bg-primary/10 text-primary'
-              : 'gap-1.5 border-areia/70'
+            holds ? 'gap-1.5 border-primary bg-primary/10 text-primary' : 'gap-1.5 border-areia/70'
           }
         >
-          {data.holds ? <CircleCheck className="size-3.5" /> : <CircleHelp className="size-3.5" />}
-          {data.holds ? m.rob_holds() : m.rob_not_holds()}
+          {holds ? <CircleCheck className="size-3.5" /> : <CircleHelp className="size-3.5" />}
+          {holds ? m.rob_holds() : m.rob_not_holds()}
         </Badge>
         <span className="text-muted-foreground text-xs">
           {m.rob_threshold({ value: formatPercent(data.min_share * 100, 0) })}
         </span>
       </div>
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-2 border-t pt-3 text-sm tabular-nums">
-        <dt className="text-muted-foreground">{m.rob_median_advantage()}</dt>
+      <dl className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-4 gap-y-2 border-t pt-3 text-sm tabular-nums">
+        <dt className="text-muted-foreground">
+          {m.rob_median_advantage_of({
+            name: aWins ? m.compare_scenario_a() : m.compare_scenario_b(),
+          })}
+        </dt>
         <dd className="text-right font-medium">
-          {data.median_advantage > 0 ? '+' : ''}
-          {criterionFormat[data.criterion](data.median_advantage)}
+          {advantage < 0 ? '−' : ''}
+          {criterionFormat[data.criterion](Math.abs(advantage))}
         </dd>
         <dt className="text-muted-foreground">{m.rob_samples()}</dt>
         <dd className="text-right">

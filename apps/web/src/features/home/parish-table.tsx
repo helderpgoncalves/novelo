@@ -2,11 +2,18 @@ import { useState } from 'react';
 import type { OverviewParish } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Button } from '@/components/ui/button';
+import { intlTag } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { stripUnion } from './choropleth';
 import { parishGapT } from './map-model';
-import { num, tonnes } from './safe';
+import { isNum, NO_VALUE, num } from './safe';
+
+/** Toneladas com uma casa decimal fixa («80,0 t»): numa coluna, os números alinham pela vírgula. */
+const tonnes1 = (v: number | null | undefined): string =>
+  isNum(v)
+    ? `${new Intl.NumberFormat(intlTag(), { minimumFractionDigits: 1, maximumFractionDigits: 1, useGrouping: 'always' }).format(v)} t`
+    : NO_VALUE;
 
 /** Linha da tabela: a freguesia com o têxtil por desviar. */
 export interface TopRow {
@@ -62,7 +69,7 @@ export function ParishTable({ rows, selected, onSelect, className }: ParishTable
             title={r.parish.name}
             onClick={() => onSelect(on ? null : r.parish.code)}
             className={cn(
-              'inline-flex min-h-8 items-center gap-2 rounded-sm text-left outline-none underline-offset-4 hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/60',
+              'inline-flex min-h-8 items-center gap-2 rounded-sm text-left pointer-coarse:min-h-10 outline-none underline-offset-4 hover:underline focus-visible:ring-[3px] focus-visible:ring-ring/60',
               on ? 'font-semibold text-primary' : 'font-medium',
             )}
           >
@@ -85,9 +92,14 @@ export function ParishTable({ rows, selected, onSelect, className }: ParishTable
       badge: true,
       type: 'number',
       value: (r) => (Number.isFinite(r.gapT) ? r.gapT : null),
-      format: (v) => tonnes(v, 1),
+      format: (v) => tonnes1(v),
       aggregate: 'sum',
-      cell: (r) => <span className="font-medium tabular-nums">{tonnes(r.gapT, 1)}</span>,
+      // Mesma altura mínima do botão do nome: no cartão em telemóvel, nome e valor ficam na mesma linha.
+      cell: (r) => (
+        <span className="inline-flex min-h-8 items-center font-medium tabular-nums pointer-coarse:min-h-10">
+          {tonnes1(r.gapT)}
+        </span>
+      ),
     },
     {
       id: 'population',
@@ -135,6 +147,7 @@ export function ParishTable({ rows, selected, onSelect, className }: ParishTable
         columns={columns}
         rows={shown}
         controls="never"
+        unbounded
         getRowId={(r) => r.parish.code}
         pageSize={8}
         initialSort={{ id: 'gap', desc: true }}

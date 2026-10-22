@@ -2,6 +2,7 @@ import type { ModeSummary } from '@/client';
 import { ModeDot } from '@/components/mode-badge';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
 import { modeHint, modeLabel } from '@/lib/scenario';
+import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 
 export function ModeSummaryCards({
@@ -12,7 +13,13 @@ export function ModeSummaryCards({
   totalTonnes: number;
 }) {
   return (
-    <ul className="grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border sm:grid-cols-3">
+    // Tantas colunas quantos os modos: com dois modos não sobra uma terceira célula vazia.
+    <ul
+      className={cn(
+        'grid gap-px overflow-hidden rounded-xl bg-border ring-1 ring-border',
+        modes.length >= 3 ? 'sm:grid-cols-3' : modes.length === 2 && 'sm:grid-cols-2',
+      )}
+    >
       {modes.map((s) => (
         <li key={s.mode} className="space-y-2 bg-card p-5">
           <p className="flex items-center gap-2 font-medium">

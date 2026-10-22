@@ -109,10 +109,15 @@ export function DataSources({ sources }: { sources: OverviewDataSource[] }) {
               ))}
             </div>
             <p className="text-muted-foreground text-xs tabular-nums">
-              {s.period_start && s.period_end
-                ? `${formatDate(s.period_start, 'short')} – ${formatDate(s.period_end, 'short')} · `
-                : ''}
-              {m.home_source_rows({ rows: num(s.rows) })}
+              {/* Fontes sem linhas importadas (pacotes ou valores de referência) não mostram «0 linhas». */}
+              {[
+                s.period_start && s.period_end
+                  ? `${formatDate(s.period_start, 'short')} – ${formatDate(s.period_end, 'short')}`
+                  : null,
+                s.rows > 0 ? m.home_source_rows({ rows: num(s.rows) }) : null,
+              ]
+                .filter(Boolean)
+                .join(' · ')}
             </p>
           </li>
         ))}

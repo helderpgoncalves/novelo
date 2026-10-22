@@ -12,10 +12,12 @@ import { FilterChips } from '@/components/filter-chips';
 import { Page } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { StatCell, StatStrip } from '@/components/stat-strip';
+import { StickyActions } from '@/components/sticky-actions';
 import { Button } from '@/components/ui/button';
 import { validateParams } from '@/features/assumptions/param-fields';
 import { ParametersForm } from '@/features/assumptions/parameters-form';
 import { FormAlert } from '@/features/auth/form-alert';
+import { useMediaQuery } from '@/hooks/use-media-query';
 import { getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
@@ -39,6 +41,8 @@ function Assumptions() {
   const errors = validateParams(value);
   const isAdmin = user.role === 'admin';
   const dirty = JSON.stringify(value) !== JSON.stringify(data.values);
+  // Ecrã largo: Guardar no cabeçalho. Telemóvel e tablet: numa barra presa ao fundo, só com alterações.
+  const wide = useMediaQuery('(min-width: 1024px)');
 
   const save = useMutation({
     ...updatePlanningParametersMutation(),
@@ -49,34 +53,34 @@ function Assumptions() {
     },
   });
 
+  const actions = (
+    <>
+      <Button
+        variant="outline"
+        className="h-10"
+        disabled={!dirty}
+        onClick={() => setValue(data.values)}
+      >
+        {m.common_cancel()}
+      </Button>
+      <Button
+        className="h-10 font-semibold"
+        disabled={!dirty || Object.keys(errors).length > 0 || save.isPending}
+        onClick={() => save.mutate({ body: value })}
+        loading={save.isPending}
+      >
+        {m.common_save()}
+      </Button>
+    </>
+  );
+
   return (
     <Page>
       <PageHeader
         eyebrow={m.assumptions_eyebrow({ version: data.version })}
         title={m.assumptions_title()}
         description={m.rw_assumptions_description()}
-        actions={
-          isAdmin ? (
-            <>
-              <Button
-                variant="outline"
-                className="h-10"
-                disabled={!dirty}
-                onClick={() => setValue(data.values)}
-              >
-                {m.common_cancel()}
-              </Button>
-              <Button
-                className="h-10 font-semibold"
-                disabled={!dirty || Object.keys(errors).length > 0 || save.isPending}
-                onClick={() => save.mutate({ body: value })}
-                loading={save.isPending}
-              >
-                {m.common_save()}
-              </Button>
-            </>
-          ) : undefined
-        }
+        actions={isAdmin && wide ? actions : undefined}
       />
       <StatStrip className="lg:grid-cols-3">
         <StatCell
@@ -124,6 +128,9 @@ function Assumptions() {
       <p className="text-muted-foreground text-xs tabular-nums">
         {m.assumptions_updated({ date: formatDateTime(data.updated_at) })}
       </p>
+      {isAdmin && !wide && dirty && (
+        <StickyActions className="flex justify-end gap-2">{actions}</StickyActions>
+      )}
     </Page>
   );
 }

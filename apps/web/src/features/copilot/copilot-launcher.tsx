@@ -116,6 +116,20 @@ export function CopilotLauncher() {
           side={mobile ? 'bottom' : 'right'}
           showCloseButton={false}
           aria-describedby="copilot-description"
+          // Com teclado (⌘K/Ctrl K), o foco vai direto para o campo em vez do botão de fechar; em telemóvel não, para
+          // não abrir o teclado virtual por cima das sugestões.
+          onOpenAutoFocus={(e) => {
+            if (mobile) return;
+            const field =
+              e.currentTarget instanceof HTMLElement
+                ? e.currentTarget.querySelector<HTMLTextAreaElement>(
+                    '[data-testid="copilot-composer"] textarea',
+                  )
+                : null;
+            if (!field) return;
+            e.preventDefault();
+            field.focus();
+          }}
           className={cn(
             'gap-0 p-0',
             mobile

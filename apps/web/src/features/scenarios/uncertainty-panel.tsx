@@ -122,7 +122,9 @@ function UncertaintyResult({ data }: { data: SensitivityOut }) {
   const eur = data.eur_per_tonne;
   const cost = data.annual_cost_eur;
   const tonnes = data.tonnes;
-  const range = (a: number, b: number, f: (v: number) => string) => `${f(a)} – ${f(b)}`;
+  // Espaços inquebráveis dentro de cada valor: «195 €/t» nunca parte entre o número e a unidade.
+  const nb = (v: string) => v.replace(/ /g, '\u00a0');
+  const range = (a: number, b: number, f: (v: number) => string) => `${nb(f(a))} – ${nb(f(b))}`;
 
   return (
     <div className="space-y-6">
@@ -167,7 +169,7 @@ function UncertaintyResult({ data }: { data: SensitivityOut }) {
 
       <Alert>
         {unsupported > 0 ? <TriangleAlert className="size-4" /> : <Info className="size-4" />}
-        <AlertTitle>
+        <AlertTitle className="line-clamp-none">
           {m.sens_unsupported_alert_title({ n: unsupported, total: TOP_DRIVERS })}
         </AlertTitle>
         <AlertDescription>{m.sens_unsupported_alert_text()}</AlertDescription>
@@ -220,14 +222,14 @@ function UncertaintyResult({ data }: { data: SensitivityOut }) {
       </div>
 
       <Collapsible className="rounded-xl bg-card ring-1 ring-foreground/10">
-        <CollapsibleTrigger className="group flex min-h-12 w-full items-center justify-between gap-3 px-5 py-3 text-left font-medium text-sm">
+        <CollapsibleTrigger className="group flex min-h-12 w-full items-center justify-between gap-3 rounded-xl px-4 py-3 text-left font-medium text-sm outline-offset-[-2px] sm:px-5">
           {m.sens_method_title()}
           <ChevronDown
             className="size-4 text-muted-foreground transition-transform group-data-[state=open]:rotate-180"
             aria-hidden="true"
           />
         </CollapsibleTrigger>
-        <CollapsibleContent className="space-y-3 px-5 pb-5 text-sm leading-relaxed">
+        <CollapsibleContent className="space-y-3 px-4 pb-5 text-sm leading-relaxed sm:px-5">
           <p className="text-muted-foreground">{data.method}</p>
           <dl className="grid grid-cols-3 gap-4 border-t pt-3 tabular-nums">
             <div>

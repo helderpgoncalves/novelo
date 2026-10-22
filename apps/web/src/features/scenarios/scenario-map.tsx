@@ -7,6 +7,7 @@ import { BaseMap } from '@/features/map/base-map';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
 import { MODE_COLORS, NO_MODE_COLOR, zonesToGeoJson } from '@/lib/map';
 import { ALL_MODES, modeLabel } from '@/lib/scenario';
+import { useTheme } from '@/lib/theme';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import { doorToDoorByParish, planWeekday } from './collection-plan';
@@ -18,7 +19,12 @@ interface ScenarioMapProps {
   className?: string;
 }
 
-const ROUTE_SHADES = ['#14211d', '#5e6b66', '#8a6a2f', '#1f4a3c', '#7c5a7a', '#3a5f8a'];
+// Tons das rotas e cor de "tinta" por tema: no mapa escuro, a tinta (#14211d) desapareceria no fundo.
+const ROUTE_SHADES = {
+  light: ['#14211d', '#5e6b66', '#8a6a2f', '#1f4a3c', '#7c5a7a', '#3a5f8a'],
+  dark: ['#f4f1ea', '#b8b2a4', '#d9b77a', '#9fd0b9', '#d2aecf', '#9dbde3'],
+} as const;
+const INK = { light: '#14211d', dark: '#f4f1ea' } as const;
 
 const modeColorExpr: ExpressionSpecification = [
   'match',
@@ -32,12 +38,12 @@ const modeColorExpr: ExpressionSpecification = [
   NO_MODE_COLOR,
 ];
 
-function routeGeoJson(routes: RouteOut[]) {
+function routeGeoJson(routes: RouteOut[], shades: readonly string[]) {
   return {
     type: 'FeatureCollection' as const,
     features: routes.map((r, i) => ({
       type: 'Feature' as const,
-      properties: { vehicle: r.vehicle, color: ROUTE_SHADES[i % ROUTE_SHADES.length] },
+      properties: { vehicle: r.vehicle, color: shades[i % shades.length] },
       geometry: {
         type: 'LineString' as const,
         coordinates: r.path.map(([lat, lon]) => [lon as number, lat as number]),
@@ -50,9 +56,6 @@ function routeGeoJson(routes: RouteOut[]) {
 const SITE_COLOR = MODE_COLORS.street;
 // Escolas (pontos assistidos): areia com contorno de tinta, para se distinguirem dos locais públicos.
 const STAFFED_FILL = '#c4a06a';
-const STAFFED_STROKE = '#14211d';
-// Freguesias no circuito porta a porta: contorno grosso a tinta.
-const PAP_LINE = '#14211d';
 
 // Cenários antigos, sem `default_modes`: a legenda mostra os modos oferecidos e os que o resultado usa.
 const MODES_SHOWN = ALL_MODES.filter((mode) => mode !== 'street');
@@ -117,7 +120,14 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
     [result.allocations, pap],
   );
   const geojson = useMemo(() => zonesToGeoJson(zones, extra), [zones, extra]);
-  const routes = useMemo(() => routeGeoJson(result.routes), [result.routes]);
+  const { resolvedTheme } = useTheme();
+  const tone = resolvedTheme === 'dark' ? 'dark' : 'light';
+  // Freguesias no circuito porta a porta (contorno grosso) e contorno das escolas: a tinta do tema.
+  const ink = INK[tone];
+  const routes = useMemo(
+    () => routeGeoJson(result.routes, ROUTE_SHADES[tone]),
+    [result.routes, tone],
+  );
   const siteLayers = useMemo(
     () => (siting ? sitesGeoJson(result.sites ?? [], siting.radius_m) : null),
     [siting, result.sites],
@@ -183,14 +193,14 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
           <Layer
             id="alloc-line"
             type="line"
-            paint={{ 'line-color': '#14211d', 'line-opacity': 0.35, 'line-width': 0.8 }}
+            paint={{ 'line-color': ink, 'line-opacity': 0.35, 'line-width': 0.8 }}
           />
           {pap.size > 0 && (
             <Layer
               id="alloc-pap"
               type="line"
               filter={['==', ['get', 'pap'], true]}
-              paint={{ 'line-color': PAP_LINE, 'line-opacity': 0.9, 'line-width': 2.4 }}
+              paint={{ 'line-color': ink, 'line-opacity': 0.9, 'line-width': 2.4 }}
             />
           )}
         </Source>
@@ -240,7 +250,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                   'circle-stroke-color': [
                     'case',
                     ['==', ['get', 'kind'], 'staffed'],
-                    STAFFED_STROKE,
+                    ink,
                     SITE_COLOR,
                   ],
                   'circle-stroke-width': ['case', ['==', ['get', 'kind'], 'staffed'], 2.5, 2],
@@ -338,7 +348,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 <li className="flex items-center gap-2">
                   <span
                     className="size-3 rounded-full border-[2.5px]"
-                    style={{ background: STAFFED_FILL, borderColor: STAFFED_STROKE }}
+                    style={{ background: STAFFED_FILL, borderColor: ink }}
                     aria-hidden="true"
                   />
                   {m.site_map_staffed()}
@@ -374,7 +384,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 <li className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-3 rounded-[3px] border-2"
-                    style={{ borderColor: PAP_LINE }}
+                    style={{ borderColor: ink }}
                     aria-hidden="true"
                   />
                   {m.site_map_pap()}
@@ -409,7 +419,7 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                 <li className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-3 rounded-[3px] border-2"
-                    style={{ borderColor: PAP_LINE }}
+                    style={{ borderColor: ink }}
                     aria-hidden="true"
                   />
                   {m.site_map_pap()}

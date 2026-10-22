@@ -106,6 +106,8 @@ export function useMunicipalMap(
   });
   const panel: Pick<LayersPanelProps, 'counts' | 'load'> = {
     counts: {
+      // Antes de os locais chegarem (camada desligada ou a carregar) não há contagem: «0» enganava.
+      sitesLoaded: sitesQuery.data !== undefined,
       kinds: countByKind(points),
       candidates: points.filter((p) => p.properties.candidate).length,
       sites: points.length,

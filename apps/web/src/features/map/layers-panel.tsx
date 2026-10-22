@@ -77,6 +77,7 @@ export interface LayersPanelProps {
   state: LayerState;
   onChange: (patch: Partial<LayerState>) => void;
   counts: {
+    sitesLoaded: boolean;
     kinds: Record<MunicipalKind, number>;
     candidates: number;
     sites: number;
@@ -89,7 +90,7 @@ export interface LayersPanelProps {
 function Group({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <fieldset className="space-y-1.5">
-      <legend className="mb-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.16em]">
+      <legend className="mb-1 font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]">
         {title}
       </legend>
       {children}
@@ -168,8 +169,8 @@ export function LayersPanel({ state, onChange, counts, load }: LayersPanelProps)
             <Label key={s} className={rowClass}>
               <RadioGroupItem value={s} />
               {sitesLabel[s]()}
-              {s === 'candidates' && !load.sites.pending && <Count value={counts.candidates} />}
-              {s === 'kind' && !load.sites.pending && <Count value={counts.sites} />}
+              {s === 'candidates' && counts.sitesLoaded && <Count value={counts.candidates} />}
+              {s === 'kind' && counts.sitesLoaded && <Count value={counts.sites} />}
             </Label>
           ))}
         </RadioGroup>

@@ -128,15 +128,16 @@ export function ChatPage({
             onValueChange={(v) => go({ tab: v as ChatTab })}
             className="min-w-0 gap-0"
           >
+            {/* Telemóvel: as cinco secções repartem a largura (cabem todas a partir de ~375 px, sem rótulos cortados). */}
             <TabsList
               aria-label={m.chat_page_title()}
-              className="group-data-[orientation=horizontal]/tabs:h-12 sm:group-data-[orientation=horizontal]/tabs:h-10"
+              className="max-sm:w-full group-data-[orientation=horizontal]/tabs:h-12 sm:group-data-[orientation=horizontal]/tabs:h-10"
             >
               {tabs.map((t) => (
                 <TabsTrigger
                   key={t.id}
                   value={t.id}
-                  className="group-data-[variant=default]/tabs-list:h-full group-data-[variant=default]/tabs-list:px-3.5"
+                  className="max-sm:flex-1 max-sm:text-[13px] group-data-[variant=default]/tabs-list:h-full group-data-[variant=default]/tabs-list:px-1 sm:group-data-[variant=default]/tabs-list:px-3.5"
                 >
                   {t.label}
                 </TabsTrigger>

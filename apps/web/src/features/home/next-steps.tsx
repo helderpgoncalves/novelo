@@ -284,7 +284,12 @@ function LotsStep() {
             title={
               open.length > 0 ? m.home_steps_lots({ count: open.length }) : m.home_steps_lots_none()
             }
-            hint={m.home_steps_lots_hint({ total: list.length })}
+            // Só acrescenta o total quando diz algo novo (com todos em curso, «3 lotes no total» repetia o título).
+            hint={
+              list.length !== open.length
+                ? m.home_steps_lots_hint({ total: list.length })
+                : undefined
+            }
             actions={
               <Button asChild {...BTN}>
                 <Link to="/lots">{m.home_steps_open()}</Link>

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router';
-import { GitCompareArrows } from 'lucide-react';
+import { ArrowUpRight, GitCompareArrows, SlidersHorizontal } from 'lucide-react';
 import type { ScenarioObjective, ScenarioSummary } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { Badge } from '@/components/ui/badge';
@@ -42,6 +42,8 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
     {
       id: 'objective',
       header: m.scenarios_col_objective(),
+      // Quase todos maximizam toneladas e o nome já diz o orçamento: escondida à partida, para caber sem rolar.
+      defaultHidden: true,
       className: 'text-muted-foreground',
       value: (s) => s.objective,
       filter: { format: (v) => objectiveLabel[v as ScenarioObjective]() },
@@ -51,6 +53,8 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'tonnes',
       header: m.kpi_tonnes(),
       align: 'right',
+      type: 'number',
+      badge: true,
       value: (s) => s.tonnes_year,
       cell: (s) => formatTonnes(s.tonnes_year),
     },
@@ -58,14 +62,16 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'eurt',
       header: m.kpi_eur_per_tonne(),
       align: 'right',
+      type: 'number',
       value: (s) => s.eur_per_tonne,
       cell: (s) =>
-        s.eur_per_tonne == null ? m.common_dash() : `${formatNumber(s.eur_per_tonne, 0)} €`,
+        s.eur_per_tonne == null ? m.common_dash() : `${formatNumber(s.eur_per_tonne, 0)} €/t`,
     },
     {
       id: 'cost',
       header: m.kpi_annual_cost(),
       align: 'right',
+      type: 'number',
       value: (s) => s.annual_cost_eur,
       cell: (s) => formatEur(s.annual_cost_eur),
     },
@@ -73,6 +79,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'capex',
       header: m.kpi_capex(),
       align: 'right',
+      type: 'number',
       value: (s) => s.capex_eur,
       cell: (s) => formatEur(s.capex_eur),
     },
@@ -80,6 +87,7 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       id: 'coverage',
       header: m.kpi_coverage(),
       align: 'right',
+      type: 'number',
       value: (s) => s.coverage_pct,
       cell: (s) => formatPercent(s.coverage_pct),
     },
@@ -103,7 +111,28 @@ export function ScenarioList({ scenarios }: { scenarios: ScenarioSummary[] }) {
       rows={scenarios}
       getRowId={(s) => s.id}
       caption={m.scenarios_title()}
+      searchLabel={m.scenarios_search()}
       selectable
+      rowActions={(s) => [
+        {
+          id: 'open',
+          label: m.simx_res_open(),
+          icon: <ArrowUpRight />,
+          onSelect: () => navigate({ to: '/scenarios/$scenarioId', params: { scenarioId: s.id } }),
+        },
+        {
+          id: 'compare',
+          label: m.scenario_compare(),
+          icon: <GitCompareArrows />,
+          onSelect: () => navigate({ to: '/scenarios/compare', search: { a: s.id } }),
+        },
+        {
+          id: 'adjust',
+          label: m.scenario_adjust(),
+          icon: <SlidersHorizontal />,
+          onSelect: () => navigate({ to: '/simulator', search: { from: s.id } }),
+        },
+      ]}
       bulkActions={[
         {
           id: 'compare',

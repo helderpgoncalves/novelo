@@ -8,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { formatEur, formatNumber, formatTonnes } from '@/lib/format';
+import { cn } from '@/lib/utils';
 import { tipauLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 import { factLabel, factValue, kpiLabel, kpiValue } from './pilot-labels';
@@ -259,7 +260,13 @@ export function PilotResult({ data }: { data: PilotOut }) {
       </StatStrip>
 
       <Section title={m.pilot_zones_title({ k: data.k })} description={m.pilot_zones_description()}>
-        <ul className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+        <ul
+          className={cn(
+            'grid grid-cols-1 gap-4 md:grid-cols-2',
+            // 2 e 4 freguesias enchem as linhas em duas colunas; só 3 pedem três (sem buraco à direita).
+            data.zones.length === 3 && 'xl:grid-cols-3',
+          )}
+        >
           {data.zones.map((z, i) => (
             <ZoneCard key={z.parish_code} zone={z} index={i} />
           ))}

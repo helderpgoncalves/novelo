@@ -46,7 +46,7 @@ export function EmptyChat({ route, onPick, variant = 'panel' }: Props) {
         <section className="space-y-2.5" aria-labelledby="copilot-empty-start">
           <h3
             id="copilot-empty-start"
-            className="font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
+            className="font-sans font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
           >
             {m.cp_empty_suggestions_title()}
           </h3>
@@ -80,14 +80,14 @@ export function EmptyChat({ route, onPick, variant = 'panel' }: Props) {
         >
           <h3
             id="copilot-empty-keys"
-            className="font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
+            className="font-sans font-semibold text-[0.6875rem] text-muted-foreground uppercase tracking-[0.16em]"
           >
             {m.cp_shortcuts_title()}
           </h3>
           <dl className="grid gap-x-6 gap-y-2 text-muted-foreground text-sm sm:grid-cols-2">
             {shortcuts.map((k) => (
               <div key={k.label} className="flex items-center gap-3">
-                <dt className="flex min-w-[5.5rem] shrink-0 items-center gap-1">
+                <dt className="flex min-w-[7.5rem] shrink-0 items-center gap-1">
                   {k.keys.map((key, i) => (
                     <span key={key} className="flex items-center gap-1">
                       {i > 0 && <span aria-hidden="true">+</span>}

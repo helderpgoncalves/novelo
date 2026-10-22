@@ -39,7 +39,11 @@ export function Topbar({
             <Menu className="size-5" />
           </Button>
         )}
-        <Link to="/" aria-label={m.nav_home_aria()} className="flex items-center rounded-md">
+        <Link
+          to="/"
+          aria-label={m.nav_home_aria()}
+          className="flex min-h-10 items-center rounded-md"
+        >
           <BrandLogo className="h-5 min-[360px]:h-6" />
         </Link>
       </div>

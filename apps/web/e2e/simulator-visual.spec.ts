@@ -33,7 +33,11 @@ for (const vp of VIEWPORTS) {
         await page.screenshot({ path: `${dir}-2-assumptions.png` });
 
         await page.getByRole('button', { name: 'Calcular cenário' }).click();
-        await expect(page.getByTestId('working-state').first()).toBeVisible();
+        // A API guarda em memória o resultado do mesmo pedido (`site_service._cache`): a segunda vez o resultado chega
+        // antes de o estado «a calcular» se ver. Aceita um ou outro.
+        await expect(
+          page.getByTestId('working-state').first().or(page.locator('#resultado')),
+        ).toBeVisible();
         await page.screenshot({ path: `${dir}-3-running.png` });
 
         await expect(page).toHaveURL(/[?&]r=[0-9a-f-]{36}/, { timeout: 90_000 });

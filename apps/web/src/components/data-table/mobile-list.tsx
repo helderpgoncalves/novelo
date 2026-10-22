@@ -42,6 +42,11 @@ export function MobileList<T>({
         const open = state.expanded.has(rowId);
         const label = rowLabel(row);
         const actions = rowActions?.(row) ?? [];
+        // No cartão, um campo sem valor (nulo ou vazio) não ocupa espaço: só ruído de travessões.
+        const fields = details.filter((c) => {
+          const v = c.value?.(row);
+          return !c.value || (v != null && v !== '');
+        });
         return (
           <li
             key={rowId}
@@ -67,9 +72,9 @@ export function MobileList<T>({
                 </div>
               )}
             </div>
-            {details.length > 0 && (
+            {fields.length > 0 && (
               <dl className={cn('grid grid-cols-2 gap-x-4 gap-y-2 text-sm', selectable && 'pl-7')}>
-                {details.map((c) => (
+                {fields.map((c) => (
                   <div key={c.id} className={cn('min-w-0', c.full && 'col-span-2')}>
                     <dt className="text-[11px] text-muted-foreground uppercase tracking-wider">
                       {c.header}

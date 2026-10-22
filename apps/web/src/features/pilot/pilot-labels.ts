@@ -23,7 +23,8 @@ export const factLabel = (key: string): string => FACT_LABEL[key]?.() ?? key;
 /** Valor com a unidade que a API enviou (as unidades vêm junto do número, com a sua fonte). */
 export function factValue(fact: PilotFact): string {
   const digits = Number.isInteger(fact.value) ? 0 : fact.value < 1 ? 3 : 2;
-  return `${formatNumber(fact.value, digits)}${fact.unit ? ` ${fact.unit}` : ''}`;
+  if (!fact.unit) return formatNumber(fact.value, digits);
+  return `${formatNumber(fact.value, digits)}${fact.unit === '%' ? '' : ' '}${fact.unit}`;
 }
 
 export const kpiLabel: Record<PilotKpiOut['key'], () => string> = {
@@ -34,5 +35,7 @@ export const kpiLabel: Record<PilotKpiOut['key'], () => string> = {
 
 export function kpiValue(kpi: PilotKpiOut, value: number): string {
   const digits = kpi.key === 'eur_per_tonne' ? 0 : 1;
-  return `${formatNumber(value, digits)} ${kpi.unit}`;
+  // Percentagem colada ao número, como no resto da app («14,1%»); as outras unidades levam espaço.
+  const sep = kpi.unit === '%' ? '' : '\u00a0';
+  return `${formatNumber(value, digits)}${sep}${kpi.unit}`;
 }
