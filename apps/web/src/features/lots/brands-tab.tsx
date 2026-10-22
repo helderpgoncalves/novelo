@@ -119,7 +119,7 @@ export function BrandsTab() {
         />
         <StatCell
           label={m.brands_stat_weight()}
-          value={`${formatNumber(data.total_kg, 1)} kg`}
+          value={`${formatNumber(data.total_kg, 2)} kg`}
           tag={m.common_estimate()}
           hint={m.brands_stat_weight_hint()}
         />
@@ -127,7 +127,11 @@ export function BrandsTab() {
           label={m.rw_brands_stat_top()}
           value={formatPercent(topShare)}
           tone="primary"
-          hint={m.rw_brands_stat_top_hint({ count: Math.min(TOP, data.brands.length) })}
+          hint={
+            Math.min(TOP, data.brands.length) === 1
+              ? m.rw_brands_stat_top_hint_one()
+              : m.rw_brands_stat_top_hint({ count: Math.min(TOP, data.brands.length) })
+          }
         />
       </StatStrip>
       {small && (

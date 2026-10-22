@@ -10,6 +10,7 @@ import type {
 } from '@/client';
 import { NumberField } from '@/components/number-field';
 import { StickyActions } from '@/components/sticky-actions';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -21,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { formatPercent } from '@/lib/format';
 import { AVERAGE_WEIGHT_G, FIBRES, fibreLabel, GARMENTS, garmentLabel } from '@/lib/lots';
 import { cn } from '@/lib/utils';
 import { destinationLabel } from '@/lib/vocab';
@@ -84,7 +86,24 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         <p className="font-medium">
           {lowConfidence ? m.triage_low_confidence() : m.triage_suggestion()}
         </p>
-        <p className="mt-0.5 text-muted-foreground text-xs">
+        {/* Resumo do que o modelo leu: no telemóvel a composição e a marca ficam abaixo da dobra. */}
+        <ul className="mt-2 flex flex-wrap gap-1.5" data-testid="triage-suggestion">
+          {[
+            ...new Set([
+              garmentLabel[a.garment_type](),
+              destinationLabel[a.condition](),
+              ...a.composition.map((p) => `${fibreLabel[p.fibre]()} ${formatPercent(p.pct, 0)}`),
+              ...(a.brand ? [a.brand] : []),
+            ]),
+          ].map((text) => (
+            <li key={text}>
+              <Badge variant="outline" className="bg-background/70 font-medium">
+                {text}
+              </Badge>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-2 text-muted-foreground text-xs">
           {m.triage_confidence({ pct: Math.round(a.confidence * 100) })} · {a.notes}
         </p>
       </div>

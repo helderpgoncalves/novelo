@@ -62,43 +62,46 @@ function LotPage() {
 
   return (
     <Page>
-      <PageHeader
-        eyebrow={`${lot.parish_name ?? m.lot_no_parish()} · ${formatDateTime(lot.opened_at)}`}
-        title={lot.code}
-        description={m.lot_description()}
-        actions={
-          <>
-            {lot.state === 'collected' && (
-              <>
-                <Button asChild variant="outline" className="h-10 gap-2">
-                  <Link to="/triage" search={{ lot: lot.code }}>
-                    <ScanLine /> {m.lot_add_items()}
-                  </Link>
-                </Button>
+      {/* «Imprimir etiqueta» imprime só a etiqueta: QR, código e o resumo do lote. */}
+      <div className="print:hidden">
+        <PageHeader
+          eyebrow={`${lot.parish_name ?? m.lot_no_parish()} · ${formatDateTime(lot.opened_at)}`}
+          title={lot.code}
+          description={m.lot_description()}
+          actions={
+            <>
+              {lot.state === 'collected' && (
+                <>
+                  <Button asChild variant="outline" className="h-10 gap-2">
+                    <Link to="/triage" search={{ lot: lot.code }}>
+                      <ScanLine /> {m.lot_add_items()}
+                    </Link>
+                  </Button>
+                  <Button
+                    className="h-10 gap-2 font-semibold"
+                    disabled={lot.items === 0 || change.isPending}
+                    onClick={() => change.mutate({ path: { code }, body: { state: 'sorted' } })}
+                  >
+                    <CheckCheck /> {m.lot_close()}
+                  </Button>
+                </>
+              )}
+              {(lot.state === 'reserved' || lot.state === 'sorted') && (
                 <Button
-                  className="h-10 gap-2 font-semibold"
-                  disabled={lot.items === 0 || change.isPending}
-                  onClick={() => change.mutate({ path: { code }, body: { state: 'sorted' } })}
+                  variant="outline"
+                  className="h-10 gap-2"
+                  disabled={change.isPending}
+                  onClick={() => change.mutate({ path: { code }, body: { state: 'delivered' } })}
                 >
-                  <CheckCheck /> {m.lot_close()}
+                  <Truck /> {m.lot_mark_delivered()}
                 </Button>
-              </>
-            )}
-            {(lot.state === 'reserved' || lot.state === 'sorted') && (
-              <Button
-                variant="outline"
-                className="h-10 gap-2"
-                disabled={change.isPending}
-                onClick={() => change.mutate({ path: { code }, body: { state: 'delivered' } })}
-              >
-                <Truck /> {m.lot_mark_delivered()}
-              </Button>
-            )}
-          </>
-        }
-      />
+              )}
+            </>
+          }
+        />
+      </div>
 
-      <StatStrip>
+      <StatStrip className="print:hidden">
         <StatCell
           label={m.lot_stat_state()}
           value={lotStateLabel[lot.state]()}
@@ -134,10 +137,20 @@ function LotPage() {
       {/* Etiqueta e composição ao lado da tabela só a partir de 2xl: até lá, por cima, em duas colunas. Lado a lado a
           1440 px a tabela das peças (6 colunas) não cabia e a «Confiança» ficava cortada. */}
       <div className="grid grid-cols-1 gap-6 2xl:grid-cols-12">
-        <aside className="grid grid-cols-1 items-start gap-4 self-start sm:grid-cols-2 2xl:col-span-3 2xl:grid-cols-1">
+        {/* div e não aside: na impressão os aside (barra lateral) escondem-se e a etiqueta desaparecia. */}
+        <div className="grid grid-cols-1 items-start gap-4 self-start sm:grid-cols-2 2xl:col-span-3 2xl:grid-cols-1 print:block">
           <Panel className="space-y-4 text-center print:ring-0">
-            <img src={qr} alt={m.lot_qr_alt({ code: lot.code })} className="mx-auto size-44" />
+            <img
+              src={qr}
+              alt={m.lot_qr_alt({ code: lot.code })}
+              className="mx-auto size-44 rounded-lg"
+            />
             <p className="font-medium font-serif text-xl tracking-widest">{lot.code}</p>
+            <p className="hidden text-sm print:block">
+              {lot.parish_name ?? m.lot_no_parish()} ·{' '}
+              {lot.items === 1 ? m.lot_items_count_one() : m.lot_items_count({ count: lot.items })}{' '}
+              · {formatNumber(lot.weight_kg, 2)} kg · {fibreLabel[lot.dominant_fibre]()}
+            </p>
             <div className="flex flex-wrap justify-center gap-2 print:hidden">
               <Button variant="outline" size="sm" className="h-9" onClick={() => window.print()}>
                 {m.lot_print_label()}
@@ -170,7 +183,7 @@ function LotPage() {
               </Panel>
             )}
           </div>
-        </aside>
+        </div>
 
         <div className="min-w-0 2xl:col-span-9 print:hidden">
           <PageTabs

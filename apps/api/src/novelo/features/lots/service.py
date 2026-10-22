@@ -1,6 +1,7 @@
 """Lotes, passaporte, bolsa de fibra e evidência por marca."""
 
 import io
+import re
 import secrets
 import uuid
 from collections import Counter, defaultdict
@@ -44,10 +45,24 @@ AVERAGE_WEIGHT_G = {
 }  # fmt: skip
 
 
+# Palavras de ligação que ficam em minúsculas a meio de uma marca («Polo by Ralph Lauren», «Calças da Avó»).
+_BRAND_SMALL_WORDS = {"by", "de", "da", "do", "das", "dos", "e", "of", "and", "the"}
+
+
 def _clean_brand(brand: str | None) -> str | None:
-    """Uma só grafia por marca ("  zara " e "ZARA" contam como "Zara") para a evidência por marca somar certo."""
+    """Uma só grafia por marca ("  zara " e "ZARA" contam como "Zara") para a evidência por marca somar certo.
+
+    Só se normaliza o que vem todo em maiúsculas ou todo em minúsculas (etiqueta ou teclado): uma grafia com maiúsculas
+    e minúsculas fica como foi escrita («Polo by Ralph Lauren», não «Polo By Ralph Lauren»).
+    """
     cleaned = " ".join((brand or "").split())
-    return cleaned.title() if cleaned else None
+    if not cleaned:
+        return None
+    if not (cleaned.isupper() or cleaned.islower()):
+        return cleaned
+    words = cleaned.lower().split(" ")
+    titled = [w if i and w in _BRAND_SMALL_WORDS else w.title() for i, w in enumerate(words)]
+    return re.sub(r"(?<=\w)'S\b", "'s", " ".join(titled))  # «Levi's», não «Levi'S»
 
 
 def new_code() -> str:
@@ -254,10 +269,16 @@ async def passport(db: AsyncSession, code: str) -> Passport:
 
 
 def qr_svg(code: str) -> bytes:
-    """QR em SVG que aponta para o passaporte público."""
+    """QR em SVG que aponta para o passaporte público.
+
+    Fundo branco no próprio SVG: sem ele, o QR desaparecia no tema escuro (módulos escuros sobre o cartão escuro) e os
+    leitores precisam da margem clara à volta para o reconhecer.
+    """
     url = f"{get_settings().app_url.rstrip('/')}/passport/{code}"
     buffer = io.BytesIO()
-    segno.make(url, error="m").save(buffer, kind="svg", scale=8, border=2, dark="#14211D", light=None, xmldecl=False)
+    segno.make(url, error="m").save(
+        buffer, kind="svg", scale=8, border=2, dark="#14211D", light="#FFFFFF", xmldecl=False
+    )
     return buffer.getvalue()
 
 
@@ -279,8 +300,15 @@ async def change_state(db: AsyncSession, user: User, code: str, state: LotState)
     return await get_lot(db, code)
 
 
-async def market(db: AsyncSession, fibre: Fibre | None) -> list[MarketEntry]:
-    query = select(Lot).where(Lot.state.in_([LotState.SORTED, LotState.RESERVED])).options(selectinload(Lot.items))
+# Na bolsa só está o que ainda se pode reservar ou já foi reservado; o relatório RAP conta também o que foi entregue.
+MARKET_STATES = (LotState.SORTED, LotState.RESERVED)
+SORTED_STATES = (LotState.SORTED, LotState.RESERVED, LotState.DELIVERED)
+
+
+async def market(
+    db: AsyncSession, fibre: Fibre | None, states: tuple[LotState, ...] = MARKET_STATES
+) -> list[MarketEntry]:
+    query = select(Lot).where(Lot.state.in_(states)).options(selectinload(Lot.items))
     if fibre:
         query = query.where(Lot.dominant_fibre == fibre)
     lots = (await db.execute(query.order_by(Lot.created_at.desc()))).scalars().all()
@@ -328,10 +356,14 @@ async def brands(db: AsyncSession) -> BrandsOut:
     # Só as três colunas usadas: a composição em JSON de cada peça não é precisa para a evidência por marca.
     stmt = select(LotItem).options(load_only(LotItem.brand, LotItem.estimated_weight_g, LotItem.dominant_fibre))
     items = (await db.execute(stmt)).scalars().all()
-    by_brand: dict[str, list[LotItem]] = defaultdict(list)
+    # Agrupa sem distinguir maiúsculas; mostra a grafia mais frequente dessa marca.
+    by_key: dict[str, list[LotItem]] = defaultdict(list)
     for i in items:
         if i.brand:
-            by_brand[i.brand.strip().title()].append(i)
+            by_key[i.brand.strip().casefold()].append(i)
+    by_brand = {
+        Counter(i.brand.strip() for i in rows if i.brand).most_common(1)[0][0]: rows for rows in by_key.values()
+    }
     total_kg = sum(i.estimated_weight_g for i in items) / 1000
     stats = []
     for brand, rows in by_brand.items():
