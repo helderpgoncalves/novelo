@@ -66,12 +66,13 @@ test('em paisagem as laterais respeitam o entalhe e o topo continua visível', a
   expect(await noOverflow(page)).toBe(true);
 });
 
-test('páginas principais sem overflow nem conteúdo tapado, claro e escuro', async ({ page }) => {
-  await emulateSafeArea(page);
-  await login(page);
-  for (const scheme of ['light', 'dark'] as const) {
-    await page.emulateMedia({ colorScheme: scheme });
-    for (const route of ['', '/map', '/chat', '/circuits', '/simulator', '/lots']) {
+// Um teste por página (claro e escuro dentro): as 12 navegações num só teste passavam dos 30 s com a suite em paralelo.
+for (const route of ['', '/map', '/chat', '/circuits', '/simulator', '/lots']) {
+  test(`${route || '/'}: sem overflow nem conteúdo tapado, claro e escuro`, async ({ page }) => {
+    await emulateSafeArea(page);
+    await login(page);
+    for (const scheme of ['light', 'dark'] as const) {
+      await page.emulateMedia({ colorScheme: scheme });
       await page.goto(`/pt${route}`);
       await expect(page.locator('#content')).toBeVisible();
       await page.waitForTimeout(400);
@@ -80,5 +81,5 @@ test('páginas principais sem overflow nem conteúdo tapado, claro e escuro', as
         .poll(async () => (await page.getByTestId('topbar').boundingBox())?.y, `${route} topo`)
         .toBe(0);
     }
-  }
-});
+  });
+}

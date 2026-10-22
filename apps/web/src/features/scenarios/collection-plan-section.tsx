@@ -271,7 +271,7 @@ function PlanBody({ plan, kpis }: { plan: CollectionPlanEntry[]; kpis?: Kpis }) 
           <li className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10">
             <ShoppingBag className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
             <p className="font-medium text-sm leading-snug" data-testid="plan-summary-door">
-              {m.plan_summary_door({
+              {(doorBag.parishes === 1 ? m.plan_summary_door_one : m.plan_summary_door)({
                 n: formatNumber(doorBag.parishes),
                 tonnes: formatTonnes(doorBag.tonnes, 1),
                 every: everyLabel(summary.everyWeeks ?? 2),
@@ -284,7 +284,7 @@ function PlanBody({ plan, kpis }: { plan: CollectionPlanEntry[]; kpis?: Kpis }) 
           <li className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10">
             <MapPin className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
             <p className="font-medium text-sm leading-snug" data-testid="plan-summary-sites">
-              {m.plan_summary_sites({
+              {(sites.parishes === 1 ? m.plan_summary_sites_one : m.plan_summary_sites)({
                 n: formatNumber(sites.parishes),
                 tonnes: formatTonnes(sites.tonnes, 1),
                 km: formatNumber(sites.km),

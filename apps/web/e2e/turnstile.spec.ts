@@ -80,30 +80,37 @@ test('login: token por tentativa, cabeçalho e ação, botão bloqueado até hav
   });
 });
 
-test('login: captcha_failed mostra a mensagem e "Repetir verificação"', async ({ page }) => {
-  await mockTurnstile(page);
-  await page.route('**/api/v1/auth/login', (route) =>
-    route.fulfill({
-      status: 403,
-      json: { code: 'captcha_failed', message: 'x', details: null },
-    }),
-  );
-  await page.goto('/pt/login?method=password');
-  await page.getByLabel('Email').fill('x@example.pt');
-  await page.getByLabel('Palavra-passe', { exact: true }).fill('qualquer-coisa-123');
-  await page.getByRole('button', { name: 'Entrar' }).click();
-  await expect(page.getByText(/Não foi possível confirmar que és uma pessoa/)).toBeVisible();
-  const retry = page.getByRole('button', { name: 'Repetir verificação' });
-  await expect(retry).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
-  await retry.click();
-  await expect(retry).toBeHidden();
-  const resets = await page.evaluate(
-    () => (window as unknown as { __ts: { resets: number } }).__ts.resets,
-  );
-  expect(resets).toBeGreaterThanOrEqual(2); // um após a tentativa, outro no "Repetir"
-  await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
-});
+// Resposta lenta (300 ms): o token novo pedido no envio chega antes do erro da API e tem de sobreviver a ele.
+for (const apiDelayMs of [0, 300]) {
+  const title = apiDelayMs
+    ? 'login: captcha_failed com resposta lenta não apaga o token novo'
+    : 'login: captcha_failed mostra a mensagem e "Repetir verificação"';
+  test(title, async ({ page }) => {
+    await mockTurnstile(page);
+    await page.route('**/api/v1/auth/login', async (route) => {
+      if (apiDelayMs) await new Promise((resolve) => setTimeout(resolve, apiDelayMs));
+      await route.fulfill({
+        status: 403,
+        json: { code: 'captcha_failed', message: 'x', details: null },
+      });
+    });
+    await page.goto('/pt/login?method=password');
+    await page.getByLabel('Email').fill('x@example.pt');
+    await page.getByLabel('Palavra-passe', { exact: true }).fill('qualquer-coisa-123');
+    await page.getByRole('button', { name: 'Entrar' }).click();
+    await expect(page.getByText(/Não foi possível confirmar que és uma pessoa/)).toBeVisible();
+    const retry = page.getByRole('button', { name: 'Repetir verificação' });
+    await expect(retry).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
+    await retry.click();
+    await expect(retry).toBeHidden();
+    const resets = await page.evaluate(
+      () => (window as unknown as { __ts: { resets: number } }).__ts.resets,
+    );
+    expect(resets).toBeGreaterThanOrEqual(2); // um após a tentativa, outro no "Repetir"
+    await expect(page.getByRole('button', { name: 'Entrar' })).toBeEnabled();
+  });
+}
 
 test('registo: honeypot invisível vai vazio e a ação é register', async ({ page }) => {
   await mockTurnstile(page);

@@ -16,13 +16,19 @@ test.describe('sala de decisão', () => {
   });
 
   test('título e faixa de situação com os números reais, selo e fonte', async ({ page }) => {
+    // Os números do título vêm da API (Vitrus + APA), não de constantes no teste.
+    const { gap } = (await (await page.request.get('/api/v1/textile/overview')).json()) as {
+      gap: { missing_t: number; capture_pct: number };
+    };
+    const missing = String(Math.round(gap.missing_t)).replace(/\B(?=(\d{3})+$)/g, '\\s?');
+    const capture = `${gap.capture_pct.toFixed(1).replace('.', ',')}%`;
     const h1 = page.getByRole('heading', { level: 1 });
-    await expect(h1).toContainText('Guimarães recolhe');
-    await expect(h1).toContainText(/≈ 2\s?325 t por ano ainda vão para o lixo/);
+    await expect(h1).toContainText(`Guimarães recolhe à parte ${capture}`);
+    await expect(h1).toContainText(new RegExp(`≈ ${missing} t por ano ainda vão para o lixo`));
 
     const strip = page.getByRole('region', { name: 'Situação em números' });
     await expect(strip).toContainText('301,3');
-    await expect(strip).toContainText('9,1%');
+    await expect(strip).toContainText(capture);
     await expect(strip).toContainText('medido');
     await expect(strip).toContainText('estimativa');
     await expect(strip).toContainText(/\d+\s*dias/);

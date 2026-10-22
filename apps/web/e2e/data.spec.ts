@@ -19,7 +19,13 @@ test.describe('dados reais da Vitrus', () => {
     await expect(proofs.getByRole('row', { name: /Nova Etapa/ })).toContainText('estimativa');
     // Origem dos dados: os contentores do pacote QGIS e os valores do RSU contam (nunca «0 linhas» nem «outra fonte»).
     await expect(proofs.getByText(/2\s?751 linhas importadas/)).toBeVisible();
-    await expect(proofs.getByText('2 valores de referência')).toBeVisible();
+    // Quantos valores de referência (RSU da Vitrus, a quota da Vitrus no concelho e a percentagem da APA) vêm da API.
+    const overview = (await (await page.request.get('/api/v1/textile/overview')).json()) as {
+      data_sources: { rows: number; rows_unit: 'rows' | 'values' }[];
+    };
+    const reference = overview.data_sources.filter((s) => s.rows_unit === 'values');
+    expect(reference).toHaveLength(1);
+    await expect(proofs.getByText(`${reference[0]?.rows} valores de referência`)).toBeVisible();
     await expect(proofs.getByText('Outra fonte')).toHaveCount(0);
     await proofs.getByRole('tab', { name: 'Para onde vai o que se recolhe' }).click();
     await expect(page.getByRole('img', { name: /Fluxo de têxtil/ })).toBeVisible();

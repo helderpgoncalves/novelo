@@ -41,7 +41,9 @@ export function SitingOverview({
               )}
               {onDemand && (
                 <span className="block">
-                  {m.site_kpi_opened_on_demand({ n: formatNumber(siting.on_demand_zones ?? 0) })}
+                  {siting.on_demand_zones === 1
+                    ? m.site_kpi_opened_on_demand_one()
+                    : m.site_kpi_opened_on_demand({ n: formatNumber(siting.on_demand_zones ?? 0) })}
                 </span>
               )}
             </>

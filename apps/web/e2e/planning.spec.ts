@@ -29,12 +29,36 @@ test.describe('simulador e cenários', () => {
     ).toBeVisible();
     await expect(page.getByText('Dados da Vitrus').first()).toBeVisible();
     await expect(page.getByText('Pressuposto').first()).toBeVisible();
-    // Os valores que ainda não chegaram da Vitrus ficam «por preencher», com a fonte em nota.
-    await expect(page.getByLabel('Custo de tratamento do indiferenciado')).toHaveAttribute(
-      'placeholder',
-      'Por preencher',
+    // Valores e origens vêm da API: o ecrã mostra o que o modelo usa, não constantes do teste.
+    const params = (await (await page.request.get('/api/v1/planning/parameters')).json()) as {
+      values: { rsu_treatment_eur_per_t: number | null };
+      meta: { key: string; source: string; note: string | null }[];
+    };
+    const source = (key: string) => params.meta.find((x) => x.key === key)?.source;
+    // Faixa: parâmetros, dados da Vitrus e pressupostos, pela ordem do ecrã.
+    const counts = page.getByRole('main').getByRole('definition');
+    await expect(counts.nth(0)).toHaveText(String(params.meta.length));
+    await expect(counts.nth(1)).toHaveText(
+      String(params.meta.filter((x) => x.source === 'vitrus_data').length),
     );
-    await expect(page.getByText(/departamento financeiro/).first()).toBeVisible();
+    await expect(counts.nth(2)).toHaveText(
+      String(params.meta.filter((x) => x.source === 'assumption').length),
+    );
+    // Tratamento do indiferenciado: dado da Vitrus (TGR + Resinorte), com a fonte em nota.
+    expect(source('rsu_treatment_eur_per_t')).toBe('vitrus_data');
+    const treatment = params.values.rsu_treatment_eur_per_t;
+    expect(treatment).not.toBeNull();
+    await expect(page.getByLabel('Custo de tratamento do indiferenciado')).toHaveValue(
+      String(treatment).replace('.', ','),
+    );
+    await expect(page.getByText(/TGR .*Resinorte/).first()).toBeVisible();
+    // Viatura de têxtil dedicada: o preço é pressuposto com fonte; o estaleiro de Polvoreira é dado da Vitrus.
+    expect(source('vehicle_capex_eur')).toBe('assumption');
+    expect(source('depot_lat')).toBe('vitrus_data');
+    await page.getByRole('button', { name: /Viatura de têxtil, estaleiro e otimizador/ }).click();
+    await expect(page.getByLabel('Preço da viatura de têxtil (sem compactação)')).toBeVisible();
+    await expect(page.getByText(/TED 72690-2025/).first()).toBeVisible();
+    await expect(page.getByText(/Polvoreira/).first()).toBeVisible();
   });
 
   test('calcular um cenário de ponta a ponta e ver o resultado', async ({ page }) => {
@@ -50,10 +74,32 @@ test.describe('simulador e cenários', () => {
     await expect(page.getByText('Face a 2025 e à meta')).toBeVisible();
     await expect(page.getByText('Têxtil captado').first()).toBeVisible();
     await expect(page.getByText('Custo por tonelada').first()).toBeVisible();
-    // Poupança no tratamento: sem o custo de tratamento da Vitrus fica «por validar», nunca um número inventado.
-    await expect(page.getByText('Poupança no tratamento')).toBeVisible();
-    await expect(page.getByText('Por validar').first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: /Plano de recolha/ })).toBeVisible();
+    // Tratamento evitado (105,64 €/t da Vitrus) e custo líquido: os valores do ecrã são os do cenário guardado.
+    const id = new URL(page.url()).searchParams.get('r');
+    const scenario = (await (
+      await page.request.get(`/api/v1/planning/scenarios/${id}`)
+    ).json()) as {
+      params: { rsu_treatment_eur_per_t: number | null };
+      result: {
+        kpis: { avoided_treatment_eur: number | null; net_annual_cost_eur: number | null };
+      };
+    };
+    const { avoided_treatment_eur: avoided, net_annual_cost_eur: net } = scenario.result.kpis;
+    expect(avoided).toBeGreaterThan(0);
+    expect(net).not.toBeNull();
+    const eur = (v: number) =>
+      new RegExp(`^-?${String(Math.round(Math.abs(v))).replace(/\B(?=(\d{3})+$)/g, '\\s?')}\\s?€$`);
+    const kpi = (label: string) =>
+      page
+        .locator('dl > div')
+        .filter({ has: page.locator('dt', { hasText: label }) })
+        .first()
+        .locator('dd');
+    await expect(kpi('Tratamento evitado')).toHaveText(eur(avoided ?? 0));
+    await expect(kpi('Custo líquido para o município')).toHaveText(eur(net ?? 0));
+    const treatment = String(scenario.params.rsu_treatment_eur_per_t).replace('.', ',');
+    await expect(page.getByText(`× ${treatment} €/t`).first()).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Plano da viatura de têxtil/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Freguesia a freguesia' })).toBeVisible();
     await page.getByRole('link', { name: 'Abrir cenário' }).click();
     await expect(page).toHaveURL(/\/pt\/scenarios\/[0-9a-f-]{36}/);
