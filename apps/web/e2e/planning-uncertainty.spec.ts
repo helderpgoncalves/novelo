@@ -3,6 +3,9 @@ import { login } from './helpers';
 
 test.describe('planeamento: incerteza, robustez, referência e piloto', () => {
   test.beforeEach(async ({ page }) => {
+    // Corre o otimizador a sério (CP-SAT e VRP, até SOLVER_TIME_LIMIT_S) e há esperas próprias de 30 a 60 s:
+    // os 30 s por omissão do teste cortavam-nas a meio.
+    test.setTimeout(120_000);
     await login(page);
   });
 

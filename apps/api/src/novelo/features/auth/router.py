@@ -356,7 +356,8 @@ async def accept_invitation(body: AcceptInvitationRequest, response: Response, d
 
 @router.patch("/me", response_model=UserOut, dependencies=[NotImpersonating])
 async def update_me(body: ProfileUpdate, user: CurrentUser, db: Db) -> UserOut:
-    return to_out(await service.update_profile(db, user, body.name, body.locale))
+    name_given = "name" in body.model_fields_set
+    return to_out(await service.update_profile(db, user, body.name, body.locale, name_given=name_given))
 
 
 @router.post("/logout-all", status_code=204, dependencies=[NotImpersonating])

@@ -173,7 +173,7 @@ test('repor password: sem widget nem cabeçalho de captcha, o botão não espera
   await expect(page.getByTestId('turnstile-field')).toHaveCount(0);
   await page.getByLabel('Nova palavra-passe').fill('uma-password-segura-123');
   await page.getByLabel('Repete a palavra-passe').fill('uma-password-segura-123');
-  const submit = page.getByRole('button', { name: 'Redefinir password' });
+  const submit = page.getByRole('button', { name: 'Redefinir palavra-passe' });
   await expect(submit).toBeEnabled();
   await submit.click();
   await expect.poll(() => header).toBeUndefined();

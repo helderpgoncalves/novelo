@@ -34,9 +34,14 @@ for (const vp of VIEWPORTS) {
 
         await page.getByRole('button', { name: 'Calcular cenário' }).click();
         // A API guarda em memória o resultado do mesmo pedido (`site_service._cache`): a segunda vez o resultado chega
-        // antes de o estado «a calcular» se ver. Aceita um ou outro.
+        // antes de o estado «a calcular» se ver. Aceita um ou outro. Em telemóvel o estado vive na barra fixa do fundo
+        // (o resumo lateral, que também o tem, está escondido): conta só o que se vê.
         await expect(
-          page.getByTestId('working-state').first().or(page.locator('#resultado')),
+          page
+            .getByTestId('working-state')
+            .filter({ visible: true })
+            .first()
+            .or(page.locator('#resultado')),
         ).toBeVisible();
         await page.screenshot({ path: `${dir}-3-running.png` });
 

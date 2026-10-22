@@ -22,7 +22,7 @@ import { AUTH_CONTROL, AUTH_CTA, AUTH_FIELDS, authLinkClass } from './auth-ui';
 import { FormAlert } from './form-alert';
 import { PasswordInput } from './password-input';
 import { type LoginValues, loginSchema } from './schemas';
-import { useAutofillSync } from './use-autofill-sync';
+import { uncontrolled, useAutofillSync } from './use-autofill-sync';
 import { useTurnstile } from './use-turnstile';
 
 const AUTOFILL_FIELDS = ['email', 'password'] as const;
@@ -71,7 +71,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
               <FormLabel>{m.login_email()}</FormLabel>
               <FormControl>
                 <Input
-                  {...field}
+                  {...uncontrolled(field)}
                   type="email"
                   autoComplete="username"
                   inputMode="email"
@@ -99,7 +99,7 @@ export function LoginForm({ next, initialEmail = '' }: { next: string; initialEm
               </div>
               <FormControl>
                 <PasswordInput
-                  {...field}
+                  {...uncontrolled(field)}
                   autoComplete="current-password"
                   placeholder={m.login_password_placeholder()}
                   className={AUTH_CONTROL}

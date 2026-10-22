@@ -24,6 +24,9 @@ interface Probe {
 async function probe(page: Page, base: string): Promise<Probe> {
   const out: Probe = { problems: [], external: new Set(), workerStatus: [] };
   page.on('console', (msg) => {
+    // O Chrome sem GPU (SwiftShader) avisa de «GPU stall due to ReadPixels» quando o Playwright captura o ecrã
+    // (trace, screencast): vem do driver do navegador, não da app (nem o MapLibre nem a app chamam readPixels).
+    if (/GL Driver Message \(OpenGL, Performance,/.test(msg.text())) return;
     if (msg.type() === 'error' || msg.type() === 'warning')
       out.problems.push(`console.${msg.type()}: ${msg.text()}`);
   });
@@ -36,8 +39,10 @@ async function probe(page: Page, base: string): Promise<Probe> {
     if (url.origin !== base) out.external.add(url.origin);
     if (/maplibre-gl-worker/.test(url.pathname)) {
       out.workerStatus.push(res.status());
+      // Um 304 (ou a resposta servida da cache depois dele) não traz Content-Type: só se julga o que veio com tipo.
+      // A regressão era o nginx devolver o index.html (text/html).
       const type = res.headers()['content-type'] ?? '';
-      if (!/javascript/.test(type)) out.problems.push(`worker com content-type ${type}`);
+      if (type && !/javascript/.test(type)) out.problems.push(`worker com content-type ${type}`);
     }
     if (res.status() >= 400 && !url.pathname.startsWith('/api/'))
       out.problems.push(`HTTP ${res.status()}: ${res.url()}`);
@@ -79,6 +84,7 @@ test.describe('mapas em build de produção: sem erros de consola', () => {
 
   for (const [name, path] of pages) {
     test(name, async ({ page, baseURL }) => {
+      test.setTimeout(60_000); // entrar e carregar o mapa duas vezes (claro e escuro), cada uma até 20 s
       const base = new URL(baseURL ?? 'http://localhost:3190').origin;
       const seen = await probe(page, base);
       await login(page);
