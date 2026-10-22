@@ -1,0 +1,300 @@
+{
+ "sim-desktop": {
+  "base": "sim-desktop-base.png",
+  "content": "sim-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 5202,
+  "anchors": {
+   "A rede no mapa": 2050
+  }
+ },
+ "sim-mobile": {
+  "base": "sim-mobile-base.png",
+  "content": "sim-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 9736,
+  "anchors": {
+   "A rede no mapa": 2561
+  }
+ },
+ "scenario-desktop": {
+  "base": "scenario-desktop-base.png",
+  "content": "scenario-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 3042,
+  "anchors": {
+   "Plano de recolha": 1337,
+   "Têxtil reutilizável": 775
+  }
+ },
+ "scenario-mobile": {
+  "base": "scenario-mobile-base.png",
+  "content": "scenario-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 5970,
+  "anchors": {
+   "Plano de recolha": 2211,
+   "Têxtil reutilizável": 1252
+  }
+ },
+ "coverage-desktop": {
+  "base": "coverage-desktop-base.png",
+  "content": "coverage-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 2272,
+  "anchors": {}
+ },
+ "coverage-mobile": {
+  "base": "coverage-mobile-base.png",
+  "content": "coverage-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 5553,
+  "anchors": {}
+ },
+ "uncertainty-desktop": {
+  "base": "uncertainty-desktop-base.png",
+  "content": "uncertainty-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 1953,
+  "anchors": {}
+ },
+ "uncertainty-mobile": {
+  "base": "uncertainty-mobile-base.png",
+  "content": "uncertainty-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 3476,
+  "anchors": {}
+ },
+ "compare-desktop": {
+  "base": "compare-desktop-base.png",
+  "content": "compare-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 1701,
+  "anchors": {}
+ },
+ "compare-mobile": {
+  "base": "compare-mobile-base.png",
+  "content": "compare-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 3833,
+  "anchors": {}
+ },
+ "lot-desktop": {
+  "base": "lot-desktop-base.png",
+  "content": "lot-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 931,
+  "anchors": {}
+ },
+ "lot-mobile": {
+  "base": "lot-mobile-base.png",
+  "content": "lot-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 1497,
+  "anchors": {}
+ },
+ "municipal-desktop": {
+  "base": "municipal-desktop-base.png",
+  "content": "municipal-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 1680,
+  "anchors": {}
+ },
+ "municipal-mobile": {
+  "base": "municipal-mobile-base.png",
+  "content": "municipal-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 2777,
+  "anchors": {}
+ },
+ "reports-desktop": {
+  "base": "reports-desktop-base.png",
+  "content": "reports-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 1818,
+  "anchors": {}
+ },
+ "reports-mobile": {
+  "base": "reports-mobile-base.png",
+  "content": "reports-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 3884,
+  "anchors": {}
+ },
+ "start-desktop": {
+  "base": "start-desktop-base.png",
+  "content": "start-desktop-content.png",
+  "viewport": [
+   1440,
+   900
+  ],
+  "rect": [
+   256,
+   64,
+   1184,
+   836
+  ],
+  "contentHeight": 5343,
+  "anchors": {}
+ },
+ "start-mobile": {
+  "base": "start-mobile-base.png",
+  "content": "start-mobile-content.png",
+  "viewport": [
+   390,
+   844
+  ],
+  "rect": [
+   0,
+   56,
+   390,
+   731
+  ],
+  "contentHeight": 10061,
+  "anchors": {}
+ }
+}

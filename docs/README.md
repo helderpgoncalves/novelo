@@ -16,6 +16,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | [Cenários e contingências](projeto/cenarios-e-contingencias.md) | Pitch, dados, mentoria, concorrência, 48 perguntas difíceis do júri, 12 por critério, cenário das Regras e pós-hackathon |
 | [Narrativa do pitch](projeto/narrativa-do-pitch.md) | Storyline em 30 s, 3 min e 5 min, falas, roteiro da demo e objeções, com a fonte de cada número |
 | [Guião de slides](projeto/pitch-slides.md) | Oito slides prontos para o deck |
+| [Deck e vídeo](../pitch/README.md) | O deck em PowerPoint (`pitch/`) e o vídeo de apresentação em 16:9 e 9:16 (`video/`), gerados a partir dos dados e das capturas reais |
 | [Pitch](projeto/pitch.md) | Resumo do guião de 5 minutos |
 | [Perguntas do júri](projeto/perguntas-do-juri.md) | Respostas preparadas |
 

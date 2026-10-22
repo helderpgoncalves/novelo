@@ -1,0 +1,109 @@
+import { AbsoluteFill, interpolate, useCurrentFrame } from 'remotion';
+import { clamp, easeInOut, fadeOut, prog, rise } from '../anim';
+import { GEO, GuimaraesMap } from '../components/GuimaraesMap';
+import { Eyebrow, Source, Title } from '../components/Type';
+import { num } from '../format';
+import { useLayout } from '../layout';
+import { C, FONT } from '../theme';
+
+const existing = GEO.modes.find((m) => m.mode === 'existing');
+const onDemand = GEO.modes.find((m) => m.mode === 'on_demand');
+const papInScenario = GEO.parishes.filter((p) => p.papInScenario).length;
+const papAll = GEO.parishes.filter((p) => p.pap).length;
+
+const STAGES = [
+  {
+    at: 30,
+    n: '1',
+    title: 'Saco fechado à porta, no dia em que o camião já passa.',
+    stats: [`${papInScenario} freguesias`, `${num(onDemand?.tonnes ?? 0, 1)} t/ano`, '0 km novos'],
+    note: `${papAll} das 48 freguesias têm circuito porta a porta com viatura.`,
+    color: C.florestaClara,
+  },
+  {
+    at: 140,
+    n: '2',
+    title: 'Paragem nos locais por onde a viatura já passa, sem contentor novo.',
+    stats: [`${existing?.points ?? 0} pontos`, `${num(existing?.tonnes ?? 0, 1)} t/ano`, `${GEO.routes.length} circuitos`],
+    note: `${num(GEO.kpis.km_year)} km por ano, a partir do depósito.`,
+    color: C.areia,
+  },
+  {
+    at: 250,
+    n: '3',
+    title: 'E as escolas, como pontos com pessoas.',
+    stats: [`${GEO.schools.length} escolas`, 'saco entregue em mão'],
+    note: 'Candidatas na rede por locais reais.',
+    color: C.linho,
+  },
+];
+
+/** 8. A rede sem contentores, desenhada no mapa a partir do cenário de 60 000 €/ano. */
+export function Network({ dur }: { dur: number }) {
+  const f = useCurrentFrame();
+  const { width, height, portrait, pad } = useLayout();
+  const mapW = portrait ? 840 : 820;
+  const s = {
+    outline: 1,
+    containers: 0,
+    pap: interpolate(f, [30, 90], [0, 1], { ...clamp, easing: easeInOut }),
+    existing: interpolate(f, [140, 200], [0, 1], { ...clamp, easing: easeInOut }),
+    routes: interpolate(f, [160, 250], [0, 1], { ...clamp, easing: easeInOut }),
+    schools: interpolate(f, [250, 300], [0, 1], clamp),
+  };
+  const active = STAGES.reduce((acc, st, i) => (f >= st.at ? i : acc), -1);
+  return (
+    <AbsoluteFill style={{ background: C.noite, opacity: fadeOut(f, dur, 6) }}>
+      <div style={{ position: 'absolute', ...(portrait ? { left: (width - 840) / 2, top: 430 } : { right: 110, top: (height - (mapW * GEO.height) / GEO.width) / 2 }) }}>
+        <GuimaraesMap width={mapW} s={s} />
+      </div>
+      <div style={{ position: 'absolute', left: pad, top: portrait ? 170 : 120, width: portrait ? width - pad * 2 : 820 }}>
+        <div style={rise(f, 0)}>
+          <Eyebrow color={C.areia}>A rede · 60 000 €/ano</Eyebrow>
+        </div>
+        <div style={{ ...rise(f, 6), marginTop: 24 }}>
+          <Title size={portrait ? 64 : 60} color={C.linho}>
+            Em cada freguesia, o canal mais barato que funciona.
+          </Title>
+        </div>
+      </div>
+      <div style={{ position: 'absolute', left: pad, ...(portrait ? { right: pad, bottom: 190 } : { top: 400, width: 800 }) }}>
+        {STAGES.map((st, i) => {
+          const on = i === active;
+          const seen = f >= st.at;
+          if (portrait && !on) return null;
+          return (
+            <div
+              key={st.n}
+              style={{
+                display: 'flex',
+                gap: 26,
+                marginBottom: portrait ? 0 : 34,
+                opacity: seen ? (on ? 1 : 0.38) * prog(f, st.at, 14) : 0,
+                transform: `translateY(${(1 - prog(f, st.at, 18)) * 30}px)`,
+              }}
+            >
+              <div style={{ flex: '0 0 auto', width: 54, height: 54, borderRadius: '50%', background: st.color, color: C.noite, font: `600 26px/54px Inter`, textAlign: 'center' }}>{st.n}</div>
+              <div>
+                <div style={{ font: `500 ${portrait ? 44 : 38}px/1.15 ${FONT.title}`, color: C.linho }}>{st.title}</div>
+                {(on || portrait) && (
+                  <>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px 28px', marginTop: 14, font: `600 ${portrait ? 30 : 27}px/1.2 Inter`, color: st.color }}>
+                      {st.stats.map((x) => (
+                        <span key={x}>{x}</span>
+                      ))}
+                    </div>
+                    <div style={{ marginTop: 10, font: `400 ${portrait ? 24 : 22}px/1.35 Inter`, color: 'rgba(244,241,234,0.66)' }}>{st.note}</div>
+                  </>
+                )}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+      <Source dark style={{ left: pad, right: pad, bottom: portrait ? 120 : 64, opacity: prog(f, 30, 12) }}>
+        Cenário de referência por freguesia, 60 000 €/ano (otimizador Novelo, 22 out 2026, estimativa); circuitos e turnos da Vitrus; INE; CAOP 2019.
+      </Source>
+    </AbsoluteFill>
+  );
+}
