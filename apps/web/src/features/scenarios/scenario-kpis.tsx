@@ -1,7 +1,9 @@
 import type { Kpis } from '@/client';
+import { Section } from '@/components/page';
 import { StatCell, StatStrip } from '@/components/stat-strip';
 import { formatEur, formatNumber, formatPercent, formatTonnes } from '@/lib/format';
 import { m } from '@/paraglide/messages';
+import { reusableSummary } from './reusable';
 
 /** Os quatro números que decidem: toneladas, €/t, custo anual e investimento. */
 export function ScenarioKpis({ kpis, bySites = false }: { kpis: Kpis; bySites?: boolean }) {
@@ -79,5 +81,62 @@ export function ScenarioSecondaryKpis({ kpis, routes }: { kpis: Kpis; routes: nu
         hint={avoided == null ? m.kpi_avoided_pending_hint() : m.kpi_avoided_hint()}
       />
     </StatStrip>
+  );
+}
+
+const eurPerT = (v: number) => `${formatNumber(v, 0)} €/t`;
+const sharePct = (v: number) => formatPercent(v * 100, 1);
+
+/**
+ * Têxtil reutilizável: o que o desafio pede. Toneladas × quota de reutilização de 2025 (as 4 entidades ao centro; o
+ * intervalo só das entidades com pesagem) e o € por tonelada reutilizável. Escondido nos cenários antigos (sem os campos).
+ */
+export function ScenarioReusable({ kpis }: { kpis: Kpis }) {
+  const r = reusableSummary(kpis);
+  if (!r) return null;
+  const ranged = r.shareLow != null && r.shareHigh != null;
+  return (
+    <Section
+      title={m.reuse_title()}
+      description={
+        ranged
+          ? m.reuse_description({
+              share: sharePct(r.share),
+              low: sharePct(r.shareLow ?? 0),
+              high: sharePct(r.shareHigh ?? 0),
+            })
+          : m.reuse_description_no_range({ share: sharePct(r.share) })
+      }
+    >
+      <StatStrip className="lg:grid-cols-2">
+        <StatCell
+          label={m.reuse_kpi_tonnes()}
+          value={formatTonnes(r.tonnes)}
+          tone="primary"
+          tag={m.common_estimate()}
+          hint={
+            r.tonnesLow != null && r.tonnesHigh != null
+              ? m.reuse_kpi_tonnes_hint({
+                  low: formatTonnes(r.tonnesLow),
+                  high: formatTonnes(r.tonnesHigh),
+                })
+              : undefined
+          }
+        />
+        <StatCell
+          label={m.reuse_kpi_eur()}
+          value={r.eurPerTonne == null ? m.common_dash() : eurPerT(r.eurPerTonne)}
+          tag={m.common_estimate()}
+          hint={
+            r.eurPerTonneLow != null && r.eurPerTonneHigh != null
+              ? m.reuse_kpi_eur_hint({
+                  low: eurPerT(r.eurPerTonneLow),
+                  high: eurPerT(r.eurPerTonneHigh),
+                })
+              : undefined
+          }
+        />
+      </StatStrip>
+    </Section>
   );
 }

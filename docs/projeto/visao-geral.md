@@ -11,7 +11,7 @@
 
 ## O problema
 
-Em Guimarães, 5,4% do lixo indiferenciado é têxtil, segundo o plano municipal (p. 30), acima da média europeia (4,7%) e nacional (cerca de 4%). São entre 1 300 e 2 650 toneladas por ano que vão para aterro ou incineração sem serem separadas (estimativa nossa; o intervalo vem de duas leituras do plano, ver a pergunta Q6 em [Perguntas aos orientadores](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54)).
+Em 2025 a Vitrus recolheu 43 051 t de resíduos urbanos em Guimarães. Segundo a APA, 5,4% dos resíduos urbanos são têxteis (valor indicado pela Vitrus). São cerca de 2 324,8 t por ano que vão para o lixo sem serem separadas (estimativa). Com as 301,3 t recolhidas à parte, o concelho gera cerca de 2 626,0 t de têxtil por ano e a recolha seletiva capta 11,5% (estimativa; ver a pergunta Q6 em [Perguntas aos orientadores](perguntas-aos-orientadores.md#q6-o-que-significam-07-kghabmês-e-54) e as linhas A8 a A16 do [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)).
 
 - **A obrigação já existe.** A recolha seletiva de têxteis é exigida desde 1 de janeiro de 2025 (Diretiva 2008/98/CE alterada em 2018 e RGGR), paga só pelo município, e o município fixou a meta de aumentar a recolha seletiva em 30%.
 - **A conta muda a partir de 2028, devagar.** A Diretiva (UE) 2025/1892 obriga cada Estado-Membro a criar, até 17 de abril de 2028, um regime em que os produtores pagam a recolha, triagem, preparação para reutilização e reciclagem. Mas só das peças postas à venda depois da lei nacional, o mais tardar depois dessa data (art. 22.º-A, n.º 11): o têxtil que já está nas casas continua anos sem produtor que pague. O custo eficiente é determinado com as autoridades locais (n.º 7 e 12). Leitura a confirmar com a APA ([enquadramento](../pesquisa/enquadramento-regulatorio.md)).
@@ -54,7 +54,7 @@ O Novelo transforma uma obrigação legal num plano com preço. É útil já par
 | --- | --- |
 | **Vitrus Ambiente / Câmara de Guimarães** | Cumprir a meta de recolha seletiva sem investir às cegas; menos têxtil no indiferenciado, que tem custo de tratamento e enrola nas máquinas |
 | **Futuras entidades gestoras da RAP têxtil** | Saber quanto custa recolher por tonelada em cada tipo de território, para negociar com os municípios |
-| **Indústria e operadores do Vale do Ave** | Fluxos de material triado por tipo de fibra, num território onde só 4 de 27 operadores licenciados fazem valorização |
+| **Indústria e operadores do Vale do Ave** | Fluxos de material triado por tipo de fibra, num território onde só 4 de 27 operadores licenciados fazem valorização (plano municipal, p. 32; por confirmar) |
 | **Outros municípios** | O mesmo modelo, com os dados abertos de cada concelho: todos têm a mesma obrigação |
 
 **Porquê agora:** a recolha seletiva já é obrigatória, Guimarães é Capital Verde Europeia em 2026 e tem um plano de ação para a circularidade têxtil que pede exatamente rotas, tipos de contentor e frequências.

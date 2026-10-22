@@ -59,7 +59,7 @@ Uma história, do saco ao fio: planear a rede, decidir em linguagem natural, seg
 | --- | --- | --- |
 | **Ponto de partida** | `/` | Os números reais de 2025, a lacuna para o potencial, o destino do recolhido, a comparação com referências e o relógio regulatório |
 | **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, modos e rotas. Otimizador OR-Tools: CP-SAT escolhe pontos e modos, VRP faz as rotas, combinando paragem em local existente (sem contentor novo) e recolha a pedido nos circuitos que já passam. O contentor de rua só entra como referência |
-| **Cenários e comparação** | `/scenarios` | Cada cenário guarda investimento, custo anual, toneladas, €/t e cobertura; compara-se lado a lado, com fluxos, referência francesa, robustez e incerteza (tornado e Monte Carlo P10/P50/P90). A fronteira de Pareto aparece no ponto de partida |
+| **Cenários e comparação** | `/scenarios` | Cada cenário guarda investimento, custo anual, toneladas, €/t, cobertura e toneladas reutilizáveis (estimativa, com a quota de reutilização de 2025); compara-se lado a lado, com fluxos, referência francesa, robustez e incerteza (tornado e Monte Carlo P10/P50/P90). A fronteira de Pareto aparece no ponto de partida. O separador Cobertura dá a matriz por freguesia e tipo de território da diretiva (art. 22.º-C, n.º 9, b)) |
 | **Pressupostos** | `/assumptions` | Cada parâmetro com valor, unidade e origem (Vitrus, plano, pressuposto da equipa) |
 | **Piloto de 3 meses** | `/pilot` | Escolhe 2 a 4 freguesias de maior valor de aprendizagem e calcula o piso de sinal: toneladas mínimas para medir o rejeito |
 | **Cobertura** | `/coverage` | Parte da população a pé de um ponto de recolha de têxteis, por freguesia. A Vitrus não tem contentores de têxtil (21/10/2026); o ecrã não inventa cobertura |
@@ -116,7 +116,7 @@ Ver [IA](docs/engenharia/ia.md) e [Copiloto](docs/engenharia/copiloto.md).
 | **Vitrus Ambiente** | Custos por recolha e quilómetro (pedidos ao departamento financeiro) | **Por receber** |
 | **INE** | População por freguesia (Censos 2021) e tipologia TIPAU | Em uso |
 | **CAOP** | Contornos das freguesias (2019, no pacote da Vitrus) | Em uso |
-| **OpenStreetMap** | Localidades geocodificadas dos circuitos (Nominatim) | Em uso (71 das 82) |
+| **OpenStreetMap** | Localidades geocodificadas dos circuitos (Nominatim) | Em uso (69 das 82; mais 10 no centro da freguesia CAOP pelo nome; 79 com freguesia) |
 
 `data/raw/` guarda os originais e nunca se edita; `just etl` gera `data/processed/`; a API importa-os no arranque, de forma idempotente, com a impressão digital (SHA-256) de cada ficheiro.
 Sem custos unitários da Vitrus, os custos do simulador são **pressupostos** visíveis em `/assumptions`, e a incerteza é mostrada como resultado (tornado e Monte Carlo), não como nota de rodapé.

@@ -30,7 +30,7 @@ Cada ficheiro tem impressão digital (SHA-256), data de receção e período reg
 | Circuitos | 40, dos quais 9 sem viatura atribuída no planeamento |
 | Viaturas | 29, duas nunca atribuídas (`29-48-XU`, `74-HN-36`) |
 | Turnos | 101 por semana |
-| Localidades | 82 com pelo menos um circuito, 71 geocodificadas |
+| Localidades | 82 com pelo menos um circuito; 79 com coordenadas e freguesia CAOP 2019 desde 22 out 2026 (antes 71 geocodificadas e 61 com freguesia), 3 por resolver (alerta 102) |
 | Contentores municipais (não são de têxteis) | 2 754 linhas, 2 751 aceites, 2 722 localizados, 2 026 locais, 17,4 por 1 000 hab. |
 | Freguesias CAOP 2019 | 48, 24 099,97 ha (241,0 km²) |
 

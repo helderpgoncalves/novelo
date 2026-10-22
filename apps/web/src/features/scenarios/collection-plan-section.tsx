@@ -1,13 +1,18 @@
+import { useQuery } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { Info, RefreshCw, Route as RouteIcon, Truck } from 'lucide-react';
+import { CalendarClock, Info, RefreshCw, Route as RouteIcon, Truck } from 'lucide-react';
 import { useMemo } from 'react';
 import type { CollectionPlanEntry } from '@/client';
+import { getFleetOptions, listCircuitsOptions } from '@/client/@tanstack/react-query.gen';
 import { type Column, DataTable } from '@/components/data-table';
 import { EstimateTag } from '@/components/panel';
 import { EmptyState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { buildOccurrences, loadBySlot, weekdayAfternoonIdle } from '@/features/fleet/schedule';
 import { formatKg, formatNumber, formatTonnes } from '@/lib/format';
+import { formatDate } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 import { m } from '@/paraglide/messages';
 import {
@@ -311,6 +316,7 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
           </span>
         </p>
       )}
+      <PlanB />
       <DataTable
         id="collection-plan"
         exportName="cenario-plano-de-recolha"
@@ -324,6 +330,67 @@ function PlanBody({ plan }: { plan: CollectionPlanEntry[] }) {
         selectable={false}
         empty={<EmptyState title={m.plan_empty_title()} description={m.plan_empty_text()} />}
       />
+    </div>
+  );
+}
+
+/**
+ * Plano B sem compactador: uma volta dedicada ao têxtil à tarde (sem esmagar o saco). Quantas viaturas ficam sem
+ * circuito em todas as tardes de segunda a sexta, contado do planeamento de turnos da Vitrus (o mesmo da página Frota).
+ * Sem custo: a Vitrus ainda não deu o custo de uma volta nem o tipo de caixa.
+ */
+function PlanB() {
+  const fleet = useQuery(getFleetOptions());
+  const circuits = useQuery(listCircuitsOptions());
+  const idle = useMemo(() => {
+    if (!fleet.data || !circuits.data) return undefined;
+    const occs = buildOccurrences(fleet.data.vehicles, circuits.data.circuits);
+    const size = fleet.data.vehicles.length;
+    return weekdayAfternoonIdle(loadBySlot(occs, size), size);
+  }, [fleet.data, circuits.data]);
+
+  if (fleet.isError || circuits.isError)
+    return (
+      <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-muted-foreground text-xs">
+        {m.plan_b_error()}
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-10"
+          onClick={() => {
+            void fleet.refetch();
+            void circuits.refetch();
+          }}
+        >
+          {m.common_retry()}
+        </Button>
+      </p>
+    );
+  if (idle === undefined) return <Skeleton className="h-16 w-full rounded-xl" />;
+  if (idle === null) return null;
+
+  const { period_start: start, period_end: end } = fleet.data ?? {};
+  const source =
+    start && end
+      ? m.plan_b_source({
+          period: m.fleet_period({ start: formatDate(start), end: formatDate(end) }),
+        })
+      : m.plan_b_source_plain();
+  return (
+    <div
+      className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10"
+      data-testid="plan-b"
+    >
+      <CalendarClock className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
+      <div className="min-w-0 space-y-1 text-sm leading-snug">
+        <p className="font-medium">{m.plan_b_title()}</p>
+        <p className="text-pretty">
+          {idle > 0
+            ? m.plan_b_text({ n: formatNumber(idle), source })
+            : m.plan_b_text_none({ source })}
+        </p>
+        <p className="text-muted-foreground text-xs">{m.plan_b_validate()}</p>
+      </div>
     </div>
   );
 }

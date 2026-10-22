@@ -16,6 +16,8 @@ import {
   loadBySlot,
   localitiesWithoutVehicle,
   routeOrder,
+  type SlotLoad,
+  weekdayAfternoonIdle,
   weekTotals,
 } from './schedule';
 
@@ -380,5 +382,36 @@ describe('agrupamento planeado vs conflito real', () => {
     expect(monstros?.overlap).toBe(true);
     expect(monstros?.grouped).toBe(false);
     expect(monstros?.collections).toEqual([]);
+  });
+});
+
+describe('viaturas livres à tarde', () => {
+  const slot = (day: number, shift: SlotLoad['shift'], vehicles: number): SlotLoad => ({
+    day,
+    shift,
+    vehicles,
+    circuits: vehicles,
+    crew: vehicles * 2,
+    rate: 0,
+  });
+
+  it('dá o mínimo das tardes de segunda a sexta (sábado e manhãs não contam)', () => {
+    const load = [
+      slot(1, 'afternoon', 3),
+      slot(2, 'afternoon', 5),
+      slot(3, 'afternoon', 1),
+      slot(4, 'afternoon', 0),
+      slot(5, 'afternoon', 2),
+      slot(6, 'afternoon', 9),
+      slot(1, 'morning', 10),
+    ];
+    // Frota de 10: livres 7, 5, 9, 10, 8 → pelo menos 5 em todas as tardes.
+    expect(weekdayAfternoonIdle(load, 10)).toBe(5);
+  });
+
+  it('dia sem turno da tarde conta a frota inteira; nunca negativo; sem frota é nulo', () => {
+    expect(weekdayAfternoonIdle([], 4)).toBe(4);
+    expect(weekdayAfternoonIdle([slot(1, 'afternoon', 6)], 4)).toBe(0);
+    expect(weekdayAfternoonIdle([], 0)).toBeNull();
   });
 });

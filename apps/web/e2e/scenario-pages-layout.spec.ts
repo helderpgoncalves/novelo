@@ -1,11 +1,11 @@
 import { expect, type Page, test } from '@playwright/test';
 import { login } from './helpers';
 
-// Páginas que o júri usa para decidir (simulador, resultado, detalhe de um cenário em todos os separadores, comparar e a
-// lista): nunca scroll horizontal da página e nunca texto por cima de texto. Para cada largura e tema, recolhe as caixas
-// visíveis de títulos, KPIs (dt/dd), botões e ligações-botão do conteúdo, recortadas pelos contentores com overflow
-// (uma tabela larga rola por dentro, sem contar como sobreposição), e falha se duas se intersetarem ou se alguma sair
-// do ecrã. Sem animações (`reducedMotion: 'reduce'`): o estado final.
+// Páginas que o júri usa para decidir (simulador, resultado, detalhe de um cenário em todos os separadores, incluindo a
+// Cobertura, comparar e a lista): nunca scroll horizontal da página e nunca texto por cima de texto. Para cada largura e
+// tema, recolhe as caixas visíveis de títulos, KPIs (dt/dd), botões e ligações-botão do conteúdo, recortadas pelos
+// contentores com overflow (uma tabela larga rola por dentro, sem contar como sobreposição), e falha se duas se
+// intersetarem ou se alguma sair do ecrã. Sem animações (`reducedMotion: 'reduce'`): o estado final.
 test.describe.configure({ mode: 'parallel' });
 
 const WIDTHS = [
@@ -161,7 +161,8 @@ for (const scheme of ['light', 'dark'] as const) {
       test('simulador, resultado, detalhe, comparar e lista sem sobreposições', async ({
         page,
       }) => {
-        test.setTimeout(240_000);
+        // 15 páginas, algumas com cálculos à parte (incerteza, robustez, cobertura).
+        test.setTimeout(420_000);
         await login(page);
         const { sites, parish } = await pickScenarios(page);
 
@@ -172,16 +173,29 @@ for (const scheme of ['light', 'dark'] as const) {
           ['resultado (freguesia)', `/pt/simulator?from=${parish.id}&r=${parish.id}`],
           ['cenário · resumo', `/pt/scenarios/${sites.id}`],
           ['cenário · rede', `/pt/scenarios/${sites.id}?tab=network`],
+          ['cenário · cobertura', `/pt/scenarios/${sites.id}?tab=coverage`],
           ['cenário · incerteza', `/pt/scenarios/${sites.id}?tab=uncertainty`],
           ['cenário · e se', `/pt/scenarios/${sites.id}?tab=whatif`],
           ['cenário freguesia · resumo', `/pt/scenarios/${parish.id}`],
           ['cenário freguesia · rede', `/pt/scenarios/${parish.id}?tab=network`],
+          ['cenário freguesia · cobertura', `/pt/scenarios/${parish.id}?tab=coverage`],
           ['comparar', `/pt/scenarios/compare?a=${sites.id}&b=${parish.id}`],
           ['comparar vazio', '/pt/scenarios/compare'],
           ['lista', '/pt/scenarios'],
         ];
         for (const [label, path] of pages) {
           await page.goto(path);
+          if (path.includes('tab=coverage')) {
+            // A matriz chega num pedido à parte: espera pelo indicador fora/dentro das zonas urbanas e pela tabela.
+            await expect(page.getByTestId('coverage-equity')).toBeVisible({ timeout: 45_000 });
+            // A tabela e os cartões de telemóvel coexistem no DOM: conta só o que está à vista.
+            await expect(
+              page
+                .getByText(/Creixomil|Azurém|Urgezes/)
+                .filter({ visible: true })
+                .first(),
+            ).toBeVisible({ timeout: 45_000 });
+          }
           if (path.includes('compare?a=')) {
             // A robustez é calculada à parte: espera pela frase para medir o cartão completo.
             await expect(page.getByText(/das amostras,|Empate/).first()).toBeVisible({

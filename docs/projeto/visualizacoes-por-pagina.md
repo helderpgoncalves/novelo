@@ -49,7 +49,7 @@ Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão 
 | Têxtil gerado | ≈ 2 626,0 t/ano | 2 324,8 + 301,3 (A12) | Cálculo, estimativa |
 | Captura atual | 11,5% | 301,3 ÷ 2 626,0 (A9) | Cálculo, estimativa |
 | Destino | 59,4% reutilização, 26,5% reciclagem, 14,1% rejeito | Vitrus, registo A4 (duas entidades estimadas, A5) | Dado Vitrus |
-| Operação atual | 40 circuitos, 29 viaturas, 82 localidades (71 geocodificadas), 101 turnos, 9 circuitos sem viatura, 2 viaturas nunca atribuídas | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`), registo A6, A7 | Dado Vitrus |
+| Operação atual | 40 circuitos, 29 viaturas, 82 localidades (79 com freguesia CAOP 2019), 101 turnos, 9 circuitos sem viatura, 2 viaturas nunca atribuídas | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`), registo A6, A7 | Dado Vitrus |
 | Alertas de qualidade | 12 | Vitrus, registo A13 | Dado Vitrus |
 | Referência francesa | 4,27 kg/hab/ano; 1 ponto por 1 414 habitantes | Refashion via imprensa, registo C1, C2 | **Por verificar** (secundária) |
 | Meta francesa e teto do modelo | 669,7 t; 562,6 t (107,1 t de distância) | Cálculo nosso ([dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês)) | Cálculo, depende da França |
@@ -309,7 +309,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 - **Momento "uau":** arrastar o orçamento e ver o ponto deslizar na fronteira, o mapa e os €/t responderem em menos de um segundo (resultados pré-calculados numa grelha com `SOLVER_TIME_LIMIT_S`; fora da grelha, "a calcular" com tempo máximo à vista).
 - **Interações:** controlo de orçamento com teclas de seta; botão "Comparar com o cenário A"; restrições avançadas num painel fechado.
-- **Estado vazio / erro:** "Define um orçamento para ver o resultado". Objetivo inviável: "A meta está acima do teto do modelo (562,6 t). Experimenta fixar o orçamento."
+- **Estado vazio / erro:** "Define um orçamento para ver o resultado". Objetivo inviável: "A meta está acima do teto do modelo sem contentores (597,7 t). Experimenta fixar o orçamento."
 - **Microcópia:** botão "Calcular o melhor plano"; aviso "Custos unitários: pressupostos até a Vitrus enviar os reais".
 - **Não pôr:** doze campos à frente; "solver status" em linguagem técnica (traduzir: "ótimo", "melhor encontrado em 20 s").
 
@@ -635,7 +635,7 @@ flowchart LR
 | --- | --- | --- | --- | --- | --- |
 | 1 | **Gancho** | "Recolhemos 301 toneladas de têxtil em 2025." Subtítulo: "1,92 kg por habitante, por ano." | Contador grande (Newsreader) + símbolo de três fios | 301,3 t; 156 830 hab. | Vitrus; INE (A1, A2, A3) |
 | 2 | **Problema** | "Era cerca de um nono do têxtil que Guimarães gera." | Barra de captura 11,5% + barra de destino 59,4 / 26,5 / 14,1% | 2 324,8 t; 11,5%; destino | A8, A9 (estimativa), A4 |
-| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo 562,6 t contra a meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
+| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo sem contentores 597,7 t (estimativa, 22 out 2026) contra a meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
 | 4 | **Relógio regulatório** | "Desde 2025 paga o município. Em 543 dias a RAP tem de existir, e só cobre as peças postas à venda a partir daí." | Linha do tempo 1 jan 2025 → hoje → 17 abr 2028; depois, a faixa do município vai clareando (sem número: a idade das peças não se conhece) | Datas | Diretiva 2008/98/CE e RGGR [F81] [F69]; Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] [F2] |
 | 5 | **Solução** | "Novelo diz onde investir, como recolher e quanto custa cada tonelada." | Cascata 301,3 t → [X] t, com intervalo de €/t | Cenário B | Otimizador (estimativa) |
 | 6 | **Prova** | "Aberto, não prometido." | Três cartões: QR do lote, verificador de números, relatório RAP | Lote de demonstração (com selo), cenário B | Produto |
@@ -671,7 +671,7 @@ Grelha de 12 colunas, largura útil de 1200 px, margens de 120 px. Secções com
 │   Mais contentores não chegam.            ┌────────────────────────────────────────────┐     │
 │   Sem custo por tonelada a conta          │ Guimarães   ██████ 1,92 kg/hab/ano         │     │
 │   não fecha.                              │ França      ██████████████ 4,27 (por verificar)    │
-│                                           │ Meta 669,7 t ┊ teto do modelo 562,6 t      │     │
+│                                           │ Meta 669,7 t ┊ teto do modelo 597,7 t      │     │
 │                                           └────────────────────────────────────────────┘     │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
 │ 4 RELÓGIO                                                                             (80vh) │

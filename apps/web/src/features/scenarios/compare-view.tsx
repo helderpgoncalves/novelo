@@ -35,6 +35,21 @@ const METRICS: Metric[] = [
     format: (v) => `${formatNumber(v, 0)} €/t`,
     better: 'down',
   },
+  // Reutilizável: nulo nos cenários anteriores a 22 out 2026 (a linha mostra «—» e a diferença também).
+  {
+    key: 'reusable',
+    label: () => m.reuse_title(),
+    get: (s) => s.result.kpis.reusable_t ?? null,
+    format: (v) => formatTonnes(v),
+    better: 'up',
+  },
+  {
+    key: 'eur_reusable',
+    label: () => m.reuse_kpi_eur(),
+    get: (s) => s.result.kpis.eur_per_reusable_t ?? null,
+    format: (v) => `${formatNumber(v, 0)} €/t`,
+    better: 'down',
+  },
   {
     key: 'annual',
     label: () => m.kpi_annual_cost(),
@@ -78,6 +93,8 @@ const METRICS: Metric[] = [
     better: 'down',
   },
 ];
+
+const OPTIONAL = new Set(['reusable', 'eur_reusable']);
 
 function Delta({ metric, a, b }: { metric: Metric; a: number | null; b: number | null }) {
   if (a == null || b == null)
@@ -188,6 +205,8 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
             : m.compare_delta_worse({ pct }),
     };
   };
+  // As linhas do reutilizável só aparecem quando pelo menos um dos cenários as tem (os antigos não).
+  const rows = METRICS.filter((x) => !OPTIONAL.has(x.key) || x.get(a) != null || x.get(b) != null);
   const tonnes = kpiDelta('tonnes');
   const eurT = kpiDelta('eur_t');
   const annual = kpiDelta('annual');
@@ -231,7 +250,7 @@ export function CompareView({ a, b, zones }: { a: ScenarioOut; b: ScenarioOut; z
           <DataTable
             id="compare-metrics"
             columns={columns}
-            rows={METRICS}
+            rows={rows}
             getRowId={(x) => x.key}
             controls="never"
             pageSize={20}
