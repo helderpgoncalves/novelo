@@ -23,6 +23,8 @@ import { CoveragePanel } from '@/features/scenarios/coverage-panel';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
 import { ParameterSummary } from '@/features/scenarios/parameter-summary';
 import { RoutesTable } from '@/features/scenarios/routes-table';
+import { routingOf } from '@/features/scenarios/routing';
+import { RoutingNote } from '@/features/scenarios/routing-note';
 import { ScenarioActions } from '@/features/scenarios/scenario-actions';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import {
@@ -206,6 +208,7 @@ function ScenarioPage() {
                   description={m.scenario_routes_description()}
                 >
                   <RoutesTable routes={result.routes} />
+                  {result.routes.length > 0 && <RoutingNote routing={routingOf(result)} />}
                 </Section>
                 <Section title={m.scenario_alloc_title()}>
                   <AllocationsTable allocations={result.allocations} />

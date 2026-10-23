@@ -23,22 +23,24 @@ forma exata para as 48 freguesias de Guimarães, com o número de viaturas dedic
 from __future__ import annotations
 
 import math
-from collections.abc import Collection
-from dataclasses import dataclass, field
+from collections.abc import Collection, Sequence
+from dataclasses import dataclass, field, replace
 from itertools import combinations
 from typing import Literal
 
 from ortools.constraint_solver import pywrapcp, routing_enums_pb2
 from ortools.sat.python import cp_model
 
-from novelo.domain import fleet
+from novelo.domain import fleet, routing
 from novelo.domain.demand import yearly_demand_t
-from novelo.domain.geo import haversine_km
+from novelo.domain.geo import haversine_km, simplify_polyline
+from novelo.domain.routing import PlanSource, RoadRouter, RoutingSource
 from novelo.domain.vocab import CollectionMode as Mode
 
 SCALE_T = 1000  # toneladas -> quilogramas inteiros no solver
 SCALE_EUR = 100  # euros -> cêntimos inteiros no solver
 SCALE_H = 100  # horas -> centésimas de hora no solver
+PATH_TOLERANCE_M = 3.0  # o traçado por estrada perde os pontos a menos de 3 m da reta (guarda-se em cada cenário)
 
 
 @dataclass(frozen=True)
@@ -71,6 +73,9 @@ class Params:
     door_stop_minutes: float = 2.0  # paragem para levar um saco à porta
     site_stop_minutes: float = 10.0  # paragem num local (ponto existente ou contentor)
     shift_hours: float = 7.0  # horas úteis de um turno da viatura
+    # Motor de rotas por estrada (OSRM), injetado pelo serviço. Sem ele (testes, OSRM em baixo) os km são estimativa
+    # (linha reta × `detour_factor`). Fora da igualdade e do repr: não é um pressuposto, é uma dependência.
+    road: RoadRouter | None = field(default=None, compare=False, repr=False)
 
     @property
     def vehicle_annual_eur(self) -> float:
@@ -90,6 +95,7 @@ class Zone:
     service_days: int  # dias por semana em que já passa um circuito de indiferenciado da Vitrus (0 a 7)
     existing_points: int | None = None  # contentores têxteis ativos já na freguesia (None = sem dados)
     area_km2: float | None = None  # área da freguesia (CAOP 2019): volta da viatura porta a porta
+    road_round_trip_km: float | None = None  # ida e volta estaleiro-freguesia por estrada (OSRM); None = estimativa
 
 
 @dataclass(frozen=True)
@@ -145,9 +151,30 @@ def zone_demand_t(zone: Zone, params: Params) -> float:
 
 
 def radial_km(zone: Zone, params: Params) -> float:
-    """Ida e volta ao estaleiro, em estrada (linha reta x desvio)."""
+    """Ida e volta estaleiro-zona: por estrada quando o OSRM respondeu, senão linha reta × desvio."""
+    if zone.road_round_trip_km is not None:
+        return zone.road_round_trip_km
     d = haversine_km(params.depot[0], params.depot[1], zone.lat, zone.lon)
     return 2 * d * params.detour_factor
+
+
+def with_road_distances(zones: Sequence[Zone], params: Params) -> list[Zone]:
+    """Põe em cada zona a ida e volta ao estaleiro por estrada (uma só chamada ao router). Sem router, devolve igual.
+
+    Zonas sem caminho (centróide fora da rede) ficam com a estimativa. O CP-SAT escolhe a rede com estes km, por isso
+    os custos da escolha e os das rotas finais partem da mesma estrada.
+    """
+    if params.road is None or not zones:
+        return list(zones)
+    nodes = [params.depot, *[(z.lat, z.lon) for z in zones]]
+    m = routing.resolve(nodes, params.road.matrix(nodes), params.detour_factor, params.vehicle_speed_kmh)
+    out: list[Zone] = []
+    for i, zone in enumerate(zones, start=1):
+        if m.exact[0][i] and m.exact[i][0]:
+            out.append(replace(zone, road_round_trip_km=(m.distance_m[0][i] + m.distance_m[i][0]) / 1000))
+        else:
+            out.append(zone)
+    return out
 
 
 def part_hours(mode: Mode, km_year: float, stops_year: float, params: Params) -> float:
@@ -359,12 +386,17 @@ class Route:
     km: float
     load_t: float
     path: list[tuple[float, float]] = field(default_factory=list)  # (lat, lon): depósito -> paragens -> depósito
+    duration_s: float | None = None  # só a condução, por estrada, sem paragens nem trânsito; None = estimativa
+    source: RoutingSource = "estimate"  # "road": todos os troços (km) vêm da estrada
+    road_path: bool = False  # `path` segue as estradas; False = linhas retas entre as paragens
 
 
 @dataclass(frozen=True)
 class RoutePlan:
     routes: list[Route]
     km_per_round: float
+    source: PlanSource = "estimate"  # "road" só se todas as rotas o são
+    duration_s: float | None = None  # soma da condução das rotas (None se alguma é estimativa)
 
 
 def plan_routes(
@@ -384,53 +416,66 @@ def plan_routes(
     total_load = sum(s.load_t for s in stops)
     max_vehicles = max(max_vehicles, math.ceil(total_load / params.vehicle_capacity_t) + 2)
     nodes = [(params.depot[0], params.depot[1]), *[(s.lat, s.lon) for s in stops]]
-    # Distâncias em metros inteiros (o solver só trabalha com inteiros), com o desvio da estrada.
-    dist = [[round(haversine_km(a[0], a[1], b[0], b[1]) * params.detour_factor * 1000) for b in nodes] for a in nodes]
+    # Distâncias em metros inteiros (o solver só trabalha com inteiros): por estrada (OSRM) onde houver caminho e,
+    # nos pares sem caminho ou sem OSRM, linha reta × desvio da estrada.
+    road = params.road.matrix(nodes) if params.road is not None else None
+    matrix = routing.resolve(nodes, road, params.detour_factor, params.vehicle_speed_kmh)
+    dist = matrix.distance_m
     demand = [0] + [max(1, round(s.load_t * SCALE_T)) for s in stops]
     capacity = round(params.vehicle_capacity_t * SCALE_T)
     # Uma só paragem que já enche o camião não pode ficar de fora: a capacidade efetiva sobe até ela.
     capacity = max(capacity, *demand)
 
     manager = pywrapcp.RoutingIndexManager(len(nodes), max_vehicles, 0)
-    routing = pywrapcp.RoutingModel(manager)
-    transit = routing.RegisterTransitCallback(lambda i, j: dist[manager.IndexToNode(i)][manager.IndexToNode(j)])
-    routing.SetArcCostEvaluatorOfAllVehicles(transit)
-    load = routing.RegisterUnaryTransitCallback(lambda i: demand[manager.IndexToNode(i)])
-    routing.AddDimensionWithVehicleCapacity(load, 0, [capacity] * max_vehicles, True, "Capacity")
+    routing_model = pywrapcp.RoutingModel(manager)
+    transit = routing_model.RegisterTransitCallback(lambda i, j: dist[manager.IndexToNode(i)][manager.IndexToNode(j)])
+    routing_model.SetArcCostEvaluatorOfAllVehicles(transit)
+    load = routing_model.RegisterUnaryTransitCallback(lambda i: demand[manager.IndexToNode(i)])
+    routing_model.AddDimensionWithVehicleCapacity(load, 0, [capacity] * max_vehicles, True, "Capacity")
     # Pequena penalização por veículo usado: prefere menos camiões a igualdade de quilómetros.
-    routing.SetFixedCostOfAllVehicles(1000)
+    routing_model.SetFixedCostOfAllVehicles(1000)
 
     search = pywrapcp.DefaultRoutingSearchParameters()
     search.first_solution_strategy = routing_enums_pb2.FirstSolutionStrategy.PATH_CHEAPEST_ARC
     search.local_search_metaheuristic = routing_enums_pb2.LocalSearchMetaheuristic.GUIDED_LOCAL_SEARCH
     search.time_limit.seconds = time_limit_s
-    solution = routing.SolveWithParameters(search)
+    solution = routing_model.SolveWithParameters(search)
     if solution is None:
         raise RuntimeError("O VRP não encontrou solução")
 
     routes: list[Route] = []
     for v in range(max_vehicles):
-        index = routing.Start(v)
+        index = routing_model.Start(v)
         visited: list[int] = []
-        meters = 0
         load_kg = 0
-        while not routing.IsEnd(index):
+        while not routing_model.IsEnd(index):
             node = manager.IndexToNode(index)
             if node != 0:
                 visited.append(node)
                 load_kg += demand[node]
-            nxt = solution.Value(routing.NextVar(index))
-            meters += routing.GetArcCostForVehicle(index, nxt, v)
-            index = nxt
-        if visited:
-            path = [params.depot, *[(stops[n - 1].lat, stops[n - 1].lon) for n in visited], params.depot]
-            routes.append(
-                Route(
-                    vehicle=len(routes) + 1,
-                    stops=[stops[n - 1].zone_id for n in visited],
-                    km=meters / 1000,
-                    load_t=load_kg / SCALE_T,
-                    path=path,
-                )
+            index = solution.Value(routing_model.NextVar(index))
+        if not visited:
+            continue
+        order = [0, *visited, 0]
+        straight = [nodes[n] for n in order]
+        exact = matrix.arcs_exact(order)
+        traced = params.road.geometry(straight) if exact and params.road is not None else None
+        routes.append(
+            Route(
+                vehicle=len(routes) + 1,
+                stops=[stops[n - 1].zone_id for n in visited],
+                km=matrix.length_m(order) / 1000,
+                load_t=load_kg / SCALE_T,
+                path=simplify_polyline(traced, PATH_TOLERANCE_M) if traced else straight,
+                duration_s=float(matrix.duration_of_s(order)) if exact else None,
+                source="road" if exact else "estimate",
+                road_path=traced is not None,
             )
-    return RoutePlan(routes, sum(r.km for r in routes))
+        )
+    duration = None if any(r.duration_s is None for r in routes) else sum(r.duration_s or 0.0 for r in routes)
+    return RoutePlan(
+        routes,
+        sum(r.km for r in routes),
+        source=routing.overall_source([r.source for r in routes]),
+        duration_s=duration,
+    )

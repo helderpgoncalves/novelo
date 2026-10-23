@@ -45,7 +45,7 @@ apps/api/src/novelo/
   core/        config, base de dados, erros tipados, segurança, limites de pedidos, limites de convidados (guest.py)
   features/    auth · users · textile · network · datasets · municipal · planning · lots · reports · ai_admin · copilot · health · dev (só em desenvolvimento)
   domain/      procura, custos, geografia, rede: só funções puras
-  adapters/    OpenRouter e email (Resend ou log); o OSRM ainda não tem adaptador
+  adapters/    OpenRouter, email (Resend ou log) e OSRM (rotas por estrada, com cache e fallback; ver rotas-reais.md)
   ai/          prompts versionados, verificador de números, catálogo de modelos, avaliações (triagem, copiloto)
 apps/web/src/
   routes/      rotas por ficheiros (_app/* exige sessão)

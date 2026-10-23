@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { AllocationsTable } from '@/features/scenarios/allocations-table';
 import { CollectionPlanSection } from '@/features/scenarios/collection-plan-section';
 import { ModeSummaryCards } from '@/features/scenarios/mode-summary';
+import { routingOf } from '@/features/scenarios/routing';
+import { RoutingNote } from '@/features/scenarios/routing-note';
 import { ScenarioAnchor } from '@/features/scenarios/scenario-anchor';
 import { ScenarioKpis, ScenarioSecondaryKpis } from '@/features/scenarios/scenario-kpis';
 import { ScenarioMap } from '@/features/scenarios/scenario-map';
@@ -111,6 +113,7 @@ export const ScenarioResult = forwardRef<HTMLElement, ScenarioResultProps>(funct
           showRoutes
           className="h-[22rem] overflow-hidden rounded-lg ring-1 ring-foreground/10 sm:h-[30rem] lg:h-[34rem]"
         />
+        {result.routes.length > 0 && <RoutingNote routing={routingOf(result)} />}
       </Panel>
 
       <CollectionPlanSection

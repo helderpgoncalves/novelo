@@ -174,7 +174,15 @@ class Settings(BaseSettings):
 
     rate_limit_enabled: bool = Field(True, alias="RATE_LIMIT_ENABLED")  # só se desliga em dev/E2E
 
-    osrm_url: str = Field("http://localhost:5000", alias="OSRM_URL")
+    # Rotas por estrada (OSRM próprio, apps/osrm). Vazio = sem OSRM: km e traçados são estimativa (linha reta × desvio).
+    osrm_url: str = Field("", alias="OSRM_URL")
+    osrm_timeout_s: float = Field(8.0, gt=0, le=60, alias="OSRM_TIMEOUT_S")
+    osrm_max_locations: int = Field(400, ge=2, le=5000, alias="OSRM_MAX_LOCATIONS")  # <= --max-table-size do servidor
+    osrm_max_snap_m: float = Field(
+        500.0, gt=0, alias="OSRM_MAX_SNAP_M"
+    )  # ponto mais longe de uma estrada = sem caminho
+    osrm_cache_size: int = Field(256, ge=0, alias="OSRM_CACHE_SIZE")
+    osrm_cooldown_s: float = Field(30.0, ge=0, alias="OSRM_COOLDOWN_S")  # pausa depois de uma falha do OSRM
     solver_time_limit_s: int = Field(20, alias="SOLVER_TIME_LIMIT_S")
 
     @model_validator(mode="after")

@@ -26,7 +26,7 @@ down *ARGS:
 
 # Só a API e o web fora do Docker (precisa de `just db`)
 api:
-    cd apps/api && uv run uvicorn novelo.main:app --reload --port 8190
+    cd apps/api && OSRM_URL="${OSRM_URL:-http://localhost:5190}" uv run uvicorn novelo.main:app --reload --port 8190
 
 web:
     pnpm dev
@@ -67,6 +67,24 @@ eval-copilot *ARGS:
 etl:
     uv run scripts/etl/build_processed.py
     uv run scripts/etl/municipal_containers.py
+
+# --- Rotas por estrada (OSRM próprio, OpenStreetMap; docs/engenharia/rotas-reais.md) ------------------------------
+# Sobe só o OSRM (:5190). A primeira vez descarrega ~300 MB e prepara o grafo (uns minutos); depois fica em cache.
+osrm-up:
+    docker compose -f docker-compose.dev.yml up -d --build --wait osrm
+
+# Volta a descarregar o OpenStreetMap e reconstrói o grafo (dados novos das estradas)
+osrm-refresh:
+    docker compose -f docker-compose.dev.yml build --no-cache osrm
+    docker compose -f docker-compose.dev.yml up -d --force-recreate --wait osrm
+
+# Compara a estrada com os pressupostos (desvio e velocidade): os números do doc rotas-reais
+osrm-calibrate *ARGS:
+    uv run --project apps/api python scripts/osrm_calibrate.py {{ARGS}}
+
+# Testes de integração contra o OSRM a sério (sobe-o se preciso); fora do `just check`, que não depende do Docker do OSRM
+osrm-test: db-wait osrm-up
+    cd apps/api && OSRM_TEST_URL=http://localhost:5190 uv run pytest tests/api/test_osrm_live.py -v -p no:cacheprovider
 
 # --- Qualidade: tudo o que tem de passar antes de cada push (sem CI remota) ----------------------------------------
 # Os dois alvos correm API (lint+tipos / testes), web (biome / tsc / vitest), marca e contrato EM PARALELO.

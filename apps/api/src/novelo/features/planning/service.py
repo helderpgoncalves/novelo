@@ -10,11 +10,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import defer, selectinload
 
+from novelo.adapters.osrm import get_road_router
 from novelo.core.errors import NotFoundError
 from novelo.domain import door_to_door, network
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.reuse import EntityReuse, ReuseShares, reuse_shares
+from novelo.domain.routing import RoadRouter, overall_source
 from novelo.domain.vocab import (
     CollectionMode,
     CollectionType,
@@ -243,10 +245,14 @@ def compute(
     request: ScenarioRequest,
     baseline_t: float,
     reuse: ReuseShares | None = None,
+    road: RoadRouter | None = None,
 ) -> tuple[ScenarioResult, str]:
-    """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs."""
-    dp = _domain_params(params)
-    dzones = [to_domain_zone(z, existing_points=True) for z in zones]
+    """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs.
+
+    Com `road` (OSRM) os km são por estrada, tanto na escolha da rede como nas rotas; sem ele, estimativa.
+    """
+    dp = _domain_params(params, road)
+    dzones = network.with_road_distances([to_domain_zone(z, existing_points=True) for z in zones], dp)
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
     options = network.build_options(dzones, dp, allowed or None, request.default_modes)
 
@@ -303,6 +309,9 @@ def compute(
                     km=round(r.km, 2),
                     load_t=round(r.load_t, 3),
                     path=[[lat, lon] for lat, lon in r.path],
+                    duration_min=round(r.duration_s / 60, 1) if r.duration_s is not None else None,
+                    source=r.source,
+                    road_path=r.road_path,
                 )
             )
 
@@ -410,6 +419,7 @@ def compute(
         routes=routes,
         modes=modes,
         depot=[params.depot_lat, params.depot_lon],
+        routing=overall_source([r.source for r in routes]),
         default_modes=request.default_modes,
         collection_plan=build_collection_plan(zones, channel_loads, routes, dp, vehicles.vehicles),
     )
@@ -456,7 +466,10 @@ async def run_scenario(
     *,
     reference_key: str | None = None,
     reference_version: int | None = None,
+    road: RoadRouter | None = None,
 ) -> ScenarioOut:
+    """Calcula e grava um cenário. `road` (por omissão o OSRM da configuração, se houver) mede os km por estrada."""
+    road = road or get_road_router()
     stored = await ensure_default_parameters(db)
     params = request.params or PlanningParams.model_validate(stored.values)
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
@@ -466,10 +479,10 @@ async def run_scenario(
     if request.siting == "sites":
         inputs = await site_service.load_site_inputs(db)
         result, solver_status = await asyncio.to_thread(
-            site_service.compute_sites, zones, params, request, baseline.total_t, inputs, reuse
+            site_service.compute_sites, zones, params, request, baseline.total_t, inputs, reuse, road
         )
     else:
-        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t, reuse)
+        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t, reuse, road)
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis

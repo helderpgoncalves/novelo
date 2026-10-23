@@ -43,3 +43,41 @@ def point_in_geometry(lat: float, lon: float, geometry: dict[str, Any]) -> bool:
         if rings and point_in_ring(lat, lon, rings[0]) and not any(point_in_ring(lat, lon, h) for h in rings[1:]):
             return True
     return False
+
+
+def simplify_polyline(points: list[tuple[float, float]], tolerance_m: float) -> list[tuple[float, float]]:
+    """Douglas-Peucker sobre (lat, lon): tira pontos que desviam menos de `tolerance_m` do traço. Mantém as pontas.
+
+    Projeção plana local (equiretangular) em metros: serve para as dezenas de km de um concelho. Iterativo, para
+    traçados longos não rebentarem a pilha.
+    """
+    n = len(points)
+    if n <= 2 or tolerance_m <= 0:
+        return list(points)
+    lat0 = radians(sum(p[0] for p in points) / n)
+    m_per_deg = EARTH_RADIUS_KM * 1000 * radians(1)
+    xy = [(p[1] * m_per_deg * cos(lat0), p[0] * m_per_deg) for p in points]
+    keep = [False] * n
+    keep[0] = keep[-1] = True
+    stack = [(0, n - 1)]
+    while stack:
+        lo, hi = stack.pop()
+        ax, ay = xy[lo]
+        bx, by = xy[hi]
+        dx, dy = bx - ax, by - ay
+        length2 = dx * dx + dy * dy
+        worst, worst_i = -1.0, lo
+        for i in range(lo + 1, hi):
+            px, py = xy[i]
+            if length2 == 0:
+                dist = sqrt((px - ax) ** 2 + (py - ay) ** 2)
+            else:
+                t = max(0.0, min(1.0, ((px - ax) * dx + (py - ay) * dy) / length2))
+                dist = sqrt((px - ax - t * dx) ** 2 + (py - ay - t * dy) ** 2)
+            if dist > worst:
+                worst, worst_i = dist, i
+        if worst > tolerance_m:
+            keep[worst_i] = True
+            stack.append((lo, worst_i))
+            stack.append((worst_i, hi))
+    return [p for p, k in zip(points, keep, strict=True) if k]

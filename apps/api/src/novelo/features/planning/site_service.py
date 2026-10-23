@@ -18,6 +18,7 @@ from novelo.domain import network, siting
 from novelo.domain.costs import avoided_treatment_eur, net_cost_eur
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.reuse import ReuseShares, reusable
+from novelo.domain.routing import RoadRouter, overall_source
 from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
 from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
 from novelo.features.planning.collection_plan import (
@@ -186,10 +187,8 @@ def _on_demand_zones(
         return {}
     out: dict[str, siting.OnDemandZone] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
-    for z in zones:
-        if CollectionMode.ON_DEMAND not in request.constraints.get(z.code, request.default_modes):
-            continue
-        zone = to_domain_zone(z)
+    eligible = [z for z in zones if CollectionMode.ON_DEMAND in request.constraints.get(z.code, request.default_modes)]
+    for z, zone in zip(eligible, network.with_road_distances([to_domain_zone(z) for z in eligible], dp), strict=True):
         c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
         out[z.code] = siting.OnDemandZone(
             z.code, c.capture, coverage, c.annual_cost_eur, c.km_year, c.hours_year, c.collections_year, c.rounds_year,
@@ -229,6 +228,9 @@ def _routes_out(
                 km=round(r.km, 2),
                 load_t=round(r.load_t, 3),
                 path=[[lat, lon] for lat, lon in r.path],
+                duration_min=round(r.duration_s / 60, 1) if r.duration_s is not None else None,
+                source=r.source,
+                road_path=r.road_path,
             )
         )
     return routes, vehicle_of
@@ -363,9 +365,11 @@ def _cache_key(
     baseline_t: float,
     inputs: SiteInputs,
     reuse: ReuseShares | None,
+    road_id: str,
 ) -> str:
-    """Identifica um cálculo: os mesmos dados, pressupostos e pedido (sem o nome) dão o mesmo cenário."""
+    """Identifica um cálculo: os mesmos dados, pressupostos, pedido (sem o nome) e estradas dão o mesmo cenário."""
     body = {
+        "road": road_id,
         "request": request.model_dump(mode="json", exclude={"label", "parent_id"}),
         "params": params.model_dump(mode="json"),
         "baseline": round(baseline_t, 3),
@@ -386,12 +390,15 @@ def compute_sites(
     baseline_t: float,
     inputs: SiteInputs,
     reuse: ReuseShares | None = None,
+    road: RoadRouter | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Simulador por locais com cache em memória: o mesmo pedido sobre os mesmos dados não volta ao solver.
 
     Pedidos iguais em simultâneo esperam pelo primeiro (um só cálculo). O resultado é uma cópia profunda.
+    A chave inclui a versão do mapa de estradas; se o OSRM falhar a meio, o cálculo (estimado) não se guarda.
     """
-    key = _cache_key(zones, params, request, baseline_t, inputs, reuse)
+    road_id = road.fingerprint if road is not None else "estimate"
+    key = _cache_key(zones, params, request, baseline_t, inputs, reuse, road_id)
     with _cache_lock:
         hit = _cache.get(key)
         if hit is not None:
@@ -402,11 +409,12 @@ def compute_sites(
         with _cache_lock:
             hit = _cache.get(key)
         if hit is None:
-            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse)
-            with _cache_lock:
-                _cache[key] = hit
-                while len(_cache) > CACHE_SIZE:
-                    _cache.popitem(last=False)
+            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse, road)
+            if road is None or road_id == road.fingerprint:  # o OSRM aguentou o cálculo todo
+                with _cache_lock:
+                    _cache[key] = hit
+                    while len(_cache) > CACHE_SIZE:
+                        _cache.popitem(last=False)
         with _cache_lock:
             _key_locks.pop(key, None)
     return hit[0].model_copy(deep=True), hit[1]
@@ -419,9 +427,10 @@ def _compute_sites(
     baseline_t: float,
     inputs: SiteInputs,
     reuse: ReuseShares | None = None,
+    road: RoadRouter | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador por locais (sem base de dados)."""
-    dp = to_domain_params(params)
+    dp = to_domain_params(params, road)
     mode: CollectionMode = request.site_mode
     mp = params.modes[mode]
     costs = siting.SiteCosts(
@@ -499,6 +508,7 @@ def _compute_sites(
         routes=routes,
         modes=summaries,
         depot=[params.depot_lat, params.depot_lon],
+        routing=overall_source([r.source for r in routes]),
         sites=_site_selections(plan, inputs, vehicle_of),
         default_modes=request.default_modes,
         collection_plan=build_collection_plan(zones, loads, routes, dp, vehicles.vehicles),

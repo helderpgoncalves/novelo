@@ -32,8 +32,11 @@ def _row(
     plan: bool = True,
     site_mode: str = "existing",
     parent: uuid.UUID | None = None,
+    routing: str | None = None,
 ) -> Scenario:
     result: dict[str, Any] = {"collection_plan": [] if plan else None}
+    if routing is not None:  # com rotas: `estimate` (linha reta) ou `road` (estrada)
+        result |= {"routes": [{"km": 1.0}], "routing": routing}
     if siting == "sites":
         result["siting"] = {"site_mode": site_mode}
     return Scenario(
@@ -53,12 +56,12 @@ async def fake_solver(session: AsyncSession, monkeypatch: pytest.MonkeyPatch) ->
 
     async def run(
         db: AsyncSession, request: ScenarioRequest, user: User, *, reference_key: str | None = None,
-        reference_version: int | None = None,
+        reference_version: int | None = None, road: Any = None,
     ) -> Any:  # fmt: skip
         calls.append(reference_key or "")
         row = _row(
             request.label, user, budget=int(request.budget_eur_year or 0), siting=request.siting, key=reference_key,
-            version=reference_version, params_version=version,
+            version=reference_version, params_version=version, routing="road" if road is not None else "estimate",
         )  # fmt: skip
         db.add(row)
         await db.commit()
@@ -191,3 +194,54 @@ async def test_parish_reference_runs_the_real_model(session: AsyncSession) -> No
     full = await service.get_scenario(session, ref.id)
     assert full.result.collection_plan and any(e.channel == "on_demand" for e in full.result.collection_plan)
     assert full.result.kpis.vehicles and full.result.kpis.net_annual_cost_eur is not None
+
+
+class _Road:
+    """Router falso só para o `refresh`: saudável ou em baixo."""
+
+    def __init__(self, up: bool) -> None:
+        self.up = up
+
+    @property
+    def fingerprint(self) -> str:
+        return "mapa" if self.up else "estimate"
+
+
+async def test_references_computed_before_the_road_router_was_up_are_redone_once(
+    session: AsyncSession, fake_solver: list[str]
+) -> None:
+    admin = await _admin(session)
+    version = (await service.ensure_default_parameters(session)).version
+    spec = reference.SPECS[0]
+    old = _row(
+        spec.label, admin, key=spec.key, version=reference.REFERENCE_MODEL_VERSION, params_version=version,
+        routing="estimate",
+    )  # fmt: skip
+    session.add(old)
+    await session.commit()
+    old_id = old.id
+
+    down = await reference.refresh(session, (spec,), road=_Road(False))  # type: ignore[arg-type]
+    assert (down.created, down.deleted, fake_solver) == (0, 0, [])  # sem OSRM não há nada a melhorar
+
+    up = await reference.refresh(session, (spec,), road=_Road(True))  # type: ignore[arg-type]
+    assert (up.created, up.deleted, fake_solver) == (1, 1, [spec.key])
+    (kept,) = (await session.execute(select(Scenario).where(Scenario.reference_key == spec.key))).scalars().all()
+    assert kept.id != old_id and kept.result["routing"] == "road"
+
+    again = await reference.refresh(session, (spec,), road=_Road(True))  # type: ignore[arg-type]
+    assert (again.created, again.deleted) == (0, 0)  # já está por estrada: não volta a refazer
+
+
+async def test_a_reference_without_routes_is_not_redone_when_the_router_comes_up(
+    session: AsyncSession, fake_solver: list[str]
+) -> None:
+    admin = await _admin(session)
+    version = (await service.ensure_default_parameters(session)).version
+    spec = reference.SPECS[0]  # p.ex. 20 000 €/ano que não abre nenhum local: sem rotas, nada a medir
+    session.add(
+        _row(spec.label, admin, key=spec.key, version=reference.REFERENCE_MODEL_VERSION, params_version=version)
+    )
+    await session.commit()
+    out = await reference.refresh(session, (spec,), road=_Road(True))  # type: ignore[arg-type]
+    assert (out.created, out.deleted, fake_solver) == (0, 0, [])

@@ -15230,6 +15230,18 @@
       },
       "RouteOut": {
         "properties": {
+          "duration_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Condução por estrada em minutos, sem paragens nem trânsito (nulo = estimativa, sem OSRM)",
+            "title": "Duration Min"
+          },
           "km": {
             "title": "Km",
             "type": "number"
@@ -15251,6 +15263,22 @@
             },
             "title": "Path",
             "type": "array"
+          },
+          "road_path": {
+            "default": false,
+            "description": "O traçado segue as estradas; falso = linhas retas",
+            "title": "Road Path",
+            "type": "boolean"
+          },
+          "source": {
+            "default": "estimate",
+            "description": "`road`: km do OpenStreetMap (OSRM); `estimate`: linha reta × desvio da estrada (pressuposto)",
+            "enum": [
+              "road",
+              "estimate"
+            ],
+            "title": "Source",
+            "type": "string"
           },
           "stops": {
             "items": {
@@ -15990,6 +16018,17 @@
             },
             "title": "Routes",
             "type": "array"
+          },
+          "routing": {
+            "default": "estimate",
+            "description": "Como foram medidas as `routes`: `road` (todas por estrada, OpenStreetMap), `mixed` ou `estimate`. A volta porta a porta dentro da freguesia é sempre uma estimativa (fórmula por área)",
+            "enum": [
+              "road",
+              "mixed",
+              "estimate"
+            ],
+            "title": "Routing",
+            "type": "string"
           },
           "sites": {
             "description": "Locais abertos (só cenários por locais)",

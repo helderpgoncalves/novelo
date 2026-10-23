@@ -9093,6 +9093,12 @@ export type RobustnessOut = {
  */
 export type RouteOut = {
     /**
+     * Duration Min
+     *
+     * Condução por estrada em minutos, sem paragens nem trânsito (nulo = estimativa, sem OSRM)
+     */
+    duration_min?: number | null;
+    /**
      * Km
      */
     km: number;
@@ -9107,6 +9113,18 @@ export type RouteOut = {
      * [latitude, longitude]: depósito, paragens, depósito
      */
     path: Array<Array<number>>;
+    /**
+     * Road Path
+     *
+     * O traçado segue as estradas; falso = linhas retas
+     */
+    road_path?: boolean;
+    /**
+     * Source
+     *
+     * `road`: km do OpenStreetMap (OSRM); `estimate`: linha reta × desvio da estrada (pressuposto)
+     */
+    source?: 'road' | 'estimate';
     /**
      * Stops
      */
@@ -9541,6 +9559,12 @@ export type ScenarioResult = {
      * Routes
      */
     routes: Array<RouteOut>;
+    /**
+     * Routing
+     *
+     * Como foram medidas as `routes`: `road` (todas por estrada, OpenStreetMap), `mixed` ou `estimate`. A volta porta a porta dentro da freguesia é sempre uma estimativa (fórmula por área)
+     */
+    routing?: 'road' | 'mixed' | 'estimate';
     /**
      * Sites
      *

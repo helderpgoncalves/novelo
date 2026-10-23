@@ -11,6 +11,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from novelo.adapters.osrm import get_road_router
 from novelo.core.errors import ForbiddenError, RateLimitError
 from novelo.core.guest import solver_slots
 from novelo.domain.overview import pareto_ids
@@ -278,7 +279,7 @@ async def get_pareto_frontier(box: "CopilotTools", args: ParetoArgs) -> dict[str
             req = ScenarioRequest(
                 label="pareto", objective=ScenarioObjective.MAX_TONNES, budget_eur_year=budget, params=params
             )
-            result, status = planning.compute(zones, params, req, baseline.total_t)
+            result, status = planning.compute(zones, params, req, baseline.total_t, road=get_road_router())
             k = result.kpis
             if status != "infeasible" and k.eur_per_tonne is not None:
                 out.append(
