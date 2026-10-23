@@ -23,7 +23,7 @@ PPTX_SKILL=<pasta da skill pptx> NODE_PATH=$PWD/node_modules node build.js   # �
 
 ## Fontes
 
-O deck usa **Newsreader Medium** nos títulos e **Inter** no texto. Instalar as duas antes de abrir no PowerPoint; são livres (SIL OFL) e estão no Google Fonts. Sem elas, o PowerPoint troca por outra fonte e os títulos mudam de largura. O PDF exportado já leva as fontes embebidas.
+O deck usa **Newsreader** nos títulos e **Inter** no texto. No Google Drive/Slides ambas existem de origem (basta carregar o `.pptx` e abrir com o Google Slides). No PowerPoint, instalar as duas antes de abrir; são livres (SIL OFL) e estão no Google Fonts. Sem elas, o programa troca por outra fonte e os títulos mudam de largura. Os gráficos de barras e de linhas são objetos nativos do PowerPoint; o Google Slides mostra-os como imagem. O vídeo do plano B só é reproduzido no PowerPoint (o Google Slides ignora vídeos embebidos): levar o `.mp4` à parte.
 
 ## Regras
 

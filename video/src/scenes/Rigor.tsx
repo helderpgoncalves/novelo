@@ -5,12 +5,12 @@ import { num } from '../format';
 import { useLayout } from '../layout';
 import { C, FONT } from '../theme';
 
-// `just check` de 22 out 2026 (testes da API e da web, verdes) e `just eval-copilot` (155 perguntas ao modelo real,
-// 100% dos números verificados; docs/engenharia/avaliacao-copiloto.md).
+// testes de 23 out 2026 (API e web) e `just eval-copilot` (155 perguntas ao modelo real,
+// 99% dos números verificados; docs/engenharia/avaliacao-copiloto.md).
 const STATS = [
-  { v: 1054, l: 'testes da API' },
-  { v: 432, l: 'testes da web' },
-  { v: 155, l: 'perguntas de avaliação ao copiloto, 100% dos números verificados' },
+  { v: 1164, l: 'testes da API' },
+  { v: 449, l: 'testes da web' },
+  { v: 155, l: 'perguntas de avaliação ao copiloto, 99% dos números verificados' },
 ];
 
 /** 12. Rigor: nenhum número sem fonte, e testado. */

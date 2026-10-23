@@ -12,9 +12,9 @@
    1184,
    836
   ],
-  "contentHeight": 5129,
+  "contentHeight": 5147,
   "anchors": {
-   "A rede no mapa": 2069
+   "A rede no mapa": 2050
   }
  },
  "sim-mobile": {
@@ -30,9 +30,9 @@
    390,
    731
   ],
-  "contentHeight": 9551,
+  "contentHeight": 9675,
   "anchors": {
-   "A rede no mapa": 2634
+   "A rede no mapa": 2682
   }
  },
  "scenario-desktop": {
@@ -48,9 +48,9 @@
    1184,
    836
   ],
-  "contentHeight": 2978,
+  "contentHeight": 3039,
   "anchors": {
-   "Têxtil reutilizável": 794
+   "Têxtil reutilizável": 775
   }
  },
  "scenario-mobile": {
@@ -66,7 +66,7 @@
    390,
    731
   ],
-  "contentHeight": 6058,
+  "contentHeight": 6082,
   "anchors": {
    "Têxtil reutilizável": 1325
   }
@@ -84,7 +84,7 @@
    1184,
    836
   ],
-  "contentHeight": 2272,
+  "contentHeight": 2246,
   "anchors": {}
  },
  "coverage-mobile": {
@@ -100,7 +100,7 @@
    390,
    731
   ],
-  "contentHeight": 5553,
+  "contentHeight": 5572,
   "anchors": {}
  },
  "uncertainty-desktop": {
@@ -116,7 +116,7 @@
    1184,
    836
   ],
-  "contentHeight": 1934,
+  "contentHeight": 1915,
   "anchors": {}
  },
  "uncertainty-mobile": {

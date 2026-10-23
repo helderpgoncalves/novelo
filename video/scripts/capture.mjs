@@ -2,6 +2,7 @@
 // Cada ecrã sai em duas peças: `-base` (o ecrã como se vê, com barra lateral e topo) e `-content` (todo o #content,
 // para deslizar dentro da moldura como um scroll verdadeiro). Também a 390 px (telemóvel), para o vídeo vertical.
 // Corre com: node scripts/capture.mjs [nome,...]
+// Produção: WEB=https://novelo.helder.si COOKIE_FILE=<linha `__Host-access_token=...` de um administrador> (sessão de 15 min).
 import { createRequire } from 'node:module';
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 
@@ -14,15 +15,24 @@ mkdirSync(OUT, { recursive: true });
 
 const b = await chromium.launch();
 const login = await (async () => {
+  const host = new URL(BASE).hostname;
   const ctx = await b.newContext({ baseURL: BASE });
-  const res = await ctx.request.post('/api/v1/auth/login', {
-    data: { email: 'admin@heldergoncalves.io', password: 'admin-novelo-dev-1' },
-    headers: { 'X-Turnstile-Token': 'XXXX.DUMMY.TOKEN.XXXX' },
-  });
-  if (!res.ok()) throw new Error(`login ${res.status()}`);
+  if (process.env.COOKIE_FILE) {
+    const line = readFileSync(process.env.COOKIE_FILE, 'utf8').trim();
+    await ctx.addCookies([
+      { name: line.split('=')[0], value: line.slice(line.indexOf('=') + 1), domain: host, path: '/', secure: true, httpOnly: true, sameSite: 'Lax' },
+      { name: 'novelo_session', value: '1', domain: host, path: '/', secure: true },
+    ]);
+  } else {
+    const res = await ctx.request.post('/api/v1/auth/login', {
+      data: { email: 'admin@heldergoncalves.io', password: 'admin-novelo-dev-1' },
+      headers: { 'X-Turnstile-Token': 'XXXX.DUMMY.TOKEN.XXXX' },
+    });
+    if (!res.ok()) throw new Error(`login ${res.status()}`);
+  }
   const me = await (await ctx.request.get('/api/v1/auth/me')).json();
   const state = await ctx.storageState();
-  state.cookies.push({ name: 'novelo_session', value: '1', domain: 'localhost', path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' });
+  if (!process.env.COOKIE_FILE) state.cookies.push({ name: 'novelo_session', value: '1', domain: host, path: '/', expires: -1, httpOnly: false, secure: false, sameSite: 'Lax' });
   await ctx.close();
   return { state, id: me.id };
 })();

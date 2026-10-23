@@ -14,8 +14,8 @@ const STAGES = [
     at: 24,
     n: '1',
     title: 'Uma viatura só para o têxtil, sem compactação.',
-    stats: ['1 viatura nova', `${GEO.routes.length} circuitos`, `${num(GEO.kpis.km_year)} km/ano`],
-    note: 'O meio novo de recolha que a Vitrus pede, a sair do estaleiro de Polvoreira.',
+    stats: ['1 viatura nova', `${GEO.routes.length} circuitos por estrada`, `${num(GEO.kpis.km_year)} km/ano`],
+    note: 'O meio novo de recolha que a Vitrus pede, a sair de Polvoreira. As rotas seguem as estradas reais (OpenStreetMap).',
     color: C.linho,
   },
   {

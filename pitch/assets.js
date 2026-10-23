@@ -73,7 +73,7 @@ async function crop(src, out, { top, height, left = 0, width, scale = 2 }) {
   if (fs.existsSync(video)) {
     const { execFileSync } = require('node:child_process');
     execFileSync('ffmpeg', ['-y', '-v', 'error', '-i', video, '-c:v', 'libx264', '-crf', '26', '-preset', 'slow', '-vf', 'scale=1600:-2', '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', path.join(OUT, 'novelo-16x9-deck.mp4')]);
-    execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '131', '-i', video, '-frames:v', '1', '-vf', 'scale=1600:-2', path.join(OUT, 'video-capa.png')]);
+    execFileSync('ffmpeg', ['-y', '-v', 'error', '-ss', '4', '-i', video, '-frames:v', '1', '-vf', 'scale=1600:-2', path.join(OUT, 'video-capa.png')]);
     console.log('vídeo do deck');
   }
   console.log('ok');

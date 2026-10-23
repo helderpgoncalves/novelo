@@ -38,7 +38,7 @@ fs.mkdirSync(OUT, { recursive: true });
 
 const THEME = {
   name: 'Novelo',
-  headFontFace: 'Newsreader Medium',
+  headFontFace: 'Newsreader',
   bodyFontFace: 'Inter',
   colors: {
     dk1: '14211D', // tinta
@@ -610,7 +610,7 @@ pres.addSection({ title: 'Anexos' });
   s.addText('PLANO B', { placeholder: 'eyebrow' });
   s.addText('O Novelo em dois minutos', { placeholder: 'title' });
   const video = path.join(__dirname, 'assets', 'novelo-16x9-deck.mp4');
-  if (fs.existsSync(video)) {
+  if (fs.existsSync(video) && !process.env.NO_VIDEO) {
     const vw = 8.6;
     s.addMedia({ type: 'video', path: video, cover: `data:image/png;base64,${fs.readFileSync(A('video-capa.png')).toString('base64')}`, x: (W - vw) / 2, y: 2.25, w: vw, h: (vw * 9) / 16, objectName: 'Vídeo do Novelo' });
   }

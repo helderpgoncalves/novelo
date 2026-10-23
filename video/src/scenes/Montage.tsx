@@ -20,7 +20,7 @@ type Shot = {
   special?: 'triage' | 'lot' | 'report' | 'copilot';
 };
 
-// Posições medidas na stack de dev (1440 × 900 e 390 × 844), 22 out 2026.
+// Posições medidas na produção (1440 × 900 e 390 × 844), 23 out 2026.
 export const SHOTS: Shot[] = [
   {
     eyebrow: 'Decidir',
@@ -32,7 +32,7 @@ export const SHOTS: Shot[] = [
   {
     eyebrow: 'Decidir',
     title: 'A rede no mapa, com as rotas.',
-    sub: 'Paragens em locais existentes e o saco à porta onde compensa, com a viatura de têxtil.',
+    sub: 'Paragens em locais existentes e o saco à porta onde compensa. As rotas seguem as estradas reais, medidas no OpenStreetMap.',
     desktop: { shot: 'sim-desktop', url: '/pt/simulator', scroll: [[0, 2010], [90, 2030]], cx: [[10, 720], [90, 850]], cy: [[10, 450], [90, 420]], z: [[10, 1], [90, 1.32]] },
     mobile: { shot: 'sim-mobile', url: '', scroll: [[0, 2450], [40, 2600]] },
   },
@@ -65,7 +65,7 @@ export const SHOTS: Shot[] = [
     mobile: { shot: 'uncertainty-mobile', url: '', scroll: [[0, 940], [36, 950], [80, 1800]] },
   },
   { eyebrow: 'Perguntar', title: 'Pergunta em português. Responde o otimizador.', sub: 'A IA nunca faz contas: um verificador rejeita qualquer número que não venha da origem.', special: 'copilot' },
-  { eyebrow: 'Operar', title: 'Na entrega, a etiqueta diz a fibra.', sub: 'A IA sugere tipo, estado, fibra e marca; o operador confirma. Lote de demonstração, com fotografias de licença livre.', special: 'triage' },
+  { eyebrow: 'Operar', title: 'Na entrega, a etiqueta diz a fibra.', sub: 'A IA sugere tipo, estado, fibra e marca; o operador confirma. Lote de demonstração, com fotografias de licença livre e crédito.', special: 'triage' },
   { eyebrow: 'Operar', title: 'Do saco ao lote, com passaporte.', sub: 'Cada lote leva um QR: composição, peso e estado, abertos no telemóvel de quem recebe.', special: 'lot' },
   { eyebrow: 'Prestar contas', title: 'O relatório RAP, num clique.', sub: 'Custo por tipo de território, toneladas por destino, marcas e fontes: o dossiê para a mesa onde se fixa o custo.', special: 'report' },
 ];
@@ -96,7 +96,7 @@ function ShotView({ shot, dur, index }: { shot: Shot; dur: number; index: number
   if (move) {
     stage = <Screen move={move} f={f} width={frameW} mobile={portrait} />;
   } else if (shot.special === 'copilot') {
-    // Troca real com o copiloto (stack de dev com OpenRouter, 22 out 2026): pergunta, resposta e cartões do otimizador.
+    // Troca real com o copiloto (produção, com OpenRouter, 23 out 2026): pergunta, resposta e cartões do otimizador.
     stage = portrait ? (
       <div style={{ width: width - pad * 2, borderRadius: 22, overflow: 'hidden', border: `1px solid ${C.linha}`, boxShadow: '0 2px 4px rgba(20,33,29,.08), 0 50px 90px -40px rgba(20,33,29,.45)', height: 1180 }}>
         <Img src={staticFile('shots/copilot-panel.png')} style={{ width: width - pad * 2, display: 'block', transform: `translateY(${-kf(f, [[20, 0], [80, 40]])}px)` }} />
@@ -109,7 +109,7 @@ function ShotView({ shot, dur, index }: { shot: Shot; dur: number; index: number
       </BrowserChrome>
     );
   } else if (shot.special === 'triage') {
-    // Triagem real na stack de dev com o modelo da OpenRouter: calças Wisent e a etiqueta (80% algodão, 20% poliéster).
+    // Triagem real em produção com o modelo da OpenRouter: cachecol de lã com a etiqueta Polo Ralph Lauren.
     stage = portrait ? (
       <PhoneChrome width={frameW * 1.064}>
         <Img src={staticFile('shots/ops/triage-mobile.png')} style={{ width: frameW, display: 'block', transform: 'none' }} />
@@ -126,7 +126,7 @@ function ShotView({ shot, dur, index }: { shot: Shot; dur: number; index: number
     stage = (
       <div style={{ position: 'relative', width: portrait ? width - pad * 2 : frameW, height: portrait ? 1100 : 820 }}>
         {portrait ? null : (
-          <BrowserChrome width={1000} url="/pt/lots/NOV-PGTV2Z">
+          <BrowserChrome width={1000} url="/pt/lots/NOV-6EYRXN">
             <div style={{ width: 1000, height: 625, overflow: 'hidden' }}>
               <Img src={staticFile('shots/ops/lot-desktop.png')} style={{ width: 1000, display: 'block', transform: `scale(${kf(f, [[10, 1], [80, 1.12]])})`, transformOrigin: '40% 30%' }} />
             </div>
@@ -203,7 +203,7 @@ function ShotView({ shot, dur, index }: { shot: Shot; dur: number; index: number
   );
 }
 
-/** 10. A app real, ecrã a ecrã (capturas da stack de dev com os dados de 22 out 2026). */
+/** 10. A app real, ecrã a ecrã (capturas da produção, 23 out 2026). */
 export function Montage({ per }: { per: number }) {
   return (
     <AbsoluteFill style={{ background: C.linho }}>

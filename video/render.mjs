@@ -6,9 +6,10 @@ import path from 'node:path';
 
 const arg = process.argv[2] ?? 'all';
 const silent = process.argv.includes('--silent');
-const browserExecutable = '/opt/pw-browsers/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell';
+
 const serveUrl = await bundle({ entryPoint: path.resolve('src/index.ts') });
 mkdirSync('out', { recursive: true });
+const browserExecutable = process.env.BROWSER ?? null; // por omissão o Remotion usa o seu Chrome headless
 const NAMES = { Landscape: 'novelo-16x9', Portrait: 'novelo-9x16' };
 for (const id of arg === 'all' ? ['Landscape', 'Portrait'] : [arg]) {
   const inputProps = { music: !silent };
@@ -25,7 +26,7 @@ for (const id of arg === 'all' ? ['Landscape', 'Portrait'] : [arg]) {
     outputLocation: out,
     inputProps,
     browserExecutable,
-    concurrency: 4,
+    concurrency: 3,
     imageFormat: 'jpeg',
     jpegQuality: 92,
     muted: silent,

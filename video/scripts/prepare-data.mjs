@@ -3,11 +3,14 @@
 import { readFileSync, writeFileSync } from 'node:fs';
 import { geoMercator, geoPath, geoCentroid } from 'd3-geo';
 
+// Dev: API local com o administrador de dev. Produção: API=https://novelo.helder.si/api/v1 e COOKIE_FILE com a linha
+// `__Host-access_token=...` de um administrador (sessão de 15 min).
 const API = process.env.API ?? 'http://localhost:8190/api/v1';
 const ROOT = new URL('../../', import.meta.url).pathname;
 const PROC = `${ROOT}data/processed`;
 
 async function login() {
+  if (process.env.COOKIE_FILE) return readFileSync(process.env.COOKIE_FILE, 'utf8').trim();
   const res = await fetch(`${API}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'X-Turnstile-Token': 'XXXX.DUMMY.TOKEN.XXXX' },
@@ -90,11 +93,17 @@ const containers = csv(`${PROC}/municipal_containers.csv`)
 const sites = csv(`${PROC}/municipal_sites.csv`);
 const schools = sites.filter((s) => s.producer_types === 'Escola').map((s) => pt(+s.longitude, +s.latitude));
 
-const routes = R.routes.map((r) => ({ mode: r.mode, stops: r.stops.map((s) => pt(s.longitude, s.latitude)) }));
+// Traçado pela estrada (OSRM) quando existe; senão as paragens em linha reta.
+const routes = R.routes.map((r) => ({
+  mode: r.mode,
+  road: Boolean(r.road_path),
+  stops: r.stops.map((s) => pt(s.longitude, s.latitude)),
+  path: r.road_path ? r.path.map(([lat, lon]) => pt(lon, lat)) : null,
+}));
 const depot = pt(R.depot[1], R.depot[0]);
 
 const out = {
-  source: `API de dev (zonas e cenário ${par60.reference_key}, ${par60.created_at}) e data/processed`,
+  source: `API (zonas e cenário ${par60.reference_key}, ${par60.created_at}) e data/processed`,
   width: W,
   height: H,
   parishes,

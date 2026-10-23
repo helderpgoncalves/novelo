@@ -26,8 +26,9 @@ export type MapState = {
   dark?: boolean;
 };
 
-function routePath(stops: number[][], depot: number[]) {
-  const pts = [depot, ...stops, depot];
+/** Traçado pela estrada (`path` já traz depósito, paragens e depósito); sem ele, as paragens em linha reta. */
+function routePath(stops: number[][], depot: number[], path?: number[][] | null) {
+  const pts = path && path.length > 1 ? path : [depot, ...stops, depot];
   return pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]} ${p[1]}`).join(' ');
 }
 
@@ -40,7 +41,7 @@ export function GuimaraesMap({ s, width }: { s: MapState; width: number }) {
     () => geo.containers.map(([x, y, kind]) => ({ x: x as number, y: y as number, kind: kind as string, d: Math.hypot((x as number) - cx, (y as number) - cy) / maxD })),
     [cx, cy, maxD],
   );
-  const routes = useMemo(() => geo.routes.map((r) => routePath(r.stops, geo.depot)), []);
+  const routes = useMemo(() => geo.routes.map((r) => routePath(r.stops, geo.depot, (r as { path?: number[][] | null }).path)), []);
   const height = (width * geo.height) / geo.width;
 
   const fillFor = (p: Parish, i: number) => {
