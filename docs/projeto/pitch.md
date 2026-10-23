@@ -1,26 +1,30 @@
 # Pitch
 
-O pitch tem uma ideia central: **sabemos dizer à Vitrus quanto custa cada tonelada de têxtil tirada do aterro, e como baixar esse custo.** Assumimos 5 minutos; ajustar ao tempo das Regras quando as tivermos.
+O pitch tem uma ideia central: **sabemos dizer à Vitrus quanto custa cada tonelada de têxtil tirada do aterro, e como baixar esse custo.** São **4 minutos de pitch e 1 de perguntas do júri** (organização, 21 out 2026).
 
 Este é o resumo. A versão completa, com as falas, as objeções e a fonte de cada número, está na [narrativa do pitch](narrativa-do-pitch.md); o guião de slides pronto para o deck está em [Guião de slides](pitch-slides.md); os números vêm do [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
 
 ## Os quatro critérios
 
-Os projetos são avaliados por quatro critérios ponderados: **inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20%** ([Critérios de avaliação](criterios-de-avaliacao.md)). O detalhe de cada um (Regras) ainda não o temos. O guião abaixo reparte os 300 segundos por eles: impacto 105 s, viabilidade 70 s, inovação 65 s, apresentação e continuidade 60 s ([como e porquê](narrativa-do-pitch.md#repartição-do-tempo-pelos-quatro-critérios)).
+Os projetos são avaliados por quatro critérios ponderados: **inovação e originalidade 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20%** ([Critérios de avaliação](criterios-de-avaliacao.md)). O detalhe de cada um (Regras) ainda não o temos. O guião abaixo cabe nos 240 segundos e distribui-se por eles; o texto falado de cada slide, gerado do deck, está em [Guião do pitch](guiao-do-pitch.md).
 
 ## Guião, slide a slide
 
+Deck: `pitch/build.js` (10 diapositivos + anexos). A fala exata de cada um, com as notas de palco, está em [Guião do pitch](guiao-do-pitch.md) e nas notas do orador do PowerPoint.
+
 | # | Tempo | Slide | Critério | O que se diz |
 | --- | --- | --- | --- | --- |
-| 1 | 0:00 a 0:20 | Capa Novelo | Apresentação | "Na Europa, cerca de 72% dos têxteis descartados vão parar ao lixo indiferenciado. Hoje mostramos como Guimarães pode recolher mais do dobro, ao menor custo." |
-| 2 | 0:20 a 0:45 | O problema | Impacto | Recolha seletiva obrigatória desde 1 jan 2025, sem entidade gestora: paga o município. A RAP têxtil tem de existir até 17 abr 2028, mas os produtores só pagam as peças postas à venda depois da lei nacional; o têxtil que já está nas casas continua anos sem produtor que pague (art. 22.º-A, n.º 11; B17). Em 2025 o concelho deitou cerca de 51 250 t ao indiferenciado (a Vitrus recolheu 43 050,5 t, 84,0%); 5,86% é têxtil (APA): cerca de 3 003 t por ano ainda no lixo, captura de 9,1% (estimativa; A8 a A10, A24). Cada tonelada no lixo paga 105,64 € de tratamento em aterro (Vitrus; A25). |
-| 3 | 0:45 a 1:00 | A referência | Impacto | Guimarães recolhe 1,9 kg por habitante, a França 4,27. "Respondemos com números, não com contentores." |
-| 4 | 1:00 a 3:00 | **Demo ao vivo** | Viabilidade, impacto e inovação (40 s cada) | Cenários A e B; um jurado faz uma pergunta "E se...?"; uma peça real vai do saco ao lote com QR; relatório RAP num clique. Guião detalhado em [Demo e entrega](../engenharia/demo-e-entrega.md) e [roteiro](narrativa-do-pitch.md#roteiro-da-demo). |
-| 5 | 3:00 a 3:30 | Como funciona | Viabilidade | A rede: nenhum contentor, uma viatura de têxtil nova, sem compactação, como a Vitrus indicou (o saco não pode ir no camião do lixo; A21, A28): saco à porta num dia fixo e paragens nos locais existentes e nas escolas. O diagrama do saco ao fio, e a regra de ouro: a IA conduz o otimizador, nunca inventa números. Sem IA, o resto funciona. |
-| 6 | 3:30 a 3:55 | Do saco ao fio | Inovação | Controlo de qualidade na entrega e lotes com passaporte: o valor está na reutilização (têxtil limpo e seco), porque reciclar custa mais que a fibra virgem (Vitrus). A qualidade depende de quem recolhe: em 2025 a Ultriplo reutilizou 72,9% e o têxtil recolhido pela Vitrus só 9,2% (relatório da To Be Green, 5,6 t; A19). Por isso cada cenário mostra as toneladas reutilizáveis, não só as toneladas (estimativa; H1). A bolsa de fibra fica em segundo plano. |
-| 7 | 3:55 a 4:20 | 2028 | Impacto | Hoje paga o município; com a RAP, os produtores pagam o custo eficiente das peças novas e o município continua a pagar uma parte que vai descendo. O custo eficiente fixa-se "entre os intervenientes relevantes", e a lei nomeia as autoridades locais (art. 22.º-A, n.º 7 e 12): a câmara chega à mesa com o número. A rede tem de cobrir o território sem se limitar às zonas rendíveis (art. 22.º-C, n.º 9, b)): no cenário de 60 000 €/ano, fora das freguesias urbanas fica servida 55,5% da população, contra 72,8% nas urbanas (estimativa; H4). Replicável com dados abertos. |
-| 8 | 4:20 a 5:00 | Fecho e pedido | Continuidade | A frase-âncora com os números do cenário escolhido; o pedido: um piloto de 3 meses em duas freguesias; replicabilidade e roadmap depois de 26 de outubro. |
-| 9 | fora do tempo | Apoio | Os quatro | [Checklist critério e prova](pitch-slides.md#9-slide-de-apoio-checklist-critério-e-prova), para as perguntas. |
+| 1 | 0:00 a 0:15 | Capa | Apresentação | Mais de nove em cada dez quilos de têxtil que deitamos fora acabam no lixo comum. |
+| 2 | 0:15 a 0:40 | O problema | Impacto | Cerca de 3 003 t por ano de têxtil no indiferenciado (estimativa); só 301 t recolhidas à parte (9,1%); 59% do recolhido é reutilizado. |
+| 3 | 0:40 a 1:00 | A lei | Impacto | Obrigatória desde jan 2025, hoje paga o município; em 2028 os produtores pagam só as peças novas e o custo eficiente. Quem não souber o custo por tonelada não defende o seu número. |
+| 4 | 1:00 a 1:15 | Ouvimos a Vitrus | Viabilidade | Sem contentores de têxtil e sem saco no camião do lixo; o modelo refeito no próprio dia, duas vezes. |
+| 5 | 1:15 a 1:35 | A resposta | Inovação | Uma viatura só para o têxtil, 58 locais em 43 freguesias, saco à porta e escolas; rotas pelas estradas reais (OpenStreetMap, servidor próprio). |
+| 6 | 1:35 a 2:05 | O resultado | Impacto | 431,1 t/ano a 101,9 €/t; o tratamento evitado (45 542 €) paga a operação. Estimativa. |
+| 7 | 2:05 a 3:05 | **Demo ao vivo** | Viabilidade, impacto e inovação | Cenário de 60 000 €/ano com as rotas; «E se o orçamento fosse 80 000 €?»; lote com QR e passaporte com fotografias. Ver [Demo e entrega](../engenharia/demo-e-entrega.md) e [Seed de demonstração](../engenharia/seed-demo.md). |
+| 8 | 3:05 a 3:20 | A IA | Inovação | A IA traduz, o otimizador calcula, o verificador recusa números inventados (155 perguntas, 99% dos números verificados). |
+| 9 | 3:20 a 3:40 | Do saco ao fio | Inovação | Triagem por foto confirmada pelo operador; fotografia opcional conforme o RGPD; QR e passaporte; relatório RAP num clique. |
+| 10 | 3:40 a 4:00 | O pedido | Continuidade | Piloto de 3 meses em duas freguesias; a frase-âncora; QR para experimentar. |
+| — | fora do tempo | Anexos | Os quatro | Reutilização por entidade, resumo contra os critérios, onde se perde, cobertura e incerteza, rigor das fontes, como foi feito, vídeo. |
 
 ## Frase-âncora
 

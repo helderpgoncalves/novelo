@@ -66,8 +66,8 @@ pres.author = 'Hélder Gonçalves e Flávio Fernandes';
 pres.subject = 'Desafio 5 TexVitrus: recolha seletiva de têxteis em Guimarães';
 const C = pres.SchemeColor;
 
-// `just check` de 22 out 2026 (verde) e `just eval-copilot` (155 perguntas ao modelo real, 100% dos números verificados).
-const TESTS = { api: '1 054', web: '432', evals: '155' };
+// testes de 23 out 2026 e `just eval-copilot` (155 perguntas ao modelo real, 99% dos números verificados).
+const TESTS = { api: '1 164', web: '449', evals: '155' };
 
 const W = 13.333;
 const M = 0.6; // margem
@@ -126,6 +126,14 @@ function body(slide, text, opts) {
   slide.addText(text, { fontFace: THEME.bodyFontFace, fontSize: 15, color: C.accent4, margin: 0, valign: 'top', isTextBox: true, paraSpaceAfter: 6, ...opts });
 }
 
+// Telemóvel uniforme (capture-mobile.cjs): todas as capturas têm a mesma moldura e proporção; só muda a altura.
+const PHONE_RATIO = 1254 / 2616;
+function phone(slide, file, { x, y, h, name }) {
+  const w = h * PHONE_RATIO;
+  slide.addImage({ path: A(file), x, y, w, h, objectName: name, altText: name, shadow: shadow() });
+  return w;
+}
+
 // Tamanho de imagem que cabe em (w, h) mantendo a proporção.
 function fit(file, maxW, maxH) {
   const buf = fs.readFileSync(A(file));
@@ -149,7 +157,7 @@ pres.addSection({ title: 'Pitch' });
     time: '0:00–0:15',
     title: 'Capa',
     say: 'Em Guimarães, mais de nove em cada dez quilos de têxtil que deitamos fora acabam no lixo comum. Somos o Novelo: desenhamos a recolha que os traz de volta, do saco ao fio, ao menor custo.',
-    cue: 'Começar logo pelo número, sem apresentações. Os nomes estão na capa.',
+    cue: 'Começar logo pelo número, sem apresentações. Olhar para o júri, não para o ecrã.',
   });
 }
 
@@ -181,43 +189,8 @@ pres.addSection({ title: 'Pitch' });
   talk(s, {
     time: '0:15–0:40',
     title: 'O problema',
-    say: `Em 2025, o concelho deitou cerca de 51 mil toneladas ao lixo indiferenciado. Segundo a APA, 5,86% é têxtil: perto de ${n(K.potential_t)} toneladas por ano a caminho do aterro. Recolhidas à parte, só 301. Hoje, 9,1%. O resto perde-se.`,
-    cue: 'Dizer «estimativa» uma vez. Base confirmada pela Vitrus a 22 de outubro: 5,86% da APA sobre o indiferenciado do concelho.',
-  });
-}
-
-// 3. Valor na reutilização --------------------------------------------------------------------------
-{
-  const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch' });
-  s.addText('O QUE INTERESSA', { placeholder: 'eyebrow' });
-  s.addText('O valor está na reutilização, e a reutilização exige têxtil limpo', { placeholder: 'title' });
-  const labels = ['Ultriplo (134,1 t)', 'H Sarah Trading (118,6 t)', 'Nova Etapa (42,9 t)', 'Vitrus (5,6 t)', 'Total (301,3 t)'];
-  s.addChart(
-    pres.charts.BAR,
-    [
-      { name: 'Reutilização', labels, values: [72.9, 50.0, 50.0, 9.2, 59.4] },
-      { name: 'Reciclagem', labels, values: [12.7, 37.0, 40.0, 34.0, 26.5] },
-      { name: 'Rejeito', labels, values: [14.5, 13.0, 10.0, 56.9, 14.1] },
-    ],
-    {
-      x: M, y: 2.3, w: 8.2, h: 4.1, barDir: 'bar', barGrouping: 'percentStacked', barGapWidthPct: 45,
-      chartColors: [HEX.floresta, HEX.pedra, HEX.rejeito], showValue: true, dataLabelPosition: 'ctr', dataLabelColor: HEX.linho, dataLabelFontSize: 11, dataLabelFontFace: '+mn-lt', dataLabelFormatCode: '0.0',
-      catAxisLabelColor: HEX.tinta, catAxisLabelFontSize: 12, catAxisLabelFontFace: '+mn-lt', catAxisOrientation: 'maxMin', catAxisLineShow: false,
-      valAxisHidden: true, valGridLine: { style: 'none' }, catGridLine: { style: 'none' },
-      showLegend: true, legendPos: 't', legendFontSize: 11, legendFontFace: '+mn-lt', legendColor: HEX.tinta,
-      showTitle: false, objectName: 'Destino por entidade',
-    },
-  );
-  card(s, { x: 9.2, y: 2.4, w: 3.53, h: 3.9, name: 'Leitura' });
-  s.addText('59,4%', { x: 9.45, y: 2.6, w: 3.1, h: 0.85, fontFace: THEME.headFontFace, fontSize: 44, color: C.accent1, margin: 0, isTextBox: true, objectName: 'Reutilização total' });
-  body(s, 'do que se recolheu em 2025 foi reutilizado. A reciclagem custa mais do que a fibra virgem: o valor está no têxtil limpo e seco.', { x: 9.45, y: 3.5, w: 3.05, h: 1.4, fontSize: 13, color: C.text1 });
-  body(s, 'A qualidade depende de como se recolhe: 72,9% reutilizado na Ultriplo, 9,2% no pouco têxtil recolhido pela Vitrus, com 56,9% de rejeito.', { x: 9.45, y: 4.85, w: 3.05, h: 1.4, fontSize: 13 });
-  source(s, 'Vitrus Ambiente, destinos de 2025 por entidade (pesagem na Ultriplo e na H Sarah Trading; percentagens declaradas na Nova Etapa e na Vitrus); mentor da Vitrus, 21 out 2026.');
-  talk(s, {
-    time: '0:40–0:55',
-    title: 'O que interessa',
-    say: 'E o que se recolhe vale pela reutilização: 59% volta a ser usado. Mas depende de como se recolhe: 73% numa entidade, 9% noutra, com mais de metade de rejeito. Têxtil limpo e seco é o que tem valor.',
-    cue: 'Apontar para a barra da Vitrus: 56,9% de rejeito.',
+    say: `Em 2025, o concelho deitou cerca de 51 mil toneladas ao lixo indiferenciado. Segundo a APA, 5,86% é têxtil: perto de ${n(K.potential_t)} toneladas por ano a caminho do aterro. Recolhidas à parte, só 301: hoje, 9,1%. E o que se recolhe vale: 59% volta a ser usado.`,
+    cue: 'Dizer «estimativa» uma vez. Base confirmada pela Vitrus a 22 de outubro: 5,86% da APA sobre o indiferenciado do concelho. Apontar para os pontos: só 18 em 200 são recolhidos à parte.',
   });
 }
 
@@ -263,10 +236,10 @@ pres.addSection({ title: 'Pitch' });
   );
   source(s, 'Diretiva (UE) 2025/1892, art. 22.º-A, n.º 7, 11 e 12; APA, perguntas frequentes sobre têxteis (dez 2025).');
   talk(s, {
-    time: '0:55–1:20',
+    time: '0:40–1:00',
     title: 'A lei',
-    say: 'A recolha seletiva de têxteis é obrigatória desde janeiro de 2025, e hoje paga-a o município. A diretiva europeia põe os produtores a pagar até 2028, mas só as peças novas e só o custo eficiente, fixado com as autoridades locais. Quem chegar a essa mesa sem saber quanto custa cada tonelada não tem como defender o seu número.',
-    cue: 'Não dizer que em 2028 os produtores pagam tudo: o têxtil que já está nas casas continua a pesar no município.',
+    say: 'A recolha seletiva de têxteis é obrigatória desde janeiro de 2025 e hoje paga-a o município. Em 2028, os produtores pagam só as peças novas e só o custo eficiente, fixado com as autoridades locais. Quem chegar a essa mesa sem saber quanto custa cada tonelada não tem como defender o seu número.',
+    cue: 'Não dizer que em 2028 os produtores pagam tudo: o têxtil que já está nas casas continua a pesar no município. Pausa antes da última frase.',
   });
 }
 
@@ -291,9 +264,9 @@ pres.addSection({ title: 'Pitch' });
   body(s, 'Cada resposta da Vitrus entrou no modelo no próprio dia: sem contentores, com uma viatura dedicada.', { x: 9.75, y: 4.0, w: 2.9, h: 1.2, fontSize: 15, color: C.text1, align: 'center' });
   source(s, 'Emails do mentor da Vitrus, 21 e 22 out 2026; registo de alterações do repositório.');
   talk(s, {
-    time: '1:20–1:40',
+    time: '1:00–1:15',
     title: 'Ouvimos a Vitrus',
-    say: 'Fomos ouvir a Vitrus. Disse-nos duas coisas. Contentores de têxtil, não: o têxtil chega contaminado. E o saco também não pode ir no camião do lixo: estraga-se na compactadora. De cada vez, refizemos o modelo no próprio dia.',
+    say: 'Fomos ouvir a Vitrus. Contentores de têxtil, não: o têxtil chega contaminado. E o saco não pode ir no camião do lixo: estraga-se na compactadora. Refizemos o modelo no próprio dia, duas vezes.',
     cue: 'Ritmo: duas respostas, uma pausa, «no próprio dia».',
   });
 }
@@ -303,10 +276,10 @@ pres.addSection({ title: 'Pitch' });
   const s = pres.addSlide({ masterName: 'ESCURO', sectionTitle: 'Pitch' });
   s.addText('A RESPOSTA', { placeholder: 'eyebrow' });
   s.addText('Uma rede sem contentores, com uma viatura só para o têxtil', { placeholder: 'title' });
-  const { w, h } = fit('mapa-rede.png', 5.6, 5.4);
-  s.addImage({ path: A('mapa-rede.png'), x: W - M - w + 0.1, y: 7.5 - h - 0.5, w, h, objectName: 'Mapa da rede', altText: 'Mapa do cenário de 60 000 euros por ano: rotas da viatura de têxtil a partir de Polvoreira, freguesias com paragens em locais existentes e com saco à porta, escolas' });
+  const ph = 4.9;
+  phone(s, 'm-rotas.png', { x: W - M - ((ph * PHONE_RATIO) + 0.6), y: 2.2, h: ph, name: 'Mapa da rede por estrada: cenário de referência de 60 000 €/ano' });
   const items = [
-    { n: '1', color: C.background1, title: 'Uma viatura só para o têxtil, sem compactação', text: `O meio novo de recolha que a Vitrus pede: ${K.vehicles} viatura, ${n(K.vehicle_days_week, 1)} dias por semana, ${n(K.km_year)} km/ano a partir do estaleiro de Polvoreira.` },
+    { n: '1', color: C.background1, title: 'Uma viatura só para o têxtil, sem compactação', text: `O meio novo de recolha que a Vitrus pede: ${K.vehicles} viatura, ${n(K.vehicle_days_week, 1)} dias por semana, ${n(K.km_year)} km/ano por estrada a partir de Polvoreira.` },
     { n: '2', color: C.accent2, title: 'Paragem nos locais por onde já se passa', text: `${MODE.existing.points} pontos em ${MODE.existing.zones} freguesias, sem contentor novo: ${n(MODE.existing.tonnes, 1)} t/ano.` },
     { n: '3', color: C.accent3, title: 'Saco fechado à porta, num dia fixo', text: `Onde compensa: ${MODE.on_demand.zones} freguesias, de 2 em 2 semanas, ${n(MODE.on_demand.tonnes, 1)} t/ano.` },
     { n: '4', color: C.accent4, title: 'Escolas como pontos com pessoas', text: '86 escolas candidatas: o saco é entregue em mão.' },
@@ -319,15 +292,15 @@ pres.addSection({ title: 'Pitch' });
         { text: it.title, options: { fontFace: THEME.headFontFace, fontSize: 18, color: C.background1, breakLine: true } },
         { text: it.text, options: { fontSize: 12, color: C.accent5 } },
       ],
-      { x: M + 0.65, y: y - 0.05, w: 6.3, h: 1.0, fontFace: THEME.bodyFontFace, valign: 'top', margin: 0, paraSpaceAfter: 3, isTextBox: true, objectName: `Texto canal ${it.n}` },
+      { x: M + 0.65, y: y - 0.05, w: 7.6, h: 1.0, fontFace: THEME.bodyFontFace, valign: 'top', margin: 0, paraSpaceAfter: 3, isTextBox: true, objectName: `Texto canal ${it.n}` },
     );
   });
   source(s, 'Cenário de referência por freguesia, 60 000 €/ano (otimizador Novelo, 22 out 2026, estimativa); depósito e respostas da Vitrus de 22 out 2026; INE; CAOP 2019.', true);
   talk(s, {
-    time: '1:40–2:05',
+    time: '1:15–1:35',
     title: 'A resposta',
-    say: `A resposta: uma rede sem um único contentor novo, com uma viatura só para o têxtil, sem compactação. Para nos locais por onde já se passa, ${MODE.existing.points} pontos em ${MODE.existing.zones} freguesias; recolhe o saco fechado à porta onde compensa; e usa as escolas como pontos com pessoas. Sai do estaleiro da Vitrus em Polvoreira.`,
-    cue: 'Preço da viatura, se perguntarem: 42 500 € sem IVA, pressuposto tirado de um concurso público (Vila Nova de Gaia, TED 338951-2024), a 8 anos.',
+    say: `A resposta: uma rede sem um único contentor novo e uma viatura só para o têxtil, sem compactação, a sair de Polvoreira. Pára em ${MODE.existing.points} locais de ${MODE.existing.zones} freguesias, recolhe o saco à porta onde compensa e usa as escolas. E as rotas seguem as estradas reais: cada quilómetro é medido no OpenStreetMap, num servidor nosso.`,
+    cue: 'Apontar para o mapa: o traço segue as estradas, não são linhas retas. Preço da viatura, se perguntarem: 42 500 € sem IVA, pressuposto tirado de um concurso público (Vila Nova de Gaia, TED 338951-2024), a 8 anos.',
   });
 }
 
@@ -376,10 +349,10 @@ pres.addSection({ title: 'Pitch' });
   body(s, `Custo líquido: ${n(K.net_annual_cost_eur)} €/ano. Tratamento: ${n(K.tonnes_year, 1)} t × 105,64 €/t (Vitrus). Captura do têxtil gerado: de 9,1% para ${n(CAPTURE_AFTER, 1)}%.`, { x: 8.15, y: 5.95, w: 4.45, h: 0.75, fontSize: 11, color: C.text1 });
   source(s, 'Otimizador Novelo (OR-Tools CP-SAT e VRP) sobre os dados da Vitrus; cenários por freguesia de 22 out 2026; Monte Carlo com 500 amostras; tratamento: Vitrus (40 €/t TGR + 65,64 €/t Resinorte).');
   talk(s, {
-    time: '2:05–2:35',
+    time: '1:35–2:05',
     title: 'O resultado',
     say: `Com 60 mil euros por ano, o otimizador desvia ${n(K.tonnes_year)} toneladas por ano do lixo, a ${n(K.annual_cost_eur / K.tonnes_year)} euros por tonelada; ${n(K.reusable_t)} reutilizáveis. E o ponto é este: cada tonelada que sai do lixo poupa 105,64 euros de aterro. São ${n(K.avoided_treatment_eur)} euros por ano, mais do que custa a operação. A rede paga-se com o que deixa de ir para o aterro.`,
-    cue: `Estimativa: os custos por hora e por km da Vitrus ainda não chegaram. Em 8 de cada 10 simulações, entre ${n(MC.p10)} e ${n(MC.p90)} €/t.`,
+    cue: `Estimativa: os custos por hora e por km da Vitrus ainda não chegaram. Em 8 de cada 10 simulações, entre ${n(MC.p10)} e ${n(MC.p90)} €/t. Nos casos pessimistas (acima de 105,64 €/t) o tratamento evitado já não cobre o custo.`,
   });
 }
 
@@ -387,9 +360,8 @@ pres.addSection({ title: 'Pitch' });
 {
   const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch' });
   s.addText('DEMO AO VIVO · NOVELO.HELDER.SI', { placeholder: 'eyebrow' });
-  s.addText('Do orçamento ao relatório, em dois minutos', { placeholder: 'title' });
-  const { w, h } = fit('sim-kpis.png', 7.6, 4.5);
-  image(s, 'sim-kpis.png', { x: M, y: 2.35, w, h, name: 'Simulador: resultado do cenário de 60 000 €/ano' });
+  s.addText('Do orçamento ao passaporte, ao vivo', { placeholder: 'title' });
+  phone(s, 'm-resumo.png', { x: W - M - 2.4 - 0.3, y: 2.2, h: 5.0, name: 'Resumo do cenário de 60 000 €/ano no telemóvel' });
   const steps = [
     ['Decidir', 'Orçamento entra; o otimizador escolhe freguesias, canais e rotas.'],
     ['Provar', 'Cobertura do art. 22.º-C e incerteza calculada.'],
@@ -398,16 +370,16 @@ pres.addSection({ title: 'Pitch' });
     ['Prestar contas', 'Relatório RAP em PDF, num clique.'],
   ];
   steps.forEach(([t, d], i) => {
-    const y = 2.35 + i * 0.86;
-    s.addText(String(i + 1), { shape: pres.shapes.OVAL, x: 8.75, y, w: 0.4, h: 0.4, fill: { color: C.accent1 }, color: C.background1, fontFace: THEME.bodyFontFace, fontSize: 12, bold: true, align: 'center', valign: 'middle', margin: 0, isTextBox: true, objectName: `Passo ${i + 1}` });
-    s.addText([{ text: t, options: { bold: true, color: C.text1, breakLine: true } }, { text: d, options: { color: C.accent4, fontSize: 12 } }], { x: 9.3, y: y - 0.05, w: W - M - 9.3, h: 0.8, fontFace: THEME.bodyFontFace, fontSize: 14, margin: 0, valign: 'top', isTextBox: true, objectName: `Texto passo ${i + 1}` });
+    const y = 2.35 + i * 0.92;
+    s.addText(String(i + 1), { shape: pres.shapes.OVAL, x: M, y, w: 0.4, h: 0.4, fill: { color: C.accent1 }, color: C.background1, fontFace: THEME.bodyFontFace, fontSize: 12, bold: true, align: 'center', valign: 'middle', margin: 0, isTextBox: true, objectName: `Passo ${i + 1}` });
+    s.addText([{ text: t, options: { bold: true, color: C.text1, breakLine: true } }, { text: d, options: { color: C.accent4, fontSize: 12 } }], { x: M + 0.6, y: y - 0.05, w: 7.6, h: 0.8, fontFace: THEME.bodyFontFace, fontSize: 16, margin: 0, valign: 'top', isTextBox: true, objectName: `Texto passo ${i + 1}` });
   });
-  source(s, 'Captura da app com os dados de 22 out 2026. Se a rede falhar: vídeo da demonstração no último anexo.');
+  source(s, 'Captura da aplicação em produção (novelo.helder.si, 23 out 2026). Se a rede falhar: vídeo da demonstração no último anexo.');
   talk(s, {
-    time: '2:35–3:50',
+    time: '2:05–3:05',
     title: 'Demonstração',
-    say: 'Isto não é um protótipo: está em produção, com os dados reais da Vitrus. Aqui está o cenário de 60 mil euros: toneladas, euros por tonelada e o mapa. Este é o plano da viatura, freguesia a freguesia. Aqui, a cobertura: a rede não fica só onde rende, como a diretiva exige. E posso perguntar em português: e se o orçamento fosse 80 mil euros?',
-    cue: 'Abrir o cenário de referência já calculado (não esperar pelo otimizador). A pergunta dos 80 000 € já foi feita uma vez: a resposta vem em 6 a 10 s. Se a rede falhar, passar o vídeo do último anexo.',
+    say: 'Isto não é um protótipo: está em produção, com os dados reais da Vitrus. [2:05] O cenário de 60 mil euros: toneladas, euros por tonelada e as rotas pelas estradas. [2:25] Pergunto ao copiloto, em português: e se o orçamento fosse 80 mil euros? O otimizador recalcula; a IA só traduz. [2:50] E aqui está um lote: o QR abre o passaporte, com a fotografia de cada peça.',
+    cue: 'Abrir o cenário de referência já calculado (não esperar pelo otimizador). A pergunta dos 80 000 € já foi feita uma vez: a resposta vem em 6 a 10 s. Lote da demonstração: NOV-6EYRXN (QR no telemóvel de quem pitcha). Se a rede falhar, passar o vídeo do último anexo.',
   });
 }
 
@@ -430,11 +402,11 @@ pres.addSection({ title: 'Pitch' });
   });
   const { w, h } = fit('copilot-panel.png', 5.3, 4.45);
   image(s, 'copilot-panel.png', { x: W - M - w, y: 2.3, w, h, name: 'Troca real com o copiloto' });
-  source(s, 'Troca real na stack de dev com OpenRouter (22 out 2026); números dos cartões calculados pelo otimizador. Sem IA, o simulador e o relatório continuam a funcionar.', true);
+  source(s, 'Troca real em produção com OpenRouter (23 out 2026); números dos cartões calculados pelo otimizador. Sem IA, o simulador e o relatório continuam a funcionar.', true);
   talk(s, {
-    time: '3:50–4:05',
+    time: '3:05–3:20',
     title: 'A IA',
-    say: 'A inteligência artificial só traduz a pergunta. Quem faz as contas é o otimizador, e um verificador recusa qualquer número que não venha do resultado. Em 155 perguntas de teste, 100% dos números verificados.',
+    say: 'A IA só traduz a pergunta. Quem faz as contas é o otimizador, e um verificador recusa qualquer número que não venha do resultado. Em 155 perguntas ao modelo real, 99% dos números verificados.',
     cue: 'Sem IA, o simulador, o plano e o relatório continuam a funcionar.',
   });
 }
@@ -444,55 +416,33 @@ pres.addSection({ title: 'Pitch' });
   const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch' });
   s.addText('DO SACO AO FIO', { placeholder: 'eyebrow' });
   s.addText('Cada quilo com origem, destino e passaporte', { placeholder: 'title' });
-  const steps = [
-    ['triagem.png', '1 · Triagem por foto', 'A IA sugere fibra, estado e marca a partir da etiqueta; o operador confirma.'],
-    ['lote.png', '2 · Lote com QR', 'Composição, peso e histórico de cada lote (lote de demonstração).'],
-    ['passaporte.png', '3 · Passaporte', 'Quem recebe lê o QR no telemóvel.'],
-    ['p-1.png', '4 · Relatório RAP', 'Um PDF para a mesa do custo eficiente.'],
-  ].filter(([f]) => fs.existsSync(A(f)));
-  // larguras à medida de cada imagem: duas capturas largas, o telemóvel e a página A4 (somam a largura útil)
-  const widths = [3.5, 3.5, 1.95, 2.28];
-  let x = M;
-  steps.forEach(([file, title, text], i) => {
-    const colW = widths[i] ?? 2.8;
-    const r = fit(file, colW, 3.3);
-    image(s, file, { x: x + (colW - r.w) / 2, y: 2.3 + (3.3 - r.h), w: r.w, h: r.h, name: title });
-    s.addText([{ text: title, options: { bold: true, color: C.text1, breakLine: true } }, { text, options: { color: C.accent4, fontSize: 12 } }], { x, y: 5.85, w: colW, h: 0.95, fontFace: THEME.bodyFontFace, fontSize: 14, margin: 0, valign: 'top', isTextBox: true, objectName: `Passo ${title}` });
-    x += colW + 0.3;
-  });
-  talk(s, {
-    time: '4:05–4:20',
-    title: 'Do saco ao fio',
-    say: 'Na entrega, uma foto da etiqueta sugere a fibra e o estado, e o operador confirma. Cada lote leva um QR com o seu passaporte. E a câmara recebe, num clique, o relatório para a mesa da responsabilidade do produtor.',
-    cue: 'A foto não vê a fibra; a etiqueta sim. O operador confirma sempre.',
-  });
-}
-
-// 11. O que já está provado ---------------------------------------------------------------------------
-{
-  const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Pitch' });
-  s.addText('EM RESUMO', { placeholder: 'eyebrow' });
-  s.addText('O que já está provado', { placeholder: 'title' });
-  const rows = [
-    ['Impacto', `${n(K.tonnes_year, 1)} t por ano fora do lixo e ${n(K.reusable_t, 1)} t reutilizáveis; a poupança no tratamento (${n(K.avoided_treatment_eur)} €) paga a operação; captura de 9,1% para ${n(CAPTURE_AFTER, 1)}% (estimativas).`],
-    ['Inovação', 'Uma rede sem contentores, com uma viatura só para o têxtil, desenhada canal a canal por um otimizador. IA que conduz o modelo e nunca inventa um número.'],
-    ['Viabilidade', `Em produção, com os dados e as respostas da Vitrus. Pressupostos à vista, incerteza calculada, ${TESTS.api} testes da API e ${TESTS.web} da web em cada entrega.`],
-    ['Continuidade', 'Um piloto de 3 meses pronto a arrancar, escolhido pelo próprio Novelo. Replicável em qualquer município com o seu inventário de contentores.'],
+  const shots = [
+    ['m-triagem.png', '1 · Triagem por foto', 'A IA lê a etiqueta; o operador confirma.'],
+    ['m-passaporte.png', '2 · Passaporte público', 'O QR do lote abre-o no telemóvel.'],
+    ['m-fotos.png', '3 · Fotografia de cada peça', 'Opcional, com crédito da licença.'],
   ];
-  rows.forEach(([name, proof], i) => {
-    const col = i % 2;
-    const row = Math.floor(i / 2);
-    const x = M + col * 6.15;
-    const y = 2.3 + row * 2.2;
-    card(s, { x, y, w: 5.95, h: 2.0, name: `Prova ${name}` });
-    s.addText(name, { x: x + 0.3, y: y + 0.22, w: 5.4, h: 0.55, fontFace: THEME.headFontFace, fontSize: 26, color: C.accent1, margin: 0, valign: 'top', isTextBox: true, objectName: `Título ${name}` });
-    s.addText(proof, { x: x + 0.3, y: y + 0.85, w: 5.4, h: 1.05, fontFace: THEME.bodyFontFace, fontSize: 13, color: C.text1, margin: 0, valign: 'top', isTextBox: true, objectName: `Texto ${name}` });
+  const ph = 3.85;
+  const pw = ph * PHONE_RATIO;
+  shots.forEach(([file, title, text], i) => {
+    const x = M + i * (pw + 0.35);
+    phone(s, file, { x, y: 2.2, h: ph, name: title });
+    s.addText([{ text: title, options: { bold: true, color: C.text1, breakLine: true } }, { text, options: { color: C.accent4, fontSize: 11 } }], { x, y: 2.2 + ph + 0.12, w: pw + 0.2, h: 0.75, fontFace: THEME.bodyFontFace, fontSize: 12, margin: 0, valign: 'top', isTextBox: true, objectName: `Legenda ${title}` });
   });
-  source(s, 'Cenário de referência de 60 000 €/ano (estimativa); verificação completa e avaliação do copiloto de 22 out 2026; novelo.helder.si e código aberto.');
+  const cx = M + 3 * (pw + 0.35) + 0.25;
+  card(s, { x: cx, y: 2.2, w: W - M - cx, h: 3.9, name: 'RGPD e relatório' });
+  s.addText('Pronto para a câmara', { x: cx + 0.3, y: 2.4, w: W - M - cx - 0.6, h: 0.5, fontFace: THEME.headFontFace, fontSize: 22, color: C.accent1, margin: 0, isTextBox: true, objectName: 'Título cartão' });
+  body(s, [
+    { text: 'Fotografia com consentimento: ', options: { bold: true, color: C.text1 } },
+    { text: 'miniatura até 640 px, sem EXIF (sem localização), apagada ao fim de 90 dias e a qualquer momento.', options: { breakLine: true } },
+    { text: 'Relatório RAP em PDF, num clique: ', options: { bold: true, color: C.text1 } },
+    { text: 'o têxtil por desviar, o recolhido, o custo por território e as rotas medidas pela estrada.' },
+  ], { x: cx + 0.3, y: 3.05, w: W - M - cx - 0.6, h: 3.9, fontSize: 14, paraSpaceAfter: 10 });
+  source(s, 'Lote de demonstração NOV-6EYRXN na produção; fotografias de licença livre (Wikimedia Commons) com crédito; política em docs/engenharia/privacidade-fotografias.md.');
   talk(s, {
-    time: '4:20–4:35',
-    title: 'O que já está provado',
-    say: `Em resumo: ${n(K.tonnes_year)} toneladas por ano fora do lixo, pagas pela poupança no tratamento. Uma rede sem contentores, com IA que não inventa números. Em produção, com os dados e as respostas da Vitrus. E pronta a replicar em qualquer município.`,
+    time: '3:20–3:40',
+    title: 'Do saco ao fio',
+    say: 'Na entrega, uma foto da etiqueta sugere fibra, estado e marca, e o operador confirma. A fotografia da peça é opcional e cumpre o RGPD. Cada lote leva um QR que abre o passaporte público, e a câmara recebe o relatório num clique.',
+    cue: 'A foto não vê a fibra; a etiqueta sim. O operador confirma sempre.',
   });
 }
 
@@ -517,19 +467,74 @@ pres.addSection({ title: 'Pitch' });
   s.addText([{ text: 'Experimentem já', options: { fontFace: THEME.headFontFace, fontSize: 18, color: C.text1, breakLine: true } }, { text: 'novelo.helder.si', options: { fontSize: 13, bold: true, color: C.accent1 } }], { x: 9.5, y: 5.5, w: 3.03, h: 0.95, fontFace: THEME.bodyFontFace, align: 'center', valign: 'middle', margin: 0, isTextBox: true, objectName: 'Endereço' });
   source(s, 'Proposta da equipa; tamanho da amostra calculado pelo recomendador de piloto do Novelo (estimativa).', true);
   talk(s, {
-    time: '4:35–5:00',
+    time: '3:40–4:00',
     title: 'O pedido',
-    say: `Pedimos um piloto de três meses em duas freguesias, escolhidas pelo próprio Novelo, para trocar pressupostos por números medidos. ${n(K.tonnes_year)} toneladas por ano fora do lixo, pagas pela poupança no tratamento, sem um único contentor novo. Obrigado.`,
-    cue: 'Dizer a frase-âncora devagar. Agradecer e parar.',
+    say: `Pedimos um piloto de três meses em duas freguesias, para trocar pressupostos por números medidos. ${n(K.tonnes_year)} toneladas por ano fora do lixo, pagas pela poupança no tratamento, sem um único contentor novo, e já em produção. Obrigado.`,
+    cue: 'Dizer a frase-âncora devagar. Agradecer e parar. Deixar o QR no ecrã para as perguntas.',
   });
 }
 
 // ================================================================================================ ANEXOS
 pres.addSection({ title: 'Anexos' });
 
+// 3. Valor na reutilização --------------------------------------------------------------------------
+{
+  const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Anexos' });
+  s.addText('O QUE INTERESSA', { placeholder: 'eyebrow' });
+  s.addText('O valor está na reutilização, e a reutilização exige têxtil limpo', { placeholder: 'title' });
+  const labels = ['Ultriplo (134,1 t)', 'H Sarah Trading (118,6 t)', 'Nova Etapa (42,9 t)', 'Vitrus (5,6 t)', 'Total (301,3 t)'];
+  s.addChart(
+    pres.charts.BAR,
+    [
+      { name: 'Reutilização', labels, values: [72.9, 50.0, 50.0, 9.2, 59.4] },
+      { name: 'Reciclagem', labels, values: [12.7, 37.0, 40.0, 34.0, 26.5] },
+      { name: 'Rejeito', labels, values: [14.5, 13.0, 10.0, 56.9, 14.1] },
+    ],
+    {
+      x: M, y: 2.3, w: 8.2, h: 4.1, barDir: 'bar', barGrouping: 'percentStacked', barGapWidthPct: 45,
+      chartColors: [HEX.floresta, HEX.pedra, HEX.rejeito], showValue: true, dataLabelPosition: 'ctr', dataLabelColor: HEX.linho, dataLabelFontSize: 11, dataLabelFontFace: '+mn-lt', dataLabelFormatCode: '0.0',
+      catAxisLabelColor: HEX.tinta, catAxisLabelFontSize: 12, catAxisLabelFontFace: '+mn-lt', catAxisOrientation: 'maxMin', catAxisLineShow: false,
+      valAxisHidden: true, valGridLine: { style: 'none' }, catGridLine: { style: 'none' },
+      showLegend: true, legendPos: 't', legendFontSize: 11, legendFontFace: '+mn-lt', legendColor: HEX.tinta,
+      showTitle: false, objectName: 'Destino por entidade',
+    },
+  );
+  card(s, { x: 9.2, y: 2.4, w: 3.53, h: 3.9, name: 'Leitura' });
+  s.addText('59,4%', { x: 9.45, y: 2.6, w: 3.1, h: 0.85, fontFace: THEME.headFontFace, fontSize: 44, color: C.accent1, margin: 0, isTextBox: true, objectName: 'Reutilização total' });
+  body(s, 'do que se recolheu em 2025 foi reutilizado. A reciclagem custa mais do que a fibra virgem: o valor está no têxtil limpo e seco.', { x: 9.45, y: 3.5, w: 3.05, h: 1.4, fontSize: 13, color: C.text1 });
+  body(s, 'A qualidade depende de como se recolhe: 72,9% reutilizado na Ultriplo, 9,2% no pouco têxtil recolhido pela Vitrus, com 56,9% de rejeito.', { x: 9.45, y: 4.85, w: 3.05, h: 1.4, fontSize: 13 });
+  source(s, 'Vitrus Ambiente, destinos de 2025 por entidade (pesagem na Ultriplo e na H Sarah Trading; percentagens declaradas na Nova Etapa e na Vitrus); mentor da Vitrus, 21 out 2026.');
+  s.addNotes('Anexo. Para «e o valor?»: 59,4% do recolhido em 2025 foi reutilizado, mas a qualidade depende de como se recolhe (72,9% reutilizado na Ultriplo, 56,9% de rejeito no pouco que a Vitrus recolhe).');
+}
+
+// 11. O que já está provado ---------------------------------------------------------------------------
+{
+  const s = pres.addSlide({ masterName: 'CLARO', sectionTitle: 'Anexos' });
+  s.addText('EM RESUMO', { placeholder: 'eyebrow' });
+  s.addText('O que já está provado', { placeholder: 'title' });
+  const rows = [
+    ['Impacto', `${n(K.tonnes_year, 1)} t por ano fora do lixo e ${n(K.reusable_t, 1)} t reutilizáveis; a poupança no tratamento (${n(K.avoided_treatment_eur)} €) paga a operação; captura de 9,1% para ${n(CAPTURE_AFTER, 1)}% (estimativas).`],
+    ['Inovação', 'Uma rede sem contentores, com uma viatura só para o têxtil, desenhada canal a canal por um otimizador. IA que conduz o modelo e nunca inventa um número.'],
+    ['Viabilidade', `Em produção, com os dados e as respostas da Vitrus. Pressupostos à vista, incerteza calculada, ${TESTS.api} testes da API e ${TESTS.web} da web em cada entrega.`],
+    ['Continuidade', 'Um piloto de 3 meses pronto a arrancar, escolhido pelo próprio Novelo. Replicável em qualquer município com o seu inventário de contentores.'],
+  ];
+  rows.forEach(([name, proof], i) => {
+    const col = i % 2;
+    const row = Math.floor(i / 2);
+    const x = M + col * 6.15;
+    const y = 2.3 + row * 2.2;
+    card(s, { x, y, w: 5.95, h: 2.0, name: `Prova ${name}` });
+    s.addText(name, { x: x + 0.3, y: y + 0.22, w: 5.4, h: 0.55, fontFace: THEME.headFontFace, fontSize: 26, color: C.accent1, margin: 0, valign: 'top', isTextBox: true, objectName: `Título ${name}` });
+    s.addText(proof, { x: x + 0.3, y: y + 0.85, w: 5.4, h: 1.05, fontFace: THEME.bodyFontFace, fontSize: 13, color: C.text1, margin: 0, valign: 'top', isTextBox: true, objectName: `Texto ${name}` });
+  });
+  source(s, 'Cenário de referência de 60 000 €/ano (estimativa); verificação completa e avaliação do copiloto de 22 out 2026; novelo.helder.si e código aberto.');
+  s.addNotes('Anexo. Resumo contra os critérios: impacto, inovação, viabilidade e continuidade.');
+}
+
+
 // 5. Onde se perde ---------------------------------------------------------------------------------
 {
-  const s = pres.addSlide({ masterName: 'ESCURO', sectionTitle: 'Pitch' });
+  const s = pres.addSlide({ masterName: 'ESCURO', sectionTitle: 'Anexos' });
   s.addText('ONDE SE PERDE', { placeholder: 'eyebrow' });
   s.addText('O têxtil perde-se onde o camião já passa', { placeholder: 'title' });
   const { w, h } = fit('mapa-contentores.png', 6.4, 6.0);
@@ -592,7 +597,7 @@ pres.addSection({ title: 'Anexos' });
     s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 2.35, w: 3.9, h: 2.55, rectRadius: 0.1, fill: { color: '1B2A25' }, line: { color: '2F4A40', width: 0.75 }, objectName: `Bloco ${t}` });
     s.addText([{ text: t, options: { fontFace: THEME.headFontFace, fontSize: 20, color: C.accent2, breakLine: true } }, { text: d, options: { fontSize: 13, color: C.accent5 } }], { x: x + 0.25, y: 2.55, w: 3.4, h: 2.25, fontFace: THEME.bodyFontFace, margin: 0, valign: 'top', paraSpaceAfter: 8, isTextBox: true, objectName: `Texto ${t}` });
   });
-  [[TESTS.api, 'testes da API'], [TESTS.web, 'testes da web'], [TESTS.evals, 'perguntas de avaliação ao copiloto, 100% dos números verificados']].forEach(([v, l], i) => {
+  [[TESTS.api, 'testes da API'], [TESTS.web, 'testes da web'], [TESTS.evals, 'perguntas de avaliação ao copiloto, 99% dos números verificados']].forEach(([v, l], i) => {
     s.addText([{ text: v, options: { fontFace: THEME.headFontFace, fontSize: 30, color: C.accent2 } }, { text: `  ${l}`, options: { fontSize: 13, color: C.accent5 } }], { x: M + i * 4.1, y: 5.05, w: 3.9, h: 0.95, fontFace: THEME.bodyFontFace, margin: 0, valign: 'middle', isTextBox: true, objectName: `Testes ${l}` });
   });
   s.addText([{ text: 'novelo.helder.si', options: { bold: true, color: C.accent3 } }, { text: '   ·   github.com/helderpgoncalves/novelo', options: { color: C.accent5 } }], { x: M, y: 6.2, w: W - 2 * M, h: 0.45, fontFace: THEME.bodyFontFace, fontSize: 16, margin: 0, isTextBox: true, objectName: 'Ligações' });
@@ -619,7 +624,7 @@ pres.addSection({ title: 'Anexos' });
   const md = [
     '# Guião do pitch',
     '',
-    'Gerado por `pitch/build.js` a partir das notas do orador do deck (`node build.js`). Cinco minutos, doze diapositivos; os números vêm da API (cenário de referência de 60 000 €/ano, estimativas).',
+    'Gerado por `pitch/build.js` a partir das notas do orador do deck (`node build.js`). Quatro minutos, dez diapositivos; os números vêm da API (cenário de referência de 60 000 €/ano, estimativas).',
     '',
     '| Tempo | Diapositivo | Fala |',
     '| --- | --- | --- |',

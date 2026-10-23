@@ -1,5 +1,7 @@
 # Narrativa do pitch
 
+> **Atualização (23 out 2026).** O pitch tem **4 minutos mais 1 de perguntas**. A versão que vale é a do [Guião do pitch](guiao-do-pitch.md) (10 diapositivos, 4:00), gerada do deck; este documento guarda a versão de 5 minutos, as objeções e as respostas.
+
 A história completa do Novelo, em três durações, com **cada afirmação ligada a um número e a uma linha do [registo de afirmações](../pesquisa/registo-de-afirmacoes.md)**. O [guião de slides](pitch-slides.md) usa esta narrativa; a [estratégia](estrategia-para-ganhar.md) explica porquê.
 
 Os pitches são presenciais a 26 de outubro a partir das 14h30. Duração do pitch **desconhecida**: assumimos 5 minutos e preparamos versões de 30 segundos e de 3 minutos. A avaliação segue quatro critérios ponderados; ver [a repartição do tempo](#repartição-do-tempo-pelos-quatro-critérios). Referências do tipo `A1` remetem para o registo.

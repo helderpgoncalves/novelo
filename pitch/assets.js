@@ -1,5 +1,5 @@
-// Recursos do deck: mapas reais (de video/src/data/geo.json, gerado da API de dev e de data/processed) e recortes das
-// capturas da app (video/public/shots). Corre com: node assets.js
+// Recursos do deck: mapa dos contentores (de video/src/data/geo.json) e recortes das capturas da produção (docs/img).
+// Corre com: node assets.js
 const sharp = require('sharp');
 const fs = require('node:fs');
 const path = require('node:path');
@@ -48,24 +48,23 @@ async function crop(src, out, { top, height, left = 0, width, scale = 2 }) {
 
 (async () => {
   await sharp(Buffer.from(mapSvg({ dark: true, containers: true }))).png().toFile(path.join(OUT, 'mapa-contentores.png'));
-  await sharp(Buffer.from(mapSvg({ dark: true, network: true }))).png().toFile(path.join(OUT, 'mapa-rede.png'));
   console.log('mapas');
-  // Posições em px CSS do #content (medidas na stack de dev, 1440 × 900, 22 out 2026); as capturas são a 2x.
-  await crop('app/sim-desktop-content.png', 'sim-kpis.png', { top: 1215, height: 600 });
-  await crop('app/sim-desktop-content.png', 'sim-mapa.png', { top: 2036, height: 610 });
-  await crop('app/sim-desktop-content.png', 'sim-form.png', { top: 0, height: 1010 });
-  await crop('app/scenario-desktop-content.png', 'plano.png', { top: 1325, height: 780 });
-  await crop('app/scenario-desktop-content.png', 'reutilizavel.png', { top: 765, height: 245 });
-  await crop('app/scenario-desktop-content.png', 'saco-ao-fio.png', { top: 2470, height: 440 });
-  await crop('app/coverage-desktop-content.png', 'cobertura.png', { top: 600, height: 700 });
-  await crop('app/uncertainty-desktop-content.png', 'incerteza.png', { top: 620, height: 1250 });
-  // Operação: triagem real com o modelo da OpenRouter e o lote de demonstração NOV-PGTV2Z (fotografias de licença livre).
-  await sharp(path.join(V, 'public/shots/ops/lot-desktop.png')).extract({ left: 512, top: 160, width: 2368, height: 1640 }).png().toFile(path.join(OUT, 'lote.png'));
-  await sharp(path.join(V, 'public/shots/ops/triage-desktop.png')).extract({ left: 590, top: 170, width: 2290, height: 1600 }).png().toFile(path.join(OUT, 'triagem.png'));
-  fs.copyFileSync(path.join(V, 'public/shots/ops/passport-mobile.png'), path.join(OUT, 'passaporte.png'));
-  for (const f of ['copilot-panel.png', 'copilot-desktop.png', 'm-passport.png', 'p-1.png', 'p-2.png', 'p-3.png', 'hero-light.png']) {
-    fs.copyFileSync(path.join(V, 'public/shots', f), path.join(OUT, f));
-  }
+  // Capturas reais da produção (23 out 2026), recortadas das páginas de docs/img (geradas por scripts/docs/page-shots.cjs).
+  const D = path.join(__dirname, '../docs/img');
+  const cut = async (src, out, left, top, width, height) => {
+    await sharp(path.join(D, src)).extract({ left, top, width, height }).png().toFile(path.join(OUT, out));
+    console.log(out);
+  };
+  await cut('pagina-rotas.png', 'rotas-mapa.png', 372, 1366, 1120, 584);
+  await cut('pagina-rotas.png', 'rotas-kpis.png', 372, 600, 1120, 330);
+  await cut('pagina-rastreio.png', 'passaporte.png', 1110, 305, 420, 1738);
+  await cut('pagina-rastreio.png', 'lote.png', 73, 976, 981, 1067);
+  await cut('pagina-triagem.png', 'triagem-telemovel.png', 1106, 370, 419, 1535);
+  await cut('pagina-triagem.png', 'triagem.png', 273, 1055, 497, 585);
+  await cut('pagina-copiloto.png', 'copilot-panel.png', 850, 420, 677, 795);
+  await cut('pagina-cobertura.png', 'cobertura.png', 73, 330, 1454, 1500);
+  await cut('pagina-incerteza.png', 'incerteza.png', 73, 330, 1454, 1700);
+  await cut('pagina-relatorio.png', 'relatorio.png', 73, 330, 1454, 800);
   fs.copyFileSync(path.join(__dirname, '../brand/redes/novelo-capa-1920x1080-escuro.png'), path.join(OUT, 'capa.png'));
   // QR para https://novelo.helder.si, nas cores da marca (gerado uma vez com a biblioteca qrcode do Python).
   fs.copyFileSync(path.join(__dirname, 'qr-novelo.png'), path.join(OUT, 'qr-novelo.png'));
