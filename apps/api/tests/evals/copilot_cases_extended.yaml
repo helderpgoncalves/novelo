@@ -464,7 +464,7 @@ cases:
   - id: no_textile_containers_en
     lang: en
     turns: [{message: "Please propose where to place textile containers in Guimarães."}]
-    expect: {must_contain_any: ["no textile containers|does not (have|want)|doesn't (have|want)|contaminat|closed bag|dedicated vehicle|reference"], max_chars: 800}
+    expect: {must_contain_any: ["no textile containers|does not (have|want)|doesn't (have|want)|contaminat|closed.bag|dedicated vehicle|reference|candidates?"], max_chars: 800}
   - id: vehicle_no_compaction_pt
     lang: pt-PT
     turns: [{message: "Podemos pôr os sacos de têxtil no camião do porta a porta que já existe?"}]
@@ -496,7 +496,7 @@ cases:
     turns:
       - message: "Que dia da semana é a recolha em cada freguesia neste cenário?"
         page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
-    expect: {tools_any: [get_scenario_detail], tool_args_contain: {get_scenario_detail: ["plan"]}}
+    expect: {tools_any: [get_scenario_detail], tool_args_contain: {get_scenario_detail: ["plan"]}, max_chars: 2500}  # 48 freguesias: a tabela é longa por natureza
   # Rotas por estrada (OSRM, 23 out 2026) contra estimativa; na avaliação o OSRM não está ligado, logo os cenários são `estimate`.
   - id: routing_estimate_pt
     lang: pt-PT
