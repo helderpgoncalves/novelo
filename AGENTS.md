@@ -52,6 +52,7 @@ com fonte, ou leva a etiqueta "estimativa" no ecrã.
 | `just seed` | Importa `data/processed/` para a base de dados (idempotente; a API já o faz ao arrancar) |
 | `just brand` / `just check-brand` | Regenera os assets da marca de uma só fonte (inclui fundos dither, partilha OG, banners; `just brand-landing` só a landing, `just brand-fonts` os subsets de fontes) / mede o alinhamento do logótipo (precisa de `rsvg-convert`) |
 | `just osrm-up` / `just osrm-test` / `just osrm-calibrate` / `just osrm-refresh` | Rotas por estrada (OSRM próprio, OpenStreetMap): sobe o serviço (:5190) / testes de integração reais / desvio e velocidade vs pressupostos / dados novos. `just dev` já o inclui; ver `docs/engenharia/rotas-reais.md` |
+| `scripts/seed/demo_seed.py` | Seed de demonstração (6 lotes com fotografias reais, 7 cenários): corre dentro do contentor da API, dry-run por omissão; ver `docs/engenharia/seed-demo.md` |
 | `just eval-copilot` / `just eval-triage` | Avaliações com o modelo real (precisam de `OPENROUTER_API_KEY`) |
 | `just fix` | Formata e corrige o que o lint conseguir |
 | `just migration "msg"` / `just migrate` | Alembic |
