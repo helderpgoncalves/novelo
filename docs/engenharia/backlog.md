@@ -19,7 +19,7 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Relatório | PDF RAP com custo por tipo de território (WeasyPrint) e histórico |
 | Web | Mapa, todos os ecrãs de dados, Frota refeita (calendário da semana tipo, `.ics`), pt/en, claro/escuro, PWA mobile-first com barra de separadores, páginas de erro, visita guiada, `DataTable` e `PageTabs` completos |
 | Marca | Geometria única, `just brand` (SVG, PNG, favicon, ícones PWA, avatares, partilha, email) e `just check-brand` |
-| Qualidade | 1 054 testes pytest, 432 Vitest e Playwright em 36 ficheiros (22 out 2026) |
+| Qualidade | 1 164 testes pytest, 449 Vitest e Playwright em 36 ficheiros (23 out 2026) |
 
 ## Falta
 
