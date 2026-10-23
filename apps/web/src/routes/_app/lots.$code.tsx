@@ -316,7 +316,7 @@ const itemColumns = (onOpenPhoto: (item: LotItemOut) => void): Column<LotItemOut
     value: (i) => (i.has_photo ? m.lotphoto_has() : m.lotphoto_none()),
     filter: true,
     searchable: false,
-    width: 80,
+    width: 260,
     cell: (i) =>
       i.has_photo && i.photo_url ? (
         <figure className="flex items-center gap-2">
@@ -327,7 +327,7 @@ const itemColumns = (onOpenPhoto: (item: LotItemOut) => void): Column<LotItemOut
             onOpen={() => onOpenPhoto(i)}
           />
           {formatPhotoCredit(i.photo_credit) && (
-            <figcaption className="max-w-44 break-words text-[11px] text-muted-foreground leading-tight">
+            <figcaption className="w-44 whitespace-normal break-words text-[11px] text-muted-foreground leading-tight">
               {formatPhotoCredit(i.photo_credit)}
             </figcaption>
           )}
