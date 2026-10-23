@@ -95,7 +95,7 @@ A foto deve mostrar uma peça de roupa. Em teoria, não há titulares. Na práti
 | Substituir | Apaga a anterior e cria outra com novo `id`, nova validade e novo `consent_at` | `save_photo` |
 | Eliminar a conta do operador | A foto fica (`created_by_id` passa a nulo); é a peça e o prazo que mandam | migração `0018` |
 
-A retenção em **cópias de segurança** não está definida: ver [Deploy](deploy.md#operação) (pg_dump diário a copiar para fora da VPS). Uma miniatura apagada pode continuar numa cópia até esta ser rodada. Decisão em aberto.
+As **cópias de segurança** (`pg_dump` diário às 04:00, 30 dias de retenção, no próprio servidor; ver [Deploy](deploy.md#operação)) incluem as miniaturas: uma foto apagada pode continuar numa cópia até 30 dias. A entidade tem de validar este prazo e se as cópias saem do servidor.
 
 ## Direitos dos titulares e como se exercem
 

@@ -52,13 +52,13 @@ Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão 
 | Operação atual | 40 circuitos, 29 viaturas, 82 localidades (79 com freguesia CAOP 2019), 101 turnos, 9 circuitos sem viatura, 2 viaturas nunca atribuídas | Vitrus (`Circuitos_Viaturas_Guimaraes.xlsx`), registo A6, A7 | Dado Vitrus |
 | Alertas de qualidade | 12 | Vitrus, registo A13 | Dado Vitrus |
 | Referência francesa | 4,27 kg/hab/ano; 1 ponto por 1 414 habitantes | Refashion via imprensa, registo C1, C2 | **Por verificar** (secundária) |
-| Meta francesa e teto do modelo | 669,7 t; 562,6 t (107,1 t de distância) | Cálculo nosso ([dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês)) | Cálculo, depende da França |
+| Meta francesa e teto do modelo | 669,7 t; 772,1 t (teto sem contentores, 102,4 t acima da meta) | Cálculo nosso ([dados e modelo](../engenharia/dados-e-modelo.md#cenário-de-referência-desempenho-francês)) | Cálculo, depende da França |
 | Obrigação do município | Desde 1 de janeiro de 2025 | Diretiva 2008/98/CE, art. 11.º, n.º 1 (alterada pela Diretiva (UE) 2018/851) e RGGR, art. 36.º [F81] [F69] [F2]; **não** vem da Diretiva (UE) 2025/1892 | Primária |
 | Prazo para criar a RAP em Portugal | 17 de abril de 2028; cobre as peças postas à venda a partir da lei nacional, o mais tardar dessa data | Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] (registo B4, B17) | Primária; leitura do n.º 11 a confirmar com a APA |
 | Dias até 17 de abril de 2028 | 543 (a 22 de outubro de 2026); 539 (a 26 de outubro). Mede o prazo para o regime existir, não o dia em que os produtores pagam tudo | Cálculo | Cálculo |
-| Exemplo de €/t | 122,7 €/t; P10 92,5, P50 123,8, P90 164,7 (cenário de 60 000 €/ano) | Modelo ([dados e modelo](../engenharia/dados-e-modelo.md#sensibilidade-tornado-e-monte-carlo)) | **Estimativa** |
+| Exemplo de €/t | 101,9 €/t; P10 81,6, P50 103,4, P90 139,7 (cenário de 60 000 €/ano por freguesia, 23 out 2026) | Modelo ([dados e modelo](../engenharia/dados-e-modelo.md#sensibilidade-tornado-e-monte-carlo)) | **Estimativa** |
 | Piso de sinal do piloto | 1,71 t em 3 meses (2 freguesias × 2 modos) | Modelo (`domain/pilot.py`) | **Estimativa** |
-| Cenário B: X t a Y €/t | por preencher a 22 de outubro | Otimizador | **Estimativa** |
+| Cenário B: 431,1 t a 101,9 €/t | preenchido (23 out 2026; registo H3) | Otimizador | **Estimativa** |
 
 Onde o texto usa "[X]" ou "[Y]", o valor vem do cenário fixado a 22 de outubro e não se escreve à mão.
 
@@ -100,7 +100,7 @@ Sobre os tokens do [guia de marca](../marca/guia-de-marca.md): Linho `#F4F1EA`, 
 
 **Regras de desenho**
 
-- **Números grandes em Newsreader 500** com algarismos alinhados; texto de interface em Inter. Unidade sempre ao lado (`301,3 t`, `122,7 €/t`), formatada por `lib/format.ts`.
+- **Números grandes em Newsreader 500** com algarismos alinhados; texto de interface em Inter. Unidade sempre ao lado (`301,3 t`, `101,9 €/t`), formatada por `lib/format.ts`.
 - **Estimativa tem sempre três sinais**: etiqueta "estimativa", contorno tracejado e, na tabela alternativa, uma coluna "origem".
 - **Categorias**: para fibras (11 valores na API) usa-se rotulagem direta e textura, com paleta categórica testada para daltonismo (por escolher; a Okabe–Ito é a candidata, por verificar [R11]). Nunca mais de seis cores num só gráfico.
 - **Movimento** só quando revela uma relação (cascata, fio que engrossa, relógio). Nunca decorativo. Respeita `prefers-reduced-motion`; qualquer animação automática com mais de cinco segundos tem botão de pausa (WCAG 2.2.2) [R7].
@@ -346,7 +346,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | 1 | **De 301,3 t para [T] t**: hoje, mais locais existentes sem contentor novo, mais recolha a pedido nos circuitos | Cascata | `Kpis.baseline_observed_t`, `ModeSummary.tonnes`, D05 | Novo |
 | 2 | **Quão certo é o €/t**: P10–P50–P90 numa linha, com o limiar e `prob_below_threshold` | Intervalo | `POST /planning/scenarios/{id}/sensitivity` (`eur_per_tonne`, `QuantilesOut`) | Existe (`uncertainty-panel`) |
 | 3 | **O que mais pesa**: barras do tornado, cor pela origem (plano, Vitrus, pressuposto), "3 dos 5 maiores são pressupostos sem dado" | Tornado | `tornado[]` (`swing_eur_per_tonne`, `source`) | Existe (`tornado-chart`) |
-| 4 | **Mapa do cenário e fluxo previsto** | Coroplético + Sankey | `allocations`, `GET /planning/scenarios/{id}/flows` | Existe (`scenario-map`) |
+| 4 | **Mapa do cenário e fluxo previsto** | Coroplético + Sankey | `allocations`, `routes` (`path`, `source`, `road_path`: rotas desenhadas pelas estradas, com a origem dos km à vista), `GET /planning/scenarios/{id}/flows` | Existe (`scenario-map`) |
 
 - **Momento "uau":** a cascata revela-se degrau a degrau (301 → +locais existentes → +a pedido) e termina no intervalo. É o slide 4 da demo.
 - **Interações:** passar o rato numa barra do tornado mostra "se este pressuposto subir 30%, o €/t passa de [A] para [B]"; clicar numa freguesia no mapa destaca a linha da tabela de alocações; *brush* sobre o intervalo escolhe o limiar.
@@ -635,13 +635,13 @@ flowchart LR
 | --- | --- | --- | --- | --- | --- |
 | 1 | **Gancho** | "Recolhemos 301 toneladas de têxtil em 2025." Subtítulo: "1,92 kg por habitante, por ano." | Contador grande (Newsreader) + símbolo de três fios | 301,3 t; 156 830 hab. | Vitrus; INE (A1, A2, A3) |
 | 2 | **Problema** | "Era cerca de um em cada onze quilos do têxtil que Guimarães gera." | Barra de captura 9,1% + barra de destino 59,4 / 26,5 / 14,1% | 3 003,3 t; 9,1%; destino | A8, A9 (estimativa), A4 |
-| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo sem contentores 772,1 t (estimativa, 22 out 2026) acima da meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
+| 3 | **Tensão** | "Mais contentores não chegam: sem custo por tonelada, a conta não fecha." | Duas barras: 1,92 contra 4,27 kg/hab/ano ("referência francesa, por verificar"); o teto do modelo sem contentores 772,1 t (estimativa, 23 out 2026) acima da meta 669,7 t | Cálculo do modelo | C1 (por verificar), C14, cálculo |
 | 4 | **Relógio regulatório** | "Desde 2025 paga o município. Em 543 dias a RAP tem de existir, e só cobre as peças postas à venda a partir daí." | Linha do tempo 1 jan 2025 → hoje → 17 abr 2028; depois, a faixa do município vai clareando (sem número: a idade das peças não se conhece) | Datas | Diretiva 2008/98/CE e RGGR [F81] [F69]; Diretiva (UE) 2025/1892, art. 22.º-A, n.º 11 e 14 [F1] [F2] |
 | 5 | **Solução** | "Novelo diz onde investir, como recolher e quanto custa cada tonelada." | Cascata 301,3 t → [X] t, com intervalo de €/t | Cenário B | Otimizador (estimativa) |
 | 6 | **Prova** | "Aberto, não prometido." | Três cartões: QR do lote, verificador de números, relatório RAP | Lote de demonstração (com selo), cenário B | Produto |
 | 7 | **CTA** | "Pedimos três meses e duas freguesias." | Botões: "Abrir o simulador" e "Ver o relatório RAP"; linha do piloto (piso de 1,71 t, estimativa) | `PilotOut` | Modelo |
 
-Rodapé: fontes, ferramentas de IA identificadas (Claude Code, GLM/Z.ai, OpenRouter, OR-Tools, OSRM, regra E11) e aviso "protótipo funcional" (a organização espera um protótipo, não um produto acabado [F61]).
+Rodapé: fontes, ferramentas de IA identificadas (Claude Code, GLM/Z.ai, OpenRouter, OR-Tools, OSRM, regra E11), atribuição «Dados do mapa © colaboradores do OpenStreetMap (ODbL)» onde houver estradas ou rotas no mapa, e aviso "protótipo funcional" (a organização espera um protótipo, não um produto acabado [F61]).
 
 ### 3.3 Wireframe a 1440 px
 
@@ -685,7 +685,7 @@ Grelha de 12 colunas, largura útil de 1200 px, margens de 120 px. Secções com
 │   ┌─────────────────────────────────────────┐   ┌─────────────────────────────────────┐   │
 │   │ Cascata (t):                            │   │ €/t [Y] (estimativa)                │   │
 │   │ hoje 301,3 ▌+existentes ▌+a pedido      │   │ P10 ────●──── P90                   │   │
-│   │ = [X] t                                 │   │ ex.: 92,5 … 123,8 … 164,7           │   │
+│   │ = [X] t                                 │   │ ex.: 81,6 … 103,4 … 139,7           │   │
 │   └─────────────────────────────────────────┘   └─────────────────────────────────────┘   │
 │   Orçamento [━━━━●━━━━] 60 000 €/ano        [Experimentar no simulador]                      │
 ├──────────────────────────────────────────────────────────────────────────────────────────────┤
@@ -704,7 +704,7 @@ Grelha de 12 colunas, largura útil de 1200 px, margens de 120 px. Secções com
 └──────────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-Valores ilustrativos do cenário (92,5 a 164,7 €/t) vêm do exemplo do modelo de 60 000 €/ano (estimativa); na versão final lêem-se do cenário B fixado.
+Valores ilustrativos do cenário (81,6 a 139,7 €/t) vêm do exemplo do modelo de 60 000 €/ano (estimativa); na versão final lêem-se do cenário B fixado.
 
 ### 3.4 Wireframe a 390 px
 

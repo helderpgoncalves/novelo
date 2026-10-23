@@ -14,7 +14,7 @@ O vídeo do Novelo, com 2 minutos e 14 segundos, em **16:9 (1920 × 1080)** e **
 | Onde se perde | 48 freguesias (CAOP 2019) e os contentores municipais, no mapa | Pacote QGIS da Vitrus |
 | A viragem | Contentores de têxtil, não; nem no camião do lixo; a rede refeita em 24 h, com uma viatura de têxtil nova | Mentor da Vitrus, 21 e 22 out 2026 |
 | A rede | A viatura de têxtil a partir de Polvoreira, o saco à porta, os locais existentes e as escolas, do cenário de 60 000 €/ano | Otimizador, API de dev |
-| Resultado | 445,8 t, 102,8 €/t, 264,9 t reutilizáveis, uma viatura de 42 500 €; o tratamento evitado (47 093 €, a 105,64 €/t) contra o custo (45 828 €); curva de custo (estimativas) | Cenários de referência v5, Vitrus |
+| Resultado | 431,1 t, 101,9 €/t, 256,1 t reutilizáveis, uma viatura de 42 500 €; o tratamento evitado (45 542 €, a 105,64 €/t) contra o custo (43 914 €); curva de custo (estimativas) | Cenários de referência v5, Vitrus |
 | Produto | 10 ecrãs reais da app, com scroll e zoom: uma troca real com o copiloto, a triagem de uma peça, o lote com QR e o relatório RAP | `scripts/capture.mjs`, `public/shots/ops` |
 | Em resumo | Impacto, inovação, viabilidade e continuidade, cada um com a prova | `docs/projeto/visao-geral.md` |
 | Rigor e pedido | Testes, produção e o piloto de 3 meses | `just check` |

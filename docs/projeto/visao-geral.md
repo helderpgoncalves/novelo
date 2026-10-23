@@ -8,9 +8,9 @@
 
 *Hack4Guimarães 2035 · Desafio 5 TexVitrus · Hélder Gonçalves e Flávio Fernandes*
 
-| **3 003,3 t** | **9,1%** | **445,8 t** | **47 093 €** | **0 contentores** |
+| **3 003,3 t** | **9,1%** | **431,1 t** | **45 542 €** | **0 contentores** |
 | :---: | :---: | :---: | :---: | :---: |
-| de têxtil por ano ainda no lixo indiferenciado (estimativa) | do têxtil gerado é hoje recolhido à parte (estimativa) | a mais por ano, a 102,8 €/t, com 60 000 €/ano de orçamento (estimativa) | de tratamento evitado por ano, a 105,64 €/t (Vitrus): paga a operação de 45 828 € (estimativa) | novos: uma só viatura de têxtil, sem compactação, e os locais que já existem |
+| de têxtil por ano ainda no lixo indiferenciado (estimativa) | do têxtil gerado é hoje recolhido à parte (estimativa) | a mais por ano, a 101,9 €/t, com 60 000 €/ano de orçamento (estimativa) | de tratamento evitado por ano, a 105,64 €/t (Vitrus): paga a operação (35 702 €) e o custo total de 43 914 € (estimativa) | novos: uma só viatura de têxtil, sem compactação, e os locais que já existem |
 
 ![A página de entrada do Novelo: 301,3 t recolhidas à parte em 2025 e cerca de 3 003 t por ano ainda no lixo, com as fontes da Vitrus e da APA](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-hero.png)
 
@@ -21,7 +21,7 @@
 - **O problema.** Em 2025 o concelho deitou cerca de **51 250 t** ao lixo indiferenciado (a Vitrus recolheu 43 050,5 t, 84,0% do total). Com 5,86% de têxtil (APA), são cerca de **3 003 t por ano** que não chegam à recolha seletiva, contra **301,3 t** recolhidas à parte (estimativas). A recolha seletiva é obrigatória desde 1 de janeiro de 2025 e hoje **paga-a só o município**.
 - **A nossa resposta.** Não propomos um contentor melhor; a Vitrus não quer contentores de têxtil, porque o têxtil de contentor vem contaminado. O saco também não pode ir no camião do lixo: a compactação estraga-o. Propomos **uma rede sem contentores** com o que a própria Vitrus indicou, **um meio novo de recolha**: uma viatura de têxtil, sem compactação, que recolhe o saco fechado à porta num dia fixo por freguesia e para nos locais municipais que já existem e nas escolas.
 - **O que poupa.** Cada tonelada que sai do lixo deixa de pagar **105,64 € de tratamento** em aterro (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). No cenário recomendado, esta poupança paga a operação.
-- **A prova.** Um otimizador (OR-Tools, CP-SAT e VRP) escolhe onde, como e com que custo. Com **60 000 €/ano**, a rede gasta **45 828 € por ano** e desvia **445,8 t a 102,8 €/t**, das quais **cerca de 265 t reutilizáveis**; a captura sobe de **9,1% para cerca de 22,6%**. O tratamento evitado, **47 093 € por ano**, cobre a operação: o custo líquido fica em −2,8 €/t. O investimento é de 57 500 €: 42 500 € na viatura e o resto em 60 pontos (estimativas). Em 8 de cada 10 simulações, o custo fica entre 82,0 e 141,3 €/t.
+- **A prova.** Um otimizador (OR-Tools, CP-SAT e VRP) escolhe onde, como e com que custo. Com **60 000 €/ano**, a rede gasta **43 914 € por ano** e desvia **431,1 t a 101,9 €/t**, das quais **cerca de 256 t reutilizáveis**; a captura sobe de **9,1% para cerca de 22,2%**. O tratamento evitado, **45 542 € por ano**, cobre a operação (35 702 €) e o custo total com a viatura: o custo líquido fica em −1 628 € por ano (−3,8 €/t). Os km são medidos pela estrada (OSRM). O investimento é de 57 000 €: 42 500 € na viatura e o resto em 58 pontos (estimativas). Em 8 de cada 10 simulações, o custo fica entre 81,6 e 139,7 €/t.
 - **O que pedimos.** Um **piloto de 3 meses em duas freguesias**, desenhado pelo próprio Novelo, para trocar os pressupostos pelos números reais.
 
 ---
@@ -81,7 +81,7 @@ A Vitrus fechou duas portas: o saco não pode ir no camião do lixo (a compacta�
 
 **Porque uma viatura nova, e não o camião que já passa?** Perguntámos à Vitrus. O saco iria para a caixa de compactação e estragava-se; cabine, gancho ou caixa lateral também não são possíveis. Um compactador não pode fazer uma volta só de têxtil, por contaminação. E a folha de turnos que parecia mostrar viaturas paradas à tarde tinha um erro: à tarde as viaturas estão em uso. A viatura nova é o caminho que a própria Vitrus indicou.
 
-**Quem paga a viatura?** O lixo que deixa de ir para aterro. Cada tonelada desviada poupa **105,64 €** de tratamento (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). No cenário recomendado, a viatura custa 42 500 € (5 312,50 € por ano em 8 anos) e o custo total da rede é de 45 828 € por ano; o tratamento evitado, 47 093 € por ano, cobre-o (estimativas). O Novelo põe esta poupança ao lado do custo de cada cenário.
+**Quem paga a viatura?** O lixo que deixa de ir para aterro. Cada tonelada desviada poupa **105,64 €** de tratamento (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). No cenário recomendado, a viatura custa 42 500 € (5 312,50 € por ano em 8 anos) e o custo total da rede é de 43 914 € por ano; o tratamento evitado, 45 542 € por ano, cobre-o, por uma margem curta de 1 628 € (estimativas). O Novelo põe esta poupança ao lado do custo de cada cenário.
 
 ---
 
@@ -89,20 +89,28 @@ A Vitrus fechou duas portas: o saco não pode ir no camião do lixo (a compacta�
 
 ### Decidir: o simulador da rede
 
-O decisor escolhe o orçamento ou a meta. O otimizador decide que freguesias servir, com que canal, e calcula as rotas da viatura de têxtil. Cada cenário mostra **investimento, custo anual, toneladas, toneladas reutilizáveis, €/t e população servida**, num mapa.
+O decisor escolhe o orçamento ou a meta. O otimizador decide que freguesias servir, com que canal, e calcula as rotas da viatura de têxtil, **medidas pela estrada** (OpenStreetMap, servidor nosso, sem custos) e desenhadas no mapa; só a volta porta a porta dentro da freguesia é estimativa por fórmula, e o ecrã di-lo. Cada cenário mostra **investimento, custo anual, toneladas, toneladas reutilizáveis, €/t e população servida**, num mapa.
 
-![Simulador: orçamento de 60 000 €/ano, o mapa das freguesias servidas e os indicadores do cenário](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-simulador.png)
+![Resultado do cenário de 60 000 €/ano: toneladas, custo anual, investimento, tratamento evitado e custo líquido, tudo marcado como estimativa](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-simulador.png)
 
 | Cenário (estimativas) | Custo anual | Toneladas por ano | €/t | Tratamento evitado | Reutilizável |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Orçamento de 40 000 €/ano | 26 909 € | 378,5 t | 71,1 | ≈ 39 985 € | ≈ 224,8 t |
-| **Orçamento de 60 000 €/ano (recomendado)** | **45 828 €** | **445,8 t** | **102,8** | **47 093 €** | **264,9 t (222,9 a 324,8)** |
-| Orçamento de 100 000 €/ano | 85 860 € | 571,2 t | 150,3 | ≈ 60 342 € | ≈ 339,3 t |
-| Teto sem contentores (2 viaturas) | 170 623 € | 772,1 t | 221,0 | ≈ 81 565 € | 458,8 t |
+| Orçamento de 40 000 €/ano | 24 042 € | 364,3 t | 66,0 | ≈ 38 480 € | ≈ 216,4 t |
+| **Orçamento de 60 000 €/ano (recomendado)** | **43 914 €** | **431,1 t** | **101,9** | **45 542 €** | **256,1 t (215,6 a 314,1)** |
+| Orçamento de 100 000 €/ano | 82 106 € | 555,3 t | 147,9 | ≈ 58 657 € | ≈ 329,9 t |
+| Teto sem contentores (2 viaturas) | 176 734 € | 772,1 t | 228,9 | ≈ 81 570 € | 458,8 t |
 
 Os valores com "≈" são cálculo nosso sobre as toneladas do cenário: × 105,64 €/t (Vitrus) e × 59,4% de reutilização (2025).
 
-No cenário recomendado, a maior parte das toneladas vem das paragens nos locais municipais que já existem (60 pontos em 45 freguesias, 366,3 t); o saco à porta só vai onde compensa (4 freguesias, 79,5 t). A viatura trabalha cerca de 1,67 dias por semana. Até aos 60 000 €/ano, o tratamento evitado paga a operação; depois, o custo por tonelada sobe à medida que a rede chega às freguesias mais dispersas. **É esta curva que permite decidir com números, e não a olho.** A meta francesa (669,7 t) fica ao alcance sem contentores, entre os 100 000 e os 150 000 €/ano (estimativa).
+No cenário recomendado, a maior parte das toneladas vem das paragens nos locais municipais que já existem (58 pontos em 43 freguesias, 359,9 t); o saco à porta só vai onde compensa (3 freguesias, 71,2 t). A viatura trabalha cerca de 1,66 dias por semana. Até aos 60 000 €/ano, o tratamento evitado paga a operação; depois, o custo por tonelada sobe à medida que a rede chega às freguesias mais dispersas. **É esta curva que permite decidir com números, e não a olho.** A meta francesa (669,7 t) fica ao alcance sem contentores, entre os 100 000 e os 150 000 €/ano (estimativa).
+
+### Decidir: as rotas seguem as estradas
+
+A viatura de têxtil parte do Estaleiro de Polvoreira e o Novelo calcula as suas viagens **sobre as estradas reais**: a distância entre cada par de paragens, nos dois sentidos (as ruas de sentido único contam), vem do OpenStreetMap, servido por um motor de rotas nosso (OSRM), sem custos. O traçado no mapa segue essas estradas, não linhas retas. Cada rota diz de onde vêm os seus quilómetros: **traço cheio** quando são medidos pela estrada, **tracejado** quando o servidor de rotas não respondeu e o Novelo estimou em linha reta, e assinala-o.
+
+![Rotas por estrada: as viagens da viatura de têxtil a partir de Polvoreira, a seguir as estradas, num cenário por locais reais de 60 000 €/ano](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-rotas.png)
+
+O que **continua a ser estimativa**, e o ecrã di-lo: a volta porta a porta dentro de cada freguesia (uma fórmula por área, porque não há moradas), os minutos de condução (o motor assume uma furgoneta de 2,8 × 2,1 × 6 m e 3,5 t, sem trânsito: a viatura da Vitrus ainda não está definida) e o desvio de 1,3 que serve de plano B quando não há estrada. Medimos esse desvio contra as estradas reais: a estrada é, em mediana, 1,37 a 1,48 vezes a linha reta, por isso o plano B é otimista. Detalhe em [Rotas por estrada](../engenharia/rotas-reais.md).
 
 ### Decidir: só conta o que se pode reutilizar
 
@@ -114,19 +122,19 @@ A qualidade depende de quem recolhe e como. Nos dados da Vitrus de 2025, a Ultri
 
 ### Provar: a cobertura que a diretiva exige
 
-O separador **Cobertura** mostra, freguesia a freguesia, os quatro critérios do art. 22.º-C, n.º 9, b): população, densidade, volume previsto, proximidade e o canal usado. Com 60 000 €/ano, o cenário serve **73,9% da população nas 36 freguesias predominantemente urbanas e 60,2% nas 12 restantes** (estimativas). A rede não se fica pelas zonas fáceis, mas o separador mostra também o que falta: a única freguesia predominantemente rural, Arosa e Castelões, fica sem serviço neste orçamento.
+O separador **Cobertura** mostra, freguesia a freguesia, os quatro critérios do art. 22.º-C, n.º 9, b): população, densidade, volume previsto, proximidade e o canal usado. Com 60 000 €/ano, o cenário serve **72,8% da população nas 36 freguesias predominantemente urbanas e 55,5% nas 12 restantes** (estimativas). A rede não se fica pelas zonas fáceis, mas o separador mostra também o que falta: a única freguesia predominantemente rural, Arosa e Castelões, fica sem serviço neste orçamento.
 
 ![Separador Cobertura: os critérios do art. 22.º-C, o resumo por tipo de território e a tabela por freguesia](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-cobertura.png)
 
 ### Provar: e se os pressupostos estiverem errados?
 
-Os custos por hora e por km das viaturas ainda não chegaram do financeiro da Vitrus. Por isso a incerteza é um resultado, não uma nota de rodapé: a **análise de tornado** mostra que pressuposto mais pesa, e a **simulação de Monte Carlo** dá o intervalo. No cenário recomendado, **em 8 de cada 10 casos o custo fica entre 82,0 e 141,3 €/t** (500 amostras, semente 7).
+Os custos por hora e por km das viaturas ainda não chegaram do financeiro da Vitrus. Por isso a incerteza é um resultado, não uma nota de rodapé: a **análise de tornado** mostra que pressuposto mais pesa, e a **simulação de Monte Carlo** dá o intervalo. No cenário recomendado, **em 8 de cada 10 casos o custo fica entre 81,6 e 139,7 €/t** (500 amostras, semente 7).
 
 ![Robustez do cenário: o tornado dos pressupostos e o intervalo do custo por tonelada](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-incerteza.png)
 
 ### Decidir em português: o copiloto que nunca faz contas
 
-O decisor pergunta como falaria a um colega: *"E se o orçamento anual passar de 40 000 € para 60 000 €?"*. O copiloto percebe a pergunta, corre o otimizador e explica a diferença: com 60 000 €/ano, 445,8 t a 102,8 €/t, mais 18 919 € do que o cenário de 40 000 € (estimativas).
+O decisor pergunta como falaria a um colega: *"E se o orçamento anual passar de 40 000 € para 60 000 €?"*. O copiloto percebe a pergunta, corre o otimizador e explica a diferença: com 60 000 €/ano, 431,1 t a 101,9 €/t, mais 19 872 € do que o cenário de 40 000 € (estimativas).
 
 Testado com o modelo real: a *"E se o orçamento fosse 80 000 € por ano?"*, o copiloto correu o otimizador e respondeu **510,1 t por ano, 66 240 € de custo anual, cerca de 130 €/t** (estimativas). Na avaliação com o modelo real, **146 de 155 perguntas** passaram e **100% dos números** foram verificados contra a origem.
 
@@ -139,12 +147,13 @@ Testado com o modelo real: a *"E se o orçamento fosse 80 000 € por ano?"*, o 
 - **Controlo de qualidade na entrega:** uma foto da peça e outra da etiqueta sugerem o tipo, o estado, a fibra e a marca; o operador confirma ou corrige. A triagem não guarda as fotos. Desde 23 out 2026, o operador pode guardar uma miniatura opcional por peça (sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser). Ver [Privacidade das fotografias](../engenharia/privacidade-fotografias.md).
 - **Lote com QR e passaporte público:** origem, composição, peso e histórico, lidos com o telemóvel por quem recebe. São quase os campos que a diretiva vai pedir por fardo exportado (art. 22.º-D, n.º 9).
 - **Bolsa de fibra** para os recicladores do Vale do Ave, para o que não se pode reutilizar.
+- **Lotes de demonstração em produção:** seis lotes com 24 peças e fotografias reais (Wikimedia Commons: CC0, domínio público, CC BY e CC BY-SA, com o autor e a licença em cada miniatura), nos quatro estados (recolhido, triado, reservado e entregue), com reservas de recicladores de demonstração e um histórico espalhado por vários dias. Ver [Seed de demonstração](../engenharia/seed-demo.md).
 
-Testámos a triagem com o modelo real e fotos de licença aberta (Wikimedia Commons e Flickr). **Com a etiqueta legível, a composição saiu certa em todas as peças**: 80% algodão e 20% poliéster, 100% lã, 55% acrílico e 45% algodão, 100% nylon, 100% poliéster, com 86% a 97% de confiança. Só com a foto da peça, a fibra fica "desconhecida": o modelo não adivinha, e é a foto da etiqueta que dá a fibra. Ainda não há um conjunto de peças com verdade-terreno para medir a exatidão em percentagem.
+Testámos a triagem com o modelo real e fotos de licença aberta (Wikimedia Commons e Flickr). Com a etiqueta legível, a composição saiu certa nos primeiros testes (por exemplo 80% algodão e 20% poliéster, 100% lã, 55% acrílico e 45% algodão), com 86% a 97% de confiança. **Mas não é infalível**: a etiqueta DIM do nosso lote de demonstração (78% poliamida, 21% elastano, 1% poliéster) foi lida certa numa execução e como 73/21/6 noutra. Por isso o operador confirma sempre, e por isso não afirmamos uma exatidão em percentagem. Só com a foto da peça, a fibra fica "desconhecida": o modelo não adivinha, e é a foto da etiqueta que dá a fibra. Ainda não há um conjunto de peças com verdade-terreno para medir a exatidão.
 
-![Triagem de umas calças de ganga: a etiqueta «80% cotton, 20% polyester» lida com 97% de confiança, no computador e no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-triagem.png)
+![Triagem de um cachecol Ralph Lauren: o modelo lê a etiqueta (marca e composição) e o operador confirma ou corrige, no computador e no telemóvel; fotografia de Amin, CC BY-SA 4.0, Wikimedia Commons](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-triagem.png)
 
-![O lote de teste NOV-PGTV2Z: 4 peças, 1,4 kg (estimativa), com QR, composição e o passaporte público que o recetor abre no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-rastreio.png)
+![O lote de demonstração NOV-6EYRXN: 5 peças de lã, 2,2 kg (estimativa), com QR, composição, fotografias com crédito e o passaporte público que o recetor abre no telemóvel](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-rastreio.png)
 
 ### Prestar contas: o relatório RAP num clique
 
@@ -166,16 +175,10 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 
 | | O que construímos | Onde se vê |
 | --- | --- | --- |
-| **Impacto** | +445,8 t por ano desviadas do lixo, 264,9 t reutilizáveis, captura de 9,1% para cerca de 22,6%; 47 093 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
+| **Impacto** | +431,1 t por ano desviadas do lixo, 256,1 t reutilizáveis, captura de 9,1% para cerca de 22,2%; 45 542 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
 | **Inovação** | Uma rede **sem contentores**: uma só viatura de têxtil nova, o saco à porta e os locais que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, triagem, passaporte |
-| **Viabilidade** | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 500 €: 42 500 € na viatura e o resto em 60 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
+| **Viabilidade** | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 000 €: 42 500 € na viatura e o resto em 58 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
 | **Continuidade** | Uma história de seis passos para quem entra pela primeira vez; um piloto de 3 meses desenhado pelo próprio Novelo; replicável em qualquer município com dados abertos | [novelo.helder.si](https://novelo.helder.si) |
-
---- | :---: | --- | --- |
-| **Impacto e relevância** | 30% | +445,8 t por ano desviadas do lixo, 264,9 t reutilizáveis, captura de 9,1% para cerca de 22,6%; 47 093 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
-| **Inovação e originalidade** | 25% | Uma rede **sem contentores**: uma só viatura de têxtil nova, o saco à porta e os locais que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, passaporte |
-| **Viabilidade técnica** | 25% | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 500 €: 42 500 € na viatura e o resto em 60 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
-| **Apresentação e continuidade** | 20% | Uma história de seis passos para quem entra pela primeira vez; um piloto de 3 meses desenhado pelo próprio Novelo; replicável em qualquer município com dados abertos | [novelo.helder.si](https://novelo.helder.si) |
 
 ---
 
@@ -190,12 +193,13 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 | 40 circuitos, 29 viaturas, 101 turnos, 82 localidades; depósito na Rua das Lameiras, Polvoreira | Vitrus Ambiente | Dado |
 | 2 751 contentores municipais em 2 026 locais | Vitrus Ambiente (pacote QGIS) | Dado |
 | População e tipologia de cada freguesia | INE; contornos oficiais CAOP 2019 | Dado |
+| Estradas de Guimarães: km e traçado das rotas, por estrada | OpenStreetMap (© colaboradores, ODbL), servidor OSRM próprio; perfil de furgoneta de 2,8 × 2,1 × 6 m e 3,5 t | Dado aberto; a viatura da Vitrus é um pressuposto; o porta a porta dentro da freguesia é estimativa |
 | Custos por hora e por km das viaturas, captura por canal | Pressupostos da equipa, visíveis no ecrã | Por receber do financeiro da Vitrus |
 
 - Todo o valor estimado leva no ecrã a palavra **"estimativa"**.
 - Os pressupostos mudam-se no ecrã e o resultado recalcula de imediato.
 - A procura conta o indiferenciado do **concelho todo**, não só os 84,0% que a Vitrus recolhe, como a Vitrus nos indicou a 22 de outubro.
-- O que ainda não sabemos, dizemo-lo: o custo por hora e por km das viaturas e a sazonalidade (os quilos por mês só se partilham com o município).
+- O que ainda não sabemos, dizemo-lo: o custo por hora e por km das viaturas, as dimensões da viatura (o mapa assume uma furgoneta), a velocidade real de recolha (30 km/h é pressuposto; o mapa dá ~40 km/h de condução sem trânsito) e a sazonalidade (os quilos por mês só se partilham com o município).
 
 ![Como o Novelo decide, passo a passo: dados, procura, otimizador, cenários e verificação](https://raw.githubusercontent.com/helderpgoncalves/novelo/main/docs/img/pagina-metodo.png)
 
@@ -212,7 +216,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 ## Como foi feito
 
 - **Web:** React, Vite, TanStack Router e Query, Tailwind v4 e shadcn/ui; aplicação instalável (PWA), pt-PT e inglês, acessibilidade AA.
-- **API:** FastAPI (Python 3.12), PostgreSQL, **OR-Tools** (CP-SAT para a localização, VRP para as rotas); contrato OpenAPI com o cliente TypeScript gerado.
+- **API:** FastAPI (Python 3.12), PostgreSQL, **OR-Tools** (CP-SAT para a localização, VRP para as rotas) e um **OSRM próprio** sobre o **OpenStreetMap** para os km e o traçado por estrada (se parar, a API estima e assinala); contrato OpenAPI com o cliente TypeScript gerado.
 - **IA, identificada e limitada:** o copiloto e a triagem usam modelos via **OpenRouter** e devolvem JSON validado, nunca fazem contas, e um verificador rejeita números fora da origem. No desenvolvimento usámos **Claude Code** e **GLM (Z.ai)** como assistentes de programação.
 - **Qualidade:** 1 054 testes da API e 432 testes da web, verdes em cada entrega; testes de ponta a ponta no browser; uma avaliação do copiloto com o modelo real, 155 perguntas, 146 aprovadas e 100% dos números verificados; e a triagem testada com o modelo real em fotos de licença aberta.
 - **Em produção** em [novelo.helder.si](https://novelo.helder.si) (Coolify, Docker), com **código aberto** em [GitHub](https://github.com/helderpgoncalves/novelo).
@@ -232,7 +236,7 @@ Novelo is a decision tool that designs Guimarães' separate textile collection a
 - **The problem.** In 2025 the municipality put about 51,250 t into mixed waste (Vitrus collected 43,050.5 t, 84.0% of it); at 5.86% textiles (APA), about **3,003 t a year** never reach separate collection, against 301.3 t collected separately (estimates). Separate collection has been mandatory since January 2025 and the municipality pays for it alone.
 - **The answer.** No textile bins: Vitrus does not want them, because bin textiles arrive contaminated. The bag cannot ride in the refuse truck either: compaction ruins it. So, as Vitrus suggested, **one new non-compacting textile vehicle** collects the closed bag at the door on a fixed day per parish and stops at existing municipal sites and the 86 schools.
 - **The saving.** Every tonne taken out of the bin saves **€105.64** in landfill treatment (Vitrus figures).
-- **The numbers.** With **€60,000 a year**, the network spends €45,828 and diverts **445.8 t a year at €102.8/t**, about 265 t of it reusable, lifting capture from 9.1% to about 22.6%. The avoided treatment, €47,093 a year, pays for the operation (estimates).
+- **The numbers.** With **€60,000 a year**, the network spends €43,914 and diverts **431.1 t a year at €101.9/t**, about 256 t of it reusable, lifting capture from 9.1% to about 22.2%. The avoided treatment, €45,542 a year, pays for the operation (€35,702) and, by a narrow margin, the total cost including the vehicle (estimates). Routes are measured along the road (OSRM).
 - **The law.** Directive (EU) 2025/1892 makes producers pay only for items first sold after national transposition, and only the cost-efficient amount, agreed with local authorities at the table. Novelo gives the municipality that number, parish by parish.
 - **AI that never does the maths.** The copilot turns questions in plain Portuguese into optimiser runs; a verifier rejects any number not in the source.
 - **Next step.** A 3-month pilot in two parishes, chosen by Novelo itself.

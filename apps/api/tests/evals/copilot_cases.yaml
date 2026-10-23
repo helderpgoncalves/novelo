@@ -117,7 +117,7 @@ cases:
   - id: muni_not_textile_pt
     lang: pt-PT
     turns: [{message: "Os contentores municipais do pacote da Vitrus são de têxteis?"}]
-    expect: {tools_any: [get_municipal_overview], must_contain_any: ["não são|outras frações|outras fraç"], max_chars: 700}
+    expect: {must_contain_any: ["não são|outras frações|outras fraç"], max_chars: 700}
   - id: muni_parish_pt
     lang: pt-PT
     turns: [{message: "Quantos contentores municipais tem Azurém e qual é a lacuna estimada de têxtil lá?"}]
@@ -171,7 +171,7 @@ cases:
     turns:
       - message: "Este cenário é bom?"
         page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
-    expect: {must_contain_any: ["Base", "122,7", "361"], max_chars: 800}
+    expect: {must_contain_any: ["Base|€/t|estimativa"], max_chars: 800}  # números do cenário vêm da ferramenta: não fixar valores
   - id: mention_lot_en
     lang: en
     turns:

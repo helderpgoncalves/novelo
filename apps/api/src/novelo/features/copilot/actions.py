@@ -23,6 +23,7 @@ from novelo.ai.catalog import catalog as default_catalog
 from novelo.ai.tasks import CONFIGURABLE_TASKS, AiTask
 from novelo.core.errors import AppError, ConflictError, ForbiddenError, NotFoundError
 from novelo.domain.vocab import AlertStatus, LotState, ScenarioObjective
+from novelo.features.copilot.labels import default_name, scenario_label, strip_prefix
 from novelo.features.copilot.models import CopilotAction
 from novelo.features.copilot.schemas_actions import ActionOut, ActionType
 from novelo.features.copilot.tables import fold
@@ -43,7 +44,6 @@ from novelo.features.users.models import User
 
 EXPIRES_MIN = 10
 CONFIRM_WORD = {"pt-PT": "APAGAR", "en": "DELETE"}
-COPILOT_PREFIX = "Copilot · "
 
 
 class ActionError(AppError):
@@ -56,7 +56,7 @@ class _P(BaseModel):
 
 
 class CreateScenarioP(_P):
-    label: str = Field(min_length=1, max_length=60)
+    label: str | None = Field(default=None, max_length=60)
     objective: ScenarioObjective
     budget_eur_year: float | None = Field(default=None, ge=0, le=5_000_000)
     target_pct: float | None = Field(default=None, ge=1, le=100)
@@ -351,7 +351,8 @@ async def e_create(ctx: Ctx, p: CreateScenarioP) -> tuple[dict[str, Any], dict[s
     if p.target_pct is not None:
         target = p.target_pct / 100 * await planning.potential_t(ctx.db)  # % do têxtil por desviar do lixo
     req = ScenarioRequest(
-        label=f"{COPILOT_PREFIX}{p.label}"[:80], objective=p.objective,
+        label=scenario_label(p.label, default_name(p.objective, p.budget_eur_year, p.target_pct, p.siting)),
+        objective=p.objective,
         budget_eur_year=p.budget_eur_year if p.objective == ScenarioObjective.MAX_TONNES else None,
         target_tonnes=target if p.objective == ScenarioObjective.MIN_COST else None, constraints=constraints,
         siting=p.siting, site_radius_m=p.site_radius_m,
@@ -374,7 +375,8 @@ def _scenario_result(s: Any) -> dict[str, Any]:
 async def e_duplicate(ctx: Ctx, p: DuplicateP) -> tuple[dict[str, Any], dict[str, Any] | None]:
     base = await planning.get_scenario(ctx.db, p.scenario_id)
     req = ScenarioRequest(
-        label=f"{COPILOT_PREFIX}{p.label or base.label}"[:80], objective=base.objective, budget_eur_year=base.budget_eur_year,
+        label=scenario_label(p.label, f"{strip_prefix(base.label)} · cópia"),
+        objective=base.objective, budget_eur_year=base.budget_eur_year,
         target_tonnes=base.target_tonnes, params=base.params, constraints=base.constraints, parent_id=base.id,
         **base.siting_options(),
     )  # fmt: skip

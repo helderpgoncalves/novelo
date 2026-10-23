@@ -1,86 +1,86 @@
 {
- "source": "API de dev, cenário parish:60000 (2026-10-22T17:04:06.642915Z)",
+ "source": "API de dev, cenário parish:60000 (2026-10-23T10:12:14.226245Z)",
  "scenario60": {
-  "id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "id": "049a0673-c19e-460b-b894-9b6c2333ec5f",
   "budget": 60000,
   "kpis": {
-   "capex_eur": 57500,
-   "opex_eur_year": 37515.71,
-   "annual_cost_eur": 45828.21,
-   "tonnes_year": 445.784,
-   "eur_per_tonne": 102.8,
-   "coverage_pct": 72.1,
-   "points": 60,
-   "km_year": 6976.3,
+   "capex_eur": 57000,
+   "opex_eur_year": 35701.88,
+   "annual_cost_eur": 43914.38,
+   "tonnes_year": 431.105,
+   "eur_per_tonne": 101.86,
+   "coverage_pct": 70.4,
+   "points": 58,
+   "km_year": 7543,
    "potential_t": 3003.3,
    "baseline_observed_t": 301.3,
-   "avoided_treatment_eur": 47092.62,
-   "net_annual_cost_eur": -1264.41,
-   "net_eur_per_tonne": -2.84,
+   "avoided_treatment_eur": 45541.93,
+   "net_annual_cost_eur": -1627.55,
+   "net_eur_per_tonne": -3.78,
    "vehicles": 1,
-   "vehicle_days_week": 1.67,
-   "vehicle_hours_year": 606.3,
+   "vehicle_days_week": 1.66,
+   "vehicle_hours_year": 604.7,
    "vehicle_capex_eur": 42500,
    "vehicle_annual_eur": 5312.5,
    "reuse_share": 0.5941,
    "reuse_share_low": 0.5,
    "reuse_share_high": 0.7286,
-   "reusable_t": 264.859,
-   "reusable_t_low": 222.892,
-   "reusable_t_high": 324.781,
-   "eur_per_reusable_t": 173.03
+   "reusable_t": 256.138,
+   "reusable_t_low": 215.553,
+   "reusable_t_high": 314.087,
+   "eur_per_reusable_t": 171.45
   },
   "modes": [
    {
     "mode": "existing",
-    "zones": 45,
-    "points": 60,
-    "tonnes": 366.285,
-    "annual_cost_eur": 21897.37
+    "zones": 43,
+    "points": 58,
+    "tonnes": 359.856,
+    "annual_cost_eur": 22642.79
    },
    {
     "mode": "on_demand",
-    "zones": 4,
+    "zones": 3,
     "points": 0,
-    "tonnes": 79.498,
-    "annual_cost_eur": 23930.86
+    "tonnes": 71.248,
+    "annual_cost_eur": 21271.59
    }
   ]
  },
  "curve": [
   {
    "budget": 20000,
-   "tonnes": 257.233,
-   "cost": 16102.32,
-   "eurPerT": 62.6
+   "tonnes": 238.673,
+   "cost": 15843.91,
+   "eurPerT": 66.38
   },
   {
    "budget": 40000,
-   "tonnes": 378.522,
-   "cost": 26908.65,
-   "eurPerT": 71.09
+   "tonnes": 364.256,
+   "cost": 24042.4,
+   "eurPerT": 66
   },
   {
    "budget": 60000,
-   "tonnes": 445.784,
-   "cost": 45828.21,
-   "eurPerT": 102.8
+   "tonnes": 431.105,
+   "cost": 43914.38,
+   "eurPerT": 101.86
   },
   {
    "budget": 100000,
-   "tonnes": 571.247,
-   "cost": 85859.6,
-   "eurPerT": 150.3
+   "tonnes": 555.258,
+   "cost": 82106.48,
+   "eurPerT": 147.87
   },
   {
    "budget": 150000,
-   "tonnes": 695.44,
-   "cost": 129336.03,
-   "eurPerT": 185.98
+   "tonnes": 676.588,
+   "cost": 126326.49,
+   "eurPerT": 186.71
   }
  ],
  "coverage": {
-  "scenario_id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "scenario_id": "049a0673-c19e-460b-b894-9b6c2333ec5f",
   "label": "Referência · por freguesia · 60 000 €/ano",
   "siting": "parish",
   "parishes": [
@@ -106,7 +106,7 @@
     "tonnes": 47.797,
     "covered_population": 8543,
     "covered_share": 0.88,
-    "annual_cost_eur": 8425.22
+    "annual_cost_eur": 8599.73
    },
    {
     "parish_code": "030804",
@@ -130,7 +130,7 @@
     "tonnes": 44.749,
     "covered_population": 7998,
     "covered_share": 0.88,
-    "annual_cost_eur": 8159.12
+    "annual_cost_eur": 8158.93
    },
    {
     "parish_code": "0308U4",
@@ -144,15 +144,17 @@
     "door_to_door_days_week": 0,
     "service_days": 0,
     "modes": [
+     "on_demand",
      "existing"
     ],
     "channels": [
+     "on_demand",
      "existing"
     ],
-    "tonnes": 18.893,
-    "covered_population": 5481,
-    "covered_share": 0.7,
-    "annual_cost_eur": 569.98
+    "tonnes": 38.551,
+    "covered_population": 6890,
+    "covered_share": 0.8799,
+    "annual_cost_eur": 6769.66
    },
    {
     "parish_code": "030838",
@@ -174,7 +176,7 @@
     "tonnes": 16.135,
     "covered_population": 4681,
     "covered_share": 0.7,
-    "annual_cost_eur": 659.23
+    "annual_cost_eur": 676.33
    },
    {
     "parish_code": "030808",
@@ -196,7 +198,7 @@
     "tonnes": 15.211,
     "covered_population": 4413,
     "covered_share": 0.7,
-    "annual_cost_eur": 727.04
+    "annual_cost_eur": 734.65
    },
    {
     "parish_code": "030854",
@@ -218,7 +220,7 @@
     "tonnes": 14.292,
     "covered_population": 4146,
     "covered_share": 0.7,
-    "annual_cost_eur": 626.93
+    "annual_cost_eur": 693.84
    },
    {
     "parish_code": "030815",
@@ -240,7 +242,7 @@
     "tonnes": 13.848,
     "covered_population": 4017,
     "covered_share": 0.6999,
-    "annual_cost_eur": 604.88
+    "annual_cost_eur": 629.19
    },
    {
     "parish_code": "030871",
@@ -254,17 +256,15 @@
     "door_to_door_days_week": 6,
     "service_days": 6,
     "modes": [
-     "on_demand",
      "existing"
     ],
     "channels": [
-     "on_demand",
      "existing"
     ],
-    "tonnes": 27.163,
-    "covered_population": 4855,
-    "covered_share": 0.88,
-    "annual_cost_eur": 4970.94
+    "tonnes": 13.312,
+    "covered_population": 3862,
+    "covered_share": 0.7,
+    "annual_cost_eur": 535.95
    },
    {
     "parish_code": "030812",
@@ -278,17 +278,15 @@
     "door_to_door_days_week": 6,
     "service_days": 7,
     "modes": [
-     "on_demand",
      "existing"
     ],
     "channels": [
-     "on_demand",
      "existing"
     ],
-    "tonnes": 26.567,
-    "covered_population": 4748,
-    "covered_share": 0.8799,
-    "annual_cost_eur": 5119.24
+    "tonnes": 13.02,
+    "covered_population": 3777,
+    "covered_share": 0.7,
+    "annual_cost_eur": 566.54
    },
    {
     "parish_code": "030807",
@@ -310,7 +308,7 @@
     "tonnes": 11.519,
     "covered_population": 3342,
     "covered_share": 0.7,
-    "annual_cost_eur": 669.2
+    "annual_cost_eur": 723.67
    },
    {
     "parish_code": "030831",
@@ -332,7 +330,7 @@
     "tonnes": 11.222,
     "covered_population": 3256,
     "covered_share": 0.7001,
-    "annual_cost_eur": 634.29
+    "annual_cost_eur": 654.11
    },
    {
     "parish_code": "030840",
@@ -354,7 +352,7 @@
     "tonnes": 10.848,
     "covered_population": 3147,
     "covered_share": 0.7,
-    "annual_cost_eur": 694.15
+    "annual_cost_eur": 753.49
    },
    {
     "parish_code": "030830",
@@ -376,7 +374,7 @@
     "tonnes": 10.035,
     "covered_population": 2911,
     "covered_share": 0.6999,
-    "annual_cost_eur": 610.13
+    "annual_cost_eur": 653.3
    },
    {
     "parish_code": "030828",
@@ -398,7 +396,7 @@
     "tonnes": 9.601,
     "covered_population": 2785,
     "covered_share": 0.6999,
-    "annual_cost_eur": 460.85
+    "annual_cost_eur": 611.06
    },
    {
     "parish_code": "0308U2",
@@ -420,7 +418,7 @@
     "tonnes": 9.188,
     "covered_population": 2666,
     "covered_share": 0.7001,
-    "annual_cost_eur": 297.7
+    "annual_cost_eur": 331.19
    },
    {
     "parish_code": "030837",
@@ -442,7 +440,7 @@
     "tonnes": 8.554,
     "covered_population": 2482,
     "covered_share": 0.7001,
-    "annual_cost_eur": 264.95
+    "annual_cost_eur": 421.4
    },
    {
     "parish_code": "030866",
@@ -464,7 +462,7 @@
     "tonnes": 8.247,
     "covered_population": 2393,
     "covered_share": 0.7001,
-    "annual_cost_eur": 390.68
+    "annual_cost_eur": 525.16
    },
    {
     "parish_code": "030887",
@@ -486,7 +484,7 @@
     "tonnes": 7.979,
     "covered_population": 2315,
     "covered_share": 0.7,
-    "annual_cost_eur": 476.25
+    "annual_cost_eur": 519.43
    },
    {
     "parish_code": "0308U1",
@@ -508,7 +506,7 @@
     "tonnes": 7.753,
     "covered_population": 2249,
     "covered_share": 0.7,
-    "annual_cost_eur": 521.78
+    "annual_cost_eur": 593.26
    },
    {
     "parish_code": "030875",
@@ -530,7 +528,7 @@
     "tonnes": 6.471,
     "covered_population": 1877,
     "covered_share": 0.6999,
-    "annual_cost_eur": 327.44
+    "annual_cost_eur": 349.04
    },
    {
     "parish_code": "030832",
@@ -552,7 +550,7 @@
     "tonnes": 6.259,
     "covered_population": 1816,
     "covered_share": 0.7001,
-    "annual_cost_eur": 309.31
+    "annual_cost_eur": 334.04
    },
    {
     "parish_code": "030821",
@@ -574,7 +572,7 @@
     "tonnes": 6.228,
     "covered_population": 1807,
     "covered_share": 0.7001,
-    "annual_cost_eur": 394.53
+    "annual_cost_eur": 474.6
    },
    {
     "parish_code": "030882",
@@ -596,7 +594,7 @@
     "tonnes": 5.945,
     "covered_population": 1725,
     "covered_share": 0.7001,
-    "annual_cost_eur": 356.6
+    "annual_cost_eur": 385.32
    },
    {
     "parish_code": "030823",
@@ -618,7 +616,7 @@
     "tonnes": 5.904,
     "covered_population": 1713,
     "covered_share": 0.7,
-    "annual_cost_eur": 413.34
+    "annual_cost_eur": 494.02
    },
    {
     "parish_code": "030891",
@@ -640,7 +638,7 @@
     "tonnes": 5.827,
     "covered_population": 1690,
     "covered_share": 0.6998,
-    "annual_cost_eur": 321.34
+    "annual_cost_eur": 326.94
    },
    {
     "parish_code": "030888",
@@ -662,7 +660,7 @@
     "tonnes": 5.48,
     "covered_population": 1590,
     "covered_share": 0.7001,
-    "annual_cost_eur": 422.45
+    "annual_cost_eur": 451.99
    },
    {
     "parish_code": "030889",
@@ -684,7 +682,7 @@
     "tonnes": 5.46,
     "covered_population": 1584,
     "covered_share": 0.7,
-    "annual_cost_eur": 398.75
+    "annual_cost_eur": 444.89
    },
    {
     "parish_code": "030868",
@@ -706,7 +704,7 @@
     "tonnes": 5.429,
     "covered_population": 1575,
     "covered_share": 0.7,
-    "annual_cost_eur": 357.5
+    "annual_cost_eur": 392.81
    },
    {
     "parish_code": "030858",
@@ -728,7 +726,7 @@
     "tonnes": 5.402,
     "covered_population": 1567,
     "covered_share": 0.6999,
-    "annual_cost_eur": 513.56
+    "annual_cost_eur": 521.83
    },
    {
     "parish_code": "030850",
@@ -750,7 +748,7 @@
     "tonnes": 5.159,
     "covered_population": 1497,
     "covered_share": 0.7002,
-    "annual_cost_eur": 353.89
+    "annual_cost_eur": 409.86
    },
    {
     "parish_code": "030806",
@@ -763,16 +761,12 @@
     "area_within_300m_pct": 78,
     "door_to_door_days_week": 0,
     "service_days": 6,
-    "modes": [
-     "existing"
-    ],
-    "channels": [
-     "existing"
-    ],
-    "tonnes": 3.472,
-    "covered_population": 1007,
-    "covered_share": 0.6998,
-    "annual_cost_eur": 497.56
+    "modes": [],
+    "channels": [],
+    "tonnes": 0,
+    "covered_population": 0,
+    "covered_share": 0,
+    "annual_cost_eur": 0
    },
    {
     "parish_code": "030801",
@@ -794,7 +788,7 @@
     "tonnes": 3.084,
     "covered_population": 895,
     "covered_share": 0.7003,
-    "annual_cost_eur": 397.87
+    "annual_cost_eur": 420.79
    },
    {
     "parish_code": "030842",
@@ -816,7 +810,7 @@
     "tonnes": 3.057,
     "covered_population": 887,
     "covered_share": 0.7001,
-    "annual_cost_eur": 462.46
+    "annual_cost_eur": 485.29
    },
    {
     "parish_code": "030857",
@@ -838,7 +832,7 @@
     "tonnes": 2.978,
     "covered_population": 864,
     "covered_share": 0.7002,
-    "annual_cost_eur": 328.48
+    "annual_cost_eur": 370.72
    },
    {
     "parish_code": "030835",
@@ -860,7 +854,7 @@
     "tonnes": 2.944,
     "covered_population": 854,
     "covered_share": 0.7,
-    "annual_cost_eur": 393.72
+    "annual_cost_eur": 408.39
    },
    {
     "parish_code": "030836",
@@ -882,7 +876,7 @@
     "tonnes": 2.739,
     "covered_population": 794,
     "covered_share": 0.6996,
-    "annual_cost_eur": 276.85
+    "annual_cost_eur": 295.15
    },
    {
     "parish_code": "030865",
@@ -904,7 +898,7 @@
     "tonnes": 8.071,
     "covered_population": 2342,
     "covered_share": 0.7001,
-    "annual_cost_eur": 468.51
+    "annual_cost_eur": 477.67
    },
    {
     "parish_code": "030878",
@@ -926,7 +920,7 @@
     "tonnes": 6.223,
     "covered_population": 1805,
     "covered_share": 0.6999,
-    "annual_cost_eur": 468.8
+    "annual_cost_eur": 521.67
    },
    {
     "parish_code": "0308U5",
@@ -948,7 +942,7 @@
     "tonnes": 4.93,
     "covered_population": 1430,
     "covered_share": 0.7,
-    "annual_cost_eur": 520.43
+    "annual_cost_eur": 557.1
    },
    {
     "parish_code": "030879",
@@ -970,7 +964,7 @@
     "tonnes": 4.884,
     "covered_population": 1417,
     "covered_share": 0.7001,
-    "annual_cost_eur": 559.23
+    "annual_cost_eur": 600.27
    },
    {
     "parish_code": "030885",
@@ -992,7 +986,7 @@
     "tonnes": 4.679,
     "covered_population": 1357,
     "covered_share": 0.6998,
-    "annual_cost_eur": 430.33
+    "annual_cost_eur": 452.99
    },
    {
     "parish_code": "030824",
@@ -1014,7 +1008,7 @@
     "tonnes": 4.198,
     "covered_population": 1218,
     "covered_share": 0.7,
-    "annual_cost_eur": 384.62
+    "annual_cost_eur": 511.01
    },
    {
     "parish_code": "030880",
@@ -1036,7 +1030,7 @@
     "tonnes": 4.071,
     "covered_population": 1181,
     "covered_share": 0.7001,
-    "annual_cost_eur": 520.2
+    "annual_cost_eur": 535.51
    },
    {
     "parish_code": "030886",
@@ -1058,7 +1052,7 @@
     "tonnes": 3.822,
     "covered_population": 1109,
     "covered_share": 0.7001,
-    "annual_cost_eur": 544.96
+    "annual_cost_eur": 541.59
    },
    {
     "parish_code": "0308U3",
@@ -1071,16 +1065,12 @@
     "area_within_300m_pct": 28.6,
     "door_to_door_days_week": 6,
     "service_days": 6,
-    "modes": [
-     "existing"
-    ],
-    "channels": [
-     "existing"
-    ],
-    "tonnes": 3.467,
-    "covered_population": 1006,
-    "covered_share": 0.7001,
-    "annual_cost_eur": 522.94
+    "modes": [],
+    "channels": [],
+    "tonnes": 0,
+    "covered_population": 0,
+    "covered_share": 0,
+    "annual_cost_eur": 0
    },
    {
     "parish_code": "030827",
@@ -1142,21 +1132,21 @@
     "tipau": "apu",
     "parishes": 36,
     "population": 135460,
-    "covered_population": 100170,
-    "covered_pct": 73.9,
-    "tonnes": 401.439,
-    "annual_cost_eur": 41408.21,
-    "eur_per_tonne": 103.15
+    "covered_population": 98608,
+    "covered_pct": 72.8,
+    "tonnes": 390.227,
+    "annual_cost_eur": 39716.57,
+    "eur_per_tonne": 101.78
    },
    {
     "tipau": "amu",
     "parishes": 11,
     "population": 20671,
-    "covered_population": 12865,
-    "covered_pct": 62.2,
-    "tonnes": 44.345,
-    "annual_cost_eur": 4420.02,
-    "eur_per_tonne": 99.67
+    "covered_population": 11859,
+    "covered_pct": 57.4,
+    "tonnes": 40.878,
+    "annual_cost_eur": 4197.81,
+    "eur_per_tonne": 102.69
    },
    {
     "tipau": "apr",
@@ -1173,30 +1163,30 @@
    "tipau": null,
    "parishes": 48,
    "population": 156830,
-   "covered_population": 113035,
-   "covered_pct": 72.1,
-   "tonnes": 445.784,
-   "annual_cost_eur": 45828.23,
-   "eur_per_tonne": 102.8
+   "covered_population": 110467,
+   "covered_pct": 70.4,
+   "tonnes": 431.105,
+   "annual_cost_eur": 43914.38,
+   "eur_per_tonne": 101.86
   },
   "equity": {
    "urban_population": 135460,
-   "urban_covered_pct": 73.9,
+   "urban_covered_pct": 72.8,
    "non_urban_population": 21370,
-   "non_urban_covered_pct": 60.2,
-   "non_urban_vs_urban": 0.814
+   "non_urban_covered_pct": 55.5,
+   "non_urban_vs_urban": 0.762
   }
  },
  "sensitivity": {
-  "scenario_id": "0075cac4-b56b-4d52-953c-4e73172e026d",
+  "scenario_id": "049a0673-c19e-460b-b894-9b6c2333ec5f",
   "swing": 0.3,
   "n_samples": 500,
   "seed": 7,
   "method": "Monte Carlo sobre o plano já otimizado: cada amostra reavalia o modelo de custos com os parâmetros perturbados (distribuição triangular em torno do pressuposto) e não resolve o otimizador de novo. Responde a 'o plano proposto aguenta se os pressupostos estiverem errados?'; reotimizar daria sempre valores mais otimistas.",
   "base": {
-   "tonnes": 445.78366520724,
-   "annual_cost_eur": 45828.461217599994,
-   "eur_per_tonne": 102.80426313129898
+   "tonnes": 431.10412357453214,
+   "annual_cost_eur": 43914.415457120005,
+   "eur_per_tonne": 101.86498587162734
   },
   "tornado": [
    {
@@ -1207,17 +1197,17 @@
     "low_value": 0.48999999999999994,
     "high_value": 0.9099999999999999,
     "low": {
-     "tonnes": 337.6511046670679,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 135.72726576087456
+     "tonnes": 324.71865582357225,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 135.23835070621814
     },
     "high": {
-     "tonnes": 553.9162257474122,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 82.73536518227566
+     "tonnes": 537.4895913254917,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 81.70282023289715
     },
-    "swing_eur_per_tonne": 52.9919005785989,
-    "swing_tonnes": 216.26512108034433,
+    "swing_eur_per_tonne": 53.53553047332099,
+    "swing_tonnes": 212.77093550191944,
     "swing_cost_eur": 0
    },
    {
@@ -1228,39 +1218,18 @@
     "low_value": 0.126,
     "high_value": 0.23399999999999999,
     "low": {
-     "tonnes": 337.65110466706824,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 135.72726576087442
+     "tonnes": 324.7186558235726,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 135.238350706218
     },
     "high": {
-     "tonnes": 553.9162257474122,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 82.73536518227566
+     "tonnes": 537.4895913254917,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 81.70282023289715
     },
-    "swing_eur_per_tonne": 52.99190057859876,
-    "swing_tonnes": 216.265121080344,
+    "swing_eur_per_tonne": 53.53553047332085,
+    "swing_tonnes": 212.7709355019191,
     "swing_cost_eur": 0
-   },
-   {
-    "key": "cost_per_collection_eur",
-    "unit": "€",
-    "source": "assumption",
-    "base_value": 6,
-    "low_value": 4.199999999999999,
-    "high_value": 7.800000000000001,
-    "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 36875.85185232,
-     "eur_per_tonne": 82.72140666073265
-    },
-    "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 54781.07058288,
-     "eur_per_tonne": 122.88711960186534
-    },
-    "swing_eur_per_tonne": 40.16571294113268,
-    "swing_tonnes": 0,
-    "swing_cost_eur": 17905.218730560002
    },
    {
     "key": "kg_per_inhab_month",
@@ -1270,18 +1239,39 @@
     "low_value": 1.117081,
     "high_value": 2.0745790000000004,
     "low": {
-     "tonnes": 312.048565645068,
-     "annual_cost_eur": 39503.27782152258,
-     "eur_per_tonne": 126.59336452920797
+     "tonnes": 301.77288650217235,
+     "annual_cost_eur": 38269.11386529006,
+     "eur_per_tonne": 126.81428841691043
     },
     "high": {
-     "tonnes": 579.5187647694123,
-     "annual_cost_eur": 52128.03596576697,
-     "eur_per_tonne": 89.95055748800206
+     "tonnes": 560.4353606468918,
+     "annual_cost_eur": 49540.101215060866,
+     "eur_per_tonne": 88.39574497561749
     },
-    "swing_eur_per_tonne": 36.64280704120591,
-    "swing_tonnes": 267.47019912434433,
-    "swing_cost_eur": 12624.758144244392
+    "swing_eur_per_tonne": 38.41854344129294,
+    "swing_tonnes": 258.66247414471945,
+    "swing_cost_eur": 11270.987349770803
+   },
+   {
+    "key": "cost_per_collection_eur",
+    "unit": "€",
+    "source": "assumption",
+    "base_value": 6,
+    "low_value": 4.199999999999999,
+    "high_value": 7.800000000000001,
+    "low": {
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 35693.03081998399,
+     "eur_per_tonne": 82.79445467612918
+    },
+    "high": {
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 52135.800094255996,
+     "eur_per_tonne": 120.93551706712546
+    },
+    "swing_eur_per_tonne": 38.14106239099628,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 16442.769274272003
    },
    {
     "key": "on_demand_kg_per_pickup",
@@ -1291,18 +1281,18 @@
     "low_value": 17.5,
     "high_value": 32.5,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 54822.301844283335,
-     "eur_per_tonne": 122.97961123989826
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 51946.8567487205,
+     "eur_per_tonne": 120.49723931656985
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 40965.924997147085,
-     "eur_per_tonne": 91.89642464378427
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 39574.16565865121,
+     "eur_per_tonne": 91.79723295272393
     },
-    "swing_eur_per_tonne": 31.08318659611399,
+    "swing_eur_per_tonne": 28.700006363845915,
     "swing_tonnes": 0,
-    "swing_cost_eur": 13856.37684713625
+    "swing_cost_eur": 12372.69109006929
    },
    {
     "key": "modes.existing.collections_per_year",
@@ -1312,18 +1302,18 @@
     "low_value": 18.2,
     "high_value": 33.800000000000004,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 41299.47821760001,
-     "eur_per_tonne": 92.64466475773698
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 39189.22645712001,
+     "eur_per_tonne": 90.90431827044381
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 50357.44421760001,
-     "eur_per_tonne": 112.96386150486106
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 48639.60445712001,
+     "eur_per_tonne": 112.8256534728109
     },
-    "swing_eur_per_tonne": 20.31919674712408,
+    "swing_eur_per_tonne": 21.92133520236709,
     "swing_tonnes": 0,
-    "swing_cost_eur": 9057.966
+    "swing_cost_eur": 9450.378000000004
    },
    {
     "key": "modes.on_demand.capture_rate",
@@ -1333,18 +1323,18 @@
     "low_value": 0.175,
     "high_value": 0.325,
     "low": {
-     "tonnes": 423.40704610201215,
-     "annual_cost_eur": 39503.27782152258,
-     "eur_per_tonne": 93.2985839163503
+     "tonnes": 411.0495211876285,
+     "annual_cost_eur": 38269.11386529006,
+     "eur_per_tonne": 93.10098149420217
     },
     "high": {
-     "tonnes": 468.1602843124681,
-     "annual_cost_eur": 52128.03596576696,
-     "eur_per_tonne": 111.34655739181565
+     "tonnes": 451.1587259614358,
+     "annual_cost_eur": 49540.101215060866,
+     "eur_per_tonne": 109.80636827867863
     },
-    "swing_eur_per_tonne": 18.047973475465355,
-    "swing_tonnes": 44.75323821045595,
-    "swing_cost_eur": 12624.758144244384
+    "swing_eur_per_tonne": 16.70538678447646,
+    "swing_tonnes": 40.10920477380728,
+    "swing_cost_eur": 11270.987349770803
    },
    {
     "key": "modes.on_demand.coverage_factor",
@@ -1354,18 +1344,18 @@
     "low_value": 0.42,
     "high_value": 0.78,
     "low": {
-     "tonnes": 423.40704610201215,
-     "annual_cost_eur": 39503.27782152258,
-     "eur_per_tonne": 93.2985839163503
+     "tonnes": 411.0495211876285,
+     "annual_cost_eur": 38269.11386529006,
+     "eur_per_tonne": 93.10098149420217
     },
     "high": {
-     "tonnes": 468.1602843124681,
-     "annual_cost_eur": 52128.03596576696,
-     "eur_per_tonne": 111.34655739181565
+     "tonnes": 451.1587259614358,
+     "annual_cost_eur": 49540.101215060866,
+     "eur_per_tonne": 109.80636827867863
     },
-    "swing_eur_per_tonne": 18.047973475465355,
-    "swing_tonnes": 44.75323821045595,
-    "swing_cost_eur": 12624.758144244384
+    "swing_eur_per_tonne": 16.70538678447646,
+    "swing_tonnes": 40.10920477380728,
+    "swing_cost_eur": 11270.987349770803
    },
    {
     "key": "cost_per_km_eur",
@@ -1375,39 +1365,18 @@
     "low_value": 0.77,
     "high_value": 1.4300000000000002,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 43526.2822176,
-     "eur_per_tonne": 97.63992181580969
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 41425.22545712002,
+     "eur_per_tonne": 96.09099795575987
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 48130.64021759998,
-     "eur_per_tonne": 107.96860444678826
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 46403.60545712,
+     "eur_per_tonne": 107.63897378749483
     },
-    "swing_eur_per_tonne": 10.328682630978577,
+    "swing_eur_per_tonne": 11.54797583173496,
     "swing_tonnes": 0,
-    "swing_cost_eur": 4604.357999999986
-   },
-   {
-    "key": "modes.existing.people_per_point",
-    "unit": "hab",
-    "source": "assumption",
-    "base_value": 4000,
-    "low_value": 2800,
-    "high_value": 5200,
-    "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 48712.46121759999,
-     "eur_per_tonne": 109.2737689142425
-    },
-    "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 44592.4612176,
-     "eur_per_tonne": 100.03161779575177
-    },
-    "swing_eur_per_tonne": 9.242151118490725,
-    "swing_tonnes": 0,
-    "swing_cost_eur": 4119.999999999985
+    "swing_cost_eur": 4978.379999999983
    },
    {
     "key": "detour_factor",
@@ -1417,18 +1386,39 @@
     "low_value": 1,
     "high_value": 1.6900000000000002,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 44057.554294523085,
-     "eur_per_tonne": 98.83169288861494
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 41999.65391865847,
+     "eur_per_tonne": 97.42345670557543
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 48130.64021759999,
-     "eur_per_tonne": 107.96860444678828
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 46403.60545712,
+     "eur_per_tonne": 107.63897378749483
     },
-    "swing_eur_per_tonne": 9.136911558173338,
+    "swing_eur_per_tonne": 10.215517081919401,
     "swing_tonnes": 0,
-    "swing_cost_eur": 4073.0859230769056
+    "swing_cost_eur": 4403.95153846153
+   },
+   {
+    "key": "modes.existing.people_per_point",
+    "unit": "hab",
+    "source": "assumption",
+    "base_value": 4000,
+    "low_value": 2800,
+    "high_value": 5200,
+    "low": {
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 46798.415457120005,
+     "eur_per_tonne": 108.55478502290221
+    },
+    "high": {
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 42678.415457120005,
+     "eur_per_tonne": 98.99792909250955
+    },
+    "swing_eur_per_tonne": 9.556855930392658,
+    "swing_tonnes": 0,
+    "swing_cost_eur": 4120
    },
    {
     "key": "vehicle_lifetime_years",
@@ -1438,16 +1428,16 @@
     "low_value": 5.6,
     "high_value": 10.4,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 48105.24693188571,
-     "eur_per_tonne": 107.91164119825275
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 46191.20117140572,
+     "eur_per_tonne": 107.14627544827898
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 44602.499679138455,
-     "eur_per_tonne": 100.05413647986235
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 42688.453918658466,
+     "eur_per_tonne": 99.02121456112262
     },
-    "swing_eur_per_tonne": 7.857504718390402,
+    "swing_eur_per_tonne": 8.125060887156366,
     "swing_tonnes": 0,
     "swing_cost_eur": 3502.7472527472564
    },
@@ -1459,16 +1449,16 @@
     "low_value": 29749.999999999996,
     "high_value": 55250,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 44234.711217599994,
-     "eur_per_tonne": 99.22909848443136
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 42320.665457120005,
+     "eur_per_tonne": 98.1680831679712
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 47422.211217599994,
-     "eur_per_tonne": 106.37942777816662
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 45508.165457120005,
+     "eur_per_tonne": 105.56188857528349
     },
-    "swing_eur_per_tonne": 7.150329293735254,
+    "swing_eur_per_tonne": 7.393805407312286,
     "swing_tonnes": 0,
     "swing_cost_eur": 3187.5
    },
@@ -1480,18 +1470,18 @@
     "low_value": 3.5,
     "high_value": 6.5,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 47114.17550331428,
-     "eur_per_tonne": 105.68842956910818
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 45157.27259997715,
+     "eur_per_tonne": 104.74794865229366
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 45136.15352529229,
-     "eur_per_tonne": 101.2512504340171
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 43245.18468788923,
+     "eur_per_tonne": 100.3126212974224
     },
-    "swing_eur_per_tonne": 4.437179135091085,
+    "swing_eur_per_tonne": 4.435327354871262,
     "swing_tonnes": 0,
-    "swing_cost_eur": 1978.0219780219923
+    "swing_cost_eur": 1912.087912087918
    },
    {
     "key": "modes.existing.capex_per_point_eur",
@@ -1501,18 +1491,18 @@
     "low_value": 175,
     "high_value": 325,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 44928.461217599994,
-     "eur_per_tonne": 100.78534662483256
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 43044.415457120005,
+     "eur_per_tonne": 99.84691192516094
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 46728.461217599994,
-     "eur_per_tonne": 104.8231796377654
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 44784.415457120005,
+     "eur_per_tonne": 103.88305981809376
     },
-    "swing_eur_per_tonne": 4.03783301293285,
+    "swing_eur_per_tonne": 4.036147892932817,
     "swing_tonnes": 0,
-    "swing_cost_eur": 1800
+    "swing_cost_eur": 1740
    },
    {
     "key": "on_demand_every_weeks",
@@ -1522,18 +1512,18 @@
     "low_value": 1.4,
     "high_value": 2.6,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 46400.778316460826,
-     "eur_per_tonne": 104.08810806221355
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 44400.24980755723,
+     "eur_per_tonne": 102.99193948647309
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 45500.59151212843,
-     "eur_per_tonne": 102.0687725086914
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 43637.723242354514,
+     "eur_per_tonne": 101.22316363046835
     },
-    "swing_eur_per_tonne": 2.019335553522154,
+    "swing_eur_per_tonne": 1.768775856004737,
     "swing_tonnes": 0,
-    "swing_cost_eur": 900.1868043323993
+    "swing_cost_eur": 762.5265652027156
    },
    {
     "key": "vehicle_capacity_t",
@@ -1543,14 +1533,14 @@
     "low_value": 1.4,
     "high_value": 2.6,
     "low": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 102.80426313129898
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 101.86498587162734
     },
     "high": {
-     "tonnes": 445.78366520724,
-     "annual_cost_eur": 45828.461217599994,
-     "eur_per_tonne": 102.80426313129898
+     "tonnes": 431.10412357453214,
+     "annual_cost_eur": 43914.415457120005,
+     "eur_per_tonne": 101.86498587162734
     },
     "swing_eur_per_tonne": 0,
     "swing_tonnes": 0,
@@ -1558,19 +1548,19 @@
    }
   ],
   "eur_per_tonne": {
-   "p10": 81.99917825561137,
-   "p50": 104.36819856774487,
-   "p90": 141.31033947586764
+   "p10": 81.62162324552813,
+   "p50": 103.41622959834493,
+   "p90": 139.71399014551102
   },
   "annual_cost_eur": {
-   "p10": 37415.218636354846,
-   "p50": 46013.35766418188,
-   "p90": 56531.83893985521
+   "p10": 36310.52659559849,
+   "p50": 44065.55454092262,
+   "p90": 53962.427551604975
   },
   "tonnes": {
-   "p10": 341.1472043486132,
-   "p50": 439.49094879226664,
-   "p90": 554.7200397546727
+   "p10": 330.5674898775609,
+   "p50": 425.96929650562305,
+   "p90": 537.3714936023528
   },
   "threshold_eur_per_tonne": null,
   "prob_below_threshold": null,
@@ -1611,7 +1601,7 @@
       "key": "demand_t",
       "value": 24.5,
       "unit": "t/ano",
-      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus e APA: ≈ 51 250,6 t de indiferenciado do concelho em 2025 × 5,86%)"
      },
      {
       "key": "startup_cost_eur",
@@ -1648,7 +1638,7 @@
       "key": "demand_t",
       "value": 13.4,
       "unit": "t/ano",
-      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus: 43 051 t de RSU em 2025 × 5,4% da APA)"
+      "source": "Modelo: população × 1,596 kg/hab/mês de têxtil que vai para o lixo (Vitrus e APA: ≈ 51 250,6 t de indiferenciado do concelho em 2025 × 5,86%)"
      },
      {
       "key": "startup_cost_eur",

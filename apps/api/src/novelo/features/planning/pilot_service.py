@@ -1,11 +1,16 @@
 """Piloto de 3 meses: escolhe as freguesias com mais valor de aprendizagem e prevê os KPIs a medir."""
 
 import asyncio
+import hashlib
+import json
+import threading
+from collections import OrderedDict
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.core.errors import ConflictError
+from novelo.core.guest import solver_budget
 from novelo.domain import network, pilot
 from novelo.domain.vocab import Tipau
 from novelo.features.network.models import Parish
@@ -23,6 +28,7 @@ from novelo.features.planning.pilot_schemas import (
 from novelo.features.planning.schemas import ZoneOut
 from novelo.features.textile import service as textile
 from novelo.features.textile.references import KG_PER_INHAB_MONTH
+from novelo.features.users.models import User
 
 SRC_CENSUS = "INE, Censos 2021"
 SRC_AREA = "INE/CAOP: população / área da freguesia"
@@ -210,7 +216,27 @@ def _recommend(
     )
 
 
-async def recommend_pilot(db: AsyncSession, body: PilotRequest) -> PilotOut:
+# O piloto é determinístico (semente fixa no pedido): o ecrã inicial pede-o a cada carga, por isso o resultado fica em
+# memória e só um cálculo a sério gasta o limite de simulações (um convidado do QR não o esgota só por abrir a página).
+_CACHE_SIZE = 16
+_cache: OrderedDict[str, PilotOut] = OrderedDict()
+_cache_lock = threading.Lock()
+
+
+def _cache_key(body: PilotRequest, params: object, zones: list[ZoneOut], reject_share: float) -> str:
+    payload = {
+        "body": body.model_dump(mode="json"),
+        "params": params.model_dump(mode="json") if hasattr(params, "model_dump") else repr(params),
+        "reject_share": round(reject_share, 6),
+        "zones": [
+            (z.code, z.population, z.demand_t, z.service_days, z.latitude, z.longitude, z.area_km2) for z in zones
+        ],
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()
+
+
+async def recommend_pilot(db: AsyncSession, body: PilotRequest, user: User | None = None) -> PilotOut:
+    """Recomenda o piloto. Com `user`, um cálculo novo gasta uma execução do otimizador; um resultado em cache não."""
     params = (await service.get_parameters(db)).values
     zones = await service.load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
@@ -221,4 +247,19 @@ async def recommend_pilot(db: AsyncSession, body: PilotRequest) -> PilotOut:
     reject_share = baseline.reject_t / baseline.total_t
     if len(zones) < body.k:
         raise ConflictError("Fewer parishes with data than requested")
-    return await asyncio.to_thread(_recommend, zones, areas, service._domain_params(params), reject_share, body)
+    key = _cache_key(body, params, zones, reject_share)
+    with _cache_lock:
+        hit = _cache.get(key)
+        if hit is not None:
+            _cache.move_to_end(key)
+            return hit.model_copy(deep=True)
+    if user is None:
+        out = await asyncio.to_thread(_recommend, zones, areas, service._domain_params(params), reject_share, body)
+    else:
+        with solver_budget(user):
+            out = await asyncio.to_thread(_recommend, zones, areas, service._domain_params(params), reject_share, body)
+    with _cache_lock:
+        _cache[key] = out.model_copy(deep=True)
+        while len(_cache) > _CACHE_SIZE:
+            _cache.popitem(last=False)
+    return out

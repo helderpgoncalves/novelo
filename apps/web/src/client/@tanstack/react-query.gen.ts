@@ -2668,6 +2668,8 @@ export const updatePlanningParametersMutation = (options?: Partial<Options<Updat
  * Recommend Pilot
  *
  * Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.
+ *
+ * O resultado é determinístico e fica em cache: só um cálculo novo gasta o limite do otimizador (`solver_budget`).
  */
 export const recommendPilotMutation = (options?: Partial<Options<RecommendPilotData>>): UseMutationOptions<RecommendPilotResponse, RecommendPilotError, Options<RecommendPilotData>> => {
     const mutationOptions: UseMutationOptions<RecommendPilotResponse, RecommendPilotError, Options<RecommendPilotData>> = {

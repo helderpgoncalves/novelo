@@ -29,6 +29,7 @@ from novelo.domain.vocab import CollectionMode, ContainerKind, ScenarioObjective
 from novelo.features.copilot import charts
 from novelo.features.copilot import mentions as mention_service
 from novelo.features.copilot import web as web_service
+from novelo.features.copilot.labels import default_name, scenario_label, strip_prefix
 from novelo.features.copilot.models import CopilotArtifact, CopilotAttachment
 from novelo.features.copilot.schemas import (
     CardKpis,
@@ -44,9 +45,9 @@ from novelo.features.copilot.schemas_artifacts import ArtifactSource
 from novelo.features.copilot.schemas_memory import CopilotSettings
 from novelo.features.copilot.tables import AnalyzeArgs, analyze_table, fold, search_text
 from novelo.features.copilot.tools_data import DATA_TOOLS, ROUTING_MEANING, assumption_note, make_table
-from novelo.features.copilot.tools_more import MORE_TOOLS
+from novelo.features.copilot.tools_more import MORE_TOOLS, _shown
 from novelo.features.copilot.tools_ui import UI_TOOLS
-from novelo.features.planning import benchmark_service, pilot_service
+from novelo.features.planning import benchmark_service, pilot_service, reference
 from novelo.features.planning import service as planning
 from novelo.features.planning.benchmark_schemas import BenchmarkScenarioRequest
 from novelo.features.planning.params import params_meta
@@ -63,7 +64,7 @@ from novelo.features.users.models import User
 
 log = logging.getLogger("novelo.copilot")
 
-COPILOT_PREFIX = "Copilot · "  # origem "copilot": os cenários criados aqui levam este prefixo no nome
+# origem "copilot": os cenários criados aqui levam o prefixo `COPILOT_PREFIX` no nome (ver labels.py)
 MAX_CREATIONS_PER_TURN = 2
 MAX_REPORTS_PER_TURN = 1
 TOOL_TIMEOUT_S = 45.0
@@ -85,6 +86,10 @@ class NoArgs(_Args):
 
 class ListScenariosArgs(_Args):
     limit: int = Field(default=10, ge=1, le=15)
+    references_only: bool = Field(
+        default=False,
+        description="True: only the app's reference scenarios (by parish and by real sites, see reference_key), the default base for «e se...?» when none is open",
+    )
 
 
 # Pressupostos que o utilizador pode escalar num cenário («e se o combustível subir 20%?»): fator multiplicativo.
@@ -118,10 +123,22 @@ class ParamChange(_Args):
 
 
 class RunScenarioArgs(_Args):
-    label: str = Field(min_length=1, max_length=60, description="Nome curto do cenário")
+    label: str | None = Field(
+        default=None, max_length=60, description="Short descriptive name; omit it and the server names the scenario"
+    )
     objective: ScenarioObjective
-    budget_eur_year: float | None = Field(default=None, ge=0, le=5_000_000, description="Para max_tonnes")
-    target_pct: float | None = Field(default=None, ge=1, le=100, description="Para min_cost: % do potencial")
+    budget_eur_year: float | None = Field(
+        default=None,
+        ge=0,
+        le=5_000_000,
+        description="Euros per year for max_tonnes, exactly as the user said, between 0 and 5 000 000. Never rescale or clamp it.",
+    )
+    target_pct: float | None = Field(
+        default=None,
+        ge=1,
+        le=100,
+        description="For min_cost: % of the textile still in the bin, from 1 to 100, exactly as the user said. Never clamp it: above 100 it is impossible",
+    )
     restrictions: list[ModeRestriction] = Field(default_factory=list, max_length=12)
     param_changes: list[ParamChange] = Field(
         default_factory=list, max_length=4, description="Escalar pressupostos (custos, capturas...) só neste cenário"
@@ -353,6 +370,7 @@ STATUS_KEYS: dict[str, str] = {
     "web_search": "status.searching_web",
     "list_assumptions": "status.reading_assumptions",
     "get_data_gaps": "status.finding_gaps",
+    "get_photo_policy": "status.reading_lots",
     "explain_scenario_difference": "status.comparing_scenarios",
     "list_reports": "status.reading_reports",
     "get_user_stats": "status.reading_admin",
@@ -378,6 +396,7 @@ def scenario_facts(s: ScenarioOut | ScenarioSummary) -> dict[str, Any]:
         "eur_per_tonne": s.eur_per_tonne,
         "investment_eur": s.capex_eur,
         "coverage_pct": s.coverage_pct,
+        "reference_key": s.reference_key,
     }
     if isinstance(
         s, ScenarioOut
@@ -419,6 +438,7 @@ def _scenarios_table(title: str, rows: list[dict[str, Any]]) -> dict[str, Any]:
         ("scenario_id", "Id", "text", None), ("label", "Cenário", "text", None), ("tonnes_per_year", "Captado", "number", "t/ano"),
         ("annual_cost_eur", "Custo anual", "currency", "€"), ("eur_per_tonne", "Custo por tonelada", "currency", "€/t"),
         ("investment_eur", "Investimento", "currency", "€"), ("coverage_pct", "Cobertura", "percent", "%"),
+        ("reference_key", "Referência", "category", None),
     ]  # fmt: skip
     keep = [c[0] for c in cols]
     return make_table(
@@ -477,12 +497,14 @@ def apply_param_changes(
         elif field == "people_per_point":
             after = max(1, round(after))
         holder[field] = after
+        scale, unit = (100.0, "%") if field == "capture_rate" else (1.0, None)  # taxas: o modelo não faz ×100
         applied.append(
             {
                 "key": ch.key,
                 "change_pct": round((ch.factor - 1) * 100, 1),
-                "from": round(before, 3),
-                "to": round(after, 3),
+                "from": round(before * scale, 3),
+                "to": round(after * scale, 3),
+                **({"unit": unit} if unit else {}),
             }
         )
     return PlanningParams.model_validate(data), applied
@@ -528,6 +550,19 @@ def status_detail(name: str, raw: str) -> str | None:
         if isinstance(data.get(key), str):
             return str(data[key])[:60]
     return None
+
+
+def _invalid_arguments(exc: ValidationError | json.JSONDecodeError) -> dict[str, Any]:
+    """Erro de argumentos para o modelo; um valor do utilizador fora dos limites não se «corrige»: explica-se."""
+    if not isinstance(exc, ValidationError):
+        return {"error": "invalid_arguments", "details": ["invalid JSON"]}
+    result: dict[str, Any] = {"error": "invalid_arguments", "details": [e["msg"] for e in exc.errors()][:5]}
+    if any(e["type"] in {"greater_than", "greater_than_equal", "less_than", "less_than_equal"} for e in exc.errors()):
+        result["hint"] = (
+            "The value is outside the allowed range. Do NOT retry with the limit or another value: tell the user it "
+            "cannot be done, why, and ask for a valid value."
+        )
+    return result
 
 
 @dataclass
@@ -582,7 +617,11 @@ class CopilotTools:
                 "Observed 2025 textile collection: TOTAL tonnes, destinations (reuse, recycling, reject), by entity, capture vs. potential.",
                 self._baseline,
             ),
-            "list_scenarios": (ListScenariosArgs, "List saved scenarios with their KPIs (newest first).", self._list),
+            "list_scenarios": (
+                ListScenariosArgs,
+                "List saved scenarios with their KPIs (newest first); references_only=true lists the reference scenarios (reference_key parish:<€/year> or sites:<€/year>).",
+                self._list,
+            ),
             "run_scenario": (
                 RunScenarioArgs,
                 "Create a NEW scenario (optimiser). max_tonnes needs budget_eur_year; min_cost needs target_pct.",
@@ -723,8 +762,8 @@ class CopilotTools:
             timeout = REPORT_TIMEOUT_S if name == "generate_rap_report" else TOOL_TIMEOUT_S
             result = await asyncio.wait_for(handler(args), timeout)
         except (ValidationError, json.JSONDecodeError) as exc:
-            details = [e["msg"] for e in exc.errors()] if isinstance(exc, ValidationError) else ["invalid JSON"]
-            return outcome(False, {"error": "invalid_arguments", "details": details[:5]}, "invalid arguments")
+            result = _invalid_arguments(exc)
+            return outcome(False, result, "invalid arguments")
         except TimeoutError:
             return outcome(False, {"error": "timeout", "message": "The tool took too long"}, "timed out")
         except (AiBudgetExceededError, FeatureDisabledError):
@@ -783,13 +822,13 @@ class CopilotTools:
             "reject_t": b.reject_t,
             "collected_kg_per_inhab_month": b.kg_per_inhab_month,
             "to_divert_kg_per_inhab_month": round(KG_PER_INHAB_MONTH, 2),
-            "estimated_potential_t": b.estimated_demand_t,
-            "potential_meaning": "textile generated = still going to the bin (gap_t) + collected separately (collected_t)",
-            "capture_meaning": "collected_t / estimated_potential_t; an estimate because the potential is one",
+            "textile_generated_t": b.estimated_demand_t,
+            "textile_generated_meaning": "«têxtil gerado» per year (estimate) = still_in_bin_t + collected_t. Never call it the demand or the potential",
+            "capture_meaning": "«do têxtil gerado já recolhido» = collected_t / textile_generated_t; an estimate because the generated textile is one",
             "textile_containers": "none: Vitrus has no textile containers and does not want them",
             "current_capture_pct": b.capture_of_demand_pct,
-            "gap_t": b.gap_t,
-            "gap_meaning": "textile still going to the bin (to divert); the scenarios' potential_t",
+            "still_in_bin_t": b.gap_t,
+            "still_in_bin_meaning": "«ainda vai para o lixo» / «por desviar» / «procura estimada» (estimate): what the model plans to recover; the scenarios' potential_t",
             "potential_source": POTENTIAL_SOURCE_LABEL,
             "entities": [{"name": e.entity, "collected_t": e.total_t} for e in b.entities],
             "table": make_table(
@@ -819,7 +858,11 @@ class CopilotTools:
         }
 
     async def _list(self, args: ListScenariosArgs) -> dict[str, Any]:
-        rows = await planning.list_scenarios(self.db, args.limit)
+        rows: list[ScenarioSummary] = (
+            list(await reference.list_references(self.db))
+            if args.references_only
+            else await planning.list_scenarios(self.db, args.limit)
+        )
         facts = [scenario_facts(r) for r in rows]
         return {
             "count": len(rows),
@@ -874,7 +917,9 @@ class CopilotTools:
         if args.target_pct is not None:  # % do têxtil por desviar do lixo (o `potential_t` do cenário)
             target = args.target_pct / 100 * await planning.potential_t(self.db, params)
         request = ScenarioRequest(
-            label=f"{COPILOT_PREFIX}{args.label}"[:80],
+            label=scenario_label(
+                args.label, default_name(args.objective, args.budget_eur_year, args.target_pct, args.siting)
+            ),
             objective=args.objective,
             budget_eur_year=args.budget_eur_year if args.objective == ScenarioObjective.MAX_TONNES else None,
             target_tonnes=target if args.objective == ScenarioObjective.MIN_COST else None,
@@ -981,7 +1026,7 @@ class CopilotTools:
             else base.target_tonnes
         )
         request = ScenarioRequest(
-            label=f"{COPILOT_PREFIX}{args.label or base.label}"[:80],
+            label=scenario_label(args.label, f"{strip_prefix(base.label)} · variante"),
             objective=objective,
             budget_eur_year=budget if objective == ScenarioObjective.MAX_TONNES else None,
             target_tonnes=target if objective == ScenarioObjective.MIN_COST else None,
@@ -1112,7 +1157,7 @@ class CopilotTools:
                         "key": meta.key,
                         "label": label,
                         "unit": meta.unit,
-                        "value": values.get(meta.key),
+                        "value": _shown(values.get(meta.key), meta.unit),
                         "source": meta.source.value,
                         "origin": origin[meta.source.value],
                         "note": assumption_note(meta.key, meta.note),
@@ -1218,6 +1263,7 @@ class CopilotTools:
             "title": out.title,
             "size_kb": round(out.size_bytes / 1024),
             "download_path": f"/api/v1/reports/{out.id}/pdf",
+            "download_markdown": f"[Transferir o PDF](/api/v1/reports/{out.id}/pdf)",
             "_summary": f"Report «{out.title}»",
         }
 

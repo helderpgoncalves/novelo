@@ -18,7 +18,13 @@ Script: `scripts/seed/demo_seed.py`. Corre **dentro do contentor da API** (usa o
   | Lote em curso (etiquetas lidas pelo modelo) | Ronfe | recolhido | 2 |
 
   Cobrem os quatro estados, quatro reservas de recicladores claramente de demonstração (`demo@example.org`), peças para reutilização e para reciclagem (sem rejeito: nenhuma peça o justifica).
-- **7 cenários `Demo · …`**: por freguesia (40 000 €/ano; 90 000 €/ano como filho do primeiro; custo mínimo para 350 t) e por locais reais (50 000 €/ano; raio 500 m como filho; escolas; custo mínimo para 250 t). Todos calculados com as rotas por estrada ([Rotas por estrada](rotas-reais.md)).
+- **Cenários `Demo · …` (19 + o francês), para a demo e para comparar**, todos com as rotas por estrada ([Rotas por estrada](rotas-reais.md)), ligados por `parent_id` para a comparação abrir com um clique:
+  - **Par do guião:** Cenário A (contentores de rua, só referência, 60 000 €/ano) contra Cenário B (sem contentores, 60 000 €/ano; filho de A).
+  - **Por freguesia:** 40 000, 90 000 e 150 000 €/ano (cadeia de orçamentos), custo mínimo para 350 t, só recolha a pedido para 250 t, restrições por freguesia (Azurém e Creixomil só em locais existentes; Ronfe e São Torcato só a pedido) e o teto do modelo sem limite de orçamento.
+  - **Por locais reais:** 20, 40 e 60 000 €/ano (cadeia), raio de 500 m, só locais públicos, sem recolha a pedido, escolas (pontos assistidos), custo mínimo para 250 t, 150 000 €/ano a 500 m e a referência de contentor de rua nos locais públicos.
+  - **Referência francesa** (4,27 kg/hab/ano, por verificar) como cenário de comparação.
+  - **Três «E se...?» sobre o B**, com o modelo a sério (a pergunta, a confirmação, o otimizador e a explicação com números verificados): orçamento de 60 000 para 90 000 €, Creixomil e Azurém só a pedido, e captura da recolha a pedido 30% mais baixa. São os exemplos que se repetem ao vivo com o júri.
+  - **Relatório RAP pré-gerado** com B, A e os locais a 60 000 €/ano, para a demo não depender de o gerar ao vivo.
 - **Histórico espalhado por dias**: lote aberto de manhã, peças ao longo de minutos, triado no dia seguinte, reservado dois dias depois da abertura, entregue dois dias a seguir (nunca no futuro). É a única parte escrita por SQL, e só mexe em datas.
 
 ## Honestidade dos dados
@@ -41,7 +47,7 @@ ssh root@<vps> 'docker exec -i $(docker ps --format "{{.Names}}" | grep ^api-) p
 cd apps/api && NOVELO_API_BASE=http://127.0.0.1:8190/api/v1 uv run python ../../scripts/seed/demo_seed.py --yes --offline-triage
 ```
 
-Opções: `--skip-lots`, `--skip-scenarios`, `--offline-triage` (só desenvolvimento) e `--cleanup MANIFESTO.json --yes`, que apaga exatamente o que um manifesto anterior criou (os lotes por código; os cenários `Demo · ` filhos antes dos pais). Cada execução escreve o manifesto em `/tmp/demo_seed_manifest.json` dentro do contentor e imprime-o no fim: guarda-o para poderes limpar.
+Opções: `--skip-lots`, `--skip-scenarios`, `--offline-triage` (só desenvolvimento) e `--cleanup MANIFESTO.json --yes`, que apaga exatamente o que um manifesto anterior criou (os lotes por código; os cenários, os «E se...?» e os relatórios por identificador). Cada execução escreve o manifesto em `/tmp/demo_seed_manifest.json` dentro do contentor e imprime-o no fim: guarda-o para poderes limpar.
 
 Não é idempotente: correr duas vezes cria dois conjuntos. Para refazer, limpa primeiro com o manifesto.
 

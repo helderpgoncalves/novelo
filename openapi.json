@@ -38119,7 +38119,7 @@
     },
     "/api/v1/planning/pilot": {
       "post": {
-        "description": "Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.",
+        "description": "Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.\n\nO resultado é determinístico e fica em cache: só um cálculo novo gasta o limite do otimizador (`solver_budget`).",
         "operationId": "recommend_pilot",
         "requestBody": {
           "content": {

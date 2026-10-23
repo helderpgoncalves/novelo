@@ -1,4 +1,4 @@
-from novelo.ai.verify import check_numbers, numbers_in, unsupported_numbers
+from novelo.ai.verify import check_numbers, numbers_in, unsupported_numbers, unsupported_rounded
 from novelo.features.planning.whatif_service import resolve_parishes
 
 FACTS = {"new": {"tonnes": "301,3", "cost": "12 400", "points": "7"}, "diff": {"t": "+4,5"}}
@@ -89,3 +89,9 @@ def test_external_numbers_need_a_source_excerpt_and_a_label() -> None:
 def test_novelo_numbers_are_never_reclassified_as_external() -> None:
     out = check_numbers("Recolhemos 301,3 t.", [{"t": 301.27}], ["301,3 t noutro país"])
     assert out.unsupported == set() and out.external == set()
+
+
+def test_numbers_are_accepted_in_portuguese_and_english_formats() -> None:
+    facts = {"capture_pct": 9.1, "still_in_bin_t": 3003.3, "generated_t": 3304.6, "treatment_eur_per_t": 105.64}
+    for text in ("9,1% e 3 003,3 t de 3 304,6 t, a 105,64 €/t", "9.1% and 3,003.3 t of 3,304.6 t, at 105.64 €/t"):
+        assert unsupported_rounded(text, facts) == set(), text

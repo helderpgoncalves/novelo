@@ -1089,6 +1089,8 @@ export const updatePlanningParameters = <ThrowOnError extends boolean = false>(o
  * Recommend Pilot
  *
  * Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.
+ *
+ * O resultado é determinístico e fica em cache: só um cálculo novo gasta o limite do otimizador (`solver_budget`).
  */
 export const recommendPilot = <ThrowOnError extends boolean = false>(options: Options<RecommendPilotData, ThrowOnError>): RequestResult<RecommendPilotResponses, RecommendPilotErrors, ThrowOnError> => (options.client ?? client).post<RecommendPilotResponses, RecommendPilotErrors, ThrowOnError>({
     url: '/api/v1/planning/pilot',

@@ -43,7 +43,7 @@ A coluna "o que o júri procura" é **hipótese** até lermos as Regras. A matri
 | **Apresentação e potencial de continuidade** (20%) | História clara, demo sem falhas; plano depois do hackathon | Narrativa, demo mínima, plano B; pedido do piloto de 3 meses | Slides 1, 8 e 9 | **5** |
 | **Nota ponderada** | | | | **6,05** (alvo 7,75 a 25 de outubro) |
 
-**As três maiores lacunas:** o número-âncora de impacto (445,8 t a 102,8 €/t, preenchido a 22 out) ainda assenta em custos estimados, sem os custos reais das viaturas da Vitrus; a continuidade sem parceiro confirmado nem deck ensaiado; a viabilidade apoiada em funcionalidades por integrar e sem E2E.
+**As três maiores lacunas:** o número-âncora de impacto (431,1 t a 101,9 €/t, recalculado a 23 out com rotas pela estrada) ainda assenta em custos estimados, sem os custos reais das viaturas da Vitrus; a continuidade sem parceiro confirmado nem deck ensaiado; a viabilidade apoiada em funcionalidades por integrar e sem E2E.
 
 ## O que ainda falta ler nas Regras
 

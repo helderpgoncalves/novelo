@@ -18,11 +18,11 @@ Hoje, o município, sozinho. A responsabilidade alargada do produtor tem de exis
 
 **"Mais toneladas garantem material reutilizável?"**
 
-Não, e por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025 a Ultriplo reutilizou 72,9% do que recolheu e a H Sarah Trading 50,0% (kg por destino), a Nova Etapa 50% (relatório) e o têxtil recolhido pela Vitrus 9,2%, com 56,9% de rejeito (relatório da To Be Green, 5,6 t). No cenário de 60 000 €/ano são 264,9 t reutilizáveis por ano, entre 222,9 e 324,8 t, a 173,0 € por tonelada reutilizável (estimativa; [registo](../pesquisa/registo-de-afirmacoes.md), A19, H1 e H2).
+Não, e por isso medimos toneladas reutilizáveis. A qualidade depende de quem recolhe: em 2025 a Ultriplo reutilizou 72,9% do que recolheu e a H Sarah Trading 50,0% (kg por destino), a Nova Etapa 50% (relatório) e o têxtil recolhido pela Vitrus 9,2%, com 56,9% de rejeito (relatório da To Be Green, 5,6 t). No cenário de 60 000 €/ano são 256,1 t reutilizáveis por ano, entre 215,6 e 314,1 t, a 171,5 € por tonelada reutilizável (estimativa; [registo](../pesquisa/registo-de-afirmacoes.md), A19, H1 e H2).
 
 **"A rede só vai onde a tonelada é barata?"**
 
-Não. A diretiva pede uma rede que não se limite às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o por tipo de território: no cenário de 60 000 €/ano, fora das freguesias urbanas fica servida 60,2% da população, contra 73,9% nas urbanas (estimativa; H4). Dizemos também o que falta: Arosa e Castelões, a única freguesia predominantemente rural, fica sem serviço neste orçamento; é uma das duas freguesias do piloto recomendado.
+Não. A diretiva pede uma rede que não se limite às zonas rendíveis (art. 22.º-C, n.º 9, b)). O separador Cobertura de cada cenário mostra-o por tipo de território: no cenário de 60 000 €/ano, fora das freguesias urbanas fica servida 55,5% da população, contra 72,8% nas urbanas (estimativa; H4). Dizemos também o que falta: Arosa e Castelões, a única freguesia predominantemente rural, fica sem serviço neste orçamento; é uma das duas freguesias do piloto recomendado.
 
 **"O saco de têxtil não acaba no compactador?"**
 
@@ -30,13 +30,17 @@ Não. Perguntámos à Vitrus a 22 de outubro: o saco iria para a caixa de compac
 
 **"Uma viatura nova não contraria o 'menor investimento'?"**
 
-É uma viatura e nenhum contentor, contra um contentor por ponto em todo o concelho. A viatura custa 42 500 € (5 312,50 € por ano em 8 anos; concurso público de Vila Nova de Gaia para uma viatura de caixa fechada). E cada tonelada que sai do lixo deixa de pagar 105,64 € de tratamento em aterro (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). Com 60 000 €/ano, a rede custa 45 828 € por ano, viatura incluída, e o tratamento evitado é de 47 093 €: paga a operação (estimativa; H3, H10). Os custos por hora e por km da viatura ainda são pressupostos, à vista e com intervalo (registo A23, A25).
+É uma viatura e nenhum contentor, contra um contentor por ponto em todo o concelho. A viatura custa 42 500 € (5 312,50 € por ano em 8 anos; concurso público de Vila Nova de Gaia para uma viatura de caixa fechada). E cada tonelada que sai do lixo deixa de pagar 105,64 € de tratamento em aterro (40 €/t de taxa de gestão de resíduos e 65,64 €/t da Resinorte, valores da Vitrus). Com 60 000 €/ano, a rede custa 43 914 € por ano, viatura incluída, e o tratamento evitado é de 45 542 €: paga a operação (35 702 €) e, por pouco, o custo total (custo líquido −1 628 € por ano; estimativa; H3, H10). Nos casos pessimistas do intervalo (P90: 139,7 €/t) já não chega. Os custos por hora e por km da viatura ainda são pressupostos, à vista e com intervalo (registo A23, A25).
 
 ## Sobre a tecnologia
 
 **"Porque não sensores de enchimento nos contentores?"**
 
 Custam dinheiro por contentor e o desafio pede o menor investimento. O Novelo funciona sem hardware; sensores podem entrar mais tarde, nos pontos onde os dados mostrarem que compensam.
+
+**"As rotas são reais ou linhas retas?"**
+
+Medimos as rotas pela estrada, com o OpenStreetMap, num servidor nosso e sem custos. Os quilómetros e o traçado de cada rota vêm daí, e cada rota diz se é «por estrada» ou estimativa (só é estimativa se o servidor de mapas falhar). Há uma parte que continua a ser fórmula, e dizemo-lo no ecrã: a volta porta a porta dentro de cada freguesia, que depende da área e do número de sacos. As horas de viatura usam 30 km/h de recolha, um pressuposto; o OpenStreetMap indica cerca de 40 km/h de condução, sem trânsito. Os dados do mapa são © colaboradores do OpenStreetMap (ODbL).
 
 **"A triagem por foto é fiável?"**
 
@@ -76,7 +80,7 @@ Uma ou duas chamadas por peça triada e uma por pergunta "E se...?", com limites
 
 **"Funciona noutro município?"**
 
-Sim. Usa dados abertos que todos os concelhos têm (INE, mapas, rede viária) mais os custos do operador local, e todos têm a mesma obrigação de recolha.
+Sim. Usa dados abertos que todos os concelhos têm (INE, OpenStreetMap para a rede viária, CAOP) mais os custos do operador local, e todos têm a mesma obrigação de recolha.
 
 **"O que fariam nos próximos 3 meses?"**
 
@@ -84,7 +88,7 @@ Um piloto em duas freguesias com a Vitrus, um modo de recolha de cada tipo, e co
 
 **"Qual é a maior limitação?"**
 
-Os custos unitários. Sem os da Vitrus, usamos valores de referência. Com eles, o modelo fica muito mais preciso, e é a primeira coisa que pedimos.
+Os custos unitários. Sem os da Vitrus, usamos valores de referência. Com eles, o modelo fica muito mais preciso, e é a primeira coisa que pedimos. Logo a seguir, a viatura: o mapa assume uma furgoneta de 2,8 × 2,1 × 6 m e 3,5 t até a Vitrus indicar a verdadeira.
 
 ## Mais perguntas
 

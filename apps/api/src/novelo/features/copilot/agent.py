@@ -2,7 +2,7 @@
 """O copiloto em streaming: um pedido -> eventos tipados (SSE).
 
 Camadas do prompt (da mais estável para a mais volátil):
-  1. regras (copilot_v5.md)  2. persona + memória + perfil, CONGELADAS por conversa (preserva o prompt cache)
+  1. regras (copilot_v6.md)  2. persona + memória + perfil, CONGELADAS por conversa (preserva o prompt cache)
   3. histórico  4. bloco [context] do pedido (ecrã, menções, anexos, ações recentes, memo) + a pergunta.
 
 Se o verificador rejeitar o texto depois de transmitido, emite-se `retract` e o texto reescrito. Se o cliente desligar,

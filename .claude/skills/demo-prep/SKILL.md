@@ -11,4 +11,4 @@ Guião: `docs/engenharia/demo-e-entrega.md` e `docs/projeto/pitch.md`; perguntas
 - **Cenários A e B fixos** (sementes fixas, guardados na BD) para a demo ser reproduzível; 5 perguntas "E se...?" de reserva testadas.
 - **Momento forte:** uma peça triada em palco engrossa um fio do Sankey; QR do lote abre o passaporte no telemóvel.
 - **Plano B:** vídeo de 60 s, relatório RAP pré-gerado, cenários em cache, funciona sem rede se necessário.
-- **Checklist antes de subir ao palco:** produção a responder, `OPENROUTER_API_KEY` válida e com saldo, 3 ensaios cronometrados, QR impressos, tag `v1.0-demo`.
+- **Checklist antes de subir ao palco:** produção a responder, serviço `osrm` saudável e cenários da demo com `routing = road` («Por estrada»), `OPENROUTER_API_KEY` válida e com saldo, 3 ensaios cronometrados, QR impressos, tag `v1.0-demo`.

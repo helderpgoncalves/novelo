@@ -68,7 +68,8 @@ async def test_fast_requests_are_served_while_the_solver_runs(
                 assert resp.status_code == 200
             latencies[name] = min(attempts)
         assert not running.done()  # os GET responderam com o solver ainda a dormir
-        assert all(v < 0.2 for v in latencies.values()), latencies
+        # Um loop bloqueado pelo solver demora ≥ SLEEP_S; meio SLEEP_S distingue-o de uma máquina carregada
+        assert all(v < 0.5 * SLEEP_S for v in latencies.values()), latencies
         created = await running
     finally:  # nunca deixar o pedido a correr se uma verificação falhar: prenderia a transação do teste
         watch.cancel()

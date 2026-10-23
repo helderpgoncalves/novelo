@@ -66,6 +66,10 @@ ASSUMPTION_NOTES: dict[str, str] = {
         "(mediana de 41,4 km/h nas freguesias e 39,2 km/h nos locais municipais, sem trânsito): não são comparáveis, por "
         "isso as horas e as viaturas não usam a duração do OSRM."
     ),
+    "rsu_treatment_eur_per_t": (
+        "Custo de tratamento por tonelada de indiferenciado: 105,64 €/t no total (40 €/t de taxa de gestão de resíduos "
+        "mais 65,64 €/t da tarifa da Resinorte), dado da Vitrus de 22 out 2026. Cada tonelada desviada poupa este valor."
+    ),
     "cost_per_km_eur": _VEHICLE_COST_NOTE,
     "cost_per_collection_eur": _VEHICLE_COST_NOTE,
     "kg_per_inhab_month": (
@@ -205,7 +209,7 @@ async def list_parishes(box: "CopilotTools", args: ParishesArgs) -> dict[str, An
     ]  # fmt: skip
     cols: list[Col] = [
         ("code", "Código", "text", None), ("name", "Freguesia", "text", None), ("population", "Habitantes", "number", "hab."),
-        ("demand_t", "Potencial", "number", "t/ano"), ("tipau", "Tipologia", "category", None), ("service_days", "Dias com circuito", "number", "dias/sem."),
+        ("demand_t", "Por desviar", "number", "t/ano"), ("tipau", "Tipologia", "category", None), ("service_days", "Dias com circuito", "number", "dias/sem."),
         ("lat", "Latitude", "number", None), ("lon", "Longitude", "number", None),
     ]  # fmt: skip
     return {
@@ -293,7 +297,7 @@ async def get_scenario_detail(box: "CopilotTools", args: ScenarioDetailArgs) -> 
             for a in sorted(s.result.allocations, key=lambda a: -a.tonnes)
         ]  # fmt: skip
         cols = [("code", "Código", "text", None), ("name", "Freguesia", "text", None), ("mode", "Modo", "category", None), ("tonnes", "Captado", "number", "t/ano"),
-                ("annual_cost_eur", "Custo anual", "currency", "€"), ("demand_t", "Potencial", "number", "t/ano"), ("population", "Habitantes", "number", "hab.")]  # fmt: skip
+                ("annual_cost_eur", "Custo anual", "currency", "€"), ("demand_t", "Por desviar", "number", "t/ano"), ("population", "Habitantes", "number", "hab.")]  # fmt: skip
     return {
         "scenario_id": str(s.id),
         "label": s.label,
@@ -479,8 +483,14 @@ async def get_brands(box: "CopilotTools", _: Empty) -> dict[str, Any]:
 
 async def get_lot_history(box: "CopilotTools", args: LotHistoryArgs) -> dict[str, Any]:
     lot = await lots.get_lot(box.db, args.code)
-    rows = [
-        {"at": e.occurred_at.isoformat(timespec="minutes"), "label": e.kind.value, "detail": e.note} for e in lot.events
+    rows = [  # `at_text`: o verificador ignora datas ISO, por isso a data em texto corrido também tem de vir da ferramenta
+        {
+            "at": e.occurred_at.isoformat(timespec="minutes"),
+            "at_text": e.occurred_at.strftime("%d/%m/%Y %H:%M"),
+            "label": e.kind.value,
+            "detail": e.note,
+        }
+        for e in lot.events
     ]
     cols: list[Col] = [
         ("at", "Quando", "date", None),

@@ -2,6 +2,7 @@
 alterações de pressupostos e ferramentas de administração. Os números vêm sempre da base de dados ou do otimizador."""
 
 import json
+import re
 from typing import Any
 
 import httpx
@@ -227,7 +228,7 @@ def test_scaled_assumptions_stay_inside_their_physical_limits() -> None:
     out, applied = apply_param_changes(base, changes)
     assert out.modes[CollectionMode.STREET].capture_rate == 1.0 and out.detour_factor == 3.0
     assert out.modes[CollectionMode.STREET].people_per_point == 300
-    assert [a["to"] for a in applied] == [1.0, 3.0, 300]
+    assert [a["to"] for a in applied] == [100.0, 3.0, 300]  # as taxas saem em %
     assert base.detour_factor == 1.3  # a cópia não altera o original
 
 
@@ -333,7 +334,12 @@ async def test_baseline_has_the_current_demand_base_and_no_textile_containers(
 ) -> None:
     await run(logged_in, llm, {"tools": [("get_baseline", {})]}, {"text": ["Veja."]})
     b = tool_results(llm)[0]
-    assert b["gap_t"] == 3003.3 and b["current_capture_pct"] == 9.1 and "none" in b["textile_containers"]
+    assert (
+        b["still_in_bin_t"] == 3003.3
+        and b["textile_generated_t"] == 3304.6
+        and b["current_capture_pct"] == 9.1
+        and "none" in b["textile_containers"]
+    )
     assert (
         b["collected_kg_per_inhab_month"] == 0.16 and b["to_divert_kg_per_inhab_month"] == 1.6
     )  # o 0,7 antigo já não existe
@@ -351,3 +357,62 @@ async def test_param_changes_accept_the_dedicated_vehicle_price_and_speed() -> N
     )
     assert params.vehicle_capex_eur == 51000.0 and params.vehicle_speed_kmh == 15.0
     assert [(a["key"], a["change_pct"]) for a in applied] == [("vehicle_capex_eur", 20.0), ("vehicle_speed_kmh", -50.0)]
+
+
+async def test_lot_history_gives_dates_as_text_the_verifier_can_check(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    code = (await logged_in.post("/api/v1/lots", json={"parish_code": None})).json()["code"]
+    await run(logged_in, llm, {"tools": [("get_lot_history", {"code": code})]}, {"text": ["Veja o histórico."]})
+    rows = tool_results(llm)[0]["table"]["rows"]
+    assert rows and all(re.fullmatch(r"\d{2}/\d{2}/\d{4} \d{2}:\d{2}", r["at_text"]) for r in rows)
+
+
+async def test_photo_policy_comes_from_the_code_and_configuration(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
+    await run(logged_in, llm, {"tools": [("get_photo_policy", {})]}, {"text": ["Veja."]})
+    p = tool_results(llm)[0]
+    assert p["thumbnail_max_side_px"] == 640 and p["thumbnail_max_kb"] == 150 and p["retention_days"] == 90
+    assert (
+        p["passport_max_photos"] == 12
+        and "NO image" in p["triage_stores_nothing"]
+        and "delivered" in p["delivered_lot"]
+    )
+
+
+async def test_scenarios_created_by_the_copilot_get_one_prefix_and_a_useful_name(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    steps = [
+        ("run_scenario", {"label": "Copilot", "objective": "max_tonnes", "budget_eur_year": 45000}),
+    ]
+    await run(logged_in, llm, {"tools": steps}, {"text": ["Feito."]})
+    first = tool_results(llm)[0]
+    assert first["label"] == "Copilot · 45 000 €/ano, por freguesia"
+    await run(
+        logged_in,
+        llm,
+        {"tools": [("what_if", {"scenario_id": first["scenario_id"], "budget_eur_year": 50000})]},
+        {"text": ["Feito."]},
+    )
+    second = tool_results(llm)[-1]
+    assert second["label"] == "Copilot · 45 000 €/ano, por freguesia · variante"
+
+
+async def test_list_scenarios_can_return_only_the_reference_scenarios(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    await run(logged_in, llm, {"tools": [("list_scenarios", {"references_only": True})]}, {"text": ["Veja."]})
+    data = tool_results(llm)[0]
+    keys = [r["reference_key"] for r in data["table"]["rows"]]
+    assert all(k and (k.startswith("parish:") or k.startswith("sites:")) for k in keys)
+
+
+async def test_out_of_range_values_come_back_with_a_do_not_retry_hint(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    step = {"objective": "max_tonnes", "budget_eur_year": -5000}
+    await run(logged_in, llm, {"tools": [("run_scenario", step)]}, {"text": ["Não é possível."]})
+    out = tool_results(llm)[0]
+    assert out["error"] == "invalid_arguments" and "Do NOT retry" in out["hint"]
+    scenarios = (await logged_in.get(f"{P}/scenarios")).json()
+    assert not any("-5" in s["label"] for s in scenarios)

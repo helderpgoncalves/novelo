@@ -6,14 +6,14 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 | Momento | Tempo | O que acontece |
 | --- | --- | --- |
-| 1. Cenários | 30 s | Mapa de Guimarães com a procura por freguesia. Cenário A (referência: contentores de rua em todo o lado, o modelo que a Vitrus não quer) contra Cenário B (sem contentores: local existente e recolha a pedido nos circuitos). Pausa de 3 s no €/t. |
+| 1. Cenários | 30 s | Mapa de Guimarães com a procura por freguesia. Cenário A (referência: contentores de rua em todo o lado, o modelo que a Vitrus não quer) contra Cenário B (sem contentores: local existente e recolha a pedido nos circuitos). Pausa de 3 s no €/t. Mostrar a etiqueta «Por estrada» e o traçado das rotas pelas estradas: os km são medidos no OpenStreetMap (OSRM próprio), não estimados em linha reta. |
 | 2. "E se...?" | 40 s | Pedimos a um jurado uma pergunta. O Novelo mostra "Entendi: ...", corre o otimizador e explica a diferença em números. |
 | 3. Do saco ao fio | 40 s | Controlo de qualidade na entrega: foto de uma peça real e da etiqueta, estado, composição e marca. A peça entra num lote (a miniatura é opcional e só se guarda se o operador a pedir); um jurado lê o QR do saco com o telemóvel e abre o passaporte. O Sankey engrossa em direto. |
 | 4. Relatório RAP | 20 s | Um clique e abre o PDF: custo por tonelada por tipo de território, toneladas por fibra, marcas mais encontradas. |
 
 ## Dados da demo
 
-- Cenários A e B pré-calculados e guardados (ecrã Cenários); a demo nunca depende de correr a otimização inteira ao vivo. Em produção há também 7 cenários de demonstração (`Demo · …`), todos com as rotas por estrada: por freguesia (40 000 e 90 000 €/ano, este filho do primeiro, e custo mínimo para 350 t) e por locais reais (50 000 €/ano, o seu filho com raio de 500 m, escolas e custo mínimo para 250 t).
+- Cenários A e B pré-calculados e guardados (ecrã Cenários); a demo nunca depende de correr a otimização inteira ao vivo. Em produção há também 7 cenários de demonstração (`Demo · …`), todos com as rotas por estrada (`routing = road`; ver [Rotas por estrada](rotas-reais.md)): por freguesia (40 000 e 90 000 €/ano, este filho do primeiro, e custo mínimo para 350 t) e por locais reais (50 000 €/ano, o seu filho com raio de 500 m, escolas e custo mínimo para 250 t).
 - Cinco perguntas "E se...?" de reserva, testadas e em cache, caso o jurado não queira perguntar ou a rede falhe. A pergunta do jurado corre a sério.
 - Seis lotes de demonstração com fotografias reais e histórico espalhado por vários dias (ver [Seed de demonstração](seed-demo.md)): o passaporte nunca aparece vazio e a peça em palco junta-se ao lote em curso `NOV-BXS4UW`.
 - A peça para a triagem: uma camisola com etiqueta legível, testada antes no mesmo telemóvel e com a mesma luz.
@@ -24,6 +24,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 - [ ] https://novelo.helder.si a funcionar fora da rede do evento
 - [ ] `just check` verde e a stack de produção testada com `just build`
+- [ ] OSRM saudável em produção (serviço `osrm` do Coolify em verde) e os cenários A, B e os `Demo · …` mostram «Por estrada» (`routing = road`), não `estimate`; se algum aparecer estimado, o OSRM estava parado quando foi criado: criar o cenário de novo
 - [ ] Cenários A e B carregam em menos de 2 segundos
 - [ ] "E se...?" responde em menos de 15 segundos; perguntas de reserva em cache
 - [ ] QR impresso no saco da demo e testado com dois telemóveis diferentes

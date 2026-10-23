@@ -339,7 +339,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | R7 | V, M · 25 | Quem autoriza cada ponto (junta, Câmara)? Que taxa de ocupação do espaço público se cobra por contentor? | A Humana pagava taxa ou contrapartida [F76] | Se há taxa: custo anual por ponto no modelo |
 | R8 | V · 25 | Qual a capacidade (litros) dos contentores de têxteis e o enchimento típico entre recolhas? Há roubo ou vandalismo? | `collections_per_year` = 26 e 4,0 t por viatura (pressupostos) | Se há dados: calibrar frequência e toneladas por recolha |
 | R9 | V · 25 | A Vitrus e a Câmara classificam estes contentores como rede de **resíduo têxtil** ou de **têxtil usado**? Há contratos revistos? Quem reporta no MIRR? | Nota Técnica da APA [F70]: o que entra em contentor é sempre resíduo | Se resíduo com contrato: o relatório RAP inclui a rede; se não: risco de conformidade a nomear |
-| R10 | V · 25 | As rotas e km dos operadores externos (Ultriplo, Sarah, Nova Etapa) podem ser partilhados? | Base de qualquer VRP real de têxteis | Se sim: substituir o fator de desvio 1,3 por km reais |
+| R10 | V · 25 | As rotas e km dos operadores externos (Ultriplo, Sarah, Nova Etapa) podem ser partilhados? | Os km do Novelo vêm da estrada (OSRM sobre o OpenStreetMap); os dos operadores externos servem para validar o modelo com circuitos reais | Se sim: comparar os km medidos pelo OSRM com os reais e afinar o perfil de condução |
 
 ### 4.3 Contentores municipais recebidos (pacote de 20 de outubro)
 
@@ -378,8 +378,8 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | V10 | V · 25 | Viaturas multi-tipologia (60-93-ZG faz C7 e BIO 3 no mesmo turno): lava-se a caixa entre fluxos? Serve para têxtil, que tem de ir seco e sem compactar? | Alerta 8 | **Respondida a 22 out:** o compactador não serve (estraga o saco; volta só de têxtil contamina) → viatura de têxtil nova, sem compactação |
 | V11 | V · 25 | A semana de 21 a 25/09/2026, o sábado 19/09 e o domingo 20/09 são típicos? O planeamento do fim de semana é da mesma semana? | Alerta 11 | Se típicos: "semana tipo" no modelo |
 | V12 | V · 25 | Têm a lista oficial das 82 localidades com freguesia? | 11 sem coordenadas ("Ruas Estreitas", "Urgezess(5ª)"...) e 21 sem freguesia (61 de 82 ligadas) | Se sim: fecha a ligação circuito → freguesia |
-| V13 | V · 25 | Quilómetros, tempos e toneladas por circuito e por viatura, e pesagens? | O fator de desvio 1,3 e o limite de 20 s são pressupostos | Se sim: calibrar VRP e rotas |
-| V14 | V · pós | Há GPS ou telemetria nas viaturas? | Rotas reais em vez de linha reta × 1,3 | Se sim: OSRM com perfis reais |
+| V13 | V · 25 | Quilómetros, tempos e toneladas por circuito e por viatura, e pesagens? | Os km das rotas vêm da estrada (OSRM); são pressupostos o limite de 20 s, os 30 km/h de recolha, o desvio 1,3 (só na volta porta a porta, no fallback e na sensibilidade; a calibração dá 1,37 a 1,48) e a furgoneta do perfil | Se sim: validar km e velocidades contra os reais e calibrar horas e viaturas |
+| V14 | V · pós | Há GPS ou telemetria nas viaturas? | Os km já são pela estrada (OSRM, perfil de furgoneta de 2,8 × 2,1 × 6 m e 3,5 t, pressuposto); o GPS daria percursos e tempos reais, com trânsito | Se sim: afinar o perfil do OSRM à viatura real e calibrar os minutos |
 
 ### 4.5 Orçamento, metas, RAP e prazos
 
@@ -387,7 +387,7 @@ A última coluna resume a ação por resposta e o sítio a atualizar. As dez per
 | --- | --- | --- | --- | --- |
 | B1 | V · 22 | Ver [Q4](#q4-custos-unitários-e-vida-útil): custos unitários | `params.py` | Ver Q4 |
 | B2 | V · 22 | De onde vem o orçamento para a rede de têxteis em 2026 e 2027 (Vitrus, Câmara, Fundo Ambiental, FEDER, PRR)? Há teto anual? | A Ação 1 do plano estima cerca de 5 M€ com financiamento misto [F74, p. 65] | Se há teto: valor por omissão do simulador |
-| B3 | V · 22 | O que conta como êxito: toneladas, captura, €/t, cobertura, rejeito máximo? | A frase-âncora do pitch (445,8 t a 102,8 €/t, estimativa) precisa de um termo de comparação | Se há metas: KPI do cenário B e do piloto |
+| B3 | V · 22 | O que conta como êxito: toneladas, captura, €/t, cobertura, rejeito máximo? | A frase-âncora do pitch (431,1 t a 101,9 €/t, estimativa) precisa de um termo de comparação | Se há metas: KPI do cenário B e do piloto |
 | B4 | V · 25 | A meta de **+30% de recolha seletiva** é sobre que base e para que ano (2025 ou 2026)? | O plano diz "até 2025" (p. 51) e "até 2026" (p. 67) [F74]; 301,265 × 1,3 = 391,6 t (cálculo) | Se a base é 301,3 t: cenário de referência "meta do plano" a 391,6 t |
 | B5 | V · 22 | Ver [Q10](#q10-êxito-orçamento-e-piloto): o que levaria a Vitrus a pilotar | Pedido final do pitch | Ver Q10 |
 | B6 | V, M · 25 | O custo da recolha seletiva de têxteis já entra na tarifa (art. 36.º, n.º 7 do RGGR)? Qual a tarifa de aterro ou incineração por tonelada, para o custo evitado? | A fórmula de custo em [Dados e modelo](../engenharia/dados-e-modelo.md) não tem custo evitado; o n.º 8 exclui o que ficar sob RAP [F69] | Se sim: custo evitado por t; relatório RAP mostra quando sai da tarifa |
