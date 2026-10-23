@@ -29,7 +29,7 @@ MODEL_RESIDUAL_KG_PER_INHAB_YEAR = references.KG_PER_INHAB_MONTH * 12  # 19,15: 
 PLAN_KG_PER_MONTH = references.PLAN_KG_PER_INHAB_MONTH  # 0,7: leitura alternativa, não usada pela Vitrus
 PLAN_RESIDUAL_KG_PER_INHAB_YEAR = 315  # indiferenciado por habitante, mesmo plano
 PLAN_TEXTILE_SHARE_OF_RESIDUAL_PCT = 5.4
-PT_TEXTILE_SHARE_PCT = 4.55  # composição dos RSU em Portugal (folha RSU de dados_textil.xlsx, EEA)
+PT_TEXTILE_SHARE_PCT = 4.55  # composição dos RSU em Portugal (folha de resíduos urbanos dos dados da Vitrus, EEA)
 FRANCE_KG_PER_INHAB_YEAR = 4.27  # Refashion; por verificar (registo de afirmações C1)
 WORST_ZONES = 8
 MODEL_BASE: ReadingKey = "vitrus_apa_share_of_rsu"
@@ -47,7 +47,7 @@ SOURCES: dict[ReadingKey, str] = {
     ),
     "pt_composition": (
         "Composição dos RSU em Portugal (4,55% de têxteis, sem sanitários) × 517 kg por habitante e por ano "
-        "(Portugal continental, 2024), folha RSU de dados_textil.xlsx."
+        "(Portugal continental, 2024), folha de resíduos urbanos dos dados da Vitrus."
     ),
     "plan_per_capita": (
         "Leitura alternativa, não usada pela Vitrus: Plano de Ação Integrado para a Circularidade Têxtil de Guimarães "

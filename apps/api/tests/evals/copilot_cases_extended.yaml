@@ -275,7 +275,7 @@ cases:
     web: directive
     settings: {web_search: "off"}
     turns: [{message: "Qual é o prazo para os Estados-Membros criarem a RAP têxtil na UE?"}]
-    expect: {no_web: true, must_contain_any: ["desligad|não (posso|consigo) pesquisar|sem (acesso|pesquisa)|não tenho (acesso|fontes)|fonte"]}
+    expect: {no_web: true, must_contain_any: ["desligad|desativad|não (posso|consigo) pesquisar|sem (acesso|pesquisa)|não tenho (acesso|fontes)|fonte"]}
   - id: web_guest_pt
     lang: pt-PT
     role: guest
@@ -436,7 +436,7 @@ cases:
     turns:
       - message: "Gera o relatório RAP do cenário Base."
         mentions: [{type: scenario, name: Base}]
-    expect: {tools_any: [generate_rap_report, propose_action]}
+    expect: {tools_any: [generate_rap_report, propose_action], must_not_contain: ["\\]\\(\\s", "/pdf\\s+\\)"]}
   - id: pilot_en
     lang: en
     turns: [{message: "Recommend which two parishes to pilot first and explain the risks."}]
@@ -503,7 +503,7 @@ cases:
     turns:
       - message: "As rotas deste cenário seguem as estradas?"
         page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
-    expect: {must_contain_any: ["estimativa|estimad|linha reta"], must_not_contain: ["seguem (as )?estradas reais", "sim, (seguem|por estrada)"], max_chars: 800}
+    expect: {must_contain_any: ["estimativa|estimad|linha reta"], must_not_contain: ["(?<!não )(?<!nao )seguem (as )?estradas reais", "sim, (seguem|por estrada)"], max_chars: 800}
   - id: routing_provenance_en
     lang: en
     turns:
@@ -530,3 +530,32 @@ cases:
     lang: pt-PT
     turns: [{message: "Para que serve a triagem por foto?"}]
     expect: {must_contain_any: ["controlo de qualidade|qualidade|contamina"], max_chars: 700}
+  # Fotografias dos lotes (política de 23 out 2026), termos da procura, números por idioma, etiquetas e base por omissão.
+  - id: photo_policy_pt
+    lang: pt-PT
+    turns: [{message: "Guardam as fotografias da triagem? Por quanto tempo e quem as vê?"}]
+    expect: {tools_any: [get_photo_policy], must_contain_any: ["90"], must_not_contain: ["não tenho informação", "nunca são guardadas"], max_chars: 800}
+  - id: photo_policy_en
+    lang: en
+    turns: [{message: "Do you keep the photos taken during sorting, for how long, and who can see them?"}]
+    expect: {tools_any: [get_photo_policy], must_contain_any: ["90"], must_not_contain: ["no verified information", "never stored"], max_chars: 800}
+  - id: demand_terms_pt
+    lang: pt-PT
+    turns: [{message: "Quanto têxtil se gera por ano em Guimarães e quanto disso ainda vai para o lixo?"}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["3 304,6"], must_not_contain: ["procura potencial", "potencial de 3 304"], max_chars: 800}
+  - id: number_format_en
+    lang: en
+    turns: [{message: "What share of the textile generated in Guimarães is already collected, and how much is still in the bin?"}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["9\\.1"], must_not_contain: ["9,1 ?%", "3 003,3"], max_chars: 800}
+  - id: label_no_duplicate_prefix_pt
+    lang: pt-PT
+    turns: [{message: "Cria um cenário com 55 mil euros por ano."}]
+    expect: {tools_any: [run_scenario], must_not_contain: ["Copilot · Copilot"], max_created: 1, max_chars: 800}
+  - id: routing_no_scenario_pt
+    lang: pt-PT
+    turns: [{message: "As rotas dos cenários seguem as estradas?"}]
+    expect: {must_not_contain: ["^depende", "depende do cenário"], max_chars: 700}
+  - id: whatif_default_base_pt
+    lang: pt-PT
+    turns: [{message: "E se o orçamento passar de 40 000 para 60 000 €?"}]
+    expect: {tools_any: [what_if, run_scenario], must_not_contain: ["em que cenário"], max_created: 2, max_chars: 900}  # sem referência guardada na BD de avaliação, cria a base e a variante

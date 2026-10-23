@@ -14,7 +14,7 @@ sai do contentor). Dry-run por omissão:
   docker exec -i <api> python - --yes < scripts/seed/demo_seed.py
   docker exec -i <api> python - --cleanup MANIFEST.json --yes < scripts/seed/demo_seed.py
 
-Opções: --yes (escreve), --skip-scenarios, --skip-lots, --offline-triage (SÓ desenvolvimento, sem chave de IA: análise
+Opções: --yes (escreve), --skip-scenarios, --skip-lots, --only=chave,chave (só esses cenários ou os passos fr, whatif, report), --offline-triage (SÓ desenvolvimento, sem chave de IA: análise
 neutra em vez de chamar o modelo), --cleanup FICHEIRO (apaga o que um manifesto anterior criou).
 Escreve o manifesto de cada execução em /tmp/demo_seed_manifest.json e imprime-o no fim.
 """
@@ -40,6 +40,7 @@ UA = {"User-Agent": "novelo-demo-seed/1.0 (https://novelo.helder.si; contacto-re
 CACHE = Path("/tmp/demo_photos")
 YES = "--yes" in sys.argv
 ARGS = sys.argv[1:]
+ONLY = {k for a in ARGS if a.startswith("--only=") for k in a[7:].split(",") if k}  # só estes passos/cenários (chaves)
 
 # (ficheiro no Commons, autor, licença). Autor e licença verificados na API do Commons a 23 out 2026.
 PHOTOS: dict[str, tuple[str, str, str]] = {
@@ -153,21 +154,50 @@ LOTS: list[dict[str, object]] = [
         "opened_days_ago": 1,
         "final": "collected",
         "items": [
-            {"p": "b037", "g": "other", "c": None, "label": True},
-            {"p": "b239", "g": "other", "c": None, "label": True},
+            {"p": "b037", "g": "other", "c": [("nylon", 78), ("elastane", 21), ("polyester", 1)], "label": True},  # etiqueta DIM: o modelo leu 73/21/6 numa execução; o operador corrige
+            {"p": "b239", "g": "other", "c": [("cotton", 100)], "label": True},  # etiqueta Muji: corpo 100% algodão (a malha canelada é 75/25)
         ],
     },
 ]
 
+# Cenários de demonstração (rótulo `Demo · `), na ordem em que se criam: o pai tem de existir antes do filho.
+# O par A/B é o do guião da demo (docs/engenharia/demo-e-entrega.md): A é a referência com contentores de rua (o modelo que
+# a Vitrus não quer), B é a rede proposta. O resto mostra a variedade do simulador e dá pares prontos para comparar.
 SCENARIOS: list[tuple[str, dict[str, object], str | None]] = [
-    ("p40", dict(label="Demo · Por freguesia · 40 000 €/ano", objective="max_tonnes", budget_eur_year=40000, siting="parish"), None),
+    ("A", dict(label="Demo · Cenário A · contentores de rua (referência) · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="parish", default_modes=["street"]), None),
+    ("B", dict(label="Demo · Cenário B · sem contentores (proposta) · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="parish"), "A"),
+    ("p40", dict(label="Demo · Por freguesia · 40 000 €/ano", objective="max_tonnes", budget_eur_year=40000, siting="parish"), "B"),
     ("p90", dict(label="Demo · Por freguesia · 90 000 €/ano", objective="max_tonnes", budget_eur_year=90000, siting="parish"), "p40"),
-    ("pmin", dict(label="Demo · Por freguesia · custo mínimo · meta 350 t", objective="min_cost", target_tonnes=350, siting="parish"), None),
-    ("s50", dict(label="Demo · Locais reais · 50 000 €/ano", objective="max_tonnes", budget_eur_year=50000, siting="sites", site_radius_m=300), None),
-    ("s50r", dict(label="Demo · Locais reais · raio 500 m · 50 000 €/ano", objective="max_tonnes", budget_eur_year=50000, siting="sites", site_radius_m=500), "s50"),
+    ("p150", dict(label="Demo · Por freguesia · 150 000 €/ano", objective="max_tonnes", budget_eur_year=150000, siting="parish"), "p90"),
+    ("pmin", dict(label="Demo · Por freguesia · custo mínimo para 350 t", objective="min_cost", target_tonnes=350, siting="parish"), "B"),
+    ("pod", dict(label="Demo · Só recolha a pedido (saco à porta) · custo mínimo para 250 t", objective="min_cost", target_tonnes=250, siting="parish", default_modes=["on_demand"]), "B"),
+    ("pcons", dict(label="Demo · Azurém e Creixomil só em locais existentes; Ronfe e São Torcato a pedido", objective="max_tonnes", budget_eur_year=60000, siting="parish", constraints={"030804": ["existing"], "030813": ["existing"], "030840": ["on_demand"], "030865": ["on_demand"]}), "B"),
+    ("pteto", dict(label="Demo · Teto do modelo sem limite de orçamento", objective="max_tonnes", budget_eur_year=10000000, siting="parish"), "B"),
+    ("s20", dict(label="Demo · Locais reais · 20 000 €/ano", objective="max_tonnes", budget_eur_year=20000, siting="sites", site_radius_m=300), None),
+    ("s40", dict(label="Demo · Locais reais · 40 000 €/ano", objective="max_tonnes", budget_eur_year=40000, siting="sites", site_radius_m=300), "s20"),
+    ("s60", dict(label="Demo · Locais reais · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="sites", site_radius_m=300), "s40"),
+    ("s60r", dict(label="Demo · Locais reais · raio 500 m · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="sites", site_radius_m=500), "s60"),
+    ("s60p", dict(label="Demo · Só locais públicos (sem escolas) · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="sites", site_candidates="public"), "s60"),
+    ("s60n", dict(label="Demo · Locais reais sem recolha a pedido · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="sites", site_on_demand=False), "s60"),
     ("sesc", dict(label="Demo · Pontos assistidos (escolas) · 30 000 €/ano", objective="max_tonnes", budget_eur_year=30000, siting="sites", site_candidates="staffed"), None),
-    ("smin", dict(label="Demo · Locais reais · custo mínimo · meta 250 t", objective="min_cost", target_tonnes=250, siting="sites", site_radius_m=300), None),
+    ("smin", dict(label="Demo · Locais reais · custo mínimo para 250 t", objective="min_cost", target_tonnes=250, siting="sites", site_radius_m=300), "s60"),
+    ("s150", dict(label="Demo · Locais reais · 150 000 €/ano · raio 500 m", objective="max_tonnes", budget_eur_year=150000, siting="sites", site_radius_m=500), "s60r"),
+    ("sstreet", dict(label="Demo · Referência: contentor de rua nos locais públicos · 60 000 €/ano", objective="max_tonnes", budget_eur_year=60000, siting="sites", site_mode="street"), "s60p"),
 ]  # fmt: skip
+
+# «E se...?» sobre o Cenário B, com o modelo a sério (percebe a pergunta, o utilizador confirma, o otimizador corre e a
+# explicação sai com os números verificados). São os exemplos que se podem repetir ao vivo com o júri.
+WHATIFS = [
+    "E se o orçamento passar de 60 000 para 90 000 euros por ano?",
+    "E se Creixomil e Azurém só tiverem recolha a pedido?",
+    "E se a captura da recolha a pedido for 30% mais baixa?",
+]
+# Relatório RAP pré-gerado (plano da demo: um PDF pronto no portátil, caso a geração demore): B contra A e contra os locais.
+REPORT_SCENARIOS = ["B", "A", "s60"]
+
+
+def wants(key: str) -> bool:
+    return not ONLY or key in ONLY
 
 
 def credit_of(key: str) -> str:
@@ -334,7 +364,15 @@ async def seed_scenarios(c: httpx.AsyncClient, manifest: dict[str, object]) -> N
     ids: dict[str, str] = {}
     created: list[dict[str, object]] = []
     manifest["scenarios"] = created
+    if ONLY:  # execução parcial: os pais e o B que já existem
+        listed = (await c.get("/planning/scenarios", params={"limit": 200})).json()
+        by_label = {x["label"]: x["id"] for x in (listed if isinstance(listed, list) else listed["items"])}
+        for k, b, _ in SCENARIOS:
+            if b["label"] in by_label:
+                ids[k] = by_label[b["label"]]
     for key, body, parent in SCENARIOS:
+        if not wants(key):
+            continue
         payload = dict(body)
         if parent:
             payload["parent_id"] = ids[parent]
@@ -351,26 +389,84 @@ async def seed_scenarios(c: httpx.AsyncClient, manifest: dict[str, object]) -> N
         )
         created.append({"key": key, "id": j["id"], "label": payload["label"]})
         await asyncio.sleep(10)  # o limite de execuções do otimizador é por minuto
+    # Cenário de comparação francês (referência externa por verificar, só como comparação)
+    if wants("fr"):
+        r = await c.post(
+            "/planning/benchmarks/french_performance/scenario",
+            json={"label": "Demo · Referência francesa (4,27 kg/hab/ano, por verificar)"},
+        )
+        if r.status_code < 300:
+            j = r.json()
+            created.append({"key": "fr", "id": j["id"], "label": j["label"]})
+            print(f"fr: {j['id']} {j['status']}", flush=True)
+        else:
+            print("ERRO benchmark", r.status_code, r.text[:200], flush=True)
+        await asyncio.sleep(10)
+    # «E se...?»: propõe, confirma e calcula (cada pergunta cria um cenário filho do B)
+    whatifs: list[dict[str, object]] = []
+    manifest["whatifs"] = whatifs
+    if "B" in ids and (wants("whatif") or any(k.startswith("whatif") for k in ONLY)):
+        for n, question in enumerate(WHATIFS, start=1):
+            if ONLY and "whatif" not in ONLY and f"whatif{n}" not in ONLY:
+                continue
+            p = await c.post(
+                "/whatif", json={"scenario_id": ids["B"], "question": question, "locale": "pt-PT"}
+            )
+            if p.status_code >= 300:
+                print("ERRO e se (propor)", p.status_code, p.text[:200], flush=True)
+                continue
+            run = p.json()
+            if run["status"] != "proposed":
+                print(
+                    f"e se «{question}»: {run['status']} {run.get('clarification') or run.get('understood')}",
+                    flush=True,
+                )
+                continue
+            ap = await c.post(f"/whatif/{run['id']}/apply", params={"locale": "pt-PT"})
+            if ap.status_code >= 300:
+                print("ERRO e se (aplicar)", ap.status_code, ap.text[:200], flush=True)
+                continue
+            done = ap.json()
+            print(
+                f"e se «{question}» -> {done['status']} verificada={done['explanation_verified']} novo={done['new_scenario_id']}",
+                flush=True,
+            )
+            whatifs.append({"id": run["id"], "question": question, "new_scenario_id": done["new_scenario_id"]})
+            await asyncio.sleep(10)
+    # Relatório RAP pré-gerado
+    reports: list[dict[str, object]] = []
+    manifest["reports"] = reports
+    pick = [ids[k] for k in REPORT_SCENARIOS if k in ids]
+    if pick and wants("report"):
+        rep = await c.post("/reports/rap", json={"scenario_ids": pick, "locale": "pt-PT"})
+        if rep.status_code < 300:
+            reports.append({"id": rep.json()["id"], "size_bytes": rep.json()["size_bytes"]})
+            print(f"relatório RAP: {rep.json()['id']} ({rep.json()['size_bytes']} bytes)", flush=True)
+        else:
+            print("ERRO relatório", rep.status_code, rep.text[:200], flush=True)
 
 
 async def cleanup(path: str) -> None:
     manifest = json.loads(Path(path).read_text())
     codes = [lot["code"] for lot in manifest.get("lots", [])]
-    ids = [s["id"] for s in reversed(manifest.get("scenarios", []))]  # filhos antes dos pais
+    whatif_ids = [w["new_scenario_id"] for w in manifest.get("whatifs", []) if w.get("new_scenario_id")]
+    # filhos antes dos pais: os do «E se...?» (filhos do B), depois os restantes por ordem inversa de criação
+    ids = [*whatif_ids, *[s["id"] for s in reversed(manifest.get("scenarios", []))]]
+    reports = [r["id"] for r in manifest.get("reports", [])]
     async with engine.begin() as c:
         n_lots = (await c.execute(text("select count(*) from lots where code = any(:c)"), {"c": codes})).scalar_one()
         n_sc = (
-            await c.execute(
-                text("select count(*) from scenarios where id::text = any(:i) and label like 'Demo · %'"), {"i": ids}
-            )
+            await c.execute(text("select count(*) from scenarios where id::text = any(:i)"), {"i": ids})
         ).scalar_one()
-        print(f"lotes: {n_lots}/{len(codes)}; cenários 'Demo · ': {n_sc}/{len(ids)}")
+        print(f"lotes: {n_lots}/{len(codes)}; cenários: {n_sc}/{len(ids)}; relatórios: {len(reports)}")
         if not YES:
             print("dry-run: nada apagado (usa --yes)")
             return
         await c.execute(text("delete from lots where code = any(:c)"), {"c": codes})
+        await c.execute(text("delete from reports where id::text = any(:i)"), {"i": reports})
+        await c.execute(text("delete from whatif_runs where base_scenario_id::text = any(:i)"), {"i": ids})
         for sid in ids:
-            await c.execute(text("delete from scenarios where id::text = :i and label like 'Demo · %'"), {"i": sid})
+            await c.execute(text("delete from scenarios where id::text = :i"), {"i": sid})
     print("apagado")
 
 
@@ -379,7 +475,7 @@ async def main() -> None:
         await cleanup(ARGS[ARGS.index("--cleanup") + 1])
         return
     total = sum(len(lot["items"]) for lot in LOTS)  # type: ignore[arg-type]
-    print(f"Plano: {len(LOTS)} lotes, {total} peças com fotografia real, {len(SCENARIOS)} cenários.")
+    print(f"Plano: {len(LOTS)} lotes, {total} peças com fotografia real, {len(SCENARIOS)} cenários, 1 de referência francesa, {len(WHATIFS)} «E se...?» e 1 relatório RAP.")
     if not YES:
         print("dry-run: nada criado (usa --yes). Fotografias:")
         for key, (title, author, licence) in PHOTOS.items():

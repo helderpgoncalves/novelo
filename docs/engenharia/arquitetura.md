@@ -1,6 +1,6 @@
 # Arquitetura
 
-Um monorepo com duas aplicações, uma base de dados e três serviços externos. O web fala só com a API; só a API toca em dados e serviços.
+Um monorepo com duas aplicações, uma base de dados, um motor de rotas por estrada próprio (OSRM) e dois serviços externos (OpenRouter e Resend). O web fala só com a API; só a API toca em dados e serviços.
 
 ```mermaid
 flowchart TB
@@ -14,7 +14,7 @@ flowchart TB
         RT["routers finos"]
         SV["services (AppError)"]
         DM["domain: funções puras<br/>procura, custos, rede"]
-        AD["adapters: OpenRouter, email"]
+        AD["adapters: OpenRouter, email, OSRM"]
         RT --> SV --> DM
         SV --> AD
     end
@@ -22,6 +22,7 @@ flowchart TB
     SV --> DB[("Postgres 17<br/>Alembic")]
     AD --> OR["OpenRouter"]
     AD --> RS["Resend"]
+    AD -->|"matriz e traçado por estrada"| OS["OSRM próprio (apps/osrm)<br/>OpenStreetMap, sem custos"]
     SV -.->|"seed"| DP["data/processed"]
 ```
 
@@ -31,6 +32,7 @@ flowchart TB
 | --- | --- | --- |
 | API | Python 3.12, FastAPI, SQLAlchemy 2 assíncrono, Pydantic v2, uv | Tipagem total e contrato OpenAPI automático |
 | Otimização | OR-Tools: CP-SAT para pontos e modos, VRP para rotas | Resolve o problema real, com limite de tempo e sementes fixas |
+| Distâncias | OSRM próprio sobre o OpenStreetMap ([Rotas por estrada](rotas-reais.md)) | Km e traçado medidos pela estrada, sem chaves nem custos; se parar, a API estima (linha reta × desvio) e marca a rota como `estimate` |
 | Base de dados | PostgreSQL 17, migrações Alembic | Escala, integridade e consultas simples |
 | Web | React, Vite, TanStack Router e Query, Tailwind v4, shadcn/ui | SPA rápida; a API é a única fonte de dados |
 | Mapa | MapLibre com estilos CARTO por omissão | Sem chave |
@@ -130,7 +132,7 @@ Os contentores **municipais** (profundidade, superfície, orgânico, verdes; 20 
 
 ### Desempenho da API
 
-- **O otimizador nunca corre no event loop.** `planning.run_scenario` lê as zonas, os pressupostos e a base têxtil, e entrega a `compute()` (CP-SAT e VRP, funções síncronas e puras sobre modelos Pydantic, sem sessão nem ORM) numa thread com `asyncio.to_thread`; grava o cenário depois, já de volta ao loop. Como o cenário, o "E se...?", o cenário de referência (benchmark) e as ações e ferramentas do Copiloto passam todos por `run_scenario`, é este o único ponto. Sensibilidade, robustez e piloto já usavam `to_thread`; a fronteira de Pareto do Copiloto também, e passou a ocupar uma vaga de `solver_slots` como as rotas (429 tipado se estiver tudo ocupado). Os limitadores (`SolverGuard`, `SOLVER_MAX_CONCURRENCY`), os limites de tempo e as sementes fixas não mudaram. Prova: `tests/api/test_solver_offload.py` (um solver falso a dormir 1 s não atrasa o loop nem `/health`).
+- **O otimizador nunca corre no event loop.** `planning.run_scenario` lê as zonas, os pressupostos e a base têxtil, e entrega a `compute()` (CP-SAT e VRP, funções síncronas e puras sobre modelos Pydantic, sem sessão nem ORM; as distâncias por estrada entram pela porta `RoadRouter`, injetada em `Params.road`) numa thread com `asyncio.to_thread`; grava o cenário depois, já de volta ao loop. Como o cenário, o "E se...?", o cenário de referência (benchmark) e as ações e ferramentas do Copiloto passam todos por `run_scenario`, é este o único ponto. Sensibilidade, robustez e piloto já usavam `to_thread`; a fronteira de Pareto do Copiloto também, e passou a ocupar uma vaga de `solver_slots` como as rotas (429 tipado se estiver tudo ocupado). Os limitadores (`SolverGuard`, `SOLVER_MAX_CONCURRENCY`), os limites de tempo e as sementes fixas não mudaram. Prova: `tests/api/test_solver_offload.py` (um solver falso a dormir 1 s não atrasa o loop nem `/health`).
 - **Listas sem colunas pesadas.** `GET /reports` faz `defer(pdf, summary)` (o PDF só sai em `/reports/{id}/pdf`). `GET /planning/scenarios` e a fronteira da home (`/textile/overview`) usam as colunas de KPIs e fazem `defer(result, params, constraints)`; a home lê os modos da coluna `scenarios.modes` (derivada de `result.modes`, preenchida ao criar e pela migração `0012` nos cenários antigos). `GET /lots` conta peças e soma pesos em SQL (um só `LEFT JOIN` agregado) em vez de carregar as peças, e `GET /brands` carrega só três colunas. O índice `ix_scenarios_created_at` serve a ordenação. Os filtros de alertas e de utilizadores não pedem índice: os alertas são filtrados no cliente e a tabela `users` é pequena.
 - **Cache HTTP partilhada (`core/http_cache.py`).** `ETag` fraco = versão dos dados + caminho + query (+ variante do utilizador quando o conteúdo depende dela, como no municipal), `Cache-Control: private`, `Vary: Cookie, Accept-Encoding`, `If-None-Match` devolve 304 sem fazer o trabalho caro e o gzip dos JSON grandes fica em cache de processo. A versão sai de uma consulta barata (`features/datasets/versioning.py`): `reference_data_version` junta hash e instante de importação de cada `data_sources` (circuitos, frota, contentores, base têxtil, municipal) e `planning_data_version` acrescenta a versão dos pressupostos ativos. Aplicação: dados importados (`textile/baseline|flows|waste`, `network/circuits|fleet|localities|containers|coverage`) com `max-age=300`; dados que dependem dos pressupostos editáveis (`planning/zones`, com a geometria, e `planning/parameters`) com `max-age=0, must-revalidate`, para a edição de um administrador se ver logo e o 304 poupar na mesma as 10 consultas e os 57 KB. Nunca se aplica a dados por utilizador ou que mudam a cada ação (cenários, alertas, lotes, relatórios, home). O municipal usa a mesma utilidade (`municipal/http.py`).
 - **Observabilidade.** O registo de cada pedido (`novelo.request`) é JSON com `method`, `route` (o modelo, por exemplo `/api/v1/planning/scenarios/{scenario_id}`, nunca o URL com ids), `status`, `duration_ms` e `request_id`: dá para agregar p50/p95 por rota. Com `LOG_LEVEL=debug` acrescenta `queries`, o número de consultas SQL do pedido, para apanhar N+1 ao ler o log.

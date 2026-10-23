@@ -10,11 +10,14 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from pydantic import BaseModel, Field
 
+from novelo.core.config import get_settings
 from novelo.core.errors import ForbiddenError
 from novelo.features.audit import service as audit
 from novelo.features.copilot.derive import DeriveArgs, DeriveError, derive_table
 from novelo.features.copilot.tools_data import _A, Col, Empty, assumption_note, make_table
 from novelo.features.datasets import service as datasets
+from novelo.features.lots.photos import MAX_SIDE
+from novelo.features.lots.service import PASSPORT_MAX_PHOTOS
 from novelo.features.network import service as network
 from novelo.features.planning import service as planning
 from novelo.features.planning.params import params_meta
@@ -67,6 +70,11 @@ def _flatten(data: dict[str, Any], prefix: str = "") -> dict[str, float]:
     return out
 
 
+def _shown(value: float | None, unit: str) -> float | None:
+    """Percentagens guardadas como fração (0,18) mostram-se como 18 %: o modelo não faz ×100."""
+    return round(value * 100, 1) if value is not None and unit == "%" else value
+
+
 async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[str, Any]:
     labels = PARAM_LABELS.get(box.locale, PARAM_LABELS["pt-PT"])
     params = await planning.get_parameters(box.db)
@@ -75,7 +83,7 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
         {
             "key": m.key,
             "label": labels.get(m.key, m.key),
-            "value": values.get(m.key),
+            "value": _shown(values.get(m.key), m.unit),
             "unit": m.unit,
             "source": m.source.value,
             "origin": ORIGIN[m.source.value],
@@ -107,6 +115,27 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
 
 
 # --- Lacunas de dados ------------------------------------------------------------------------------
+
+
+async def get_photo_policy(box: "CopilotTools", _: Empty) -> dict[str, Any]:
+    """Política de fotografias dos lotes (comportamento do código, 23 out 2026): os números vêm da configuração."""
+    cfg = get_settings()
+    return {
+        "triage_stores_nothing": "Photo triage stores NO image: the photos live in memory during the request, are reduced and sent to the vision model.",
+        "optional_thumbnail": "Since 23 Oct 2026 the operator may save ONE optional thumbnail per piece in the lot, as a separate step.",
+        "thumbnail_max_side_px": MAX_SIDE,
+        "thumbnail_max_kb": round(cfg.lot_photo_max_bytes / 1024),
+        "thumbnail_format": "JPEG without EXIF, GPS or camera data; the original is never kept",
+        "consent": "The operator must confirm that the photo shows no people, faces, documents or personal data",
+        "retention_days": cfg.lot_photo_retention_days,
+        "retention": "Expires by itself after retention_days (LOT_PHOTO_RETENTION_DAYS)",
+        "who_sees": "Operators in the lot and the public passport (up to passport_max_photos non-expired photos, no login)",
+        "passport_max_photos": PASSPORT_MAX_PHOTOS,
+        "delete": "The operator can delete a photo at any time, in any lot state",
+        "delivered_lot": "A delivered lot accepts no new photos",
+        "no_personal_data": "Never any data about who handed the piece in; the brand, composition, state and weight are the only piece data",
+        "_summary": "política de fotografias",
+    }
 
 
 async def get_data_gaps(box: "CopilotTools", _: Empty) -> dict[str, Any]:
@@ -386,8 +415,15 @@ MORE_TOOLS: dict[str, tuple[type[BaseModel], str, Callable[[Any, Any], Awaitable
     "list_assumptions": (
         AssumptionsArgs,
         "All simulator assumptions with value, unit, origin (Vitrus data or team assumption = estimate to validate) and a provenance note "
-        "(e.g. the road calibration of the detour and speed, the vehicle costs still missing from Vitrus finance).",
+        "(e.g. the road calibration of the detour and speed, the vehicle costs still missing from Vitrus finance). "
+        "Values with unit % are already percentages (18 means 18%). Mention at most 5 in the answer and offer the rest.",
         list_assumptions,
+    ),
+    "get_photo_policy": (
+        Empty,
+        "Facts on lot photographs: does triage store images, the optional thumbnail (size, consent, who sees it, how long it is kept, "
+        "deletion). Use it for any question on photos, privacy or retention; quote its values and say they are policy, not measurements.",
+        get_photo_policy,
     ),
     "get_data_gaps": (
         Empty,

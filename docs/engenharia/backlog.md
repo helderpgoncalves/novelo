@@ -14,6 +14,7 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Planeamento | Otimizador (CP-SAT e VRP), três modos combináveis, cenários, comparação, pressupostos com origem, tornado e Monte Carlo, robustez, referência francesa, piloto com piso de sinal; simulador redesenhado |
 | "E se...?" | `ScenarioDelta`, confirmação, explicação e verificador de números |
 | Copiloto | SSE tipado, 52 ferramentas, threads, memória, anexos, `@menções`, artefactos, ações com confirmação e auditoria, página `/chat`, avaliação com 155 casos |
+| Rotas por estrada | Desde 23 out 2026, km e traçado das rotas por estrada num OSRM próprio sobre o OpenStreetMap (sem custos), com fallback para estimativa, `source`/`routing` no contrato e calibração do desvio e da velocidade ([Rotas por estrada](rotas-reais.md)). O porta a porta dentro da freguesia continua a ser fórmula |
 | Operação | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra, evidência por marca |
 | Relatório | PDF RAP com custo por tipo de território (WeasyPrint) e histórico |
 | Web | Mapa, todos os ecrãs de dados, Frota refeita (calendário da semana tipo, `.ics`), pt/en, claro/escuro, PWA mobile-first com barra de separadores, páginas de erro, visita guiada, `DataTable` e `PageTabs` completos |
@@ -34,7 +35,9 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Média | Correr `just eval-copilot` com os 11 casos `muni_*` e atualizar a [avaliação](avaliacao-copiloto.md) | Por fazer |
 | Média | Passar as restantes variáveis (`MAGIC_LINK_*`, `GUEST_*`, `COPILOT_*`, `EMAIL_TRANSPORT`...) pelo `docker-compose.yml` de produção, se for preciso alterá-las no Coolify | Por decidir |
 | Média | Cenários A e B fixos, cinco perguntas "E se...?" de reserva, lote de demonstração | Por fazer |
-| Média | Decidir se o `detour_factor` de fallback sobe de 1,3 para ~1,4 a 1,5 (calibração OSRM de 23 out: mediana 1,37 a 1,48; [Rotas por estrada](rotas-reais.md)) e confirmar com a Vitrus as dimensões da viatura (perfil `novelo-van`) | Por decidir |
+| Média | Decidir se o `detour_factor` (agora só na estimativa de reserva, na volta porta a porta e na sensibilidade) sobe de 1,3 para ~1,4 a 1,5 (calibração OSRM de 23 out: mediana 1,37 a 1,48; [Rotas por estrada](rotas-reais.md)); mexe nos valores de referência e nos testes calculados à mão | Por decidir |
+| Média | Confirmar com a Vitrus a viatura (dimensões e peso do perfil `novelo-van`, hoje 2,8 × 2,1 × 6 m e 3,5 t, pressuposto) e, se houver GPS, calibrar a velocidade de recolha (30 km/h) contra a de condução do OSRM (~40 km/h) | Por pedir |
+| Baixa | Rotas com trânsito e horários (centro histórico, cargas e descargas), que o OSRM não modela | Adiado |
 | Baixa | Limites de pedidos partilhados entre processos (hoje em memória, por processo) | Adiado |
 | Baixa | Eventos de progresso do otimizador no stream do copiloto; virtualização de linhas no `DataTable` | Adiado |
 | Baixa | Integração contínua remota (por agora só `just check` local) | Adiado |

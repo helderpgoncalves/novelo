@@ -130,11 +130,25 @@ export function parseBlocks(source: string): Block[] {
 }
 
 const INLINE =
-  /(\*\*[^*\n]+\*\*|`[^`\n]+`|\[[^\]\n]+\]\([^)\s]+\)|(?<![\w*])\*[^*\s][^*\n]*\*(?![\w*]))/g;
+  /(\*\*[^*\n]+\*\*|`[^`\n]+`|\[[^\]\n]+\]\(\s*[^)\s]+\s*\)|(?<![\w*])\*[^*\s][^*\n]*\*(?![\w*]))/g;
 
 const SAFE_HREF = /^(https?:\/\/|mailto:)/i;
 
 function renderLink(label: string, href: string, key: string): ReactNode {
+  if (href.startsWith('/api/')) {
+    // Ficheiros da API (PDF do relatório): descarregam-se, não são rotas do web.
+    return (
+      <a
+        key={key}
+        href={href}
+        target="_blank"
+        rel="noreferrer noopener"
+        className="text-primary underline underline-offset-2"
+      >
+        {label}
+      </a>
+    );
+  }
   if (href.startsWith('/') && !href.startsWith('//')) {
     return (
       <Link key={key} to={href as never} className="text-primary underline underline-offset-2">
@@ -170,7 +184,7 @@ export function renderInline(text: string): ReactNode[] {
           {part.slice(1, -1)}
         </code>
       );
-    const link = /^\[([^\]]+)\]\(([^)\s]+)\)$/.exec(part);
+    const link = /^\[([^\]]+)\]\(\s*([^)\s]+)\s*\)$/.exec(part);
     if (link) return renderLink(link[1] ?? '', link[2] ?? '', key);
     if (part.startsWith('*') && part.endsWith('*') && part.length > 2)
       return <em key={key}>{part.slice(1, -1)}</em>;

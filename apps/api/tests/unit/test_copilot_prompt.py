@@ -15,9 +15,11 @@ def prompt() -> str:
     return load("copilot")[0]
 
 
-def test_current_version_is_v5_and_older_ones_stay_for_audit() -> None:
-    assert load("copilot")[1] == "v5" and load("copilot_title")[1] == "v3"
-    assert (_DIR / "copilot_v4.md").exists() and (_DIR / "copilot_v3.md").exists()  # mensagens antigas referem-nas
+def test_current_version_is_v6_and_older_ones_stay_for_audit() -> None:
+    assert load("copilot")[1] == "v6" and load("copilot_title")[1] == "v3"
+    assert (
+        (_DIR / "copilot_v5.md").exists() and (_DIR / "copilot_v4.md").exists() and (_DIR / "copilot_v3.md").exists()
+    )  # mensagens antigas referem-nas
 
 
 def test_prompt_states_the_current_network() -> None:
@@ -58,3 +60,14 @@ def test_every_tool_named_in_the_prompt_exists() -> None:
     )
     assert not (mentioned - names), sorted(mentioned - names)
     assert {"get_scenario_detail", "get_data_gaps", "explain_assumption"} <= mentioned
+
+
+def test_prompt_refuses_impossible_requests_without_creating_scenarios() -> None:
+    text = prompt()
+    for needle in (
+        "copy the user's numbers into tool arguments EXACTLY",
+        "`unknown_parish`",
+        "Never silently swap in",
+        "WITHOUT calling any tool",
+    ):
+        assert needle in text, needle

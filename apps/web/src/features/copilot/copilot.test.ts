@@ -1,7 +1,8 @@
+import { isValidElement } from 'react';
 import { describe, expect, it } from 'vitest';
 import type { CopilotEventMessage } from '@/client';
 import { pieSlices } from './artifacts/chart-options';
-import { parseBlocks } from './markdown';
+import { parseBlocks, renderInline } from './markdown';
 import { applyEvent, closingEvents, fromServer, newTurn } from './reducer';
 import { parseSseBlock, splitSse } from './sse';
 import { familyOf, indicatorLabelKey } from './thinking';
@@ -124,6 +125,17 @@ describe('frases e markdown', () => {
       '# Título\n\n- a\n- b\n\n| x | y |\n|---|---|\n| 1 | 2 |\n\n```\ncódigo\n```',
     );
     expect(blocks.map((b) => b.kind)).toEqual(['h', 'ul', 'table', 'code']);
+  });
+
+  it('desenha a ligação do PDF mesmo com espaços dentro dos parênteses e sem a tratar como rota do web', () => {
+    for (const text of [
+      '[Transferir o PDF](/api/v1/reports/abc/pdf)',
+      '[Transferir o PDF]( /api/v1/reports/abc/pdf )',
+    ]) {
+      const link = renderInline(text).find(isValidElement);
+      expect(link?.type).toBe('a');
+      expect((link?.props as { href: string } | undefined)?.href).toBe('/api/v1/reports/abc/pdf');
+    }
   });
 });
 

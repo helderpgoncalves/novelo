@@ -37,9 +37,9 @@
 
 ---
 
-| **3 003,3 t** | **9,1%** | **+445,8 t** | **47 093 €** | **0** |
+| **3 003,3 t** | **9,1%** | **+431,1 t** | **45 542 €** | **0** |
 | :---: | :---: | :---: | :---: | :---: |
-| de têxtil por ano ainda no lixo indiferenciado (estimativa) | do têxtil gerado é hoje recolhido à parte (estimativa) | por ano a 102,8 €/t, com 60 000 €/ano de orçamento (estimativa) | por ano de tratamento evitado, a 105,64 €/t (Vitrus): paga a operação de 45 828 € (estimativa) | contentores novos: uma viatura de têxtil, sem compactação, e os locais que já existem |
+| de têxtil por ano ainda no lixo indiferenciado (estimativa) | do têxtil gerado é hoje recolhido à parte (estimativa) | por ano a 101,9 €/t, com 60 000 €/ano de orçamento (estimativa) | por ano de tratamento evitado, a 105,64 €/t (Vitrus): paga a operação (35 702 €) e o custo total de 43 914 € (estimativa) | contentores novos: uma viatura de têxtil, sem compactação, e os locais que já existem |
 
 <p align="center">
   <img src="docs/img/pagina-hero.png" alt="A página de entrada do Novelo: 301,3 t recolhidas à parte em 2025 e cerca de 3 003 t por ano ainda no lixo, com as fontes da Vitrus e da APA" width="100%">
@@ -73,9 +73,9 @@ O Novelo desenha a rede à volta dessa **viatura de têxtil nova, sem compactaç
 1. **Saco fechado à porta, num dia fixo por freguesia.** Seco e sem compactar.
 2. **Paragens nos locais municipais que já existem e nas 86 escolas,** sem contentor novo: o saco é entregue em mão.
 
-Com **60 000 €/ano**, o otimizador escolhe 60 pontos em 45 freguesias e o saco à porta em 4. A rede custa **45 828 €** por ano e desvia **445,8 t a 102,8 €/t**, das quais cerca de **265 t reutilizáveis**.
-A captura sobe de 9,1% para cerca de 22,6%. O tratamento evitado, **47 093 €** por ano, paga a operação.
-O investimento é de 57 500 €: 42 500 € na viatura e o resto nos 60 pontos. Em 8 de cada 10 simulações, o custo fica entre 82,0 e 141,3 €/t (todos estimativa).
+Com **60 000 €/ano**, o otimizador escolhe 58 pontos em 43 freguesias e o saco à porta em 3. A rede custa **43 914 €** por ano e desvia **431,1 t a 101,9 €/t**, das quais cerca de **256 t reutilizáveis**. Os km são medidos pela estrada (OSRM, 23 out 2026).
+A captura sobe de 9,1% para cerca de 22,2%. O tratamento evitado, **45 542 €** por ano, paga a operação (35 702 €) e o custo total com a viatura (43 914 €): o custo líquido é de −1 628 € por ano.
+O investimento é de 57 000 €: 42 500 € na viatura e o resto nos 58 pontos. Em 8 de cada 10 simulações, o custo fica entre 81,6 e 139,7 €/t (todos estimativa).
 
 **O que pedimos:** um piloto de 3 meses em duas freguesias, desenhado pelo próprio Novelo, para trocar os pressupostos pelos números reais.
 
@@ -137,13 +137,13 @@ As 301,3 t foram recolhidas à parte, fora do indiferenciado, por isso os 5,86% 
 
 | Orçamento | Custo anual | Toneladas por ano | €/t | Tratamento evitado | Reutilizável |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| 40 000 €/ano | 26 909 € | 378,5 t | 71,1 | ≈ 39 985 € | ≈ 224,8 t |
-| **60 000 €/ano (recomendado)** | **45 828 €** | **445,8 t** | **102,8** | **47 093 €** | **264,9 t** (222,9 a 324,8) |
-| 100 000 €/ano | 85 860 € | 571,2 t | 150,3 | ≈ 60 342 € | ≈ 339,3 t |
-| Teto sem contentores (2 viaturas) | 170 623 € | 772,1 t | 221,0 | ≈ 81 565 € | 458,8 t |
+| 40 000 €/ano | 24 042 € | 364,3 t | 66,0 | ≈ 38 480 € | ≈ 216,4 t |
+| **60 000 €/ano (recomendado)** | **43 914 €** | **431,1 t** | **101,9** | **45 542 €** | **256,1 t** (215,6 a 314,1) |
+| 100 000 €/ano | 82 106 € | 555,3 t | 147,9 | ≈ 58 657 € | ≈ 329,9 t |
+| Teto sem contentores (2 viaturas) | 176 734 € | 772,1 t | 228,9 | 81 570 € | 458,8 t |
 
 Os valores com "≈" são cálculo nosso sobre as toneladas do cenário: × 105,64 €/t (Vitrus) e × 59,4% de reutilização (2025).
-Até aos 60 000 €/ano, o tratamento evitado paga a operação; depois, o €/t sobe à medida que a rede chega às freguesias mais dispersas.
+Até aos 60 000 €/ano, o tratamento evitado paga a operação (e, aos 60 000, o custo total com a viatura, por 1 628 €); depois, o €/t sobe à medida que a rede chega às freguesias mais dispersas.
 
 ## O que o Novelo faz
 
@@ -152,7 +152,7 @@ Uma história, do saco ao fio: **decidir** a rede, **provar** que aguenta, **ope
 | Funcionalidade | Onde | Em resumo |
 | --- | --- | --- |
 | **Ponto de partida** | `/` | Os números reais de 2025, a lacuna para o potencial, o destino do recolhido, a comparação com referências e o relógio regulatório |
-| **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, canais e rotas. OR-Tools: CP-SAT escolhe pontos e canais, VRP faz as rotas da viatura de têxtil a partir de Polvoreira. Saco fechado à porta num dia fixo e paragem em local existente (sem contentor novo); o contentor de rua só entra como referência |
+| **Simulador da rede** | `/simulator` | Orçamento (60 000 € por ano por omissão) e meta entram; saem pontos, canais e rotas. OR-Tools: CP-SAT escolhe pontos e canais, VRP faz as rotas da viatura de têxtil a partir de Polvoreira, com os km e o traçado **medidos pela estrada** (OSRM próprio sobre o OpenStreetMap; cada rota diz se é «por estrada» ou estimativa). Saco fechado à porta num dia fixo e paragem em local existente (sem contentor novo); o contentor de rua só entra como referência |
 | **Cenários e comparação** | `/scenarios` | Investimento, custo anual, tratamento evitado, custo líquido, toneladas, toneladas reutilizáveis, €/t e cobertura; lado a lado, com fluxos, referência francesa, tornado e Monte Carlo (P10/P50/P90). O separador Cobertura dá a matriz por freguesia e tipo de território da diretiva (art. 22.º-C, n.º 9, b)) |
 | **Pressupostos** | `/assumptions` | Cada parâmetro com valor, unidade e origem (Vitrus, contrato público, pressuposto da equipa) |
 | **Piloto de 3 meses** | `/pilot` | Escolhe as freguesias de maior valor de aprendizagem e calcula as toneladas mínimas para a medição valer |
@@ -212,6 +212,7 @@ Ver [IA](docs/engenharia/ia.md) e [Copiloto](docs/engenharia/copiloto.md).
 | **INE** | População por freguesia (Censos 2021) e tipologia TIPAU | Em uso |
 | **CAOP** | Contornos das freguesias (2019, no pacote da Vitrus) | Em uso |
 | **OpenStreetMap** | Localidades geocodificadas dos circuitos (Nominatim) | Em uso (69 das 82; mais 10 no centro da freguesia CAOP pelo nome; 79 com freguesia) |
+| **OpenStreetMap (estradas)** | Extrato de Portugal (Geofabrik) recortado a Guimarães e ~10 km à volta, servido por um OSRM próprio: km e traçado das rotas | Em uso desde 23 out 2026 ([Rotas por estrada](docs/engenharia/rotas-reais.md)) |
 
 `data/raw/` guarda os originais e nunca se edita; `just etl` gera `data/processed/`; a API importa-os no arranque, de forma idempotente, com a impressão digital (SHA-256) de cada ficheiro.
 Sem custos unitários da Vitrus, os custos do simulador são **pressupostos** visíveis em `/assumptions`, e a incerteza é mostrada como resultado (tornado e Monte Carlo), não como nota de rodapé.
@@ -228,6 +229,7 @@ flowchart LR
         N["web: nginx<br/>SPA + /api (SSE sem buffering)"]
         A["api: FastAPI<br/>OR-Tools, WeasyPrint"]
         D[("Postgres 17<br/>Alembic")]
+        OS["osrm: rotas por estrada<br/>OpenStreetMap, sem custos"]
     end
     subgraph Externos
         OR["OpenRouter (LLM)"]
@@ -237,6 +239,7 @@ flowchart LR
     W -->|"cliente gerado do OpenAPI"| N
     QR --> N
     N --> A --> D
+    A -->|"matriz e traçado"| OS
     A --> OR
     A --> RS
     A --> GO
@@ -253,6 +256,7 @@ O web nunca escreve rotas nem tipos à mão; `just check-contract` falha se o co
 | --- | --- |
 | API | Python 3.12, FastAPI, SQLAlchemy 2 assíncrono, Alembic, Pydantic v2, uv |
 | Otimização | OR-Tools (CP-SAT e VRP), funções puras em `domain/`, sementes fixas e limite de tempo (`SOLVER_TIME_LIMIT_S`) |
+| Rotas por estrada | OSRM próprio sobre o OpenStreetMap (Geofabrik, ODbL), perfil de furgoneta, com cache e fallback para estimativa ([Rotas por estrada](docs/engenharia/rotas-reais.md)) |
 | Base de dados | PostgreSQL 17 |
 | Web | React 19, Vite, TanStack Router e Query, Tailwind v4, shadcn/ui, MapLibre, ECharts, Paraglide (i18n), vite-plugin-pwa |
 | Contrato | OpenAPI e hey-api (cliente, SDK, Zod, React Query) |
@@ -385,7 +389,7 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 | Sem quilos por mês (sazonalidade) | Modelo anual | A Vitrus só os partilha com o município |
 | Taxas de captura por canal sem dados locais | Todas são pressuposto | Piloto de 3 meses |
 | Triagem sem conjunto de peças com verdade-terreno | A composição pela etiqueta saiu certa nos testes, mas a exatidão não tem percentagem; estado "reciclagem" e "rejeito" ainda sem fotos de teste | `just eval-triage` com 30 ou mais peças reais no piloto |
-| Perfil de furgoneta no OSRM, sem trânsito; dimensões da viatura por confirmar | Km por estrada fiáveis, minutos são um limite inferior; fallback e porta a porta dentro da freguesia usam desvio 1,3 (a calibração dá 1,4 a 1,5) | Confirmar a viatura com a Vitrus e decidir o desvio ([Rotas por estrada](docs/engenharia/rotas-reais.md)) |
+| Perfil de furgoneta no OSRM (2,8 × 2,1 × 6 m, 3,5 t), sem trânsito; dimensões da viatura por confirmar | Km por estrada fiáveis, minutos do OSRM são um limite inferior (as horas usam 30 km/h de recolha, pressuposto; o OSRM dá ~40 km/h de condução). A volta porta a porta dentro da freguesia é sempre estimativa por fórmula, e a reserva (OSRM parado ou par sem caminho) é linha reta × desvio 1,3 (a calibração mediu 1,37 a 1,48) | Confirmar a viatura com a Vitrus e decidir o desvio ([Rotas por estrada](docs/engenharia/rotas-reais.md)) |
 | Peso das peças por tabela de pesos médios por tipo | KPI "estimativa" | Balança nos pontos do piloto |
 | Códigos de zona `0308U1` a `0308U5` provisórios | Ligação por nome às freguesias CAOP | Validar com o INE |
 | Planeamento da Frota é "semana tipo" | Sem datas nem horas reais | Dados de operação da Vitrus |
@@ -410,6 +414,7 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 ## Créditos e licença
 
 Dados da Vitrus Ambiente, INE (Censos 2021 e tipologia TIPAU), CAOP e OpenStreetMap; APA (percentagem de têxtil no RSU).
+Estradas: © colaboradores do OpenStreetMap, licença ODbL; extrato de Portugal da Geofabrik; motor [Project OSRM](https://project-osrm.org) (BSD-2).
 Tipografia: Inter e Newsreader (SIL Open Font License). A fotografia do hero da landing é CC BY-SA 4.0 (`apps/web/public/landing/CREDITS.md`).
 As fotos da triagem em `docs/img/pagina-triagem.png` são de Minderbinder, na Wikimedia Commons (CC BY-SA 4.0).
 Direitos reservados à equipa até decisão em contrário: o repositório é público, mas não tem ficheiro de licença.

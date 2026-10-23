@@ -126,12 +126,14 @@ EN_WORDS = set(
 )
 REFUSAL = re.compile(
     r"(não posso|nao posso|só posso|apenas posso|fora d[oa]|não consigo|não é possível|não faz parte|só ajudo|apenas ajudo|posso ajudar com|"
+    r"posso ajudar (apenas|só|somente)|ajudo (apenas|só|somente)|só (posso )?ajudar|não (escrevo|faço|respondo|ajudo|dou)|"
+    r"only help|help only|can only assist|only assist|i don't (write|do|provide)|"
     r"só tenho dados|apenas tenho dados|não tenho dados|only have|i only|"
     r"cannot|can't|can not|only help|outside|not able|unable|out of scope|i can only|i'm limited|not something i)",
     re.IGNORECASE,
 )
 NO_DATA = re.compile(
-    r"(não (tenho|temos|existe|há|é possível|posso|consigo)|sem dados|ainda não|nenhum dado|impossível|fictíci|"
+    r"(não (tenho|temos|existe|há|é possível|posso|consigo|encontr)|sem dados|did not find|could not find|couldn't find|ainda não|nenhum dado|impossível|fictíci|"
     r"no data|don't have|do not have|not available|cannot|can't|unknown|no way to know|not possible)",
     re.IGNORECASE,
 )

@@ -103,7 +103,7 @@ def _references(gap: OverviewGap) -> list[OverviewReference]:
             kg_per_inhab_year=gap.kg_per_inhab_year,
             year=gap.year,
             scope="municipality",
-            source_label="Vitrus (dados_textil.xlsx) e INE (Censos 2021); cálculo nosso",
+            source_label="Vitrus (dados de têxtil de 2025) e INE (Censos 2021); cálculo nosso",
             source_url=None,
             verified=True,
             evidence="dado_vitrus",
@@ -320,7 +320,7 @@ async def _highlights(
                 unit="pct",
                 text_key="overview.highlights.topEntityShare",
                 context={"entity": top.entity, "tonnes": top.total_t, "total_t": base.total_t},
-                source_label="Vitrus, dados_textil.xlsx",
+                source_label="Vitrus, dados de têxtil de 2025",
                 verified=True,
                 is_estimate=False,
             )
@@ -332,7 +332,7 @@ async def _highlights(
                 unit="pct",
                 text_key="overview.highlights.reuseShare",
                 context={"reuse_t": base.reuse_t, "total_t": base.total_t},
-                source_label="Vitrus, dados_textil.xlsx (duas entidades por percentagens de relatório)",
+                source_label="Vitrus, dados de têxtil de 2025 (duas entidades por percentagens de relatório)",
                 verified=True,
                 is_estimate=True,
             )
@@ -364,7 +364,7 @@ async def _highlights(
                 unit="pct",
                 text_key="overview.highlights.textileInMixedWaste",
                 context={},
-                source_label="Caracterização dos resíduos urbanos (Vitrus, dados_textil.xlsx), Portugal",
+                source_label="Caracterização dos resíduos urbanos (Vitrus, dados de têxtil de 2025), Portugal",
                 verified=True,
                 is_estimate=False,
             )

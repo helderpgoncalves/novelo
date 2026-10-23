@@ -46,7 +46,7 @@ A cache em memória dos cenários por locais inclui na chave a **versão do mapa
 
 `RouteOut` ganha `source` (`road` ou `estimate`), `road_path` e `duration_min` (nulo na estimativa). `ScenarioResult.routing` resume as rotas: `road`, `mixed` ou `estimate`. Cenários guardados antes disto carregam com `estimate`/`false`/`null`.
 
-`routing` fala só das **rotas** (`routes`). A volta dentro de uma freguesia no porta a porta (a fórmula de Beardwood-Halton-Hammersley, secção 9 de [Dados e modelo](dados-e-modelo.md)) é uma estimativa por área e não tem estrada: continua a levar `detour_factor`.
+`routing` fala só das **rotas** (`routes`). A volta dentro de uma freguesia no porta a porta (a fórmula de Beardwood-Halton-Hammersley, secção 9 de [Dados e modelo](dados-e-modelo.md)) é uma estimativa por área e não tem estrada: continua a levar `detour_factor`. Na sensibilidade (tornado e Monte Carlo), `detour_factor` é uma alavanca que escala os km das rotas já medidos, em proporção ao valor do cenário; não volta a consultar o OSRM.
 
 ## O serviço OSRM (`apps/osrm`)
 
@@ -105,7 +105,7 @@ Nenhum ponto ficou sem caminho. Leitura:
 - Perfil de furgoneta, não de camião com restrições reais da Vitrus (viaturas e dimensões por confirmar). Ruas estreitas do centro histórico podem ser menos viáveis do que o grafo diz.
 - Sem trânsito nem horários (zonas pedonais por horas, cargas e descargas).
 - O recorte cobre Guimarães e ~10 km à volta. Pontos fora da caixa não têm caminho e caem na estimativa.
-- Os cenários de referência semeados no arranque da API podem ser calculados antes de o OSRM estar de pé; nesse caso ficam `estimate`. Voltar a criá-los (ou reiniciar a API com o OSRM saudável) refaz-os por estrada.
+- Os cenários de referência semeados no arranque esperam até ~1 minuto (12 tentativas de 5 s) que o OSRM responda. Se ele não aparecer, ficam `estimate` (a API regista um aviso) e são refeitos por estrada, uma só vez, no arranque seguinte da API em que o OSRM responda (`reference.py`). Um cenário criado por um utilizador (ou pelo [seed de demonstração](seed-demo.md)) enquanto o OSRM está parado fica `estimate` e não é refeito sozinho: cria-se de novo.
 - O traçado é simplificado a 3 m (Douglas-Peucker) para não engordar cada cenário guardado.
 
 ## Atribuição

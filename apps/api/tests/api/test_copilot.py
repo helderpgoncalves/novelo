@@ -28,7 +28,7 @@ async def test_run_scenario_creates_a_copilot_scenario_and_a_card(logged_in: htt
     resp = await logged_in.post(C, json=ask("Simula um cenário com 60 mil euros por ano"))
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v5"
+    assert body["verified"] is True and body["warning"] is None and body["prompt_version"] == "v6"
     assert [t["name"] for t in body["tools_used"]] == ["run_scenario"] and body["tools_used"][0]["ok"] is True
     card = body["cards"][0]
     assert card["created_now"] is True and card["label"].startswith("Copilot · ")

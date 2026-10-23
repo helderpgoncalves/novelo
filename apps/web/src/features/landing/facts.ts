@@ -47,38 +47,38 @@ export const FACTS = {
   recycling: 26.5,
   reject: 14.1,
   /**
-   * Cenário de referência por freguesia de 60 000 €/ano (estimativa, 22 out 2026, modelo com a viatura de têxtil nova e as
-   * respostas da Vitrus de 22 out): gasta 45 828 €, 445,8 t a 102,8 €/t; P10/P50/P90 de 500 amostras (semente 7).
+   * Cenário de referência por freguesia de 60 000 €/ano (estimativa, 23 out 2026, modelo com a viatura de têxtil nova, as
+   * respostas da Vitrus de 22 out e as rotas medidas pela estrada): gasta 43 914 €, 431,1 t a 101,9 €/t; P10/P50/P90 de 500 amostras (semente 7).
    * docs/engenharia/dados-e-modelo.md; números tirados da API por video/scripts/prepare-numbers.mjs.
    */
   scenario60k: {
     /** Dia em que estes números foram recalculados (a legenda da Fig. 3 mostra-o; nunca escrito à mão na mensagem). */
-    computedOn: '2026-10-22',
+    computedOn: '2026-10-23',
     budget: 60000,
-    cost: 45828,
-    tonnes: 445.8,
-    eurPerT: 102.8,
-    p10: 82.0,
-    p50: 104.4,
-    p90: 141.3,
+    cost: 43914,
+    tonnes: 431.1,
+    eurPerT: 101.9,
+    p10: 81.6,
+    p50: 103.4,
+    p90: 139.7,
     /** Tratamento evitado (toneladas × 105,64 €/t, Vitrus) e custo líquido (custo anual − tratamento evitado). */
-    avoidedTreatment: 47093,
-    netCost: -1264,
+    avoidedTreatment: 45542,
+    netCost: -1628,
   },
-  /** Cenário base do exemplo do Copiloto: 40 000 €/ano por freguesia, mesma base e pressupostos (gasta 26 909 €, 378,5 t). */
-  scenarioBase: { budget: 40000, cost: 26909, tonnes: 378.5 },
+  /** Cenário base do exemplo do Copiloto: 40 000 €/ano por freguesia, mesma base e pressupostos (gasta 24 042 €, 364,3 t). */
+  scenarioBase: { budget: 40000, cost: 24042, tonnes: 364.3 },
   /**
    * Têxtil reutilizável do cenário de 60 000 €/ano (estimativa): toneladas × quota de reutilização de 2025 (59,4% nas 4
    * entidades; 50,0% a 72,9% nas entidades com pesagem) e custo ÷ reutilizável. KPIs `reusable_t*` e `eur_per_reusable_t`
    * do cenário; os €/t baixo e alto são o custo ÷ `reusable_t_high` / `_low`.
    */
   reusable60k: {
-    tonnes: 264.9,
-    low: 222.9,
-    high: 324.8,
-    eurPerT: 173.0,
-    eurPerTLow: 141.1,
-    eurPerTHigh: 205.6,
+    tonnes: 256.1,
+    low: 215.6,
+    high: 314.1,
+    eurPerT: 171.5,
+    eurPerTLow: 139.8,
+    eurPerTHigh: 203.7,
   },
   /** Escolas do pacote municipal (`producer_types`), candidatas a pontos com pessoas (pontos assistidos). */
   schools: 86,

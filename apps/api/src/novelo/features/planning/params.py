@@ -101,7 +101,16 @@ def params_meta() -> list[ParamMeta]:
         *_mode_meta("on_demand", ParamSource.ASSUMPTION),
         ParamMeta(key="cost_per_collection_eur", unit="€", source=ParamSource.ASSUMPTION),
         ParamMeta(key="cost_per_km_eur", unit="€/km", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="detour_factor", unit="x", source=ParamSource.ASSUMPTION),
+        ParamMeta(
+            key="detour_factor",
+            unit="x",
+            source=ParamSource.ASSUMPTION,
+            note=(
+                "Estrada real ÷ linha reta. As rotas dos cenários são medidas pela estrada (OSRM); este fator só vale "
+                "quando o OSRM não responde, na volta porta a porta dentro da freguesia e na sensibilidade. "
+                "Calibração de 23 out 2026: mediana 1,37 a 1,48."
+            ),
+        ),
         ParamMeta(key="on_demand_kg_per_pickup", unit="kg", source=ParamSource.ASSUMPTION),
         ParamMeta(key="on_demand_every_weeks", unit="semanas", source=ParamSource.ASSUMPTION),
         ParamMeta(

@@ -22,7 +22,7 @@ Nenhuma porta é publicada pelo compose: o Traefik do Coolify é a única entrad
 2. **Projeto:** no Coolify, criar o recurso "Docker Compose" a partir do repositório (GitHub App), branch `main`, ficheiro `docker-compose.yml`.
 3. **Domínio:** atribuir `https://novelo.helder.si` ao serviço `web` (o compose declara `SERVICE_FQDN_WEB_80`).
 4. **Variáveis:** preencher as do quadro abaixo no recurso (Environment Variables).
-5. **Deploy automático por push:** ligado; o Coolify constrói as duas imagens e arranca.
+5. **Deploy automático por push:** ligado; o Coolify constrói as imagens (`web`, `api` e `osrm`) e arranca.
 
 ## O que o compose faz
 
@@ -63,13 +63,13 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 
 ## Operação
 
-- **Estado:** `GET /api/v1/health` (processo) e `GET /api/v1/ready` (base de dados e se a IA está ligada).
+- **Estado:** `GET /api/v1/health` (processo) e `GET /api/v1/ready` (base de dados e se a IA está ligada). O serviço `osrm` tem healthcheck próprio (uma rota de teste em Guimarães); antes de uma demo, confirmar que está saudável e que os cenários mostram «Por estrada».
 - **Primeiro arranque:** a migração cria as tabelas e o seed importa os dados da Vitrus, o pacote municipal (tabelas `municipal_*`) e o administrador. Na primeira entrada, o administrador abre `/users`, separador «Cartaz do QR», para imprimir o QR do evento.
 - **Logs:** no Coolify, por serviço; os da API são JSON com `request_id`. Sem `RESEND_API_KEY`, os emails aparecem no log da API.
 - **Retenção das miniaturas:** automática (30 s após o arranque e de 24 em 24 h), sem tarefa agendada. Uma foto apagada pode ficar até 1 h em caches públicas.
 - **Retenção do copiloto:** `python -m novelo.cli purge-copilot` apaga o que passou do prazo; pode agendar-se uma vez por dia no Coolify (ver [Copiloto](copiloto.md#definições-do-utilizador-vs-definições-do-sistema)).
 - **Rollback:** `git revert` do commit em `main` e novo push. Antes da apresentação, marcar a versão da demo com uma tag (`v1.0-demo`).
-- **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. As cópias incluem as miniaturas (`lot_item_photos`): uma foto apagada continua na cópia até esta ser rodada; definir a retenção das cópias (ver [Privacidade das fotografias](privacidade-fotografias.md)). Tudo o resto reconstrói-se a partir do repositório.
+- **Backups:** o único estado é o volume `pgdata`. Há um backup diário às 04:00 da base de dados do Novelo (`scripts/ops/novelo-backup.sh`, instalado em `/root/novelo-backup.sh` com cron `0 4 * * *`, registo em `/var/log/novelo-backup.log`): `pg_dump -Fc` verificado com `pg_restore --list` antes de ficar, em `/root/backups/novelo/` (permissões 700/600) e com retenção de 30 dias. Instalado e restaurado a sério a 23 out 2026 numa base temporária (cenários, lotes, peças, fotografias e utilizadores com as mesmas contagens). Ficam no mesmo disco da VPS: **copiar `/root/backups/novelo/` para fora do servidor** de vez em quando (um disco morto leva os dois). Para restaurar: `docker exec -i <db> pg_restore -U novelo -d <base> --no-owner < ficheiro.dump` numa base vazia. As cópias incluem as miniaturas (`lot_item_photos`): uma foto apagada continua nas cópias até ao fim dos 30 dias (ver [Privacidade das fotografias](privacidade-fotografias.md)). Tudo o resto reconstrói-se a partir do repositório.
 - **Cenários de referência:** com `SEED_REFERENCE_SCENARIOS=true` (por omissão no `docker-compose.yml`), cada arranque verifica em segundo plano os 6 cenários de referência e recalcula os desatualizados (um processo de cada vez, por tranca do Postgres; 20 a 40 s cada por locais). Depois de um deploy que mude o modelo, sobe `REFERENCE_MODEL_VERSION` em `features/planning/reference.py` (ver [Arquitetura](arquitetura.md#cenários-de-referência)).
 - **Registo aberto:** para um evento, um administrador liga-o com `PATCH /api/v1/admin/settings` (`open_registration`, opcionalmente `approve_pending` para aprovar já os pendentes); fica na base de dados, não é uma variável de ambiente.
 - **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem os custos ou uma caracterização do lixo). A pasta `data/raw` não vai para a imagem.
@@ -85,6 +85,7 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 | `/join` diz que o acesso está fechado | `QUICK_JOIN_CODE` por definir em produção |
 | O copiloto "fica pendurado" ou chega de uma vez | Algo entre o browser e a API está a fazer buffering do stream (ver as locations do `nginx.conf`) |
 | IA responde 503 | `OPENROUTER_API_KEY` |
+| Cenários novos saem com `routing = estimate` (rotas em linha reta × desvio, sem «Por estrada») | Serviço `osrm` saudável no Coolify; aviso «OSRM indisponível» no log da `api`; `OSRM_URL=http://osrm:5000`. A API continua a funcionar sem ele. Ver [Rotas por estrada](rotas-reais.md#como-falha) |
 | PDF do relatório falha | Bibliotecas Pango na imagem da API |
 
 **Fontes:** [Coolify, Docker Compose](https://coolify.io/docs/services/configuration/docker-compose) · [Hey API, TanStack Query](https://heyapi.dev/openapi-ts/plugins/tanstack-query)

@@ -50,6 +50,7 @@ const TOOL_LABELS: Record<string, () => string> = {
   web_search: () => m.copilot_tool_web_search(),
   list_assumptions: () => m.copilot_tool_list_assumptions(),
   get_data_gaps: () => m.copilot_tool_get_data_gaps(),
+  get_photo_policy: () => m.copilot_tool_get_photo_policy(),
   explain_scenario_difference: () => m.copilot_tool_explain_scenario_difference(),
   list_reports: () => m.copilot_tool_list_reports(),
   analyze_result: () => m.copilot_tool_analyze_result(),

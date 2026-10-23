@@ -6,6 +6,7 @@ extra (têm os limites gerais de cada rota).
 
 import threading
 from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
@@ -81,8 +82,12 @@ solver_slots = Slots(lambda: get_settings().solver_max_concurrency)
 pdf_slots = Slots(lambda: get_settings().pdf_max_concurrency)
 
 
-def solver_guard(user: CurrentUser) -> Iterator[None]:
-    """Otimizador (CPU): execuções por utilizador e por minuto, por hora para convidados, e concorrência global."""
+@contextmanager
+def solver_budget(user: User) -> Iterator[None]:
+    """Gasta uma execução do otimizador (CPU): por utilizador e minuto, por hora para convidados, e concorrência global.
+
+    Usa-se à volta do cálculo a sério, para que um resultado servido da cache não gaste o limite de ninguém.
+    """
     s = get_settings()
     if user.role == "guest":
         guest_solver_limiter.check(f"guest-solver:{user.id}", s.guest_solver_per_hour)
@@ -93,6 +98,12 @@ def solver_guard(user: CurrentUser) -> Iterator[None]:
         yield
     finally:
         solver_slots.release()
+
+
+def solver_guard(user: CurrentUser) -> Iterator[None]:
+    """Otimizador (CPU) como dependência de uma rota: ver `solver_budget`."""
+    with solver_budget(user):
+        yield
 
 
 def pdf_guard(user: CurrentUser) -> Iterator[None]:

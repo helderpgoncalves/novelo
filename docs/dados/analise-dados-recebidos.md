@@ -139,6 +139,7 @@ Relatório completo da pesquisa, com páginas e citações, guardado fora do rep
 | Indiferenciado do concelho (2025) e 5,86% (APA) | Procura do modelo: têxtil por desviar por freguesia |
 | Tratamento do indiferenciado (105,64 €/t) | Custo evitado por tonelada desviada, ao lado do custo de cada cenário |
 | Depósito (Rua das Lameiras, Polvoreira) | Origem e fim das rotas da viatura de têxtil |
+| Estradas do OpenStreetMap (não vêm da Vitrus; © colaboradores, ODbL) | Km e traçado das rotas pela estrada, num OSRM próprio ([Rotas por estrada](../engenharia/rotas-reais.md)); o porta a porta dentro da freguesia é estimativa por fórmula |
 | População e freguesias | Procura por zona, simulador, mapa |
 | TIPAU | Custo por tipo de território no relatório RAP |
 | Circuitos, viaturas e turnos | Circuitos e Frota (contexto). Desde 22 out não sustentam a recolha de têxtil: o saco não vai no compactador e não há viaturas livres |

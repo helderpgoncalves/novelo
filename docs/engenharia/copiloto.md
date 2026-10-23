@@ -273,7 +273,7 @@ Inspirada no Hermes Agent, adaptada a vários utilizadores em Postgres. Camadas:
 
 ```mermaid
 flowchart TB
-    R["Regras (copilot_v5.md)<br/>iguais para todos, em cache"]
+    R["Regras (copilot_v6.md)<br/>iguais para todos, em cache"]
     P["Persona (estilo)<br/>por utilizador"]
     M["MEMORY — notas do copiloto<br/>≤ 2 200 caracteres"]
     U["USER — perfil da pessoa<br/>≤ 1 375 caracteres"]
@@ -333,6 +333,7 @@ Recusados: executáveis (MZ, ELF, Mach-O, `#!`), HTML/SVG/scripts, ZIP que não 
 - `@freguesia` (`parish`) traz também os números municipais (`municipal_network`: contentores, por 1 000 hab., locais públicos, candidatos, lacuna estimada e ordem) quando o pacote está importado. `@local` (`municipal_site`) pesquisa na base de dados por id, rua ou freguesia (sem acentos; nunca por nomes de produtores) e resolve para os factos do local, sem nomes.
 - `/copilot/stream` aceita `mentions: [{type, id}]` e `page_context`. **O servidor resolve cada menção** para um bloco curto com dados reais (nunca usa o texto do cliente). Menção inexistente: 404 `not_found`; sem permissão: 403 `forbidden`.
 - O ecrã vira uma linha do tipo `screen: Cenário — «Base» (scenario_id=...) with 122,7 €/t, 361,1 t/ano, 44 288 €/ano, routing=estimate`, construída no servidor a partir de ids validados. Só rotas conhecidas; filtros só de uma lista e com valores seguros; nomes de utilizador numa só linha.
+- **Origem das rotas.** O resultado das ferramentas de cenário traz `routing` (`road`, `mixed` ou `estimate`) com o seu significado (`ROUTING_MEANING`) e, em `explain_assumption`, a calibração do desvio e da velocidade contra a estrada (`ASSUMPTION_NOTES`, de [Rotas por estrada](rotas-reais.md)). O prompt `copilot_v5` obriga o modelo a dizer que os km são estimativa quando `routing` é `estimate` ou `mixed`, a nunca afirmar que uma rota segue estradas ou dar uma distância exata sem `road`, e a lembrar que o porta a porta dentro da freguesia é sempre fórmula.
 - `GET /copilot/commands`: `/compact` e `/websearch on|off` (servidor; o segundo muda a preferência `web_search` sem chamar o modelo), `/novo`, `/limpar`, `/exportar` (cliente) e `/modelo` (só administradores).
 - "Anexar o ecrã atual" é enviar o `page_context`; anexar uma entidade é uma menção.
 

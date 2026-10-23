@@ -60,7 +60,10 @@ async def create_benchmark_scenario(key: str, body: BenchmarkScenarioRequest, us
     return await benchmark_service.create_benchmark_scenario(db, key, body, user)
 
 
-@router.post("/pilot", response_model=PilotOut, dependencies=[SolverGuard])
-async def recommend_pilot(body: PilotRequest, db: Db) -> PilotOut:
-    """Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir."""
-    return await pilot_service.recommend_pilot(db, body)
+@router.post("/pilot", response_model=PilotOut)
+async def recommend_pilot(body: PilotRequest, user: CurrentUser, db: Db) -> PilotOut:
+    """Escolhe as freguesias do piloto de maior valor de aprendizagem e prevê os KPIs a medir.
+
+    O resultado é determinístico e fica em cache: só um cálculo novo gasta o limite do otimizador (`solver_budget`).
+    """
+    return await pilot_service.recommend_pilot(db, body, user)
