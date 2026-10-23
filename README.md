@@ -16,7 +16,7 @@
 <p align="center">
   <a href="https://novelo.helder.si"><img alt="Em produção: novelo.helder.si" src="https://img.shields.io/badge/em%20produ%C3%A7%C3%A3o-novelo.helder.si-2E6B57?style=flat-square"></a>
   <img alt="Hack4Guimarães 2035, Desafio 5 TexVitrus" src="https://img.shields.io/badge/Hack4Guimar%C3%A3es%202035-Desafio%205%20TexVitrus-14211D?style=flat-square">
-  <img alt="Testes: 1 054 da API e 432 da web" src="https://img.shields.io/badge/testes-1%20054%20API%20%C2%B7%20432%20web-2E6B57?style=flat-square">
+  <img alt="Testes: 1 164 da API e 449 da web" src="https://img.shields.io/badge/testes-1%20164%20API%20%C2%B7%20449%20web-2E6B57?style=flat-square">
   <img alt="Copiloto: 100% dos números verificados" src="https://img.shields.io/badge/copiloto-100%25%20n%C3%BAmeros%20verificados-2E6B57?style=flat-square">
   <br>
   <img alt="Python 3.12" src="https://img.shields.io/badge/Python-3.12-3776AB?style=flat-square&logo=python&logoColor=white">
@@ -83,7 +83,7 @@ O investimento é de 57 000 €: 42 500 € na viatura e o resto nos 58 pontos. 
 
 <table>
   <tr>
-    <td width="50%"><img src="docs/img/pagina-simulador.png" alt="Simulador: orçamento de 60 000 €/ano, o mapa das freguesias servidas e os indicadores do cenário"><br><sub><b>Simulador.</b> Orçamento e meta entram; saem freguesias, canais, rotas e KPIs.</sub></td>
+    <td width="50%"><img src="docs/img/pagina-simulador.png" alt="Resultado do cenário de 60 000 €/ano: toneladas, custo anual, investimento, tratamento evitado e custo líquido, tudo marcado como estimativa"><br><sub><b>Simulador.</b> Orçamento e meta entram; saem freguesias, canais, rotas e KPIs, todos marcados como estimativa.</sub></td>
     <td width="50%"><img src="docs/img/pagina-plano-recolha.png" alt="Plano de recolha: cada freguesia com o dia e os quilos por ronda"><br><sub><b>Plano da viatura de têxtil.</b> O dia de cada freguesia e os quilos por ronda.</sub></td>
   </tr>
   <tr>
@@ -91,8 +91,12 @@ O investimento é de 57 000 €: 42 500 € na viatura e o resto nos 58 pontos. 
     <td><img src="docs/img/pagina-incerteza.png" alt="Robustez do cenário: o tornado dos pressupostos e o intervalo do custo por tonelada"><br><sub><b>Incerteza.</b> Tornado dos pressupostos e Monte Carlo (P10 a P90).</sub></td>
   </tr>
   <tr>
-    <td><img src="docs/img/pagina-triagem.png" alt="Triagem de umas calças de ganga: a etiqueta 80% algodão e 20% poliéster lida com 97% de confiança"><br><sub><b>Triagem na entrega.</b> Teste real: a etiqueta «80% cotton, 20% polyester» lida com 97% de confiança.</sub></td>
-    <td><img src="docs/img/pagina-rastreio.png" alt="O lote NOV-PGTV2Z com QR, composição e o passaporte público no telemóvel"><br><sub><b>Lote com QR e passaporte.</b> 4 peças triadas com o modelo real, 1,4 kg (estimativa).</sub></td>
+    <td><img src="docs/img/pagina-triagem.png" alt="Triagem de um cachecol Ralph Lauren: o modelo lê a etiqueta (marca e composição) e o operador confirma ou corrige"><br><sub><b>Triagem na entrega.</b> Teste real com o modelo de visão: lê a etiqueta (marca e composição) e o operador confirma; a leitura não é infalível, por isso confirma-se sempre.</sub></td>
+    <td><img src="docs/img/pagina-rastreio.png" alt="O lote NOV-6EYRXN com QR, composição, fotografias com crédito e o passaporte público no telemóvel"><br><sub><b>Lote com QR e passaporte.</b> Lote de demonstração de 5 peças de lã, com fotografias reais (autor e licença visíveis) e o histórico de cada peça.</sub></td>
+  </tr>
+  <tr>
+    <td><img src="docs/img/pagina-rotas.png" alt="Rotas por estrada: as viagens da viatura de têxtil a partir de Polvoreira, a seguir as estradas"><br><sub><b>Rotas por estrada.</b> As viagens da viatura de têxtil seguem as estradas reais (OpenStreetMap); tracejado = estimativa em linha reta.</sub></td>
+    <td><img src="docs/img/pagina-telemovel.png" alt="Três ecrãs no telemóvel: a página de entrada, o resumo de um cenário e as rotas"><br><sub><b>Pensado para o telemóvel.</b> Landing, resumo do cenário e rotas a 390 px.</sub></td>
   </tr>
   <tr>
     <td><img src="docs/img/pagina-cobertura.png" alt="Separador Cobertura: os critérios do art. 22.º-C, o resumo por tipo de território e a tabela por freguesia"><br><sub><b>Cobertura.</b> Os critérios do art. 22.º-C da diretiva, freguesia a freguesia.</sub></td>
@@ -191,7 +195,7 @@ flowchart LR
 - **O que a IA não faz:** contas, nem escrever valores em gráficos e tabelas (o servidor desenha-os a partir dos resultados), nem alterar dados sem um clique de confirmação.
 - **Verificador de números** (`ai/verify.py`): rejeita qualquer número do texto que não exista nos resultados de origem; no copiloto, o texto já transmitido é retirado (`retract`) e reescrito uma vez.
 - **Provado com o modelo real** (22 out 2026):
-  - Copiloto: 155 perguntas em pt-PT e inglês, 146 aprovadas, **100% dos números verificados**, 100% de resistência a injeção de prompt ([avaliação](docs/engenharia/avaliacao-copiloto.md)).
+  - Copiloto: 180 casos em pt-PT e inglês, entre 173 e 177 aprovados em duas corridas completas, **99% dos números verificados**, 100% de resistência a injeção de prompt ([avaliação](docs/engenharia/avaliacao-copiloto.md)).
   - Triagem: com a etiqueta legível, a composição saiu certa em todas as peças testadas (5 composições diferentes, 86% a 97% de confiança); só com a foto da peça, a fibra fica "desconhecida", porque o modelo não adivinha.
 - **Custos e travões:** modelo por tarefa e orçamento mensal em `/admin/ai`; sem `OPENROUTER_API_KEY` a API arranca e as funcionalidades de IA respondem 503; sem IA, o relatório RAP sai com um texto determinístico.
 
@@ -323,8 +327,8 @@ Sem `OPENROUTER_API_KEY` as funcionalidades de IA respondem 503; o resto funcion
 
 | Área | O que corre |
 | --- | --- |
-| API | **1 054 testes** de pytest em paralelo (funções puras do `domain/` com valores calculados à mão, otimizador, rotas, autenticação, relatório, copiloto com modelo falso, lotes e triagem), com Ruff e mypy strict limpos |
-| Web | **432 testes** de Vitest (formatação, erros tipados, DataTable, separadores, copiloto, frota, QR, triagem); Biome e `tsc` |
+| API | **1 164 testes** de pytest em paralelo (funções puras do `domain/` com valores calculados à mão, otimizador, rotas, autenticação, relatório, copiloto com modelo falso, lotes e triagem), com Ruff e mypy strict limpos |
+| Web | **449 testes** de Vitest (formatação, erros tipados, DataTable, separadores, copiloto, frota, QR, triagem); Biome e `tsc` |
 | Ponta a ponta | **Playwright** em 36 ficheiros, contra a stack de `just dev`, em desktop e telemóvel (`just e2e`, `just e2e-full`; não fazem parte do `just check`) |
 | Contrato | `just check-contract` falha se `openapi.json` ou o cliente gerado estiverem desatualizados |
 | Marca | `just check-brand` mede o logótipo em píxeis (tolerância de 0,5 px a 512 px) |

@@ -136,7 +136,7 @@ Os custos por hora e por km das viaturas ainda não chegaram do financeiro da Vi
 
 O decisor pergunta como falaria a um colega: *"E se o orçamento anual passar de 40 000 € para 60 000 €?"*. O copiloto percebe a pergunta, corre o otimizador e explica a diferença: com 60 000 €/ano, 431,1 t a 101,9 €/t, mais 19 872 € do que o cenário de 40 000 € (estimativas).
 
-Testado com o modelo real: a *"E se o orçamento fosse 80 000 € por ano?"*, o copiloto correu o otimizador e respondeu **510,1 t por ano, 66 240 € de custo anual, cerca de 130 €/t** (estimativas). Na avaliação com o modelo real, **146 de 155 perguntas** passaram e **100% dos números** foram verificados contra a origem.
+Testado com o modelo real, em produção, sobre o cenário de 60 000 €/ano: a *"E se o orçamento passar de 60 000 para 90 000 euros por ano?"*, o copiloto correu o otimizador e respondeu **525,3 t por ano, 73 083 € de custo anual, 139,1 €/t e 75,2% de cobertura** (estimativas); o mesmo valor que dá o cenário por freguesia de 90 000 €/ano. Na avaliação com o modelo real (180 casos, duas corridas completas), **entre 173 e 177 casos passaram (96% a 98%)** e **99% dos números** foram verificados contra a origem.
 
 **A IA nunca faz contas.** Só traduz a pergunta num pedido estruturado. Todos os números vêm do otimizador ou da base de dados, e um **verificador rejeita qualquer número que não esteja na origem**. Sem IA, tudo o resto funciona.
 
@@ -177,7 +177,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 | --- | --- | --- |
 | **Impacto** | +431,1 t por ano desviadas do lixo, 256,1 t reutilizáveis, captura de 9,1% para cerca de 22,2%; 45 542 € por ano de tratamento evitado, a 105,64 €/t (Vitrus), que paga a operação (estimativas); a resposta a "quem paga?" antes e depois da RAP; cobertura de todo o território, não só das zonas rendíveis | Simulador, separador Cobertura, relatório RAP |
 | **Inovação** | Uma rede **sem contentores**: uma só viatura de têxtil nova, o saco à porta e os locais que já existem; o otimizador decide canal a canal; a IA conduz o modelo matemático, mas um verificador impede-a de inventar números; do saco ao lote com passaporte | Plano de recolha, copiloto, triagem, passaporte |
-| **Viabilidade** | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 000 €: 42 500 € na viatura e o resto em 58 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 054 testes da API, 432 da web e testes de ponta a ponta no browser; 155 perguntas de avaliação ao copiloto, com 100% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
+| **Viabilidade** | Em produção, com os dados reais da Vitrus (40 circuitos, 29 viaturas, 2 751 contentores, 301,3 t por destino); nenhum contentor novo e uma só viatura nova, a que a Vitrus indicou (o investimento do cenário recomendado é de 57 000 €: 42 500 € na viatura e o resto em 58 pontos, estimativa); pressupostos visíveis e etiquetados; incerteza calculada; 1 164 testes da API, 449 da web e testes de ponta a ponta no browser; 180 perguntas de avaliação ao copiloto, com 99% dos números verificados | Pressupostos, robustez, [código](https://github.com/helderpgoncalves/novelo) |
 | **Continuidade** | Uma história de seis passos para quem entra pela primeira vez; um piloto de 3 meses desenhado pelo próprio Novelo; replicável em qualquer município com dados abertos | [novelo.helder.si](https://novelo.helder.si) |
 
 ---
@@ -218,7 +218,7 @@ Aplicação instalável, em português e inglês, tema claro e escuro, pensada p
 - **Web:** React, Vite, TanStack Router e Query, Tailwind v4 e shadcn/ui; aplicação instalável (PWA), pt-PT e inglês, acessibilidade AA.
 - **API:** FastAPI (Python 3.12), PostgreSQL, **OR-Tools** (CP-SAT para a localização, VRP para as rotas) e um **OSRM próprio** sobre o **OpenStreetMap** para os km e o traçado por estrada (se parar, a API estima e assinala); contrato OpenAPI com o cliente TypeScript gerado.
 - **IA, identificada e limitada:** o copiloto e a triagem usam modelos via **OpenRouter** e devolvem JSON validado, nunca fazem contas, e um verificador rejeita números fora da origem. No desenvolvimento usámos **Claude Code** e **GLM (Z.ai)** como assistentes de programação.
-- **Qualidade:** 1 054 testes da API e 432 testes da web, verdes em cada entrega; testes de ponta a ponta no browser; uma avaliação do copiloto com o modelo real, 155 perguntas, 146 aprovadas e 100% dos números verificados; e a triagem testada com o modelo real em fotos de licença aberta.
+- **Qualidade:** 1 164 testes da API e 449 testes da web; testes de ponta a ponta no browser; uma avaliação do copiloto com o modelo real, 180 casos, entre 173 e 177 aprovados em duas corridas completas (96% a 98%) e 99% dos números verificados; e a triagem testada com o modelo real em fotos de licença aberta.
 - **Em produção** em [novelo.helder.si](https://novelo.helder.si) (Coolify, Docker), com **código aberto** em [GitHub](https://github.com/helderpgoncalves/novelo).
 
 ## Equipa
