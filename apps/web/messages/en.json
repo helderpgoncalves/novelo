@@ -4602,5 +4602,15 @@
   "home_plan_net_value": "{eur} per year ({eurt})",
   "story_answer_line_every": "every {weeks} weeks",
   "story_cost_param_vehicle": "New textile vehicle",
-  "story_cost_vitrus": "Vitrus data"
+  "story_cost_vitrus": "Vitrus data",
+  "routing_road": "Routes measured along the road network (OpenStreetMap).",
+  "routing_mixed": "Some routes measured along the road network (OpenStreetMap), others estimated as straight line × road detour. The door-to-door round is always an estimate.",
+  "routing_estimate": "Km estimated as straight line × road detour.",
+  "route_duration": "Driving",
+  "route_duration_hint": "Road driving time, excluding stops and traffic.",
+  "route_source": "Km source",
+  "route_source_road": "By road",
+  "route_source_estimate": "Estimate",
+  "route_legend_road": "Solid: follows the roads",
+  "route_legend_straight": "Dashed: straight-line estimate"
 }

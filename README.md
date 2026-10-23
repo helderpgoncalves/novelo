@@ -277,6 +277,7 @@ just dev        # stack completa com hot reload (Docker)
 | Web | http://localhost:3190 |
 | API e documentação | http://localhost:8190/api/docs (só em desenvolvimento) |
 | Postgres | `localhost:5590` |
+| OSRM (rotas por estrada) | `localhost:5190` |
 
 **Credenciais de desenvolvimento** (definidas no `.env.example`, nunca usar em produção):
 
@@ -297,6 +298,7 @@ Sem `OPENROUTER_API_KEY` as funcionalidades de IA respondem 503; o resto funcion
 | `just check-fast` | Iteração diária: API, web, marca e contrato em paralelo, com o VRP cortado nos testes |
 | `just check` | O mesmo com os limites reais do solver. Corre localmente; tem de passar antes de cada push |
 | `just e2e` / `just e2e-full` | Playwright contra a stack de dev: fluxos críticos (desktop) / tudo (desktop e telemóvel) |
+| `just osrm-up` / `osrm-test` / `osrm-calibrate` / `osrm-refresh` | Rotas por estrada (OSRM próprio, OpenStreetMap): sobe o serviço, testes reais, calibração, dados novos ([doc](docs/engenharia/rotas-reais.md)) |
 | `just gen` | Regenera `openapi.json` e o cliente TypeScript sempre que a API muda |
 | `just etl` | Converte os Excel e o pacote QGIS de `data/raw` em `data/processed` |
 | `just seed` | Importa `data/processed` para a base de dados (idempotente; corre sozinho no arranque da API) |
@@ -382,7 +384,7 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 | Sem quilos por mês (sazonalidade) | Modelo anual | A Vitrus só os partilha com o município |
 | Taxas de captura por canal sem dados locais | Todas são pressuposto | Piloto de 3 meses |
 | Triagem sem conjunto de peças com verdade-terreno | A composição pela etiqueta saiu certa nos testes, mas a exatidão não tem percentagem; estado "reciclagem" e "rejeito" ainda sem fotos de teste | `just eval-triage` com 30 ou mais peças reais no piloto |
-| Distâncias em linha reta com fator de desvio 1,3 | Rotas aproximadas; a variável `OSRM_URL` existe mas **não há cliente OSRM** | Integrar um motor de rotas |
+| Perfil de furgoneta no OSRM, sem trânsito; dimensões da viatura por confirmar | Km por estrada fiáveis, minutos são um limite inferior; fallback e porta a porta dentro da freguesia usam desvio 1,3 (a calibração dá 1,4 a 1,5) | Confirmar a viatura com a Vitrus e decidir o desvio ([Rotas por estrada](docs/engenharia/rotas-reais.md)) |
 | Peso das peças por tabela de pesos médios por tipo | KPI "estimativa" | Balança nos pontos do piloto |
 | Códigos de zona `0308U1` a `0308U5` provisórios | Ligação por nome às freguesias CAOP | Validar com o INE |
 | Planeamento da Frota é "semana tipo" | Sem datas nem horas reais | Dados de operação da Vitrus |

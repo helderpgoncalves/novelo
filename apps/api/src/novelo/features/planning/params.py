@@ -6,6 +6,7 @@ tratamento) entram no modelo por outra via ou derivam-se aqui; o resto são núm
 """
 
 from novelo.domain import network
+from novelo.domain.routing import RoadRouter
 from novelo.domain.vocab import CollectionMode
 from novelo.features.planning import assumptions as a
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams, ZoneOut
@@ -135,7 +136,7 @@ def params_meta() -> list[ParamMeta]:
     ]
 
 
-def to_domain_params(p: PlanningParams) -> network.Params:
+def to_domain_params(p: PlanningParams, road: RoadRouter | None = None) -> network.Params:
     return network.Params(
         kg_per_inhab_month=p.kg_per_inhab_month,
         modes={m: network.ModeParams(**mp.model_dump()) for m, mp in p.modes.items()},
@@ -152,6 +153,7 @@ def to_domain_params(p: PlanningParams) -> network.Params:
         door_stop_minutes=p.door_stop_minutes,
         site_stop_minutes=p.site_stop_minutes,
         shift_hours=p.shift_hours,
+        road=road,
     )
 
 

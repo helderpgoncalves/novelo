@@ -51,6 +51,7 @@ com fonte, ou leva a etiqueta "estimativa" no ecrã.
 | `just etl` | Excel e pacote QGIS (contentores municipais, CAOP) de `data/raw/` para `data/processed/` |
 | `just seed` | Importa `data/processed/` para a base de dados (idempotente; a API já o faz ao arrancar) |
 | `just brand` / `just check-brand` | Regenera os assets da marca de uma só fonte (inclui fundos dither, partilha OG, banners; `just brand-landing` só a landing, `just brand-fonts` os subsets de fontes) / mede o alinhamento do logótipo (precisa de `rsvg-convert`) |
+| `just osrm-up` / `just osrm-test` / `just osrm-calibrate` / `just osrm-refresh` | Rotas por estrada (OSRM próprio, OpenStreetMap): sobe o serviço (:5190) / testes de integração reais / desvio e velocidade vs pressupostos / dados novos. `just dev` já o inclui; ver `docs/engenharia/rotas-reais.md` |
 | `just eval-copilot` / `just eval-triage` | Avaliações com o modelo real (precisam de `OPENROUTER_API_KEY`) |
 | `just fix` | Formata e corrige o que o lint conseguir |
 | `just migration "msg"` / `just migrate` | Alembic |
@@ -80,7 +81,7 @@ O `operationId` é o nome da função Python: nomes claros (`list_zones`, `creat
 **Python (API).**
 - Feature-based: `features/<nome>/{router,service,models,schemas}.py`. Routers finos, sem prefixo (aplica-se no `main.py`);
   services sem FastAPI que levantam `AppError`; `domain/` só funções puras (fórmulas, otimização), 100% testadas com valores calculados à mão.
-- I/O externo só em `adapters/` (OpenRouter, email; um futuro cliente OSRM também), injetado por `Depends`; nos testes troca-se por falsos.
+- I/O externo só em `adapters/` (OpenRouter, email, OSRM), injetado por `Depends` (o OSRM entra no domínio pela porta `RoadRouter` em `Params.road`); nos testes troca-se por falsos.
 - Tudo tipado: `mypy --strict` e `ruff` limpos. Pydantic v2 em todos os pedidos e respostas. Erros no formato `{code, message, details}`.
 - Config só por `core/config.py` (`.env.example` lista tudo). Segredos nunca no código nem nos logs.
 - Rotas que chamam OR-Tools são `def` (threadpool), com limite de tempo (`SOLVER_TIME_LIMIT_S`) e sementes fixas.

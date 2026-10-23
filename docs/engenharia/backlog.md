@@ -33,7 +33,7 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Média | Correr `just eval-copilot` com os 11 casos `muni_*` e atualizar a [avaliação](avaliacao-copiloto.md) | Por fazer |
 | Média | Passar as restantes variáveis (`MAGIC_LINK_*`, `GUEST_*`, `COPILOT_*`, `EMAIL_TRANSPORT`...) pelo `docker-compose.yml` de produção, se for preciso alterá-las no Coolify | Por decidir |
 | Média | Cenários A e B fixos, cinco perguntas "E se...?" de reserva, lote de demonstração | Por fazer |
-| Baixa | Cliente OSRM para distâncias por estrada (hoje linha reta x 1,3; `OSRM_URL` não é usada) | Adiado |
+| Média | Decidir se o `detour_factor` de fallback sobe de 1,3 para ~1,4 a 1,5 (calibração OSRM de 23 out: mediana 1,37 a 1,48; [Rotas por estrada](rotas-reais.md)) e confirmar com a Vitrus as dimensões da viatura (perfil `novelo-van`) | Por decidir |
 | Baixa | Limites de pedidos partilhados entre processos (hoje em memória, por processo) | Adiado |
 | Baixa | Eventos de progresso do otimizador no stream do copiloto; virtualização de linhas no `DataTable` | Adiado |
 | Baixa | Integração contínua remota (por agora só `just check` local) | Adiado |

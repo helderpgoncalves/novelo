@@ -5,6 +5,7 @@ from typing import Literal, Self
 
 from pydantic import BaseModel, Field, model_validator
 
+from novelo.domain.routing import PlanSource, RoutingSource
 from novelo.domain.vocab import CollectionMode, ProducerType, ScenarioObjective, ScenarioStatus, Tipau
 from novelo.features.planning import assumptions as a
 
@@ -338,6 +339,15 @@ class RouteOut(BaseModel):
     km: float
     load_t: float
     path: list[list[float]] = Field(description="[latitude, longitude]: depósito, paragens, depósito")
+    duration_min: float | None = Field(
+        default=None,
+        description="Condução por estrada em minutos, sem paragens nem trânsito (nulo = estimativa, sem OSRM)",
+    )
+    source: RoutingSource = Field(
+        default="estimate",
+        description="`road`: km do OpenStreetMap (OSRM); `estimate`: linha reta × desvio da estrada (pressuposto)",
+    )
+    road_path: bool = Field(default=False, description="O traçado segue as estradas; falso = linhas retas")
 
 
 class ModeSummary(BaseModel):
@@ -429,6 +439,13 @@ class ScenarioResult(BaseModel):
     routes: list[RouteOut]
     modes: list[ModeSummary]
     depot: list[float]
+    routing: PlanSource = Field(
+        default="estimate",
+        description=(
+            "Como foram medidas as `routes`: `road` (todas por estrada, OpenStreetMap), `mixed` ou `estimate`. A volta "
+            "porta a porta dentro da freguesia é sempre uma estimativa (fórmula por área)"
+        ),
+    )
     sites: list[SiteSelection] = Field(default_factory=list, description="Locais abertos (só cenários por locais)")
     siting: SitingSummary | None = Field(default=None, description="Preenchido nos cenários por locais")
     default_modes: list[CollectionMode] = Field(

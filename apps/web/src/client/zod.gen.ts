@@ -3590,10 +3590,13 @@ export const zRouteStop = z.object({
  * RouteOut
  */
 export const zRouteOut = z.object({
+    duration_min: z.number().nullish(),
     km: z.number(),
     load_t: z.number(),
     mode: zCollectionMode,
     path: z.array(z.array(z.number())),
+    road_path: z.boolean().optional().default(false),
+    source: z.enum(['road', 'estimate']).optional().default('estimate'),
     stops: z.array(zRouteStop),
     vehicle: z.int()
 });
@@ -4088,6 +4091,11 @@ export const zScenarioResult = z.object({
     kpis: zKpis,
     modes: z.array(zModeSummary),
     routes: z.array(zRouteOut),
+    routing: z.enum([
+        'road',
+        'mixed',
+        'estimate'
+    ]).optional().default('estimate'),
     sites: z.array(zSiteSelection).optional(),
     siting: zSitingSummary.nullish()
 });

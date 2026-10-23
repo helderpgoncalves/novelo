@@ -4602,5 +4602,15 @@
   "home_plan_net_value": "{eur} por ano ({eurt})",
   "story_answer_line_every": "a cada {weeks} semanas",
   "story_cost_param_vehicle": "Viatura nova de têxtil",
-  "story_cost_vitrus": "dado Vitrus"
+  "story_cost_vitrus": "dado Vitrus",
+  "routing_road": "Rotas medidas pela estrada (OpenStreetMap).",
+  "routing_mixed": "Algumas rotas medidas pela estrada (OpenStreetMap) e outras estimadas em linha reta × desvio da estrada. A volta porta a porta é sempre estimativa.",
+  "routing_estimate": "Km estimados em linha reta × desvio da estrada.",
+  "route_duration": "Condução",
+  "route_duration_hint": "Condução por estrada, sem paragens nem trânsito.",
+  "route_source": "Origem dos km",
+  "route_source_road": "Por estrada",
+  "route_source_estimate": "Estimativa",
+  "route_legend_road": "Traço cheio: segue as estradas",
+  "route_legend_straight": "Tracejado: estimativa em linha reta"
 }

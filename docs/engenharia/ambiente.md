@@ -5,7 +5,7 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Grupo | Variáveis | Notas |
 | --- | --- | --- |
 | Geral | `APP_ENV`, `LOG_LEVEL`, `DOMAIN`, `SEED_REFERENCE_SCENARIOS` | `APP_ENV=production` desliga `/api/docs` e `/api/openapi.json`. `LOG_LEVEL=debug` acrescenta `queries` (consultas SQL por pedido) ao registo de cada pedido. `SEED_REFERENCE_SCENARIOS=true` (por omissão em produção) garante em segundo plano, a cada arranque, 5 cenários de referência por locais reais (20 000 a 150 000 €/ano, a sala de decisão usa-os) e 1 por freguesia a 60 000 €/ano (ecrã inicial), e recalcula os desatualizados (ver [Arquitetura](arquitetura.md#cenários-de-referência)) |
-| Portas (dev) | `WEB_PORT=3190`, `API_PORT=8190`, `DB_PORT=5590` | `OSRM_PORT` existe no `.env.example` mas não é usada |
+| Portas (dev) | `WEB_PORT=3190`, `API_PORT=8190`, `DB_PORT=5590`, `OSRM_HOST_PORT=5190` | `OSRM_PORT` do `.env.example` antigo já não é usada |
 | Base de dados | `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` | Em produção a password é gerada pelo Coolify |
 | Sessão | `SECRET_KEY`, `APP_URL`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `SESSION_TOKEN_HOURS` | `APP_URL` entra nos links dos emails e no retorno do Google |
 | Contas | `ALLOW_REGISTRATION`, `ADMIN_EMAIL`, `ADMIN_PASSWORD`, `PASSWORD_RESET_EXPIRE_MINUTES`, `EMAIL_VERIFY_EXPIRE_HOURS`, `RATE_LIMIT_ENABLED` | O administrador é criado no arranque se não existir |
@@ -19,7 +19,8 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Email | `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `RESEND_READ_API_KEY`, `EMAIL_TRANSPORT`, `EMAIL_FROM`, `EMAIL_SUPPORT`, `EMAIL_REPLY_TO`, `EMAIL_NOT_FOUND_PER_HOUR`, `EMAIL_SEND_TIMEOUT_S`, `EMAIL_RETRY_BACKOFF_S` | Ver abaixo e [Emails](emails.md) |
 | IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S`, `LLM_AUX_PROVIDER_SORT`, `WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
 | Copiloto | `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS` | Limites do sistema; o resto cada utilizador gere nas suas definições. Ver [Copiloto](copiloto.md) |
-| Otimização | `SOLVER_TIME_LIMIT_S`, `OSRM_URL` | `OSRM_URL` está reservada: a API lê-a, mas ainda não há cliente OSRM (as distâncias são em linha reta com fator de desvio 1,3) e o compose não tem serviço OSRM |
+| Otimização | `SOLVER_TIME_LIMIT_S` | Limite de tempo do CP-SAT e do VRP |
+| Rotas por estrada | `OSRM_URL`, `OSRM_TIMEOUT_S`, `OSRM_MAX_LOCATIONS`, `OSRM_MAX_SNAP_M`, `OSRM_CACHE_SIZE`, `OSRM_COOLDOWN_S` | OSRM próprio sobre o OpenStreetMap, sem custos. Vazio = km estimados em linha reta. Em Docker (dev e produção) o compose define `OSRM_URL=http://osrm:5000`; fora do Docker o `just api` usa `http://localhost:5190`. Ver [Rotas por estrada](rotas-reais.md) |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
 
 ## Resend (email)

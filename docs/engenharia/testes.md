@@ -12,6 +12,7 @@ Não há CI remota: tudo corre localmente com `just`. O objetivo é iterar depre
 | `just test-api -k nome -m "not slow"` | Um teste ou um grupo | pytest paralelo com argumentos livres |
 | `just test-shuffle` | Caçar testes dependentes | pytest em ordem aleatória (`pytest-randomly`); repetir com `--randomly-seed=N` |
 | `just test-slowest` | Medir | Serial, com os 25 testes mais lentos |
+| `just osrm-test` | Ao mexer nas rotas por estrada | Testes de integração contra o OSRM a sério (sobe-o se preciso); fora do `just check`, que usa um OSRM falso (`test_osrm_adapter.py`, `test_routing.py`, `test_road_routes.py`) |
 | `just e2e` | Antes de mexer em fluxos de UI | Playwright, só desktop, ficheiros críticos (auth, home, planning, coverage, municipal, data-table, errors, operations, hero-layout) |
 | `just e2e-full` | Antes de uma demo | Playwright completo (desktop + mobile, inclui o copiloto com o modelo real) |
 

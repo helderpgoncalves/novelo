@@ -5,8 +5,9 @@ guiada mostram o plano de recolha do cenário por freguesia (`ONBOARDING_KEY`). 
 versão do modelo com que foi calculado.
 
 No arranque (`SEED_REFERENCE_SCENARIOS=true`) cria os que faltam e **recalcula os desatualizados**: versão do modelo
-diferente de `REFERENCE_MODEL_VERSION`, versão dos pressupostos ativos diferente, sem `collection_plan` ou com
-`site_mode = street`. Primeiro calcula o novo e só depois apaga o antigo da mesma chave (a página nunca fica sem
+diferente de `REFERENCE_MODEL_VERSION`, versão dos pressupostos ativos diferente, sem `collection_plan`, com
+`site_mode = street` ou com as rotas estimadas em linha reta quando o OSRM já responde (calculado antes de ele estar
+de pé). Primeiro calcula o novo e só depois apaga o antigo da mesma chave (a página nunca fica sem
 referência). Só apaga cenários com `reference_key`: os dos utilizadores nunca. Cada cenário demora 20 a 40 s, por isso
 corre fora do pedido, um de cada vez, e uma tranca consultiva do Postgres evita que dois processos repitam o trabalho.
 """
@@ -22,7 +23,9 @@ from sqlalchemy import delete, func, select, text, update
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker
 from sqlalchemy.orm import defer
 
+from novelo.adapters.osrm import get_road_router
 from novelo.core.database import SessionLocal, engine
+from novelo.domain.routing import RoadRouter
 from novelo.domain.vocab import CollectionMode, ScenarioObjective
 from novelo.features.planning import service
 from novelo.features.planning.models import Scenario
@@ -127,6 +130,13 @@ def _row_reasons(row: Scenario, current_parameter_version: int) -> list[Referenc
     )
 
 
+def _estimated_with_road_available(row: Scenario, road_available: bool) -> bool:
+    """Calculado em linha reta enquanto o OSRM já responde: vale a pena refazer por estrada (uma só vez: o novo vem
+    `road`, ou `mixed` se algum par não tiver caminho, e esse já não se refaz)."""
+    result: dict[str, Any] = row.result or {}
+    return road_available and bool(result.get("routes")) and result.get("routing", "estimate") == "estimate"
+
+
 @dataclass
 class RefreshOutcome:
     adopted: int = 0
@@ -175,8 +185,16 @@ async def _rows_for(db: AsyncSession, key: str) -> Sequence[Scenario]:
     )
 
 
-async def refresh(db: AsyncSession, specs: Sequence[ReferenceSpec] = SPECS) -> RefreshOutcome:
-    """Cria os cenários de referência em falta e recalcula os desatualizados. Idempotente; sem tranca (ver `seed`)."""
+async def refresh(
+    db: AsyncSession, specs: Sequence[ReferenceSpec] = SPECS, road: RoadRouter | None = None
+) -> RefreshOutcome:
+    """Cria os cenários de referência em falta e recalcula os desatualizados. Idempotente; sem tranca (ver `seed`).
+
+    `road` é o router de rotas por estrada (por omissão o da configuração): se responde, as referências calculadas em
+    linha reta são refeitas por estrada.
+    """
+    road = road or get_road_router()
+    road_available = road is not None and await asyncio.to_thread(lambda: road.fingerprint != "estimate")
     out = RefreshOutcome(adopted=await _adopt_legacy(db))
     admin = (
         (
@@ -195,10 +213,13 @@ async def refresh(db: AsyncSession, specs: Sequence[ReferenceSpec] = SPECS) -> R
     version = (await service.ensure_default_parameters(db)).version
     for spec in specs:
         rows = await _rows_for(db, spec.key)
-        keep = next((r for r in rows if not _row_reasons(r, version)), None)
+        keep = next(
+            (r for r in rows if not _row_reasons(r, version) and not _estimated_with_road_available(r, road_available)),
+            None,
+        )
         if keep is None:
             created = await service.run_scenario(
-                db, spec.request(), admin, reference_key=spec.key, reference_version=REFERENCE_MODEL_VERSION
+                db, spec.request(), admin, reference_key=spec.key, reference_version=REFERENCE_MODEL_VERSION, road=road
             )
             out.created += 1
             keep_id = created.id
@@ -230,10 +251,23 @@ async def seed_reference_scenarios(
             await lock.execute(text("SELECT pg_advisory_unlock(:k)"), {"k": LOCK_KEY})
 
 
+async def _wait_for_road(attempts: int = 12, pause_s: float = 5.0) -> None:
+    """Dá ao OSRM até ~1 min para ficar de pé (arrancam juntos): senão as referências sairiam estimadas."""
+    road = get_road_router()
+    if road is None:
+        return
+    for _ in range(attempts):
+        if await asyncio.to_thread(lambda: road.fingerprint != "estimate"):
+            return
+        await asyncio.sleep(pause_s)
+    log.warning("OSRM sem resposta: os cenários de referência ficam com rotas estimadas até ao próximo arranque")
+
+
 async def seed_in_background() -> None:
     """Corre depois de a API arrancar; nunca derruba o arranque."""
     try:
         await asyncio.sleep(20)  # deixa o arranque e o seed dos dados terminarem
+        await _wait_for_road()
         outcome = await seed_reference_scenarios()
         if outcome and (outcome.created or outcome.deleted):
             log.info(

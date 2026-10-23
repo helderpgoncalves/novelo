@@ -10,6 +10,7 @@ flowchart LR
     T --> W["web: nginx :80<br/>SPA + /api"]
     W -->|/api| A["api: FastAPI :8000"]
     A --> D[("db: Postgres 17<br/>volume pgdata")]
+    A -->|"/table · /route"| R["osrm: rotas por estrada<br/>OpenStreetMap, sem custos"]
     A --> X["OpenRouter, Resend, Google"]
 ```
 
@@ -25,13 +26,14 @@ Nenhuma porta é publicada pelo compose: o Traefik do Coolify é a única entrad
 
 ## O que o compose faz
 
-`docker-compose.yml` tem três serviços:
+`docker-compose.yml` tem quatro serviços:
 
 | Serviço | Imagem | Notas |
 | --- | --- | --- |
 | `web` | `apps/web/Dockerfile`: build do Vite e nginx | Healthcheck em `/health`; limite de 8 MB por pedido (fotos da triagem), 55 MB nos anexos do copiloto; stream do copiloto sem buffering e com leitura até 300 s; devolve 503 JSON `service_unavailable` quando a API reinicia |
 | `api` | `apps/api/Dockerfile`: Python 3.12 slim, utilizador sem privilégios, Pango para o PDF | `entrypoint.sh` corre `alembic upgrade head`, o seed idempotente de `data/processed` (que vai dentro da imagem) e o `uvicorn` com 2 processos por omissão (`WEB_CONCURRENCY`) |
 | `db` | `postgres:17-alpine`, volume `pgdata` | Healthcheck com `pg_isready` |
+| `osrm` | `apps/osrm/Dockerfile`: descarrega o OpenStreetMap de Portugal (Geofabrik), recorta Guimarães e prepara o grafo no build | ~340 MB, ~60 MB de RAM (`mem_limit` 384 MB). O build precisa de rede para o Geofabrik e leva uns minutos na primeira vez. A API não depende dele: se parar, estima os km em linha reta. Ver [Rotas por estrada](rotas-reais.md) |
 
 O Coolify gera `SERVICE_PASSWORD_POSTGRES` e `SERVICE_PASSWORD_64_SECRETKEY`. As imagens podem testar-se localmente com `just build`.
 

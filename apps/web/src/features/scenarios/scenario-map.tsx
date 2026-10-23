@@ -43,7 +43,11 @@ function routeGeoJson(routes: RouteOut[], shades: readonly string[]) {
     type: 'FeatureCollection' as const,
     features: routes.map((r, i) => ({
       type: 'Feature' as const,
-      properties: { vehicle: r.vehicle, color: shades[i % shades.length] },
+      properties: {
+        vehicle: r.vehicle,
+        color: shades[i % shades.length],
+        road: r.road_path === true,
+      },
       geometry: {
         type: 'LineString' as const,
         coordinates: r.path.map(([lat, lon]) => [lon as number, lat as number]),
@@ -128,6 +132,8 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
     () => routeGeoJson(result.routes, ROUTE_SHADES[tone]),
     [result.routes, tone],
   );
+  const hasRoadRoutes = result.routes.some((r) => r.road_path === true);
+  const hasStraightRoutes = result.routes.some((r) => r.road_path !== true);
   const siteLayers = useMemo(
     () => (siting ? sitesGeoJson(result.sites ?? [], siting.radius_m) : null),
     [siting, result.sites],
@@ -209,7 +215,15 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
             <Layer
               id="routes-line"
               type="line"
+              filter={['==', ['get', 'road'], true]}
               layout={{ 'line-cap': 'round', 'line-join': 'round' }}
+              paint={{ 'line-color': ['get', 'color'], 'line-width': 2.5 }}
+            />
+            <Layer
+              id="routes-line-straight"
+              type="line"
+              filter={['!=', ['get', 'road'], true]}
+              layout={{ 'line-join': 'round' }}
               paint={{
                 'line-color': ['get', 'color'],
                 'line-width': 2.5,
@@ -390,6 +404,30 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                   {m.site_map_pap()}
                 </li>
               )}
+              {showRoutes && (
+                <>
+                  {hasRoadRoutes && (
+                    <li className="flex items-center gap-2">
+                      <span
+                        className="h-0 w-4 shrink-0 border-t-2"
+                        style={{ borderColor: ink }}
+                        aria-hidden="true"
+                      />
+                      {m.route_legend_road()}
+                    </li>
+                  )}
+                  {hasStraightRoutes && result.routes.length > 0 && (
+                    <li className="flex items-center gap-2">
+                      <span
+                        className="h-0 w-4 shrink-0 border-t-2 border-dashed"
+                        style={{ borderColor: ink }}
+                        aria-hidden="true"
+                      />
+                      {m.route_legend_straight()}
+                    </li>
+                  )}
+                </>
+              )}
             </>
           ) : (
             <>
@@ -424,6 +462,30 @@ export function ScenarioMap({ zones, result, showRoutes, className }: ScenarioMa
                   />
                   {m.site_map_pap()}
                 </li>
+              )}
+              {showRoutes && (
+                <>
+                  {hasRoadRoutes && (
+                    <li className="flex items-center gap-2">
+                      <span
+                        className="h-0 w-4 shrink-0 border-t-2"
+                        style={{ borderColor: ink }}
+                        aria-hidden="true"
+                      />
+                      {m.route_legend_road()}
+                    </li>
+                  )}
+                  {hasStraightRoutes && result.routes.length > 0 && (
+                    <li className="flex items-center gap-2">
+                      <span
+                        className="h-0 w-4 shrink-0 border-t-2 border-dashed"
+                        style={{ borderColor: ink }}
+                        aria-hidden="true"
+                      />
+                      {m.route_legend_straight()}
+                    </li>
+                  )}
+                </>
               )}
             </>
           )}

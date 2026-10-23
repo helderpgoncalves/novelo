@@ -19,6 +19,18 @@ services:
       timeout: 5s
       retries: 10
 
+  # Rotas por estrada (OpenStreetMap). A primeira construção descarrega ~300 MB e demora uns minutos; depois fica em cache.
+  osrm:
+    build: ./apps/osrm
+    ports:
+      - "${OSRM_HOST_PORT:-5190}:5000"
+    healthcheck:
+      test: ["CMD", "bash", "-c", 'exec 3<>/dev/tcp/127.0.0.1/5000 && printf "GET /route/v1/driving/-8.3187,41.4592;-8.2918,41.4425?overview=false HTTP/1.0\r\n\r\n" >&3 && read -r line <&3 && [[ $$line == *200* ]]']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
   api:
     build:
       context: ./apps/api
@@ -37,6 +49,7 @@ services:
       APP_URL: http://localhost:${WEB_PORT:-3190}
       CORS_ORIGINS: '["http://localhost:${WEB_PORT:-3190}"]'
       WATCHFILES_FORCE_POLLING: "true"  # file watching fiável em bind mounts
+      OSRM_URL: http://osrm:5000  # dentro do Docker; fora dele (`just api`) o `justfile` aponta para localhost:5190
     depends_on:
       db:
         condition: service_healthy

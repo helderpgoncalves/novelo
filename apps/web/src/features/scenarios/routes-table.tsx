@@ -4,6 +4,7 @@ import { ModeBadge } from '@/components/mode-badge';
 import { formatNumber, formatTonnes } from '@/lib/format';
 import { modeLabel } from '@/lib/scenario';
 import { m } from '@/paraglide/messages';
+import { formatDuration, isRoadRoute } from './routing';
 
 const stopNames = (r: RouteOut) => r.stops.map((s) => s.label ?? s.parish_name);
 
@@ -59,6 +60,31 @@ export function RoutesTable({ routes }: { routes: RouteOut[] }) {
       value: (r) => r.km,
       searchable: false,
       cell: (r) => `${formatNumber(r.km, 1)} km`,
+    },
+    {
+      id: 'duration',
+      aggregate: 'sum',
+      format: (n) => formatDuration(n),
+      header: m.route_duration(),
+      align: 'right',
+      value: (r) => r.duration_min ?? null,
+      exportValue: (r) => r.duration_min ?? '',
+      searchable: false,
+      cell: (r) => (
+        <span title={m.route_duration_hint()} className="tabular-nums">
+          {formatDuration(r.duration_min)}
+        </span>
+      ),
+    },
+    {
+      id: 'source',
+      header: m.route_source(),
+      badge: true,
+      value: (r) => (isRoadRoute(r) ? 'road' : 'estimate'),
+      filter: {
+        format: (v) => (v === 'road' ? m.route_source_road() : m.route_source_estimate()),
+      },
+      cell: (r) => (isRoadRoute(r) ? m.route_source_road() : `${m.route_source_estimate()}`),
     },
   ];
   return (

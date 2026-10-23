@@ -94,9 +94,27 @@ services:
       - SOLVER_RUNS_PER_MINUTE=${SOLVER_RUNS_PER_MINUTE:-6}
       - SOLVER_MAX_CONCURRENCY=${SOLVER_MAX_CONCURRENCY:-2}
       - SOLVER_TIME_LIMIT_S=${SOLVER_TIME_LIMIT_S:-20}
+      # Rotas por estrada (OSRM próprio, serviço `osrm`). Vazio = estimativa em linha reta. Ver docs/engenharia/rotas-reais.md.
+      - OSRM_URL=${OSRM_URL:-http://osrm:5000}
     depends_on:
       db:
         condition: service_healthy
+    restart: unless-stopped
+
+  # Rotas por estrada: OpenStreetMap de Guimarães e arredores, grafo preparado no build (apps/osrm/Dockerfile).
+  # Sem custos nem chaves. Se parar, a API continua e passa a estimar os km (linha reta x desvio).
+  osrm:
+    build:
+      context: apps/osrm
+    mem_limit: 384m
+    cpus: 1
+    pids_limit: 128
+    healthcheck:
+      test: ["CMD", "bash", "-c", 'exec 3<>/dev/tcp/127.0.0.1/5000 && printf "GET /route/v1/driving/-8.3187,41.4592;-8.2918,41.4425?overview=false HTTP/1.0\r\n\r\n" >&3 && read -r line <&3 && [[ $$line == *200* ]]']
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
     restart: unless-stopped
 
   db:
