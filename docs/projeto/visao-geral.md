@@ -136,7 +136,7 @@ Testado com o modelo real: a *"E se o orçamento fosse 80 000 € por ano?"*, o 
 
 ### Operar: do saco ao lote, com passaporte
 
-- **Controlo de qualidade na entrega:** uma foto da peça e outra da etiqueta sugerem o tipo, o estado, a fibra e a marca; o operador confirma ou corrige. As fotos não são guardadas.
+- **Controlo de qualidade na entrega:** uma foto da peça e outra da etiqueta sugerem o tipo, o estado, a fibra e a marca; o operador confirma ou corrige. A triagem não guarda as fotos. Desde 23 out 2026, o operador pode guardar uma miniatura opcional por peça (sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser). Ver [Privacidade das fotografias](../engenharia/privacidade-fotografias.md).
 - **Lote com QR e passaporte público:** origem, composição, peso e histórico, lidos com o telemóvel por quem recebe. São quase os campos que a diretiva vai pedir por fardo exportado (art. 22.º-D, n.º 9).
 - **Bolsa de fibra** para os recicladores do Vale do Ave, para o que não se pode reutilizar.
 

@@ -64,6 +64,11 @@ class LotItemOut(BaseModel):
     estimated_weight_g: int
     confidence: float
     created_at: datetime
+    has_photo: bool = Field(default=False, description="Tem miniatura guardada e ainda não expirada")
+    photo_url: str | None = Field(
+        default=None, description="URL relativa (autenticada) da miniatura; nula sem foto ou depois de expirar"
+    )
+    photo_credit: str | None = Field(default=None, description="Atribuição da licença da foto (se for de terceiros)")
 
 
 class LotOpen(BaseModel):
@@ -109,6 +114,16 @@ class BrandCount(BaseModel):
     items: int
 
 
+class PassportPhoto(BaseModel):
+    """Miniatura pública de uma peça (sem metadados; apagada ao fim da retenção)."""
+
+    item_id: uuid.UUID
+    garment_type: GarmentType
+    brand: str | None
+    url: str = Field(description="URL relativa da rota pública da imagem (JPEG)")
+    credit: str | None = Field(default=None, description="Atribuição da licença da foto (se for de terceiros)")
+
+
 class Passport(BaseModel):
     """Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais."""
 
@@ -125,6 +140,7 @@ class Passport(BaseModel):
     brands: list[BrandCount]
     events: list[LotEventOut]
     opened_at: datetime
+    photos: list[PassportPhoto] = Field(default_factory=list, description="Até 12 miniaturas não expiradas")
 
 
 class LotStateChange(BaseModel):

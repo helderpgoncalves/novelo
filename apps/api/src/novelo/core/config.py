@@ -185,6 +185,10 @@ class Settings(BaseSettings):
     osrm_cooldown_s: float = Field(30.0, ge=0, alias="OSRM_COOLDOWN_S")  # pausa depois de uma falha do OSRM
     solver_time_limit_s: int = Field(20, alias="SOLVER_TIME_LIMIT_S")
 
+    # Miniatura opcional por peça de lote (RGPD: minimização no tempo e no tamanho). Ver features/lots/photos.py.
+    lot_photo_retention_days: int = Field(90, ge=1, le=365, alias="LOT_PHOTO_RETENTION_DAYS")
+    lot_photo_max_bytes: int = Field(153_600, ge=20_000, le=1_000_000, alias="LOT_PHOTO_MAX_BYTES")  # já processada
+
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> "Settings":
         if self.environment == "production" and (self.secret_key.startswith("dev-only") or len(self.secret_key) < 32):

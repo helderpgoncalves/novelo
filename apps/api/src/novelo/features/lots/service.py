@@ -15,7 +15,7 @@ from sqlalchemy.orm import load_only, selectinload
 from novelo.core.config import get_settings
 from novelo.core.errors import ConflictError, NotFoundError
 from novelo.domain.vocab import Fibre, LotEventKind, LotState, TextileDestination
-from novelo.features.lots.models import Lot, LotEvent, LotItem, LotReservation
+from novelo.features.lots.models import Lot, LotEvent, LotItem, LotItemPhoto, LotReservation
 from novelo.features.lots.schemas import (
     BrandCount,
     BrandsOut,
@@ -29,6 +29,7 @@ from novelo.features.lots.schemas import (
     MarketEntry,
     MarketLot,
     Passport,
+    PassportPhoto,
     ReservationOut,
     ReserveRequest,
 )
@@ -93,7 +94,18 @@ def aggregate_composition(items: list[LotItem]) -> list[CompositionPart]:
     return sorted(parts, key=lambda p: -p.pct)
 
 
-def _item_out(i: LotItem) -> LotItemOut:
+API_PREFIX = "/api/v1"  # igual a `main.API_PREFIX` (um teste confirma; importar o main daria um ciclo)
+PASSPORT_MAX_PHOTOS = 12
+
+
+def photo_url(code: str, item_id: uuid.UUID, *, public: bool = False) -> str:
+    """URL relativa da imagem de uma peça: autenticada por omissão, pública para o passaporte."""
+    prefix = f"{API_PREFIX}/public" if public else API_PREFIX
+    return f"{prefix}/lots/{code}/items/{item_id}/photo"
+
+
+def _item_out(i: LotItem, code: str, with_photo: dict[uuid.UUID, str | None] | None = None) -> LotItemOut:
+    has_photo = i.id in with_photo if with_photo else False
     return LotItemOut(
         id=i.id,
         garment_type=i.garment_type,
@@ -104,7 +116,20 @@ def _item_out(i: LotItem) -> LotItemOut:
         estimated_weight_g=i.estimated_weight_g,
         confidence=float(i.confidence),
         created_at=i.created_at,
+        has_photo=has_photo,
+        photo_url=photo_url(code, i.id) if has_photo else None,
+        photo_credit=with_photo[i.id] if with_photo and has_photo else None,
     )
+
+
+async def _photo_item_ids(db: AsyncSession, lot_id: uuid.UUID) -> dict[uuid.UUID, str | None]:
+    """Peças do lote com miniatura por expirar (e o crédito). Nunca lê os bytes."""
+    rows = await db.execute(
+        select(LotItemPhoto.item_id, LotItemPhoto.credit)
+        .join(LotItem, LotItem.id == LotItemPhoto.item_id)
+        .where(LotItem.lot_id == lot_id, LotItemPhoto.expires_at > datetime.now(UTC))
+    )
+    return {iid: credit for iid, credit in rows.all()}
 
 
 async def _load(db: AsyncSession, code: str) -> Lot:
@@ -181,7 +206,7 @@ async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> 
     lot.dominant_fibre = dominant_fibre(aggregate_composition(lot.items))
     _event(lot, LotEventKind.ITEM_ADDED, user)
     await db.commit()
-    return _item_out(item)
+    return _item_out(item, lot.code)
 
 
 async def list_lots(
@@ -225,13 +250,16 @@ async def get_lot(db: AsyncSession, code: str) -> LotDetail:
     lot = await _load(db, code)
     parishes = await _parish_names(db)
     kg = _destination_kg(lot)
+    with_photo = await _photo_item_ids(db, lot.id)
     return LotDetail(
         **_summary(lot, parishes).model_dump(),
         composition=aggregate_composition(lot.items),
         reuse_kg=round(kg[TextileDestination.REUSE], 3),
         recycle_kg=round(kg[TextileDestination.RECYCLE], 3),
         reject_kg=round(kg[TextileDestination.REJECT], 3),
-        item_list=[_item_out(i) for i in sorted(lot.items, key=lambda i: i.created_at, reverse=True)],
+        item_list=[
+            _item_out(i, lot.code, with_photo) for i in sorted(lot.items, key=lambda i: i.created_at, reverse=True)
+        ],
         events=[LotEventOut(kind=e.kind, occurred_at=e.occurred_at, note=e.note) for e in lot.events],
         reservation=ReservationOut(
             recycler_name=lot.reservation.recycler_name,
@@ -251,6 +279,15 @@ async def passport(db: AsyncSession, code: str) -> Passport:
     kg = _destination_kg(lot)
     total = sum(kg.values()) or 1.0
     brands = Counter(i.brand for i in lot.items if i.brand)
+    photos = (
+        await db.execute(
+            select(LotItem.id, LotItem.garment_type, LotItem.brand, LotItemPhoto.credit)
+            .join(LotItemPhoto, LotItemPhoto.item_id == LotItem.id)
+            .where(LotItem.lot_id == lot.id, LotItemPhoto.expires_at > datetime.now(UTC))
+            .order_by(LotItemPhoto.created_at, LotItemPhoto.id)
+            .limit(PASSPORT_MAX_PHOTOS)
+        )
+    ).all()
     return Passport(
         code=lot.code,
         state=lot.state,
@@ -265,6 +302,12 @@ async def passport(db: AsyncSession, code: str) -> Passport:
         brands=[BrandCount(brand=b, items=n) for b, n in brands.most_common(8)],
         events=[LotEventOut(kind=e.kind, occurred_at=e.occurred_at, note=None) for e in lot.events],
         opened_at=lot.created_at,
+        photos=[
+            PassportPhoto(
+                item_id=iid, garment_type=gt, brand=brand, url=photo_url(lot.code, iid, public=True), credit=credit
+            )
+            for iid, gt, brand, credit in photos
+        ],
     )
 
 

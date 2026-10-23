@@ -24,6 +24,7 @@ const MESSAGES: Record<ErrorCode, () => string> = {
   email_taken: () => m.error_email_taken(),
   cannot_modify_self: () => m.error_cannot_modify_self(),
   conflict: () => m.error_conflict(),
+  consent_required: () => m.error_consent_required(),
   account_pending: () => m.error_account_pending(),
   account_rejected: () => m.error_account_rejected(),
   invitation_pending: () => m.error_invitation_pending(),

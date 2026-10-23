@@ -187,6 +187,7 @@ login_account_limiter = RateLimiter(limit=10, window_s=900, name="login-account"
 # Rotas caras: execuções por utilizador (a chave inclui o id; o limite real vem da configuração).
 solver_user_limiter = RateLimiter(limit=6, window_s=60, name="solver")
 pdf_user_limiter = RateLimiter(limit=6, window_s=60, name="pdf")
+lot_photo_limiter = RateLimiter(limit=30, window_s=60, name="lot-photo")  # carregar/apagar miniaturas, por IP
 passport_limiter = RateLimiter(limit=60, window_s=60, name="passport")  # passaporte público do lote, por IP
 
 # Email: webhook do Resend (por IP), alertas e ferramentas de administração, reenvios do próprio utilizador.

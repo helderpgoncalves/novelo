@@ -94,6 +94,9 @@ services:
       - SOLVER_RUNS_PER_MINUTE=${SOLVER_RUNS_PER_MINUTE:-6}
       - SOLVER_MAX_CONCURRENCY=${SOLVER_MAX_CONCURRENCY:-2}
       - SOLVER_TIME_LIMIT_S=${SOLVER_TIME_LIMIT_S:-20}
+      # Miniaturas das peças de lote (RGPD): dias até ao apagamento automático e tamanho máximo depois de processada.
+      - LOT_PHOTO_RETENTION_DAYS=${LOT_PHOTO_RETENTION_DAYS:-90}
+      - LOT_PHOTO_MAX_BYTES=${LOT_PHOTO_MAX_BYTES:-153600}
       # Rotas por estrada (OSRM próprio, serviço `osrm`). Vazio = estimativa em linha reta. Ver docs/engenharia/rotas-reais.md.
       - OSRM_URL=${OSRM_URL:-http://osrm:5000}
     depends_on:

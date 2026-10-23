@@ -58,7 +58,7 @@ async def test_full_turn_emits_typed_events_and_persists_the_thread(logged_in: h
         kinds.index("tool_start") < kinds.index("tool_result") < kinds.index("text_delta") < kinds.index("verification")
     )
     start = events[0]
-    assert start["model"] == "fake/model" and start["prompt_version"] == "v4"
+    assert start["model"] == "fake/model" and start["prompt_version"] == "v5"
     status = [e for e in events if e["type"] == "status"]
     assert {"thinking", "tool", "writing", "verifying"} <= {e["phase"] for e in status}
     assert any(e["label_key"] == "status.reading_baseline" for e in status)

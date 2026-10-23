@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, Numeric, String, Text
+from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, LargeBinary, Numeric, String, Text, func
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -46,7 +46,7 @@ class Lot(Base, UuidPkMixin, TimestampMixin):
 
 
 class LotItem(Base, UuidPkMixin, TimestampMixin):
-    """Uma peça triada. Guarda marca, composição e estado; a fotografia nunca é guardada."""
+    """Uma peça triada. Guarda marca, composição e estado. A miniatura opcional vive à parte (`LotItemPhoto`)."""
 
     __tablename__ = "lot_items"
     __table_args__ = (
@@ -71,6 +71,32 @@ class LotItem(Base, UuidPkMixin, TimestampMixin):
     )
 
     lot: Mapped[Lot] = relationship(back_populates="items")
+
+
+class LotItemPhoto(Base, UuidPkMixin):
+    """Miniatura opcional de uma peça (RGPD: sem metadados, JPEG pequeno, apagada ao fim de `expires_at`).
+
+    Tabela à parte para que nenhuma listagem carregue os bytes: `content` é diferida e só se lê com uma consulta
+    explícita. Substituir a foto cria uma linha nova (novo `id`, logo novo ETag) depois de apagar a anterior.
+    """
+
+    __tablename__ = "lot_item_photos"
+
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("lot_items.id", ondelete="CASCADE"), unique=True
+    )
+    content: Mapped[bytes] = mapped_column(LargeBinary, deferred=True)
+    mime: Mapped[str] = mapped_column(String(20), default="image/jpeg", server_default="image/jpeg")
+    width: Mapped[int] = mapped_column(Integer)
+    height: Mapped[int] = mapped_column(Integer)
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    credit: Mapped[str | None] = mapped_column(String(240))  # atribuição de licença quando a foto é de terceiros
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+    created_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+    expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    consent_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
 
 
 class LotEvent(Base, UuidPkMixin):

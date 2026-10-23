@@ -173,7 +173,7 @@ CANNED = {
     "pt-PT": {
         "default": "A captura é a fração do têxtil gerado que chega, de facto, a um ponto de recolha.",
         "analyst": "Captura = têxtil recolhido ÷ têxtil gerado. É um rácio: convém sempre indicar a fonte e a incerteza.",
-        "mentor": "Pensa assim: de todo o têxtil que as pessoas deitam fora, a captura diz que parte acaba num contentor certo.",
+        "mentor": "Pensa assim: de todo o têxtil que as pessoas deitam fora, a captura diz que parte acaba recolhida em vez de ir para o lixo.",
         "executive": "Captura é a parte do têxtil que a rede apanha. Quanto maior, menos vai para o lixo indiferenciado.",
         "storyteller": "Imagina uma camisola esquecida no armário: a captura conta quantas, em vez do lixo, ganham uma segunda vida.",
         "custom": "A captura é a parte do têxtil gerado que chega a um ponto de recolha.",
@@ -181,7 +181,7 @@ CANNED = {
     "en": {
         "default": "Capture is the share of generated textile that actually reaches a collection point.",
         "analyst": "Capture = textile collected / textile generated. It is a ratio: always state the source and the uncertainty.",
-        "mentor": "Think of it this way: of all the textile people discard, capture tells you how much ends up in the right bin.",
+        "mentor": "Think of it this way: of all the textile people discard, capture tells you how much gets collected instead of going to the bin.",
         "executive": "Capture is the share of textile the network catches. Higher means less in general waste.",
         "storyteller": "Picture a forgotten jumper in a wardrobe: capture counts how many get a second life instead of the bin.",
         "custom": "Capture is the share of generated textile that reaches a collection point.",
@@ -202,8 +202,8 @@ async def preview_persona(llm: OpenRouterClient, body: PersonaPreviewIn) -> Pers
                 f"The custom persona was refused: {security.EXPLANATION[exc.reason]}"
             ) from exc
     system = persona.render(settings) + (
-        "\n\nContext: Novelo plans textile collection in Guimarães WITHOUT textile containers (existing places with people"
-        " and on-demand pickup on the circuits that already run). Answer the user's sample in at most 2 sentences."
+        "\n\nContext: Novelo plans textile collection in Guimarães WITHOUT textile containers (one new dedicated vehicle without"
+        " compaction: closed bags at the door and stops at existing places). Answer the user's sample in at most 2 sentences."
         " Do not use any number."
     )
     fallback = CANNED[body.language].get(persona.effective_key(settings), CANNED[body.language]["default"])

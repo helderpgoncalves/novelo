@@ -7,7 +7,7 @@ cases:
   - id: data_baseline_pt
     lang: pt-PT
     turns: [{message: "Quanto têxtil recolhemos em 2025 e qual é a captura atual?"}]
-    expect: {tools_any: [get_baseline], must_contain_any: ["301", "22,9"]}
+    expect: {tools_any: [get_baseline], must_contain_any: ["301", "9,1"], must_not_contain: ["22,9", "11,5"]}
   - id: data_baseline_en
     lang: en
     turns: [{message: "How many tonnes of textile were collected in 2025, and how much went to reuse?"}]
@@ -46,7 +46,7 @@ cases:
     expect: {tools_any: [get_brands]}
   - id: data_assumption_pt
     lang: pt-PT
-    turns: [{message: "De onde vem a taxa de captura da recolha em rua?"}]
+    turns: [{message: "De onde vem a taxa de captura da recolha a pedido?"}]
     expect: {tools_any: [explain_assumption]}
   - id: data_search_parish_pt
     lang: pt-PT
@@ -84,10 +84,10 @@ cases:
       - message: "E se o orçamento deste cenário fosse de 80 000 € por ano?"
         page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
     expect: {tools_any: [what_if, run_scenario]}
-  - id: coverage_pt
+  - id: coverage_no_textile_containers_pt
     lang: pt-PT
-    turns: [{message: "Qual é a cobertura da rede de contentores?"}]
-    expect: {tools_any: [get_container_coverage]}
+    turns: [{message: "Qual é a cobertura da rede de contentores de têxteis?"}]
+    expect: {must_contain_any: ["não (há|existe|existem|tem|temos)|nenhum|sem contentores"], must_not_contain: ["\\d+(,\\d+)? ?% (da população )?(está )?(coberta|servida)"], max_chars: 700}
   - id: sensitivity_en
     lang: en
     turns:
@@ -131,7 +131,7 @@ cases:
   - id: muni_site_mention_en
     lang: en
     turns:
-      - message: "Could this site host a textile bin, and what is around it?"
+      - message: "Could this site host a textile collection stop, and what is around it?"
         mentions: [{type: municipal_site, id: "S2410a486"}]
     expect: {max_chars: 700, must_not_contain: ["recommend (it|this) (strongly|definitely)"]}
   - id: muni_sites_filter_pt
@@ -140,11 +140,11 @@ cases:
     expect: {tools_any: [find_municipal_sites], max_chars: 800}
   - id: muni_candidates_pt
     lang: pt-PT
-    turns: [{message: "Quais são os locais possíveis para pôr contentores de têxteis aproveitando a rede municipal?"}]
+    turns: [{message: "Quais são os locais possíveis para paragens de recolha de têxteis aproveitando a rede municipal?"}]
     expect: {tools_any: [get_textile_candidates], must_contain_any: ["possíve|candidat"], max_chars: 900}
   - id: muni_candidates_en
     lang: en
-    turns: [{message: "Which municipal sites could host textile bins in Lordelo?"}]
+    turns: [{message: "Which municipal sites could host a textile collection stop in Lordelo?"}]
     expect: {tools_any: [get_textile_candidates, find_municipal_sites]}
   - id: muni_gap_ranking_pt
     lang: pt-PT

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Link } from '@tanstack/react-router';
-import { PackagePlus, ScanLine } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { ImageOff, PackagePlus, ScanLine } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import type { LotItemIn, LotSummary, ZoneOut } from '@/client';
 import {
@@ -25,9 +25,17 @@ import {
 } from '@/components/ui/select';
 import { WorkingState } from '@/components/working-state';
 import { FormAlert } from '@/features/auth/form-alert';
+import { uploadVars, useUploadItemPhoto } from '@/features/lots/photo-actions';
 import { getErrorCode, getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
+import {
+  NO_PHOTO_CHOICE,
+  type PhotoChoice,
+  type PhotoRequest,
+  photoErrorMessage,
+  photoRequestFrom,
+} from '@/lib/lot-photos';
 import { m } from '@/paraglide/messages';
 import { PhotoInput, PhotoThumbs } from './photo-input';
 import { ReviewForm } from './review-form';
@@ -45,6 +53,13 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
   const [itemPhoto, setItemPhoto] = useState<File | null>(null);
   const [labelPhoto, setLabelPhoto] = useState<File | null>(null);
   const [added, setAdded] = useState(0);
+  // A peça já está no lote mas a foto não seguiu: guardamo-la aqui para «Tentar guardar a foto outra vez».
+  const [failedPhoto, setFailedPhoto] = useState<{
+    code: string;
+    itemId: string;
+    request: PhotoRequest;
+    message: string;
+  } | null>(null);
 
   const lot = openLots.find((l) => l.code === lotCode);
   const refresh = () =>
@@ -65,6 +80,17 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
     onError: (error) => toast.error(getErrorMessage(error)),
   });
   const review = useRef<HTMLDivElement>(null);
+  const photoAlert = useRef<HTMLDivElement>(null);
+  // O botão «Acrescentar ao lote» fica no fundo: se a foto falhar, o aviso (no topo) tem de aparecer à vista.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: só quando surge uma falha nova
+  useEffect(() => {
+    if (!failedPhoto) return;
+    const el = photoAlert.current;
+    const scroller = el?.closest('main');
+    if (!el || !scroller) return;
+    const offset = el.getBoundingClientRect().top - scroller.getBoundingClientRect().top;
+    scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + offset - 16) });
+  }, [failedPhoto?.itemId, failedPhoto?.message]);
   const analyse = useMutation({
     ...analyseGarmentMutation(),
     // No telemóvel o botão «Analisar» fica no fundo: a confirmação abre no topo, com as fotos à vista.
@@ -78,15 +104,30 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
         scroller.scrollTo({ top: Math.max(0, scroller.scrollTop + offset - 16) });
       }),
   });
+  const pendingChoice = useRef<PhotoChoice>(NO_PHOTO_CHOICE);
+  const uploadPhoto = useUploadItemPhoto(lotCode ?? '');
+  const savePhoto = (code: string, itemId: string, request: PhotoRequest) =>
+    uploadPhoto.mutate(uploadVars(code, itemId, request), {
+      onSuccess: () => {
+        setFailedPhoto(null);
+        toast.success(m.lotphoto_saved());
+      },
+      onError: (error) =>
+        setFailedPhoto({ code, itemId, request, message: photoErrorMessage(error) }),
+    });
   const confirm = useMutation({
     ...addLotItemMutation(),
-    onSuccess: async () => {
+    onSuccess: async (created, vars) => {
       setAdded((n) => n + 1);
+      const request = photoRequestFrom(pendingChoice.current, itemPhoto);
       setItemPhoto(null);
       setLabelPhoto(null);
       analyse.reset();
+      setFailedPhoto(null);
       await refresh();
       toast.success(m.triage_item_added());
+      // A foto só segue depois de a peça estar no lote; se falhar, a peça fica e o erro é recuperável.
+      if (request) savePhoto(vars.path.code, created.id, request);
     },
     onError: (error) => toast.error(getErrorMessage(error)),
   });
@@ -191,6 +232,43 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
             <AlertDescription>{m.triage_ai_off_text()}</AlertDescription>
           </Alert>
         )}
+        {(failedPhoto || uploadPhoto.isPending) && (
+          <Alert
+            ref={photoAlert}
+            variant={failedPhoto ? 'destructive' : 'default'}
+            role={failedPhoto ? 'alert' : 'status'}
+          >
+            <ImageOff className="size-4" />
+            <AlertTitle className="line-clamp-none">
+              {failedPhoto ? m.lotphoto_failed_title() : m.lotphoto_saving()}
+            </AlertTitle>
+            {failedPhoto && (
+              <AlertDescription className="space-y-3">
+                <p>{failedPhoto.message}</p>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    className="h-11"
+                    loading={uploadPhoto.isPending}
+                    onClick={() =>
+                      savePhoto(failedPhoto.code, failedPhoto.itemId, failedPhoto.request)
+                    }
+                  >
+                    {m.lotphoto_retry()}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 text-foreground"
+                    onClick={() => setFailedPhoto(null)}
+                  >
+                    {m.lotphoto_skip()}
+                  </Button>
+                </div>
+              </AlertDescription>
+            )}
+          </Alert>
+        )}
         <FormAlert message={analyse.isError && !aiOff ? getErrorMessage(analyse.error) : null} />
 
         {analyse.data ? (
@@ -211,9 +289,10 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
                   setItemPhoto(null);
                   setLabelPhoto(null);
                 }}
-                onConfirm={(item: LotItemIn) =>
-                  confirm.mutate({ path: { code: lot.code }, body: item })
-                }
+                onConfirm={(item: LotItemIn, photo) => {
+                  pendingChoice.current = photo;
+                  confirm.mutate({ path: { code: lot.code }, body: item });
+                }}
               />
             </div>
           </Panel>

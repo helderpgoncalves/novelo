@@ -399,6 +399,15 @@ export const zBodyUploadCopilotAttachments = z.object({
 });
 
 /**
+ * Body_upload_item_photo
+ */
+export const zBodyUploadItemPhoto = z.object({
+    confirm_no_people: z.boolean().optional().default(false),
+    credit: z.string().max(240).nullish(),
+    photo: z.string()
+});
+
+/**
  * BrandCount
  */
 export const zBrandCount = z.object({
@@ -785,6 +794,7 @@ export const zCopilotErrorEvent = z.object({
         'email_taken',
         'cannot_modify_self',
         'conflict',
+        'consent_required',
         'account_pending',
         'account_rejected',
         'invitation_pending',
@@ -1371,6 +1381,7 @@ export const zErrorBody = z.object({
         'email_taken',
         'cannot_modify_self',
         'conflict',
+        'consent_required',
         'account_pending',
         'account_rejected',
         'invitation_pending',
@@ -2849,6 +2860,19 @@ export const zParishMatchLevel = z.enum([
 ]);
 
 /**
+ * PassportPhoto
+ *
+ * Miniatura pública de uma peça (sem metadados; apagada ao fim da retenção).
+ */
+export const zPassportPhoto = z.object({
+    brand: z.string().nullable(),
+    credit: z.string().nullish(),
+    garment_type: zGarmentType,
+    item_id: z.uuid(),
+    url: z.string()
+});
+
+/**
  * Passport
  *
  * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
@@ -2862,6 +2886,7 @@ export const zPassport = z.object({
     items: z.int(),
     opened_at: z.iso.datetime(),
     parish_name: z.string().nullable(),
+    photos: z.array(zPassportPhoto).optional(),
     recycle_pct: z.number(),
     reject_pct: z.number(),
     reuse_pct: z.number(),
@@ -4420,7 +4445,10 @@ export const zLotItemOut = z.object({
     dominant_fibre: zFibre,
     estimated_weight_g: z.int(),
     garment_type: zGarmentType,
-    id: z.uuid()
+    has_photo: z.boolean().optional().default(false),
+    id: z.uuid(),
+    photo_credit: z.string().nullish(),
+    photo_url: z.string().nullish()
 });
 
 /**
@@ -6361,6 +6389,33 @@ export const zAddLotItemPath = z.object({
  */
 export const zAddLotItemResponse = zLotItemOut;
 
+export const zDeleteItemPhotoPath = z.object({
+    code: z.string(),
+    item_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteItemPhotoResponse = z.void();
+
+export const zGetItemPhotoPath = z.object({
+    code: z.string(),
+    item_id: z.uuid()
+});
+
+export const zUploadItemPhotoBody = zBodyUploadItemPhoto;
+
+export const zUploadItemPhotoPath = z.object({
+    code: z.string(),
+    item_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUploadItemPhotoResponse = z.void();
+
 export const zChangeLotStateBody = zLotStateChange;
 
 export const zChangeLotStatePath = z.object({
@@ -6779,6 +6834,11 @@ export const zGetPassportPath = z.object({
  * Successful Response
  */
 export const zGetPassportResponse = zPassport;
+
+export const zGetPublicItemPhotoPath = z.object({
+    code: z.string(),
+    item_id: z.uuid()
+});
 
 export const zGetLotQrPath = z.object({
     code: z.string()

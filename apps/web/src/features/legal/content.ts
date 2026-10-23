@@ -31,7 +31,7 @@ export const GOOGLE_POLICY_URL =
 
 const privacyPt: LegalDoc = {
   title: 'Política de Privacidade',
-  updated: 'Última atualização: 20 de outubro de 2026',
+  updated: 'Última atualização: 23 de outubro de 2026',
   intro:
     'O Novelo é a ferramenta de decisão que desenha a rede de recolha seletiva de têxteis de Guimarães ao menor custo (Desafio 5 TexVitrus, Hack4Guimarães 2035). Esta política explica que dados pessoais tratamos, porquê, durante quanto tempo, com quem os partilhamos e como exerces os teus direitos. Pedimos o mínimo para te dar acesso.',
   sections: [
@@ -55,7 +55,7 @@ const privacyPt: LegalDoc = {
         'Consentimento: a data e a versão do texto que aceitaste, quando aplicável.',
         'Segurança e auditoria: endereço IP e identificação do browser (user-agent) associados a ações sensíveis (entrar, convites, aprovações, alterações de permissões), e contadores de pedidos para travar abusos e limitar o uso da IA por pessoa.',
         'Copiloto: as mensagens que escreves, os ficheiros que anexas (guardamos só o texto extraído; o ficheiro é descartado), as ações que o copiloto propõe e as que confirmas, e as notas de memória que tu próprio vês, editas e apagas.',
-        'Triagem por foto: as fotografias são analisadas e apagadas. Só ficam a marca, a composição, o estado e o peso da peça, nunca dados de quem a entregou.',
+        'Triagem por foto: a fotografia é enviada para análise e não é guardada pela triagem. Ficam só a marca, a composição, o estado e o peso da peça, nunca dados de quem a entregou. Só se o operador escolher, guarda-se uma miniatura da peça no lote (secção 11).',
         'Preferências neste dispositivo (armazenamento local do browser): tema claro ou escuro, idioma e o último email usado no formulário de entrada.',
       ],
     },
@@ -88,7 +88,7 @@ const privacyPt: LegalDoc = {
         'Conta e dados Google: enquanto a conta existir. Eliminamos a conta e os dados associados quando o pedires, no prazo máximo de 30 dias.',
         'Histórico do copiloto e memória: tu escolhes o prazo (30, 90 ou 365 dias) ou apagas tudo quando quiseres; o sistema pode impor um máximo.',
         'Registos de auditoria e segurança (IP, user-agent): o tempo necessário para a segurança do serviço e para demonstrar o cumprimento de pedidos, e eliminados ou anonimizados a pedido quando a lei o permita.',
-        'Fotografias da triagem: apagadas depois de analisadas.',
+        'Fotografias da triagem: não são guardadas pela análise. As miniaturas opcionais das peças seguem a secção 11 (90 dias por omissão).',
         'Cópias de segurança da base de dados: seguem o ciclo de rotação do servidor; os dados eliminados desaparecem delas quando as cópias rodam.',
       ],
     },
@@ -140,8 +140,26 @@ const privacyPt: LegalDoc = {
       ],
     },
     {
+      id: 'fotografias',
+      title: '11. Fotografias das peças dos lotes',
+      paragraphs: [
+        'Ao acrescentar uma peça a um lote, o operador pode, se quiser, guardar uma fotografia dessa peça. É sempre opcional e está desligado por omissão.',
+      ],
+      items: [
+        'Finalidade: prova de qualidade e rastreabilidade do lote, para o reciclador e a câmara verem o que foi recolhido.',
+        'Base legal: interesse legítimo da entidade que gere o lote (art. 6.º, n.º 1, al. f), com as salvaguardas desta secção, e a escolha expressa do operador, que só guarda a fotografia depois de confirmar que ela não mostra pessoas, rostos, documentos nem outra informação pessoal.',
+        'Dados: uma miniatura reduzida (até 640 px), sem metadados (a localização GPS, a data e os dados da câmara são removidos), e um crédito opcional quando a fotografia é de terceiros. Não guardamos o original.',
+        'Retenção: 90 dias por omissão, ao fim dos quais a miniatura se apaga sozinha. O operador pode apagá-la a qualquer momento, mesmo depois de o lote ser entregue, e nós também a apagamos a pedido.',
+        'Destinatários: quem tiver a ligação ou o código QR do passaporte público do lote, que mostra as miniaturas sem dados pessoais. Os subprocessadores da secção 6 só tratam os dados para fornecer o serviço.',
+        'Decisões automatizadas: não tomamos decisões automatizadas sobre pessoas com base nestas fotografias, nem as usamos para treinar modelos.',
+      ],
+      after: [
+        `Se aparecer numa fotografia ou quiseres exercer os teus direitos (acesso, apagamento, oposição), escreve para ${CONTACT_EMAIL} com o código do lote e apagamos a miniatura sem demora.`,
+      ],
+    },
+    {
       id: 'alteracoes',
-      title: '11. Alterações a esta política',
+      title: '12. Alterações a esta política',
       paragraphs: [
         'Se mudarmos esta política de forma relevante, atualizamos a data no topo e avisamos-te na aplicação ou por email. A versão em vigor está sempre em https://novelo.helder.si/pt/privacy.',
       ],
@@ -151,7 +169,7 @@ const privacyPt: LegalDoc = {
 
 const privacyEn: LegalDoc = {
   title: 'Privacy Policy',
-  updated: 'Last updated: 20 October 2026',
+  updated: 'Last updated: 23 October 2026',
   intro:
     'Novelo is the decision tool that designs the cheapest separate textile collection network for Guimarães, Portugal (Challenge 5 TexVitrus, Hack4Guimarães 2035). This policy explains which personal data we process, why, for how long, who we share it with and how you can exercise your rights. We ask for the minimum needed to give you access.',
   sections: [
@@ -175,7 +193,7 @@ const privacyEn: LegalDoc = {
         'Consent: the date and version of the text you accepted, where applicable.',
         'Security and audit: IP address and browser identification (user agent) linked to sensitive actions (sign-in, invitations, approvals, permission changes), and request counters to stop abuse and limit AI use per person.',
         'Copilot: the messages you write, the files you attach (we keep only the extracted text; the file is discarded), the actions the copilot proposes and the ones you confirm, and memory notes that you can see, edit and delete yourself.',
-        'Photo triage: photos are analysed and then deleted. Only the brand, composition, condition and weight of the item are kept, never data about who handed it in.',
+        'Photo triage: the photo is sent for analysis and is not stored by the triage. Only the brand, composition, condition and weight of the item are kept, never data about who handed it in. Only if the operator chooses, a thumbnail of the item is stored in the lot (section 11).',
         'Preferences on this device (browser local storage): light or dark theme, language and the last email used in the sign-in form.',
       ],
     },
@@ -208,7 +226,7 @@ const privacyEn: LegalDoc = {
         'Account and Google data: for as long as the account exists. We delete the account and its data when you ask, within 30 days at most.',
         'Copilot history and memory: you choose the period (30, 90 or 365 days) or delete everything whenever you want; the system may impose a maximum.',
         'Audit and security logs (IP, user agent): as long as needed for the security of the service and to demonstrate that requests were handled, and deleted or anonymised on request where the law allows.',
-        'Triage photos: deleted after analysis.',
+        'Triage photos: not stored by the analysis. Optional item thumbnails follow section 11 (90 days by default).',
         'Database backups: follow the server rotation cycle; deleted data disappears from them as backups rotate.',
       ],
     },
@@ -260,8 +278,26 @@ const privacyEn: LegalDoc = {
       ],
     },
     {
+      id: 'photos',
+      title: '11. Item photos in lots',
+      paragraphs: [
+        'When adding an item to a lot, the operator may choose to store a photo of that item. It is always optional and off by default.',
+      ],
+      items: [
+        'Purpose: quality proof and traceability of the lot, so the recycler and the municipality can see what was collected.',
+        'Legal basis: legitimate interest of the entity running the lot (Art. 6(1)(f)), with the safeguards in this section, and the operator’s explicit choice: the photo is stored only after they confirm it shows no people, faces, documents or other personal information.',
+        'Data: a reduced thumbnail (up to 640 px) with no metadata (GPS location, date and camera data are removed), and an optional credit when the photo is by someone else. We do not keep the original.',
+        'Retention: 90 days by default, after which the thumbnail deletes itself. The operator can delete it at any time, even after the lot is delivered, and we also delete it on request.',
+        'Recipients: anyone with the link or QR code of the lot’s public passport, which shows the thumbnails without personal data. The sub-processors in section 6 only process the data to provide the service.',
+        'Automated decisions: we take no automated decisions about people based on these photos, and we do not use them to train models.',
+      ],
+      after: [
+        `If you appear in a photo or want to exercise your rights (access, erasure, objection), write to ${CONTACT_EMAIL} with the lot code and we will delete the thumbnail without delay.`,
+      ],
+    },
+    {
       id: 'changes',
-      title: '11. Changes to this policy',
+      title: '12. Changes to this policy',
       paragraphs: [
         'If we change this policy in a material way, we update the date at the top and let you know in the app or by email. The current version is always at https://novelo.helder.si/en/privacy.',
       ],

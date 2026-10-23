@@ -57,12 +57,15 @@ async def test_list_assumptions_labels_the_origin_of_each_value(logged_in: httpx
 
 
 async def test_data_gaps_are_measured_in_the_database(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
-    await run(logged_in, llm, {"tools": [("get_data_gaps", {})]}, {"text": ["Faltam as localizações dos contentores."]})
+    await run(logged_in, llm, {"tools": [("get_data_gaps", {})]}, {"text": ["Faltam os custos das viaturas."]})
     data = tool_results(llm)[0]
     rows = {r["area"]: r for r in data["table"]["rows"]}
-    assert rows["Rede de têxteis"]["count"] == data["textile_containers_received"]
+    assert "none" in data["textile_containers"] and "textile_containers_received" not in data
     assert "ask" in rows["Recolha"] and rows["Qualidade"]["count"] >= 0
-    assert len(rows) == 7 and data["table"]["source"].startswith("Base de dados")
+    assert len(rows) == 9 and data["table"]["source"].startswith("Base de dados")
+    # não há contentores de têxteis: as localizações deles nunca são uma lacuna
+    assert not any("contentores de têxteis" in r["gap"] for r in rows.values())
+    assert "viatura" in rows["Simulador"]["ask"] and "Rotas" in rows
     # as frases fixas das lacunas não levam números: só as contagens da base de dados
     assert not any(ch.isdigit() for r in rows.values() for k in ("gap", "impact", "ask") for ch in r[k])
 
@@ -267,3 +270,84 @@ async def test_new_tools_have_status_labels(logged_in: httpx.AsyncClient, llm: F
     events = await run(logged_in, llm, {"tools": [("get_data_gaps", {})]}, {"text": ["Pronto."]})
     labels = {e["label_key"] for e in events if e["type"] == "status"}
     assert "status.finding_gaps" in labels
+
+
+async def test_scenario_facts_carry_vehicle_avoided_treatment_and_routing(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    base = await scenario(logged_in, "Base", 60000)
+    await run(
+        logged_in,
+        llm,
+        {"tools": [("what_if", {"scenario_id": base["id"], "budget_eur_year": 70000})]},
+        {"text": ["Feito."]},
+    )
+    data = tool_results(llm)[0]
+    kpis = (await logged_in.get(f"{P}/scenarios/{data['scenario_id']}")).json()["result"]["kpis"]
+    assert data["routing"] == "estimate" and data["routing_meaning"].startswith("ESTIMATE")  # sem OSRM nos testes
+    assert data["vehicles"] == kpis["vehicles"] and data["net_annual_cost_eur"] == kpis["net_annual_cost_eur"]
+    assert data["avoided_treatment_eur"] == kpis["avoided_treatment_eur"]
+
+
+async def test_scenario_detail_routes_and_plan_views_tell_the_provenance(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    base = await scenario(logged_in, "Base", 60000)
+    steps = [("get_scenario_detail", {"scenario_id": base["id"], "view": v}) for v in ("routes", "plan")]
+    await run(logged_in, llm, {"tools": steps}, {"text": ["Veja as tabelas."]})
+    routes, plan = tool_results(llm)[:2]
+    assert routes["routing"] == "estimate" and {c["key"] for c in routes["table"]["columns"]} >= {
+        "source",
+        "duration_min",
+    }
+    assert all(r["source"] == "estimate" and r["duration_min"] is None for r in routes["table"]["rows"])
+    assert plan["view"] == "plan" and plan["plan_available"] is True
+    assert {"weekday", "every_weeks", "kg_per_round"} <= {c["key"] for c in plan["table"]["columns"]}
+    assert plan["table"]["rows"] and all(
+        r["channel"] in {"on_demand", "existing", "street"} for r in plan["table"]["rows"]
+    )
+
+
+async def test_assumptions_explain_the_road_calibration_and_the_missing_vehicle_costs(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    await run(
+        logged_in,
+        llm,
+        {"tools": [("explain_assumption", {"query": "desvio"}), ("explain_assumption", {"query": "quilómetro"})]},
+        {"text": ["Veja."]},
+    )
+    detour, cost = tool_results(llm)[:2]
+    assert "1,48" in detour["assumptions"][0]["note"] and "1,37" in detour["assumptions"][0]["note"]
+    assert "ainda não enviou" in cost["assumptions"][0]["note"] and "estimativa" in cost["assumptions"][0]["note"]
+    queries = ("vehicle_speed", "tratamento", "street.capture")
+    await run(logged_in, llm, {"tools": [("explain_assumption", {"query": q}) for q in queries]}, {"text": ["Veja."]})
+    speed, treatment, street = (r["assumptions"][0] for r in tool_results(llm)[-3:])
+    assert "41,4" in speed["note"] and "Resinorte" in treatment["note"] and "referência" in street["note"].lower()
+    await run(logged_in, llm, {"tools": [("list_assumptions", {"source": "vitrus_data"})]}, {"text": ["Veja."]})
+    assert {"key", "note"} <= {c["key"] for c in tool_results(llm)[-1]["table"]["columns"]}
+
+
+async def test_baseline_has_the_current_demand_base_and_no_textile_containers(
+    logged_in: httpx.AsyncClient, llm: FakeLlm
+) -> None:
+    await run(logged_in, llm, {"tools": [("get_baseline", {})]}, {"text": ["Veja."]})
+    b = tool_results(llm)[0]
+    assert b["gap_t"] == 3003.3 and b["current_capture_pct"] == 9.1 and "none" in b["textile_containers"]
+    assert (
+        b["collected_kg_per_inhab_month"] == 0.16 and b["to_divert_kg_per_inhab_month"] == 1.6
+    )  # o 0,7 antigo já não existe
+
+
+async def test_textile_coverage_says_there_is_nothing_to_cover(logged_in: httpx.AsyncClient, llm: FakeLlm) -> None:
+    await run(logged_in, llm, {"tools": [("get_container_coverage", {})]}, {"text": ["Não há contentores de têxteis."]})
+    assert "NO textile containers" in tool_results(llm)[0]["note"]
+
+
+async def test_param_changes_accept_the_dedicated_vehicle_price_and_speed() -> None:
+    params, applied = apply_param_changes(
+        default_params(),
+        [ParamChange(key="vehicle_capex_eur", factor=1.2), ParamChange(key="vehicle_speed_kmh", factor=0.5)],
+    )
+    assert params.vehicle_capex_eur == 51000.0 and params.vehicle_speed_kmh == 15.0
+    assert [(a["key"], a["change_pct"]) for a in applied] == [("vehicle_capex_eur", 20.0), ("vehicle_speed_kmh", -50.0)]

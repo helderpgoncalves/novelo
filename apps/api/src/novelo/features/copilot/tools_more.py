@@ -11,10 +11,9 @@ from typing import TYPE_CHECKING, Any, Literal
 from pydantic import BaseModel, Field
 
 from novelo.core.errors import ForbiddenError
-from novelo.domain.vocab import ContainerKind
 from novelo.features.audit import service as audit
 from novelo.features.copilot.derive import DeriveArgs, DeriveError, derive_table
-from novelo.features.copilot.tools_data import _A, Col, Empty, make_table
+from novelo.features.copilot.tools_data import _A, Col, Empty, assumption_note, make_table
 from novelo.features.datasets import service as datasets
 from novelo.features.network import service as network
 from novelo.features.planning import service as planning
@@ -80,6 +79,7 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
             "unit": m.unit,
             "source": m.source.value,
             "origin": ORIGIN[m.source.value],
+            "note": assumption_note(m.key, m.note),
         }
         for m in params_meta()
         if args.source is None or m.source.value == args.source
@@ -91,6 +91,7 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
         ("source", "Origem", "category", None),
         ("origin", "Fonte", "text", None),
         ("key", "Chave", "text", None),
+        ("note", "Nota", "text", None),
     ]
     by_source = {s: sum(1 for r in rows if r["source"] == s) for s in ("vitrus_data", "assumption")}
     return {
@@ -111,7 +112,6 @@ async def list_assumptions(box: "CopilotTools", args: AssumptionsArgs) -> dict[s
 async def get_data_gaps(box: "CopilotTools", _: Empty) -> dict[str, Any]:
     """O que a plataforma ainda não sabe: lacunas medidas na base de dados, com o dado a pedir para as fechar."""
     db = box.db
-    containers = await network.list_containers(db, 1, 0, ContainerKind.TEXTILE)
     circuits = await network.list_circuits(db)
     fleet = await network.get_fleet(db)
     localities = await network.list_localities(db)
@@ -123,9 +123,12 @@ async def get_data_gaps(box: "CopilotTools", _: Empty) -> dict[str, Any]:
     unassigned = sum(1 for v in fleet.vehicles if v.never_assigned)
     assumptions = sum(1 for m in params.meta if m.source.value == "assumption")
     rows: list[dict[str, Any]] = [
-        {"area": "Rede de têxteis", "gap": "Localizações dos contentores de têxteis atuais", "count": containers.total,
-         "impact": "Sem elas, a cobertura e o ponto de partida da rede são estimativas",
-         "ask": "Lista de contentores de têxteis com morada ou coordenadas, estado e entidade gestora"},
+        {"area": "Rede de têxteis", "gap": "Têxtil realmente depositado por local, por canal e por mês", "count": None,
+         "impact": "As capturas por modo são pressupostos e o modelo usa o total anual até haver piloto e pesagens",
+         "ask": "Pesagens por local e por mês no piloto (a Vitrus só partilha os quilos por mês com o município)"},
+        {"area": "Procura", "gap": "Têxtil no indiferenciado do concelho: média nacional da APA aplicada ao concelho", "count": None,
+         "impact": "O potencial e a captura atual são estimativas, não medições",
+         "ask": "Caracterização do indiferenciado de Guimarães, se existir"},
         {"area": "Recolha", "gap": "Circuitos sem viatura atribuída", "count": circuits.without_vehicle,
          "impact": "Não se sabe que veículo faz estes circuitos, o que afeta custo e rota",
          "ask": "Plano de viaturas por circuito"},
@@ -144,7 +147,10 @@ async def get_data_gaps(box: "CopilotTools", _: Empty) -> dict[str, Any]:
          "ask": "Rever e resolver os alertas"},
         {"area": "Simulador", "gap": "Pressupostos ainda não validados com a Vitrus", "count": assumptions,
          "impact": "Os resultados dos cenários dependem deles (ver a sensibilidade)",
-         "ask": "Custos unitários reais: recolha, quilómetro, contentor, capacidade"},
+         "ask": "Custo por hora e por quilómetro da viatura de têxtil (departamento financeiro da Vitrus), orçamento do veículo e capacidade"},
+        {"area": "Rotas", "gap": "Dimensões e tipo da viatura nova: as rotas por estrada usam um perfil de furgoneta", "count": None,
+         "impact": "Ruas estreitas e restrições de peso podem tornar uma rota menos viável do que o mapa diz",
+         "ask": "Ficha técnica da viatura que a Vitrus vai adquirir"},
     ]  # fmt: skip
     cols: list[Col] = [
         ("area", "Área", "category", None),
@@ -154,7 +160,7 @@ async def get_data_gaps(box: "CopilotTools", _: Empty) -> dict[str, Any]:
         ("ask", "Dado a pedir", "text", None),
     ]
     return {
-        "textile_containers_received": containers.total,
+        "textile_containers": "none: Vitrus has no textile containers and does not want them, so their locations are not a gap",
         "estimated_entities": estimated_entities,
         "table": make_table("Lacunas de dados da plataforma", "Base de dados do Novelo (contagens)", cols, rows),
         "_summary": f"{len(rows)} lacunas",
@@ -379,13 +385,15 @@ async def analyze_result(box: "CopilotTools", args: DeriveArgs) -> dict[str, Any
 MORE_TOOLS: dict[str, tuple[type[BaseModel], str, Callable[[Any, Any], Awaitable[dict[str, Any]]]]] = {
     "list_assumptions": (
         AssumptionsArgs,
-        "All simulator assumptions with value, unit and origin (plan, Vitrus data or team assumption = estimate to validate).",
+        "All simulator assumptions with value, unit, origin (Vitrus data or team assumption = estimate to validate) and a provenance note "
+        "(e.g. the road calibration of the detour and speed, the vehicle costs still missing from Vitrus finance).",
         list_assumptions,
     ),
     "get_data_gaps": (
         Empty,
-        "What the platform does NOT know yet, measured in the database (missing textile container locations, circuits "
-        "without vehicle, estimated destinations, unvalidated assumptions...) and the data to ask for.",
+        "What the platform does NOT know yet, measured in the database (circuits without vehicle, unlocated localities, estimated "
+        "destinations, open data-quality alerts, unvalidated assumptions such as the vehicle cost per hour and per km...) and the "
+        "data to ask for. There are no textile containers, so their locations are never a gap.",
         get_data_gaps,
     ),
     "explain_scenario_difference": (

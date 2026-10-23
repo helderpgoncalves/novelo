@@ -30,6 +30,7 @@ ErrorCode = Literal[
     "email_taken",
     "cannot_modify_self",
     "conflict",
+    "consent_required",
     "account_pending",
     "account_rejected",
     "invitation_pending",
@@ -148,6 +149,13 @@ class CannotModifySelfError(AppError):
 class ConflictError(AppError):
     status_code = 409
     code = "conflict"
+
+
+class ConsentRequiredError(AppError):
+    """Falta a confirmação do operador (ex.: a foto não mostra pessoas nem dados pessoais)."""
+
+    status_code = 422
+    code = "consent_required"
 
 
 class AccountPendingError(AppError):

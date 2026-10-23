@@ -176,6 +176,7 @@ async def test_page_context_line_is_built_on_the_server(logged_in: httpx.AsyncCl
         and "€/t" in ctx
         and f"{base['eur_per_tonne']:.1f}".replace(".", ",") in ctx
     )
+    assert "routing=estimate" in ctx  # o Copiloto sabe se as rotas do ecrã são por estrada ou estimativa
     # texto do cliente nunca entra no prompt: filtros fora da lista, valores perigosos e rotas desconhecidas são ignorados
     llm.queue_rounds({"text": ["Ok."]})
     evil = {

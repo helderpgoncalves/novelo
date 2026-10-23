@@ -41,6 +41,47 @@ if TYPE_CHECKING:
 Col = tuple[str, str, str, str | None]  # key, label, type, unit
 WEEKDAY_NAMES = ("seg", "ter", "qua", "qui", "sex", "sáb", "dom")  # 1 = segunda ... 7 = domingo
 
+# O que o modelo pode dizer de cada origem das rotas (planning.schemas.ScenarioResult.routing). Não leva números.
+ROUTING_MEANING = {
+    "road": "all routes follow real roads (own OSRM server on OpenStreetMap); the door-to-door loop inside a parish is still an area-formula estimate",
+    "mixed": "some routes follow real roads and some are estimated (straight line x road-detour assumption); the door-to-door loop is an estimate",
+    "estimate": "ESTIMATE: km are straight line x a road-detour assumption, not a road measurement (road server unavailable or older scenario)",
+}
+
+# Notas de proveniência de pressupostos que o Copiloto pode citar (vêm no resultado das ferramentas, por isso os números
+# contam como verificados). Fontes: docs/engenharia/rotas-reais.md (calibração do OSRM a 23 out 2026) e
+# docs/dados/analise-dados-recebidos.md (respostas da Vitrus de 22 out 2026). Se o doc mudar, muda aqui.
+_VEHICLE_COST_NOTE = (
+    "A Vitrus ainda não enviou o custo por hora nem por quilómetro das viaturas (pedido ao departamento financeiro): "
+    "pressuposto da equipa, estimativa; na sensibilidade varia ±30%."
+)
+ASSUMPTION_NOTES: dict[str, str] = {
+    "detour_factor": (
+        "Calibração com a estrada real (OSRM sobre OpenStreetMap, 23 out 2026): o desvio mediano é 1,48 nas freguesias e "
+        "1,37 nos locais municipais, contra 1,3 aqui, por isso este pressuposto é otimista. Nas rotas por estrada deixa "
+        "de pesar; continua na estimativa de reserva, no porta a porta dentro da freguesia e na sensibilidade."
+    ),
+    "vehicle_speed_kmh": (
+        "Velocidade média em recolha, com manobras e paragens curtas. A condução por estrada no OSRM é mais rápida "
+        "(mediana de 41,4 km/h nas freguesias e 39,2 km/h nos locais municipais, sem trânsito): não são comparáveis, por "
+        "isso as horas e as viaturas não usam a duração do OSRM."
+    ),
+    "cost_per_km_eur": _VEHICLE_COST_NOTE,
+    "cost_per_collection_eur": _VEHICLE_COST_NOTE,
+    "kg_per_inhab_month": (
+        "Têxtil que ainda vai para o lixo: indiferenciado de todo o concelho × percentagem de têxtil da APA ÷ habitantes ÷ 12 "
+        "(Vitrus, 22 out 2026). É uma estimativa e substitui as bases anteriores."
+    ),
+}
+STREET_NOTE = "Só referência (benchmark francês): a Vitrus não tem contentores de têxtil nem os quer."
+
+
+def assumption_note(key: str, meta_note: str | None) -> str | None:
+    """Nota de proveniência de um pressuposto: a do cadastro (`ParamMeta.note`) e/ou a do Copiloto."""
+    extra = STREET_NOTE if key.startswith("modes.street.") else ASSUMPTION_NOTES.get(key)
+    parts = [x for x in (meta_note, extra) if x]
+    return " ".join(parts) if parts else None
+
 
 class _A(BaseModel):
     model_config = ConfigDict(extra="forbid")
@@ -72,7 +113,7 @@ class ParishesArgs(_A):
 
 class ScenarioDetailArgs(_A):
     scenario_id: uuid.UUID
-    view: Literal["allocations", "modes", "routes"] = "allocations"
+    view: Literal["allocations", "modes", "routes", "plan"] = "allocations"
 
 
 class CircuitsArgs(_A):
@@ -197,7 +238,15 @@ async def get_scenario_detail(box: "CopilotTools", args: ScenarioDetailArgs) -> 
         ]
     elif args.view == "routes":
         rows = [
-            {"vehicle": r.vehicle, "mode": r.mode.value, "stops": len(r.stops), "km": r.km, "load_t": r.load_t}
+            {
+                "vehicle": r.vehicle,
+                "mode": r.mode.value,
+                "stops": len(r.stops),
+                "km": r.km,
+                "load_t": r.load_t,
+                "source": r.source,
+                "duration_min": r.duration_min,
+            }
             for r in s.result.routes
         ]
         cols = [
@@ -206,6 +255,36 @@ async def get_scenario_detail(box: "CopilotTools", args: ScenarioDetailArgs) -> 
             ("stops", "Paragens", "number", None),
             ("km", "Distância", "number", "km"),
             ("load_t", "Carga", "number", "t"),
+            ("source", "Origem dos km", "category", None),
+            ("duration_min", "Condução (sem paragens)", "number", "min"),
+        ]
+    elif args.view == "plan":
+        rows = [
+            {
+                "name": e.parish_name,
+                "channel": e.channel.value,
+                "weekday": WEEKDAY_NAMES[e.weekday - 1] if e.weekday else None,
+                "vehicle": e.vehicle,
+                "every_weeks": e.every_weeks,
+                "rounds_year": e.rounds_year,
+                "kg_per_round": e.kg_per_round,
+                "tonnes": e.tonnes_year,
+                "km_year": e.km_year,
+                "hours_year": e.hours_year,
+            }
+            for e in (s.result.collection_plan or [])
+        ]
+        cols = [
+            ("name", "Freguesia", "text", None),
+            ("channel", "Canal", "category", None),
+            ("weekday", "Dia", "category", None),
+            ("vehicle", "Viatura", "number", None),
+            ("every_weeks", "Uma ronda a cada", "number", "semanas"),
+            ("rounds_year", "Rondas", "number", "/ano"),
+            ("kg_per_round", "Por ronda", "number", "kg"),
+            ("tonnes", "Têxtil", "number", "t/ano"),
+            ("km_year", "Distância", "number", "km/ano"),
+            ("hours_year", "Horas", "number", "h/ano"),
         ]
     else:
         rows = [
@@ -219,6 +298,9 @@ async def get_scenario_detail(box: "CopilotTools", args: ScenarioDetailArgs) -> 
         "scenario_id": str(s.id),
         "label": s.label,
         "view": args.view,
+        "routing": s.result.routing,
+        "routing_meaning": ROUTING_MEANING[s.result.routing],
+        "plan_available": s.result.collection_plan is not None,
         "table": make_table(f"{s.label}: {args.view}", "Otimizador (cenário guardado)", cols, rows, estimate=True),
         "_summary": f"«{s.label}» · {args.view}",
     }
@@ -628,7 +710,9 @@ DATA_TOOLS: dict[str, tuple[type[BaseModel], str, Callable[[Any, Any], Awaitable
     "list_parishes": (ParishesArgs, "Parishes with population, potential, typology and coordinates.", list_parishes),
     "get_scenario_detail": (
         ScenarioDetailArgs,
-        "A saved scenario in detail: per-parish allocations, per-mode totals or routes.",
+        "A saved scenario in detail: view allocations (per parish), modes (per-mode totals), routes (km and whether each route is by road "
+        "or an estimate) or plan (weekday, vehicle, round frequency and kg per round of the dedicated vehicle, per parish and channel). "
+        "Also returns routing: road, mixed or estimate.",
         get_scenario_detail,
     ),
     "get_circuits": (
