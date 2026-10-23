@@ -43,7 +43,7 @@ from novelo.features.copilot.schemas import (
 from novelo.features.copilot.schemas_artifacts import ArtifactSource
 from novelo.features.copilot.schemas_memory import CopilotSettings
 from novelo.features.copilot.tables import AnalyzeArgs, analyze_table, fold, search_text
-from novelo.features.copilot.tools_data import DATA_TOOLS, make_table
+from novelo.features.copilot.tools_data import DATA_TOOLS, ROUTING_MEANING, assumption_note, make_table
 from novelo.features.copilot.tools_more import MORE_TOOLS
 from novelo.features.copilot.tools_ui import UI_TOOLS
 from novelo.features.planning import benchmark_service, pilot_service
@@ -58,7 +58,7 @@ from novelo.features.reports import service as report_service
 from novelo.features.reports.schemas import ReportRequest
 from novelo.features.reports.texts import PARAM_LABELS
 from novelo.features.textile import service as textile
-from novelo.features.textile.references import POTENTIAL_SOURCE_LABEL
+from novelo.features.textile.references import KG_PER_INHAB_MONTH, POTENTIAL_SOURCE_LABEL
 from novelo.features.users.models import User
 
 log = logging.getLogger("novelo.copilot")
@@ -95,6 +95,8 @@ ParamKey = Literal[
     "detour_factor",
     "on_demand_kg_per_pickup",
     "vehicle_capacity_t",
+    "vehicle_capex_eur",
+    "vehicle_speed_kmh",
     "street_capture_rate",
     "street_capex_per_point_eur",
     "street_people_per_point",
@@ -212,6 +214,12 @@ async def _coverage_provider(db: AsyncSession, args: dict[str, Any]) -> Any:
 
     summary = await coverage_service.get_coverage(db, int(args["radius_m"]), ContainerKind(args["kind"]))
     data = summary.model_dump(mode="json", exclude={"parishes"})
+    if args["kind"] == ContainerKind.TEXTILE.value:
+        data["note"] = (
+            "There are NO textile containers: Vitrus has none and does not want them (contamination), so there is "
+            "no textile container network to cover and a zero here is not a finding. Coverage of a planned network "
+            "is the scenario's coverage_pct; the municipal containers (other fractions) are in get_municipal_overview."
+        )
     worst = sorted((p for p in summary.parishes if p.covered_pct is not None), key=lambda p: p.covered_pct or 0)[:5]
     data["least_covered_parishes"] = [p.model_dump(mode="json") for p in worst]
     cols: list[tuple[str, str, str, str | None]] = [
@@ -359,7 +367,7 @@ EXTERNAL_TOOLS = frozenset({"web_search"})
 
 
 def scenario_facts(s: ScenarioOut | ScenarioSummary) -> dict[str, Any]:
-    return {
+    facts: dict[str, Any] = {
         "scenario_id": str(s.id),
         "label": s.label,
         "objective": s.objective.value,
@@ -371,6 +379,22 @@ def scenario_facts(s: ScenarioOut | ScenarioSummary) -> dict[str, Any]:
         "investment_eur": s.capex_eur,
         "coverage_pct": s.coverage_pct,
     }
+    if isinstance(
+        s, ScenarioOut
+    ):  # o detalhe completo traz a viatura dedicada, o tratamento evitado e a origem das rotas
+        k = s.result.kpis
+        facts |= {
+            "routing": s.result.routing,
+            "routing_meaning": ROUTING_MEANING[s.result.routing],
+            "vehicles": k.vehicles,
+            "vehicle_days_per_week": k.vehicle_days_week,
+            "avoided_treatment_eur": k.avoided_treatment_eur,
+            "net_annual_cost_eur": k.net_annual_cost_eur,
+            "net_eur_per_tonne": k.net_eur_per_tonne,
+            "reusable_tonnes_per_year": k.reusable_t,
+            "eur_per_reusable_tonne": k.eur_per_reusable_t,
+        }
+    return facts
 
 
 def _card(s: ScenarioOut | ScenarioSummary, created_now: bool) -> ScenarioCard:
@@ -576,7 +600,8 @@ class CopilotTools:
             ),
             "get_container_coverage": (
                 CoverageArgs,
-                "Population coverage of the container network within a walking radius.",
+                "Walking-radius coverage of the containers registered as textile. Vitrus has NO textile containers (and wants none), "
+                "so for textile it has nothing to cover: do not use it to describe the network. A scenario's coverage is its coverage_pct.",
                 self._provider("get_container_coverage"),
             ),
             "get_sensitivity": (
@@ -756,9 +781,12 @@ class CopilotTools:
             "reuse_t": b.reuse_t,
             "recycle_t": b.recycle_t,
             "reject_t": b.reject_t,
-            "kg_per_inhab_month": b.kg_per_inhab_month,
+            "collected_kg_per_inhab_month": b.kg_per_inhab_month,
+            "to_divert_kg_per_inhab_month": round(KG_PER_INHAB_MONTH, 2),
             "estimated_potential_t": b.estimated_demand_t,
-            "potential_meaning": "textile generated = still going to the bin (gap_t) + collected separately",
+            "potential_meaning": "textile generated = still going to the bin (gap_t) + collected separately (collected_t)",
+            "capture_meaning": "collected_t / estimated_potential_t; an estimate because the potential is one",
+            "textile_containers": "none: Vitrus has no textile containers and does not want them",
             "current_capture_pct": b.capture_of_demand_pct,
             "gap_t": b.gap_t,
             "gap_meaning": "textile still going to the bin (to divert); the scenarios' potential_t",
@@ -887,6 +915,8 @@ class CopilotTools:
             ],
             "lowest_eur_per_tonne": cheapest.label if cheapest else None,
             "most_tonnes": most.label,
+            "routing_by_scenario": [{"label": s.label, "routing": s.result.routing} for s in scenarios],
+            "routing_meaning": ROUTING_MEANING,
             "table": _scenarios_table("Comparação de cenários", [scenario_facts(s) for s in scenarios]),
             "_summary": f"{len(scenarios)} scenarios compared",
         }
@@ -1085,6 +1115,7 @@ class CopilotTools:
                         "value": values.get(meta.key),
                         "source": meta.source.value,
                         "origin": origin[meta.source.value],
+                        "note": assumption_note(meta.key, meta.note),
                     }
                 )
         if not hits:

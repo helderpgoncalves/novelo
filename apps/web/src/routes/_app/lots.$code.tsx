@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { CheckCheck, ExternalLink, ScanLine, Truck } from 'lucide-react';
+import { Camera, CheckCheck, ExternalLink, ImagePlus, ScanLine, Trash2, Truck } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { z } from 'zod';
 import type { Fibre, GarmentType, GetLotQrData, LotItemOut, TextileDestination } from '@/client';
@@ -11,7 +12,7 @@ import {
   listLotsQueryKey,
 } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
-import { type Column, DataTable } from '@/components/data-table';
+import { type Column, DataTable, type RowAction } from '@/components/data-table';
 import { Page, Panel } from '@/components/page';
 import { PageHeader } from '@/components/page-header';
 import { PageTabs } from '@/components/page-tabs';
@@ -20,9 +21,13 @@ import { EmptyState } from '@/components/states';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline } from '@/features/lots/lot-parts';
+import { photoSrc } from '@/features/lots/photo-actions';
+import { PhotoDeleteDialog, PhotoUploadDialog } from '@/features/lots/photo-dialogs';
+import { ItemThumb, PhotoViewer, type ViewerPhoto } from '@/features/lots/photo-viewer';
 import { getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
+import { formatPhotoCredit, photoActionFor, photoAlt } from '@/lib/lot-photos';
 import { fibreLabel, garmentLabel, lotStateLabel } from '@/lib/lots';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
@@ -49,6 +54,60 @@ function LotPage() {
     url: '/api/v1/public/lots/{code}/qr',
     path: { code },
   });
+
+  const [uploading, setUploading] = useState<LotItemOut | null>(null);
+  const [deleting, setDeleting] = useState<LotItemOut | null>(null);
+  const [viewing, setViewing] = useState<number | null>(null);
+  const viewerPhotos = useMemo<ViewerPhoto[]>(
+    () =>
+      lot.item_list.flatMap((i) =>
+        i.has_photo && i.photo_url
+          ? [
+              {
+                id: i.id,
+                src: photoSrc(i.photo_url, i.id),
+                alt: photoAlt(i.garment_type, i.brand),
+                credit: i.photo_credit ?? null,
+              },
+            ]
+          : [],
+      ),
+    [lot.item_list],
+  );
+  const columns = useMemo(
+    () =>
+      itemColumns((item) => {
+        const at = viewerPhotos.findIndex((p) => p.id === item.id);
+        if (at >= 0) setViewing(at);
+      }),
+    [viewerPhotos],
+  );
+  const rowActions = (item: LotItemOut): RowAction<LotItemOut>[] => {
+    const action = photoActionFor(item.has_photo === true, lot.state);
+    return [
+      ...(action
+        ? [
+            {
+              id: 'photo-save',
+              label: action === 'add' ? m.lotphoto_add() : m.lotphoto_replace(),
+              icon: <ImagePlus />,
+              onSelect: setUploading,
+            },
+          ]
+        : []),
+      ...(item.has_photo
+        ? [
+            {
+              id: 'photo-delete',
+              label: m.lotphoto_delete(),
+              icon: <Trash2 />,
+              destructive: true,
+              onSelect: setDeleting,
+            },
+          ]
+        : []),
+    ];
+  };
 
   const change = useMutation({
     ...changeLotStateMutation(),
@@ -212,14 +271,22 @@ function LotPage() {
                       }
                     />
                   ) : (
-                    <DataTable
-                      id="lot-items"
-                      exportName="itens-do-lote"
-                      columns={itemColumns}
-                      rows={lot.item_list}
-                      getRowId={(i) => i.id}
-                      caption={m.lot_items_title()}
-                    />
+                    <div className="space-y-3">
+                      {lot.state === 'delivered' && viewerPhotos.length < lot.item_list.length && (
+                        <p className="text-muted-foreground text-sm">
+                          {m.lotphoto_delivered_note()}
+                        </p>
+                      )}
+                      <DataTable
+                        id="lot-items"
+                        exportName="itens-do-lote"
+                        columns={columns}
+                        rowActions={rowActions}
+                        rows={lot.item_list}
+                        getRowId={(i) => i.id}
+                        caption={m.lot_items_title()}
+                      />
+                    </div>
                   ),
               },
               {
@@ -235,11 +302,46 @@ function LotPage() {
           />
         </div>
       </div>
+      <PhotoViewer photos={viewerPhotos} index={viewing} onIndexChange={setViewing} />
+      <PhotoUploadDialog code={code} item={uploading} onClose={() => setUploading(null)} />
+      <PhotoDeleteDialog code={code} item={deleting} onClose={() => setDeleting(null)} />
     </Page>
   );
 }
 
-const itemColumns: Column<LotItemOut>[] = [
+const itemColumns = (onOpenPhoto: (item: LotItemOut) => void): Column<LotItemOut>[] => [
+  {
+    id: 'photo',
+    header: m.lotphoto_col(),
+    value: (i) => (i.has_photo ? m.lotphoto_has() : m.lotphoto_none()),
+    filter: true,
+    searchable: false,
+    width: 80,
+    cell: (i) =>
+      i.has_photo && i.photo_url ? (
+        <figure className="flex items-center gap-2">
+          <ItemThumb
+            src={photoSrc(i.photo_url, i.id)}
+            alt={photoAlt(i.garment_type, i.brand)}
+            openLabel={m.lotphoto_open({ label: photoAlt(i.garment_type, i.brand) })}
+            onOpen={() => onOpenPhoto(i)}
+          />
+          {formatPhotoCredit(i.photo_credit) && (
+            <figcaption className="max-w-44 break-words text-[11px] text-muted-foreground leading-tight">
+              {formatPhotoCredit(i.photo_credit)}
+            </figcaption>
+          )}
+        </figure>
+      ) : (
+        <span
+          className="grid aspect-square w-14 place-items-center rounded-lg border border-dashed text-muted-foreground/60"
+          role="img"
+          aria-label={m.lotphoto_none()}
+        >
+          <Camera className="size-4" aria-hidden="true" />
+        </span>
+      ),
+  },
   {
     id: 'garment',
     header: m.triage_garment(),

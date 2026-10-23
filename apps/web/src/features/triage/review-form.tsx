@@ -22,7 +22,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { PhotoConsent } from '@/features/lots/photo-consent';
 import { formatPercent } from '@/lib/format';
+import { NO_PHOTO_CHOICE, type PhotoChoice, photoChoiceReady } from '@/lib/lot-photos';
 import { AVERAGE_WEIGHT_G, FIBRES, fibreLabel, GARMENTS, garmentLabel } from '@/lib/lots';
 import { cn } from '@/lib/utils';
 import { destinationLabel } from '@/lib/vocab';
@@ -37,7 +39,7 @@ const withId = (part: CompositionPart): Row => ({ ...part, id: crypto.randomUUID
 interface ReviewFormProps {
   result: TriageResult;
   pending: boolean;
-  onConfirm: (item: LotItemIn) => void;
+  onConfirm: (item: LotItemIn, photo: PhotoChoice) => void;
   onDiscard: () => void;
 }
 
@@ -51,6 +53,8 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
   );
   const [brand, setBrand] = useState(a.brand ?? '');
   const [weight, setWeight] = useState(result.estimated_weight_g);
+  // Guardar a fotografia no lote é opcional e começa desligado.
+  const [photo, setPhoto] = useState<PhotoChoice>(NO_PHOTO_CHOICE);
   const total = composition.reduce((s, p) => s + (Number.isFinite(p.pct) ? p.pct : 0), 0);
   const valid =
     Math.abs(total - 100) <= 1 && weight > 0 && composition.every((p) => Number.isFinite(p.pct));
@@ -64,16 +68,19 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
       className="space-y-5"
       onSubmit={(e) => {
         e.preventDefault();
-        if (!valid) return;
-        onConfirm({
-          garment_type: garment,
-          condition,
-          composition: composition.map(({ fibre, pct }) => ({ fibre, pct })),
-          brand: brand.trim() || null,
-          estimated_weight_g: Math.round(weight),
-          confidence: a.confidence,
-          prompt_version: result.prompt_version,
-        });
+        if (!valid || !photoChoiceReady(photo)) return;
+        onConfirm(
+          {
+            garment_type: garment,
+            condition,
+            composition: composition.map(({ fibre, pct }) => ({ fibre, pct })),
+            brand: brand.trim() || null,
+            estimated_weight_g: Math.round(weight),
+            confidence: a.confidence,
+            prompt_version: result.prompt_version,
+          },
+          photo,
+        );
       }}
     >
       <div
@@ -250,6 +257,8 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         />
       </div>
 
+      <PhotoConsent choice={photo} onChange={setPhoto} />
+
       <StickyActions className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
         <Button
           type="button"
@@ -263,7 +272,7 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         <Button
           type="submit"
           className="h-11 font-semibold"
-          disabled={!valid || pending}
+          disabled={!valid || !photoChoiceReady(photo) || pending}
           loading={pending}
         >
           {m.triage_add_to_lot()}

@@ -29,6 +29,7 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Alta | Custos por hora e por quilómetro das viaturas da Vitrus para trocar os pressupostos por dados | Pedidos ao departamento financeiro a 21/10; ainda por chegar a 22/10 |
 | Média | Substituir os códigos de zona provisórios `0308U1` a `0308U5` (a CAOP 2019 já traz os oficiais) | Por validar |
 | Média | Confirmar o depósito real da Vitrus (hoje o centro de Guimarães) | Por pedir |
+| Alta | Miniatura opcional por peça feita a 23 out 2026 (migração `0018`). Falta a entidade (Vitrus/município) validar base jurídica, texto do aviso, retenção e canal de pedidos de titulares ([lista](privacidade-fotografias.md#o-que-a-entidade-responsável-tem-de-decidir-ou-validar)) | Por validar |
 | Média | Medir a exatidão da triagem (`just eval-triage` com 30 ou mais peças com verdade-terreno) | Por fazer |
 | Média | Correr `just eval-copilot` com os 11 casos `muni_*` e atualizar a [avaliação](avaliacao-copiloto.md) | Por fazer |
 | Média | Passar as restantes variáveis (`MAGIC_LINK_*`, `GUEST_*`, `COPILOT_*`, `EMAIL_TRANSPORT`...) pelo `docker-compose.yml` de produção, se for preciso alterá-las no Coolify | Por decidir |

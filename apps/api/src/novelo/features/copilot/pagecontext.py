@@ -35,12 +35,13 @@ async def _scenario_line(db: AsyncSession, scenario_id: uuid.UUID, pt: bool) -> 
     unit = "t/ano" if pt else "t/yr"
     label = re.sub(r"\s+", " ", s.label)[:60]  # nomes são dados do utilizador: uma linha, curtos
     cost = f"{_num(k.annual_cost_eur, 0, pt)} €/{'ano' if pt else 'yr'}"
-    line = f"«{label}» (scenario_id={s.id}) with {eur}, {_num(k.tonnes_year, 1, pt)} {unit}, {cost}"
+    line = f"«{label}» (scenario_id={s.id}) with {eur}, {_num(k.tonnes_year, 1, pt)} {unit}, {cost}, routing={s.result.routing}"
     facts = {
         "label": s.label,
         "eur_per_tonne": k.eur_per_tonne,
         "tonnes_per_year": k.tonnes_year,
         "annual_cost_eur": k.annual_cost_eur,
+        "routing": s.result.routing,
     }
     return line, facts
 

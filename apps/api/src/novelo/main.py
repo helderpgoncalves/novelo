@@ -26,6 +26,7 @@ from novelo.features.dev.router import router as dev_router
 from novelo.features.email_log.router import admin_router as email_admin_router
 from novelo.features.email_log.router import webhook_router
 from novelo.features.health.router import router as health_router
+from novelo.features.lots import photo_store
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
 from novelo.features.municipal.router import router as municipal_router
@@ -54,7 +55,9 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
     async with SessionLocal() as db:
         await auth_service.seed_admin(db)
     task = asyncio.create_task(reference.seed_in_background()) if get_settings().seed_reference_scenarios else None
+    purge_task = asyncio.create_task(photo_store.purge_loop())  # retenção das miniaturas (RGPD)
     yield
+    purge_task.cancel()
     if task is not None:
         task.cancel()
 

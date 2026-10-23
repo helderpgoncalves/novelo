@@ -54,7 +54,11 @@ A IA não faz contas. Traduz a pergunta numa alteração ao cenário, mostra "En
 
 **"Ler a marca na etiqueta não levanta problemas de privacidade?"**
 
-Não guardamos nada de quem entrega a peça. As fotografias são apagadas depois de processadas; ficam marca, composição, estado e peso. A marca é de uma empresa, não de uma pessoa.
+Não guardamos nada de quem entrega a peça. A triagem não guarda as fotografias: ficam marca, composição, estado e peso. Desde 23 out 2026 há uma novidade, e dizemo-la: o operador pode guardar uma miniatura da peça, mas só se a pedir, sem metadados, com confirmação de que não mostra pessoas, e é apagada ao fim de 90 dias ou quando quiser. A marca é de uma empresa, não de uma pessoa. Detalhe em [Privacidade das fotografias](../engenharia/privacidade-fotografias.md).
+
+**"As fotos ficam guardadas?"**
+
+Na triagem, não: existem em memória durante o pedido. Só se guarda uma miniatura se o operador a pedir, sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser. É uma avaliação técnica nossa, a validar com a entidade responsável pelos dados.
 
 **"Os recicladores querem mesmo estes lotes?"**
 

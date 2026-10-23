@@ -8,7 +8,7 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 | --- | --- | --- |
 | 1. Cenários | 30 s | Mapa de Guimarães com a procura por freguesia. Cenário A (referência: contentores de rua em todo o lado, o modelo que a Vitrus não quer) contra Cenário B (sem contentores: local existente e recolha a pedido nos circuitos). Pausa de 3 s no €/t. |
 | 2. "E se...?" | 40 s | Pedimos a um jurado uma pergunta. O Novelo mostra "Entendi: ...", corre o otimizador e explica a diferença em números. |
-| 3. Do saco ao fio | 40 s | Controlo de qualidade na entrega: foto de uma peça real e da etiqueta, estado, composição e marca. A peça entra num lote; um jurado lê o QR do saco com o telemóvel e abre o passaporte. O Sankey engrossa em direto. |
+| 3. Do saco ao fio | 40 s | Controlo de qualidade na entrega: foto de uma peça real e da etiqueta, estado, composição e marca. A peça entra num lote (a miniatura é opcional e só se guarda se o operador a pedir); um jurado lê o QR do saco com o telemóvel e abre o passaporte. O Sankey engrossa em direto. |
 | 4. Relatório RAP | 20 s | Um clique e abre o PDF: custo por tonelada por tipo de território, toneladas por fibra, marcas mais encontradas. |
 
 ## Dados da demo

@@ -188,7 +188,7 @@ cases:
   - id: whatif_two_changes_en
     lang: en
     turns:
-      - message: "What if the budget were 70,000 per year and the street capture rate were 20% higher?"
+      - message: "What if the budget were 70,000 per year and the on-demand capture rate were 20% higher?"
         page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
     expect: {tools_any: [what_if], tool_args_contain: {what_if: ["budget"]}}
 
@@ -197,10 +197,10 @@ cases:
     lang: pt-PT
     turns: [{message: "O que é que a plataforma ainda não sabe? Que dados devemos pedir à Vitrus?"}]
     expect: {tools_any: [get_data_gaps], max_chars: 1100}
-  - id: gaps_textile_containers_pt
+  - id: no_textile_containers_pt
     lang: pt-PT
-    turns: [{message: "Onde estão hoje os contentores de têxteis em Guimarães?"}]
-    expect: {tools_any: [get_data_gaps, get_container_coverage], must_contain_any: ["ainda não|não (tenho|temos|recebemos)|por receber|sem localiza"], max_chars: 800}
+    turns: [{message: "Onde estão hoje os contentores de têxteis em Guimarães e quantos são?"}]
+    expect: {must_contain_any: ["não (há|existe|existem|tem|temos)|nenhum|sem contentores"], must_not_contain: ["\\b\\d+ contentores de têxteis?\\b", "ainda não (recebemos|temos) as localiza"], tools_forbidden: [run_scenario, what_if], max_chars: 700}
   - id: gaps_future_pt
     lang: pt-PT
     turns: [{message: "Quantas toneladas vamos recolher em 2031?"}]
@@ -441,3 +441,92 @@ cases:
     lang: en
     turns: [{message: "Recommend which two parishes to pilot first and explain the risks."}]
     expect: {tools_any: [get_pilot_recommendation]}
+
+  # ---------------------------------------------------------------- L. alinhamento com o projeto de hoje (copilot_v5, 23 out 2026)
+  # Procura e captura atuais (base de 22 out: indiferenciado do concelho x 5,86% da APA) e recusa dos valores antigos.
+  - id: demand_current_base_pt
+    lang: pt-PT
+    turns: [{message: "Quanto têxtil ainda vai para o lixo em Guimarães por ano e de onde vem essa base?"}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["3 003,3|3003,3"], must_not_contain: ["2 324|1 317|1317"], max_chars: 900}
+  - id: capture_current_pt
+    lang: pt-PT
+    turns: [{message: "Qual é a taxa de captura atual do têxtil em Guimarães?"}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["9,1"], must_not_contain: ["22,9", "11,5"], max_chars: 700}
+  - id: old_values_refused_pt
+    lang: pt-PT
+    turns: [{message: "Confirma que o potencial de Guimarães é 0,7 kg por habitante por mês, cerca de 1 317 t por ano, e que a captura atual é 22,9%."}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["substitu|desatualiz|já não|deixou|não (é|são|corresponde|confirmo)|atual"], must_not_contain: ["sim, (é|são|confirmo)", "confirmo"], max_chars: 800}
+  - id: old_values_refused_en
+    lang: en
+    turns: [{message: "Is it right that Guimarães has a potential of 1,317 tonnes a year at 0.7 kg per inhabitant per month, with 22.9% capture?"}]
+    expect: {tools_any: [get_baseline], must_contain_any: ["replaced|outdated|no longer|superseded|not (valid|current|correct)|current"], must_not_contain: ["yes, (it is|that is|that's)"], max_chars: 800}
+  # Sem contentores de têxteis; uma viatura nova sem compactação; nenhuma viatura livre à tarde; estaleiro de Polvoreira.
+  - id: no_textile_containers_en
+    lang: en
+    turns: [{message: "Please propose where to place textile containers in Guimarães."}]
+    expect: {must_contain_any: ["no textile containers|does not (have|want)|doesn't (have|want)|contaminat|closed bag|dedicated vehicle|reference"], max_chars: 800}
+  - id: vehicle_no_compaction_pt
+    lang: pt-PT
+    turns: [{message: "Podemos pôr os sacos de têxtil no camião do porta a porta que já existe?"}]
+    expect: {must_contain_any: ["compact"], must_not_contain: ["^sim\\b", "sim, (podemos|pode)"], tools_forbidden: [run_scenario, what_if], max_chars: 700}
+  - id: vehicle_afternoon_withdrawn_pt
+    lang: pt-PT
+    turns: [{message: "E se usarmos as viaturas que ficam livres à tarde para recolher o têxtil?"}]
+    expect: {must_contain_any: ["não (há|existe|existem|estão)|nenhuma viatura|já não|retirad|compact|em uso"], tools_forbidden: [run_scenario, what_if], max_chars: 800}
+  - id: depot_pt
+    lang: pt-PT
+    turns: [{message: "De onde parte a viatura de têxtil e onde descarrega?"}]
+    expect: {must_contain_any: ["Lameiras|Polvoreira|estaleiro"], max_chars: 600}
+  - id: treatment_cost_pt
+    lang: pt-PT
+    turns: [{message: "Quanto custa tratar uma tonelada de indiferenciado e de onde vem esse valor?"}]
+    expect: {tools_any: [explain_assumption, list_assumptions], must_contain_any: ["105,64"], max_chars: 800}
+  - id: vehicle_costs_missing_pt
+    lang: pt-PT
+    turns: [{message: "Já temos os custos reais por hora e por quilómetro das viaturas da Vitrus?"}]
+    expect: {tools_any: [get_data_gaps, explain_assumption, list_assumptions], must_contain_any: ["ainda não|não (temos|recebemos|foram|há)|por receber|estimativa|pressuposto"], max_chars: 800}
+  - id: vehicle_price_what_if_pt
+    lang: pt-PT
+    turns:
+      - message: "E se a viatura nova custar mais 20%?"
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {tools_any: [what_if], tool_args_contain: {what_if: ["vehicle_capex_eur"]}, max_created: 1}
+  - id: collection_plan_view_pt
+    lang: pt-PT
+    turns:
+      - message: "Que dia da semana é a recolha em cada freguesia neste cenário?"
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {tools_any: [get_scenario_detail], tool_args_contain: {get_scenario_detail: ["plan"]}}
+  # Rotas por estrada (OSRM, 23 out 2026) contra estimativa; na avaliação o OSRM não está ligado, logo os cenários são `estimate`.
+  - id: routing_estimate_pt
+    lang: pt-PT
+    turns:
+      - message: "As rotas deste cenário seguem as estradas?"
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {must_contain_any: ["estimativa|estimad|linha reta"], must_not_contain: ["seguem (as )?estradas reais", "sim, (seguem|por estrada)"], max_chars: 800}
+  - id: routing_provenance_en
+    lang: en
+    turns:
+      - message: "Where do the kilometres of this scenario come from?"
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {must_contain_any: ["estimate|straight|detour|not (a )?road"], max_chars: 800}
+  - id: routing_door_to_door_pt
+    lang: pt-PT
+    turns:
+      - message: "A volta porta a porta dentro da freguesia também é medida por estrada?"
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {must_contain_any: ["estimativa|estimad|fórmula|área"], max_chars: 800}
+  - id: routes_view_source_pt
+    lang: pt-PT
+    turns:
+      - message: "Mostra as rotas deste cenário e de onde vem cada distância."
+        page: {route: "/scenarios/$scenarioId", params: {scenarioId: "{Base}"}}
+    expect: {tools_any: [get_scenario_detail], tool_args_contain: {get_scenario_detail: ["routes"]}}
+  - id: detour_calibration_pt
+    lang: pt-PT
+    turns: [{message: "O desvio de 1,3 da estrada em relação à linha reta é realista?"}]
+    expect: {tools_any: [explain_assumption, list_assumptions], must_contain_any: ["1,48|1,37"], max_chars: 900}
+  - id: triage_quality_control_pt
+    lang: pt-PT
+    turns: [{message: "Para que serve a triagem por foto?"}]
+    expect: {must_contain_any: ["controlo de qualidade|qualidade|contamina"], max_chars: 700}

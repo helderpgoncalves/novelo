@@ -52,6 +52,7 @@ Os nomes vivem em `.env.example` (versionado); os valores só no Coolify. Descri
 | `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_SUPPORT`, `EMAIL_REPLY_TO` | **Segredo** (a chave) | O domínio do `EMAIL_FROM` tem de estar verificado no Resend. Sem chave não há magic link por email |
 | `RESEND_WEBHOOK_SECRET`, `RESEND_READ_API_KEY`, `EMAIL_NOT_FOUND_PER_HOUR` | **Segredo** (os dois primeiros) | Entrega verificada dos emails; ver [Emails](emails.md). Sem eles só se sabe que o Resend aceitou o email |
 | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION` | **Segredo** e opções | Sem chave, a IA responde 503. Depois do primeiro arranque os modelos mudam em `/admin/ai` |
+| `LOT_PHOTO_RETENTION_DAYS`, `LOT_PHOTO_MAX_BYTES` | Opcional | Retenção (90 dias) e tamanho máximo (150 KB) das miniaturas das peças; ver [Privacidade das fotografias](privacidade-fotografias.md) |
 | `SOLVER_TIME_LIMIT_S`, `LOG_LEVEL` | Opcional | |
 
 Em produção `/api/docs` e `/api/openapi.json` ficam desligados; o contrato consulta-se no `openapi.json` do repositório.
@@ -65,9 +66,10 @@ O caminho normal é o push para `main`. Se o webhook não disparar ou for precis
 - **Estado:** `GET /api/v1/health` (processo) e `GET /api/v1/ready` (base de dados e se a IA está ligada).
 - **Primeiro arranque:** a migração cria as tabelas e o seed importa os dados da Vitrus, o pacote municipal (tabelas `municipal_*`) e o administrador. Na primeira entrada, o administrador abre `/users`, separador «Cartaz do QR», para imprimir o QR do evento.
 - **Logs:** no Coolify, por serviço; os da API são JSON com `request_id`. Sem `RESEND_API_KEY`, os emails aparecem no log da API.
+- **Retenção das miniaturas:** automática (30 s após o arranque e de 24 em 24 h), sem tarefa agendada. Uma foto apagada pode ficar até 1 h em caches públicas.
 - **Retenção do copiloto:** `python -m novelo.cli purge-copilot` apaga o que passou do prazo; pode agendar-se uma vez por dia no Coolify (ver [Copiloto](copiloto.md#definições-do-utilizador-vs-definições-do-sistema)).
 - **Rollback:** `git revert` do commit em `main` e novo push. Antes da apresentação, marcar a versão da demo com uma tag (`v1.0-demo`).
-- **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. Tudo o resto reconstrói-se a partir do repositório.
+- **Backups:** o único estado é o volume `pgdata`. Agendar um `pg_dump` diário no Coolify e copiá-lo para fora da VPS. As cópias incluem as miniaturas (`lot_item_photos`): uma foto apagada continua na cópia até esta ser rodada; definir a retenção das cópias (ver [Privacidade das fotografias](privacidade-fotografias.md)). Tudo o resto reconstrói-se a partir do repositório.
 - **Cenários de referência:** com `SEED_REFERENCE_SCENARIOS=true` (por omissão no `docker-compose.yml`), cada arranque verifica em segundo plano os 6 cenários de referência e recalcula os desatualizados (um processo de cada vez, por tranca do Postgres; 20 a 40 s cada por locais). Depois de um deploy que mude o modelo, sobe `REFERENCE_MODEL_VERSION` em `features/planning/reference.py` (ver [Arquitetura](arquitetura.md#cenários-de-referência)).
 - **Registo aberto:** para um evento, um administrador liga-o com `PATCH /api/v1/admin/settings` (`open_registration`, opcionalmente `approve_pending` para aprovar já os pendentes); fica na base de dados, não é uma variável de ambiente.
 - **Novos dados:** `data/processed` vai dentro da imagem da API e é importado no arranque; basta correr `just etl`, fazer commit e push (por exemplo, quando chegarem os custos ou uma caracterização do lixo). A pasta `data/raw` não vai para a imagem.

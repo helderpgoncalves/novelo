@@ -190,6 +190,10 @@ export function CreditsPage() {
                 <h3 className="font-medium">{m.credits_derivatives_title()}</h3>
                 <p>{m.credits_derivatives_text()}</p>
               </div>
+              <div className="lp-cr-note">
+                <h3 className="font-medium">{m.credits_lotphotos_title()}</h3>
+                <p>{m.credits_lotphotos_text()}</p>
+              </div>
             </Section>
 
             <Section id="dados" title={m.credits_data_title()} lead={m.credits_data_lead()}>

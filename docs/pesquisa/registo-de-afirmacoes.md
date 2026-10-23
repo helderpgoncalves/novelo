@@ -109,7 +109,9 @@ Estados: **Dado Vitrus** · **Primária** (verificado em fonte oficial) · **Sec
 | D2 | As misturas de fibras e a humidade degradam a exatidão | 83,1% para 78,9% (humidade, ensaio) | [F34] | Primária (investigação) | 5 |
 | D3 | Uma foto não mede a fibra; a composição vem da etiqueta | — | [F32], [F37] | Secundária | 5 |
 | D4 | O Novelo acerta X% no tipo de peça | **por medir** | avaliação da triagem | **Por verificar** | só depois da avaliação |
-| D5 | As fotos são apagadas depois de processadas | comportamento da aplicação | código e [IA](../engenharia/ia.md) | Cálculo/produto | 5 |
+| D5 | A triagem não guarda as fotos: só existem em memória durante o pedido (substitui «as fotos são apagadas depois de processadas», revisto a 23 out 2026) | comportamento da aplicação | `POST /triage` em `features/lots/router.py` e [IA](../engenharia/ia.md) | Cálculo/produto | 5 |
+| D6 | Só se guarda uma miniatura se o operador a pedir: JPEG até 640 px e ~150 KB, sem EXIF/GPS, com confirmação de que não há pessoas, apagada ao fim de 90 dias (configurável, 1 a 365) ou quando se quiser; o passaporte público mostra até 12 | 640 px; 150 KB; 90 dias (estimativa de política, não imposição legal) | código `features/lots/{photos,photo_store}.py` e migração `0018_lot_item_photos.py`, 23 out 2026; [Privacidade das fotografias](../engenharia/privacidade-fotografias.md) | Cálculo/produto | 5 |
+| D7 | Uma foto apagada pode ficar até 1 h em caches públicas | `max-age=3600` | `features/lots/router.py`, 23 out 2026 | Cálculo/produto | 5 |
 
 ## E. Hackathon
 

@@ -121,7 +121,7 @@ Os pesos são conhecidos (inovação 25%, viabilidade 25%, impacto 30%, apresent
 
 | Cenário | Prob. | Sinal de aviso | Resposta preparada | Dono |
 | --- | --- | --- | --- | --- |
-| **Pergunta sobre RGPD e fotos** | Média | "As fotos ficam guardadas?" | Não guardamos fotos de quem entrega; apagadas depois de processadas; ficam marca, composição, estado e peso | H |
+| **Pergunta sobre RGPD e fotos** | Média | "As fotos ficam guardadas?" | Na triagem não (só em memória). Só se guarda uma miniatura se o operador a pedir, sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser (novo a 23 out 2026). Nada de quem entrega. Avaliação técnica interna, por validar com o encarregado de proteção de dados: [Privacidade das fotografias](../engenharia/privacidade-fotografias.md) | H |
 | **Pedido para retirar dados da Vitrus do repositório** | Baixa | Mentor ou Vitrus | Remover de `data/raw` com `git rm` num novo commit. Reescrever o histórico **só se pedido por escrito**, porque a organização pode verificar a originalidade pelo histórico dos repositórios; avisar a equipa e a organização | HF |
 
 ---
@@ -193,7 +193,7 @@ Resposta de 20 segundos e a evidência a abrir. **Estados:** as respostas usam a
 | 16 | Porque não usam NIR? | É a tecnologia certa para a indústria, mas custa e não cabe no "menor investimento"; fica no reciclador. O Novelo garante o lote e a composição declarada | Tecnologia de triagem |
 | 17 | Que modelo de IA usam e quanto custa? | `openai/gpt-6-luna` por defeito, via OpenRouter, com orçamento mensal e custo real por chamada visíveis no painel de administração (feito) | Painel de IA |
 | 18 | E se o modelo mudar ou ficar caro? | Trocamos de modelo no painel por funcionalidade, com custo estimado por operação e modelo de reserva | Painel de IA (feito) |
-| 19 | Os dados saem do país? | As fotos são processadas pelo fornecedor de IA e apagadas; não guardamos fotos nem dados de quem entrega. Dados da Vitrus ficam na nossa base de dados | Documento de IA |
+| 19 | Os dados saem do país? | Na triagem, as fotos reduzidas vão ao fornecedor de IA (via OpenRouter) e a nossa API não as guarda; não guardamos dados de quem entrega. Só ficam miniaturas que o operador peça, na nossa base de dados, durante 90 dias no máximo por omissão. A retenção do lado do fornecedor não está verificada (ver [Privacidade das fotografias](../engenharia/privacidade-fotografias.md)). Dados da Vitrus ficam na nossa base de dados | Documento de IA |
 | 20 | Porque OpenRouter? | Um único ponto para vários modelos, com custo por chamada e modelo de reserva | Painel de IA |
 | 21 | Como evitam alucinações? | Saída estruturada, validação com esquema, verificador de números e recusa fora do âmbito | "E se...?" e copiloto (feito) |
 | 22 | O copiloto pode apagar dados? | Não: só cria cenários marcados como do copiloto, com limite por pedido | Copiloto (feito) |

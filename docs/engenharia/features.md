@@ -79,7 +79,7 @@ Um diagrama de fluxo (Sankey) com quatro colunas: **freguesia → modo de recolh
 Na triagem, a foto da etiqueta dá também a marca, quando está visível. O Novelo agrega **quilos por marca e por composição** ao longo do tempo.
 
 - A nova diretiva permite que os Estados-Membros cobrem taxas de RAP mais altas a quem vende moda rápida (ecomodulação). Com isto, o município passa a ter dados próprios para essa discussão, em vez de médias europeias.
-- Só se guardam marca, composição e peso. As fotografias são apagadas depois de processadas e nunca há dados de quem entregou a peça.
+- A evidência guarda marca, composição e peso. A triagem não guarda fotografias (só em memória durante o pedido) e nunca há dados de quem entregou a peça. Desde 23 out 2026 o operador pode, peça a peça, guardar uma **miniatura opcional** (JPEG até 640 px, sem metadados, sem pessoas, confirmada pelo operador), apagada ao fim de 90 dias ou quando quiser. Ver [Privacidade das fotografias](privacidade-fotografias.md).
 - No relatório RAP, esta evidência aparece agregada e com o tamanho da amostra, para não tirar conclusões de poucos lotes.
 
 ## 6. Copiloto conversacional

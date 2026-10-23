@@ -19,9 +19,21 @@ Tudo se configura por variáveis de ambiente lidas em `apps/api/src/novelo/core/
 | Email | `RESEND_API_KEY`, `RESEND_WEBHOOK_SECRET`, `RESEND_READ_API_KEY`, `EMAIL_TRANSPORT`, `EMAIL_FROM`, `EMAIL_SUPPORT`, `EMAIL_REPLY_TO`, `EMAIL_NOT_FOUND_PER_HOUR`, `EMAIL_SEND_TIMEOUT_S`, `EMAIL_RETRY_BACKOFF_S` | Ver abaixo e [Emails](emails.md) |
 | IA | `OPENROUTER_API_KEY`, `OPENROUTER_BASE_URL`, `LLM_MODEL_TEXT`, `LLM_MODEL_VISION`, `LLM_MODEL_FALLBACK`, `LLM_MAX_OUTPUT_TOKENS`, `LLM_REASONING_EFFORT`, `LLM_MONTHLY_BUDGET_USD`, `LLM_MAX_CONCURRENCY`, `LLM_TIMEOUT_S`, `LLM_CHAT_TIMEOUT_S`, `LLM_MAX_RETRIES`, `LLM_RETRY_BACKOFF_S`, `LLM_AUX_PROVIDER_SORT`, `WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED` | Só dão o valor inicial: depois, a base de dados manda (painel `/admin/ai`). Ver [IA](ia.md) |
 | Copiloto | `COPILOT_CONTEXT_CAP_TOKENS`, `COPILOT_MEMORY_CHAR_LIMIT`, `COPILOT_USER_CHAR_LIMIT`, `COPILOT_DEFAULT_PERSONA`, `COPILOT_MAX_RETENTION_DAYS`, `COPILOT_REVIEW_EVERY_TURNS` | Limites do sistema; o resto cada utilizador gere nas suas definições. Ver [Copiloto](copiloto.md) |
+| Fotografias dos lotes | `LOT_PHOTO_RETENTION_DAYS` (90), `LOT_PHOTO_MAX_BYTES` (153 600) | Ver «Fotografias dos lotes» abaixo |
 | Otimização | `SOLVER_TIME_LIMIT_S` | Limite de tempo do CP-SAT e do VRP |
 | Rotas por estrada | `OSRM_URL`, `OSRM_TIMEOUT_S`, `OSRM_MAX_LOCATIONS`, `OSRM_MAX_SNAP_M`, `OSRM_CACHE_SIZE`, `OSRM_COOLDOWN_S` | OSRM próprio sobre o OpenStreetMap, sem custos. Vazio = km estimados em linha reta. Em Docker (dev e produção) o compose define `OSRM_URL=http://osrm:5000`; fora do Docker o `just api` usa `http://localhost:5190`. Ver [Rotas por estrada](rotas-reais.md) |
 | Web | `VITE_API_URL`, `VITE_MAP_STYLE_LIGHT`, `VITE_MAP_STYLE_DARK` | Vazio = mesmo domínio; mapa CARTO por omissão |
+
+## Fotografias dos lotes
+
+Miniatura opcional por peça (desde 23 out 2026). O compose repassa as duas variáveis à API; ambas têm valor por omissão e validação em `core/config.py`.
+
+| Variável | Por omissão | Notas |
+| --- | --- | --- |
+| `LOT_PHOTO_RETENTION_DAYS` | `90` | Dias até a miniatura expirar (1 a 365). Conta a partir de quando é guardada ou substituída. Deixa de ser servida ao expirar e a purga apaga-a (30 s após o arranque e de 24 em 24 h) |
+| `LOT_PHOTO_MAX_BYTES` | `153600` | Tamanho máximo da miniatura já processada (20 000 a 1 000 000). Se não couber, o pedido recebe 400 |
+
+Mudar a retenção só afeta as fotos guardadas a partir daí: as que já existem mantêm o `expires_at` com que foram gravadas. Regras, riscos e direitos em [Privacidade das fotografias](privacidade-fotografias.md).
 
 ## Resend (email)
 
@@ -162,7 +174,7 @@ O admin de dev é `admin@heldergoncalves.io` / `admin-novelo-dev-1` (entra-se em
 
 ## O que o compose de produção passa à API
 
-O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. Também repassa as variáveis de pesquisa na web (`WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED`), `LLM_MONTHLY_BUDGET_USD` (30 por omissão; o teto mensal global de IA, editável depois no painel `/admin/ai`), `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD`, `INVITATION_EXPIRE_DAYS`, `INVITATIONS_PER_HOUR`, `IMPERSONATION_MINUTES`, `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `WEB_CONCURRENCY`, `SOLVER_RUNS_PER_MINUTE` e `SOLVER_MAX_CONCURRENCY`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*` por convidado, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
+O `docker-compose.yml` não repassa todas as variáveis do `.env.example`: só as que lista em `api.environment`. Também repassa as variáveis de pesquisa na web (`WEB_SEARCH_*`, `WEB_FETCH_*`, `GUEST_WEB_SEARCH_ENABLED`, `SERVER_TOOLS_*`, `OPENROUTER_ZDR_ENFORCED`), `LLM_MONTHLY_BUDGET_USD` (30 por omissão; o teto mensal global de IA, editável depois no painel `/admin/ai`), `GUEST_SIGNUPS_PER_HOUR`, `GUEST_AI_GLOBAL_BUDGET_USD`, `INVITATION_EXPIRE_DAYS`, `INVITATIONS_PER_HOUR`, `IMPERSONATION_MINUTES`, `TRUSTED_PROXY_HOPS`, `TRUST_CLOUDFLARE_HEADER`, `WEB_CONCURRENCY`, `SOLVER_RUNS_PER_MINUTE`, `SOLVER_MAX_CONCURRENCY`, `LOT_PHOTO_RETENTION_DAYS` e `LOT_PHOTO_MAX_BYTES`. As restantes (por exemplo `MAGIC_LINK_EXPIRE_MINUTES`, `QUICK_JOIN_CONSENT_VERSION`, `GUEST_*` por convidado, `COPILOT_*`, `LLM_*` além dos modelos, `EMAIL_TRANSPORT`, `SESSION_TOKEN_HOURS`) ficam nos valores por omissão do `config.py` até serem acrescentadas ao compose. Definidas pelo compose, não pelo `.env`: `APP_ENV=production`, `DATABASE_URL`, `DATA_DIR`, `SECRET_KEY` (a partir de `SERVICE_PASSWORD_64_SECRETKEY`), `APP_URL` e `CORS_ORIGINS` (a partir de `DOMAIN`). Lista completa em [Deploy](deploy.md#variáveis).
 
 ## Copiloto
 

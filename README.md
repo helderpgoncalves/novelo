@@ -158,7 +158,7 @@ Uma história, do saco ao fio: **decidir** a rede, **provar** que aguenta, **ope
 | **Piloto de 3 meses** | `/pilot` | Escolhe as freguesias de maior valor de aprendizagem e calcula as toneladas mínimas para a medição valer |
 | **"E se...?"** | no cenário e no copiloto | Pergunta em português; a IA só traduz para uma alteração estruturada e o otimizador faz as contas |
 | **Copiloto** | `/chat`, painel `⌘K` | Conversa em streaming com 52 ferramentas tipadas, gráficos e tabelas construídos pelo servidor, ações que só correm com confirmação, memória por utilizador, anexos e `@menções` |
-| **Triagem por foto** | `/triage` | Controlo de qualidade na entrega: uma foto da peça e outra da etiqueta dão tipo, estado, composição e marca, sempre confirmadas pelo operador. As fotos não são guardadas |
+| **Triagem por foto** | `/triage` | Controlo de qualidade na entrega: uma foto da peça e outra da etiqueta dão tipo, estado, composição e marca, sempre confirmadas pelo operador. A triagem não guarda as fotos; o operador pode guardar uma miniatura opcional por peça (desde 23 out 2026; ver [privacidade](docs/engenharia/privacidade-fotografias.md)) |
 | **Lotes, QR e passaporte** | `/lots`, `/passport/:código` | Cada lote tem código, QR, etiqueta para imprimir e uma página pública com origem, composição, peso e histórico |
 | **Bolsa de fibra** | `/market` | Lotes agregados por fibra, que os recicladores reservam. Prioridade baixa: o valor está na reutilização |
 | **Evidência por marca** | `/brands` | Quilos por marca e composição, com o tamanho da amostra |
@@ -357,7 +357,8 @@ Passo a passo, variáveis, operação e diagnóstico em [deploy](docs/engenharia
 - **Sem sondar contas:** o magic link e a recuperação de password respondem sempre 204; os limites de pedidos protegem as rotas sensíveis (em memória, por processo).
 - **Papéis:** `admin`, `operator` e `guest` (convidado do evento: sem gestão de utilizadores, sem administração de IA, sem apagar dados, sem ações de risco alto, com limites de IA e de otimizador).
 - **Entrada por QR:** pede nome e email, regista a data e a versão do consentimento e só fica ativa em produção se `QUICK_JOIN_CODE` estiver definido. Texto público em `/privacy`.
-- **Fotografias da triagem:** reduzidas, enviadas ao modelo, processadas e descartadas; guardam-se só tipo, estado, composição, marca e peso. Nunca há dados de quem entregou a peça.
+- **Fotografias da triagem:** reduzidas, enviadas ao modelo, processadas e descartadas; a triagem guarda só tipo, estado, composição, marca e peso. Nunca há dados de quem entregou a peça.
+- **Miniatura opcional (novo, 23 out 2026):** só se guarda se o operador a pedir, sem metadados, com confirmação de que não há pessoas, apagada ao fim de 90 dias (configurável) ou quando quiser. Avaliação técnica interna, não aconselhamento jurídico: [privacidade das fotografias](docs/engenharia/privacidade-fotografias.md).
 - **IA:** o registo de uso guarda tarefa, modelo, tokens, custo e latência, nunca prompts, imagens nem respostas. Anexos do copiloto são validados pelo conteúdo e tratados como dado, não como ordem; as memórias são varridas contra injeção de prompt.
 - **Direitos:** cada utilizador exporta e apaga os seus dados do copiloto (`/chat`, Definições) e escolhe a retenção.
 - **Dados municipais:** os nomes dos estabelecimentos produtores só saem a um `admin`, e nunca pelo copiloto.

@@ -455,7 +455,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 
 - **Momento "uau":** o QR grande ao lado do lote, com "Lê no telemóvel".
 - **Estado vazio:** "Ainda não há lotes. Abre o primeiro" ou "Ver o lote de demonstração (selo de demonstração)".
-- **Não pôr:** fotografias das peças (apagadas depois de processadas); dados de quem entregou.
+- **Não pôr:** fotografias de peças que não tenham miniatura guardada pelo operador (a triagem não guarda fotos; a miniatura é opcional, sem metadados, e expira ao fim de 90 dias); dados de quem entregou.
 
 #### 2.4.3 Passaporte público (`/passport/$code`)
 
@@ -476,7 +476,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 - **Momento "uau":** abre em menos de um segundo no telemóvel de um jurado, a 390 px, sem login. Meta interna, ainda por medir.
 - **Obrigatório:** selo "Dados de demonstração" em lotes de demonstração (D19). Mostrar um lote de demonstração como real é o maior risco de credibilidade.
 - **Estado de erro:** "Este código não existe. Verifica o QR."
-- **Não pôr:** dados pessoais, fotografias, preço.
+- **Não pôr:** dados pessoais, preço. Fotografias só as miniaturas opcionais e não expiradas (até 12 no passaporte), com o crédito da licença quando forem de terceiros.
 
 #### 2.4.4 Bolsa de fibra (`/market`)
 

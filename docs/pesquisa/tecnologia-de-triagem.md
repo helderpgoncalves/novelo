@@ -56,7 +56,8 @@ flowchart TD
 | "Acertamos X% no tipo de peça e Y% na marca, num teste de N peças" | **Só depois de medir** (ver avaliação abaixo) |
 | "A IA identifica a fibra pela foto" | **Não** |
 | "Substitui a linha de triagem industrial" | **Não** |
-| "Não guardamos fotografias nem dados de quem entrega" | Sim, é o comportamento atual: as fotos são apagadas depois de processadas |
+| "A triagem não guarda fotografias nem dados de quem entrega" | Sim: na triagem as fotos só existem em memória durante o pedido |
+| "Só se guarda uma miniatura se o operador a pedir, sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser" | Sim, desde 23 out 2026 (novo): ver [Privacidade das fotografias](../engenharia/privacidade-fotografias.md). **Não** dizer «nunca guardamos fotos» |
 
 ## A avaliação que vamos fazer
 

@@ -1,6 +1,7 @@
+import uuid
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, File, Query, UploadFile
+from fastapi import APIRouter, Depends, File, Form, Query, Request, UploadFile
 from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,9 +9,10 @@ from novelo.adapters.openrouter import OpenRouterClient
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
 from novelo.core.guest import AiGuard, NotGuestDep
-from novelo.core.ratelimit import passport_limiter, triage_limiter
+from novelo.core.ratelimit import lot_photo_limiter, passport_limiter, triage_limiter
+from novelo.core.request_meta import Meta
 from novelo.domain.vocab import Fibre, LotState
-from novelo.features.lots import service, triage
+from novelo.features.lots import photo_store, photos, service, triage
 from novelo.features.lots.schemas import (
     BrandsOut,
     LotDetail,
@@ -63,6 +65,86 @@ async def get_lot(code: str, db: Db) -> LotDetail:
 async def add_lot_item(code: str, body: LotItemIn, user: CurrentUser, db: Db) -> LotItemOut:
     """Acrescenta ao lote uma peça confirmada pelo operador."""
     return await service.add_item(db, user, code, body)
+
+
+PHOTO_RESPONSES: dict[int | str, dict[str, object]] = {
+    200: {"content": {"image/jpeg": {}}, "description": "Miniatura JPEG sem metadados"},
+    304: {"description": "O cliente já tem esta versão (If-None-Match)"},
+}
+
+
+def _photo_response(request: Request, etag: str, *, cache_control: str) -> Response | None:
+    """304 se o cliente já tem esta versão; senão `None` e o chamador envia os bytes."""
+    sent = request.headers.get("if-none-match", "")
+    tags = {t.strip().removeprefix("W/") for t in sent.split(",")}
+    if sent.strip() == "*" or etag in tags:
+        return Response(status_code=304, headers={"ETag": etag, "Cache-Control": cache_control})
+    return None
+
+
+async def _serve_photo(
+    db: AsyncSession, request: Request, code: str, item_id: uuid.UUID, *, cache_control: str, vary: str | None
+) -> Response:
+    etag = await photo_store.photo_etag(db, code, item_id)  # 404 antes de ler os bytes
+    not_modified = _photo_response(request, etag, cache_control=cache_control)
+    if not_modified is not None:
+        return not_modified
+    blob = await photo_store.read_photo(db, code, item_id)
+    headers = {"ETag": blob.etag, "Cache-Control": cache_control, "Content-Disposition": "inline"}
+    if vary:
+        headers["Vary"] = vary
+    return Response(content=blob.content, media_type=blob.mime, headers=headers)
+
+
+@router.put(
+    "/lots/{code}/items/{item_id}/photo",
+    status_code=204,
+    dependencies=[NotGuestDep, Depends(lot_photo_limiter)],
+)
+async def upload_item_photo(
+    code: str,
+    item_id: uuid.UUID,
+    user: CurrentUser,
+    db: Db,
+    meta: Meta,
+    photo: Annotated[UploadFile, File(description="Foto da peça (JPEG, PNG ou WebP, até 5 MB)")],
+    confirm_no_people: Annotated[
+        bool,
+        Form(
+            description="Obrigatório e verdadeiro: o operador confirma que a foto não mostra pessoas, rostos, "
+            "documentos nem informação pessoal"
+        ),
+    ] = False,
+    credit: Annotated[
+        str | None,
+        Form(max_length=240, description="Atribuição da licença se a foto for de terceiros; texto simples, sem HTML"),
+    ] = None,
+) -> Response:
+    """Guarda (ou substitui) a miniatura da peça: sem metadados, JPEG até 640 px, apagada ao fim da retenção."""
+    data = await photo.read(photos.MAX_INPUT_BYTES + 1)
+    await photo_store.save_photo(
+        db, user, code, item_id, data, confirm_no_people=confirm_no_people, credit=credit, meta=meta
+    )
+    return Response(status_code=204)
+
+
+@router.delete(
+    "/lots/{code}/items/{item_id}/photo", status_code=204, dependencies=[NotGuestDep, Depends(lot_photo_limiter)]
+)
+async def delete_item_photo(code: str, item_id: uuid.UUID, user: CurrentUser, db: Db, meta: Meta) -> Response:
+    """Apaga já a miniatura da peça (direito ao apagamento), em qualquer estado do lote."""
+    await photo_store.delete_photo(db, user, code, item_id, meta=meta)
+    return Response(status_code=204)
+
+
+@router.get(
+    "/lots/{code}/items/{item_id}/photo",
+    response_class=Response,
+    responses=PHOTO_RESPONSES,
+)
+async def get_item_photo(code: str, item_id: uuid.UUID, request: Request, db: Db) -> Response:
+    """Miniatura da peça para a sessão autenticada (cache privada, revalida com ETag)."""
+    return await _serve_photo(db, request, code, item_id, cache_control="private, no-cache", vary="Cookie")
 
 
 @router.post("/lots/{code}/state", response_model=LotDetail, dependencies=[NotGuestDep])
@@ -125,3 +207,14 @@ async def get_lot_qr(code: str, db: Db) -> Response:
     """QR em SVG do passaporte."""
     await service.passport(db, code)  # 404 se não existir
     return Response(content=service.qr_svg(code.upper()), media_type="image/svg+xml")
+
+
+@public_router.get(
+    "/lots/{code}/items/{item_id}/photo",
+    response_class=Response,
+    responses=PHOTO_RESPONSES,
+    dependencies=[Depends(passport_limiter)],
+)
+async def get_public_item_photo(code: str, item_id: uuid.UUID, request: Request, db: Db) -> Response:
+    """Miniatura pública de uma peça do passaporte. 404 se não existe ou já expirou."""
+    return await _serve_photo(db, request, code, item_id, cache_control="public, max-age=3600", vary=None)

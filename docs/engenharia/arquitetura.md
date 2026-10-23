@@ -57,7 +57,7 @@ apps/web/src/
 
 ## API
 
-Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `main.py`. As rotas de dados são autenticadas; são públicas só `health`, `ready`, as rotas de entrada (`auth/*`, `quick-join/info`) e o passaporte do lote (`/api/v1/public/lots/{code}` e o seu QR), para o QR abrir sem sessão. Em desenvolvimento há ainda `/api/v1/dev/emails` (fora do OpenAPI) e `/api/docs`; em produção não.
+Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `main.py`. As rotas de dados são autenticadas; são públicas só `health`, `ready`, as rotas de entrada (`auth/*`, `quick-join/info`) e o passaporte do lote (`/api/v1/public/lots/{code}`, o seu QR e as miniaturas das peças), para o QR abrir sem sessão. Em desenvolvimento há ainda `/api/v1/dev/emails` (fora do OpenAPI) e `/api/docs`; em produção não.
 
 | Grupo | Exemplos |
 | --- | --- |
@@ -70,7 +70,7 @@ Todas as rotas vivem sob `/api/v1`. Os routers não têm prefixo; aplica-se no `
 | `municipal` | rede **municipal** de contentores (indiferenciado, orgânico, seletivo; não é têxtil; base geográfica do modelo): `overview`, `parishes`, `sites`, `containers`, `producers`, `b2b-channel`, `textile-candidates`, `gap-ranking`, `density-benchmark`, `export`, GeoJSON (ver [Rede municipal](#rede-municipal-municipal)) |
 | `planning` | `parameters`, `zones`, `scenarios` (criar, listar, ler, renomear, apagar, `flows`, `sensitivity`, `coverage`: ver [Matriz de cobertura](#matriz-de-cobertura-e-têxtil-reutilizável)), `scenarios/reference` (`list_reference_scenarios`: os cenários de referência atuais, ver [Cenários de referência](#cenários-de-referência)), `compare-robustness`, `benchmarks`, `pilot` |
 | `whatif` | criar, aplicar e listar perguntas "E se...?" |
-| `lots`, `triage`, `market`, `brands` | `/lots` (abrir, listar, ler, itens, estado), `/triage` (análise de uma peça), `/market` e reservas, `/brands`; público: `/public/lots/{code}` e `/qr` |
+| `lots`, `triage`, `market`, `brands` | `/lots` (abrir, listar, ler, itens, estado, miniatura opcional `PUT`/`DELETE`/`GET .../items/{id}/photo`), `/triage` (análise de uma peça, sem guardar fotos), `/market` e reservas, `/brands`; público: `/public/lots/{code}`, `/qr` e `/public/lots/{code}/items/{id}/photo` (com `ETag` e `Cache-Control: public, max-age=3600`). A API purga as miniaturas expiradas 30 s depois do arranque e de 24 em 24 h |
 | `reports` | `rap` (gera o PDF), listar, `{id}/pdf` |
 | `ai` | `settings`, `models`, `usage`, `credits`, `test`, `eval/triage` (só administradores) |
 | `copilot` | `stream`, `chat`, `threads`, `history`, `actions`, `artifacts`, `attachments`, `mentions`, `memory`, `settings`, `data` (ver [Copiloto](copiloto.md#endpoints-operationid)) |
@@ -158,7 +158,7 @@ Postgres com migrações Alembic (`apps/api/alembic`). Tabelas por domínio:
 | Planeamento | `parameter_sets`, `scenarios`, `whatif_runs` |
 | IA | `ai_settings` (uma linha), `ai_usage` |
 | Copiloto | `copilot_threads`, `copilot_messages`, `copilot_actions`, `copilot_artifacts`, `copilot_attachments`, `copilot_memory_entries`, `copilot_memory_pending`, `copilot_user_settings`, `copilot_feedback` |
-| Operação | `lots`, `lot_items`, `lot_events`, `lot_reservations`, `reports` |
+| Operação | `lots`, `lot_items`, `lot_item_photos` (miniatura opcional por peça, tabela à parte, com `expires_at` e `consent_at`; migração `0018`; ver [Privacidade das fotografias](privacidade-fotografias.md)), `lot_events`, `lot_reservations`, `reports` |
 
 `data/processed` é importado no arranque da API de forma idempotente (`just seed` também o faz). Os ficheiros de origem ficam registados com impressão digital. Há oito migrações (`0001` a `0008`: esquema inicial, alertas e contentores, definições e uso de IA, copiloto, rede municipal, magic link e entrada por QR, ordem das localidades, convites, auditoria, impersonação e aprovação de contas).
 

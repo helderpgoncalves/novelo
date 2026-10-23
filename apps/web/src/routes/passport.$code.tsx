@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { SearchX } from 'lucide-react';
+import { useMemo, useState } from 'react';
 import type { GetLotQrData } from '@/client';
 import { getPassportOptions } from '@/client/@tanstack/react-query.gen';
 import { client } from '@/client/client.gen';
@@ -10,9 +11,11 @@ import { ErrorState } from '@/components/states';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
 import { CompositionBar, EventTimeline, LotStateBadge } from '@/features/lots/lot-parts';
+import { ItemThumb, PhotoViewer, type ViewerPhoto } from '@/features/lots/photo-viewer';
 import { getErrorCode } from '@/lib/errors';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
+import { formatPhotoCredit, photoAlt } from '@/lib/lot-photos';
 import { fibreLabel } from '@/lib/lots';
 import { ogImage, SITE_URL } from '@/lib/seo';
 import { destinationLabel } from '@/lib/vocab';
@@ -53,6 +56,17 @@ function PassportPage() {
   } = useQuery(getPassportOptions({ path: { code } }));
   // Só um 404 é «lote não encontrado»; sem rede ou com o limite de pedidos atingido mostra-se o erro e tentar de novo.
   const notFound = getErrorCode(error) === 'not_found';
+  const [viewing, setViewing] = useState<number | null>(null);
+  const photos = useMemo<ViewerPhoto[]>(
+    () =>
+      (passport?.photos ?? []).map((p) => ({
+        id: p.item_id,
+        src: p.url,
+        alt: photoAlt(p.garment_type, p.brand),
+        credit: p.credit ?? null,
+      })),
+    [passport?.photos],
+  );
   const qr = client.buildUrl<GetLotQrData>({
     url: '/api/v1/public/lots/{code}/qr',
     path: { code },
@@ -163,6 +177,42 @@ function PassportPage() {
               </section>
             )}
 
+            {photos.length > 0 && (
+              <section
+                className="space-y-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10"
+                aria-labelledby="passport-photos"
+              >
+                <div className="space-y-0.5">
+                  <h2 id="passport-photos" className="text-xl">
+                    {m.lotphoto_pass_title()}
+                  </h2>
+                  <p className="text-muted-foreground text-xs">{m.lotphoto_pass_note()}</p>
+                </div>
+                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                  {photos.map((p, i) => {
+                    const credit = formatPhotoCredit(p.credit);
+                    return (
+                      <li key={p.id} className="min-w-0 space-y-1.5">
+                        <ItemThumb
+                          fluid
+                          size={320}
+                          src={p.src}
+                          alt={p.alt}
+                          openLabel={m.lotphoto_open({ label: p.alt })}
+                          onOpen={() => setViewing(i)}
+                        />
+                        {credit && (
+                          <p className="line-clamp-2 break-words text-[11px] text-muted-foreground leading-tight">
+                            {credit}
+                          </p>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            )}
+
             <div className="grid gap-6 sm:grid-cols-[1fr_auto]">
               <section className="space-y-3 rounded-xl bg-card p-5 ring-1 ring-foreground/10">
                 <h2 className="text-xl">{m.lot_history_title()}</h2>
@@ -175,6 +225,7 @@ function PassportPage() {
               />
             </div>
             <p className="text-muted-foreground text-xs">{m.passport_privacy()}</p>
+            <PhotoViewer photos={photos} index={viewing} onIndexChange={setViewing} />
           </>
         )}
       </main>

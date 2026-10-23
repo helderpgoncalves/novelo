@@ -173,6 +173,7 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 | "Quem paga isto hoje?" | "O município, sozinho. A APA confirma que ainda não há entidade gestora. A diretiva só obriga os regimes a existir em abril de 2028, e mesmo então só cobrem as peças postas à venda a partir daí." | B11, B12, B17 |
 | "O que acontece em 2028?" | "Os produtores pagam o custo eficiente das peças que põem à venda depois da lei nacional; as antigas continuam a pesar no município, uma parte que vai descendo. A leitura exata confirmamos com a APA. O custo eficiente determina-se com as autoridades locais, e a entidade gestora não pode recusar o município: quem tiver o custo medido por tipo de território negoceia melhor." | B6, B17, B18 |
 | "Não vão competir com a economia social?" | "A diretiva protege os pontos de recolha da economia social. São parceiros: no Novelo entram como um modo de recolha com os seus próprios pontos." | B10 |
+| "As fotos ficam guardadas?" | "Na triagem não. Só se guarda uma miniatura se o operador a pedir, sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser. É novo desde 23 de outubro: antes não guardávamos nenhuma." | D5, D6 |
 | "A triagem por foto é fiável?" | "Dizemos o que medimos: [X% no tipo de peça, Y% na marca, em N peças]. A fibra vem da etiqueta, não da foto, e o operador confirma sempre." | D4 (só depois de medir) |
 | "A indústria quer isto?" | "A Sasia recicla cerca de 2 000 toneladas por mês, quase tudo pré-consumo. O que falta é pós-consumo homogéneo. O piloto valida critérios e preço com eles." | C16, C17 |
 | "Porque não sensores de enchimento?" | "Custam por contentor e o desafio pede o menor investimento. Entram mais tarde onde os dados mostrarem que compensam." | — |
@@ -190,6 +191,7 @@ Respostas curtas, para dizer em 20 segundos. As anteriores estão em [Perguntas 
 - "Em 2028 os produtores passam a pagar a recolha" (incompleto: pagam a das peças postas à venda depois da lei nacional, B17).
 - "A diretiva de 2025 proíbe incinerar o têxtil recolhido" (a proibição vem de 2018, B27).
 - "A IA lê a composição pela foto" (falso, D3).
+- "Nunca guardamos fotografias" (deixou de ser verdade a 23 out 2026: há miniatura opcional, D6). Dizer: "só se guarda uma miniatura se o operador a pedir, sem metadados, sem pessoas, apagada ao fim de 90 dias ou quando quiser".
 - "A França paga 228 euros por tonelada" (por verificar, C5).
 - "Só 4 de 27 operadores reciclam têxteis" (por verificar, A11).
 

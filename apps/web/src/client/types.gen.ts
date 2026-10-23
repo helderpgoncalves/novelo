@@ -1190,6 +1190,30 @@ export type BodyUploadCopilotAttachments = {
 };
 
 /**
+ * Body_upload_item_photo
+ */
+export type BodyUploadItemPhoto = {
+    /**
+     * Confirm No People
+     *
+     * Obrigatório e verdadeiro: o operador confirma que a foto não mostra pessoas, rostos, documentos nem informação pessoal
+     */
+    confirm_no_people?: boolean;
+    /**
+     * Credit
+     *
+     * Atribuição da licença se a foto for de terceiros; texto simples, sem HTML
+     */
+    credit?: string | null;
+    /**
+     * Photo
+     *
+     * Foto da peça (JPEG, PNG ou WebP, até 5 MB)
+     */
+    photo: Blob | File;
+};
+
+/**
  * BrandCount
  */
 export type BrandCount = {
@@ -2105,7 +2129,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      */
@@ -3717,7 +3741,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
     /**
      * Message
      *
@@ -5030,9 +5054,27 @@ export type LotItemOut = {
     estimated_weight_g: number;
     garment_type: GarmentType;
     /**
+     * Has Photo
+     *
+     * Tem miniatura guardada e ainda não expirada
+     */
+    has_photo?: boolean;
+    /**
      * Id
      */
     id: string;
+    /**
+     * Photo Credit
+     *
+     * Atribuição da licença da foto (se for de terceiros)
+     */
+    photo_credit?: string | null;
+    /**
+     * Photo Url
+     *
+     * URL relativa (autenticada) da miniatura; nula sem foto ou depois de expirar
+     */
+    photo_url?: string | null;
 };
 
 /**
@@ -7905,6 +7947,12 @@ export type Passport = {
      */
     parish_name: string | null;
     /**
+     * Photos
+     *
+     * Até 12 miniaturas não expiradas
+     */
+    photos?: Array<PassportPhoto>;
+    /**
      * Recycle Pct
      */
     recycle_pct: number;
@@ -7921,6 +7969,35 @@ export type Passport = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * PassportPhoto
+ *
+ * Miniatura pública de uma peça (sem metadados; apagada ao fim da retenção).
+ */
+export type PassportPhoto = {
+    /**
+     * Brand
+     */
+    brand: string | null;
+    /**
+     * Credit
+     *
+     * Atribuição da licença da foto (se for de terceiros)
+     */
+    credit?: string | null;
+    garment_type: GarmentType;
+    /**
+     * Item Id
+     */
+    item_id: string;
+    /**
+     * Url
+     *
+     * URL relativa da rota pública da imagem (JPEG)
+     */
+    url: string;
 };
 
 /**
@@ -17799,6 +17876,214 @@ export type AddLotItemResponses = {
 
 export type AddLotItemResponse = AddLotItemResponses[keyof AddLotItemResponses];
 
+export type DeleteItemPhotoData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/items/{item_id}/photo';
+};
+
+export type DeleteItemPhotoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteItemPhotoError = DeleteItemPhotoErrors[keyof DeleteItemPhotoErrors];
+
+export type DeleteItemPhotoResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteItemPhotoResponse = DeleteItemPhotoResponses[keyof DeleteItemPhotoResponses];
+
+export type GetItemPhotoData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/items/{item_id}/photo';
+};
+
+export type GetItemPhotoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetItemPhotoError = GetItemPhotoErrors[keyof GetItemPhotoErrors];
+
+export type GetItemPhotoResponses = {
+    /**
+     * Miniatura JPEG sem metadados
+     */
+    200: unknown;
+};
+
+export type UploadItemPhotoData = {
+    body: BodyUploadItemPhoto;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/items/{item_id}/photo';
+};
+
+export type UploadItemPhotoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UploadItemPhotoError = UploadItemPhotoErrors[keyof UploadItemPhotoErrors];
+
+export type UploadItemPhotoResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type UploadItemPhotoResponse = UploadItemPhotoResponses[keyof UploadItemPhotoResponses];
+
 export type ChangeLotStateData = {
     body: LotStateChange;
     path: {
@@ -20803,6 +21088,74 @@ export type GetPassportResponses = {
 };
 
 export type GetPassportResponse = GetPassportResponses[keyof GetPassportResponses];
+
+export type GetPublicItemPhotoData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/public/lots/{code}/items/{item_id}/photo';
+};
+
+export type GetPublicItemPhotoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicItemPhotoError = GetPublicItemPhotoErrors[keyof GetPublicItemPhotoErrors];
+
+export type GetPublicItemPhotoResponses = {
+    /**
+     * Miniatura JPEG sem metadados
+     */
+    200: unknown;
+};
 
 export type GetLotQrData = {
     body?: never;
