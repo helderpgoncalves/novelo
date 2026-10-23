@@ -10,7 +10,7 @@ Os projetos são avaliados por quatro critérios ponderados: **inovação e orig
 
 ## Guião, slide a slide
 
-Deck: `pitch/build.js` (10 diapositivos + anexos). A fala exata de cada um, com as notas de palco, está em [Guião do pitch](guiao-do-pitch.md) e nas notas do orador do PowerPoint.
+Deck: `pitch/build.js` (10 diapositivos + «Obrigado» + anexos). A fala exata de cada um, com as notas de palco, está em [Guião do pitch](guiao-do-pitch.md) e nas notas do orador do PowerPoint.
 
 | # | Tempo | Slide | Critério | O que se diz |
 | --- | --- | --- | --- | --- |
@@ -24,6 +24,7 @@ Deck: `pitch/build.js` (10 diapositivos + anexos). A fala exata de cada um, com 
 | 8 | 3:05 a 3:20 | A IA | Inovação | A IA traduz, o otimizador calcula, o verificador recusa números inventados (155 perguntas, 99% dos números verificados). |
 | 9 | 3:20 a 3:40 | Do saco ao fio | Inovação | Triagem por foto confirmada pelo operador; fotografia opcional conforme o RGPD; QR e passaporte; relatório RAP num clique. |
 | 10 | 3:40 a 4:00 | O pedido | Continuidade | Piloto de 3 meses em duas freguesias; a frase-âncora; QR para experimentar. |
+| 11 | perguntas (1 min) | Obrigado | Apresentação | Agradecimento à Vitrus, ao município e à organização; QR e ligações ficam no ecrã durante as perguntas do júri. |
 | — | fora do tempo | Anexos | Os quatro | Reutilização por entidade, resumo contra os critérios, onde se perde, cobertura e incerteza, rigor das fontes, como foi feito, vídeo. |
 
 ## Frase-âncora

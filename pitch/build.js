@@ -474,6 +474,19 @@ pres.addSection({ title: 'Pitch' });
   });
 }
 
+// 13. Obrigado -------------------------------------------------------------------------------------
+{
+  const s = pres.addSlide({ masterName: 'CAPA', sectionTitle: 'Pitch' });
+  s.addText('HACK4GUIMARÃES 2035 · DESAFIO 5 TEXVITRUS', { x: M + 0.13, y: 0.6, w: 8, h: 0.3, fontFace: THEME.bodyFontFace, fontSize: 11, bold: true, charSpacing: 3, color: C.accent2, margin: 0, isTextBox: true, objectName: 'Desafio' });
+  s.addText('Obrigado.', { x: M + 0.13, y: 4.45, w: 7.2, h: 0.95, fontFace: THEME.headFontFace, fontSize: 54, color: C.background1, margin: 0, valign: 'middle', isTextBox: true, objectName: 'Agradecimento' });
+  s.addText('À Vitrus Ambiente, pelos dados e pelas respostas em 24 horas.\nAo Município de Guimarães e à organização do Hack4Guimarães.', { x: M + 0.13, y: 5.5, w: 7.4, h: 0.9, fontFace: THEME.bodyFontFace, fontSize: 15, color: C.accent5, margin: 0, valign: 'top', paraSpaceAfter: 4, isTextBox: true, objectName: 'Agradecimentos' });
+  s.addText('Hélder Gonçalves · Flávio Fernandes  ·  novelo.helder.si', { x: M + 0.13, y: 6.6, w: 8, h: 0.3, fontFace: THEME.bodyFontFace, fontSize: 12, color: C.accent5, margin: 0, isTextBox: true, objectName: 'Equipa' });
+  s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x: 9.5, y: 2.3, w: 3.23, h: 4.2, rectRadius: 0.12, fill: { color: C.background1 }, line: { type: 'none' }, objectName: 'Cartão QR' });
+  s.addImage({ path: A('qr-novelo.png'), x: 9.75, y: 2.5, w: 2.73, h: 2.73, objectName: 'QR novelo.helder.si', altText: 'Código QR para novelo.helder.si' });
+  s.addText([{ text: 'Experimentem já', options: { fontFace: THEME.headFontFace, fontSize: 18, color: C.text1, breakLine: true } }, { text: 'novelo.helder.si', options: { fontSize: 13, bold: true, color: C.accent1, breakLine: true } }, { text: 'github.com/helderpgoncalves/novelo', options: { fontSize: 10, color: C.accent4 } }], { x: 9.6, y: 5.3, w: 3.03, h: 1.1, fontFace: THEME.bodyFontFace, align: 'center', valign: 'middle', margin: 0, isTextBox: true, objectName: 'Endereço' });
+  s.addNotes('[perguntas do júri, 1 minuto] Deixar este ecrã durante as perguntas. Agradecer à Vitrus, ao município e à organização. Respostas curtas e honestas: o que ainda não sabemos (custos por hora e por km da Vitrus, preço final da viatura) dizemo-lo; ver docs/projeto/perguntas-do-juri.md.');
+}
+
 // ================================================================================================ ANEXOS
 pres.addSection({ title: 'Anexos' });
 

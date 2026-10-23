@@ -1,7 +1,7 @@
 # Deck do pitch
 
 O deck do Novelo em PowerPoint, gerado por código (`pptxgenjs`) para que cada número venha dos dados e das capturas reais da app.
-Dez diapositivos para os 4 minutos do pitch (mais 1 de perguntas) e anexos de apoio para o júri, com tempo e fala nas notas do orador de cada um.
+Dez diapositivos para os 4 minutos do pitch, um de agradecimento para o minuto de perguntas e anexos de apoio para o júri, com tempo e fala nas notas do orador de cada um.
 
 | Ficheiro | O que é |
 | --- | --- |
