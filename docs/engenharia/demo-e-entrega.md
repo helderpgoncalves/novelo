@@ -13,9 +13,9 @@ A demo dura 2 minutos e 10 segundos dentro do pitch e percorre a história intei
 
 ## Dados da demo
 
-- Cenários A e B pré-calculados e guardados (ecrã Cenários); a demo nunca depende de correr a otimização inteira ao vivo.
+- Cenários A e B pré-calculados e guardados (ecrã Cenários); a demo nunca depende de correr a otimização inteira ao vivo. Em produção há também 7 cenários de demonstração (`Demo · …`), todos com as rotas por estrada: por freguesia (40 000 e 90 000 €/ano, este filho do primeiro, e custo mínimo para 350 t) e por locais reais (50 000 €/ano, o seu filho com raio de 500 m, escolas e custo mínimo para 250 t).
 - Cinco perguntas "E se...?" de reserva, testadas e em cache, caso o jurado não queira perguntar ou a rede falhe. A pergunta do jurado corre a sério.
-- Um lote de demonstração já com histórico (recolhido, triado), para o passaporte não aparecer vazio; a peça em palco junta-se a ele.
+- Seis lotes de demonstração com fotografias reais e histórico espalhado por vários dias (ver [Seed de demonstração](seed-demo.md)): o passaporte nunca aparece vazio e a peça em palco junta-se ao lote em curso `NOV-BXS4UW`.
 - A peça para a triagem: uma camisola com etiqueta legível, testada antes no mesmo telemóvel e com a mesma luz.
 - Um relatório RAP pré-gerado no portátil, caso a geração demore.
 - O copiloto (`/chat`) só entra na demo com `OPENROUTER_API_KEY` e orçamento disponíveis; sem eles responde 503 e o resto da demo não depende dele.
