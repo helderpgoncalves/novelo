@@ -351,7 +351,7 @@ pres.addSection({ title: 'Pitch' });
   talk(s, {
     time: '1:35–2:05',
     title: 'O resultado',
-    say: `Com 60 mil euros por ano, o otimizador desvia ${n(K.tonnes_year)} toneladas por ano do lixo, a ${n(K.annual_cost_eur / K.tonnes_year)} euros por tonelada; ${n(K.reusable_t)} reutilizáveis. E o ponto é este: cada tonelada que sai do lixo poupa 105,64 euros de aterro. São ${n(K.avoided_treatment_eur)} euros por ano, mais do que custa a operação. A rede paga-se com o que deixa de ir para o aterro.`,
+    say: `Com 60 mil euros por ano, o otimizador desvia ${n(K.tonnes_year, 1)} toneladas por ano do lixo, a ${n(K.annual_cost_eur / K.tonnes_year, 1)} euros por tonelada; ${n(K.reusable_t, 1)} reutilizáveis. E o ponto é este: cada tonelada que sai do lixo poupa 105,64 euros de aterro. São ${n(K.avoided_treatment_eur)} euros por ano, mais do que custa a operação. A rede paga-se com o que deixa de ir para o aterro.`,
     cue: `Estimativa: os custos por hora e por km da Vitrus ainda não chegaram. Em 8 de cada 10 simulações, entre ${n(MC.p10)} e ${n(MC.p90)} €/t. Nos casos pessimistas (acima de 105,64 €/t) o tratamento evitado já não cobre o custo.`,
   });
 }
@@ -469,7 +469,7 @@ pres.addSection({ title: 'Pitch' });
   talk(s, {
     time: '3:40–4:00',
     title: 'O pedido',
-    say: `Pedimos um piloto de três meses em duas freguesias, para trocar pressupostos por números medidos. ${n(K.tonnes_year)} toneladas por ano fora do lixo, pagas pela poupança no tratamento, sem um único contentor novo, e já em produção. Obrigado.`,
+    say: `Pedimos um piloto de três meses em duas freguesias, para trocar pressupostos por números medidos. ${n(K.tonnes_year, 1)} toneladas por ano fora do lixo, pagas pela poupança no tratamento, sem um único contentor novo, e já em produção. Obrigado.`,
     cue: 'Dizer a frase-âncora devagar. Agradecer e parar. Deixar o QR no ecrã para as perguntas.',
   });
 }
