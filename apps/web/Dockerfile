@@ -14,7 +14,7 @@ ARG VITE_API_URL=""
 ENV VITE_API_URL=$VITE_API_URL
 RUN pnpm --filter web build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.31-alpine
 # O nginx não conhece .mjs (serviria application/octet-stream) e um worker de módulo com nosniff exige JavaScript.
 RUN sed -i 's|^\(\s*application/javascript\s*js\);|\1 mjs;|' /etc/nginx/mime.types && grep -q 'js mjs;' /etc/nginx/mime.types
 COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
