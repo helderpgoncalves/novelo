@@ -50,6 +50,7 @@ def test_implausibly_small_outline_is_discarded() -> None:
     assert parish_area_km2(ok) == pytest.approx(3.71, rel=0.01)
 
 
+@pytest.mark.skipif(not RAW.exists(), reason="dados brutos locais (data/raw) não estão no repositório público")
 def test_real_parishes_add_up_to_most_of_the_municipality() -> None:
     # Guimarães tem ~241 km². 44 das 48 freguesias têm contorno fiável (3 sem contorno e Briteiros com um engano).
     features = json.loads(RAW.read_text())["features"]

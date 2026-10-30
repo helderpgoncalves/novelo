@@ -436,7 +436,10 @@ PACKAGE = REPO / "data" / "raw" / "vitrus-mapa-qgis"
 PROCESSED = REPO / "data" / "processed"
 
 
-@pytest.mark.skipif(not (PROCESSED / "municipal_summary.json").exists(), reason="corre `just etl` primeiro")
+@pytest.mark.skipif(
+    not (PROCESSED / "municipal_summary.json").exists() or not PACKAGE.exists(),
+    reason="corre `just etl`; os dados brutos locais (data/raw) não estão no repositório público",
+)
 def test_real_totals_match_raw_files() -> None:
     summary = json.loads((PROCESSED / "municipal_summary.json").read_text(encoding="utf-8"))
     # linhas de dados por ficheiro: contadas por fora do ETL (linhas físicas menos o cabeçalho)
