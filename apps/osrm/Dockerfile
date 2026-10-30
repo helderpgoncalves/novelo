@@ -17,7 +17,7 @@ RUN curl -fsSL --retry 5 --retry-delay 5 -D headers.txt -o portugal.osm.pbf "$OS
     && osmium fileinfo -e area.osm.pbf | head -20 > FILEINFO \
     && rm portugal.osm.pbf headers.txt
 
-FROM ghcr.io/project-osrm/osrm-backend:v5.27.1 AS prepare
+FROM ghcr.io/project-osrm/osrm-backend:v26.4.0 AS prepare
 WORKDIR /data
 COPY --from=clip /data/area.osm.pbf /data/SNAPSHOT /data/
 # Perfil da viatura de têxtil (sem compactação): o `car.lua` oficial com as dimensões de uma furgoneta/camião ligeiro
@@ -32,7 +32,7 @@ RUN osrm-extract -p /opt/novelo-van.lua /data/area.osm.pbf \
     && osrm-customize /data/area.osrm \
     && rm /data/area.osm.pbf
 
-FROM ghcr.io/project-osrm/osrm-backend:v5.27.1
+FROM ghcr.io/project-osrm/osrm-backend:v26.4.0
 WORKDIR /data
 COPY --from=prepare /data /data
 EXPOSE 5000
