@@ -1,19 +1,21 @@
-# Atualizações de dependências (Dependabot). Semanais e agrupadas (minor+patch) para reduzir ruído;
-# as correções de segurança chegam à parte, de imediato, independentemente deste calendário.
+# Atualizações de dependências (Dependabot). Semanais e agrupadas (minor+patch) para reduzir ruído.
+# As correções de segurança chegam à parte e de imediato (Dependabot security updates), sem esperar
+# pelo calendário. `cooldown` espera 7 dias por versões novas: dá tempo a detetar pacotes comprometidos
+# (cadeia de fornecimento) antes de os propor; não atrasa as correções de segurança.
 version: 2
 updates:
   - package-ecosystem: "npm"
     directories:
       - "/"
       - "/apps/web"
-      - "/pitch"
-      - "/video"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "07:00"
       timezone: "Europe/Lisbon"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     labels:
       - "dependencies"
     commit-message:
@@ -23,7 +25,7 @@ updates:
         update-types:
           - "minor"
           - "patch"
-  - package-ecosystem: "pip"
+  - package-ecosystem: "uv"
     directory: "/apps/api"
     schedule:
       interval: "weekly"
@@ -31,6 +33,8 @@ updates:
       time: "07:00"
       timezone: "Europe/Lisbon"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     labels:
       - "dependencies"
     commit-message:
@@ -44,12 +48,15 @@ updates:
     directories:
       - "/apps/api"
       - "/apps/web"
+      - "/apps/osrm"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "07:00"
       timezone: "Europe/Lisbon"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     labels:
       - "dependencies"
     commit-message:
@@ -69,6 +76,8 @@ updates:
       time: "07:00"
       timezone: "Europe/Lisbon"
     open-pull-requests-limit: 5
+    cooldown:
+      default-days: 7
     labels:
       - "dependencies"
     commit-message:
