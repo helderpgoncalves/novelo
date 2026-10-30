@@ -40,3 +40,17 @@ apps/web/playwright-report/
 apps/web/.gen-check/
 scripts/brand/cache/
 apps/web/.tanstack/
+
+# Material privado (pitch, vídeo, estratégia, dados brutos da Vitrus): fica fora do repositório público
+/pitch/
+/video/
+/data/raw/
+/docs/pesquisa/
+/docs/projeto/*pitch*
+/docs/projeto/estrategia-para-ganhar.md
+/docs/projeto/mentores.md
+/docs/projeto/perguntas-*.md
+/docs/projeto/cenarios-e-contingencias.md
+/docs/projeto/criterios-de-avaliacao.md
+/docs/engenharia/demo-e-entrega.md
+/.claude/skills/demo-prep/

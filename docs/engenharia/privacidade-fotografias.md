@@ -171,4 +171,4 @@ Não assumimos nada sobre a organização interna da Vitrus ou do município.
 - [Ambiente](ambiente.md#fotografias-dos-lotes): variáveis `LOT_PHOTO_*`.
 - [Arquitetura](arquitetura.md): tabelas e rotas dos lotes.
 - [Funcionalidades](features.md): a evidência por marca e o que se guarda.
-- [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md): afirmações D5 e D6.
+- Registo de afirmações: afirmações D5 e D6.

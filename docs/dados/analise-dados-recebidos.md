@@ -129,7 +129,7 @@ Antes de perguntar à Vitrus, procurámos o que já é público e pedimos confir
 | Depósito | Estaleiro Operacional na Rua das Lameiras, Polvoreira | vitrusambiente.pt/contactos | **Confirmado a 22 out** como depósito das rotas |
 | Quem recolhe têxteis | A To Be Green recolhe nos contentores das escolas (RRRCICLO); H Sarah, Ultriplo e Nova Etapa trabalham com contentores próprios noutros concelhos | Plano URBACT, pp. 56–57; EWWR; protocolos municipais | Explica a qualidade por entidade (9,2% a 72,9% de reutilização); por confirmar em Guimarães |
 
-Relatório completo da pesquisa, com páginas e citações, guardado fora do repositório durante o hackathon; resumo no [registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
+Relatório completo da pesquisa, com páginas e citações, guardado fora do repositório durante o hackathon; resumo no registo de afirmações.
 
 ## Onde se usa cada dado
 

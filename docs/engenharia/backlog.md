@@ -50,6 +50,6 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Slides com a identidade Novelo | Por fazer |
 | Vídeo de 60 s da demo (plano B) e relatório RAP pré-gerado | Por fazer |
 | 3 ensaios cronometrados, com perguntas do júri | Por fazer |
-| Checklist de entrega ([Demo e entrega](demo-e-entrega.md)) | Por fazer |
+| Checklist de entrega (Demo e entrega) | Por fazer |
 
 Se o tempo apertar, segue-se a [ordem de corte das features](features.md#ordem-de-corte). A comparação de cenários, o "E se...?" e o relatório RAP nunca se cortam.

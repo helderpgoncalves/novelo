@@ -17,7 +17,7 @@ from pathlib import Path
 import httpx
 
 OUT = Path(__file__).resolve().parents[2] / "data" / "raw" / "public" / "tipau.json"
-UA = "novelo-hackathon/1.0 (https://novelo.helder.si; contacto-removido)"
+UA = "novelo-hackathon/1.0 (https://novelo.helder.si)"
 PAGE = 862035  # "Freguesias e organização administrativa de Guimarães"
 
 

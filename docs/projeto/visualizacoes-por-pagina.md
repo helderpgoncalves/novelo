@@ -2,7 +2,7 @@
 
 Como transformar o Novelo, hoje correto mas "aborrecido e confuso", num produto que o júri percebe em dez segundos e recorda. Cada página passa a ter **uma mensagem**, **duas a quatro visualizações** com os dados de onde vêm, **um momento "uau"** e uma prioridade. No fim há a **home** em detalhe, o mapa de **reaproveitamento** (app, relatório RAP, slides) e a lista do que **falta na API e nos dados**.
 
-Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; código congelado às 15h00 ([estratégia](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro)). Os critérios e pesos estão em [Critérios de avaliação](criterios-de-avaliacao.md): inovação 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20% (fonte oficial [F61], registo E4).
+Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; código congelado às 15h00 (estratégia). Os critérios e pesos estão em Critérios de avaliação: inovação 25%, viabilidade técnica 25%, impacto e relevância 30%, apresentação e potencial de continuidade 20% (fonte oficial [F61], registo E4).
 
 **Estado deste documento: proposta de design.** Nada aqui está implementado, exceto onde a coluna "Estado" diz "Existe". Atualização de 20 de outubro de 2026: o ponto de partida (`/`) já conta a história com `get_overview`, mas **exige sessão**; a home pública e a rota `/baseline` desta proposta não existem (a rota `/` é a home autenticada). O diagnóstico parte do código e da estrutura da app, sem testes com utilizadores; valida-se com três pessoas fora da equipa antes de congelar (hipótese).
 
@@ -34,11 +34,11 @@ Escrito a 19 de outubro de 2026. Submissão a **23 de outubro às 17h30**; códi
 | 5 | Comparar: veredicto + inclinação A→B + robustez | Impacto (nunca se corta) | M |
 | 6 | Passaporte público a 390 px com selo "dados de demonstração" | Inovação, apresentação | S |
 
-Tudo o resto fica atrás de **E2E verde** (regra de corte da [estratégia](estrategia-para-ganhar.md#regras-de-corte-em-função-dos-pesos)). Esforço: S = até meio dia, M = até um dia, L = mais de um dia.
+Tudo o resto fica atrás de **E2E verde** (regra de corte da estratégia). Esforço: S = até meio dia, M = até um dia, L = mais de um dia.
 
 ## Números usados neste documento
 
-Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão em [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md).
+Todo o número tem fonte ou a palavra "estimativa". As linhas do registo estão em Registo de afirmações.
 
 | Número | Valor | Fonte | Estado |
 | --- | --- | --- | --- |
@@ -433,7 +433,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | 2 | **Fiabilidade medida**: matriz de confusão e exatidão | Mapa de calor | `GET /ai/eval/triage` | Existe no Painel de IA; D12 (medição por fazer) |
 | 3 | **A peça entra no lote e o fio do Sankey engrossa** | Sankey animado | `POST /lots/{code}/items`, `GET /textile/flows` | Novo, D19 |
 
-- **Momento "uau":** confirmar a peça e vê-la voar para o lote, engrossando um fio. É o momento da demo (passo 8 do [roteiro](narrativa-do-pitch.md#roteiro-da-demo)).
+- **Momento "uau":** confirmar a peça e vê-la voar para o lote, engrossando um fio. É o momento da demo (passo 8 do roteiro).
 - **Estado vazio:** "Tira uma foto da peça e da etiqueta". Sem chave de IA (503): "A triagem por IA está desligada. Podes preencher à mão".
 - **Microcópia honesta:** "Composição lida da etiqueta, confirmada por ti." Sem medição: "Estamos a medir a exatidão; resultados a [data]".
 - **Não pôr:** "a IA identifica a fibra" ou "substitui a triagem" (lista do que nunca dizer).
@@ -584,7 +584,7 @@ Os destinos passam a quatro grupos com nome de pergunta, e três páginas (Circu
 | **Prioridade / esforço** | P2 / S |
 
 - **Visual recomendado: nenhum.** Só os quatro estados (a carregar, vazio, erro, sucesso) e microcópia clara ("Email por confirmar"). Não investir horas aqui.
-- **Não pôr:** gráficos de utilização (as [métricas de ecrã não contam](estrategia-para-ganhar.md#regras-de-corte-em-função-dos-pesos)).
+- **Não pôr:** gráficos de utilização (as métricas de ecrã não contam).
 
 ### 2.6 Quadro de prioridades
 
@@ -791,7 +791,7 @@ Princípio: **animar só quando o movimento revela uma relação ou uma ordem**.
 
 ## 4. Mapa de reaproveitamento: app, relatório RAP e slides
 
-Um visual construído **uma vez**, com dados e título-conclusão num só módulo, serve três saídas: o ecrã, o PDF e o slide. Os slides são os do [guião](pitch-slides.md) (1 Capa, 2 Problema, 3 Referência, 4 Demo, 5 IA, 6 Indústria, 7 2028, 8 Pedido, 9 Apoio). As secções do PDF são as do `rap.html` (Resumo, Custo por tipo de território, Material recolhido, Cenários comparados, Quem polui paga, Método e fontes).
+Um visual construído **uma vez**, com dados e título-conclusão num só módulo, serve três saídas: o ecrã, o PDF e o slide. Os slides são os do guião (1 Capa, 2 Problema, 3 Referência, 4 Demo, 5 IA, 6 Indústria, 7 2028, 8 Pedido, 9 Apoio). As secções do PDF são as do `rap.html` (Resumo, Custo por tipo de território, Material recolhido, Cenários comparados, Quem polui paga, Método e fontes).
 
 | Visual | App | Relatório RAP (secção) | Slide | Formato de exportação | Esforço |
 | --- | --- | --- | --- | --- | --- |
@@ -843,7 +843,7 @@ Cada linha diz o que falta, onde, e se **bloqueia um P0**. Os campos já existen
 | **D13** | Relatório RAP | Pré-visualização/miniaturas do PDF | API, `GET /reports/{id}/preview` | Não | M |
 | **D14** | Relatório RAP, slides | SVG dos gráficos dentro do PDF (SSR ECharts ou envio do cliente) | `reports/builder.py` | Não | L |
 | **D15** | Mapa, Relatório, slides | Coroplético estático em SVG a partir de `ZoneOut.geometry` (projeção própria) | Web | Não | M |
-| **D16** | Qualidade dos dados | Proveniência por número (Dado Vitrus / Cálculo / Estimativa / Por verificar), a partir do [registo](../pesquisa/registo-de-afirmacoes.md) | API, `GET /datasets/provenance` | Não | M |
+| **D16** | Qualidade dos dados | Proveniência por número (Dado Vitrus / Cálculo / Estimativa / Por verificar), a partir do registo | API, `GET /datasets/provenance` | Não | M |
 | **D17** | Piloto | Limiares da regra "se... então" e calendário de 13 semanas: **decisão da equipa**, validar com a Vitrus | Conteúdo | Não | S |
 | **D18** | Ponto de partida (opcional) | Série **mensal** por entidade (os Excel têm kg por mês em pelo menos uma entidade; o ETL guarda só o ano): pequenos múltiplos e *sparklines* | ETL, **por verificar** nos ficheiros | Não | M |
 | **D19** | Passaporte, Lotes, Triagem | Campo `is_demo` no lote e selo "Dados de demonstração" | Modelo `lots` + migração + schema | **Sim** (honestidade) | S |
@@ -861,7 +861,7 @@ Cada linha diz o que falta, onde, e se **bloqueia um P0**. Os campos já existen
 
 ### 6.1 Ordem de execução até ao congelamento
 
-Alinhada com o [calendário](estrategia-para-ganhar.md#calendário-dia-a-dia-19-a-28-de-outubro). H = Hélder, F = Flávio (proposta).
+Alinhada com o calendário. H = Hélder, F = Flávio (proposta).
 
 | Dia | Entregas | Quem |
 | --- | --- | --- |
@@ -914,4 +914,4 @@ Consultadas a **19 de outubro de 2026**, por ligação direta (HTTP 200). "Verif
 | R11 | Okabe e Ito, paleta de cores acessível a daltonismo (Color Universal Design) | Paleta categórica das fibras | **Por verificar**: não foi consultada |
 | R12 | Bank of England, *fan charts* de inflação, e literatura sobre visualização de incerteza | Princípio 7 | **Por verificar**: não foi consultada |
 
-**Fontes do projeto usadas:** [Critérios de avaliação](criterios-de-avaliacao.md), [Estratégia para ganhar](estrategia-para-ganhar.md), [Guião de slides](pitch-slides.md), [Narrativa do pitch](narrativa-do-pitch.md), [Registo de afirmações](../pesquisa/registo-de-afirmacoes.md), [Dados e modelo](../engenharia/dados-e-modelo.md), [Funcionalidades](../engenharia/features.md), [Análise dos dados recebidos](../dados/analise-dados-recebidos.md) e [Guia de marca](../marca/guia-de-marca.md).
+**Fontes do projeto usadas:** Critérios de avaliação, Estratégia para ganhar, Guião de slides, Narrativa do pitch, Registo de afirmações, [Dados e modelo](../engenharia/dados-e-modelo.md), [Funcionalidades](../engenharia/features.md), [Análise dos dados recebidos](../dados/analise-dados-recebidos.md) e [Guia de marca](../marca/guia-de-marca.md).

@@ -287,4 +287,4 @@ O `seed` importa estes ficheiros (`DATA_DIR`) para `municipal_containers`, `muni
 
 ## Fontes
 
-[F63] Lasso, brochura de contentores enterrados (Blue Bee, Green Bee, Red Bee). [F64] Lasso, página do Green Bee. [F65] Molok e fornecedores portugueses (Resopre, SULO). [F66] DGT, Carta Administrativa Oficial de Portugal. [F67] DGT, catálogo de entidades da CAOP 2023. [F68] ISO 19157-1:2023. Detalhe, estado e ligações em [Fontes](../pesquisa/fontes.md).
+[F63] Lasso, brochura de contentores enterrados (Blue Bee, Green Bee, Red Bee). [F64] Lasso, página do Green Bee. [F65] Molok e fornecedores portugueses (Resopre, SULO). [F66] DGT, Carta Administrativa Oficial de Portugal. [F67] DGT, catálogo de entidades da CAOP 2023. [F68] ISO 19157-1:2023. Detalhe, estado e ligações em Fontes.

@@ -36,7 +36,7 @@ from novelo.core.security import create_access_token
 from novelo.features.auth.cookies import ACCESS_COOKIE, cookie_name
 
 BASE = os.environ.get("NOVELO_API_BASE", "http://127.0.0.1:8000/api/v1")
-UA = {"User-Agent": "novelo-demo-seed/1.0 (https://novelo.helder.si; contacto-removido)"}
+UA = {"User-Agent": "novelo-demo-seed/1.0 (https://novelo.helder.si)"}
 CACHE = Path("/tmp/demo_photos")
 YES = "--yes" in sys.argv
 ARGS = sys.argv[1:]

@@ -17,7 +17,7 @@ triagem por foto (controlo de qualidade na entrega), lotes com QR e passaporte p
 
 ## Regra zero: usar os dados reais da Vitrus
 
-Os dados recebidos são obrigatórios em tudo o que for número. Estão em `data/raw/` (Excel, nunca editar)
+Os dados recebidos são obrigatórios em tudo o que for número. Estão em `data/raw/` (Excel, nunca editar; **local, fora do Git**: pedir à equipa) 
 e `data/processed/` (gerado por `just etl`). Análise e limites em `docs/dados/analise-dados-recebidos.md`.
 
 | Facto | Valor | Onde se usa |
@@ -127,7 +127,6 @@ procedimento lendo diretamente `.claude/skills/<nome>/SKILL.md`. `.agents/skills
 | `llm-feature` | "E se...?", triagem por foto, verificador, evals |
 | `deploy-coolify` | Deploy, domínio, variáveis, diagnóstico em produção |
 | `ship` | Fechar uma tarefa: check, commit, push |
-| `demo-prep` | Cenários A/B, guião, plano B da demo |
 | `write-docs` | Escrever ou rever documentação |
 
 | Agente | Responsável por |

@@ -45,7 +45,7 @@ Cada peça triada entra num lote; cada lote tem um QR e uma página pública; os
 | Peso | Estimado por tipo de peça no MVP; balança no ponto no piloto |
 | Histórico | Recolhido, triado, reservado, entregue, com data |
 
-**O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o plano municipal de Guimarães (contexto público, [F74](../pesquisa/fontes.md)) descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
+**O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o plano municipal de Guimarães (contexto público, F74) descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
 
 **A bolsa de fibra (prioridade baixa).** A Vitrus diz que reciclar custa muito mais que a fibra virgem (21 out 2026): o valor está na reutilização, e a bolsa desce na prioridade. Uma vista agregada para quem recicla: "algodão 100%, reciclável, 320 kg em 4 lotes, Azurém e Creixomil". O reciclador registado manifesta interesse e o lote fica reservado. Sem preços nem pagamentos no MVP: o valor está em tornar visível material que hoje vai para aterro.
 

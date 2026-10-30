@@ -1,0 +1,35 @@
+Copyright (c) 2026 Hélder Gonçalves e Flávio Fernandes. Todos os direitos reservados.
+Copyright (c) 2026 Hélder Gonçalves and Flávio Fernandes. All rights reserved.
+
+O Novelo (código, dados tratados, documentação, marca, textos e imagens) é
+propriedade dos autores. Este repositório é público apenas para consulta e
+avaliação (por exemplo, por júris, entidades parceiras e potenciais
+colaboradores). Sem autorização prévia e escrita dos autores, é proibido:
+
+  1. copiar, reproduzir, modificar, traduzir ou criar obras derivadas;
+  2. redistribuir ou publicar, no todo ou em parte;
+  3. executar o software como serviço, interno ou público, comercial ou não;
+  4. usar o nome "Novelo", o símbolo, o logótipo ou a identidade visual;
+  5. usar o código, a documentação ou as imagens para treinar modelos de
+     inteligência artificial ou para extração automática em massa.
+
+Ler, avaliar e clonar localmente para fins de avaliação é permitido. Nenhum
+direito de patente ou de marca é concedido.
+
+Componentes de terceiros mantêm as respetivas licenças (dependências de código
+aberto, tipografia Inter e Newsreader em SIL OFL, OpenStreetMap em ODbL, etc.).
+Os dados da Vitrus Ambiente, do INE, da APA e de outras fontes pertencem aos
+respetivos titulares.
+
+O SOFTWARE É FORNECIDO "COMO ESTÁ", SEM GARANTIA DE QUALQUER TIPO.
+
+Pedidos de autorização: abrir uma issue privada de contacto através do perfil
+GitHub dos autores.
+
+---
+
+Copyright (c) 2026 Hélder Gonçalves and Flávio Fernandes. All rights reserved.
+This repository is public for viewing and evaluation only. Copying, modifying,
+redistributing, running as a service, using the Novelo name and branding, or
+using the contents to train AI models is prohibited without prior written
+permission from the authors.

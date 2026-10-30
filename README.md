@@ -15,7 +15,8 @@
 
 <p align="center">
   <a href="https://novelo.helder.si"><img alt="Em produção: novelo.helder.si" src="https://img.shields.io/badge/em%20produ%C3%A7%C3%A3o-novelo.helder.si-2E6B57?style=flat-square"></a>
-  <img alt="Hack4Guimarães 2035, Desafio 5 TexVitrus" src="https://img.shields.io/badge/Hack4Guimar%C3%A3es%202035-Desafio%205%20TexVitrus-14211D?style=flat-square">
+  <img alt="Vencedor do Hack4Guimarães 2035: 8 500 euros em prémios" src="https://img.shields.io/badge/%F0%9F%8F%86%20Hack4Guimar%C3%A3es%202035-1.%C2%BA%20lugar%20%C2%B7%208%20500%20%E2%82%AC-B8862B?style=flat-square">
+  <img alt="Vencedor do desafio TexVitrus (Vitrus Ambiente)" src="https://img.shields.io/badge/Desafio%20TexVitrus-vencedor-14211D?style=flat-square">
   <img alt="Testes: 1 164 da API e 449 da web" src="https://img.shields.io/badge/testes-1%20164%20API%20%C2%B7%20449%20web-2E6B57?style=flat-square">
   <img alt="Copiloto: 100% dos números verificados" src="https://img.shields.io/badge/copiloto-100%25%20n%C3%BAmeros%20verificados-2E6B57?style=flat-square">
   <br>
@@ -33,7 +34,19 @@
   <a href="docs/README.md"><strong>Documentação</strong></a>
 </p>
 
-<p align="center"><em>Hélder Gonçalves e Flávio Fernandes · Hack4Guimarães 2035 · Desafio 5 TexVitrus (Vitrus Ambiente)</em></p>
+<p align="center"><em>Hélder Gonçalves e Flávio Fernandes · Hack4Guimarães 2035 · Desafio TexVitrus (Vitrus Ambiente)</em></p>
+
+> ### 🏆 Vencedor do Hack4Guimarães 2035
+>
+> O Novelo ganhou o **concurso geral** (7 500 €) e o **desafio TexVitrus**, lançado pela Vitrus Ambiente (1 000 €): **8 500 € em prémios**, entregues a 28 de outubro de 2026 no Mês da Economia de Guimarães.
+> Cinco dias de maratona (19 a 23 de outubro), apresentação ao júri a 26 de outubro.
+>
+> **Na imprensa:**
+> [Portugal Têxtil](https://portugaltextil.com/novelo-quer-tornar-recolha-de-residuos-texteis-mais-eficiente/) ·
+> [Mais Guimarães](https://maisguimaraes.pt/dupla-de-barcelos-vence-hack4guimaraes-com-um-plano-para-recolher-mais-texteis-gastando-menos) ·
+> [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) ·
+> [E24](https://e24.pt/guimaraes-plataforma-novelo-vence-hack4guimaraes-e-combate-lixo-textil/) ·
+> [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/)
 
 ---
 
@@ -47,7 +60,7 @@
 
 ## Índice
 
-[O problema](#o-problema) · [A resposta](#a-resposta-uma-viatura-de-têxtil-nenhum-contentor-novo) · [Em imagens](#em-imagens) · [Os números](#os-números-que-alimentam-tudo) · [O que o Novelo faz](#o-que-o-novelo-faz) · [IA](#ia-com-rédea-curta) · [Dados](#dados-e-regra-zero) · [Arquitetura](#arquitetura) · [Stack](#stack) · [Arrancar](#arrancar) · [Testes](#testes-e-qualidade) · [Estrutura](#estrutura-do-repositório) · [Produção](#produção-e-deploy) · [Segurança e RGPD](#segurança-e-rgpd) · [Marca, vídeo e pitch](#marca-vídeo-e-pitch) · [Limitações](#limitações-conhecidas-e-roteiro) · [Documentação](#documentação)
+[O problema](#o-problema) · [A resposta](#a-resposta-uma-viatura-de-têxtil-nenhum-contentor-novo) · [Em imagens](#em-imagens) · [Os números](#os-números-que-alimentam-tudo) · [O que o Novelo faz](#o-que-o-novelo-faz) · [IA](#ia-com-rédea-curta) · [Dados](#dados-e-regra-zero) · [Arquitetura](#arquitetura) · [Stack](#stack) · [Arrancar](#arrancar) · [Testes](#testes-e-qualidade) · [Estrutura](#estrutura-do-repositório) · [Produção](#produção-e-deploy) · [Segurança e RGPD](#segurança-e-rgpd) · [Marca e imprensa](#marca-e-imprensa) · [Limitações](#limitações-conhecidas-e-roteiro) · [Documentação](#documentação)
 
 ## O problema
 
@@ -341,11 +354,9 @@ Mais em [testes](docs/engenharia/testes.md).
 ```
 apps/api/            FastAPI (src/novelo/{core,features,domain,adapters,ai}), migrações e testes
 apps/web/            React + Vite. src/client é gerado; src/components/data-table é a tabela única do produto
-data/raw|processed/  Excel e pacote QGIS recebidos | CSV, JSON e GeoJSON limpos (gerados)
+data/processed/      CSV, JSON e GeoJSON limpos (gerados); os ficheiros brutos da Vitrus não são públicos
 docs/                projeto/ · pesquisa/ · engenharia/ · dados/ · marca/ (só Markdown) · img/
 brand/               símbolo, logotipos, fontes, avatares e redes (gerados por `just brand`)
-video/               vídeo de apresentação em Remotion (16:9 e 9:16), a partir dos dados reais
-pitch/               deck do pitch em PowerPoint, gerado por código (pptxgenjs)
 scripts/             etl/, brand/, eval_*.py e export_openapi.py
 .claude/             agentes e skills partilhados (Claude Code, GLM/Z.ai, ZCode)
 openapi.json         contrato exportado e versionado
@@ -372,14 +383,12 @@ Passo a passo, variáveis, operação e diagnóstico em [deploy](docs/engenharia
 - **Dados municipais:** os nomes dos estabelecimentos produtores só saem a um `admin`, e nunca pelo copiloto.
 - **Segredos:** só em variáveis de ambiente (Coolify em produção); `.env` nunca vai para o Git.
 
-## Marca, vídeo e pitch
+## Marca e imprensa
 
 - **Marca.** Identidade calma e editorial: Linho, Tinta e Floresta, Newsreader nos títulos e Inter no texto (ambas SIL Open Font License). O símbolo são três fios quase fechados à volta de um ponto.
   `just brand` gera todos os assets a partir de uma só geometria, incluindo os fundos em **dither** ([linguagem dither](docs/marca/linguagem-dither.md)). Ver [guia de marca](docs/marca/guia-de-marca.md).
-- **Vídeo.** 2 min 14 s em 16:9 e 9:16, feito em Remotion a partir dos dados reais e de ecrãs reais da app, com banda sonora original sintetizada. Ver [video/](video/README.md).
-- **Pitch.** Doze diapositivos para cinco minutos, mais cinco de apoio, gerados por código com cada número dos dados. Ver [pitch/](pitch/README.md) e o [guião](docs/projeto/guiao-do-pitch.md).
-
-Submissão até 23 de outubro de 2026 às 17h30; pitches a 26 de outubro.
+- **Prémios.** 1.º lugar do Hack4Guimarães 2035 (7 500 €) e vencedor do desafio TexVitrus (1 000 €), 28 de outubro de 2026.
+- **Imprensa.** [Portugal Têxtil](https://portugaltextil.com/novelo-quer-tornar-recolha-de-residuos-texteis-mais-eficiente/) (29 out), [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/) (29 out), [E24](https://e24.pt/guimaraes-plataforma-novelo-vence-hack4guimaraes-e-combate-lixo-textil/) (29 out), [Mais Guimarães](https://maisguimaraes.pt/dupla-de-barcelos-vence-hack4guimaraes-com-um-plano-para-recolher-mais-texteis-gastando-menos) e [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) (28 out).
 
 ## Limitações conhecidas e roteiro
 
@@ -407,10 +416,8 @@ Honestidade primeiro: o que o Novelo ainda não sabe ou não faz.
 
 | Para quê | Onde |
 | --- | --- |
-| Perceber o projeto | [Visão geral](docs/projeto/visao-geral.md) (a página pública), [proposta](docs/projeto/proposta.md), [estratégia](docs/projeto/estrategia-para-ganhar.md) |
-| Pitch | [Guião](docs/projeto/guiao-do-pitch.md), [narrativa](docs/projeto/narrativa-do-pitch.md), [perguntas difíceis](docs/projeto/perguntas-do-juri.md), [cenários e contingências](docs/projeto/cenarios-e-contingencias.md) |
-| Falar com a Vitrus e mentores | [Perguntas aos orientadores](docs/projeto/perguntas-aos-orientadores.md), [mentores](docs/projeto/mentores.md) |
-| Provas | [Pesquisa](docs/pesquisa/README.md), [registo de afirmações](docs/pesquisa/registo-de-afirmacoes.md) |
+| Perceber o projeto | [Visão geral](docs/projeto/visao-geral.md) (a página pública), [proposta](docs/projeto/proposta.md) |
+| Provas | Pesquisa, registo de afirmações |
 | Construir | [Arquitetura](docs/engenharia/arquitetura.md), [funcionalidades](docs/engenharia/features.md), [dados e modelo](docs/engenharia/dados-e-modelo.md), [IA](docs/engenharia/ia.md), [copiloto](docs/engenharia/copiloto.md), [ambiente](docs/engenharia/ambiente.md), [deploy](docs/engenharia/deploy.md), [testes](docs/engenharia/testes.md) |
 | Dados recebidos | [Análise dos dados](docs/dados/analise-dados-recebidos.md), [contentores municipais](docs/dados/analise-contentores-municipais.md) |
 | Trabalhar com agentes | [AGENTS.md](AGENTS.md), [CLAUDE.md](CLAUDE.md), [workflow](docs/engenharia/workflow-ia.md) |
@@ -421,4 +428,4 @@ Dados da Vitrus Ambiente, INE (Censos 2021 e tipologia TIPAU), CAOP e OpenStreet
 Estradas: © colaboradores do OpenStreetMap, licença ODbL; extrato de Portugal da Geofabrik; motor [Project OSRM](https://project-osrm.org) (BSD-2).
 Tipografia: Inter e Newsreader (SIL Open Font License). A fotografia do hero da landing é CC BY-SA 4.0 (`apps/web/public/landing/CREDITS.md`).
 As fotos da triagem em `docs/img/pagina-triagem.png` são de Minderbinder, na Wikimedia Commons (CC BY-SA 4.0).
-Direitos reservados à equipa até decisão em contrário: o repositório é público, mas não tem ficheiro de licença.
+**Todos os direitos reservados** © 2026 Hélder Gonçalves e Flávio Fernandes. O código está público só para consulta e avaliação; copiar, reutilizar, redistribuir ou pôr em serviço (comercial ou não) exige autorização escrita. Ver [LICENSE](LICENSE). Os dados de terceiros mantêm as licenças das respetivas fontes.

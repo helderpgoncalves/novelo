@@ -4,9 +4,9 @@
 
 **Novelo é a ferramenta de decisão que desenha a rede de recolha seletiva de têxteis de Guimarães ao menor custo.** Entram um orçamento e uma meta. Saem cenários comparáveis em **euros, toneladas, toneladas reutilizáveis e €/tonelada**, calculados por um otimizador sobre os dados reais da Vitrus Ambiente: o lixo que recolhe, o custo de o tratar e os 2 751 contentores municipais.
 
-**[Experimentar em novelo.helder.si](https://novelo.helder.si)** · **[Código aberto no GitHub](https://github.com/helderpgoncalves/novelo)**
+**[Experimentar em novelo.helder.si](https://novelo.helder.si)** · **[Código no GitHub, só para consulta](https://github.com/helderpgoncalves/novelo)**
 
-*Hack4Guimarães 2035 · Desafio 5 TexVitrus · Hélder Gonçalves e Flávio Fernandes*
+*🏆 Vencedor do Hack4Guimarães 2035 (7 500 €) e do desafio TexVitrus (1 000 €) · Hélder Gonçalves e Flávio Fernandes*
 
 | **3 003,3 t** | **9,1%** | **431,1 t** | **45 542 €** | **0 contentores** |
 | :---: | :---: | :---: | :---: | :---: |
