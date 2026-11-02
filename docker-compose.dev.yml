@@ -4,7 +4,7 @@ name: novelo-dev
 
 services:
   db:
-    image: postgres:17-alpine
+    image: postgres:18-alpine
     environment:
       POSTGRES_USER: ${POSTGRES_USER:-novelo}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-novelo}
