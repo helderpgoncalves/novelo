@@ -9,6 +9,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | [Visão geral](projeto/visao-geral.md) | A página pública do projeto: problema, resposta, produto com capturas, o que já está provado e próximo passo (pronta a colar na TAIKAI) |
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
 | [Visualizações por página](projeto/visualizacoes-por-pagina.md) | Data storytelling: princípios, 2 a 4 visuais por página com dados e prioridade, a home em detalhe, reaproveitamento na app, no RAP e nos slides, e dependências em falta |
+| [Triagem do lado do consumidor](projeto/triagem-lado-consumidor.md) | Análise da sugestão da Vitrus de o munícipe triar em casa: como a triagem funciona hoje, a matemática da escala, o que os dados e outros sistemas dizem, sete abordagens comparadas e a recomendada (triagem partilhada em camadas: dois sacos, verificação à porta, auditoria por amostragem e feedback) |
 
 ## Engenharia
 
