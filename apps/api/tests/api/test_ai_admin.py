@@ -45,7 +45,16 @@ async def test_only_admins_reach_the_panel(logged_in: httpx.AsyncClient) -> None
 async def test_settings_show_effective_model_and_its_origin_per_task(admin: httpx.AsyncClient) -> None:
     first = (await admin.get(f"{AI}/settings")).json()
     tasks = {t["task"]: t for t in first["tasks"]}
-    assert set(tasks) == {"copilot", "whatif", "explain", "briefing", "alert_resolution", "copilot_aux", "triage"}
+    assert set(tasks) == {
+        "copilot",
+        "whatif",
+        "explain",
+        "briefing",
+        "alert_resolution",
+        "copilot_aux",
+        "triage",
+        "precheck",
+    }
     assert tasks["triage"]["effective"]["model"] == get_settings().llm_model_vision
     assert tasks["triage"]["effective"]["model_source"] == "env" and tasks["triage"]["requirements"] == [
         "image",
@@ -71,6 +80,10 @@ async def test_settings_show_effective_model_and_its_origin_per_task(admin: http
     assert (out["whatif"]["model"], out["whatif"]["model_source"]) == ("acme/text-only", "global_default")
     # o modelo de visão não herda o de texto
     assert (out["triage"]["model"], out["triage"]["model_source"]) == (get_settings().llm_model_vision, "env")
+    assert (out["precheck"]["model"], out["precheck"]["model_source"]) == (
+        get_settings().llm_model_vision,
+        "env",
+    )
     assert (out["explain"]["max_output_tokens"], out["explain"]["max_tokens_source"]) == (200, "database")
     assert (out["whatif"]["max_output_tokens"], out["whatif"]["max_tokens_source"]) == (700, "global_default")
     assert out["copilot"]["reasoning_effort"] == "medium" and out["whatif"]["reasoning_source"] == "env"

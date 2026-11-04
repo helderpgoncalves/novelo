@@ -6,6 +6,7 @@ from fastapi.responses import Response
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.adapters.openrouter import OpenRouterClient
+from novelo.ai.images import MAX_BYTES
 from novelo.core.database import get_db
 from novelo.core.deps import CurrentUser
 from novelo.core.guest import AiGuard, NotGuestDep
@@ -165,8 +166,8 @@ async def analyse_garment(
     try:
         return await triage.analyse(
             llm,
-            await item_photo.read(triage.MAX_BYTES + 1),
-            await label_photo.read(triage.MAX_BYTES + 1) if label_photo else None,
+            await item_photo.read(MAX_BYTES + 1),
+            await label_photo.read(MAX_BYTES + 1) if label_photo else None,
             locale=locale,
         )
     finally:

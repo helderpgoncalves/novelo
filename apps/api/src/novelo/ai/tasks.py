@@ -16,6 +16,7 @@ class AiTask(StrEnum):
     ALERT_RESOLUTION = "alert_resolution"
     COPILOT_AUX = "copilot_aux"  # título, sugestões e resumos do copiloto (modelo barato)
     TRIAGE = "triage"  # visão
+    PRECHECK = "precheck"  # visão: conselho «vai no saco?» antes da recolha (rota pública)
     TEST = "test"  # ping do painel (modelo explícito; não é configurável)
     WEB_SEARCH = "web_search"  # pesquisa na web do copiloto (usa o modelo de `copilot_aux`; só para a contabilidade)
 
@@ -29,6 +30,7 @@ CONFIGURABLE_TASKS: tuple[AiTask, ...] = (
     AiTask.ALERT_RESOLUTION,
     AiTask.COPILOT_AUX,
     AiTask.TRIAGE,
+    AiTask.PRECHECK,
 )
 
 TASK_REQUIREMENTS: dict[AiTask, frozenset[str]] = {
@@ -39,9 +41,13 @@ TASK_REQUIREMENTS: dict[AiTask, frozenset[str]] = {
     AiTask.ALERT_RESOLUTION: frozenset({STRUCTURED}),
     AiTask.COPILOT_AUX: frozenset({STRUCTURED}),
     AiTask.TRIAGE: frozenset({IMAGE, STRUCTURED}),
+    AiTask.PRECHECK: frozenset({IMAGE, STRUCTURED}),
     AiTask.TEST: frozenset(),
     AiTask.WEB_SEARCH: frozenset(),
 }
+
+# Tarefas de visão: herdam o modelo de visão, nunca o de texto (ver ai_admin e o adaptador).
+VISION_TASKS: frozenset[AiTask] = frozenset(t for t, req in TASK_REQUIREMENTS.items() if IMAGE in req)
 
 # Modelo recomendado por tarefa (verificado no catálogo público do OpenRouter).
 RECOMMENDED_MODEL = "openai/gpt-6-luna"
@@ -56,6 +62,7 @@ TASK_MAX_TOKENS: dict[AiTask, int] = {
     AiTask.ALERT_RESOLUTION: 500,
     AiTask.COPILOT_AUX: 400,
     AiTask.TRIAGE: 500,
+    AiTask.PRECHECK: 200,
     AiTask.TEST: 16,
     AiTask.WEB_SEARCH: 256,
 }
@@ -68,6 +75,7 @@ SCHEMA_TASKS: dict[str, AiTask] = {
     "ScenarioDelta": AiTask.WHATIF,
     "_Explanation": AiTask.EXPLAIN,
     "TriageAnalysis": AiTask.TRIAGE,
+    "PreCheckAnalysis": AiTask.PRECHECK,
     "AlertSuggestion": AiTask.ALERT_RESOLUTION,
     "_Briefing": AiTask.BRIEFING,
     "_ThreadTitle": AiTask.COPILOT_AUX,
@@ -79,6 +87,7 @@ SCHEMA_TASKS: dict[str, AiTask] = {
 # São estimativas declaradas como tal. As fotos da triagem já vão reduzidas (<= 1024 px).
 TYPICAL_TOKENS: dict[AiTask, tuple[int, int]] = {
     AiTask.TRIAGE: (2200, 250),
+    AiTask.PRECHECK: (1200, 120),  # uma foto, sem etiqueta (estimativa)
     AiTask.COPILOT: (5000, 600),
     AiTask.BRIEFING: (1200, 250),
     AiTask.WHATIF: (1500, 200),
@@ -89,6 +98,7 @@ TYPICAL_TOKENS: dict[AiTask, tuple[int, int]] = {
 
 OPERATION_LABEL: dict[AiTask, str] = {
     AiTask.TRIAGE: "per_item_sorted",
+    AiTask.PRECHECK: "per_precheck",
     AiTask.COPILOT: "per_question",
     AiTask.BRIEFING: "per_briefing",
     AiTask.WHATIF: "per_question",

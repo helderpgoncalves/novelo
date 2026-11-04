@@ -16,6 +16,7 @@ export const TASKS = [
   'briefing',
   'alert_resolution',
   'triage',
+  'precheck',
 ] as const satisfies readonly AiTask[];
 
 export type ConfigurableTask = (typeof TASKS)[number];
@@ -29,6 +30,7 @@ export const taskLabel: Record<AiTask, () => string> = {
   copilot_aux: () => m.aiadm_task_copilot_aux(),
   web_search: () => m.aiadm_task_web_search(),
   triage: () => m.aiadm_task_triage(),
+  precheck: () => m.aiadm_task_precheck(),
   test: () => m.aiadm_task_test(),
 };
 
@@ -39,6 +41,7 @@ export const taskDescription: Record<ConfigurableTask, () => string> = {
   briefing: () => m.aiadm_task_briefing_desc(),
   alert_resolution: () => m.aiadm_task_alert_resolution_desc(),
   triage: () => m.aiadm_task_triage_desc(),
+  precheck: () => m.aiadm_task_precheck_desc(),
 };
 
 export const labelForTask = (task: string | null): string =>

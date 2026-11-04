@@ -131,6 +131,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Conta | `/account` | Perfil, língua, tema, sessões, password |
 | Entrada | `/login`, `/join`, `/magic-link`, `/verify-email`, `/privacy` | Magic link (principal), password, Google, entrada de evento por QR, confirmação de email e texto de privacidade |
 | Passaporte | `/passport/:código` | Público, sem sessão: o que o QR do lote abre |
+| «Vai no saco?» | `/bag-check` | Público, sem sessão: a triagem pré-recolha para quem prepara o saco em casa (uma foto, conselho numa frase, nada guardado) |
 
 **Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, apresentação de seis passos na primeira entrada (o impacto com os números da API), `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
 
@@ -141,6 +142,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
 | Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; exatidão da triagem por medir |
+| Triagem pré-recolha «Vai no saco?» (proposta da Vitrus de nov 2026): fase 1, página pública sem sessão | Feito ([desenho e fases](triagem-pre-recolha.md)); fase 2 (operador na ronda, KPI «rejeito evitado») por fazer |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |

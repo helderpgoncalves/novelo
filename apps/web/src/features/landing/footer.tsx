@@ -100,6 +100,11 @@ export function LandingFooter() {
                   </a>
                 </li>
                 <li>
+                  <Link to="/bag-check" className="lp-ft-link">
+                    {m.bag_title()}
+                  </Link>
+                </li>
+                <li>
                   <Link to="/login" className="lp-ft-link lp-ft-strong">
                     {m.landing_sign_in()}
                   </Link>
