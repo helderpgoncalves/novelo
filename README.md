@@ -42,11 +42,14 @@
 > Cinco dias de maratona (19 a 23 de outubro), apresentação ao júri a 26 de outubro.
 >
 > **Na imprensa:**
+> [ECO](https://eco.sapo.pt/2026/11/03/dois-jovens-de-barcelos-querem-desatar-o-no-da-recolha-de-residuos-texteis-em-guimaraes/) ·
+> [FashionNetwork](https://pt.fashionnetwork.com/news/Hack4guimaraes-2035-engenheiros-de-barcelos-ganham-no-concurso-vimaranense-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis-mais-1-000-pela-vitoria-no-desafio-da-vitrus-ambiente,1881327.html) ·
+> [Jornal T](https://jornal-t.pt/noticia/novelo-propoe-recolher-431-toneladas-de-texteis-por-ano-em-guimaraes/) ·
 > [Portugal Têxtil](https://portugaltextil.com/novelo-quer-tornar-recolha-de-residuos-texteis-mais-eficiente/) ·
-> [Mais Guimarães](https://maisguimaraes.pt/dupla-de-barcelos-vence-hack4guimaraes-com-um-plano-para-recolher-mais-texteis-gastando-menos) ·
-> [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) ·
 > [E24](https://e24.pt/guimaraes-plataforma-novelo-vence-hack4guimaraes-e-combate-lixo-textil/) ·
-> [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/)
+> [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/) ·
+> [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) ·
+> [e mais](#marca-e-imprensa)
 
 ---
 
@@ -388,7 +391,11 @@ Passo a passo, variáveis, operação e diagnóstico em [deploy](docs/engenharia
 - **Marca.** Identidade calma e editorial: Linho, Tinta e Floresta, Newsreader nos títulos e Inter no texto (ambas SIL Open Font License). O símbolo são três fios quase fechados à volta de um ponto.
   `just brand` gera todos os assets a partir de uma só geometria, incluindo os fundos em **dither** ([linguagem dither](docs/marca/linguagem-dither.md)). Ver [guia de marca](docs/marca/guia-de-marca.md).
 - **Prémios.** 1.º lugar do Hack4Guimarães 2035 (7 500 €) e vencedor do desafio TexVitrus (1 000 €), 28 de outubro de 2026.
-- **Imprensa.** [Portugal Têxtil](https://portugaltextil.com/novelo-quer-tornar-recolha-de-residuos-texteis-mais-eficiente/) (29 out), [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/) (29 out), [E24](https://e24.pt/guimaraes-plataforma-novelo-vence-hack4guimaraes-e-combate-lixo-textil/) (29 out), [Mais Guimarães](https://maisguimaraes.pt/dupla-de-barcelos-vence-hack4guimaraes-com-um-plano-para-recolher-mais-texteis-gastando-menos) e [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) (28 out).
+- **Imprensa** (da mais recente para a mais antiga):
+  - [ECO](https://eco.sapo.pt/2026/11/03/dois-jovens-de-barcelos-querem-desatar-o-no-da-recolha-de-residuos-texteis-em-guimaraes/) (3 nov) · [Jornal T](https://jornal-t.pt/noticia/novelo-propoe-recolher-431-toneladas-de-texteis-por-ano-em-guimaraes/) · [FashionNetwork](https://pt.fashionnetwork.com/news/Hack4guimaraes-2035-engenheiros-de-barcelos-ganham-no-concurso-vimaranense-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis-mais-1-000-pela-vitoria-no-desafio-da-vitrus-ambiente,1881327.html)
+  - [O Amarense](https://oamarense.pt/dois-jovens-de-barcelos-vencem-hack4guimaraes-2035-com-plataforma-para-recolha-de-residuos-texteis/) e [O Amarense, encerramento do Mês da Economia](https://oamarense.pt/autarca-de-guimaraes-defende-inovacao-e-cooperacao-para-reforcar-economia-local/) (30 out)
+  - [Portugal Têxtil](https://portugaltextil.com/novelo-quer-tornar-recolha-de-residuos-texteis-mais-eficiente/) · [Rádio Alto Minho](https://radioaltominho.pt/noticias/novelo-projeto-de-estudante-e-antigo-aluno-da-unipvc-vence-dois-premios-em-guimaraes/) · [E24](https://e24.pt/guimaraes-plataforma-novelo-vence-hack4guimaraes-e-combate-lixo-textil/) · [Rádio Fundação](https://radiofundacao.net/projeto-novelo-vence-o-hack4guimaraes-2035-e-o-desafio-textvitrus/) (29 out)
+  - [Mais Guimarães](https://maisguimaraes.pt/dupla-de-barcelos-vence-hack4guimaraes-com-um-plano-para-recolher-mais-texteis-gastando-menos) · [O Minho](https://ominho.pt/engenheiros-de-barcelos-ganham-premio-de-7-500-euros-por-inovacao-na-gestao-dos-residuos-texteis/) (28 out)
 
 ## Limitações conhecidas e roteiro
 
