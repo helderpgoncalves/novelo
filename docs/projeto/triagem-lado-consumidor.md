@@ -93,19 +93,60 @@ Nenhum sistema conhecido pede ao cidadão a triagem por peça em casa. Os que fu
 
 ## 6. As abordagens possíveis — crítica de cada uma
 
-| # | Abordagem | Carga no operador | Risco de contaminação | Evidência RAP | Veredicto |
-| --- | --- | --- | --- | --- | --- |
-| A | **Status quo**: operador tria cada peça na entrega | 30–48 ETC no alvo (estimativa) | Baixo (é o QC) | Censo por peça | Não escala; fica como **instrumento de auditoria** |
-| B | **Cidadão tria peça a peça em casa** com fotos na app | ~0 | Médio — e sem correção | Riqueza aparente, fiabilidade desconhecida | **Não**: fricção mata a participação (7–8 passos × dezenas de peças por saco); quem adere é quem já separava bem |
-| C | **Cidadão declara o saco, sem verificação** | ~0 | Alto — replica os 56,9% | Fraca (autorreporte) | **Não**: remove o QC que é a razão de ser da triagem |
-| D | **Triagem partilhada em camadas** (física + porta + amostragem + feedback) | ~2–3 ETC (estimativa) | Controlado (porta + amostragem) | Amostragem estratificada com IC 95% | **Recomendada** (secção 7) |
-| E | Variante mínima: **dois sacos físicos + motorista espreita**, sem app, com estudo de composição trimestral | ~2 ETC | Controlado | Só estatística de agregado | Plano B sólido; perde passaporte, feedback e confiança graduada |
-| F | **Pontos de triagem comunitários** (escolas/juntas com voluntários) | Voluntariado (não escala sozinho) | Médio | Fraca | Complemento de educação, não processo |
-| G | **Externalizar tudo nos licenciados** (Sarah/Ultriplo) como hoje | 0 na Vitrus; custo de tratamento nas entidades | Baixo (triagem profissional) | Fora do Novelo | É o contrafacto: sem dados, sem evidência RAP municipal, sem bolsa |
+Visão geral (●●● melhor, ●○○ pior; avaliações da equipa):
 
-Sobre B, o argumento sedutor é "o mesmo modelo, outro utilizador". Falha por três lados: (1) fricção — cada peça exige 2 fotos e revisão, e o saco médio tem dezenas; (2) seleção — só participa quem já tem o hábito, logo mede mal a população; (3) confiança — sem verificação, os dados valem para orientar, não para provar. O que B tem de bom (educação pelo making, sentimento de agência) obtém-se na camada 2 de D com uma fração da fricção.
+| # | Abordagem | Carga no operador | Contaminação controlada | Evidência RAP | Adesão esperada | Custo | Escala |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| A | Status quo (operador, peça a peça) | ●○○ | ●●● | ●●● | — | ●○○ | ●○○ |
+| B | Cidadão tria peça a peça em casa | ●●● | ●○○ | ●○○ | ●○○ | ●●○ | ●○○ |
+| C | Cidadão declara o saco, sem verificação | ●●● | ●○○ | ●○○ | ●●○ | ●●● | ●○○ |
+| D | **Triagem partilhada em camadas** | ●●● | ●●● | ●●○ | ●●● | ●●○ | ●●● |
+| E | Mínima: 2 sacos + porta, sem app | ●●● | ●●● | ●○○ | ●●○ | ●●● | ●●● |
+| F | Pontos comunitários (escolas/juntas) | ●●● | ●●○ | ●○○ | ●●○ | ●●● | ●○○ |
+| G | Externalizar nos licenciados (hoje) | ●●● | ●●● | ●○○ | ●●○ | ●●○ | ●●○ |
 
-Sobre C, há ainda o problema do incentivo perverso: se a declaração tiver qualquer consequência (recompensa, estatuto), sem auditoria o sistema ensina a declarar bem, não a separar bem.
+### A. Status quo — operador tria cada peça na entrega
+
+A favor: é o controlo de qualidade no momento certo; evidência por peça (marca, composição, estado) pronta para a ecomodulação RAP; já está construído e a funcionar; nada depende do comportamento do cidadão.
+Contra: 7–8 passos por peça; no alvo de 3 003 t são 30–48 ETC e 25–100 mil €/ano de IA (estimativas); o gargalo está na pessoa mais cara do fluxo; não existe equipa para isto.
+Veredito: não escala como processo. **Fica como instrumento de auditoria** (secção 9) — é a peça que a abordagem D reutiliza.
+
+### B. Cidadão tria peça a peça em casa, com fotos na app
+
+A favor: zero carga no operador; educação pelo gesto; sentimento de agência; riqueza de dados se funcionasse.
+Contra: fricção — 2 fotos e revisão por peça, dezenas de peças por saco, e a participação morre; seleção — só adere quem já separava bem, logo mede mal a população; confiança — sem verificação, os dados orientam mas não provam; exclusão digital; o custo de IA volta ao do censo se muita gente aderir.
+Veredicto: **não**. O que B tem de bom obtém-se com a declaração opcional de 30 segundos da abordagem D, a uma fração da fricção.
+
+### C. Cidadão declara o saco, sem qualquer verificação
+
+A favor: custo quase zero; um formulário; rápido a pôr no terreno.
+Contra: replica o cenário dos 56,9% de rejeito do canal sem controlo — à escala de 3 003 t desperdiçaria ~1 700 t/ano (estimativa); incentivo perverso — se a declaração tiver consequências, ensina a *declarar* bem, não a *separar* bem; a falha é silenciosa: descobre-se quando Sarah ou Ultriplo rejeitam o lote.
+Veredicto: **não**. Remove o QC que é a razão de ser da triagem.
+
+### D. Triagem partilhada em camadas (recomendada)
+
+Física (2 sacos) + declaração opcional + verificação à porta + auditoria por amostragem + feedback. Detalhe na secção 7.
+A favor: carga de operador ~2–3 ETC para o concelho (estimativa); contaminação controlada em dois pontos (porta e amostragem); evidência RAP por amostragem estatística, auditável; funciona sem app; o saco é a campanha; o feedback educa e gera adesão; degrada-se para mais controlo, nunca para menos; reutiliza a triagem por foto atual como auditoria.
+Contra: exige custo e logística dos sacos (50–200 mil €/ano no pico, estimativa); exige disciplina do motorista — recusar um saco é socialmente difícil; é a abordagem com mais peças de sistema a construir (sacos, declaração, porta, amostragem, feedback); a adesão média é a incógnita — por isso é um piloto com métricas, não uma certeza; a evidência passa de censo a estatística (perde-se a visão peça a peça de tudo).
+Veredicto: **recomendada**.
+
+### E. Variante mínima — dois sacos físicos + motorista espreita, sem app
+
+A favor: o mais barato e rápido a pôr no terreno; zero exclusão digital; resolve o essencial (fluxos separados na origem + controlo à porta); quase sem software novo.
+Contra: sem passaporte do saco, feedback individual ou confiança graduada; medição só por estudo de composição trimestral e agregado; a adesão depende só da campanha física; evidência RAP fraca.
+Veredicto: **plano B sólido** — e o fallback natural de D se a camada digital não pegar. Não é exclusivo: D pode lançar com E embutido e ligar o digital só ao segundo mês.
+
+### F. Pontos de triagem comunitários (escolas/juntas com voluntários)
+
+A favor: educa no gesto; envolve as escolas, que já são locais da rede; boa narrativa comunitária; barato.
+Contra: voluntariado não escala; qualidade variável com o voluntário; não cobre o porta a porta; vive de campeões locais.
+Veredicto: **complemento de educação e campanha**, não um processo de triagem.
+
+### G. Externalizar tudo nos licenciados (Sarah/Ultriplo) — o contrafacto de hoje
+
+A favor: zero carga na Vitrus; triagem profissional com 10–14,5% de rejeito; sem investimento nem mudança.
+Contra: o município fica sem dados próprios, sem evidência RAP, sem bolsa de fibra e sem alavancagem na negociação com os sistemas produtores; dependência de três entidades externas; o custo evitado deixa de ser demonstrável — e o que não se mede não conta na RAP.
+Veredicto: é o "não fazer nada" — serve de grupo de controlo para comparar as outras, não é uma aposta.
 
 ## 7. A recomendada: triagem partilhada em camadas
 
