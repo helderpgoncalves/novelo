@@ -56,6 +56,25 @@ test.describe('páginas públicas (sem sessão)', () => {
     await expect(page.getByRole('link', { name: 'Política de Privacidade' }).first()).toBeVisible();
   });
 
+  // A triagem pré-recolha é pública: para quem prepara o saco em casa, sem sessão.
+  test('«Vai no saco?» abre sem sessão, com a fotografia e o aviso de privacidade', async ({
+    page,
+  }) => {
+    await page.goto('/pt/bag-check');
+    await expect(page.getByRole('heading', { level: 1, name: 'Vai no saco?' })).toBeVisible();
+    await expect(page.getByText('Fotografia da peça')).toBeVisible();
+    // Sem fotografia não há verificação: o botão só acorda com a peça escolhida.
+    await expect(page.getByRole('button', { name: 'Verificar' })).toBeDisabled();
+    await expect(
+      page.getByText('não é guardada nem guardamos dados pessoais', { exact: false }),
+    ).toBeVisible();
+    await page.goto('/en/bag-check');
+    await expect(
+      page.getByRole('heading', { level: 1, name: 'Does it go in the bag?' }),
+    ).toBeVisible();
+    await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  });
+
   test('robots.txt e sitemap.xml existem', async ({ request }) => {
     const robots = await request.get('/robots.txt');
     expect(robots.headers()['content-type']).toContain('text/plain');

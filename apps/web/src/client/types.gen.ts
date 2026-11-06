@@ -322,7 +322,7 @@ export type AiSettingsUpdate = {
 /**
  * AiTask
  */
-export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'copilot_aux' | 'triage' | 'test' | 'web_search';
+export type AiTask = 'copilot' | 'whatif' | 'explain' | 'briefing' | 'alert_resolution' | 'copilot_aux' | 'triage' | 'precheck' | 'test' | 'web_search';
 
 /**
  * AiUsageOut
@@ -1175,6 +1175,18 @@ export type BodyAnalyseGarment = {
      * Foto da etiqueta de composição
      */
     label_photo?: Blob | File | null;
+};
+
+/**
+ * Body_check_pre_collection
+ */
+export type BodyCheckPreCollection = {
+    /**
+     * Photo
+     *
+     * Foto da peça antes de a pôr no saco
+     */
+    photo: Blob | File;
 };
 
 /**
@@ -8524,6 +8536,42 @@ export type PotentialReadingOut = {
      * Source
      */
     source: string;
+};
+
+/**
+ * PreCollectionAdvice
+ *
+ * O conselho devolvido a quem prepara o saco. Aconselha, não condiciona; nada é guardado.
+ */
+export type PreCollectionAdvice = {
+    /**
+     * reuse/recycle quando vai; reject quando não vai
+     */
+    condition: TextileDestination;
+    /**
+     * Confidence
+     */
+    confidence: number;
+    /**
+     * Decision
+     *
+     * in_bag se a peça vai no saco; keep_out se fica em casa (indiferenciado)
+     */
+    decision: 'in_bag' | 'keep_out';
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    /**
+     * Reason
+     *
+     * Uma frase curta, no idioma pedido
+     */
+    reason: string;
 };
 
 /**
@@ -21222,6 +21270,72 @@ export type GetLotQrResponses = {
 };
 
 export type GetLotQrResponse = GetLotQrResponses[keyof GetLotQrResponses];
+
+export type CheckPreCollectionData = {
+    body: BodyCheckPreCollection;
+    path?: never;
+    query?: {
+        /**
+         * Locale
+         */
+        locale?: 'pt-PT' | 'en';
+    };
+    url: '/api/v1/public/pre-collection/check';
+};
+
+export type CheckPreCollectionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CheckPreCollectionError = CheckPreCollectionErrors[keyof CheckPreCollectionErrors];
+
+export type CheckPreCollectionResponses = {
+    /**
+     * Successful Response
+     */
+    200: PreCollectionAdvice;
+};
+
+export type CheckPreCollectionResponse = CheckPreCollectionResponses[keyof CheckPreCollectionResponses];
 
 export type ReadyData = {
     body?: never;

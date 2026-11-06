@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as BagCheckRouteImport } from './routes/bag-check'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
@@ -68,6 +69,11 @@ const AuthRoute = AuthRouteImport.update({
 const AcceptInviteRoute = AcceptInviteRouteImport.update({
   id: '/accept-invite',
   path: '/accept-invite',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BagCheckRoute = BagCheckRouteImport.update({
+  id: '/bag-check',
+  path: '/bag-check',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CreditsRoute = CreditsRouteImport.update({
@@ -264,6 +270,7 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/bag-check': typeof BagCheckRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
@@ -306,6 +313,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/bag-check': typeof BagCheckRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
@@ -351,6 +359,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/accept-invite': typeof AcceptInviteRoute
+  '/bag-check': typeof BagCheckRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/magic-link': typeof MagicLinkRoute
@@ -395,6 +404,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accept-invite'
+    | '/bag-check'
     | '/credits'
     | '/join'
     | '/magic-link'
@@ -437,6 +447,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accept-invite'
+    | '/bag-check'
     | '/credits'
     | '/join'
     | '/magic-link'
@@ -481,6 +492,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/accept-invite'
+    | '/bag-check'
     | '/credits'
     | '/join'
     | '/magic-link'
@@ -526,6 +538,7 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   AcceptInviteRoute: typeof AcceptInviteRoute
+  BagCheckRoute: typeof BagCheckRoute
   CreditsRoute: typeof CreditsRoute
   JoinRoute: typeof JoinRoute
   MagicLinkRoute: typeof MagicLinkRoute
@@ -564,6 +577,13 @@ declare module '@tanstack/react-router' {
       path: '/accept-invite'
       fullPath: '/accept-invite'
       preLoaderRoute: typeof AcceptInviteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bag-check': {
+      id: '/bag-check'
+      path: '/bag-check'
+      fullPath: '/bag-check'
+      preLoaderRoute: typeof BagCheckRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/credits': {
@@ -916,6 +936,7 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   AcceptInviteRoute: AcceptInviteRoute,
+  BagCheckRoute: BagCheckRoute,
   CreditsRoute: CreditsRoute,
   JoinRoute: JoinRoute,
   MagicLinkRoute: MagicLinkRoute,

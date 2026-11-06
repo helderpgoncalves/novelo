@@ -27,6 +27,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | [Seed de demonstração](engenharia/seed-demo.md) | Os 6 lotes com fotografias reais e os 7 cenários de demonstração: o que cria, o que é real e o que é pressuposto, como repetir e limpar |
 | [Rotas por estrada](engenharia/rotas-reais.md) | OSRM próprio sobre o OpenStreetMap: arquitetura, fallback, serviço, variáveis, comandos, calibração do desvio e da velocidade, limitações |
 | [Privacidade das fotografias](engenharia/privacidade-fotografias.md) | Miniatura opcional por peça: finalidade, o que se guarda, fluxo, base jurídica proposta, riscos, retenção, direitos, subcontratante, segurança e triagem de DPIA (avaliação técnica interna, não aconselhamento jurídico) |
+| [Triagem pré-recolha](engenharia/triagem-pre-recolha.md) | A decisão antes do saco: análise cidadão vs. operador, decisão de aconselhar sem condicionar, endpoint público, prompt `precheck`, fases e abertura ao multi-município |
 | [Deploy](engenharia/deploy.md) | Coolify na VPS, domínio, variáveis que o compose repassa, deploy manual, operação |
 | [Workflow com agentes](engenharia/workflow-ia.md) | Claude Code e GLM/Z.ai/ZCode a partilhar o mesmo contexto |
 | [Backlog](engenharia/backlog.md) | O que está feito e o que falta, por dia |
