@@ -12,7 +12,7 @@ Complementos deste plano: o [guião de ensaio](apresentacao-vitrus-guiao.md) (fa
 | --- | --- | --- |
 | D1 | Formato | Uma sessão conjunta (~30 min com perguntas); momentos do presidente **nos primeiros 15 min** (um presidente sai primeiro) |
 | D2 | Quem apresenta | Flávio, sozinho: conduz os slides e a app; **máximo 2 momentos ao vivo** («E se...?» e triagem+QR); todo o resto pré-aberto e pré-calculado |
-| D3 | Triagem | Mostrar as **abordagens encontradas** (A–G) e **propor a D para começar** — triagem partilhada em camadas, arranque na variante mínima (E). Nunca «decisão fechada»: é proposta para **desenhar juntos** (issue #21) |
+| D3 | Triagem | **Um slide de resposta** à sugestão de 4 nov (a direção está certa; a escala muda a letra; arranque mínimo) — a matriz A–G e as cinco camadas ficam em **anexo**, só se abrem se perguntarem. Nunca «decisão fechada»: é proposta para **desenhar juntos** (issue #21). Revisto a 11 nov: gestão primeiro, operacional como convite |
 | D4 | Motorista | Compromisso de **piloto** (sem wireframe): um **Android da viatura** (150–300 €/van, não o telemóvel pessoal), 3 botões + QR, offline. A rota é o **plano do dia**; o motorista **não navega** pela app |
 | D5 | Escolas/pontos assistidos | **Acumulador coberto**: os sacos esperam dentro (continuação da campanha escolar que já existe), recolha no dia anunciado, lote abre no momento. A escola **não tem ecrã no piloto** (telefone/WhatsApp; link de 1 toque fica para depois) |
 | D6 | Paragens vazias | No piloto **paramos sempre**; com dados, a paragem sai da rota depois de **3 rondas consecutivas vazias** — **regra anunciada, nunca em silêncio** |
@@ -35,32 +35,38 @@ Faltam fechar com o **Hélder, por mensagem, hoje** (issue #21): arranque em E, 
 2. **Dados que só a Vitrus tem**: custos por hora e por km das viaturas (o financeiro ainda não os enviou), kg mensais por entidade, tempo e custo de uma paragem, orçamento dos sacos (a imprimir é com a Vitrus).
 3. **Triagem — direção e desenho conjunto**: aprovar a direção D (arranque mínimo: dois sacos + verificação à porta) e **agendar a sessão de desenho com a operação** (sacos, dia fixo, recusa à porta, auditoria no depósito).
 
-## 3. Estrutura e tempos (25 min + perguntas; sozinho)
+## 3. Estrutura e tempos (~23 min estruturados + folga dos momentos ao vivo ≈ 25; sozinho)
+
+Revista a 11 nov: **a gestão é a espinha dorsal** (o que cada decisão custa, rende e arrisca); a operação entra como convite para desenhar junto. O QR no telemóvel do presidente calha aos ~14:30, dentro da janela em que ele está na sala.
 
 | Bloco | Tempo | Suporte | Objetivo em uma frase |
 | --- | --- | --- | --- |
 | 0. Pronto antes de começar | −5 min | app (separadores abertos) | Nunca procurar ecrã ao vivo |
-| 1. Abertura | 0:00–1:30 | slide 1 | Quem somos; no fim há três pedidos |
-| 2. O problema em 4 números | 1:30–3:30 | app `/` + slide 2 | O problema em números deles, com selo medido/estimativa |
-| 3. Cenários A/B | 3:30–6:30 | app `/scenarios` | Mesma pergunta, dois desenhos, números comparáveis |
-| 4. «E se...?» **[ao vivo 1]** | 6:30–9:00 | app cenário B | A ferramenta responde à pergunta **deles**, na hora |
-| 5. Rotas: um dia de viatura | 9:00–12:00 | app cenário «Piloto» | O plano concreto da viatura; motorista não navega |
-| 6. Do saco ao fio **[ao vivo 2]** | 12:00–16:00 | app `/triage` → QR → Sankey | O sistema inteiro num gesto; o QR abre no telemóvel do presidente |
-| 7. «Vai no saco?» | 16:00–16:30 | app `/bag-check` (ou captura) | A resposta visual à sugestão deles de 4 nov |
-| 8. Rede no terreno | 16:30–18:00 | app `/municipal` | O candidato é o lugar; nenhum saco na rua; a escolha é deles |
-| 9. Relatório RAP | 18:00–19:30 | app `/reports` + PDF impresso | O dossiê de 2028 num clique |
-| 10. Triagem: as soluções e a proposta | 19:30–24:00 | slides 4–7 | A escala muda tudo; D para começar; desenhamos juntos |
-| 11. Os três pedidos | 24:00–25:30 | app `/pilot` + slide 8 | Converter: piloto, dados, direção |
-| Perguntas | — | slide 9 no ecrã | Quem responde o quê: tudo tu (ver §8) |
+| 1. Abertura | 0:00–1:30 | slide 1 | Quem somos; gestão em números; no fim três pedidos |
+| 2. O problema em 4 números | 1:30–3:30 | slide 2 + app `/` | O problema em números deles, com selo medido/estimativa e comando de orçamento |
+| 3. Ponte | 3:30–4:00 | slide 3 | A app é a apresentação |
+| 4. Cenários A/B | 4:00–6:30 | app `/scenarios` | Mesma pergunta, dois desenhos, números comparáveis; custo líquido |
+| 5. «E se...?» **[ao vivo 1]** | 6:30–9:30 | app cenário B | A ferramenta responde à pergunta **deles**, na hora |
+| 6. A conversa do orçamento | 9:30–11:00 | app `/scenarios` (cadeia 20–150 k€) | O que cada orçamento compra; intervalos («nos pessimistas não chega»); cobertura da diretiva numa frase |
+| 7. O piloto: um dia de viatura | 11:00–12:30 | app cenário «Piloto» | O plano concreto da viatura; motorista não navega |
+| 8. A prova: do saco ao fio **[ao vivo 2]** | 12:30–16:30 | app `/triage` → QR → Sankey → `/brands` | Medição e evidência; o QR abre no telemóvel do presidente (~14:30); marcas = quem paga em 2028; bolsa = indústria |
+| 9. «Vai no saco?» | 16:30–17:00 | app `/bag-check` (ou captura) | A resposta visual à sugestão deles de 4 nov |
+| 10. Rede no terreno — e as empresas | 17:00–18:30 | app `/municipal` (+ separador B2B) | O candidato é o lugar; nenhum saco na rua; a escolha é deles; canal B2B de lares e hotelaria |
+| 11. Relatório RAP | 18:30–20:00 | app `/reports` + PDF impresso | O dossiê de 2028 num clique; em 2028 são os produtores a pagar |
+| 12. A resposta sobre a triagem | 20:00–21:30 | slide 4 | Direção certa; a escala muda a letra; desenhamos juntos (A–G e camadas em anexo) |
+| 13. Os três pedidos | 21:30–23:00 | app `/pilot` + slides 5–6 | Converter: piloto, dados, direção |
+| Perguntas | — | slide 6 no ecrã | Quem responde o quê: tudo tu (ver §8) |
 
 ## 4. Fluxo na aplicação, clique a clique
+
+**Os tempos e a fala corrida de cada passo estão no [guião de ensaio](apresentacao-vitrus-guiao.md)** (revisto a 11 nov, gestão primeiro: bloco novo de orçamentos, B2B no `/municipal`, triagem num slide). As tabelas abaixo mantêm os planos B por passo — esses não mudaram.
 
 Regra geral: **um objetivo por ecrã; diz-se uma frase e aponta-se; não se lê o ecrã em voz alta.** Se algo falhar ao vivo, usa-se a frase da coluna Plano B e segue-se.
 
 ### 0. Pronto antes de começar (5 min antes de entrar na sala)
 
 - Login feito (conta com password, **não magic link**); telemóvel com hotspot ativado como rede de reserva; peça de ensaio (camisola com etiqueta legível) e toalha velha em cima da mesa; saco de demonstração com o **QR do lote `NOV-BXS4UW` impresso e colado**.
-- Separadores abertos por ordem (app em produção): `/` (home) · `/scenarios` (comparação A/B pronta) · cenário B com «E se...?» visível · cenário «Piloto» (rotas + plano de recolha) · `/triage` (novo lote pronto a abrir) · `/municipal` (separador candidatos) · `/reports` (RAP pré-gerado) · `/bag-check` (se deploy saiu) · `/pilot`.
+- Separadores abertos por ordem (app em produção): `/` (home) · `/scenarios` (comparação A/B pronta) · comparação da cadeia de orçamentos (20–150 k€) · cenário B com «E se...?» visível · cenário «Piloto» (rotas + plano de recolha) · `/triage` (novo lote pronto a abrir) · `/municipal` (separadores candidatos e B2B) · `/reports` (RAP pré-gerado) · `/bag-check` (se deploy saiu) · `/pilot`.
 - Resolução/zoom do portátil testada no projetor/TV da sala.
 
 ### 1–2. Home: o problema em 4 números (app, 3 min)
@@ -78,7 +84,7 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 
 | Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
-| 1 | `/scenarios` → comparação A/B (pré-aberta) | "A mesma pergunta, dois desenhos de rede. A: contentores em todo o lado — o modelo que a Vitrus não quer. B: sem um único contentor." | O contraste que fundamenta a rede sem contentores | Capturas no slide 3 |
+| 1 | `/scenarios` → comparação A/B (pré-aberta) | "A mesma pergunta, dois desenhos de rede. A: contentores em todo o lado — o modelo que a Vitrus não quer. B: sem um único contentor." | O contraste que fundamenta a rede sem contentores | Capturas no portátil (sem slide; abre-se o compare em cache) |
 | 2 | Pausa 3 s no €/t de cada um | (deixa o ecrã falar) | — | — |
 | 3 | Apontar custo líquido de B (−1 628 €/ano) e evitado (45 542 €) | "No caso central, o aterro evitado paga a operação. **Estimativa** — e é por isso que há piloto." | O € para o presidente | — |
 | 4 | Etiqueta «Por estrada» na rota | "Os km vêm das estradas reais, OpenStreetMap, servidor nosso — não linhas retas." | Rigor do modelo | — |
@@ -113,7 +119,7 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 
 | Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
-| 1 | `/bag-check`, fotografar a **toalha velha** | "O munícipe em casa fotografa a peça e recebe um conselho: esta fica fora — molhada. Nada guardado, ninguém bloqueado." | A resposta à sugestão deles de 4 nov | Captura no slide 7 |
+| 1 | `/bag-check`, fotografar a **toalha velha** | "O munícipe em casa fotografa a peça e recebe um conselho: esta fica fora — molhada. Nada guardado, ninguém bloqueado." | A resposta à sugestão deles de 4 nov | Captura no slide 4 |
 
 ### 8. Rede no terreno (app `/municipal`, 1,5 min)
 
@@ -129,34 +135,31 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 | --- | --- | --- | --- | --- |
 | 1 | RAP pré-gerado (abrir o PDF) | "Custo por tipo de território, toneladas por fibra, evidência por marca com tamanho de amostra, método e fontes. O dossiê de 2028, num clique." | O entregável institucional | **PDF impresso na pasta** (2 cópias: presidente + Lucas) |
 
-### 10. Triagem: as soluções e a proposta (slides, 4,5 min) — ver §5
+### 10. Triagem: a resposta num slide (1,5 min) — ver §5
 
-Sem app. Slides 4–7: a escala → as abordagens → a proposta D → desenhamos juntos.
+Sem app. Slide 4 (fala no [guião](apresentacao-vitrus-guiao.md), bloco 13): a direção de 4 nov está certa; a escala muda a letra; a proposta para desenhar juntos. A matriz A–G e as cinco camadas ficam nos anexos A4–A5.
 
-### 11. Os três pedidos (app `/pilot` + slide 8, 1,5 min)
+### 11. Os três pedidos (app `/pilot` + slide 5, 1,5 min)
 
 | Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
-| 1 | `/pilot` com as freguesias recomendadas | "Aldão e Arosa e Castelões: um modo de recolha de cada tipo, máxima aprendizagem." | O pedido 1 com nome | Slide 8 |
+| 1 | `/pilot` com as freguesias recomendadas | "Aldão e Arosa e Castelões: um modo de recolha de cada tipo, máxima aprendizagem." | O pedido 1 com nome | Slide 5 |
 | 2 | Slide 8 | Os três pedidos, com datas ("que dados chegam esta semana; a sessão de desenho em duas semanas") | Converter | — |
 | 3 | Slide 9 | A frase-âncora, outra vez. Obrigado. | Fecho | — |
 
-## 5. PPT — plano de slides (9 + anexos)
+## 5. PPT — plano de slides (6 + 5 anexos)
 
-Construir sobre a infraestrutura existente (`pitch/build.js`: tema, Newsreader/Inter, notas do orador; abre bem no Google Slides). Uma ideia por slide; título que diz a conclusão; fontes no rodapé; números iguais aos do ecrã e do one-pager.
+A spec completa, **autocontida** para construir o deck (textos exatos, cores, fontes, rodapés, notas do orador, números canónicos), está em [Slides](apresentacao-vitrus-slides.md) — é esse ficheiro que se dá a quem construir o PPTX. Princípio: **a gestão é a espinha dorsal; a triagem é um slide de resposta + anexos** (revisto a 11 nov — antes eram 4 slides de triagem). Construir sobre a infraestrutura do hackathon (`pitch/build.js`) ou Google Slides (fallback). Uma ideia por slide; título que diz a conclusão; fontes no rodapé; números iguais aos do ecrã e do one-pager.
 
-| # | Título (conclusão, não tema) | Conteúdo | Fala nas notas |
-| --- | --- | --- | --- |
-| 1 | Novelo · do saco ao fio | Capa: nome, «Apresentação à Vitrus e ao Município de Guimarães · 12 nov 2026», Flávio Fernandes e Hélder Gonçalves | Quem somos; ganhámos o hackathon **com os vossos dados**; hoje: a funcionar + três pedidos |
-| 2 | 9 em cada 10 kg de têxtil ainda vão para o lixo | 301,3 t (medido) · 3 003,3 t (estimativa) · 105,64 €/t · 17 abr 2028 | A frase-âncora, devagar |
-| 3 | O que está a funcionar (e vamos ver ao vivo) | 3 colunas: **planear** (simulador, cenários) · **decidir em português** («E se...?») · **provar** (triagem, passaporte, RAP) | "A app é a apresentação; os slides são só para duas coisas: a triagem e os pedidos" |
-| 4 | À escala de 3 003 t, a triagem peça a peça não escala | 10 M peças/ano; operador = 32–48 ETC + 24,5–98 k€/ano IA; sem controlo = 56,9% rejeito ≈ 1 709 t desperdiçadas | "A intuição de 4 nov está certa na direção; a letra é que tem de mudar" |
-| 5 | Sete abordagens; nenhuma é «o cidadão tria peça a peça» | Matriz curta A–G (carga operador / contaminação / evidência RAP / escala); B, C e G riscadas com uma frase cada | Uma frase por alternativa (ver §8) |
-| 6 | A proposta para começar: triagem partilhada em camadas | As 5 camadas (saco → declaração → porta 10 s → amostragem → feedback); ~2–3 ETC vs 32–48; 317 269 €/ano evitados pagam o sistema; «Vai no saco?» (foto ou captura) | "Arranque mínimo: dois sacos + verificação à porta; digital ao 2.º mês" |
-| 7 | Desenhemos isto juntos | A sessão de desenho (sacos, dia fixo, recusa, auditoria no depósito) + o piloto decide com números (métricas) | "O hackathon deu a pergunta; a solução desenha-se com quem a opera" |
-| 8 | Três pedidos | 1) Piloto Aldão + Arosa e Castelões (8–12 semanas) · 2) Dados (€/h, €/km, kg mensais, paragem, sacos) · 3) Direção da triagem + sessão de desenho | Com datas |
-| 9 | Obrigado | Frase-âncora + QR do site (fica no ecrã nas perguntas) | — |
-| A1–A3 (anexos, se pedirem) | Cobertura da diretiva · onde o têxtil se perde · pressupostos com fonte | — | Só abrir se houver pergunta |
+| # | Título (conclusão) | Momento |
+| --- | --- | --- |
+| 1 | Novelo · do saco ao fio | Abertura |
+| 2 | 9 em cada 10 kg de têxtil ainda vão para o lixo | Problema |
+| 3 | O que está a funcionar — e vamos ver ao vivo | Ponte para a app |
+| 4 | A direção de 4 de novembro está certa; a escala muda a letra | A resposta sobre a triagem |
+| 5 | Três pedidos | Fecho |
+| 6 | Obrigado (frase-âncora + QR) | Perguntas |
+| A1–A5 | Cobertura da diretiva · onde o têxtil se perde · pressupostos · matriz A–G · as cinco camadas | Só abrir se houver pergunta |
 
 **Se não houver tempo de gerar o PPTX**: os slides 1–9 funcionam no Google Slides com: fundo linho `#F4F1EA`, texto tinta `#14211D`, títulos Newsreader, corpo Inter, floresta `#2E6B57` como acento, areia `#C4A06A` como detalhe.
 
@@ -207,9 +210,9 @@ Copiloto `/chat` (1 min máx, se houver tempo e saldo de IA) · `/admin/ai`, `/u
 
 Por ordem; as horas são orientativas mas a sequência não é.
 
-- [ ] **14h00 · Deploy «Vai no saco?» (go/no-go)**: PR #20 já existe. `git checkout feat/pre-collection-bag-check && just check`; verde → `gh pr merge 20` → Coolify faz deploy → **verificar em produção**: `/bag-check` abre, foto → veredicto, **e a triagem de entrega continua a funcionar** (o PR mexe em código partilhado). **No-go se**: check vermelho, deploy depois das 18h, ou qualquer coisa estranha → capturas de ecrã da stack local (`just dev` na branch) para o slide 7.
+- [ ] **14h00 · Deploy «Vai no saco?» (go/no-go)**: PR #20 já existe. `git checkout feat/pre-collection-bag-check && just check`; verde → `gh pr merge 20` → Coolify faz deploy → **verificar em produção**: `/bag-check` abre, foto → veredicto, **e a triagem de entrega continua a funcionar** (o PR mexe em código partilhado). **No-go se**: check vermelho, deploy depois das 18h, ou qualquer coisa estranha → capturas de ecrã da stack local (`just dev` na branch) para o slide 4.
 - [ ] **15h00 · Cenário «Piloto» em produção**: `/simulator` → restrição às freguesias **Aldão** e **Arosa e Castelões** (as recomendadas em `/pilot`), modos `on_demand` + `existing`, orçamento a ajustar até abrir serviço (começar por 15–30 k€/ano), etiqueta «Piloto · Aldão + Arosa e Castelões». Confirmar rotas «Por estrada» e o plano de recolha preenchido.
-- [ ] **16h00 · PPT**: 9 slides (§5), no `pitch/` (build) ou Google Slides (fallback). Exportar PDF para o portátil.
+- [ ] **16h00 · PPT**: 6 diapositivos + 5 anexos (§5; spec autocontida em [Slides](apresentacao-vitrus-slides.md)), com as notas do orador preenchidas. Exportar PDF para o portátil.
 - [ ] **16h30 · One-pager A4** (D10): âncora, 4 números, 3 pedidos, fontes; fundo linho, identidade Novelo; imprimir 3 cópias.
 - [ ] **17h00 · Impressões**: QR do lote `NOV-BXS4UW` → colar no saco de demonstração; RAP pré-gerado → 2 cópias; slides → PDF; one-pager → 3; (plano B) vídeo de 60 s no portátil e no telemóvel.
 - [ ] **17h30 · Hélder por mensagem**: fechar as 3 perguntas do issue #21 (arranque E, auditoria 20%, RAP amostral) — alinhados antes do ensaio.
@@ -231,7 +234,7 @@ Por ordem; as horas são orientativas mas a sequência não é.
 
 1. **Sem rede/produção**: vídeo de 60 s (portátil + telemóvel) + RAP impresso + one-pager — a apresentação sobrevive em papel com os slides.
 2. **IA sem saldo/falha**: «E se...?» fica em cache (pergunta de reserva); triagem fica «a demonstração está offline hoje» e mostra-se o lote e o passaporte (não dependem da chave).
-3. **Deploy do «Vai no saco?» não saiu**: captura no slide 7.
+3. **Deploy do «Vai no saco?» não saiu**: captura no slide 4.
 4. **Projetor falha**: a app no telemóvel (PWA) + one-pager; os slides são apoio, não espinha dorsal.
 5. **Pergunta hostil sem resposta**: §8 regra 5.
 

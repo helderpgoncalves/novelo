@@ -27,7 +27,7 @@ Mantêm-se, porque já vêm dos dados reais: o número (51 250,6 t × 5,86% ≈ 
 | 4 | 0:27–0:40 | A viragem e a rede | Contentores de têxtil, não; o saco não vai no camião do lixo; a viatura nova de têxtil sai de Polvoreira; saco à porta + locais existentes + escolas; rotas pelas estradas reais | Vitrus 21–22 out; cenário B |
 | 5 | 0:40–0:48 | O resultado | 431,1 t/ano · 101,9 €/t · tratamento evitado 45 542 € paga a operação · viatura 42 500 € (estimativas) | cenário B (60 000 €/ano) |
 | 6 | 0:48–1:08 | O produto | Três momentos rápidos dos ecrãs reais: «E se...?» → triagem + QR + passaporte no telemóvel → relatório RAP; (se sair o deploy: «Vai no saco?» 4 s) | capturas de produção |
-| 7 | 1:08–1:20 | O piloto | «Duas freguesias, oito a doze semanas»: mapa do cenário Piloto (Aldão + Arosa e Castelões); métricas: conformidade ≥ 80%, rejeito do verde ≤ 15% | cenário «Piloto» (novo) |
+| 7 | 1:08–1:20 | O piloto | «Duas freguesias, oito a doze semanas»: mapa do cenário Piloto (Aldão + Arosa e Castelões); métricas: conformidade ≥ 80%, rejeito do verde ≤ 15%; e as empresas: canal B2B de lares e hotelaria (têxtil limpo de alto valor) | cenário «Piloto» (novo) |
 | 8 | 1:20–1:30 | Fecho | Frase-âncora; «Três pedidos: piloto · dados · desenho da triagem»; QR `novelo.helder.si` | — |
 
 Uma linha discreta de rigor cabe na cena 6 ou 8: «1 164 testes à API · 449 à web · 155 perguntas ao copiloto verificadas».
@@ -36,7 +36,7 @@ Uma linha discreta de rigor cabe na cena 6 ou 8: «1 164 testes à API · 449 à
 
 - Correr `prepare-numbers.mjs` contra a produção **depois** de o cenário «Piloto» existir (checklist do plano, 15h00).
 - O novo nos slides — **317 269 €/ano** de aterro evitado no alvo — só entra se aparecer na cena 2 ou 5; conferir com o [deck](apresentacao-vitrus-slides.md).
-- A frase-âncora tem de ser **igual** à do slide 9 e à falada: 431,1 t · 101,9 €/t · 45 542 €.
+- A frase-âncora tem de ser **igual** à do slide 6 e à falada: 431,1 t · 101,9 €/t · 45 542 €.
 - Toda a estimativa com a palavra «estimativa» no ecrã, como no vídeo atual.
 
 ## 4. Produção (véspora curta — três níveis)
