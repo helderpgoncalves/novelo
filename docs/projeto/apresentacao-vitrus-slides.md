@@ -92,7 +92,7 @@ Três colunas (título da coluna em Floresta, 24 pt; corpo Inter 18 pt):
 | --- | --- | --- |
 | `Simulador e cenários comparáveis; rotas medidas pelas estradas reais (OpenStreetMap)` | `«E se...?» traduz a pergunta; o otimizador calcula; o verificador rejeita números sem origem` | `Triagem por fotografia, passaporte do lote, relatório RAP num clique` |
 
-Frase de fecho por baixo (Inter 20 pt, itálico): `A app é a apresentação — os slides servem para duas coisas: a triagem e os pedidos.`
+Frase de fecho por baixo (Inter 20 pt, itálico): `A app é a apresentação — os slides servem para duas coisas: a resposta sobre a triagem e o que se segue.`
 
 Rodapé de fontes: `Em produção: novelo.helder.si`
 
