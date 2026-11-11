@@ -120,7 +120,7 @@ Três blocos numerados (número grande em Areia, Newsreader):
 
 1. **`Piloto`** — `Aldão + Arosa e Castelões (+ freguesias de controlo) · 8–12 semanas · a começar em janeiro`
 2. **`Dados que só a Vitrus tem`** — `€/h e €/km das viaturas · kg mensais por entidade · tempo de uma paragem · orçamento dos sacos`
-3. **`Triagem`** — `aprovar a direção: partilhada em camadas, arranque mínimo · sessão de desenho dentro de 2 semanas`
+3. **`Triagem`** — `desenho conjunto: a análise e o arranque mínimo estão na mesa · sessão de desenho com a operação dentro de 2 semanas`
 
 Rodapé de fontes: `cenário «Piloto» e métricas na plataforma · pressupostos com fonte em /assumptions`
 

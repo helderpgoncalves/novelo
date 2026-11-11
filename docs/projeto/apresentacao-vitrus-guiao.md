@@ -38,7 +38,7 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > Sou o Flávio Fernandes; o Hélder Gonçalves, que hoje não pôde estar, segue connosco à distância. Há três semanas, o Hack4Guimarães pôs uma pergunta: como desenhar a rede de recolha de têxteis de Guimarães ao menor custo. Ganhámos esse desafio — mas o prémio que interessa está aqui: uma ferramenta a funcionar, em produção, que responde em números à pergunta que vocês fizeram: **onde** recolher, **como**, e **a quanto fica** cada tonelada tirada do aterro.
 >
-> O que vos mostro é sobretudo isto: **a gestão da rede em números** — o que cada decisão custa, o que rende e o que arrisca. No fim, três pedidos. Começo pelo princípio: onde estamos.
+> Não viemos inventar a roda. Pusemos os vossos dados e um otimizador bom a trabalhar juntos — o que sai é a gestão da rede em números: o que cada decisão custa, o que rende e o que arrisca. Nós sabemos programar soluções; a operação conhecem-na vocês. Hoje mostro o que está a funcionar, no fim tenho três pedidos — e depois quero ouvir-vos: o que falta, o que não faz sentido. Começo pelo princípio: onde estamos.
 
 ## 2. O problema em 4 números — slide 2 (1:30–2:30)
 
@@ -202,7 +202,7 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > **Segundo: os dados que só a Vitrus tem.** Os euros por hora e por quilómetro das viaturas, que o financeiro ainda não enviou; os quilos mensais por entidade; o tempo de uma paragem; e o orçamento dos sacos. Com isto, os pressupostos saem e entram os vossos números.
 >
-> **Terceiro: a direção da triagem.** Aprovar a triagem partilhada em camadas, com arranque mínimo, e agendar a sessão de desenho — daqui a duas semanas.
+> **Terceiro: a triagem.** A nossa análise está na mesa — a direção que nos faz sentido é partilhar em camadas, com arranque mínimo. Mas o que pedimos é outra coisa: sentem-se connosco ao desenho e digam-nos o que não faz sentido. Sessão de desenho com a operação, daqui a duas semanas.
 >
 > **PALCO:** slide 6; abranda. Deixo a frase com que comecei: **com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e o tratamento evitado paga a operação.** Estimativa — e é exatamente por isso que há um piloto a pedir.
 >
@@ -212,7 +212,12 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 
 ## Perguntas (slide 6 no ecrã)
 
-As respostas de 20 segundos, tema a tema, estão no plano §6. Resumo dos gatilhos:
+**Se houver silêncio, começamos nós.** Duas perguntas nossas, a sério, com o bloco de notas à mão (as respostas são o input do plano de 48 h):
+
+1. «O que é que o Novelo teria de fazer para entrar no vosso dia a dia — não em abril de 2028, na segunda-feira?»
+2. «O que é que não vos convence nos números? Onde é que carregam?»
+
+Depois, as respostas de 20 segundos, tema a tema, estão no plano §6. Resumo dos gatilhos:
 
 - **Contaminação / lixo no saco** → peso denuncia, recusa à porta com nota educativa, nunca se paga por quilo.
 - **«Não são contentores ao ar livre?»** → o candidato é o lugar; encontro anunciado; o saco nunca fica na rua.

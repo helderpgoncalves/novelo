@@ -33,7 +33,7 @@ Faltam fechar com o **Hélder, por mensagem, hoje** (issue #21): arranque em E, 
 
 1. **Piloto**: Aldão + Arosa e Castelões (+ freguesias de controlo semelhantes), 8–12 semanas, métricas do issue #21: participação, captura vs controlo, conformidade ≥ 80%, rejeito do saco verde ≤ 15%, recusados à porta < 5%. Dentro do piloto: validação dos pontos no terreno (350 de 1 187 têm coordenada aproximada), **edição dos pontos pela Vitrus** na plataforma (D9) e a regra das paragens vazias (D6).
 2. **Dados que só a Vitrus tem**: custos por hora e por km das viaturas (o financeiro ainda não os enviou), kg mensais por entidade, tempo e custo de uma paragem, orçamento dos sacos (a imprimir é com a Vitrus).
-3. **Triagem — direção e desenho conjunto**: aprovar a direção D (arranque mínimo: dois sacos + verificação à porta) e **agendar a sessão de desenho com a operação** (sacos, dia fixo, recusa à porta, auditoria no depósito).
+3. **Triagem — desenho conjunto**: a análise e a proposta de arranque mínimo (dois sacos + verificação à porta) estão na mesa; o que se pede é a **sessão de desenho com a operação** (sacos, dia fixo, recusa à porta, auditoria no depósito) e a leitura deles — não uma aprovação em sala.
 
 ## 3. Estrutura e tempos (~23 min estruturados + folga dos momentos ao vivo ≈ 25; sozinho)
 
@@ -205,6 +205,7 @@ Copiloto `/chat` (1 min máx, se houver tempo e saldo de IA) · `/admin/ai`, `/u
 6. Um objetivo por ecrã; uma frase e aponta-se; não se lê o ecrã.
 7. O QR lê-se **no telemóvel do presidente**, com o saco na mão dele — não no teu.
 8. Falar **com** a Vitrus (o Lucas), não **para** o projetor: a app é o pretexto, a conversa é o objetivo.
+9. **Postura**: a ferramenta ajuda a decidir, não decide por eles. Nas perguntas, ouvir mais do que dizer — e se houver silêncio, abrem as nossas duas perguntas a eles (guião, secção Perguntas).
 
 ## 9. Checklist — HOJE (11 de novembro)
 
