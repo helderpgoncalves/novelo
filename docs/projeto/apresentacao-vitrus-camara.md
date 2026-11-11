@@ -4,6 +4,8 @@ Apresentação **amanha, 12 de novembro de 2026**, à **Vitrus** (equipa operaci
 
 Não é o pitch do júri: ganhámos o hackathon com os dados da Vitrus; agora o objetivo é **converter** — sair da sala com o piloto aprovado, os dados que faltam e a direção da triagem acordada. Guião do hackathon (herdado com cortes): [pitch](pitch.md), [demo e entrega](../engenharia/demo-e-entrega.md), [seed de demonstração](../engenharia/seed-demo.md).
 
+Complementos deste plano: o [guião de ensaio](apresentacao-vitrus-guiao.md) (fala corrida, palavra a palavra, com tempos e marcações de palco), a [especificação do deck](apresentacao-vitrus-slides.md) (autocontida, para construir o PowerPoint) e o [plano do vídeo](apresentacao-vitrus-video.md) (adaptação do Remotion à sessão).
+
 ## 1. Decisões já fechadas (não reabrir)
 
 | # | Decisão | Valor |
