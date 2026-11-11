@@ -2,7 +2,7 @@
 
 Apresentação **amanha, 12 de novembro de 2026**, à **Vitrus** (equipa operacional, com o Lucas) e ao **presidente da Câmara de Guimarães**, **na mesma sala, na mesma sessão**. Quem apresenta: **Flávio, sozinho** (o Hélder não pode estar; fica alinhado por mensagem). Duração alvo: **25 minutos + perguntas**.
 
-Não é o pitch do júri: ganhámos o hackathon com os dados da Vitrus; agora o objetivo é **converter** — sair da sala com o piloto aprovado, os dados que faltam e a direção da triagem acordada. Guião do hackathon (herdado com cortes): [pitch](pitch.md), [demo e entrega](../engenharia/demo-e-entrega.md), [seed de demonstração](../engenharia/seed-demo.md).
+Não é o pitch do júri: ganhámos o hackathon com os dados da Vitrus; agora o objetivo é **abrir a porta** — sair da sala com os dados encaminhados, a sessão com a operação marcada e a Vitrus a saber exatamente o que somos: quem construiu a plataforma, mantém-na e desenha a rede com eles (consultoria e solução tecnológica). **O piloto deixa de ser pedido** (11 nov, Hélder): plantam-no o cenário «Duas freguesias» e o ecrã `/pilot`; se a Vitrus o propor, aceita-se na hora. Guião do hackathon (herdado com cortes): [pitch](pitch.md), [demo e entrega](../engenharia/demo-e-entrega.md), [seed de demonstração](../engenharia/seed-demo.md).
 
 Complementos deste plano: o [guião de ensaio](apresentacao-vitrus-guiao.md) (fala corrida, palavra a palavra, com tempos e marcações de palco), a [especificação do deck](apresentacao-vitrus-slides.md) (autocontida, para construir o PowerPoint) e o [plano do vídeo](apresentacao-vitrus-video.md) (adaptação do Remotion à sessão).
 
@@ -17,23 +17,24 @@ Complementos deste plano: o [guião de ensaio](apresentacao-vitrus-guiao.md) (fa
 | D5 | Escolas/pontos assistidos | **Acumulador coberto**: os sacos esperam dentro (continuação da campanha escolar que já existe), recolha no dia anunciado, lote abre no momento. A escola **não tem ecrã no piloto** (telefone/WhatsApp; link de 1 toque fica para depois) |
 | D6 | Paragens vazias | No piloto **paramos sempre**; com dados, a paragem sai da rota depois de **3 rondas consecutivas vazias** — **regra anunciada, nunca em silêncio** |
 | D7 | «Vai no saco?» | Ao vivo **só se** o deploy do PR #20 sair hoje com verificação (ver checklist); senão captura nos slides. Conselho, nunca bloqueio; nada guardado |
-| D8 | Cenário «Piloto» | Criado na véspera em produção, com as freguesias recomendadas: **Aldão** e **União das freguesias de Arosa e Castelões** (as do ecrã `/pilot`) |
+| D8 | Cenário «Duas freguesias» | Criado na véspera em produção, com as freguesias recomendadas: **Aldão** e **União das freguesias de Arosa e Castelões** (as do ecrã `/pilot`). Etiqueta **sem a palavra «piloto»** («Duas freguesias · Aldão + Arosa e Castelões»): a ideia planta-se, o pedido não se faz |
 | D9 | Pontos editáveis | Dizer que **no piloto a Vitrus passa a fixar/excluir/acrescentar pontos** na plataforma (hoje só por freguesia e tipo) — criar o issue para ter número |
-| D10 | One-pager | Folha A4 (âncora, 4 números, 3 pedidos, fontes) para ficar na pasta do presidente |
+| D10 | One-pager | Folha A4 (âncora, 4 números, **o que se segue**, fontes) para ficar na pasta do presidente |
 
 Faltam fechar com o **Hélder, por mensagem, hoje** (issue #21): arranque em E, taxa de auditoria inicial (20%), evidência RAP amostral. Uma voz só na sala.
 
-## 2. A mensagem e os três pedidos
+## 2. A mensagem e o que se segue
 
 **Frase-âncora** (dizer duas vezes: no bloco do problema e no fecho):
 
 > "Com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia **431,1 t por ano** do aterro a **101,9 € por tonelada**, e os 45 542 € de tratamento evitado pagam a operação." Estimativa (registo H3, H10).
 
-**Os três pedidos** (o fecho):
+**O que se segue** (o fecho; sem pedidos à descarada — 11 nov, Hélder):
 
-1. **Piloto**: Aldão + Arosa e Castelões (+ freguesias de controlo semelhantes), 8–12 semanas, métricas do issue #21: participação, captura vs controlo, conformidade ≥ 80%, rejeito do saco verde ≤ 15%, recusados à porta < 5%. Dentro do piloto: validação dos pontos no terreno (350 de 1 187 têm coordenada aproximada), **edição dos pontos pela Vitrus** na plataforma (D9) e a regra das paragens vazias (D6).
-2. **Dados que só a Vitrus tem**: custos por hora e por km das viaturas (o financeiro ainda não os enviou), kg mensais por entidade, tempo e custo de uma paragem, orçamento dos sacos (a imprimir é com a Vitrus).
-3. **Triagem — desenho conjunto**: a análise e a proposta de arranque mínimo (dois sacos + verificação à porta) estão na mesa; o que se pede é a **sessão de desenho com a operação** (sacos, dia fixo, recusa à porta, auditoria no depósito) e a leitura deles — não uma aprovação em sala.
+1. **Fechar os dados que só a Vitrus tem**: custos por hora e por km das viaturas (o financeiro ainda não os enviou), kg mensais por entidade, tempo e custo de uma paragem, orçamento dos sacos. É meio dia de trabalho deles; a plataforma afina-se toda.
+2. **Sessão com a operação** (dentro de duas semanas): a triagem e a rede desenham-se com quem as faz; a análise está na mesa (anexos A4–A5), falta a leitura deles. Inclui, quando houver rede: validação dos pontos no terreno (350 de 1 187 têm coordenada aproximada), **edição dos pontos pela Vitrus** na plataforma (D9) e a regra das paragens vazias (D6).
+
+E declara-se o que somos: **consultoria e solução tecnológica** — a plataforma fica; mantemos, desenvolvemos e desenhamos a rede com a Vitrus. O piloto de 2 freguesias (Aldão + Arosa e Castelões, métricas do issue #21) **não se pede**: plantam-no o cenário «Duas freguesias» e o ecrã `/pilot`; se o propuserem, aceita-se na hora e liga-se ao plano de 48 h.
 
 ## 3. Estrutura e tempos (~23 min estruturados + folga dos momentos ao vivo ≈ 25; sozinho)
 
@@ -42,19 +43,19 @@ Revista a 11 nov: **a gestão é a espinha dorsal** (o que cada decisão custa, 
 | Bloco | Tempo | Suporte | Objetivo em uma frase |
 | --- | --- | --- | --- |
 | 0. Pronto antes de começar | −5 min | app (separadores abertos) | Nunca procurar ecrã ao vivo |
-| 1. Abertura | 0:00–1:30 | slide 1 | Quem somos; gestão em números; no fim três pedidos |
+| 1. Abertura | 0:00–1:30 | slide 1 | Quem somos; gestão em números; no fim, o que se segue |
 | 2. O problema em 4 números | 1:30–3:30 | slide 2 + app `/` | O problema em números deles, com selo medido/estimativa e comando de orçamento |
 | 3. Ponte | 3:30–4:00 | slide 3 | A app é a apresentação |
 | 4. Cenários A/B | 4:00–6:30 | app `/scenarios` | Mesma pergunta, dois desenhos, números comparáveis; custo líquido |
 | 5. «E se...?» **[ao vivo 1]** | 6:30–9:30 | app cenário B | A ferramenta responde à pergunta **deles**, na hora |
 | 6. A conversa do orçamento | 9:30–11:00 | app `/scenarios` (cadeia 20–150 k€) | O que cada orçamento compra; intervalos («nos pessimistas não chega»); cobertura da diretiva numa frase |
-| 7. O piloto: um dia de viatura | 11:00–12:30 | app cenário «Piloto» | O plano concreto da viatura; motorista não navega |
+| 7. Duas freguesias: um dia de viatura | 11:00–12:30 | app cenário «Duas freguesias» | A rede ao concreto, sem ser pedido; motorista não navega |
 | 8. A prova: do saco ao fio **[ao vivo 2]** | 12:30–16:30 | app `/triage` → QR → Sankey → `/brands` | Medição e evidência; o QR abre no telemóvel do presidente (~14:30); marcas = quem paga em 2028; bolsa = indústria |
 | 9. «Vai no saco?» | 16:30–17:00 | app `/bag-check` (ou captura) | A resposta visual à sugestão deles de 4 nov |
 | 10. Rede no terreno — e as empresas | 17:00–18:30 | app `/municipal` (+ separador B2B) | O candidato é o lugar; nenhum saco na rua; a escolha é deles; canal B2B de lares e hotelaria |
 | 11. Relatório RAP | 18:30–20:00 | app `/reports` + PDF impresso | O dossiê de 2028 num clique; em 2028 são os produtores a pagar |
 | 12. A resposta sobre a triagem | 20:00–21:30 | slide 4 | Direção certa; a escala muda a letra; desenhamos juntos (A–G e camadas em anexo) |
-| 13. Os três pedidos | 21:30–23:00 | app `/pilot` + slides 5–6 | Converter: piloto, dados, direção |
+| 13. O que se segue | 21:30–23:00 | slides 5–6 | Fechar os dados; sessão com a operação; a plataforma fica — e ouvir |
 | Perguntas | — | slide 6 no ecrã | Quem responde o quê: tudo tu (ver §8) |
 
 ## 4. Fluxo na aplicação, clique a clique
@@ -66,7 +67,7 @@ Regra geral: **um objetivo por ecrã; diz-se uma frase e aponta-se; não se lê 
 ### 0. Pronto antes de começar (5 min antes de entrar na sala)
 
 - Login feito (conta com password, **não magic link**); telemóvel com hotspot ativado como rede de reserva; peça de ensaio (camisola com etiqueta legível) e toalha velha em cima da mesa; saco de demonstração com o **QR do lote `NOV-BXS4UW` impresso e colado**.
-- Separadores abertos por ordem (app em produção): `/` (home) · `/scenarios` (comparação A/B pronta) · comparação da cadeia de orçamentos (20–150 k€) · cenário B com «E se...?» visível · cenário «Piloto» (rotas + plano de recolha) · `/triage` (novo lote pronto a abrir) · `/municipal` (separadores candidatos e B2B) · `/reports` (RAP pré-gerado) · `/bag-check` (se deploy saiu) · `/pilot`.
+- Separadores abertos por ordem (app em produção): `/` (home) · `/scenarios` (comparação A/B pronta) · comparação da cadeia de orçamentos (20–150 k€) · cenário B com «E se...?» visível · cenário «Duas freguesias» (rotas + plano de recolha) · `/triage` (novo lote pronto a abrir) · `/municipal` (separadores candidatos e B2B) · `/reports` (RAP pré-gerado) · `/bag-check` (se deploy saiu).
 - Resolução/zoom do portátil testada no projetor/TV da sala.
 
 ### 1–2. Home: o problema em 4 números (app, 3 min)
@@ -86,7 +87,7 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 | --- | --- | --- | --- | --- |
 | 1 | `/scenarios` → comparação A/B (pré-aberta) | "A mesma pergunta, dois desenhos de rede. A: contentores em todo o lado — o modelo que a Vitrus não quer. B: sem um único contentor." | O contraste que fundamenta a rede sem contentores | Capturas no portátil (sem slide; abre-se o compare em cache) |
 | 2 | Pausa 3 s no €/t de cada um | (deixa o ecrã falar) | — | — |
-| 3 | Apontar custo líquido de B (−1 628 €/ano) e evitado (45 542 €) | "No caso central, o aterro evitado paga a operação. **Estimativa** — e é por isso que há piloto." | O € para o presidente | — |
+| 3 | Apontar custo líquido de B (−1 628 €/ano) e evitado (45 542 €) | "No caso central, o aterro evitado paga a operação. **Estimativa** — e é por isso que há números a fechar." | O € para o presidente | — |
 | 4 | Etiqueta «Por estrada» na rota | "Os km vêm das estradas reais, OpenStreetMap, servidor nosso — não linhas retas." | Rigor do modelo | — |
 
 ### 4. «E se...?» — ao vivo 1 (app, 2,5 min)
@@ -97,14 +98,14 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 | 2 | Escrever a pergunta tal como dita | "Entendi: ..." aparece primeiro | Confirmar antes de calcular | — |
 | 3 | Confirmar → correr otimizador | "Quem calcula é o otimizador; a IA nunca faz contas. A diferença sai explicada em números." | **O momento de confiança** | Se falhar: "respondo com o cenário em cache" (uma das 3 de reserva do seed) |
 
-### 5. Rotas: um dia de viatura (app cenário «Piloto», 3 min)
+### 5. Duas freguesias: um dia de viatura (app cenário «Duas freguesias», 3 min)
 
 | Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
-| 1 | Abrir cenário «Piloto · Aldão + Arosa e Castelões» | "Isto é o vosso piloto, já calculado." | O pedido 1 fica tangível | O cenário por freguesias de referência |
-| 2 | Zoom a uma rota no mapa; selo «Por estrada» | "É o **plano do dia** da viatura: sai de Polvoreira, recolhe os sacos, volta. O motorista **não navega pela app** — o ecrã dele chega no piloto." | Dizer D4 em voz alta | Captura |
-| 3 | Plano de recolha filtrado a uma freguesia | "Dia fixo, ronda de 15 em 15 dias, tantos kg por ronda, tantos km e horas por ano. Tudo pressuposto com fonte, editável — é isto que o piloto calibra." | A folha de serviço da viatura | — |
-| 4 | (sem clique) | "No piloto paramos sempre; com dados, a paragem vazia sai da rota — 3 rondas vazias, sempre anunciado." | D6 dita em uma frase | — |
+| 1 | Abrir cenário «Duas freguesias · Aldão + Arosa e Castelões» | "A ferramenta desenha a rede à escala que se quiser — duas freguesias, as que o modelo aponta para começar." | A ideia de arranque fica tangível, **sem ser pedido** | O cenário por freguesias de referência |
+| 2 | Zoom a uma rota no mapa; selo «Por estrada» | "É o **plano do dia** da viatura: sai de Polvoreira, recolhe os sacos, volta. O motorista **não navega pela app** — o ecrã dele chega com a rede, não no primeiro dia." | Dizer D4 em voz alta | Captura |
+| 3 | Plano de recolha filtrado a uma freguesia | "Dia fixo, ronda de 15 em 15 dias, tantos kg por ronda, tantos km e horas por ano. Tudo pressuposto com fonte, editável — a recolha real calibra." | A folha de serviço da viatura | — |
+| 4 | (sem clique) | "A começar paramos sempre; com dados, a paragem vazia sai da rota — 3 rondas vazias, sempre anunciado." | D6 dita em uma frase | — |
 
 ### 6. Do saco ao fio — ao vivo 2 (app, 4 min)
 
@@ -126,7 +127,7 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 | Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
 | 1 | Separador candidatos (1 187 públicos + 86 escolas) | "O candidato é o **lugar**: camião já passa, licença já existe, o munícipe já lá vai. **Nenhum saco fica na rua**: a paragem é um encontro anunciado, o saco entrega-se à mão." | Desarmar a objeção dos contentores ao ar livre | Captura |
-| 2 | Apontar «Lugar possível, não recomendado: a validar com a Vitrus» | "Nas escolas, o saco espera **dentro**. E no piloto, **vocês** escolhem: fixar, excluir, acrescentar pontos." | D5 + D9 | — |
+| 2 | Apontar «Lugar possível, não recomendado: a validar com a Vitrus» | "Nas escolas, o saco espera **dentro**. E quando houver rede, **vocês** escolhem: fixar, excluir, acrescentar pontos." | D5 + D9 | — |
 | 3 | (sem clique) | "Exportação GeoJSON a um clique — o vosso QGIS entra aqui." | Ponte para a equipa técnica | — |
 
 ### 9. Relatório RAP (app `/reports`, 1,5 min)
@@ -139,13 +140,12 @@ Dizer a **frase-âncora** uma vez, devagar, e avançar.
 
 Sem app. Slide 4 (fala no [guião](apresentacao-vitrus-guiao.md), bloco 13): a direção de 4 nov está certa; a escala muda a letra; a proposta para desenhar juntos. A matriz A–G e as cinco camadas ficam nos anexos A4–A5.
 
-### 11. Os três pedidos (app `/pilot` + slide 5, 1,5 min)
+### 11. O que se segue (slides 5–6, 1,5 min; sem app)
 
-| Passo | Clica/mostra | Diz-se | Objetivo | Plano B |
+| Passo | Mostra | Diz-se | Objetivo | Plano B |
 | --- | --- | --- | --- | --- |
-| 1 | `/pilot` com as freguesias recomendadas | "Aldão e Arosa e Castelões: um modo de recolha de cada tipo, máxima aprendizagem." | O pedido 1 com nome | Slide 5 |
-| 2 | Slide 8 | Os três pedidos, com datas ("que dados chegam esta semana; a sessão de desenho em duas semanas") | Converter | — |
-| 3 | Slide 9 | A frase-âncora, outra vez. Obrigado. | Fecho | — |
+| 1 | Slide 5 | Fechar os dados (a lista); sessão com a operação dentro de duas semanas; e a plataforma fica — mantemos, desenvolvemos e desenhamos a rede com eles. **Nenhum pedido de piloto.** | Porta aberta; se eles propuserem, aceitar na hora | — |
+| 2 | Slide 6 | A frase-âncora, outra vez. Obrigado. "E agora quero ouvir-vos — tenho duas perguntas a fazer-vos." | Fecho que abre a conversa (perguntas nossas primeiro, guião) | — |
 
 ## 5. PPT — plano de slides (6 + 5 anexos)
 
@@ -157,7 +157,7 @@ A spec completa, **autocontida** para construir o deck (textos exatos, cores, fo
 | 2 | 9 em cada 10 kg de têxtil ainda vão para o lixo | Problema |
 | 3 | O que está a funcionar — e vamos ver ao vivo | Ponte para a app |
 | 4 | A direção de 4 de novembro está certa; a escala muda a letra | A resposta sobre a triagem |
-| 5 | Três pedidos | Fecho |
+| 5 | O que se segue | Fecho |
 | 6 | Obrigado (frase-âncora + QR) | Perguntas |
 | A1–A5 | Cobertura da diretiva · onde o têxtil se perde · pressupostos · matriz A–G · as cinco camadas | Só abrir se houver pergunta |
 
@@ -170,22 +170,22 @@ Adaptadas das [perguntas do júri](perguntas-do-juri.md).
 **Da Vitrus:**
 
 - **"O munícipe não vai pôr lixo no saco?"** — O peso denuncia (peso vs declaração sobe a auditoria), o motorista recusa à porta com nota educativa padrão, e nunca pagamos por kg nem por peça. Os 56,9% de rejeito vieram do canal sem controlo; a porta é o controlo.
-- **"Os locais públicos são contentores ao ar livre? O saco não fica na chuva?"** — O candidato é o lugar, não o contentor. A paragem é um **encontro anunciado**: o saco entrega-se à mão, nunca fica exposto. Quem não puder estar à hora, guarda o saco para a ronda seguinte ou leva-o a um ponto assistido, onde espera **dentro**. O piloto mede paragem a paragem o que funciona.
-- **"Podemos ser nós a escolher os pontos?"** — Sim, é esse o caminho: hoje restringe-se por freguesia e tipo; no piloto a Vitrus fixa, exclui e acrescenta pontos na plataforma; os 350 de coordenada aproximada confirmam-se no terreno.
-- **"Como sabem que a escola tem sacos?"** — No piloto, a viatura para sempre no dia anunciado e a escola avisa por telefone como hoje; o sinal digital (1 toque) vem depois e serve para **prever**, nunca para autorizar. Com dados, paragem vazia (3 rondas seguidas) sai da rota — sempre anunciado.
+- **"Os locais públicos são contentores ao ar livre? O saco não fica na chuva?"** — O candidato é o lugar, não o contentor. A paragem é um **encontro anunciado**: o saco entrega-se à mão, nunca fica exposto. Quem não puder estar à hora, guarda o saco para a ronda seguinte ou leva-o a um ponto assistido, onde espera **dentro**. A recolha mede paragem a paragem o que funciona.
+- **"Podemos ser nós a escolher os pontos?"** — Sim, é esse o caminho: hoje restringe-se por freguesia e tipo; quando houver rede, a Vitrus fixa, exclui e acrescenta pontos na plataforma; os 350 de coordenada aproximada confirmam-se no terreno.
+- **"Como sabem que a escola tem sacos?"** — A viatura para sempre no dia anunciado e a escola avisa por telefone como hoje; o sinal digital (1 toque) vem depois e serve para **prever**, nunca para autorizar. Com dados, paragem vazia (3 rondas seguidas) sai da rota — sempre anunciado.
 - **"O motorista anda com telemóvel?"** — Um Android da viatura (um por viatura, 150–300 €, não o pessoal de ninguém), 3 botões grandes e QR, a funcionar offline. A rota é o plano do dia; ele não navega pela app.
 - **"E se o munícipe não puser o saco no dia?"** — Guarda-o para a ronda seguinte (dia fixo, de 15 em 15 dias) ou leva-o ao ponto assistido. Sem marcação, sem app.
-- **"De 15 em 15 dias não é pouco (ou muito)?"** — Pressuposto editável, com sensibilidade; o piloto calibra o intervalo com número, não com opinião.
+- **"De 15 em 15 dias não é pouco (ou muito)?"** — Pressuposto editável, com sensibilidade; a recolha real calibra o intervalo com número, não com opinião.
 - **"Que viatura e quanto custa?"** — Furgoneta de caixa fechada sem compactação, 42 500 € (concurso de Gaia, pressuposto); os €/h e €/km são um dos pedidos.
 - **"Isto substitui a Sarah, a Ultriplo, a Nova Etapa?"** — Não; elas continuam a triar profissionalmente. O Novelo é a camada de decisão e evidência, e a bolsa liga-as ao material por fibra.
 - **"Fotos, marcas, RGPD?"** — A foto vive em memória durante o pedido; a miniatura é opcional, sem metadados, apagada aos 90 dias; a marca é de uma empresa, nunca de uma pessoa.
 - **"Quanto custa a IA?"** — Cêntimos por peça, orçamento mensal com teto; sem chave de IA o resto funciona.
 - **"E a To-Be-Green?"** — Complementar: eles, o cidadão e a reutilização; o Novelo, quem opera a recolha.
-- **"Quem mantém isto?"** — Nós, com o piloto de 3 meses; depois, contratação pública — sabemos o caminho e faz parte do plano.
+- **"Quem mantém isto?"** — Nós — é mesmo a oferta: mantemos e desenvolvemos; a seguir, contratação pública, sabemos o caminho e faz parte do plano.
 
 **Do presidente:**
 
-- **"Quanto custa ao município?"** — No cenário de 60 000 €/ano, o aterro evitado (45 542 €) paga a operação: custo líquido −1 628 €/ano no caso central. Estimativa; nos casos pessimistas não chega — por isso há piloto.
+- **"Quanto custa ao município?"** — No cenário de 60 000 €/ano, o aterro evitado (45 542 €) paga a operação: custo líquido −1 628 €/ano no caso central. Estimativa; nos casos pessimistas não chega — por isso há números a fechar e rede a medir.
 - **"O que ganha o cidadão?"** — Saco grátis, dia fixo, e resposta: o passaporte diz para onde foi a roupa e quanto a freguesia desviou. Sem app obrigatória.
 - **"O que muda em 2028?"** — Os produtores pagam o custo eficiente, determinado com as autoridades locais; Guimarães chega a essa mesa com números próprios por tipo de território e por marca.
 - **"Emprego e economia social?"** — Os lotes por fibra ligam ao tecido do Vale do Ave; as entidades que hoje recolhem 301 t continuam e ganham mais material e evidência.
@@ -212,9 +212,9 @@ Copiloto `/chat` (1 min máx, se houver tempo e saldo de IA) · `/admin/ai`, `/u
 Por ordem; as horas são orientativas mas a sequência não é.
 
 - [ ] **14h00 · Deploy «Vai no saco?» (go/no-go)**: PR #20 já existe. `git checkout feat/pre-collection-bag-check && just check`; verde → `gh pr merge 20` → Coolify faz deploy → **verificar em produção**: `/bag-check` abre, foto → veredicto, **e a triagem de entrega continua a funcionar** (o PR mexe em código partilhado). **No-go se**: check vermelho, deploy depois das 18h, ou qualquer coisa estranha → capturas de ecrã da stack local (`just dev` na branch) para o slide 4.
-- [ ] **15h00 · Cenário «Piloto» em produção**: `/simulator` → restrição às freguesias **Aldão** e **Arosa e Castelões** (as recomendadas em `/pilot`), modos `on_demand` + `existing`, orçamento a ajustar até abrir serviço (começar por 15–30 k€/ano), etiqueta «Piloto · Aldão + Arosa e Castelões». Confirmar rotas «Por estrada» e o plano de recolha preenchido.
+- [ ] **15h00 · Cenário «Duas freguesias» em produção**: `/simulator` → restrição às freguesias **Aldão** e **Arosa e Castelões** (as recomendadas em `/pilot`), modos `on_demand` + `existing`, orçamento a ajustar até abrir serviço (começar por 15–30 k€/ano), etiqueta **«Duas freguesias · Aldão + Arosa e Castelões»** (sem a palavra «piloto» no ecrã). Confirmar rotas «Por estrada» e o plano de recolha preenchido.
 - [ ] **16h00 · PPT**: 6 diapositivos + 5 anexos (§5; spec autocontida em [Slides](apresentacao-vitrus-slides.md)), com as notas do orador preenchidas. Exportar PDF para o portátil.
-- [ ] **16h30 · One-pager A4** (D10): âncora, 4 números, 3 pedidos, fontes; fundo linho, identidade Novelo; imprimir 3 cópias.
+- [ ] **16h30 · One-pager A4** (D10): âncora, 4 números, **o que se segue** (dados · sessão · plataforma fica), fontes; fundo linho, identidade Novelo; imprimir 3 cópias.
 - [ ] **17h00 · Impressões**: QR do lote `NOV-BXS4UW` → colar no saco de demonstração; RAP pré-gerado → 2 cópias; slides → PDF; one-pager → 3; (plano B) vídeo de 60 s no portátil e no telemóvel.
 - [ ] **17h30 · Hélder por mensagem**: fechar as 3 perguntas do issue #21 (arranque E, auditoria 20%, RAP amostral) — alinhados antes do ensaio.
 - [ ] **18h00 · Verificações de produção**: health, cenários `Demo · …` e A/B carregam < 2 s e «Por estrada»; lotes com miniaturas (expiram ~21 jan, ok); saldo OpenRouter; `QUICK_JOIN_CODE` não é preciso (sem convidados); conta com password testada.

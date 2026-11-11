@@ -31,7 +31,7 @@ Documento **autocontido**: contém tudo o que é preciso para construir o PowerP
 | 1:30–2:30 | 2 | Os 4 números do problema |
 | 3:30–4:00 | 3 | Ponte para a demonstração na app |
 | 20:00–21:30 | 4 | A resposta sobre a triagem |
-| 21:30–23:00 | 5 | Os três pedidos |
+| 21:30–23:00 | 5 | O que se segue |
 | 23:00 + perguntas | 6 | Obrigado (fica no ecrã) |
 
 ## 3. Os números canónicos (não usar outros)
@@ -67,7 +67,7 @@ Documento **autocontido**: contém tudo o que é preciso para construir o PowerP
 - Rodapé central: `Guimarães · 12 de novembro de 2026 · Flávio Fernandes e Hélder Gonçalves`
 - Linha pequena por baixo: `Projeto vencedor · Hack4Guimarães 2035 · Desafio 5 TexVitrus`
 
-**Notas do orador:** a fala do bloco 1 do [guião](apresentacao-vitrus-guiao.md), desde «Bom dia, senhor presidente...» até «...começo pelo princípio: onde estamos.» (termina com «O que vos mostro é sobretudo isto: a gestão da rede em números — o que cada decisão custa, o que rende e o que arrisca. No fim, três pedidos.»)
+**Notas do orador:** a fala do bloco 1 do [guião](apresentacao-vitrus-guiao.md), desde «Bom dia, senhor presidente...» até «...começo pelo princípio: onde estamos.» (inclui «Não viemos inventar a roda... no fim digo o que se seguiria — e depois quero ouvir-vos.»)
 
 ### Slide 2 — «9 em cada 10 kg de têxtil ainda vão para o lixo» (1:30–2:30)
 
@@ -114,17 +114,17 @@ Rodapé de fontes: `0,3 kg/peça (pressuposto) · 20–30 s/peça (uso real) · 
 
 **Notas do orador:** a fala do bloco 13 do [guião](apresentacao-vitrus-guiao.md), desde «Falta a resposta à vossa sugestão de 4 de novembro...» até «...o digital liga ao segundo mês.» — inclui fechar com «A matriz das sete abordagens e as camadas todas estão no anexo, se quiserem entrar nelas.»
 
-### Slide 5 — «Três pedidos» (21:30–22:50)
+### Slide 5 — «O que se segue» (21:30–22:50)
 
-Três blocos numerados (número grande em Areia, Newsreader):
+O fecho da apresentação: **não é um pedido** — são dois próximos passos concretos e uma declaração do que a equipa é (consultoria e solução tecnológica). Três blocos numerados (número grande em Areia, Newsreader):
 
-1. **`Piloto`** — `Aldão + Arosa e Castelões (+ freguesias de controlo) · 8–12 semanas · a começar em janeiro`
-2. **`Dados que só a Vitrus tem`** — `€/h e €/km das viaturas · kg mensais por entidade · tempo de uma paragem · orçamento dos sacos`
-3. **`Triagem`** — `desenho conjunto: a análise e o arranque mínimo estão na mesa · sessão de desenho com a operação dentro de 2 semanas`
+1. **`Fechar os dados`** — `€/h e €/km das viaturas · kg mensais por entidade · tempo de uma paragem · orçamento dos sacos — só a Vitrus os tem; a plataforma afina-se toda`
+2. **`Sessão com a operação`** — `a triagem e a rede desenham-se com quem as faz · a análise está na mesa, falta a vossa leitura · dentro de 2 semanas`
+3. **`A plataforma fica`** — `mantemos, desenvolvemos e desenhamos a rede convosco — o próximo passo é o que fizer sentido para vocês`
 
-Rodapé de fontes: `cenário «Piloto» e métricas na plataforma · pressupostos com fonte em /assumptions`
+Rodapé de fontes: `pressupostos com fonte em /assumptions · análise da triagem em anexo (A4–A5)`
 
-**Notas do orador:** a fala do bloco 14 do [guião](apresentacao-vitrus-guiao.md), desde «O ecrã do piloto...» até «...daqui a duas semanas.»
+**Notas do orador:** a fala do bloco 14 do [guião](apresentacao-vitrus-guiao.md), desde «E termino, não com pedidos...» até «...o que fizer sentido para vocês.» — inclui: não se pede nenhum piloto; se a Vitrus o propor, aceita-se na hora.
 
 ### Slide 6 — «Obrigado» (23:00 + perguntas)
 
@@ -132,17 +132,17 @@ Rodapé de fontes: `cenário «Piloto» e métricas na plataforma · pressuposto
 
 > `Com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431,1 t por ano do aterro a 101,9 € por tonelada — e os 45 542 € de tratamento evitado pagam a operação.`
 
-- Por baixo, pequeno: `estimativa — é por isso que há um piloto a pedir`
+- Por baixo, pequeno: `estimativa — é por isso que há números a fechar e uma rede a medir`
 - QR (ver secção 5) ao canto inferior direito com legenda `novelo.helder.si`
 - `Flávio Fernandes · Hélder Gonçalves`
 
-**Notas do orador:** «Deixo a frase com que comecei: com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e o tratamento evitado paga a operação. Estimativa — e é exatamente por isso que existe um piloto a pedir. Obrigado, senhor presidente; obrigado, equipa. Fico para as vossas perguntas.»
+**Notas do orador:** «Deixo a frase com que comecei: com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e o tratamento evitado paga a operação. Estimativa — e é por isso que há números a fechar e uma sessão a marcar. Obrigado, senhor presidente; obrigado, equipa. E agora quero ouvir-vos — até tenho duas perguntas a fazer-vos.»
 
 ### Anexos (só se houver pergunta)
 
-**A1 — «A rede não fica só onde é barato»**: `fora das freguesias urbanas: 55,5% da população servida · nas urbanas: 72,8% (cenário 60 000 €/ano, estimativa) · Arosa e Castelões sem serviço neste orçamento — entra no piloto · Diretiva 2025/1892, art. 22.º-C, n.º 9, b)`.
+**A1 — «A rede não fica só onde é barato»**: `fora das freguesias urbanas: 55,5% da população servida · nas urbanas: 72,8% (cenário 60 000 €/ano, estimativa) · Arosa e Castelões sem serviço neste orçamento — é onde o modelo começa (cenário «Duas freguesias») · Diretiva 2025/1892, art. 22.º-C, n.º 9, b)`.
 
-**A2 — «Onde o têxtil se perde»**: `48 freguesias · 2 751 contentores municipais em 2 026 locais (não são de têxteis) · 1 187 lugares candidatos + 86 escolas · canal B2B: lares e hotelaria (têxtil limpo de alto valor; toneladas a medir no piloto) · pacote QGIS da Vitrus, 20 out 2026`.
+**A2 — «Onde o têxtil se perde»**: `48 freguesias · 2 751 contentores municipais em 2 026 locais (não são de têxteis) · 1 187 lugares candidatos + 86 escolas · canal B2B: lares e hotelaria (têxtil limpo de alto valor; toneladas a medir no terreno) · pacote QGIS da Vitrus, 20 out 2026`.
 
 **A3 — «Pressupostos com fonte»**: `viatura 42 500 € (concurso de Gaia; pressuposto) · recolha a 30 km/h · 0,3 kg/peça · desvio de linha reta 1,37–1,48 (calibração OSRM) · aterro 105,64 €/t (Vitrus) · todos editáveis em /assumptions`.
 

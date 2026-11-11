@@ -17,13 +17,13 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 | 4:00–6:30 | Cenários A/B: a mesma pergunta, dois desenhos | app `/scenarios` | — |
 | 6:30–9:30 | «E se...?» | app cenário B | **ao vivo 1** |
 | 9:30–11:00 | A conversa do orçamento | app `/scenarios` (cadeia) | — |
-| 11:00–12:30 | O piloto: um dia de viatura | app cenário «Piloto» | — |
+| 11:00–12:30 | Duas freguesias: um dia de viatura | app cenário «Duas freguesias» | — |
 | 12:30–16:30 | A prova: do saco ao fio | app `/triage` → QR → Sankey → `/brands` | **ao vivo 2** |
 | 16:30–17:00 | «Vai no saco?» | app `/bag-check` | — |
 | 17:00–18:30 | A rede no terreno — e as empresas | app `/municipal` (+ B2B) | — |
 | 18:30–20:00 | Relatório RAP | app `/reports` + PDF impresso | — |
 | 20:00–21:30 | A resposta sobre a triagem | slide 4 | — |
-| 21:30–23:00 | Os três pedidos e fecho | app `/pilot` + slides 5–6 | — |
+| 21:30–23:00 | O que se segue e fecho | slides 5–6 | — |
 | — | Perguntas | slide 6 no ecrã | — |
 
 **Antes de entrar na sala** (−5 min; detalhe no plano §4.0): login com password feito, hotspot do telemóvel ativo, camisola com etiqueta legível + toalha velha em cima da mesa, saco de demonstração com o QR do lote `NOV-BXS4UW` colado, separadores abertos por ordem, zoom testado no ecrã da sala.
@@ -38,7 +38,7 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > Sou o Flávio Fernandes; o Hélder Gonçalves, que hoje não pôde estar, segue connosco à distância. Há três semanas, o Hack4Guimarães pôs uma pergunta: como desenhar a rede de recolha de têxteis de Guimarães ao menor custo. Ganhámos esse desafio — mas o prémio que interessa está aqui: uma ferramenta a funcionar, em produção, que responde em números à pergunta que vocês fizeram: **onde** recolher, **como**, e **a quanto fica** cada tonelada tirada do aterro.
 >
-> Não viemos inventar a roda. Pusemos os vossos dados e um otimizador bom a trabalhar juntos — o que sai é a gestão da rede em números: o que cada decisão custa, o que rende e o que arrisca. Nós sabemos programar soluções; a operação conhecem-na vocês. Hoje mostro o que está a funcionar, no fim tenho três pedidos — e depois quero ouvir-vos: o que falta, o que não faz sentido. Começo pelo princípio: onde estamos.
+> Não viemos inventar a roda. Pusemos os vossos dados e um otimizador bom a trabalhar juntos — o que sai é a gestão da rede em números: o que cada decisão custa, o que rende e o que arrisca. Nós sabemos programar soluções; a operação conhecem-na vocês. Hoje mostro o que está a funcionar, no fim digo o que se seguiria — e depois quero ouvir-vos: o que falta, o que não faz sentido. Começo pelo princípio: onde estamos.
 
 ## 2. O problema em 4 números — slide 2 (1:30–2:30)
 
@@ -56,7 +56,7 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > Isto resume o desafio: nove em cada dez quilos de têxtil que Guimarães gera ainda vão para o lixo — e em 2028 a fatura muda de dono. Quem chegar a essa mesa a saber o seu custo por tonelada defende o seu número.
 >
-> E a frase que resume o que encontramos: **com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e os 45 542 euros de tratamento evitado pagam a operação.** Estimativa — e é por isso que há um piloto para confirmar.
+> E a frase que resume o que encontramos: **com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e os 45 542 euros de tratamento evitado pagam a operação.** Estimativa — e é por isso que há números a fechar e uma rede a medir.
 
 ## 3. A mesma página, na app — app `/` (2:30–3:30)
 
@@ -68,7 +68,7 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > **PALCO:** aponta o comando de orçamento. Este comando é a conversa de gestão: mexo no orçamento e vejo logo a recolha que esse orçamento compra — sem esperar por cálculos, porque interpola entre cenários guardados.
 >
-> **PALCO:** aponta o mapa em meio-tom; desce à barra de confiança. O mapa mostra onde o têxtil se perde, sobre a vossa rede municipal — 2 751 contentores em 2 026 locais, o pacote de 20 de outubro. E a barra no fundo é a confiança dos dados: medido, estimado, em falta. Quando o piloto correr, o «estimado» vai-se tornando «medido».
+> **PALCO:** aponta o mapa em meio-tom; desce à barra de confiança. O mapa mostra onde o têxtil se perde, sobre a vossa rede municipal — 2 751 contentores em 2 026 locais, o pacote de 20 de outubro. E a barra no fundo é a confiança dos dados: medido, estimado, em falta. Quando houver recolha, o «estimado» vai-se tornando «medido».
 
 ## 4. Ponte: o que está a funcionar — slide 3 (3:30–4:00)
 
@@ -112,23 +112,23 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > É a fronteira de decisão, sem opinião pelo meio: cada orçamento compra toneladas a um custo por tonelada que está aqui — e vê-se onde o euro extra começa a ficar caro. Quem propõe o orçamento da rede responde com esta curva; quem corta o orçamento, também.
 >
-> E como toda a estimativa tem intervalo: cada cenário traz o seu. Nos casos pessimistas, o aterro evitado não chega para pagar a operação — está no ecrã, está assumido, e é mais uma razão para o piloto medir.
+> E como toda a estimativa tem intervalo: cada cenário traz o seu. Nos casos pessimistas, o aterro evitado não chega para pagar a operação — está no ecrã, está assumido, e é mais uma razão para medir no terreno.
 >
-> Uma nota de conformidade, senhor presidente: a diretiva pede uma rede que não se limite às zonas rendíveis. A ferramenta mostra a cobertura por tipo de território — e o nosso piloto começa precisamente pela freguesia rural que este orçamento deixa de fora.
+> Uma nota de conformidade, senhor presidente: a diretiva pede uma rede que não se limite às zonas rendíveis. A ferramenta mostra a cobertura por tipo de território — e o modelo começa precisamente pela freguesia rural que este orçamento deixa de fora.
 
-## 8. O piloto: um dia de viatura — app cenário «Piloto» (11:00–12:30)
+## 8. Duas freguesias: um dia de viatura — app cenário «Duas freguesias» (11:00–12:30)
 
-**PALCO:** cenário «Piloto · Aldão + Arosa e Castelões», criado na véspera. **Plano B:** cenário por freguesias de referência; captura.
+**PALCO:** cenário «Duas freguesias · Aldão + Arosa e Castelões», criado na véspera. **Plano B:** cenário por freguesias de referência; captura.
 
-> E isto desce ao concreto: é o vosso piloto, já calculado — **Aldão** e **Arosa e Castelões**, as freguesias que o próprio Novelo recomenda: um modo de recolha de cada tipo, máxima aprendizagem.
+> E isto desce ao concreto. A ferramenta desenha a rede à escala que se quiser — por exemplo, **duas freguesias**: Aldão e Arosa e Castelões, as que o próprio modelo aponta para começar, porque juntas têm um modo de recolha de cada tipo.
 >
 > **PALCO:** zoom a uma rota no mapa; aponta o selo «Por estrada». Isto é o plano do dia da viatura: sai do estaleiro da Polvoreira, ronda com as paragens nos locais, e volta. Quilómetros e traçado vêm das estradas reais.
 >
-> O motorista não navega pela app: um Android da viatura, três botões grandes, leitor de QR, offline — chega no piloto. A rota é o plano do dia.
+> O motorista não navega pela app: um Android da viatura, três botões grandes, leitor de QR, offline — chega com a rede, não no primeiro dia. A rota é o plano do dia.
 >
-> **PALCO:** plano de recolha filtrado a uma freguesia. A folha de serviço: dia fixo, ronda de 15 em 15 dias, quilos por ronda, quilómetros e horas por ano — pressupostos à vista e editáveis; o piloto troca-os por medidos.
+> **PALCO:** plano de recolha filtrado a uma freguesia. A folha de serviço: dia fixo, ronda de 15 em 15 dias, quilos por ronda, quilómetros e horas por ano — pressupostos à vista e editáveis; a recolha real troca-os por medidos.
 >
-> E uma regra, dita já: no piloto **paramos sempre**; com dados, a paragem vazia três rondas seguidas sai da rota — sempre anunciado, nunca em silêncio.
+> E uma regra, dita já: a começar, **paramos sempre**; com dados, a paragem vazia três rondas seguidas sai da rota — sempre anunciado, nunca em silêncio.
 
 ## 9. A prova: do saco ao fio — ao vivo 2 — app `/triage` → QR → Sankey → `/brands` (12:30–16:30)
 
@@ -166,9 +166,9 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 
 > Onde para a viatura? Em locais que já existem: 1 187 lugares públicos candidatos e 86 escolas, saídos do vosso pacote QGIS. E notem: **o candidato é o lugar, não é um contentor.** A paragem é um encontro anunciado — o saco entrega-se à mão, nunca fica na rua, à chuva. Nas escolas, o saco espera **dentro**.
 >
-> E no piloto a escolha é vossa: a Vitrus passa a fixar, excluir e acrescentar pontos na plataforma; há 350 lugares com coordenada aproximada, confirmam-se no terreno, convosco. Para a equipa: exportação GeoJSON num clique — o vosso QGIS entra aqui.
+> Quando houver rede, a escolha dos pontos é vossa: a Vitrus passa a fixar, excluir e acrescentar pontos na plataforma; há 350 lugares com coordenada aproximada, confirmam-se no terreno, convosco. Para a equipa: exportação GeoJSON num clique — o vosso QGIS entra aqui.
 >
-> **PALCO:** muda para o separador B2B (lares e hotelaria). E há têxtil que não vem das casas: os **lares e a hotelaria** da vossa rede — roupa de cama e toalhas, têxtil limpo, do mais alto valor de reutilização. É um canal à parte da rede aos habitantes, já contado do pacote municipal, freguesia a freguesia; as toneladas medem-se no piloto. É provavelmente a tonelada mais barata e mais limpa que esta rede consegue captar — e são as empresas a entregá-la à porta.
+> **PALCO:** muda para o separador B2B (lares e hotelaria). E há têxtil que não vem das casas: os **lares e a hotelaria** da vossa rede — roupa de cama e toalhas, têxtil limpo, do mais alto valor de reutilização. É um canal à parte da rede aos habitantes, já contado do pacote municipal, freguesia a freguesia; as toneladas medem-se quando houver recolha — está no ecrã, não se inventam. É provavelmente a tonelada mais barata e mais limpa que esta rede consegue captar — e são as empresas a entregá-la à porta.
 
 ## 12. Relatório RAP — app `/reports` + PDF impresso (18:30–20:00)
 
@@ -190,41 +190,41 @@ A fala corrida, palavra a palavra, da apresentação de **12 de novembro de 2026
 >
 > A matriz das sete abordagens e as camadas todas estão no anexo, se quiserem entrar nelas.
 
-## 14. Os três pedidos — app `/pilot` + slides 5 e 6 (21:30–23:00)
+## 14. O que se segue — slides 5 e 6 (21:30–23:00)
 
-**PALCO:** `/pilot` com as freguesias recomendadas; depois slide 5.
+**PALCO:** slide 5. Sem ecrã da app: o fecho é conversa. **Não se pede nenhum piloto** — o cenário «Duas freguesias» e o ecrã `/pilot` plantam a ideia; se eles a disserem, aceite na hora e liga-se ao plano de 48 h.
 
-> O ecrã do piloto: Aldão e Arosa e Castelões, mais freguesias de controlo semelhantes; 8 a 12 semanas; e as métricas que decidem o escalonamento — participação, captura contra o controlo, conformidade, rejeito.
+> E termino, não com pedidos — com o que se seguiria.
 >
-> **PALCO:** slide 5. Termino com os três pedidos.
+> **Primeiro: fechar os dados.** Os euros por hora e por quilómetro das viaturas — que o financeiro ainda não enviou; os quilos mensais por entidade; o tempo de uma paragem; o orçamento dos sacos. São números que só vocês têm. É meio dia de trabalho vosso, e a plataforma afina-se toda: os pressupostos saem, entram os vossos valores.
 >
-> **Primeiro: o piloto.** Duas freguesias, três meses; propomos começar em janeiro.
+> **Segundo: uma sessão com a operação.** A triagem e a rede desenham-se com quem as faz. A nossa análise está na mesa — falta a vossa leitura: o que está certo, o que é ingénuo, o que falta. Duas semanas?
 >
-> **Segundo: os dados que só a Vitrus tem.** Os euros por hora e por quilómetro das viaturas, que o financeiro ainda não enviou; os quilos mensais por entidade; o tempo de uma paragem; e o orçamento dos sacos. Com isto, os pressupostos saem e entram os vossos números.
+> E o que fica de nós: **a plataforma.** Somos quem a construiu, e é isto que sabemos fazer — programar soluções sobre dados reais. Mantemo-la, desenvolvemo-la ao ritmo que a operação pedir, e desenhamos a rede convosco. O que se faz a seguir é o que fizer sentido para vocês.
 >
-> **Terceiro: a triagem.** A nossa análise está na mesa — a direção que nos faz sentido é partilhar em camadas, com arranque mínimo. Mas o que pedimos é outra coisa: sentem-se connosco ao desenho e digam-nos o que não faz sentido. Sessão de desenho com a operação, daqui a duas semanas.
+> **PALCO:** slide 6; abranda. Deixo a frase com que comecei: **com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e o tratamento evitado paga a operação.** Estimativa — e é por isso que há números a fechar e uma sessão a marcar.
 >
-> **PALCO:** slide 6; abranda. Deixo a frase com que comecei: **com uma viatura nova só para o têxtil e sem um único contentor novo, Guimarães desvia 431 toneladas por ano do aterro, a 101,9 euros por tonelada — e o tratamento evitado paga a operação.** Estimativa — e é exatamente por isso que há um piloto a pedir.
->
-> Obrigado, senhor presidente; obrigado, equipa. Fico para as vossas perguntas.
+> Obrigado, senhor presidente; obrigado, equipa. E agora quero ouvir-vos — até tenho duas perguntas a fazer-vos.
 
 ---
 
 ## Perguntas (slide 6 no ecrã)
 
-**Se houver silêncio, começamos nós.** Duas perguntas nossas, a sério, com o bloco de notas à mão (as respostas são o input do plano de 48 h):
+**As nossas primeiro, sempre** (10–15 s cada; ouvir, não contestar; bloco de notas à mão — as respostas são o input do plano de 48 h):
 
 1. «O que é que o Novelo teria de fazer para entrar no vosso dia a dia — não em abril de 2028, na segunda-feira?»
 2. «O que é que não vos convence nos números? Onde é que carregam?»
+
+Se a Vitrus propor um piloto, uma freguesia, um contacto, uma data — **aceitar na hora**, agradecer e anotar; é a conversa a converter-se sozinha. Não empurrar mais nada.
 
 Depois, as respostas de 20 segundos, tema a tema, estão no plano §6. Resumo dos gatilhos:
 
 - **Contaminação / lixo no saco** → peso denuncia, recusa à porta com nota educativa, nunca se paga por quilo.
 - **«Não são contentores ao ar livre?»** → o candidato é o lugar; encontro anunciado; o saco nunca fica na rua.
-- **«E os lares e a hotelaria — quem trata disso?»** → canal à parte no piloto; os contactos são da Vitrus; as toneladas medem-se lá.
-- **«Podemos escolher os pontos?»** → sim, no piloto, na plataforma.
-- **«Quanto custa ao município?»** → 60 k€/ano: evitado 45 542 € paga a operação; líquido −1 628 €/ano no caso central; pessimista não chega — piloto.
-- **«Como sabem que a triagem em camadas funciona?»** → não sabemos ao certo — por isso é piloto com métricas (conformidade ≥ 80%, rejeito ≤ 15%) e desenho com a operação; a matriz A–G está no anexo.
+- **«E os lares e a hotelaria — quem trata disso?»** → canal à parte quando houver rede; os contactos são da Vitrus; as toneladas medem-se lá.
+- **«Podemos escolher os pontos?»** → sim, na plataforma, quando houver rede.
+- **«Quanto custa ao município?»** → 60 k€/ano: evitado 45 542 € paga a operação; líquido −1 628 €/ano no caso central; pessimista não chega — mede-se no terreno.
+- **«Como sabem que a triagem em camadas funciona?»** → não sabemos ao certo — por isso se desenha com a operação e mede-se com métricas (conformidade ≥ 80%, rejeito ≤ 15%); a matriz A–G está no anexo.
 - **«E as entidades que hoje recolhem?»** → não substitui; camada de decisão e evidência; a bolsa liga-as.
 - **«E o RGPD?»** → fotografias em memória; miniatura opcional sem metadados, 90 dias; marca é de empresa, não de pessoa.
 - **Detalhe da triagem (camadas, auditoria, sacos)** → abrir o anexo A4/A5 e responder a partir dele.
