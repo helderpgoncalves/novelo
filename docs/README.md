@@ -8,6 +8,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | --- | --- |
 | [Visão geral](projeto/visao-geral.md) | A página pública do projeto: problema, resposta, produto com capturas, o que já está provado e próximo passo (pronta a colar na TAIKAI) |
 | [Proposta](projeto/proposta.md) | Análise do desafio e proposta inicial |
+| [Apresentação à Vitrus e à Câmara](projeto/apresentacao-vitrus-camara.md) | Plano pós-hackathon: guião, demo, perguntas esperadas, pedidos e checklist |
 | [Visualizações por página](projeto/visualizacoes-por-pagina.md) | Data storytelling: princípios, 2 a 4 visuais por página com dados e prioridade, a home em detalhe, reaproveitamento na app, no RAP e nos slides, e dependências em falta |
 
 ## Engenharia
