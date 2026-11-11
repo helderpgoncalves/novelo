@@ -20,6 +20,7 @@ from novelo.ai.tasks import (
     TASK_MAX_TOKENS,
     TASK_REQUIREMENTS,
     TYPICAL_TOKENS,
+    VISION_TASKS,
     AiTask,
 )
 from novelo.core.config import Settings, get_settings
@@ -71,7 +72,7 @@ def _override(row: AiSettings, task: AiTask) -> TaskOverride:
 def resolve_task(row: AiSettings | None, s: Settings, task: AiTask) -> ResolvedTask:
     """Tarefa -> valor efetivo e origem: valor da tarefa, depois global (BD), depois `.env`, depois o código."""
     o = _override(row, task) if row else TaskOverride()
-    vision = task == AiTask.TRIAGE
+    vision = task in VISION_TASKS
 
     def pick(own: Any, global_db: Any, env: Any, code: Any = None) -> tuple[Any, Source]:
         if own is not None:
@@ -242,7 +243,7 @@ def _required_by_model(body: AiSettingsUpdate) -> dict[str, tuple[set[str], list
 
     for t in CONFIGURABLE_TASKS:
         o = own.get(t)
-        default_model = d.vision_model if t == AiTask.TRIAGE else d.text_model
+        default_model = d.vision_model if t in VISION_TASKS else d.text_model
         add(o.model if o and o.model else default_model, t)
         add(o.fallback_model if o and o.fallback_model else d.fallback_model, t)
     return need

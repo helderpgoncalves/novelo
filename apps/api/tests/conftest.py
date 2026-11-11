@@ -60,6 +60,7 @@ from novelo.features.municipal import models as _municipal_models  # noqa: F401
 from novelo.features.network import models as _network_models  # noqa: F401
 from novelo.features.planning import models as _planning_models  # noqa: F401
 from novelo.features.planning import whatif_models as _whatif_models  # noqa: F401
+from novelo.features.pre_collection.router import get_public_llm
 from novelo.features.reports import models as _report_models  # noqa: F401
 from novelo.features.textile import models as _textile_models  # noqa: F401
 from novelo.features.users import models as _user_models  # noqa: F401
@@ -530,6 +531,7 @@ async def client(
     app.dependency_overrides[get_db] = _db
     app.dependency_overrides[get_email_sender] = lambda: outbox
     app.dependency_overrides[get_llm] = lambda: llm
+    app.dependency_overrides[get_public_llm] = lambda: llm
     app.dependency_overrides[get_turnstile] = lambda: turnstile
     app.dependency_overrides[get_catalog] = lambda: catalog
     from novelo.features.copilot.router import get_stream_deps  # noqa: PLC0415
