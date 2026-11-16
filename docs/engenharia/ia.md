@@ -51,6 +51,7 @@ Todos os modelos passam pelo **OpenRouter** (API compatível com OpenAI), atrav�
 | `briefing` | Parágrafo executivo do relatório RAP | structured outputs | `briefing_v1.md` |
 | `alert_resolution` | Proposta de resolução de alertas de qualidade | structured outputs | `alert_resolution_v2.md` |
 | `triage` | Triagem por foto (visão) | imagem + structured outputs | `triage_v3.md` |
+| `precheck` | Pré-recolha «Vai no saco?» (visão, rota pública sem sessão): o conselho antes de a peça entrar no saco | imagem + structured outputs | `precheck_v1.md` |
 
 **Modelo recomendado: `openai/gpt-6-luna`.** US$ 0,10 por milhão de tokens de entrada, US$ 0,50 por milhão de saída, contexto de 1,05 M, texto e imagem. É o valor por omissão de todas as tarefas, incluindo a visão. `typesafe/jev-router` existe no catálogo mas tem preço dinâmico e escolhe o modelo por baixo; não é default e só serve para ser avaliado (`just eval-triage --models ...`).
 
@@ -59,6 +60,7 @@ Custo estimado por operação com `gpt-6-luna` (estimativa a partir de tokens t�
 | Operação | Tokens típicos (entrada / saída) | Custo estimado |
 | --- | --- | --- |
 | Peça triada (duas fotos reduzidas) | 2 200 / 250 | cerca de US$ 0,00035 |
+| Conselho «vai no saco?» (uma foto) | 1 200 / 120 | cerca de US$ 0,00018 |
 | Pergunta ao copiloto (várias chamadas) | 5 000 / 600 | cerca de US$ 0,0008 |
 | Briefing do relatório | 1 200 / 250 | cerca de US$ 0,00025 |
 

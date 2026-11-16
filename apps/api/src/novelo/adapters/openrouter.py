@@ -25,7 +25,7 @@ from pydantic import BaseModel, ValidationError
 
 from novelo.ai.cache import fingerprint, response_cache
 from novelo.ai.runtime import AiRuntime, UsageEvent
-from novelo.ai.tasks import CACHEABLE, SCHEMA_TASKS, TASK_MAX_TOKENS, AiTask
+from novelo.ai.tasks import CACHEABLE, SCHEMA_TASKS, TASK_MAX_TOKENS, VISION_TASKS, AiTask
 from novelo.ai.web import ServerTools, WebCitation, WebSearchResult, WebSearchUnavailableError, parse_citations
 from novelo.core.config import Settings, get_settings
 from novelo.core.errors import AiBudgetExceededError, FeatureDisabledError, UpstreamError
@@ -263,7 +263,7 @@ class OpenRouterClient:
         resolved = self._rt.resolve(t) if self._rt else None
         if resolved:
             return resolved.model
-        return self._s.llm_model_vision if t == AiTask.TRIAGE else self._s.llm_model_text
+        return self._s.llm_model_vision if t in VISION_TASKS else self._s.llm_model_text
 
     def _fallback_for(self, task: AiTask) -> str | None:
         resolved = self._rt.resolve(task) if self._rt else None

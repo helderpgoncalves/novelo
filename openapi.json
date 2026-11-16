@@ -627,6 +627,7 @@
           "alert_resolution",
           "copilot_aux",
           "triage",
+          "precheck",
           "test",
           "web_search"
         ],
@@ -2099,6 +2100,21 @@
           "item_photo"
         ],
         "title": "Body_analyse_garment",
+        "type": "object"
+      },
+      "Body_check_pre_collection": {
+        "properties": {
+          "photo": {
+            "contentMediaType": "application/octet-stream",
+            "description": "Foto da peça antes de a pôr no saco",
+            "title": "Photo",
+            "type": "string"
+          }
+        },
+        "required": [
+          "photo"
+        ],
+        "title": "Body_check_pre_collection",
         "type": "object"
       },
       "Body_upload_copilot_attachments": {
@@ -14352,6 +14368,54 @@
           "source"
         ],
         "title": "PotentialReadingOut",
+        "type": "object"
+      },
+      "PreCollectionAdvice": {
+        "description": "O conselho devolvido a quem prepara o saco. Aconselha, não condiciona; nada é guardado.",
+        "properties": {
+          "condition": {
+            "$ref": "#/components/schemas/TextileDestination",
+            "description": "reuse/recycle quando vai; reject quando não vai"
+          },
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "decision": {
+            "description": "in_bag se a peça vai no saco; keep_out se fica em casa (indiferenciado)",
+            "enum": [
+              "in_bag",
+              "keep_out"
+            ],
+            "title": "Decision",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "reason": {
+            "description": "Uma frase curta, no idioma pedido",
+            "maxLength": 240,
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "decision",
+          "condition",
+          "reason",
+          "confidence",
+          "prompt_version",
+          "model"
+        ],
+        "title": "PreCollectionAdvice",
         "type": "object"
       },
       "ProducerType": {
@@ -39965,6 +40029,154 @@
           }
         },
         "summary": "Get Lot Qr",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/pre-collection/check": {
+      "post": {
+        "description": "Aconselha quem prepara o saco: «vai no saco» ou «não vai». Não grava nada e não precisa de sessão.",
+        "operationId": "check_pre_collection",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "locale",
+            "required": false,
+            "schema": {
+              "default": "pt-PT",
+              "enum": [
+                "pt-PT",
+                "en"
+              ],
+              "title": "Locale",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "$ref": "#/components/schemas/Body_check_pre_collection"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PreCollectionAdvice"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Check Pre Collection",
         "tags": [
           "public"
         ]

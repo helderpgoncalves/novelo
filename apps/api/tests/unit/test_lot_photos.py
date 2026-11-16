@@ -6,10 +6,10 @@ import random
 import pytest
 from PIL import Image
 
+from novelo.ai.images import InvalidImageError
 from novelo.core.errors import AppError
 from novelo.features.lots import photos
 from novelo.features.lots.photo_store import CREDIT_MAX_CHARS, InvalidCreditError, clean_credit_text
-from novelo.features.lots.triage import InvalidImageError
 
 MAX = 153_600
 

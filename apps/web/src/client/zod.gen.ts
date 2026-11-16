@@ -125,6 +125,7 @@ export const zAiTask = z.enum([
     'alert_resolution',
     'copilot_aux',
     'triage',
+    'precheck',
     'test',
     'web_search'
 ]);
@@ -389,6 +390,13 @@ export const zAuthConfig = z.object({
 export const zBodyAnalyseGarment = z.object({
     item_photo: z.string(),
     label_photo: z.string().nullish()
+});
+
+/**
+ * Body_check_pre_collection
+ */
+export const zBodyCheckPreCollection = z.object({
+    photo: z.string()
 });
 
 /**
@@ -4473,6 +4481,20 @@ export const zLotDetail = z.object({
 });
 
 /**
+ * PreCollectionAdvice
+ *
+ * O conselho devolvido a quem prepara o saco. Aconselha, não condiciona; nada é guardado.
+ */
+export const zPreCollectionAdvice = z.object({
+    condition: zTextileDestination,
+    confidence: z.number().gte(0).lte(1),
+    decision: z.enum(['in_bag', 'keep_out']),
+    model: z.string(),
+    prompt_version: z.string(),
+    reason: z.string().max(240)
+});
+
+/**
  * ThreadExport
  */
 export const zThreadExport = z.object({
@@ -6848,6 +6870,17 @@ export const zGetLotQrPath = z.object({
  * Successful Response
  */
 export const zGetLotQrResponse = z.string();
+
+export const zCheckPreCollectionBody = zBodyCheckPreCollection;
+
+export const zCheckPreCollectionQuery = z.object({
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT')
+});
+
+/**
+ * Successful Response
+ */
+export const zCheckPreCollectionResponse = zPreCollectionAdvice;
 
 /**
  * Successful Response

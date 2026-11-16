@@ -10,7 +10,7 @@ from dataclasses import dataclass
 
 from PIL import Image, ImageOps, UnidentifiedImageError
 
-from novelo.features.lots.triage import MAX_BYTES, InvalidImageError, sniff_mime
+from novelo.ai.images import MAX_BYTES, InvalidImageError, sniff_mime
 
 MAX_INPUT_BYTES = MAX_BYTES  # 5 MB
 MAX_SIDE = 640

@@ -1,53 +1,15 @@
 """Triagem por foto: valida as imagens, pede a análise ao modelo de visão e calcula o peso do lado do servidor.
 
 As fotografias vivem só em memória durante o pedido e nunca são guardadas (privacidade).
+A validação e a redução das fotos vivem em `ai/images.py`, partilhadas com a pré-recolha.
 """
 
-import base64
-from typing import Literal
-
 from novelo.adapters.openrouter import OpenRouterClient
-from novelo.ai.images import UnreadableImageError, shrink_for_vision
+from novelo.ai.images import data_url
 from novelo.ai.prompts import load
 from novelo.ai.tasks import AiTask
-from novelo.core.errors import AppError
 from novelo.features.lots.schemas import TriageAnalysis, TriageResult
 from novelo.features.lots.service import dominant_fibre, estimate_weight_g
-
-MAX_BYTES = 5 * 1024 * 1024
-_MAGIC = {
-    b"\xff\xd8\xff": "image/jpeg",
-    b"\x89PNG\r\n\x1a\n": "image/png",
-    b"RIFF": "image/webp",  # confirmado abaixo com "WEBP"
-}
-
-
-class InvalidImageError(AppError):
-    status_code = 400
-    code = "bad_request"
-
-
-def sniff_mime(data: bytes) -> Literal["image/jpeg", "image/png", "image/webp"]:
-    """Confirma o formato pelos primeiros bytes: o Content-Type enviado pelo cliente não é de fiar."""
-    for magic, mime in _MAGIC.items():
-        if data.startswith(magic):
-            if mime == "image/webp" and data[8:12] != b"WEBP":
-                break
-            return mime  # type: ignore[return-value]
-    raise InvalidImageError("Only JPEG, PNG or WebP images are accepted")
-
-
-def _data_url(data: bytes) -> str:
-    if not data:
-        raise InvalidImageError("Empty image")
-    if len(data) > MAX_BYTES:
-        raise InvalidImageError("Each photo must be at most 5 MB")
-    sniff_mime(data)  # valida o formato real; o que se envia é sempre JPEG reduzido
-    try:
-        small = shrink_for_vision(data)
-    except UnreadableImageError as exc:
-        raise InvalidImageError("The image could not be read") from exc
-    return f"data:image/jpeg;base64,{base64.b64encode(small).decode()}"
 
 
 async def analyse(
@@ -61,12 +23,12 @@ async def analyse(
     content: list[dict[str, object]] = [
         {"type": "text", "text": f"Language for `notes`: {locale}."},
         {"type": "text", "text": "Photo 1: the garment."},
-        {"type": "image_url", "image_url": {"url": _data_url(item_photo)}},
+        {"type": "image_url", "image_url": {"url": data_url(item_photo)}},
     ]
     if label_photo:
         content += [
             {"type": "text", "text": "Photo 2: the care/composition label."},
-            {"type": "image_url", "image_url": {"url": _data_url(label_photo)}},
+            {"type": "image_url", "image_url": {"url": data_url(label_photo)}},
         ]
     chosen = model or client.model_for(AiTask.TRIAGE)
     analysis = await client.structured(

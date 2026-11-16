@@ -35,6 +35,7 @@ from novelo.features.planning import reference
 from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
+from novelo.features.pre_collection.router import public_router as public_pre_collection_router
 from novelo.features.reports.router import router as reports_router
 from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
@@ -137,6 +138,9 @@ def create_app() -> FastAPI:
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
     app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    app.include_router(
+        public_pre_collection_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS
+    )
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app
