@@ -227,6 +227,17 @@ class LotWeightSource(StrEnum):
     ESTIMATED = "estimated"  # média por tipo de peça (pressuposto, antes de haver balança)
 
 
+class BagDeclaration(StrEnum):
+    """Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+
+    É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+    dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+    """
+
+    REUSE = "reuse"  # «vestir de novo»: roupa limpa e seca, nível A do modelo Retex
+    RECYCLE = "recycle"  # «dar a vida»: têxtil gasto para matéria-prima, nível B
+
+
 class ExportLotState(StrEnum):
     """Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado)."""
 

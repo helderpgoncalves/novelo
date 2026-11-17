@@ -13,10 +13,12 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as CidadaoRouteImport } from './routes/cidadao'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as JoinRouteImport } from './routes/join'
 import { Route as LocalRouteImport } from './routes/local'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
+import { Route as OndeQuandoRouteImport } from './routes/onde-quando'
 import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
@@ -77,6 +79,11 @@ const AcceptInviteRoute = AcceptInviteRouteImport.update({
   path: '/accept-invite',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CidadaoRoute = CidadaoRouteImport.update({
+  id: '/cidadao',
+  path: '/cidadao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreditsRoute = CreditsRouteImport.update({
   id: '/credits',
   path: '/credits',
@@ -95,6 +102,11 @@ const LocalRoute = LocalRouteImport.update({
 const MagicLinkRoute = MagicLinkRouteImport.update({
   id: '/magic-link',
   path: '/magic-link',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OndeQuandoRoute = OndeQuandoRouteImport.update({
+  id: '/onde-quando',
+  path: '/onde-quando',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PendingApprovalRoute = PendingApprovalRouteImport.update({
@@ -307,10 +319,12 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -356,10 +370,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -408,10 +424,12 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
   '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
@@ -459,10 +477,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
     | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
     | '/privacy'
     | '/terms'
@@ -508,10 +528,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
     | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
     | '/privacy'
     | '/terms'
@@ -559,10 +581,12 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
     | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
     | '/privacy'
     | '/terms'
@@ -611,10 +635,12 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   AcceptInviteRoute: typeof AcceptInviteRoute
+  CidadaoRoute: typeof CidadaoRoute
   CreditsRoute: typeof CreditsRoute
   JoinRoute: typeof JoinRoute
   LocalRoute: typeof LocalRoute
   MagicLinkRoute: typeof MagicLinkRoute
+  OndeQuandoRoute: typeof OndeQuandoRoute
   PendingApprovalRoute: typeof PendingApprovalRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
@@ -653,6 +679,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AcceptInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cidadao': {
+      id: '/cidadao'
+      path: '/cidadao'
+      fullPath: '/cidadao'
+      preLoaderRoute: typeof CidadaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/credits': {
       id: '/credits'
       path: '/credits'
@@ -679,6 +712,13 @@ declare module '@tanstack/react-router' {
       path: '/magic-link'
       fullPath: '/magic-link'
       preLoaderRoute: typeof MagicLinkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onde-quando': {
+      id: '/onde-quando'
+      path: '/onde-quando'
+      fullPath: '/onde-quando'
+      preLoaderRoute: typeof OndeQuandoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/pending-approval': {
@@ -1062,10 +1102,12 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   AcceptInviteRoute: AcceptInviteRoute,
+  CidadaoRoute: CidadaoRoute,
   CreditsRoute: CreditsRoute,
   JoinRoute: JoinRoute,
   LocalRoute: LocalRoute,
   MagicLinkRoute: MagicLinkRoute,
+  OndeQuandoRoute: OndeQuandoRoute,
   PendingApprovalRoute: PendingApprovalRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,

@@ -305,7 +305,8 @@ export const zApproveRequest = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ]).optional().default('operator')
 });
 
@@ -382,6 +383,51 @@ export const zAuthConfig = z.object({
     registration_open: z.boolean(),
     turnstile_enabled: z.boolean(),
     turnstile_site_key: z.string().nullable()
+});
+
+/**
+ * BagDeclaration
+ *
+ * Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+ *
+ * É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+ * dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+ */
+export const zBagDeclaration = z.enum(['reuse', 'recycle']);
+
+/**
+ * BagActivationCreate
+ *
+ * Ativar um saco da plataforma: apelido privado opcional e a declaração «Vai no saco?» opcional.
+ */
+export const zBagActivationCreate = z.object({
+    declaration: zBagDeclaration.nullish(),
+    nickname: z.string().max(80).nullish()
+});
+
+/**
+ * BagActivationOut
+ *
+ * Um saco ativado, visto pelo dono. `active` é `deactivated_at is null`.
+ */
+export const zBagActivationOut = z.object({
+    active: z.boolean(),
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    declaration: zBagDeclaration.nullable(),
+    declared_at: z.iso.datetime().nullable(),
+    id: z.uuid(),
+    nickname: z.string().nullable()
+});
+
+/**
+ * BagActivationUpdate
+ *
+ * Corrigir o apelido ou a declaração enquanto o saco está ativo (desativado congela).
+ */
+export const zBagActivationUpdate = z.object({
+    declaration: zBagDeclaration.nullish(),
+    nickname: z.string().max(80).nullish()
 });
 
 /**
@@ -614,6 +660,26 @@ export const zCollectionFrequency = z.enum([
     'monthly',
     'quarterly'
 ]);
+
+/**
+ * CollectionHistoryOut
+ *
+ * Uma linha do histórico do doador: o saco e o lote que o levou (link só para o passaporte público).
+ *
+ * O lote chega por `lot_units.code == bag code` — é o scan da viatura que faz a ligação; sem scan o
+ * saco ainda está em casa (`lot_code` nulo). O passaporte nunca mostra o doador.
+ */
+export const zCollectionHistoryOut = z.object({
+    activated_at: z.iso.datetime(),
+    bag_code: z.string(),
+    bag_id: z.uuid(),
+    collected_at: z.iso.datetime().nullish(),
+    declaration: zBagDeclaration.nullable(),
+    lot_code: z.string().nullish(),
+    lot_state: z.string().nullish(),
+    nickname: z.string().nullable(),
+    weight_kg: z.number().nullish()
+});
 
 /**
  * CollectionMode
@@ -976,6 +1042,9 @@ export const zCopilotErrorEvent = z.object({
         'citizen_address_required',
         'citizen_parish_required',
         'citizen_bags_limit',
+        'age_below_minimum',
+        'bag_limit_reached',
+        'bag_inactive',
         'local_address_forbidden',
         'request_not_dispatchable',
         'request_not_scheduled',
@@ -1383,6 +1452,44 @@ export const zDnsCheck = z.object({
 });
 
 /**
+ * DonorAccountOut
+ *
+ * A conta de doador vista por quem nela entra: pseudónimo do QR de conta e a idade declarada.
+ */
+export const zDonorAccountOut = z.object({
+    created_at: z.iso.datetime(),
+    declared_age: z.int().nullable(),
+    donor_code: z.string().nullable(),
+    email: z.string(),
+    id: z.uuid(),
+    name: z.string().nullable()
+});
+
+/**
+ * DonorQrOut
+ *
+ * QR em SVG (fundo branco, como o passaporte) e o código que ele codifica.
+ */
+export const zDonorQrOut = z.object({
+    code: z.string(),
+    svg: z.string()
+});
+
+/**
+ * DonorSignUpRequest
+ *
+ * Conta de doador por email, sem password: idade DECLARADA (13+; abaixo é recusa explícita) e
+ * consentimento RGPD (conta e crédito = contrato, ADR #49).
+ */
+export const zDonorSignUpRequest = z.object({
+    consent: z.literal(true),
+    declared_age: z.int().gte(0).lte(120),
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    website: z.string().max(200).nullish()
+});
+
+/**
  * DoorToDoorPass
  *
  * Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.
@@ -1592,6 +1699,9 @@ export const zErrorBody = z.object({
         'citizen_address_required',
         'citizen_parish_required',
         'citizen_bags_limit',
+        'age_below_minimum',
+        'bag_limit_reached',
+        'bag_inactive',
         'local_address_forbidden',
         'request_not_dispatchable',
         'request_not_scheduled',
@@ -2128,7 +2238,8 @@ export const zInvitationCreate = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ]).optional().default('operator')
 });
 
@@ -2171,7 +2282,8 @@ export const zInvitationOut = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ]),
     send_count: z.int(),
     status: z.enum([
@@ -2222,7 +2334,8 @@ export const zInvitationPreview = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ])
 });
 
@@ -3052,7 +3165,8 @@ export const zMeOut = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ])
 });
 
@@ -3805,6 +3919,20 @@ export const zPublicAgendaEntry = z.object({
     parish_name: z.string(),
     rounds_year: z.number(),
     weekday: z.int()
+});
+
+/**
+ * CollectionAgendaOut
+ *
+ * A agenda pública «onde e quando entrego»: as rondas publicadas do cenário mais recente.
+ *
+ * `agenda` nulo = nenhum cenário publicado tem agenda (política fixa antiga): a página diz que ainda
+ * não há promessa publicada — nunca inventa dias.
+ */
+export const zCollectionAgendaOut = z.object({
+    agenda: z.array(zPublicAgendaEntry).nullable(),
+    scenario_label: z.string().nullish(),
+    updated_at: z.iso.datetime().nullish()
 });
 
 /**
@@ -5816,7 +5944,8 @@ export const zUserAdminOut = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ])
 });
 
@@ -5830,7 +5959,8 @@ export const zUserAdminUpdate = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ]).nullish()
 });
 
@@ -5862,7 +5992,8 @@ export const zUserOut = z.object({
         'admin',
         'operator',
         'guest',
-        'local'
+        'local',
+        'donor'
     ])
 });
 
@@ -6501,6 +6632,17 @@ export const zChangePasswordResponse = z.void();
  */
 export const zGetAuthConfigResponse = zAuthConfig;
 
+export const zDonorSignUpBody = zDonorSignUpRequest;
+
+export const zDonorSignUpHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zDonorSignUpResponse = z.void();
+
 export const zForgotPasswordBody = zForgotPasswordRequest;
 
 export const zForgotPasswordHeaders = z.object({
@@ -6686,6 +6828,75 @@ export const zGetBrandEvidenceResponse = zBrandsOut;
  * Successful Response
  */
 export const zGetCalibrationResponse = zCalibrationOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorAccountResponse = zDonorAccountOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorAccountQrResponse = zDonorQrOut;
+
+/**
+ * Response List Bag Activations
+ *
+ * Successful Response
+ */
+export const zListBagActivationsResponse = z.array(zBagActivationOut);
+
+export const zCreateBagActivationBody = zBagActivationCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateBagActivationResponse = zBagActivationOut;
+
+export const zUpdateBagActivationBody = zBagActivationUpdate;
+
+export const zUpdateBagActivationPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateBagActivationResponse = zBagActivationOut;
+
+export const zActivateBagPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zActivateBagResponse = zBagActivationOut;
+
+export const zDeactivateBagPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeactivateBagResponse = zBagActivationOut;
+
+export const zGetBagQrPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetBagQrResponse = zDonorQrOut;
+
+/**
+ * Response Get Collection History
+ *
+ * Successful Response
+ */
+export const zGetCollectionHistoryResponse = z.array(zCollectionHistoryOut);
 
 export const zListCollectionRequestsQuery = z.object({
     state: zCollectionRequestState.nullish(),
@@ -7834,6 +8045,11 @@ export const zRunScenarioSensitivityResponse = zSensitivityOut;
  * Successful Response
  */
 export const zListZonesResponse = z.array(zZoneOut);
+
+/**
+ * Successful Response
+ */
+export const zGetPublicCollectionAgendaResponse = zCollectionAgendaOut;
 
 export const zGetPublicLocalCertificatePath = z.object({
     account_id: z.uuid()

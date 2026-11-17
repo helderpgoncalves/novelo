@@ -36,8 +36,9 @@ export const Route = createFileRoute('/')({
   }),
   beforeLoad: async ({ context: { queryClient } }) => {
     const user = await resolvePublicSessionUser(queryClient);
-    // A conta de local tem a sua própria área: entrar na app de equipa ia direto ao portão errado.
+    // Contas com área própria não param na app de equipa: o local vai ao seu portão, o doador à carteira.
     if (user?.role === 'local') throw redirect({ to: '/local' });
+    if (user?.role === 'donor') throw redirect({ to: '/cidadao' });
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };

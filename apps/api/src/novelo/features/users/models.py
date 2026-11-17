@@ -10,7 +10,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from novelo.core.database import Base, TimestampMixin, UuidPkMixin, enum_check, enum_column
 from novelo.domain.vocab import LocalKind
 
-Role = Literal["admin", "operator", "guest", "local"]
+Role = Literal["admin", "operator", "guest", "local", "donor"]
 JoinedVia = Literal["password", "google", "quick_join", "magic_link", "invited"]
 ApprovalStatus = Literal["pending", "approved", "rejected"]
 
@@ -33,6 +33,8 @@ class User(Base, UuidPkMixin, TimestampMixin):
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint("approval_status IN ('pending', 'approved', 'rejected')", name="approval_status_valid"),
+        # A idade DECLARADA do doador: abaixo de 13 nunca entra (recusa explícita na criação, #63).
+        CheckConstraint("declared_age IS NULL OR declared_age >= 13", name="declared_age_minimum"),
     )
     __allow_unmapped__ = True
 
@@ -62,6 +64,11 @@ class User(Base, UuidPkMixin, TimestampMixin):
     # Introdução guiada: quando foi vista (ou saltada) e o checklist «Primeiros passos» (`done`, `dismissed`).
     onboarding_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     onboarding_state: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default=text("'{}'::jsonb"))
+    # Perfil de doador (#63): só nas contas com papel `donor`. A idade é DECLARADA na criação — a regra
+    # dos 13 anos recusa a conta abaixo disso (ADR: RGPD da conta de doador); o código é o pseudónimo do
+    # QR de conta (portador de crédito, nunca credencial de sessão).
+    declared_age: Mapped[int | None] = mapped_column(Integer)
+    donor_code: Mapped[str | None] = mapped_column(String(16), unique=True, index=True)
     # Não persistido: preenchido em cada pedido por `core/deps.get_current_user`. `None` = sessão normal.
     impersonation: ImpersonationInfo | None = None
 
