@@ -1,5 +1,8 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router';
-import { LocalPrototypePage, type VariantKey } from '@/features/local-prototype/local-prototype-page';
+import {
+  LocalPrototypePage,
+  type VariantKey,
+} from '@/features/local-prototype/local-prototype-page';
 
 // PROTÓTIPO (wayfinder #51) — fluxo do local assistido na futura área /local.
 // Três variantes estruturalmente diferentes, comutáveis por ?variant=A|B|C
@@ -19,7 +22,9 @@ function LocalPrototypeRoute() {
   return (
     <LocalPrototypePage
       variant={variant}
-      onVariantChange={(v) => navigate({ to: '/prototype/local', search: { variant: v }, replace: true })}
+      onVariantChange={(v) =>
+        navigate({ to: '/prototype/local', search: { variant: v }, replace: true })
+      }
     />
   );
 }

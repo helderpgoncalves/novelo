@@ -5,12 +5,13 @@
  * Afirmação primária: ler os números; o aviso é um formulário sempre à mão.
  * Throwaway.
  */
-import { useState } from 'react';
+
 import { CalendarDays, Share2, Users } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Switch } from '@/components/ui/switch';
 import { formatKg, formatPercent } from '@/lib/format';
-import { SITE, totalsFor, visitsInPeriod, type PeriodKey, type Visit } from './data';
+import { type PeriodKey, SITE, totalsFor, type Visit, visitsInPeriod } from './data';
 import {
   AvisoForm,
   CertificatePreview,
@@ -43,8 +44,15 @@ export function VariantB() {
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         {/* Coluna principal: KPIs + relatório + tabela */}
         <div className="min-w-0 space-y-6">
-          <section aria-label="Indicadores do período" className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-            <Kpi label="Total medido" value={formatKg(totals.kgTotal)} sub={`${totals.sacos} sacos`} />
+          <section
+            aria-label="Indicadores do período"
+            className="grid grid-cols-2 gap-3 sm:grid-cols-4"
+          >
+            <Kpi
+              label="Total medido"
+              value={formatKg(totals.kgTotal)}
+              sub={`${totals.sacos} sacos`}
+            />
             <Kpi
               label="Para reutilização"
               value={totals.pct ? formatPercent(totals.pct.reutilizacao) : '—'}
@@ -53,7 +61,11 @@ export function VariantB() {
             <Kpi
               label="Rondas"
               value={String(totals.visitas)}
-              sub={totals.kgEmTriagem > 0 ? `${formatKg(totals.kgEmTriagem)} em triagem` : 'tudo triado'}
+              sub={
+                totals.kgEmTriagem > 0
+                  ? `${formatKg(totals.kgEmTriagem)} em triagem`
+                  : 'tudo triado'
+              }
             />
             <Kpi label="Próxima ronda" value="24 nov" sub="terça-feira" />
           </section>
@@ -83,13 +95,19 @@ export function VariantB() {
                             ['reutilizacao', totals.split.reutilizacao, totals.pct.reutilizacao],
                             ['reciclagem', totals.split.reciclagem, totals.pct.reciclagem],
                             ['rejeito', totals.split.rejeito, totals.pct.rejeito],
-                          ) as const
+                          ] as const
                         ).map(([key, kg, pct]) => (
                           <tr key={key} className="border-b last:border-0">
                             <th scope="row" className="py-2 text-left font-normal">
-                              {key === 'reutilizacao' ? 'Reutilização' : key === 'reciclagem' ? 'Reciclagem' : 'Rejeito'}
+                              {key === 'reutilizacao'
+                                ? 'Reutilização'
+                                : key === 'reciclagem'
+                                  ? 'Reciclagem'
+                                  : 'Rejeito'}
                             </th>
-                            <td className="py-2 text-right font-medium tabular-nums">{formatKg(kg)}</td>
+                            <td className="py-2 text-right font-medium tabular-nums">
+                              {formatKg(kg)}
+                            </td>
                             <td className="py-2 text-right tabular-nums text-muted-foreground">
                               {formatPercent(pct)}
                             </td>
@@ -104,8 +122,8 @@ export function VariantB() {
                 </div>
               ) : (
                 <p className="text-muted-foreground text-sm">
-                  Ainda sem triagem concluída neste período — os destinos medem-se a jusante,
-                  na mesa de triagem.
+                  Ainda sem triagem concluída neste período — os destinos medem-se a jusante, na
+                  mesa de triagem.
                 </p>
               )}
             </div>
@@ -120,14 +138,30 @@ export function VariantB() {
                 <caption className="sr-only">Visitas da viatura de têxtil ao local</caption>
                 <thead>
                   <tr className="border-b text-left text-muted-foreground">
-                    <th scope="col" className="px-4 py-2.5 font-medium">Data</th>
-                    <th scope="col" className="px-4 py-2.5 font-medium">Sacos</th>
-                    <th scope="col" className="px-4 py-2.5 text-right font-medium">Peso</th>
-                    <th scope="col" className="px-4 py-2.5 font-medium">Estado</th>
-                    <th scope="col" className="px-4 py-2.5 text-right font-medium">Reut.</th>
-                    <th scope="col" className="px-4 py-2.5 text-right font-medium">Rec.</th>
-                    <th scope="col" className="px-4 py-2.5 text-right font-medium">Rej.</th>
-                    <th scope="col" className="px-4 py-2.5 font-medium">Lote</th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Data
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Sacos
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Peso
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Estado
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Reut.
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Rec.
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 text-right font-medium">
+                      Rej.
+                    </th>
+                    <th scope="col" className="px-4 py-2.5 font-medium">
+                      Lote
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -138,15 +172,18 @@ export function VariantB() {
               </table>
             </div>
             <p className="text-muted-foreground text-xs">
-              Na implementação real, esta tabela usa o componente DataTable do produto
-              (ordenar, filtrar, exportar).
+              Na implementação real, esta tabela usa o componente DataTable do produto (ordenar,
+              filtrar, exportar).
             </p>
           </section>
         </div>
 
         {/* Coluna lateral: ações e definições */}
         <aside className="space-y-5" aria-label="Ações e definições">
-          <section aria-labelledby="aviso-b" className="rounded-xl border border-primary/40 bg-card p-4">
+          <section
+            aria-labelledby="aviso-b"
+            className="rounded-xl border border-primary/40 bg-card p-4"
+          >
             <h2 id="aviso-b" className="mb-1 font-semibold">
               Avisar sacos prontos
             </h2>
@@ -156,17 +193,24 @@ export function VariantB() {
             <AvisoForm compact />
           </section>
 
-          <section aria-labelledby="cert-b" className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+          <section
+            aria-labelledby="cert-b"
+            className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
+          >
             <h2 id="cert-b" className="mb-2 flex items-center gap-2 font-semibold">
               <Share2 className="size-4 text-muted-foreground" aria-hidden />
               Certificado público
             </h2>
-            <label className="flex items-start justify-between gap-3">
+            <div className="flex items-start justify-between gap-3">
               <span className="text-muted-foreground text-sm">
                 Página pública com os kg medidos. Sem doadores.
               </span>
-              <Switch checked={certOn} onCheckedChange={setCertOn} aria-label="Partilhar certificado" />
-            </label>
+              <Switch
+                checked={certOn}
+                onCheckedChange={setCertOn}
+                aria-label="Partilhar certificado"
+              />
+            </div>
             {certOn && (
               <div className="mt-3 space-y-3">
                 <CertificatePreview className="bg-muted/30" />
@@ -181,7 +225,10 @@ export function VariantB() {
             )}
           </section>
 
-          <section aria-labelledby="acesso-b" className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
+          <section
+            aria-labelledby="acesso-b"
+            className="rounded-xl bg-card p-4 ring-1 ring-foreground/10"
+          >
             <h2 id="acesso-b" className="mb-2 flex items-center gap-2 font-semibold">
               <Users className="size-4 text-muted-foreground" aria-hidden />
               Acesso
@@ -223,7 +270,9 @@ function VisitCells({ visit }: { visit: Visit }) {
         <span className="text-muted-foreground block text-xs">{visit.weekday}</span>
       </td>
       <td className="px-4 py-2.5 tabular-nums">{visit.sacos}</td>
-      <td className="px-4 py-2.5 text-right font-medium tabular-nums">{formatKg(visit.weightKg)}</td>
+      <td className="px-4 py-2.5 text-right font-medium tabular-nums">
+        {formatKg(visit.weightKg)}
+      </td>
       <td className="px-4 py-2.5">
         <StateBadge emTriagem={d === null} />
       </td>

@@ -6,8 +6,9 @@
  * Afirmação primária: a ação de avisar; a leitura é secundária e profunda.
  * Throwaway.
  */
-import { useState } from 'react';
+
 import { Bell, CalendarDays, Share2, Users } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import {
@@ -20,7 +21,7 @@ import {
 } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
 import { formatKg } from '@/lib/format';
-import { SITE, totalsFor, visitsInPeriod, type PeriodKey, type Visit } from './data';
+import { type PeriodKey, SITE, totalsFor, type Visit, visitsInPeriod } from './data';
 import {
   AvisoForm,
   CertificatePreview,
@@ -40,9 +41,7 @@ export function VariantC() {
         <h1 className="font-serif text-3xl leading-tight text-balance">
           Bom dia, {SITE.shortName}
         </h1>
-        <p className="text-muted-foreground text-sm">
-          A viatura de têxtil passa {SITE.nextRound}.
-        </p>
+        <p className="text-muted-foreground text-sm">A viatura de têxtil passa {SITE.nextRound}.</p>
       </header>
 
       {/* Porta 1 — o herói */}
@@ -207,9 +206,7 @@ function VisitCard({ visit }: { visit: Visit }) {
           <span className="rounded-full bg-areia/60 px-2 py-0.5 text-xs">via aviso</span>
         )}
       </div>
-      <div className="mt-2">
-        {visit.destinos && <DestinationBar split={visit.destinos} />}
-      </div>
+      <div className="mt-2">{visit.destinos && <DestinationBar split={visit.destinos} />}</div>
       <div className="mt-2">
         <PassportLink code={visit.lotCode} />
       </div>
@@ -221,7 +218,7 @@ function CertSheet() {
   const [on, setOn] = useState(false);
   return (
     <div className="mt-4 space-y-4">
-      <label className="flex items-start justify-between gap-3 rounded-xl bg-muted/40 p-4">
+      <div className="flex items-start justify-between gap-3 rounded-xl bg-muted/40 p-4">
         <span className="text-sm font-medium">
           Publicar o certificado da escola
           <span className="text-muted-foreground mt-0.5 block text-xs font-normal">
@@ -229,7 +226,7 @@ function CertSheet() {
           </span>
         </span>
         <Switch checked={on} onCheckedChange={setOn} aria-label="Publicar certificado" />
-      </label>
+      </div>
       {on ? (
         <>
           <CertificatePreview />

@@ -25,7 +25,10 @@ export function LocalPrototypePage({
   variant: VariantKey;
   onVariantChange: (v: VariantKey) => void;
 }) {
-  useVariantKeyboard(VARIANTS, variant, onVariantChange);
+  const select = (key: string) => {
+    if (key === 'A' || key === 'B' || key === 'C') onVariantChange(key);
+  };
+  useVariantKeyboard(VARIANTS, variant, select);
 
   return (
     <div className="bg-background text-foreground min-h-dvh">
@@ -49,10 +52,10 @@ export function LocalPrototypePage({
                   Convite: gerir a conta de «Agrupamento de Escolas de Selho»
                 </p>
                 <p className="text-amber-900/80">
-                  A equipa cria a conta do local e convida pessoas da escola (sem auto-registo).
-                  O link abre por magic link — o mesmo mecanismo já existente — e cai na área
-                  /local. Quem entra: só leitura + aviso «sacos prontos»; convites e revogações
-                  ficam com a equipa.
+                  A equipa cria a conta do local e convida pessoas da escola (sem auto-registo). O
+                  link abre por magic link — o mesmo mecanismo já existente — e cai na área /local.
+                  Quem entra: só leitura + aviso «sacos prontos»; convites e revogações ficam com a
+                  equipa.
                 </p>
               </div>
             </div>
@@ -70,7 +73,7 @@ export function LocalPrototypePage({
         {variant === 'C' && <VariantC />}
       </main>
 
-      <PrototypeSwitcher variants={VARIANTS} current={variant} onSelect={onVariantChange} />
+      <PrototypeSwitcher variants={VARIANTS} current={variant} onSelect={select} />
     </div>
   );
 }

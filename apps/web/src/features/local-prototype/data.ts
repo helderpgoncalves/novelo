@@ -134,7 +134,9 @@ export interface PeriodTotals {
 }
 
 export function totalsFor(visits: Visit[]): PeriodTotals {
-  const medidos = visits.filter((v): v is Visit & { destinos: DestinationSplit } => v.destinos !== null);
+  const medidos = visits.filter(
+    (v): v is Visit & { destinos: DestinationSplit } => v.destinos !== null,
+  );
   const sum = (pick: (d: DestinationSplit) => number) =>
     medidos.reduce((acc, v) => acc + pick(v.destinos), 0);
   const split: DestinationSplit | null =

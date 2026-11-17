@@ -5,14 +5,15 @@
  * Afirmação primária: avisar a viatura; a leitura é o caderno.
  * Throwaway.
  */
-import { useState } from 'react';
+
 import { CalendarDays, Share2, Users } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { formatKg } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { SITE, totalsFor, visitsInPeriod, type PeriodKey, type Visit } from './data';
+import { type PeriodKey, SITE, totalsFor, type Visit, visitsInPeriod } from './data';
 import {
   AvisoForm,
   CertificatePreview,
@@ -41,7 +42,10 @@ export function VariantA() {
       </header>
 
       {/* A ação: avisar sacos prontos */}
-      <section aria-labelledby="aviso-a" className="rounded-xl border border-primary/40 bg-card p-4">
+      <section
+        aria-labelledby="aviso-a"
+        className="rounded-xl border border-primary/40 bg-card p-4"
+      >
         <h2 id="aviso-a" className="mb-1 font-semibold">
           Tem sacos prontos?
         </h2>
@@ -63,8 +67,8 @@ export function VariantA() {
         <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10">
           <p className="text-3xl font-semibold tabular-nums">{formatKg(totals.kgTotal)}</p>
           <p className="text-muted-foreground mb-3 text-sm">
-            em {totals.visitas} {totals.visitas === 1 ? 'ronda' : 'rondas'} ·{' '}
-            {totals.sacos} {totals.sacos === 1 ? 'saco' : 'sacos'} ·{' '}
+            em {totals.visitas} {totals.visitas === 1 ? 'ronda' : 'rondas'} · {totals.sacos}{' '}
+            {totals.sacos === 1 ? 'saco' : 'sacos'} ·{' '}
             {totals.kgEmTriagem > 0 && `${formatKg(totals.kgEmTriagem)} ainda em triagem`}
           </p>
           {totals.split && totals.pct ? (
@@ -101,15 +105,19 @@ export function VariantA() {
           </h2>
         </div>
         <div className="rounded-xl bg-card p-4 ring-1 ring-foreground/10 space-y-3">
-          <label className="flex items-start justify-between gap-3">
+          <div className="flex items-start justify-between gap-3">
             <span className="text-sm">
               Partilhar os nossos kg num página pública
               <span className="text-muted-foreground mt-0.5 block text-xs">
                 Sem doadores, só o que foi medido. O link divulga-se a partir da escola.
               </span>
             </span>
-            <Switch checked={certOn} onCheckedChange={setCertOn} aria-label="Partilhar certificado" />
-          </label>
+            <Switch
+              checked={certOn}
+              onCheckedChange={setCertOn}
+              aria-label="Partilhar certificado"
+            />
+          </div>
           {certOn && (
             <div className="space-y-3">
               <CertificatePreview />
@@ -186,9 +194,7 @@ function VisitRow({ visit }: { visit: Visit }) {
           {visit.destinos ? (
             <DestinationBar split={visit.destinos} />
           ) : (
-            <p className="text-muted-foreground text-xs">
-              Destinos por medir na mesa de triagem.
-            </p>
+            <p className="text-muted-foreground text-xs">Destinos por medir na mesa de triagem.</p>
           )}
         </div>
         <div className="mt-2">

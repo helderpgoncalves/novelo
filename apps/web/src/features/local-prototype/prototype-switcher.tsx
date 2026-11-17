@@ -5,8 +5,9 @@
  * (Duplicado de propósito do comutador do protótipo do cidadão: ambos são
  * throwaway e vivem em branches separados.)
  */
-import { useEffect } from 'react';
+
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 
 export interface VariantDef {
@@ -34,8 +35,7 @@ export function PrototypeSwitcher({
     onSelect(variants[(index + dir + variants.length) % variants.length]?.key ?? current);
 
   return (
-    <div
-      role="group"
+    <section
       aria-label="Variantes do protótipo"
       className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4 print:hidden"
     >
@@ -62,12 +62,16 @@ export function PrototypeSwitcher({
           <ChevronRight className="size-5" aria-hidden />
         </Button>
       </div>
-    </div>
+    </section>
   );
 }
 
 /** Atalhos de teclado ←/→ (fora de campos de escrita). */
-export function useVariantKeyboard(variants: VariantDef[], current: string, onSelect: (key: string) => void) {
+export function useVariantKeyboard(
+  variants: VariantDef[],
+  current: string,
+  onSelect: (key: string) => void,
+) {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       const target = e.target;

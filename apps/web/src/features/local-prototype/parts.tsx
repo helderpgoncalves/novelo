@@ -4,15 +4,16 @@
  * as variantes divergem na estrutura, não nos dados nem no comportamento.
  * Throwaway.
  */
-import { useState } from 'react';
+
 import { ArrowUpRight, Check, Minus, Plus } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { formatKg, formatPercent } from '@/lib/format';
 import { cn } from '@/lib/utils';
-import { PERIODS, SITE, type DestinationSplit, type PeriodKey } from './data';
+import { type DestinationSplit, PERIODS, type PeriodKey, SITE } from './data';
 
 /** Cores por destino: a mesma da composição do lote no produto. */
 const DESTINO_SHADE = {
@@ -42,7 +43,13 @@ export function StateBadge({ emTriagem }: { emTriagem: boolean }) {
   );
 }
 
-export function DestinationBar({ split, className }: { split: DestinationSplit; className?: string }) {
+export function DestinationBar({
+  split,
+  className,
+}: {
+  split: DestinationSplit;
+  className?: string;
+}) {
   const total = split.reutilizacao + split.reciclagem + split.rejeito;
   const seg = (kg: number) => `${(kg / total) * 100}%`;
   return (
@@ -221,9 +228,7 @@ export function CertificatePreview({ className }: { className?: string }) {
         </p>
       </div>
       <div className="space-y-2">
-        <DestinationBar
-          split={{ reutilizacao: 44.7, reciclagem: 12.6, rejeito: 4.7 }}
-        />
+        <DestinationBar split={{ reutilizacao: 44.7, reciclagem: 12.6, rejeito: 4.7 }} />
         <DestinationLegend
           split={{ reutilizacao: 44.7, reciclagem: 12.6, rejeito: 4.7 }}
           pct={{ reutilizacao: 72.1, reciclagem: 20.3, rejeito: 7.6 }}
