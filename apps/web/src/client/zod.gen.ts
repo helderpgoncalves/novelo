@@ -627,6 +627,43 @@ export const zCollectionPlanEntry = z.object({
 });
 
 /**
+ * CollectionRequestCreate
+ *
+ * O que quem pede envia: sacos, dia, e — só para cidadão — morada e freguesia.
+ *
+ * O teto de validação (500 no local) é o travão de sanidade do campo; acima do teto de 20 o pedido
+ * segue para a fila de exceções como **recolha especial** (não é erro). O teto de 5 do cidadão é
+ * validado no serviço, que já sabe o sujeito.
+ */
+export const zCollectionRequestCreate = z.object({
+    address: z.string().max(280).nullish(),
+    bag_count: z.int().gte(1).lte(500),
+    note: z.string().max(240).nullish(),
+    parish_code: z.string().max(6).nullish(),
+    requested_date: z.iso.date(),
+    urgent: z.boolean().optional().default(false)
+});
+
+/**
+ * CollectionRequestState
+ *
+ * Estado do pedido de recolha.
+ *
+ * A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+ * Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+ * 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+ * pedido; nenhum estado volta atrás.
+ */
+export const zCollectionRequestState = z.enum([
+    'scheduled',
+    'exception',
+    'rejected',
+    'collected',
+    'expired',
+    'cancelled'
+]);
+
+/**
  * CollectionType
  */
 export const zCollectionType = z.enum([
@@ -847,6 +884,14 @@ export const zCopilotErrorEvent = z.object({
         'local_account_missing',
         'notice_already_active',
         'certificate_not_public',
+        'address_request_active',
+        'citizen_address_required',
+        'citizen_parish_required',
+        'citizen_bags_limit',
+        'local_address_forbidden',
+        'request_not_dispatchable',
+        'request_not_scheduled',
+        'request_cancel_not_allowed',
         'internal_error'
     ]),
     message: z.string(),
@@ -1212,6 +1257,24 @@ export const zDeleteUserRequest = z.object({
 });
 
 /**
+ * DispatchAction
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
+ */
+export const zDispatchAction = z.enum(['schedule', 'reject']);
+
+/**
+ * DispatchRequest
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data, que pode ser outra) ou recusar (com motivo).
+ */
+export const zDispatchRequest = z.object({
+    action: zDispatchAction,
+    reason: z.string().max(280).nullish(),
+    requested_date: z.iso.date().nullish()
+});
+
+/**
  * DnsCheck
  */
 export const zDnsCheck = z.object({
@@ -1437,6 +1500,14 @@ export const zErrorBody = z.object({
         'local_account_missing',
         'notice_already_active',
         'certificate_not_public',
+        'address_request_active',
+        'citizen_address_required',
+        'citizen_parish_required',
+        'citizen_bags_limit',
+        'local_address_forbidden',
+        'request_not_dispatchable',
+        'request_not_scheduled',
+        'request_cancel_not_allowed',
         'internal_error'
     ]),
     message: z.string()
@@ -3796,6 +3867,79 @@ export const zReportSpec = z.object({
 export const zReportArtifact = z.object({
     artifact_type: z.literal('report').optional().default('report'),
     spec: zReportSpec
+});
+
+/**
+ * RequestExceptionReason
+ *
+ * Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+ *
+ * `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+ * `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+ * urgente — nunca é auto-aceite, o gestor decide.
+ */
+export const zRequestExceptionReason = z.enum([
+    'out_of_round',
+    'cutoff',
+    'special_volume',
+    'urgency'
+]);
+
+/**
+ * RequestOutcome
+ *
+ * O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª).
+ */
+export const zRequestOutcome = z.enum(['collected', 'missed']);
+
+/**
+ * RequestOutcomeCreate
+ *
+ * O resultado da visita ao pedido agendado: recolhido, ou ausência (a 3.ª expira o pedido).
+ */
+export const zRequestOutcomeCreate = z.object({
+    outcome: zRequestOutcome
+});
+
+/**
+ * RequestSubject
+ *
+ * Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+ *
+ * Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+ * máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+ */
+export const zRequestSubject = z.enum(['citizen', 'local']);
+
+/**
+ * CollectionRequestOut
+ *
+ * Um pedido de recolha, visto por quem pediu ou pela equipa (com o pedido e o despacho).
+ */
+export const zCollectionRequestOut = z.object({
+    address: z.string().nullish(),
+    address_retained_until: z.iso.datetime().nullish(),
+    bag_count: z.int(),
+    cancelled_at: z.iso.datetime().nullish(),
+    collected_at: z.iso.datetime().nullish(),
+    created_at: z.iso.datetime(),
+    dispatch_reason: z.string().nullish(),
+    dispatched_at: z.iso.datetime().nullish(),
+    exception_reason: zRequestExceptionReason.nullish(),
+    expired_at: z.iso.datetime().nullish(),
+    id: z.uuid(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    missed_count: z.int(),
+    note: z.string().nullish(),
+    parish_code: z.string().nullish(),
+    parish_name: z.string().nullish(),
+    requested_date: z.iso.date(),
+    requester_email: z.string().nullish(),
+    requester_id: z.uuid().nullable(),
+    state: zCollectionRequestState,
+    subject_kind: zRequestSubject,
+    urgent: z.boolean()
 });
 
 /**
@@ -6421,6 +6565,58 @@ export const zVerifyEmailResponse = z.void();
  * Successful Response
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
+
+export const zListCollectionRequestsQuery = z.object({
+    state: zCollectionRequestState.nullish(),
+    subject: zRequestSubject.nullish(),
+    parish_code: z.string().max(6).nullish(),
+    limit: z.int().gte(1).lte(1000).optional().default(200)
+});
+
+/**
+ * Response List Collection Requests
+ *
+ * Successful Response
+ */
+export const zListCollectionRequestsResponse = z.array(zCollectionRequestOut);
+
+export const zCreateCollectionRequestBody = zCollectionRequestCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCollectionRequestResponse = zCollectionRequestOut;
+
+export const zCancelCollectionRequestPath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zCancelCollectionRequestResponse = z.void();
+
+export const zDispatchCollectionRequestBody = zDispatchRequest;
+
+export const zDispatchCollectionRequestPath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDispatchCollectionRequestResponse = zCollectionRequestOut;
+
+export const zRecordRequestOutcomeBody = zRequestOutcomeCreate;
+
+export const zRecordRequestOutcomePath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRecordRequestOutcomeResponse = zCollectionRequestOut;
 
 export const zListCopilotActionsQuery = z.object({
     scope: z.enum(['mine', 'all']).optional().default('mine'),

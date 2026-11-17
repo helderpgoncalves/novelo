@@ -7,7 +7,7 @@ aqui fica só a costura com a base de dados (ronda na freguesia, 1 ativo por mor
 """
 
 import uuid
-from datetime import UTC, datetime
+from datetime import UTC, date as dt_date, datetime
 from typing import NamedTuple
 
 from sqlalchemy import select, update
@@ -38,8 +38,6 @@ from novelo.domain.collection_requests import (
 from novelo.domain.vocab import (
     CollectionRequestState,
     DispatchAction,
-    RequestExceptionReason,
-    RequestOutcome,
     RequestSubject,
 )
 from novelo.features.collection_requests.models import CollectionRequest
@@ -69,7 +67,7 @@ def subject_of(user: User) -> RequestSubject:
 
 
 async def _parish_by_code(db: AsyncSession, dicofre: str) -> Parish:
-    parish = (
+    parish: Parish | None = (
         await db.execute(select(Parish).where(Parish.dicofre == dicofre))
     ).scalar_one_or_none()
     if parish is None:
@@ -78,7 +76,11 @@ async def _parish_by_code(db: AsyncSession, dicofre: str) -> Parish:
 
 
 async def _in_round(
-    db: AsyncSession, *, parish_id: uuid.UUID | None = None, locality_id: uuid.UUID | None, requested_date
+    db: AsyncSession,
+    *,
+    parish_id: uuid.UUID | None = None,
+    locality_id: uuid.UUID | None = None,
+    requested_date: dt_date,
 ) -> bool:
     """Há ronda nesse dia para a freguesia (ou o local)? Proxy do MVP: os dias dos circuitos da Vitrus.
 
@@ -201,7 +203,7 @@ async def purge_expired_addresses(db: AsyncSession) -> int:
         .values(address=None, address_key=None)
     )
     await db.commit()
-    return result.rowcount or 0
+    return int(getattr(result, "rowcount", 0) or 0)
 
 
 class _Names(NamedTuple):
@@ -216,12 +218,12 @@ async def _names(db: AsyncSession, requests: list[CollectionRequest]) -> _Names:
     locality_ids = {r.locality_id for r in requests if r.locality_id is not None}
     parishes: dict[uuid.UUID, Parish] = {}
     if parish_ids:
-        rows = await db.execute(select(Parish).where(Parish.id.in_(parish_ids)))
-        parishes = {p.id: p for p in rows.scalars()}
+        found_parishes = await db.execute(select(Parish).where(Parish.id.in_(parish_ids)))
+        parishes = {p.id: p for p in found_parishes.scalars()}
     localities: dict[uuid.UUID, Locality] = {}
     if locality_ids:
-        rows = await db.execute(select(Locality).where(Locality.id.in_(locality_ids)))
-        localities = {l.id: l for l in rows.scalars()}
+        found_localities = await db.execute(select(Locality).where(Locality.id.in_(locality_ids)))
+        localities = {item.id: item for item in found_localities.scalars()}
     return _Names(parishes=parishes, localities=localities)
 
 
@@ -334,7 +336,6 @@ def _to_out(
         expired_at=request.expired_at,
         address_retained_until=request.address_retained_until,
         created_at=request.created_at,
-        updated_at=request.updated_at,
     )
 
 
@@ -353,7 +354,9 @@ async def cancel_request(db: AsyncSession, user: User, request_id: uuid.UUID) ->
     return request
 
 
-async def dispatch_request(db: AsyncSession, user: User, request_id: uuid.UUID, body: DispatchRequest) -> CollectionRequest:
+async def dispatch_request(
+    db: AsyncSession, user: User, request_id: uuid.UUID, body: DispatchRequest
+) -> CollectionRequest:
     """O gestor despacha uma exceção: agendar (com data, que pode sair da ronda pedida) ou recusar com motivo."""
     request = await get_request(db, request_id)
     if request.state is not CollectionRequestState.EXCEPTION:

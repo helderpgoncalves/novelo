@@ -24,7 +24,7 @@ Decisões documentadas (ver também `docs/engenharia/dados-e-modelo.md`):
 import re
 import unicodedata
 from dataclasses import dataclass
-from datetime import UTC, date, datetime, timedelta
+from datetime import date, datetime, timedelta
 from typing import Final
 from uuid import UUID
 
@@ -116,7 +116,7 @@ def decide(
     ronda ou fora do prazo. `bag_count` fora do limite de validação do sujeito levanta `ValueError` —
     os limites validam-se antes (a API devolve 422; o domínio não deixa passar o que não devia chegar).
     """
-    low, high = bag_limits(subject)
+    low = bag_limits(subject)[0]
     if not (low <= bag_count <= hard_bag_max(subject)):
         raise ValueError(f"bag_count out of range: {bag_count}")
     if urgent:

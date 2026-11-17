@@ -1773,6 +1773,179 @@ export type CollectionPlanEntry = {
 };
 
 /**
+ * CollectionRequestCreate
+ *
+ * O que quem pede envia: sacos, dia, e — só para cidadão — morada e freguesia.
+ *
+ * O teto de validação (500 no local) é o travão de sanidade do campo; acima do teto de 20 o pedido
+ * segue para a fila de exceções como **recolha especial** (não é erro). O teto de 5 do cidadão é
+ * validado no serviço, que já sabe o sujeito.
+ */
+export type CollectionRequestCreate = {
+    /**
+     * Address
+     *
+     * Morada manual, só para cidadão — alternativa igual ao GPS (que fica fora do MVP)
+     */
+    address?: string | null;
+    /**
+     * Bag Count
+     *
+     * Sacos a recolher (cidadão 1–5; local até 20)
+     */
+    bag_count: number;
+    /**
+     * Note
+     *
+     * Recado para a equipa (ex.: «portão azul»)
+     */
+    note?: string | null;
+    /**
+     * Parish Code
+     *
+     * Código DICOFRE da freguesia declarada, só para cidadão: liga o pedido à ronda
+     */
+    parish_code?: string | null;
+    /**
+     * Requested Date
+     *
+     * Dia pretendido para a recolha (corte de 48 h: hoje + 2 dias no mínimo)
+     */
+    requested_date: string;
+    /**
+     * Urgent
+     *
+     * Urgência: nunca é auto-aceite — cai na fila do gestor para despacho
+     */
+    urgent?: boolean;
+};
+
+/**
+ * CollectionRequestOut
+ *
+ * Um pedido de recolha, visto por quem pediu ou pela equipa (com o pedido e o despacho).
+ */
+export type CollectionRequestOut = {
+    /**
+     * Address
+     *
+     * Morada escrita (cidadão); `null` depois da purga de 12 meses
+     */
+    address?: string | null;
+    /**
+     * Address Retained Until
+     *
+     * Até quando a morada fica retida (12 meses; RGPD)
+     */
+    address_retained_until?: string | null;
+    /**
+     * Bag Count
+     *
+     * Sacos pedidos (cidadão 1–5; local até 20 — teto estimativa)
+     */
+    bag_count: number;
+    /**
+     * Cancelled At
+     */
+    cancelled_at?: string | null;
+    /**
+     * Collected At
+     */
+    collected_at?: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Dispatch Reason
+     *
+     * Motivo da recusa ou nota do agendamento
+     */
+    dispatch_reason?: string | null;
+    /**
+     * Dispatched At
+     */
+    dispatched_at?: string | null;
+    /**
+     * `out_of_round`, `cutoff`, `special_volume` (recolha especial) ou `urgency`
+     */
+    exception_reason?: RequestExceptionReason | null;
+    /**
+     * Expired At
+     */
+    expired_at?: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Id
+     *
+     * Local institucional (só local/B2B)
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name?: string | null;
+    /**
+     * Missed Count
+     *
+     * Ausências acumuladas; à 3.ª o pedido expira
+     */
+    missed_count: number;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Parish Code
+     *
+     * DICOFRE da freguesia declarada (cidadão)
+     */
+    parish_code?: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name?: string | null;
+    /**
+     * Requested Date
+     */
+    requested_date: string;
+    /**
+     * Requester Email
+     *
+     * Só a equipa vê quem pediu; a leitura do próprio traz `null`
+     */
+    requester_email?: string | null;
+    /**
+     * Requester Id
+     */
+    requester_id: string | null;
+    state: CollectionRequestState;
+    /**
+     * `citizen` (com conta) ou `local` (assistido/B2B)
+     */
+    subject_kind: RequestSubject;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
+};
+
+/**
+ * CollectionRequestState
+ *
+ * Estado do pedido de recolha.
+ *
+ * A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+ * Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+ * 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+ * pedido; nenhum estado volta atrás.
+ */
+export type CollectionRequestState = 'scheduled' | 'exception' | 'rejected' | 'collected' | 'expired' | 'cancelled';
+
+/**
  * CollectionType
  */
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
@@ -2161,7 +2334,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
     /**
      * Message
      */
@@ -3391,6 +3564,34 @@ export type DeleteUserRequest = {
 };
 
 /**
+ * DispatchAction
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
+ */
+export type DispatchAction = 'schedule' | 'reject';
+
+/**
+ * DispatchRequest
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data, que pode ser outra) ou recusar (com motivo).
+ */
+export type DispatchRequest = {
+    action: DispatchAction;
+    /**
+     * Reason
+     *
+     * Motivo da recusa (obrigatório ao recusar) ou nota do agendamento
+     */
+    reason?: string | null;
+    /**
+     * Requested Date
+     *
+     * Nova data ao agendar (a fila de exceções pode sair da ronda pedida)
+     */
+    requested_date?: string | null;
+};
+
+/**
  * DnsCheck
  */
 export type DnsCheck = {
@@ -3773,7 +3974,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
     /**
      * Message
      *
@@ -9795,6 +9996,43 @@ export type ReportSpec = {
 };
 
 /**
+ * RequestExceptionReason
+ *
+ * Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+ *
+ * `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+ * `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+ * urgente — nunca é auto-aceite, o gestor decide.
+ */
+export type RequestExceptionReason = 'out_of_round' | 'cutoff' | 'special_volume' | 'urgency';
+
+/**
+ * RequestOutcome
+ *
+ * O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª).
+ */
+export type RequestOutcome = 'collected' | 'missed';
+
+/**
+ * RequestOutcomeCreate
+ *
+ * O resultado da visita ao pedido agendado: recolhido, ou ausência (a 3.ª expira o pedido).
+ */
+export type RequestOutcomeCreate = {
+    outcome: RequestOutcome;
+};
+
+/**
+ * RequestSubject
+ *
+ * Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+ *
+ * Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+ * máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+ */
+export type RequestSubject = 'citizen' | 'local';
+
+/**
  * ReservationOut
  */
 export type ReservationOut = {
@@ -15305,6 +15543,345 @@ export type GetBrandEvidenceResponses = {
 };
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
+
+export type ListCollectionRequestsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * State
+         */
+        state?: CollectionRequestState | null;
+        /**
+         * Subject
+         */
+        subject?: RequestSubject | null;
+        /**
+         * Parish Code
+         */
+        parish_code?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/collection-requests';
+};
+
+export type ListCollectionRequestsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCollectionRequestsError = ListCollectionRequestsErrors[keyof ListCollectionRequestsErrors];
+
+export type ListCollectionRequestsResponses = {
+    /**
+     * Response List Collection Requests
+     *
+     * Successful Response
+     */
+    200: Array<CollectionRequestOut>;
+};
+
+export type ListCollectionRequestsResponse = ListCollectionRequestsResponses[keyof ListCollectionRequestsResponses];
+
+export type CreateCollectionRequestData = {
+    body: CollectionRequestCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/collection-requests';
+};
+
+export type CreateCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCollectionRequestError = CreateCollectionRequestErrors[keyof CreateCollectionRequestErrors];
+
+export type CreateCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    201: CollectionRequestOut;
+};
+
+export type CreateCollectionRequestResponse = CreateCollectionRequestResponses[keyof CreateCollectionRequestResponses];
+
+export type CancelCollectionRequestData = {
+    body?: never;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}';
+};
+
+export type CancelCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CancelCollectionRequestError = CancelCollectionRequestErrors[keyof CancelCollectionRequestErrors];
+
+export type CancelCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CancelCollectionRequestResponse = CancelCollectionRequestResponses[keyof CancelCollectionRequestResponses];
+
+export type DispatchCollectionRequestData = {
+    body: DispatchRequest;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}/dispatch';
+};
+
+export type DispatchCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DispatchCollectionRequestError = DispatchCollectionRequestErrors[keyof DispatchCollectionRequestErrors];
+
+export type DispatchCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionRequestOut;
+};
+
+export type DispatchCollectionRequestResponse = DispatchCollectionRequestResponses[keyof DispatchCollectionRequestResponses];
+
+export type RecordRequestOutcomeData = {
+    body: RequestOutcomeCreate;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}/outcome';
+};
+
+export type RecordRequestOutcomeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RecordRequestOutcomeError = RecordRequestOutcomeErrors[keyof RecordRequestOutcomeErrors];
+
+export type RecordRequestOutcomeResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionRequestOut;
+};
+
+export type RecordRequestOutcomeResponse = RecordRequestOutcomeResponses[keyof RecordRequestOutcomeResponses];
 
 export type ListCopilotActionsData = {
     body?: never;

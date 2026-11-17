@@ -3015,6 +3015,320 @@
         "title": "CollectionPlanEntry",
         "type": "object"
       },
+      "CollectionRequestCreate": {
+        "description": "O que quem pede envia: sacos, dia, e — só para cidadão — morada e freguesia.\n\nO teto de validação (500 no local) é o travão de sanidade do campo; acima do teto de 20 o pedido\nsegue para a fila de exceções como **recolha especial** (não é erro). O teto de 5 do cidadão é\nvalidado no serviço, que já sabe o sujeito.",
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Morada manual, só para cidadão — alternativa igual ao GPS (que fica fora do MVP)",
+            "title": "Address"
+          },
+          "bag_count": {
+            "description": "Sacos a recolher (cidadão 1–5; local até 20)",
+            "maximum": 500.0,
+            "minimum": 1.0,
+            "title": "Bag Count",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recado para a equipa (ex.: «portão azul»)",
+            "title": "Note"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Código DICOFRE da freguesia declarada, só para cidadão: liga o pedido à ronda",
+            "title": "Parish Code"
+          },
+          "requested_date": {
+            "description": "Dia pretendido para a recolha (corte de 48 h: hoje + 2 dias no mínimo)",
+            "format": "date",
+            "title": "Requested Date",
+            "type": "string"
+          },
+          "urgent": {
+            "default": false,
+            "description": "Urgência: nunca é auto-aceite — cai na fila do gestor para despacho",
+            "title": "Urgent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "bag_count",
+          "requested_date"
+        ],
+        "title": "CollectionRequestCreate",
+        "type": "object"
+      },
+      "CollectionRequestOut": {
+        "description": "Um pedido de recolha, visto por quem pediu ou pela equipa (com o pedido e o despacho).",
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Morada escrita (cidadão); `null` depois da purga de 12 meses",
+            "title": "Address"
+          },
+          "address_retained_until": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Até quando a morada fica retida (12 meses; RGPD)",
+            "title": "Address Retained Until"
+          },
+          "bag_count": {
+            "description": "Sacos pedidos (cidadão 1–5; local até 20 — teto estimativa)",
+            "title": "Bag Count",
+            "type": "integer"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "collected_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Collected At"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "dispatch_reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Motivo da recusa ou nota do agendamento",
+            "title": "Dispatch Reason"
+          },
+          "dispatched_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Dispatched At"
+          },
+          "exception_reason": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RequestExceptionReason"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "`out_of_round`, `cutoff`, `special_volume` (recolha especial) ou `urgency`"
+          },
+          "expired_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expired At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Local institucional (só local/B2B)",
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "missed_count": {
+            "description": "Ausências acumuladas; à 3.ª o pedido expira",
+            "title": "Missed Count",
+            "type": "integer"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "DICOFRE da freguesia declarada (cidadão)",
+            "title": "Parish Code"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "requested_date": {
+            "format": "date",
+            "title": "Requested Date",
+            "type": "string"
+          },
+          "requester_email": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Só a equipa vê quem pediu; a leitura do próprio traz `null`",
+            "title": "Requester Email"
+          },
+          "requester_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Requester Id"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CollectionRequestState"
+          },
+          "subject_kind": {
+            "$ref": "#/components/schemas/RequestSubject",
+            "description": "`citizen` (com conta) ou `local` (assistido/B2B)"
+          },
+          "urgent": {
+            "title": "Urgent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "subject_kind",
+          "requester_id",
+          "bag_count",
+          "requested_date",
+          "urgent",
+          "state",
+          "missed_count",
+          "created_at"
+        ],
+        "title": "CollectionRequestOut",
+        "type": "object"
+      },
+      "CollectionRequestState": {
+        "description": "Estado do pedido de recolha.\n\nA criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da\nVitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à\n3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o\npedido; nenhum estado volta atrás.",
+        "enum": [
+          "scheduled",
+          "exception",
+          "rejected",
+          "collected",
+          "expired",
+          "cancelled"
+        ],
+        "title": "CollectionRequestState",
+        "type": "string"
+      },
       "CollectionType": {
         "enum": [
           "door_to_door",
@@ -3708,6 +4022,14 @@
               "local_account_missing",
               "notice_already_active",
               "certificate_not_public",
+              "address_request_active",
+              "citizen_address_required",
+              "citizen_parish_required",
+              "citizen_bags_limit",
+              "local_address_forbidden",
+              "request_not_dispatchable",
+              "request_not_scheduled",
+              "request_cancel_not_allowed",
               "internal_error"
             ],
             "title": "Code",
@@ -5742,6 +6064,54 @@
         "title": "DeleteUserRequest",
         "type": "object"
       },
+      "DispatchAction": {
+        "description": "A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).",
+        "enum": [
+          "schedule",
+          "reject"
+        ],
+        "title": "DispatchAction",
+        "type": "string"
+      },
+      "DispatchRequest": {
+        "description": "A decisão do gestor na fila de exceções: agendar (com data, que pode ser outra) ou recusar (com motivo).",
+        "properties": {
+          "action": {
+            "$ref": "#/components/schemas/DispatchAction"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "maxLength": 280,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Motivo da recusa (obrigatório ao recusar) ou nota do agendamento",
+            "title": "Reason"
+          },
+          "requested_date": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nova data ao agendar (a fila de exceções pode sair da ronda pedida)",
+            "title": "Requested Date"
+          }
+        },
+        "required": [
+          "action"
+        ],
+        "title": "DispatchRequest",
+        "type": "object"
+      },
       "DnsCheck": {
         "properties": {
           "detail": {
@@ -6465,6 +6835,14 @@
               "local_account_missing",
               "notice_already_active",
               "certificate_not_public",
+              "address_request_active",
+              "citizen_address_required",
+              "citizen_parish_required",
+              "citizen_bags_limit",
+              "local_address_forbidden",
+              "request_not_dispatchable",
+              "request_not_scheduled",
+              "request_cancel_not_allowed",
               "internal_error"
             ],
             "title": "Code",
@@ -16564,6 +16942,48 @@
         ],
         "title": "ReportSpec",
         "type": "object"
+      },
+      "RequestExceptionReason": {
+        "description": "Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).\n\n`out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;\n`special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado\nurgente — nunca é auto-aceite, o gestor decide.",
+        "enum": [
+          "out_of_round",
+          "cutoff",
+          "special_volume",
+          "urgency"
+        ],
+        "title": "RequestExceptionReason",
+        "type": "string"
+      },
+      "RequestOutcome": {
+        "description": "O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª).",
+        "enum": [
+          "collected",
+          "missed"
+        ],
+        "title": "RequestOutcome",
+        "type": "string"
+      },
+      "RequestOutcomeCreate": {
+        "description": "O resultado da visita ao pedido agendado: recolhido, ou ausência (a 3.ª expira o pedido).",
+        "properties": {
+          "outcome": {
+            "$ref": "#/components/schemas/RequestOutcome"
+          }
+        },
+        "required": [
+          "outcome"
+        ],
+        "title": "RequestOutcomeCreate",
+        "type": "object"
+      },
+      "RequestSubject": {
+        "description": "Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).\n\nEntidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma\nmáquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).",
+        "enum": [
+          "citizen",
+          "local"
+        ],
+        "title": "RequestSubject",
+        "type": "string"
       },
       "ReservationOut": {
         "properties": {
@@ -26819,6 +27239,740 @@
         "summary": "Get Brand Evidence",
         "tags": [
           "lots"
+        ]
+      }
+    },
+    "/api/v1/collection-requests": {
+      "get": {
+        "description": "Os pedidos de recolha: quem pede vê os seus; a equipa vê todos com filtros (`state=exception`\né a fila de despacho). Moradas fora dos 12 meses de retenção são purgadas à leitura.",
+        "operationId": "list_collection_requests",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/CollectionRequestState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "subject",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/RequestSubject"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Subject"
+            }
+          },
+          {
+            "in": "query",
+            "name": "parish_code",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 6,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Parish Code"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 1000,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CollectionRequestOut"
+                  },
+                  "title": "Response List Collection Requests",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Collection Requests",
+        "tags": [
+          "collection-requests"
+        ]
+      },
+      "post": {
+        "description": "Pede uma recolha. Cidadão: morada manual + freguesia, 1–5 sacos, corte de 48 h, auto-aceite pelas\nregras — fora de ronda, fora do prazo, urgência ou mais de 20 sacos (local/B2B) caem na fila de\nexceções do gestor. Local/B2B: morada institucional do sítio da conta, teto de 20 (estimativa).",
+        "operationId": "create_collection_request",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CollectionRequestCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Collection Request",
+        "tags": [
+          "collection-requests"
+        ]
+      }
+    },
+    "/api/v1/collection-requests/{request_id}": {
+      "delete": {
+        "description": "Anula um pedido ativo (agendado ou em exceção). Quem pediu anula o seu; a equipa pode anular qualquer um.",
+        "operationId": "cancel_collection_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Cancel Collection Request",
+        "tags": [
+          "collection-requests"
+        ]
+      }
+    },
+    "/api/v1/collection-requests/{request_id}/dispatch": {
+      "post": {
+        "description": "O gestor despacha uma exceção: agendar (com data, que pode sair da ronda pedida) ou recusar com motivo.",
+        "operationId": "dispatch_collection_request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DispatchRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Dispatch Collection Request",
+        "tags": [
+          "collection-requests"
+        ]
+      }
+    },
+    "/api/v1/collection-requests/{request_id}/outcome": {
+      "post": {
+        "description": "Aponta o resultado da visita: recolhido fecha o pedido; a ausência soma — à 3.ª, o pedido expira.",
+        "operationId": "record_request_outcome",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "request_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Request Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOutcomeCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionRequestOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Record Request Outcome",
+        "tags": [
+          "collection-requests"
         ]
       }
     },

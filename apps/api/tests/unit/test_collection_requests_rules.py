@@ -4,6 +4,8 @@ Tudo em `domain/collection_requests.py` é puro — sem FastAPI, sem base de dad
 saem da aritmética escrita nos comentários, como no resto de `domain/`.
 """
 
+import datetime as dt
+
 import pytest
 
 from novelo.domain.collection_requests import (
@@ -21,7 +23,6 @@ from novelo.domain.collection_requests import (
     passes_cutoff,
 )
 from novelo.domain.vocab import CollectionRequestState, RequestExceptionReason, RequestOutcome, RequestSubject
-
 
 # --- morada normalizada: a chave de «1 ativo por morada» ---------------------------------------
 
@@ -90,8 +91,6 @@ def test_special_volume_is_above_the_local_ceiling() -> None:
 
 
 def test_cutoff_requires_two_full_days_ahead() -> None:
-    import datetime as dt
-
     # O corte de 48 h aplica-se à data: hoje é 17 nov; quarta 18 não, quinta 19 sim (17+2=19).
     today = dt.date(2026, 11, 17)
     assert passes_cutoff(dt.date(2026, 11, 19), today) is True
@@ -104,13 +103,11 @@ def test_cutoff_requires_two_full_days_ahead() -> None:
 
 
 def test_decision_auto_accepts_when_everything_passes() -> None:
-    from datetime import date
-
     d = decide(
         subject=RequestSubject.CITIZEN,
         bag_count=3,
-        requested_date=date(2026, 11, 19),
-        today=date(2026, 11, 17),
+        requested_date=dt.date(2026, 11, 19),
+        today=dt.date(2026, 11, 17),
         urgent=False,
         in_round=True,
     )
@@ -119,14 +116,12 @@ def test_decision_auto_accepts_when_everything_passes() -> None:
 
 
 def test_decision_sends_each_failure_to_the_exception_queue_with_its_reason() -> None:
-    from datetime import date
-
-    today = date(2026, 11, 17)
+    today = dt.date(2026, 11, 17)
     # fora do prazo (48 h)
     d = decide(
         subject=RequestSubject.CITIZEN,
         bag_count=2,
-        requested_date=date(2026, 11, 18),
+        requested_date=dt.date(2026, 11, 18),
         today=today,
         urgent=False,
         in_round=True,
@@ -139,7 +134,7 @@ def test_decision_sends_each_failure_to_the_exception_queue_with_its_reason() ->
     d = decide(
         subject=RequestSubject.CITIZEN,
         bag_count=2,
-        requested_date=date(2026, 11, 25),
+        requested_date=dt.date(2026, 11, 25),
         today=today,
         urgent=False,
         in_round=False,
@@ -152,7 +147,7 @@ def test_decision_sends_each_failure_to_the_exception_queue_with_its_reason() ->
     d = decide(
         subject=RequestSubject.LOCAL,
         bag_count=25,
-        requested_date=date(2026, 11, 25),
+        requested_date=dt.date(2026, 11, 25),
         today=today,
         urgent=False,
         in_round=True,
@@ -165,7 +160,7 @@ def test_decision_sends_each_failure_to_the_exception_queue_with_its_reason() ->
     d = decide(
         subject=RequestSubject.CITIZEN,
         bag_count=2,
-        requested_date=date(2026, 11, 25),
+        requested_date=dt.date(2026, 11, 25),
         today=today,
         urgent=True,
         in_round=True,
@@ -174,9 +169,7 @@ def test_decision_sends_each_failure_to_the_exception_queue_with_its_reason() ->
 
 
 def test_decision_reason_precedence_is_urgency_special_cutoff_round() -> None:
-    from datetime import date
-
-    today = date(2026, 11, 17)
+    today = dt.date(2026, 11, 17)
     # urgência domina tudo: o gestor tem de a ver como urgência, mesmo fora de ronda e fora do prazo
     d = decide(
         subject=RequestSubject.LOCAL, bag_count=30, requested_date=today, today=today, urgent=True, in_round=False
@@ -195,14 +188,12 @@ def test_decision_reason_precedence_is_urgency_special_cutoff_round() -> None:
 
 
 def test_decision_rejects_invalid_bag_counts() -> None:
-    from datetime import date
-
     with pytest.raises(ValueError):
         decide(
             subject=RequestSubject.CITIZEN,
             bag_count=6,
-            requested_date=date(2026, 11, 25),
-            today=date(2026, 11, 17),
+            requested_date=dt.date(2026, 11, 25),
+            today=dt.date(2026, 11, 17),
             urgent=False,
             in_round=True,
         )
@@ -210,8 +201,8 @@ def test_decision_rejects_invalid_bag_counts() -> None:
         decide(
             subject=RequestSubject.CITIZEN,
             bag_count=0,
-            requested_date=date(2026, 11, 25),
-            today=date(2026, 11, 17),
+            requested_date=dt.date(2026, 11, 25),
+            today=dt.date(2026, 11, 17),
             urgent=False,
             in_round=True,
         )
@@ -253,11 +244,9 @@ def test_outcomes_only_apply_to_scheduled_requests() -> None:
 
 
 def test_address_retention_is_twelve_calendar_months() -> None:
-    from datetime import UTC, datetime
-
-    assert address_retained_until(datetime(2026, 3, 15, 10, 30, tzinfo=UTC)) == datetime(
-        2027, 3, 15, 10, 30, tzinfo=UTC
+    assert address_retained_until(dt.datetime(2026, 3, 15, 10, 30, tzinfo=dt.UTC)) == dt.datetime(
+        2027, 3, 15, 10, 30, tzinfo=dt.UTC
     )
     # 29 de fevereiro (bissexto) → 28 de fevereiro do ano seguinte (aperta para o fim do mês)
-    assert address_retained_until(datetime(2024, 2, 29, tzinfo=UTC)) == datetime(2025, 2, 28, tzinfo=UTC)
-    assert address_retained_until(datetime(2026, 1, 31, tzinfo=UTC)) == datetime(2027, 1, 31, tzinfo=UTC)
+    assert address_retained_until(dt.datetime(2024, 2, 29, tzinfo=dt.UTC)) == dt.datetime(2025, 2, 28, tzinfo=dt.UTC)
+    assert address_retained_until(dt.datetime(2026, 1, 31, tzinfo=dt.UTC)) == dt.datetime(2027, 1, 31, tzinfo=dt.UTC)

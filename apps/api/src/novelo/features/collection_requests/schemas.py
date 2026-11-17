@@ -102,7 +102,6 @@ class CollectionRequestOut(BaseModel):
         default=None, description="Até quando a morada fica retida (12 meses; RGPD)"
     )
     created_at: datetime
-    updated_at: datetime
 
 
 class CollectionRequestListFilters(BaseModel):

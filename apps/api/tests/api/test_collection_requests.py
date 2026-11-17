@@ -7,7 +7,6 @@ os endpoints do gestor estão em `test_collection_requests_manager.py`.
 import uuid
 from datetime import UTC, date, datetime, timedelta
 
-import pytest
 from sqlalchemy import select
 
 from novelo.domain.vocab import CircuitStatus, CollectionType, Typology
@@ -187,9 +186,10 @@ async def test_listing_by_role_team_sees_all_and_filters_the_queue(make_user, se
     resp = await first.post("/api/v1/collection-requests", json=citizen_body(parish))
     assert resp.status_code == 201, resp.text
     scheduled_id = resp.json()["id"]
+    tomorrow = datetime.now(UTC).date() + timedelta(days=1)
     resp = await second.post(
         "/api/v1/collection-requests",
-        json=citizen_body(parish, address="Rua da Fila do Gestor, 1", date_=datetime.now(UTC).date() + timedelta(days=1)),
+        json=citizen_body(parish, address="Rua da Fila do Gestor, 1", date_=tomorrow),
     )
     assert resp.status_code == 201, resp.text
     exception_id = resp.json()["id"]

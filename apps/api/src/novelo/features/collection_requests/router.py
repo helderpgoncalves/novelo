@@ -6,7 +6,6 @@ são cidadão. A fila de despacho do gestor é a mesma para fora de ronda, urgê
 """
 
 import uuid
-from datetime import date
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Query
@@ -40,16 +39,18 @@ Team = Annotated[User, Depends(require_role("admin", "operator"))]
 
 
 def _filters(
-    state: CollectionRequestState | None = Query(default=None),
-    subject_kind: RequestSubject | None = Query(default=None, alias="subject"),
-    parish_code: str | None = Query(default=None, max_length=6),
-    limit: int = Query(default=200, ge=1, le=1000),
+    state: Annotated[CollectionRequestState | None, Query()] = None,
+    subject_kind: Annotated[RequestSubject | None, Query(alias="subject")] = None,
+    parish_code: Annotated[str | None, Query(max_length=6)] = None,
+    limit: Annotated[int, Query(ge=1, le=1000)] = 200,
 ) -> CollectionRequestListFilters:
     return CollectionRequestListFilters(state=state, subject_kind=subject_kind, parish_code=parish_code, limit=limit)
 
 
 @router.post("/collection-requests", response_model=CollectionRequestOut, status_code=201, dependencies=[NotGuestDep])
-async def create_collection_request(body: CollectionRequestCreate, user: Caller, db: Db, meta: Meta) -> CollectionRequestOut:
+async def create_collection_request(
+    body: CollectionRequestCreate, user: Caller, db: Db, meta: Meta
+) -> CollectionRequestOut:
     """Pede uma recolha. Cidadão: morada manual + freguesia, 1–5 sacos, corte de 48 h, auto-aceite pelas
     regras — fora de ronda, fora do prazo, urgência ou mais de 20 sacos (local/B2B) caem na fila de
     exceções do gestor. Local/B2B: morada institucional do sítio da conta, teto de 20 (estimativa)."""
@@ -81,7 +82,7 @@ async def list_collection_requests(
 
 
 @router.delete("/collection-requests/{request_id}", status_code=204)
-async def cancel_collection_request(request_id: uuid.UUID, user: Caller, db: Db, meta: Meta):
+async def cancel_collection_request(request_id: uuid.UUID, user: Caller, db: Db, meta: Meta) -> None:
     """Anula um pedido ativo (agendado ou em exceção). Quem pediu anula o seu; a equipa pode anular qualquer um."""
     request = await service.cancel_request(db, user, request_id)
     await audit.record(
