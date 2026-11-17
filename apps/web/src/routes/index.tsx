@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { lazy, Suspense } from 'react';
 import { z } from 'zod';
 import {
@@ -36,6 +36,8 @@ export const Route = createFileRoute('/')({
   }),
   beforeLoad: async ({ context: { queryClient } }) => {
     const user = await resolvePublicSessionUser(queryClient);
+    // A conta de local tem a sua própria área: entrar na app de equipa ia direto ao portão errado.
+    if (user?.role === 'local') throw redirect({ to: '/local' });
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };

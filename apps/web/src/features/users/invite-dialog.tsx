@@ -1,10 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import type { InvitationOut } from '@/client';
-import { createInvitationMutation } from '@/client/@tanstack/react-query.gen';
+import {
+  createInvitationMutation,
+  listLocalitiesOptions,
+} from '@/client/@tanstack/react-query.gen';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -23,6 +26,14 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { FormAlert } from '@/features/auth/form-alert';
 import { getErrorMessage } from '@/lib/errors';
@@ -32,7 +43,7 @@ import { m } from '@/paraglide/messages';
 import { invalidateAdminQueries } from './cache';
 import { ConfirmCheck } from './confirm-check';
 import { InviteResult } from './invite-result';
-import { INVITE_MESSAGE_MAX, needsAdminConfirm, type Role } from './logic';
+import { INVITE_MESSAGE_MAX, INVITE_ROLES, needsAdminConfirm, type Role } from './logic';
 import { RolePicker } from './role-picker';
 
 const schema = z.object({
@@ -70,6 +81,9 @@ function InviteBody({ onClose }: { onClose: () => void }) {
   const [role, setRole] = useState<Role>('operator');
   const [confirmAdmin, setConfirmAdmin] = useState(false);
   const [locale, setLocale] = useState<Locale>(getLocale());
+  // Papel `local`: o local da conta e a natureza do sítio (a conta pertence ao local, nunca à pessoa).
+  const [localityId, setLocalityId] = useState<string>('');
+  const [localKind, setLocalKind] = useState<'assistido' | 'b2b'>('assistido');
   const [fieldError, setFieldError] = useState(false);
   const [result, setResult] = useState<InvitationOut | null>(null);
   const form = useForm<Values>({
@@ -77,6 +91,11 @@ function InviteBody({ onClose }: { onClose: () => void }) {
     defaultValues: { email: '', name: '', message: '' },
   });
   const message = form.watch('message');
+  // Os locais da Vitrus para o seletor (só se carrega quando o papel é `local`).
+  const { data: localities } = useQuery({
+    ...listLocalitiesOptions(),
+    enabled: role === 'local',
+  });
 
   const create = useMutation({
     ...createInvitationMutation(),
@@ -91,7 +110,8 @@ function InviteBody({ onClose }: { onClose: () => void }) {
       setResult(invitation);
     },
   });
-  const ready = !needsAdminConfirm(role) || confirmAdmin;
+  const ready =
+    (!needsAdminConfirm(role) || confirmAdmin) && (role !== 'local' || localityId !== '');
 
   if (result) return <InviteResult invitation={result} onClose={onClose} />;
 
@@ -107,6 +127,7 @@ function InviteBody({ onClose }: { onClose: () => void }) {
           className="space-y-4"
           onSubmit={form.handleSubmit((v) => {
             if (!ready) return;
+            if (role === 'local' && !localityId) return;
             create.mutate({
               body: {
                 email: v.email,
@@ -115,6 +136,7 @@ function InviteBody({ onClose }: { onClose: () => void }) {
                 role,
                 locale,
                 confirm_admin: needsAdminConfirm(role) ? confirmAdmin : undefined,
+                ...(role === 'local' ? { locality_id: localityId, local_kind: localKind } : {}),
               },
             });
           })}
@@ -159,12 +181,64 @@ function InviteBody({ onClose }: { onClose: () => void }) {
           />
           <RolePicker
             value={role}
+            roles={INVITE_ROLES}
             onChange={(next) => {
               setRole(next);
               setConfirmAdmin(false);
             }}
             legend={m.invite_role()}
           />
+          {role === 'local' && (
+            <div className="space-y-3 rounded-lg border p-3">
+              <div className="space-y-1.5">
+                <Label htmlFor="invite-locality">{m.invite_field_locality()}</Label>
+                <Select value={localityId} onValueChange={setLocalityId} required>
+                  <SelectTrigger id="invite-locality" className="h-10 w-full">
+                    <SelectValue placeholder={m.common_loading()} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {(localities ?? []).map((locality) => (
+                      <SelectItem key={locality.id} value={locality.id}>
+                        {locality.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <p className="text-muted-foreground text-xs">{m.invite_field_locality_hint()}</p>
+              </div>
+              <fieldset className="space-y-1.5">
+                <legend className="font-medium text-sm">{m.invite_field_local_kind()}</legend>
+                <div className="grid grid-cols-2 gap-2">
+                  {(
+                    [
+                      { value: 'assistido', label: m.locals_kind_assistido() },
+                      { value: 'b2b', label: m.locals_kind_b2b() },
+                    ] as const
+                  ).map((option) => (
+                    <Label
+                      key={option.value}
+                      className={
+                        localKind === option.value
+                          ? 'border-primary bg-primary/5 cursor-pointer rounded-lg border p-2 text-center text-sm font-medium transition-colors'
+                          : 'hover:bg-accent/50 cursor-pointer rounded-lg border p-2 text-center text-sm font-medium transition-colors'
+                      }
+                    >
+                      <input
+                        type="radio"
+                        name="local-kind"
+                        value={option.value}
+                        checked={localKind === option.value}
+                        onChange={() => setLocalKind(option.value)}
+                        className="sr-only"
+                      />
+                      {option.label}
+                    </Label>
+                  ))}
+                </div>
+                <p className="text-muted-foreground text-xs">{m.invite_field_local_kind_hint()}</p>
+              </fieldset>
+            </div>
+          )}
           {needsAdminConfirm(role) && (
             <ConfirmCheck checked={confirmAdmin} onChange={setConfirmAdmin}>
               {m.invite_admin_confirm()}

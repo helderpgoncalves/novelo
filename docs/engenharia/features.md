@@ -132,6 +132,7 @@ Um só papel (`local`); a conta pertence ao **local**, é criada pela equipa (se
 - **Locais assistidos (escolas no MVP)**: leitura — lotes por paragem com o peso medido, relatório em kg medidos por destino (sem CO₂ nem doadores); certificado público **opt-in**; e uma única escrita: o **aviso «sacos prontos»**, que garante paragem.
 - **Produtor B2B (17 lares + 9 de hotelaria)**: leitura em espelho do assistido; pedido de recolha com a mecânica do cidadão, exceto o volume (teto de 20 sacos, estimativa; acima = recolha especial) e a morada institucional fixa; sem pontos nem crédito.
 - Protótipo «Duas portas» (branch `prototype/fluxo-local`): o aviso como herói; rondas e certificado atrás de portões grandes, em folhas inferiores.
+- **Na API e no contrato (17 nov 2026)**: convite com papel `local` traz `locality_id` + `local_kind` (`assistido`/`b2b`) e ao aceitar nasce `local_accounts` (conta ligada ao local; certificado opt-in por conta). O aviso vive em `stop_notices`: **um só ativo por local** (índice parcial único; anular não apaga, avisar outra vez cria linha nova), com `bag_count` opcional — sinal de procura para o otimizador (#61), nunca contabilidade (o peso verdadeiro é o da balança). Leitura do próprio local em `/local/account`, `/local/lots`, `/local/report` (kg por destino: o peso vem da balança, os destinos da triagem — só lotes triados contam no desvio); a equipa vê tudo em `/locals`; o certificado público em `GET /public/locals/{id}/certificate` só existe com opt-in (404 `certificate_not_public`), sem doadores e sem CO₂. No web, `/local` «Duas portas» (telemóvel primeiro, pt-PT) e `/certificado/{id}` público; mudar o papel de uma conta existente para `local` é bloqueado no UI (a conta de local nasce do convite, com local).
 
 ## 12. Ecrã da viatura: pesar, etiquetar, offline
 
@@ -172,7 +173,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Entrada | `/login`, `/join`, `/magic-link`, `/verify-email`, `/privacy` | Magic link (principal), password, Google, entrada de evento por QR, confirmação de email e texto de privacidade |
 | Passaporte | `/passport/:código` | Público, sem sessão: o que o QR do lote abre |
 | Cidadão | `/cidadao` | Secções 8–10: os meus sacos, saldo, histórico, «onde e quando entrego», pedir recolha (planeado) |
-| Local | `/local` | Secção 11: conta do local assistido ou produtor B2B — aviso «sacos prontos», rondas, certificado (planeado) |
+| Local | `/local` | Secção 11: conta do local assistido ou produtor B2B — aviso «sacos prontos» (única escrita), rondas com peso medido, certificado público opt-in; ecrã próprio fora da app de equipa, telemóvel primeiro |
 
 **Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, apresentação de seis passos na primeira entrada (o impacto com os números da API), `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
 
@@ -194,6 +195,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Entrada por magic link, entrada por QR (`guest`), Google, emails transacionais | Feito |
 | Páginas de erro, PWA e interface de telemóvel, marca gerada por `just brand` | Feito |
 | Camada e cobertura dos contentores de **têxteis** | Não se aplica: não há contentores de têxteis (Vitrus, 21 out 2026) |
+| Conta de local: papel `local` criado por convite (com local e natureza do sítio), `/local` «Duas portas» (aviso, rondas, certificado opt-in) e página pública `/certificado` | Feito na API, no contrato e no web; pedido de recolha B2B e o consumo do aviso pelo otimizador por fazer |
 | Agente semanal de operações | Não iniciado (fica para depois) |
 | Resposta ao feedback da Vitrus (nov 2026): âmbito decidido e documentado — ADR, glossário (`GLOSSARY.md`), secções 8–13 e backlog | Feito (documentação; mapa wayfinder #30) |
 | Ecrã da viatura, conta de local, superfície do cidadão, recolha a pedido, pontos, política de paragem, calibração (secções 8–13) | Por fazer; protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |

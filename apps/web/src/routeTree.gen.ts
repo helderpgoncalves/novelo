@@ -15,6 +15,7 @@ import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as LocalRouteImport } from './routes/local'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
 import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
 import { Route as PrivacyRouteImport } from './routes/privacy'
@@ -43,6 +44,7 @@ import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-pa
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as CertificadoLocalIdRouteImport } from './routes/certificado.$localId'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
@@ -78,6 +80,11 @@ const CreditsRoute = CreditsRouteImport.update({
 const JoinRoute = JoinRouteImport.update({
   id: '/join',
   path: '/join',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LocalRoute = LocalRouteImport.update({
+  id: '/local',
+  path: '/local',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MagicLinkRoute = MagicLinkRouteImport.update({
@@ -220,6 +227,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const CertificadoLocalIdRoute = CertificadoLocalIdRouteImport.update({
+  id: '/certificado/$localId',
+  path: '/certificado/$localId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PassportCodeRoute = PassportCodeRouteImport.update({
   id: '/passport/$code',
   path: '/passport/$code',
@@ -266,6 +278,7 @@ export interface FileRoutesByFullPath {
   '/accept-invite': typeof AcceptInviteRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
@@ -294,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
@@ -308,6 +322,7 @@ export interface FileRoutesByTo {
   '/accept-invite': typeof AcceptInviteRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
@@ -336,6 +351,7 @@ export interface FileRoutesByTo {
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
@@ -353,6 +369,7 @@ export interface FileRoutesById {
   '/accept-invite': typeof AcceptInviteRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
   '/pending-approval': typeof PendingApprovalRoute
   '/privacy': typeof PrivacyRoute
@@ -381,6 +398,7 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
@@ -397,6 +415,7 @@ export interface FileRouteTypes {
     | '/accept-invite'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
     | '/pending-approval'
     | '/privacy'
@@ -425,6 +444,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
     | '/lots/$code'
@@ -439,6 +459,7 @@ export interface FileRouteTypes {
     | '/accept-invite'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
     | '/pending-approval'
     | '/privacy'
@@ -467,6 +488,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
     | '/lots/$code'
@@ -483,6 +505,7 @@ export interface FileRouteTypes {
     | '/accept-invite'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
     | '/pending-approval'
     | '/privacy'
@@ -511,6 +534,7 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/_app/admin/ai'
     | '/_app/lots/$code'
@@ -528,11 +552,13 @@ export interface RootRouteChildren {
   AcceptInviteRoute: typeof AcceptInviteRoute
   CreditsRoute: typeof CreditsRoute
   JoinRoute: typeof JoinRoute
+  LocalRoute: typeof LocalRoute
   MagicLinkRoute: typeof MagicLinkRoute
   PendingApprovalRoute: typeof PendingApprovalRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  CertificadoLocalIdRoute: typeof CertificadoLocalIdRoute
   PassportCodeRoute: typeof PassportCodeRoute
 }
 
@@ -578,6 +604,13 @@ declare module '@tanstack/react-router' {
       path: '/join'
       fullPath: '/join'
       preLoaderRoute: typeof JoinRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/local': {
+      id: '/local'
+      path: '/local'
+      fullPath: '/local'
+      preLoaderRoute: typeof LocalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/magic-link': {
@@ -776,6 +809,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/certificado/$localId': {
+      id: '/certificado/$localId'
+      path: '/certificado/$localId'
+      fullPath: '/certificado/$localId'
+      preLoaderRoute: typeof CertificadoLocalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/passport/$code': {
       id: '/passport/$code'
       path: '/passport/$code'
@@ -918,11 +958,13 @@ const rootRouteChildren: RootRouteChildren = {
   AcceptInviteRoute: AcceptInviteRoute,
   CreditsRoute: CreditsRoute,
   JoinRoute: JoinRoute,
+  LocalRoute: LocalRoute,
   MagicLinkRoute: MagicLinkRoute,
   PendingApprovalRoute: PendingApprovalRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  CertificadoLocalIdRoute: CertificadoLocalIdRoute,
   PassportCodeRoute: PassportCodeRoute,
 }
 export const routeTree = rootRouteImport

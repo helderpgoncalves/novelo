@@ -10,14 +10,18 @@ export const roleLabel = (role: Role): string =>
     ? m.account_role_admin()
     : role === 'guest'
       ? m.account_role_guest()
-      : m.account_role_operator();
+      : role === 'local'
+        ? m.account_role_local()
+        : m.account_role_operator();
 
 const roleHelp = (role: Role): string =>
   role === 'admin'
     ? m.users_role_desc_admin()
     : role === 'guest'
       ? m.users_role_desc_guest()
-      : m.users_role_desc_operator();
+      : role === 'local'
+        ? m.invite_role_local_hint()
+        : m.users_role_desc_operator();
 
 const ROLES: Role[] = ['operator', 'admin', 'guest'];
 

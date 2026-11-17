@@ -32,7 +32,7 @@ export interface HomeSearch {
 }
 
 interface HomePageProps {
-  role: 'admin' | 'operator' | 'guest';
+  role: 'admin' | 'operator' | 'guest' | 'local';
   search: HomeSearch;
   onSearch: (
     patch: Partial<{ tab: HomeTab; layer: LayerId; parish: string | null; budget: number }>,
