@@ -43,7 +43,7 @@ Cada saco recolhido vira um lote; cada lote tem um QR e uma página pública; os
 | Código e QR | Um QR por unidade física: o do saco da plataforma, ou etiqueta impressa na viatura quando não há |
 | Paragem (freguesia, local) | Onde o lote nasce — à porta (ronda ou pedido) ou num local; a atribuição vem do scan na viatura |
 | Peso | Medido na viatura, na paragem (balança BLE); no MVP, estimado por tipo de peça |
-| Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA») |
+| Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA»). Vocabulário fechado e versionado: [Taxonomia da triagem (v1)](dados-e-modelo.md#taxonomia-da-triagem-v1) |
 | Composição (ex.: 100% algodão) | Lida da etiqueta na triagem |
 | Histórico | Recolhido, triado, reservado, entregue, com data |
 
@@ -182,7 +182,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | --- | --- |
 | Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
-| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; exatidão da triagem por medir |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»); exatidão real por medir |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |
