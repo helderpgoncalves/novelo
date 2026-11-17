@@ -2,8 +2,18 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
+from novelo.domain.taxonomy import (
+    Colour,
+    FineState,
+    Gender,
+    Provenance,
+    Season,
+    SizeBand,
+    TriageAxis,
+    destination_for,
+)
 from novelo.domain.vocab import (
     Fibre,
     GarmentType,
@@ -28,10 +38,18 @@ def _check_composition(parts: list[CompositionPart]) -> list[CompositionPart]:
 
 
 class TriageAnalysis(BaseModel):
-    """O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor."""
+    """O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.
+
+    A IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),
+    e o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.
+    """
 
     garment_type: GarmentType
-    condition: TextileDestination = Field(description="reuse, recycle ou reject")
+    fine_state: FineState
+    season: Season
+    colour: Colour
+    gender: Gender
+    size_band: SizeBand = SizeBand.UNKNOWN
     composition: Annotated[list[CompositionPart], Field(max_length=6)]
     brand: str | None = Field(default=None, max_length=80)
     confidence: float = Field(ge=0, le=1)
@@ -42,30 +60,100 @@ class TriageAnalysis(BaseModel):
 
 class TriageResult(BaseModel):
     analysis: TriageAnalysis
+    destination: TextileDestination = Field(description="Destino derivado do estado fino (reuse/recycle/reject)")
     dominant_fibre: Fibre
     estimated_weight_g: int
     prompt_version: str
     model: str
 
 
+class AttributeSource(BaseModel):
+    """Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador)."""
+
+    origin: Provenance
+    confidence: float = Field(ge=0, le=1)
+
+
+class TriageProvenance(BaseModel):
+    """Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor."""
+
+    fine_state: AttributeSource | None = None
+    garment_type: AttributeSource | None = None
+    season: AttributeSource | None = None
+    colour: AttributeSource | None = None
+    gender: AttributeSource | None = None
+    size_band: AttributeSource | None = None
+
+
+class TriageProposalValues(BaseModel):
+    """O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados)."""
+
+    garment_type: GarmentType | None = None
+    fine_state: FineState | None = None
+    season: Season | None = None
+    colour: Colour | None = None
+    gender: Gender | None = None
+    size_band: SizeBand | None = None
+
+
+class TriageProposal(BaseModel):
+    """Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores)."""
+
+    model: str = Field(max_length=120)
+    prompt_version: str = Field(max_length=20)
+    confidence: float = Field(ge=0, le=1)
+    values: TriageProposalValues
+
+
+def _check_destination(body: "LotItemIn") -> "LotItemIn":
+    """O destino vem do estado fino; clientes antigos podem mandar só o destino (peça sem estado fino)."""
+    if body.fine_state is not None and body.condition is not None:
+        if destination_for(body.fine_state) is not body.condition:
+            raise ValueError("O destino tem de ser o derivado do estado fino")
+    elif body.fine_state is None and body.condition is None:
+        raise ValueError("Há de vir o estado fino ou o destino (condition)")
+    return body
+
+
 class LotItemIn(BaseModel):
-    """Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu)."""
+    """Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+
+    O caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)
+    é derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.
+    """
 
     garment_type: GarmentType
-    condition: TextileDestination
+    fine_state: FineState | None = None
+    condition: TextileDestination | None = Field(
+        default=None, description="Destino (legado); derivado do estado fino quando este vem"
+    )
+    season: Season | None = None
+    colour: Colour | None = None
+    gender: Gender | None = None
+    size_band: SizeBand | None = Field(default=None, description="Banda lida só da etiqueta")
     composition: Annotated[list[CompositionPart], Field(max_length=6)]
     brand: str | None = Field(default=None, max_length=80)
     estimated_weight_g: int = Field(gt=0, le=20000)
     confidence: float = Field(ge=0, le=1, default=1.0)
     prompt_version: str | None = None
+    ai_proposal: TriageProposal | None = Field(
+        default=None, description="Proposta da IA revista; gera rótulos dourados"
+    )
 
     _composition = field_validator("composition")(_check_composition)
+    _destination = model_validator(mode="after")(_check_destination)
 
 
 class LotItemOut(BaseModel):
     id: uuid.UUID
     garment_type: GarmentType
+    fine_state: FineState | None = None
     condition: TextileDestination
+    season: Season | None = None
+    colour: Colour | None = None
+    gender: Gender | None = None
+    size_band: SizeBand | None = None
+    provenance: TriageProvenance | None = Field(default=None, description="Selo «confirmado»/«IA» por eixo")
     composition: list[CompositionPart]
     dominant_fibre: Fibre
     brand: str | None
@@ -239,3 +327,17 @@ class BrandsOut(BaseModel):
     sample_items: int
     items_without_brand: int
     total_kg: float
+
+
+class GoldenLabelOut(BaseModel):
+    """Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo)."""
+
+    id: uuid.UUID
+    axis: TriageAxis
+    ai_value: str | None
+    operator_value: str
+    ai_confidence: float | None
+    model: str | None
+    prompt_version: str | None
+    lot_code: str | None
+    created_at: datetime

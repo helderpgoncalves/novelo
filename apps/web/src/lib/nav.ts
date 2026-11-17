@@ -10,6 +10,7 @@ import {
   MapPinned,
   MessagesSquare,
   Network,
+  PackageOpen,
   QrCode,
   Route as RouteIcon,
   ScanLine,
@@ -34,6 +35,7 @@ export interface NavItem {
     | '/chat'
     | '/triage'
     | '/lots'
+    | '/export-lots'
     | '/reports'
     | '/simulator'
     | '/scenarios'
@@ -91,6 +93,7 @@ export const NAV: NavSection[] = [
     items: [
       { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
       { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
+      { label: () => m.nav_export_lots(), to: '/export-lots', icon: PackageOpen },
     ],
   },
   {

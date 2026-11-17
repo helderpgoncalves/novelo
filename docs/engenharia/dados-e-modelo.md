@@ -229,10 +229,52 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Ponto assistido (escola) com os pressupostos do modo `existing` | captura, investimento, recolhas | Pressuposto, sem dados próprios (secção 8) |
 | Litros desconhecidos de um contentor | mediana do tipo | Regra explícita (secção 8); 10 contentores, todos de produtores |
 | Quota de reutilização igual em todos os modos | 59,4% (50,0% a 72,9%) | Calculada dos fluxos de 2025 na base, não escrita à mão; aplicá-la a todos os canais é **pressuposto** (não há qualidade por canal; secção 3) |
+| Peso médio do calçado (par) e do acessório na triagem | 400 g / 150 g | Pressuposto da equipa (tabela `AVERAGE_WEIGHT_G`, «estimativa»; no piloto vem de uma balança) |
+| Tamanho em bandas só com letras da etiqueta | XS–XXL (PT P/M/G/GG/XG; 3XL/4XL → XXL+) | Regra da taxonomia: numerais («42», «98») e «tamanho único» ficam `unknown` — as tabelas EU de homem e de mulher conflituam e o sistema não inventa o mapeamento; o operador, com a etiqueta à mão, escolhe a banda |
+| Eixo «prometido» no eval (género, tamanho) | ≥ 90% de acerto com ≥ 30 peças por eixo | Pressuposto da equipa (`ai/eval_triage.py`); abaixo disso a coluna leva «prometido» no relatório e no painel `/admin/ai` |
 | Proximidade na matriz de cobertura | % da área a ≤ 300 m de um local municipal | Proxy de área, não de população (sem BGRI; secção 10) |
 | Localidades dos circuitos sem freguesia inequívoca | ficam sem freguesia | Regra explícita (Fontes de dados); 3 por resolver e 2 por confirmar nos alertas 101 e 102 |
 
 Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` sem uma linha nesta tabela. Os custos e as taxas por modo estão lá marcados como `assumption` e aparecem com a sua origem no ecrã "Pressupostos".
+
+## Taxonomia da triagem (v1)
+
+Vocabulário **fechado e versionado** (`apps/api/src/novelo/domain/taxonomy.py`, `TAXONOMY_VERSION = 1`):
+mudar um valor é uma decisão visível — nova versão do módulo, migração (CHECKs das colunas),
+`just gen` e traduções no web (`apps/web/src/lib/taxonomy.ts`). A IA propõe cada eixo; o operador
+confirma ou corrige, e cada atributo guarda a proveniência («confirmado»/«IA») e a confiança.
+As correções do operador viram **rótulos dourados** (tabela `golden_labels`, uma linha por eixo
+corrigido, com o valor proposto e o humano, o modelo e a versão do prompt) — a verdade-terreno que
+o eval por eixo mede. Os quatro graus e a sazonalidade vêm do que a Retex (Maia) faz
+(`research/retex-maia`); os segmentos seguem o que o mercado de roupa usada compra.
+
+| Eixo | Valores | Na chave do lote de escoamento (#57) |
+| --- | --- | --- |
+| Estado fino (`fine_state`) | 4 graus de qualidade + reciclar/rejeitar: `grade_a` como nova, `grade_b` muito boa, `grade_c` boa, `grade_d` suficiente, `recycle`, `reject` — mapeado nos 3 destinos (A–D → reutilização) | sim |
+| Tipologia (`garment_type`) | as 10 tipologias existentes + `footwear` (calçado, o par) + `accessory` (cinto, lenço, mala pequena, chapéu) | sim |
+| Estação (`season`) | `all_season`, `warm` (primavera/verão), `cold` (outono/inverno) | sim |
+| Cor (`colour`) | 12 cores + `unknown` (foto escura/ilegível) | não — só filtros |
+| Género (`gender`) | `men`, `women`, `kids`, `babies` | sim |
+| Tamanho (`size_band`) | bandas lidas **só da etiqueta**: `xs`–`xxl` (PT P/M/G/GG/XG; 3XL/4XL → XXL+); numerais e «tamanho único» → `unknown` | não — só filtros |
+
+Peças anteriores à taxonomia (só com o destino legado `reuse`/`recycle`/`reject`) entram com
+`fine_state` nulo e ficam fora dos lotes de escoamento até re-triagem. O destino continua a ser
+guardado e derivado do estado fino (`destination_for`), para o passaporte, a bolsa de fibra e o
+relatório RAP não mudarem.
+
+## Proveniência e rótulos dourados
+
+- Cada eixo confirmado pelo operador guarda `{"origin": "confirmed" | "ai", "confidence": 0..1}`
+  (JSONB `provenance` da peça): «IA» quando o operador aceitou o valor proposto tal e qual (com a
+  confiança da proposta), «confirmado» quando definiu o valor. Os selos aparecem no ecrã de triagem
+  ao lado de cada atributo.
+- Quando o valor final difere do proposto e havia proposta (`ai_proposal` no pedido), o servidor
+  cria rótulos dourados (`POST /lots/{code}/items`); sem proposta não há correção a medir.
+- Leitura dos rótulos: `GET /api/v1/triage/golden-labels?axis=…&limit=…` (sessão obrigatória).
+- O eval (`just eval-triage`) mede **por eixo** (estado, tipologia, estação, cor, género, tamanho,
+  destino derivado, marca, fibra, composição ±10 pp); género e tamanho levam a marca
+  **«prometido»** enquanto não houver ≥ 90% de acerto com ≥ 30 peças por eixo (pressuposto,
+  tabela acima). A verdade-terreno do CSV também é validada contra o vocabulário fechado.
 
 ## 7. Validação do modelo
 

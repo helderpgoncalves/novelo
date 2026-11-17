@@ -47,6 +47,8 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as CertificadoLocalIdRouteImport } from './routes/certificado.$localId'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
+import { Route as AppExportLotsIndexRouteImport } from './routes/_app/export-lots.index'
+import { Route as AppExportLotsCodeRouteImport } from './routes/_app/export-lots.$code'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
 import { Route as AppLotsCodeRouteImport } from './routes/_app/lots.$code'
 import { Route as AppScenariosIndexRouteImport } from './routes/_app/scenarios.index'
@@ -242,6 +244,16 @@ const AppAdminAiRoute = AppAdminAiRouteImport.update({
   path: '/admin/ai',
   getParentRoute: () => AppRoute,
 } as any)
+const AppExportLotsIndexRoute = AppExportLotsIndexRouteImport.update({
+  id: '/export-lots/',
+  path: '/export-lots/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExportLotsCodeRoute = AppExportLotsCodeRouteImport.update({
+  id: '/export-lots/$code',
+  path: '/export-lots/$code',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLotsIndexRoute = AppLotsIndexRouteImport.update({
   id: '/lots/',
   path: '/lots/',
@@ -310,9 +322,11 @@ export interface FileRoutesByFullPath {
   '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
+  '/export-lots/$code': typeof AppExportLotsCodeRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/export-lots/': typeof AppExportLotsIndexRoute
   '/lots/': typeof AppLotsIndexRoute
   '/scenarios/': typeof AppScenariosIndexRoute
   '/chat/shared/$token': typeof AppChatSharedTokenRoute
@@ -354,9 +368,11 @@ export interface FileRoutesByTo {
   '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
+  '/export-lots/$code': typeof AppExportLotsCodeRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/export-lots': typeof AppExportLotsIndexRoute
   '/lots': typeof AppLotsIndexRoute
   '/scenarios': typeof AppScenariosIndexRoute
   '/chat/shared/$token': typeof AppChatSharedTokenRoute
@@ -401,9 +417,11 @@ export interface FileRoutesById {
   '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
+  '/_app/export-lots/$code': typeof AppExportLotsCodeRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/_app/scenarios/compare': typeof AppScenariosCompareRoute
+  '/_app/export-lots/': typeof AppExportLotsIndexRoute
   '/_app/lots/': typeof AppLotsIndexRoute
   '/_app/scenarios/': typeof AppScenariosIndexRoute
   '/_app/chat_/shared/$token': typeof AppChatSharedTokenRoute
@@ -447,9 +465,11 @@ export interface FileRouteTypes {
     | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
+    | '/export-lots/$code'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/export-lots/'
     | '/lots/'
     | '/scenarios/'
     | '/chat/shared/$token'
@@ -491,9 +511,11 @@ export interface FileRouteTypes {
     | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
+    | '/export-lots/$code'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/export-lots'
     | '/lots'
     | '/scenarios'
     | '/chat/shared/$token'
@@ -537,9 +559,11 @@ export interface FileRouteTypes {
     | '/certificado/$localId'
     | '/passport/$code'
     | '/_app/admin/ai'
+    | '/_app/export-lots/$code'
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
     | '/_app/scenarios/compare'
+    | '/_app/export-lots/'
     | '/_app/lots/'
     | '/_app/scenarios/'
     | '/_app/chat_/shared/$token'
@@ -830,6 +854,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminAiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/export-lots/': {
+      id: '/_app/export-lots/'
+      path: '/export-lots'
+      fullPath: '/export-lots/'
+      preLoaderRoute: typeof AppExportLotsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/export-lots/$code': {
+      id: '/_app/export-lots/$code'
+      path: '/export-lots/$code'
+      fullPath: '/export-lots/$code'
+      preLoaderRoute: typeof AppExportLotsCodeRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/lots/': {
       id: '/_app/lots/'
       path: '/lots'
@@ -896,9 +934,11 @@ interface AppRouteChildren {
   AppUsersRoute: typeof AppUsersRoute
   AppValidationRoute: typeof AppValidationRoute
   AppAdminAiRoute: typeof AppAdminAiRoute
+  AppExportLotsCodeRoute: typeof AppExportLotsCodeRoute
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
   AppScenariosCompareRoute: typeof AppScenariosCompareRoute
+  AppExportLotsIndexRoute: typeof AppExportLotsIndexRoute
   AppLotsIndexRoute: typeof AppLotsIndexRoute
   AppScenariosIndexRoute: typeof AppScenariosIndexRoute
   AppChatSharedTokenRoute: typeof AppChatSharedTokenRoute
@@ -925,9 +965,11 @@ const AppRouteChildren: AppRouteChildren = {
   AppUsersRoute: AppUsersRoute,
   AppValidationRoute: AppValidationRoute,
   AppAdminAiRoute: AppAdminAiRoute,
+  AppExportLotsCodeRoute: AppExportLotsCodeRoute,
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,
   AppScenariosCompareRoute: AppScenariosCompareRoute,
+  AppExportLotsIndexRoute: AppExportLotsIndexRoute,
   AppLotsIndexRoute: AppLotsIndexRoute,
   AppScenariosIndexRoute: AppScenariosIndexRoute,
   AppChatSharedTokenRoute: AppChatSharedTokenRoute,

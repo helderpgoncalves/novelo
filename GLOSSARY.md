@@ -56,6 +56,12 @@ Página pública de um lote (origem, composição, peso, histórico), aberta pel
 **Estado fino**:
 Nível de qualidade em 4 graus + reciclar/rejeitar, mapeado nos 3 destinos. Atributo confirmável pelo operador (padrão-ouro) e estimado pela IA.
 
+**Taxonomia da triagem**:
+Vocabulário fechado e versionado (`domain/taxonomy.py`, v1) dos seis eixos — estado fino, tipologia (+ calçado e acessório), estação, cor, género e tamanho em bandas lidas só da etiqueta. A chave do lote de escoamento usa estado fino, tipologia, estação e género; cor e tamanho ficam para filtros.
+
+**Proveniência**:
+De onde veio o valor de um atributo: proposto pela IA («IA», com a confiança da proposta) ou definido pelo operador («confirmado»). Guardada por atributo e mostrada em selos no ecrã de triagem.
+
 **Linhagem**:
 Rastreio das peças de um lote de escoamento até aos lotes de recolha de origem.
 

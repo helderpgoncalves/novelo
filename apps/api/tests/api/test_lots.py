@@ -116,7 +116,10 @@ async def test_triage_analyses_photos_without_storing_them(logged_in: httpx.Asyn
         "TriageAnalysis",
         TriageAnalysis(
             garment_type="shirt",
-            condition="reuse",
+            fine_state="grade_b",
+            season="all_season",
+            colour="white",
+            gender="women",
             composition=[CompositionPart(fibre="cotton", pct=100)],
             brand="Mango",
             confidence=0.82,
@@ -130,7 +133,8 @@ async def test_triage_analyses_photos_without_storing_them(logged_in: httpx.Asyn
     assert resp.status_code == 200, resp.text
     body = resp.json()
     assert body["analysis"]["brand"] == "Mango" and body["dominant_fibre"] == "cotton"
-    assert body["estimated_weight_g"] == 200 and body["prompt_version"] == "v3"  # peso calculado no servidor
+    assert body["destination"] == "reuse" and body["estimated_weight_g"] == 200  # derivados no servidor
+    assert body["prompt_version"] == "v4"  # prompt v4: a taxonomia da triagem (bilhete #56)
     sent = llm.calls[0]["user"]
     assert isinstance(sent, list) and sum(1 for p in sent if p["type"] == "image_url") == 2  # type: ignore[index]
     assert "notes`: pt-PT" in sent[0]["text"]  # type: ignore[index]  # a nota vem na língua do ecrã
@@ -146,7 +150,10 @@ async def test_triage_sends_reduced_jpeg_photos_to_the_vision_model(logged_in: h
         "TriageAnalysis",
         TriageAnalysis(
             garment_type="shirt",
-            condition="reuse",
+            fine_state="grade_b",
+            season="all_season",
+            colour="white",
+            gender="women",
             composition=[CompositionPart(fibre="cotton", pct=100)],
             brand=None,
             confidence=0.8,

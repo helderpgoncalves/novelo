@@ -1655,6 +1655,26 @@
         "title": "AttachmentOut",
         "type": "object"
       },
+      "AttributeSource": {
+        "description": "Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador).",
+        "properties": {
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "origin": {
+            "$ref": "#/components/schemas/Provenance"
+          }
+        },
+        "required": [
+          "origin",
+          "confidence"
+        ],
+        "title": "AttributeSource",
+        "type": "object"
+      },
       "AuditEntryOut": {
         "properties": {
           "action": {
@@ -3003,6 +3023,26 @@
           "unspecified"
         ],
         "title": "CollectionType",
+        "type": "string"
+      },
+      "Colour": {
+        "description": "Cor observada na peça (nunca entra na chave do lote de escoamento; só filtros).",
+        "enum": [
+          "black",
+          "white",
+          "grey",
+          "beige",
+          "brown",
+          "red",
+          "orange",
+          "yellow",
+          "green",
+          "blue",
+          "pink",
+          "multicolour",
+          "unknown"
+        ],
+        "title": "Colour",
         "type": "string"
       },
       "CommandsOut": {
@@ -6452,6 +6492,362 @@
         "title": "ExportFormat",
         "type": "string"
       },
+      "ExportLotDetail": {
+        "properties": {
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "collection_lots": {
+            "description": "Lotes de recolha de origem distintos",
+            "title": "Collection Lots",
+            "type": "integer"
+          },
+          "composition": {
+            "description": "Composição agregada, ponderada pelo peso",
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "item_list": {
+            "items": {
+              "$ref": "#/components/schemas/ExportLotItemOut"
+            },
+            "title": "Item List",
+            "type": "array"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "lineage": {
+            "description": "Lotes de recolha de origem, mais pesado primeiro",
+            "items": {
+              "$ref": "#/components/schemas/LineageLotOut"
+            },
+            "title": "Lineage",
+            "type": "array"
+          },
+          "localities": {
+            "description": "Paragens (locais) distintas na linhagem",
+            "title": "Localities",
+            "type": "integer"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ExportLotState"
+          },
+          "taxonomy_version": {
+            "description": "Versão da taxonomia em que o lote foi fechado",
+            "title": "Taxonomy Version",
+            "type": "integer"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender",
+          "taxonomy_version",
+          "items",
+          "weight_kg",
+          "collection_lots",
+          "localities",
+          "created_at",
+          "closed_at",
+          "composition",
+          "item_list",
+          "lineage"
+        ],
+        "title": "ExportLotDetail",
+        "type": "object"
+      },
+      "ExportLotItemOut": {
+        "description": "Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.",
+        "properties": {
+          "added_at": {
+            "format": "date-time",
+            "title": "Added At",
+            "type": "string"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Colour"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimated_weight_g": {
+            "title": "Estimated Weight G",
+            "type": "integer"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Paragem (local) donde a peça veio",
+            "title": "Locality Name"
+          },
+          "lot_code": {
+            "description": "Lote de recolha de origem",
+            "title": "Lot Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriageProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Selo «confirmado»/«IA» por eixo"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SizeBand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "garment_type",
+          "fine_state",
+          "season",
+          "gender",
+          "colour",
+          "size_band",
+          "brand",
+          "estimated_weight_g",
+          "lot_code",
+          "added_at"
+        ],
+        "title": "ExportLotItemOut",
+        "type": "object"
+      },
+      "ExportLotItemsIn": {
+        "description": "Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).",
+        "properties": {
+          "item_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Item Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_ids"
+        ],
+        "title": "ExportLotItemsIn",
+        "type": "object"
+      },
+      "ExportLotKeyIn": {
+        "description": "A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.",
+        "properties": {
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          }
+        },
+        "required": [
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender"
+        ],
+        "title": "ExportLotKeyIn",
+        "type": "object"
+      },
+      "ExportLotState": {
+        "description": "Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "title": "ExportLotState",
+        "type": "string"
+      },
+      "ExportLotSummary": {
+        "properties": {
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "collection_lots": {
+            "description": "Lotes de recolha de origem distintos",
+            "title": "Collection Lots",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "localities": {
+            "description": "Paragens (locais) distintas na linhagem",
+            "title": "Localities",
+            "type": "integer"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ExportLotState"
+          },
+          "taxonomy_version": {
+            "description": "Versão da taxonomia em que o lote foi fechado",
+            "title": "Taxonomy Version",
+            "type": "integer"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender",
+          "taxonomy_version",
+          "items",
+          "weight_kg",
+          "collection_lots",
+          "localities",
+          "created_at",
+          "closed_at"
+        ],
+        "title": "ExportLotSummary",
+        "type": "object"
+      },
       "ExportScope": {
         "enum": [
           "sites",
@@ -6610,6 +7006,19 @@
         ],
         "title": "FieldFix",
         "type": "object"
+      },
+      "FineState": {
+        "description": "Estado fino: 4 graus de qualidade reutilizável + reciclar/rejeitar, mapeado nos 3 destinos.\n\nOs graus seguem a letra usada no comércio de roupa usada (A é a melhor); `recycle` e `reject`\nmantêm o significado dos 3 destinos que a plataforma já usa (`TextileDestination`).",
+        "enum": [
+          "grade_a",
+          "grade_b",
+          "grade_c",
+          "grade_d",
+          "recycle",
+          "reject"
+        ],
+        "title": "FineState",
+        "type": "string"
       },
       "FleetSummary": {
         "properties": {
@@ -7005,6 +7414,7 @@
         "type": "object"
       },
       "GarmentType": {
+        "description": "Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`).",
         "enum": [
           "tshirt",
           "shirt",
@@ -7015,6 +7425,8 @@
           "skirt",
           "bedding",
           "towel",
+          "footwear",
+          "accessory",
           "other"
         ],
         "title": "GarmentType",
@@ -7101,6 +7513,17 @@
         "title": "GaugeChart",
         "type": "object"
       },
+      "Gender": {
+        "description": "Género/segmento como o mercado compra (entra na chave do lote de escoamento).",
+        "enum": [
+          "men",
+          "women",
+          "kids",
+          "babies"
+        ],
+        "title": "Gender",
+        "type": "string"
+      },
       "GlobalDefaults": {
         "description": "Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.",
         "properties": {
@@ -7171,6 +7594,96 @@
           }
         },
         "title": "GlobalDefaults",
+        "type": "object"
+      },
+      "GoldenLabelOut": {
+        "description": "Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo).",
+        "properties": {
+          "ai_confidence": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Confidence"
+          },
+          "ai_value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ai Value"
+          },
+          "axis": {
+            "$ref": "#/components/schemas/TriageAxis"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model"
+          },
+          "operator_value": {
+            "title": "Operator Value",
+            "type": "string"
+          },
+          "prompt_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Prompt Version"
+          }
+        },
+        "required": [
+          "id",
+          "axis",
+          "ai_value",
+          "operator_value",
+          "ai_confidence",
+          "model",
+          "prompt_version",
+          "lot_code",
+          "created_at"
+        ],
+        "title": "GoldenLabelOut",
         "type": "object"
       },
       "GuestOut": {
@@ -8505,6 +9018,54 @@
         "title": "KpisSpec",
         "type": "object"
       },
+      "LineageLotOut": {
+        "description": "Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "lot_code": {
+            "title": "Lot Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lot_code",
+          "locality_name",
+          "parish_name",
+          "items",
+          "weight_kg"
+        ],
+        "title": "LineageLotOut",
+        "type": "object"
+      },
       "LocalAccountAdminOut": {
         "description": "A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.",
         "properties": {
@@ -9192,8 +9753,19 @@
         "type": "object"
       },
       "LotItemIn": {
-        "description": "Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).",
+        "description": "Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).\n\nO caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)\né derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.",
         "properties": {
+          "ai_proposal": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriageProposal"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Proposta da IA revista; gera rótulos dourados"
+          },
           "brand": {
             "anyOf": [
               {
@@ -9206,6 +9778,16 @@
             ],
             "title": "Brand"
           },
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Colour"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "composition": {
             "items": {
               "$ref": "#/components/schemas/CompositionPart"
@@ -9215,7 +9797,15 @@
             "type": "array"
           },
           "condition": {
-            "$ref": "#/components/schemas/TextileDestination"
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TextileDestination"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Destino (legado); derivado do estado fino quando este vem"
           },
           "confidence": {
             "default": 1.0,
@@ -9230,8 +9820,28 @@
             "title": "Estimated Weight G",
             "type": "integer"
           },
+          "fine_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FineState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "garment_type": {
             "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "prompt_version": {
             "anyOf": [
@@ -9243,11 +9853,31 @@
               }
             ],
             "title": "Prompt Version"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Season"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SizeBand"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Banda lida só da etiqueta"
           }
         },
         "required": [
           "garment_type",
-          "condition",
           "composition",
           "estimated_weight_g"
         ],
@@ -9266,6 +9896,16 @@
               }
             ],
             "title": "Brand"
+          },
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Colour"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "composition": {
             "items": {
@@ -9293,8 +9933,28 @@
             "title": "Estimated Weight G",
             "type": "integer"
           },
+          "fine_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FineState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "garment_type": {
             "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "has_photo": {
             "default": false,
@@ -9330,6 +9990,37 @@
             ],
             "description": "URL relativa (autenticada) da miniatura; nula sem foto ou depois de expirar",
             "title": "Photo Url"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriageProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Selo «confirmado»/«IA» por eixo"
+          },
+          "season": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Season"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SizeBand"
+              },
+              {
+                "type": "null"
+              }
+            ]
           }
         },
         "required": [
@@ -15150,6 +15841,15 @@
         "title": "ProposeActionIn",
         "type": "object"
       },
+      "Provenance": {
+        "description": "De onde vem o valor de um atributo: proposto pela IA e aceite, ou definido pelo operador.",
+        "enum": [
+          "confirmed",
+          "ai"
+        ],
+        "title": "Provenance",
+        "type": "string"
+      },
       "QuantilesOut": {
         "properties": {
           "p10": {
@@ -17057,6 +17757,16 @@
         "title": "ScheduleEntry",
         "type": "object"
       },
+      "Season": {
+        "description": "Estação: quando faz sentido voltar a colocar a peça em uso (critério da Retex).",
+        "enum": [
+          "all_season",
+          "warm",
+          "cold"
+        ],
+        "title": "Season",
+        "type": "string"
+      },
       "SensitivityOut": {
         "properties": {
           "annual_cost_eur": {
@@ -17783,6 +18493,20 @@
         ],
         "title": "SitingSummary",
         "type": "object"
+      },
+      "SizeBand": {
+        "description": "Tamanho em bandas, lido SÓ da etiqueta. Nunca se deduz da foto.\n\nBandas e não tamanhos exatos: as etiquetas variam (letras, P/M/G, numerais). Numerais\n(«42», «98») ficam `unknown` — as tabelas EU de homem e de mulher conflituam e a função\nnão inventa o mapeamento (regra zero); o operador, com a etiqueta à mão, escolhe a banda.",
+        "enum": [
+          "xs",
+          "s",
+          "m",
+          "l",
+          "xl",
+          "xxl",
+          "unknown"
+        ],
+        "title": "SizeBand",
+        "type": "string"
       },
       "SlotCount": {
         "properties": {
@@ -19400,7 +20124,7 @@
         "type": "object"
       },
       "TriageAnalysis": {
-        "description": "O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.",
+        "description": "O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.\n\nA IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),\ne o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.",
         "properties": {
           "brand": {
             "anyOf": [
@@ -19414,6 +20138,9 @@
             ],
             "title": "Brand"
           },
+          "colour": {
+            "$ref": "#/components/schemas/Colour"
+          },
           "composition": {
             "items": {
               "$ref": "#/components/schemas/CompositionPart"
@@ -19422,28 +20149,40 @@
             "title": "Composition",
             "type": "array"
           },
-          "condition": {
-            "$ref": "#/components/schemas/TextileDestination",
-            "description": "reuse, recycle ou reject"
-          },
           "confidence": {
             "maximum": 1.0,
             "minimum": 0.0,
             "title": "Confidence",
             "type": "number"
           },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
           "garment_type": {
             "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
           },
           "notes": {
             "maxLength": 240,
             "title": "Notes",
             "type": "string"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "size_band": {
+            "$ref": "#/components/schemas/SizeBand",
+            "default": "unknown"
           }
         },
         "required": [
           "garment_type",
-          "condition",
+          "fine_state",
+          "season",
+          "colour",
+          "gender",
           "composition",
           "confidence",
           "notes"
@@ -19451,13 +20190,26 @@
         "title": "TriageAnalysis",
         "type": "object"
       },
+      "TriageAxis": {
+        "description": "Os seis eixos da taxonomia; o eval mede a IA em cada um.",
+        "enum": [
+          "fine_state",
+          "garment_type",
+          "season",
+          "colour",
+          "gender",
+          "size_band"
+        ],
+        "title": "TriageAxis",
+        "type": "string"
+      },
       "TriageEvalModel": {
         "properties": {
           "accuracy": {
             "additionalProperties": {
               "type": "number"
             },
-            "description": "Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp",
+            "description": "Por campo, de 0 a 1: eixos da taxonomia (fine_state, garment_type, season, colour, gender, size_band), destination, brand, dominant_fibre, composition_within_10pp",
             "title": "Accuracy",
             "type": "object"
           },
@@ -19477,14 +20229,14 @@
             "title": "Avg Latency S",
             "type": "number"
           },
-          "confusion_condition": {
+          "confusion_fine_state": {
             "additionalProperties": {
               "additionalProperties": {
                 "type": "integer"
               },
               "type": "object"
             },
-            "title": "Confusion Condition",
+            "title": "Confusion Fine State",
             "type": "object"
           },
           "confusion_garment_type": {
@@ -19520,6 +20272,22 @@
             "title": "Pieces",
             "type": "integer"
           },
+          "promised_axes": {
+            "description": "Eixos «prometidos»: género e tamanho enquanto a exatidão e a amostra não aguentarem",
+            "items": {
+              "type": "string"
+            },
+            "title": "Promised Axes",
+            "type": "array"
+          },
+          "samples": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Por eixo da taxonomia, com quantas peças de verdade-terreno se mediu",
+            "title": "Samples",
+            "type": "object"
+          },
           "total_cost_usd": {
             "anyOf": [
               {
@@ -19542,7 +20310,7 @@
           "avg_cost_usd",
           "total_cost_usd",
           "confusion_garment_type",
-          "confusion_condition",
+          "confusion_fine_state",
           "errors"
         ],
         "title": "TriageEvalModel",
@@ -19580,10 +20348,180 @@
         "title": "TriageEvalReport",
         "type": "object"
       },
+      "TriageProposal": {
+        "description": "Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores).",
+        "properties": {
+          "confidence": {
+            "maximum": 1.0,
+            "minimum": 0.0,
+            "title": "Confidence",
+            "type": "number"
+          },
+          "model": {
+            "maxLength": 120,
+            "title": "Model",
+            "type": "string"
+          },
+          "prompt_version": {
+            "maxLength": 20,
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "values": {
+            "$ref": "#/components/schemas/TriageProposalValues"
+          }
+        },
+        "required": [
+          "model",
+          "prompt_version",
+          "confidence",
+          "values"
+        ],
+        "title": "TriageProposal",
+        "type": "object"
+      },
+      "TriageProposalValues": {
+        "description": "O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados).",
+        "properties": {
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Colour"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fine_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FineState"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "garment_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/GarmentType"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Gender"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "season": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Season"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SizeBand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "TriageProposalValues",
+        "type": "object"
+      },
+      "TriageProvenance": {
+        "description": "Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor.",
+        "properties": {
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fine_state": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "garment_type": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "gender": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "season": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AttributeSource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "TriageProvenance",
+        "type": "object"
+      },
       "TriageResult": {
         "properties": {
           "analysis": {
             "$ref": "#/components/schemas/TriageAnalysis"
+          },
+          "destination": {
+            "$ref": "#/components/schemas/TextileDestination",
+            "description": "Destino derivado do estado fino (reuse/recycle/reject)"
           },
           "dominant_fibre": {
             "$ref": "#/components/schemas/Fibre"
@@ -19603,6 +20541,7 @@
         },
         "required": [
           "analysis",
+          "destination",
           "dominant_fibre",
           "estimated_weight_g",
           "prompt_version",
@@ -32633,6 +33572,773 @@
         ]
       }
     },
+    "/api/v1/export-lots": {
+      "get": {
+        "description": "Lotes de escoamento, mais recentes primeiro; os filtros da chave e os de cor/tamanho combinam.",
+        "operationId": "list_export_lots",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fine_state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FineState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fine State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "garment_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/GarmentType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Garment Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "season",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Season"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Season"
+            }
+          },
+          {
+            "in": "query",
+            "name": "gender",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Gender"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Gender"
+            }
+          },
+          {
+            "description": "Lotes com pelo menos uma peça desta cor (filtro, não chave)",
+            "in": "query",
+            "name": "colour",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Colour"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Lotes com pelo menos uma peça desta cor (filtro, não chave)",
+              "title": "Colour"
+            }
+          },
+          {
+            "description": "Lotes com pelo menos uma peça desta banda (filtro, não chave)",
+            "in": "query",
+            "name": "size_band",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SizeBand"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Lotes com pelo menos uma peça desta banda (filtro, não chave)",
+              "title": "Size Band"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExportLotSummary"
+                  },
+                  "title": "Response List Export Lots",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Export Lots",
+        "tags": [
+          "export-lots"
+        ]
+      },
+      "post": {
+        "description": "Fecha um lote de escoamento por (estado fino, tipologia, estação, género): agrega todas as peças\ntriadas que apanham a chave e ainda não têm lote. Cor e tamanho ficam fora, para filtros.",
+        "operationId": "create_export_lot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportLotKeyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}": {
+      "get": {
+        "description": "Detalhe com linhagem: peças com a paragem de origem e lotes de recolha, mais pesado primeiro.",
+        "operationId": "get_export_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}/close": {
+      "post": {
+        "description": "Sela o lote para o mercado: as peças nunca mais entram noutro lote e a chave fica livre.",
+        "operationId": "close_export_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Close Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}/items": {
+      "post": {
+        "description": "Junta a um lote aberto peças triadas depois do fecho: a chave tem de bater certo e a peça não\npode já pertencer a outro lote de escoamento.",
+        "operationId": "add_export_lot_items",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportLotItemsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Add Export Lot Items",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
     "/api/v1/health": {
       "get": {
         "description": "Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.",
@@ -43949,6 +45655,162 @@
           }
         },
         "summary": "Analyse Garment",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/triage/golden-labels": {
+      "get": {
+        "description": "Rótulos dourados: correções do operador a propostas da IA, por eixo (verdade-terreno do eval).",
+        "operationId": "list_triage_golden_labels",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "axis",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/TriageAxis"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Axis"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 200,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/GoldenLabelOut"
+                  },
+                  "title": "Response List Triage Golden Labels",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Triage Golden Labels",
         "tags": [
           "lots"
         ]

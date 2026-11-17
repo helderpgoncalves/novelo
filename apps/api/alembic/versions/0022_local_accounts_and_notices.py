@@ -5,8 +5,8 @@ e `local_kind`). Tabela nova `local_accounts`: a conta pertence ao local (assist
 pela equipa, com o certificado público opt-in. Tabela nova `stop_notices`: o aviso «sacos prontos» — um só
 ativo por local (índice parcial único); anular não apaga, avisar outra vez cria linha nova.
 
-Revision ID: 0020
-Revises: 0019
+Revision ID: 0022
+Revises: 0021
 Create Date: 2026-11-17 21:00:00.000000
 """
 
@@ -16,8 +16,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = "0020"
-down_revision: str | None = "0019"
+revision: str = "0022"
+down_revision: str | None = "0021"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

@@ -1,10 +1,16 @@
 import { Plus, X } from 'lucide-react';
 import { useState } from 'react';
 import type {
+  Colour,
   CompositionPart,
   Fibre,
+  FineState,
   GarmentType,
+  Gender,
   LotItemIn,
+  Provenance,
+  Season,
+  SizeBand,
   TextileDestination,
   TriageResult,
 } from '@/client';
@@ -26,11 +32,35 @@ import { PhotoConsent } from '@/features/lots/photo-consent';
 import { formatPercent } from '@/lib/format';
 import { NO_PHOTO_CHOICE, type PhotoChoice, photoChoiceReady } from '@/lib/lot-photos';
 import { AVERAGE_WEIGHT_G, FIBRES, fibreLabel, GARMENTS, garmentLabel } from '@/lib/lots';
+import {
+  COLOURS,
+  colourLabel,
+  destinationFor,
+  FINE_STATES,
+  fineStateLabel,
+  GENDERS,
+  genderLabel,
+  SEASONS,
+  SIZE_BANDS,
+  seasonLabel,
+  sizeBandLabel,
+} from '@/lib/taxonomy';
 import { cn } from '@/lib/utils';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
+import { AttributeSeal } from './attribute-seal';
 
-const CONDITIONS: TextileDestination[] = ['reuse', 'recycle', 'reject'];
+// Eixos que o operador vê com selo; a tipologia (garment_type) tem o seu próprio campo.
+type AxisKey = 'fine_state' | 'season' | 'colour' | 'gender' | 'size_band';
+type Origins = Record<AxisKey, Provenance>;
+
+const initialOrigins = (): Origins => ({
+  fine_state: 'ai',
+  season: 'ai',
+  colour: 'ai',
+  gender: 'ai',
+  size_band: 'ai',
+});
 
 // Cada linha da composição tem um id estável (as fibras podem repetir-se, por exemplo duas "outras").
 type Row = CompositionPart & { id: string };
@@ -43,11 +73,19 @@ interface ReviewFormProps {
   onDiscard: () => void;
 }
 
-/** O operador confirma ou corrige o que o modelo sugeriu antes de a peça entrar no lote. */
+/** O operador confirma ou corrige o que o modelo sugeriu antes de a peça entrar no lote.
+
+Cada eixo da taxonomia leva um selo «IA»/«Confirmado»: mudar o valor passa o selo a «Confirmado»
+(a palavra final é humana) — as correções viram rótulos dourados no servidor. */
 export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewFormProps) {
   const a = result.analysis;
-  const [garment, setGarment] = useState<GarmentType>(a.garment_type);
-  const [condition, setCondition] = useState<TextileDestination>(a.condition);
+  const [garment, setGarment] = useState(a.garment_type);
+  const [fine, setFine] = useState<FineState>(a.fine_state);
+  const [season, setSeason] = useState<Season>(a.season);
+  const [colour, setColour] = useState<Colour>(a.colour);
+  const [gender, setGender] = useState<Gender>(a.gender);
+  const [size, setSize] = useState<SizeBand>(a.size_band ?? 'unknown');
+  const [origins, setOrigins] = useState<Origins>(initialOrigins);
   const [composition, setComposition] = useState<Row[]>(() =>
     (a.composition.length ? a.composition : [{ fibre: 'unknown' as Fibre, pct: 100 }]).map(withId),
   );
@@ -59,9 +97,14 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
   const valid =
     Math.abs(total - 100) <= 1 && weight > 0 && composition.every((p) => Number.isFinite(p.pct));
   const lowConfidence = a.confidence < 0.6;
+  const destination: TextileDestination = destinationFor(fine);
 
   const update = (id: string, patch: Partial<CompositionPart>) =>
     setComposition((prev) => prev.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+
+  /** Uma correção do operador passa o selo do eixo a «Confirmado». */
+  const correct = <K extends AxisKey>(key: K) =>
+    setOrigins((prev) => (prev[key] === 'confirmed' ? prev : { ...prev, [key]: 'confirmed' }));
 
   return (
     <form
@@ -72,12 +115,29 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
         onConfirm(
           {
             garment_type: garment,
-            condition,
+            fine_state: fine,
+            season,
+            colour,
+            gender,
+            size_band: size,
             composition: composition.map(({ fibre, pct }) => ({ fibre, pct })),
             brand: brand.trim() || null,
             estimated_weight_g: Math.round(weight),
             confidence: a.confidence,
             prompt_version: result.prompt_version,
+            ai_proposal: {
+              model: result.model,
+              prompt_version: result.prompt_version,
+              confidence: a.confidence,
+              values: {
+                garment_type: a.garment_type,
+                fine_state: a.fine_state,
+                season: a.season,
+                colour: a.colour,
+                gender: a.gender,
+                size_band: a.size_band,
+              },
+            },
           },
           photo,
         );
@@ -98,7 +158,8 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
           {[
             ...new Set([
               garmentLabel[a.garment_type](),
-              destinationLabel[a.condition](),
+              fineStateLabel[a.fine_state](),
+              destinationLabel[result.destination](),
               ...a.composition.map((p) => `${fibreLabel[p.fibre]()} ${formatPercent(p.pct, 0)}`),
               ...(a.brand ? [a.brand] : []),
             ]),
@@ -117,7 +178,7 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
-          <Label>{m.triage_garment()}</Label>
+          <Label htmlFor="garment">{m.triage_garment()}</Label>
           <Select
             value={garment}
             onValueChange={(v) => {
@@ -125,7 +186,7 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
               setWeight(AVERAGE_WEIGHT_G[v as GarmentType]);
             }}
           >
-            <SelectTrigger className="h-11 w-full">
+            <SelectTrigger id="garment" className="h-11 w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -149,27 +210,152 @@ export function ReviewForm({ result, pending, onConfirm, onDiscard }: ReviewForm
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="mb-1 font-medium text-sm">{m.triage_condition()}</legend>
+        <legend className="mb-1 flex items-center gap-2 font-medium text-sm">
+          {m.triage_axis_fine_state()}
+          <AttributeSeal
+            origin={origins.fine_state}
+            confidence={origins.fine_state === 'ai' ? a.confidence : undefined}
+          />
+        </legend>
         <RadioGroup
-          value={condition}
-          onValueChange={(v) => setCondition(v as TextileDestination)}
+          value={fine}
+          onValueChange={(v) => {
+            setFine(v as FineState);
+            correct('fine_state');
+          }}
           className="grid gap-2 sm:grid-cols-3"
         >
-          {CONDITIONS.map((c) => (
+          {FINE_STATES.map((f) => (
             <Label
-              key={c}
-              htmlFor={`cond-${c}`}
+              key={f}
+              htmlFor={`fine-${f}`}
               className={cn(
                 'flex cursor-pointer items-center gap-2 rounded-lg border p-3 font-normal text-sm',
-                condition === c && 'border-primary bg-primary/5',
+                fine === f && 'border-primary bg-primary/5',
               )}
             >
-              <RadioGroupItem id={`cond-${c}`} value={c} />
-              {destinationLabel[c]()}
+              <RadioGroupItem id={`fine-${f}`} value={f} />
+              {fineStateLabel[f]()}
             </Label>
           ))}
         </RadioGroup>
+        <p className="text-muted-foreground text-xs" role="status">
+          {m.triage_destination()}:{' '}
+          <span className="font-medium text-foreground">{destinationLabel[destination]()}</span>
+        </p>
       </fieldset>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div className="space-y-1.5">
+          <Label htmlFor="season">{m.triage_axis_season()}</Label>
+          <div className="flex items-center gap-2">
+            <Select
+              value={season}
+              onValueChange={(v) => {
+                setSeason(v as Season);
+                correct('season');
+              }}
+            >
+              <SelectTrigger id="season" className="h-11 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SEASONS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {seasonLabel[s]()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <AttributeSeal
+              origin={origins.season}
+              confidence={origins.season === 'ai' ? a.confidence : undefined}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="colour">{m.triage_axis_colour()}</Label>
+          <div className="flex items-center gap-2">
+            <Select
+              value={colour}
+              onValueChange={(v) => {
+                setColour(v as Colour);
+                correct('colour');
+              }}
+            >
+              <SelectTrigger id="colour" className="h-11 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {COLOURS.map((c) => (
+                  <SelectItem key={c} value={c}>
+                    {colourLabel[c]()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <AttributeSeal
+              origin={origins.colour}
+              confidence={origins.colour === 'ai' ? a.confidence : undefined}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="gender">{m.triage_axis_gender()}</Label>
+          <div className="flex items-center gap-2">
+            <Select
+              value={gender}
+              onValueChange={(v) => {
+                setGender(v as Gender);
+                correct('gender');
+              }}
+            >
+              <SelectTrigger id="gender" className="h-11 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {GENDERS.map((g) => (
+                  <SelectItem key={g} value={g}>
+                    {genderLabel[g]()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <AttributeSeal
+              origin={origins.gender}
+              confidence={origins.gender === 'ai' ? a.confidence : undefined}
+            />
+          </div>
+        </div>
+        <div className="space-y-1.5">
+          <Label htmlFor="size">{m.triage_axis_size()}</Label>
+          <div className="flex items-center gap-2">
+            <Select
+              value={size}
+              onValueChange={(v) => {
+                setSize(v as SizeBand);
+                correct('size_band');
+              }}
+            >
+              <SelectTrigger id="size" className="h-11 flex-1">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {SIZE_BANDS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {sizeBandLabel[s]()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <AttributeSeal
+              origin={origins.size_band}
+              confidence={origins.size_band === 'ai' ? a.confidence : undefined}
+            />
+          </div>
+          <p className="text-muted-foreground text-xs">{m.triage_size_hint()}</p>
+        </div>
+      </div>
 
       <fieldset className="space-y-2">
         <legend className="mb-1 font-medium text-sm">{m.triage_composition()}</legend>
