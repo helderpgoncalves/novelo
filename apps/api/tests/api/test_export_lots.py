@@ -105,9 +105,7 @@ async def test_no_matching_items_is_409(logged_in: httpx.AsyncClient) -> None:
     assert resp.status_code == 409 and resp.json()["code"] == "conflict"
 
 
-async def test_one_open_lot_per_key_and_one_lot_per_piece(
-    logged_in: httpx.AsyncClient, session: AsyncSession
-) -> None:
+async def test_one_open_lot_per_key_and_one_lot_per_piece(logged_in: httpx.AsyncClient, session: AsyncSession) -> None:
     code = await stop(logged_in, session, "Abação")
     await add_item(logged_in, code)  # 400 g: a peça fundadora do lote
     first = await must_open(logged_in)

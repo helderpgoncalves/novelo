@@ -75,7 +75,9 @@ def upgrade() -> None:
         sa.Column("item_id", postgresql.UUID(as_uuid=True), nullable=False),
         sa.Column("added_by_id", postgresql.UUID(as_uuid=True), nullable=True),
         sa.ForeignKeyConstraint(
-            ["export_lot_id"], ["export_lots.id"], name=op.f("fk_export_lot_items_export_lot_id_export_lots"),
+            ["export_lot_id"],
+            ["export_lots.id"],
+            name=op.f("fk_export_lot_items_export_lot_id_export_lots"),
             ondelete="CASCADE",
         ),
         sa.ForeignKeyConstraint(

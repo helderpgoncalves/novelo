@@ -53,6 +53,7 @@ const ROUTE_LABEL: Record<string, () => string> = {
   '/scenarios/compare': () => m.cp_page_compare(),
   '/triage': () => m.nav_triage(),
   '/lots': () => m.nav_lots(),
+  '/export-lots': () => m.nav_export_lots(),
   '/reports': () => m.nav_rap(),
   '/pilot': () => m.nav_pilot(),
   '/assumptions': () => m.nav_assumptions(),
@@ -84,6 +85,8 @@ const FAMILY: Record<string, SuggestionFamily> = {
   '/lots': 'trace',
   '/lots/$code': 'trace',
   '/triage': 'trace',
+  '/export-lots': 'trace',
+  '/export-lots/$code': 'trace',
   '/data-quality': 'data',
   '/assumptions': 'data',
 };

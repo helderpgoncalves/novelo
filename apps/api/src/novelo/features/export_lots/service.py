@@ -85,8 +85,11 @@ async def get_export_lot(db: AsyncSession, code: str) -> ExportLotDetail:
     lineage = lineage_summary(
         [
             LineageRow(
-                item_id=piece.id, weight_g=piece.estimated_weight_g, lot_code=code_,
-                locality_name=locality, parish_name=parish,
+                item_id=piece.id,
+                weight_g=piece.estimated_weight_g,
+                lot_code=code_,
+                locality_name=locality,
+                parish_name=parish,
             )
             for _, piece, code_, locality, parish in rows
         ]
@@ -108,8 +111,7 @@ async def get_export_lot(db: AsyncSession, code: str) -> ExportLotDetail:
         closed_at=lot.closed_at,
         composition=aggregate_composition(pieces),
         item_list=[
-            _item_out(membership, piece, code_, locality, parish)
-            for membership, piece, code_, locality, parish in rows
+            _item_out(membership, piece, code_, locality, parish) for membership, piece, code_, locality, parish in rows
         ],
         lineage=[
             LineageLotOut(
@@ -139,18 +141,22 @@ async def create_export_lot(db: AsyncSession, user: User, body: ExportLotKeyIn) 
     if open_lot is not None:
         raise ConflictError("An open export lot already exists for this key")
     pieces = (
-        await db.execute(
-            select(LotItem).where(
-                LotItem.fine_state == body.fine_state,
-                LotItem.garment_type == body.garment_type,
-                LotItem.season == body.season,
-                LotItem.gender == body.gender,
-                # Peças sem taxonomia completa ficam de fora (os == já excluem nulos);
-                # e uma peça só entra uma vez em toda a vida do escoamento:
-                ~exists(select(ExportLotItem.id).where(ExportLotItem.item_id == LotItem.id)),
+        (
+            await db.execute(
+                select(LotItem).where(
+                    LotItem.fine_state == body.fine_state,
+                    LotItem.garment_type == body.garment_type,
+                    LotItem.season == body.season,
+                    LotItem.gender == body.gender,
+                    # Peças sem taxonomia completa ficam de fora (os == já excluem nulos);
+                    # e uma peça só entra uma vez em toda a vida do escoamento:
+                    ~exists(select(ExportLotItem.id).where(ExportLotItem.item_id == LotItem.id)),
+                )
             )
         )
-    ).scalars().all()
+        .scalars()
+        .all()
+    )
     if not pieces:
         raise ConflictError("No triaged items match this key")
     lot = ExportLot(
@@ -178,9 +184,7 @@ async def add_items(db: AsyncSession, user: User, code: str, item_ids: list[uuid
     for piece in pieces:
         if (piece.fine_state, piece.garment_type, piece.season, piece.gender) != key:
             raise ConflictError("Item taxonomy does not match this export lot's key")
-    assigned = (
-        await db.execute(select(ExportLotItem.item_id).where(ExportLotItem.item_id.in_(found)))
-    ).scalars().all()
+    assigned = (await db.execute(select(ExportLotItem.item_id).where(ExportLotItem.item_id.in_(found)))).scalars().all()
     if assigned:
         raise ConflictError("Some items are already in an export lot")
     lot.memberships.extend(ExportLotItem(item_id=piece.id, added_by_id=user.id) for piece in pieces)
