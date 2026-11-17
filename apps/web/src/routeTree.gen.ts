@@ -44,6 +44,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
+import { Route as PrototypeParagemRouteImport } from './routes/prototype.paragem'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
 import { Route as AppLotsCodeRouteImport } from './routes/_app/lots.$code'
@@ -225,6 +226,11 @@ const PassportCodeRoute = PassportCodeRouteImport.update({
   path: '/passport/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrototypeParagemRoute = PrototypeParagemRouteImport.update({
+  id: '/prototype/paragem',
+  path: '/prototype/paragem',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppAdminAiRoute = AppAdminAiRouteImport.update({
   id: '/admin/ai',
   path: '/admin/ai',
@@ -295,6 +301,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/paragem': typeof PrototypeParagemRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
@@ -337,6 +344,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/paragem': typeof PrototypeParagemRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
@@ -382,6 +390,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/paragem': typeof PrototypeParagemRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
@@ -426,6 +435,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/prototype/paragem'
     | '/admin/ai'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
@@ -468,6 +478,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/prototype/paragem'
     | '/admin/ai'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
@@ -512,6 +523,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/passport/$code'
+    | '/prototype/paragem'
     | '/_app/admin/ai'
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
@@ -534,6 +546,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   PassportCodeRoute: typeof PassportCodeRoute
+  PrototypeParagemRoute: typeof PrototypeParagemRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -783,6 +796,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassportCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prototype/paragem': {
+      id: '/prototype/paragem'
+      path: '/prototype/paragem'
+      fullPath: '/prototype/paragem'
+      preLoaderRoute: typeof PrototypeParagemRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/_app/admin/ai': {
       id: '/_app/admin/ai'
       path: '/admin/ai'
@@ -924,6 +944,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   PassportCodeRoute: PassportCodeRoute,
+  PrototypeParagemRoute: PrototypeParagemRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
