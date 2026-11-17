@@ -372,6 +372,30 @@ class CollectionFrequency(StrEnum):
     QUARTERLY = "quarterly"
 
 
+class CalibrationMetric(StrEnum):
+    """As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+
+    O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+    (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+    captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+    fotografia do cenário, mas nunca se guarda na tabela de agregados.
+    """
+
+    GENERATION_RATE = "generation_rate"  # taxa de geração: kg/dia por local (peso ÷ intervalo entre visitas)
+    KG_PER_BAG = "kg_per_bag"  # kg por saco, por local (e o agrupado do concelho)
+    BAGS_PER_ROUND = "bags_per_round"  # sacos por ronda, por freguesia
+    REQUESTS_PER_WEEK = "requests_per_week"  # pedidos por semana, por freguesia (nunca multiplicam kg)
+    ON_DEMAND_CAPTURE = "on_demand_capture"  # DERIVADA: captura do saco à porta por freguesia (taxa × degrau)
+
+
+class CalibrationScope(StrEnum):
+    """Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado."""
+
+    LOCAL = "local"  # localidade da rede da Vitrus (taxa de geração, kg por saco)
+    PARISH = "parish"  # freguesia (sacos por ronda, pedidos por semana, captura derivada)
+    CONCELHO = "concelho"  # agrupamento do concelho (kg por saco que calibra o parâmetro global)
+
+
 class RequestSubject(StrEnum):
     """Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
 

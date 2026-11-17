@@ -3,11 +3,16 @@
 Dados reais (população INE, circuitos, indiferenciado da Vitrus e percentagem de têxtil da APA, estaleiro e custo de
 tratamento) entram no modelo por outra via ou derivam-se aqui; o resto são números que a Vitrus ainda não forneceu
 (custos unitários, capturas por modo, viatura dedicada), marcados como `assumption` até serem validados.
+
+Com calibração (spec #62), os parâmetros que o observado toca mudam de fonte: «assumption» passa a
+«estimativa·n» ou «observado·n» conforme as amostras (k=4 visitas nos locais, k=8 semanas nas freguesias).
+O `kg_per_inhab_month` (o q da APA) NUNCA muda de fonte: a procura nunca é auto-substituída (ADR #53).
 """
 
 from novelo.domain import network
+from novelo.domain.calibration import PSEUDO_K_LOCAL, PSEUDO_K_PARISH, Calibration
 from novelo.domain.routing import RoadRouter
-from novelo.domain.vocab import CollectionMode
+from novelo.domain.vocab import CalibrationMetric, CollectionMode
 from novelo.features.planning import assumptions as a
 from novelo.features.planning.schemas import ModeParams, ParamMeta, ParamSource, PlanningParams, ZoneOut
 from novelo.features.textile.references import KG_PER_INHAB_MONTH
@@ -93,8 +98,31 @@ def _mode_meta(mode: str, rate_source: ParamSource) -> list[ParamMeta]:
     ]
 
 
-def params_meta() -> list[ParamMeta]:
-    return [
+def _calibrated(meta_in: list[ParamMeta], calibration: Calibration | None) -> list[ParamMeta]:
+    """As fontes que a calibração toca: captura do saco à porta e kg por saco passam a «observado·n» / «estimativa·n».
+
+    n é a soma das amostras da métrica (visitas nas capturas por freguesia, unidades nos kg por saco);
+    o limiar de dominância é o k da própria métrica. O `q` e tudo o que o observado não toca ficam como estavam.
+    """
+    if calibration is None:
+        return meta_in
+    capture_n = sum(r.n for r in calibration.readings if r.metric == CalibrationMetric.ON_DEMAND_CAPTURE)
+    bag_row = calibration.reading(CalibrationMetric.KG_PER_BAG, "concelho")
+    out = []
+    for meta in meta_in:
+        if meta.key == "modes.on_demand.capture_rate" and capture_n > 0:
+            source = ParamSource.OBSERVED if capture_n >= PSEUDO_K_PARISH else ParamSource.ASSUMPTION
+            out.append(meta.model_copy(update={"source": source, "n": capture_n}))
+        elif meta.key == "on_demand_kg_per_pickup" and bag_row is not None and bag_row.n > 0:
+            source = ParamSource.OBSERVED if bag_row.n >= PSEUDO_K_LOCAL else ParamSource.ASSUMPTION
+            out.append(meta.model_copy(update={"source": source, "n": bag_row.n}))
+        else:
+            out.append(meta)
+    return out
+
+
+def params_meta(calibration: Calibration | None = None) -> list[ParamMeta]:
+    meta = [
         ParamMeta(key="kg_per_inhab_month", unit="kg/hab/mês", source=ParamSource.VITRUS_DATA),
         *_mode_meta("existing", ParamSource.ASSUMPTION),
         *_mode_meta("street", ParamSource.ASSUMPTION),
@@ -154,6 +182,7 @@ def params_meta() -> list[ParamMeta]:
             note="40 €/t TGR + 65,64 €/t Resinorte, Vitrus 22 out 2026.",
         ),
     ]
+    return _calibrated(meta, calibration)
 
 
 def to_domain_params(p: PlanningParams, road: RoadRouter | None = None) -> network.Params:

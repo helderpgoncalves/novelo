@@ -23,7 +23,7 @@ forma exata para as 48 freguesias de Guimarães, com o número de viaturas dedic
 from __future__ import annotations
 
 import math
-from collections.abc import Collection, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from itertools import combinations
 from typing import Literal
@@ -184,9 +184,24 @@ def part_hours(mode: Mode, km_year: float, stops_year: float, params: Params) ->
     return fleet.hours(km_year, stops_year, params.vehicle_speed_kmh, params.stop_minutes(mode))
 
 
-def mode_cost(zone: Zone, mode: Mode, params: Params, on_demand_weeks: float | None = None) -> ModeCost:
+def mode_cost(
+    zone: Zone,
+    mode: Mode,
+    params: Params,
+    on_demand_weeks: float | None = None,
+    on_demand_capture: float | None = None,
+) -> ModeCost:
+    """Custo e captura de um modo numa zona.
+
+    `on_demand_capture` substitui a captura prior do saco à porta (`capture_rate × coverage_factor`)
+    nas freguesias com calibração (spec #62): o observado calibra o modo a pedido; a escala do degrau
+    (`rung_capture`) aplica-se igualmente ao valor calibrado e o teto continua a ser a procura.
+    """
     mp = params.modes[mode]
-    capture = mp.capture_rate * mp.coverage_factor
+    base_capture = mp.capture_rate * mp.coverage_factor
+    if mode == Mode.ON_DEMAND and on_demand_capture is not None:
+        base_capture = on_demand_capture
+    capture = base_capture
     weeks = params.on_demand_every_weeks if on_demand_weeks is None else on_demand_weeks
     if mode == Mode.ON_DEMAND:
         # Taxa × degrau (ADR «Captura anual é derivada»): o prior de captura vale ao degrau quinzenal e escala
@@ -247,12 +262,19 @@ def mode_cost(zone: Zone, mode: Mode, params: Params, on_demand_weeks: float | N
     )
 
 
-def build_option(zone: Zone, modes: tuple[Mode, ...], params: Params, on_demand_weeks: float | None = None) -> Option:
+def build_option(
+    zone: Zone,
+    modes: tuple[Mode, ...],
+    params: Params,
+    on_demand_weeks: float | None = None,
+    on_demand_capture: float | None = None,
+) -> Option:
     """Opção (zona, combinação de modos): toneladas por captura independente, custos somados.
 
-    `on_demand_weeks` é o degrau da escada desta variante do saco à porta (None = as semanas globais).
+    `on_demand_weeks` é o degrau da escada desta variante do saco à porta (None = as semanas globais);
+    `on_demand_capture` é a captura calibrada da freguesia (None = o prior dos pressupostos).
     """
-    parts = tuple(mode_cost(zone, m, params, on_demand_weeks) for m in modes)
+    parts = tuple(mode_cost(zone, m, params, on_demand_weeks, on_demand_capture) for m in modes)
     miss = 1.0
     uncovered = 1.0
     for p in parts:
@@ -275,6 +297,7 @@ def build_options(
     *,
     on_demand_weeks: Sequence[float] | None = None,
     required: dict[str, set[Mode]] | None = None,
+    on_demand_capture: Mapping[str, float] | None = None,
 ) -> list[Option]:
     """Todas as combinações de modos por zona.
 
@@ -287,6 +310,9 @@ def build_options(
 
     `required` GARANTE modos por zona (o aviso «sacos prontos» garante paragem, ADR): as combinações da zona têm de
     os incluir, mesmo que `allowed` os exclua — o aviso ganha a restrição.
+
+    `on_demand_capture` é a captura calibrada por freguesia (spec #62): nas zonas com entrada substitui a captura
+    prior do saco à porta; as restantes ficam com o prior (nunca auto-substituído).
     """
     fallback = set(default_modes) if default_modes is not None else set(Mode)
     weeks_list = list(on_demand_weeks) if on_demand_weeks is not None else [params.on_demand_every_weeks]
@@ -296,12 +322,13 @@ def build_options(
         must = (required or {}).get(zone.id)
         if must:
             modes = [m for m in Mode if m in set(modes) | must]
+        capture = (on_demand_capture or {}).get(zone.id)
         for size in range(1, len(modes) + 1):
             for combo in combinations(modes, size):
                 if must and not must <= set(combo):
                     continue
                 if Mode.ON_DEMAND in combo:
-                    options += [build_option(zone, combo, params, w) for w in weeks_list]
+                    options += [build_option(zone, combo, params, w, capture) for w in weeks_list]
                 else:
                     options.append(build_option(zone, combo, params))
     return options
