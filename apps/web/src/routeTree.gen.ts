@@ -45,6 +45,7 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
+import { Route as PrototypeCidadaoRouteImport } from './routes/prototype.cidadao'
 import { Route as PrototypeLocalRouteImport } from './routes/prototype.local'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
@@ -232,6 +233,11 @@ const PassportCodeRoute = PassportCodeRouteImport.update({
   path: '/passport/$code',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrototypeCidadaoRoute = PrototypeCidadaoRouteImport.update({
+  id: '/prototype/cidadao',
+  path: '/prototype/cidadao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PrototypeLocalRoute = PrototypeLocalRouteImport.update({
   id: '/prototype/local',
   path: '/prototype/local',
@@ -308,6 +314,7 @@ export interface FileRoutesByFullPath {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/cidadao': typeof PrototypeCidadaoRoute
   '/prototype/local': typeof PrototypeLocalRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
@@ -352,6 +359,7 @@ export interface FileRoutesByTo {
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/cidadao': typeof PrototypeCidadaoRoute
   '/prototype/local': typeof PrototypeLocalRoute
   '/admin/ai': typeof AppAdminAiRoute
   '/lots/$code': typeof AppLotsCodeRoute
@@ -399,6 +407,7 @@ export interface FileRoutesById {
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/passport/$code': typeof PassportCodeRoute
+  '/prototype/cidadao': typeof PrototypeCidadaoRoute
   '/prototype/local': typeof PrototypeLocalRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
@@ -445,6 +454,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/prototype/cidadao'
     | '/prototype/local'
     | '/admin/ai'
     | '/lots/$code'
@@ -489,6 +499,7 @@ export interface FileRouteTypes {
     | '/register'
     | '/reset-password'
     | '/passport/$code'
+    | '/prototype/cidadao'
     | '/prototype/local'
     | '/admin/ai'
     | '/lots/$code'
@@ -535,6 +546,7 @@ export interface FileRouteTypes {
     | '/_auth/register'
     | '/_auth/reset-password'
     | '/passport/$code'
+    | '/prototype/cidadao'
     | '/prototype/local'
     | '/_app/admin/ai'
     | '/_app/lots/$code'
@@ -559,6 +571,7 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   PassportCodeRoute: typeof PassportCodeRoute
+  PrototypeCidadaoRoute: typeof PrototypeCidadaoRoute
   PrototypeLocalRoute: typeof PrototypeLocalRoute
 }
 
@@ -816,6 +829,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PassportCodeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/prototype/cidadao': {
+      id: '/prototype/cidadao'
+      path: '/prototype/cidadao'
+      fullPath: '/prototype/cidadao'
+      preLoaderRoute: typeof PrototypeCidadaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/prototype/local': {
       id: '/prototype/local'
       path: '/prototype/local'
@@ -965,6 +985,7 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   PassportCodeRoute: PassportCodeRoute,
+  PrototypeCidadaoRoute: PrototypeCidadaoRoute,
   PrototypeLocalRoute: PrototypeLocalRoute,
 }
 export const routeTree = rootRouteImport
