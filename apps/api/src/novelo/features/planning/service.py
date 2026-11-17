@@ -4,6 +4,7 @@ import asyncio
 import uuid
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import replace
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -13,6 +14,7 @@ from sqlalchemy.orm import defer, selectinload
 from novelo.adapters.osrm import get_road_router
 from novelo.core.errors import NotFoundError
 from novelo.domain import door_to_door, network, stop_policy
+from novelo.domain.calibration import Calibration
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.reuse import EntityReuse, ReuseShares, reuse_shares
@@ -32,6 +34,7 @@ from novelo.domain.vocab import (
     Typology,
     WeighingMethod,
 )
+from novelo.features.calibration import service as calibration_service
 from novelo.features.locals.models import StopNotice
 from novelo.features.municipal.models import MunicipalParishStat
 from novelo.features.network.models import Circuit, Container, Locality, Parish, ShiftAssignment, Vehicle
@@ -89,10 +92,11 @@ async def ensure_default_parameters(db: AsyncSession) -> ParameterSet:
 
 async def get_parameters(db: AsyncSession) -> ParametersOut:
     row = await ensure_default_parameters(db)
+    calibration = calibration_service.calibration_of_rows(await calibration_service.load_rows(db))
     return ParametersOut(
         values=PlanningParams.model_validate(row.values),
         version=row.version,
-        meta=params_meta(),
+        meta=params_meta(calibration),
         updated_at=row.updated_at,
     )
 
@@ -326,22 +330,38 @@ def compute(
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
     notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs.
 
     Com `road` (OSRM) os km são por estrada, tanto na escolha da rede como nas rotas; sem ele, estimativa.
     `notice_parishes` são as freguesias com um aviso «sacos prontos» ativo: a paragem nelas é garantida (ADR:
-    política de paragem), à revelia das restrições e da escada.
+    política de paragem), à revelia das restrições e da escada. `calibration` é a retroalimentação observada
+    (spec #62, só agregados): nas freguesias com amostras substitui a captura prior do saco à porta e o kg por
+    saco; o `q` da APA e os priores das restantes freguesias nunca são substituídos.
     """
     dp = _domain_params(params, road)
+    if calibration is not None and (kg_bag := calibration.kg_per_pickup()) is not None:
+        dp = replace(dp, on_demand_kg_per_pickup=kg_bag)
     dzones = network.with_road_distances([to_domain_zone(z, existing_points=True) for z in zones], dp)
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
     # Política de paragem: dinâmica = o otimizador escolhe o degrau de cada freguesia na escada discreta;
     # fixa = o degrau global de sempre (`on_demand_every_weeks`). O aviso garante paragem nas duas.
     weeks = [float(stop_policy.weeks_of(r)) for r in stop_policy.LADDER] if request.stop_policy == "dynamic" else None
     required = {code: {CollectionMode.ON_DEMAND} for code in notice_parishes}
+    calibrated_capture = (
+        {code: reading.blended for code, reading in calibration.capture_by_parish().items()}
+        if calibration is not None
+        else None
+    )
     options = network.build_options(
-        dzones, dp, allowed or None, request.default_modes, on_demand_weeks=weeks, required=required or None
+        dzones,
+        dp,
+        allowed or None,
+        request.default_modes,
+        on_demand_weeks=weeks,
+        required=required or None,
+        on_demand_capture=calibrated_capture,
     )
 
     solved = network.solve(
@@ -533,6 +553,9 @@ async def run_scenario(
     road = road or get_road_router()
     stored = await ensure_default_parameters(db)
     params = request.params or PlanningParams.model_validate(stored.values)
+    # Retroalimentação (spec #62): o recálculo do cenário É o gatilho da recomputação dos agregados —
+    # manual, nunca agendada (ADR: captura anual é derivada). O cálculo depois consome só os agregados.
+    calibration = calibration_service.calibration_of_rows(await calibration_service.recompute(db, params))
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
     reuse = reuse_shares_of(baseline)
@@ -541,12 +564,24 @@ async def run_scenario(
     if request.siting == "sites":
         inputs = await site_service.load_site_inputs(db)
         result, solver_status = await asyncio.to_thread(
-            site_service.compute_sites, zones, params, request, baseline.total_t, inputs, reuse, road, notices
+            site_service.compute_sites,
+            zones,
+            params,
+            request,
+            baseline.total_t,
+            inputs,
+            reuse,
+            road,
+            notices,
+            calibration,
         )
     else:
         result, solver_status = await asyncio.to_thread(
-            compute, zones, params, request, baseline.total_t, reuse, road, notices
+            compute, zones, params, request, baseline.total_t, reuse, road, notices, calibration
         )
+    # A fotografia da calibração usada: linha a linha da tabela de agregados (cenário comparável com honestidade).
+    rows = await calibration_service.load_rows(db)
+    result = result.model_copy(update={"calibration": calibration_service.photo_of_rows(rows)})
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis

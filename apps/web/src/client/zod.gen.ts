@@ -491,6 +491,77 @@ export const zBudgetOut = z.object({
 });
 
 /**
+ * CalibrationMetric
+ *
+ * As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+ *
+ * O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+ * (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+ * captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+ * fotografia do cenário, mas nunca se guarda na tabela de agregados.
+ */
+export const zCalibrationMetric = z.enum([
+    'generation_rate',
+    'kg_per_bag',
+    'bags_per_round',
+    'requests_per_week',
+    'on_demand_capture'
+]);
+
+/**
+ * CalibrationScope
+ *
+ * Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado.
+ */
+export const zCalibrationScope = z.enum([
+    'local',
+    'parish',
+    'concelho'
+]);
+
+/**
+ * CalibrationReadingOut
+ *
+ * Uma linha da calibração: métrica × unidade na janela atual (a tabela de agregados).
+ */
+export const zCalibrationReadingOut = z.object({
+    blended: z.number(),
+    label: z.string(),
+    metric: zCalibrationMetric,
+    n: z.int(),
+    observed: z.number().nullable(),
+    parish_code: z.string(),
+    prior: z.number(),
+    pseudo_k: z.int(),
+    scope: zCalibrationScope,
+    unit_code: z.string(),
+    unit_name: z.string(),
+    weight: z.number()
+});
+
+/**
+ * CalibrationOut
+ *
+ * O painel «Calibração» (gestão): a tabela de agregados atual, por métrica e unidade.
+ */
+export const zCalibrationOut = z.object({
+    computed_at: z.iso.datetime().nullable(),
+    rows: z.array(zCalibrationReadingOut),
+    window_weeks: z.int()
+});
+
+/**
+ * CalibrationPhoto
+ *
+ * A fotografia da calibração que um cenário copia para o seu resultado (reprodutível e comparável).
+ */
+export const zCalibrationPhoto = z.object({
+    computed_at: z.iso.datetime().nullish(),
+    readings: z.array(zCalibrationReadingOut),
+    window_weeks: z.int()
+});
+
+/**
  * CaopProps
  */
 export const zCaopProps = z.object({
@@ -3262,13 +3333,18 @@ export const zCopilotStreamRequest = z.object({
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export const zParamSource = z.enum(['vitrus_data', 'assumption']);
+export const zParamSource = z.enum([
+    'vitrus_data',
+    'assumption',
+    'observed'
+]);
 
 /**
  * ParamMeta
  */
 export const zParamMeta = z.object({
     key: z.string(),
+    n: z.int().nullish(),
     note: z.string().nullish(),
     source: zParamSource,
     unit: z.string()
@@ -4792,6 +4868,7 @@ export const zSitingSummary = z.object({
  */
 export const zScenarioResult = z.object({
     allocations: z.array(zAllocation),
+    calibration: zCalibrationPhoto.nullish(),
     collection_plan: z.array(zCollectionPlanEntry).nullish(),
     default_modes: z.array(zCollectionMode).optional(),
     depot: z.array(z.number()),
@@ -6824,6 +6901,11 @@ export const zVerifyEmailResponse = z.void();
  * Successful Response
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetCalibrationResponse = zCalibrationOut;
 
 /**
  * Successful Response

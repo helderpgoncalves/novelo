@@ -2479,6 +2479,182 @@
         "title": "BudgetOut",
         "type": "object"
       },
+      "CalibrationMetric": {
+        "description": "As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).\n\nO observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados\n(métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A\ncaptura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na\nfotografia do cenário, mas nunca se guarda na tabela de agregados.",
+        "enum": [
+          "generation_rate",
+          "kg_per_bag",
+          "bags_per_round",
+          "requests_per_week",
+          "on_demand_capture"
+        ],
+        "title": "CalibrationMetric",
+        "type": "string"
+      },
+      "CalibrationOut": {
+        "description": "O painel «Calibração» (gestão): a tabela de agregados atual, por métrica e unidade.",
+        "properties": {
+          "computed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Altura do último recálculo (ao recalcular um cenário; nunca agendada)",
+            "title": "Computed At"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/CalibrationReadingOut"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "window_weeks": {
+            "description": "Janela de observação em semanas (12, móvel)",
+            "title": "Window Weeks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_weeks",
+          "computed_at",
+          "rows"
+        ],
+        "title": "CalibrationOut",
+        "type": "object"
+      },
+      "CalibrationPhoto": {
+        "description": "A fotografia da calibração que um cenário copia para o seu resultado (reprodutível e comparável).",
+        "properties": {
+          "computed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Computed At"
+          },
+          "readings": {
+            "items": {
+              "$ref": "#/components/schemas/CalibrationReadingOut"
+            },
+            "title": "Readings",
+            "type": "array"
+          },
+          "window_weeks": {
+            "title": "Window Weeks",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window_weeks",
+          "readings"
+        ],
+        "title": "CalibrationPhoto",
+        "type": "object"
+      },
+      "CalibrationReadingOut": {
+        "description": "Uma linha da calibração: métrica × unidade na janela atual (a tabela de agregados).",
+        "properties": {
+          "blended": {
+            "description": "Valor calibrado: (k·prior + n·observado) ÷ (k + n) — o que o planeamento consome",
+            "title": "Blended",
+            "type": "number"
+          },
+          "label": {
+            "description": "Fonte para o ecrã: «pressuposto», «estimativa·n» ou «observado·n»",
+            "title": "Label",
+            "type": "string"
+          },
+          "metric": {
+            "$ref": "#/components/schemas/CalibrationMetric"
+          },
+          "n": {
+            "description": "Amostras: visitas nas métricas por local, semanas nas por freguesia",
+            "title": "N",
+            "type": "integer"
+          },
+          "observed": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Estatística da janela (mediana dos pesos; pedidos ÷ semanas); nulo sem amostras",
+            "title": "Observed"
+          },
+          "parish_code": {
+            "description": "Freguesia da unidade («» no concelho); liga a taxa do local à captura",
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "prior": {
+            "description": "Valor dos pressupostos com que foi recalculado",
+            "title": "Prior",
+            "type": "number"
+          },
+          "pseudo_k": {
+            "description": "Peso do prior na pseudo-contagem (4 visitas por local; 8 semanas por freguesia)",
+            "title": "Pseudo K",
+            "type": "integer"
+          },
+          "scope": {
+            "$ref": "#/components/schemas/CalibrationScope"
+          },
+          "unit_code": {
+            "description": "Código da unidade: UUID do local, DICOFRE da freguesia ou «concelho»",
+            "title": "Unit Code",
+            "type": "string"
+          },
+          "unit_name": {
+            "title": "Unit Name",
+            "type": "string"
+          },
+          "weight": {
+            "description": "Peso do observado: n ÷ (n + k)",
+            "title": "Weight",
+            "type": "number"
+          }
+        },
+        "required": [
+          "metric",
+          "scope",
+          "unit_code",
+          "unit_name",
+          "parish_code",
+          "n",
+          "pseudo_k",
+          "observed",
+          "prior",
+          "blended",
+          "weight",
+          "label"
+        ],
+        "title": "CalibrationReadingOut",
+        "type": "object"
+      },
+      "CalibrationScope": {
+        "description": "Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado.",
+        "enum": [
+          "local",
+          "parish",
+          "concelho"
+        ],
+        "title": "CalibrationScope",
+        "type": "string"
+      },
       "CaopFeature": {
         "properties": {
           "geometry": {
@@ -15456,6 +15632,18 @@
             "title": "Key",
             "type": "string"
           },
+          "n": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Amostras observadas (calibração #62): visitas ou semanas, conforme a métrica. Com n abaixo do limiar de dominância a fonte mostra «estimativa·n»; a partir dele, «observado·n». Nulo sem calibração",
+            "title": "N"
+          },
           "note": {
             "anyOf": [
               {
@@ -15488,7 +15676,8 @@
         "description": "Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.",
         "enum": [
           "vitrus_data",
-          "assumption"
+          "assumption",
+          "observed"
         ],
         "title": "ParamSource",
         "type": "string"
@@ -18636,6 +18825,17 @@
             },
             "title": "Allocations",
             "type": "array"
+          },
+          "calibration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CalibrationPhoto"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "A calibração que o cenário usou (fotografia da tabela de agregados: métrica × unidade, n, rótulo, prior vs observado vs calibrado). Nulo nos cenários calculados sem observação — comparam-se com honestidade, cada um com a calibração que teve (ADR: captura anual é derivada)"
           },
           "collection_plan": {
             "anyOf": [
@@ -28258,6 +28458,128 @@
         "summary": "Get Brand Evidence",
         "tags": [
           "lots"
+        ]
+      }
+    },
+    "/api/v1/calibration": {
+      "get": {
+        "description": "O estado atual da calibração: por métrica e unidade, com n, rótulo, taxa corrente vs prior.\n\nVazio até alguém recalcular um cenário (a recomputação é manual, nunca agendada — ADR: captura\nanual é derivada). A taxa de pedidos por freguesia está aqui como KPI de procura manifesta.",
+        "operationId": "get_calibration",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CalibrationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Calibration",
+        "tags": [
+          "calibration"
         ]
       }
     },

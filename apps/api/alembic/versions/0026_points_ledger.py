@@ -5,8 +5,8 @@ saco na vida — e por não haver caminho de UPDATE/DELETE no código. `seq` é 
 desempata o `created_at` (igual dentro da transação) e dá aos auditores um número único por lançamento.
 `user_id` é SET NULL: apagar a conta perde o crédito, o livro-razão sobrevive para os agregados (ADR RGPD).
 
-Revision ID: 0025
-Revises: 0024
+Revision ID: 0026
+Revises: 0025
 Create Date: 2026-11-18 00:30:00.000000
 """
 
@@ -16,8 +16,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = "0025"
-down_revision: str | None = "0024"
+revision: str = "0026"
+down_revision: str | None = "0025"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 

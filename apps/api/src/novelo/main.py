@@ -20,6 +20,7 @@ from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.app_settings.router import router as app_settings_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
+from novelo.features.calibration.router import router as calibration_router
 from novelo.features.cidadao.router import public_router as public_cidadao_router
 from novelo.features.cidadao.router import router as cidadao_router
 from novelo.features.collection_requests.router import router as collection_requests_router
@@ -148,6 +149,15 @@ def create_app() -> FastAPI:
         collection_requests_router,
         prefix=API_PREFIX,
         tags=["collection-requests"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
+    # Painel «Calibração» (#62): a tabela de agregados da retroalimentação (leitura; a recomputação é
+    # ao recalcular um cenário). O planeamento também consome só esta tabela, nunca os eventos.
+    app.include_router(
+        calibration_router,
+        prefix=API_PREFIX,
+        tags=["calibration"],
         dependencies=protected,
         responses=COMMON_ERRORS,
     )

@@ -14,6 +14,7 @@ from novelo.domain.vocab import (
     ScenarioStatus,
     Tipau,
 )
+from novelo.features.calibration.schemas import CalibrationPhoto
 from novelo.features.planning import assumptions as a
 
 Siting = Literal["parish", "sites"]
@@ -35,6 +36,7 @@ class ParamSource(StrEnum):
 
     VITRUS_DATA = "vitrus_data"  # dados reais da Vitrus (com a APA, para o têxtil no RSU)
     ASSUMPTION = "assumption"  # pressuposto da equipa, a validar com a Vitrus
+    OBSERVED = "observed"  # observado nos pilotos com n amostras (calibração, spec #62: «observado·n»)
 
 
 class ModeParams(BaseModel):
@@ -116,6 +118,13 @@ class ParamMeta(BaseModel):
     key: str = Field(description="Caminho do parâmetro, ex.: `modes.street.capture_rate`")
     unit: str
     source: ParamSource
+    n: int | None = Field(
+        default=None,
+        description=(
+            "Amostras observadas (calibração #62): visitas ou semanas, conforme a métrica. Com n abaixo do "
+            "limiar de dominância a fonte mostra «estimativa·n»; a partir dele, «observado·n». Nulo sem calibração"
+        ),
+    )
     note: str | None = Field(default=None, description="Fonte em texto, quando o valor ainda está por preencher")
 
 
@@ -518,6 +527,14 @@ class ScenarioResult(BaseModel):
             "Agenda pública (dado introduzido): as rondas publicadas, por dia, freguesia e canal, com a cadência do "
             "degrau escolhido — nenhuma visita publicada é saltada. Nulo nos cenários calculados antes da política "
             "de paragem (a página pública de #63 lê este campo)"
+        ),
+    )
+    calibration: CalibrationPhoto | None = Field(
+        default=None,
+        description=(
+            "A calibração que o cenário usou (fotografia da tabela de agregados: métrica × unidade, n, rótulo, "
+            "prior vs observado vs calibrado). Nulo nos cenários calculados sem observação — comparam-se com "
+            "honestidade, cada um com a calibração que teve (ADR: captura anual é derivada)"
         ),
     )
 

@@ -1419,6 +1419,137 @@ export type BudgetOut = {
 };
 
 /**
+ * CalibrationMetric
+ *
+ * As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+ *
+ * O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+ * (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+ * captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+ * fotografia do cenário, mas nunca se guarda na tabela de agregados.
+ */
+export type CalibrationMetric = 'generation_rate' | 'kg_per_bag' | 'bags_per_round' | 'requests_per_week' | 'on_demand_capture';
+
+/**
+ * CalibrationOut
+ *
+ * O painel «Calibração» (gestão): a tabela de agregados atual, por métrica e unidade.
+ */
+export type CalibrationOut = {
+    /**
+     * Computed At
+     *
+     * Altura do último recálculo (ao recalcular um cenário; nunca agendada)
+     */
+    computed_at: string | null;
+    /**
+     * Rows
+     */
+    rows: Array<CalibrationReadingOut>;
+    /**
+     * Window Weeks
+     *
+     * Janela de observação em semanas (12, móvel)
+     */
+    window_weeks: number;
+};
+
+/**
+ * CalibrationPhoto
+ *
+ * A fotografia da calibração que um cenário copia para o seu resultado (reprodutível e comparável).
+ */
+export type CalibrationPhoto = {
+    /**
+     * Computed At
+     */
+    computed_at?: string | null;
+    /**
+     * Readings
+     */
+    readings: Array<CalibrationReadingOut>;
+    /**
+     * Window Weeks
+     */
+    window_weeks: number;
+};
+
+/**
+ * CalibrationReadingOut
+ *
+ * Uma linha da calibração: métrica × unidade na janela atual (a tabela de agregados).
+ */
+export type CalibrationReadingOut = {
+    /**
+     * Blended
+     *
+     * Valor calibrado: (k·prior + n·observado) ÷ (k + n) — o que o planeamento consome
+     */
+    blended: number;
+    /**
+     * Label
+     *
+     * Fonte para o ecrã: «pressuposto», «estimativa·n» ou «observado·n»
+     */
+    label: string;
+    metric: CalibrationMetric;
+    /**
+     * N
+     *
+     * Amostras: visitas nas métricas por local, semanas nas por freguesia
+     */
+    n: number;
+    /**
+     * Observed
+     *
+     * Estatística da janela (mediana dos pesos; pedidos ÷ semanas); nulo sem amostras
+     */
+    observed: number | null;
+    /**
+     * Parish Code
+     *
+     * Freguesia da unidade («» no concelho); liga a taxa do local à captura
+     */
+    parish_code: string;
+    /**
+     * Prior
+     *
+     * Valor dos pressupostos com que foi recalculado
+     */
+    prior: number;
+    /**
+     * Pseudo K
+     *
+     * Peso do prior na pseudo-contagem (4 visitas por local; 8 semanas por freguesia)
+     */
+    pseudo_k: number;
+    scope: CalibrationScope;
+    /**
+     * Unit Code
+     *
+     * Código da unidade: UUID do local, DICOFRE da freguesia ou «concelho»
+     */
+    unit_code: string;
+    /**
+     * Unit Name
+     */
+    unit_name: string;
+    /**
+     * Weight
+     *
+     * Peso do observado: n ÷ (n + k)
+     */
+    weight: number;
+};
+
+/**
+ * CalibrationScope
+ *
+ * Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado.
+ */
+export type CalibrationScope = 'local' | 'parish' | 'concelho';
+
+/**
  * CaopFeature
  */
 export type CaopFeature = {
@@ -9018,6 +9149,12 @@ export type ParamMeta = {
      */
     key: string;
     /**
+     * N
+     *
+     * Amostras observadas (calibração #62): visitas ou semanas, conforme a métrica. Com n abaixo do limiar de dominância a fonte mostra «estimativa·n»; a partir dele, «observado·n». Nulo sem calibração
+     */
+    n?: number | null;
+    /**
      * Note
      *
      * Fonte em texto, quando o valor ainda está por preencher
@@ -9035,7 +9172,7 @@ export type ParamMeta = {
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export type ParamSource = 'vitrus_data' | 'assumption';
+export type ParamSource = 'vitrus_data' | 'assumption' | 'observed';
 
 /**
  * ParametersOut
@@ -11068,6 +11205,10 @@ export type ScenarioResult = {
      * Allocations
      */
     allocations: Array<Allocation>;
+    /**
+     * A calibração que o cenário usou (fotografia da tabela de agregados: métrica × unidade, n, rótulo, prior vs observado vs calibrado). Nulo nos cenários calculados sem observação — comparam-se com honestidade, cada um com a calibração que teve (ADR: captura anual é derivada)
+     */
+    calibration?: CalibrationPhoto | null;
     /**
      * Collection Plan
      *
@@ -16147,6 +16288,67 @@ export type GetBrandEvidenceResponses = {
 };
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
+
+export type GetCalibrationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/calibration';
+};
+
+export type GetCalibrationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCalibrationError = GetCalibrationErrors[keyof GetCalibrationErrors];
+
+export type GetCalibrationResponses = {
+    /**
+     * Successful Response
+     */
+    200: CalibrationOut;
+};
+
+export type GetCalibrationResponse = GetCalibrationResponses[keyof GetCalibrationResponses];
 
 export type GetDonorAccountData = {
     body?: never;

@@ -8,13 +8,14 @@ import hashlib
 import json
 import threading
 from collections import OrderedDict, defaultdict
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from novelo.domain import network, siting, stop_policy
+from novelo.domain.calibration import Calibration
 from novelo.domain.costs import avoided_treatment_eur, net_cost_eur
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.reuse import ReuseShares, reusable
@@ -186,16 +187,19 @@ def _on_demand_zones(
     dp: network.Params,
     request: ScenarioRequest,
     notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> dict[str, list[siting.OnDemandZone]]:
     """Recolha a pedido por freguesia, com o custo do modelo por zonas (ronda da viatura dedicada).
 
     Na política dinâmica cada freguesia traz uma variante por degrau da escada (o MIP escolhe um); na fixa,
-    uma só variante com o passo global `on_demand_every_weeks`.
+    uma só variante com o passo global `on_demand_every_weeks`. A captura calibrada (spec #62) substitui a
+    prior nas freguesias com amostras; a escala do degrau aplica-se ao valor que entre.
     """
     if not request.site_on_demand and not notice_parishes:
         return {}
     out: dict[str, list[siting.OnDemandZone]] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
+    calibrated = calibration.capture_by_parish() if calibration is not None else {}
     # o aviso garante paragem mesmo onde os constraints ou o `site_on_demand` a excluem (ADR #42)
     eligible = [
         z
@@ -205,9 +209,12 @@ def _on_demand_zones(
     ]
     rungs: list[CollectionFrequency | None] = list(stop_policy.LADDER) if request.stop_policy == "dynamic" else [None]
     for z, zone in zip(eligible, network.with_road_distances([to_domain_zone(z) for z in eligible], dp), strict=True):
+        override = calibrated[z.code].blended if z.code in calibrated else None
         variants = []
         for rung in rungs:
-            c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp, stop_policy.weeks_of(rung) if rung else None)
+            c = network.mode_cost(
+                zone, CollectionMode.ON_DEMAND, dp, stop_policy.weeks_of(rung) if rung else None, override
+            )
             variants.append(
                 siting.OnDemandZone(
                     z.code, c.capture, coverage, c.annual_cost_eur, c.km_year, c.hours_year, c.collections_year,
@@ -388,8 +395,9 @@ def _cache_key(
     inputs: SiteInputs,
     reuse: ReuseShares | None,
     road_id: str,
+    calibration: Calibration | None = None,
 ) -> str:
-    """Identifica um cálculo: os mesmos dados, pressupostos, pedido (sem o nome) e estradas dão o mesmo cenário."""
+    """Identifica um cálculo: mesmos dados, pressupostos, pedido (sem o nome), estradas e calibração."""
     body = {
         "road": road_id,
         "request": request.model_dump(mode="json", exclude={"label", "parent_id"}),
@@ -401,6 +409,9 @@ def _cache_key(
         ],
         "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
         "candidates": [(c.id, c.zone_id, inputs.meta[c.id].kind) for c in inputs.candidates],
+        "calibration": None
+        if calibration is None
+        else [(r.metric, r.unit_code, r.n, r.blended) for r in calibration.readings],
     }
     return hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -414,6 +425,7 @@ def compute_sites(
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
     notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Simulador por locais com cache em memória: o mesmo pedido sobre os mesmos dados não volta ao solver.
 
@@ -421,7 +433,7 @@ def compute_sites(
     A chave inclui a versão do mapa de estradas; se o OSRM falhar a meio, o cálculo (estimado) não se guarda.
     """
     road_id = road.fingerprint if road is not None else "estimate"
-    key = _cache_key(zones, params, request, baseline_t, inputs, reuse, road_id)
+    key = _cache_key(zones, params, request, baseline_t, inputs, reuse, road_id, calibration)
     with _cache_lock:
         hit = _cache.get(key)
         if hit is not None and not notice_parishes:
@@ -432,7 +444,7 @@ def compute_sites(
         with _cache_lock:
             hit = _cache.get(key)
         if hit is None:
-            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse, road, notice_parishes)
+            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse, road, notice_parishes, calibration)
             if road is None or road_id == road.fingerprint:  # o OSRM aguentou o cálculo todo
                 with _cache_lock:
                     _cache[key] = hit
@@ -452,13 +464,18 @@ def _compute_sites(
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
     notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador por locais (sem base de dados).
 
     `notice_parishes`: freguesias com aviso «sacos prontos» ativo — a recolha a pedido fica GARANTIDA nelas
-    (ADR: política de paragem), mesmo sem local aberto e à revelia das restrições.
+    (ADR: política de paragem), mesmo sem local aberto e à revelia das restrições. `calibration`: a
+    retroalimentação observada (spec #62) — o kg por saco calibra o parâmetro global e a captura do saco
+    à porta nas freguesias com amostras; os restantes priores nunca são substituídos.
     """
     dp = to_domain_params(params, road)
+    if calibration is not None and (kg_bag := calibration.kg_per_pickup()) is not None:
+        dp = replace(dp, on_demand_kg_per_pickup=kg_bag)
     mode: CollectionMode = request.site_mode
     mp = params.modes[mode]
     costs = siting.SiteCosts(
@@ -488,7 +505,7 @@ def _compute_sites(
         objective=request.objective.value,
         budget_eur_year=request.budget_eur_year,
         target_tonnes=request.target_tonnes,
-        on_demand=_on_demand_zones(zones, params, dp, request, notice_parishes),
+        on_demand=_on_demand_zones(zones, params, dp, request, notice_parishes, calibration),
         time_limit_s=float(params.solver_time_limit_s),
         required_od=notice_parishes,
     )
