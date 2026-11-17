@@ -5,6 +5,7 @@ import {
   CheckCircle2,
   ChevronRight,
   Circle,
+  Gift,
   History,
   Home,
   PackageOpen,
@@ -50,6 +51,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { agendaByDay, cadenceLabel, channelLabel } from '@/features/cidadao/agenda';
+import { CatalogoTab } from '@/features/cidadao/catalogo-tab';
 import { bagsAtHome, milestones, onboardingCollapsed } from '@/features/cidadao/onboarding';
 import { RequestSheet } from '@/features/cidadao/request-sheet';
 import { getErrorCode } from '@/lib/errors';
@@ -59,16 +61,17 @@ import { cn } from '@/lib/utils';
 
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
 
-type WalletTabId = 'inicio' | 'sacos' | 'saldo' | 'historico';
+type WalletTabId = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico';
 
 const TABS: Array<{ id: WalletTabId; label: string; icon: typeof Home }> = [
   { id: 'inicio', label: 'Início', icon: Home },
   { id: 'sacos', label: 'Sacos', icon: ShoppingBag },
   { id: 'saldo', label: 'Saldo', icon: WalletIcon },
+  { id: 'catalogo', label: 'Catálogo', icon: Gift },
   { id: 'historico', label: 'Histórico', icon: History },
 ];
 
-/** A «Carteira» do doador: barra de separadores em baixo (telemóvel primeiro), quatro ecrãs densos. */
+/** A «Carteira» do doador: barra de separadores em baixo (telemóvel primeiro), cinco ecrãs densos. */
 export function Wallet({ tab }: { tab: WalletTabId }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -142,6 +145,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
               />
             )}
             {tab === 'saldo' && <SaldoTab saldoQuery={saldoQuery} />}
+            {tab === 'catalogo' && <CatalogoTab balance={saldoQuery.data?.balance ?? 0} />}
             {tab === 'historico' && <HistoricoTab history={history} />}
           </>
         )}
@@ -712,8 +716,20 @@ function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDono
         <ul className="text-muted-foreground space-y-1.5">
           <li>+100 por saco ativado, recolhido e pesado (nunca por kg — estimativa)</li>
           <li>+50 de bónus quando a triagem confirma a tua declaração (estimativa)</li>
-          <li>1 000 pontos ≈ 5 € num donativo a IPSS (estimativa; a troca chega com o #65)</li>
+          <li>
+            1 000 pontos ≈ 5 € <span className="text-foreground">de donativo</span> a IPSS — a
+            âncora € é o valor do donativo, nunca o valor dos pontos (estimativa)
+          </li>
         </ul>
+        <Link
+          to="/cidadao"
+          search={{ tab: 'catalogo' }}
+          className="text-primary inline-flex min-h-11 items-center gap-1.5 text-sm font-medium"
+        >
+          <Gift className="size-4" aria-hidden />
+          Ver o catálogo e resgatar
+          <ChevronRight className="size-4" aria-hidden />
+        </Link>
       </div>
 
       {/* Histórico de pontos: o livro-razão do próprio, o mais recente primeiro. */}

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { CatalogItemPublic, RedemptionOut } from '@/client';
-import { catalogItemKindLabel, donationValueNote, redeemBlocked, redemptionStateLabel } from './catalogo';
+import {
+  catalogItemKindLabel,
+  donationValueNote,
+  redeemBlocked,
+  redemptionStateLabel,
+} from './catalogo';
 
 const item = (over: Partial<CatalogItemPublic>): CatalogItemPublic => ({
   id: '00000000-0000-0000-0000-000000000001',
@@ -25,8 +30,9 @@ describe('catalogItemKindLabel', () => {
 describe('donationValueNote', () => {
   it('mostra a âncora € como VALOR DO DONATIVO, nunca como valor dos pontos', () => {
     // 1 000 pontos ≈ 5 € é o valor do donativo que a Vitrus paga — a âncora é apresentação.
-    expect(donationValueNote(item({ donation_value_cents: 500 }))).toBe('donativo de 5 €');
-    expect(donationValueNote(item({ donation_value_cents: 150 }))).toBe('donativo de 1,50 €');
+    // (O valor vem em cêntimos: duas casas sempre, e o Intl usa espaço inquebrável antes do €.)
+    expect(donationValueNote(item({ donation_value_cents: 500 }))).toBe('donativo de 5,00\u00A0€');
+    expect(donationValueNote(item({ donation_value_cents: 150 }))).toBe('donativo de 1,50\u00A0€');
   });
 });
 
@@ -51,8 +57,16 @@ describe('redeemBlocked', () => {
 
 describe('redemptionStateLabel', () => {
   it('traduz o estado do código', () => {
-    const base = { id: 'x', code: 'RDM-ABC234', points_spent: 50, validated_at: null, created_at: '' } as Partial<RedemptionOut>;
+    const base = {
+      id: 'x',
+      code: 'RDM-ABC234',
+      points_spent: 50,
+      validated_at: null,
+      created_at: '',
+    } as Partial<RedemptionOut>;
     expect(redemptionStateLabel({ ...(base as RedemptionOut), state: 'pending' })).toBe('pendente');
-    expect(redemptionStateLabel({ ...(base as RedemptionOut), state: 'validated' })).toBe('validado');
+    expect(redemptionStateLabel({ ...(base as RedemptionOut), state: 'validated' })).toBe(
+      'validado',
+    );
   });
 });

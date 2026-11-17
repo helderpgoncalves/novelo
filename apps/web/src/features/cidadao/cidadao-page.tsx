@@ -13,7 +13,7 @@ import { getErrorCode } from '@/lib/errors';
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
 
 /** Aba ativa da carteira (vai na URL: partilhável e voltável). */
-export type WalletTab = 'inicio' | 'sacos' | 'saldo' | 'historico';
+export type WalletTab = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico';
 
 /**
  * A área do cidadão: sem sessão é a porta de entrada (herói público + criação de conta);

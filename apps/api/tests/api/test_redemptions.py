@@ -8,11 +8,13 @@ o teto de donativos IPSS é indexado ao custo evitado (105,64 €/t × kg MEDIDO
 
 import re
 import uuid
+from datetime import UTC, datetime, timedelta
 
 import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.features.audit.models import AuditLog
 from novelo.features.catalog.models import Redemption
 from novelo.features.points.models import PointEntry
 
@@ -46,9 +48,7 @@ async def _donor_with_weighed_bags(
         assert bag.status_code == 201, bag.text
         unit = await operator.post(f"{LOTS}/{lot_code}/units", json={"bag_code": bag.json()["code"]})
         assert unit.status_code == 201, unit.text
-        weighed = await operator.put(
-            f"{LOTS}/{lot_code}/units/{unit.json()['id']}", json={"weight_g": weight_g}
-        )
+        weighed = await operator.put(f"{LOTS}/{lot_code}/units/{unit.json()['id']}", json={"weight_g": weight_g})
         assert weighed.status_code == 200, weighed.text
     return client, lot.json()
 
@@ -59,9 +59,7 @@ def _magic_token(outbox) -> str:
     return match.group(1)
 
 
-async def _create_item(
-    team: httpx.AsyncClient, **overrides: object
-) -> dict[str, object]:
+async def _create_item(team: httpx.AsyncClient, **overrides: object) -> dict[str, object]:
     body: dict[str, object] = {
         "name": "Compromisso Ambiental",
         "kind": "environmental",
@@ -97,9 +95,7 @@ async def test_donor_redeems_and_gets_a_pseudonymous_code(
     assert CODE_RE.match(data["code"]), data["code"]  # RDM-XXXXXX, o alfabeto dos sacos
 
     # O livro-razão: a linha negativa `redemption` (append-only, sem expiração — consome).
-    entries = (
-        (await session.execute(select(PointEntry).order_by(PointEntry.seq))).scalars().all()
-    )
+    entries = (await session.execute(select(PointEntry).order_by(PointEntry.seq))).scalars().all()
     assert [(e.kind, e.amount) for e in entries] == [("gain_flat", 100), ("redemption", -50)]
     assert entries[-1].expires_at is None
 
@@ -186,9 +182,7 @@ async def test_donation_cap_blocks_when_the_measured_tonnes_do_not_fund_it(
     assert body["details"]["item_value_cents"] == 100
 
     # Um donativo AO ALCANCE do teto passa: 30 cênt. ≤ 50 ← 4 800 g medidos; saldo fica 100.
-    ok = await _create_item(
-        team, name="Lanche escolar", kind="ipss_donation", points_cost=100, donation_value_cents=30
-    )
+    ok = await _create_item(team, name="Lanche escolar", kind="ipss_donation", points_cost=100, donation_value_cents=30)
     redeemed = await c.post(f"{CID}/redemptions", json={"item_id": ok["id"]})
     assert redeemed.status_code == 201, redeemed.text
     assert redeemed.json()["donation_value_cents"] == 30
@@ -226,9 +220,7 @@ async def test_donation_cap_counts_the_measured_kg_of_every_bag(
 # --- stock: o decremento é atómico e 0 esgota -------------------------------------------------------
 
 
-async def test_stock_runs_out_and_blocks(
-    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
-) -> None:
+async def test_stock_runs_out_and_blocks(client: httpx.AsyncClient, session: AsyncSession, outbox, make_user) -> None:
     c, _lot = await _donor_with_weighed_bags(client, session, outbox, make_user, bags=5, weight_g=5000)
     team = await _team_client(make_user)
     item = await _create_item(team, name="Caderneta", points_cost=100, stock=1)
@@ -255,7 +247,9 @@ async def test_partner_prize_lifecycle_gates_the_catalog(
     team = await _team_client(make_user)
 
     # A forma é fechada: prémio sem parceiro nem donativo com € fora do lugar → 422 com campos.
-    bad_prize = await team.post(f"{ADMIN}/items", json={"name": "Prémio solto", "kind": "partner_prize", "points_cost": 50})
+    bad_prize = await team.post(
+        f"{ADMIN}/items", json={"name": "Prémio solto", "kind": "partner_prize", "points_cost": 50}
+    )
     assert bad_prize.status_code == 422
     bad_donation = await team.post(
         f"{ADMIN}/items",
@@ -267,7 +261,9 @@ async def test_partner_prize_lifecycle_gates_the_catalog(
     proposed = await team.post(f"{ADMIN}/partners", json={"name": "Pastelaria do Vilão"})
     assert proposed.status_code == 201, proposed.text
     assert proposed.json()["state"] == "proposed"
-    prize = await _create_item(team, name="Bolo de soupa", kind="partner_prize", points_cost=50, partner_id=proposed.json()["id"])
+    prize = await _create_item(
+        team, name="Bolo de soupa", kind="partner_prize", points_cost=50, partner_id=proposed.json()["id"]
+    )
     hidden = [i["name"] for i in (await c.get(f"{CID}/catalog")).json()]
     assert "Bolo de soupa" not in hidden  # parceiro proposto não entra no catálogo do doador
 
@@ -314,8 +310,6 @@ async def test_partner_prize_lifecycle_gates_the_catalog(
 async def test_campaigns_shown_to_the_donor_only_inside_the_window(
     client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
 ) -> None:
-    from datetime import UTC, datetime, timedelta
-
     c, _lot = await _donor_with_weighed_bags(client, session, outbox, make_user, bags=1)
     team = await _team_client(make_user)
     now = datetime.now(UTC)
@@ -371,7 +365,11 @@ async def test_role_gates_keep_the_donor_out_of_management(
     for method, path, body in (
         ("post", f"{ADMIN}/items", {"name": "Item X", "kind": "environmental", "points_cost": 1}),
         ("post", f"{ADMIN}/partners", {"name": "Parceiro X"}),
-        ("post", f"{ADMIN}/campaigns", {"name": "Campanha", "starts_at": "2026-12-01T00:00:00Z", "ends_at": "2026-12-02T00:00:00Z"}),
+        (
+            "post",
+            f"{ADMIN}/campaigns",
+            {"name": "Campanha", "starts_at": "2026-12-01T00:00:00Z", "ends_at": "2026-12-02T00:00:00Z"},
+        ),
         ("post", "/api/v1/admin/redemptions/validate", {"code": "RDM-AAAAAA"}),
     ):
         resp = await getattr(c, method)(path, json=body)
@@ -399,8 +397,6 @@ async def test_donor_ledger_history_shows_the_redemption_line(
 async def test_redemption_and_validation_are_audited(
     client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
 ) -> None:
-    from novelo.features.audit.models import AuditLog
-
     c, _lot = await _donor_with_weighed_bags(client, session, outbox, make_user, bags=1)
     team = await _team_client(make_user)
     item = await _create_item(team, name="Compromisso", points_cost=50)
@@ -408,8 +404,6 @@ async def test_redemption_and_validation_are_audited(
     code = redeemed.json()["code"]
     await team.post("/api/v1/admin/redemptions/validate", json={"code": code})
 
-    actions = (
-        (await session.execute(select(AuditLog.action).order_by(AuditLog.created_at))).scalars().all()
-    )
+    actions = (await session.execute(select(AuditLog.action).order_by(AuditLog.created_at))).scalars().all()
     assert "catalog.redeem" in actions
     assert "catalog.validate" in actions

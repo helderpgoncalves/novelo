@@ -8036,7 +8036,7 @@
                 "type": "null"
               }
             ],
-            "description": "Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o quando faz sentido",
+            "description": "Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o",
             "title": "Details"
           },
           "message": {

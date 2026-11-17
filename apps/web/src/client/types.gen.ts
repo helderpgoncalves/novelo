@@ -4657,7 +4657,7 @@ export type ErrorBody = {
     /**
      * Details
      *
-     * Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o quando faz sentido
+     * Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o
      */
     details?: {
         [key: string]: unknown;

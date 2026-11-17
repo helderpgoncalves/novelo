@@ -68,8 +68,8 @@ class RedemptionState(StrEnum):
 
 __all__ = [
     "AVOIDED_TREATMENT_EUR_CENTS_PER_T",
-    "CatalogItemKind",
     "DONATION_CAP_PCT",
+    "CatalogItemKind",
     "PartnerState",
     "RedemptionState",
     "donation_cap_cents",

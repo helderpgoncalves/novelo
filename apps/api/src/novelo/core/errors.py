@@ -81,7 +81,7 @@ class ErrorBody(BaseModel):
     message: str = Field(description="Mensagem técnica em inglês; o web traduz a partir de `code`")
     details: dict[str, Any] | None = Field(
         default=None,
-        description="Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o quando faz sentido",
+        description="Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o",
     )
 
 
@@ -420,9 +420,7 @@ class DonationCapReachedError(AppError):
             "donated_this_month_cents": donated_this_month_cents,
             "item_value_cents": item_value_cents,
         }
-        super().__init__(
-            f"Donation cap {cap_cents} cents reached; {donated_this_month_cents} donated this month"
-        )
+        super().__init__(f"Donation cap {cap_cents} cents reached; {donated_this_month_cents} donated this month")
 
 
 class OutOfStockError(AppError):

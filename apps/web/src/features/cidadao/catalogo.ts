@@ -1,5 +1,5 @@
-import { formatEur, formatNumber } from '@/lib/format';
 import type { CatalogItemPublic, RedemptionOut } from '@/client';
+import { formatEur, formatNumber } from '@/lib/format';
 
 // Helpers puros do catálogo do doador (#65): testados em `catalogo.test.ts`.
 // Strings em pt-PT de propósito — a área do cidadão é só portuguesa no MVP (decisão da spec #54).
@@ -22,13 +22,14 @@ export const catalogItemKindLabel = (kind: CatalogItemPublic['kind']): string =>
  */
 export const donationValueNote = (item: CatalogItemPublic): string | null =>
   item.kind === 'ipss_donation' && item.donation_value_cents != null
-    ? `donativo de ${formatEur(item.donation_value_cents / 100)}`
+    ? `donativo de ${formatEur(item.donation_value_cents / 100, 2)}`
     : null;
 
 /** Motivo pelo qual o resgate está bloqueado (ou nulo, se se pode resgatar). Esgotado ganha ao saldo. */
 export const redeemBlocked = (item: CatalogItemPublic, balance: number): string | null => {
   if (item.stock === 0) return 'Esgotado';
-  if (balance < item.points_cost) return `Faltam ${formatNumber(item.points_cost - balance)} pontos`;
+  if (balance < item.points_cost)
+    return `Faltam ${formatNumber(item.points_cost - balance)} pontos`;
   return null;
 };
 

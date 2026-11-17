@@ -6,6 +6,7 @@ import {
   FileText,
   FlaskConical,
   Gauge,
+  Gift,
   GitCompareArrows,
   HandHeart,
   type LucideIcon,
@@ -40,6 +41,7 @@ export interface NavItem {
     | '/viatura'
     | '/export-lots'
     | '/collection-requests'
+    | '/catalogo'
     | '/calibration'
     | '/reports'
     | '/simulator'
@@ -102,6 +104,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
       { label: () => m.nav_export_lots(), to: '/export-lots', icon: PackageOpen },
       { label: () => m.nav_collection_requests(), to: '/collection-requests', icon: HandHeart },
+      { label: () => m.nav_catalog(), to: '/catalogo', icon: Gift },
     ],
   },
   {

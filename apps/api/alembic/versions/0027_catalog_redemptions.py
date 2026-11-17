@@ -37,7 +37,9 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_catalog_partners")),
         sa.UniqueConstraint("name", name=op.f("uq_catalog_partners_name")),
-        sa.ForeignKeyConstraint(["parish_id"], ["parishes.id"], name=op.f("fk_catalog_partners_parish_id_parishes"), ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["parish_id"], ["parishes.id"], name=op.f("fk_catalog_partners_parish_id_parishes"), ondelete="SET NULL"
+        ),
         sa.ForeignKeyConstraint(
             ["proposed_by_id"], ["users.id"], name=op.f("fk_catalog_partners_proposed_by_id_users"), ondelete="SET NULL"
         ),
@@ -58,13 +60,18 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.ForeignKeyConstraint(
-            ["partner_id"], ["catalog_partners.id"], name=op.f("fk_catalog_items_partner_id_catalog_partners"), ondelete="SET NULL"
+            ["partner_id"],
+            ["catalog_partners.id"],
+            name=op.f("fk_catalog_items_partner_id_catalog_partners"),
+            ondelete="SET NULL",
         ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_catalog_items")),
         sa.CheckConstraint("kind IN ('ipss_donation', 'partner_prize', 'environmental')", name="kind_valid"),
         sa.CheckConstraint("points_cost > 0", name="cost_positive"),
         sa.CheckConstraint("stock IS NULL OR stock >= 0", name="stock_nonnegative"),
-        sa.CheckConstraint("(kind = 'ipss_donation') = (donation_value_cents IS NOT NULL)", name="donation_value_only_ipss"),
+        sa.CheckConstraint(
+            "(kind = 'ipss_donation') = (donation_value_cents IS NOT NULL)", name="donation_value_only_ipss"
+        ),
         sa.CheckConstraint("(kind = 'partner_prize') = (partner_id IS NOT NULL)", name="partner_only_prizes"),
     )
     op.create_index(op.f("ix_catalog_items_partner_id"), "catalog_items", ["partner_id"], unique=False)
@@ -100,9 +107,18 @@ def upgrade() -> None:
         sa.Column("validated_by_id", postgresql.UUID(as_uuid=True), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.text("now()"), nullable=False),
-        sa.ForeignKeyConstraint(["user_id"], ["users.id"], name=op.f("fk_redemptions_user_id_users"), ondelete="SET NULL"),
-        sa.ForeignKeyConstraint(["item_id"], ["catalog_items.id"], name=op.f("fk_redemptions_item_id_catalog_items"), ondelete="SET NULL"),
-        sa.ForeignKeyConstraint(["partner_id"], ["catalog_partners.id"], name=op.f("fk_redemptions_partner_id_catalog_partners"), ondelete="SET NULL"),
+        sa.ForeignKeyConstraint(
+            ["user_id"], ["users.id"], name=op.f("fk_redemptions_user_id_users"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["item_id"], ["catalog_items.id"], name=op.f("fk_redemptions_item_id_catalog_items"), ondelete="SET NULL"
+        ),
+        sa.ForeignKeyConstraint(
+            ["partner_id"],
+            ["catalog_partners.id"],
+            name=op.f("fk_redemptions_partner_id_catalog_partners"),
+            ondelete="SET NULL",
+        ),
         sa.ForeignKeyConstraint(
             ["validated_by_id"], ["users.id"], name=op.f("fk_redemptions_validated_by_id_users"), ondelete="SET NULL"
         ),
