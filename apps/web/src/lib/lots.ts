@@ -24,6 +24,8 @@ export const GARMENTS: GarmentType[] = [
   'skirt',
   'bedding',
   'towel',
+  'footwear',
+  'accessory',
   'other',
 ];
 
@@ -51,6 +53,8 @@ export const garmentLabel: Record<GarmentType, () => string> = {
   skirt: () => m.garment_skirt(),
   bedding: () => m.garment_bedding(),
   towel: () => m.garment_towel(),
+  footwear: () => m.garment_footwear(),
+  accessory: () => m.garment_accessory(),
   other: () => m.garment_other(),
 };
 
@@ -70,6 +74,7 @@ export const lotEventLabel: Record<LotEventKind, () => string> = {
 };
 
 // Pesos médios por peça usados quando o operador altera o tipo (pressuposto; o piloto usa balança).
+// Calçado conta o par, acessório é uma peça (cinto, lenço, chapéu) — pressupostos, ver dados-e-modelo.md.
 export const AVERAGE_WEIGHT_G: Record<GarmentType, number> = {
   tshirt: 150,
   shirt: 200,
@@ -80,5 +85,7 @@ export const AVERAGE_WEIGHT_G: Record<GarmentType, number> = {
   skirt: 250,
   bedding: 900,
   towel: 500,
+  footwear: 400,
+  accessory: 150,
   other: 300,
 };

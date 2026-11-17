@@ -13,11 +13,16 @@ import { m } from '@/paraglide/messages';
 import { formatSeconds, formatUsd } from './ai';
 
 const FIELDS = [
-  ['garment_type', () => m.aiadm_eval_garment()],
-  ['condition', () => m.aiadm_eval_condition()],
-  ['brand', () => m.aiadm_eval_brand()],
-  ['dominant_fibre', () => m.aiadm_eval_fibre()],
-  ['composition_within_10pp', () => m.aiadm_eval_composition()],
+  ['fine_state', () => m.aiadm_eval_fine_state(), false],
+  ['garment_type', () => m.aiadm_eval_garment(), false],
+  ['season', () => m.aiadm_eval_season(), false],
+  ['colour', () => m.aiadm_eval_colour(), false],
+  ['gender', () => m.aiadm_eval_gender(), true],
+  ['size_band', () => m.aiadm_eval_size(), true],
+  ['destination', () => m.aiadm_eval_destination(), false],
+  ['brand', () => m.aiadm_eval_brand(), false],
+  ['dominant_fibre', () => m.aiadm_eval_fibre(), false],
+  ['composition_within_10pp', () => m.aiadm_eval_composition(), false],
 ] as const;
 
 const mean = (model: TriageEvalModel): number => {
@@ -86,13 +91,24 @@ export function TriageEvalTab() {
       cell: (r) => <strong>{formatPercent(mean(r) * 100, 0)}</strong>,
     },
     ...FIELDS.map(
-      ([key, label]): Column<TriageEvalModel> => ({
+      ([key, label, promised]): Column<TriageEvalModel> => ({
         id: key,
         header: label(),
         align: 'right',
         value: (r) => r.accuracy[key] ?? null,
         cell: (r) =>
-          r.accuracy[key] === undefined ? '—' : formatPercent(r.accuracy[key] * 100, 0),
+          r.accuracy[key] === undefined ? (
+            '—'
+          ) : (
+            <span className="flex items-center justify-end gap-1">
+              {promised && (r.promised_axes ?? []).includes(key) && (
+                <Badge variant="outline" className="text-muted-foreground">
+                  {m.aiadm_eval_promised()}
+                </Badge>
+              )}
+              {formatPercent(r.accuracy[key] * 100, 0)}
+            </span>
+          ),
       }),
     ),
     {
