@@ -35,6 +35,7 @@ export interface NavItem {
     | '/chat'
     | '/triage'
     | '/lots'
+    | '/viatura'
     | '/export-lots'
     | '/reports'
     | '/simulator'
@@ -92,6 +93,7 @@ export const NAV: NavSection[] = [
     title: () => m.nav_section_operations(),
     items: [
       { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
+      { label: () => m.nav_viatura(), to: '/viatura', icon: Truck },
       { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
       { label: () => m.nav_export_lots(), to: '/export-lots', icon: PackageOpen },
     ],

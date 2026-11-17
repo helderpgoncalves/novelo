@@ -10175,7 +10175,7 @@
         "type": "object"
       },
       "LotUnitIn": {
-        "description": "Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).",
+        "description": "Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).\n\n`label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse\nUUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:\nou o QR do saco, ou o UUID da etiqueta.",
         "properties": {
           "bag_code": {
             "anyOf": [
@@ -10190,6 +10190,19 @@
             ],
             "description": "QR do saco da plataforma, tal como lido no scan",
             "title": "Bag Code"
+          },
+          "label_code": {
+            "anyOf": [
+              {
+                "maxLength": 36,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "UUID gerado no dispositivo para a etiqueta impressa offline (QR = esse UUID)",
+            "title": "Label Code"
           }
         },
         "title": "LotUnitIn",

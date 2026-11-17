@@ -196,6 +196,39 @@ async def test_passport_shows_measured_weight_and_stop_never_donor(
     await anonymous.aclose()
 
 
+async def test_label_uuid_from_the_device_is_accepted_for_offline_reconciliation(
+    logged_in: httpx.AsyncClient, session: AsyncSession
+) -> None:
+    """A etiqueta impressa offline (#58) leva um UUID gerado NA viatura: o QR do papel reconcilia pelo código."""
+    locality = await _locality(session)
+    code = (await _open_stop(logged_in, locality.id)).json()["code"]
+
+    # Sem rede, o dispositivo gera o UUID e imprime já; o servidor aceita esse UUID como código da unidade.
+    offline_uuid = str(uuid.uuid4())
+    label = await logged_in.post(f"/api/v1/lots/{code}/units", json={"label_code": offline_uuid})
+    assert label.status_code == 201, label.text
+    body = label.json()
+    assert body["source"] == "label" and body["code"] == offline_uuid
+
+    # O mesmo UUID não entra duas vezes (repetição da fila sincronizada = idempotência pelo código).
+    dup = await logged_in.post(f"/api/v1/lots/{code}/units", json={"label_code": offline_uuid})
+    assert dup.status_code == 409 and dup.json()["code"] == "conflict"
+
+    # Não-UUID recusa-se (o QR da etiqueta tem de ser um UUID para reconciliar sem rede).
+    bad = await logged_in.post(f"/api/v1/lots/{code}/units", json={"label_code": "ETIQUETA-1"})
+    assert bad.status_code == 422
+
+    # Um código só: ou o QR do saco ou o UUID da etiqueta, nunca os dois.
+    both = await logged_in.post(
+        f"/api/v1/lots/{code}/units", json={"bag_code": "SACO-B", "label_code": str(uuid.uuid4())}
+    )
+    assert both.status_code == 422
+
+    # O QR impresso continua a ser o UUID da etiqueta.
+    qr = await logged_in.get(f"/api/v1/lots/{code}/units/{body['id']}/qr")
+    assert qr.status_code == 200 and b"<svg" in qr.content
+
+
 async def test_list_lots_filters_by_locality(logged_in: httpx.AsyncClient, session: AsyncSession) -> None:
     locality = await _locality(session)
     stop_code = (await _open_stop(logged_in, locality.id)).json()["code"]

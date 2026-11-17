@@ -136,10 +136,12 @@ Um só papel (`local`); a conta pertence ao **local**, é criada pela equipa (se
 
 ## 12. Ecrã da viatura: pesar, etiquetar, offline
 
-O lote de recolha nasce aqui (secção 2). **«O scan manda»**: câmara primeiro; etiqueta impressa só quando o saco não tem QR; pratos calculados pela app (≤ 15 kg por pesagem); correção direta por saco (o prato pesado anula-se); total sempre visível; «Cheguei» e «Partir» os únicos gestos deliberados (sem GPS no MVP). Offline com fila «à espera de sincronização» (IndexedDB + Background Sync).
+O lote de recolha nasce aqui (secção 2), na rota **`/viatura`** do PWA. **«O scan manda»**: câmara primeiro (`BarcodeDetector`, Android + Chrome; leitura manual ao lado para leitor HID ou sem câmara); etiqueta impressa só quando o saco não tem QR — o UUID gera-se **no dispositivo**, a etiqueta imprime-se já (ZPL com QR nativo `^BQN` na térmica) e o QR do papel leva esse UUID nu para reconciliar offline pelo código; pratos calculados pela app (≤ 15 kg por leitura, partes somadas por saco); correção direta por saco (pesar de novo substitui); total sempre visível numa barra fixa; «Cheguei» e «Partir» os únicos gestos deliberados (sem GPS no MVP — a âncora é o local escolhido, guardado no dispositivo para trabalhar sem rede).
 
+- **Porta de dispositivo** ([ADR](adr/porta-de-dispositivo-da-viatura.md)): interface `VehicleDevice` (balança + impressora) no padrão da porta `RoadRouter` da API — `src/features/viatura/device/port.ts`; o **falso** com pesos programados e etiquetas «impressas» serve dev e testes; o Web Bluetooth vive **só** no adaptador (`device/bluetooth-device.ts`, importado a pedido: KERN por GATT notificação, Zebra BLE Parser Service a escrever ZPL em blocos). O hardware alvo prova-se à mão no Android da viatura.
+- **Offline**: cada gesto («Cheguei», saco, peso, «Partir») enfileira em **IndexedDB** e aplica-se logo na sessão do ecrã; a fila despeja **pela ordem de registo** quando a rede volta (evento `online`, ao regressar à app e **Background Sync** — tag `novelo-outbox`, tratado em `public/sw-sync.js`). O 409 do mesmo QR/UUID é reconciliado pelo código (idempotência), e o contador «à espera de sincronização» está sempre à vista.
 - **Hardware** (branch `research/hardware-viatura`): Zebra ZQ511 (etiquetas, BLE) + KERN IXC 10K-3M (balança 15 kg, BLE, IP65) ≈ 1 300–1 600 € s/IVA por viatura (**estimativa**); alternativa de demonstração ~200–350 €.
-- **Exige Android + Chrome** (Web Bluetooth e Background Sync não existem no Safari/iOS).
+- **Exige Android + Chrome** (Web Bluetooth e Background Sync não existem no Safari/iOS): a câmara e o Bluetooth avisam no ecrã; o resto do fluxo (peso manual, fila) funciona noutras plataformas para demonstração.
 
 ## 13. Política de paragem e calibração
 
@@ -163,6 +165,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Rede municipal | `/municipal` | Contentores de **outras frações** (não são de têxteis) em seis separadores: visão geral, freguesias, locais, candidatos a têxteis, lacunas (estimativa) e qualidade; exportação CSV, XLSX e GeoJSON. Nomes de produtores só para administradores |
 | Circuitos e localidades | `/circuits`, `/localities` | Os circuitos e as 82 localidades da Vitrus, por tipologia e por frequência |
 | Frota e turnos | `/fleet` | Calendário da semana tipo (semana, dia, por viatura, por circuito) com conflitos reais, mapa das localidades por circuito, visão geral com carga por turno, viaturas e tipologias; exportação `.ics` e CSV. É planeamento de semana tipo, sem datas nem horas reais |
+| Paragem da viatura | `/viatura` | Onde o lote nasce (secção 12): «Cheguei» abre o lote no local escolhido, scan pela câmara (ou código manual/leitor HID), etiqueta impressa no dispositivo só para sacos sem QR, pratos ≤ 15 kg somados pela app, correção por saco, total sempre visível, «Partir» fecha; fila offline «à espera de sincronização» (IndexedDB + Background Sync). **Exige Android + Chrome** para a câmara e o Bluetooth; sem GPS no MVP |
 | Qualidade dos dados | `/data-quality` | Alertas (12 dos circuitos da Vitrus, 2 da atribuição das localidades à freguesia e 25 municipais) resolúveis, com sugestão de IA, e fontes com impressão digital |
 | Triagem, lotes, bolsa, marcas | `/triage`, `/lots`, `/market`, `/brands` | Funcionalidades 2 e 5 |
 | Relatório RAP | `/reports` | Funcionalidade 3 |
@@ -183,7 +186,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | --- | --- |
 | Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
-| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»), lote nascido na paragem (um por paragem, ancorado ao local, peso medido por saco com QR por unidade) na API e no contrato; ecrã da viatura e exatidão real da triagem por fazer |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»), lote nascido na paragem (um por paragem, ancorado ao local, peso medido por saco com QR por unidade) na API e no contrato; ecrã `/viatura` feito e exatidão real da triagem por fazer |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |
@@ -198,7 +201,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Conta de local: papel `local` criado por convite (com local e natureza do sítio), `/local` «Duas portas» (aviso, rondas, certificado opt-in) e página pública `/certificado` | Feito na API, no contrato e no web; pedido de recolha B2B e o consumo do aviso pelo otimizador por fazer |
 | Agente semanal de operações | Não iniciado (fica para depois) |
 | Resposta ao feedback da Vitrus (nov 2026): âmbito decidido e documentado — ADR, glossário (`GLOSSARY.md`), secções 8–13 e backlog | Feito (documentação; mapa wayfinder #30) |
-| Ecrã da viatura, conta de local, superfície do cidadão, recolha a pedido, pontos, política de paragem, calibração (secções 8–13) | Por fazer; protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |
+| Ecrã da viatura (`/viatura`, porta de dispositivo, offline, #58) | **Feito** (Web Bluetooth do hardware real por provar à mão em Android + Chrome); conta de local, superfície do cidadão, recolha a pedido, pontos, política de paragem, calibração por fazer; protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |
 
 ## O que fica de fora, de propósito
 
