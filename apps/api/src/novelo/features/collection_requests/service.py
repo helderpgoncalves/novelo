@@ -7,7 +7,8 @@ aqui fica só a costura com a base de dados (ronda na freguesia, 1 ativo por mor
 """
 
 import uuid
-from datetime import UTC, date as dt_date, datetime
+from datetime import UTC, datetime
+from datetime import date as dt_date
 from typing import NamedTuple
 
 from sqlalchemy import select, update
@@ -67,9 +68,7 @@ def subject_of(user: User) -> RequestSubject:
 
 
 async def _parish_by_code(db: AsyncSession, dicofre: str) -> Parish:
-    parish: Parish | None = (
-        await db.execute(select(Parish).where(Parish.dicofre == dicofre))
-    ).scalar_one_or_none()
+    parish: Parish | None = (await db.execute(select(Parish).where(Parish.dicofre == dicofre))).scalar_one_or_none()
     if parish is None:
         raise NotFoundError(f"Unknown parish code {dicofre}")
     return parish

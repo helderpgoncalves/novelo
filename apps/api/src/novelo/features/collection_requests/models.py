@@ -61,9 +61,7 @@ class CollectionRequest(Base, UuidPkMixin, TimestampMixin):
     requested_date: Mapped[date] = mapped_column(Date)
     urgent: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     note: Mapped[str | None] = mapped_column(Text)
-    state: Mapped[CollectionRequestState] = mapped_column(
-        enum_column(CollectionRequestState), index=True
-    )
+    state: Mapped[CollectionRequestState] = mapped_column(enum_column(CollectionRequestState), index=True)
     exception_reason: Mapped[RequestExceptionReason | None] = mapped_column(enum_column(RequestExceptionReason))
     # Ausências: a 3.ª expira o pedido (regra pura em `domain/collection_requests.py`).
     missed_count: Mapped[int] = mapped_column(Integer, default=0, server_default=text("0"))

@@ -160,9 +160,7 @@ async def test_one_active_request_per_normalized_address(make_user, session) -> 
     assert resp.status_code == 409, resp.text
     assert resp.json()["code"] == "address_request_active"
     # Outra morada (número diferente) passa: a regra é por morada, não por conta.
-    resp = await second.post(
-        "/api/v1/collection-requests", json=citizen_body(parish, address="Rua de Santa Maria, 44")
-    )
+    resp = await second.post("/api/v1/collection-requests", json=citizen_body(parish, address="Rua de Santa Maria, 44"))
     assert resp.status_code == 201, resp.text
     # Cancelado o primeiro, a morada volta a ficar livre.
     resp = await first.delete(f"/api/v1/collection-requests/{request_id}")
