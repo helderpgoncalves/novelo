@@ -48,6 +48,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as CertificadoLocalIdRouteImport } from './routes/certificado.$localId'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
+import { Route as AppCollectionRequestsIndexRouteImport } from './routes/_app/collection-requests.index'
 import { Route as AppExportLotsIndexRouteImport } from './routes/_app/export-lots.index'
 import { Route as AppExportLotsCodeRouteImport } from './routes/_app/export-lots.$code'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
@@ -250,6 +251,12 @@ const AppAdminAiRoute = AppAdminAiRouteImport.update({
   path: '/admin/ai',
   getParentRoute: () => AppRoute,
 } as any)
+const AppCollectionRequestsIndexRoute =
+  AppCollectionRequestsIndexRouteImport.update({
+    id: '/collection-requests/',
+    path: '/collection-requests/',
+    getParentRoute: () => AppRoute,
+  } as any)
 const AppExportLotsIndexRoute = AppExportLotsIndexRouteImport.update({
   id: '/export-lots/',
   path: '/export-lots/',
@@ -333,6 +340,7 @@ export interface FileRoutesByFullPath {
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/collection-requests/': typeof AppCollectionRequestsIndexRoute
   '/export-lots/': typeof AppExportLotsIndexRoute
   '/lots/': typeof AppLotsIndexRoute
   '/scenarios/': typeof AppScenariosIndexRoute
@@ -380,6 +388,7 @@ export interface FileRoutesByTo {
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/collection-requests': typeof AppCollectionRequestsIndexRoute
   '/export-lots': typeof AppExportLotsIndexRoute
   '/lots': typeof AppLotsIndexRoute
   '/scenarios': typeof AppScenariosIndexRoute
@@ -430,6 +439,7 @@ export interface FileRoutesById {
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/_app/scenarios/compare': typeof AppScenariosCompareRoute
+  '/_app/collection-requests/': typeof AppCollectionRequestsIndexRoute
   '/_app/export-lots/': typeof AppExportLotsIndexRoute
   '/_app/lots/': typeof AppLotsIndexRoute
   '/_app/scenarios/': typeof AppScenariosIndexRoute
@@ -479,6 +489,7 @@ export interface FileRouteTypes {
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/collection-requests/'
     | '/export-lots/'
     | '/lots/'
     | '/scenarios/'
@@ -526,6 +537,7 @@ export interface FileRouteTypes {
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/collection-requests'
     | '/export-lots'
     | '/lots'
     | '/scenarios'
@@ -575,6 +587,7 @@ export interface FileRouteTypes {
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
     | '/_app/scenarios/compare'
+    | '/_app/collection-requests/'
     | '/_app/export-lots/'
     | '/_app/lots/'
     | '/_app/scenarios/'
@@ -873,6 +886,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAdminAiRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/collection-requests/': {
+      id: '/_app/collection-requests/'
+      path: '/collection-requests'
+      fullPath: '/collection-requests/'
+      preLoaderRoute: typeof AppCollectionRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/export-lots/': {
       id: '/_app/export-lots/'
       path: '/export-lots'
@@ -958,6 +978,7 @@ interface AppRouteChildren {
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
   AppScenariosCompareRoute: typeof AppScenariosCompareRoute
+  AppCollectionRequestsIndexRoute: typeof AppCollectionRequestsIndexRoute
   AppExportLotsIndexRoute: typeof AppExportLotsIndexRoute
   AppLotsIndexRoute: typeof AppLotsIndexRoute
   AppScenariosIndexRoute: typeof AppScenariosIndexRoute
@@ -990,6 +1011,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,
   AppScenariosCompareRoute: AppScenariosCompareRoute,
+  AppCollectionRequestsIndexRoute: AppCollectionRequestsIndexRoute,
   AppExportLotsIndexRoute: AppExportLotsIndexRoute,
   AppLotsIndexRoute: AppLotsIndexRoute,
   AppScenariosIndexRoute: AppScenariosIndexRoute,

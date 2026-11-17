@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
-import { Bell, BellOff, CalendarDays, CheckCircle2, Share2 } from 'lucide-react';
+import { Bell, BellOff, CalendarDays, CheckCircle2, HandHeart, Share2 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import type { StopNoticeOut } from '@/client';
@@ -30,6 +30,7 @@ import {
   DestinationLegend,
   type DestinationSplit,
 } from '@/features/local-area/destination-bar';
+import { LocalRequestsSheet } from '@/features/local-area/local-requests-sheet';
 import { getErrorCode } from '@/lib/errors';
 import { formatKg } from '@/lib/format';
 import { weightSourceLabel } from '@/lib/lots';
@@ -41,7 +42,7 @@ import { weightSourceLabel } from '@/lib/lots';
 export function LocalAreaPage() {
   const { data: account } = useSuspenseQuery(getLocalAccountOptions());
   const { data: current } = useSuspenseQuery(getActiveLocalNoticeOptions());
-  const [door, setDoor] = useState<'aviso' | 'rondas' | 'certificado' | null>(null);
+  const [door, setDoor] = useState<'aviso' | 'rondas' | 'certificado' | 'pedido' | null>(null);
   const kindLabel = account.kind === 'b2b' ? 'Produtor B2B' : 'Local assistido';
 
   return (
@@ -117,6 +118,23 @@ export function LocalAreaPage() {
           </span>
         </button>
 
+        {/* Porta 4 — pedir recolha (#60): a morada é a institucional; acima de 20 sacos é recolha especial. */}
+        <button
+          type="button"
+          onClick={() => setDoor('pedido')}
+          className="ring-foreground/10 flex min-h-20 w-full items-center justify-between gap-3 rounded-2xl bg-card p-5 text-left ring-1 transition-transform active:scale-[0.99]"
+        >
+          <span className="flex items-center gap-4">
+            <HandHeart className="text-muted-foreground size-6 shrink-0" aria-hidden />
+            <span className="space-y-0.5">
+              <span className="block font-semibold">Pedir recolha</span>
+              <span className="text-muted-foreground block text-sm">
+                Marque um dia com a viatura de têxtil (até 20 sacos)
+              </span>
+            </span>
+          </span>
+        </button>
+
         <p className="text-muted-foreground text-sm">
           A conta pertence ao local, nunca a uma pessoa: quem convida e revoga é a equipa Novelo.
         </p>
@@ -158,6 +176,19 @@ export function LocalAreaPage() {
             </SheetDescription>
           </SheetHeader>
           <CertificateSheet optIn={account.certificate_opt_in} accountId={account.id} />
+        </SheetContent>
+      </Sheet>
+
+      <Sheet open={door === 'pedido'} onOpenChange={(open) => setDoor(open ? 'pedido' : null)}>
+        <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto px-4 pb-8">
+          <SheetHeader className="text-left">
+            <SheetTitle>Pedir recolha</SheetTitle>
+            <SheetDescription>
+              A morada é a institucional do local. Com 48 horas de margem, o dia fica garantido como
+              os avisos.
+            </SheetDescription>
+          </SheetHeader>
+          <LocalRequestsSheet />
         </SheetContent>
       </Sheet>
     </div>
