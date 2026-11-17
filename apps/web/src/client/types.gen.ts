@@ -886,6 +886,19 @@ export type AttachmentOut = {
 };
 
 /**
+ * AttributeSource
+ *
+ * Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador).
+ */
+export type AttributeSource = {
+    /**
+     * Confidence
+     */
+    confidence: number;
+    origin: Provenance;
+};
+
+/**
  * AuditEntryOut
  */
 export type AuditEntryOut = {
@@ -1751,6 +1764,13 @@ export type CollectionPlanEntry = {
  * CollectionType
  */
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
+
+/**
+ * Colour
+ *
+ * Cor observada na peça (nunca entra na chave do lote de escoamento; só filtros).
+ */
+export type Colour = 'black' | 'white' | 'grey' | 'beige' | 'brown' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'pink' | 'multicolour' | 'unknown';
 
 /**
  * CommandsOut
@@ -3850,6 +3870,16 @@ export type FieldFix = {
 };
 
 /**
+ * FineState
+ *
+ * Estado fino: 4 graus de qualidade reutilizável + reciclar/rejeitar, mapeado nos 3 destinos.
+ *
+ * Os graus seguem a letra usada no comércio de roupa usada (A é a melhor); `recycle` e `reject`
+ * mantêm o significado dos 3 destinos que a plataforma já usa (`TextileDestination`).
+ */
+export type FineState = 'grade_a' | 'grade_b' | 'grade_c' | 'grade_d' | 'recycle' | 'reject';
+
+/**
  * FleetSummary
  */
 export type FleetSummary = {
@@ -4087,8 +4117,10 @@ export type FrontierPoint = {
 
 /**
  * GarmentType
+ *
+ * Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`).
  */
-export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'other';
+export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'footwear' | 'accessory' | 'other';
 
 /**
  * GaugeChart
@@ -4143,6 +4175,13 @@ export type GaugeChart = {
 };
 
 /**
+ * Gender
+ *
+ * Género/segmento como o mercado compra (entra na chave do lote de escoamento).
+ */
+export type Gender = 'men' | 'women' | 'kids' | 'babies';
+
+/**
  * GlobalDefaults
  *
  * Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.
@@ -4168,6 +4207,47 @@ export type GlobalDefaults = {
      * Vision Model
      */
     vision_model?: string | null;
+};
+
+/**
+ * GoldenLabelOut
+ *
+ * Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo).
+ */
+export type GoldenLabelOut = {
+    /**
+     * Ai Confidence
+     */
+    ai_confidence: number | null;
+    /**
+     * Ai Value
+     */
+    ai_value: string | null;
+    axis: TriageAxis;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Lot Code
+     */
+    lot_code: string | null;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
+     * Operator Value
+     */
+    operator_value: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string | null;
 };
 
 /**
@@ -5000,17 +5080,28 @@ export type LotEventOut = {
  * LotItemIn
  *
  * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ *
+ * O caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)
+ * é derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.
  */
 export type LotItemIn = {
+    /**
+     * Proposta da IA revista; gera rótulos dourados
+     */
+    ai_proposal?: TriageProposal | null;
     /**
      * Brand
      */
     brand?: string | null;
+    colour?: Colour | null;
     /**
      * Composition
      */
     composition: Array<CompositionPart>;
-    condition: TextileDestination;
+    /**
+     * Destino (legado); derivado do estado fino quando este vem
+     */
+    condition?: TextileDestination | null;
     /**
      * Confidence
      */
@@ -5019,11 +5110,18 @@ export type LotItemIn = {
      * Estimated Weight G
      */
     estimated_weight_g: number;
+    fine_state?: FineState | null;
     garment_type: GarmentType;
+    gender?: Gender | null;
     /**
      * Prompt Version
      */
     prompt_version?: string | null;
+    season?: Season | null;
+    /**
+     * Banda lida só da etiqueta
+     */
+    size_band?: SizeBand | null;
 };
 
 /**
@@ -5034,6 +5132,7 @@ export type LotItemOut = {
      * Brand
      */
     brand: string | null;
+    colour?: Colour | null;
     /**
      * Composition
      */
@@ -5052,7 +5151,9 @@ export type LotItemOut = {
      * Estimated Weight G
      */
     estimated_weight_g: number;
+    fine_state?: FineState | null;
     garment_type: GarmentType;
+    gender?: Gender | null;
     /**
      * Has Photo
      *
@@ -5075,6 +5176,12 @@ export type LotItemOut = {
      * URL relativa (autenticada) da miniatura; nula sem foto ou depois de expirar
      */
     photo_url?: string | null;
+    /**
+     * Selo «confirmado»/«IA» por eixo
+     */
+    provenance?: TriageProvenance | null;
+    season?: Season | null;
+    size_band?: SizeBand | null;
 };
 
 /**
@@ -8581,6 +8688,13 @@ export type ProposeActionIn = {
 };
 
 /**
+ * Provenance
+ *
+ * De onde vem o valor de um atributo: proposto pela IA e aceite, ou definido pelo operador.
+ */
+export type Provenance = 'confirmed' | 'ai';
+
+/**
  * QuantilesOut
  */
 export type QuantilesOut = {
@@ -9749,6 +9863,13 @@ export type ScheduleEntry = {
 };
 
 /**
+ * Season
+ *
+ * Estação: quando faz sentido voltar a colocar a peça em uso (critério da Retex).
+ */
+export type Season = 'all_season' | 'warm' | 'cold';
+
+/**
  * SensitivityOut
  */
 export type SensitivityOut = {
@@ -10218,6 +10339,17 @@ export type SitingSummary = {
      */
     staffed_candidates?: number;
 };
+
+/**
+ * SizeBand
+ *
+ * Tamanho em bandas, lido SÓ da etiqueta. Nunca se deduz da foto.
+ *
+ * Bandas e não tamanhos exatos: as etiquetas variam (letras, P/M/G, numerais). Numerais
+ * («42», «98») ficam `unknown` — as tabelas EU de homem e de mulher conflituam e a função
+ * não inventa o mapeamento (regra zero); o operador, com a etiqueta à mão, escolhe a banda.
+ */
+export type SizeBand = 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'unknown';
 
 /**
  * SlotCount
@@ -11110,31 +11242,42 @@ export type TreemapItem = {
 /**
  * TriageAnalysis
  *
- * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ * O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.
+ *
+ * A IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),
+ * e o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.
  */
 export type TriageAnalysis = {
     /**
      * Brand
      */
     brand?: string | null;
+    colour: Colour;
     /**
      * Composition
      */
     composition: Array<CompositionPart>;
     /**
-     * reuse, recycle ou reject
-     */
-    condition: TextileDestination;
-    /**
      * Confidence
      */
     confidence: number;
+    fine_state: FineState;
     garment_type: GarmentType;
+    gender: Gender;
     /**
      * Notes
      */
     notes: string;
+    season: Season;
+    size_band?: SizeBand;
 };
+
+/**
+ * TriageAxis
+ *
+ * Os seis eixos da taxonomia; o eval mede a IA em cada um.
+ */
+export type TriageAxis = 'fine_state' | 'garment_type' | 'season' | 'colour' | 'gender' | 'size_band';
 
 /**
  * TriageEvalModel
@@ -11143,7 +11286,7 @@ export type TriageEvalModel = {
     /**
      * Accuracy
      *
-     * Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp
+     * Por campo, de 0 a 1: eixos da taxonomia (fine_state, garment_type, season, colour, gender, size_band), destination, brand, dominant_fibre, composition_within_10pp
      */
     accuracy: {
         [key: string]: number;
@@ -11159,9 +11302,9 @@ export type TriageEvalModel = {
      */
     avg_latency_s: number;
     /**
-     * Confusion Condition
+     * Confusion Fine State
      */
-    confusion_condition: {
+    confusion_fine_state: {
         [key: string]: {
             [key: string]: number;
         };
@@ -11195,6 +11338,20 @@ export type TriageEvalModel = {
      */
     pieces: number;
     /**
+     * Promised Axes
+     *
+     * Eixos «prometidos»: género e tamanho enquanto a exatidão e a amostra não aguentarem
+     */
+    promised_axes?: Array<string>;
+    /**
+     * Samples
+     *
+     * Por eixo da taxonomia, com quantas peças de verdade-terreno se mediu
+     */
+    samples?: {
+        [key: string]: number;
+    };
+    /**
      * Total Cost Usd
      */
     total_cost_usd: number | null;
@@ -11223,10 +11380,63 @@ export type TriageEvalReport = {
 };
 
 /**
+ * TriageProposal
+ *
+ * Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores).
+ */
+export type TriageProposal = {
+    /**
+     * Confidence
+     */
+    confidence: number;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    values: TriageProposalValues;
+};
+
+/**
+ * TriageProposalValues
+ *
+ * O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados).
+ */
+export type TriageProposalValues = {
+    colour?: Colour | null;
+    fine_state?: FineState | null;
+    garment_type?: GarmentType | null;
+    gender?: Gender | null;
+    season?: Season | null;
+    size_band?: SizeBand | null;
+};
+
+/**
+ * TriageProvenance
+ *
+ * Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor.
+ */
+export type TriageProvenance = {
+    colour?: AttributeSource | null;
+    fine_state?: AttributeSource | null;
+    garment_type?: AttributeSource | null;
+    gender?: AttributeSource | null;
+    season?: AttributeSource | null;
+    size_band?: AttributeSource | null;
+};
+
+/**
  * TriageResult
  */
 export type TriageResult = {
     analysis: TriageAnalysis;
+    /**
+     * Destino derivado do estado fino (reuse/recycle/reject)
+     */
+    destination: TextileDestination;
     dominant_fibre: Fibre;
     /**
      * Estimated Weight G
@@ -21783,6 +21993,78 @@ export type AnalyseGarmentResponses = {
 };
 
 export type AnalyseGarmentResponse = AnalyseGarmentResponses[keyof AnalyseGarmentResponses];
+
+export type ListTriageGoldenLabelsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Axis
+         */
+        axis?: TriageAxis | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/triage/golden-labels';
+};
+
+export type ListTriageGoldenLabelsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListTriageGoldenLabelsError = ListTriageGoldenLabelsErrors[keyof ListTriageGoldenLabelsErrors];
+
+export type ListTriageGoldenLabelsResponses = {
+    /**
+     * Response List Triage Golden Labels
+     *
+     * Successful Response
+     */
+    200: Array<GoldenLabelOut>;
+};
+
+export type ListTriageGoldenLabelsResponse = ListTriageGoldenLabelsResponses[keyof ListTriageGoldenLabelsResponses];
 
 export type ListUsersData = {
     body?: never;

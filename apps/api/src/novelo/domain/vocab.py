@@ -180,6 +180,8 @@ class Fibre(StrEnum):
 
 
 class GarmentType(StrEnum):
+    """Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`)."""
+
     TSHIRT = "tshirt"
     SHIRT = "shirt"
     TROUSERS = "trousers"
@@ -189,6 +191,8 @@ class GarmentType(StrEnum):
     SKIRT = "skirt"
     BEDDING = "bedding"
     TOWEL = "towel"
+    FOOTWEAR = "footwear"  # calçado (par)
+    ACCESSORY = "accessory"  # acessório: cinto, lenço, mala pequena, chapéu
     OTHER = "other"
 
 

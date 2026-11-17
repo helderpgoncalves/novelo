@@ -11,10 +11,12 @@ from novelo.core.deps import CurrentUser
 from novelo.core.guest import AiGuard, NotGuestDep
 from novelo.core.ratelimit import lot_photo_limiter, passport_limiter, triage_limiter
 from novelo.core.request_meta import Meta
+from novelo.domain.taxonomy import TriageAxis
 from novelo.domain.vocab import Fibre, LotState
 from novelo.features.lots import photo_store, photos, service, triage
 from novelo.features.lots.schemas import (
     BrandsOut,
+    GoldenLabelOut,
     LotDetail,
     LotItemIn,
     LotItemOut,
@@ -171,6 +173,16 @@ async def analyse_garment(
         )
     finally:
         await llm.aclose()
+
+
+@router.get("/triage/golden-labels", response_model=list[GoldenLabelOut], dependencies=[NotGuestDep])
+async def list_triage_golden_labels(
+    db: Db,
+    axis: TriageAxis | None = None,
+    limit: Annotated[int, Query(ge=1, le=500)] = 200,
+) -> list[GoldenLabelOut]:
+    """Rótulos dourados: correções do operador a propostas da IA, por eixo (verdade-terreno do eval)."""
+    return await service.golden_labels(db, axis, limit)
 
 
 @router.get("/market", response_model=list[MarketEntry])
