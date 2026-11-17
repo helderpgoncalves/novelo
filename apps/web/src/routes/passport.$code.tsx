@@ -16,7 +16,7 @@ import { getErrorCode } from '@/lib/errors';
 import { formatNumber, formatPercent } from '@/lib/format';
 import { getLocale } from '@/lib/i18n';
 import { formatPhotoCredit, photoAlt } from '@/lib/lot-photos';
-import { fibreLabel } from '@/lib/lots';
+import { fibreLabel, weightSourceLabel } from '@/lib/lots';
 import { ogImage, SITE_URL } from '@/lib/seo';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
@@ -110,9 +110,16 @@ function PassportPage() {
                 <LotStateBadge state={passport.state} />
               </div>
               <p className="text-muted-foreground">
-                {passport.parish_name
-                  ? m.passport_origin({ parish: passport.parish_name })
-                  : m.passport_origin_unknown()}
+                {passport.locality_name && passport.parish_name
+                  ? m.passport_origin_local({
+                      locality: passport.locality_name,
+                      parish: passport.parish_name,
+                    })
+                  : passport.locality_name
+                    ? m.passport_origin_local_unknown_parish({ locality: passport.locality_name })
+                    : passport.parish_name
+                      ? m.passport_origin({ parish: passport.parish_name })
+                      : m.passport_origin_unknown()}
               </p>
             </div>
 
@@ -121,9 +128,9 @@ function PassportPage() {
               <div className="space-y-1 bg-card p-5">
                 <dt className="flex flex-wrap items-center gap-x-2 gap-y-1 font-semibold text-[10px] text-muted-foreground uppercase tracking-[0.18em]">
                   {m.lot_stat_weight()}
-                  {/* Peso médio por tipo de peça (pressuposto): estimativa, como na página do lote. */}
+                  {/* Regra zero: o que veio da balança da viatura diz-se «medido»; o resto é estimativa. */}
                   <span className="rounded-full bg-areia/25 px-1.5 py-px text-[9px] text-foreground/80">
-                    {m.common_estimate()}
+                    {weightSourceLabel[passport.weight_source ?? 'estimated']()}
                   </span>
                 </dt>
                 <dd className="font-medium font-serif text-3xl tabular-nums sm:text-4xl">

@@ -4656,5 +4656,17 @@
   "route_source_road": "By road",
   "route_source_estimate": "Estimate",
   "route_legend_road": "Solid: follows the roads",
-  "route_legend_straight": "Dashed: straight-line estimate"
+  "route_legend_straight": "Dashed: straight-line estimate",
+  "common_measured": "measured",
+  "lot_stat_weight_hint_measured": "weighed on the vehicle scale",
+  "lot_stat_weight_hint_unmeasured": "no measured weight yet",
+  "passport_origin_local": "Origin: {locality}, {parish}, Guimarães",
+  "passport_origin_local_unknown_parish": "Origin: {locality}, Guimarães",
+  "lot_event_departed": "Left the stop",
+  "lot_event_unit_removed": "Unit removed from lot",
+  "lot_units_title": "Units weighed at the stop",
+  "lot_units_hint": "One QR per bag: the platform bag's QR or the UUID printed on the vehicle label.",
+  "lot_unit_source_bag": "Platform bag",
+  "lot_unit_source_label": "Printed label",
+  "lot_unit_weight_pending": "no weight"
 }

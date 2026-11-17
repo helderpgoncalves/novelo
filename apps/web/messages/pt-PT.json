@@ -4656,5 +4656,17 @@
   "route_source_road": "Por estrada",
   "route_source_estimate": "Estimativa",
   "route_legend_road": "Traço cheio: segue as estradas",
-  "route_legend_straight": "Tracejado: estimativa em linha reta"
+  "route_legend_straight": "Tracejado: estimativa em linha reta",
+  "common_measured": "medido",
+  "lot_stat_weight_hint_measured": "pesado na balança da viatura",
+  "lot_stat_weight_hint_unmeasured": "ainda sem peso medido",
+  "passport_origin_local": "Origem: {locality}, {parish}, Guimarães",
+  "passport_origin_local_unknown_parish": "Origem: {locality}, Guimarães",
+  "lot_event_departed": "Partiu da paragem",
+  "lot_event_unit_removed": "Unidade retirada do lote",
+  "lot_units_title": "Unidades pesadas na paragem",
+  "lot_units_hint": "Um QR por saco: o do saco da plataforma ou o UUID da etiqueta impressa na viatura.",
+  "lot_unit_source_bag": "Saco da plataforma",
+  "lot_unit_source_label": "Etiqueta impressa",
+  "lot_unit_weight_pending": "sem peso"
 }
