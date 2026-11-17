@@ -15,6 +15,7 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | Documento | Para quê |
 | --- | --- |
 | [Arquitetura](engenharia/arquitetura.md) | Camadas, contrato OpenAPI, base de dados, autenticação, qualidade |
+| [Decisões (ADR)](engenharia/adr/README.md) | Decisões difíceis de reverter: política de paragem, doador, pontos, captura derivada, RGPD |
 | [Funcionalidades](engenharia/features.md) | O que cada funcionalidade e cada ecrã faz, e o estado de implementação |
 | [Dados e modelo](engenharia/dados-e-modelo.md) | Fórmulas, pressupostos e calibração |
 | [IA](engenharia/ia.md) | OpenRouter, prompts versionados, verificador, triagem |
@@ -47,4 +48,4 @@ O ponto de entrada do projeto é o [README](../README.md). Só Markdown, em pt-P
 | [Landing: direção](marca/landing-direcao.md) | Pesquisa de referências, direção, tipografia, hero, painel de entrada, checklist móvel e SEO ponta a ponta |
 | [Descrição](marca/descricao.md) | Textos da página do projeto |
 
-Para agentes de código: [AGENTS.md](../AGENTS.md) (fonte única) e [CLAUDE.md](../CLAUDE.md).
+Para agentes de código: [AGENTS.md](../AGENTS.md) (fonte única) e [CLAUDE.md](../CLAUDE.md). Glossário canónico do domínio: [GLOSSARY.md](../GLOSSARY.md).

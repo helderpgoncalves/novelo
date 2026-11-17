@@ -1,6 +1,6 @@
 # Backlog
 
-O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que muda a realidade. Estado a 20 de outubro de 2026.
+O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que muda a realidade. Estado a 17 de novembro de 2026.
 
 ## Feito
 
@@ -25,6 +25,15 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 
 | Prioridade | Tarefa | Estado |
 | --- | --- | --- |
+| Alta | **Resposta ao feedback da Vitrus (nov 2026, [mapa wayfinder #30](https://github.com/helderpgoncalves/novelo/issues/30))**: âmbito decidido e documentado ([funcionalidades 8–13](features.md), [ADR](adr/README.md), [glossário](../../GLOSSARY.md)); a execução segue por esta ordem | Documentação feita; execução por fazer |
+| Alta | Taxonomia de triagem para exportar roupa reutilizável: vocabulário fechado (estado fino, tipologia, estação, cor, género, tamanho), proveniência e confiança por atributo, rótulos dourados, eval por eixo (#36) | Por fazer |
+| Alta | Lote pesado e etiquetado na viatura: um lote por paragem, QR por unidade física, offline; hardware Zebra ZQ511 + KERN IXC 10K-3M ≈ 1 300–1 600 € s/IVA (**estimativa**) (#34, #33; protótipo #50) | Por fazer |
+| Alta | Recolha a pedido do cidadão (#37) e política de paragem no otimizador: escada de frequências por local, corte de 48 h, `collection_plan` com frequência por local (#42) | Por fazer |
+| Média | Superfície do cidadão `/cidadao`: conta magic link, os meus sacos, QR de conta, saldo, histórico, «onde e quando entrego» (#38; protótipo #48) | Por fazer |
+| Média | Pontos e parcerias: ganho por saco + bónus de conformidade, catálogo (IPSS + parceiros locais), resgate por código pseudónimo, gestor de parcerias; regulamento de pontos e minuta de patrocínio (#39, #47) | Por fazer |
+| Média | Conta de local `/local`: assistidos (escolas) com aviso «sacos prontos» e produtor B2B (17 lares + 9 de hotelaria) (#40, #52; protótipo #51) | Por fazer |
+| Média | Calibração/retroalimentação: quatro métricas operacionais, taxa de geração, tabela de agregados, painel «Calibração», fotografia no cenário (#53) | Por fazer |
+| Média | RGPD da conta de doador: ADR fechado; falta a política de privacidade por finalidades com prazos, o DPA Vitrus↔plataforma, os consentimentos em duas camadas e espelhar na conta de local (#49, [ADR](adr/rgpd-conta-de-doador.md)) | Por fazer |
 | Alta | Aplicar as respostas da Vitrus de 22/10: saco fora do compactador e viatura de têxtil nova, sem compactação (sai o "0 km novos" e o plano B das viaturas livres); procura = 51 250,6 t × 5,86% (≈ 3 003,3 t); tratamento evitado 105,64 €/t; depósito na Rua das Lameiras, Polvoreira; recalcular cenários, sensibilidade, cobertura e piloto, e preencher os números da narrativa | Em curso |
 | Alta | Aplicar as respostas da Vitrus de 21/10 (base da procura substituída a 22/10): procura = 43 051 t × 5,4% (2 324,8 t por desviar), modos por omissão `existing` e `on_demand` (`street` só referência), sem calibração da rua, sem receita de reciclagem; recalcular cenários de referência, sensibilidade, teto francês e a tabela dos locais reais em [Dados e modelo](dados-e-modelo.md) | Em curso |
 | Alta | Custos por hora e por quilómetro das viaturas da Vitrus para trocar os pressupostos por dados | Pedidos ao departamento financeiro a 21/10; ainda por chegar a 22/10 |
@@ -42,6 +51,14 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Baixa | Eventos de progresso do otimizador no stream do copiloto; virtualização de linhas no `DataTable` | Adiado |
 | Baixa | Integração contínua remota (por agora só `just check` local) | Adiado |
 | Baixa | Agente semanal de operações (execução com uma semana simulada) | Adiado |
+| Baixa | Migração dos lotes e passaportes do seed de demonstração para o modelo por local | Quando o lote novo existir |
+| Baixa | Canais de exportação/comercialização dos lotes de escoamento (tamanho mínimo, janela de fecho) | Por decidir com a Vitrus |
+| Baixa | Contas institucionais de doador (escolas, coletividades) com resgate coletivo | Só se a Vitrus priorizar |
+| Baixa | «Recolha fixa» recorrente para produtores B2B | Quando o piloto medir volume |
+| Baixa | Grandes produtores (hospital, universidade, fardamento) no canal B2B | Só se a Vitrus priorizar |
+| Baixa | Sazonalidade da procura no modelo | Com 1 ano de dados observados |
+| Baixa | Confirmar a lei de menores de 2026 quando publicada (aprovada 8 jul 2026; o âmbito publicado é redes sociais) | A aguardar publicação |
+| Baixa | Verificação parental, se a Vitrus quiser contas com menos de 13 anos | Fase 2 |
 
 ## Pitch e entrega
 
@@ -51,5 +68,6 @@ O que está feito e o que falta, por frente. Atualiza-se no mesmo commit que mud
 | Vídeo de 60 s da demo (plano B) e relatório RAP pré-gerado | Por fazer |
 | 3 ensaios cronometrados, com perguntas do júri | Por fazer |
 | Checklist de entrega (Demo e entrega) | Por fazer |
+| Atualizar o pitch e a demo com as novas capacidades (viatura, cidadão, pontos) | Por fazer |
 
 Se o tempo apertar, segue-se a [ordem de corte das features](features.md#ordem-de-corte). A comparação de cenários, o "E se...?" e o relatório RAP nunca se cortam.

@@ -41,7 +41,7 @@ Têxtil captado depende do modo de recolha *m* que serve a zona:
 C_z = D_z \cdot c_m
 ```
 
-A taxa de captura *c* por modo não tem fonte local: é **pressuposto**, visível no ecrã, até haver dados do piloto. Antes calibrávamos o contentor de rua para reproduzir as 301 t de 2025; essa calibração saiu, porque as 301 t são recolhidas por terceiros e não há contentor de têxtil que as reproduza.
+A taxa de captura *c* por modo não tem fonte local: é **pressuposto**, visível no ecrã, até haver dados do piloto. Com a calibração (secção 4), a captura anual passa a ser **derivada** (taxa × frequência; sacos por ronda × rondas) e o *c* por modo fica como **prior** dos locais ainda não visitados. Antes calibrávamos o contentor de rua para reproduzir as 301 t de 2025; essa calibração saiu, porque as 301 t são recolhidas por terceiros e não há contentor de têxtil que as reproduza.
 
 **Modos.** Por omissão o modelo só oferece dois, ambos sem contentor:
 
@@ -102,22 +102,30 @@ Os lotes são o lado real do modelo: o que foi mesmo recolhido, triado e entregu
 
 | Entidade | Campos principais |
 | --- | --- |
-| Peça triada | estado, composição, marca (se visível), peso estimado, ponto, data |
-| Lote | código, ponto, freguesia, fibra dominante, estado, peso total, histórico |
+| Peça triada | estado fino, tipologia, estação, cor, género, tamanho (com proveniência e confiança), composição, marca (se visível), peso, paragem, data |
+| Lote | código, paragem (freguesia e local), estado, peso total **medido na viatura**, histórico; o lote de escoamento fecha por (estado, tipologia, estação, género) com linhagem |
 | Evento do lote | tipo (recolhido, triado, reservado, entregue), data, quem |
 | Reserva | lote, reciclador, data |
 
-**Peso no MVP:** cada peça recebe o peso médio do seu tipo (camisola, calças, lençol...), que é um pressuposto marcado como tal. No piloto passa a vir de uma balança no ponto.
+**Peso no MVP:** cada peça recebe o peso médio do seu tipo (camisola, calças, lençol...), que é um pressuposto marcado como tal. No piloto o peso vem da **balança na viatura, por paragem** (um lote de recolha por paragem; [Funcionalidades](features.md#2-lote-com-passaporte-e-bolsa-de-fibra)), não de uma balança na mesa de triagem.
 
 **Fluxos (Sankey):** soma de toneladas por freguesia → modo → estado → destino, a partir do cenário (previsto) ou dos lotes (observado).
 
-**Calibração das taxas de captura** pelo copiloto: cada semana, a taxa de cada modo aproxima-se do que foi observado, com um peso que cresce com as semanas de dados.
+### Calibração
+
+Decidida em [#53](https://github.com/helderpgoncalves/novelo/issues/53) ([ADR](adr/captura-anual-e-derivada.md)): o observado (pesos medidos por paragem, pedidos) calibra **quatro métricas operacionais** — taxa de geração (kg/dia por local), kg por saco, sacos por ronda por freguesia, pedidos por semana — e a **captura anual é derivada** (taxa × frequência do degrau; sacos por ronda × rondas por ano), limitada por *D*<sub>z</sub>. O *q* da APA e os priores dos locais não visitados nunca são substituídos automaticamente (viés de adoção do piloto).
+
+- **Estado por local = taxa de geração.** O observado é sempre kg/visita num dado intervalo; o estado é kg/dia (peso ÷ dias desde a última visita) e a procura a qualquer degrau é taxa × intervalo.
+- **Janela de 12 semanas, mediana móvel** (robusta a outliers); toda a pesagem > 0 conta; peso 0 = falha, não amostra. Sem sazonalidade até haver um ano de dados.
+- **Pseudo-contagem, sem penhascos**: peso do prior *k* = 4 visitas (local) ou 8 semanas (freguesia); o observado empata à 4.ª visita e domina depois. Rótulos «estimativa·n» / «observado·n». Os pedidos chegam primeiro (sinal de arranque) e nunca multiplicam kg.
 
 ```latex
-c_m^{\text{nova}} = \frac{k \cdot c_m^{\text{pressuposto}} + s \cdot c_m^{\text{observada}}}{k + s}
+\hat{m} = \frac{k \cdot m^{\text{prior}} + s \cdot m^{\text{observado}}}{k + s}
 ```
 
-*s* = semanas com dados; *k* = peso dado ao pressuposto (ex.: 4 semanas). Ao fim de um mês, observado e pressuposto pesam o mesmo.
+- **Atualização manual, ao recalcular o cenário** (nunca agendada); o cenário fotografa a calibração que usou (janela, n por métrica, mistura) e a tabela de agregados (métrica × unidade × janela) é a única ponte entre os eventos e o planeamento — morada e identidade nunca passam dela ([RGPD](adr/rgpd-conta-de-doador.md)).
+
+Esta secção substitui a antiga «calibração semanal das taxas de captura por modo pelo copiloto» (17 nov 2026).
 
 **Tipologia de território** para o relatório RAP: Tipologia de Áreas Urbanas do INE (predominantemente urbanas, mediamente urbanas, predominantemente rurais), cruzada com as freguesias (`data/raw/public/tipau.json`). Os códigos de zona `0308U1` a `0308U5` são provisórios até serem validados.
 
@@ -194,7 +202,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Têxtil no indiferenciado | 5,86% | Fonte: APA, RARU 2025, p. 24 (indiferenciado nacional), indicado pela Vitrus |
 | Têxtil por habitante por desviar (*q*) | 1,596 kg/hab/mês (derivado; 1,59583 nos pressupostos) | Cálculo: 51 250,6 t × 5,86% ÷ 156 830 ÷ 12; **estimativa** |
 | Habitantes | 156 830 | Fonte: INE, Censos 2021 (soma das freguesias) |
-| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto, a calibrar no piloto (já não há calibração do contentor de rua) |
+| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto; **prior** dos locais não visitados — a captura anual é derivada pela [calibração](#calibração) |
 | Modos por omissão | `existing` e `on_demand` | Decisão (Vitrus, 21 de outubro): sem contentores de têxtil; `street` só como referência |
 | Distância máxima a pé por modo | a definir | Pressuposto, validar com o mentor |
 | Desvio da estrada (`detour_factor`) | 1,3 (estrada ÷ linha reta) | Pressuposto da equipa. **Já não mede as rotas dos cenários** (vêm do OSRM): só vale na estimativa de reserva, na volta porta a porta dentro da freguesia (fórmula, secção 9) e como alavanca da sensibilidade. Calibração de 23 out 2026 contra a estrada (OSRM, `portugal-261020`): mediana **1,48** nas 48 freguesias e **1,37** em 300 locais candidatos, logo 1,3 é otimista; subir para ~1,4 a 1,5 fica por decidir ([Rotas por estrada](rotas-reais.md#calibração-23-out-2026-dados-portugal-261020)) |
@@ -207,7 +215,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Perfil de condução do OSRM (`novelo-van`) | furgoneta de 2,8 m de altura, 2,1 m de largura, 6,0 m de comprimento e 3 500 kg | Pressuposto: a Vitrus ainda não indicou a viatura (ver [Rotas por estrada](rotas-reais.md)) |
 | Minutos por paragem | 2 por saco à porta, 10 por local | Pressuposto da equipa |
 | Horas úteis por turno | 7 h, 5 dias por semana (1 820 h por ano por viatura) | Pressuposto da equipa (8 h menos descarga e pausas) |
-| Frequência da ronda porta a porta (`on_demand_every_weeks`) | a cada 2 semanas (26 rondas por ano) | Pressuposto da equipa |
+| Frequência da ronda porta a porta (`on_demand_every_weeks`) | a cada 2 semanas (26 rondas por ano) | Pressuposto da equipa; nos locais, a frequência passa a ser **por local, na escada discreta** (semanal, quinzenal, mensal, trimestral — degraus como pressuposto com fonte; [#42](https://github.com/helderpgoncalves/novelo/issues/42)) |
 | Volta dentro da freguesia (porta a porta) | 0,7124 · √(sacos por ronda · área) · desvio | Beardwood, Halton e Hammersley (1959); área CAOP 2019; cada ronda é uma viagem própria (teto dos km). **Sempre estimativa por fórmula, mesmo nos cenários `routing = road`**: não há paragens com morada para pedir ao OSRM |
 | Custo de um contentor de rua | pressuposto | Só para o cenário de referência; a Vitrus não quer contentores |
 | Variação da sensibilidade | ±30%, distribuição triangular | Pressuposto da equipa (secção 5), configurável |

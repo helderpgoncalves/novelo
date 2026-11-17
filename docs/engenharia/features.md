@@ -1,6 +1,8 @@
 # Funcionalidades
 
-Seis funcionalidades que nos distinguem, uma história: **do saco ao fio**. Planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028. Cada uma usa a anterior, e as cinco primeiras cabem numa demo de dois minutos. A seguir vêm o copiloto conversacional, o agente semanal (ainda por fazer) e os ecrãs de base.
+Seis funcionalidades que nos distinguem, uma história: **do saco ao fio**. Planear a rede, decidir em linguagem natural, seguir cada saco até à indústria e entregar à câmara o dossiê de 2028. Cada uma usa a anterior, e as cinco primeiras cabem numa demo de dois minutos. A seguir vêm o copiloto conversacional (6), o agente semanal (7) e os ecrãs de base.
+
+A resposta ao feedback da Vitrus (apresentação de nov 2026) acrescentou uma segunda frente, **a rede no terreno e o cidadão** (secções 8–13): do saco ativado em casa ao lote pesado na viatura, ao aviso da escola e ao crédito em pontos. O âmbito foi decidido e documentado no [mapa wayfinder](https://github.com/helderpgoncalves/novelo/issues/30); as decisões difíceis de reverter estão nos [ADR](adr/README.md) e os termos no [glossário](../../GLOSSARY.md).
 
 ![Do saco ao fio: cada passo alimenta o seguinte](../img/diagrama-do-saco-ao-fio.png)
 
@@ -32,18 +34,20 @@ O decisor pergunta em português e recebe um cenário novo, calculado pelo otimi
 
 ## 2. Lote com passaporte e bolsa de fibra
 
-Cada peça triada entra num lote; cada lote tem um QR e uma página pública; os lotes juntam-se por fibra numa bolsa que os recicladores do Vale do Ave consultam. A recolha deixa de acabar no camião e passa a acabar na fábrica.
+Cada saco recolhido vira um lote; cada lote tem um QR e uma página pública; os lotes juntam-se por fibra numa bolsa que os recicladores do Vale do Ave consultam. A recolha deixa de acabar no camião e passa a acabar na fábrica.
 
 **O lote**
 
 | Campo | Origem |
 | --- | --- |
-| Código e QR | Gerado ao abrir o lote no ponto de recolha |
-| Freguesia e ponto | Ponto onde a peça foi entregue |
+| Código e QR | Um QR por unidade física: o do saco da plataforma, ou etiqueta impressa na viatura quando não há |
+| Paragem (freguesia, local) | Onde o lote nasce — à porta (ronda ou pedido) ou num local; a atribuição vem do scan na viatura |
+| Peso | Medido na viatura, na paragem (balança BLE); no MVP, estimado por tipo de peça |
+| Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA») |
 | Composição (ex.: 100% algodão) | Lida da etiqueta na triagem |
-| Estado (reutilizável, reciclável, rejeito) | Triagem por foto, confirmável pelo operador: é o controlo de qualidade na entrega (o problema da Vitrus é a contaminação) |
-| Peso | Estimado por tipo de peça no MVP; balança no ponto no piloto |
 | Histórico | Recolhido, triado, reservado, entregue, com data |
+
+**Um lote de recolha por paragem.** O lote de recolha nasce na viatura, um por paragem (na recolha a pedido, um por saco), pesado e etiquetado no momento. O lote de **escoamento** é que se fecha por categoria para exportar roupa reutilizável — chave (estado fino, tipologia, estação, género), com a linhagem preservada até às paragens; cor e tamanho ficam como atributos filtráveis. É a resposta ao pedido da Vitrus de categorizar as triagens (cor, estação, …) para exportar lotes; os níveis de qualidade e a sazonalidade vêm do que a Retex (Maia) faz (branch `research/retex-maia`; a Retex é candidata a operador de triagem).
 
 **O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o plano municipal de Guimarães (contexto público, F74) descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
 
@@ -96,14 +100,50 @@ Desenho, contrato dos eventos, segurança e avaliação em [Copiloto](copiloto.m
 
 ## 7. Agente semanal de operações (se houver tempo)
 
-Um agente que corre todas as segundas-feiras e fecha o ciclo entre o plano e o terreno:
+Um agente que escreve o resumo semanal para a Vitrus: lê os lotes e os pesos da semana, compara com o previsto por paragem e propõe recálculos de cenário com a poupança esperada ("o local X já só dá 2 kg/semana: baixar para mensal poupa Y €"). A calibração em si é a da secção 13 — o agente propõe e **nada é aplicado sem aprovação humana**. No pitch entra como o próximo passo natural. **Não iniciado.**
 
-1. Lê os lotes da semana e compara toneladas reais com as previstas por ponto.
-2. Recalibra as taxas de captura por modo (ver [Dados e modelo](dados-e-modelo.md)).
-3. Volta a correr o otimizador e propõe alterações com a poupança esperada ("mover o ponto da Junta X para o supermercado Y: +0,4 t/mês").
-4. Escreve um resumo para a Vitrus. **Nada é aplicado sem aprovação humana.**
+## 8. Superfície do cidadão (`/cidadao`)
 
-No hackathon mostra-se uma execução, com dados simulados de uma semana. No pitch entra como o próximo passo natural. **Não iniciado.**
+O PWA que existe evolui; **sem app nativa** (é na viatura que o Android + Chrome é exigido, para o Bluetooth da balança e da impressora). Conta por magic link de email (ou telefone, sem password); só `pt-PT` no MVP; sem conta, só o que já é público. RGPD no [ADR](adr/rgpd-conta-de-doador.md) (13 anos, consentimentos em duas camadas, apagamento).
+
+- **Os meus sacos**: ativar/desativar, apelido privado; saldo só leitura; histórico ligado ao passaporte; crédito por **saco ativado**, nunca por kg ([ADR](adr/identidade-e-credito-do-doador.md)).
+- **Dois portadores**: saco da plataforma com QR único, ou mão a mão com o QR de conta (locais públicos sem sacos = lote sem doador).
+- **«Onde e quando entrego»**: página pública com a agenda real de cada local (dado introduzido, não saída do otimizador).
+- **«Vai no saco?»** continua público e sem sessão.
+- Protótipo (branch `prototype/fluxo-cidadao`): base «Carteira» (separadores Início/Sacos/Saldo/Histórico), onboarding passo a passo na primeira sessão e herói público «onde e quando entrego». Privacidade no [ADR do RGPD](adr/rgpd-conta-de-doador.md).
+
+## 9. Recolha a pedido
+
+A ronda mantém-se **universal** (o saco no dia da freguesia é sempre recolhido); o pedido é opcional e vale **certeza**: data e aviso. Só com conta, gratuito, auto-aceite por regras; corte às **48 h**; 1–5 sacos; 1 pedido ativo por morada; expira à 3.ª ausência; morada retida 12 meses. Fora da ronda é exceção despachada pela Vitrus, não produto. Para o modelo, o pedido é **sinal de procura** e calibra os sacos por ronda (secção 13).
+
+## 10. Pontos e parcerias
+
+- Ganho **flat por saco recolhido (100, estimativa)** + **bónus de conformidade (+50)** a quem declarou o conteúdo e a triagem confirmou; teto mensal por conta; valores configuráveis, sempre «estimativa».
+- **Catálogo MVP**: donativos a IPSS (1 000 pontos ≈ 5 €, a única âncora em €), prémios **cedidos por parceiros locais** e acumulado ambiental verificado.
+- **Economia**: os parceiros pagam os prémios; a Vitrus paga os donativos **com teto indexado ao custo evitado** (105,64 €/t). Nunca dinheiro nem vouchers de moda ([ADR](adr/economia-dos-pontos.md)).
+- **Resgate por código pseudónimo**: zero partilha de dados com parceiros ([ADR](adr/resgate-por-codigo-pseudonimo.md)); 12 meses por ganho, FIFO; campanhas sazonais da Vitrus.
+- **Benefícios municipais** em fases (2: perímetro Vitrus; 3: equipamentos da câmara e freguesias; 4: bonificação tarifária por regulamento, com parecer ERSAR — precedente Ovar 780/2024); donativo a IPSS = **mecenato** (EBF art. 62.º, DL 167/2026); regulamento de pontos com abuso de critérios objetivos; minuta de contrato de patrocínio (10 cláusulas). Detalhe legal no branch `research/enquadramento-legal-incentivos`.
+- **Gestor de parcerias** na app de gestão (as freguesias propõem); acumular desde o dia 1, trocar no passo seguinte do PWA.
+
+## 11. Contas de local: assistidas e produtor B2B (`/local`)
+
+Um só papel (`local`); a conta pertence ao **local**, é criada pela equipa (sem auto-registo) e a natureza do sítio decide a home.
+
+- **Locais assistidos (escolas no MVP)**: leitura — lotes por paragem com o peso medido, relatório em kg medidos por destino (sem CO₂ nem doadores); certificado público **opt-in**; e uma única escrita: o **aviso «sacos prontos»**, que garante paragem.
+- **Produtor B2B (17 lares + 9 de hotelaria)**: leitura em espelho do assistido; pedido de recolha com a mecânica do cidadão, exceto o volume (teto de 20 sacos, estimativa; acima = recolha especial) e a morada institucional fixa; sem pontos nem crédito.
+- Protótipo «Duas portas» (branch `prototype/fluxo-local`): o aviso como herói; rondas e certificado atrás de portões grandes, em folhas inferiores.
+
+## 12. Ecrã da viatura: pesar, etiquetar, offline
+
+O lote de recolha nasce aqui (secção 2). **«O scan manda»**: câmara primeiro; etiqueta impressa só quando o saco não tem QR; pratos calculados pela app (≤ 15 kg por pesagem); correção direta por saco (o prato pesado anula-se); total sempre visível; «Cheguei» e «Partir» os únicos gestos deliberados (sem GPS no MVP). Offline com fila «à espera de sincronização» (IndexedDB + Background Sync).
+
+- **Hardware** (branch `research/hardware-viatura`): Zebra ZQ511 (etiquetas, BLE) + KERN IXC 10K-3M (balança 15 kg, BLE, IP65) ≈ 1 300–1 600 € s/IVA por viatura (**estimativa**); alternativa de demonstração ~200–350 €.
+- **Exige Android + Chrome** (Web Bluetooth e Background Sync não existem no Safari/iOS).
+
+## 13. Política de paragem e calibração
+
+- **Política de paragem** ([ADR](adr/politica-de-paragem.md)): o aviso garante paragem; sem aviso, a frequência de cada local é escolhida pelo otimizador na **escada discreta** (semanal a trimestral); a porta não encolhe (ronda universal — o pedido calibra os sacos por ronda, não corta quilómetros); a agenda pública acompanha o degrau; nenhuma visita publicada é saltada; corte único de 48 h. O `collection_plan` passa a mostrar a frequência por local.
+- **Calibração** ([ADR](adr/captura-anual-e-derivada.md) e [Dados e modelo](dados-e-modelo.md#calibração)): o observado (pesos por paragem, pedidos) calibra quatro métricas operacionais — **taxa de geração** (kg/dia por local), kg por saco, sacos por ronda por freguesia, pedidos por semana — com janela de 12 semanas (mediana) e pseudo-contagem (o observado domina a partir da 4.ª visita pesada; rótulos «estimativa·n» / «observado·n»). A captura anual é **derivada** (taxa × frequência), nunca auto-calibrada pelo piloto; a atualização é manual, ao recalcular, e o cenário fotografa a calibração que usou. Painel «Calibração» na app de gestão; os pedidos chegam primeiro (sinal de arranque) e **nunca multiplicam quilos**.
 
 ## Ecrãs de base
 
@@ -131,6 +171,8 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Conta | `/account` | Perfil, língua, tema, sessões, password |
 | Entrada | `/login`, `/join`, `/magic-link`, `/verify-email`, `/privacy` | Magic link (principal), password, Google, entrada de evento por QR, confirmação de email e texto de privacidade |
 | Passaporte | `/passport/:código` | Público, sem sessão: o que o QR do lote abre |
+| Cidadão | `/cidadao` | Secções 8–10: os meus sacos, saldo, histórico, «onde e quando entrego», pedir recolha (planeado) |
+| Local | `/local` | Secção 11: conta do local assistido ou produtor B2B — aviso «sacos prontos», rondas, certificado (planeado) |
 
 **Transversal:** pt-PT e inglês, tema claro e escuro, PWA instalável com barra de separadores em telemóvel, páginas de erro, apresentação de seis passos na primeira entrada (o impacto com os números da API), `DataTable` em todas as tabelas (ver [Arquitetura](arquitetura.md#web)).
 
@@ -153,15 +195,20 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Páginas de erro, PWA e interface de telemóvel, marca gerada por `just brand` | Feito |
 | Camada e cobertura dos contentores de **têxteis** | Não se aplica: não há contentores de têxteis (Vitrus, 21 out 2026) |
 | Agente semanal de operações | Não iniciado (fica para depois) |
+| Resposta ao feedback da Vitrus (nov 2026): âmbito decidido e documentado — ADR, glossário (`GLOSSARY.md`), secções 8–13 e backlog | Feito (documentação; mapa wayfinder #30) |
+| Ecrã da viatura, conta de local, superfície do cidadão, recolha a pedido, pontos, política de paragem, calibração (secções 8–13) | Por fazer; protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |
 
 ## O que fica de fora, de propósito
 
 - **Sensores nos contentores:** custam por unidade e o desafio pede o menor investimento.
 - **Blockchain no passaporte:** um registo com histórico na base de dados chega para rastrear lotes; não acrescenta nada que o júri valorize.
-- **App do cidadão completa:** a recolha a pedido pode começar com um formulário simples; a app vem depois do piloto.
+- **App nativa (iOS/Android):** a superfície do cidadão é o PWA; só a viatura exige Android + Chrome (balança e impressora por Bluetooth).
+- **Resgate em dinheiro ou vouchers de moda:** pontos não são dinheiro nem conversíveis; o valor sai em donativos e prémios locais ([ADR](adr/economia-dos-pontos.md)).
+- **Contas a menores de 13 anos:** idade mínima 13 (Lei 58/2019); sem verificação parental no MVP.
+- **Contentores de têxtil:** não existem e a Vitrus não os quer — a rede é de saco fechado, porta a porta e em locais.
 
 ## Ordem de corte
 
-Se o tempo apertar, corta-se por esta ordem: agente semanal (7), copiloto conversacional (6), evidência por marca (5), animação do Sankey (fica estático), bolsa de fibra (fica só o passaporte do lote). **Nunca se cortam:** a comparação de cenários, o "E se...?" e o relatório RAP.
+Se o tempo apertar, corta-se por esta ordem na frente nova: **calibração** (13; precisa de dados de piloto na mesma) → **pontos e parcerias** (10; dependem de parceiros) → **recolha a pedido** (9) → **contas de local** (11) → **ecrã da viatura** (12; depende de hardware) → **superfície do cidadão** (8; é a raiz da frente, sai em último). Depois, o rabo antigo: agente semanal (7), copiloto conversacional (6), evidência por marca (5), animação do Sankey (fica estático), bolsa de fibra (fica só o passaporte do lote). **Nunca se cortam:** a comparação de cenários, o "E se...?" e o relatório RAP.
 
 **Fontes:** [Plano de Ação Integrado para a Circularidade Têxtil de Guimarães](https://urbact.eu/sites/default/files/2026-01/Guimaraes_IAP_PT.pdf) (passaporte digital, mercado de matérias-primas secundárias; documento do Município/URBACT, não usado pela Vitrus; números do modelo vêm da Vitrus e da APA) · [Diretiva 2025/1892, VdA](https://www.vda.pt/pt/publicacoes/insights/diretiva-20251892-que-altera-a-diretiva-quadro-dos-residuos-diretiva-200898ce/28063/) (prazo da RAP) · [EU Parliament mandates EPR for textiles, AMI](https://www.ami.international/insights/eu-parliament-mandates-extended-producer-responsibility-epr-for-textiles) (taxas mais altas para moda rápida)
