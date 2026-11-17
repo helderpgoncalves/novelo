@@ -356,3 +356,59 @@ class NoticeState(StrEnum):
 
     ACTIVE = "active"
     CANCELLED = "cancelled"
+
+
+class RequestSubject(StrEnum):
+    """Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+
+    Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+    máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+    """
+
+    CITIZEN = "citizen"
+    LOCAL = "local"
+
+
+class CollectionRequestState(StrEnum):
+    """Estado do pedido de recolha.
+
+    A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+    Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+    3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+    pedido; nenhum estado volta atrás.
+    """
+
+    SCHEDULED = "scheduled"
+    EXCEPTION = "exception"
+    REJECTED = "rejected"
+    COLLECTED = "collected"
+    EXPIRED = "expired"
+    CANCELLED = "cancelled"
+
+
+class RequestExceptionReason(StrEnum):
+    """Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+
+    `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+    `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+    urgente — nunca é auto-aceite, o gestor decide.
+    """
+
+    OUT_OF_ROUND = "out_of_round"
+    CUTOFF = "cutoff"
+    SPECIAL_VOLUME = "special_volume"
+    URGENCY = "urgency"
+
+
+class RequestOutcome(StrEnum):
+    """O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª)."""
+
+    COLLECTED = "collected"
+    MISSED = "missed"
+
+
+class DispatchAction(StrEnum):
+    """A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo)."""
+
+    SCHEDULE = "schedule"
+    REJECT = "reject"

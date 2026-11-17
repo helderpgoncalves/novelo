@@ -52,6 +52,14 @@ ErrorCode = Literal[
     "local_account_missing",
     "notice_already_active",
     "certificate_not_public",
+    "address_request_active",
+    "citizen_address_required",
+    "citizen_parish_required",
+    "citizen_bags_limit",
+    "local_address_forbidden",
+    "request_not_dispatchable",
+    "request_not_scheduled",
+    "request_cancel_not_allowed",
     "internal_error",
 ]
 
@@ -296,6 +304,62 @@ class CertificateNotPublicError(AppError):
 
     status_code = 404
     code = "certificate_not_public"
+
+
+class AddressRequestActiveError(AppError):
+    """Já há um pedido de recolha ativo (agendado ou em exceção) para esta morada — 1 ativo por morada."""
+
+    status_code = 409
+    code = "address_request_active"
+
+
+class CitizenAddressRequiredError(AppError):
+    """Pedido de cidadão sem morada (a morada manual é de primeira classe; nunca GPS)."""
+
+    status_code = 422
+    code = "citizen_address_required"
+
+
+class CitizenParishRequiredError(AppError):
+    """Pedido de cidadão sem freguesia: é ela que liga o pedido à ronda e às estatísticas."""
+
+    status_code = 422
+    code = "citizen_parish_required"
+
+
+class CitizenBagsLimitError(AppError):
+    """Mais de 5 sacos num pedido de cidadão (o teto do local é outro: acima de 20 é recolha especial)."""
+
+    status_code = 422
+    code = "citizen_bags_limit"
+
+
+class LocalAddressForbiddenError(AppError):
+    """O local/B2B não escreve morada: a institucional vem do local da conta (corpo com `address` ou `parish_code`)."""
+
+    status_code = 422
+    code = "local_address_forbidden"
+
+
+class RequestNotDispatchableError(AppError):
+    """Só um pedido na fila de exceções se despacha (agendar ou recusar)."""
+
+    status_code = 409
+    code = "request_not_dispatchable"
+
+
+class RequestNotScheduledError(AppError):
+    """Só um pedido agendado recebe o resultado da visita (recolhido ou ausência)."""
+
+    status_code = 409
+    code = "request_not_scheduled"
+
+
+class RequestCancelNotAllowedError(AppError):
+    """Só um pedido ativo (agendado ou em exceção) se anula; os terminais ficam como estão."""
+
+    status_code = 409
+    code = "request_cancel_not_allowed"
 
 
 # Declarado em todos os routers: é o que dá ao cliente gerado os tipos de erro.

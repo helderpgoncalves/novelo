@@ -20,6 +20,7 @@ from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.app_settings.router import router as app_settings_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
+from novelo.features.collection_requests.router import router as collection_requests_router
 from novelo.features.copilot.router import router as copilot_router
 from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
@@ -139,6 +140,14 @@ def create_app() -> FastAPI:
         responses=COMMON_ERRORS,
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
+    # Pedido de recolha unificado (#60): cidadão, local assistido e produtor B2B na mesma entidade.
+    app.include_router(
+        collection_requests_router,
+        prefix=API_PREFIX,
+        tags=["collection-requests"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
     app.include_router(
         export_lots_router,
         prefix=f"{API_PREFIX}/export-lots",
