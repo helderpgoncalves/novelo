@@ -6471,6 +6471,362 @@
         "title": "ExportFormat",
         "type": "string"
       },
+      "ExportLotDetail": {
+        "properties": {
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "collection_lots": {
+            "description": "Lotes de recolha de origem distintos",
+            "title": "Collection Lots",
+            "type": "integer"
+          },
+          "composition": {
+            "description": "Composição agregada, ponderada pelo peso",
+            "items": {
+              "$ref": "#/components/schemas/CompositionPart"
+            },
+            "title": "Composition",
+            "type": "array"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "item_list": {
+            "items": {
+              "$ref": "#/components/schemas/ExportLotItemOut"
+            },
+            "title": "Item List",
+            "type": "array"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "lineage": {
+            "description": "Lotes de recolha de origem, mais pesado primeiro",
+            "items": {
+              "$ref": "#/components/schemas/LineageLotOut"
+            },
+            "title": "Lineage",
+            "type": "array"
+          },
+          "localities": {
+            "description": "Paragens (locais) distintas na linhagem",
+            "title": "Localities",
+            "type": "integer"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ExportLotState"
+          },
+          "taxonomy_version": {
+            "description": "Versão da taxonomia em que o lote foi fechado",
+            "title": "Taxonomy Version",
+            "type": "integer"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender",
+          "taxonomy_version",
+          "items",
+          "weight_kg",
+          "collection_lots",
+          "localities",
+          "created_at",
+          "closed_at",
+          "composition",
+          "item_list",
+          "lineage"
+        ],
+        "title": "ExportLotDetail",
+        "type": "object"
+      },
+      "ExportLotItemOut": {
+        "description": "Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.",
+        "properties": {
+          "added_at": {
+            "format": "date-time",
+            "title": "Added At",
+            "type": "string"
+          },
+          "brand": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Brand"
+          },
+          "colour": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/Colour"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "estimated_weight_g": {
+            "title": "Estimated Weight G",
+            "type": "integer"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Paragem (local) donde a peça veio",
+            "title": "Locality Name"
+          },
+          "lot_code": {
+            "description": "Lote de recolha de origem",
+            "title": "Lot Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "provenance": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TriageProvenance"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Selo «confirmado»/«IA» por eixo"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "size_band": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SizeBand"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "garment_type",
+          "fine_state",
+          "season",
+          "gender",
+          "colour",
+          "size_band",
+          "brand",
+          "estimated_weight_g",
+          "lot_code",
+          "added_at"
+        ],
+        "title": "ExportLotItemOut",
+        "type": "object"
+      },
+      "ExportLotItemsIn": {
+        "description": "Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).",
+        "properties": {
+          "item_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 500,
+            "minItems": 1,
+            "title": "Item Ids",
+            "type": "array"
+          }
+        },
+        "required": [
+          "item_ids"
+        ],
+        "title": "ExportLotItemsIn",
+        "type": "object"
+      },
+      "ExportLotKeyIn": {
+        "description": "A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.",
+        "properties": {
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          }
+        },
+        "required": [
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender"
+        ],
+        "title": "ExportLotKeyIn",
+        "type": "object"
+      },
+      "ExportLotState": {
+        "description": "Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).",
+        "enum": [
+          "open",
+          "closed"
+        ],
+        "title": "ExportLotState",
+        "type": "string"
+      },
+      "ExportLotSummary": {
+        "properties": {
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "collection_lots": {
+            "description": "Lotes de recolha de origem distintos",
+            "title": "Collection Lots",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "fine_state": {
+            "$ref": "#/components/schemas/FineState"
+          },
+          "garment_type": {
+            "$ref": "#/components/schemas/GarmentType"
+          },
+          "gender": {
+            "$ref": "#/components/schemas/Gender"
+          },
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "localities": {
+            "description": "Paragens (locais) distintas na linhagem",
+            "title": "Localities",
+            "type": "integer"
+          },
+          "season": {
+            "$ref": "#/components/schemas/Season"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ExportLotState"
+          },
+          "taxonomy_version": {
+            "description": "Versão da taxonomia em que o lote foi fechado",
+            "title": "Taxonomy Version",
+            "type": "integer"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "code",
+          "state",
+          "fine_state",
+          "garment_type",
+          "season",
+          "gender",
+          "taxonomy_version",
+          "items",
+          "weight_kg",
+          "collection_lots",
+          "localities",
+          "created_at",
+          "closed_at"
+        ],
+        "title": "ExportLotSummary",
+        "type": "object"
+      },
       "ExportScope": {
         "enum": [
           "sites",
@@ -8544,6 +8900,54 @@
           "items"
         ],
         "title": "KpisSpec",
+        "type": "object"
+      },
+      "LineageLotOut": {
+        "description": "Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.",
+        "properties": {
+          "items": {
+            "title": "Items",
+            "type": "integer"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "lot_code": {
+            "title": "Lot Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "lot_code",
+          "locality_name",
+          "parish_name",
+          "items",
+          "weight_kg"
+        ],
+        "title": "LineageLotOut",
         "type": "object"
       },
       "LocalityOut": {
@@ -32539,6 +32943,773 @@
         "summary": "Get Data Quality",
         "tags": [
           "datasets"
+        ]
+      }
+    },
+    "/api/v1/export-lots": {
+      "get": {
+        "description": "Lotes de escoamento, mais recentes primeiro; os filtros da chave e os de cor/tamanho combinam.",
+        "operationId": "list_export_lots",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fine_state",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/FineState"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Fine State"
+            }
+          },
+          {
+            "in": "query",
+            "name": "garment_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/GarmentType"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Garment Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "season",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Season"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Season"
+            }
+          },
+          {
+            "in": "query",
+            "name": "gender",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Gender"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Gender"
+            }
+          },
+          {
+            "description": "Lotes com pelo menos uma peça desta cor (filtro, não chave)",
+            "in": "query",
+            "name": "colour",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/Colour"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Lotes com pelo menos uma peça desta cor (filtro, não chave)",
+              "title": "Colour"
+            }
+          },
+          {
+            "description": "Lotes com pelo menos uma peça desta banda (filtro, não chave)",
+            "in": "query",
+            "name": "size_band",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "$ref": "#/components/schemas/SizeBand"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Lotes com pelo menos uma peça desta banda (filtro, não chave)",
+              "title": "Size Band"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ExportLotSummary"
+                  },
+                  "title": "Response List Export Lots",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Export Lots",
+        "tags": [
+          "export-lots"
+        ]
+      },
+      "post": {
+        "description": "Fecha um lote de escoamento por (estado fino, tipologia, estação, género): agrega todas as peças\ntriadas que apanham a chave e ainda não têm lote. Cor e tamanho ficam fora, para filtros.",
+        "operationId": "create_export_lot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportLotKeyIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}": {
+      "get": {
+        "description": "Detalhe com linhagem: peças com a paragem de origem e lotes de recolha, mais pesado primeiro.",
+        "operationId": "get_export_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}/close": {
+      "post": {
+        "description": "Sela o lote para o mercado: as peças nunca mais entram noutro lote e a chave fica livre.",
+        "operationId": "close_export_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Close Export Lot",
+        "tags": [
+          "export-lots"
+        ]
+      }
+    },
+    "/api/v1/export-lots/{code}/items": {
+      "post": {
+        "description": "Junta a um lote aberto peças triadas depois do fecho: a chave tem de bater certo e a peça não\npode já pertencer a outro lote de escoamento.",
+        "operationId": "add_export_lot_items",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExportLotItemsIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExportLotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Add Export Lot Items",
+        "tags": [
+          "export-lots"
         ]
       }
     },

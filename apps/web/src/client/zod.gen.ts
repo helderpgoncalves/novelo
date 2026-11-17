@@ -1436,6 +1436,22 @@ export const zExportFormat = z.enum([
 ]);
 
 /**
+ * ExportLotItemsIn
+ *
+ * Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).
+ */
+export const zExportLotItemsIn = z.object({
+    item_ids: z.array(z.uuid()).min(1).max(500)
+});
+
+/**
+ * ExportLotState
+ *
+ * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
+ */
+export const zExportLotState = z.enum(['open', 'closed']);
+
+/**
  * ExportScope
  */
 export const zExportScope = z.enum(['sites', 'containers']);
@@ -1979,6 +1995,19 @@ export const zKpisSpec = z.object({
 export const zKpisArtifact = z.object({
     artifact_type: z.literal('kpis').optional().default('kpis'),
     spec: zKpisSpec
+});
+
+/**
+ * LineageLotOut
+ *
+ * Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.
+ */
+export const zLineageLotOut = z.object({
+    items: z.int(),
+    locality_name: z.string().nullable(),
+    lot_code: z.string(),
+    parish_name: z.string().nullable(),
+    weight_kg: z.number()
 });
 
 /**
@@ -3951,6 +3980,37 @@ export const zSeason = z.enum([
 ]);
 
 /**
+ * ExportLotKeyIn
+ *
+ * A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.
+ */
+export const zExportLotKeyIn = z.object({
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    season: zSeason
+});
+
+/**
+ * ExportLotSummary
+ */
+export const zExportLotSummary = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    items: z.int(),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
+});
+
+/**
  * SensitivityRequest
  */
 export const zSensitivityRequest = z.object({
@@ -5054,6 +5114,50 @@ export const zTriageProvenance = z.object({
     gender: zAttributeSource.nullish(),
     season: zAttributeSource.nullish(),
     size_band: zAttributeSource.nullish()
+});
+
+/**
+ * ExportLotItemOut
+ *
+ * Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.
+ */
+export const zExportLotItemOut = z.object({
+    added_at: z.iso.datetime(),
+    brand: z.string().nullable(),
+    colour: zColour.nullable(),
+    estimated_weight_g: z.int(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    id: z.uuid(),
+    locality_name: z.string().nullish(),
+    lot_code: z.string(),
+    parish_name: z.string().nullish(),
+    provenance: zTriageProvenance.nullish(),
+    season: zSeason,
+    size_band: zSizeBand.nullable()
+});
+
+/**
+ * ExportLotDetail
+ */
+export const zExportLotDetail = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    composition: z.array(zCompositionPart),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    item_list: z.array(zExportLotItemOut),
+    items: z.int(),
+    lineage: z.array(zLineageLotOut),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
 });
 
 /**
@@ -6605,6 +6709,58 @@ export const zSuggestAlertResolutionResponse = zAlertSuggestionOut;
  * Successful Response
  */
 export const zGetDataQualityResponse = zDataQuality;
+
+export const zListExportLotsQuery = z.object({
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType.nullish(),
+    season: zSeason.nullish(),
+    gender: zGender.nullish(),
+    colour: zColour.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * Response List Export Lots
+ *
+ * Successful Response
+ */
+export const zListExportLotsResponse = z.array(zExportLotSummary);
+
+export const zCreateExportLotBody = zExportLotKeyIn;
+
+/**
+ * Successful Response
+ */
+export const zCreateExportLotResponse = zExportLotDetail;
+
+export const zGetExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetExportLotResponse = zExportLotDetail;
+
+export const zCloseExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseExportLotResponse = zExportLotDetail;
+
+export const zAddExportLotItemsBody = zExportLotItemsIn;
+
+export const zAddExportLotItemsPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddExportLotItemsResponse = zExportLotDetail;
 
 /**
  * Successful Response

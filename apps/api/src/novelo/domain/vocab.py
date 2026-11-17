@@ -227,6 +227,13 @@ class LotWeightSource(StrEnum):
     ESTIMATED = "estimated"  # média por tipo de peça (pressuposto, antes de haver balança)
 
 
+class ExportLotState(StrEnum):
+    """Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado)."""
+
+    OPEN = "open"  # criado por chave; ainda aceita peças por POST /items
+    CLOSED = "closed"  # selado: a peça seguiu para o mercado e nunca volta a entrar noutro lote
+
+
 class WhatIfStatus(StrEnum):
     PROPOSED = "proposed"  # o modelo percebeu a pergunta; aguarda confirmação
     APPLIED = "applied"  # confirmada e calculada

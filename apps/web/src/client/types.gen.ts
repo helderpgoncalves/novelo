@@ -3776,6 +3776,201 @@ export type ErrorBody = {
 export type ExportFormat = 'csv' | 'xlsx' | 'geojson';
 
 /**
+ * ExportLotDetail
+ */
+export type ExportLotDetail = {
+    /**
+     * Closed At
+     */
+    closed_at: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Collection Lots
+     *
+     * Lotes de recolha de origem distintos
+     */
+    collection_lots: number;
+    /**
+     * Composition
+     *
+     * Composição agregada, ponderada pelo peso
+     */
+    composition: Array<CompositionPart>;
+    /**
+     * Created At
+     */
+    created_at: string;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Item List
+     */
+    item_list: Array<ExportLotItemOut>;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Lineage
+     *
+     * Lotes de recolha de origem, mais pesado primeiro
+     */
+    lineage: Array<LineageLotOut>;
+    /**
+     * Localities
+     *
+     * Paragens (locais) distintas na linhagem
+     */
+    localities: number;
+    season: Season;
+    state: ExportLotState;
+    /**
+     * Taxonomy Version
+     *
+     * Versão da taxonomia em que o lote foi fechado
+     */
+    taxonomy_version: number;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * ExportLotItemOut
+ *
+ * Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.
+ */
+export type ExportLotItemOut = {
+    /**
+     * Added At
+     */
+    added_at: string;
+    /**
+     * Brand
+     */
+    brand: string | null;
+    colour: Colour | null;
+    /**
+     * Estimated Weight G
+     */
+    estimated_weight_g: number;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Name
+     *
+     * Paragem (local) donde a peça veio
+     */
+    locality_name?: string | null;
+    /**
+     * Lot Code
+     *
+     * Lote de recolha de origem
+     */
+    lot_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name?: string | null;
+    /**
+     * Selo «confirmado»/«IA» por eixo
+     */
+    provenance?: TriageProvenance | null;
+    season: Season;
+    size_band: SizeBand | null;
+};
+
+/**
+ * ExportLotItemsIn
+ *
+ * Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).
+ */
+export type ExportLotItemsIn = {
+    /**
+     * Item Ids
+     */
+    item_ids: Array<string>;
+};
+
+/**
+ * ExportLotKeyIn
+ *
+ * A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.
+ */
+export type ExportLotKeyIn = {
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    season: Season;
+};
+
+/**
+ * ExportLotState
+ *
+ * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
+ */
+export type ExportLotState = 'open' | 'closed';
+
+/**
+ * ExportLotSummary
+ */
+export type ExportLotSummary = {
+    /**
+     * Closed At
+     */
+    closed_at: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Collection Lots
+     *
+     * Lotes de recolha de origem distintos
+     */
+    collection_lots: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Localities
+     *
+     * Paragens (locais) distintas na linhagem
+     */
+    localities: number;
+    season: Season;
+    state: ExportLotState;
+    /**
+     * Taxonomy Version
+     *
+     * Versão da taxonomia em que o lote foi fechado
+     */
+    taxonomy_version: number;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
  * ExportScope
  */
 export type ExportScope = 'sites' | 'containers';
@@ -4929,6 +5124,34 @@ export type KpisSpec = {
      * Title
      */
     title: string;
+};
+
+/**
+ * LineageLotOut
+ *
+ * Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.
+ */
+export type LineageLotOut = {
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Lot Code
+     */
+    lot_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
 };
 
 /**
@@ -17906,6 +18129,357 @@ export type GetDataQualityResponses = {
 };
 
 export type GetDataQualityResponse = GetDataQualityResponses[keyof GetDataQualityResponses];
+
+export type ListExportLotsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fine State
+         */
+        fine_state?: FineState | null;
+        /**
+         * Garment Type
+         */
+        garment_type?: GarmentType | null;
+        /**
+         * Season
+         */
+        season?: Season | null;
+        /**
+         * Gender
+         */
+        gender?: Gender | null;
+        /**
+         * Colour
+         *
+         * Lotes com pelo menos uma peça desta cor (filtro, não chave)
+         */
+        colour?: Colour | null;
+        /**
+         * Size Band
+         *
+         * Lotes com pelo menos uma peça desta banda (filtro, não chave)
+         */
+        size_band?: SizeBand | null;
+    };
+    url: '/api/v1/export-lots';
+};
+
+export type ListExportLotsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListExportLotsError = ListExportLotsErrors[keyof ListExportLotsErrors];
+
+export type ListExportLotsResponses = {
+    /**
+     * Response List Export Lots
+     *
+     * Successful Response
+     */
+    200: Array<ExportLotSummary>;
+};
+
+export type ListExportLotsResponse = ListExportLotsResponses[keyof ListExportLotsResponses];
+
+export type CreateExportLotData = {
+    body: ExportLotKeyIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/export-lots';
+};
+
+export type CreateExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateExportLotError = CreateExportLotErrors[keyof CreateExportLotErrors];
+
+export type CreateExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    201: ExportLotDetail;
+};
+
+export type CreateExportLotResponse = CreateExportLotResponses[keyof CreateExportLotResponses];
+
+export type GetExportLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}';
+};
+
+export type GetExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetExportLotError = GetExportLotErrors[keyof GetExportLotErrors];
+
+export type GetExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: ExportLotDetail;
+};
+
+export type GetExportLotResponse = GetExportLotResponses[keyof GetExportLotResponses];
+
+export type CloseExportLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}/close';
+};
+
+export type CloseExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CloseExportLotError = CloseExportLotErrors[keyof CloseExportLotErrors];
+
+export type CloseExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: ExportLotDetail;
+};
+
+export type CloseExportLotResponse = CloseExportLotResponses[keyof CloseExportLotResponses];
+
+export type AddExportLotItemsData = {
+    body: ExportLotItemsIn;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}/items';
+};
+
+export type AddExportLotItemsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AddExportLotItemsError = AddExportLotItemsErrors[keyof AddExportLotItemsErrors];
+
+export type AddExportLotItemsResponses = {
+    /**
+     * Successful Response
+     */
+    201: ExportLotDetail;
+};
+
+export type AddExportLotItemsResponse = AddExportLotItemsResponses[keyof AddExportLotItemsResponses];
 
 export type HealthData = {
     body?: never;
