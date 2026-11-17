@@ -60,6 +60,9 @@ test.describe('conta de doador: magic link com 13+', () => {
 });
 
 test.describe('carteira do doador', () => {
+  // Telemóvel primeiro (aceitação do bilhete): a carteira corre sempre num viewport de telemóvel.
+  test.use({ viewport: { width: 390, height: 844 } });
+
   test('ativar saco com apelido privado e declaração; QR e desativar', async ({ page }) => {
     const email = uniqueEmail('sacos');
     const donor = await createDonorSession(page, email);
