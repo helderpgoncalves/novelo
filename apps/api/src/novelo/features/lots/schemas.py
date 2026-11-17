@@ -4,7 +4,15 @@ from typing import Annotated
 
 from pydantic import BaseModel, Field, field_validator
 
-from novelo.domain.vocab import Fibre, GarmentType, LotEventKind, LotState, TextileDestination
+from novelo.domain.vocab import (
+    Fibre,
+    GarmentType,
+    LotEventKind,
+    LotState,
+    LotUnitSource,
+    LotWeightSource,
+    TextileDestination,
+)
 
 
 class CompositionPart(BaseModel):
@@ -75,6 +83,37 @@ class LotOpen(BaseModel):
     parish_code: str | None = Field(default=None, description="Freguesia do ponto de recolha (código INE)")
 
 
+class StopLotOpen(BaseModel):
+    """Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier."""
+
+    locality_id: uuid.UUID = Field(description="Local da paragem (à porta ou num local assistido)")
+    parish_code: str | None = Field(
+        default=None, max_length=6, description="Freguesia da paragem (código INE); por omissão, a do local"
+    )
+
+
+class LotUnitIn(BaseModel):
+    """Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta)."""
+
+    bag_code: str | None = Field(
+        default=None, min_length=1, max_length=80, description="QR do saco da plataforma, tal como lido no scan"
+    )
+
+
+class LotUnitWeight(BaseModel):
+    weight_g: int = Field(
+        gt=0, le=30000, description="Peso medido em gramas (pratos ≤ 15 kg: um saco pode somar vários pratos)"
+    )
+
+
+class LotUnitOut(BaseModel):
+    id: uuid.UUID
+    code: str = Field(description="QR da unidade: código do saco da plataforma, ou UUID da etiqueta impressa")
+    source: LotUnitSource
+    weight_g: int | None = Field(description="Peso medido; nulo até a unidade passar pela balança")
+    created_at: datetime
+
+
 class LotEventOut(BaseModel):
     kind: LotEventKind
     occurred_at: datetime
@@ -93,9 +132,16 @@ class LotSummary(BaseModel):
     state: LotState
     parish_code: str | None
     parish_name: str | None
+    locality_id: uuid.UUID | None = Field(default=None, description="Local da paragem que deu origem ao lote")
+    locality_name: str | None = Field(default=None, description="Nome do local da paragem")
     dominant_fibre: Fibre
     items: int
+    units: int = Field(default=0, description="Unidades físicas (sacos) pesadas na paragem")
     weight_kg: float
+    weight_source: LotWeightSource = Field(
+        default=LotWeightSource.ESTIMATED,
+        description="`measured` quando o peso vem da balança da viatura; `estimated` é pressuposto",
+    )
     opened_at: datetime
 
 
@@ -105,6 +151,7 @@ class LotDetail(LotSummary):
     recycle_kg: float
     reject_kg: float
     item_list: list[LotItemOut]
+    unit_list: list[LotUnitOut] = Field(default_factory=list, description="Unidades físicas pesadas na paragem")
     events: list[LotEventOut]
     reservation: ReservationOut | None
 
@@ -125,14 +172,19 @@ class PassportPhoto(BaseModel):
 
 
 class Passport(BaseModel):
-    """Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais."""
+    """Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais."""
 
     code: str
     state: LotState
     parish_name: str | None
+    locality_name: str | None = Field(default=None, description="Local da paragem (nunca identifica ninguém)")
     dominant_fibre: Fibre
     composition: list[CompositionPart]
     weight_kg: float
+    weight_source: LotWeightSource = Field(
+        default=LotWeightSource.ESTIMATED,
+        description="`measured` quando o peso vem da balança da viatura; `estimated` é pressuposto",
+    )
     items: int
     reuse_pct: float
     recycle_pct: float

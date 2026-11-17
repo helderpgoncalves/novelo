@@ -1942,6 +1942,8 @@ export const zLoginRequest = z.object({
 export const zLotEventKind = z.enum([
     'opened',
     'item_added',
+    'departed',
+    'unit_removed',
     'sorted',
     'reserved',
     'delivered'
@@ -1981,17 +1983,62 @@ export const zLotStateChange = z.object({
 });
 
 /**
+ * LotUnitIn
+ *
+ * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ */
+export const zLotUnitIn = z.object({
+    bag_code: z.string().min(1).max(80).nullish()
+});
+
+/**
+ * LotUnitSource
+ *
+ * De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem).
+ */
+export const zLotUnitSource = z.enum(['bag', 'label']);
+
+/**
+ * LotUnitOut
+ */
+export const zLotUnitOut = z.object({
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    source: zLotUnitSource,
+    weight_g: z.int().nullable()
+});
+
+/**
+ * LotUnitWeight
+ */
+export const zLotUnitWeight = z.object({
+    weight_g: z.int().gt(0).lte(30000)
+});
+
+/**
+ * LotWeightSource
+ *
+ * De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado).
+ */
+export const zLotWeightSource = z.enum(['measured', 'estimated']);
+
+/**
  * LotSummary
  */
 export const zLotSummary = z.object({
     code: z.string(),
     dominant_fibre: zFibre,
     items: z.int(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
     opened_at: z.iso.datetime(),
     parish_code: z.string().nullable(),
     parish_name: z.string().nullable(),
     state: zLotState,
-    weight_kg: z.number()
+    units: z.int().optional().default(0),
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -2875,7 +2922,7 @@ export const zPassportPhoto = z.object({
 /**
  * Passport
  *
- * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ * Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.
  */
 export const zPassport = z.object({
     brands: z.array(zBrandCount),
@@ -2884,6 +2931,7 @@ export const zPassport = z.object({
     dominant_fibre: zFibre,
     events: z.array(zLotEventOut),
     items: z.int(),
+    locality_name: z.string().nullish(),
     opened_at: z.iso.datetime(),
     parish_name: z.string().nullable(),
     photos: z.array(zPassportPhoto).optional(),
@@ -2891,7 +2939,8 @@ export const zPassport = z.object({
     reject_pct: z.number(),
     reuse_pct: z.number(),
     state: zLotState,
-    weight_kg: z.number()
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -4212,6 +4261,16 @@ export const zEmailSummary = z.object({
 });
 
 /**
+ * StopLotOpen
+ *
+ * Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier.
+ */
+export const zStopLotOpen = z.object({
+    locality_id: z.uuid(),
+    parish_code: z.string().max(6).nullish()
+});
+
+/**
  * SuppressionCreate
  */
 export const zSuppressionCreate = z.object({
@@ -4461,6 +4520,8 @@ export const zLotDetail = z.object({
     events: z.array(zLotEventOut),
     item_list: z.array(zLotItemOut),
     items: z.int(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
     opened_at: z.iso.datetime(),
     parish_code: z.string().nullable(),
     parish_name: z.string().nullable(),
@@ -4469,7 +4530,10 @@ export const zLotDetail = z.object({
     reservation: zReservationOut.nullable(),
     reuse_kg: z.number(),
     state: zLotState,
-    weight_kg: z.number()
+    unit_list: z.array(zLotUnitOut).optional(),
+    units: z.int().optional().default(0),
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -4907,6 +4971,7 @@ export const zLocalityOut = z.object({
     circuits: z.array(z.string()),
     collection_types: z.array(zCollectionType),
     days_per_week: z.int(),
+    id: z.uuid(),
     latitude: z.number().nullable(),
     longitude: z.number().nullable(),
     name: z.string(),
@@ -6352,7 +6417,8 @@ export const zHealthResponse = zHealth;
 export const zListLotsQuery = z.object({
     fibre: zFibre.nullish(),
     state: zLotState.nullish(),
-    parish_code: z.string().max(6).nullish()
+    parish_code: z.string().max(6).nullish(),
+    locality_id: z.uuid().nullish()
 });
 
 /**
@@ -6369,6 +6435,13 @@ export const zOpenLotBody = zLotOpen;
  */
 export const zOpenLotResponse = zLotSummary;
 
+export const zOpenStopLotBody = zStopLotOpen;
+
+/**
+ * Successful Response
+ */
+export const zOpenStopLotResponse = zLotSummary;
+
 export const zGetLotPath = z.object({
     code: z.string()
 });
@@ -6377,6 +6450,15 @@ export const zGetLotPath = z.object({
  * Successful Response
  */
 export const zGetLotResponse = zLotDetail;
+
+export const zCloseStopLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseStopLotResponse = zLotDetail;
 
 export const zAddLotItemBody = zLotItemIn;
 
@@ -6426,6 +6508,49 @@ export const zChangeLotStatePath = z.object({
  * Successful Response
  */
 export const zChangeLotStateResponse = zLotDetail;
+
+export const zAddLotUnitBody = zLotUnitIn;
+
+export const zAddLotUnitPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddLotUnitResponse = zLotUnitOut;
+
+export const zDeleteLotUnitPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteLotUnitResponse = z.void();
+
+export const zSetLotUnitWeightBody = zLotUnitWeight;
+
+export const zSetLotUnitWeightPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zSetLotUnitWeightResponse = zLotUnitOut;
+
+export const zGetLotUnitQrPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetLotUnitQrResponse = z.string();
 
 export const zGetFibreMarketQuery = z.object({
     fibre: zFibre.nullish()

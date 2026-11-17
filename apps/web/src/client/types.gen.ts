@@ -4870,6 +4870,10 @@ export type LocalityOut = {
      */
     days_per_week: number;
     /**
+     * Id
+     */
+    id: string;
+    /**
      * Latitude
      *
      * OpenStreetMap (Nominatim); vazio se a localidade não é um lugar
@@ -4945,6 +4949,18 @@ export type LotDetail = {
      */
     items: number;
     /**
+     * Locality Id
+     *
+     * Local da paragem que deu origem ao lote
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local da paragem
+     */
+    locality_name?: string | null;
+    /**
      * Opened At
      */
     opened_at: string;
@@ -4971,15 +4987,31 @@ export type LotDetail = {
     reuse_kg: number;
     state: LotState;
     /**
+     * Unit List
+     *
+     * Unidades físicas pesadas na paragem
+     */
+    unit_list?: Array<LotUnitOut>;
+    /**
+     * Units
+     *
+     * Unidades físicas (sacos) pesadas na paragem
+     */
+    units?: number;
+    /**
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
 
 /**
  * LotEventKind
  */
-export type LotEventKind = 'opened' | 'item_added' | 'sorted' | 'reserved' | 'delivered';
+export type LotEventKind = 'opened' | 'item_added' | 'departed' | 'unit_removed' | 'sorted' | 'reserved' | 'delivered';
 
 /**
  * LotEventOut
@@ -5115,6 +5147,18 @@ export type LotSummary = {
      */
     items: number;
     /**
+     * Locality Id
+     *
+     * Local da paragem que deu origem ao lote
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local da paragem
+     */
+    locality_name?: string | null;
+    /**
      * Opened At
      */
     opened_at: string;
@@ -5128,10 +5172,87 @@ export type LotSummary = {
     parish_name: string | null;
     state: LotState;
     /**
+     * Units
+     *
+     * Unidades físicas (sacos) pesadas na paragem
+     */
+    units?: number;
+    /**
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
+
+/**
+ * LotUnitIn
+ *
+ * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ */
+export type LotUnitIn = {
+    /**
+     * Bag Code
+     *
+     * QR do saco da plataforma, tal como lido no scan
+     */
+    bag_code?: string | null;
+};
+
+/**
+ * LotUnitOut
+ */
+export type LotUnitOut = {
+    /**
+     * Code
+     *
+     * QR da unidade: código do saco da plataforma, ou UUID da etiqueta impressa
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    source: LotUnitSource;
+    /**
+     * Weight G
+     *
+     * Peso medido; nulo até a unidade passar pela balança
+     */
+    weight_g: number | null;
+};
+
+/**
+ * LotUnitSource
+ *
+ * De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem).
+ */
+export type LotUnitSource = 'bag' | 'label';
+
+/**
+ * LotUnitWeight
+ */
+export type LotUnitWeight = {
+    /**
+     * Weight G
+     *
+     * Peso medido em gramas (pratos ≤ 15 kg: um saco pode somar vários pratos)
+     */
+    weight_g: number;
+};
+
+/**
+ * LotWeightSource
+ *
+ * De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado).
+ */
+export type LotWeightSource = 'measured' | 'estimated';
 
 /**
  * MagicLinkRequest
@@ -7914,7 +8035,7 @@ export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'parti
 /**
  * Passport
  *
- * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ * Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.
  */
 export type Passport = {
     /**
@@ -7938,6 +8059,12 @@ export type Passport = {
      * Items
      */
     items: number;
+    /**
+     * Locality Name
+     *
+     * Local da paragem (nunca identifica ninguém)
+     */
+    locality_name?: string | null;
     /**
      * Opened At
      */
@@ -7969,6 +8096,10 @@ export type Passport = {
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
 
 /**
@@ -10321,6 +10452,26 @@ export type StatusCounts = {
      * Total
      */
     total?: number;
+};
+
+/**
+ * StopLotOpen
+ *
+ * Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier.
+ */
+export type StopLotOpen = {
+    /**
+     * Locality Id
+     *
+     * Local da paragem (à porta ou num local assistido)
+     */
+    locality_id: string;
+    /**
+     * Parish Code
+     *
+     * Freguesia da paragem (código INE); por omissão, a do local
+     */
+    parish_code?: string | null;
 };
 
 /**
@@ -17623,6 +17774,12 @@ export type ListLotsData = {
          * Parish Code
          */
         parish_code?: string | null;
+        /**
+         * Locality Id
+         *
+         * Lotes de um local (conta de local, #59)
+         */
+        locality_id?: string | null;
     };
     url: '/api/v1/lots';
 };
@@ -17744,6 +17901,67 @@ export type OpenLotResponses = {
 
 export type OpenLotResponse = OpenLotResponses[keyof OpenLotResponses];
 
+export type OpenStopLotData = {
+    body: StopLotOpen;
+    path?: never;
+    query?: never;
+    url: '/api/v1/lots/stops';
+};
+
+export type OpenStopLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type OpenStopLotError = OpenStopLotErrors[keyof OpenStopLotErrors];
+
+export type OpenStopLotResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotSummary;
+};
+
+export type OpenStopLotResponse = OpenStopLotResponses[keyof OpenStopLotResponses];
+
 export type GetLotData = {
     body?: never;
     path: {
@@ -17809,6 +18027,72 @@ export type GetLotResponses = {
 };
 
 export type GetLotResponse = GetLotResponses[keyof GetLotResponses];
+
+export type CloseStopLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/departure';
+};
+
+export type CloseStopLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CloseStopLotError = CloseStopLotErrors[keyof CloseStopLotErrors];
+
+export type CloseStopLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotDetail;
+};
+
+export type CloseStopLotResponse = CloseStopLotResponses[keyof CloseStopLotResponses];
 
 export type AddLotItemData = {
     body: LotItemIn;
@@ -18149,6 +18433,282 @@ export type ChangeLotStateResponses = {
 };
 
 export type ChangeLotStateResponse = ChangeLotStateResponses[keyof ChangeLotStateResponses];
+
+export type AddLotUnitData = {
+    body: LotUnitIn;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units';
+};
+
+export type AddLotUnitErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AddLotUnitError = AddLotUnitErrors[keyof AddLotUnitErrors];
+
+export type AddLotUnitResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotUnitOut;
+};
+
+export type AddLotUnitResponse = AddLotUnitResponses[keyof AddLotUnitResponses];
+
+export type DeleteLotUnitData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}';
+};
+
+export type DeleteLotUnitErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteLotUnitError = DeleteLotUnitErrors[keyof DeleteLotUnitErrors];
+
+export type DeleteLotUnitResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteLotUnitResponse = DeleteLotUnitResponses[keyof DeleteLotUnitResponses];
+
+export type SetLotUnitWeightData = {
+    body: LotUnitWeight;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}';
+};
+
+export type SetLotUnitWeightErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetLotUnitWeightError = SetLotUnitWeightErrors[keyof SetLotUnitWeightErrors];
+
+export type SetLotUnitWeightResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotUnitOut;
+};
+
+export type SetLotUnitWeightResponse = SetLotUnitWeightResponses[keyof SetLotUnitWeightResponses];
+
+export type GetLotUnitQrData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}/qr';
+};
+
+export type GetLotUnitQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLotUnitQrError = GetLotUnitQrErrors[keyof GetLotUnitQrErrors];
+
+export type GetLotUnitQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: Blob | File;
+};
+
+export type GetLotUnitQrResponse = GetLotUnitQrResponses[keyof GetLotUnitQrResponses];
 
 export type GetFibreMarketData = {
     body?: never;

@@ -8410,6 +8410,11 @@
             "title": "Days Per Week",
             "type": "integer"
           },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
           "latitude": {
             "anyOf": [
               {
@@ -8465,6 +8470,7 @@
           }
         },
         "required": [
+          "id",
           "name",
           "latitude",
           "longitude",
@@ -8539,6 +8545,31 @@
             "title": "Items",
             "type": "integer"
           },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Local da paragem que deu origem ao lote",
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome do local da paragem",
+            "title": "Locality Name"
+          },
           "opened_at": {
             "format": "date-time",
             "title": "Opened At",
@@ -8591,9 +8622,28 @@
           "state": {
             "$ref": "#/components/schemas/LotState"
           },
+          "unit_list": {
+            "description": "Unidades físicas pesadas na paragem",
+            "items": {
+              "$ref": "#/components/schemas/LotUnitOut"
+            },
+            "title": "Unit List",
+            "type": "array"
+          },
+          "units": {
+            "default": 0,
+            "description": "Unidades físicas (sacos) pesadas na paragem",
+            "title": "Units",
+            "type": "integer"
+          },
           "weight_kg": {
             "title": "Weight Kg",
             "type": "number"
+          },
+          "weight_source": {
+            "$ref": "#/components/schemas/LotWeightSource",
+            "default": "estimated",
+            "description": "`measured` quando o peso vem da balança da viatura; `estimated` é pressuposto"
           }
         },
         "required": [
@@ -8620,6 +8670,8 @@
         "enum": [
           "opened",
           "item_added",
+          "departed",
+          "unit_removed",
           "sorted",
           "reserved",
           "delivered"
@@ -8865,6 +8917,31 @@
             "title": "Items",
             "type": "integer"
           },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Local da paragem que deu origem ao lote",
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome do local da paragem",
+            "title": "Locality Name"
+          },
           "opened_at": {
             "format": "date-time",
             "title": "Opened At",
@@ -8895,9 +8972,20 @@
           "state": {
             "$ref": "#/components/schemas/LotState"
           },
+          "units": {
+            "default": 0,
+            "description": "Unidades físicas (sacos) pesadas na paragem",
+            "title": "Units",
+            "type": "integer"
+          },
           "weight_kg": {
             "title": "Weight Kg",
             "type": "number"
+          },
+          "weight_source": {
+            "$ref": "#/components/schemas/LotWeightSource",
+            "default": "estimated",
+            "description": "`measured` quando o peso vem da balança da viatura; `estimated` é pressuposto"
           }
         },
         "required": [
@@ -8912,6 +9000,104 @@
         ],
         "title": "LotSummary",
         "type": "object"
+      },
+      "LotUnitIn": {
+        "description": "Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).",
+        "properties": {
+          "bag_code": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "minLength": 1,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "QR do saco da plataforma, tal como lido no scan",
+            "title": "Bag Code"
+          }
+        },
+        "title": "LotUnitIn",
+        "type": "object"
+      },
+      "LotUnitOut": {
+        "properties": {
+          "code": {
+            "description": "QR da unidade: código do saco da plataforma, ou UUID da etiqueta impressa",
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "source": {
+            "$ref": "#/components/schemas/LotUnitSource"
+          },
+          "weight_g": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Peso medido; nulo até a unidade passar pela balança",
+            "title": "Weight G"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "source",
+          "weight_g",
+          "created_at"
+        ],
+        "title": "LotUnitOut",
+        "type": "object"
+      },
+      "LotUnitSource": {
+        "description": "De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem).",
+        "enum": [
+          "bag",
+          "label"
+        ],
+        "title": "LotUnitSource",
+        "type": "string"
+      },
+      "LotUnitWeight": {
+        "properties": {
+          "weight_g": {
+            "description": "Peso medido em gramas (pratos ≤ 15 kg: um saco pode somar vários pratos)",
+            "exclusiveMinimum": 0.0,
+            "maximum": 30000.0,
+            "title": "Weight G",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "weight_g"
+        ],
+        "title": "LotUnitWeight",
+        "type": "object"
+      },
+      "LotWeightSource": {
+        "description": "De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado).",
+        "enum": [
+          "measured",
+          "estimated"
+        ],
+        "title": "LotWeightSource",
+        "type": "string"
       },
       "MagicLinkRequest": {
         "properties": {
@@ -13383,7 +13569,7 @@
         "type": "string"
       },
       "Passport": {
-        "description": "Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.",
+        "description": "Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.",
         "properties": {
           "brands": {
             "items": {
@@ -13416,6 +13602,18 @@
           "items": {
             "title": "Items",
             "type": "integer"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Local da paragem (nunca identifica ninguém)",
+            "title": "Locality Name"
           },
           "opened_at": {
             "format": "date-time",
@@ -13459,6 +13657,11 @@
           "weight_kg": {
             "title": "Weight Kg",
             "type": "number"
+          },
+          "weight_source": {
+            "$ref": "#/components/schemas/LotWeightSource",
+            "default": "estimated",
+            "description": "`measured` quando o peso vem da balança da viatura; `estimated` é pressuposto"
           }
         },
         "required": [
@@ -17227,6 +17430,35 @@
           }
         },
         "title": "StatusCounts",
+        "type": "object"
+      },
+      "StopLotOpen": {
+        "description": "Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier.",
+        "properties": {
+          "locality_id": {
+            "description": "Local da paragem (à porta ou num local assistido)",
+            "format": "uuid",
+            "title": "Locality Id",
+            "type": "string"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "maxLength": 6,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesia da paragem (código INE); por omissão, a do local",
+            "title": "Parish Code"
+          }
+        },
+        "required": [
+          "locality_id"
+        ],
+        "title": "StopLotOpen",
         "type": "object"
       },
       "SuppressionCreate": {
@@ -31949,6 +32181,25 @@
               ],
               "title": "Parish Code"
             }
+          },
+          {
+            "description": "Lotes de um local (conta de local, #59)",
+            "in": "query",
+            "name": "locality_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Lotes de um local (conta de local, #59)",
+              "title": "Locality Id"
+            }
           }
         ],
         "responses": {
@@ -32073,7 +32324,7 @@
         ]
       },
       "post": {
-        "description": "Abre um lote no ponto de recolha: gera o código que vai no QR.",
+        "description": "Abre um lote ancorado só à freguesia (caminho antigo, antes do lote nascer na paragem).",
         "operationId": "open_lot",
         "requestBody": {
           "content": {
@@ -32198,6 +32449,138 @@
           }
         },
         "summary": "Open Lot",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/stops": {
+      "post": {
+        "description": "Abre o lote na paragem («Cheguei»): um lote por paragem, ancorado ao local e à freguesia.\n\nNa recolha a pedido a paragem é 1:1 com o saco; nas rondas acumula os sacos do local. O peso só fica\ncompleto quando as unidades passam pela balança e a viatura parte (`POST /lots/{code}/departure`).",
+        "operationId": "open_stop_lot",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopLotOpen"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotSummary"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Open Stop Lot",
         "tags": [
           "lots"
         ]
@@ -32330,6 +32713,139 @@
           }
         },
         "summary": "Get Lot",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/departure": {
+      "post": {
+        "description": "Fecha a paragem («Partir»): exige todas as unidades pesadas; o peso do lote passa a ser o medido.",
+        "operationId": "close_stop_lot",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Close Stop Lot",
         "tags": [
           "lots"
         ]
@@ -33036,6 +33552,575 @@
           }
         },
         "summary": "Change Lot State",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/units": {
+      "post": {
+        "description": "Regista uma unidade física na paragem: o QR do saco da plataforma, ou etiqueta impressa com UUID.\n\nSem `bag_code` o servidor gera o UUID da etiqueta (o QR imprime-se em `GET /lots/{code}/units/{id}/qr`).",
+        "operationId": "add_lot_unit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotUnitIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotUnitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Add Lot Unit",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/units/{unit_id}": {
+      "delete": {
+        "description": "Retira uma unidade do lote (scan enganado); fica no histórico e é impossível depois de partir.",
+        "operationId": "delete_lot_unit",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "unit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Unit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete Lot Unit",
+        "tags": [
+          "lots"
+        ]
+      },
+      "put": {
+        "description": "Peso medido da unidade na balança da viatura (pratos ≤ 15 kg: aqui entra a soma dos pratos).",
+        "operationId": "set_lot_unit_weight",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "unit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Unit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LotUnitWeight"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LotUnitOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Set Lot Unit Weight",
+        "tags": [
+          "lots"
+        ]
+      }
+    },
+    "/api/v1/lots/{code}/units/{unit_id}/qr": {
+      "get": {
+        "description": "QR em SVG da unidade física: o que vai na etiqueta impressa na viatura (UUID quando o saco não tem QR).",
+        "operationId": "get_lot_unit_qr",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "title": "Code",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "unit_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Unit Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "image/svg+xml": {}
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Lot Unit Qr",
         "tags": [
           "lots"
         ]
