@@ -180,6 +180,8 @@ class Fibre(StrEnum):
 
 
 class GarmentType(StrEnum):
+    """Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`)."""
+
     TSHIRT = "tshirt"
     SHIRT = "shirt"
     TROUSERS = "trousers"
@@ -189,6 +191,8 @@ class GarmentType(StrEnum):
     SKIRT = "skirt"
     BEDDING = "bedding"
     TOWEL = "towel"
+    FOOTWEAR = "footwear"  # calçado (par)
+    ACCESSORY = "accessory"  # acessório: cinto, lenço, mala pequena, chapéu
     OTHER = "other"
 
 
@@ -221,6 +225,13 @@ class LotWeightSource(StrEnum):
 
     MEASURED = "measured"  # soma dos pesos medidos por unidade na paragem
     ESTIMATED = "estimated"  # média por tipo de peça (pressuposto, antes de haver balança)
+
+
+class ExportLotState(StrEnum):
+    """Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado)."""
+
+    OPEN = "open"  # criado por chave; ainda aceita peças por POST /items
+    CLOSED = "closed"  # selado: a peça seguiu para o mercado e nunca volta a entrar noutro lote
 
 
 class WhatIfStatus(StrEnum):

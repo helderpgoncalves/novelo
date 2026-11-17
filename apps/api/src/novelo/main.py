@@ -25,6 +25,7 @@ from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
 from novelo.features.email_log.router import admin_router as email_admin_router
 from novelo.features.email_log.router import webhook_router
+from novelo.features.export_lots.router import router as export_lots_router
 from novelo.features.health.router import router as health_router
 from novelo.features.lots import photo_store
 from novelo.features.lots.router import public_router as public_lots_router
@@ -136,6 +137,13 @@ def create_app() -> FastAPI:
         responses=COMMON_ERRORS,
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
+    app.include_router(
+        export_lots_router,
+        prefix=f"{API_PREFIX}/export-lots",
+        tags=["export-lots"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
     app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)

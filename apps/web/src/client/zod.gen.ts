@@ -627,6 +627,27 @@ export const zCollectionType = z.enum([
 ]);
 
 /**
+ * Colour
+ *
+ * Cor observada na peça (nunca entra na chave do lote de escoamento; só filtros).
+ */
+export const zColour = z.enum([
+    'black',
+    'white',
+    'grey',
+    'beige',
+    'brown',
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'pink',
+    'multicolour',
+    'unknown'
+]);
+
+/**
  * ComparisonColumn
  */
 export const zComparisonColumn = z.object({
@@ -1415,6 +1436,22 @@ export const zExportFormat = z.enum([
 ]);
 
 /**
+ * ExportLotItemsIn
+ *
+ * Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).
+ */
+export const zExportLotItemsIn = z.object({
+    item_ids: z.array(z.uuid()).min(1).max(500)
+});
+
+/**
+ * ExportLotState
+ *
+ * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
+ */
+export const zExportLotState = z.enum(['open', 'closed']);
+
+/**
  * ExportScope
  */
 export const zExportScope = z.enum(['sites', 'containers']);
@@ -1534,6 +1571,23 @@ export const zAlertSuggestionOut = z.object({
 });
 
 /**
+ * FineState
+ *
+ * Estado fino: 4 graus de qualidade reutilizável + reciclar/rejeitar, mapeado nos 3 destinos.
+ *
+ * Os graus seguem a letra usada no comércio de roupa usada (A é a melhor); `recycle` e `reject`
+ * mantêm o significado dos 3 destinos que a plataforma já usa (`TextileDestination`).
+ */
+export const zFineState = z.enum([
+    'grade_a',
+    'grade_b',
+    'grade_c',
+    'grade_d',
+    'recycle',
+    'reject'
+]);
+
+/**
  * FlowLink
  */
 export const zFlowLink = z.object({
@@ -1603,6 +1657,8 @@ export const zFranceReference = z.object({
 
 /**
  * GarmentType
+ *
+ * Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`).
  */
 export const zGarmentType = z.enum([
     'tshirt',
@@ -1614,6 +1670,8 @@ export const zGarmentType = z.enum([
     'skirt',
     'bedding',
     'towel',
+    'footwear',
+    'accessory',
     'other'
 ]);
 
@@ -1632,6 +1690,18 @@ export const zGaugeChart = z.object({
     unit: z.string().nullish(),
     value: z.number()
 });
+
+/**
+ * Gender
+ *
+ * Género/segmento como o mercado compra (entra na chave do lote de escoamento).
+ */
+export const zGender = z.enum([
+    'men',
+    'women',
+    'kids',
+    'babies'
+]);
 
 /**
  * GlobalDefaults
@@ -1925,6 +1995,19 @@ export const zKpisSpec = z.object({
 export const zKpisArtifact = z.object({
     artifact_type: z.literal('kpis').optional().default('kpis'),
     spec: zKpisSpec
+});
+
+/**
+ * LineageLotOut
+ *
+ * Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.
+ */
+export const zLineageLotOut = z.object({
+    items: z.int(),
+    locality_name: z.string().nullable(),
+    lot_code: z.string(),
+    parish_name: z.string().nullable(),
+    weight_kg: z.number()
 });
 
 /**
@@ -3419,6 +3502,23 @@ export const zProposeActionIn = z.object({
 });
 
 /**
+ * Provenance
+ *
+ * De onde vem o valor de um atributo: proposto pela IA e aceite, ou definido pelo operador.
+ */
+export const zProvenance = z.enum(['confirmed', 'ai']);
+
+/**
+ * AttributeSource
+ *
+ * Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador).
+ */
+export const zAttributeSource = z.object({
+    confidence: z.number().gte(0).lte(1),
+    origin: zProvenance
+});
+
+/**
  * QuantilesOut
  */
 export const zQuantilesOut = z.object({
@@ -3874,6 +3974,48 @@ export const zScenarioSummary = z.object({
 });
 
 /**
+ * Season
+ *
+ * Estação: quando faz sentido voltar a colocar a peça em uso (critério da Retex).
+ */
+export const zSeason = z.enum([
+    'all_season',
+    'warm',
+    'cold'
+]);
+
+/**
+ * ExportLotKeyIn
+ *
+ * A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.
+ */
+export const zExportLotKeyIn = z.object({
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    season: zSeason
+});
+
+/**
+ * ExportLotSummary
+ */
+export const zExportLotSummary = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    items: z.int(),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
+});
+
+/**
  * SensitivityRequest
  */
 export const zSensitivityRequest = z.object({
@@ -4209,6 +4351,25 @@ export const zScenarioOut = z.object({
 });
 
 /**
+ * SizeBand
+ *
+ * Tamanho em bandas, lido SÓ da etiqueta. Nunca se deduz da foto.
+ *
+ * Bandas e não tamanhos exatos: as etiquetas variam (letras, P/M/G, numerais). Numerais
+ * («42», «98») ficam `unknown` — as tabelas EU de homem e de mulher conflituam e a função
+ * não inventa o mapeamento (regra zero); o operador, com a etiqueta à mão, escolhe a banda.
+ */
+export const zSizeBand = z.enum([
+    'xs',
+    's',
+    'm',
+    'l',
+    'xl',
+    'xxl',
+    'unknown'
+]);
+
+/**
  * SlotCount
  */
 export const zSlotCount = z.object({
@@ -4480,65 +4641,6 @@ export const zFlows = z.object({
     links: z.array(zFlowLink),
     nodes: z.array(zFlowNode),
     observed: z.boolean()
-});
-
-/**
- * LotItemIn
- *
- * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
- */
-export const zLotItemIn = z.object({
-    brand: z.string().max(80).nullish(),
-    composition: z.array(zCompositionPart).max(6),
-    condition: zTextileDestination,
-    confidence: z.number().gte(0).lte(1).optional().default(1),
-    estimated_weight_g: z.int().gt(0).lte(20000),
-    garment_type: zGarmentType,
-    prompt_version: z.string().nullish()
-});
-
-/**
- * LotItemOut
- */
-export const zLotItemOut = z.object({
-    brand: z.string().nullable(),
-    composition: z.array(zCompositionPart),
-    condition: zTextileDestination,
-    confidence: z.number(),
-    created_at: z.iso.datetime(),
-    dominant_fibre: zFibre,
-    estimated_weight_g: z.int(),
-    garment_type: zGarmentType,
-    has_photo: z.boolean().optional().default(false),
-    id: z.uuid(),
-    photo_credit: z.string().nullish(),
-    photo_url: z.string().nullish()
-});
-
-/**
- * LotDetail
- */
-export const zLotDetail = z.object({
-    code: z.string(),
-    composition: z.array(zCompositionPart),
-    dominant_fibre: zFibre,
-    events: z.array(zLotEventOut),
-    item_list: z.array(zLotItemOut),
-    items: z.int(),
-    locality_id: z.uuid().nullish(),
-    locality_name: z.string().nullish(),
-    opened_at: z.iso.datetime(),
-    parish_code: z.string().nullable(),
-    parish_name: z.string().nullable(),
-    recycle_kg: z.number(),
-    reject_kg: z.number(),
-    reservation: zReservationOut.nullable(),
-    reuse_kg: z.number(),
-    state: zLotState,
-    unit_list: z.array(zLotUnitOut).optional(),
-    units: z.int().optional().default(0),
-    weight_kg: z.number(),
-    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -4877,15 +4979,53 @@ export const zTreemapChart = z.object({
 /**
  * TriageAnalysis
  *
- * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ * O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.
+ *
+ * A IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),
+ * e o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.
  */
 export const zTriageAnalysis = z.object({
     brand: z.string().max(80).nullish(),
+    colour: zColour,
     composition: z.array(zCompositionPart).max(6),
-    condition: zTextileDestination,
     confidence: z.number().gte(0).lte(1),
+    fine_state: zFineState,
     garment_type: zGarmentType,
-    notes: z.string().max(240)
+    gender: zGender,
+    notes: z.string().max(240),
+    season: zSeason,
+    size_band: zSizeBand.optional().default('unknown')
+});
+
+/**
+ * TriageAxis
+ *
+ * Os seis eixos da taxonomia; o eval mede a IA em cada um.
+ */
+export const zTriageAxis = z.enum([
+    'fine_state',
+    'garment_type',
+    'season',
+    'colour',
+    'gender',
+    'size_band'
+]);
+
+/**
+ * GoldenLabelOut
+ *
+ * Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo).
+ */
+export const zGoldenLabelOut = z.object({
+    ai_confidence: z.number().nullable(),
+    ai_value: z.string().nullable(),
+    axis: zTriageAxis,
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    lot_code: z.string().nullable(),
+    model: z.string().nullable(),
+    operator_value: z.string(),
+    prompt_version: z.string().nullable()
 });
 
 /**
@@ -4895,13 +5035,15 @@ export const zTriageEvalModel = z.object({
     accuracy: z.record(z.string(), z.number()),
     avg_cost_usd: z.number().nullable(),
     avg_latency_s: z.number(),
-    confusion_condition: z.record(z.string(), z.record(z.string(), z.int())),
+    confusion_fine_state: z.record(z.string(), z.record(z.string(), z.int())),
     confusion_garment_type: z.record(z.string(), z.record(z.string(), z.int())),
     errors: z.array(z.string()),
     failures: z.int(),
     model: z.string(),
     p95_latency_s: z.number(),
     pieces: z.int(),
+    promised_axes: z.array(z.string()).optional(),
+    samples: z.record(z.string(), z.int()).optional(),
     total_cost_usd: z.number().nullable()
 });
 
@@ -4916,10 +5058,169 @@ export const zTriageEvalReport = z.object({
 });
 
 /**
+ * TriageProposalValues
+ *
+ * O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados).
+ */
+export const zTriageProposalValues = z.object({
+    colour: zColour.nullish(),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType.nullish(),
+    gender: zGender.nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * TriageProposal
+ *
+ * Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores).
+ */
+export const zTriageProposal = z.object({
+    confidence: z.number().gte(0).lte(1),
+    model: z.string().max(120),
+    prompt_version: z.string().max(20),
+    values: zTriageProposalValues
+});
+
+/**
+ * LotItemIn
+ *
+ * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ *
+ * O caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)
+ * é derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.
+ */
+export const zLotItemIn = z.object({
+    ai_proposal: zTriageProposal.nullish(),
+    brand: z.string().max(80).nullish(),
+    colour: zColour.nullish(),
+    composition: z.array(zCompositionPart).max(6),
+    condition: zTextileDestination.nullish(),
+    confidence: z.number().gte(0).lte(1).optional().default(1),
+    estimated_weight_g: z.int().gt(0).lte(20000),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType,
+    gender: zGender.nullish(),
+    prompt_version: z.string().nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * TriageProvenance
+ *
+ * Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor.
+ */
+export const zTriageProvenance = z.object({
+    colour: zAttributeSource.nullish(),
+    fine_state: zAttributeSource.nullish(),
+    garment_type: zAttributeSource.nullish(),
+    gender: zAttributeSource.nullish(),
+    season: zAttributeSource.nullish(),
+    size_band: zAttributeSource.nullish()
+});
+
+/**
+ * ExportLotItemOut
+ *
+ * Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.
+ */
+export const zExportLotItemOut = z.object({
+    added_at: z.iso.datetime(),
+    brand: z.string().nullable(),
+    colour: zColour.nullable(),
+    estimated_weight_g: z.int(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    id: z.uuid(),
+    locality_name: z.string().nullish(),
+    lot_code: z.string(),
+    parish_name: z.string().nullish(),
+    provenance: zTriageProvenance.nullish(),
+    season: zSeason,
+    size_band: zSizeBand.nullable()
+});
+
+/**
+ * ExportLotDetail
+ */
+export const zExportLotDetail = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    composition: z.array(zCompositionPart),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    item_list: z.array(zExportLotItemOut),
+    items: z.int(),
+    lineage: z.array(zLineageLotOut),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
+});
+
+/**
+ * LotItemOut
+ */
+export const zLotItemOut = z.object({
+    brand: z.string().nullable(),
+    colour: zColour.nullish(),
+    composition: z.array(zCompositionPart),
+    condition: zTextileDestination,
+    confidence: z.number(),
+    created_at: z.iso.datetime(),
+    dominant_fibre: zFibre,
+    estimated_weight_g: z.int(),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType,
+    gender: zGender.nullish(),
+    has_photo: z.boolean().optional().default(false),
+    id: z.uuid(),
+    photo_credit: z.string().nullish(),
+    photo_url: z.string().nullish(),
+    provenance: zTriageProvenance.nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * LotDetail
+ */
+export const zLotDetail = z.object({
+    code: z.string(),
+    composition: z.array(zCompositionPart),
+    dominant_fibre: zFibre,
+    events: z.array(zLotEventOut),
+    item_list: z.array(zLotItemOut),
+    items: z.int(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    opened_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    recycle_kg: z.number(),
+    reject_kg: z.number(),
+    reservation: zReservationOut.nullable(),
+    reuse_kg: z.number(),
+    state: zLotState,
+    unit_list: z.array(zLotUnitOut).optional(),
+    units: z.int().optional().default(0),
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
+});
+
+/**
  * TriageResult
  */
 export const zTriageResult = z.object({
     analysis: zTriageAnalysis,
+    destination: zTextileDestination,
     dominant_fibre: zFibre,
     estimated_weight_g: z.int(),
     model: z.string(),
@@ -6414,6 +6715,58 @@ export const zSuggestAlertResolutionResponse = zAlertSuggestionOut;
  */
 export const zGetDataQualityResponse = zDataQuality;
 
+export const zListExportLotsQuery = z.object({
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType.nullish(),
+    season: zSeason.nullish(),
+    gender: zGender.nullish(),
+    colour: zColour.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * Response List Export Lots
+ *
+ * Successful Response
+ */
+export const zListExportLotsResponse = z.array(zExportLotSummary);
+
+export const zCreateExportLotBody = zExportLotKeyIn;
+
+/**
+ * Successful Response
+ */
+export const zCreateExportLotResponse = zExportLotDetail;
+
+export const zGetExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetExportLotResponse = zExportLotDetail;
+
+export const zCloseExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseExportLotResponse = zExportLotDetail;
+
+export const zAddExportLotItemsBody = zExportLotItemsIn;
+
+export const zAddExportLotItemsPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddExportLotItemsResponse = zExportLotDetail;
+
 /**
  * Successful Response
  */
@@ -7037,6 +7390,18 @@ export const zAnalyseGarmentQuery = z.object({
  * Successful Response
  */
 export const zAnalyseGarmentResponse = zTriageResult;
+
+export const zListTriageGoldenLabelsQuery = z.object({
+    axis: zTriageAxis.nullish(),
+    limit: z.int().gte(1).lte(500).optional().default(200)
+});
+
+/**
+ * Response List Triage Golden Labels
+ *
+ * Successful Response
+ */
+export const zListTriageGoldenLabelsResponse = z.array(zGoldenLabelOut);
 
 export const zListUsersQuery = z.object({
     approval_status: z.enum([

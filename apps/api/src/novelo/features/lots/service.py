@@ -14,13 +14,29 @@ from sqlalchemy.orm import load_only, selectinload
 
 from novelo.core.config import get_settings
 from novelo.core.errors import ConflictError, NotFoundError
+from novelo.domain.taxonomy import (
+    TriageAxis,
+    attribute_provenance,
+    corrected_axes,
+    destination_for,
+)
 from novelo.domain.vocab import Fibre, LotEventKind, LotState, LotUnitSource, LotWeightSource, TextileDestination
-from novelo.features.lots.models import Lot, LotEvent, LotItem, LotItemPhoto, LotReservation, LotUnit
+from novelo.features.lots.models import (
+    GoldenLabel,
+    Lot,
+    LotEvent,
+    LotItem,
+    LotItemPhoto,
+    LotReservation,
+    LotUnit,
+)
 from novelo.features.lots.schemas import (
+    AttributeSource,
     BrandCount,
     BrandsOut,
     BrandStat,
     CompositionPart,
+    GoldenLabelOut,
     LotDetail,
     LotEventOut,
     LotItemIn,
@@ -34,6 +50,8 @@ from novelo.features.lots.schemas import (
     PassportPhoto,
     ReservationOut,
     ReserveRequest,
+    TriageProposal,
+    TriageProvenance,
 )
 from novelo.features.network.models import Locality, Parish
 from novelo.features.users.models import User
@@ -41,10 +59,12 @@ from novelo.features.users.models import User
 # Alfabeto sem 0/O/1/I/L: o código lê-se bem em etiquetas impressas.
 _ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
 
-# Peso médio por tipo de peça, em gramas. PRESSUPOSTO da equipa (no piloto vem de uma balança no ponto).
+# Peso médio por tipo de peça, em gramas. PRESSUPOSTO da equipa (no piloto vem de uma balança no ponto);
+# calçado conta o par, acessório é uma peça (cinto, lenço, chapéu).
 AVERAGE_WEIGHT_G = {
     "tshirt": 150, "shirt": 200, "trousers": 450, "jumper": 400, "jacket": 700,
-    "dress": 300, "skirt": 250, "bedding": 900, "towel": 500, "other": 300,
+    "dress": 300, "skirt": 250, "bedding": 900, "towel": 500, "footwear": 400,
+    "accessory": 150, "other": 300,
 }  # fmt: skip
 
 
@@ -133,7 +153,13 @@ def _item_out(i: LotItem, code: str, with_photo: dict[uuid.UUID, str | None] | N
     return LotItemOut(
         id=i.id,
         garment_type=i.garment_type,
+        fine_state=i.fine_state,
         condition=i.condition,
+        season=i.season,
+        colour=i.colour,
+        gender=i.gender,
+        size_band=i.size_band,
+        provenance=TriageProvenance.model_validate(i.provenance) if i.provenance else None,
         composition=[CompositionPart(**p) for p in i.composition],
         dominant_fibre=i.dominant_fibre,
         brand=i.brand,
@@ -144,6 +170,74 @@ def _item_out(i: LotItem, code: str, with_photo: dict[uuid.UUID, str | None] | N
         photo_url=photo_url(code, i.id) if has_photo else None,
         photo_credit=with_photo[i.id] if with_photo and has_photo else None,
     )
+
+
+def _axis_values(body: LotItemIn) -> dict[TriageAxis, str | None]:
+    """Valor final de cada eixo da taxonomia, para a proveniência e os rótulos dourados."""
+    return {
+        TriageAxis.FINE_STATE: body.fine_state.value if body.fine_state else None,
+        TriageAxis.GARMENT_TYPE: body.garment_type.value,
+        TriageAxis.SEASON: body.season.value if body.season else None,
+        TriageAxis.COLOUR: body.colour.value if body.colour else None,
+        TriageAxis.GENDER: body.gender.value if body.gender else None,
+        TriageAxis.SIZE_BAND: body.size_band.value if body.size_band else None,
+    }
+
+
+def _proposed_axes(proposal: TriageProposal | None) -> dict[TriageAxis, str | None]:
+    if proposal is None:
+        return {}
+    v = proposal.values
+    return {
+        TriageAxis.FINE_STATE: v.fine_state.value if v.fine_state else None,
+        TriageAxis.GARMENT_TYPE: v.garment_type.value if v.garment_type else None,
+        TriageAxis.SEASON: v.season.value if v.season else None,
+        TriageAxis.COLOUR: v.colour.value if v.colour else None,
+        TriageAxis.GENDER: v.gender.value if v.gender else None,
+        TriageAxis.SIZE_BAND: v.size_band.value if v.size_band else None,
+    }
+
+
+def provenance_of(body: LotItemIn) -> TriageProvenance:
+    """Selo por eixo: «IA» quando o operador aceitou o valor proposto, «confirmado» quando corrigiu."""
+    sources = attribute_provenance(_proposed_axes(body.ai_proposal), _axis_values(body), body.confidence)
+
+    def src(axis: TriageAxis) -> AttributeSource | None:
+        found = sources.get(axis)
+        return AttributeSource(origin=found.origin, confidence=found.confidence) if found else None
+
+    return TriageProvenance(
+        fine_state=src(TriageAxis.FINE_STATE),
+        garment_type=src(TriageAxis.GARMENT_TYPE),
+        season=src(TriageAxis.SEASON),
+        colour=src(TriageAxis.COLOUR),
+        gender=src(TriageAxis.GENDER),
+        size_band=src(TriageAxis.SIZE_BAND),
+    )
+
+
+def _golden_label_rows(body: LotItemIn, lot: Lot, item: LotItem, user: User) -> None:
+    """Anexa à peça uma linha por eixo corrigido: é isto que alimenta o eval por eixo.
+
+    Vão por `item.golden_labels` (e não por `db.add`) para o `item_id` ser preenchido no flush —
+    o id da peça ainda não existe aqui; o `lot_id` vem do lote, que também só se liga no flush.
+    """
+    proposal = body.ai_proposal
+    if proposal is None:
+        return
+    for axis, ai_value, operator_value in corrected_axes(_proposed_axes(proposal), _axis_values(body)):
+        item.golden_labels.append(
+            GoldenLabel(
+                lot_id=lot.id,
+                axis=axis,
+                ai_value=ai_value,
+                operator_value=operator_value,
+                ai_confidence=proposal.confidence,
+                model=proposal.model,
+                prompt_version=proposal.prompt_version,
+                confirmed_by_id=user.id,
+            )
+        )
 
 
 async def _photo_item_ids(db: AsyncSession, lot_id: uuid.UUID) -> dict[uuid.UUID, str | None]:
@@ -333,7 +427,13 @@ async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> 
         raise ConflictError("The lot is closed: no more items can be added")
     item = LotItem(
         garment_type=body.garment_type,
-        condition=body.condition,
+        condition=destination_for(body.fine_state) if body.fine_state else body.condition,
+        fine_state=body.fine_state,
+        season=body.season,
+        colour=body.colour,
+        gender=body.gender,
+        size_band=body.size_band,
+        provenance=provenance_of(body).model_dump(mode="json") if body.fine_state else None,
         composition=[p.model_dump(mode="json") for p in body.composition],
         dominant_fibre=dominant_fibre(body.composition),
         brand=_clean_brand(body.brand),
@@ -345,8 +445,36 @@ async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> 
     lot.items.append(item)
     lot.dominant_fibre = dominant_fibre(aggregate_composition(lot.items))
     _event(lot, LotEventKind.ITEM_ADDED, user)
+    _golden_label_rows(body, lot, item, user)
     await db.commit()
     return _item_out(item, lot.code)
+
+
+async def golden_labels(db: AsyncSession, axis: TriageAxis | None = None, limit: int = 200) -> list[GoldenLabelOut]:
+    """Rótulos dourados recentes: as correções do operador, verdade-terreno por eixo do eval."""
+    query = (
+        select(GoldenLabel, Lot.code)
+        .join(Lot, Lot.id == GoldenLabel.lot_id)
+        .order_by(GoldenLabel.created_at.desc())
+        .limit(limit)
+    )
+    if axis:
+        query = query.where(GoldenLabel.axis == axis)
+    rows = (await db.execute(query)).all()
+    return [
+        GoldenLabelOut(
+            id=label.id,
+            axis=label.axis,
+            ai_value=label.ai_value,
+            operator_value=label.operator_value,
+            ai_confidence=float(label.ai_confidence) if label.ai_confidence is not None else None,
+            model=label.model,
+            prompt_version=label.prompt_version,
+            lot_code=code,
+            created_at=label.created_at,
+        )
+        for label, code in rows
+    ]
 
 
 async def list_lots(

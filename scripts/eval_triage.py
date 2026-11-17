@@ -2,9 +2,10 @@
 
 Uso (via just):  just eval-triage [--models a,b,c] [--dir data/eval/triage] [--limit N]
 
-Lê `<dir>/truth.csv` (file, label_file, garment_type, condition, brand, composition) e as imagens da pasta,
-corre o modelo de visão peça a peça e escreve:
-  - docs/engenharia/avaliacao-triagem.md  (exatidão, matrizes de confusão, custo e latência)
+Lê `<dir>/truth.csv` (file, label_file, garment_type, fine_state, condition, season, colour, gender,
+size_band, brand, composition — os eixos da taxonomia são opcionais e validados contra o vocabulário
+fechado) e as imagens da pasta, corre o modelo de visão peça a peça e escreve:
+  - docs/engenharia/avaliacao-triagem.md  (exatidão por eixo, matrizes de confusão, custo e latência)
   - data/eval/triage-last.json            (o painel /admin/ai mostra este ficheiro)
 Sem imagens, escreve o modelo vazio com as instruções. Só o modelo de visão é chamado; nada é guardado no servidor.
 """
@@ -79,13 +80,19 @@ async def main() -> int:
     a.out.write_text(render_markdown(report), encoding="utf-8")
     save_report(a.json, report)
 
-    print(f"\n{'modelo':42} {'tipo':>6} {'estado':>7} {'marca':>6} {'fibra':>6} {'lat.':>7} {'US$/peça':>10} falhas")
+    print(f"\n{'modelo':42} {'estado':>7} {'tipo':>6} {'estação':>7} {'cor':>6} {'género':>7} {'tamanho':>7} {'destino':>7} {'marca':>6} {'lat.':>7} {'US$/peça':>10} falhas")
     for m in results:
         x = m.accuracy
         cost = "n/d" if m.avg_cost_usd is None else f"{m.avg_cost_usd:.5f}"
+
+        def pct(key: str) -> str:
+            return f"{x[key]:>6.0%}" if key in x else "     —"
+
+        promised = ",".join(m.promised_axes) or "-"
         print(
-            f"{m.model:42} {x['garment_type']:>6.0%} {x['condition']:>7.0%} {x['brand']:>6.0%} "
-            f"{x['dominant_fibre']:>6.0%} {m.avg_latency_s:>6.1f}s {cost:>10} {m.failures}/{m.pieces}"
+            f"{m.model:42} {pct('fine_state')} {pct('garment_type')} {pct('season')} {pct('colour')} "
+            f"{pct('gender')} {pct('size_band')} {pct('destination')} {pct('brand')} "
+            f"{m.avg_latency_s:>6.1f}s {cost:>10} {m.failures}/{m.pieces}  prometidos: {promised}"
         )
     print(f"\nEscrevi {a.out} e {a.json}")
     return 0

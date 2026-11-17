@@ -10,6 +10,7 @@ import {
   MapPinned,
   MessagesSquare,
   Network,
+  PackageOpen,
   QrCode,
   Route as RouteIcon,
   ScanLine,
@@ -35,6 +36,7 @@ export interface NavItem {
     | '/triage'
     | '/lots'
     | '/viatura'
+    | '/export-lots'
     | '/reports'
     | '/simulator'
     | '/scenarios'
@@ -93,6 +95,7 @@ export const NAV: NavSection[] = [
       { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
       { label: () => m.nav_viatura(), to: '/viatura', icon: Truck },
       { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
+      { label: () => m.nav_export_lots(), to: '/export-lots', icon: PackageOpen },
     ],
   },
   {

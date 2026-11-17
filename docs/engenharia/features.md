@@ -43,7 +43,7 @@ Cada saco recolhido vira um lote; cada lote tem um QR e uma página pública; os
 | Código e QR | Um QR por unidade física (`lot_units`): o do saco da plataforma (`source: bag`), ou etiqueta impressa na viatura com UUID (`source: label`) quando não há; o QR imprime-se via `GET /lots/{código}/units/{id}/qr` |
 | Paragem (freguesia, local) | Onde o lote nasce — à porta (ronda ou pedido) ou num local; ancorado ao abrir (`locality_id` + freguesia deduzida ou explícita) |
 | Peso | **Medido na viatura, por unidade** (`weight_g` em cada saco; pratos ≤ 15 kg somados); lotes antigos caem na estimativa por tipo de peça e dizem-no (`weight_source: measured` / `estimated`) |
-| Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA») |
+| Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA»). Vocabulário fechado e versionado: [Taxonomia da triagem (v1)](dados-e-modelo.md#taxonomia-da-triagem-v1) |
 | Composição (ex.: 100% algodão) | Lida da etiqueta na triagem |
 | Histórico | Aberto na paragem, partiu («Partir»), peças triadas, reservado, entregue, com data |
 
@@ -185,7 +185,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | --- | --- |
 | Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
-| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; lote nascido na paragem (um por paragem, ancorado ao local, peso medido por saco com QR por unidade) na API, no contrato e no ecrã `/viatura`; exatidão da triagem por fazer |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»), lote nascido na paragem (um por paragem, ancorado ao local, peso medido por saco com QR por unidade) na API e no contrato; ecrã `/viatura` feito e exatidão real da triagem por fazer |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |

@@ -288,7 +288,7 @@ _MARKS: dict[str, tuple[str, ...]] = {
         "test_sensitivity", "test_benchmarks", "test_coverage", "test_copilot",
     ),
     "llm": ("test_copilot", "test_whatif", "test_ai_", "test_openrouter", "test_stream_adapter", "test_alert_suggest",
-            "test_lots", "test_verify", "test_catalog", "test_eval_triage"),
+            "test_lots", "test_triage", "test_verify", "test_catalog", "test_eval_triage"),
     "slow": ("test_etl_", "test_reports", "test_copilot_attachments"),
 }  # fmt: skip
 

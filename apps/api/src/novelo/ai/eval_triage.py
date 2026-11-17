@@ -15,11 +15,36 @@ from typing import Any, Protocol
 from pydantic import BaseModel, Field
 
 from novelo.adapters.openrouter import CallUsage
+from novelo.domain.taxonomy import PROMISED_AXES, Colour, FineState, Gender, Season, SizeBand, destination_for
 from novelo.features.lots.schemas import TriageResult
 from novelo.features.lots.triage import analyse
 
 COMPOSITION_TOLERANCE_PP = 10.0
-TRUTH_COLUMNS = ("file", "label_file", "garment_type", "condition", "brand", "composition")
+TRUTH_COLUMNS = (
+    "file",
+    "label_file",
+    "garment_type",
+    "fine_state",
+    "condition",
+    "season",
+    "colour",
+    "gender",
+    "size_band",
+    "brand",
+    "composition",
+)
+# Um eixo deixa de ser «prometido» quando a exatidão aguenta E a amostra prova o número.
+GENDER_SIZE_PROMISE_THRESHOLD = 0.9
+PROMISE_MIN_SAMPLES = 30
+
+# Eixo → valores fechados da taxonomia (a verdade-terreno também é validada contra o vocabulário).
+_AXIS_ENUMS: dict[str, type] = {
+    "fine_state": FineState,
+    "season": Season,
+    "colour": Colour,
+    "gender": Gender,
+    "size_band": SizeBand,
+}
 
 
 class EvalClient(Protocol):
@@ -34,7 +59,12 @@ class TruthRow(BaseModel):
     file: str
     label_file: str | None = None
     garment_type: str
-    condition: str
+    fine_state: str | None = None
+    condition: str | None = None  # legado: só o destino (reuse/recycle/reject)
+    season: str | None = None
+    colour: str | None = None
+    gender: str | None = None
+    size_band: str | None = None
     brand: str | None = None
     composition: dict[str, float] = Field(default_factory=dict)
 
@@ -44,14 +74,22 @@ class TriageEvalModel(BaseModel):
     pieces: int
     failures: int
     accuracy: dict[str, float] = Field(
-        description="Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp"
+        description="Por campo, de 0 a 1: eixos da taxonomia (fine_state, garment_type, season, colour, gender, "
+        "size_band), destination, brand, dominant_fibre, composition_within_10pp"
+    )
+    samples: dict[str, int] = Field(
+        default_factory=dict, description="Por eixo da taxonomia, com quantas peças de verdade-terreno se mediu"
+    )
+    promised_axes: list[str] = Field(
+        default_factory=list,
+        description="Eixos «prometidos»: género e tamanho enquanto a exatidão e a amostra não aguentarem",
     )
     avg_latency_s: float
     p95_latency_s: float
     avg_cost_usd: float | None = Field(description="Por peça, custo real devolvido pelo OpenRouter")
     total_cost_usd: float | None
     confusion_garment_type: dict[str, dict[str, int]]
-    confusion_condition: dict[str, dict[str, int]]
+    confusion_fine_state: dict[str, dict[str, int]]
     errors: list[str]
 
 
@@ -77,21 +115,36 @@ def parse_composition(raw: str) -> dict[str, float]:
 def load_truth(csv_path: Path) -> list[TruthRow]:
     with csv_path.open(newline="", encoding="utf-8-sig") as fh:
         reader = csv.DictReader(fh)
-        missing = {"file", "garment_type", "condition"} - set(reader.fieldnames or [])
+        missing = {"file", "garment_type"} - set(reader.fieldnames or [])
         if missing:
             raise ValueError(f"{csv_path.name}: missing columns {sorted(missing)}; expected {list(TRUTH_COLUMNS)}")
-        return [
-            TruthRow(
-                file=row["file"].strip(),
-                label_file=(row.get("label_file") or "").strip() or None,
-                garment_type=row["garment_type"].strip().lower(),
-                condition=row["condition"].strip().lower(),
-                brand=(row.get("brand") or "").strip() or None,
-                composition=parse_composition(row.get("composition") or ""),
+        rows: list[TruthRow] = []
+        for row in reader:
+            if not (row.get("file") or "").strip():
+                continue
+            axis_values = {axis: (row.get(axis) or "").strip().lower() or None for axis in _AXIS_ENUMS}
+            for axis, value in axis_values.items():
+                enum_cls = _AXIS_ENUMS[axis]
+                if value is not None:
+                    try:
+                        enum_cls(value)
+                    except ValueError as exc:
+                        allowed = ", ".join(member.value for member in enum_cls)  # type: ignore[attr-defined]
+                        raise ValueError(
+                            f"{csv_path.name}: {axis}={value!r} não está no vocabulário fechado; valores: {allowed}"
+                        ) from exc
+            rows.append(
+                TruthRow(
+                    file=row["file"].strip(),
+                    label_file=(row.get("label_file") or "").strip() or None,
+                    garment_type=row["garment_type"].strip().lower(),
+                    condition=(row.get("condition") or "").strip().lower() or None,
+                    brand=(row.get("brand") or "").strip() or None,
+                    composition=parse_composition(row.get("composition") or ""),
+                    **axis_values,
+                )
             )
-            for row in reader
-            if (row.get("file") or "").strip()
-        ]
+        return rows
 
 
 # --- Métricas --------------------------------------------------------------------------------------
@@ -134,13 +187,25 @@ def _confusion(pairs: list[tuple[str, str]]) -> dict[str, dict[str, int]]:
     return matrix
 
 
+def promised_axes(accuracy: dict[str, float], samples: dict[str, int]) -> list[str]:
+    """Género e tamanho ficam «prometidos» enquanto a exatidão não aguentar com amostra que prove o número."""
+    return sorted(
+        axis.value
+        for axis in PROMISED_AXES
+        if accuracy.get(axis.value, 0.0) < GENDER_SIZE_PROMISE_THRESHOLD
+        or samples.get(axis.value, 0) < PROMISE_MIN_SAMPLES
+    )
+
+
 def score(
     model: str, rows: list[TruthRow], outcomes: list[tuple[TriageResult | None, float, float | None, str | None]]
 ) -> TriageEvalModel:
     """`outcomes` alinhado com `rows`: (resultado ou None se falhou, latência em s, custo em USD, erro)."""
-    hits = dict.fromkeys(("garment_type", "condition", "brand", "dominant_fibre", "composition_within_10pp"), 0)
+    axes = ("fine_state", "garment_type", "season", "colour", "gender", "size_band")
+    hits = dict.fromkeys((*axes, "destination", "brand", "dominant_fibre", "composition_within_10pp"), 0)
+    axis_total = dict.fromkeys(axes, 0)  # só se mede o eixo onde há verdade-terreno
     garment: list[tuple[str, str]] = []
-    condition: list[tuple[str, str]] = []
+    fine: list[tuple[str, str]] = []
     latencies: list[float] = []
     costs: list[float] = []
     errors: list[str] = []
@@ -155,30 +220,50 @@ def score(
         ok += 1
         a = result.analysis
         garment.append((row.garment_type, a.garment_type.value))
-        condition.append((row.condition, a.condition.value))
+        pred_destination = destination_for(a.fine_state).value
+        if row.condition is not None:  # verdade legada: só o destino derivado
+            hits["destination"] += pred_destination == row.condition
+        if row.fine_state is not None:
+            fine.append((row.fine_state, a.fine_state.value))
+            axis_total["fine_state"] += 1
+            hits["fine_state"] += a.fine_state.value == row.fine_state
+        pred_axes = {
+            "garment_type": a.garment_type.value,
+            "season": a.season.value,
+            "colour": a.colour.value,
+            "gender": a.gender.value,
+            "size_band": a.size_band.value,
+        }
+        for axis, value in pred_axes.items():
+            truth = getattr(row, axis, None)
+            if truth is None:
+                continue
+            axis_total[axis] += 1
+            hits[axis] += value == truth
         pred = _predicted_composition(result)
-        hits["garment_type"] += a.garment_type.value == row.garment_type
-        hits["condition"] += a.condition.value == row.condition
         hits["brand"] += _norm_brand(a.brand) == _norm_brand(row.brand)
         if row.composition:
             hits["dominant_fibre"] += _top(pred) == _top(row.composition)
             hits["composition_within_10pp"] += _within(row.composition, pred)
     with_comp = sum(1 for r, o in zip(rows, outcomes, strict=True) if o[0] is not None and r.composition)
-    denominators = {"dominant_fibre": with_comp, "composition_within_10pp": with_comp}
+    denominators = {"dominant_fibre": with_comp, "composition_within_10pp": with_comp} | axis_total
+    accuracy = {
+        k: round(v / (denominators.get(k, ok) or 1), 4) if (denominators.get(k, ok)) else 0.0 for k, v in hits.items()
+    }
+    samples = {k: axis_total[k] for k in axes}
     return TriageEvalModel(
         model=model,
         pieces=len(rows),
         failures=len(rows) - ok,
-        accuracy={
-            k: round(v / (denominators.get(k, ok) or 1), 4) if (denominators.get(k, ok)) else 0.0
-            for k, v in hits.items()
-        },
+        accuracy=accuracy,
+        samples=samples,
+        promised_axes=promised_axes(accuracy, samples),
         avg_latency_s=round(statistics.fmean(latencies), 3) if latencies else 0.0,
         p95_latency_s=round(_p95(latencies), 3),
         avg_cost_usd=round(statistics.fmean(costs), 6) if costs else None,
         total_cost_usd=round(sum(costs), 6) if costs else None,
         confusion_garment_type=_confusion(garment),
-        confusion_condition=_confusion(condition),
+        confusion_fine_state=_confusion(fine),
         errors=errors,
     )
 
@@ -250,23 +335,41 @@ def render_markdown(report: TriageEvalReport) -> str:
         f"Gerado por `just eval-triage` a {when}. Prompt `triage_{report.prompt_version}`, "
         f"{report.images} peças com verdade-terreno. Valores de custo reais do OpenRouter (`usage.cost`).",
         "",
-        "## Comparação entre modelos",
+        "## Comparação entre modelos (por eixo da taxonomia)",
         "",
-        "| Modelo | Tipo | Estado | Marca | Fibra dominante | Composição ±10 pp | Latência média | P95 | Custo/peça | Falhas |",
-        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Modelo | Estado | Tipologia | Estação | Cor | Género | Tamanho | Destino | Marca | Fibra | Composição ±10 pp "
+        "| Latência média | P95 | Custo/peça | Falhas |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
     ]
+
+    def _axis(a: dict[str, float], key: str, model_promised: list[str]) -> str:
+        mark = " ‹prometido›" if key in model_promised else ""
+        return _pct(a.get(key, 0.0)) + mark
+
     for m in report.models:
         a = m.accuracy
         lines.append(
-            f"| `{m.model}` | {_pct(a['garment_type'])} | {_pct(a['condition'])} | {_pct(a['brand'])} | "
-            f"{_pct(a['dominant_fibre'])} | {_pct(a['composition_within_10pp'])} | "
+            f"| `{m.model}` | {_axis(a, 'fine_state', m.promised_axes)} | {_axis(a, 'garment_type', m.promised_axes)} "
+            f"| {_axis(a, 'season', m.promised_axes)} | {_axis(a, 'colour', m.promised_axes)} "
+            f"| {_axis(a, 'gender', m.promised_axes)} | {_axis(a, 'size_band', m.promised_axes)} "
+            f"| {_pct(a.get('destination', 0.0))} | {_pct(a.get('brand', 0.0))} | {_pct(a.get('dominant_fibre', 0.0))} "
+            f"| {_pct(a.get('composition_within_10pp', 0.0))} | "
             f"{str(m.avg_latency_s).replace('.', ',')} s | {str(m.p95_latency_s).replace('.', ',')} s | "
             f"{_usd(m.avg_cost_usd, 5)} | {m.failures}/{m.pieces} |"
         )
+    if any("prometido" in line for line in lines):
+        lines += [
+            "",
+            "«prometido» = género/tamanho ainda não têm exatidão e amostra para se dar por garantidos "
+            f"(linha: ≥ {GENDER_SIZE_PROMISE_THRESHOLD:.0%} de acerto e ≥ {PROMISE_MIN_SAMPLES} peças por eixo).",
+        ]
+    samples_note = ", ".join(f"{k}: {v}" for k, v in sorted(report.models[0].samples.items())) if report.models else ""
+    if samples_note:
+        lines += ["", f"Amostra por eixo (primeiro modelo): {samples_note}."]
     for m in report.models:
         lines += ["", f"## `{m.model}`", ""]
         lines += _matrix_md("Matriz de confusão: tipo de peça", m.confusion_garment_type)
-        lines += _matrix_md("Matriz de confusão: estado (reuse/recycle/reject)", m.confusion_condition)
+        lines += _matrix_md("Matriz de confusão: estado fino", m.confusion_fine_state)
         lines.append(f"Custo total: {_usd(m.total_cost_usd)} · peças: {m.pieces}")
         if m.errors:
             lines += ["", "Falhas:", "", *[f"- {e}" for e in m.errors]]
@@ -287,8 +390,13 @@ Ainda não foi corrida nenhuma avaliação: não há imagens de teste com verdad
    | --- | --- | --- |
    | `file` | sim | nome da foto da peça |
    | `label_file` | não | nome da foto da etiqueta |
-   | `garment_type` | sim | `tshirt`, `shirt`, `trousers`, `jumper`, `jacket`, `dress`, `skirt`, `bedding`, `towel`, `other` |
-   | `condition` | sim | `reuse`, `recycle`, `reject` |
+   | `garment_type` | sim | `tshirt`, `shirt`, `trousers`, `jumper`, `jacket`, `dress`, `skirt`, `bedding`, `towel`, `footwear`, `accessory`, `other` |
+   | `fine_state` | não | `grade_a`, `grade_b`, `grade_c`, `grade_d`, `recycle`, `reject` (estado fino da taxonomia) |
+   | `condition` | não | `reuse`, `recycle`, `reject` (legado: mede só o destino derivado) |
+   | `season` | não | `all_season`, `warm`, `cold` |
+   | `colour` | não | `black`, `white`, `grey`, `beige`, `brown`, `red`, `orange`, `yellow`, `green`, `blue`, `pink`, `multicolour`, `unknown` |
+   | `gender` | não | `men`, `women`, `kids`, `babies` |
+   | `size_band` | não | `xs`, `s`, `m`, `l`, `xl`, `xxl`, `unknown` |
    | `brand` | não | marca como está escrita; vazio se não houver |
    | `composition` | não | `cotton:60;polyester:40` (fibras: as do esquema `Fibre`, ex.: `cotton`, `wool`, `polyester`) |
 
@@ -301,8 +409,10 @@ de IA (`/admin/ai`) mostra. Usa pelo menos 30 peças variadas: com menos, as per
 
 ## O que se mede
 
-- **Exatidão por campo**: tipo de peça, estado, marca (igualdade ignorando acentos e maiúsculas), fibra dominante e
+- **Exatidão por eixo**: estado fino, tipologia, estação, cor, género e tamanho (só se mede o eixo com verdade-terreno);
+  destino derivado (verdade legada `condition`), marca (igualdade ignorando acentos e maiúsculas), fibra dominante e
   composição (todas as fibras a ±10 pontos percentuais).
-- **Matriz de confusão** do tipo de peça e do estado, por modelo.
+- **«prometido»**: género e tamanho ficam marcados enquanto não houver ≥ 90% de acerto com ≥ 30 peças por eixo.
+- **Matriz de confusão** do tipo de peça e do estado fino, por modelo.
 - **Custo e latência por peça**: custo real devolvido pelo OpenRouter; latência média e P95.
 """
