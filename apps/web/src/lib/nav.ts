@@ -5,6 +5,7 @@ import {
   Compass,
   FileText,
   FlaskConical,
+  Gauge,
   GitCompareArrows,
   HandHeart,
   type LucideIcon,
@@ -39,6 +40,7 @@ export interface NavItem {
     | '/viatura'
     | '/export-lots'
     | '/collection-requests'
+    | '/calibration'
     | '/reports'
     | '/simulator'
     | '/scenarios'
@@ -79,6 +81,7 @@ export const NAV: NavSection[] = [
     items: [
       { label: () => m.nav_validation(), to: '/validation', icon: BadgeCheck },
       { label: () => m.nav_assumptions(), to: '/assumptions', icon: Sigma },
+      { label: () => m.nav_calibration(), to: '/calibration', icon: Gauge },
       { label: () => m.nav_data_quality(), to: '/data-quality', icon: ClipboardCheck },
     ],
   },

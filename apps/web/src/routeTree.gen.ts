@@ -25,6 +25,7 @@ import { Route as AppSplatRouteImport } from './routes/_app/$'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
 import { Route as AppBrandsRouteImport } from './routes/_app/brands'
+import { Route as AppCalibrationRouteImport } from './routes/_app/calibration'
 import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as AppCircuitsRouteImport } from './routes/_app/circuits'
 import { Route as AppCoverageRouteImport } from './routes/_app/coverage'
@@ -134,6 +135,11 @@ const AppAssumptionsRoute = AppAssumptionsRouteImport.update({
 const AppBrandsRoute = AppBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalibrationRoute = AppCalibrationRouteImport.update({
+  id: '/calibration',
+  path: '/calibration',
   getParentRoute: () => AppRoute,
 } as any)
 const AppChatRoute = AppChatRouteImport.update({
@@ -313,6 +319,7 @@ export interface FileRoutesByFullPath {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/calibration': typeof AppCalibrationRoute
   '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
@@ -361,6 +368,7 @@ export interface FileRoutesByTo {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/calibration': typeof AppCalibrationRoute
   '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
@@ -412,6 +420,7 @@ export interface FileRoutesById {
   '/_app/account': typeof AppAccountRoute
   '/_app/assumptions': typeof AppAssumptionsRoute
   '/_app/brands': typeof AppBrandsRoute
+  '/_app/calibration': typeof AppCalibrationRoute
   '/_app/chat': typeof AppChatRoute
   '/_app/circuits': typeof AppCircuitsRoute
   '/_app/coverage': typeof AppCoverageRoute
@@ -462,6 +471,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/calibration'
     | '/chat'
     | '/circuits'
     | '/coverage'
@@ -510,6 +520,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/calibration'
     | '/chat'
     | '/circuits'
     | '/coverage'
@@ -560,6 +571,7 @@ export interface FileRouteTypes {
     | '/_app/account'
     | '/_app/assumptions'
     | '/_app/brands'
+    | '/_app/calibration'
     | '/_app/chat'
     | '/_app/circuits'
     | '/_app/coverage'
@@ -723,6 +735,13 @@ declare module '@tanstack/react-router' {
       path: '/brands'
       fullPath: '/brands'
       preLoaderRoute: typeof AppBrandsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calibration': {
+      id: '/_app/calibration'
+      path: '/calibration'
+      fullPath: '/calibration'
+      preLoaderRoute: typeof AppCalibrationRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/chat': {
@@ -957,6 +976,7 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppAssumptionsRoute: typeof AppAssumptionsRoute
   AppBrandsRoute: typeof AppBrandsRoute
+  AppCalibrationRoute: typeof AppCalibrationRoute
   AppChatRoute: typeof AppChatRoute
   AppCircuitsRoute: typeof AppCircuitsRoute
   AppCoverageRoute: typeof AppCoverageRoute
@@ -990,6 +1010,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppAssumptionsRoute: AppAssumptionsRoute,
   AppBrandsRoute: AppBrandsRoute,
+  AppCalibrationRoute: AppCalibrationRoute,
   AppChatRoute: AppChatRoute,
   AppCircuitsRoute: AppCircuitsRoute,
   AppCoverageRoute: AppCoverageRoute,

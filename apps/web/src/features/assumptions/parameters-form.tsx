@@ -31,7 +31,7 @@ export function ParametersForm({
   wide = false,
 }: ParametersFormProps) {
   const [open, setOpen] = useState<Set<string>>(new Set(defaultOpen));
-  const source = new Map(meta.map((x) => [x.key, x.source]));
+  const source = new Map(meta.map((x) => [x.key, x]));
   const notes = new Map(meta.map((x) => [x.key, x.note ?? null]));
 
   return (
@@ -42,7 +42,7 @@ export function ParametersForm({
     >
       {PARAM_GROUPS.map((group) => {
         const fields = sourceFilter
-          ? group.fields.filter((f) => source.get(f.path) === sourceFilter)
+          ? group.fields.filter((f) => source.get(f.path)?.source === sourceFilter)
           : group.fields;
         if (fields.length === 0) return null;
         const isOpen = sourceFilter !== null || open.has(group.id);
@@ -117,7 +117,9 @@ export function ParametersForm({
                       error={errors[f.path]}
                       placeholder={f.nullable ? m.param_empty() : undefined}
                       hint={note}
-                      badge={origin ? <SourceBadge source={origin} /> : undefined}
+                      badge={
+                        origin ? <SourceBadge source={origin.source} n={origin.n} /> : undefined
+                      }
                     />
                   );
                 })}
