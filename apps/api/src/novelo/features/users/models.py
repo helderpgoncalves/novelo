@@ -7,9 +7,10 @@ from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, In
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from novelo.core.database import Base, TimestampMixin, UuidPkMixin
+from novelo.core.database import Base, TimestampMixin, UuidPkMixin, enum_check, enum_column
+from novelo.domain.vocab import LocalKind
 
-Role = Literal["admin", "operator", "guest"]
+Role = Literal["admin", "operator", "guest", "local"]
 JoinedVia = Literal["password", "google", "quick_join", "magic_link", "invited"]
 ApprovalStatus = Literal["pending", "approved", "rejected"]
 
@@ -69,12 +70,14 @@ class Invitation(Base, UuidPkMixin):
     """Convite por email. Só o SHA-256 do token fica aqui; uso único (`accepted_at` atómico).
 
     Estado: aceite (`accepted_at`), revogado (`revoked_at`), expirado (`expires_at` no passado) ou pendente.
-    Um email só tem um convite pendente de cada vez (índice parcial único).
+    Um email só tem um convite pendente de cada vez (índice parcial único). No papel `local` traz o local
+    e a natureza do sítio: ao aceitar, nasce a conta de local (`local_accounts`).
     """
 
     __tablename__ = "invitations"
     __table_args__ = (
-        CheckConstraint("role IN ('admin', 'operator', 'guest')", name="role_valid"),
+        CheckConstraint("role IN ('admin', 'operator', 'guest', 'local')", name="role_valid"),
+        enum_check("local_kind", LocalKind),
         Index(
             "uq_invitations_pending_email",
             "email",
@@ -88,6 +91,11 @@ class Invitation(Base, UuidPkMixin):
     role: Mapped[str] = mapped_column(String(20))
     locale: Mapped[str] = mapped_column(String(8), default="pt-PT", server_default="pt-PT")
     message: Mapped[str | None] = mapped_column(String(500))
+    # Só no papel `local`: o local da conta e a natureza do sítio (assistido — escola — ou produtor B2B).
+    locality_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("localities.id", ondelete="SET NULL")
+    )
+    local_kind: Mapped[LocalKind | None] = mapped_column(enum_column(LocalKind))
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     invited_by_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True

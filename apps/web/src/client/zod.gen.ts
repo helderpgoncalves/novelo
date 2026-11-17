@@ -304,7 +304,8 @@ export const zApproveRequest = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local'
     ]).optional().default('operator')
 });
 
@@ -490,6 +491,15 @@ export const zCardKpis = z.object({
     coverage_pct: z.number(),
     eur_per_tonne: z.number().nullable(),
     tonnes_year: z.number()
+});
+
+/**
+ * CertificateOptIn
+ *
+ * Opt-in do certificado público: só o próprio local decide partilhar os kg agregados.
+ */
+export const zCertificateOptIn = z.object({
+    opt_in: z.boolean()
 });
 
 /**
@@ -813,6 +823,9 @@ export const zCopilotErrorEvent = z.object({
         'captcha_required',
         'captcha_failed',
         'captcha_unavailable',
+        'local_account_missing',
+        'notice_already_active',
+        'certificate_not_public',
         'internal_error'
     ]),
     message: z.string(),
@@ -1400,6 +1413,9 @@ export const zErrorBody = z.object({
         'captcha_required',
         'captcha_failed',
         'captcha_unavailable',
+        'local_account_missing',
+        'notice_already_active',
+        'certificate_not_public',
         'internal_error'
     ]),
     message: z.string()
@@ -1757,108 +1773,6 @@ export const zImpersonationOut = z.object({
 });
 
 /**
- * InvitationCreate
- */
-export const zInvitationCreate = z.object({
-    confirm_admin: z.boolean().optional().default(false),
-    email: z.email(),
-    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
-    message: z.string().max(500).nullish(),
-    name: z.string().max(120).nullish(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ]).optional().default('operator')
-});
-
-/**
- * InvitationOut
- */
-export const zInvitationOut = z.object({
-    accepted_at: z.iso.datetime().nullable(),
-    created_at: z.iso.datetime(),
-    delivery_error: z.string().nullable(),
-    delivery_status: z.enum([
-        'queued',
-        'sent',
-        'delivered',
-        'delayed',
-        'bounced',
-        'complained',
-        'failed',
-        'skipped',
-        'none'
-    ]),
-    email: z.string(),
-    email_delivered: z.boolean(),
-    expires_at: z.iso.datetime(),
-    id: z.uuid(),
-    invited_by_avatar_url: z.string().nullish(),
-    invited_by_email: z.string().nullish(),
-    invited_by_id: z.uuid().nullable(),
-    invited_by_name: z.string().nullable(),
-    last_email_at: z.iso.datetime().nullable(),
-    last_sent_at: z.iso.datetime().nullable(),
-    locale: z.enum(['pt-PT', 'en']),
-    message: z.string().nullable(),
-    name: z.string().nullable(),
-    revoked_at: z.iso.datetime().nullable(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ]),
-    send_count: z.int(),
-    status: z.enum([
-        'pending',
-        'accepted',
-        'expired',
-        'revoked'
-    ])
-});
-
-/**
- * InvitationLinkOut
- *
- * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
- */
-export const zInvitationLinkOut = z.object({
-    expires_at: z.iso.datetime(),
-    invitation: zInvitationOut,
-    url: z.string()
-});
-
-/**
- * InvitationPage
- */
-export const zInvitationPage = z.object({
-    items: z.array(zInvitationOut),
-    limit: z.int(),
-    offset: z.int(),
-    total: z.int()
-});
-
-/**
- * InvitationPreview
- *
- * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
- */
-export const zInvitationPreview = z.object({
-    email: z.string(),
-    expires_at: z.iso.datetime(),
-    invited_by_name: z.string().nullable(),
-    locale: z.enum(['pt-PT', 'en']),
-    message: z.string().nullable(),
-    name: z.string().nullable(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ])
-});
-
-/**
  * InvitationTokenRequest
  */
 export const zInvitationTokenRequest = z.object({
@@ -1925,6 +1839,187 @@ export const zKpisSpec = z.object({
 export const zKpisArtifact = z.object({
     artifact_type: z.literal('kpis').optional().default('kpis'),
     spec: zKpisSpec
+});
+
+/**
+ * LocalCertificateOut
+ *
+ * Página pública do certificado (opt-in): totais agregados do local. Nunca doadores, nunca CO₂.
+ */
+export const zLocalCertificateOut = z.object({
+    first_stop_at: z.iso.datetime().nullable(),
+    locality_name: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    recycle_kg: z.number(),
+    recycle_pct: z.number(),
+    reject_kg: z.number(),
+    reject_pct: z.number(),
+    reuse_kg: z.number(),
+    reuse_pct: z.number(),
+    stops: z.int(),
+    updated_at: z.iso.datetime(),
+    weight_kg: z.number()
+});
+
+/**
+ * LocalKind
+ *
+ * Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+ *
+ * Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+ * A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+ */
+export const zLocalKind = z.enum(['assistido', 'b2b']);
+
+/**
+ * InvitationCreate
+ */
+export const zInvitationCreate = z.object({
+    confirm_admin: z.boolean().optional().default(false),
+    email: z.email(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    locality_id: z.uuid().nullish(),
+    message: z.string().max(500).nullish(),
+    name: z.string().max(120).nullish(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local'
+    ]).optional().default('operator')
+});
+
+/**
+ * InvitationOut
+ */
+export const zInvitationOut = z.object({
+    accepted_at: z.iso.datetime().nullable(),
+    created_at: z.iso.datetime(),
+    delivery_error: z.string().nullable(),
+    delivery_status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped',
+        'none'
+    ]),
+    email: z.string(),
+    email_delivered: z.boolean(),
+    expires_at: z.iso.datetime(),
+    id: z.uuid(),
+    invited_by_avatar_url: z.string().nullish(),
+    invited_by_email: z.string().nullish(),
+    invited_by_id: z.uuid().nullable(),
+    invited_by_name: z.string().nullable(),
+    last_email_at: z.iso.datetime().nullable(),
+    last_sent_at: z.iso.datetime().nullable(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    revoked_at: z.iso.datetime().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local'
+    ]),
+    send_count: z.int(),
+    status: z.enum([
+        'pending',
+        'accepted',
+        'expired',
+        'revoked'
+    ])
+});
+
+/**
+ * InvitationLinkOut
+ *
+ * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
+ */
+export const zInvitationLinkOut = z.object({
+    expires_at: z.iso.datetime(),
+    invitation: zInvitationOut,
+    url: z.string()
+});
+
+/**
+ * InvitationPage
+ */
+export const zInvitationPage = z.object({
+    items: z.array(zInvitationOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
+ * InvitationPreview
+ *
+ * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
+ */
+export const zInvitationPreview = z.object({
+    email: z.string(),
+    expires_at: z.iso.datetime(),
+    invited_by_name: z.string().nullable(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local'
+    ])
+});
+
+/**
+ * LocalAccountOut
+ *
+ * A conta de local vista por quem nela entra: o sítio, a natureza e o certificado.
+ */
+export const zLocalAccountOut = z.object({
+    certificate_opt_in: z.boolean(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    kind: zLocalKind,
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    parish_name: z.string().nullish()
+});
+
+/**
+ * LocalReportOut
+ *
+ * Relatório do local em kg por destino — medido na pesagem, destinos pela triagem. Sem CO₂ nem doadores.
+ *
+ * O peso total soma o medido na paragem de cada lote (estimado nos lotes anteriores à balança);
+ * os destinos vêm da mesa de triagem, logo só cobrem os lotes triados (`lots_in_triage` fica de fora).
+ */
+export const zLocalReportOut = z.object({
+    first_stop_at: z.iso.datetime().nullable(),
+    last_stop_at: z.iso.datetime().nullable(),
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    lots: z.int(),
+    lots_in_triage: z.int(),
+    measured_lots: z.int(),
+    recycle_kg: z.number(),
+    reject_kg: z.number(),
+    reuse_kg: z.number(),
+    sorted_lots: z.int(),
+    weight_kg: z.number()
 });
 
 /**
@@ -2652,6 +2747,16 @@ export const zMunicipalDensityBenchmarkOut = z.object({
 });
 
 /**
+ * NoticeState
+ *
+ * Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+ *
+ * Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+ * avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+ */
+export const zNoticeState = z.enum(['active', 'cancelled']);
+
+/**
  * OnboardingOut
  *
  * Estado da introdução guiada da conta (vale em todos os dispositivos).
@@ -2699,7 +2804,8 @@ export const zMeOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local'
     ])
 });
 
@@ -4271,6 +4377,58 @@ export const zStopLotOpen = z.object({
 });
 
 /**
+ * StopNoticeCreate
+ *
+ * O que o local diz ao avisar: quantos sacos (opcional) e um recado para a equipa (opcional).
+ */
+export const zStopNoticeCreate = z.object({
+    bag_count: z.int().gte(1).lte(50).nullish(),
+    note: z.string().max(240).nullish()
+});
+
+/**
+ * StopNoticeOut
+ *
+ * Um aviso «sacos prontos»: garante paragem no dia (política de paragem).
+ */
+export const zStopNoticeOut = z.object({
+    bag_count: z.int().nullish(),
+    cancelled_at: z.iso.datetime().nullable(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    locality_id: z.uuid().nullable(),
+    note: z.string().nullable(),
+    state: zNoticeState
+});
+
+/**
+ * LocalAccountAdminOut
+ *
+ * A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.
+ */
+export const zLocalAccountAdminOut = z.object({
+    certificate_opt_in: z.boolean(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    kind: zLocalKind,
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    notice: zStopNoticeOut.nullish(),
+    user_email: z.string(),
+    user_id: z.uuid(),
+    user_name: z.string().nullable()
+});
+
+/**
+ * StopNoticeCurrent
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum (a porta do herói mostra o estado certo).
+ */
+export const zStopNoticeCurrent = z.object({
+    notice: zStopNoticeOut.nullable()
+});
+
+/**
  * SuppressionCreate
  */
 export const zSuppressionCreate = z.object({
@@ -5091,7 +5249,8 @@ export const zUserAdminOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local'
     ])
 });
 
@@ -5104,7 +5263,8 @@ export const zUserAdminUpdate = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local'
     ]).nullish()
 });
 
@@ -5135,7 +5295,8 @@ export const zUserOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local'
     ])
 });
 
@@ -6414,6 +6575,54 @@ export const zGetDataQualityResponse = zDataQuality;
  */
 export const zHealthResponse = zHealth;
 
+/**
+ * Successful Response
+ */
+export const zGetLocalAccountResponse = zLocalAccountOut;
+
+export const zSetLocalCertificateBody = zCertificateOptIn;
+
+/**
+ * Successful Response
+ */
+export const zSetLocalCertificateResponse = zLocalAccountOut;
+
+/**
+ * Response List Local Lots
+ *
+ * Successful Response
+ */
+export const zListLocalLotsResponse = z.array(zLotSummary);
+
+export const zCreateLocalNoticeBody = zStopNoticeCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateLocalNoticeResponse = zStopNoticeOut;
+
+/**
+ * Successful Response
+ */
+export const zCancelLocalNoticeResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetActiveLocalNoticeResponse = zStopNoticeCurrent;
+
+/**
+ * Successful Response
+ */
+export const zGetLocalReportResponse = zLocalReportOut;
+
+/**
+ * Response List Local Accounts
+ *
+ * Successful Response
+ */
+export const zListLocalAccountsResponse = z.array(zLocalAccountAdminOut);
+
 export const zListLotsQuery = z.object({
     fibre: zFibre.nullish(),
     state: zLotState.nullish(),
@@ -6950,6 +7159,15 @@ export const zRunScenarioSensitivityResponse = zSensitivityOut;
  * Successful Response
  */
 export const zListZonesResponse = z.array(zZoneOut);
+
+export const zGetPublicLocalCertificatePath = z.object({
+    account_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPublicLocalCertificateResponse = zLocalCertificateOut;
 
 export const zGetPassportPath = z.object({
     code: z.string()

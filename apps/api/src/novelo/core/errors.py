@@ -49,6 +49,9 @@ ErrorCode = Literal[
     "captcha_required",
     "captcha_failed",
     "captcha_unavailable",
+    "local_account_missing",
+    "notice_already_active",
+    "certificate_not_public",
     "internal_error",
 ]
 
@@ -272,6 +275,27 @@ class CaptchaUnavailableError(AppError):
 class UpstreamError(AppError):
     status_code = 502
     code = "upstream_error"
+
+
+class LocalAccountMissingError(AppError):
+    """Utilizador com papel `local` sem conta de local (a equipa cria as duas coisas juntas; nunca devia acontecer)."""
+
+    status_code = 404
+    code = "local_account_missing"
+
+
+class LocalNoticeActiveError(AppError):
+    """Já há um aviso «sacos prontos» ativo para este local (um só por local; anular antes de avisar outra vez)."""
+
+    status_code = 409
+    code = "notice_already_active"
+
+
+class CertificateNotPublicError(AppError):
+    """O certificado público não existe: o local não ligou o opt-in (ou voltou a desligá-lo)."""
+
+    status_code = 404
+    code = "certificate_not_public"
 
 
 # Declarado em todos os routers: é o que dá ao cliente gerado os tipos de erro.

@@ -26,6 +26,8 @@ from novelo.features.dev.router import router as dev_router
 from novelo.features.email_log.router import admin_router as email_admin_router
 from novelo.features.email_log.router import webhook_router
 from novelo.features.health.router import router as health_router
+from novelo.features.locals.router import public_router as public_locals_router
+from novelo.features.locals.router import router as locals_router
 from novelo.features.lots import photo_store
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
@@ -137,6 +139,11 @@ def create_app() -> FastAPI:
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
     app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    # Conta de local e aviso «sacos prontos» (#59): leitura do próprio local; o certificado opt-in é público.
+    app.include_router(
+        locals_router, prefix=API_PREFIX, tags=["locals"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    app.include_router(public_locals_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app

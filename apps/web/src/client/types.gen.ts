@@ -694,7 +694,7 @@ export type ApproveRequest = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest';
+    role?: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -1524,6 +1524,18 @@ export type CartesianChart = {
 };
 
 /**
+ * CertificateOptIn
+ *
+ * Opt-in do certificado público: só o próprio local decide partilhar os kg agregados.
+ */
+export type CertificateOptIn = {
+    /**
+     * Opt In
+     */
+    opt_in: boolean;
+};
+
+/**
  * ChangePasswordRequest
  */
 export type ChangePasswordRequest = {
@@ -2129,7 +2141,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'internal_error';
     /**
      * Message
      */
@@ -3741,7 +3753,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'internal_error';
     /**
      * Message
      *
@@ -4446,9 +4458,19 @@ export type InvitationCreate = {
      */
     email: string;
     /**
+     * Papel `local`: natureza do sítio — `assistido` (escola no MVP) ou `b2b`
+     */
+    local_kind?: LocalKind | null;
+    /**
      * Locale
      */
     locale?: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     *
+     * Papel `local`: o local (assistido ou produtor B2B) da conta
+     */
+    locality_id?: string | null;
     /**
      * Message
      *
@@ -4462,7 +4484,7 @@ export type InvitationCreate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest';
+    role?: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -4557,9 +4579,23 @@ export type InvitationOut = {
      */
     last_sent_at: string | null;
     /**
+     * Natureza do sítio (só no papel `local`)
+     */
+    local_kind?: LocalKind | null;
+    /**
      * Locale
      */
     locale: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local (só no papel `local`)
+     */
+    locality_name?: string | null;
     /**
      * Message
      */
@@ -4575,7 +4611,7 @@ export type InvitationOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local';
     /**
      * Send Count
      */
@@ -4626,10 +4662,19 @@ export type InvitationPreview = {
      * Invited By Name
      */
     invited_by_name: string | null;
+    local_kind?: LocalKind | null;
     /**
      * Locale
      */
     locale: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name?: string | null;
     /**
      * Message
      */
@@ -4641,7 +4686,7 @@ export type InvitationPreview = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -4849,6 +4894,230 @@ export type KpisSpec = {
      * Title
      */
     title: string;
+};
+
+/**
+ * LocalAccountAdminOut
+ *
+ * A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.
+ */
+export type LocalAccountAdminOut = {
+    /**
+     * Certificate Opt In
+     */
+    certificate_opt_in: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    kind: LocalKind;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Aviso ativo do local, se houver
+     */
+    notice?: StopNoticeOut | null;
+    /**
+     * User Email
+     */
+    user_email: string;
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * User Name
+     */
+    user_name: string | null;
+};
+
+/**
+ * LocalAccountOut
+ *
+ * A conta de local vista por quem nela entra: o sítio, a natureza e o certificado.
+ */
+export type LocalAccountOut = {
+    /**
+     * Certificate Opt In
+     *
+     * Certificado público ligado (opt-in do próprio local)
+     */
+    certificate_opt_in: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Natureza do sítio: `assistido` (escola no MVP) ou `b2b`
+     */
+    kind: LocalKind;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Parish Name
+     *
+     * Freguesia do local, para o cabeçalho
+     */
+    parish_name?: string | null;
+};
+
+/**
+ * LocalCertificateOut
+ *
+ * Página pública do certificado (opt-in): totais agregados do local. Nunca doadores, nunca CO₂.
+ */
+export type LocalCertificateOut = {
+    /**
+     * First Stop At
+     */
+    first_stop_at: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Recycle Kg
+     */
+    recycle_kg: number;
+    /**
+     * Recycle Pct
+     */
+    recycle_pct: number;
+    /**
+     * Reject Kg
+     */
+    reject_kg: number;
+    /**
+     * Reject Pct
+     */
+    reject_pct: number;
+    /**
+     * Reuse Kg
+     */
+    reuse_kg: number;
+    /**
+     * Reuse Pct
+     */
+    reuse_pct: number;
+    /**
+     * Stops
+     *
+     * Paragens com lote pesado
+     */
+    stops: number;
+    /**
+     * Updated At
+     *
+     * Momento do cálculo (os totais são sempre os de agora)
+     */
+    updated_at: string;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * LocalKind
+ *
+ * Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+ *
+ * Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+ * A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+ */
+export type LocalKind = 'assistido' | 'b2b';
+
+/**
+ * LocalReportOut
+ *
+ * Relatório do local em kg por destino — medido na pesagem, destinos pela triagem. Sem CO₂ nem doadores.
+ *
+ * O peso total soma o medido na paragem de cada lote (estimado nos lotes anteriores à balança);
+ * os destinos vêm da mesa de triagem, logo só cobrem os lotes triados (`lots_in_triage` fica de fora).
+ */
+export type LocalReportOut = {
+    /**
+     * First Stop At
+     */
+    first_stop_at: string | null;
+    /**
+     * Last Stop At
+     */
+    last_stop_at: string | null;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Lots
+     *
+     * Paragens com lote (um lote por paragem)
+     */
+    lots: number;
+    /**
+     * Lots In Triage
+     *
+     * Lotes ainda na mesa de triagem, sem destinos
+     */
+    lots_in_triage: number;
+    /**
+     * Measured Lots
+     *
+     * Lotes com peso medido na balança da viatura
+     */
+    measured_lots: number;
+    /**
+     * Recycle Kg
+     */
+    recycle_kg: number;
+    /**
+     * Reject Kg
+     */
+    reject_kg: number;
+    /**
+     * Reuse Kg
+     */
+    reuse_kg: number;
+    /**
+     * Sorted Lots
+     *
+     * Lotes já triados (com destinos)
+     */
+    sorted_lots: number;
+    /**
+     * Weight Kg
+     *
+     * Peso total (medido quando há balança; estimado nos lotes antigos)
+     */
+    weight_kg: number;
 };
 
 /**
@@ -5493,7 +5762,7 @@ export type MeOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -7399,6 +7668,16 @@ export type MunicipalTextileReference = {
      */
     verified: boolean;
 };
+
+/**
+ * NoticeState
+ *
+ * Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+ *
+ * Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+ * avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+ */
+export type NoticeState = 'active' | 'cancelled';
 
 /**
  * OnboardingOut
@@ -10475,6 +10754,75 @@ export type StopLotOpen = {
 };
 
 /**
+ * StopNoticeCreate
+ *
+ * O que o local diz ao avisar: quantos sacos (opcional) e um recado para a equipa (opcional).
+ */
+export type StopNoticeCreate = {
+    /**
+     * Bag Count
+     *
+     * Quantos sacos estão prontos (o protótipo pede «diz quantos»)
+     */
+    bag_count?: number | null;
+    /**
+     * Note
+     *
+     * Recado para a equipa, ex.: «sala 12»
+     */
+    note?: string | null;
+};
+
+/**
+ * StopNoticeCurrent
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum (a porta do herói mostra o estado certo).
+ */
+export type StopNoticeCurrent = {
+    notice: StopNoticeOut | null;
+};
+
+/**
+ * StopNoticeOut
+ *
+ * Um aviso «sacos prontos»: garante paragem no dia (política de paragem).
+ */
+export type StopNoticeOut = {
+    /**
+     * Bag Count
+     *
+     * Sacos que o local declara prontos (sinal, não contagem)
+     */
+    bag_count?: number | null;
+    /**
+     * Cancelled At
+     */
+    cancelled_at: string | null;
+    /**
+     * Created At
+     *
+     * Quando o aviso foi dado
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * `active` garante paragem; `cancelled` é histórico
+     */
+    state: NoticeState;
+};
+
+/**
  * SuppressionCreate
  */
 export type SuppressionCreate = {
@@ -11608,7 +11956,7 @@ export type UserAdminOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -11628,7 +11976,7 @@ export type UserAdminUpdate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest' | null;
+    role?: 'admin' | 'operator' | 'guest' | 'local' | null;
 };
 
 /**
@@ -11680,7 +12028,7 @@ export type UserOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local';
 };
 
 /**
@@ -17758,6 +18106,498 @@ export type HealthResponses = {
 
 export type HealthResponse = HealthResponses[keyof HealthResponses];
 
+export type GetLocalAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/account';
+};
+
+export type GetLocalAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLocalAccountError = GetLocalAccountErrors[keyof GetLocalAccountErrors];
+
+export type GetLocalAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalAccountOut;
+};
+
+export type GetLocalAccountResponse = GetLocalAccountResponses[keyof GetLocalAccountResponses];
+
+export type SetLocalCertificateData = {
+    body: CertificateOptIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/certificate';
+};
+
+export type SetLocalCertificateErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetLocalCertificateError = SetLocalCertificateErrors[keyof SetLocalCertificateErrors];
+
+export type SetLocalCertificateResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalAccountOut;
+};
+
+export type SetLocalCertificateResponse = SetLocalCertificateResponses[keyof SetLocalCertificateResponses];
+
+export type ListLocalLotsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/lots';
+};
+
+export type ListLocalLotsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLocalLotsError = ListLocalLotsErrors[keyof ListLocalLotsErrors];
+
+export type ListLocalLotsResponses = {
+    /**
+     * Response List Local Lots
+     *
+     * Successful Response
+     */
+    200: Array<LotSummary>;
+};
+
+export type ListLocalLotsResponse = ListLocalLotsResponses[keyof ListLocalLotsResponses];
+
+export type CreateLocalNoticeData = {
+    body: StopNoticeCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices';
+};
+
+export type CreateLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateLocalNoticeError = CreateLocalNoticeErrors[keyof CreateLocalNoticeErrors];
+
+export type CreateLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    201: StopNoticeOut;
+};
+
+export type CreateLocalNoticeResponse = CreateLocalNoticeResponses[keyof CreateLocalNoticeResponses];
+
+export type CancelLocalNoticeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices/active';
+};
+
+export type CancelLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CancelLocalNoticeError = CancelLocalNoticeErrors[keyof CancelLocalNoticeErrors];
+
+export type CancelLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CancelLocalNoticeResponse = CancelLocalNoticeResponses[keyof CancelLocalNoticeResponses];
+
+export type GetActiveLocalNoticeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices/active';
+};
+
+export type GetActiveLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetActiveLocalNoticeError = GetActiveLocalNoticeErrors[keyof GetActiveLocalNoticeErrors];
+
+export type GetActiveLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    200: StopNoticeCurrent;
+};
+
+export type GetActiveLocalNoticeResponse = GetActiveLocalNoticeResponses[keyof GetActiveLocalNoticeResponses];
+
+export type GetLocalReportData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/report';
+};
+
+export type GetLocalReportErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLocalReportError = GetLocalReportErrors[keyof GetLocalReportErrors];
+
+export type GetLocalReportResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalReportOut;
+};
+
+export type GetLocalReportResponse = GetLocalReportResponses[keyof GetLocalReportResponses];
+
+export type ListLocalAccountsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/locals';
+};
+
+export type ListLocalAccountsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLocalAccountsError = ListLocalAccountsErrors[keyof ListLocalAccountsErrors];
+
+export type ListLocalAccountsResponses = {
+    /**
+     * Response List Local Accounts
+     *
+     * Successful Response
+     */
+    200: Array<LocalAccountAdminOut>;
+};
+
+export type ListLocalAccountsResponse = ListLocalAccountsResponses[keyof ListLocalAccountsResponses];
+
 export type ListLotsData = {
     body?: never;
     path?: never;
@@ -21582,6 +22422,72 @@ export type ListZonesResponses = {
 };
 
 export type ListZonesResponse = ListZonesResponses[keyof ListZonesResponses];
+
+export type GetPublicLocalCertificateData = {
+    body?: never;
+    path: {
+        /**
+         * Account Id
+         */
+        account_id: string;
+    };
+    query?: never;
+    url: '/api/v1/public/locals/{account_id}/certificate';
+};
+
+export type GetPublicLocalCertificateErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicLocalCertificateError = GetPublicLocalCertificateErrors[keyof GetPublicLocalCertificateErrors];
+
+export type GetPublicLocalCertificateResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalCertificateOut;
+};
+
+export type GetPublicLocalCertificateResponse = GetPublicLocalCertificateResponses[keyof GetPublicLocalCertificateResponses];
 
 export type GetPassportData = {
     body?: never;

@@ -1310,7 +1310,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -2627,6 +2628,20 @@
         "title": "CartesianChart",
         "type": "object"
       },
+      "CertificateOptIn": {
+        "description": "Opt-in do certificado público: só o próprio local decide partilhar os kg agregados.",
+        "properties": {
+          "opt_in": {
+            "title": "Opt In",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "opt_in"
+        ],
+        "title": "CertificateOptIn",
+        "type": "object"
+      },
       "ChangePasswordRequest": {
         "properties": {
           "current_password": {
@@ -3650,6 +3665,9 @@
               "captcha_required",
               "captcha_failed",
               "captcha_unavailable",
+              "local_account_missing",
+              "notice_already_active",
+              "certificate_not_public",
               "internal_error"
             ],
             "title": "Code",
@@ -6404,6 +6422,9 @@
               "captcha_required",
               "captcha_failed",
               "captcha_unavailable",
+              "local_account_missing",
+              "notice_already_active",
+              "certificate_not_public",
               "internal_error"
             ],
             "title": "Code",
@@ -7614,6 +7635,17 @@
             "title": "Email",
             "type": "string"
           },
+          "local_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalKind"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Papel `local`: natureza do sítio — `assistido` (escola no MVP) ou `b2b`"
+          },
           "locale": {
             "default": "pt-PT",
             "enum": [
@@ -7622,6 +7654,19 @@
             ],
             "title": "Locale",
             "type": "string"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Papel `local`: o local (assistido ou produtor B2B) da conta",
+            "title": "Locality Id"
           },
           "message": {
             "anyOf": [
@@ -7653,7 +7698,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -7828,6 +7874,17 @@
             ],
             "title": "Last Sent At"
           },
+          "local_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalKind"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Natureza do sítio (só no papel `local`)"
+          },
           "locale": {
             "enum": [
               "pt-PT",
@@ -7835,6 +7892,30 @@
             ],
             "title": "Locale",
             "type": "string"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome do local (só no papel `local`)",
+            "title": "Locality Name"
           },
           "message": {
             "anyOf": [
@@ -7874,7 +7955,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -7972,6 +8054,16 @@
             ],
             "title": "Invited By Name"
           },
+          "local_kind": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LocalKind"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "locale": {
             "enum": [
               "pt-PT",
@@ -7979,6 +8071,29 @@
             ],
             "title": "Locale",
             "type": "string"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
           },
           "message": {
             "anyOf": [
@@ -8006,7 +8121,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -8387,6 +8503,372 @@
           "items"
         ],
         "title": "KpisSpec",
+        "type": "object"
+      },
+      "LocalAccountAdminOut": {
+        "description": "A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.",
+        "properties": {
+          "certificate_opt_in": {
+            "title": "Certificate Opt In",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/LocalKind"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "notice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StopNoticeOut"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Aviso ativo do local, se houver"
+          },
+          "user_email": {
+            "title": "User Email",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          },
+          "user_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "User Name"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "user_email",
+          "user_name",
+          "locality_id",
+          "locality_name",
+          "kind",
+          "certificate_opt_in",
+          "created_at"
+        ],
+        "title": "LocalAccountAdminOut",
+        "type": "object"
+      },
+      "LocalAccountOut": {
+        "description": "A conta de local vista por quem nela entra: o sítio, a natureza e o certificado.",
+        "properties": {
+          "certificate_opt_in": {
+            "description": "Certificado público ligado (opt-in do próprio local)",
+            "title": "Certificate Opt In",
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/LocalKind",
+            "description": "Natureza do sítio: `assistido` (escola no MVP) ou `b2b`"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Freguesia do local, para o cabeçalho",
+            "title": "Parish Name"
+          }
+        },
+        "required": [
+          "id",
+          "locality_id",
+          "locality_name",
+          "kind",
+          "certificate_opt_in",
+          "created_at"
+        ],
+        "title": "LocalAccountOut",
+        "type": "object"
+      },
+      "LocalCertificateOut": {
+        "description": "Página pública do certificado (opt-in): totais agregados do local. Nunca doadores, nunca CO₂.",
+        "properties": {
+          "first_stop_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Stop At"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Name"
+          },
+          "recycle_kg": {
+            "title": "Recycle Kg",
+            "type": "number"
+          },
+          "recycle_pct": {
+            "title": "Recycle Pct",
+            "type": "number"
+          },
+          "reject_kg": {
+            "title": "Reject Kg",
+            "type": "number"
+          },
+          "reject_pct": {
+            "title": "Reject Pct",
+            "type": "number"
+          },
+          "reuse_kg": {
+            "title": "Reuse Kg",
+            "type": "number"
+          },
+          "reuse_pct": {
+            "title": "Reuse Pct",
+            "type": "number"
+          },
+          "stops": {
+            "description": "Paragens com lote pesado",
+            "title": "Stops",
+            "type": "integer"
+          },
+          "updated_at": {
+            "description": "Momento do cálculo (os totais são sempre os de agora)",
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "weight_kg": {
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "locality_name",
+          "parish_name",
+          "stops",
+          "weight_kg",
+          "reuse_kg",
+          "recycle_kg",
+          "reject_kg",
+          "reuse_pct",
+          "recycle_pct",
+          "reject_pct",
+          "first_stop_at",
+          "updated_at"
+        ],
+        "title": "LocalCertificateOut",
+        "type": "object"
+      },
+      "LocalKind": {
+        "description": "Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.\n\nAssistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.\nA conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).",
+        "enum": [
+          "assistido",
+          "b2b"
+        ],
+        "title": "LocalKind",
+        "type": "string"
+      },
+      "LocalReportOut": {
+        "description": "Relatório do local em kg por destino — medido na pesagem, destinos pela triagem. Sem CO₂ nem doadores.\n\nO peso total soma o medido na paragem de cada lote (estimado nos lotes anteriores à balança);\nos destinos vêm da mesa de triagem, logo só cobrem os lotes triados (`lots_in_triage` fica de fora).",
+        "properties": {
+          "first_stop_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "First Stop At"
+          },
+          "last_stop_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Last Stop At"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "locality_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Name"
+          },
+          "lots": {
+            "description": "Paragens com lote (um lote por paragem)",
+            "title": "Lots",
+            "type": "integer"
+          },
+          "lots_in_triage": {
+            "description": "Lotes ainda na mesa de triagem, sem destinos",
+            "title": "Lots In Triage",
+            "type": "integer"
+          },
+          "measured_lots": {
+            "description": "Lotes com peso medido na balança da viatura",
+            "title": "Measured Lots",
+            "type": "integer"
+          },
+          "recycle_kg": {
+            "title": "Recycle Kg",
+            "type": "number"
+          },
+          "reject_kg": {
+            "title": "Reject Kg",
+            "type": "number"
+          },
+          "reuse_kg": {
+            "title": "Reuse Kg",
+            "type": "number"
+          },
+          "sorted_lots": {
+            "description": "Lotes já triados (com destinos)",
+            "title": "Sorted Lots",
+            "type": "integer"
+          },
+          "weight_kg": {
+            "description": "Peso total (medido quando há balança; estimado nos lotes antigos)",
+            "title": "Weight Kg",
+            "type": "number"
+          }
+        },
+        "required": [
+          "locality_id",
+          "locality_name",
+          "lots",
+          "measured_lots",
+          "sorted_lots",
+          "lots_in_triage",
+          "weight_kg",
+          "reuse_kg",
+          "recycle_kg",
+          "reject_kg",
+          "first_stop_at",
+          "last_stop_at"
+        ],
+        "title": "LocalReportOut",
         "type": "object"
       },
       "LocalityOut": {
@@ -9520,7 +10002,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -12640,6 +13123,15 @@
         ],
         "title": "MunicipalTextileReference",
         "type": "object"
+      },
+      "NoticeState": {
+        "description": "Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).\n\nUm só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a\navisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.",
+        "enum": [
+          "active",
+          "cancelled"
+        ],
+        "title": "NoticeState",
+        "type": "string"
       },
       "OnboardingOut": {
         "description": "Estado da introdução guiada da conta (vale em todos os dispositivos).",
@@ -17461,6 +17953,137 @@
         "title": "StopLotOpen",
         "type": "object"
       },
+      "StopNoticeCreate": {
+        "description": "O que o local diz ao avisar: quantos sacos (opcional) e um recado para a equipa (opcional).",
+        "properties": {
+          "bag_count": {
+            "anyOf": [
+              {
+                "maximum": 50.0,
+                "minimum": 1.0,
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quantos sacos estão prontos (o protótipo pede «diz quantos»)",
+            "title": "Bag Count"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "maxLength": 240,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Recado para a equipa, ex.: «sala 12»",
+            "title": "Note"
+          }
+        },
+        "title": "StopNoticeCreate",
+        "type": "object"
+      },
+      "StopNoticeCurrent": {
+        "description": "O aviso ativo do local, ou `null` quando não há nenhum (a porta do herói mostra o estado certo).",
+        "properties": {
+          "notice": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/StopNoticeOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "notice"
+        ],
+        "title": "StopNoticeCurrent",
+        "type": "object"
+      },
+      "StopNoticeOut": {
+        "description": "Um aviso «sacos prontos»: garante paragem no dia (política de paragem).",
+        "properties": {
+          "bag_count": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Sacos que o local declara prontos (sinal, não contagem)",
+            "title": "Bag Count"
+          },
+          "cancelled_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cancelled At"
+          },
+          "created_at": {
+            "description": "Quando o aviso foi dado",
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "locality_id": {
+            "anyOf": [
+              {
+                "format": "uuid",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Locality Id"
+          },
+          "note": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Note"
+          },
+          "state": {
+            "$ref": "#/components/schemas/NoticeState",
+            "description": "`active` garante paragem; `cancelled` é histórico"
+          }
+        },
+        "required": [
+          "id",
+          "locality_id",
+          "state",
+          "note",
+          "created_at",
+          "cancelled_at"
+        ],
+        "title": "StopNoticeOut",
+        "type": "object"
+      },
       "SuppressionCreate": {
         "properties": {
           "email": {
@@ -19338,7 +19961,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -19387,7 +20011,8 @@
                 "enum": [
                   "admin",
                   "operator",
-                  "guest"
+                  "guest",
+                  "local"
                 ],
                 "type": "string"
               },
@@ -19479,7 +20104,8 @@
             "enum": [
               "admin",
               "operator",
-              "guest"
+              "guest",
+              "local"
             ],
             "title": "Role",
             "type": "string"
@@ -32129,6 +32755,1001 @@
         ]
       }
     },
+    "/api/v1/local/account": {
+      "get": {
+        "description": "A conta de local de quem pede: o sítio, a natureza e o estado do certificado público.",
+        "operationId": "get_local_account",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Local Account",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/local/certificate": {
+      "put": {
+        "description": "Opt-in do certificado público: ligar ou desligar. Só o próprio local decide — a equipa vê, não muda.",
+        "operationId": "set_local_certificate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CertificateOptIn"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Set Local Certificate",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/local/lots": {
+      "get": {
+        "description": "Os lotes das paragens do próprio local, com o peso medido (`weight_source` diz de onde vem).",
+        "operationId": "list_local_lots",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LotSummary"
+                  },
+                  "title": "Response List Local Lots",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Local Lots",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/local/notices": {
+      "post": {
+        "description": "Avisa «sacos prontos»: o sinal que garante paragem no dia (ADR: política de paragem). 409 se já houver um.",
+        "operationId": "create_local_notice",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StopNoticeCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopNoticeOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Local Notice",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/local/notices/active": {
+      "delete": {
+        "description": "Anula o aviso ativo (o histórico fica). 404 quando não há aviso ativo.",
+        "operationId": "cancel_local_notice",
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Cancel Local Notice",
+        "tags": [
+          "locals"
+        ]
+      },
+      "get": {
+        "description": "O aviso ativo do local, ou `null` quando não há nenhum.",
+        "operationId": "get_active_local_notice",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopNoticeCurrent"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Active Local Notice",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/local/report": {
+      "get": {
+        "description": "Relatório do local em kg medidos por destino. Sem CO₂ e sem dados de doadores — nunca.",
+        "operationId": "get_local_report",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalReportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Local Report",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
+    "/api/v1/locals": {
+      "get": {
+        "description": "As contas de local, com o aviso ativo de cada sítio — a mesa da equipa para despachar rondas.",
+        "operationId": "list_local_accounts",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/LocalAccountAdminOut"
+                  },
+                  "title": "Response List Local Accounts",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Local Accounts",
+        "tags": [
+          "locals"
+        ]
+      }
+    },
     "/api/v1/lots": {
       "get": {
         "operationId": "list_lots",
@@ -40648,6 +42269,140 @@
         "summary": "List Zones",
         "tags": [
           "planning"
+        ]
+      }
+    },
+    "/api/v1/public/locals/{account_id}/certificate": {
+      "get": {
+        "description": "Página pública do certificado de um local (opt-in). 404 quando desligado: sem opt-in não há página.",
+        "operationId": "get_public_local_certificate",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "account_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Account Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalCertificateOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Public Local Certificate",
+        "tags": [
+          "public"
         ]
       }
     },

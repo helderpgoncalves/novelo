@@ -2,8 +2,9 @@ import uuid
 from datetime import datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
+from novelo.domain.vocab import LocalKind
 from novelo.features.email_log.schemas import ApprovalEmailOut, DeliveryStatusOrNone, EmailWarning
 from novelo.features.users.models import ApprovalStatus, JoinedVia, Role
 
@@ -176,12 +177,30 @@ class InvitationCreate(BaseModel):
     locale: Locale = "pt-PT"
     message: str | None = Field(default=None, max_length=500, description="Texto livre que aparece no email")
     confirm_admin: bool = Field(default=False, description="Obrigatório (true) quando `role` é `admin`")
+    # Só no papel `local` (a conta pertence ao local, criada pela equipa, sem auto-registo).
+    locality_id: uuid.UUID | None = Field(
+        default=None, description="Papel `local`: o local (assistido ou produtor B2B) da conta"
+    )
+    local_kind: LocalKind | None = Field(
+        default=None, description="Papel `local`: natureza do sítio — `assistido` (escola no MVP) ou `b2b`"
+    )
 
     @field_validator("name", "message")
     @classmethod
     def _clean(cls, value: str | None) -> str | None:
         cleaned = " ".join(value.split()) if value else ""
         return cleaned or None
+
+    @model_validator(mode="after")
+    def _local_fields_only_for_local_role(self) -> "InvitationCreate":
+        is_local = self.role == "local"
+        if is_local and self.locality_id is None:
+            raise ValueError("O papel `local` exige locality_id")
+        if is_local and self.local_kind is None:
+            raise ValueError("O papel `local` exige local_kind")
+        if not is_local and (self.locality_id is not None or self.local_kind is not None):
+            raise ValueError("locality_id/local_kind só se usam no papel `local`")
+        return self
 
 
 class InvitationOut(BaseModel):
@@ -191,6 +210,10 @@ class InvitationOut(BaseModel):
     role: Role
     locale: Locale
     message: str | None
+    # Papel `local`: o local da conta e a natureza do sítio, para a equipa conferir antes de aceitar.
+    locality_id: uuid.UUID | None = None
+    locality_name: str | None = Field(default=None, description="Nome do local (só no papel `local`)")
+    local_kind: LocalKind | None = Field(default=None, description="Natureza do sítio (só no papel `local`)")
     status: InvitationStatus
     invited_by_id: uuid.UUID | None
     invited_by_name: str | None
@@ -239,6 +262,9 @@ class InvitationPreview(BaseModel):
     invited_by_name: str | None
     message: str | None
     expires_at: datetime
+    locality_id: uuid.UUID | None = None
+    locality_name: str | None = None
+    local_kind: LocalKind | None = None
 
 
 class ProfileUpdate(BaseModel):

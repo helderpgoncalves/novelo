@@ -323,3 +323,25 @@ PRODUCER_TYPE_LABELS: dict[ProducerType, str] = {
     ProducerType.CARE_HOME: "Lar",
     ProducerType.HOSPITALITY: "Hotelaria",
 }
+
+
+class LocalKind(StrEnum):
+    """Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+
+    Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+    A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+    """
+
+    ASSISTED = "assistido"
+    B2B = "b2b"
+
+
+class NoticeState(StrEnum):
+    """Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+
+    Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+    avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+    """
+
+    ACTIVE = "active"
+    CANCELLED = "cancelled"
