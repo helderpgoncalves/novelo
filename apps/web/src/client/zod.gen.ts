@@ -1986,9 +1986,14 @@ export const zLotStateChange = z.object({
  * LotUnitIn
  *
  * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ *
+ * `label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse
+ * UUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:
+ * ou o QR do saco, ou o UUID da etiqueta.
  */
 export const zLotUnitIn = z.object({
-    bag_code: z.string().min(1).max(80).nullish()
+    bag_code: z.string().min(1).max(80).nullish(),
+    label_code: z.string().max(36).nullish()
 });
 
 /**

@@ -2,7 +2,7 @@ import uuid
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from novelo.domain.vocab import (
     Fibre,
@@ -92,12 +92,48 @@ class StopLotOpen(BaseModel):
     )
 
 
+def _strip(v: str | None) -> str | None:
+    value = (v or "").strip()
+    return value or None
+
+
 class LotUnitIn(BaseModel):
-    """Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta)."""
+    """Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+
+    `label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse
+    UUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:
+    ou o QR do saco, ou o UUID da etiqueta.
+    """
 
     bag_code: str | None = Field(
         default=None, min_length=1, max_length=80, description="QR do saco da plataforma, tal como lido no scan"
     )
+    label_code: str | None = Field(
+        default=None,
+        max_length=36,
+        description="UUID gerado no dispositivo para a etiqueta impressa offline (QR = esse UUID)",
+    )
+
+    @field_validator("bag_code", "label_code", mode="before")
+    @classmethod
+    def _trim(cls, v: str | None) -> str | None:
+        return _strip(v)
+
+    @field_validator("label_code")
+    @classmethod
+    def _label_is_uuid(cls, v: str | None) -> str | None:
+        if v is not None:
+            try:
+                uuid.UUID(v)
+            except ValueError as e:
+                raise ValueError("O código da etiqueta tem de ser um UUID") from e
+        return v
+
+    @model_validator(mode="after")
+    def _one_code_only(self) -> "LotUnitIn":
+        if self.bag_code and self.label_code:
+            raise ValueError("Ou o QR do saco ou o UUID da etiqueta, nunca os dois")
+        return self
 
 
 class LotUnitWeight(BaseModel):

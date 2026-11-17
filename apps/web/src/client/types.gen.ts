@@ -5191,6 +5191,10 @@ export type LotSummary = {
  * LotUnitIn
  *
  * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ *
+ * `label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse
+ * UUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:
+ * ou o QR do saco, ou o UUID da etiqueta.
  */
 export type LotUnitIn = {
     /**
@@ -5199,6 +5203,12 @@ export type LotUnitIn = {
      * QR do saco da plataforma, tal como lido no scan
      */
     bag_code?: string | null;
+    /**
+     * Label Code
+     *
+     * UUID gerado no dispositivo para a etiqueta impressa offline (QR = esse UUID)
+     */
+    label_code?: string | null;
 };
 
 /**

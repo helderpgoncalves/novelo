@@ -274,14 +274,15 @@ async def _open_lot_for_units(db: AsyncSession, code: str) -> Lot:
 
 
 async def add_unit(db: AsyncSession, user: User, code: str, body: LotUnitIn) -> LotUnitOut:
-    """Um QR por unidade física: o do saco da plataforma, ou uma etiqueta impressa com UUID quando não há."""
+    """Um QR por unidade física: o do saco da plataforma, ou uma etiqueta com UUID (do servidor, ou da viatura offline)."""
     lot = await _open_lot_for_units(db, code)
-    bag_code = (body.bag_code or "").strip()
-    if bag_code and await db.scalar(select(LotUnit.id).where(LotUnit.lot_id == lot.id, LotUnit.code == bag_code)):
+    bag_code = body.bag_code or ""
+    unit_code = bag_code or body.label_code or str(uuid.uuid4())
+    if await db.scalar(select(LotUnit.id).where(LotUnit.lot_id == lot.id, LotUnit.code == unit_code)):
         raise ConflictError("This bag QR is already in this lot")
     unit = LotUnit(
         lot_id=lot.id,
-        code=bag_code or str(uuid.uuid4()),
+        code=unit_code,
         source=LotUnitSource.BAG if bag_code else LotUnitSource.LABEL,
     )
     lot.units.append(unit)
