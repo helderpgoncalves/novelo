@@ -368,7 +368,7 @@ async def _open_lot_for_units(db: AsyncSession, code: str) -> Lot:
 
 
 async def add_unit(db: AsyncSession, user: User, code: str, body: LotUnitIn) -> LotUnitOut:
-    """Um QR por unidade física: o do saco da plataforma, ou uma etiqueta com UUID (do servidor, ou da viatura offline)."""
+    """Um QR por unidade física: o do saco da plataforma, ou uma etiqueta com UUID (do servidor ou da viatura)."""
     lot = await _open_lot_for_units(db, code)
     bag_code = body.bag_code or ""
     unit_code = bag_code or body.label_code or str(uuid.uuid4())
