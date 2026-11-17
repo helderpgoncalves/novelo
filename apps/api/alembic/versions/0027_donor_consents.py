@@ -37,9 +37,8 @@ def upgrade() -> None:
         sa.ForeignKeyConstraint(
             ["user_id"], ["users.id"], name=op.f("fk_donor_consents_user_id_users"), ondelete="SET NULL"
         ),
-        sa.CheckConstraint(
-            "purpose IN ('marketing', 'partnerships')", name=op.f("ck_donor_consents_purpose_valid")
-        ),
+        sa.UniqueConstraint("seq", name=op.f("uq_donor_consents_seq")),
+        sa.CheckConstraint("purpose IN ('marketing', 'partnerships')", name=op.f("ck_donor_consents_purpose_valid")),
     )
     op.create_index(
         "ix_donor_consents_user_purpose_created",
