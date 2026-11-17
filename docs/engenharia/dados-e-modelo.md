@@ -107,7 +107,7 @@ Os lotes são o lado real do modelo: o que foi mesmo recolhido, triado e entregu
 | Evento do lote | tipo (recolhido, triado, reservado, entregue), data, quem |
 | Reserva | lote, reciclador, data |
 
-**Peso no MVP:** cada peça recebe o peso médio do seu tipo (camisola, calças, lençol...), que é um pressuposto marcado como tal. No piloto o peso vem da **balança na viatura, por paragem** (um lote de recolha por paragem; [Funcionalidades](features.md#2-lote-com-passaporte-e-bolsa-de-fibra)), não de uma balança na mesa de triagem.
+**Peso no MVP:** o peso do lote é o **medido na viatura, por unidade** (`lot_units.weight_g`, pratos ≤ 15 kg somados por saco; um lote de recolha por paragem; [Funcionalidades](features.md#2-lote-com-passaporte-e-bolsa-de-fibra)), não de uma balança na mesa de triagem — e `weight_source` diz-o em todo o produto («medido» vs «estimativa»). Lotes abertos antes de haver balança (e as peças triadas, para a composição) usam o peso médio do tipo de peça (camisola, calças, lençol...), que é um pressuposto marcado como tal; nunca substitui o medido.
 
 **Fluxos (Sankey):** soma de toneladas por freguesia → modo → estado → destino, a partir do cenário (previsto) ou dos lotes (observado).
 
