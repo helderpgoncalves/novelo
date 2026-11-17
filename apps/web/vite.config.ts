@@ -137,6 +137,8 @@ export default defineConfig({
         ],
         cleanupOutdatedCaches: true,
         maximumFileSizeToCacheInBytes: 3_000_000,
+        // A fila da viatura (#58): o worker acorda as janelas no Background Sync (public/sw-sync.js).
+        importScripts: ['/sw-sync.js'],
       },
     }),
   ],
