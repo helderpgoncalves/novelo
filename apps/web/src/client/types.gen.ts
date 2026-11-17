@@ -1683,6 +1683,17 @@ export type CircuitsSummary = {
 };
 
 /**
+ * CollectionFrequency
+ *
+ * Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+ *
+ * Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+ * confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+ * `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+ */
+export type CollectionFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly';
+
+/**
  * CollectionMode
  *
  * Modos de recolha de têxteis que o simulador compara.
@@ -1708,6 +1719,10 @@ export type CollectionPlanEntry = {
      * Uma ronda a cada N semanas
      */
     every_weeks: number;
+    /**
+     * Degrau da escada escolhido pelo otimizador para esta freguesia (`weekly`, `biweekly`, `monthly`, `quarterly`). Nulo na política fixa e nos cenários antigos — o passo global não é um degrau gravado
+     */
+    frequency?: CollectionFrequency | null;
     /**
      * Hours Year
      *
@@ -9539,6 +9554,52 @@ export type ProposeActionIn = {
 export type Provenance = 'confirmed' | 'ai';
 
 /**
+ * PublicAgendaEntry
+ *
+ * Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).
+ *
+ * É a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do
+ * degrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.
+ * A página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.
+ */
+export type PublicAgendaEntry = {
+    /**
+     * `on_demand`: ronda porta a porta; `existing`: paragens nos locais
+     */
+    channel: CollectionMode;
+    /**
+     * Every Weeks
+     *
+     * Uma visita a cada N semanas (a cadência do degrau escolhido)
+     */
+    every_weeks: number;
+    /**
+     * O degrau escolhido (`weekly` a `quarterly`); nulo na política fixa
+     */
+    frequency?: CollectionFrequency | null;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Rounds Year
+     *
+     * Visitas por ano
+     */
+    rounds_year: number;
+    /**
+     * Weekday
+     *
+     * Dia da ronda (1 = segunda ... 5 = sexta)
+     */
+    weekday: number;
+};
+
+/**
  * QuantilesOut
  */
 export type QuantilesOut = {
@@ -10591,6 +10652,12 @@ export type ScenarioRequest = {
      */
     siting?: 'parish' | 'sites';
     /**
+     * Stop Policy
+     *
+     * Política de paragem (ADR #42): `fixed` mantém o degrau global `on_demand_every_weeks` para todas as freguesias; `dynamic` deixa o otimizador escolher o degrau de cada freguesia na escada discreta (semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura. O aviso «sacos prontos» garante paragem nas duas. Cenários antigos, sem o campo: `fixed`
+     */
+    stop_policy?: 'fixed' | 'dynamic';
+    /**
      * Target Tonnes
      *
      * Meta de captura (min_cost)
@@ -10628,6 +10695,12 @@ export type ScenarioResult = {
      */
     modes: Array<ModeSummary>;
     /**
+     * Public Agenda
+     *
+     * Agenda pública (dado introduzido): as rondas publicadas, por dia, freguesia e canal, com a cadência do degrau escolhido — nenhuma visita publicada é saltada. Nulo nos cenários calculados antes da política de paragem (a página pública de #63 lê este campo)
+     */
+    public_agenda?: Array<PublicAgendaEntry> | null;
+    /**
      * Routes
      */
     routes: Array<RouteOut>;
@@ -10647,6 +10720,12 @@ export type ScenarioResult = {
      * Preenchido nos cenários por locais
      */
     siting?: SitingSummary | null;
+    /**
+     * Stop Policy
+     *
+     * Política de paragem com que o cenário foi calculado (`fixed` = degrau global; `dynamic` = degrau por freguesia na escada). Cenários antigos, sem o campo: `fixed`
+     */
+    stop_policy?: 'fixed' | 'dynamic';
 };
 
 /**

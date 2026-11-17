@@ -2900,6 +2900,17 @@
         "title": "CircuitsSummary",
         "type": "object"
       },
+      "CollectionFrequency": {
+        "description": "Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.\n\nOs DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a\nconfirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em\n`domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).",
+        "enum": [
+          "weekly",
+          "biweekly",
+          "monthly",
+          "quarterly"
+        ],
+        "title": "CollectionFrequency",
+        "type": "string"
+      },
       "CollectionMode": {
         "description": "Modos de recolha de têxteis que o simulador compara.\n\nA Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no\nvocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.",
         "enum": [
@@ -2921,6 +2932,17 @@
             "description": "Uma ronda a cada N semanas",
             "title": "Every Weeks",
             "type": "number"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionFrequency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Degrau da escada escolhido pelo otimizador para esta freguesia (`weekly`, `biweekly`, `monthly`, `quarterly`). Nulo na política fixa e nos cenários antigos — o passo global não é um degrau gravado"
           },
           "hours_year": {
             "description": "Horas por ano da viatura dedicada neste canal",
@@ -16241,6 +16263,59 @@
         "title": "Provenance",
         "type": "string"
       },
+      "PublicAgendaEntry": {
+        "description": "Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).\n\nÉ a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do\ndegrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.\nA página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.",
+        "properties": {
+          "channel": {
+            "$ref": "#/components/schemas/CollectionMode",
+            "description": "`on_demand`: ronda porta a porta; `existing`: paragens nos locais"
+          },
+          "every_weeks": {
+            "description": "Uma visita a cada N semanas (a cadência do degrau escolhido)",
+            "title": "Every Weeks",
+            "type": "number"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionFrequency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "O degrau escolhido (`weekly` a `quarterly`); nulo na política fixa"
+          },
+          "parish_code": {
+            "title": "Parish Code",
+            "type": "string"
+          },
+          "parish_name": {
+            "title": "Parish Name",
+            "type": "string"
+          },
+          "rounds_year": {
+            "description": "Visitas por ano",
+            "title": "Rounds Year",
+            "type": "number"
+          },
+          "weekday": {
+            "description": "Dia da ronda (1 = segunda ... 5 = sexta)",
+            "title": "Weekday",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "parish_code",
+          "parish_name",
+          "channel",
+          "weekday",
+          "every_weeks",
+          "rounds_year"
+        ],
+        "title": "PublicAgendaEntry",
+        "type": "object"
+      },
       "QuantilesOut": {
         "properties": {
           "p10": {
@@ -17893,6 +17968,16 @@
             "title": "Siting",
             "type": "string"
           },
+          "stop_policy": {
+            "default": "fixed",
+            "description": "Política de paragem (ADR #42): `fixed` mantém o degrau global `on_demand_every_weeks` para todas as freguesias; `dynamic` deixa o otimizador escolher o degrau de cada freguesia na escada discreta (semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura. O aviso «sacos prontos» garante paragem nas duas. Cenários antigos, sem o campo: `fixed`",
+            "enum": [
+              "fixed",
+              "dynamic"
+            ],
+            "title": "Stop Policy",
+            "type": "string"
+          },
           "target_tonnes": {
             "anyOf": [
               {
@@ -17963,6 +18048,21 @@
             "title": "Modes",
             "type": "array"
           },
+          "public_agenda": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PublicAgendaEntry"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Agenda pública (dado introduzido): as rondas publicadas, por dia, freguesia e canal, com a cadência do degrau escolhido — nenhuma visita publicada é saltada. Nulo nos cenários calculados antes da política de paragem (a página pública de #63 lê este campo)",
+            "title": "Public Agenda"
+          },
           "routes": {
             "items": {
               "$ref": "#/components/schemas/RouteOut"
@@ -17999,6 +18099,16 @@
               }
             ],
             "description": "Preenchido nos cenários por locais"
+          },
+          "stop_policy": {
+            "default": "fixed",
+            "description": "Política de paragem com que o cenário foi calculado (`fixed` = degrau global; `dynamic` = degrau por freguesia na escada). Cenários antigos, sem o campo: `fixed`",
+            "enum": [
+              "fixed",
+              "dynamic"
+            ],
+            "title": "Stop Policy",
+            "type": "string"
           }
         },
         "required": [

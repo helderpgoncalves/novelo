@@ -24,7 +24,7 @@ from __future__ import annotations
 import math
 import statistics
 from collections import defaultdict
-from collections.abc import Sequence
+from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from typing import Literal
 
@@ -32,6 +32,7 @@ from ortools.sat.python import cp_model
 
 from novelo.domain import fleet, network
 from novelo.domain.geo import haversine_km
+from novelo.domain.vocab import CollectionFrequency
 
 SCALE_KG = 1000  # t -> kg inteiros no solver
 SCALE_EUR = 100
@@ -169,19 +170,21 @@ def greedy_coverage(
 
 
 def greedy_hybrid(
+    demand_t: Sequence[float],
     site_t: Sequence[float],
-    od_t: Sequence[float],
-    overlap_t: Sequence[float],
+    site_capture: float,
     zone_of: Sequence[str],
     near: Sequence[Sequence[int]],
     site_cost_eur: float,
-    od_cost_eur: dict[str, float],
+    od_variants: Mapping[str, Sequence[OnDemandZone]],
     budget_eur: float,
 ) -> tuple[tuple[int, ...], frozenset[str]]:
     """Solução inicial dos locais e da recolha a pedido: a ação com mais têxtil novo por euro, até acabar o orçamento.
 
-    Ligar a recolha a pedido numa freguesia vale `od_i − overlap_i·y_i` por ponto; abrir um local vale
-    `site_i − overlap_i·z_p` por ponto que ainda não estava servido (a união dos canais não conta duas vezes).
+    Ligar a recolha a pedido numa freguesia vale, por ponto, o que o DEGRAU escolhido capta sozinho
+    (`demand_t · capture_v`) menos ooverlap já servido pelos locais; abrir um local vale `site_t` por ponto ainda
+    não servido (a união dos canais não conta duas vezes). Os degraus são ações distintas: escolher o degrau é
+    parte da decisão (ADR: política de paragem).
     """
     by_site: dict[int, list[int]] = defaultdict(list)
     by_zone: dict[str, list[int]] = defaultdict(list)
@@ -191,6 +194,7 @@ def greedy_hybrid(
             by_site[j].append(i)
     served = [False] * len(near)
     od_on: set[str] = set()
+    od_capture: dict[str, float] = {}  # captura do degrau ligado em cada freguesia (para o overlap com os locais)
     chosen: list[int] = []
     spent = 0.0
 
@@ -199,17 +203,25 @@ def greedy_hybrid(
         for j, pts in by_site.items():
             if j in chosen or spent + site_cost_eur > budget_eur:
                 continue
-            gain = sum(site_t[i] - (overlap_t[i] if zone_of[i] in od_on else 0.0) for i in pts if not served[i])
+            gain = sum(
+                site_t[i] - (demand_t[i] * site_capture * od_capture[zone_of[i]] if zone_of[i] in od_capture else 0.0)
+                for i in pts if not served[i]
+            )  # fmt: skip
             ratio = gain / site_cost_eur if site_cost_eur > 0 else gain
             if ratio > 1e-12 and (best is None or ratio > best[0] + 1e-12):
                 best = (ratio, "s", j)
-        for p, cost in od_cost_eur.items():
-            if p in od_on or spent + cost > budget_eur:
-                continue
-            gain = sum(od_t[i] - (overlap_t[i] if served[i] else 0.0) for i in by_zone.get(p, ()))
-            ratio = gain / cost if cost > 0 else gain
-            if ratio > 1e-12 and (best is None or ratio > best[0] + 1e-12):
-                best = (ratio, "z", p)
+        for p, variants in od_variants.items():
+            for i, v in enumerate(variants):
+                key = f"{p}#{i}"
+                if key in od_on or v.capture <= 0 or spent + v.cost_eur > budget_eur:
+                    continue
+                gain = sum(
+                    demand_t[k] * v.capture - (demand_t[k] * site_capture * v.capture if served[k] else 0.0)
+                    for k in by_zone.get(p, ())
+                )
+                ratio = gain / v.cost_eur if v.cost_eur > 0 else gain
+                if ratio > 1e-12 and (best is None or ratio > best[0] + 1e-12):
+                    best = (ratio, "z", key)
         return best
 
     while (action := best_action()) is not None:
@@ -221,7 +233,9 @@ def greedy_hybrid(
                 served[i] = True
         else:
             od_on.add(ref)
-            spent += od_cost_eur[ref]
+            v = next(v for p, vs in od_variants.items() for i, v in enumerate(vs) if f"{p}#{i}" == ref)
+            od_capture[v.zone_id] = v.capture
+            spent += v.cost_eur
     return tuple(sorted(chosen)), frozenset(od_on)
 
 
@@ -306,10 +320,14 @@ def solve_coverage(
 
 @dataclass(frozen=True)
 class OnDemandZone:
-    """Recolha a pedido numa freguesia: saco fechado à porta, numa ronda da viatura dedicada (`network.mode_cost`)."""
+    """Recolha a pedido numa freguesia: saco fechado à porta, numa ronda da viatura dedicada (`network.mode_cost`).
+
+    Na política dinâmica cada freguesia traz uma LISTA de variantes (uma por degrau da escada) e o MIP escolhe
+    uma (`solve_hybrid`/`greedy_hybrid`); na fixa, uma só variante com o passo global (`rung` nulo).
+    """
 
     zone_id: str
-    capture: float  # c · f do modo: fração do têxtil da freguesia que capta sozinho
+    capture: float  # c · f do modo AO DEGRAU ESCOLHIDO: fração do têxtil da freguesia que capta sozinho
     coverage: float  # fração da população que serve
     cost_eur: float  # custo anual com km (modelo `network.mode_cost`)
     km_year: float
@@ -317,6 +335,7 @@ class OnDemandZone:
     stops_year: float = 0.0  # sacos por ano
     rounds_year: float = 0.0
     trips_per_round: int = 0
+    rung: CollectionFrequency | None = None  # o degrau da escada; None = o passo global da política fixa
 
 
 @dataclass(frozen=True)
@@ -326,14 +345,14 @@ class HybridSolution:
     status: Literal["optimal", "feasible", "infeasible"]
 
 
-def solve_hybrid(
+def solve_hybrid(  # noqa: PLR0915  (o kernel do MIP híbrido: grupos, degraus, dicas e objetivo num só modelo)
+    demand_t: Sequence[float],
     site_t: Sequence[float],
-    od_t: Sequence[float],
-    overlap_t: Sequence[float],
+    site_capture: float,
     zone_of: Sequence[str],
     near: Sequence[Sequence[int]],
     site_cost_eur: float,
-    od_cost_eur: dict[str, float],
+    od_variants: Mapping[str, Sequence[OnDemandZone]],
     objective: Literal["max_tonnes", "min_cost"],
     *,
     budget_eur: float | None = None,
@@ -342,58 +361,82 @@ def solve_hybrid(
     seed: int = 7,
     hint: Sequence[int] = (),
     hint_on_demand: frozenset[str] = frozenset(),
+    required_od: frozenset[str] = frozenset(),
 ) -> HybridSolution:
-    """Locais + recolha a pedido por freguesia. Os dois canais captam de forma independente, como no modelo por zonas:
+    """Locais + recolha a pedido por freguesia, com o DEGRAU da escada escolhido pelo MIP.
 
-      têxtil do ponto i = site_i · y_i + od_i · z_p − overlap_i · y_i · z_p     (overlap = site · od / procura)
+    Os dois canais captam de forma independente, como no modelo por zonas; cada degrau é uma variável:
 
-    `y_i` = ponto servido por um local aberto; `z_p` = recolha a pedido ligada na freguesia. O produto y·z linearizase
-    com `w ≥ y + z − 1` (como o coeficiente é negativo, `w` não sobe sem necessidade).
+      têxtil do ponto i = site_i · y_i + D_i · c_v · z_v − overlap_i · y_i · z_v      (v = degrau da freguesia)
+
+    `y_i` = ponto servido por um local aberto; `z_v` = o degrau v ligado na freguesia (no máximo um por freguesia).
+    O produto y·z_v linearizase com `w_v ≥ y + z_v − 1` (coeficiente negativo: `w_v` não sobe sem necessidade).
+    As chaves de `z` são `"{freguesia}#{índice da variante}"` e é nesse formato que a dica (`hint_on_demand`) fala.
     """
-    groups: dict[tuple[str, tuple[int, ...]], list[float]] = defaultdict(lambda: [0.0, 0.0, 0.0])
+    groups: dict[tuple[str, tuple[int, ...]], list[float]] = defaultdict(lambda: [0.0, 0.0])
     for i, row in enumerate(near):
         g = groups[(zone_of[i], tuple(row))]
         g[0] += site_t[i]
-        g[1] += od_t[i]
-        g[2] += overlap_t[i]
+        g[1] += demand_t[i]
     usable = sorted({j for _, row in groups for j in row})
 
     model = cp_model.CpModel()
     x = {j: model.new_bool_var(f"x{j}") for j in usable}
-    z = {p: model.new_bool_var(f"z{p}") for p in od_cost_eur}
+    z: dict[str, cp_model.IntVar] = {}
+    variant_by_key: dict[str, OnDemandZone] = {}
+    for p, variants in od_variants.items():
+        for i, v in enumerate(variants):
+            key = f"{p}#{i}"
+            variant_by_key[key] = v
+            z[key] = model.new_bool_var(f"z{key}")
+        if variants:
+            model.add_at_most_one(z[f"{p}#{i}"] for i in range(len(variants)))
+        if p in required_od and variants:
+            # aviso «sacos prontos» garantido: UM degrau tem de estar ligado (ADR: política de paragem)
+            model.add(sum(z[f"{p}#{i}"] for i in range(len(variants))) == 1)
+
     kg_vars: list[cp_model.IntVar] = []
     kg_coefs: list[int] = []
-    hint_vars: list[tuple[cp_model.IntVar, str, tuple[int, ...], str]] = []  # (var, tipo, locais, freguesia)
-    for idx, ((zone, row), (s_t, o_t, v_t)) in enumerate(groups.items()):
-        if zone in z and o_t > 0:
-            kg_vars.append(z[zone])
-            kg_coefs.append(round(o_t * SCALE_KG))
+    hint_vars: list[tuple[cp_model.IntVar, str, tuple[int, ...], str]] = []  # (var, tipo, locais, chave da variante)
+
+    def group_terms(idx: int, zone: str, row: tuple[int, ...], s_t: float, d_t: float) -> None:
+        """Termos de um grupo (freguesia, mesmos locais ao alcance): o y dos locais e o z (e w) de cada degrau."""
         live = [j for j in row if j in x]
+        od_keys = [k for k, v in variant_by_key.items() if k.startswith(f"{zone}#") and v.capture > 0]
         if not live or s_t <= 0:
-            continue
+            # grupo sem local possível: a recolha a pedido ainda pode estar ligada (só o degrau conta)
+            for k in od_keys:
+                kg_vars.append(z[k])
+                kg_coefs.append(round(d_t * variant_by_key[k].capture * SCALE_KG))
+            return
         y = model.new_bool_var(f"y{idx}")
         model.add(sum(x[j] for j in live) >= 1).only_enforce_if(y)
         hint_vars.append((y, "y", tuple(live), zone))
         kg_vars.append(y)
         kg_coefs.append(round(s_t * SCALE_KG))
-        if zone in z and v_t > 0:
-            w = model.new_bool_var(f"w{idx}")
-            model.add(w >= y + z[zone] - 1)
-            hint_vars.append((w, "w", tuple(live), zone))
+        for k in od_keys:
+            kg_vars.append(z[k])
+            kg_coefs.append(round(d_t * variant_by_key[k].capture * SCALE_KG))
+            w = model.new_bool_var(f"w{k}")
+            model.add(w >= y + z[k] - 1)
+            hint_vars.append((w, "w", tuple(live), k))
             kg_vars.append(w)
-            kg_coefs.append(-round(v_t * SCALE_KG))
+            kg_coefs.append(-round(d_t * site_capture * variant_by_key[k].capture * SCALE_KG))
+
+    for idx, ((zone, row), (s_t, d_t)) in enumerate(groups.items()):
+        group_terms(idx, zone, row, s_t, d_t)
     total_kg = cp_model.LinearExpr.weighted_sum(kg_vars, kg_coefs)
     unit = round(site_cost_eur * SCALE_EUR)
     cost_vars = [*x.values(), *z.values()]
-    cost_coefs = [unit] * len(x) + [round(od_cost_eur[p] * SCALE_EUR) for p in z]
+    cost_coefs = [unit] * len(x) + [round(variant_by_key[k].cost_eur * SCALE_EUR) for k in z]
     total_c = cp_model.LinearExpr.weighted_sum(cost_vars, cost_coefs)
 
     _set_goal(model, objective, total_kg, total_c, budget_eur, target_tonnes)
     hinted = set(hint)
     for j in usable:
         model.add_hint(x[j], 1 if j in hinted else 0)
-    for p, var in z.items():
-        model.add_hint(var, 1 if p in hint_on_demand else 0)
+    for key, var in z.items():
+        model.add_hint(var, 1 if key in hint_on_demand else 0)
     for var, kind, reach, hz in hint_vars:  # dica completa: o solver parte de uma solução viável (a gulosa)
         served = any(j in hinted for j in reach)
         model.add_hint(var, int(served if kind == "y" else served and hz in hint_on_demand))
@@ -402,7 +445,7 @@ def solve_hybrid(
         return HybridSolution((), frozenset(), "infeasible")
     return HybridSolution(
         tuple(j for j in usable if solver.value(x[j])),
-        frozenset(p for p in z if solver.value(z[p])),
+        frozenset(k for k, var in z.items() if solver.value(var)),
         status,
     )
 
@@ -555,7 +598,27 @@ def evaluate(
     )
 
 
-def plan_site_network(
+def chosen_od(variants: Mapping[str, Sequence[OnDemandZone]], keys: Iterable[str]) -> dict[str, OnDemandZone]:
+    """As variantes ligadas (chaves `freguesia#índice`): uma por freguesia, no máximo."""
+    out: dict[str, OnDemandZone] = {}
+    for key in keys:
+        p, i = key.rsplit("#", 1)
+        out[p] = variants[p][int(i)]
+    return out
+
+
+def keys_of(variants: Mapping[str, Sequence[OnDemandZone]], od: Mapping[str, OnDemandZone]) -> frozenset[str]:
+    """As chaves das variantes escolhidas (formato das dicas e das variáveis de `solve_hybrid`)."""
+    out: set[str] = set()
+    for p, v in od.items():
+        for i, variant in enumerate(variants.get(p, ())):
+            if variant == v:
+                out.add(f"{p}#{i}")
+                break
+    return frozenset(out)
+
+
+def plan_site_network(  # noqa: PLR0915  (a procura de orçamento para os km não lineares vive toda nesta função)
     demand: Sequence[DemandPoint],
     candidates: Sequence[Candidate],
     zone_demand_t: dict[str, float],
@@ -569,40 +632,38 @@ def plan_site_network(
     objective: Literal["max_tonnes", "min_cost"],
     budget_eur_year: float | None = None,
     target_tonnes: float | None = None,
-    on_demand: dict[str, OnDemandZone] | None = None,
+    on_demand: Mapping[str, Sequence[OnDemandZone]] | None = None,
     time_limit_s: float = 12.0,
+    required_od: frozenset[str] = frozenset(),
 ) -> SitePlan:
-    """Escolhe os locais (e as freguesias com recolha a pedido) e planeia as rotas.
+    """Escolhe os locais (e as freguesias com recolha a pedido, escolhendo o degrau da escada) e planeia as rotas.
 
-    Em `max_tonnes` o custo real (fixo + km das rotas + recolha a pedido) cabe no orçamento pedido.
+    Em `max_tonnes` o custo real (fixo + km das rotas + recolha a pedido) cabe no orçamento pedido. `required_od`
+    garante a recolha a pedido nessas freguesias (o aviso «sacos prontos» garante paragem, ADR #42).
     """
     near = neighbours(demand, candidates, radius_m)
     demand_t = point_tonnes(demand, zone_demand_t, 1.0)
     tonnes = [t * capture_rate for t in demand_t]
     site_cost = [costs.annual_fixed_eur] * len(candidates)
-    od_zones = on_demand or {}
+    od_variants: Mapping[str, Sequence[OnDemandZone]] = on_demand or {}
     empty = SitePlan([], "infeasible", 0.0, 0.0, 0, len(demand), 0.0, 0.0, 0.0)
     zone_of = [d.zone_id for d in demand]
-    od_t = [t * od_zones[z].capture if z in od_zones else 0.0 for t, z in zip(demand_t, zone_of, strict=True)]
-    overlap_t = [
-        t * capture_rate * od_zones[z].capture if z in od_zones else 0.0 for t, z in zip(demand_t, zone_of, strict=True)
-    ]
 
     def solve(
         budget: float | None, hint: Sequence[int], limit: float, hint_od: frozenset[str] = frozenset()
     ) -> tuple[tuple[int, ...], dict[str, OnDemandZone], str]:
-        if od_zones:
+        if od_variants:
             h = solve_hybrid(
-                tonnes, od_t, overlap_t, zone_of, near, costs.annual_fixed_eur,
-                {z: v.cost_eur for z, v in od_zones.items()}, objective,
+                demand_t, tonnes, capture_rate, zone_of, near, costs.annual_fixed_eur,
+                od_variants, objective,
                 budget_eur=budget, target_tonnes=target_tonnes, time_limit_s=limit, hint=hint,
-                hint_on_demand=hint_od,
+                hint_on_demand=hint_od, required_od=required_od,
             )  # fmt: skip
             if budget is not None and h.status == "infeasible" and (hint or hint_od):
                 # Com orçamento, abrir nada é sempre válido: "infeasible" aqui é o CP-SAT sem solução no tempo dado.
                 # A dica (gulosa ou a volta anterior) é uma solução; o custo real decide depois se cabe no orçamento.
-                return tuple(hint), {z: od_zones[z] for z in hint_od}, "feasible"
-            return h.sites, {z: od_zones[z] for z in h.on_demand}, h.status
+                return tuple(hint), chosen_od(od_variants, hint_od), "feasible"
+            return h.sites, chosen_od(od_variants, h.on_demand), h.status
         c = solve_coverage(
             tonnes, near, site_cost, objective, budget_eur=budget, target_tonnes=target_tonnes,
             time_limit_s=limit, hint=hint,
@@ -624,45 +685,58 @@ def plan_site_network(
             return empty
         return _with(build(chosen, od, 6), status, 1)  # type: ignore[arg-type]
 
+    def greedy() -> tuple[tuple[int, ...], frozenset[str]]:
+        """A dica inicial (solução viável): gulosa nos locais e nos degraus, com as paragens garantidas incluídas."""
+        if not od_variants:
+            return greedy_coverage(tonnes, near, site_cost, solver_budget), frozenset()
+        hint, hint_od = greedy_hybrid(
+            demand_t, tonnes, capture_rate, zone_of, near, costs.annual_fixed_eur, od_variants, solver_budget,
+        )  # fmt: skip
+        # nas freguesias com paragem garantida, a dica tem de incluir um degrau (o mais barato: solução viável)
+        forced = set(hint_od)
+        for p, vs in od_variants.items():
+            if p in required_od and vs:
+                forced.add(f"{p}#{min(range(len(vs)), key=lambda i: vs[i].cost_eur)}")
+        return hint, frozenset(forced)
+
+    def search_budget(
+        budget_limit: float, solver_budget: float, hint: tuple[int, ...], hint_od: frozenset[str]
+    ) -> SitePlan:
+        """A volta gulosa com o orçamento do solver a subir ou a descer até o custo REAL caber em `budget_limit`."""
+        best: SitePlan | None = None
+        for it in range(1, MAX_BUDGET_ITERATIONS + 1):
+            chosen, od, status = solve(solver_budget, hint, time_limit_s / 3, hint_od)
+            if not chosen and not od:
+                solver_budget *= 0.5
+                continue
+            hint, hint_od = chosen, keys_of(od_variants, od)
+            plan = build(chosen, od, 3)
+            cost = plan.annual_cost_eur
+            if cost <= budget_limit + 1e-6:
+                if best is None or plan.tonnes > best.tonnes:
+                    best = _with(plan, status, it)  # type: ignore[arg-type]
+                slack = budget_limit - cost
+                if slack <= 0.02 * budget_limit:
+                    break
+                solver_budget += slack * 0.9
+            else:
+                # Corta a partir do custo que o solver viu para ESTA solução (pode estar bem abaixo do orçamento):
+                # cortar só ao orçamento devolvia a mesma solução e o cenário ficava "infeasible" com dinheiro de sobra.
+                seen_cost = len(chosen) * costs.annual_fixed_eur + sum(v.cost_eur for v in od.values())
+                solver_budget = min(solver_budget, seen_cost) - (cost - budget_limit) * 1.02
+                solver_budget -= 0.005 * budget_limit
+            if solver_budget <= 0:
+                break
+        return best if best is not None else empty
+
     if budget_eur_year is None:
         raise ValueError("max_tonnes exige budget_eur_year")
     # Os km e as viaturas não são lineares nos locais escolhidos: o solver trabalha com o custo fixo e o orçamento do
     # solver sobe ou desce pela folga ou excesso do custo REAL (fixo + km do VRP + viaturas) até caber no pedido. A
     # primeira volta desconta logo uma viatura dedicada.
     solver_budget = budget_eur_year - params.vehicle_annual_eur
-    best: SitePlan | None = None
-    hint: tuple[int, ...]
-    hint_od: frozenset[str] = frozenset()
-    if od_zones:
-        hint, hint_od = greedy_hybrid(
-            tonnes, od_t, overlap_t, zone_of, near, costs.annual_fixed_eur,
-            {z: v.cost_eur for z, v in od_zones.items()}, solver_budget,
-        )  # fmt: skip
-    else:
-        hint = greedy_coverage(tonnes, near, site_cost, solver_budget)
-    for it in range(1, MAX_BUDGET_ITERATIONS + 1):
-        chosen, od, status = solve(solver_budget, hint, time_limit_s / 3, hint_od)
-        if not chosen and not od:
-            solver_budget *= 0.5
-            continue
-        hint, hint_od = chosen, frozenset(od)
-        plan = build(chosen, od, 3)
-        cost = plan.annual_cost_eur
-        if cost <= budget_eur_year + 1e-6:
-            if best is None or plan.tonnes > best.tonnes:
-                best = _with(plan, status, it)  # type: ignore[arg-type]
-            slack = budget_eur_year - cost
-            if slack <= 0.02 * budget_eur_year:
-                break
-            solver_budget += slack * 0.9
-        else:
-            # Corta a partir do custo que o solver viu para ESTA solução (pode estar bem abaixo do orçamento do solver):
-            # cortar só ao orçamento devolvia a mesma solução e o cenário acabava "infeasible" com dinheiro de sobra.
-            seen = len(chosen) * costs.annual_fixed_eur + sum(v.cost_eur for v in od.values())
-            solver_budget = min(solver_budget, seen) - (cost - budget_eur_year) * 1.02 - 0.005 * budget_eur_year
-        if solver_budget <= 0:
-            break
-    return best if best is not None else empty
+    hint, hint_od = greedy()
+    return search_budget(budget_eur_year, solver_budget, hint, hint_od)
 
 
 def _with(plan: SitePlan, status: Literal["optimal", "feasible", "infeasible"], iterations: int) -> SitePlan:

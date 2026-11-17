@@ -17,6 +17,7 @@ from novelo.domain.siting import (
     point_tonnes,
     solve_coverage,
 )
+from novelo.domain.vocab import CollectionFrequency as F
 
 # 0,002° de latitude ≈ 222 m: A e B (e B e C) ficam a 222 m; A e C a 445 m.
 LAT = 41.0
@@ -154,7 +155,7 @@ def test_a_budget_that_only_covers_the_fixed_cost_fails_once_km_are_counted() ->
     assert plan.sites == []
 
 
-OD = {"z": OnDemandZone("z", capture=0.25, coverage=0.6, cost_eur=50.0, km_year=0.0)}
+OD = {"z": [OnDemandZone("z", capture=0.25, coverage=0.6, cost_eur=50.0, km_year=0.0)]}
 
 
 def hybrid(budget: float) -> SitePlan:
@@ -173,9 +174,46 @@ def test_hybrid_combines_a_site_and_on_demand_as_independent_channels() -> None:
     assert plan.tonnes == pytest.approx(3.75)
     # a pedido leva o que capta sozinha (3 · 2 · 0,25 = 1,5 t); os locais levam o resto (3 · 2 · 0,5 · 0,75 = 2,25 t)
     assert plan.zone_tonnes_on_demand["z"] == pytest.approx(1.5)
-    assert plan.sites[0].tonnes == pytest.approx(2.25)
-    assert plan.annual_cost_eur == pytest.approx(206.0 + 50.0)
-    assert plan.population_covered == pytest.approx(3000)
+
+
+def test_hybrid_variants_choose_one_rung_per_zone() -> None:
+    """Escada na recolha a pedido da rede por locais: o otimizador escolhe UM degrau por freguesia."""
+    # D = 2 t por ponto; local capta 50%. Variantes da recolha a pedido (taxa × degrau, prior 0,25 à quinzenal):
+    # mensal: captura 0,125, 30 €; quinzenal: 0,25, 50 €; semanal: 0,5 (o dobro), 100 €
+    od = {
+        "z": [
+            OnDemandZone("z", capture=0.125, coverage=0.6, cost_eur=30.0, km_year=0.0, rung=F.MONTHLY),
+            OnDemandZone("z", capture=0.25, coverage=0.6, cost_eur=50.0, km_year=0.0, rung=F.BIWEEKLY),
+            OnDemandZone("z", capture=0.5, coverage=0.6, cost_eur=100.0, km_year=0.0, rung=F.WEEKLY),
+        ]
+    }
+    costs = SiteCosts(250.0, 206.0, 26)
+    # 306 €: local (206) + semanal (100) — união 2·(1 − 0,5·0,5) = 1,5 t por ponto, 4,5 t no total
+    rich = plan_site_network(
+        DEMAND, CANDS, {"z": 6.0}, {"z": 3000}, costs, params(),
+        capture_rate=0.5, radius_m=250, collections_per_year=26,
+        objective="max_tonnes", budget_eur_year=306.0, on_demand=od,
+    )  # fmt: skip
+    assert rich.on_demand["z"].rung is F.WEEKLY and rich.tonnes == pytest.approx(4.5)
+    assert rich.annual_cost_eur == pytest.approx(206.0 + 100.0)
+    # 256 €: local + quinzenal — união 1,25 t por ponto, 3,75 t
+    mid = plan_site_network(
+        DEMAND, CANDS, {"z": 6.0}, {"z": 3000}, costs, params(),
+        capture_rate=0.5, radius_m=250, collections_per_year=26,
+        objective="max_tonnes", budget_eur_year=256.0, on_demand=od,
+    )  # fmt: skip
+    assert mid.on_demand["z"].rung is F.BIWEEKLY and mid.tonnes == pytest.approx(3.75)
+    # min_cost para 3,75 t: o quinzenal chega (206 + 50 = 256 €); o mensal fica a 3,375 t de união
+    cheap = plan_site_network(
+        DEMAND, CANDS, {"z": 6.0}, {"z": 3000}, costs, params(),
+        capture_rate=0.5, radius_m=250, collections_per_year=26,
+        objective="min_cost", target_tonnes=3.75, on_demand=od,
+    )  # fmt: skip
+    assert cheap.on_demand["z"].rung is F.BIWEEKLY
+    assert cheap.annual_cost_eur == pytest.approx(256.0)
+    # os locais levam o que o degrau deixa: 2 t · 0,5 · (1 − 0,25) = 0,75 t por ponto (2,25 t no total)
+    assert cheap.sites[0].tonnes == pytest.approx(2.25)
+    assert cheap.population_covered == pytest.approx(3000)
 
 
 def test_hybrid_with_only_the_on_demand_budget() -> None:

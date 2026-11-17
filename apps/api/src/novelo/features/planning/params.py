@@ -112,7 +112,18 @@ def params_meta() -> list[ParamMeta]:
             ),
         ),
         ParamMeta(key="on_demand_kg_per_pickup", unit="kg", source=ParamSource.ASSUMPTION),
-        ParamMeta(key="on_demand_every_weeks", unit="semanas", source=ParamSource.ASSUMPTION),
+        ParamMeta(
+            key="on_demand_every_weeks",
+            unit="semanas",
+            source=ParamSource.ASSUMPTION,
+            note=(
+                "O passo global da política FIXA de paragem (a cada 2 semanas: 26 rondas por ano). Na política "
+                "DINÂMICA o otimizador escolhe o degrau de cada freguesia na escada discreta — semanal, quinzenal, "
+                "mensal (4 semanas) e trimestral (13 semanas), degraus como pressuposto (prática da Vitrus, a "
+                "confirmar). O prior de captura vale ao degrau quinzenal e escala com o ritmo (taxa × degrau). "
+                "O aviso «sacos prontos» garante paragem nas duas políticas."
+            ),
+        ),
         ParamMeta(
             key="vehicle_capex_eur",
             unit="€",

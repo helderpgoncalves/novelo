@@ -1,7 +1,13 @@
+import json
+import re
+
 import httpx
 import pytest
+from sqlalchemy import select, text
 
+from novelo.features.network.models import Locality, Parish
 from novelo.features.users import service as users
+from tests.api.test_collection_requests import citizen_body, make_parish_with_round
 from tests.conftest import PASSWORD
 
 P = "/api/v1/planning"
@@ -296,3 +302,150 @@ async def test_coverage_matrix_by_parish_and_tipau(logged_in: httpx.AsyncClient,
 async def test_coverage_matrix_of_a_missing_scenario_is_not_found(logged_in: httpx.AsyncClient) -> None:
     missing = await logged_in.get(f"{P}/scenarios/00000000-0000-0000-0000-000000000000/coverage")
     assert missing.status_code == 404 and missing.json()["code"] == "not_found"
+
+
+# --- Política de paragem: escada de frequências, aviso e agenda pública (#61) ----------------------------------------
+
+
+async def test_fixed_policy_is_the_legacy_global_step(logged_in: httpx.AsyncClient) -> None:
+    """Sem bandeira (ou com `fixed`), o cenário é exatamente o de hoje: quinzenal global, sem degrau gravado."""
+    body = request_body(budget_eur_year=60000)
+    plain = (await logged_in.post(f"{P}/scenarios", json=body)).json()
+    explicit = (await logged_in.post(f"{P}/scenarios", json={**body, "stop_policy": "fixed"})).json()
+    for s in (plain, explicit):
+        assert s["result"]["stop_policy"] == "fixed"
+        plan = s["result"]["collection_plan"]
+        assert plan and all(e["frequency"] is None for e in plan)
+        door = [e for e in plan if e["channel"] == "on_demand"]
+        assert door and all(e["every_weeks"] == 2.0 for e in door)  # o passo global de sempre
+        # a agenda pública acompanha mesmo a política fixa (dado introduzido)
+        agenda = s["result"]["public_agenda"]
+        assert agenda is not None and agenda
+        assert all(v["weekday"] is not None and v["every_weeks"] > 0 for v in agenda)
+
+
+async def test_dynamic_policy_records_the_chosen_rung_per_parish(logged_in: httpx.AsyncClient) -> None:
+    s = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=60000, stop_policy="dynamic"))).json()
+    assert s["result"]["stop_policy"] == "dynamic"
+    plan = s["result"]["collection_plan"]
+    door = [e for e in plan if e["channel"] == "on_demand"]
+    assert door
+    degraus = {e["frequency"] for e in door}
+    assert degraus <= {"weekly", "biweekly", "monthly", "quarterly"} and degraus  # o degrau escolhido, na escada
+    for e in door:
+        visits = {"weekly": 52.0, "biweekly": 26.0, "monthly": 13.0, "quarterly": 4.0}[e["frequency"]]
+        assert e["rounds_year"] == pytest.approx(visits)
+        assert e["every_weeks"] == pytest.approx(52 / visits)
+    # a agenda pública segue o degrau: cada ronda publicada é a promessa, com o dia e a cadência escolhidos
+    agenda = s["result"]["public_agenda"]
+    assert agenda and all(v["weekday"] is not None for v in agenda)
+    by_key = {(v["parish_code"], v["channel"]): v for v in agenda}
+    for e in door:
+        if e["weekday"] is not None:
+            v = by_key[(e["parish_code"], e["channel"])]
+            assert v["every_weeks"] == e["every_weeks"] and v["frequency"] == e["frequency"]
+        # as rondas dos locais também se publicam (visita publicada nunca é saltada), sem degrau próprio
+        for row in [x for x in plan if x["channel"] == "existing" and x["weekday"] is not None]:
+            v = by_key[(row["parish_code"], row["channel"])]
+            assert v["every_weeks"] == row["every_weeks"] and v["frequency"] is None
+    # repetir o pedido dá o mesmo cenário (sementes fixas)
+    again = (
+        await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=60000, stop_policy="dynamic"))
+    ).json()
+    assert again["result"]["collection_plan"] == plan
+
+
+async def test_old_scenarios_still_load_without_the_new_fields(
+    logged_in: httpx.AsyncClient,
+    session,  # type: ignore[no-untyped-def]
+) -> None:
+    """Cenários guardados antes da escada: sem migração forçada — os campos novos defaultizam ao legado."""
+    created = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=60000))).json()
+    sid = created["id"]
+    # simula um resultado antigo: sem `stop_policy`, sem `public_agenda`, plano sem `frequency`
+    stripped = created["result"]
+    stripped.pop("stop_policy", None)
+    stripped.pop("public_agenda", None)
+    for e in stripped.get("collection_plan") or []:
+        e.pop("frequency", None)
+    await session.execute(
+        text("UPDATE scenarios SET result = CAST(:result AS jsonb) WHERE id = :id"),
+        {"result": json.dumps(stripped), "id": sid},
+    )
+    await session.commit()
+    loaded = (await logged_in.get(f"{P}/scenarios/{sid}")).json()
+    assert loaded["result"]["stop_policy"] == "fixed"
+    assert loaded["result"]["public_agenda"] is None
+    assert all(e["frequency"] is None for e in loaded["result"]["collection_plan"])
+
+
+async def test_an_active_notice_guarantees_the_door_round(
+    client: httpx.AsyncClient,
+    logged_in: httpx.AsyncClient,
+    make_user,
+    outbox,
+    session,  # type: ignore[no-untyped-def]
+) -> None:
+    """ADR: o aviso «sacos prontos» garante paragem — mesmo onde os constraints excluem a recolha a pedido."""
+    row = (
+        await session.execute(
+            select(Locality, Parish).join(Parish, Parish.id == Locality.parish_id).where(Locality.name == "Abação")
+        )
+    ).first()
+    assert row is not None, "o seed traz a localidade de Abação"
+    locality, parish = row
+
+    def body() -> dict[str, object]:
+        return {
+            "label": "Aviso",
+            "objective": "min_cost",
+            "target_tonnes": 200,
+            "constraints": {parish.dicofre: ["existing"]},
+        }
+
+    # sem aviso: a restrição vale e a freguesia fica só com o modo existente
+    before = (await logged_in.post(f"{P}/scenarios", json=body())).json()
+    alloc = next(a for a in before["result"]["allocations"] if a["parish_code"] == parish.dicofre)
+    assert alloc["modes"] == ["existing"]
+
+    # o local avisa «sacos prontos»: convite, conta de local, aviso ativo
+    admin = await make_user("boss61@test.pt", "admin")
+    invite = await admin.post(
+        "/api/v1/users/invitations",
+        json={"email": "escola61@test.pt", "role": "local", "locality_id": str(locality.id), "local_kind": "assistido"},
+    )
+    assert invite.status_code == 201, invite.text
+    token = re.search(r"accept-invite\?token=([\w-]+)", outbox.sent[-1]["text"])
+    assert token
+    accepted = await client.post(
+        "/api/v1/auth/invitations/accept", json={"token": token.group(1), "name": "Escola", "password": PASSWORD}
+    )
+    assert accepted.status_code == 200, accepted.text
+    notice = await client.post("/api/v1/local/notices", json={"bag_count": 3})
+    assert notice.status_code == 201, notice.text
+
+    after = (await logged_in.post(f"{P}/scenarios", json=body())).json()
+    alloc = next(a for a in after["result"]["allocations"] if a["parish_code"] == parish.dicofre)
+    assert "on_demand" in alloc["modes"]  # a paragem garantida, à revelia da escada e da restrição
+    # e o plano publica a ronda: dia e cadência na agenda pública
+    plan = [e for e in after["result"]["collection_plan"] if e["parish_code"] == parish.dicofre]
+    assert any(e["channel"] == "on_demand" for e in plan)
+
+
+async def test_a_request_in_the_meantime_never_reoptimizes_a_stored_scenario(
+    logged_in: httpx.AsyncClient,
+    make_user,
+    session,  # type: ignore[no-untyped-def]
+) -> None:
+    """Sem reotimização a meio do dia: o cenário guardado não muda por eventos novos (pedidos, avisos)."""
+    created = (await logged_in.post(f"{P}/scenarios", json=request_body(budget_eur_year=60000))).json()
+    sid = created["id"]
+    before = (await logged_in.get(f"{P}/scenarios/{sid}")).json()
+
+    parish = await make_parish_with_round(session)
+    c = await make_user("cidadao61@test.pt")
+    resp = await c.post("/api/v1/collection-requests", json=citizen_body(parish))
+    assert resp.status_code == 201, resp.text
+
+    after = (await logged_in.get(f"{P}/scenarios/{sid}")).json()
+    assert after["result"] == before["result"] and after["tonnes_year"] == before["tonnes_year"]

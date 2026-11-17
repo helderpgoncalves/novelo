@@ -358,6 +358,20 @@ class NoticeState(StrEnum):
     CANCELLED = "cancelled"
 
 
+class CollectionFrequency(StrEnum):
+    """Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+
+    Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+    confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+    `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+    """
+
+    WEEKLY = "weekly"
+    BIWEEKLY = "biweekly"
+    MONTHLY = "monthly"
+    QUARTERLY = "quarterly"
+
+
 class RequestSubject(StrEnum):
     """Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
 

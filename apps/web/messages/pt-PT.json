@@ -4932,5 +4932,20 @@
   "error_local_address_forbidden": "O local não escreve morada: a recolha é à morada institucional do sítio.",
   "error_request_not_dispatchable": "Só um pedido na fila de exceções se pode despachar.",
   "error_request_not_scheduled": "Só um pedido agendado recebe o resultado da visita.",
-  "error_request_cancel_not_allowed": "Este pedido já está fechado: já não se pode anular."
+  "error_request_cancel_not_allowed": "Este pedido já está fechado: já não se pode anular.",
+  "plan_summary_door_mixed": "Saco fechado à porta em {n} freguesias: {tonnes}/ano, cadência por freguesia, {km} km/ano",
+  "plan_summary_door_mixed_one": "Saco fechado à porta em 1 freguesia: {tonnes}/ano, {km} km/ano",
+  "plan_col_rung": "Degrau",
+  "plan_rung_weekly": "semanal",
+  "plan_rung_biweekly": "quinzenal",
+  "plan_rung_monthly": "mensal",
+  "plan_rung_quarterly": "trimestral",
+  "sim_policy_label": "Política de paragem",
+  "sim_policy_aria": "Política de paragem",
+  "sim_policy_fixed": "Fixa",
+  "sim_policy_dynamic": "Dinâmica",
+  "sim_policy_help_fixed": "O mesmo passo para todas as freguesias: uma ronda a cada N semanas (o valor global dos pressupostos).",
+  "sim_policy_help_dynamic": "O otimizador escolhe o degrau de cada freguesia na escada discreta (semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura.",
+  "sim_policy_note": "O aviso «sacos prontos» garante paragem nas duas políticas; nenhuma visita publicada é saltada.",
+  "plan_rung_none": "passo global"
 }

@@ -4875,5 +4875,20 @@
   "error_local_address_forbidden": "Locals do not write an address: collection goes to the site's institutional address.",
   "error_request_not_dispatchable": "Only a request in the exception queue can be dispatched.",
   "error_request_not_scheduled": "Only a scheduled request receives the visit outcome.",
-  "error_request_cancel_not_allowed": "This request is already closed: it cannot be cancelled."
+  "error_request_cancel_not_allowed": "This request is already closed: it cannot be cancelled.",
+  "plan_summary_door_mixed": "Closed bags at the door in {n} parishes: {tonnes}/year, cadence per parish, {km} km/year",
+  "plan_summary_door_mixed_one": "Closed bags at the door in 1 parish: {tonnes}/year, {km} km/year",
+  "plan_col_rung": "Rung",
+  "plan_rung_weekly": "weekly",
+  "plan_rung_biweekly": "biweekly",
+  "plan_rung_monthly": "monthly",
+  "plan_rung_quarterly": "quarterly",
+  "sim_policy_label": "Stop policy",
+  "sim_policy_aria": "Stop policy",
+  "sim_policy_fixed": "Fixed",
+  "sim_policy_dynamic": "Dynamic",
+  "sim_policy_help_fixed": "The same step for every parish: one round every N weeks (the global assumptions value).",
+  "sim_policy_help_dynamic": "The optimizer picks each parish's rung on the discrete ladder (weekly, biweekly, monthly, quarterly), trading round cost for demand.",
+  "sim_policy_note": "A «bags ready» notice guarantees a stop under both policies; a published visit is never skipped.",
+  "plan_rung_none": "global step"
 }

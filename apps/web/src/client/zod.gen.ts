@@ -529,6 +529,22 @@ export const zCircuitStatus = z.enum([
 ]);
 
 /**
+ * CollectionFrequency
+ *
+ * Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+ *
+ * Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+ * confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+ * `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+ */
+export const zCollectionFrequency = z.enum([
+    'weekly',
+    'biweekly',
+    'monthly',
+    'quarterly'
+]);
+
+/**
  * CollectionMode
  *
  * Modos de recolha de têxteis que o simulador compara.
@@ -613,6 +629,7 @@ export const zCaptureScale = z.object({
 export const zCollectionPlanEntry = z.object({
     channel: zCollectionMode,
     every_weeks: z.number(),
+    frequency: zCollectionFrequency.nullish(),
     hours_year: z.number(),
     kg_per_round: z.number(),
     km_year: z.number(),
@@ -3696,6 +3713,25 @@ export const zAttributeSource = z.object({
 });
 
 /**
+ * PublicAgendaEntry
+ *
+ * Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).
+ *
+ * É a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do
+ * degrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.
+ * A página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.
+ */
+export const zPublicAgendaEntry = z.object({
+    channel: zCollectionMode,
+    every_weeks: z.number(),
+    frequency: zCollectionFrequency.nullish(),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    rounds_year: z.number(),
+    weekday: z.int()
+});
+
+/**
  * QuantilesOut
  */
 export const zQuantilesOut = z.object({
@@ -4163,6 +4199,7 @@ export const zScenarioRequest = z.object({
     site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
+    stop_policy: z.enum(['fixed', 'dynamic']).optional().default('fixed'),
     target_tonnes: z.number().gte(0).nullish()
 });
 
@@ -4561,6 +4598,7 @@ export const zScenarioResult = z.object({
     depot: z.array(z.number()),
     kpis: zKpis,
     modes: z.array(zModeSummary),
+    public_agenda: z.array(zPublicAgendaEntry).nullish(),
     routes: z.array(zRouteOut),
     routing: z.enum([
         'road',
@@ -4568,7 +4606,8 @@ export const zScenarioResult = z.object({
         'estimate'
     ]).optional().default('estimate'),
     sites: z.array(zSiteSelection).optional(),
-    siting: zSitingSummary.nullish()
+    siting: zSitingSummary.nullish(),
+    stop_policy: z.enum(['fixed', 'dynamic']).optional().default('fixed')
 });
 
 /**
