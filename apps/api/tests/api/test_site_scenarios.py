@@ -128,6 +128,24 @@ async def test_on_demand_completes_the_site_network(operator: httpx.AsyncClient)
     assert sum(a["tonnes"] for a in r["allocations"]) == pytest.approx(r["kpis"]["tonnes_year"], abs=0.01)
 
 
+async def test_the_dynamic_policy_chooses_the_rung_in_site_scenarios(operator: httpx.AsyncClient) -> None:
+    """A escada também vale na rede por locais: a recolha a pedido escolhe um degrau por freguesia (#61)."""
+    fixed = await run(operator, site_on_demand=True, budget_eur_year=20000)
+    dynamic = await run(
+        operator, site_on_demand=True, budget_eur_year=20000, label="Locais com escada", stop_policy="dynamic"
+    )
+    assert dynamic["result"]["stop_policy"] == "dynamic"
+    plan = [e for e in dynamic["result"]["collection_plan"] if e["channel"] == "on_demand"]
+    assert plan and {e["frequency"] for e in plan} <= {"weekly", "biweekly", "monthly", "quarterly"}
+    visits = {"weekly": 52.0, "biweekly": 26.0, "monthly": 13.0, "quarterly": 4.0}
+    for e in plan:
+        assert e["rounds_year"] == pytest.approx(visits[e["frequency"]])
+    # a fixa continua sem degrau gravado (o passo global de sempre) e o resto do contrato é igual
+    assert all(e["frequency"] is None for e in fixed["result"]["collection_plan"])
+    agenda = dynamic["result"]["public_agenda"]
+    assert agenda is not None and agenda
+
+
 async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx.AsyncClient) -> None:
     parish = (
         await operator.post(
