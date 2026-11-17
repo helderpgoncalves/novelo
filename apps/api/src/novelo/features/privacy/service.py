@@ -14,7 +14,6 @@ from datetime import UTC, datetime
 from sqlalchemy import delete, func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from novelo.core.config import get_settings
 from novelo.core.errors import ConfirmationMismatchError
 from novelo.core.request_meta import RequestMeta
 from novelo.domain.points import LedgerEntry
@@ -27,7 +26,7 @@ from novelo.features.network.models import Parish
 from novelo.features.points import service as points_service
 from novelo.features.points.models import PointEntry
 from novelo.features.privacy.models import DonorConsent
-from novelo.features.privacy.policy import POLICY_VERSION, policy
+from novelo.features.privacy.policy import POLICY_VERSION, PolicyOut, policy
 from novelo.features.privacy.schemas import (
     AccountExportOut,
     ConsentsOut,
@@ -49,7 +48,7 @@ log = logging.getLogger(__name__)
 # --- política (a página pública lê daqui) -----------------------------------------------------------
 
 
-def get_policy() -> object:
+def get_policy() -> PolicyOut:
     """A política em vigor (Pydantic; o FastAPI serializa tal e qual)."""
     return policy()
 
@@ -356,11 +355,6 @@ async def retention_loop(interval_s: float = 24 * 3600, start_delay_s: float = 3
         raise
 
 
-def settings_for_docs() -> dict[str, int]:
-    """Os prazos que vêm da configuração (para a política nunca prometer o que o código não faz)."""
-    return {"lot_photo_retention_days": get_settings().lot_photo_retention_days}
-
-
 __all__ = [
     "consent_history",
     "delete_account",
@@ -371,5 +365,4 @@ __all__ = [
     "purge_expired_login_tokens",
     "record_consent",
     "retention_loop",
-    "settings_for_docs",
 ]

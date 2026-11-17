@@ -41,7 +41,7 @@ async def get_public_privacy_policy(db: Db, response: Response) -> PolicyOut:
     Cache curta no cliente: a política só muda quando a equipa muda a versão.
     """
     response.headers["Cache-Control"] = "public, max-age=300"
-    return service.get_policy()  # type: ignore[return-value]
+    return service.get_policy()
 
 
 @router.get("/cidadao/consents", response_model=ConsentsOut)
