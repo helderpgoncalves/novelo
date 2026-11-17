@@ -22,6 +22,7 @@ from novelo.core.errors import (
 from novelo.core.ratelimit import (
     auth_limiter,
     client_ip,
+    donor_signup_limiter,
     invite_accept_limiter,
     invite_preview_limiter,
     login_account_limiter,
@@ -65,6 +66,8 @@ from novelo.features.auth.schemas import (
     SignedIn,
     VerifyEmailRequest,
 )
+from novelo.features.cidadao import service as cidadao
+from novelo.features.cidadao.schemas import DonorSignUpRequest
 from novelo.features.email_log import monitor
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.schemas import DeliveryStatusOrNone
@@ -250,6 +253,20 @@ async def register(body: RegisterRequest, response: Response, db: Db, sender: Se
     )
     _set_session(response, access, refresh, body.remember_me)
     return to_out(user)
+
+
+@router.post(
+    "/donor/sign-up",
+    status_code=204,
+    dependencies=[Depends(auth_limiter), Depends(donor_signup_limiter), Depends(captcha("donor_sign_up"))],
+)
+async def donor_sign_up(body: DonorSignUpRequest, request: Request, db: Db, sender: Sender, meta: Meta) -> None:
+    """Conta de doador por email, sem password (13+ com idade declarada; menor de 13 é recusa explícita).
+
+    Email novo: cria a conta leve logo aprovada (papel `donor`) e envia o link de entrada para
+    `/cidadao`. Email que já tem conta: só o link de entrada — nunca revela que existia. A resposta é
+    sempre 204 exista ou não a conta, como no magic link."""
+    await cidadao.sign_up_donor(db, sender, body, ip=client_ip(request), user_agent=_user_agent(request), meta=meta)
 
 
 @router.post("/refresh", status_code=204)

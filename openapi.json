@@ -1311,7 +1311,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -1960,6 +1961,142 @@
         ],
         "title": "AuthConfig",
         "type": "object"
+      },
+      "BagActivationCreate": {
+        "description": "Ativar um saco da plataforma: apelido privado opcional e a declaração «Vai no saco?» opcional.",
+        "properties": {
+          "declaration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BagDeclaration"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "«Vai no saco?»: `reuse` (vestir de novo) ou `recycle` (dar a vida); base do bónus de conformidade"
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Apelido PRIVADO (nunca é público)",
+            "title": "Nickname"
+          }
+        },
+        "title": "BagActivationCreate",
+        "type": "object"
+      },
+      "BagActivationOut": {
+        "description": "Um saco ativado, visto pelo dono. `active` é `deactivated_at is null`.",
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "declaration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BagDeclaration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "declared_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname"
+          }
+        },
+        "required": [
+          "id",
+          "code",
+          "nickname",
+          "declaration",
+          "declared_at",
+          "active",
+          "created_at"
+        ],
+        "title": "BagActivationOut",
+        "type": "object"
+      },
+      "BagActivationUpdate": {
+        "description": "Corrigir o apelido ou a declaração enquanto o saco está ativo (desativado congela).",
+        "properties": {
+          "declaration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BagDeclaration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "maxLength": 80,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname"
+          }
+        },
+        "title": "BagActivationUpdate",
+        "type": "object"
+      },
+      "BagDeclaration": {
+        "description": "Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).\n\nÉ a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino\ndominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.",
+        "enum": [
+          "reuse",
+          "recycle"
+        ],
+        "title": "BagDeclaration",
+        "type": "string"
       },
       "BenchmarkOut": {
         "properties": {
@@ -2900,6 +3037,55 @@
         "title": "CircuitsSummary",
         "type": "object"
       },
+      "CollectionAgendaOut": {
+        "description": "A agenda pública «onde e quando entrego»: as rondas publicadas do cenário mais recente.\n\n`agenda` nulo = nenhum cenário publicado tem agenda (política fixa antiga): a página diz que ainda\nnão há promessa publicada — nunca inventa dias.",
+        "properties": {
+          "agenda": {
+            "anyOf": [
+              {
+                "items": {
+                  "$ref": "#/components/schemas/PublicAgendaEntry"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Agenda"
+          },
+          "scenario_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "De que cenário vem a agenda",
+            "title": "Scenario Label"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quando o cenário foi calculado",
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "agenda"
+        ],
+        "title": "CollectionAgendaOut",
+        "type": "object"
+      },
       "CollectionFrequency": {
         "description": "Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.\n\nOs DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a\nconfirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em\n`domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).",
         "enum": [
@@ -2910,6 +3096,103 @@
         ],
         "title": "CollectionFrequency",
         "type": "string"
+      },
+      "CollectionHistoryOut": {
+        "description": "Uma linha do histórico do doador: o saco e o lote que o levou (link só para o passaporte público).\n\nO lote chega por `lot_units.code == bag code` — é o scan da viatura que faz a ligação; sem scan o\nsaco ainda está em casa (`lot_code` nulo). O passaporte nunca mostra o doador.",
+        "properties": {
+          "activated_at": {
+            "format": "date-time",
+            "title": "Activated At",
+            "type": "string"
+          },
+          "bag_code": {
+            "title": "Bag Code",
+            "type": "string"
+          },
+          "bag_id": {
+            "format": "uuid",
+            "title": "Bag Id",
+            "type": "string"
+          },
+          "collected_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Quando a paragem deu origem ao lote",
+            "title": "Collected At"
+          },
+          "declaration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BagDeclaration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Código do lote: abre `/passport/{code}`",
+            "title": "Lot Code"
+          },
+          "lot_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot State"
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Peso medido na paragem (ou estimado, legado)",
+            "title": "Weight Kg"
+          }
+        },
+        "required": [
+          "bag_id",
+          "bag_code",
+          "nickname",
+          "declaration",
+          "activated_at"
+        ],
+        "title": "CollectionHistoryOut",
+        "type": "object"
       },
       "CollectionMode": {
         "description": "Modos de recolha de têxteis que o simulador compara.\n\nA Vitrus não tem contentores de têxtil nem os quer: por omissão só `existing` e `on_demand`. `street` fica no\nvocabulário (base de dados e contrato) apenas como referência explícita, ex.: o benchmark francês.",
@@ -4048,6 +4331,9 @@
               "citizen_address_required",
               "citizen_parish_required",
               "citizen_bags_limit",
+              "age_below_minimum",
+              "bag_limit_reached",
+              "bag_inactive",
               "local_address_forbidden",
               "request_not_dispatchable",
               "request_not_scheduled",
@@ -6176,6 +6462,142 @@
         "title": "DnsCheck",
         "type": "object"
       },
+      "DonorAccountOut": {
+        "description": "A conta de doador vista por quem nela entra: pseudónimo do QR de conta e a idade declarada.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "declared_age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared Age"
+          },
+          "donor_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Pseudónimo do QR de conta (`NVA-…`); nulo em contas antigas",
+            "title": "Donor Code"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "id",
+          "email",
+          "name",
+          "donor_code",
+          "declared_age",
+          "created_at"
+        ],
+        "title": "DonorAccountOut",
+        "type": "object"
+      },
+      "DonorQrOut": {
+        "description": "QR em SVG (fundo branco, como o passaporte) e o código que ele codifica.",
+        "properties": {
+          "code": {
+            "description": "`NVA-XXXXXX` (conta) ou `NVL-XXXXXX` (saco): é o payload inteiro do QR",
+            "title": "Code",
+            "type": "string"
+          },
+          "svg": {
+            "description": "QR em SVG; o código é o payload — o ecrã da viatura lê-o offline",
+            "title": "Svg",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "svg"
+        ],
+        "title": "DonorQrOut",
+        "type": "object"
+      },
+      "DonorSignUpRequest": {
+        "description": "Conta de doador por email, sem password: idade DECLARADA (13+; abaixo é recusa explícita) e\nconsentimento RGPD (conta e crédito = contrato, ADR #49).",
+        "properties": {
+          "consent": {
+            "const": true,
+            "description": "Aceitação do tratamento de dados; tem de ser true",
+            "title": "Consent",
+            "type": "boolean"
+          },
+          "declared_age": {
+            "description": "Idade declarada; tudo abaixo de 13 é recusa explícita (`age_below_minimum`)",
+            "maximum": 120.0,
+            "minimum": 0.0,
+            "title": "Declared Age",
+            "type": "integer"
+          },
+          "email": {
+            "format": "email",
+            "title": "Email",
+            "type": "string"
+          },
+          "locale": {
+            "default": "pt-PT",
+            "enum": [
+              "pt-PT",
+              "en"
+            ],
+            "title": "Locale",
+            "type": "string"
+          },
+          "website": {
+            "anyOf": [
+              {
+                "maxLength": 200,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot",
+            "title": "Website"
+          }
+        },
+        "required": [
+          "email",
+          "declared_age",
+          "consent"
+        ],
+        "title": "DonorSignUpRequest",
+        "type": "object"
+      },
       "DoorToDoorPass": {
         "description": "Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.",
         "properties": {
@@ -6861,6 +7283,9 @@
               "citizen_address_required",
               "citizen_parish_required",
               "citizen_bags_limit",
+              "age_below_minimum",
+              "bag_limit_reached",
+              "bag_inactive",
               "local_address_forbidden",
               "request_not_dispatchable",
               "request_not_scheduled",
@@ -8612,7 +9037,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -8869,7 +9295,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -9035,7 +9462,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -11107,7 +11535,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -21444,7 +21873,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -21494,7 +21924,8 @@
                   "admin",
                   "operator",
                   "guest",
-                  "local"
+                  "local",
+                  "donor"
                 ],
                 "type": "string"
               },
@@ -21587,7 +22018,8 @@
               "admin",
               "operator",
               "guest",
-              "local"
+              "local",
+              "donor"
             ],
             "title": "Role",
             "type": "string"
@@ -23917,6 +24349,151 @@
           }
         },
         "summary": "Get Auth Config",
+        "tags": [
+          "auth"
+        ]
+      }
+    },
+    "/api/v1/auth/donor/sign-up": {
+      "post": {
+        "description": "Conta de doador por email, sem password (13+ com idade declarada; menor de 13 é recusa explícita).\n\nEmail novo: cria a conta leve logo aprovada (papel `donor`) e envia o link de entrada para\n`/cidadao`. Email que já tem conta: só o link de entrada — nunca revela que existia. A resposta é\nsempre 204 exista ou não a conta, como no magic link.",
+        "operationId": "donor_sign_up",
+        "parameters": [
+          {
+            "description": "Token do widget Cloudflare Turnstile (uso único)",
+            "in": "header",
+            "name": "X-Turnstile-Token",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Token do widget Cloudflare Turnstile (uso único)",
+              "title": "X-Turnstile-Token"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DonorSignUpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Donor Sign Up",
         "tags": [
           "auth"
         ]
@@ -27349,6 +27926,1178 @@
         "summary": "Get Brand Evidence",
         "tags": [
           "lots"
+        ]
+      }
+    },
+    "/api/v1/cidadao/account": {
+      "get": {
+        "description": "A conta de doador de quem pede: o pseudónimo do QR de conta e a idade declarada.",
+        "operationId": "get_donor_account",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorAccountOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Donor Account",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/account/qr": {
+      "get": {
+        "description": "O QR de conta (segundo portador, ADR #35): entrega mão a mão, sem saco da plataforma.\n\nÉ um portador de CRÉDITO, nunca uma credencial de sessão — quem o apresenta atribui a entrega à\nprópria conta; o scan só etiqueta o lote com o código pseudónimo. Perder o telemóvel não perde a\nconta; o QR pode voltar a abrir-se a qualquer momento.",
+        "operationId": "get_donor_account_qr",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorQrOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Donor Account Qr",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/bags": {
+      "get": {
+        "description": "Os sacos do próprio, o mais recente primeiro (apelido e declaração incluídos: são privados).",
+        "operationId": "list_bag_activations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/BagActivationOut"
+                  },
+                  "title": "Response List Bag Activations",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Bag Activations",
+        "tags": [
+          "cidadao"
+        ]
+      },
+      "post": {
+        "description": "Ativa um saco da plataforma: nasce com código e QR próprios (`NVL-…`), apelido privado opcional\ne a declaração «Vai no saco?» opcional — a base do bónus de conformidade quando a triagem confirma.",
+        "operationId": "create_bag_activation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BagActivationCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BagActivationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Bag Activation",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/bags/{bag_id}": {
+      "patch": {
+        "description": "Corrige o apelido ou a declaração enquanto o saco está ativo; desativado congela (409).",
+        "operationId": "update_bag_activation",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bag_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Bag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BagActivationUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BagActivationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Update Bag Activation",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/bags/{bag_id}/activate": {
+      "post": {
+        "description": "Reativa um saco desativado (o código é o mesmo: o QR impresso continua a valer).",
+        "operationId": "activate_bag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bag_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Bag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BagActivationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Activate Bag",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/bags/{bag_id}/deactivate": {
+      "post": {
+        "description": "Desativa um saco (saiu do sistema: rasgou-se, perdeu-se). Congela sem apagar — o histórico fica.",
+        "operationId": "deactivate_bag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bag_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Bag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BagActivationOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Deactivate Bag",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/bags/{bag_id}/qr": {
+      "get": {
+        "description": "O QR do saco ativado: imprime-se ou mostra-se à viatura; o payload é o próprio código `NVL-…`.",
+        "operationId": "get_bag_qr",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "bag_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "title": "Bag Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DonorQrOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Bag Qr",
+        "tags": [
+          "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/history": {
+      "get": {
+        "description": "O histórico do doador: cada saco ligado ao lote que o levou, com link só para o passaporte\npúblico — o passaporte nunca mostra quem entregou (ADR #35).",
+        "operationId": "get_collection_history",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/CollectionHistoryOut"
+                  },
+                  "title": "Response Get Collection History",
+                  "type": "array"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Collection History",
+        "tags": [
+          "cidadao"
         ]
       }
     },
@@ -45252,6 +47001,128 @@
         "summary": "List Zones",
         "tags": [
           "planning"
+        ]
+      }
+    },
+    "/api/v1/public/collection-agenda": {
+      "get": {
+        "description": "As rondas publicadas («onde e quando entrego»), do cenário completo mais recente com agenda.\n\nPúblico e sem sessão: é a promessa do serviço ao cidadão. `agenda` nulo = ainda não há agenda\npublicada — a página diz-o, nunca inventa dias. Agregado: nenhum dado de contas aqui. Cache curto\nno cliente: a agenda muda quando a equipa publica um cenário novo, não a cada minuto.",
+        "operationId": "get_public_collection_agenda",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CollectionAgendaOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Public Collection Agenda",
+        "tags": [
+          "public"
         ]
       }
     },

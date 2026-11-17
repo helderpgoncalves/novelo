@@ -56,6 +56,9 @@ ErrorCode = Literal[
     "citizen_address_required",
     "citizen_parish_required",
     "citizen_bags_limit",
+    "age_below_minimum",
+    "bag_limit_reached",
+    "bag_inactive",
     "local_address_forbidden",
     "request_not_dispatchable",
     "request_not_scheduled",
@@ -304,6 +307,27 @@ class CertificateNotPublicError(AppError):
 
     status_code = 404
     code = "certificate_not_public"
+
+
+class AgeBelowMinimumError(AppError):
+    """A conta de doador exige 13 anos declarados (ADR: RGPD da conta de doador, art. 16.º da Lei 58/2019)."""
+
+    status_code = 422
+    code = "age_below_minimum"
+
+
+class BagLimitReachedError(AppError):
+    """Teto de sacos ativos por conta (`domain.bags.MAX_ACTIVE_BAGS`, estimativa); desativar liberta."""
+
+    status_code = 409
+    code = "bag_limit_reached"
+
+
+class BagInactiveError(AppError):
+    """O saco está desativado: congela (sem edições); reativar volta a permitir editar."""
+
+    status_code = 409
+    code = "bag_inactive"
 
 
 class AddressRequestActiveError(AppError):

@@ -694,7 +694,7 @@ export type ApproveRequest = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest' | 'local';
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -1059,6 +1059,80 @@ export type AuthConfig = {
      */
     turnstile_site_key: string | null;
 };
+
+/**
+ * BagActivationCreate
+ *
+ * Ativar um saco da plataforma: apelido privado opcional e a declaração «Vai no saco?» opcional.
+ */
+export type BagActivationCreate = {
+    /**
+     * «Vai no saco?»: `reuse` (vestir de novo) ou `recycle` (dar a vida); base do bónus de conformidade
+     */
+    declaration?: BagDeclaration | null;
+    /**
+     * Nickname
+     *
+     * Apelido PRIVADO (nunca é público)
+     */
+    nickname?: string | null;
+};
+
+/**
+ * BagActivationOut
+ *
+ * Um saco ativado, visto pelo dono. `active` é `deactivated_at is null`.
+ */
+export type BagActivationOut = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    declaration: BagDeclaration | null;
+    /**
+     * Declared At
+     */
+    declared_at: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+};
+
+/**
+ * BagActivationUpdate
+ *
+ * Corrigir o apelido ou a declaração enquanto o saco está ativo (desativado congela).
+ */
+export type BagActivationUpdate = {
+    declaration?: BagDeclaration | null;
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+};
+
+/**
+ * BagDeclaration
+ *
+ * Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+ *
+ * É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+ * dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+ */
+export type BagDeclaration = 'reuse' | 'recycle';
 
 /**
  * BenchmarkOut
@@ -1683,6 +1757,33 @@ export type CircuitsSummary = {
 };
 
 /**
+ * CollectionAgendaOut
+ *
+ * A agenda pública «onde e quando entrego»: as rondas publicadas do cenário mais recente.
+ *
+ * `agenda` nulo = nenhum cenário publicado tem agenda (política fixa antiga): a página diz que ainda
+ * não há promessa publicada — nunca inventa dias.
+ */
+export type CollectionAgendaOut = {
+    /**
+     * Agenda
+     */
+    agenda: Array<PublicAgendaEntry> | null;
+    /**
+     * Scenario Label
+     *
+     * De que cenário vem a agenda
+     */
+    scenario_label?: string | null;
+    /**
+     * Updated At
+     *
+     * Quando o cenário foi calculado
+     */
+    updated_at?: string | null;
+};
+
+/**
  * CollectionFrequency
  *
  * Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
@@ -1692,6 +1793,56 @@ export type CircuitsSummary = {
  * `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
  */
 export type CollectionFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly';
+
+/**
+ * CollectionHistoryOut
+ *
+ * Uma linha do histórico do doador: o saco e o lote que o levou (link só para o passaporte público).
+ *
+ * O lote chega por `lot_units.code == bag code` — é o scan da viatura que faz a ligação; sem scan o
+ * saco ainda está em casa (`lot_code` nulo). O passaporte nunca mostra o doador.
+ */
+export type CollectionHistoryOut = {
+    /**
+     * Activated At
+     */
+    activated_at: string;
+    /**
+     * Bag Code
+     */
+    bag_code: string;
+    /**
+     * Bag Id
+     */
+    bag_id: string;
+    /**
+     * Collected At
+     *
+     * Quando a paragem deu origem ao lote
+     */
+    collected_at?: string | null;
+    declaration: BagDeclaration | null;
+    /**
+     * Lot Code
+     *
+     * Código do lote: abre `/passport/{code}`
+     */
+    lot_code?: string | null;
+    /**
+     * Lot State
+     */
+    lot_state?: string | null;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+    /**
+     * Weight Kg
+     *
+     * Peso medido na paragem (ou estimado, legado)
+     */
+    weight_kg?: number | null;
+};
 
 /**
  * CollectionMode
@@ -2349,7 +2500,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
     /**
      * Message
      */
@@ -3633,6 +3784,95 @@ export type DnsCheck = {
 };
 
 /**
+ * DonorAccountOut
+ *
+ * A conta de doador vista por quem nela entra: pseudónimo do QR de conta e a idade declarada.
+ */
+export type DonorAccountOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Declared Age
+     */
+    declared_age: number | null;
+    /**
+     * Donor Code
+     *
+     * Pseudónimo do QR de conta (`NVA-…`); nulo em contas antigas
+     */
+    donor_code: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string | null;
+};
+
+/**
+ * DonorQrOut
+ *
+ * QR em SVG (fundo branco, como o passaporte) e o código que ele codifica.
+ */
+export type DonorQrOut = {
+    /**
+     * Code
+     *
+     * `NVA-XXXXXX` (conta) ou `NVL-XXXXXX` (saco): é o payload inteiro do QR
+     */
+    code: string;
+    /**
+     * Svg
+     *
+     * QR em SVG; o código é o payload — o ecrã da viatura lê-o offline
+     */
+    svg: string;
+};
+
+/**
+ * DonorSignUpRequest
+ *
+ * Conta de doador por email, sem password: idade DECLARADA (13+; abaixo é recusa explícita) e
+ * consentimento RGPD (conta e crédito = contrato, ADR #49).
+ */
+export type DonorSignUpRequest = {
+    /**
+     * Consent
+     *
+     * Aceitação do tratamento de dados; tem de ser true
+     */
+    consent: true;
+    /**
+     * Declared Age
+     *
+     * Idade declarada; tudo abaixo de 13 é recusa explícita (`age_below_minimum`)
+     */
+    declared_age: number;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Website
+     *
+     * Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot
+     */
+    website?: string | null;
+};
+
+/**
  * DoorToDoorPass
  *
  * Uma passagem semanal de um circuito porta a porta (PAP) da Vitrus numa freguesia.
@@ -3989,7 +4229,7 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
     /**
      * Message
      *
@@ -4975,7 +5215,7 @@ export type InvitationCreate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest' | 'local';
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -5102,7 +5342,7 @@ export type InvitationOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest' | 'local';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
     /**
      * Send Count
      */
@@ -5177,7 +5417,7 @@ export type InvitationPreview = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest' | 'local';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -6318,7 +6558,7 @@ export type MeOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest' | 'local';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -12716,7 +12956,7 @@ export type UserAdminOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest' | 'local';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -12736,7 +12976,7 @@ export type UserAdminUpdate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest' | 'local' | null;
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor' | null;
 };
 
 /**
@@ -12788,7 +13028,7 @@ export type UserOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest' | 'local';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -13973,6 +14213,75 @@ export type GetAuthConfigResponses = {
 };
 
 export type GetAuthConfigResponse = GetAuthConfigResponses[keyof GetAuthConfigResponses];
+
+export type DonorSignUpData = {
+    body: DonorSignUpRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/donor/sign-up';
+};
+
+export type DonorSignUpErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DonorSignUpError = DonorSignUpErrors[keyof DonorSignUpErrors];
+
+export type DonorSignUpResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DonorSignUpResponse = DonorSignUpResponses[keyof DonorSignUpResponses];
 
 export type ForgotPasswordData = {
     body: ForgotPasswordRequest;
@@ -15622,6 +15931,579 @@ export type GetBrandEvidenceResponses = {
 };
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
+
+export type GetDonorAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account';
+};
+
+export type GetDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorAccountError = GetDonorAccountErrors[keyof GetDonorAccountErrors];
+
+export type GetDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorAccountOut;
+};
+
+export type GetDonorAccountResponse = GetDonorAccountResponses[keyof GetDonorAccountResponses];
+
+export type GetDonorAccountQrData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/qr';
+};
+
+export type GetDonorAccountQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorAccountQrError = GetDonorAccountQrErrors[keyof GetDonorAccountQrErrors];
+
+export type GetDonorAccountQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorQrOut;
+};
+
+export type GetDonorAccountQrResponse = GetDonorAccountQrResponses[keyof GetDonorAccountQrResponses];
+
+export type ListBagActivationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/bags';
+};
+
+export type ListBagActivationsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListBagActivationsError = ListBagActivationsErrors[keyof ListBagActivationsErrors];
+
+export type ListBagActivationsResponses = {
+    /**
+     * Response List Bag Activations
+     *
+     * Successful Response
+     */
+    200: Array<BagActivationOut>;
+};
+
+export type ListBagActivationsResponse = ListBagActivationsResponses[keyof ListBagActivationsResponses];
+
+export type CreateBagActivationData = {
+    body: BagActivationCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/bags';
+};
+
+export type CreateBagActivationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateBagActivationError = CreateBagActivationErrors[keyof CreateBagActivationErrors];
+
+export type CreateBagActivationResponses = {
+    /**
+     * Successful Response
+     */
+    201: BagActivationOut;
+};
+
+export type CreateBagActivationResponse = CreateBagActivationResponses[keyof CreateBagActivationResponses];
+
+export type UpdateBagActivationData = {
+    body: BagActivationUpdate;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}';
+};
+
+export type UpdateBagActivationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateBagActivationError = UpdateBagActivationErrors[keyof UpdateBagActivationErrors];
+
+export type UpdateBagActivationResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type UpdateBagActivationResponse = UpdateBagActivationResponses[keyof UpdateBagActivationResponses];
+
+export type ActivateBagData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/activate';
+};
+
+export type ActivateBagErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ActivateBagError = ActivateBagErrors[keyof ActivateBagErrors];
+
+export type ActivateBagResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type ActivateBagResponse = ActivateBagResponses[keyof ActivateBagResponses];
+
+export type DeactivateBagData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/deactivate';
+};
+
+export type DeactivateBagErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeactivateBagError = DeactivateBagErrors[keyof DeactivateBagErrors];
+
+export type DeactivateBagResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type DeactivateBagResponse = DeactivateBagResponses[keyof DeactivateBagResponses];
+
+export type GetBagQrData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/qr';
+};
+
+export type GetBagQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetBagQrError = GetBagQrErrors[keyof GetBagQrErrors];
+
+export type GetBagQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorQrOut;
+};
+
+export type GetBagQrResponse = GetBagQrResponses[keyof GetBagQrResponses];
+
+export type GetCollectionHistoryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/history';
+};
+
+export type GetCollectionHistoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCollectionHistoryError = GetCollectionHistoryErrors[keyof GetCollectionHistoryErrors];
+
+export type GetCollectionHistoryResponses = {
+    /**
+     * Response Get Collection History
+     *
+     * Successful Response
+     */
+    200: Array<CollectionHistoryOut>;
+};
+
+export type GetCollectionHistoryResponse = GetCollectionHistoryResponses[keyof GetCollectionHistoryResponses];
 
 export type ListCollectionRequestsData = {
     body?: never;
@@ -23872,6 +24754,67 @@ export type ListZonesResponses = {
 };
 
 export type ListZonesResponse = ListZonesResponses[keyof ListZonesResponses];
+
+export type GetPublicCollectionAgendaData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/public/collection-agenda';
+};
+
+export type GetPublicCollectionAgendaErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicCollectionAgendaError = GetPublicCollectionAgendaErrors[keyof GetPublicCollectionAgendaErrors];
+
+export type GetPublicCollectionAgendaResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionAgendaOut;
+};
+
+export type GetPublicCollectionAgendaResponse = GetPublicCollectionAgendaResponses[keyof GetPublicCollectionAgendaResponses];
 
 export type GetPublicLocalCertificateData = {
     body?: never;
