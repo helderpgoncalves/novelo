@@ -9,7 +9,7 @@ import { resolvePublicSessionUser } from '@/lib/session';
 // A área do cidadão («Carteira») vive FORA da app de equipa (`_app`), como a do local: telemóvel primeiro.
 // Sem sessão é a porta de entrada do doador (email + 13 anos); quem tem conta de equipa vê só o público.
 
-const TABS = ['inicio', 'sacos', 'saldo', 'historico'] as const;
+const TABS = ['inicio', 'sacos', 'saldo', 'historico', 'privacidade'] as const;
 
 export const Route = createFileRoute('/cidadao')({
   validateSearch: z.object({ tab: z.enum(TABS).optional().catch(undefined) }),

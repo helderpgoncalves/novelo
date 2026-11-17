@@ -25,6 +25,40 @@ export type AcceptInvitationRequest = {
 };
 
 /**
+ * AccountExportOut
+ *
+ * A conta inteira, legível por máquina (JSON). Só dados FORNECIDOS ou OBSERVADOS — nunca
+ * derivados (sem calibração, sem pontuações de conformidade: WP29 242 rev.01, p. 10).
+ */
+export type AccountExportOut = {
+    /**
+     * Bags
+     */
+    bags: Array<ExportBag>;
+    /**
+     * Collection Requests
+     */
+    collection_requests: Array<ExportRequest>;
+    /**
+     * Consents
+     */
+    consents: Array<ExportConsent>;
+    /**
+     * Exported At
+     */
+    exported_at: string;
+    /**
+     * Points
+     */
+    points: Array<ExportPointEntry>;
+    /**
+     * Policy Version
+     */
+    policy_version: string;
+    profile: ExportProfile;
+};
+
+/**
  * ActionOut
  */
 export type ActionOut = {
@@ -2403,6 +2437,66 @@ export type ConfirmActionIn = {
 };
 
 /**
+ * ConsentPurpose
+ *
+ * As finalidades que EXIGEM consentimento (prévio e expresso, em duas camadas; nunca soft opt-in).
+ *
+ * O essencial da conta (crédito, recolhas, triagem) é contrato — não anda aqui. Marketing e parcerias
+ * têm caixas próprias, desligadas por defeito, retiráveis a qualquer momento (art. 7.º/3 RGPD).
+ */
+export type ConsentPurpose = 'marketing' | 'partnerships';
+
+/**
+ * ConsentStateOut
+ *
+ * O estado corrente de uma finalidade: a última linha vence; sem linhas é desligado e nunca pedido.
+ */
+export type ConsentStateOut = {
+    /**
+     * Granted
+     */
+    granted: boolean;
+    /**
+     * Policy Version
+     */
+    policy_version?: string | null;
+    purpose: ConsentPurpose;
+    /**
+     * Updated At
+     */
+    updated_at?: string | null;
+};
+
+/**
+ * ConsentUpdate
+ *
+ * Uma decisão: finalidade + dado ou retirado (o histórico fica append-only lá atrás).
+ */
+export type ConsentUpdate = {
+    /**
+     * Granted
+     */
+    granted: boolean;
+    purpose: ConsentPurpose;
+    /**
+     * Source
+     */
+    source?: 'account' | 'api';
+};
+
+/**
+ * ConsentsOut
+ *
+ * As DUAS camadas (marketing e parcerias), sempre ambas, com o estado corrente de cada uma.
+ */
+export type ConsentsOut = {
+    /**
+     * Items
+     */
+    items: Array<ConsentStateOut>;
+};
+
+/**
  * ContainerKind
  */
 export type ContainerKind = 'textile' | 'undifferentiated' | 'organic' | 'recyclable' | 'other';
@@ -3888,6 +3982,58 @@ export type DeleteUserRequest = {
 };
 
 /**
+ * DeletionPreviewOut
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde.
+ *
+ * `points_are_not_money` é o texto decidido no ADR («pontos não são dinheiro nem conversíveis») —
+ * o web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.
+ */
+export type DeletionPreviewOut = {
+    /**
+     * Active Bags
+     */
+    active_bags: number;
+    /**
+     * Bags
+     */
+    bags: number;
+    /**
+     * Points Are Not Money
+     */
+    points_are_not_money?: boolean;
+    /**
+     * Points Entries
+     */
+    points_entries: number;
+    /**
+     * Redeem Hint Path
+     */
+    redeem_hint_path?: string;
+    /**
+     * Requests
+     */
+    requests: number;
+    saldo: SaldoOut;
+    /**
+     * Timeline
+     */
+    timeline: Array<NoveloFeaturesPrivacySchemasTimelineItem>;
+};
+
+/**
+ * DeletionRequest
+ *
+ * A confirmação: o email da conta, escrito à mão (a 3.ª proteção é o texto no ecrã; esta é a trava).
+ */
+export type DeletionRequest = {
+    /**
+     * Confirm Email
+     */
+    confirm_email: string;
+};
+
+/**
  * DispatchAction
  *
  * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
@@ -4397,6 +4543,59 @@ export type ErrorBody = {
 };
 
 /**
+ * ExportBag
+ */
+export type ExportBag = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Deactivated At
+     */
+    deactivated_at: string | null;
+    declaration: BagDeclaration | null;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+};
+
+/**
+ * ExportConsent
+ */
+export type ExportConsent = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Granted
+     */
+    granted: boolean;
+    /**
+     * Policy Version
+     */
+    policy_version: string;
+    /**
+     * Purpose
+     */
+    purpose: string;
+    /**
+     * Source
+     */
+    source: string;
+};
+
+/**
  * ExportFormat
  */
 export type ExportFormat = 'csv' | 'xlsx' | 'geojson';
@@ -4594,6 +4793,108 @@ export type ExportLotSummary = {
      * Weight Kg
      */
     weight_kg: number;
+};
+
+/**
+ * ExportPointEntry
+ */
+export type ExportPointEntry = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Bag Code
+     */
+    bag_code: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Expires At
+     */
+    expires_at: string | null;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Lot Code
+     */
+    lot_code: string | null;
+    /**
+     * Reason
+     */
+    reason: string | null;
+};
+
+/**
+ * ExportProfile
+ *
+ * O perfil fornecido pelo titular: identificador, nome opcional, pseudónimo, idade declarada.
+ */
+export type ExportProfile = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Declared Age
+     */
+    declared_age: number | null;
+    /**
+     * Donor Code
+     */
+    donor_code: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Joined Via
+     */
+    joined_via: string;
+    /**
+     * Locale
+     */
+    locale: string;
+    /**
+     * Name
+     */
+    name: string | null;
+};
+
+/**
+ * ExportRequest
+ */
+export type ExportRequest = {
+    /**
+     * Address
+     */
+    address: string | null;
+    /**
+     * Bag Count
+     */
+    bag_count: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Requested Date
+     */
+    requested_date: string;
+    state: CollectionRequestState;
+    subject_kind: RequestSubject;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
 };
 
 /**
@@ -9924,6 +10225,83 @@ export type PointsHistoryOut = {
 };
 
 /**
+ * PolicyCategory
+ *
+ * Uma categoria de dados dentro de uma finalidade, com o SEU prazo de conservação.
+ */
+export type PolicyCategory = {
+    /**
+     * Applied By
+     */
+    applied_by: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Retention
+     */
+    retention: string;
+};
+
+/**
+ * PolicyOut
+ *
+ * A política inteira, como a página pública a recebe (JSON; a web só desenha).
+ */
+export type PolicyOut = {
+    /**
+     * Controller
+     */
+    controller: string;
+    /**
+     * Minimum Age
+     */
+    minimum_age: number;
+    /**
+     * Purposes
+     */
+    purposes: Array<PolicyPurpose>;
+    /**
+     * Rights
+     */
+    rights: Array<string>;
+    /**
+     * Version
+     */
+    version: string;
+};
+
+/**
+ * PolicyPurpose
+ *
+ * Uma finalidade de tratamento: base legal, texto claro e as categorias com prazos.
+ */
+export type PolicyPurpose = {
+    /**
+     * Categories
+     */
+    categories: Array<PolicyCategory>;
+    /**
+     * Consent Required
+     */
+    consent_required?: boolean;
+    /**
+     * Description
+     */
+    description: string;
+    id: PurposeId;
+    /**
+     * Legal Basis
+     */
+    legal_basis: string;
+    /**
+     * Title
+     */
+    title: string;
+};
+
+/**
  * PotentialReadingOut
  */
 export type PotentialReadingOut = {
@@ -10077,6 +10455,13 @@ export type PublicAgendaEntry = {
      */
     weekday: number;
 };
+
+/**
+ * PurposeId
+ *
+ * Identificadores estáveis das finalidades (o contrato público da política entre versões).
+ */
+export type PurposeId = 'conta' | 'sacos' | 'pedidos' | 'pontos' | 'triagem' | 'logs_autenticacao' | 'marketing' | 'parcerias';
 
 /**
  * QuantilesOut
@@ -12578,31 +12963,13 @@ export type TimelineEvent = {
 };
 
 /**
- * TimelineItem
- */
-export type TimelineItem = {
-    /**
-     * At
-     */
-    at: string;
-    /**
-     * Detail
-     */
-    detail?: string | null;
-    /**
-     * Label
-     */
-    label: string;
-};
-
-/**
  * TimelineSpec
  */
 export type TimelineSpec = {
     /**
      * Items
      */
-    items: Array<TimelineItem>;
+    items: Array<NoveloFeaturesCopilotSchemasArtifactsTimelineItem>;
     /**
      * Source
      */
@@ -13750,6 +14117,40 @@ export type ZoneOut = {
      * Tipologia de áreas urbanas do INE
      */
     tipau: Tipau | null;
+};
+
+/**
+ * TimelineItem
+ */
+export type NoveloFeaturesCopilotSchemasArtifactsTimelineItem = {
+    /**
+     * At
+     */
+    at: string;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
+ * TimelineItem
+ *
+ * Uma data de expiração FIFO e quantos pontos caem nela (o calendário do saldo).
+ */
+export type NoveloFeaturesPrivacySchemasTimelineItem = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Expires At
+     */
+    expires_at: string;
 };
 
 export type CreatePointsAnnulmentData = {
@@ -16411,6 +16812,189 @@ export type GetDonorAccountResponses = {
 
 export type GetDonorAccountResponse = GetDonorAccountResponses[keyof GetDonorAccountResponses];
 
+export type DeleteDonorAccountData = {
+    body: DeletionRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/delete';
+};
+
+export type DeleteDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteDonorAccountError = DeleteDonorAccountErrors[keyof DeleteDonorAccountErrors];
+
+export type DeleteDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteDonorAccountResponse = DeleteDonorAccountResponses[keyof DeleteDonorAccountResponses];
+
+export type GetDonorDeletionPreviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/delete-preview';
+};
+
+export type GetDonorDeletionPreviewErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorDeletionPreviewError = GetDonorDeletionPreviewErrors[keyof GetDonorDeletionPreviewErrors];
+
+export type GetDonorDeletionPreviewResponses = {
+    /**
+     * Successful Response
+     */
+    200: DeletionPreviewOut;
+};
+
+export type GetDonorDeletionPreviewResponse = GetDonorDeletionPreviewResponses[keyof GetDonorDeletionPreviewResponses];
+
+export type ExportDonorAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/export';
+};
+
+export type ExportDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportDonorAccountError = ExportDonorAccountErrors[keyof ExportDonorAccountErrors];
+
+export type ExportDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: AccountExportOut;
+};
+
+export type ExportDonorAccountResponse = ExportDonorAccountResponses[keyof ExportDonorAccountResponses];
+
 export type GetDonorAccountQrData = {
     body?: never;
     path?: never;
@@ -16859,6 +17443,128 @@ export type GetBagQrResponses = {
 };
 
 export type GetBagQrResponse = GetBagQrResponses[keyof GetBagQrResponses];
+
+export type GetDonorConsentsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/consents';
+};
+
+export type GetDonorConsentsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorConsentsError = GetDonorConsentsErrors[keyof GetDonorConsentsErrors];
+
+export type GetDonorConsentsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ConsentsOut;
+};
+
+export type GetDonorConsentsResponse = GetDonorConsentsResponses[keyof GetDonorConsentsResponses];
+
+export type SetDonorConsentData = {
+    body: ConsentUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/consents';
+};
+
+export type SetDonorConsentErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetDonorConsentError = SetDonorConsentErrors[keyof SetDonorConsentErrors];
+
+export type SetDonorConsentResponses = {
+    /**
+     * Successful Response
+     */
+    200: ConsentsOut;
+};
+
+export type SetDonorConsentResponse = SetDonorConsentResponses[keyof SetDonorConsentResponses];
 
 export type GetCollectionHistoryData = {
     body?: never;
@@ -25630,6 +26336,67 @@ export type GetLotQrResponses = {
 };
 
 export type GetLotQrResponse = GetLotQrResponses[keyof GetLotQrResponses];
+
+export type GetPublicPrivacyPolicyData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/public/privacy-policy';
+};
+
+export type GetPublicPrivacyPolicyErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicPrivacyPolicyError = GetPublicPrivacyPolicyErrors[keyof GetPublicPrivacyPolicyErrors];
+
+export type GetPublicPrivacyPolicyResponses = {
+    /**
+     * Successful Response
+     */
+    200: PolicyOut;
+};
+
+export type GetPublicPrivacyPolicyResponse = GetPublicPrivacyPolicyResponses[keyof GetPublicPrivacyPolicyResponses];
 
 export type ReadyData = {
     body?: never;
