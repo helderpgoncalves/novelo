@@ -186,6 +186,8 @@ register_limiter = RateLimiter(limit=10, window_s=3600, name="register")
 donor_signup_limiter = RateLimiter(limit=5, window_s=3600, name="donor-signup")
 donor_bags_limiter = RateLimiter(limit=30, window_s=60, name="donor-bags")
 agenda_limiter = RateLimiter(limit=60, window_s=60, name="agenda")  # página pública «onde e quando entrego»
+# Resgates do doador (#65): cada resgate move dinheiro-âncora e consome stock — rajada não é normal.
+redemptions_limiter = RateLimiter(limit=20, window_s=60, name="donor-redemptions")
 # Login: falhas por CONTA (hash do email), independente do IP.
 login_account_limiter = RateLimiter(limit=10, window_s=900, name="login-account")
 # Rotas caras: execuções por utilizador (a chave inclui o id; o limite real vem da configuração).

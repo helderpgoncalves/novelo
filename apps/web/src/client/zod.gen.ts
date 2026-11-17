@@ -562,6 +562,44 @@ export const zCalibrationPhoto = z.object({
 });
 
 /**
+ * CampaignCreate
+ *
+ * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ */
+export const zCampaignCreate = z.object({
+    description: z.string().max(2000).nullish(),
+    ends_at: z.iso.datetime(),
+    name: z.string().min(3).max(120),
+    starts_at: z.iso.datetime()
+});
+
+/**
+ * CampaignOut
+ *
+ * Uma campanha: o web mostra-a ao doador enquanto `starts_at ≤ agora < ends_at`.
+ */
+export const zCampaignOut = z.object({
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    ends_at: z.iso.datetime(),
+    id: z.uuid(),
+    name: z.string(),
+    starts_at: z.iso.datetime()
+});
+
+/**
+ * CampaignUpdate
+ *
+ * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ */
+export const zCampaignUpdate = z.object({
+    description: z.string().max(2000).nullish(),
+    ends_at: z.iso.datetime().nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    starts_at: z.iso.datetime().nullish()
+});
+
+/**
  * CaopProps
  */
 export const zCaopProps = z.object({
@@ -620,6 +658,87 @@ export const zCardKpis = z.object({
     coverage_pct: z.number(),
     eur_per_tonne: z.number().nullable(),
     tonnes_year: z.number()
+});
+
+/**
+ * CatalogItemKind
+ *
+ * As três prateleiras do catálogo (espec #54): o valor guardado na base é a string inglesa.
+ *
+ * Só o donativo IPSS tem âncora € (`donation_value_cents`) — e é APRESENTAÇÃO do valor do donativo
+ * (1 000 pontos ≈ 5 €), nunca câmbio. Prémios de parceiro são cedidos e PAGOS pelo parceiro
+ * (pagamento integral por código apresentado); o acumulado ambiental é conquista não monetária.
+ */
+export const zCatalogItemKind = z.enum([
+    'ipss_donation',
+    'partner_prize',
+    'environmental'
+]);
+
+/**
+ * CatalogItemCreate
+ *
+ * Criar um item: a forma é fechada — âncora € SÓ em donativo IPSS, parceiro OBRIGATÓRIO em prémio.
+ */
+export const zCatalogItemCreate = z.object({
+    active: z.boolean().optional().default(true),
+    description: z.string().max(2000).nullish(),
+    donation_value_cents: z.int().gt(0).nullish(),
+    kind: zCatalogItemKind,
+    name: z.string().min(3).max(120),
+    partner_id: z.uuid().nullish(),
+    points_cost: z.int().gt(0),
+    stock: z.int().gte(0).nullish()
+});
+
+/**
+ * CatalogItemOut
+ *
+ * Um item do catálogo visto pela EQUIPA: inclui inativos e o parceiro (pseudónimo zero-dados fica).
+ */
+export const zCatalogItemOut = z.object({
+    active: z.boolean(),
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    kind: zCatalogItemKind,
+    name: z.string(),
+    partner_id: z.uuid().nullable(),
+    partner_name: z.string().nullish(),
+    points_cost: z.int(),
+    stock: z.int().nullable()
+});
+
+/**
+ * CatalogItemPublic
+ *
+ * Um item visto pelo DOADOR: só o que ele precisa para escolher — nunca dados internos do parceiro.
+ */
+export const zCatalogItemPublic = z.object({
+    description: z.string().nullable(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    kind: zCatalogItemKind,
+    name: z.string(),
+    partner_name: z.string().nullish(),
+    points_cost: z.int(),
+    stock: z.int().nullable()
+});
+
+/**
+ * CatalogItemUpdate
+ *
+ * Editar um item: campos parciais; a forma é revalidada sobre o estado resultante no serviço.
+ */
+export const zCatalogItemUpdate = z.object({
+    active: z.boolean().nullish(),
+    description: z.string().max(2000).nullish(),
+    donation_value_cents: z.int().gt(0).nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    partner_id: z.uuid().nullish(),
+    points_cost: z.int().gt(0).nullish(),
+    stock: z.int().gte(0).nullish()
 });
 
 /**
@@ -1061,6 +1180,13 @@ export const zCopilotErrorEvent = z.object({
         'request_not_dispatchable',
         'request_not_scheduled',
         'request_cancel_not_allowed',
+        'insufficient_points',
+        'donation_cap_reached',
+        'out_of_stock',
+        'catalog_item_inactive',
+        'redemption_already_used',
+        'catalog_item_shape',
+        'campaign_window',
         'internal_error'
     ]),
     message: z.string(),
@@ -1718,8 +1844,16 @@ export const zErrorBody = z.object({
         'request_not_dispatchable',
         'request_not_scheduled',
         'request_cancel_not_allowed',
+        'insufficient_points',
+        'donation_cap_reached',
+        'out_of_stock',
+        'catalog_item_inactive',
+        'redemption_already_used',
+        'catalog_item_shape',
+        'campaign_window',
         'internal_error'
     ]),
+    details: z.record(z.string(), z.unknown()).nullish(),
     message: z.string()
 });
 
@@ -3391,6 +3525,57 @@ export const zParishMatchLevel = z.enum([
 ]);
 
 /**
+ * PartnerCreate
+ *
+ * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ */
+export const zPartnerCreate = z.object({
+    contact: z.string().max(200).nullish(),
+    description: z.string().max(2000).nullish(),
+    name: z.string().min(3).max(120),
+    parish_id: z.uuid().nullish()
+});
+
+/**
+ * PartnerState
+ *
+ * Vida de um parceiro: a freguesia PROPÕE, a Vitrus APROVA (e pode pôr em pausa).
+ */
+export const zPartnerState = z.enum([
+    'proposed',
+    'active',
+    'inactive'
+]);
+
+/**
+ * PartnerOut
+ *
+ * Um parceiro: estado de vida (proposto/aprovado/em pausa) e quem propôs.
+ */
+export const zPartnerOut = z.object({
+    contact: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    id: z.uuid(),
+    name: z.string(),
+    parish_id: z.uuid().nullable(),
+    proposed_by_id: z.uuid().nullable(),
+    state: zPartnerState
+});
+
+/**
+ * PartnerUpdate
+ *
+ * Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`.
+ */
+export const zPartnerUpdate = z.object({
+    contact: z.string().max(200).nullish(),
+    description: z.string().max(2000).nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    parish_id: z.uuid().nullish()
+});
+
+/**
  * PassportPhoto
  *
  * Miniatura pública de uma peça (sem metadados; apagada ao fim da retenção).
@@ -4061,6 +4246,49 @@ export const zReadiness = z.object({
     ]),
     llm_enabled: z.boolean(),
     status: z.enum(['ok', 'degraded'])
+});
+
+/**
+ * RedemptionCreate
+ *
+ * Resgatar um item do catálogo: o saldo FIFO é debitado e nasce um código pseudónimo.
+ */
+export const zRedemptionCreate = z.object({
+    item_id: z.uuid()
+});
+
+/**
+ * RedemptionState
+ *
+ * Estado do código de resgate: nasce pendente e valida-se UMA única vez (pagamento integral).
+ */
+export const zRedemptionState = z.enum(['pending', 'validated']);
+
+/**
+ * RedemptionOut
+ *
+ * Um resgate visto pelo doador OU pela equipa na validação: o código e o seu estado de vida.
+ */
+export const zRedemptionOut = z.object({
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    item_kind: zCatalogItemKind,
+    item_name: z.string(),
+    partner_name: z.string().nullable(),
+    points_spent: z.int(),
+    state: zRedemptionState,
+    validated_at: z.iso.datetime().nullable()
+});
+
+/**
+ * RedemptionValidate
+ *
+ * Validar um código apresentado (equipa, no MVP; portal do parceiro fica para depois).
+ */
+export const zRedemptionValidate = z.object({
+    code: z.string().min(3).max(16)
 });
 
 /**
@@ -6615,12 +6843,112 @@ export const zZoneOut = z.object({
     tipau: zTipau.nullable()
 });
 
+/**
+ * Response List Admin Campaigns
+ *
+ * Successful Response
+ */
+export const zListAdminCampaignsResponse = z.array(zCampaignOut);
+
+export const zCreatePointCampaignBody = zCampaignCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreatePointCampaignResponse = zCampaignOut;
+
+export const zUpdatePointCampaignBody = zCampaignUpdate;
+
+export const zUpdatePointCampaignPath = z.object({
+    campaign_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdatePointCampaignResponse = zCampaignOut;
+
+/**
+ * Response List Admin Catalog Items
+ *
+ * Successful Response
+ */
+export const zListAdminCatalogItemsResponse = z.array(zCatalogItemOut);
+
+export const zCreateCatalogItemBody = zCatalogItemCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCatalogItemResponse = zCatalogItemOut;
+
+export const zUpdateCatalogItemBody = zCatalogItemUpdate;
+
+export const zUpdateCatalogItemPath = z.object({
+    item_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCatalogItemResponse = zCatalogItemOut;
+
+/**
+ * Response List Catalog Partners
+ *
+ * Successful Response
+ */
+export const zListCatalogPartnersResponse = z.array(zPartnerOut);
+
+export const zCreateCatalogPartnerBody = zPartnerCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCatalogPartnerResponse = zPartnerOut;
+
+export const zUpdateCatalogPartnerBody = zPartnerUpdate;
+
+export const zUpdateCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCatalogPartnerResponse = zPartnerOut;
+
+export const zApproveCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zApproveCatalogPartnerResponse = zPartnerOut;
+
+export const zDeactivateCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeactivateCatalogPartnerResponse = zPartnerOut;
+
 export const zCreatePointsAnnulmentBody = zAnnulmentCreate;
 
 /**
  * Successful Response
  */
 export const zCreatePointsAnnulmentResponse = zPointEntryOut;
+
+export const zValidateRedemptionCodeBody = zRedemptionValidate;
+
+/**
+ * Successful Response
+ */
+export const zValidateRedemptionCodeResponse = zRedemptionOut;
 
 /**
  * Successful Response
@@ -6970,6 +7298,20 @@ export const zGetBagQrPath = z.object({
 export const zGetBagQrResponse = zDonorQrOut;
 
 /**
+ * Response List Donor Campaigns
+ *
+ * Successful Response
+ */
+export const zListDonorCampaignsResponse = z.array(zCampaignOut);
+
+/**
+ * Response Get Donor Catalog
+ *
+ * Successful Response
+ */
+export const zGetDonorCatalogResponse = z.array(zCatalogItemPublic);
+
+/**
  * Response Get Collection History
  *
  * Successful Response
@@ -6985,6 +7327,20 @@ export const zListDonorPointsQuery = z.object({
  * Successful Response
  */
 export const zListDonorPointsResponse = zPointsHistoryOut;
+
+/**
+ * Response List Donor Redemptions
+ *
+ * Successful Response
+ */
+export const zListDonorRedemptionsResponse = z.array(zRedemptionOut);
+
+export const zCreateRedemptionBody = zRedemptionCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateRedemptionResponse = zRedemptionOut;
 
 /**
  * Successful Response

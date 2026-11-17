@@ -1550,6 +1550,88 @@ export type CalibrationReadingOut = {
 export type CalibrationScope = 'local' | 'parish' | 'concelho';
 
 /**
+ * CampaignCreate
+ *
+ * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ */
+export type CampaignCreate = {
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Ends At
+     *
+     * Tem de ser DEPOIS de `starts_at` (422 caso contrário)
+     */
+    ends_at: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+};
+
+/**
+ * CampaignOut
+ *
+ * Uma campanha: o web mostra-a ao doador enquanto `starts_at ≤ agora < ends_at`.
+ */
+export type CampaignOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+};
+
+/**
+ * CampaignUpdate
+ *
+ * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ */
+export type CampaignUpdate = {
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Ends At
+     */
+    ends_at?: string | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Starts At
+     */
+    starts_at?: string | null;
+};
+
+/**
  * CaopFeature
  */
 export type CaopFeature = {
@@ -1766,6 +1848,190 @@ export type CartesianChart = {
      * Y Unit
      */
     y_unit?: string | null;
+};
+
+/**
+ * CatalogItemCreate
+ *
+ * Criar um item: a forma é fechada — âncora € SÓ em donativo IPSS, parceiro OBRIGATÓRIO em prémio.
+ */
+export type CatalogItemCreate = {
+    /**
+     * Active
+     */
+    active?: boolean;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * APENAS donativo IPSS: valor do donativo em cêntimos (1 000 pts ≈ 5 €)
+     */
+    donation_value_cents?: number | null;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Id
+     *
+     * Obrigatório no prémio de parceiro
+     */
+    partner_id?: string | null;
+    /**
+     * Points Cost
+     *
+     * Pontos que o resgate debita (FIFO, saldo nunca negativo)
+     */
+    points_cost: number;
+    /**
+     * Stock
+     *
+     * Nulo = sem limite; 0 = esgotado
+     */
+    stock?: number | null;
+};
+
+/**
+ * CatalogItemKind
+ *
+ * As três prateleiras do catálogo (espec #54): o valor guardado na base é a string inglesa.
+ *
+ * Só o donativo IPSS tem âncora € (`donation_value_cents`) — e é APRESENTAÇÃO do valor do donativo
+ * (1 000 pontos ≈ 5 €), nunca câmbio. Prémios de parceiro são cedidos e PAGOS pelo parceiro
+ * (pagamento integral por código apresentado); o acumulado ambiental é conquista não monetária.
+ */
+export type CatalogItemKind = 'ipss_donation' | 'partner_prize' | 'environmental';
+
+/**
+ * CatalogItemOut
+ *
+ * Um item do catálogo visto pela EQUIPA: inclui inativos e o parceiro (pseudónimo zero-dados fica).
+ */
+export type CatalogItemOut = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * Só no donativo IPSS: valor APRESENTADO do donativo
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Id
+     */
+    partner_id: string | null;
+    /**
+     * Partner Name
+     */
+    partner_name?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost: number;
+    /**
+     * Stock
+     */
+    stock: number | null;
+};
+
+/**
+ * CatalogItemPublic
+ *
+ * Um item visto pelo DOADOR: só o que ele precisa para escolher — nunca dados internos do parceiro.
+ */
+export type CatalogItemPublic = {
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * Só no donativo IPSS: «este resgate vale um donativo de X €» — nunca é o valor dos pontos
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Name
+     */
+    partner_name?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost: number;
+    /**
+     * Stock
+     *
+     * Nulo = sem limite; 0 = esgotado (não se pode resgatar)
+     */
+    stock: number | null;
+};
+
+/**
+ * CatalogItemUpdate
+ *
+ * Editar um item: campos parciais; a forma é revalidada sobre o estado resultante no serviço.
+ */
+export type CatalogItemUpdate = {
+    /**
+     * Active
+     */
+    active?: boolean | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Donation Value Cents
+     */
+    donation_value_cents?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Partner Id
+     */
+    partner_id?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost?: number | null;
+    /**
+     * Stock
+     */
+    stock?: number | null;
 };
 
 /**
@@ -2658,7 +2924,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'insufficient_points' | 'donation_cap_reached' | 'out_of_stock' | 'catalog_item_inactive' | 'redemption_already_used' | 'catalog_item_shape' | 'campaign_window' | 'internal_error';
     /**
      * Message
      */
@@ -4387,7 +4653,15 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'insufficient_points' | 'donation_cap_reached' | 'out_of_stock' | 'catalog_item_inactive' | 'redemption_already_used' | 'catalog_item_shape' | 'campaign_window' | 'internal_error';
+    /**
+     * Details
+     *
+     * Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o quando faz sentido
+     */
+    details?: {
+        [key: string]: unknown;
+    } | null;
     /**
      * Message
      *
@@ -9272,6 +9546,102 @@ export type ParishMatch = 'igual' | 'diferente' | 'sem_coord' | 'nao_mapeada';
 export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'partial' | 'none';
 
 /**
+ * PartnerCreate
+ *
+ * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ */
+export type PartnerCreate = {
+    /**
+     * Contact
+     *
+     * Contato da equipa; nunca sai para o doador
+     */
+    contact?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Parish Id
+     *
+     * Freguesia proponente (gestor de parcerias)
+     */
+    parish_id?: string | null;
+};
+
+/**
+ * PartnerOut
+ *
+ * Um parceiro: estado de vida (proposto/aprovado/em pausa) e quem propôs.
+ */
+export type PartnerOut = {
+    /**
+     * Contact
+     */
+    contact: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Parish Id
+     */
+    parish_id: string | null;
+    /**
+     * Proposed By Id
+     */
+    proposed_by_id: string | null;
+    state: PartnerState;
+};
+
+/**
+ * PartnerState
+ *
+ * Vida de um parceiro: a freguesia PROPÕE, a Vitrus APROVA (e pode pôr em pausa).
+ */
+export type PartnerState = 'proposed' | 'active' | 'inactive';
+
+/**
+ * PartnerUpdate
+ *
+ * Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`.
+ */
+export type PartnerUpdate = {
+    /**
+     * Contact
+     */
+    contact?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Parish Id
+     */
+    parish_id?: string | null;
+};
+
+/**
  * Passport
  *
  * Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.
@@ -10272,6 +10642,83 @@ export type Readiness = {
      * Status
      */
     status: 'ok' | 'degraded';
+};
+
+/**
+ * RedemptionCreate
+ *
+ * Resgatar um item do catálogo: o saldo FIFO é debitado e nasce um código pseudónimo.
+ */
+export type RedemptionCreate = {
+    /**
+     * Item Id
+     */
+    item_id: string;
+};
+
+/**
+ * RedemptionOut
+ *
+ * Um resgate visto pelo doador OU pela equipa na validação: o código e o seu estado de vida.
+ */
+export type RedemptionOut = {
+    /**
+     * Code
+     *
+     * `RDM-XXXXXX`: a ÚNICA coisa que o parceiro vê — zero dados do doador
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Donation Value Cents
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    item_kind: CatalogItemKind;
+    /**
+     * Item Name
+     */
+    item_name: string;
+    /**
+     * Partner Name
+     */
+    partner_name: string | null;
+    /**
+     * Points Spent
+     */
+    points_spent: number;
+    state: RedemptionState;
+    /**
+     * Validated At
+     */
+    validated_at: string | null;
+};
+
+/**
+ * RedemptionState
+ *
+ * Estado do código de resgate: nasce pendente e valida-se UMA única vez (pagamento integral).
+ */
+export type RedemptionState = 'pending' | 'validated';
+
+/**
+ * RedemptionValidate
+ *
+ * Validar um código apresentado (equipa, no MVP; portal do parceiro fica para depois).
+ */
+export type RedemptionValidate = {
+    /**
+     * Code
+     *
+     * O código `RDM-…` tal como o parceiro o leu
+     */
+    code: string;
 };
 
 /**
@@ -13752,6 +14199,708 @@ export type ZoneOut = {
     tipau: Tipau | null;
 };
 
+export type ListAdminCampaignsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns';
+};
+
+export type ListAdminCampaignsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAdminCampaignsError = ListAdminCampaignsErrors[keyof ListAdminCampaignsErrors];
+
+export type ListAdminCampaignsResponses = {
+    /**
+     * Response List Admin Campaigns
+     *
+     * Successful Response
+     */
+    200: Array<CampaignOut>;
+};
+
+export type ListAdminCampaignsResponse = ListAdminCampaignsResponses[keyof ListAdminCampaignsResponses];
+
+export type CreatePointCampaignData = {
+    body: CampaignCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns';
+};
+
+export type CreatePointCampaignErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreatePointCampaignError = CreatePointCampaignErrors[keyof CreatePointCampaignErrors];
+
+export type CreatePointCampaignResponses = {
+    /**
+     * Successful Response
+     */
+    201: CampaignOut;
+};
+
+export type CreatePointCampaignResponse = CreatePointCampaignResponses[keyof CreatePointCampaignResponses];
+
+export type UpdatePointCampaignData = {
+    body: CampaignUpdate;
+    path: {
+        /**
+         * Campaign Id
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns/{campaign_id}';
+};
+
+export type UpdatePointCampaignErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdatePointCampaignError = UpdatePointCampaignErrors[keyof UpdatePointCampaignErrors];
+
+export type UpdatePointCampaignResponses = {
+    /**
+     * Successful Response
+     */
+    200: CampaignOut;
+};
+
+export type UpdatePointCampaignResponse = UpdatePointCampaignResponses[keyof UpdatePointCampaignResponses];
+
+export type ListAdminCatalogItemsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/items';
+};
+
+export type ListAdminCatalogItemsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAdminCatalogItemsError = ListAdminCatalogItemsErrors[keyof ListAdminCatalogItemsErrors];
+
+export type ListAdminCatalogItemsResponses = {
+    /**
+     * Response List Admin Catalog Items
+     *
+     * Successful Response
+     */
+    200: Array<CatalogItemOut>;
+};
+
+export type ListAdminCatalogItemsResponse = ListAdminCatalogItemsResponses[keyof ListAdminCatalogItemsResponses];
+
+export type CreateCatalogItemData = {
+    body: CatalogItemCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/items';
+};
+
+export type CreateCatalogItemErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCatalogItemError = CreateCatalogItemErrors[keyof CreateCatalogItemErrors];
+
+export type CreateCatalogItemResponses = {
+    /**
+     * Successful Response
+     */
+    201: CatalogItemOut;
+};
+
+export type CreateCatalogItemResponse = CreateCatalogItemResponses[keyof CreateCatalogItemResponses];
+
+export type UpdateCatalogItemData = {
+    body: CatalogItemUpdate;
+    path: {
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/items/{item_id}';
+};
+
+export type UpdateCatalogItemErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCatalogItemError = UpdateCatalogItemErrors[keyof UpdateCatalogItemErrors];
+
+export type UpdateCatalogItemResponses = {
+    /**
+     * Successful Response
+     */
+    200: CatalogItemOut;
+};
+
+export type UpdateCatalogItemResponse = UpdateCatalogItemResponses[keyof UpdateCatalogItemResponses];
+
+export type ListCatalogPartnersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/partners';
+};
+
+export type ListCatalogPartnersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCatalogPartnersError = ListCatalogPartnersErrors[keyof ListCatalogPartnersErrors];
+
+export type ListCatalogPartnersResponses = {
+    /**
+     * Response List Catalog Partners
+     *
+     * Successful Response
+     */
+    200: Array<PartnerOut>;
+};
+
+export type ListCatalogPartnersResponse = ListCatalogPartnersResponses[keyof ListCatalogPartnersResponses];
+
+export type CreateCatalogPartnerData = {
+    body: PartnerCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/partners';
+};
+
+export type CreateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCatalogPartnerError = CreateCatalogPartnerErrors[keyof CreateCatalogPartnerErrors];
+
+export type CreateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    201: PartnerOut;
+};
+
+export type CreateCatalogPartnerResponse = CreateCatalogPartnerResponses[keyof CreateCatalogPartnerResponses];
+
+export type UpdateCatalogPartnerData = {
+    body: PartnerUpdate;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}';
+};
+
+export type UpdateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCatalogPartnerError = UpdateCatalogPartnerErrors[keyof UpdateCatalogPartnerErrors];
+
+export type UpdateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type UpdateCatalogPartnerResponse = UpdateCatalogPartnerResponses[keyof UpdateCatalogPartnerResponses];
+
+export type ApproveCatalogPartnerData = {
+    body?: never;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}/approve';
+};
+
+export type ApproveCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ApproveCatalogPartnerError = ApproveCatalogPartnerErrors[keyof ApproveCatalogPartnerErrors];
+
+export type ApproveCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type ApproveCatalogPartnerResponse = ApproveCatalogPartnerResponses[keyof ApproveCatalogPartnerResponses];
+
+export type DeactivateCatalogPartnerData = {
+    body?: never;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}/deactivate';
+};
+
+export type DeactivateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeactivateCatalogPartnerError = DeactivateCatalogPartnerErrors[keyof DeactivateCatalogPartnerErrors];
+
+export type DeactivateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type DeactivateCatalogPartnerResponse = DeactivateCatalogPartnerResponses[keyof DeactivateCatalogPartnerResponses];
+
 export type CreatePointsAnnulmentData = {
     body: AnnulmentCreate;
     path?: never;
@@ -13812,6 +14961,67 @@ export type CreatePointsAnnulmentResponses = {
 };
 
 export type CreatePointsAnnulmentResponse = CreatePointsAnnulmentResponses[keyof CreatePointsAnnulmentResponses];
+
+export type ValidateRedemptionCodeData = {
+    body: RedemptionValidate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/redemptions/validate';
+};
+
+export type ValidateRedemptionCodeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ValidateRedemptionCodeError = ValidateRedemptionCodeErrors[keyof ValidateRedemptionCodeErrors];
+
+export type ValidateRedemptionCodeResponses = {
+    /**
+     * Successful Response
+     */
+    200: RedemptionOut;
+};
+
+export type ValidateRedemptionCodeResponse = ValidateRedemptionCodeResponses[keyof ValidateRedemptionCodeResponses];
 
 export type GetAppSettingsData = {
     body?: never;
@@ -16860,6 +18070,132 @@ export type GetBagQrResponses = {
 
 export type GetBagQrResponse = GetBagQrResponses[keyof GetBagQrResponses];
 
+export type ListDonorCampaignsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/campaigns';
+};
+
+export type ListDonorCampaignsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorCampaignsError = ListDonorCampaignsErrors[keyof ListDonorCampaignsErrors];
+
+export type ListDonorCampaignsResponses = {
+    /**
+     * Response List Donor Campaigns
+     *
+     * Successful Response
+     */
+    200: Array<CampaignOut>;
+};
+
+export type ListDonorCampaignsResponse = ListDonorCampaignsResponses[keyof ListDonorCampaignsResponses];
+
+export type GetDonorCatalogData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/catalog';
+};
+
+export type GetDonorCatalogErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorCatalogError = GetDonorCatalogErrors[keyof GetDonorCatalogErrors];
+
+export type GetDonorCatalogResponses = {
+    /**
+     * Response Get Donor Catalog
+     *
+     * Successful Response
+     */
+    200: Array<CatalogItemPublic>;
+};
+
+export type GetDonorCatalogResponse = GetDonorCatalogResponses[keyof GetDonorCatalogResponses];
+
 export type GetCollectionHistoryData = {
     body?: never;
     path?: never;
@@ -16992,6 +18328,130 @@ export type ListDonorPointsResponses = {
 };
 
 export type ListDonorPointsResponse = ListDonorPointsResponses[keyof ListDonorPointsResponses];
+
+export type ListDonorRedemptionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/redemptions';
+};
+
+export type ListDonorRedemptionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorRedemptionsError = ListDonorRedemptionsErrors[keyof ListDonorRedemptionsErrors];
+
+export type ListDonorRedemptionsResponses = {
+    /**
+     * Response List Donor Redemptions
+     *
+     * Successful Response
+     */
+    200: Array<RedemptionOut>;
+};
+
+export type ListDonorRedemptionsResponse = ListDonorRedemptionsResponses[keyof ListDonorRedemptionsResponses];
+
+export type CreateRedemptionData = {
+    body: RedemptionCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/redemptions';
+};
+
+export type CreateRedemptionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateRedemptionError = CreateRedemptionErrors[keyof CreateRedemptionErrors];
+
+export type CreateRedemptionResponses = {
+    /**
+     * Successful Response
+     */
+    201: RedemptionOut;
+};
+
+export type CreateRedemptionResponse = CreateRedemptionResponses[keyof CreateRedemptionResponses];
 
 export type GetDonorSaldoData = {
     body?: never;

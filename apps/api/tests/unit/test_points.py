@@ -161,6 +161,70 @@ def test_redemption_kind_consumes_like_annulment() -> None:
     assert saldo.balance == 60
 
 
+# --- resgate (#65): o gasto FIFO com exemplos trabalhados ------------------------------------------
+
+
+def test_redemption_spends_oldest_first_across_two_gains() -> None:
+    # Dois ganhos 800 (1 jan, flat) + 700 (1 fev, bónus); resgate de 1 200 em 1 mar come o de janeiro
+    # INTEIRO e 400 do de fevereiro: restam 300 — todos do bónus (flat = 0, bonus = 300).
+    entries = [
+        _gain(800, datetime(2026, 1, 1, tzinfo=UTC)),
+        _gain(700, datetime(2026, 2, 1, tzinfo=UTC), kind=PointEntryKind.GAIN_BONUS),
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-1200, created_at=datetime(2026, 3, 1, tzinfo=UTC)),
+    ]
+    saldo = fifo_balance(entries, now=NOW)
+    assert (saldo.balance, saldo.flat, saldo.bonus, saldo.expired) == (300, 0, 300, 0)
+
+
+def test_redemption_after_expiry_spends_only_what_survived() -> None:
+    # Ganho de 800 a 1 jan 2025 expira 1 jan 2026. Resgate de 500 a 1 fev 2026: os 800 já caíram
+    # (expired), o resgate não os toca — saldo 0, sem milagre.
+    entries = [
+        _gain(800, datetime(2025, 1, 1, tzinfo=UTC)),
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-500, created_at=datetime(2026, 2, 1, tzinfo=UTC)),
+    ]
+    saldo = fifo_balance(entries, now=datetime(2026, 2, 2, tzinfo=UTC))
+    assert (saldo.balance, saldo.expired) == (0, 800)
+
+
+def test_redemption_between_expiries_consumes_the_dying_gain_first() -> None:
+    # 800 (1 jan 2025, expira 1 jan 2026) + 700 (1 jun 2025, expira 1 jun 2026). Resgate 500 em
+    # dez 2025 come o de janeiro (fica 300). A 2 jan 2026 esses 300 CAEM (expired = 300): sobram 700.
+    # Novo resgate de 500 a 2 fev 2026: saldo fica 200 — o gasto nunca ressuscita o expirado.
+    # (O livro-razão é dado como existe em cada momento: os lançamentos futuros ainda não existem.)
+    ganhos = [
+        _gain(800, datetime(2025, 1, 1, tzinfo=UTC)),
+        _gain(700, datetime(2025, 6, 1, tzinfo=UTC), kind=PointEntryKind.GAIN_BONUS),
+    ]
+    um_resgate = [
+        *ganhos,
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-500, created_at=datetime(2025, 12, 1, tzinfo=UTC)),
+    ]
+    dois_resgates = [
+        *um_resgate,
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-500, created_at=datetime(2026, 2, 1, tzinfo=UTC)),
+    ]
+    before = fifo_balance(um_resgate, now=datetime(2025, 12, 2, tzinfo=UTC))
+    assert (before.balance, before.flat, before.bonus) == (1000, 300, 700)
+    after_first_expiry = fifo_balance(um_resgate, now=datetime(2026, 1, 2, tzinfo=UTC))
+    assert (after_first_expiry.balance, after_first_expiry.expired) == (700, 300)
+    after_second_redemption = fifo_balance(dois_resgates, now=datetime(2026, 2, 2, tzinfo=UTC))
+    assert (after_second_redemption.balance, after_second_redemption.expired) == (200, 300)
+    assert fifo_balance(ganhos, now=datetime(2025, 11, 1, tzinfo=UTC)).balance == 1500  # antes de tudo
+
+
+def test_redemption_bigger_than_balance_leaves_zero_never_negative() -> None:
+    # Saldo 300 (700 − 400 gastos); um resgate de 1 200 (serviço recusa, mas se entrasse na base)
+    # comeria o que há: saldo 0, nunca negativo. O shortfall é decisão do SERVIÇO (409), não do domínio.
+    entries = [
+        _gain(700, datetime(2026, 1, 1, tzinfo=UTC)),
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-400, created_at=datetime(2026, 2, 1, tzinfo=UTC)),
+        LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-1200, created_at=datetime(2026, 3, 1, tzinfo=UTC)),
+    ]
+    saldo = fifo_balance(entries, now=NOW)
+    assert saldo.balance == 0
+
+
 def test_empty_ledger_has_zero_balance() -> None:
     saldo = fifo_balance([], now=NOW)
     assert (saldo.balance, saldo.flat, saldo.bonus, saldo.expiring_soon, saldo.expired) == (0, 0, 0, 0, 0)

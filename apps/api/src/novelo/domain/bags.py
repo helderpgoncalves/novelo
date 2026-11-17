@@ -16,6 +16,7 @@ ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
 
 BAG_CODE_PREFIX = "NVL-"  # saco da plataforma ativado no app
 ACCOUNT_CODE_PREFIX = "NVA-"  # QR de conta: entrega mão a mão, sem saco da plataforma
+REDEMPTION_CODE_PREFIX = "RDM-"  # código de resgate (#65): o ÚNICO que o parceiro vê — zero dados
 CODE_CHARS = 6
 
 # Teto de sacos ativos por conta (estimativa, #63): um agregado familiar não precisa de mais;
@@ -38,6 +39,12 @@ def new_bag_code(rng: Chooser | None = None) -> str:
 def new_account_code(rng: Chooser | None = None) -> str:
     """Código pseudónimo da conta (`NVA-XXXXXX`): o payload do QR de conta, sem qualquer dado pessoal."""
     return _new_code(ACCOUNT_CODE_PREFIX, rng or _default())
+
+
+def new_redemption_code(rng: Chooser | None = None) -> str:
+    """Código de resgate pseudónimo (`RDM-XXXXXX`, #65): a ÚNICA coisa que o parceiro vê — nunca sabe
+    quem trocou (ADR «resgate por código pseudónimo»); mesmo alfabeto dos sacos, legível em QR impresso."""
+    return _new_code(REDEMPTION_CODE_PREFIX, rng or _default())
 
 
 def _default() -> Chooser:

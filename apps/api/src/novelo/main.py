@@ -21,6 +21,7 @@ from novelo.features.app_settings.router import router as app_settings_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
 from novelo.features.calibration.router import router as calibration_router
+from novelo.features.catalog.router import router as catalog_router
 from novelo.features.cidadao.router import public_router as public_cidadao_router
 from novelo.features.cidadao.router import router as cidadao_router
 from novelo.features.collection_requests.router import router as collection_requests_router
@@ -182,6 +183,10 @@ def create_app() -> FastAPI:
     # Pontos (#64): saldo e histórico do doador (livro-razão imutável); anulação em abuso é de equipa.
     app.include_router(
         points_router, prefix=API_PREFIX, tags=["points"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    # Catálogo e resgate (#65): o doador vê e resgata; a equipa gere parceiros/campanhas e valida códigos.
+    app.include_router(
+        catalog_router, prefix=API_PREFIX, tags=["catalog"], dependencies=protected, responses=COMMON_ERRORS
     )
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)

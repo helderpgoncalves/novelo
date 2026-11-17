@@ -63,6 +63,13 @@ ErrorCode = Literal[
     "request_not_dispatchable",
     "request_not_scheduled",
     "request_cancel_not_allowed",
+    "insufficient_points",
+    "donation_cap_reached",
+    "out_of_stock",
+    "catalog_item_inactive",
+    "redemption_already_used",
+    "catalog_item_shape",
+    "campaign_window",
     "internal_error",
 ]
 
@@ -72,6 +79,10 @@ class ErrorBody(BaseModel):
 
     code: ErrorCode
     message: str = Field(description="Mensagem técnica em inglês; o web traduz a partir de `code`")
+    details: dict[str, Any] | None = Field(
+        default=None,
+        description="Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o quando faz sentido",
+    )
 
 
 class FieldError(BaseModel):
@@ -386,6 +397,73 @@ class RequestCancelNotAllowedError(AppError):
     code = "request_cancel_not_allowed"
 
 
+class InsufficientPointsError(AppError):
+    """Saldo FIFO insuficiente para o resgate: falta a diferença — nada entrou no livro-razão."""
+
+    status_code = 409
+    code = "insufficient_points"
+
+    def __init__(self, balance: int, shortfall: int) -> None:
+        self.details = {"balance": balance, "shortfall": shortfall}
+        super().__init__(f"Insufficient FIFO balance ({balance}); short by {shortfall}")
+
+
+class DonationCapReachedError(AppError):
+    """O valor-eu­ro doado a IPSS este mês transborda o teto indexado ao custo evitado (105,64 €/t)."""
+
+    status_code = 409
+    code = "donation_cap_reached"
+
+    def __init__(self, cap_cents: int, donated_this_month_cents: int, item_value_cents: int) -> None:
+        self.details = {
+            "cap_cents": cap_cents,
+            "donated_this_month_cents": donated_this_month_cents,
+            "item_value_cents": item_value_cents,
+        }
+        super().__init__(
+            f"Donation cap {cap_cents} cents reached; {donated_this_month_cents} donated this month"
+        )
+
+
+class OutOfStockError(AppError):
+    """O item tem stock finito e esgotou-se (o decremento é atómico: nunca vende o que não há)."""
+
+    status_code = 409
+    code = "out_of_stock"
+
+
+class CatalogItemInactiveError(AppError):
+    """O item está desativado (ou o parceiro em pausa): saiu do catálogo do doador."""
+
+    status_code = 409
+    code = "catalog_item_inactive"
+
+
+class RedemptionAlreadyUsedError(AppError):
+    """O código já foi validado: pagamento integral é UMA vez por código (nunca valida outra vez)."""
+
+    status_code = 409
+    code = "redemption_already_used"
+
+
+class CatalogItemShapeError(AppError):
+    """Forma inválida do item ao editar: âncora € só em donativo IPSS; parceiro obrigatório em prémio."""
+
+    status_code = 422
+    code = "catalog_item_shape"
+
+    def __init__(self, fields: list[str]) -> None:
+        self.details = {"fields": fields}
+        super().__init__(f"Invalid catalog item shape: {', '.join(fields)}")
+
+
+class CampaignWindowError(AppError):
+    """A janela da campanha não faz sentido temporal: o fim tem de ser DEPOIS do início."""
+
+    status_code = 422
+    code = "campaign_window"
+
+
 # Declarado em todos os routers: é o que dá ao cliente gerado os tipos de erro.
 COMMON_ERRORS: dict[int | str, dict[str, Any]] = {
     400: {"model": ErrorBody, "description": "Pedido inválido"},
@@ -404,8 +482,11 @@ COMMON_ERRORS: dict[int | str, dict[str, Any]] = {
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _app_error(_: Request, exc: AppError) -> JSONResponse:
-        body = ErrorBody(code=exc.code, message=exc.message)
-        return JSONResponse(status_code=exc.status_code, content=body.model_dump())
+        details = getattr(exc, "details", None)
+        body = ErrorBody(code=exc.code, message=exc.message, details=details)
+        # `details` só existe quando faz sentido (ex.: falta num `insufficient_points`): sem o campo
+        # nulo, os corpos dos erros continuam iguais ao contrato anterior ({code, message}).
+        return JSONResponse(status_code=exc.status_code, content=body.model_dump(exclude_none=True))
 
     @app.exception_handler(RequestValidationError)
     async def _validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
