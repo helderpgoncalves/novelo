@@ -67,7 +67,7 @@ def upgrade() -> None:
             ["users.id"],
             name=op.f("fk_local_accounts_certificate_opt_in_by_id_users"),
             ondelete="SET NULL",
-        ),  # fmt: skip
+        ),
         sa.PrimaryKeyConstraint("id", name=op.f("pk_local_accounts")),
         sa.CheckConstraint("kind IN ('assistido', 'b2b')", name=op.f("ck_local_accounts_kind_valid")),
     )
@@ -116,9 +116,9 @@ def downgrade() -> None:
     op.drop_index(op.f("ix_local_accounts_locality_id"), table_name="local_accounts")
     op.drop_index(op.f("ix_local_accounts_user_id"), table_name="local_accounts")
     op.drop_table("local_accounts")
+    op.drop_constraint(op.f("ck_invitations_local_kind_valid"), "invitations", type_="check")
     op.drop_column("invitations", "local_kind")
-    op.drop_constraint(op.f("ck_invitations_local_kind_valid"), "invitations", type_name="check")
-    op.drop_constraint(op.f("fk_invitations_locality_id_localities"), "invitations", type_name="foreignkey")
+    op.drop_constraint(op.f("fk_invitations_locality_id_localities"), "invitations", type_="foreignkey")
     op.drop_column("invitations", "locality_id")
     op.execute("ALTER TABLE invitations DROP CONSTRAINT ck_invitations_role_valid")
     op.execute(f"ALTER TABLE invitations ADD CONSTRAINT ck_invitations_role_valid CHECK (role IN {ROLE_OLD})")
