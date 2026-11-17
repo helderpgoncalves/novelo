@@ -4890,5 +4890,8 @@
   "sim_policy_help_fixed": "The same step for every parish: one round every N weeks (the global assumptions value).",
   "sim_policy_help_dynamic": "The optimizer picks each parish's rung on the discrete ladder (weekly, biweekly, monthly, quarterly), trading round cost for demand.",
   "sim_policy_note": "A «bags ready» notice guarantees a stop under both policies; a published visit is never skipped.",
-  "plan_rung_none": "global step"
+  "plan_rung_none": "global step",
+  "error_age_below_minimum": "Donor accounts require a declared age of at least 13.",
+  "error_bag_limit_reached": "You have reached the active bag limit. Deactivate one to create another.",
+  "error_bag_inactive": "This bag is deactivated; activate it again to edit."
 }

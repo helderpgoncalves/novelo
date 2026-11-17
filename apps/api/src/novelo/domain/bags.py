@@ -10,7 +10,6 @@ não é prático no MVP; rotação fica para #64/#66.
 """
 
 from collections.abc import Callable, Sequence
-from typing import TypeAlias
 
 # O mesmo alfabeto dos lotes (`features/lots/service.py`): sem 0/O/1/I/L.
 ALPHABET = "23456789ABCDEFGHJKMNPQRSTUVWXYZ"
@@ -23,7 +22,7 @@ CODE_CHARS = 6
 # sem teto, gerar códigos em série era abuso trivial. Desativar não conta para o teto.
 MAX_ACTIVE_BAGS = 10
 
-Chooser: TypeAlias = Callable[[Sequence[str]], str]
+type Chooser = Callable[[Sequence[str]], str]
 
 
 def _new_code(prefix: str, chooser: Chooser) -> str:

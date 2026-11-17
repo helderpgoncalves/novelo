@@ -33,6 +33,8 @@ class User(Base, UuidPkMixin, TimestampMixin):
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint("approval_status IN ('pending', 'approved', 'rejected')", name="approval_status_valid"),
+        # A idade DECLARADA do doador: abaixo de 13 nunca entra (recusa explícita na criação, #63).
+        CheckConstraint("declared_age IS NULL OR declared_age >= 13", name="declared_age_minimum"),
     )
     __allow_unmapped__ = True
 

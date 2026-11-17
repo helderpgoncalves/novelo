@@ -4947,5 +4947,8 @@
   "sim_policy_help_fixed": "O mesmo passo para todas as freguesias: uma ronda a cada N semanas (o valor global dos pressupostos).",
   "sim_policy_help_dynamic": "O otimizador escolhe o degrau de cada freguesia na escada discreta (semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura.",
   "sim_policy_note": "O aviso «sacos prontos» garante paragem nas duas políticas; nenhuma visita publicada é saltada.",
-  "plan_rung_none": "passo global"
+  "plan_rung_none": "passo global",
+  "error_age_below_minimum": "É preciso ter 13 anos ou mais para criar uma conta de doador.",
+  "error_bag_limit_reached": "Já tens o máximo de sacos ativos. Desativa um para criar outro.",
+  "error_bag_inactive": "Este saco está desativado; reativa-o para poder editar."
 }
