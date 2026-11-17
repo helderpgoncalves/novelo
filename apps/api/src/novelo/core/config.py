@@ -189,6 +189,12 @@ class Settings(BaseSettings):
     lot_photo_retention_days: int = Field(90, ge=1, le=365, alias="LOT_PHOTO_RETENTION_DAYS")
     lot_photo_max_bytes: int = Field(153_600, ge=20_000, le=1_000_000, alias="LOT_PHOTO_MAX_BYTES")  # já processada
 
+    # Pontos (economia dos pontos, ADR #39): valores de LANÇAMENTO, pressuposto da equipa («estimativa»
+    # no ecrã), configuráveis por ambiente. O teto mensal RECUSA o ganho que transborda (não adia); 0 = sem teto.
+    points_gain_flat: int = Field(100, ge=0, alias="POINTS_GAIN_FLAT")
+    points_bonus_conformity: int = Field(50, ge=0, alias="POINTS_BONUS_CONFORMITY")
+    points_monthly_cap: int = Field(500, ge=0, alias="POINTS_MONTHLY_CAP")
+
     @model_validator(mode="after")
     def _require_real_secret_in_production(self) -> "Settings":
         if self.environment == "production" and (self.secret_key.startswith("dev-only") or len(self.secret_key) < 32):

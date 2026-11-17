@@ -1016,6 +1016,37 @@
         "title": "AllocationPart",
         "type": "object"
       },
+      "AnnulmentCreate": {
+        "description": "Anulação em abuso (interesse legítimo declarado): valor positivo, motivo OBRIGATÓRIO — fica no\nlivro-razão como entrada negativa com autor; nunca se apaga nem se edita uma linha.",
+        "properties": {
+          "amount": {
+            "description": "Pontos a anular (positivo; fica −no livro-razão)",
+            "exclusiveMinimum": 0.0,
+            "title": "Amount",
+            "type": "integer"
+          },
+          "reason": {
+            "description": "Motivo obrigatório (auditoria, RGPD art. 6.º-1-f)",
+            "maxLength": 2000,
+            "minLength": 3,
+            "title": "Reason",
+            "type": "string"
+          },
+          "user_id": {
+            "description": "Conta doadora cujos pontos se anulam",
+            "format": "uuid",
+            "title": "User Id",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "amount",
+          "reason"
+        ],
+        "title": "AnnulmentCreate",
+        "type": "object"
+      },
       "AppSettingsOut": {
         "properties": {
           "open_registration": {
@@ -16494,6 +16525,101 @@
         "title": "Point",
         "type": "object"
       },
+      "PointEntryKind": {
+        "description": "Tipos de lançamento do livro-razão (imutável: nunca se atualiza nem se apaga uma linha).\n\n`redemption` fica reservado ao #65 (catálogo e resgate): o valor e o CHECK da tabela já o aceitam,\nmas nenhum caminho de código o escreve até lá.",
+        "enum": [
+          "gain_flat",
+          "gain_bonus",
+          "annulment",
+          "redemption"
+        ],
+        "title": "PointEntryKind",
+        "type": "string"
+      },
+      "PointEntryOut": {
+        "description": "Uma linha do livro-razão vista pelo doador: valor assinado, fontes e, nos ganhos, a expiração.",
+        "properties": {
+          "amount": {
+            "description": "Assinado: ganhos positivos, anulação negativa",
+            "title": "Amount",
+            "type": "integer"
+          },
+          "bag_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Saco ativado que originou o lançamento (`NVL-…`)",
+            "title": "Bag Code"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Fim do ganho (12 meses); nulo em anulações",
+            "title": "Expires At"
+          },
+          "id": {
+            "format": "uuid",
+            "title": "Id",
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/PointEntryKind"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Lote onde o saco foi pesado ou triado (`NOV-…`)",
+            "title": "Lot Code"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Motivo obrigatório na anulação em abuso; nulo nos ganhos",
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "amount",
+          "reason",
+          "bag_code",
+          "lot_code",
+          "expires_at",
+          "created_at"
+        ],
+        "title": "PointEntryOut",
+        "type": "object"
+      },
       "PointGeometry": {
         "properties": {
           "coordinates": {
@@ -16517,6 +16643,29 @@
           "coordinates"
         ],
         "title": "PointGeometry",
+        "type": "object"
+      },
+      "PointsHistoryOut": {
+        "description": "Página do histórico de pontos (o mais recente primeiro).",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PointEntryOut"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "total": {
+            "description": "Total de linhas do livro-razão da conta (para paginar sem surpresas)",
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "total"
+        ],
+        "title": "PointsHistoryOut",
         "type": "object"
       },
       "PotentialReadingOut": {
@@ -17813,6 +17962,57 @@
           "load_t"
         ],
         "title": "RouteStop",
+        "type": "object"
+      },
+      "SaldoOut": {
+        "description": "O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).\n\n`balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias\n(estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.",
+        "properties": {
+          "balance": {
+            "description": "Pontos não expirados disponíveis (ganhos − anulações; FIFO)",
+            "title": "Balance",
+            "type": "integer"
+          },
+          "bonus": {
+            "description": "Parte do saldo que veio de bónus de conformidade confirmados pela triagem",
+            "title": "Bonus",
+            "type": "integer"
+          },
+          "credited_this_month": {
+            "description": "Ganhos já creditados no mês corrente (flat + bónus)",
+            "title": "Credited This Month",
+            "type": "integer"
+          },
+          "expired": {
+            "description": "Pontos já expirados (12 meses por ganho, FIFO)",
+            "title": "Expired",
+            "type": "integer"
+          },
+          "expiring_soon": {
+            "description": "Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)",
+            "title": "Expiring Soon",
+            "type": "integer"
+          },
+          "flat": {
+            "description": "Parte do saldo que veio de ganhos flat por saco recolhido e pesado",
+            "title": "Flat",
+            "type": "integer"
+          },
+          "monthly_cap": {
+            "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
+            "title": "Monthly Cap",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "balance",
+          "flat",
+          "bonus",
+          "expiring_soon",
+          "expired",
+          "monthly_cap",
+          "credited_this_month"
+        ],
+        "title": "SaldoOut",
         "type": "object"
       },
       "SankeyChart": {
@@ -22762,6 +22962,138 @@
   },
   "openapi": "3.1.0",
   "paths": {
+    "/api/v1/admin/points/annulments": {
+      "post": {
+        "description": "Anular pontos em abuso (interesse legítimo declarado): entrada NEGATIVA com motivo OBRIGATÓRIO\nno livro-razão — nunca se apaga nem se edita linha. Fica na trilha de auditoria com o autor.",
+        "operationId": "create_points_annulment",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AnnulmentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointEntryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Create Points Annulment",
+        "tags": [
+          "points"
+        ]
+      }
+    },
     "/api/v1/admin/settings": {
       "get": {
         "description": "Global application settings (admins only): open registration and how many accounts wait for approval.",
@@ -29098,6 +29430,275 @@
         "summary": "Get Collection History",
         "tags": [
           "cidadao"
+        ]
+      }
+    },
+    "/api/v1/cidadao/pontos": {
+      "get": {
+        "description": "O livro-razão do próprio, o mais recente primeiro, paginado: cada ganho com o saco e o lote que\no originou, cada anulação com o motivo — auditável, mas sem sair da conta.",
+        "operationId": "list_donor_points",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PointsHistoryOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "List Donor Points",
+        "tags": [
+          "points"
+        ]
+      }
+    },
+    "/api/v1/cidadao/saldo": {
+      "get": {
+        "description": "O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,\no que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web.",
+        "operationId": "get_donor_saldo",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaldoOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Donor Saldo",
+        "tags": [
+          "points"
         ]
       }
     },

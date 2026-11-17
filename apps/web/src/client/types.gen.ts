@@ -534,6 +534,33 @@ export type AllocationPart = {
 };
 
 /**
+ * AnnulmentCreate
+ *
+ * Anulação em abuso (interesse legítimo declarado): valor positivo, motivo OBRIGATÓRIO — fica no
+ * livro-razão como entrada negativa com autor; nunca se apaga nem se edita uma linha.
+ */
+export type AnnulmentCreate = {
+    /**
+     * Amount
+     *
+     * Pontos a anular (positivo; fica −no livro-razão)
+     */
+    amount: number;
+    /**
+     * Reason
+     *
+     * Motivo obrigatório (auditoria, RGPD art. 6.º-1-f)
+     */
+    reason: string;
+    /**
+     * User Id
+     *
+     * Conta doadora cujos pontos se anulam
+     */
+    user_id: string;
+};
+
+/**
  * AppSettingsOut
  */
 export type AppSettingsOut = {
@@ -9666,6 +9693,63 @@ export type Point = {
 };
 
 /**
+ * PointEntryKind
+ *
+ * Tipos de lançamento do livro-razão (imutável: nunca se atualiza nem se apaga uma linha).
+ *
+ * `redemption` fica reservado ao #65 (catálogo e resgate): o valor e o CHECK da tabela já o aceitam,
+ * mas nenhum caminho de código o escreve até lá.
+ */
+export type PointEntryKind = 'gain_flat' | 'gain_bonus' | 'annulment' | 'redemption';
+
+/**
+ * PointEntryOut
+ *
+ * Uma linha do livro-razão vista pelo doador: valor assinado, fontes e, nos ganhos, a expiração.
+ */
+export type PointEntryOut = {
+    /**
+     * Amount
+     *
+     * Assinado: ganhos positivos, anulação negativa
+     */
+    amount: number;
+    /**
+     * Bag Code
+     *
+     * Saco ativado que originou o lançamento (`NVL-…`)
+     */
+    bag_code: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Expires At
+     *
+     * Fim do ganho (12 meses); nulo em anulações
+     */
+    expires_at: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: PointEntryKind;
+    /**
+     * Lot Code
+     *
+     * Lote onde o saco foi pesado ou triado (`NOV-…`)
+     */
+    lot_code: string | null;
+    /**
+     * Reason
+     *
+     * Motivo obrigatório na anulação em abuso; nulo nos ganhos
+     */
+    reason: string | null;
+};
+
+/**
  * PointGeometry
  */
 export type PointGeometry = {
@@ -9682,6 +9766,24 @@ export type PointGeometry = {
      * Type
      */
     type?: 'Point';
+};
+
+/**
+ * PointsHistoryOut
+ *
+ * Página do histórico de pontos (o mais recente primeiro).
+ */
+export type PointsHistoryOut = {
+    /**
+     * Items
+     */
+    items: Array<PointEntryOut>;
+    /**
+     * Total
+     *
+     * Total de linhas do livro-razão da conta (para paginar sem surpresas)
+     */
+    total: number;
 };
 
 /**
@@ -10544,6 +10646,59 @@ export type RouteStop = {
      * Local da rede municipal (cenários por locais)
      */
     site_id?: string | null;
+};
+
+/**
+ * SaldoOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export type SaldoOut = {
+    /**
+     * Balance
+     *
+     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
+     */
+    balance: number;
+    /**
+     * Bonus
+     *
+     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
+     */
+    bonus: number;
+    /**
+     * Credited This Month
+     *
+     * Ganhos já creditados no mês corrente (flat + bónus)
+     */
+    credited_this_month: number;
+    /**
+     * Expired
+     *
+     * Pontos já expirados (12 meses por ganho, FIFO)
+     */
+    expired: number;
+    /**
+     * Expiring Soon
+     *
+     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
+     */
+    expiring_soon: number;
+    /**
+     * Flat
+     *
+     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
+     */
+    flat: number;
+    /**
+     * Monthly Cap
+     *
+     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
+     */
+    monthly_cap: number;
 };
 
 /**
@@ -13455,6 +13610,67 @@ export type ZoneOut = {
      */
     tipau: Tipau | null;
 };
+
+export type CreatePointsAnnulmentData = {
+    body: AnnulmentCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/points/annulments';
+};
+
+export type CreatePointsAnnulmentErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreatePointsAnnulmentError = CreatePointsAnnulmentErrors[keyof CreatePointsAnnulmentErrors];
+
+export type CreatePointsAnnulmentResponses = {
+    /**
+     * Successful Response
+     */
+    201: PointEntryOut;
+};
+
+export type CreatePointsAnnulmentResponse = CreatePointsAnnulmentResponses[keyof CreatePointsAnnulmentResponses];
 
 export type GetAppSettingsData = {
     body?: never;
@@ -16504,6 +16720,137 @@ export type GetCollectionHistoryResponses = {
 };
 
 export type GetCollectionHistoryResponse = GetCollectionHistoryResponses[keyof GetCollectionHistoryResponses];
+
+export type ListDonorPointsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/cidadao/pontos';
+};
+
+export type ListDonorPointsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorPointsError = ListDonorPointsErrors[keyof ListDonorPointsErrors];
+
+export type ListDonorPointsResponses = {
+    /**
+     * Successful Response
+     */
+    200: PointsHistoryOut;
+};
+
+export type ListDonorPointsResponse = ListDonorPointsResponses[keyof ListDonorPointsResponses];
+
+export type GetDonorSaldoData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/saldo';
+};
+
+export type GetDonorSaldoErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorSaldoError = GetDonorSaldoErrors[keyof GetDonorSaldoErrors];
+
+export type GetDonorSaldoResponses = {
+    /**
+     * Successful Response
+     */
+    200: SaldoOut;
+};
+
+export type GetDonorSaldoResponse = GetDonorSaldoResponses[keyof GetDonorSaldoResponses];
 
 export type ListCollectionRequestsData = {
     body?: never;

@@ -385,12 +385,21 @@ async def add_unit(db: AsyncSession, user: User, code: str, body: LotUnitIn) -> 
 
 
 async def set_unit_weight(db: AsyncSession, user: User, code: str, unit_id: uuid.UUID, weight_g: int) -> LotUnitOut:
-    """Peso medido na balança da viatura (pratos ≤ 15 kg: a soma dos pratos do saco)."""
+    """Peso medido na balança da viatura (pratos ≤ 15 kg: a soma dos pratos do saco).
+
+    É AQUI que o saco ativado se torna «recolhido e pesado»: o scan ligou o código e a balança deu o
+    peso — momento do ganho flat (#64, idempotente: um saco nunca ganha duas vezes, o teto mensal
+    recusa o que transborda). Etiquetas impressas nunca creditam (não revelam o doador).
+    """
     lot = await _open_lot_for_units(db, code)
     unit = next((u for u in lot.units if u.id == unit_id), None)
     if unit is None:
         raise NotFoundError("Lot unit not found")
     unit.weight_g = weight_g
+    if unit.source is LotUnitSource.BAG:
+        from novelo.features.points import service as points  # noqa: PLC0415  (ciclo lots↔points)
+
+        await points.credit_flat_for_bag(db, unit.code, lot_code=lot.code)
     await db.commit()
     return _unit_out(unit)
 
@@ -446,6 +455,11 @@ async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> 
     lot.dominant_fibre = dominant_fibre(aggregate_composition(lot.items))
     _event(lot, LotEventKind.ITEM_ADDED, user)
     _golden_label_rows(body, lot, item, user)
+    # Bónus de conformidade (#64): a peça triada pode ter confirmado a declaração «Vai no saco?» de um
+    # saco do lote — idempotente por saco; contradita ou dúvida nunca creditam (nem penalizam).
+    from novelo.features.points import service as points  # noqa: PLC0415  (ciclo lots↔points)
+
+    await points.credit_confirmed_declarations(db, lot)
     await db.commit()
     return _item_out(item, lot.code)
 

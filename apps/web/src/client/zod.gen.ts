@@ -202,6 +202,18 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * AnnulmentCreate
+ *
+ * Anulação em abuso (interesse legítimo declarado): valor positivo, motivo OBRIGATÓRIO — fica no
+ * livro-razão como entrada negativa com autor; nunca se apaga nem se edita uma linha.
+ */
+export const zAnnulmentCreate = z.object({
+    amount: z.int().gt(0),
+    reason: z.string().min(3).max(2000),
+    user_id: z.uuid()
+});
+
+/**
  * AppSettingsOut
  */
 export const zAppSettingsOut = z.object({
@@ -3602,11 +3614,52 @@ export const zPoint = z.object({
 });
 
 /**
+ * PointEntryKind
+ *
+ * Tipos de lançamento do livro-razão (imutável: nunca se atualiza nem se apaga uma linha).
+ *
+ * `redemption` fica reservado ao #65 (catálogo e resgate): o valor e o CHECK da tabela já o aceitam,
+ * mas nenhum caminho de código o escreve até lá.
+ */
+export const zPointEntryKind = z.enum([
+    'gain_flat',
+    'gain_bonus',
+    'annulment',
+    'redemption'
+]);
+
+/**
+ * PointEntryOut
+ *
+ * Uma linha do livro-razão vista pelo doador: valor assinado, fontes e, nos ganhos, a expiração.
+ */
+export const zPointEntryOut = z.object({
+    amount: z.int(),
+    bag_code: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    expires_at: z.iso.datetime().nullable(),
+    id: z.uuid(),
+    kind: zPointEntryKind,
+    lot_code: z.string().nullable(),
+    reason: z.string().nullable()
+});
+
+/**
  * PointGeometry
  */
 export const zPointGeometry = z.object({
     coordinates: z.tuple([z.number(), z.number()]),
     type: z.literal('Point').optional().default('Point')
+});
+
+/**
+ * PointsHistoryOut
+ *
+ * Página do histórico de pontos (o mais recente primeiro).
+ */
+export const zPointsHistoryOut = z.object({
+    items: z.array(zPointEntryOut),
+    total: z.int()
 });
 
 /**
@@ -4192,6 +4245,24 @@ export const zRouteOut = z.object({
     source: z.enum(['road', 'estimate']).optional().default('estimate'),
     stops: z.array(zRouteStop),
     vehicle: z.int()
+});
+
+/**
+ * SaldoOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export const zSaldoOut = z.object({
+    balance: z.int(),
+    bonus: z.int(),
+    credited_this_month: z.int(),
+    expired: z.int(),
+    expiring_soon: z.int(),
+    flat: z.int(),
+    monthly_cap: z.int()
 });
 
 /**
@@ -6467,6 +6538,13 @@ export const zZoneOut = z.object({
     tipau: zTipau.nullable()
 });
 
+export const zCreatePointsAnnulmentBody = zAnnulmentCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreatePointsAnnulmentResponse = zPointEntryOut;
+
 /**
  * Successful Response
  */
@@ -6815,6 +6893,21 @@ export const zGetBagQrResponse = zDonorQrOut;
  * Successful Response
  */
 export const zGetCollectionHistoryResponse = z.array(zCollectionHistoryOut);
+
+export const zListDonorPointsQuery = z.object({
+    limit: z.int().gte(1).lte(100).optional().default(20),
+    offset: z.int().gte(0).optional().default(0)
+});
+
+/**
+ * Successful Response
+ */
+export const zListDonorPointsResponse = zPointsHistoryOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorSaldoResponse = zSaldoOut;
 
 export const zListCollectionRequestsQuery = z.object({
     state: zCollectionRequestState.nullish(),

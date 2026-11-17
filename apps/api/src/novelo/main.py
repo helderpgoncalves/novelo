@@ -41,6 +41,7 @@ from novelo.features.planning import reference
 from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
+from novelo.features.points.router import router as points_router
 from novelo.features.reports.router import router as reports_router
 from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
@@ -168,6 +169,10 @@ def create_app() -> FastAPI:
         cidadao_router, prefix=API_PREFIX, tags=["cidadao"], dependencies=protected, responses=COMMON_ERRORS
     )
     app.include_router(public_cidadao_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    # Pontos (#64): saldo e histórico do doador (livro-razão imutável); anulação em abuso é de equipa.
+    app.include_router(
+        points_router, prefix=API_PREFIX, tags=["points"], dependencies=protected, responses=COMMON_ERRORS
+    )
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app

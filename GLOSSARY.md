@@ -99,6 +99,10 @@ _Avoid_: saco registado
 Moeda de incentivo, ganha por saco recolhido (mais bónus de conformidade), com teto mensal. Não são dinheiro nem conversíveis.
 _Avoid_: prémios (estão no catálogo), ponto assistido/paragem (são sítios)
 
+**Livro-razão de pontos**:
+Registo imutável e auditável de todos os lançamentos (ganhos, bónus, anulações, resgates); o saldo é sempre derivado dele, nunca guardado.
+_Avoid_: saldo em cache, apagar lançamento (a correção é anular)
+
 **Código de resgate**:
 Código pseudónimo que troca pontos por prémio sem revelar o doador ao parceiro.
 

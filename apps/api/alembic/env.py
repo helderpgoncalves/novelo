@@ -21,6 +21,7 @@ from novelo.features.municipal import models as municipal_models  # noqa: F401
 from novelo.features.network import models as network_models  # noqa: F401
 from novelo.features.planning import models as planning_models  # noqa: F401
 from novelo.features.planning import whatif_models  # noqa: F401
+from novelo.features.points import models as point_models  # noqa: F401
 from novelo.features.reports import models as report_models  # noqa: F401
 from novelo.features.textile import models as textile_models  # noqa: F401
 from novelo.features.users import models as user_models  # noqa: F401

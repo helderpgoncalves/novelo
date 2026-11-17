@@ -1,3 +1,4 @@
+import type { UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQuery, useQueryClient, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, useNavigate } from '@tanstack/react-router';
 import {
@@ -15,7 +16,13 @@ import {
 } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import type { BagActivationOut, CollectionHistoryOut } from '@/client';
+import type {
+  BagActivationOut,
+  CollectionHistoryOut,
+  GetDonorSaldoError,
+  PointEntryOut,
+  SaldoOut,
+} from '@/client';
 import {
   activateBagMutation,
   createBagActivationMutation,
@@ -24,12 +31,14 @@ import {
   getCollectionHistoryOptions,
   getDonorAccountOptions,
   getDonorAccountQrOptions,
+  getDonorSaldoOptions,
   getPublicCollectionAgendaOptions,
   listBagActivationsOptions,
+  listDonorPointsOptions,
   updateBagActivationMutation,
 } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
-import { ErrorState } from '@/components/states';
+import { EmptyState, ErrorState } from '@/components/states';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -44,8 +53,8 @@ import { agendaByDay, cadenceLabel, channelLabel } from '@/features/cidadao/agen
 import { bagsAtHome, milestones, onboardingCollapsed } from '@/features/cidadao/onboarding';
 import { RequestSheet } from '@/features/cidadao/request-sheet';
 import { getErrorCode } from '@/lib/errors';
-import { formatKg } from '@/lib/format';
-import { weekdayLong } from '@/lib/i18n';
+import { formatKg, formatNumber } from '@/lib/format';
+import { formatDate, weekdayLong } from '@/lib/i18n';
 import { cn } from '@/lib/utils';
 
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
@@ -80,6 +89,8 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
   const { data: history } = useSuspenseQuery(getCollectionHistoryOptions());
   // A agenda é secundária: a carteira desenha sem ela (a página pública é quem manda nela).
   const { data: agendaData } = useQuery(getPublicCollectionAgendaOptions());
+  // O saldo real (#64): derivado do livro-razão; o Início mostra-o em resumo, o Saldo por inteiro.
+  const saldoQuery = useQuery({ ...getDonorSaldoOptions(), refetchOnWindowFocus: false });
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: listBagActivationsOptions().queryKey });
@@ -114,6 +125,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
                 bags={bags}
                 history={history}
                 agenda={agendaByDay(agendaData?.agenda ?? null)}
+                saldoBalance={saldoQuery.data?.balance}
                 onShowAccountQr={() => setAccountQrOpen(true)}
                 onNewBag={() => changeTab('sacos')}
                 onRequest={() => setRequesting(true)}
@@ -129,7 +141,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
                 onChanged={invalidate}
               />
             )}
-            {tab === 'saldo' && <SaldoTab />}
+            {tab === 'saldo' && <SaldoTab saldoQuery={saldoQuery} />}
             {tab === 'historico' && <HistoricoTab history={history} />}
           </>
         )}
@@ -178,6 +190,7 @@ function InicioTab({
   bags,
   history,
   agenda,
+  saldoBalance,
   onShowAccountQr,
   onNewBag,
   onRequest,
@@ -186,6 +199,7 @@ function InicioTab({
   bags: BagActivationOut[];
   history: CollectionHistoryOut[];
   agenda: ReturnType<typeof agendaByDay>;
+  saldoBalance: number | undefined;
   onShowAccountQr: () => void;
   onNewBag: () => void;
   onRequest: () => void;
@@ -203,10 +217,12 @@ function InicioTab({
         <button
           type="button"
           className="ring-foreground/10 space-y-1 rounded-xl bg-card p-4 text-left ring-1"
-          aria-label="Saldo de pontos (só leitura, a zero até os pontos chegarem)"
+          aria-label="Saldo de pontos (só leitura)"
         >
           <p className="text-muted-foreground text-xs">Saldo (estimativa)</p>
-          <p className="font-serif text-3xl">0</p>
+          <p className="font-serif text-3xl">
+            {saldoBalance != null ? formatNumber(saldoBalance) : '—'}
+          </p>
           <p className="text-muted-foreground text-[11px]">pontos · só leitura</p>
         </button>
         <button
@@ -586,9 +602,38 @@ function SacosTab({
   );
 }
 
-// --- Saldo (só leitura) ---------------------------------------------------------------------------
+// --- Saldo (só leitura): derivado do livro-razão, com histórico paginado ---------------------------
 
-function SaldoTab() {
+/** Etiqueta pt-PT de cada lançamento do livro-razão. `redemption` é reservado ao #65 — traduzido por
+ * defesa, nunca deve aparecer antes de lá chegar. */
+const POINT_KIND_LABEL: Record<PointEntryOut['kind'], string> = {
+  gain_flat: 'Saco recolhido',
+  gain_bonus: 'Bónus de conformidade',
+  annulment: 'Anulação',
+  redemption: 'Resgate',
+};
+
+function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDonorSaldoError> }) {
+  const { data: saldo, error: saldoError, refetch: refetchSaldo } = saldoQuery;
+  // O histórico de pontos: dez recentes chegam ao ecrã (a lista completa é o livro-razão paginado).
+  const {
+    data: pontos,
+    isLoading: pontosLoading,
+    error: pontosError,
+    refetch: refetchPontos,
+  } = useQuery({
+    ...listDonorPointsOptions({ query: { limit: 10, offset: 0 } }),
+    refetchOnWindowFocus: false,
+  });
+
+  if (saldoError) {
+    return <ErrorState error={saldoError} onRetry={() => void refetchSaldo()} />;
+  }
+  const capShare =
+    saldo && saldo.monthly_cap > 0
+      ? Math.min(100, Math.round((saldo.credited_this_month / saldo.monthly_cap) * 100))
+      : null;
+
   return (
     <>
       <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-6 text-center ring-1">
@@ -596,24 +641,154 @@ function SaldoTab() {
           Saldo{' '}
           <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px]">estimativa</span>
         </p>
-        <p className="font-serif text-5xl">0</p>
-        <p className="text-muted-foreground text-sm">
-          pontos · só leitura — o crédito chega com o arranque do piloto
+        <p className="font-serif text-5xl" aria-live="polite">
+          {saldo ? formatNumber(saldo.balance) : '…'}
         </p>
+        <p className="text-muted-foreground text-sm">
+          pontos · só leitura — nunca são dinheiro nem conversíveis
+        </p>
+        {saldo && (
+          <dl className="text-muted-foreground grid grid-cols-2 gap-2 pt-2 text-xs">
+            <div className="rounded-xl bg-muted/60 p-2">
+              <dt className="sr-only">De ganhos flat</dt>
+              <dd>
+                <span className="font-medium text-foreground">{formatNumber(saldo.flat)}</span> por
+                sacos
+              </dd>
+            </div>
+            <div className="rounded-xl bg-muted/60 p-2">
+              <dt className="sr-only">De bónus de conformidade</dt>
+              <dd>
+                <span className="font-medium text-foreground">{formatNumber(saldo.bonus)}</span> de
+                bónus
+              </dd>
+            </div>
+          </dl>
+        )}
+        {saldo && saldo.expiring_soon > 0 && (
+          <p className="rounded-xl bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
+            {formatNumber(saldo.expiring_soon)} pontos expiram nos próximos 30 dias (os mais antigos
+            primeiro).
+          </p>
+        )}
+        {saldo && saldo.expired > 0 && (
+          <p className="text-muted-foreground text-xs">
+            {formatNumber(saldo.expired)} pontos já expiraram (12 meses por ganho).
+          </p>
+        )}
       </div>
+
+      {/* Teto mensal (configurável, estimativa): o que transborda é recusado — nunca adiado. */}
+      {saldo && (
+        <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-5 text-sm ring-1">
+          <div className="flex items-baseline justify-between gap-2">
+            <p className="font-medium">Teto deste mês</p>
+            <p className="text-muted-foreground text-xs">
+              {formatNumber(saldo.credited_this_month)}
+              {saldo.monthly_cap > 0 ? ` de ${formatNumber(saldo.monthly_cap)}` : ''}{' '}
+              <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px]">estimativa</span>
+            </p>
+          </div>
+          {capShare != null && (
+            <div
+              role="progressbar"
+              aria-valuenow={capShare}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-label="Ganhos do mês em relação ao teto mensal"
+              className="bg-muted h-2 rounded-full"
+            >
+              <div className="bg-primary h-2 rounded-full" style={{ width: `${capShare}%` }} />
+            </div>
+          )}
+          {saldo.monthly_cap === 0 && (
+            <p className="text-muted-foreground text-xs">Este mês não tem teto de ganhos.</p>
+          )}
+        </div>
+      )}
+
       <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-5 text-sm ring-1">
-        <p className="font-medium">Como vai funcionar</p>
+        <p className="font-medium">Como se ganha</p>
         <ul className="text-muted-foreground space-y-1.5">
-          <li>+100 por saco ativado e recolhido (nunca por kg — estimativa)</li>
+          <li>+100 por saco ativado, recolhido e pesado (nunca por kg — estimativa)</li>
           <li>+50 de bónus quando a triagem confirma a tua declaração (estimativa)</li>
-          <li>1 000 pontos ≈ 5 € num donativo a IPSS (estimativa)</li>
+          <li>1 000 pontos ≈ 5 € num donativo a IPSS (estimativa; a troca chega com o #65)</li>
         </ul>
       </div>
+
+      {/* Histórico de pontos: o livro-razão do próprio, o mais recente primeiro. */}
+      <section className="space-y-2">
+        <h2 className="font-serif text-xl">Movimentos</h2>
+        {pontosError ? (
+          <ErrorState error={pontosError} onRetry={() => void refetchPontos()} />
+        ) : pontosLoading ? (
+          <div className="ring-foreground/10 rounded-2xl bg-card p-8 ring-1" role="status">
+            <p className="text-muted-foreground text-center text-sm">A carregar movimentos…</p>
+          </div>
+        ) : !pontos || pontos.items.length === 0 ? (
+          <EmptyState
+            title="Ainda sem movimentos"
+            description="Quando a viatura pesar um saco teu, o ganho aparece aqui — e o bónus quando a triagem confirma a declaração."
+          />
+        ) : (
+          <ul className="space-y-2">
+            {pontos.items.map((row) => (
+              <PointEntryRow key={row.id} row={row} />
+            ))}
+          </ul>
+        )}
+        {pontos && pontos.total > pontos.items.length && (
+          <p className="text-muted-foreground px-2 text-xs">
+            A mostrar {pontos.items.length} de {formatNumber(pontos.total)} movimentos.
+          </p>
+        )}
+      </section>
+
       <p className="text-muted-foreground px-2 text-xs">
-        Pontos não são dinheiro nem são conversíveis; expiram 12 meses por ganho, os mais antigos
-        primeiro. Apagar a conta perde o saldo — lotes e passaportes ficam (nunca tiveram doador).
+        Os pontos expiram 12 meses por ganho, os mais antigos primeiro. Apagar a conta perde o saldo
+        — lotes e passaportes ficam (nunca tiveram doador).
       </p>
     </>
+  );
+}
+
+function PointEntryRow({ row }: { row: PointEntryOut }) {
+  const gain = row.amount > 0;
+  return (
+    <li className="ring-foreground/10 rounded-xl bg-card p-4 ring-1">
+      <div className="flex items-baseline justify-between gap-2">
+        <p className="text-sm font-medium">{POINT_KIND_LABEL[row.kind]}</p>
+        <p
+          className={cn(
+            'font-mono text-sm',
+            gain ? 'text-primary font-medium' : 'text-destructive',
+          )}
+        >
+          {gain ? '+' : ''}
+          {formatNumber(row.amount)}
+        </p>
+      </div>
+      <p className="text-muted-foreground mt-1 text-xs">
+        {formatDate(row.created_at)}
+        {row.bag_code ? ` · saco ${row.bag_code}` : ''}
+        {row.lot_code ? (
+          <>
+            {' · '}
+            <Link
+              to="/passport/$code"
+              params={{ code: row.lot_code }}
+              className="text-primary underline-offset-2 hover:underline"
+            >
+              lote {row.lot_code}
+            </Link>
+          </>
+        ) : null}
+        {row.expires_at ? ` · expira ${formatDate(row.expires_at)}` : ''}
+      </p>
+      {row.reason && (
+        <p className="text-muted-foreground mt-1 text-xs italic">Motivo: {row.reason}</p>
+      )}
+    </li>
   );
 }
 
