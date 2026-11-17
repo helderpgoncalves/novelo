@@ -205,6 +205,7 @@ async def list_localities(db: AsyncSession) -> list[LocalityOut]:
         loc = e["locality"]
         out.append(
             LocalityOut(
+                id=loc.id,
                 name=name,
                 latitude=float(loc.latitude) if loc.latitude is not None else None,
                 longitude=float(loc.longitude) if loc.longitude is not None else None,

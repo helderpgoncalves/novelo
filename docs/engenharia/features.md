@@ -36,18 +36,18 @@ O decisor pergunta em português e recebe um cenário novo, calculado pelo otimi
 
 Cada saco recolhido vira um lote; cada lote tem um QR e uma página pública; os lotes juntam-se por fibra numa bolsa que os recicladores do Vale do Ave consultam. A recolha deixa de acabar no camião e passa a acabar na fábrica.
 
-**O lote**
+**O lote** — nasce na paragem (`POST /lots/stops`), acumula unidades com QR e pesos medidos e fecha quando a viatura parte (`POST /lots/{código}/departure`):
 
 | Campo | Origem |
 | --- | --- |
-| Código e QR | Um QR por unidade física: o do saco da plataforma, ou etiqueta impressa na viatura quando não há |
-| Paragem (freguesia, local) | Onde o lote nasce — à porta (ronda ou pedido) ou num local; a atribuição vem do scan na viatura |
-| Peso | Medido na viatura, na paragem (balança BLE); no MVP, estimado por tipo de peça |
+| Código e QR | Um QR por unidade física (`lot_units`): o do saco da plataforma (`source: bag`), ou etiqueta impressa na viatura com UUID (`source: label`) quando não há; o QR imprime-se via `GET /lots/{código}/units/{id}/qr` |
+| Paragem (freguesia, local) | Onde o lote nasce — à porta (ronda ou pedido) ou num local; ancorado ao abrir (`locality_id` + freguesia deduzida ou explícita) |
+| Peso | **Medido na viatura, por unidade** (`weight_g` em cada saco; pratos ≤ 15 kg somados); lotes antigos caem na estimativa por tipo de peça e dizem-no (`weight_source: measured` / `estimated`) |
 | Estado fino, tipologia, estação, cor, género, tamanho | Triagem a jusante: a IA propõe (foto), o operador confirma (padrão-ouro); cada atributo carrega proveniência e confiança («confirmado» / «IA»). Vocabulário fechado e versionado: [Taxonomia da triagem (v1)](dados-e-modelo.md#taxonomia-da-triagem-v1) |
 | Composição (ex.: 100% algodão) | Lida da etiqueta na triagem |
-| Histórico | Recolhido, triado, reservado, entregue, com data |
+| Histórico | Aberto na paragem, partiu («Partir»), peças triadas, reservado, entregue, com data |
 
-**Um lote de recolha por paragem.** O lote de recolha nasce na viatura, um por paragem (na recolha a pedido, um por saco), pesado e etiquetado no momento. O lote de **escoamento** é que se fecha por categoria para exportar roupa reutilizável — chave (estado fino, tipologia, estação, género), com a linhagem preservada até às paragens; cor e tamanho ficam como atributos filtráveis. É a resposta ao pedido da Vitrus de categorizar as triagens (cor, estação, …) para exportar lotes; os níveis de qualidade e a sazonalidade vêm do que a Retex (Maia) faz (branch `research/retex-maia`; a Retex é candidata a operador de triagem).
+**Um lote de recolha por paragem.** O lote de recolha nasce na viatura, um por paragem (na recolha a pedido, um por saco), pesado e etiquetado no momento: «Cheguei» abre, os sacos entram com o QR próprio e o peso da balança, e «Partir» fecha a paragem (exige todas as unidades pesadas; depois as unidades congelam, e a triagem acrescenta peças sem tocar no peso medido). O lote de **escoamento** é que se fecha por categoria para exportar roupa reutilizável — chave (estado fino, tipologia, estação, género), com a linhagem preservada até às paragens; cor e tamanho ficam como atributos filtráveis. É a resposta ao pedido da Vitrus de categorizar as triagens (cor, estação, …) para exportar lotes; os níveis de qualidade e a sazonalidade vêm do que a Retex (Maia) faz (branch `research/retex-maia`; a Retex é candidata a operador de triagem).
 
 **O passaporte.** Ler o QR abre a página pública do lote: origem, composição, peso e histórico. Os campos seguem o que o plano municipal de Guimarães (contexto público, F74) descreve para a primeira fase do Passaporte Digital do Produto dos têxteis (composição, reciclabilidade, rastreabilidade), prevista até 2027, para o Novelo encaixar quando a regra chegar.
 
@@ -182,7 +182,7 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | --- | --- |
 | Simulador, cenários e comparação, pressupostos com origem, incerteza, robustez e piloto | Feito |
 | "E se...?" com verificador de números | Feito (precisa de `OPENROUTER_API_KEY`) |
-| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»); exatidão real por medir |
+| Triagem por foto, lotes, QR, passaporte público, bolsa de fibra | Feito; taxonomia fechada (v1) com proveniência, rótulos dourados e eval por eixo (género/tamanho «prometidos»), lote nascido na paragem (um por paragem, ancorado ao local, peso medido por saco com QR por unidade) na API e no contrato; ecrã da viatura e exatidão real da triagem por fazer |
 | Evidência por marca, relatório RAP em PDF com custo por TIPAU | Feito |
 | Mapa da rede, circuitos, localidades, qualidade dos dados | Feito |
 | Frota: calendário da semana tipo com conflitos reais, mapa, visão geral, `.ics`/CSV | Feito (semana tipo, sem datas nem horas reais) |

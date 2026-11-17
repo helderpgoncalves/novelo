@@ -20,8 +20,16 @@ from novelo.domain.taxonomy import (
     corrected_axes,
     destination_for,
 )
-from novelo.domain.vocab import Fibre, LotEventKind, LotState, TextileDestination
-from novelo.features.lots.models import GoldenLabel, Lot, LotEvent, LotItem, LotItemPhoto, LotReservation
+from novelo.domain.vocab import Fibre, LotEventKind, LotState, LotUnitSource, LotWeightSource, TextileDestination
+from novelo.features.lots.models import (
+    GoldenLabel,
+    Lot,
+    LotEvent,
+    LotItem,
+    LotItemPhoto,
+    LotReservation,
+    LotUnit,
+)
 from novelo.features.lots.schemas import (
     AttributeSource,
     BrandCount,
@@ -34,6 +42,8 @@ from novelo.features.lots.schemas import (
     LotItemIn,
     LotItemOut,
     LotSummary,
+    LotUnitIn,
+    LotUnitOut,
     MarketEntry,
     MarketLot,
     Passport,
@@ -43,7 +53,7 @@ from novelo.features.lots.schemas import (
     TriageProposal,
     TriageProvenance,
 )
-from novelo.features.network.models import Parish
+from novelo.features.network.models import Locality, Parish
 from novelo.features.users.models import User
 
 # Alfabeto sem 0/O/1/I/L: o código lê-se bem em etiquetas impressas.
@@ -90,6 +100,28 @@ def dominant_fibre(composition: list[CompositionPart]) -> Fibre:
 
 def estimate_weight_g(garment_type: str) -> int:
     return AVERAGE_WEIGHT_G.get(garment_type, AVERAGE_WEIGHT_G["other"])
+
+
+# Peso máximo de uma unidade: a balança pesa em pratos ≤ 15 kg, mas um saco pode somar vários pratos.
+UNIT_MAX_WEIGHT_G = 30000
+
+
+def lot_weight(measured_g: int | None, estimated_g: int | None) -> tuple[float, LotWeightSource]:
+    """Peso do lote em kg e a sua fonte: o medido na paragem ganha sempre à estimativa das peças.
+
+    `measured_g` é a soma das unidades pesadas (nulo ou zero quando não há balança); `estimated_g` a soma das
+    peças triadas. 8000 g medidos → (8.0, measured); 600 g estimados → (0.6, estimated).
+    """
+    if measured_g:
+        return round(measured_g / 1000, 3), LotWeightSource.MEASURED
+    return round((estimated_g or 0) / 1000, 3), LotWeightSource.ESTIMATED
+
+
+def _lot_grams(lot: Lot) -> tuple[int, int]:
+    """(gramas medidas nas unidades, gramas estimados nas peças) de um lote com as relações carregadas."""
+    measured = sum(u.weight_g for u in lot.units if u.weight_g is not None)
+    estimated = sum(i.estimated_weight_g for i in lot.items)
+    return measured, estimated
 
 
 def aggregate_composition(items: list[LotItem]) -> list[CompositionPart]:
@@ -223,7 +255,12 @@ async def _load(db: AsyncSession, code: str) -> Lot:
         await db.execute(
             select(Lot)
             .where(Lot.code == code.upper())
-            .options(selectinload(Lot.items), selectinload(Lot.events), selectinload(Lot.reservation))
+            .options(
+                selectinload(Lot.items),
+                selectinload(Lot.units),
+                selectinload(Lot.events),
+                selectinload(Lot.reservation),
+            )
         )
     ).scalar_one_or_none()
     if lot is None:
@@ -238,21 +275,44 @@ async def _parish_names(db: AsyncSession) -> dict[uuid.UUID, tuple[str, str]]:
     }
 
 
+async def _locality_names(db: AsyncSession) -> dict[uuid.UUID, str]:
+    return dict((await db.execute(select(Locality.id, Locality.name))).all())
+
+
 def _summary(
-    lot: Lot, parishes: dict[uuid.UUID, tuple[str, str]], *, n_items: int | None = None, grams: int | None = None
+    lot: Lot,
+    parishes: dict[uuid.UUID, tuple[str, str]],
+    *,
+    localities: dict[uuid.UUID, str] | None = None,
+    n_items: int | None = None,
+    grams: int | None = None,
+    n_units: int | None = None,
+    measured_grams: int | None = None,
 ) -> LotSummary:
-    """`n_items`/`grams` vêm de um agregado SQL nas listas; sem eles contam-se as peças já carregadas."""
+    """`n_*`/`grams` vêm de um agregado SQL nas listas; sem eles contam-se as relações já carregadas."""
+    if n_items is None:
+        measured, estimated = _lot_grams(lot)
+        n_items, grams, n_units, measured_grams = len(lot.items), estimated, len(lot.units), measured
+    weight_kg, weight_source = lot_weight(measured_grams, grams)
     code, name = parishes.get(lot.parish_id, (None, None)) if lot.parish_id else (None, None)
     return LotSummary(
         code=lot.code,
         state=lot.state,
         parish_code=code,
         parish_name=name,
+        locality_id=lot.locality_id,
+        locality_name=(localities or {}).get(lot.locality_id) if lot.locality_id else None,
         dominant_fibre=lot.dominant_fibre,
-        items=len(lot.items) if n_items is None else n_items,
-        weight_kg=round((sum(i.estimated_weight_g for i in lot.items) if grams is None else grams) / 1000, 3),
+        items=n_items,
+        units=n_units or 0,
+        weight_kg=weight_kg,
+        weight_source=weight_source,
         opened_at=lot.created_at,
     )
+
+
+def _unit_out(u: LotUnit) -> LotUnitOut:
+    return LotUnitOut(id=u.id, code=u.code, source=u.source, weight_g=u.weight_g, created_at=u.created_at)
 
 
 def _event(lot: Lot, kind: LotEventKind, user: User | None, note: str | None = None) -> None:
@@ -266,11 +326,98 @@ async def open_lot(db: AsyncSession, user: User, parish_code: str | None) -> Lot
         if parish is None:
             raise NotFoundError("Parish not found")
         parish_id = parish.id
-    lot = Lot(code=new_code(), parish_id=parish_id, created_by_id=user.id, items=[], events=[])
+    lot = Lot(code=new_code(), parish_id=parish_id, created_by_id=user.id, items=[], events=[], units=[])
     _event(lot, LotEventKind.OPENED, user)
     db.add(lot)
     await db.commit()
     return _summary(lot, await _parish_names(db))
+
+
+async def open_stop_lot(db: AsyncSession, user: User, locality_id: uuid.UUID, parish_code: str | None) -> LotSummary:
+    """Abre o lote na paragem («Cheguei»): ancorado ao local; a freguesia deduz-se do local se não vier explícita."""
+    locality = (await db.execute(select(Locality).where(Locality.id == locality_id))).scalar_one_or_none()
+    if locality is None:
+        raise NotFoundError("Locality not found")
+    parish_id = locality.parish_id
+    if parish_code:
+        parish = (await db.execute(select(Parish).where(Parish.dicofre == parish_code))).scalar_one_or_none()
+        if parish is None:
+            raise NotFoundError("Parish not found")
+        parish_id = parish.id
+    lot = Lot(
+        code=new_code(),
+        parish_id=parish_id,
+        locality_id=locality.id,
+        created_by_id=user.id,
+        items=[],
+        events=[],
+        units=[],
+    )
+    _event(lot, LotEventKind.OPENED, user)
+    db.add(lot)
+    await db.commit()
+    return _summary(lot, await _parish_names(db), localities=await _locality_names(db))
+
+
+async def _open_lot_for_units(db: AsyncSession, code: str) -> Lot:
+    """Lote ainda na paragem: sem «Partir», as unidades podem entrar, sair e ganhar peso."""
+    lot = await _load(db, code)
+    if lot.departed_at is not None:
+        raise ConflictError("The vehicle already left this stop: units are frozen")
+    return lot
+
+
+async def add_unit(db: AsyncSession, user: User, code: str, body: LotUnitIn) -> LotUnitOut:
+    """Um QR por unidade física: o do saco da plataforma, ou uma etiqueta impressa com UUID quando não há."""
+    lot = await _open_lot_for_units(db, code)
+    bag_code = (body.bag_code or "").strip()
+    if bag_code and await db.scalar(select(LotUnit.id).where(LotUnit.lot_id == lot.id, LotUnit.code == bag_code)):
+        raise ConflictError("This bag QR is already in this lot")
+    unit = LotUnit(
+        lot_id=lot.id,
+        code=bag_code or str(uuid.uuid4()),
+        source=LotUnitSource.BAG if bag_code else LotUnitSource.LABEL,
+    )
+    lot.units.append(unit)
+    await db.commit()
+    return _unit_out(unit)
+
+
+async def set_unit_weight(db: AsyncSession, user: User, code: str, unit_id: uuid.UUID, weight_g: int) -> LotUnitOut:
+    """Peso medido na balança da viatura (pratos ≤ 15 kg: a soma dos pratos do saco)."""
+    lot = await _open_lot_for_units(db, code)
+    unit = next((u for u in lot.units if u.id == unit_id), None)
+    if unit is None:
+        raise NotFoundError("Lot unit not found")
+    unit.weight_g = weight_g
+    await db.commit()
+    return _unit_out(unit)
+
+
+async def remove_unit(db: AsyncSession, user: User, code: str, unit_id: uuid.UUID) -> None:
+    """Retira uma unidade do lote (scan enganado): o histórico fica no lote."""
+    lot = await _open_lot_for_units(db, code)
+    unit = next((u for u in lot.units if u.id == unit_id), None)
+    if unit is None:
+        raise NotFoundError("Lot unit not found")
+    lot.units.remove(unit)  # cascade delete-orphan apaga a linha
+    _event(lot, LotEventKind.UNIT_REMOVED, user, note=unit.code)
+    await db.commit()
+
+
+async def close_stop_lot(db: AsyncSession, user: User, code: str) -> LotDetail:
+    """Fecha a paragem («Partir»): todas as unidades têm de estar pesadas e pelo menos um saco recolhido."""
+    lot = await _load(db, code)
+    if lot.departed_at is not None:
+        raise ConflictError("The vehicle already left this stop")
+    if not lot.units:
+        raise ConflictError("A stop without bags does not open a lot")
+    if any(u.weight_g is None for u in lot.units):
+        raise ConflictError("Every unit must be weighed before the vehicle leaves")
+    lot.departed_at = datetime.now(UTC)
+    _event(lot, LotEventKind.DEPARTED, user)
+    await db.commit()
+    return await get_lot(db, code)
 
 
 async def add_item(db: AsyncSession, user: User, code: str, body: LotItemIn) -> LotItemOut:
@@ -330,10 +477,14 @@ async def golden_labels(db: AsyncSession, axis: TriageAxis | None = None, limit:
 
 
 async def list_lots(
-    db: AsyncSession, fibre: Fibre | None, state: LotState | None, parish_code: str | None
+    db: AsyncSession,
+    fibre: Fibre | None,
+    state: LotState | None,
+    parish_code: str | None,
+    locality_id: uuid.UUID | None = None,
 ) -> list[LotSummary]:
-    # Contagem e peso por lote em SQL: não se carregam as peças (com a composição em JSON) só para somar.
-    totals = (
+    # Contagens e pesos por lote em SQL: não se carregam as peças (com a composição em JSON) só para somar.
+    item_totals = (
         select(
             LotItem.lot_id.label("lot_id"),
             func.count().label("n"),
@@ -342,9 +493,25 @@ async def list_lots(
         .group_by(LotItem.lot_id)
         .subquery()
     )
+    unit_totals = (
+        select(
+            LotUnit.lot_id.label("lot_id"),
+            func.count().label("n"),
+            func.coalesce(func.sum(LotUnit.weight_g), 0).label("grams"),
+        )
+        .group_by(LotUnit.lot_id)
+        .subquery()
+    )
     query = (
-        select(Lot, func.coalesce(totals.c.n, 0), func.coalesce(totals.c.grams, 0))
-        .outerjoin(totals, totals.c.lot_id == Lot.id)
+        select(
+            Lot,
+            func.coalesce(item_totals.c.n, 0),
+            func.coalesce(item_totals.c.grams, 0),
+            func.coalesce(unit_totals.c.n, 0),
+            func.coalesce(unit_totals.c.grams, 0),
+        )
+        .outerjoin(item_totals, item_totals.c.lot_id == Lot.id)
+        .outerjoin(unit_totals, unit_totals.c.lot_id == Lot.id)
         .order_by(Lot.created_at.desc())
     )
     if fibre:
@@ -355,8 +522,22 @@ async def list_lots(
     if parish_code:
         ids = [pid for pid, (code, _) in parishes.items() if code == parish_code]
         query = query.where(Lot.parish_id.in_(ids))
+    if locality_id:
+        query = query.where(Lot.locality_id == locality_id)
     rows = (await db.execute(query)).all()
-    return [_summary(lot, parishes, n_items=int(n), grams=int(grams)) for lot, n, grams in rows]
+    localities = await _locality_names(db)
+    return [
+        _summary(
+            lot,
+            parishes,
+            localities=localities,
+            n_items=int(n),
+            grams=int(grams),
+            n_units=int(nu),
+            measured_grams=int(u_grams),
+        )
+        for lot, n, grams, nu, u_grams in rows
+    ]
 
 
 def _destination_kg(lot: Lot) -> dict[TextileDestination, float]:
@@ -372,7 +553,7 @@ async def get_lot(db: AsyncSession, code: str) -> LotDetail:
     kg = _destination_kg(lot)
     with_photo = await _photo_item_ids(db, lot.id)
     return LotDetail(
-        **_summary(lot, parishes).model_dump(),
+        **_summary(lot, parishes, localities=await _locality_names(db)).model_dump(),
         composition=aggregate_composition(lot.items),
         reuse_kg=round(kg[TextileDestination.REUSE], 3),
         recycle_kg=round(kg[TextileDestination.RECYCLE], 3),
@@ -380,6 +561,7 @@ async def get_lot(db: AsyncSession, code: str) -> LotDetail:
         item_list=[
             _item_out(i, lot.code, with_photo) for i in sorted(lot.items, key=lambda i: i.created_at, reverse=True)
         ],
+        unit_list=[_unit_out(u) for u in lot.units],
         events=[LotEventOut(kind=e.kind, occurred_at=e.occurred_at, note=e.note) for e in lot.events],
         reservation=ReservationOut(
             recycler_name=lot.reservation.recycler_name,
@@ -398,6 +580,7 @@ async def passport(db: AsyncSession, code: str) -> Passport:
     parishes = await _parish_names(db)
     kg = _destination_kg(lot)
     total = sum(kg.values()) or 1.0
+    weight_kg, weight_source = lot_weight(*_lot_grams(lot))
     brands = Counter(i.brand for i in lot.items if i.brand)
     photos = (
         await db.execute(
@@ -408,13 +591,16 @@ async def passport(db: AsyncSession, code: str) -> Passport:
             .limit(PASSPORT_MAX_PHOTOS)
         )
     ).all()
+    locality_name = (await _locality_names(db)).get(lot.locality_id) if lot.locality_id else None
     return Passport(
         code=lot.code,
         state=lot.state,
         parish_name=parishes[lot.parish_id][1] if lot.parish_id in parishes else None,
+        locality_name=locality_name,
         dominant_fibre=lot.dominant_fibre,
         composition=aggregate_composition(lot.items),
-        weight_kg=round(sum(kg.values()), 3),
+        weight_kg=weight_kg,
+        weight_source=weight_source,
         items=len(lot.items),
         reuse_pct=round(kg[TextileDestination.REUSE] / total * 100, 1),
         recycle_pct=round(kg[TextileDestination.RECYCLE] / total * 100, 1),
@@ -445,6 +631,27 @@ def qr_svg(code: str) -> bytes:
     return buffer.getvalue()
 
 
+def unit_qr_svg(code: str) -> bytes:
+    """QR em SVG de uma unidade física: para a etiqueta impressa na viatura quando o saco não tem QR próprio.
+
+    No QR vai só o código (o UUID da etiqueta): o ecrã da paragem reconcilia offline pelo código, sem rede.
+    """
+    buffer = io.BytesIO()
+    segno.make(code, error="m").save(
+        buffer, kind="svg", scale=8, border=2, dark="#14211D", light="#FFFFFF", xmldecl=False
+    )
+    return buffer.getvalue()
+
+
+async def unit_qr(db: AsyncSession, code: str, unit_id: uuid.UUID) -> bytes:
+    """SVG do QR de uma unidade do lote (etiqueta para imprimir na viatura)."""
+    lot = await _load(db, code)
+    unit = next((u for u in lot.units if u.id == unit_id), None)
+    if unit is None:
+        raise NotFoundError("Lot unit not found")
+    return unit_qr_svg(unit.code)
+
+
 async def change_state(db: AsyncSession, user: User, code: str, state: LotState) -> LotDetail:
     lot = await _load(db, code)
     order = [LotState.COLLECTED, LotState.SORTED, LotState.RESERVED, LotState.DELIVERED]
@@ -471,7 +678,7 @@ SORTED_STATES = (LotState.SORTED, LotState.RESERVED, LotState.DELIVERED)
 async def market(
     db: AsyncSession, fibre: Fibre | None, states: tuple[LotState, ...] = MARKET_STATES
 ) -> list[MarketEntry]:
-    query = select(Lot).where(Lot.state.in_(states)).options(selectinload(Lot.items))
+    query = select(Lot).where(Lot.state.in_(states)).options(selectinload(Lot.items), selectinload(Lot.units))
     if fibre:
         query = query.where(Lot.dominant_fibre == fibre)
     lots = (await db.execute(query.order_by(Lot.created_at.desc()))).scalars().all()
@@ -482,17 +689,18 @@ async def market(
     entries = []
     for f, group in groups.items():
         names = sorted({parishes[lot.parish_id][1] for lot in group if lot.parish_id in parishes})
+        grams = sum((m or e) for m, e in (_lot_grams(lot) for lot in group))
         entries.append(
             MarketEntry(
                 fibre=f,
                 lots=len(group),
-                weight_kg=round(sum(i.estimated_weight_g for lot in group for i in lot.items) / 1000, 3),
+                weight_kg=round(grams / 1000, 3),
                 parishes=names,
                 items=[
                     MarketLot(
                         code=lot.code,
                         parish_name=parishes[lot.parish_id][1] if lot.parish_id in parishes else None,
-                        weight_kg=round(sum(i.estimated_weight_g for i in lot.items) / 1000, 3),
+                        weight_kg=lot_weight(*_lot_grams(lot))[0],
                         state=lot.state,
                         dominant_fibre=lot.dominant_fibre,
                         composition=aggregate_composition(lot.items),

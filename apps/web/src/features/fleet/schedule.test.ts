@@ -257,8 +257,9 @@ describe('filtros e carga', () => {
 describe('localidades sem viatura', () => {
   it('só conta as servidas apenas por circuitos sem viatura', () => {
     const circuits = [circuit('A', [1], { vehicles: ['AA'] }), circuit('B', [1], { vehicles: [] })];
-    const loc = (name: string, c: string[]) =>
+    const loc = (name: string, c: string[], id: string) =>
       ({
+        id,
         name,
         latitude: 41,
         longitude: -8,
@@ -270,7 +271,7 @@ describe('localidades sem viatura', () => {
         days_per_week: 1,
       }) satisfies LocalityOut;
     const out = localitiesWithoutVehicle(
-      [loc('x', ['A']), loc('y', ['B']), loc('z', ['A', 'B'])],
+      [loc('x', ['A'], '1'), loc('y', ['B'], '2'), loc('z', ['A', 'B'], '3')],
       circuits,
     );
     expect(out.map((l) => l.name)).toEqual(['y']);

@@ -23,9 +23,13 @@ from novelo.features.lots.schemas import (
     LotOpen,
     LotStateChange,
     LotSummary,
+    LotUnitIn,
+    LotUnitOut,
+    LotUnitWeight,
     MarketEntry,
     Passport,
     ReserveRequest,
+    StopLotOpen,
     TriageResult,
 )
 from novelo.features.users.schemas import Locale
@@ -44,8 +48,18 @@ async def get_llm(db: Db, user: CurrentUser) -> OpenRouterClient:
 
 @router.post("/lots", response_model=LotSummary, status_code=201, dependencies=[NotGuestDep])
 async def open_lot(body: LotOpen, user: CurrentUser, db: Db) -> LotSummary:
-    """Abre um lote no ponto de recolha: gera o código que vai no QR."""
+    """Abre um lote ancorado só à freguesia (caminho antigo, antes do lote nascer na paragem)."""
     return await service.open_lot(db, user, body.parish_code)
+
+
+@router.post("/lots/stops", response_model=LotSummary, status_code=201, dependencies=[NotGuestDep])
+async def open_stop_lot(body: StopLotOpen, user: CurrentUser, db: Db) -> LotSummary:
+    """Abre o lote na paragem («Cheguei»): um lote por paragem, ancorado ao local e à freguesia.
+
+    Na recolha a pedido a paragem é 1:1 com o saco; nas rondas acumula os sacos do local. O peso só fica
+    completo quando as unidades passam pela balança e a viatura parte (`POST /lots/{code}/departure`).
+    """
+    return await service.open_stop_lot(db, user, body.locality_id, body.parish_code)
 
 
 @router.get("/lots", response_model=list[LotSummary])
@@ -54,8 +68,9 @@ async def list_lots(
     fibre: Fibre | None = None,
     state: LotState | None = None,
     parish_code: Annotated[str | None, Query(max_length=6)] = None,
+    locality_id: Annotated[uuid.UUID | None, Query(description="Lotes de um local (conta de local, #59)")] = None,
 ) -> list[LotSummary]:
-    return await service.list_lots(db, fibre, state, parish_code)
+    return await service.list_lots(db, fibre, state, parish_code, locality_id)
 
 
 @router.get("/lots/{code}", response_model=LotDetail)
@@ -67,6 +82,46 @@ async def get_lot(code: str, db: Db) -> LotDetail:
 async def add_lot_item(code: str, body: LotItemIn, user: CurrentUser, db: Db) -> LotItemOut:
     """Acrescenta ao lote uma peça confirmada pelo operador."""
     return await service.add_item(db, user, code, body)
+
+
+@router.post("/lots/{code}/units", response_model=LotUnitOut, status_code=201, dependencies=[NotGuestDep])
+async def add_lot_unit(code: str, body: LotUnitIn, user: CurrentUser, db: Db) -> LotUnitOut:
+    """Regista uma unidade física na paragem: o QR do saco da plataforma, ou etiqueta impressa com UUID.
+
+    Sem `bag_code` o servidor gera o UUID da etiqueta (o QR imprime-se em `GET /lots/{code}/units/{id}/qr`).
+    """
+    return await service.add_unit(db, user, code, body)
+
+
+@router.put("/lots/{code}/units/{unit_id}", response_model=LotUnitOut, dependencies=[NotGuestDep])
+async def set_lot_unit_weight(
+    code: str, unit_id: uuid.UUID, body: LotUnitWeight, user: CurrentUser, db: Db
+) -> LotUnitOut:
+    """Peso medido da unidade na balança da viatura (pratos ≤ 15 kg: aqui entra a soma dos pratos)."""
+    return await service.set_unit_weight(db, user, code, unit_id, body.weight_g)
+
+
+@router.delete("/lots/{code}/units/{unit_id}", status_code=204, dependencies=[NotGuestDep])
+async def delete_lot_unit(code: str, unit_id: uuid.UUID, user: CurrentUser, db: Db) -> Response:
+    """Retira uma unidade do lote (scan enganado); fica no histórico e é impossível depois de partir."""
+    await service.remove_unit(db, user, code, unit_id)
+    return Response(status_code=204)
+
+
+@router.get(
+    "/lots/{code}/units/{unit_id}/qr",
+    response_class=Response,
+    responses={200: {"content": {"image/svg+xml": {}}}},
+)
+async def get_lot_unit_qr(code: str, unit_id: uuid.UUID, db: Db) -> Response:
+    """QR em SVG da unidade física: o que vai na etiqueta impressa na viatura (UUID quando o saco não tem QR)."""
+    return Response(content=await service.unit_qr(db, code, unit_id), media_type="image/svg+xml")
+
+
+@router.post("/lots/{code}/departure", response_model=LotDetail, dependencies=[NotGuestDep])
+async def close_stop_lot(code: str, user: CurrentUser, db: Db) -> LotDetail:
+    """Fecha a paragem («Partir»): exige todas as unidades pesadas; o peso do lote passa a ser o medido."""
+    return await service.close_stop_lot(db, user, code)
 
 
 PHOTO_RESPONSES: dict[int | str, dict[str, object]] = {

@@ -4708,5 +4708,17 @@
   "triage_seal_confirmed": "Confirmado",
   "triage_destination": "Destino",
   "triage_no_open_lots": "Sem lotes abertos",
-  "triage_no_open_lots_text": "Nenhum lote está aberto neste momento. Abre um novo para começares a triar."
+  "triage_no_open_lots_text": "Nenhum lote está aberto neste momento. Abre um novo para começares a triar.",
+  "common_measured": "medido",
+  "lot_stat_weight_hint_measured": "pesado na balança da viatura",
+  "lot_stat_weight_hint_unmeasured": "ainda sem peso medido",
+  "passport_origin_local": "Origem: {locality}, {parish}, Guimarães",
+  "passport_origin_local_unknown_parish": "Origem: {locality}, Guimarães",
+  "lot_event_departed": "Partiu da paragem",
+  "lot_event_unit_removed": "Unidade retirada do lote",
+  "lot_units_title": "Unidades pesadas na paragem",
+  "lot_units_hint": "Um QR por saco: o do saco da plataforma ou o UUID da etiqueta impressa na viatura.",
+  "lot_unit_source_bag": "Saco da plataforma",
+  "lot_unit_source_label": "Etiqueta impressa",
+  "lot_unit_weight_pending": "sem peso"
 }

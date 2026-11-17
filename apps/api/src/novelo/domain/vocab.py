@@ -206,9 +206,25 @@ class LotState(StrEnum):
 class LotEventKind(StrEnum):
     OPENED = "opened"
     ITEM_ADDED = "item_added"
+    DEPARTED = "departed"  # «Partir»: a viatura deixou a paragem; o lote segue para a mesa de triagem
+    UNIT_REMOVED = "unit_removed"  # unidade retirada do lote (scan enganado, corrigido na paragem)
     SORTED = "sorted"
     RESERVED = "reserved"
     DELIVERED = "delivered"
+
+
+class LotUnitSource(StrEnum):
+    """De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem)."""
+
+    BAG = "bag"  # saco da plataforma: o QR lido no scan
+    LABEL = "label"  # saco sem QR: etiqueta impressa na viatura com UUID no QR
+
+
+class LotWeightSource(StrEnum):
+    """De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado)."""
+
+    MEASURED = "measured"  # soma dos pesos medidos por unidade na paragem
+    ESTIMATED = "estimated"  # média por tipo de peça (pressuposto, antes de haver balança)
 
 
 class WhatIfStatus(StrEnum):
