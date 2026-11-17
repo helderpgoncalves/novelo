@@ -116,6 +116,9 @@ O PWA que existe evolui; **sem app nativa** (é na viatura que o Android + Chrom
 
 A ronda mantém-se **universal** (o saco no dia da freguesia é sempre recolhido); o pedido é opcional e vale **certeza**: data e aviso. Só com conta, gratuito, auto-aceite por regras; corte às **48 h**; 1–5 sacos; 1 pedido ativo por morada; expira à 3.ª ausência; morada retida 12 meses. Fora da ronda é exceção despachada pela Vitrus, não produto. Para o modelo, o pedido é **sinal de procura** e calibra os sacos por ronda (secção 13).
 
+- **Na API e no contrato (17 nov 2026)**: entidade única `collection_requests` para cidadão, local assistido e produtor B2B (decisão da spec #54), com o sujeito deduzido do papel de quem pede — papel `local` usa a morada institucional do sítio da conta (teto de 20 sacos, estimativa; acima é recolha especial), todos os outros são cidadão com morada manual e freguesia declarada (nunca GPS). Regras puras em `domain/collection_requests.py`: corte de 48 h à data (hoje + 2 dias), 1–5 sacos, urgência nunca auto-aceite, fora de ronda pelo calendário dos circuitos da Vitrus (proxy do MVP, estimativa — o calendário da viatura é do otimizador, #61), expiração à 3.ª ausência, retenção da morada 12 meses com purga à leitura (detalhe em [Dados e modelo](dados-e-modelo.md#11-pedido-de-recolha-regras-e-retenção-17-nov-2026)). Endpoints: `POST/GET/DELETE /collection-requests` (quem pede vê o seu; a equipa vê tudo com filtros — `?state=exception` é a fila de despacho), `POST /collection-requests/{id}/dispatch` (agendar com data ou recusar com motivo) e `POST /collection-requests/{id}/outcome` (recolhido ou ausência) para admin/operator.
+- **No web (17 nov 2026)**: ecrã da equipa `/collection-requests` — separadores «Pedidos» e «Fila de exceções» (badge de atenção com as pendentes), despacho (agendar/recusar com motivo), resultado da visita e anulação, tudo em `DataTable` com os quatro estados. A área `/local` ganhou a porta «Pedir recolha»: morada institucional, teto de 20 sacos com a nota de recolha especial e os pedidos do próprio sítio. O ecrã do cidadão é o bilhete #63.
+
 ## 10. Pontos e parcerias
 
 - Ganho **flat por saco recolhido (100, estimativa)** + **bónus de conformidade (+50)** a quem declarou o conteúdo e a triagem confirmou; teto mensal por conta; valores configuráveis, sempre «estimativa».
@@ -198,10 +201,11 @@ Tudo o que as funcionalidades acima precisam para funcionar com dados reais.
 | Entrada por magic link, entrada por QR (`guest`), Google, emails transacionais | Feito |
 | Páginas de erro, PWA e interface de telemóvel, marca gerada por `just brand` | Feito |
 | Camada e cobertura dos contentores de **têxteis** | Não se aplica: não há contentores de têxteis (Vitrus, 21 out 2026) |
-| Conta de local: papel `local` criado por convite (com local e natureza do sítio), `/local` «Duas portas» (aviso, rondas, certificado opt-in) e página pública `/certificado` | Feito na API, no contrato e no web; pedido de recolha B2B e o consumo do aviso pelo otimizador por fazer |
+| Conta de local: papel `local` criado por convite (com local e natureza do sítio), `/local` «Duas portas» (aviso, rondas, certificado opt-in, **pedir recolha**) e página pública `/certificado` | Feito na API, no contrato e no web; o consumo do aviso pelo otimizador por fazer |
+| Pedido de recolha unificado (cidadão, local e B2B; regras de auto-aceite, fila de exceções, despacho, ausências, retenção de 12 meses) | **Feito** na API, no contrato e no ecrã da equipa `/collection-requests`; ecrã do cidadão (#63), consumo pelo otimizador (#61) e agregados da calibração (#62) por fazer |
 | Agente semanal de operações | Não iniciado (fica para depois) |
 | Resposta ao feedback da Vitrus (nov 2026): âmbito decidido e documentado — ADR, glossário (`GLOSSARY.md`), secções 8–13 e backlog | Feito (documentação; mapa wayfinder #30) |
-| Ecrã da viatura (`/viatura`, porta de dispositivo, offline, #58) | **Feito** (Web Bluetooth do hardware real por provar à mão em Android + Chrome); conta de local, superfície do cidadão, recolha a pedido, pontos, política de paragem, calibração por fazer; protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |
+| Ecrã da viatura (`/viatura`, porta de dispositivo, offline, #58) | **Feito** (Web Bluetooth do hardware real por provar à mão em Android + Chrome); conta de local, superfície do cidadão, pontos, política de paragem, calibração por fazer; pedido de recolha unificado feito (API + ecrã da equipa); protótipos nos branches `prototype/fluxo-cidadao` (#48), `prototype/fluxo-local` (#51) e `prototype/paragem-viatura` (#50) |
 
 ## O que fica de fora, de propósito
 

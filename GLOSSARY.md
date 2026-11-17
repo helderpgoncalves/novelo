@@ -12,6 +12,17 @@ _Avoid_: circuito (é do RSU da Vitrus), volta
 Pedido opcional, com conta, que dá certeza de recolha (data e aviso) num saco que a ronda já apanha. Não encolhe a ronda.
 _Avoid_: recolha expressa
 
+**Ausência**:
+Visita agendada ao pedido que não encontra o saco. Conta no pedido; à 3.ª ausência o pedido expira.
+
+**Fila de exceções**:
+Fila única do gestor da Vitrus para os pedidos que as regras não auto-aceitaram: fora de ronda, fora do prazo de 48 h, urgências e recolha especial. Despacha-se agendando com data ou recusando com motivo.
+_Avoid_: fila de espera; triagem manual de pedidos
+
+**Recolha especial**:
+Pedido de local/B2B acima do teto de 20 sacos (estimativa). Não é erro: cai na fila de exceções e o gestor confirma o volume.
+_Avoid_: recolha de grande volume
+
 **Aviso («sacos prontos»)**:
 Sinal de um local («estou pronto, vem cá») que garante paragem nesse dia. Única escrita da conta de local no MVP.
 

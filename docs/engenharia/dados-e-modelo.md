@@ -387,3 +387,27 @@ Código: `domain/coverage_matrix.py` (funções puras, testadas à mão), `featu
 | Concelho | 48 | 156 830 | 110 467 | 70,4% | 431,1 t | 43 914 € | 101,9 |
 
 Fora das freguesias urbanas (21 370 habitantes) o cenário serve 55,5% da população, contra 72,8% nas urbanas (razão 0,762). A freguesia APR é uma só (Arosa e Castelões, 699 habitantes) e fica sem recolha neste orçamento: a ronda da viatura dedicada até lá não compensa ao lado de outras freguesias. Antes (22 out, linha reta × 1,3): 73,9% nas urbanas, 60,2% nas restantes (razão 0,814), 72,1% no concelho. Com 60 000 €/ano a rede por locais reais serve 88,2% da população (secção 8).
+
+## 11. Pedido de recolha: regras e retenção (17 nov 2026)
+
+O pedido de recolha é **uma entidade só** (`collection_requests`) para cidadão com conta, local assistido e produtor B2B (decisão da spec #54): um discriminador `subject_kind` (`citizen` | `local`, deduzido do papel de quem pede — nunca do corpo) e a mesma máquina de estados. É diferente do **aviso «sacos prontos»** (secção de contas de local em [Funcionalidades](features.md#11-contas-de-local-assistidas-e-produtor-b2b-local)): aquele é o sinal de procura do local; este é um pedido com data, morada e ciclo de vida próprio. O pedido vale **certeza**, nunca corta quilómetros — a ronda mantém-se universal ([ADR](adr/politica-de-paragem.md)).
+
+**Estados** (nenhum volta atrás): a criação resolve logo — `scheduled` (auto-aceite pelas regras) ou `exception` (a **fila de exceções** do gestor: fora de ronda, fora do prazo, urgência ou recolha especial; despacho = agendar com data, que pode sair da ronda pedida, ou recusar com motivo). Depois: `collected` (a visita recolheu), `expired` (à 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu, ou a equipa). A visita ao agendado aponta-se como `collected` ou `missed` (ausência); o pedido guarda `missed_count`.
+
+**Regras de auto-aceite** (puras em `domain/collection_requests.py`, testadas à mão; precedência: urgência > volume > prazo > ronda):
+
+| Regra | Valor | Fonte/natureza |
+| --- | --- | --- |
+| Sacos por pedido (cidadão) | 1–5 | Decisão da spec #54 |
+| Teto por pedido (local/B2B) | 20 sacos — **estimativa**; acima = recolha especial (exceção, não erro) | Decisão da spec #54 |
+| Corte | **48 h** aplicadas à data: o dia pedido tem de ser hoje + 2 dias, no mínimo (a recolha só tem dia, não hora; simplificação documentada — um pedido tardio da noite pode ficar com menos de 48 h relógio até à meia-noite do dia) | Decisão da spec #54 |
+| Um ativo por morada | Chave normalizada da morada (cidadão) ou `localidade:<uuid>` (local), índice parcial único nos estados ativos (`scheduled`/`exception`) | Decisão da spec #54 |
+| Expiração | À **3.ª ausência** (`missed_count ≥ 3` → `expired`) | Decisão da spec #54 |
+| Urgência | `urgent: true` nunca é auto-aceite — cai na fila do gestor | Decisão da spec #54 |
+| Fora de ronda | A data pedida não tem nenhum circuito da Vitrus a passar nesse dia da semana na freguesia (cidadão: freguesias dos circuitos; local: os circuitos do próprio sítio) — **proxy do MVP, estimativa**: não é o calendário da viatura de têxtil, que o otimizador escolherá (#61) | Rede da Vitrus (`circuit_days` × `circuit_localities`), estimativa |
+
+**Morada normalizada** (a chave de «1 ativo por morada», `normalize_address`): minúsculas, sem acentos (NFKD), indicadores ordinais `º ª °` retirados antes da decomposição (assim «nº» e «n.º» batem certo), letras e dígitos em contacto separados («nº42» → «n 42»), tudo o que não é letra/dígito vira um espaço. É **lexical, nunca geocodificação**: «Av.» e «Avenida» dão chaves diferentes — a mesma morada escrita de outra forma dá a mesma chave, mas formas distintas da mesma rua ficam distintas (o gestor vê-as na fila de exceções). O local/B2B não escreve morada: a institucional é o sítio da conta (`local_accounts.locality_id`), e a chave institucional vive num espaço de nomes à parte (`localidade:<uuid>`) que nenhuma morada escrita alcança (uma chave normalizada nunca contém «:»). GPS fora do MVP; a morada manual é alternativa igual ([ADR RGPD](adr/rgpd-conta-de-doador.md)).
+
+**Retenção da morada — 12 meses** (categoria própria na política de privacidade, mesma vida dos logs de magic link; [ADR RGPD](adr/rgpd-conta-de-doador.md)): a morada vive **só ligada ao pedido** — nunca no perfil da conta (não há livro de moradas). O campo `address_retained_until` = criação + 12 meses de calendário (29 de fevereiro aperta para 28); passado o prazo, a **purga à leitura** nas listagens põe `address`/`address_key` a nulo e o pedido fica (o histórico e os agregados de calibração nunca dependem da morada). Interpretação do «morada efémera só em pedidos agendados» da spec: a morada é efémera no sentido de existir só dentro do pedido, e o local/B2B nunca a tem; a retenção de 12 meses é a que a spec fixa para todas as moradas.
+
+**Para o planeamento (#62):** o pedido é **sinal de procura** (pedidos por semana por freguesia, na tabela de agregados) e calibra os **sacos por ronda** — nunca multiplica quilos nem encolhe a ronda ([captura anual derivada](adr/captura-anual-e-derivada.md)). Código: `features/collection_requests/` (serviço), `domain/collection_requests.py` (regras puras), migração `0023_collection_requests`.
