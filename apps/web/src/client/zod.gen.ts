@@ -1000,6 +1000,48 @@ export const zConfirmActionIn = z.object({
 });
 
 /**
+ * ConsentPurpose
+ *
+ * As finalidades que EXIGEM consentimento (prévio e expresso, em duas camadas; nunca soft opt-in).
+ *
+ * O essencial da conta (crédito, recolhas, triagem) é contrato — não anda aqui. Marketing e parcerias
+ * têm caixas próprias, desligadas por defeito, retiráveis a qualquer momento (art. 7.º/3 RGPD).
+ */
+export const zConsentPurpose = z.enum(['marketing', 'partnerships']);
+
+/**
+ * ConsentStateOut
+ *
+ * O estado corrente de uma finalidade: a última linha vence; sem linhas é desligado e nunca pedido.
+ */
+export const zConsentStateOut = z.object({
+    granted: z.boolean(),
+    policy_version: z.string().nullish(),
+    purpose: zConsentPurpose,
+    updated_at: z.iso.datetime().nullish()
+});
+
+/**
+ * ConsentUpdate
+ *
+ * Uma decisão: finalidade + dado ou retirado (o histórico fica append-only lá atrás).
+ */
+export const zConsentUpdate = z.object({
+    granted: z.boolean(),
+    purpose: zConsentPurpose,
+    source: z.enum(['account', 'api']).optional().default('account')
+});
+
+/**
+ * ConsentsOut
+ *
+ * As DUAS camadas (marketing e parcerias), sempre ambas, com o estado corrente de cada uma.
+ */
+export const zConsentsOut = z.object({
+    items: z.array(zConsentStateOut)
+});
+
+/**
  * ContainerKind
  */
 export const zContainerKind = z.enum([
@@ -1552,6 +1594,15 @@ export const zDeleteUserRequest = z.object({
 });
 
 /**
+ * DeletionRequest
+ *
+ * A confirmação: o email da conta, escrito à mão (a 3.ª proteção é o texto no ecrã; esta é a trava).
+ */
+export const zDeletionRequest = z.object({
+    confirm_email: z.string().min(3).max(255)
+});
+
+/**
  * DispatchAction
  *
  * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
@@ -1858,6 +1909,29 @@ export const zErrorBody = z.object({
 });
 
 /**
+ * ExportBag
+ */
+export const zExportBag = z.object({
+    active: z.boolean(),
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    deactivated_at: z.iso.datetime().nullable(),
+    declaration: zBagDeclaration.nullable(),
+    nickname: z.string().nullable()
+});
+
+/**
+ * ExportConsent
+ */
+export const zExportConsent = z.object({
+    created_at: z.iso.datetime(),
+    granted: z.boolean(),
+    policy_version: z.string(),
+    purpose: z.string(),
+    source: z.string()
+});
+
+/**
  * ExportFormat
  */
 export const zExportFormat = z.enum([
@@ -1881,6 +1955,34 @@ export const zExportLotItemsIn = z.object({
  * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
  */
 export const zExportLotState = z.enum(['open', 'closed']);
+
+/**
+ * ExportPointEntry
+ */
+export const zExportPointEntry = z.object({
+    amount: z.int(),
+    bag_code: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    expires_at: z.iso.datetime().nullable(),
+    kind: z.string(),
+    lot_code: z.string().nullable(),
+    reason: z.string().nullable()
+});
+
+/**
+ * ExportProfile
+ *
+ * O perfil fornecido pelo titular: identificador, nome opcional, pseudónimo, idade declarada.
+ */
+export const zExportProfile = z.object({
+    created_at: z.iso.datetime(),
+    declared_age: z.int().nullable(),
+    donor_code: z.string().nullable(),
+    email: z.string(),
+    joined_via: z.string(),
+    locale: z.string(),
+    name: z.string().nullable()
+});
 
 /**
  * ExportScope
@@ -3924,6 +4026,17 @@ export const zPointsHistoryOut = z.object({
 });
 
 /**
+ * PolicyCategory
+ *
+ * Uma categoria de dados dentro de uma finalidade, com o SEU prazo de conservação.
+ */
+export const zPolicyCategory = z.object({
+    applied_by: z.string(),
+    name: z.string(),
+    retention: z.string()
+});
+
+/**
  * PotentialReadingOut
  */
 export const zPotentialReadingOut = z.object({
@@ -4171,6 +4284,49 @@ export const zCollectionAgendaOut = z.object({
     agenda: z.array(zPublicAgendaEntry).nullable(),
     scenario_label: z.string().nullish(),
     updated_at: z.iso.datetime().nullish()
+});
+
+/**
+ * PurposeId
+ *
+ * Identificadores estáveis das finalidades (o contrato público da política entre versões).
+ */
+export const zPurposeId = z.enum([
+    'conta',
+    'sacos',
+    'pedidos',
+    'pontos',
+    'triagem',
+    'logs_autenticacao',
+    'marketing',
+    'parcerias'
+]);
+
+/**
+ * PolicyPurpose
+ *
+ * Uma finalidade de tratamento: base legal, texto claro e as categorias com prazos.
+ */
+export const zPolicyPurpose = z.object({
+    categories: z.array(zPolicyCategory),
+    consent_required: z.boolean().optional().default(false),
+    description: z.string(),
+    id: zPurposeId,
+    legal_basis: z.string(),
+    title: z.string()
+});
+
+/**
+ * PolicyOut
+ *
+ * A política inteira, como a página pública a recebe (JSON; a web só desenha).
+ */
+export const zPolicyOut = z.object({
+    controller: z.string(),
+    minimum_age: z.int(),
+    purposes: z.array(zPolicyPurpose),
+    rights: z.array(z.string()),
+    version: z.string()
 });
 
 /**
@@ -4461,6 +4617,36 @@ export const zCollectionRequestOut = z.object({
     state: zCollectionRequestState,
     subject_kind: zRequestSubject,
     urgent: z.boolean()
+});
+
+/**
+ * ExportRequest
+ */
+export const zExportRequest = z.object({
+    address: z.string().nullable(),
+    bag_count: z.int(),
+    created_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    requested_date: z.string(),
+    state: zCollectionRequestState,
+    subject_kind: zRequestSubject,
+    urgent: z.boolean()
+});
+
+/**
+ * AccountExportOut
+ *
+ * A conta inteira, legível por máquina (JSON). Só dados FORNECIDOS ou OBSERVADOS — nunca
+ * derivados (sem calibração, sem pontuações de conformidade: WP29 242 rev.01, p. 10).
+ */
+export const zAccountExportOut = z.object({
+    bags: z.array(zExportBag),
+    collection_requests: z.array(zExportRequest),
+    consents: z.array(zExportConsent),
+    exported_at: z.iso.datetime(),
+    points: z.array(zExportPointEntry),
+    policy_version: z.string(),
+    profile: zExportProfile
 });
 
 /**
@@ -5568,32 +5754,6 @@ export const zTimelineEvent = z.object({
 });
 
 /**
- * TimelineItem
- */
-export const zTimelineItem = z.object({
-    at: z.string(),
-    detail: z.string().nullish(),
-    label: z.string()
-});
-
-/**
- * TimelineSpec
- */
-export const zTimelineSpec = z.object({
-    items: z.array(zTimelineItem),
-    source: z.string(),
-    title: z.string()
-});
-
-/**
- * TimelineArtifact
- */
-export const zTimelineArtifact = z.object({
-    artifact_type: z.literal('timeline').optional().default('timeline'),
-    spec: zTimelineSpec
-});
-
-/**
  * Tipau
  *
  * Tipologia de Áreas Urbanas do INE: define o custo de recolher em território urbano ou rural.
@@ -6478,185 +6638,6 @@ export const zChartArtifact = z.object({
 });
 
 /**
- * ArtifactEnvelope
- */
-export const zArtifactEnvelope = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    id: z.uuid(),
-    sources: z.array(zArtifactSource),
-    title: z.string()
-});
-
-/**
- * ArtifactOut
- */
-export const zArtifactOut = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    artifact_type: z.string(),
-    created_at: z.iso.datetime(),
-    id: z.uuid(),
-    message_id: z.uuid().nullable(),
-    pinned: z.boolean(),
-    refreshable: z.boolean(),
-    refreshed_at: z.iso.datetime().nullable(),
-    sources: z.array(z.record(z.string(), z.string().nullable())),
-    thread_id: z.uuid().nullable(),
-    title: z.string()
-});
-
-/**
- * ArtifactPage
- */
-export const zArtifactPage = z.object({
-    items: z.array(zArtifactOut),
-    next_cursor: z.string().nullable()
-});
-
-/**
- * CopilotArtifactEvent
- *
- * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
- */
-export const zCopilotArtifactEvent = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    id: z.uuid(),
-    sources: z.array(zArtifactSource),
-    title: z.string(),
-    type: z.literal('artifact').optional().default('artifact')
-});
-
-/**
- * CopilotEventMessage
- *
- * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
- */
-export const zCopilotEventMessage = z.discriminatedUnion('type', [
-    zCopilotStartEvent,
-    zCopilotStatusEvent,
-    zCopilotToolStartEvent,
-    zCopilotToolResultEvent,
-    zCopilotTextDeltaEvent,
-    zCopilotCardEvent,
-    zCopilotRetractEvent,
-    zCopilotVerificationEvent,
-    zCopilotSuggestionsEvent,
-    zCopilotContextEvent,
-    zCopilotUsageEvent,
-    zCopilotTitleEvent,
-    zCopilotErrorEvent,
-    zCopilotMemoryEvent,
-    zCopilotPlanEvent,
-    zCopilotClarifyEvent,
-    zCopilotSourcesEvent,
-    zCopilotWebSearchEvent,
-    zCopilotArtifactEvent,
-    zCopilotConfirmEvent,
-    zCopilotActionResultEvent,
-    zCopilotNavigateEvent,
-    zCopilotDoneEvent
-]);
-
-/**
- * CopilotEventCatalog
- *
- * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
- */
-export const zCopilotEventCatalog = z.object({
-    events: z.array(zCopilotEventMessage)
-});
-
-/**
- * MessageOut
- */
-export const zMessageOut = z.object({
-    actions: z.array(zActionOut),
-    artifacts: z.array(zArtifactEnvelope),
-    attachments: z.array(zAttachmentOut),
-    cards: z.array(zScenarioCard),
-    cost_usd: z.number().nullable(),
-    created_at: z.iso.datetime(),
-    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
-    id: z.uuid(),
-    mentions: z.array(zMentionRef),
-    model: z.string().nullable(),
-    role: z.enum(['user', 'assistant']),
-    status: z.enum([
-        'complete',
-        'cancelled',
-        'error'
-    ]),
-    text: z.string(),
-    tokens: z.int().nullable(),
-    tools: z.array(zToolTraceOut),
-    verified: z.boolean().nullable(),
-    web_sources: z.array(zCopilotSource).optional()
-});
-
-/**
- * ThreadOut
- */
-export const zThreadOut = z.object({
-    archived: z.boolean(),
-    created_at: z.iso.datetime(),
-    ephemeral: z.boolean(),
-    has_summary: z.boolean(),
-    id: z.uuid(),
-    message_count: z.int(),
-    messages: z.array(zMessageOut),
-    parent_thread_id: z.uuid().nullable(),
-    pinned: z.boolean(),
-    project: z.string(),
-    shared: z.boolean(),
-    snippet: z.string().nullish(),
-    summary: z.string(),
-    title: z.string(),
-    updated_at: z.iso.datetime(),
-    used_tokens: z.int(),
-    window_tokens: z.int()
-});
-
-/**
- * DataExport
- */
-export const zDataExport = z.object({
-    actions: z.array(zActionOut),
-    exported_at: z.iso.datetime(),
-    memory: z.array(z.record(z.string(), z.unknown())),
-    settings: z.record(z.string(), z.unknown()),
-    threads: z.array(zThreadOut)
-});
-
-/**
  * WebhookAck
  */
 export const zWebhookAck = z.object({
@@ -6841,6 +6822,240 @@ export const zZoneOut = z.object({
     population_year: z.int().nullable(),
     service_days: z.int(),
     tipau: zTipau.nullable()
+});
+
+/**
+ * TimelineItem
+ */
+export const zNoveloFeaturesCopilotSchemasArtifactsTimelineItem = z.object({
+    at: z.string(),
+    detail: z.string().nullish(),
+    label: z.string()
+});
+
+/**
+ * TimelineSpec
+ */
+export const zTimelineSpec = z.object({
+    items: z.array(zNoveloFeaturesCopilotSchemasArtifactsTimelineItem),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * TimelineArtifact
+ */
+export const zTimelineArtifact = z.object({
+    artifact_type: z.literal('timeline').optional().default('timeline'),
+    spec: zTimelineSpec
+});
+
+/**
+ * ArtifactEnvelope
+ */
+export const zArtifactEnvelope = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string()
+});
+
+/**
+ * ArtifactOut
+ */
+export const zArtifactOut = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    artifact_type: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    message_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    refreshable: z.boolean(),
+    refreshed_at: z.iso.datetime().nullable(),
+    sources: z.array(z.record(z.string(), z.string().nullable())),
+    thread_id: z.uuid().nullable(),
+    title: z.string()
+});
+
+/**
+ * ArtifactPage
+ */
+export const zArtifactPage = z.object({
+    items: z.array(zArtifactOut),
+    next_cursor: z.string().nullable()
+});
+
+/**
+ * CopilotArtifactEvent
+ *
+ * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
+ */
+export const zCopilotArtifactEvent = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string(),
+    type: z.literal('artifact').optional().default('artifact')
+});
+
+/**
+ * CopilotEventMessage
+ *
+ * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
+ */
+export const zCopilotEventMessage = z.discriminatedUnion('type', [
+    zCopilotStartEvent,
+    zCopilotStatusEvent,
+    zCopilotToolStartEvent,
+    zCopilotToolResultEvent,
+    zCopilotTextDeltaEvent,
+    zCopilotCardEvent,
+    zCopilotRetractEvent,
+    zCopilotVerificationEvent,
+    zCopilotSuggestionsEvent,
+    zCopilotContextEvent,
+    zCopilotUsageEvent,
+    zCopilotTitleEvent,
+    zCopilotErrorEvent,
+    zCopilotMemoryEvent,
+    zCopilotPlanEvent,
+    zCopilotClarifyEvent,
+    zCopilotSourcesEvent,
+    zCopilotWebSearchEvent,
+    zCopilotArtifactEvent,
+    zCopilotConfirmEvent,
+    zCopilotActionResultEvent,
+    zCopilotNavigateEvent,
+    zCopilotDoneEvent
+]);
+
+/**
+ * CopilotEventCatalog
+ *
+ * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
+ */
+export const zCopilotEventCatalog = z.object({
+    events: z.array(zCopilotEventMessage)
+});
+
+/**
+ * MessageOut
+ */
+export const zMessageOut = z.object({
+    actions: z.array(zActionOut),
+    artifacts: z.array(zArtifactEnvelope),
+    attachments: z.array(zAttachmentOut),
+    cards: z.array(zScenarioCard),
+    cost_usd: z.number().nullable(),
+    created_at: z.iso.datetime(),
+    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
+    id: z.uuid(),
+    mentions: z.array(zMentionRef),
+    model: z.string().nullable(),
+    role: z.enum(['user', 'assistant']),
+    status: z.enum([
+        'complete',
+        'cancelled',
+        'error'
+    ]),
+    text: z.string(),
+    tokens: z.int().nullable(),
+    tools: z.array(zToolTraceOut),
+    verified: z.boolean().nullable(),
+    web_sources: z.array(zCopilotSource).optional()
+});
+
+/**
+ * ThreadOut
+ */
+export const zThreadOut = z.object({
+    archived: z.boolean(),
+    created_at: z.iso.datetime(),
+    ephemeral: z.boolean(),
+    has_summary: z.boolean(),
+    id: z.uuid(),
+    message_count: z.int(),
+    messages: z.array(zMessageOut),
+    parent_thread_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    project: z.string(),
+    shared: z.boolean(),
+    snippet: z.string().nullish(),
+    summary: z.string(),
+    title: z.string(),
+    updated_at: z.iso.datetime(),
+    used_tokens: z.int(),
+    window_tokens: z.int()
+});
+
+/**
+ * DataExport
+ */
+export const zDataExport = z.object({
+    actions: z.array(zActionOut),
+    exported_at: z.iso.datetime(),
+    memory: z.array(z.record(z.string(), z.unknown())),
+    settings: z.record(z.string(), z.unknown()),
+    threads: z.array(zThreadOut)
+});
+
+/**
+ * TimelineItem
+ *
+ * Uma data de expiração FIFO e quantos pontos caem nela (o calendário do saldo).
+ */
+export const zNoveloFeaturesPrivacySchemasTimelineItem = z.object({
+    amount: z.int(),
+    expires_at: z.iso.datetime()
+});
+
+/**
+ * DeletionPreviewOut
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde.
+ *
+ * `points_are_not_money` é o texto decidido no ADR («pontos não são dinheiro nem conversíveis») —
+ * o web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.
+ */
+export const zDeletionPreviewOut = z.object({
+    active_bags: z.int(),
+    bags: z.int(),
+    points_are_not_money: z.boolean().optional().default(true),
+    points_entries: z.int(),
+    redeem_hint_path: z.string().optional().default('/cidadao?tab=saldo'),
+    requests: z.int(),
+    saldo: zSaldoOut,
+    timeline: z.array(zNoveloFeaturesPrivacySchemasTimelineItem)
 });
 
 /**
@@ -7240,6 +7455,23 @@ export const zGetCalibrationResponse = zCalibrationOut;
  */
 export const zGetDonorAccountResponse = zDonorAccountOut;
 
+export const zDeleteDonorAccountBody = zDeletionRequest;
+
+/**
+ * Successful Response
+ */
+export const zDeleteDonorAccountResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetDonorDeletionPreviewResponse = zDeletionPreviewOut;
+
+/**
+ * Successful Response
+ */
+export const zExportDonorAccountResponse = zAccountExportOut;
+
 /**
  * Successful Response
  */
@@ -7310,6 +7542,18 @@ export const zListDonorCampaignsResponse = z.array(zCampaignOut);
  * Successful Response
  */
 export const zGetDonorCatalogResponse = z.array(zCatalogItemPublic);
+
+/**
+ * Successful Response
+ */
+export const zGetDonorConsentsResponse = zConsentsOut;
+
+export const zSetDonorConsentBody = zConsentUpdate;
+
+/**
+ * Successful Response
+ */
+export const zSetDonorConsentResponse = zConsentsOut;
 
 /**
  * Response Get Collection History
@@ -8531,6 +8775,11 @@ export const zGetLotQrPath = z.object({
  * Successful Response
  */
 export const zGetLotQrResponse = z.string();
+
+/**
+ * Successful Response
+ */
+export const zGetPublicPrivacyPolicyResponse = zPolicyOut;
 
 /**
  * Successful Response

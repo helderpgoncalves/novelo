@@ -11,6 +11,7 @@ import {
   PackageOpen,
   Pencil,
   QrCode,
+  ShieldCheck,
   ShoppingBag,
   Truck,
   Wallet as WalletIcon,
@@ -53,6 +54,7 @@ import {
 import { agendaByDay, cadenceLabel, channelLabel } from '@/features/cidadao/agenda';
 import { CatalogoTab } from '@/features/cidadao/catalogo-tab';
 import { bagsAtHome, milestones, onboardingCollapsed } from '@/features/cidadao/onboarding';
+import { PrivacyTab } from '@/features/cidadao/privacy-tab';
 import { RequestSheet } from '@/features/cidadao/request-sheet';
 import { getErrorCode } from '@/lib/errors';
 import { formatKg, formatNumber } from '@/lib/format';
@@ -61,7 +63,7 @@ import { cn } from '@/lib/utils';
 
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
 
-type WalletTabId = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico';
+type WalletTabId = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico' | 'privacidade';
 
 const TABS: Array<{ id: WalletTabId; label: string; icon: typeof Home }> = [
   { id: 'inicio', label: 'Início', icon: Home },
@@ -69,9 +71,10 @@ const TABS: Array<{ id: WalletTabId; label: string; icon: typeof Home }> = [
   { id: 'saldo', label: 'Saldo', icon: WalletIcon },
   { id: 'catalogo', label: 'Catálogo', icon: Gift },
   { id: 'historico', label: 'Histórico', icon: History },
+  { id: 'privacidade', label: 'Privacidade', icon: ShieldCheck },
 ];
 
-/** A «Carteira» do doador: barra de separadores em baixo (telemóvel primeiro), cinco ecrãs densos. */
+/** A «Carteira» do doador: barra de separadores em baixo (telemóvel primeiro), seis ecrãs densos. */
 export function Wallet({ tab }: { tab: WalletTabId }) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -147,6 +150,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
             {tab === 'saldo' && <SaldoTab saldoQuery={saldoQuery} />}
             {tab === 'catalogo' && <CatalogoTab balance={saldoQuery.data?.balance ?? 0} />}
             {tab === 'historico' && <HistoricoTab history={history} />}
+            {tab === 'privacidade' && <PrivacyTab />}
           </>
         )}
       </main>

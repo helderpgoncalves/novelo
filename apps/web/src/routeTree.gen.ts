@@ -20,6 +20,7 @@ import { Route as LocalRouteImport } from './routes/local'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
 import { Route as OndeQuandoRouteImport } from './routes/onde-quando'
 import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
+import { Route as PoliticaDadosRouteImport } from './routes/politica-dados'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
@@ -113,6 +114,11 @@ const OndeQuandoRoute = OndeQuandoRouteImport.update({
 const PendingApprovalRoute = PendingApprovalRouteImport.update({
   id: '/pending-approval',
   path: '/pending-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliticaDadosRoute = PoliticaDadosRouteImport.update({
+  id: '/politica-dados',
+  path: '/politica-dados',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -332,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/magic-link': typeof MagicLinkRoute
   '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -384,6 +391,7 @@ export interface FileRoutesByTo {
   '/magic-link': typeof MagicLinkRoute
   '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -439,6 +447,7 @@ export interface FileRoutesById {
   '/magic-link': typeof MagicLinkRoute
   '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -493,6 +502,7 @@ export interface FileRouteTypes {
     | '/magic-link'
     | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -545,6 +555,7 @@ export interface FileRouteTypes {
     | '/magic-link'
     | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -599,6 +610,7 @@ export interface FileRouteTypes {
     | '/magic-link'
     | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -654,6 +666,7 @@ export interface RootRouteChildren {
   MagicLinkRoute: typeof MagicLinkRoute
   OndeQuandoRoute: typeof OndeQuandoRoute
   PendingApprovalRoute: typeof PendingApprovalRoute
+  PoliticaDadosRoute: typeof PoliticaDadosRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
@@ -738,6 +751,13 @@ declare module '@tanstack/react-router' {
       path: '/pending-approval'
       fullPath: '/pending-approval'
       preLoaderRoute: typeof PendingApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/politica-dados': {
+      id: '/politica-dados'
+      path: '/politica-dados'
+      fullPath: '/politica-dados'
+      preLoaderRoute: typeof PoliticaDadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -1130,6 +1150,7 @@ const rootRouteChildren: RootRouteChildren = {
   MagicLinkRoute: MagicLinkRoute,
   OndeQuandoRoute: OndeQuandoRoute,
   PendingApprovalRoute: PendingApprovalRoute,
+  PoliticaDadosRoute: PoliticaDadosRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,

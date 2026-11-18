@@ -13,7 +13,7 @@ import { getErrorCode } from '@/lib/errors';
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
 
 /** Aba ativa da carteira (vai na URL: partilhável e voltável). */
-export type WalletTab = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico';
+export type WalletTab = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico' | 'privacidade';
 
 /**
  * A área do cidadão: sem sessão é a porta de entrada (herói público + criação de conta);
@@ -96,7 +96,11 @@ function CidadaoPublic() {
 
         <p className="text-muted-foreground px-2 text-xs">
           A rede de recolha de têxtil é uma operação da Vitrus · Guimarães. Lotes e passaportes
-          nunca mostram doadores.
+          nunca mostram doadores — a{' '}
+          <Link to="/politica-dados" className="text-primary underline-offset-2 hover:underline">
+            política de dados
+          </Link>{' '}
+          diz o que guardamos e até quando.
         </p>
       </div>
     </div>

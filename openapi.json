@@ -36,6 +36,62 @@
         "title": "AcceptInvitationRequest",
         "type": "object"
       },
+      "AccountExportOut": {
+        "description": "A conta inteira, legível por máquina (JSON). Só dados FORNECIDOS ou OBSERVADOS — nunca\nderivados (sem calibração, sem pontuações de conformidade: WP29 242 rev.01, p. 10).",
+        "properties": {
+          "bags": {
+            "items": {
+              "$ref": "#/components/schemas/ExportBag"
+            },
+            "title": "Bags",
+            "type": "array"
+          },
+          "collection_requests": {
+            "items": {
+              "$ref": "#/components/schemas/ExportRequest"
+            },
+            "title": "Collection Requests",
+            "type": "array"
+          },
+          "consents": {
+            "items": {
+              "$ref": "#/components/schemas/ExportConsent"
+            },
+            "title": "Consents",
+            "type": "array"
+          },
+          "exported_at": {
+            "format": "date-time",
+            "title": "Exported At",
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/ExportPointEntry"
+            },
+            "title": "Points",
+            "type": "array"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/ExportProfile"
+          }
+        },
+        "required": [
+          "exported_at",
+          "policy_version",
+          "profile",
+          "consents",
+          "bags",
+          "collection_requests",
+          "points"
+        ],
+        "title": "AccountExportOut",
+        "type": "object"
+      },
       "ActionOut": {
         "properties": {
           "auto_approved": {
@@ -4584,6 +4640,100 @@
         "title": "ConfirmActionIn",
         "type": "object"
       },
+      "ConsentPurpose": {
+        "description": "As finalidades que EXIGEM consentimento (prévio e expresso, em duas camadas; nunca soft opt-in).\n\nO essencial da conta (crédito, recolhas, triagem) é contrato — não anda aqui. Marketing e parcerias\ntêm caixas próprias, desligadas por defeito, retiráveis a qualquer momento (art. 7.º/3 RGPD).",
+        "enum": [
+          "marketing",
+          "partnerships"
+        ],
+        "title": "ConsentPurpose",
+        "type": "string"
+      },
+      "ConsentStateOut": {
+        "description": "O estado corrente de uma finalidade: a última linha vence; sem linhas é desligado e nunca pedido.",
+        "properties": {
+          "granted": {
+            "title": "Granted",
+            "type": "boolean"
+          },
+          "policy_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Policy Version"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ConsentPurpose"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "purpose",
+          "granted"
+        ],
+        "title": "ConsentStateOut",
+        "type": "object"
+      },
+      "ConsentUpdate": {
+        "description": "Uma decisão: finalidade + dado ou retirado (o histórico fica append-only lá atrás).",
+        "properties": {
+          "granted": {
+            "title": "Granted",
+            "type": "boolean"
+          },
+          "purpose": {
+            "$ref": "#/components/schemas/ConsentPurpose"
+          },
+          "source": {
+            "default": "account",
+            "enum": [
+              "account",
+              "api"
+            ],
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "granted"
+        ],
+        "title": "ConsentUpdate",
+        "type": "object"
+      },
+      "ConsentsOut": {
+        "description": "As DUAS camadas (marketing e parcerias), sempre ambas, com o estado corrente de cada uma.",
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/ConsentStateOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "ConsentsOut",
+        "type": "object"
+      },
       "ContainerKind": {
         "enum": [
           "textile",
@@ -7096,6 +7246,73 @@
         "title": "DeleteUserRequest",
         "type": "object"
       },
+      "DeletionPreviewOut": {
+        "description": "O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde.\n\n`points_are_not_money` é o texto decidido no ADR («pontos não são dinheiro nem conversíveis») —\no web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.",
+        "properties": {
+          "active_bags": {
+            "title": "Active Bags",
+            "type": "integer"
+          },
+          "bags": {
+            "title": "Bags",
+            "type": "integer"
+          },
+          "points_are_not_money": {
+            "default": true,
+            "title": "Points Are Not Money",
+            "type": "boolean"
+          },
+          "points_entries": {
+            "title": "Points Entries",
+            "type": "integer"
+          },
+          "redeem_hint_path": {
+            "default": "/cidadao?tab=saldo",
+            "title": "Redeem Hint Path",
+            "type": "string"
+          },
+          "requests": {
+            "title": "Requests",
+            "type": "integer"
+          },
+          "saldo": {
+            "$ref": "#/components/schemas/SaldoOut"
+          },
+          "timeline": {
+            "items": {
+              "$ref": "#/components/schemas/novelo__features__privacy__schemas__TimelineItem"
+            },
+            "title": "Timeline",
+            "type": "array"
+          }
+        },
+        "required": [
+          "saldo",
+          "timeline",
+          "active_bags",
+          "bags",
+          "requests",
+          "points_entries"
+        ],
+        "title": "DeletionPreviewOut",
+        "type": "object"
+      },
+      "DeletionRequest": {
+        "description": "A confirmação: o email da conta, escrito à mão (a 3.ª proteção é o texto no ecrã; esta é a trava).",
+        "properties": {
+          "confirm_email": {
+            "maxLength": 255,
+            "minLength": 3,
+            "title": "Confirm Email",
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm_email"
+        ],
+        "title": "DeletionRequest",
+        "type": "object"
+      },
       "DispatchAction": {
         "description": "A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).",
         "enum": [
@@ -8052,6 +8269,100 @@
         "title": "ErrorBody",
         "type": "object"
       },
+      "ExportBag": {
+        "properties": {
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          },
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "deactivated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Deactivated At"
+          },
+          "declaration": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/BagDeclaration"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "nickname": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nickname"
+          }
+        },
+        "required": [
+          "code",
+          "nickname",
+          "declaration",
+          "active",
+          "created_at",
+          "deactivated_at"
+        ],
+        "title": "ExportBag",
+        "type": "object"
+      },
+      "ExportConsent": {
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "granted": {
+            "title": "Granted",
+            "type": "boolean"
+          },
+          "policy_version": {
+            "title": "Policy Version",
+            "type": "string"
+          },
+          "purpose": {
+            "title": "Purpose",
+            "type": "string"
+          },
+          "source": {
+            "title": "Source",
+            "type": "string"
+          }
+        },
+        "required": [
+          "purpose",
+          "granted",
+          "policy_version",
+          "source",
+          "created_at"
+        ],
+        "title": "ExportConsent",
+        "type": "object"
+      },
       "ExportFormat": {
         "enum": [
           "csv",
@@ -8415,6 +8726,206 @@
           "closed_at"
         ],
         "title": "ExportLotSummary",
+        "type": "object"
+      },
+      "ExportPointEntry": {
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "bag_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bag Code"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "expires_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expires At"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "lot_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lot Code"
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reason"
+          }
+        },
+        "required": [
+          "kind",
+          "amount",
+          "bag_code",
+          "lot_code",
+          "reason",
+          "created_at",
+          "expires_at"
+        ],
+        "title": "ExportPointEntry",
+        "type": "object"
+      },
+      "ExportProfile": {
+        "description": "O perfil fornecido pelo titular: identificador, nome opcional, pseudónimo, idade declarada.",
+        "properties": {
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "declared_age": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Declared Age"
+          },
+          "donor_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Donor Code"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "joined_via": {
+            "title": "Joined Via",
+            "type": "string"
+          },
+          "locale": {
+            "title": "Locale",
+            "type": "string"
+          },
+          "name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Name"
+          }
+        },
+        "required": [
+          "email",
+          "name",
+          "donor_code",
+          "declared_age",
+          "locale",
+          "joined_via",
+          "created_at"
+        ],
+        "title": "ExportProfile",
+        "type": "object"
+      },
+      "ExportRequest": {
+        "properties": {
+          "address": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Address"
+          },
+          "bag_count": {
+            "title": "Bag Count",
+            "type": "integer"
+          },
+          "created_at": {
+            "format": "date-time",
+            "title": "Created At",
+            "type": "string"
+          },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Parish Code"
+          },
+          "requested_date": {
+            "title": "Requested Date",
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CollectionRequestState"
+          },
+          "subject_kind": {
+            "$ref": "#/components/schemas/RequestSubject"
+          },
+          "urgent": {
+            "title": "Urgent",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "subject_kind",
+          "address",
+          "parish_code",
+          "bag_count",
+          "requested_date",
+          "urgent",
+          "state",
+          "created_at"
+        ],
+        "title": "ExportRequest",
         "type": "object"
       },
       "ExportScope": {
@@ -17594,6 +18105,111 @@
         "title": "PointsHistoryOut",
         "type": "object"
       },
+      "PolicyCategory": {
+        "description": "Uma categoria de dados dentro de uma finalidade, com o SEU prazo de conservação.",
+        "properties": {
+          "applied_by": {
+            "title": "Applied By",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "retention": {
+            "title": "Retention",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "retention",
+          "applied_by"
+        ],
+        "title": "PolicyCategory",
+        "type": "object"
+      },
+      "PolicyOut": {
+        "description": "A política inteira, como a página pública a recebe (JSON; a web só desenha).",
+        "properties": {
+          "controller": {
+            "title": "Controller",
+            "type": "string"
+          },
+          "minimum_age": {
+            "title": "Minimum Age",
+            "type": "integer"
+          },
+          "purposes": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyPurpose"
+            },
+            "title": "Purposes",
+            "type": "array"
+          },
+          "rights": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Rights",
+            "type": "array"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "controller",
+          "minimum_age",
+          "rights",
+          "purposes"
+        ],
+        "title": "PolicyOut",
+        "type": "object"
+      },
+      "PolicyPurpose": {
+        "description": "Uma finalidade de tratamento: base legal, texto claro e as categorias com prazos.",
+        "properties": {
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/PolicyCategory"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "consent_required": {
+            "default": false,
+            "title": "Consent Required",
+            "type": "boolean"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "id": {
+            "$ref": "#/components/schemas/PurposeId"
+          },
+          "legal_basis": {
+            "title": "Legal Basis",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "legal_basis",
+          "description",
+          "categories"
+        ],
+        "title": "PolicyPurpose",
+        "type": "object"
+      },
       "PotentialReadingOut": {
         "properties": {
           "basis": {
@@ -17819,6 +18435,21 @@
         ],
         "title": "PublicAgendaEntry",
         "type": "object"
+      },
+      "PurposeId": {
+        "description": "Identificadores estáveis das finalidades (o contrato público da política entre versões).",
+        "enum": [
+          "conta",
+          "sacos",
+          "pedidos",
+          "pontos",
+          "triagem",
+          "logs_autenticacao",
+          "marketing",
+          "parcerias"
+        ],
+        "title": "PurposeId",
+        "type": "string"
       },
       "QuantilesOut": {
         "properties": {
@@ -21997,42 +22628,12 @@
         "title": "TimelineEvent",
         "type": "object"
       },
-      "TimelineItem": {
-        "additionalProperties": false,
-        "properties": {
-          "at": {
-            "title": "At",
-            "type": "string"
-          },
-          "detail": {
-            "anyOf": [
-              {
-                "type": "string"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Detail"
-          },
-          "label": {
-            "title": "Label",
-            "type": "string"
-          }
-        },
-        "required": [
-          "at",
-          "label"
-        ],
-        "title": "TimelineItem",
-        "type": "object"
-      },
       "TimelineSpec": {
         "additionalProperties": false,
         "properties": {
           "items": {
             "items": {
-              "$ref": "#/components/schemas/TimelineItem"
+              "$ref": "#/components/schemas/novelo__features__copilot__schemas_artifacts__TimelineItem"
             },
             "title": "Items",
             "type": "array"
@@ -24012,6 +24613,56 @@
           "geometry"
         ],
         "title": "ZoneOut",
+        "type": "object"
+      },
+      "novelo__features__copilot__schemas_artifacts__TimelineItem": {
+        "additionalProperties": false,
+        "properties": {
+          "at": {
+            "title": "At",
+            "type": "string"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "at",
+          "label"
+        ],
+        "title": "TimelineItem",
+        "type": "object"
+      },
+      "novelo__features__privacy__schemas__TimelineItem": {
+        "description": "Uma data de expiração FIFO e quantos pontos caem nela (o calendário do saldo).",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "title": "Expires At",
+            "type": "string"
+          }
+        },
+        "required": [
+          "expires_at",
+          "amount"
+        ],
+        "title": "TimelineItem",
         "type": "object"
       }
     }
@@ -31165,6 +31816,375 @@
         ]
       }
     },
+    "/api/v1/cidadao/account/delete": {
+      "post": {
+        "description": "Apagar a própria conta (art. 17.º): exige o email da conta escrito à mão. A pessoa desaparece;\nsacos, livro de pontos, pedidos e consentimentos ficam anónimos (os agregados sobrevivem) e o\nfacto fica na auditoria, sem email nem IP do próprio.",
+        "operationId": "delete_donor_account",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Delete Donor Account",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/v1/cidadao/account/delete-preview": {
+      "get": {
+        "description": "O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde. O web usa-o\npara as três proteções do ADR (aviso, resgatar antes, «pontos não são dinheiro nem conversíveis»).",
+        "operationId": "get_donor_deletion_preview",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeletionPreviewOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Donor Deletion Preview",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
+    "/api/v1/cidadao/account/export": {
+      "get": {
+        "description": "Portabilidade (art. 20.º): a conta inteira em JSON legível por máquina — perfil, consentimentos,\nsacos, pedidos e livro de pontos. Nunca inclui dados derivados (calibração, pontuações).",
+        "operationId": "export_donor_account",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountExportOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Export Donor Account",
+        "tags": [
+          "privacy"
+        ]
+      }
+    },
     "/api/v1/cidadao/account/qr": {
       "get": {
         "description": "O QR de conta (segundo portador, ADR #35): entrega mão a mão, sem saco da plataforma.\n\nÉ um portador de CRÉDITO, nunca uma credencial de sessão — quem o apresenta atribui a entrega à\nprópria conta; o scan só etiqueta o lote com o código pseudónimo. Perder o telemóvel não perde a\nconta; o QR pode voltar a abrir-se a qualquer momento.",
@@ -32338,6 +33358,258 @@
         "summary": "Get Donor Catalog",
         "tags": [
           "catalog"
+        ]
+      }
+    },
+    "/api/v1/cidadao/consents": {
+      "get": {
+        "description": "As duas camadas de consentimento (marketing da Vitrus e ofertas de parceiros), desligadas por\ndefeito — cada uma com o momento e a versão da política em que foi dada ou retirada.",
+        "operationId": "get_donor_consents",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Donor Consents",
+        "tags": [
+          "privacy"
+        ]
+      },
+      "put": {
+        "description": "Dar ou retirar UMA camada de consentimento: linha nova append-only + trilha de auditoria (a\nprova do art. 7.º/1 RGPD). Retirar é tão fácil como dar; a outra camada não se mexe.",
+        "operationId": "set_donor_consent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentsOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Set Donor Consent",
+        "tags": [
+          "privacy"
         ]
       }
     },
@@ -51550,6 +52822,128 @@
           }
         },
         "summary": "Get Lot Qr",
+        "tags": [
+          "public"
+        ]
+      }
+    },
+    "/api/v1/public/privacy-policy": {
+      "get": {
+        "description": "A política de privacidade por finalidades, com prazos por categoria — pública e sem sessão.\n\nUMA fonte (`features/privacy/policy.py`): o web desenha-a tal e qual; mudou algo, muda-se lá.\nCache curta no cliente: a política só muda quando a equipa muda a versão.",
+        "operationId": "get_public_privacy_policy",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PolicyOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Pedido inválido"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem sessão ou credenciais inválidas"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Sem permissão"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Não encontrado"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Conflito"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationErrorBody"
+                }
+              }
+            },
+            "description": "Dados inválidos"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Demasiados pedidos"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Erro interno"
+          },
+          "502": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Falha num serviço externo"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Funcionalidade indisponível"
+          }
+        },
+        "summary": "Get Public Privacy Policy",
         "tags": [
           "public"
         ]
