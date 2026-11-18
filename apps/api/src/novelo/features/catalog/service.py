@@ -130,7 +130,7 @@ async def redeem(db: AsyncSession, user: User, item_id: uuid.UUID, meta: Request
     if balance < item.points_cost:
         raise InsufficientPointsError(balance=balance, shortfall=item.points_cost - balance)
 
-    # 2. Teto de donativos IPSS: valor-eu­ro do mês ≤ pct × custo evitado × toneladas MEDIDAS.
+    # 2. Teto de donativos IPSS: valor-euro do mês ≤ pct × custo evitado × toneladas MEDIDAS.
     if item.kind is CatalogItemKind.IPSS_DONATION and item.donation_value_cents is not None:
         cap = donation_cap_cents(await _measured_grams(db, user.id), cap_pct=get_settings().points_donation_cap_pct)
         donated = await _donated_this_month_cents(db, user.id, now)

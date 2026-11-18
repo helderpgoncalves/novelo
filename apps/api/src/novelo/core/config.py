@@ -195,7 +195,7 @@ class Settings(BaseSettings):
     points_bonus_conformity: int = Field(50, ge=0, alias="POINTS_BONUS_CONFORMITY")
     points_monthly_cap: int = Field(500, ge=0, alias="POINTS_MONTHLY_CAP")
     # Teto de donativos a IPSS: % do custo evitado (105,64 €/t × kg MEDIDOS da conta) que financia
-    # o valor-eu­ro doado num mês (#65, ADR «economia dos pontos»); 0 desliga o financiamento.
+    # o valor-euro doado num mês (#65, ADR «economia dos pontos»); 0 desliga o financiamento.
     points_donation_cap_pct: int = Field(100, ge=0, le=100, alias="POINTS_DONATION_CAP_PCT")
 
     @model_validator(mode="after")

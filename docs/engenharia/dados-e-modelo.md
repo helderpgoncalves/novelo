@@ -466,7 +466,7 @@ A conta de doador é uma **conta normal com perfil de doador** — decisão da s
 
 **Validação = pagamento integral por código apresentado** (uma única vez): `POST /admin/redemptions/validate` (equipa `admin`/`operator`, aceita o código em qualquer caixa) faz UPDATE condicional ao estado `pending` → `validated` com autor e momento (409 `redemption_already_used` na segunda apresentação, também em corrida; trilha de auditoria `catalog.redeem`/`catalog.validate`). **Decisão do MVP**: a validação é feita pela equipa na app de gestão (a parceira apresenta o código à Vitrus ou à mesa); o portal do parceiro com token próprio e autenticação dedicada fica para depois — o ADR não define auth de parceiro, e assim não nasce mais nenhuma máquina de credenciais. Pagamento apura-se por `redemptions` validados por parceiro (`ix_redemptions_partner_state`).
 
-**Teto de donativos indexado ao custo evitado** (`domain/catalog.py::donation_cap_cents`, função pura com valores calculados à mão): o valor-eu­ro de donativos IPSS empenhados num mês de calendário, por conta, não passa de `POINTS_DONATION_CAP_PCT` (100 por omissão; 0 desliga) do **custo evitado** da têxtil que a conta fez pesar na balança, vida toda:
+**Teto de donativos indexado ao custo evitado** (`domain/catalog.py::donation_cap_cents`, função pura com valores calculados à mão): o valor-euro de donativos IPSS empenhados num mês de calendário, por conta, não passa de `POINTS_DONATION_CAP_PCT` (100 por omissão; 0 desliga) do **custo evitado** da têxtil que a conta fez pesar na balança, vida toda:
 
 ```
 teto_cêntimos = ⌊ gramas_medidos × 10 564 × pct ÷ (100 × 1 000 000) ⌋
