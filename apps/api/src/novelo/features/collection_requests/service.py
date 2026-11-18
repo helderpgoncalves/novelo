@@ -130,6 +130,8 @@ async def create_request(db: AsyncSession, user: User, body: CollectionRequestCr
     if subject is RequestSubject.LOCAL:
         if body.address is not None or body.parish_code is not None:
             raise LocalAddressForbiddenError("Local/B2B requests carry no address: it is the institutional one")
+        if body.ephemeral_address:
+            raise LocalAddressForbiddenError("Ephemeral addresses exist only on dated citizen requests")
         account = (await db.execute(select(LocalAccount).where(LocalAccount.user_id == user.id))).scalar_one_or_none()
         if account is None or account.locality_id is None:
             raise LocalAccountMissingError("This account has no locality binding")
@@ -169,6 +171,8 @@ async def create_request(db: AsyncSession, user: User, body: CollectionRequestCr
         locality_id=locality_id,
         address=address_text,
         address_key=address_key,
+        # Morada efémera (só cidadão): sem retenção de 12 meses — apaga-se ao fechar o pedido.
+        ephemeral_address=bool(body.ephemeral_address and address_text),
         parish_id=parish.id if parish else None,
         bag_count=body.bag_count,
         requested_date=body.requested_date,
@@ -176,7 +180,9 @@ async def create_request(db: AsyncSession, user: User, body: CollectionRequestCr
         note=body.note,
         state=decision.state,
         exception_reason=decision.exception_reason,
-        address_retained_until=address_retained_until(datetime.now(UTC)) if address_text else None,
+        address_retained_until=(
+            address_retained_until(datetime.now(UTC)) if address_text and not body.ephemeral_address else None
+        ),
     )
     db.add(request)
     try:
@@ -203,6 +209,15 @@ async def purge_expired_addresses(db: AsyncSession) -> int:
     )
     await db.commit()
     return int(getattr(result, "rowcount", 0) or 0)
+
+
+def _purge_ephemeral_address(request: CollectionRequest) -> None:
+    """Morada efémera (só cidadão): ao CHEGAR ao estado terminal a morada apaga-se na hora —
+    minimização RGPD sem os 12 meses de retenção do caminho normal. A morada efémera nunca tem
+    `address_retained_until`, por isso a purga de leitura não a tocaria: esta é a única purga dela."""
+    if request.ephemeral_address:
+        request.address = None
+        request.address_key = None
 
 
 class _Names(NamedTuple):
@@ -321,6 +336,7 @@ def _to_out(
         parish_code=parish.dicofre if parish else None,
         parish_name=parish.name if parish else None,
         address=request.address,
+        ephemeral_address=request.ephemeral_address,
         bag_count=request.bag_count,
         requested_date=request.requested_date,
         urgent=request.urgent,
@@ -349,6 +365,7 @@ async def cancel_request(db: AsyncSession, user: User, request_id: uuid.UUID) ->
     request.state = CollectionRequestState.CANCELLED
     request.cancelled_at = datetime.now(UTC)
     request.cancelled_by_id = user.id
+    _purge_ephemeral_address(request)  # morada efémera: apaga-se ao fechar (sem retenção)
     await db.commit()
     return request
 
@@ -365,6 +382,7 @@ async def dispatch_request(
             raise RequestNotDispatchableError("Rejecting needs a reason")
         request.state = CollectionRequestState.REJECTED
         request.dispatch_reason = body.reason  # o motivo da exceção fica no histórico do pedido
+        _purge_ephemeral_address(request)  # recusado é terminal: morada efémera apaga-se já
     else:
         request.state = CollectionRequestState.SCHEDULED
         request.exception_reason = None
@@ -393,5 +411,7 @@ async def record_outcome(
         request.collected_at = datetime.now(UTC)
     elif result.state is CollectionRequestState.EXPIRED:
         request.expired_at = datetime.now(UTC)
+    if result.state in TERMINAL_STATES:
+        _purge_ephemeral_address(request)  # recolhido/expirado: morada efémera apaga-se ao fechar
     await db.commit()
     return request

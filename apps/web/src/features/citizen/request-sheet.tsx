@@ -63,6 +63,7 @@ export function RequestSheet({
   const [bags, setBags] = useState(1);
   const [parishCode, setParishCode] = useState('');
   const [address, setAddress] = useState('');
+  const [ephemeral, setEphemeral] = useState(false);
   const [date, setDate] = useState(() =>
     new Date(Date.now() + TWO_DAYS_MS).toISOString().slice(0, 10),
   );
@@ -93,6 +94,7 @@ export function RequestSheet({
                 requested_date: date,
                 address: address.trim(),
                 parish_code: parishCode,
+                ephemeral_address: ephemeral,
                 note: note.trim() || undefined,
               },
             });
@@ -165,6 +167,21 @@ export function RequestSheet({
               className="text-base"
             />
           </div>
+          <label className="flex min-h-11 items-start gap-3 rounded-md p-1">
+            <input
+              type="checkbox"
+              checked={ephemeral}
+              onChange={(e) => setEphemeral(e.target.checked)}
+              className="mt-0.5 size-4 accent-[var(--color-primary)]"
+            />
+            <span className="text-sm">
+              Não guardar a morada depois da recolha
+              <span className="text-muted-foreground block text-xs">
+                A morada apaga-se quando o pedido fecha (recolhido, cancelado ou recusado) — a
+                equipa só a vê enquanto o pedido está ativo.
+              </span>
+            </span>
+          </label>
           <StickyActions>
             <Button
               type="submit"

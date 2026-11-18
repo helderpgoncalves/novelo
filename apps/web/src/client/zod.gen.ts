@@ -926,6 +926,7 @@ export const zCollectionPlanEntry = z.object({
 export const zCollectionRequestCreate = z.object({
     address: z.string().max(280).nullish(),
     bag_count: z.int().gte(1).lte(500),
+    ephemeral_address: z.boolean().optional().default(false),
     note: z.string().max(240).nullish(),
     parish_code: z.string().max(6).nullish(),
     requested_date: z.iso.date(),
@@ -4630,6 +4631,7 @@ export const zCollectionRequestOut = z.object({
     created_at: z.iso.datetime(),
     dispatch_reason: z.string().nullish(),
     dispatched_at: z.iso.datetime().nullish(),
+    ephemeral_address: z.boolean().optional().default(false),
     exception_reason: zRequestExceptionReason.nullish(),
     expired_at: z.iso.datetime().nullish(),
     id: z.uuid(),

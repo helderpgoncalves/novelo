@@ -44,6 +44,13 @@ class CollectionRequestCreate(BaseModel):
         default=False,
         description="Urgência: nunca é auto-aceite — cai na fila do gestor para despacho",
     )
+    ephemeral_address: bool = Field(
+        default=False,
+        description=(
+            "«Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção "
+            "de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)"
+        ),
+    )
     note: str | None = Field(default=None, max_length=240, description="Recado para a equipa (ex.: «portão azul»)")
 
 
@@ -82,6 +89,10 @@ class CollectionRequestOut(BaseModel):
     parish_name: str | None = None
     address: str | None = Field(
         default=None, description="Morada escrita (cidadão); `null` depois da purga de 12 meses"
+    )
+    ephemeral_address: bool = Field(
+        default=False,
+        description="Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal",
     )
     bag_count: int = Field(description="Sacos pedidos (cidadão 1–5; local até 20 — teto estimativa)")
     requested_date: date

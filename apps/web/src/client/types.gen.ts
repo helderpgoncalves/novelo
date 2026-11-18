@@ -2435,6 +2435,12 @@ export type CollectionRequestCreate = {
      */
     bag_count: number;
     /**
+     * Ephemeral Address
+     *
+     * «Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)
+     */
+    ephemeral_address?: boolean;
+    /**
      * Note
      *
      * Recado para a equipa (ex.: «portão azul»)
@@ -2506,6 +2512,12 @@ export type CollectionRequestOut = {
      * Dispatched At
      */
     dispatched_at?: string | null;
+    /**
+     * Ephemeral Address
+     *
+     * Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal
+     */
+    ephemeral_address?: boolean;
     /**
      * `out_of_round`, `cutoff`, `special_volume` (recolha especial) ou `urgency`
      */

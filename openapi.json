@@ -4143,6 +4143,12 @@
             "title": "Bag Count",
             "type": "integer"
           },
+          "ephemeral_address": {
+            "default": false,
+            "description": "«Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)",
+            "title": "Ephemeral Address",
+            "type": "boolean"
+          },
           "note": {
             "anyOf": [
               {
@@ -4274,6 +4280,12 @@
               }
             ],
             "title": "Dispatched At"
+          },
+          "ephemeral_address": {
+            "default": false,
+            "description": "Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal",
+            "title": "Ephemeral Address",
+            "type": "boolean"
           },
           "exception_reason": {
             "anyOf": [

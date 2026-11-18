@@ -54,6 +54,9 @@ class CollectionRequest(Base, UuidPkMixin, TimestampMixin):
     # Cidadão: morada manual de primeira classe (nunca GPS) + a freguesia declarada, que liga à ronda.
     address: Mapped[str | None] = mapped_column(Text)
     address_key: Mapped[str | None] = mapped_column(Text, index=True)
+    # «Morada efémera» (só pedidos agendados de cidadão, RGPD por minimização): a morada apaga-se ao
+    # CHEGAR ao estado terminal — sem os 12 meses de retenção do caminho normal.
+    ephemeral_address: Mapped[bool] = mapped_column(Boolean, default=False, server_default=text("false"))
     parish_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("parishes.id", ondelete="SET NULL"), index=True
     )
