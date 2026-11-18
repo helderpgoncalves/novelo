@@ -102,8 +102,15 @@ describe('despejo da fila (a sincronização, pela ordem de registo)', () => {
     });
     // Transitório: a operação volta a 'queued' (não fica presa em 'syncing' nem marca falha).
     const addUnitOp = state.ops[1];
-    expect(actions).toContainEqual({ type: 'requeue', id: addUnitOp.id });
-    expect(actions).not.toContainEqual({ type: 'mark-failed', id: addUnitOp.id, error: 'sem rede' });
+    expect(addUnitOp).toBeDefined();
+    if (addUnitOp) {
+      expect(actions).toContainEqual({ type: 'requeue', id: addUnitOp.id });
+      expect(actions).not.toContainEqual({
+        type: 'mark-failed',
+        id: addUnitOp.id,
+        error: 'sem rede',
+      });
+    }
   });
 
   it('erro definitivo: marca a falhada (o operador vê o motivo) e não despeja o resto', async () => {
