@@ -6,8 +6,8 @@ IPSS; parceiro obrigatório em prémio de parceiro. O resgate vive aqui só como
 de 0026 já o aceita). Snapshots do item/parceiro/valor para o pagamento por apresentação sobreviver
 a renomeações; `user_id`/`validated_by_id`/`item_id`/`partner_id` são SET NULL (agregados ficam).
 
-Revision ID: 0027
-Revises: 0026
+Revision ID: 0028
+Revises: 0027
 Create Date: 2026-11-18 12:00:00.000000
 """
 
@@ -17,8 +17,8 @@ import sqlalchemy as sa
 from alembic import op
 from sqlalchemy.dialects import postgresql
 
-revision: str = "0027"
-down_revision: str | None = "0026"
+revision: str = "0028"
+down_revision: str | None = "0027"
 branch_labels: str | Sequence[str] | None = None
 depends_on: str | Sequence[str] | None = None
 
