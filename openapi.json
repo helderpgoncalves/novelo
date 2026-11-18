@@ -2712,7 +2712,7 @@
         "type": "string"
       },
       "CampaignCreate": {
-        "description": "Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).",
+        "description": "Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).",
         "properties": {
           "description": {
             "anyOf": [
@@ -2731,6 +2731,14 @@
             "format": "date-time",
             "title": "Ends At",
             "type": "string"
+          },
+          "gain_multiplier": {
+            "default": 1.0,
+            "description": "Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)",
+            "exclusiveMinimum": 0.0,
+            "maximum": 10.0,
+            "title": "Gain Multiplier",
+            "type": "number"
           },
           "name": {
             "maxLength": 120,
@@ -2776,6 +2784,11 @@
             "title": "Ends At",
             "type": "string"
           },
+          "gain_multiplier": {
+            "description": "Multiplicador do ganho flat na janela (estimativa; 1 = informativa)",
+            "title": "Gain Multiplier",
+            "type": "number"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -2797,13 +2810,14 @@
           "description",
           "starts_at",
           "ends_at",
+          "gain_multiplier",
           "created_at"
         ],
         "title": "CampaignOut",
         "type": "object"
       },
       "CampaignUpdate": {
-        "description": "Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.",
+        "description": "Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.",
         "properties": {
           "description": {
             "anyOf": [
@@ -2828,6 +2842,19 @@
               }
             ],
             "title": "Ends At"
+          },
+          "gain_multiplier": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 10.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gain Multiplier"
           },
           "name": {
             "anyOf": [
@@ -18096,7 +18123,7 @@
             "type": "integer"
           },
           "bonus_conformity_points": {
-            "description": "Bónus de conformidade por saco confirmado, tal como configurado (estimativa; o web desenha «+N» daqui)",
+            "description": "Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)",
             "title": "Bonus Conformity Points",
             "type": "integer"
           },
@@ -18121,7 +18148,7 @@
             "type": "integer"
           },
           "gain_flat_points": {
-            "description": "Ganho flat por saco recolhido e pesado, tal como configurado (estimativa; o web desenha «+N» daqui)",
+            "description": "Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)",
             "title": "Gain Flat Points",
             "type": "integer"
           },

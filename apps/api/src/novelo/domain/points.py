@@ -57,6 +57,18 @@ def apply_monthly_cap(credited_this_month: int, candidate: int, cap: int) -> int
     return candidate if credited_this_month + candidate <= cap else 0
 
 
+def campaign_gain_multiplier(windows: Sequence[tuple[datetime, datetime, float]], now: datetime) -> float:
+    """Multiplicador de ganhos de campanhas sazonais (US40): o MAIOR entre as janelas ativas
+    (`início ≤ agora < fim`), nunca composto; 1,0 sem campanha ativa.
+
+    Pressuposto da equipa («estimativa», configurável por campanha): multiplica o ganho FLAT por saco
+    creditado dentro da janela; o teto mensal continua a aplicar-se ao valor já multiplicado e o
+    FIFO/a expiração não mudam. O bónus de conformidade fica de fora (decisão documentada).
+    """
+    active = [multiplier for starts_at, ends_at, multiplier in windows if starts_at <= now < ends_at]
+    return max(active, default=1.0)
+
+
 def declaration_confirmed(declaration: BagDeclaration, destinations: Sequence[TextileDestination]) -> bool:
     """A triagem confirma a declaração «Vai no saco?» do doador?
 

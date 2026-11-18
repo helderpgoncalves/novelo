@@ -5,7 +5,7 @@ e pesado, +50 de bónus de conformidade, teto mensal de 500, expiração 12 mese
 diz a aritmética — é a especificação que #65 (catálogo/resgate) consome pela função `fifo_balance`.
 """
 
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 
 from novelo.core.config import Settings
 from novelo.domain.points import (
@@ -13,6 +13,7 @@ from novelo.domain.points import (
     EXPIRY_MONTHS,
     GAIN_FLAT_POINTS,
     MONTHLY_CAP_POINTS,
+    campaign_gain_multiplier,
     LedgerEntry,
     PointEntryKind,
     apply_monthly_cap,
@@ -276,3 +277,32 @@ def test_config_defaults_read_the_domain_constants() -> None:
     assert fields["points_bonus_conformity"].default is BONUS_CONFORMITY_POINTS  # 50
     assert fields["points_monthly_cap"].default is MONTHLY_CAP_POINTS  # 500
     assert (GAIN_FLAT_POINTS, BONUS_CONFORMITY_POINTS, MONTHLY_CAP_POINTS) == (100, 50, 500)
+
+
+# --- campanhas sazonais: multiplicador de ganho (US40) ----------------------------------------------
+
+
+def test_campaign_multiplier_is_max_of_active_windows() -> None:
+    # Duas campanhas ativas (×1,5 e ×2,0): vale a maior — nunca se compõem (estimativa, configurável).
+    now = datetime(2027, 6, 10, 12, 0, tzinfo=UTC)
+    windows = [
+        (now - timedelta(days=2), now + timedelta(days=2), 1.5),
+        (now - timedelta(days=1), now + timedelta(days=1), 2.0),
+    ]
+    assert campaign_gain_multiplier(windows, now) == 2.0
+
+
+def test_campaign_multiplier_outside_the_window_is_one() -> None:
+    now = datetime(2027, 6, 10, 12, 0, tzinfo=UTC)
+    past = [(now - timedelta(days=10), now - timedelta(days=1), 3.0)]
+    future = [(now + timedelta(days=1), now + timedelta(days=10), 3.0)]
+    assert campaign_gain_multiplier(past, now) == 1.0
+    assert campaign_gain_multiplier(future, now) == 1.0
+    assert campaign_gain_multiplier([], now) == 1.0
+
+
+def test_campaign_multiplier_one_is_exact_parity() -> None:
+    # Multiplicador 1 = paridade: o ganho é o mesmo com e sem campanha (à mão: 100 × 1 = 100).
+    now = datetime(2027, 6, 10, 12, 0, tzinfo=UTC)
+    active_one = [(now - timedelta(days=1), now + timedelta(days=1), 1.0)]
+    assert round(GAIN_FLAT_POINTS * campaign_gain_multiplier(active_one, now)) == GAIN_FLAT_POINTS

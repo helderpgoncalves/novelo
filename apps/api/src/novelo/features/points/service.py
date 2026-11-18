@@ -28,12 +28,14 @@ from novelo.domain.points import (
     LedgerEntry,
     PointEntryKind,
     apply_monthly_cap,
+    campaign_gain_multiplier,
     declaration_confirmed,
     fifo_balance,
     gain_expiry,
 )
 from novelo.domain.vocab import LotUnitSource
 from novelo.features.audit import service as audit
+from novelo.features.catalog.models import PointCampaign
 from novelo.features.citizen.models import BagActivation
 from novelo.features.lots.models import Lot
 from novelo.features.points.models import PointEntry
@@ -94,9 +96,23 @@ async def _credit_gain(
     return bool(int(getattr(result, "rowcount", 0) or 0))
 
 
+async def _active_campaign_multiplier(db: AsyncSession, now: datetime) -> float:
+    """O multiplicador das campanhas ativas (US40): a maior das janelas que contêm `now`; 1,0 sem campanha."""
+    rows = (
+        await db.execute(
+            select(PointCampaign.starts_at, PointCampaign.ends_at, PointCampaign.gain_multiplier).where(
+                PointCampaign.starts_at <= now, PointCampaign.ends_at > now
+            )
+        )
+    ).all()
+    return campaign_gain_multiplier([(start, end, float(mult)) for start, end, mult in rows], now)
+
+
 async def credit_flat_for_bag(db: AsyncSession, bag_code: str, *, lot_code: str | None = None) -> bool:
     """Ganho flat (+100, estimativa) ao saco ATIVADO recolhido e pesado. Idempotente: uma linha por saco
-    no mundo. Sacos sem dono (conta apagada: `user_id` nulo) e etiquetas impressas nunca creditam."""
+    no mundo. Sacos sem dono (conta apagada: `user_id` nulo) e etiquetas impressas nunca creditam.
+    Campanha sazonal ativa (US40): o ganho flat multiplica-se pelo multiplicador da campanha
+    («estimativa», configurável); o teto mensal continua a aplicar-se ao valor já multiplicado."""
     now = datetime.now(UTC)
     activation = (
         await db.execute(
@@ -105,10 +121,11 @@ async def credit_flat_for_bag(db: AsyncSession, bag_code: str, *, lot_code: str 
     ).scalar_one_or_none()
     if activation is None or activation.user_id is None:
         return False
+    multiplier = await _active_campaign_multiplier(db, now)
     return await _credit_gain(
         db,
         kind=PointEntryKind.GAIN_FLAT,
-        points=get_settings().points_gain_flat,
+        points=round(get_settings().points_gain_flat * multiplier),
         user_id=activation.user_id,
         bag_code=bag_code,
         lot_code=lot_code,

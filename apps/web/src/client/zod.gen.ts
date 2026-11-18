@@ -564,11 +564,12 @@ export const zCalibrationPhoto = z.object({
 /**
  * CampaignCreate
  *
- * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
  */
 export const zCampaignCreate = z.object({
     description: z.string().max(2000).nullish(),
     ends_at: z.iso.datetime(),
+    gain_multiplier: z.number().gt(0).lte(10).optional().default(1),
     name: z.string().min(3).max(120),
     starts_at: z.iso.datetime()
 });
@@ -582,6 +583,7 @@ export const zCampaignOut = z.object({
     created_at: z.iso.datetime(),
     description: z.string().nullable(),
     ends_at: z.iso.datetime(),
+    gain_multiplier: z.number(),
     id: z.uuid(),
     name: z.string(),
     starts_at: z.iso.datetime()
@@ -590,11 +592,12 @@ export const zCampaignOut = z.object({
 /**
  * CampaignUpdate
  *
- * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
  */
 export const zCampaignUpdate = z.object({
     description: z.string().max(2000).nullish(),
     ends_at: z.iso.datetime().nullish(),
+    gain_multiplier: z.number().gt(0).lte(10).nullish(),
     name: z.string().min(3).max(120).nullish(),
     starts_at: z.iso.datetime().nullish()
 });

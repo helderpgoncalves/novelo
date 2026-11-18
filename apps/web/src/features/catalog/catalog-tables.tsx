@@ -613,7 +613,7 @@ function PartnerDialog({
 
 // --- campanhas sazonais ----------------------------------------------------------------------------
 
-/** As campanhas de pontos: janela temporal + descrição (informativa no MVP, sem multiplicador). */
+/** As campanhas de pontos: janela + descrição + multiplicador opcional do ganho flat (US40, estimativa). */
 export function CampaignsTable({ id }: { id: string }) {
   const query = useQuery(listAdminCampaignsOptions());
   const queryClient = useQueryClient();
@@ -640,6 +640,19 @@ export function CampaignsTable({ id }: { id: string }) {
         </span>
       ),
       value: (row) => `${row.starts_at} → ${row.ends_at}`,
+    },
+    {
+      id: 'multiplier',
+      header: m.campaign_col_multiplier(),
+      cell: (row) => (
+        <span className="text-muted-foreground text-sm tabular-nums">
+          ×{row.gain_multiplier.toLocaleString('pt-PT')}
+          {row.gain_multiplier === 1 ? '' : ' · estimativa'}
+        </span>
+      ),
+      value: (row) => row.gain_multiplier,
+      type: 'number',
+      filter: true,
     },
     {
       id: 'description',
@@ -741,6 +754,7 @@ function CampaignDialog({
               description: String(data.get('description') ?? '').trim() || null,
               starts_at: new Date(String(data.get('starts_at'))).toISOString(),
               ends_at: new Date(String(data.get('ends_at'))).toISOString(),
+              gain_multiplier: Number(data.get('gain_multiplier') ?? 1) || 1,
             };
             if (campaign) {
               update.mutate({ path: { campaign_id: campaign.id }, body });
@@ -781,6 +795,21 @@ function CampaignDialog({
                 defaultValue={campaign?.ends_at?.slice(0, 16) ?? ''}
               />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="campaign-multiplier">{m.campaign_form_multiplier()}</Label>
+            <Input
+              id="campaign-multiplier"
+              name="gain_multiplier"
+              type="number"
+              min={0.1}
+              max={10}
+              step={0.1}
+              inputMode="decimal"
+              required
+              defaultValue={campaign?.gain_multiplier ?? 1}
+            />
+            <p className="text-muted-foreground text-xs">{m.campaign_form_multiplier_hint()}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="campaign-description">{m.campaign_col_description()}</Label>

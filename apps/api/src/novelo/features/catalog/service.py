@@ -450,7 +450,11 @@ async def create_campaign(db: AsyncSession, body: CampaignCreate) -> CampaignOut
     if body.ends_at <= body.starts_at:
         raise CampaignWindowError()
     campaign = PointCampaign(
-        name=body.name, description=body.description, starts_at=body.starts_at, ends_at=body.ends_at
+        name=body.name,
+        description=body.description,
+        starts_at=body.starts_at,
+        ends_at=body.ends_at,
+        gain_multiplier=body.gain_multiplier,
     )
     db.add(campaign)
     await db.commit()

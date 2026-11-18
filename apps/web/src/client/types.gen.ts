@@ -1586,7 +1586,7 @@ export type CalibrationScope = 'local' | 'parish' | 'concelho';
 /**
  * CampaignCreate
  *
- * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
  */
 export type CampaignCreate = {
     /**
@@ -1599,6 +1599,12 @@ export type CampaignCreate = {
      * Tem de ser DEPOIS de `starts_at` (422 caso contrário)
      */
     ends_at: string;
+    /**
+     * Gain Multiplier
+     *
+     * Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)
+     */
+    gain_multiplier?: number;
     /**
      * Name
      */
@@ -1628,6 +1634,12 @@ export type CampaignOut = {
      */
     ends_at: string;
     /**
+     * Gain Multiplier
+     *
+     * Multiplicador do ganho flat na janela (estimativa; 1 = informativa)
+     */
+    gain_multiplier: number;
+    /**
      * Id
      */
     id: string;
@@ -1644,7 +1656,7 @@ export type CampaignOut = {
 /**
  * CampaignUpdate
  *
- * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
  */
 export type CampaignUpdate = {
     /**
@@ -1655,6 +1667,10 @@ export type CampaignUpdate = {
      * Ends At
      */
     ends_at?: string | null;
+    /**
+     * Gain Multiplier
+     */
+    gain_multiplier?: number | null;
     /**
      * Name
      */
@@ -10600,7 +10616,7 @@ export type PointsBalanceOut = {
     /**
      * Bonus Conformity Points
      *
-     * Bónus de conformidade por saco confirmado, tal como configurado (estimativa; o web desenha «+N» daqui)
+     * Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)
      */
     bonus_conformity_points: number;
     /**
@@ -10630,7 +10646,7 @@ export type PointsBalanceOut = {
     /**
      * Gain Flat Points
      *
-     * Ganho flat por saco recolhido e pesado, tal como configurado (estimativa; o web desenha «+N» daqui)
+     * Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)
      */
     gain_flat_points: number;
     /**

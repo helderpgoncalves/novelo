@@ -101,6 +101,13 @@ export function CatalogTab({ balance }: { balance: number }) {
           {campaign.description && (
             <p className="text-muted-foreground text-xs">{campaign.description}</p>
           )}
+          {campaign.gain_multiplier !== 1 && (
+            <p className="text-xs">
+              Cada saco recolhido e pesado na campanha vale{' '}
+              {campaign.gain_multiplier.toLocaleString('pt-PT')}× os pontos habituais (estimativa) —
+              o teto do mês continua a aplicar-se.
+            </p>
+          )}
         </div>
       )}
 
