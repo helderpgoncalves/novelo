@@ -504,9 +504,7 @@ async def test_monthly_cap_still_applies_to_the_multiplied_gain(
     )
     # Dois sacos no mesmo lote, campanha ×2: cada ganho vale 200; o teto de 300 RECUSA o 2.º
     # (200 + 200 = 400 > 300) — o teto aplica-se ao valor JÁ multiplicado, sem adiar.
-    c, _lot = await _donor_with_weighed_bags(
-        client, session, outbox, make_user, email="doador+teto@exemplo.pt", bags=2
-    )
+    c, _lot = await _donor_with_weighed_bags(client, session, outbox, make_user, email="doador+teto@exemplo.pt", bags=2)
     saldo = (await c.get(f"{CID}/saldo")).json()
     assert saldo["balance"] == 200
     assert saldo["credited_this_month"] == 200

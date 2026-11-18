@@ -164,9 +164,7 @@ def test_calibrated_bags_per_round_recalibrates_the_tour_n() -> None:
     assert _parish_km(plain) == pytest.approx(26 * 0.7124 * (114.8998 / 26 * 5.0) ** 0.5 * 1.3, abs=0.05)
     # Calibrado a 3,0 sacos por ronda: o n da volta muda (km = 26 · 0,7124 · √(3 · 5) · 1,3 = 93,25),
     # as toneladas ficam EXATAMENTE as mesmas — o pedido calibra o n, nunca multiplica kg.
-    calibrated, _ = compute(
-        [_zone()], default_params(), _request(), baseline_t=0.0, calibration=_bags_calibration(3.0)
-    )
+    calibrated, _ = compute([_zone()], default_params(), _request(), baseline_t=0.0, calibration=_bags_calibration(3.0))
     assert _parish_km(calibrated) == pytest.approx(26 * 0.7124 * (3.0 * 5.0) ** 0.5 * 1.3, abs=0.05)
     assert _parish_km(calibrated) < _parish_km(plain)
     assert _parish_tonnes(calibrated) == pytest.approx(_parish_tonnes(plain), abs=0.01)
