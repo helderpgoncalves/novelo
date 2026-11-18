@@ -65,6 +65,9 @@ describe('sessão da paragem (as operações contam a história)', () => {
     expect(session.status).toBe('open');
     expect(session.locality?.name).toBe('Escola de São Torcato');
     expect(session.lotCode).toBeNull(); // o código do lote chega com a sincronização
+    // A sessão liga-se ao stopId DA OPERAÇÃO (não ao id do op): é por ele que o despejo encontra
+    // o resultado do open-stop quando chega a vez dos sacos.
+    expect(session.stopId).toBe('s1');
   });
 
   it('os sacos acumulam: QR lido vira unidade; sem QR, etiqueta à espera de impressão', () => {

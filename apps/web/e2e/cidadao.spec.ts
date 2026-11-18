@@ -33,6 +33,7 @@ test.describe('conta de doador: magic link com 13+', () => {
     await page.goto('/pt/cidadao');
     await page.getByLabel('Email').fill(uniqueEmail('pequeno'));
     await page.getByLabel(/Que idade tens/i).fill('12');
+    await page.getByRole('checkbox').check(); // o botão só liga com o consentimento
     await page.getByRole('button', { name: 'Entrar com email' }).click();
     await expect(page.getByRole('alert')).toContainText('13 anos ou mais');
     // Continua na porta de entrada (sem ecrã de «abre o email»).
@@ -90,7 +91,7 @@ test.describe('carteira do doador', () => {
     const donor = await createDonorSession(page, email);
     await donor.goto('/pt/cidadao?tab=saldo');
     await expect(donor.getByText('pontos · só leitura')).toBeVisible();
-    await expect(donor.getByText('Como vai funcionar')).toBeVisible();
+    await expect(donor.getByText('Como se ganha')).toBeVisible();
     await donor.goto('/pt/cidadao?tab=historico');
     await expect(donor.getByText(/Ainda sem recolhas/)).toBeVisible();
   });

@@ -70,7 +70,7 @@ export function stopSession(state: StopSession, action: SessionAction): StopSess
       switch (op.kind) {
         case 'open-stop':
           if (state.status === 'open') return state;
-          return { ...state, status: 'open', stopId: op.id, lotCode: null, units: [] };
+          return { ...state, status: 'open', stopId: op.stopId, lotCode: null, units: [] };
         case 'add-unit': {
           // O mesmo QR não entra duas vezes no lote.
           if (state.units.some((u) => u.ref === op.payload.code)) return state;

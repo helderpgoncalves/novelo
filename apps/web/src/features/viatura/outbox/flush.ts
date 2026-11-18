@@ -76,7 +76,8 @@ export async function flushQueue(
       flushed += 1;
     } catch (error) {
       if (error instanceof SenderError && error.retryable) {
-        // Transitório: a operação fica 'queued' (só se desfaz o 'syncing') e o despejo pára aqui.
+        // Transitório: a operação volta a 'queued' e o despejo pára aqui (o resto depende dela).
+        actions.push({ type: 'requeue', id: op.id });
         return { actions, outcome: stopOutcome(flushed, op, true, error.message) };
       }
       const message = error instanceof Error ? error.message : 'erro a sincronizar';

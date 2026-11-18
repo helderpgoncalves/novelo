@@ -36,7 +36,7 @@ test.describe('passaporte com peso medido e paragem', () => {
     const qr = await page.request.get(`/api/v1/lots/${lot.code}/units/${unit.id}/qr`);
     expect(qr.headers()['content-type']).toBe('image/svg+xml');
 
-    // Passaporte público, sem sessão: peso medido (4,30 kg) e a paragem; nunca o doador nem os QR das unidades.
+    // Passaporte público, sem sessão: peso medido (4,3 kg — o formatKg corta o zero) e a paragem; nunca o doador nem os QR das unidades.
     const passportBody = (await (
       await page.request.get(`/api/v1/public/lots/${lot.code}`)
     ).json()) as Record<string, unknown>;
@@ -57,12 +57,11 @@ test.describe('passaporte com peso medido e paragem', () => {
     // A paragem: local e freguesia.
     await expect(pub.getByText(locality.name)).toBeVisible();
     // Peso medido com a etiqueta certa (não «estimativa»).
-    await expect(pub.getByText('4,30 kg')).toBeVisible();
+    await expect(pub.getByText('4,3 kg')).toBeVisible();
     await expect(pub.getByText('medido', { exact: true })).toBeVisible();
     await expect(pub.getByText('estimativa', { exact: true })).toBeHidden();
     // A linha do tempo mostra o «Partir».
     await expect(pub.getByText('Partiu da paragem')).toBeVisible();
-    await anonymous.close();
 
     // Lote só estimado (caminho antigo): o passaporte diz «estimativa».
     const legacy = (await (
@@ -72,5 +71,6 @@ test.describe('passaporte com peso medido e paragem', () => {
     };
     await pub.goto(`/pt/passport/${legacy.code}`);
     await expect(pub.getByText('estimativa').first()).toBeVisible();
+    await anonymous.close();
   });
 });

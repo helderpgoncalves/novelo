@@ -92,7 +92,7 @@ describe('despejo da fila (a sincronização, pela ordem de registo)', () => {
       op('set-weight', 3, { unitRef: 'SACO-A', weightG: 4_200 }),
     ]);
     const sender = fakeSender(['ok', 'network']);
-    const { outcome } = await run(state, sender);
+    const { actions, outcome } = await run(state, sender);
     expect(outcome).toEqual({
       flushed: 1,
       done: false,
@@ -100,9 +100,10 @@ describe('despejo da fila (a sincronização, pela ordem de registo)', () => {
       error: 'sem rede',
       stoppedAt: expect.any(String),
     });
-    // A ação não marca falha: a operação segue 'queued' para a próxima tentativa.
-    const marks = (outcome as { flushed: number }).flushed;
-    expect(marks).toBe(1);
+    // Transitório: a operação volta a 'queued' (não fica presa em 'syncing' nem marca falha).
+    const addUnitOp = state.ops[1];
+    expect(actions).toContainEqual({ type: 'requeue', id: addUnitOp.id });
+    expect(actions).not.toContainEqual({ type: 'mark-failed', id: addUnitOp.id, error: 'sem rede' });
   });
 
   it('erro definitivo: marca a falhada (o operador vê o motivo) e não despeja o resto', async () => {

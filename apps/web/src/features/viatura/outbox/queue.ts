@@ -48,6 +48,7 @@ export type StopOp = NewStopOp & SyncFields;
 export type QueueAction =
   | { type: 'enqueue'; op: NewStopOp }
   | { type: 'mark-syncing'; id: string }
+  | { type: 'requeue'; id: string }
   | { type: 'mark-done'; id: string; result: StopOpResult }
   | { type: 'mark-failed'; id: string; error: string }
   | { type: 'retry-failed' }
@@ -78,6 +79,9 @@ export function stopQueue(state: QueueState, action: QueueAction): QueueState {
       return { ops: [...state.ops, newOp(action.op)] };
     case 'mark-syncing':
       return { ops: updateById(state.ops, action.id, (op) => ({ ...op, status: 'syncing' })) };
+    case 'requeue':
+      // Falha transitória: a operação volta a 'queued' (o despejo seguinte tenta-a outra vez).
+      return { ops: updateById(state.ops, action.id, (op) => ({ ...op, status: 'queued' })) };
     case 'mark-done':
       return {
         ops: updateById(state.ops, action.id, (op) => ({
