@@ -52,6 +52,8 @@ async def create_user(
     consent_at: datetime | None = None,
     consent_version: str | None = None,
     approval_status: str = "approved",
+    declared_age: int | None = None,
+    donor_code: str | None = None,
 ) -> User:
     user = User(
         email=email.lower(),
@@ -66,6 +68,8 @@ async def create_user(
         consent_at=consent_at,
         consent_version=consent_version,
         approval_status=approval_status,
+        declared_age=declared_age,
+        donor_code=donor_code,
     )
     db.add(user)
     await db.commit()

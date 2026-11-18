@@ -25,6 +25,40 @@ export type AcceptInvitationRequest = {
 };
 
 /**
+ * AccountExportOut
+ *
+ * A conta inteira, legível por máquina (JSON). Só dados FORNECIDOS ou OBSERVADOS — nunca
+ * derivados (sem calibração, sem pontuações de conformidade: WP29 242 rev.01, p. 10).
+ */
+export type AccountExportOut = {
+    /**
+     * Bags
+     */
+    bags: Array<ExportBag>;
+    /**
+     * Collection Requests
+     */
+    collection_requests: Array<ExportRequest>;
+    /**
+     * Consents
+     */
+    consents: Array<ExportConsent>;
+    /**
+     * Exported At
+     */
+    exported_at: string;
+    /**
+     * Points
+     */
+    points: Array<ExportPointEntry>;
+    /**
+     * Policy Version
+     */
+    policy_version: string;
+    profile: ExportProfile;
+};
+
+/**
  * ActionOut
  */
 export type ActionOut = {
@@ -534,6 +568,33 @@ export type AllocationPart = {
 };
 
 /**
+ * AnnulmentCreate
+ *
+ * Anulação em abuso (interesse legítimo declarado): valor positivo, motivo OBRIGATÓRIO — fica no
+ * livro-razão como entrada negativa com autor; nunca se apaga nem se edita uma linha.
+ */
+export type AnnulmentCreate = {
+    /**
+     * Amount
+     *
+     * Pontos a anular (positivo; fica −no livro-razão)
+     */
+    amount: number;
+    /**
+     * Reason
+     *
+     * Motivo obrigatório (auditoria, RGPD art. 6.º-1-f)
+     */
+    reason: string;
+    /**
+     * User Id
+     *
+     * Conta doadora cujos pontos se anulam
+     */
+    user_id: string;
+};
+
+/**
  * AppSettingsOut
  */
 export type AppSettingsOut = {
@@ -694,7 +755,7 @@ export type ApproveRequest = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest';
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -886,6 +947,19 @@ export type AttachmentOut = {
 };
 
 /**
+ * AttributeSource
+ *
+ * Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador).
+ */
+export type AttributeSource = {
+    /**
+     * Confidence
+     */
+    confidence: number;
+    origin: Provenance;
+};
+
+/**
  * AuditEntryOut
  */
 export type AuditEntryOut = {
@@ -1046,6 +1120,80 @@ export type AuthConfig = {
      */
     turnstile_site_key: string | null;
 };
+
+/**
+ * BagActivationCreate
+ *
+ * Ativar um saco da plataforma: apelido privado opcional e a declaração «Vai no saco?» opcional.
+ */
+export type BagActivationCreate = {
+    /**
+     * «Vai no saco?»: `reuse` (vestir de novo) ou `recycle` (dar a vida); base do bónus de conformidade
+     */
+    declaration?: BagDeclaration | null;
+    /**
+     * Nickname
+     *
+     * Apelido PRIVADO (nunca é público)
+     */
+    nickname?: string | null;
+};
+
+/**
+ * BagActivationOut
+ *
+ * Um saco ativado, visto pelo dono. `active` é `deactivated_at is null`.
+ */
+export type BagActivationOut = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    declaration: BagDeclaration | null;
+    /**
+     * Declared At
+     */
+    declared_at: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+};
+
+/**
+ * BagActivationUpdate
+ *
+ * Corrigir o apelido ou a declaração enquanto o saco está ativo (desativado congela).
+ */
+export type BagActivationUpdate = {
+    declaration?: BagDeclaration | null;
+    /**
+     * Nickname
+     */
+    nickname?: string | null;
+};
+
+/**
+ * BagDeclaration
+ *
+ * Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+ *
+ * É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+ * dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+ */
+export type BagDeclaration = 'reuse' | 'recycle';
 
 /**
  * BenchmarkOut
@@ -1305,6 +1453,235 @@ export type BudgetOut = {
 };
 
 /**
+ * CalibrationMetric
+ *
+ * As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+ *
+ * O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+ * (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+ * captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+ * fotografia do cenário, mas nunca se guarda na tabela de agregados.
+ */
+export type CalibrationMetric = 'generation_rate' | 'kg_per_bag' | 'bags_per_round' | 'requests_per_week' | 'on_demand_capture';
+
+/**
+ * CalibrationOut
+ *
+ * O painel «Calibração» (gestão): a tabela de agregados atual, por métrica e unidade.
+ */
+export type CalibrationOut = {
+    /**
+     * Computed At
+     *
+     * Altura do último recálculo (ao recalcular um cenário; nunca agendada)
+     */
+    computed_at: string | null;
+    /**
+     * Rows
+     */
+    rows: Array<CalibrationReadingOut>;
+    /**
+     * Window Weeks
+     *
+     * Janela de observação em semanas (12, móvel)
+     */
+    window_weeks: number;
+};
+
+/**
+ * CalibrationPhoto
+ *
+ * A fotografia da calibração que um cenário copia para o seu resultado (reprodutível e comparável).
+ */
+export type CalibrationPhoto = {
+    /**
+     * Computed At
+     */
+    computed_at?: string | null;
+    /**
+     * Readings
+     */
+    readings: Array<CalibrationReadingOut>;
+    /**
+     * Window Weeks
+     */
+    window_weeks: number;
+};
+
+/**
+ * CalibrationReadingOut
+ *
+ * Uma linha da calibração: métrica × unidade na janela atual (a tabela de agregados).
+ */
+export type CalibrationReadingOut = {
+    /**
+     * Blended
+     *
+     * Valor calibrado: (k·prior + n·observado) ÷ (k + n) — o que o planeamento consome
+     */
+    blended: number;
+    /**
+     * Label
+     *
+     * Fonte para o ecrã: «pressuposto», «estimativa·n» ou «observado·n»
+     */
+    label: string;
+    metric: CalibrationMetric;
+    /**
+     * N
+     *
+     * Amostras: visitas nas métricas por local, semanas nas por freguesia
+     */
+    n: number;
+    /**
+     * Observed
+     *
+     * Estatística da janela (mediana dos pesos; pedidos ÷ semanas); nulo sem amostras
+     */
+    observed: number | null;
+    /**
+     * Parish Code
+     *
+     * Freguesia da unidade («» no concelho); liga a taxa do local à captura
+     */
+    parish_code: string;
+    /**
+     * Prior
+     *
+     * Valor dos pressupostos com que foi recalculado
+     */
+    prior: number;
+    /**
+     * Pseudo K
+     *
+     * Peso do prior na pseudo-contagem (4 visitas por local; 8 semanas por freguesia)
+     */
+    pseudo_k: number;
+    scope: CalibrationScope;
+    /**
+     * Unit Code
+     *
+     * Código da unidade: UUID do local, DICOFRE da freguesia ou «concelho»
+     */
+    unit_code: string;
+    /**
+     * Unit Name
+     */
+    unit_name: string;
+    /**
+     * Weight
+     *
+     * Peso do observado: n ÷ (n + k)
+     */
+    weight: number;
+};
+
+/**
+ * CalibrationScope
+ *
+ * Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado.
+ */
+export type CalibrationScope = 'local' | 'parish' | 'concelho';
+
+/**
+ * CampaignCreate
+ *
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
+ */
+export type CampaignCreate = {
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Ends At
+     *
+     * Tem de ser DEPOIS de `starts_at` (422 caso contrário)
+     */
+    ends_at: string;
+    /**
+     * Gain Multiplier
+     *
+     * Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)
+     */
+    gain_multiplier?: number;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+};
+
+/**
+ * CampaignOut
+ *
+ * Uma campanha: o web mostra-a ao doador enquanto `starts_at ≤ agora < ends_at`.
+ */
+export type CampaignOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Ends At
+     */
+    ends_at: string;
+    /**
+     * Gain Multiplier
+     *
+     * Multiplicador do ganho flat na janela (estimativa; 1 = informativa)
+     */
+    gain_multiplier: number;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Starts At
+     */
+    starts_at: string;
+};
+
+/**
+ * CampaignUpdate
+ *
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
+ */
+export type CampaignUpdate = {
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Ends At
+     */
+    ends_at?: string | null;
+    /**
+     * Gain Multiplier
+     */
+    gain_multiplier?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Starts At
+     */
+    starts_at?: string | null;
+};
+
+/**
  * CaopFeature
  */
 export type CaopFeature = {
@@ -1524,6 +1901,202 @@ export type CartesianChart = {
 };
 
 /**
+ * CatalogItemCreate
+ *
+ * Criar um item: a forma é fechada — âncora € SÓ em donativo IPSS, parceiro OBRIGATÓRIO em prémio.
+ */
+export type CatalogItemCreate = {
+    /**
+     * Active
+     */
+    active?: boolean;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * APENAS donativo IPSS: valor do donativo em cêntimos (1 000 pts ≈ 5 €)
+     */
+    donation_value_cents?: number | null;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Id
+     *
+     * Obrigatório no prémio de parceiro
+     */
+    partner_id?: string | null;
+    /**
+     * Points Cost
+     *
+     * Pontos que o resgate debita (FIFO, saldo nunca negativo)
+     */
+    points_cost: number;
+    /**
+     * Stock
+     *
+     * Nulo = sem limite; 0 = esgotado
+     */
+    stock?: number | null;
+};
+
+/**
+ * CatalogItemKind
+ *
+ * As três prateleiras do catálogo (espec #54): o valor guardado na base é a string inglesa.
+ *
+ * Só o donativo IPSS tem âncora € (`donation_value_cents`) — e é APRESENTAÇÃO do valor do donativo
+ * (1 000 pontos ≈ 5 €), nunca câmbio. Prémios de parceiro são cedidos e PAGOS pelo parceiro
+ * (pagamento integral por código apresentado); o acumulado ambiental é conquista não monetária.
+ */
+export type CatalogItemKind = 'ipss_donation' | 'partner_prize' | 'environmental';
+
+/**
+ * CatalogItemOut
+ *
+ * Um item do catálogo visto pela EQUIPA: inclui inativos e o parceiro (pseudónimo zero-dados fica).
+ */
+export type CatalogItemOut = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * Só no donativo IPSS: valor APRESENTADO do donativo
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Id
+     */
+    partner_id: string | null;
+    /**
+     * Partner Name
+     */
+    partner_name?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost: number;
+    /**
+     * Stock
+     */
+    stock: number | null;
+};
+
+/**
+ * CatalogItemPublic
+ *
+ * Um item visto pelo DOADOR: só o que ele precisa para escolher — nunca dados internos do parceiro.
+ */
+export type CatalogItemPublic = {
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Donation Value Cents
+     *
+     * Só no donativo IPSS: «este resgate vale um donativo de X €» — nunca é o valor dos pontos
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: CatalogItemKind;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Partner Name
+     */
+    partner_name?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost: number;
+    /**
+     * Stock
+     *
+     * Nulo = sem limite; 0 = esgotado (não se pode resgatar)
+     */
+    stock: number | null;
+};
+
+/**
+ * CatalogItemUpdate
+ *
+ * Editar um item: campos parciais; a forma é revalidada sobre o estado resultante no serviço.
+ */
+export type CatalogItemUpdate = {
+    /**
+     * Active
+     */
+    active?: boolean | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Donation Value Cents
+     */
+    donation_value_cents?: number | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Partner Id
+     */
+    partner_id?: string | null;
+    /**
+     * Points Cost
+     */
+    points_cost?: number | null;
+    /**
+     * Stock
+     */
+    stock?: number | null;
+};
+
+/**
+ * CertificateOptIn
+ *
+ * Opt-in do certificado público: só o próprio local decide partilhar os kg agregados.
+ */
+export type CertificateOptIn = {
+    /**
+     * Opt In
+     */
+    opt_in: boolean;
+};
+
+/**
  * ChangePasswordRequest
  */
 export type ChangePasswordRequest = {
@@ -1658,6 +2231,94 @@ export type CircuitsSummary = {
 };
 
 /**
+ * CollectionAgendaOut
+ *
+ * A agenda pública «onde e quando entrego»: as rondas publicadas do cenário mais recente.
+ *
+ * `agenda` nulo = nenhum cenário publicado tem agenda (política fixa antiga): a página diz que ainda
+ * não há promessa publicada — nunca inventa dias.
+ */
+export type CollectionAgendaOut = {
+    /**
+     * Agenda
+     */
+    agenda: Array<PublicAgendaEntry> | null;
+    /**
+     * Scenario Label
+     *
+     * De que cenário vem a agenda
+     */
+    scenario_label?: string | null;
+    /**
+     * Updated At
+     *
+     * Quando o cenário foi calculado
+     */
+    updated_at?: string | null;
+};
+
+/**
+ * CollectionFrequency
+ *
+ * Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+ *
+ * Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+ * confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+ * `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+ */
+export type CollectionFrequency = 'weekly' | 'biweekly' | 'monthly' | 'quarterly';
+
+/**
+ * CollectionHistoryOut
+ *
+ * Uma linha do histórico do doador: o saco e o lote que o levou (link só para o passaporte público).
+ *
+ * O lote chega por `lot_units.code == bag code` — é o scan da viatura que faz a ligação; sem scan o
+ * saco ainda está em casa (`lot_code` nulo). O passaporte nunca mostra o doador.
+ */
+export type CollectionHistoryOut = {
+    /**
+     * Activated At
+     */
+    activated_at: string;
+    /**
+     * Bag Code
+     */
+    bag_code: string;
+    /**
+     * Bag Id
+     */
+    bag_id: string;
+    /**
+     * Collected At
+     *
+     * Quando a paragem deu origem ao lote
+     */
+    collected_at?: string | null;
+    declaration: BagDeclaration | null;
+    /**
+     * Lot Code
+     *
+     * Código do lote: abre `/passport/{code}`
+     */
+    lot_code?: string | null;
+    /**
+     * Lot State
+     */
+    lot_state?: string | null;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+    /**
+     * Weight Kg
+     *
+     * Peso medido na paragem (ou estimado, legado)
+     */
+    weight_kg?: number | null;
+};
+
+/**
  * CollectionMode
  *
  * Modos de recolha de têxteis que o simulador compara.
@@ -1683,6 +2344,10 @@ export type CollectionPlanEntry = {
      * Uma ronda a cada N semanas
      */
     every_weeks: number;
+    /**
+     * Degrau da escada escolhido pelo otimizador para esta freguesia (`weekly`, `biweekly`, `monthly`, `quarterly`). Nulo na política fixa e nos cenários antigos — o passo global não é um degrau gravado
+     */
+    frequency?: CollectionFrequency | null;
     /**
      * Hours Year
      *
@@ -1748,9 +2413,201 @@ export type CollectionPlanEntry = {
 };
 
 /**
+ * CollectionRequestCreate
+ *
+ * O que quem pede envia: sacos, dia, e — só para cidadão — morada e freguesia.
+ *
+ * O teto de validação (500 no local) é o travão de sanidade do campo; acima do teto de 20 o pedido
+ * segue para a fila de exceções como **recolha especial** (não é erro). O teto de 5 do cidadão é
+ * validado no serviço, que já sabe o sujeito.
+ */
+export type CollectionRequestCreate = {
+    /**
+     * Address
+     *
+     * Morada manual, só para cidadão — alternativa igual ao GPS (que fica fora do MVP)
+     */
+    address?: string | null;
+    /**
+     * Bag Count
+     *
+     * Sacos a recolher (cidadão 1–5; local até 20)
+     */
+    bag_count: number;
+    /**
+     * Ephemeral Address
+     *
+     * «Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)
+     */
+    ephemeral_address?: boolean;
+    /**
+     * Note
+     *
+     * Recado para a equipa (ex.: «portão azul»)
+     */
+    note?: string | null;
+    /**
+     * Parish Code
+     *
+     * Código DICOFRE da freguesia declarada, só para cidadão: liga o pedido à ronda
+     */
+    parish_code?: string | null;
+    /**
+     * Requested Date
+     *
+     * Dia pretendido para a recolha (corte de 48 h: hoje + 2 dias no mínimo)
+     */
+    requested_date: string;
+    /**
+     * Urgent
+     *
+     * Urgência: nunca é auto-aceite — cai na fila do gestor para despacho
+     */
+    urgent?: boolean;
+};
+
+/**
+ * CollectionRequestOut
+ *
+ * Um pedido de recolha, visto por quem pediu ou pela equipa (com o pedido e o despacho).
+ */
+export type CollectionRequestOut = {
+    /**
+     * Address
+     *
+     * Morada escrita (cidadão); `null` depois da purga de 12 meses
+     */
+    address?: string | null;
+    /**
+     * Address Retained Until
+     *
+     * Até quando a morada fica retida (12 meses; RGPD)
+     */
+    address_retained_until?: string | null;
+    /**
+     * Bag Count
+     *
+     * Sacos pedidos (cidadão 1–5; local até 20 — teto estimativa)
+     */
+    bag_count: number;
+    /**
+     * Cancelled At
+     */
+    cancelled_at?: string | null;
+    /**
+     * Collected At
+     */
+    collected_at?: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Dispatch Reason
+     *
+     * Motivo da recusa ou nota do agendamento
+     */
+    dispatch_reason?: string | null;
+    /**
+     * Dispatched At
+     */
+    dispatched_at?: string | null;
+    /**
+     * Ephemeral Address
+     *
+     * Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal
+     */
+    ephemeral_address?: boolean;
+    /**
+     * `out_of_round`, `cutoff`, `special_volume` (recolha especial) ou `urgency`
+     */
+    exception_reason?: RequestExceptionReason | null;
+    /**
+     * Expired At
+     */
+    expired_at?: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Id
+     *
+     * Local institucional (só local/B2B)
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name?: string | null;
+    /**
+     * Missed Count
+     *
+     * Ausências acumuladas; à 3.ª o pedido expira
+     */
+    missed_count: number;
+    /**
+     * Note
+     */
+    note?: string | null;
+    /**
+     * Parish Code
+     *
+     * DICOFRE da freguesia declarada (cidadão)
+     */
+    parish_code?: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name?: string | null;
+    /**
+     * Requested Date
+     */
+    requested_date: string;
+    /**
+     * Requester Email
+     *
+     * Só a equipa vê quem pediu; a leitura do próprio traz `null`
+     */
+    requester_email?: string | null;
+    /**
+     * Requester Id
+     */
+    requester_id: string | null;
+    state: CollectionRequestState;
+    /**
+     * `citizen` (com conta) ou `local` (assistido/B2B)
+     */
+    subject_kind: RequestSubject;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
+};
+
+/**
+ * CollectionRequestState
+ *
+ * Estado do pedido de recolha.
+ *
+ * A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+ * Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+ * 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+ * pedido; nenhum estado volta atrás.
+ */
+export type CollectionRequestState = 'scheduled' | 'exception' | 'rejected' | 'collected' | 'expired' | 'cancelled';
+
+/**
  * CollectionType
  */
 export type CollectionType = 'door_to_door' | 'moloks' | 'containers' | 'unspecified';
+
+/**
+ * Colour
+ *
+ * Cor observada na peça (nunca entra na chave do lote de escoamento; só filtros).
+ */
+export type Colour = 'black' | 'white' | 'grey' | 'beige' | 'brown' | 'red' | 'orange' | 'yellow' | 'green' | 'blue' | 'pink' | 'multicolour' | 'unknown';
 
 /**
  * CommandsOut
@@ -1871,6 +2728,66 @@ export type ConfirmActionIn = {
      * Idempotency Key
      */
     idempotency_key?: string | null;
+};
+
+/**
+ * ConsentPurpose
+ *
+ * As finalidades que EXIGEM consentimento (prévio e expresso, em duas camadas; nunca soft opt-in).
+ *
+ * O essencial da conta (crédito, recolhas, triagem) é contrato — não anda aqui. Marketing e parcerias
+ * têm caixas próprias, desligadas por defeito, retiráveis a qualquer momento (art. 7.º/3 RGPD).
+ */
+export type ConsentPurpose = 'marketing' | 'partnerships';
+
+/**
+ * ConsentStateOut
+ *
+ * O estado corrente de uma finalidade: a última linha vence; sem linhas é desligado e nunca pedido.
+ */
+export type ConsentStateOut = {
+    /**
+     * Granted
+     */
+    granted: boolean;
+    /**
+     * Policy Version
+     */
+    policy_version?: string | null;
+    purpose: ConsentPurpose;
+    /**
+     * Updated At
+     */
+    updated_at?: string | null;
+};
+
+/**
+ * ConsentUpdate
+ *
+ * Uma decisão: finalidade + dado ou retirado (o histórico fica append-only lá atrás).
+ */
+export type ConsentUpdate = {
+    /**
+     * Granted
+     */
+    granted: boolean;
+    purpose: ConsentPurpose;
+    /**
+     * Source
+     */
+    source?: 'account' | 'api';
+};
+
+/**
+ * ConsentsOut
+ *
+ * As DUAS camadas (marketing e parcerias), sempre ambas, com o estado corrente de cada uma.
+ */
+export type ConsentsOut = {
+    /**
+     * Items
+     */
+    items: Array<ConsentStateOut>;
 };
 
 /**
@@ -2129,7 +3046,7 @@ export type CopilotErrorEvent = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'insufficient_points' | 'donation_cap_reached' | 'out_of_stock' | 'catalog_item_inactive' | 'redemption_already_used' | 'catalog_item_shape' | 'campaign_window' | 'internal_error';
     /**
      * Message
      */
@@ -3359,6 +4276,86 @@ export type DeleteUserRequest = {
 };
 
 /**
+ * DeletionPreviewOut
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde.
+ *
+ * `points_are_not_money` é o texto decidido no ADR («pontos não são dinheiro nem conversíveis») —
+ * o web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.
+ */
+export type DeletionPreviewOut = {
+    /**
+     * Active Bags
+     */
+    active_bags: number;
+    /**
+     * Bags
+     */
+    bags: number;
+    balance: PointsBalanceOut;
+    /**
+     * Points Are Not Money
+     */
+    points_are_not_money?: boolean;
+    /**
+     * Points Entries
+     */
+    points_entries: number;
+    /**
+     * Redeem Hint Path
+     */
+    redeem_hint_path?: string;
+    /**
+     * Requests
+     */
+    requests: number;
+    /**
+     * Timeline
+     */
+    timeline: Array<NoveloFeaturesPrivacySchemasTimelineItem>;
+};
+
+/**
+ * DeletionRequest
+ *
+ * A confirmação: o email da conta, escrito à mão (a 3.ª proteção é o texto no ecrã; esta é a trava).
+ */
+export type DeletionRequest = {
+    /**
+     * Confirm Email
+     */
+    confirm_email: string;
+};
+
+/**
+ * DispatchAction
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
+ */
+export type DispatchAction = 'schedule' | 'reject';
+
+/**
+ * DispatchRequest
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data, que pode ser outra) ou recusar (com motivo).
+ */
+export type DispatchRequest = {
+    action: DispatchAction;
+    /**
+     * Reason
+     *
+     * Motivo da recusa (obrigatório ao recusar) ou nota do agendamento
+     */
+    reason?: string | null;
+    /**
+     * Requested Date
+     *
+     * Nova data ao agendar (a fila de exceções pode sair da ronda pedida)
+     */
+    requested_date?: string | null;
+};
+
+/**
  * DnsCheck
  */
 export type DnsCheck = {
@@ -3382,6 +4379,95 @@ export type DnsCheck = {
      * Status
      */
     status: 'ok' | 'warn' | 'fail' | 'unknown';
+};
+
+/**
+ * DonorAccountOut
+ *
+ * A conta de doador vista por quem nela entra: pseudónimo do QR de conta e a idade declarada.
+ */
+export type DonorAccountOut = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Declared Age
+     */
+    declared_age: number | null;
+    /**
+     * Donor Code
+     *
+     * Pseudónimo do QR de conta (`NVA-…`); nulo em contas antigas
+     */
+    donor_code: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string | null;
+};
+
+/**
+ * DonorQrOut
+ *
+ * QR em SVG (fundo branco, como o passaporte) e o código que ele codifica.
+ */
+export type DonorQrOut = {
+    /**
+     * Code
+     *
+     * `NVA-XXXXXX` (conta) ou `NVL-XXXXXX` (saco): é o payload inteiro do QR
+     */
+    code: string;
+    /**
+     * Svg
+     *
+     * QR em SVG; o código é o payload — o ecrã da viatura lê-o offline
+     */
+    svg: string;
+};
+
+/**
+ * DonorSignUpRequest
+ *
+ * Conta de doador por email, sem password: idade DECLARADA (13+; abaixo é recusa explícita) e
+ * consentimento RGPD (conta e crédito = contrato, ADR #49).
+ */
+export type DonorSignUpRequest = {
+    /**
+     * Consent
+     *
+     * Aceitação do tratamento de dados; tem de ser true
+     */
+    consent: true;
+    /**
+     * Declared Age
+     *
+     * Idade declarada; tudo abaixo de 13 é recusa explícita (`age_below_minimum`)
+     */
+    declared_age: number;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Locale
+     */
+    locale?: 'pt-PT' | 'en';
+    /**
+     * Website
+     *
+     * Honeypot: campo invisível que o web deixa vazio; qualquer valor é tratado como bot
+     */
+    website?: string | null;
 };
 
 /**
@@ -3741,7 +4827,15 @@ export type ErrorBody = {
     /**
      * Code
      */
-    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'internal_error';
+    code: 'bad_request' | 'validation_error' | 'unauthenticated' | 'session_expired' | 'invalid_credentials' | 'account_inactive' | 'current_password_incorrect' | 'invalid_token' | 'forbidden' | 'registration_closed' | 'invalid_event_code' | 'not_found' | 'user_not_found' | 'email_taken' | 'cannot_modify_self' | 'conflict' | 'consent_required' | 'account_pending' | 'account_rejected' | 'invitation_pending' | 'last_admin' | 'impersonation_active' | 'impersonation_blocked' | 'impersonation_forbidden' | 'confirmation_mismatch' | 'admin_confirmation_required' | 'rate_limited' | 'feature_disabled' | 'email_unavailable' | 'email_suppressed' | 'upstream_error' | 'ai_budget_exceeded' | 'captcha_required' | 'captcha_failed' | 'captcha_unavailable' | 'local_account_missing' | 'notice_already_active' | 'certificate_not_public' | 'address_request_active' | 'citizen_address_required' | 'citizen_parish_required' | 'citizen_bags_limit' | 'age_below_minimum' | 'bag_limit_reached' | 'bag_inactive' | 'local_address_forbidden' | 'request_not_dispatchable' | 'request_not_scheduled' | 'request_cancel_not_allowed' | 'insufficient_points' | 'donation_cap_reached' | 'out_of_stock' | 'catalog_item_inactive' | 'redemption_already_used' | 'catalog_item_shape' | 'campaign_window' | 'internal_error';
+    /**
+     * Details
+     *
+     * Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o
+     */
+    details?: {
+        [key: string]: unknown;
+    } | null;
     /**
      * Message
      *
@@ -3751,9 +4845,359 @@ export type ErrorBody = {
 };
 
 /**
+ * ExportBag
+ */
+export type ExportBag = {
+    /**
+     * Active
+     */
+    active: boolean;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Deactivated At
+     */
+    deactivated_at: string | null;
+    declaration: BagDeclaration | null;
+    /**
+     * Nickname
+     */
+    nickname: string | null;
+};
+
+/**
+ * ExportConsent
+ */
+export type ExportConsent = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Granted
+     */
+    granted: boolean;
+    /**
+     * Policy Version
+     */
+    policy_version: string;
+    /**
+     * Purpose
+     */
+    purpose: string;
+    /**
+     * Source
+     */
+    source: string;
+};
+
+/**
  * ExportFormat
  */
 export type ExportFormat = 'csv' | 'xlsx' | 'geojson';
+
+/**
+ * ExportLotDetail
+ */
+export type ExportLotDetail = {
+    /**
+     * Closed At
+     */
+    closed_at: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Collection Lots
+     *
+     * Lotes de recolha de origem distintos
+     */
+    collection_lots: number;
+    /**
+     * Composition
+     *
+     * Composição agregada, ponderada pelo peso
+     */
+    composition: Array<CompositionPart>;
+    /**
+     * Created At
+     */
+    created_at: string;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Item List
+     */
+    item_list: Array<ExportLotItemOut>;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Lineage
+     *
+     * Lotes de recolha de origem, mais pesado primeiro
+     */
+    lineage: Array<LineageLotOut>;
+    /**
+     * Localities
+     *
+     * Paragens (locais) distintas na linhagem
+     */
+    localities: number;
+    season: Season;
+    state: ExportLotState;
+    /**
+     * Taxonomy Version
+     *
+     * Versão da taxonomia em que o lote foi fechado
+     */
+    taxonomy_version: number;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * ExportLotItemOut
+ *
+ * Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.
+ */
+export type ExportLotItemOut = {
+    /**
+     * Added At
+     */
+    added_at: string;
+    /**
+     * Brand
+     */
+    brand: string | null;
+    colour: Colour | null;
+    /**
+     * Estimated Weight G
+     */
+    estimated_weight_g: number;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Name
+     *
+     * Paragem (local) donde a peça veio
+     */
+    locality_name?: string | null;
+    /**
+     * Lot Code
+     *
+     * Lote de recolha de origem
+     */
+    lot_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name?: string | null;
+    /**
+     * Selo «confirmado»/«IA» por eixo
+     */
+    provenance?: TriageProvenance | null;
+    season: Season;
+    size_band: SizeBand | null;
+};
+
+/**
+ * ExportLotItemsIn
+ *
+ * Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).
+ */
+export type ExportLotItemsIn = {
+    /**
+     * Item Ids
+     */
+    item_ids: Array<string>;
+};
+
+/**
+ * ExportLotKeyIn
+ *
+ * A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.
+ */
+export type ExportLotKeyIn = {
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    season: Season;
+};
+
+/**
+ * ExportLotState
+ *
+ * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
+ */
+export type ExportLotState = 'open' | 'closed';
+
+/**
+ * ExportLotSummary
+ */
+export type ExportLotSummary = {
+    /**
+     * Closed At
+     */
+    closed_at: string | null;
+    /**
+     * Code
+     */
+    code: string;
+    /**
+     * Collection Lots
+     *
+     * Lotes de recolha de origem distintos
+     */
+    collection_lots: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    fine_state: FineState;
+    garment_type: GarmentType;
+    gender: Gender;
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Localities
+     *
+     * Paragens (locais) distintas na linhagem
+     */
+    localities: number;
+    season: Season;
+    state: ExportLotState;
+    /**
+     * Taxonomy Version
+     *
+     * Versão da taxonomia em que o lote foi fechado
+     */
+    taxonomy_version: number;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * ExportPointEntry
+ */
+export type ExportPointEntry = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Bag Code
+     */
+    bag_code: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Expires At
+     */
+    expires_at: string | null;
+    /**
+     * Kind
+     */
+    kind: string;
+    /**
+     * Lot Code
+     */
+    lot_code: string | null;
+    /**
+     * Reason
+     */
+    reason: string | null;
+};
+
+/**
+ * ExportProfile
+ *
+ * O perfil fornecido pelo titular: identificador, nome opcional, pseudónimo, idade declarada.
+ */
+export type ExportProfile = {
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Declared Age
+     */
+    declared_age: number | null;
+    /**
+     * Donor Code
+     */
+    donor_code: string | null;
+    /**
+     * Email
+     */
+    email: string;
+    /**
+     * Joined Via
+     */
+    joined_via: string;
+    /**
+     * Locale
+     */
+    locale: string;
+    /**
+     * Name
+     */
+    name: string | null;
+};
+
+/**
+ * ExportRequest
+ */
+export type ExportRequest = {
+    /**
+     * Address
+     */
+    address: string | null;
+    /**
+     * Bag Count
+     */
+    bag_count: number;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Parish Code
+     */
+    parish_code: string | null;
+    /**
+     * Requested Date
+     */
+    requested_date: string;
+    state: CollectionRequestState;
+    subject_kind: RequestSubject;
+    /**
+     * Urgent
+     */
+    urgent: boolean;
+};
 
 /**
  * ExportScope
@@ -3848,6 +5292,16 @@ export type FieldFix = {
      */
     proposed_value?: string | null;
 };
+
+/**
+ * FineState
+ *
+ * Estado fino: 4 graus de qualidade reutilizável + reciclar/rejeitar, mapeado nos 3 destinos.
+ *
+ * Os graus seguem a letra usada no comércio de roupa usada (A é a melhor); `recycle` e `reject`
+ * mantêm o significado dos 3 destinos que a plataforma já usa (`TextileDestination`).
+ */
+export type FineState = 'grade_a' | 'grade_b' | 'grade_c' | 'grade_d' | 'recycle' | 'reject';
 
 /**
  * FleetSummary
@@ -4087,8 +5541,10 @@ export type FrontierPoint = {
 
 /**
  * GarmentType
+ *
+ * Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`).
  */
-export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'other';
+export type GarmentType = 'tshirt' | 'shirt' | 'trousers' | 'jumper' | 'jacket' | 'dress' | 'skirt' | 'bedding' | 'towel' | 'footwear' | 'accessory' | 'other';
 
 /**
  * GaugeChart
@@ -4143,6 +5599,13 @@ export type GaugeChart = {
 };
 
 /**
+ * Gender
+ *
+ * Género/segmento como o mercado compra (entra na chave do lote de escoamento).
+ */
+export type Gender = 'men' | 'women' | 'kids' | 'babies';
+
+/**
  * GlobalDefaults
  *
  * Valores globais: herdados por todas as tarefas sem valor próprio. Nulos herdam o `.env`.
@@ -4168,6 +5631,47 @@ export type GlobalDefaults = {
      * Vision Model
      */
     vision_model?: string | null;
+};
+
+/**
+ * GoldenLabelOut
+ *
+ * Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo).
+ */
+export type GoldenLabelOut = {
+    /**
+     * Ai Confidence
+     */
+    ai_confidence: number | null;
+    /**
+     * Ai Value
+     */
+    ai_value: string | null;
+    axis: TriageAxis;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Lot Code
+     */
+    lot_code: string | null;
+    /**
+     * Model
+     */
+    model: string | null;
+    /**
+     * Operator Value
+     */
+    operator_value: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string | null;
 };
 
 /**
@@ -4446,9 +5950,19 @@ export type InvitationCreate = {
      */
     email: string;
     /**
+     * Papel `local`: natureza do sítio — `assistido` (escola no MVP) ou `b2b`
+     */
+    local_kind?: LocalKind | null;
+    /**
      * Locale
      */
     locale?: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     *
+     * Papel `local`: o local (assistido ou produtor B2B) da conta
+     */
+    locality_id?: string | null;
     /**
      * Message
      *
@@ -4462,7 +5976,7 @@ export type InvitationCreate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest';
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -4557,9 +6071,23 @@ export type InvitationOut = {
      */
     last_sent_at: string | null;
     /**
+     * Natureza do sítio (só no papel `local`)
+     */
+    local_kind?: LocalKind | null;
+    /**
      * Locale
      */
     locale: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local (só no papel `local`)
+     */
+    locality_name?: string | null;
     /**
      * Message
      */
@@ -4575,7 +6103,7 @@ export type InvitationOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
     /**
      * Send Count
      */
@@ -4626,10 +6154,19 @@ export type InvitationPreview = {
      * Invited By Name
      */
     invited_by_name: string | null;
+    local_kind?: LocalKind | null;
     /**
      * Locale
      */
     locale: 'pt-PT' | 'en';
+    /**
+     * Locality Id
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name?: string | null;
     /**
      * Message
      */
@@ -4641,7 +6178,7 @@ export type InvitationPreview = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -4852,6 +6389,258 @@ export type KpisSpec = {
 };
 
 /**
+ * LineageLotOut
+ *
+ * Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.
+ */
+export type LineageLotOut = {
+    /**
+     * Items
+     */
+    items: number;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Lot Code
+     */
+    lot_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * LocalAccountAdminOut
+ *
+ * A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.
+ */
+export type LocalAccountAdminOut = {
+    /**
+     * Certificate Opt In
+     */
+    certificate_opt_in: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    kind: LocalKind;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Aviso ativo do local, se houver
+     */
+    notice?: StopNoticeOut | null;
+    /**
+     * User Email
+     */
+    user_email: string;
+    /**
+     * User Id
+     */
+    user_id: string;
+    /**
+     * User Name
+     */
+    user_name: string | null;
+};
+
+/**
+ * LocalAccountOut
+ *
+ * A conta de local vista por quem nela entra: o sítio, a natureza e o certificado.
+ */
+export type LocalAccountOut = {
+    /**
+     * Certificate Opt In
+     *
+     * Certificado público ligado (opt-in do próprio local)
+     */
+    certificate_opt_in: boolean;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Natureza do sítio: `assistido` (escola no MVP) ou `b2b`
+     */
+    kind: LocalKind;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Parish Name
+     *
+     * Freguesia do local, para o cabeçalho
+     */
+    parish_name?: string | null;
+};
+
+/**
+ * LocalCertificateOut
+ *
+ * Página pública do certificado (opt-in): totais agregados do local. Nunca doadores, nunca CO₂.
+ */
+export type LocalCertificateOut = {
+    /**
+     * First Stop At
+     */
+    first_stop_at: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Parish Name
+     */
+    parish_name: string | null;
+    /**
+     * Recycle Kg
+     */
+    recycle_kg: number;
+    /**
+     * Recycle Pct
+     */
+    recycle_pct: number;
+    /**
+     * Reject Kg
+     */
+    reject_kg: number;
+    /**
+     * Reject Pct
+     */
+    reject_pct: number;
+    /**
+     * Reuse Kg
+     */
+    reuse_kg: number;
+    /**
+     * Reuse Pct
+     */
+    reuse_pct: number;
+    /**
+     * Stops
+     *
+     * Paragens com lote pesado
+     */
+    stops: number;
+    /**
+     * Updated At
+     *
+     * Momento do cálculo (os totais são sempre os de agora)
+     */
+    updated_at: string;
+    /**
+     * Weight Kg
+     */
+    weight_kg: number;
+};
+
+/**
+ * LocalKind
+ *
+ * Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+ *
+ * Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+ * A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+ */
+export type LocalKind = 'assistido' | 'b2b';
+
+/**
+ * LocalReportOut
+ *
+ * Relatório do local em kg por destino — medido na pesagem, destinos pela triagem. Sem CO₂ nem doadores.
+ *
+ * O peso total soma o medido na paragem de cada lote (estimado nos lotes anteriores à balança);
+ * os destinos vêm da mesa de triagem, logo só cobrem os lotes triados (`lots_in_triage` fica de fora).
+ */
+export type LocalReportOut = {
+    /**
+     * First Stop At
+     */
+    first_stop_at: string | null;
+    /**
+     * Last Stop At
+     */
+    last_stop_at: string | null;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Locality Name
+     */
+    locality_name: string | null;
+    /**
+     * Lots
+     *
+     * Paragens com lote (um lote por paragem)
+     */
+    lots: number;
+    /**
+     * Lots In Triage
+     *
+     * Lotes ainda na mesa de triagem, sem destinos
+     */
+    lots_in_triage: number;
+    /**
+     * Measured Lots
+     *
+     * Lotes com peso medido na balança da viatura
+     */
+    measured_lots: number;
+    /**
+     * Recycle Kg
+     */
+    recycle_kg: number;
+    /**
+     * Reject Kg
+     */
+    reject_kg: number;
+    /**
+     * Reuse Kg
+     */
+    reuse_kg: number;
+    /**
+     * Sorted Lots
+     *
+     * Lotes já triados (com destinos)
+     */
+    sorted_lots: number;
+    /**
+     * Weight Kg
+     *
+     * Peso total (medido quando há balança; estimado nos lotes antigos)
+     */
+    weight_kg: number;
+};
+
+/**
  * LocalityOut
  */
 export type LocalityOut = {
@@ -4869,6 +6658,10 @@ export type LocalityOut = {
      * Dias distintos da semana com algum circuito a passar
      */
     days_per_week: number;
+    /**
+     * Id
+     */
+    id: string;
     /**
      * Latitude
      *
@@ -4945,6 +6738,18 @@ export type LotDetail = {
      */
     items: number;
     /**
+     * Locality Id
+     *
+     * Local da paragem que deu origem ao lote
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local da paragem
+     */
+    locality_name?: string | null;
+    /**
      * Opened At
      */
     opened_at: string;
@@ -4971,15 +6776,31 @@ export type LotDetail = {
     reuse_kg: number;
     state: LotState;
     /**
+     * Unit List
+     *
+     * Unidades físicas pesadas na paragem
+     */
+    unit_list?: Array<LotUnitOut>;
+    /**
+     * Units
+     *
+     * Unidades físicas (sacos) pesadas na paragem
+     */
+    units?: number;
+    /**
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
 
 /**
  * LotEventKind
  */
-export type LotEventKind = 'opened' | 'item_added' | 'sorted' | 'reserved' | 'delivered';
+export type LotEventKind = 'opened' | 'item_added' | 'departed' | 'unit_removed' | 'sorted' | 'reserved' | 'delivered';
 
 /**
  * LotEventOut
@@ -5000,17 +6821,28 @@ export type LotEventOut = {
  * LotItemIn
  *
  * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ *
+ * O caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)
+ * é derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.
  */
 export type LotItemIn = {
+    /**
+     * Proposta da IA revista; gera rótulos dourados
+     */
+    ai_proposal?: TriageProposal | null;
     /**
      * Brand
      */
     brand?: string | null;
+    colour?: Colour | null;
     /**
      * Composition
      */
     composition: Array<CompositionPart>;
-    condition: TextileDestination;
+    /**
+     * Destino (legado); derivado do estado fino quando este vem
+     */
+    condition?: TextileDestination | null;
     /**
      * Confidence
      */
@@ -5019,11 +6851,18 @@ export type LotItemIn = {
      * Estimated Weight G
      */
     estimated_weight_g: number;
+    fine_state?: FineState | null;
     garment_type: GarmentType;
+    gender?: Gender | null;
     /**
      * Prompt Version
      */
     prompt_version?: string | null;
+    season?: Season | null;
+    /**
+     * Banda lida só da etiqueta
+     */
+    size_band?: SizeBand | null;
 };
 
 /**
@@ -5034,6 +6873,7 @@ export type LotItemOut = {
      * Brand
      */
     brand: string | null;
+    colour?: Colour | null;
     /**
      * Composition
      */
@@ -5052,7 +6892,9 @@ export type LotItemOut = {
      * Estimated Weight G
      */
     estimated_weight_g: number;
+    fine_state?: FineState | null;
     garment_type: GarmentType;
+    gender?: Gender | null;
     /**
      * Has Photo
      *
@@ -5075,6 +6917,12 @@ export type LotItemOut = {
      * URL relativa (autenticada) da miniatura; nula sem foto ou depois de expirar
      */
     photo_url?: string | null;
+    /**
+     * Selo «confirmado»/«IA» por eixo
+     */
+    provenance?: TriageProvenance | null;
+    season?: Season | null;
+    size_band?: SizeBand | null;
 };
 
 /**
@@ -5115,6 +6963,18 @@ export type LotSummary = {
      */
     items: number;
     /**
+     * Locality Id
+     *
+     * Local da paragem que deu origem ao lote
+     */
+    locality_id?: string | null;
+    /**
+     * Locality Name
+     *
+     * Nome do local da paragem
+     */
+    locality_name?: string | null;
+    /**
      * Opened At
      */
     opened_at: string;
@@ -5128,10 +6988,97 @@ export type LotSummary = {
     parish_name: string | null;
     state: LotState;
     /**
+     * Units
+     *
+     * Unidades físicas (sacos) pesadas na paragem
+     */
+    units?: number;
+    /**
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
+
+/**
+ * LotUnitIn
+ *
+ * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ *
+ * `label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse
+ * UUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:
+ * ou o QR do saco, ou o UUID da etiqueta.
+ */
+export type LotUnitIn = {
+    /**
+     * Bag Code
+     *
+     * QR do saco da plataforma, tal como lido no scan
+     */
+    bag_code?: string | null;
+    /**
+     * Label Code
+     *
+     * UUID gerado no dispositivo para a etiqueta impressa offline (QR = esse UUID)
+     */
+    label_code?: string | null;
+};
+
+/**
+ * LotUnitOut
+ */
+export type LotUnitOut = {
+    /**
+     * Code
+     *
+     * QR da unidade: código do saco da plataforma, ou UUID da etiqueta impressa
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    source: LotUnitSource;
+    /**
+     * Weight G
+     *
+     * Peso medido; nulo até a unidade passar pela balança
+     */
+    weight_g: number | null;
+};
+
+/**
+ * LotUnitSource
+ *
+ * De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem).
+ */
+export type LotUnitSource = 'bag' | 'label';
+
+/**
+ * LotUnitWeight
+ */
+export type LotUnitWeight = {
+    /**
+     * Weight G
+     *
+     * Peso medido em gramas (pratos ≤ 15 kg: um saco pode somar vários pratos)
+     */
+    weight_g: number;
+};
+
+/**
+ * LotWeightSource
+ *
+ * De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado).
+ */
+export type LotWeightSource = 'measured' | 'estimated';
 
 /**
  * MagicLinkRequest
@@ -5372,7 +7319,7 @@ export type MeOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -7280,6 +9227,16 @@ export type MunicipalTextileReference = {
 };
 
 /**
+ * NoticeState
+ *
+ * Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+ *
+ * Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+ * avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+ */
+export type NoticeState = 'active' | 'cancelled';
+
+/**
  * OnboardingOut
  *
  * Estado da introdução guiada da conta (vale em todos os dispositivos).
@@ -7795,6 +9752,12 @@ export type ParamMeta = {
      */
     key: string;
     /**
+     * N
+     *
+     * Amostras observadas (calibração #62): visitas ou semanas, conforme a métrica. Com n abaixo do limiar de dominância a fonte mostra «estimativa·n»; a partir dele, «observado·n». Nulo sem calibração
+     */
+    n?: number | null;
+    /**
      * Note
      *
      * Fonte em texto, quando o valor ainda está por preencher
@@ -7812,7 +9775,7 @@ export type ParamMeta = {
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export type ParamSource = 'vitrus_data' | 'assumption';
+export type ParamSource = 'vitrus_data' | 'assumption' | 'observed';
 
 /**
  * ParametersOut
@@ -7912,9 +9875,120 @@ export type ParishMatch = 'igual' | 'diferente' | 'sem_coord' | 'nao_mapeada';
 export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'partial' | 'none';
 
 /**
+ * PartnerCreate
+ *
+ * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
+ */
+export type PartnerCreate = {
+    /**
+     * Contact
+     *
+     * Contato da equipa; nunca sai para o doador
+     */
+    contact?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Parish Code
+     *
+     * Dicofre da freguesia proponente
+     */
+    parish_code?: string | null;
+};
+
+/**
+ * PartnerOut
+ *
+ * Um parceiro: estado de vida (proposto/aprovado/em pausa) e quem propôs.
+ */
+export type PartnerOut = {
+    /**
+     * Contact
+     */
+    contact: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Description
+     */
+    description: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Parish Code
+     *
+     * Dicofre da freguesia proponente (vazio se a proposta veio da equipa)
+     */
+    parish_code?: string | null;
+    /**
+     * Parish Id
+     */
+    parish_id: string | null;
+    /**
+     * Parish Name
+     *
+     * Nome da freguesia proponente, para a mesa da equipa
+     */
+    parish_name?: string | null;
+    /**
+     * Proposed By Id
+     */
+    proposed_by_id: string | null;
+    state: PartnerState;
+};
+
+/**
+ * PartnerState
+ *
+ * Vida de um parceiro: a freguesia PROPÕE, a Vitrus APROVA (e pode pôr em pausa).
+ */
+export type PartnerState = 'proposed' | 'active' | 'inactive';
+
+/**
+ * PartnerUpdate
+ *
+ * Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`.
+ */
+export type PartnerUpdate = {
+    /**
+     * Contact
+     */
+    contact?: string | null;
+    /**
+     * Description
+     */
+    description?: string | null;
+    /**
+     * Name
+     */
+    name?: string | null;
+    /**
+     * Parish Code
+     */
+    parish_code?: string | null;
+};
+
+/**
  * Passport
  *
- * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ * Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.
  */
 export type Passport = {
     /**
@@ -7938,6 +10012,12 @@ export type Passport = {
      * Items
      */
     items: number;
+    /**
+     * Locality Name
+     *
+     * Local da paragem (nunca identifica ninguém)
+     */
+    locality_name?: string | null;
     /**
      * Opened At
      */
@@ -7969,6 +10049,10 @@ export type Passport = {
      * Weight Kg
      */
     weight_kg: number;
+    /**
+     * `measured` quando o peso vem da balança da viatura; `estimated` é pressuposto
+     */
+    weight_source?: LotWeightSource;
 };
 
 /**
@@ -8460,6 +10544,63 @@ export type Point = {
 };
 
 /**
+ * PointEntryKind
+ *
+ * Tipos de lançamento do livro-razão (imutável: nunca se atualiza nem se apaga uma linha).
+ *
+ * `redemption` fica reservado ao #65 (catálogo e resgate): o valor e o CHECK da tabela já o aceitam,
+ * mas nenhum caminho de código o escreve até lá.
+ */
+export type PointEntryKind = 'gain_flat' | 'gain_bonus' | 'annulment' | 'redemption';
+
+/**
+ * PointEntryOut
+ *
+ * Uma linha do livro-razão vista pelo doador: valor assinado, fontes e, nos ganhos, a expiração.
+ */
+export type PointEntryOut = {
+    /**
+     * Amount
+     *
+     * Assinado: ganhos positivos, anulação negativa
+     */
+    amount: number;
+    /**
+     * Bag Code
+     *
+     * Saco ativado que originou o lançamento (`NVL-…`)
+     */
+    bag_code: string | null;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Expires At
+     *
+     * Fim do ganho (12 meses); nulo em anulações
+     */
+    expires_at: string | null;
+    /**
+     * Id
+     */
+    id: string;
+    kind: PointEntryKind;
+    /**
+     * Lot Code
+     *
+     * Lote onde o saco foi pesado ou triado (`NOV-…`)
+     */
+    lot_code: string | null;
+    /**
+     * Reason
+     *
+     * Motivo obrigatório na anulação em abuso; nulo nos ganhos
+     */
+    reason: string | null;
+};
+
+/**
  * PointGeometry
  */
 export type PointGeometry = {
@@ -8476,6 +10617,166 @@ export type PointGeometry = {
      * Type
      */
     type?: 'Point';
+};
+
+/**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export type PointsBalanceOut = {
+    /**
+     * Balance
+     *
+     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
+     */
+    balance: number;
+    /**
+     * Bonus
+     *
+     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
+     */
+    bonus: number;
+    /**
+     * Bonus Conformity Points
+     *
+     * Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)
+     */
+    bonus_conformity_points: number;
+    /**
+     * Credited This Month
+     *
+     * Ganhos já creditados no mês corrente (flat + bónus)
+     */
+    credited_this_month: number;
+    /**
+     * Expired
+     *
+     * Pontos já expirados (12 meses por ganho, FIFO)
+     */
+    expired: number;
+    /**
+     * Expiring Soon
+     *
+     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
+     */
+    expiring_soon: number;
+    /**
+     * Flat
+     *
+     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
+     */
+    flat: number;
+    /**
+     * Gain Flat Points
+     *
+     * Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)
+     */
+    gain_flat_points: number;
+    /**
+     * Monthly Cap
+     *
+     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
+     */
+    monthly_cap: number;
+};
+
+/**
+ * PointsHistoryOut
+ *
+ * Página do histórico de pontos (o mais recente primeiro).
+ */
+export type PointsHistoryOut = {
+    /**
+     * Items
+     */
+    items: Array<PointEntryOut>;
+    /**
+     * Total
+     *
+     * Total de linhas do livro-razão da conta (para paginar sem surpresas)
+     */
+    total: number;
+};
+
+/**
+ * PolicyCategory
+ *
+ * Uma categoria de dados dentro de uma finalidade, com o SEU prazo de conservação.
+ */
+export type PolicyCategory = {
+    /**
+     * Applied By
+     */
+    applied_by: string;
+    /**
+     * Name
+     */
+    name: string;
+    /**
+     * Retention
+     */
+    retention: string;
+};
+
+/**
+ * PolicyOut
+ *
+ * A política inteira, como a página pública a recebe (JSON; a web só desenha).
+ */
+export type PolicyOut = {
+    /**
+     * Controller
+     */
+    controller: string;
+    /**
+     * Minimum Age
+     */
+    minimum_age: number;
+    /**
+     * Purposes
+     */
+    purposes: Array<PolicyPurpose>;
+    /**
+     * Rights
+     */
+    rights: Array<string>;
+    /**
+     * Version
+     */
+    version: string;
+};
+
+/**
+ * PolicyPurpose
+ *
+ * Uma finalidade de tratamento: base legal, texto claro e as categorias com prazos.
+ */
+export type PolicyPurpose = {
+    /**
+     * Categories
+     */
+    categories: Array<PolicyCategory>;
+    /**
+     * Consent Required
+     */
+    consent_required?: boolean;
+    /**
+     * Description
+     */
+    description: string;
+    id: PurposeId;
+    /**
+     * Legal Basis
+     */
+    legal_basis: string;
+    /**
+     * Title
+     */
+    title: string;
 };
 
 /**
@@ -8579,6 +10880,66 @@ export type ProposeActionIn = {
     thread_id?: string | null;
     type: ActionType;
 };
+
+/**
+ * Provenance
+ *
+ * De onde vem o valor de um atributo: proposto pela IA e aceite, ou definido pelo operador.
+ */
+export type Provenance = 'confirmed' | 'ai';
+
+/**
+ * PublicAgendaEntry
+ *
+ * Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).
+ *
+ * É a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do
+ * degrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.
+ * A página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.
+ */
+export type PublicAgendaEntry = {
+    /**
+     * `on_demand`: ronda porta a porta; `existing`: paragens nos locais
+     */
+    channel: CollectionMode;
+    /**
+     * Every Weeks
+     *
+     * Uma visita a cada N semanas (a cadência do degrau escolhido)
+     */
+    every_weeks: number;
+    /**
+     * O degrau escolhido (`weekly` a `quarterly`); nulo na política fixa
+     */
+    frequency?: CollectionFrequency | null;
+    /**
+     * Parish Code
+     */
+    parish_code: string;
+    /**
+     * Parish Name
+     */
+    parish_name: string;
+    /**
+     * Rounds Year
+     *
+     * Visitas por ano
+     */
+    rounds_year: number;
+    /**
+     * Weekday
+     *
+     * Dia da ronda (1 = segunda ... 5 = sexta)
+     */
+    weekday: number;
+};
+
+/**
+ * PurposeId
+ *
+ * Identificadores estáveis das finalidades (o contrato público da política entre versões).
+ */
+export type PurposeId = 'conta' | 'sacos' | 'pedidos' | 'pontos' | 'triagem' | 'logs_autenticacao' | 'marketing' | 'parcerias';
 
 /**
  * QuantilesOut
@@ -8774,6 +11135,83 @@ export type Readiness = {
      * Status
      */
     status: 'ok' | 'degraded';
+};
+
+/**
+ * RedemptionCreate
+ *
+ * Resgatar um item do catálogo: o saldo FIFO é debitado e nasce um código pseudónimo.
+ */
+export type RedemptionCreate = {
+    /**
+     * Item Id
+     */
+    item_id: string;
+};
+
+/**
+ * RedemptionOut
+ *
+ * Um resgate visto pelo doador OU pela equipa na validação: o código e o seu estado de vida.
+ */
+export type RedemptionOut = {
+    /**
+     * Code
+     *
+     * `RDM-XXXXXX`: a ÚNICA coisa que o parceiro vê — zero dados do doador
+     */
+    code: string;
+    /**
+     * Created At
+     */
+    created_at: string;
+    /**
+     * Donation Value Cents
+     */
+    donation_value_cents: number | null;
+    /**
+     * Id
+     */
+    id: string;
+    item_kind: CatalogItemKind;
+    /**
+     * Item Name
+     */
+    item_name: string;
+    /**
+     * Partner Name
+     */
+    partner_name: string | null;
+    /**
+     * Points Spent
+     */
+    points_spent: number;
+    state: RedemptionState;
+    /**
+     * Validated At
+     */
+    validated_at: string | null;
+};
+
+/**
+ * RedemptionState
+ *
+ * Estado do código de resgate: nasce pendente e valida-se UMA única vez (pagamento integral).
+ */
+export type RedemptionState = 'pending' | 'validated';
+
+/**
+ * RedemptionValidate
+ *
+ * Validar um código apresentado (equipa, no MVP; portal do parceiro fica para depois).
+ */
+export type RedemptionValidate = {
+    /**
+     * Code
+     *
+     * O código `RDM-…` tal como o parceiro o leu
+     */
+    code: string;
 };
 
 /**
@@ -9036,6 +11474,43 @@ export type ReportSpec = {
      */
     title: string;
 };
+
+/**
+ * RequestExceptionReason
+ *
+ * Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+ *
+ * `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+ * `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+ * urgente — nunca é auto-aceite, o gestor decide.
+ */
+export type RequestExceptionReason = 'out_of_round' | 'cutoff' | 'special_volume' | 'urgency';
+
+/**
+ * RequestOutcome
+ *
+ * O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª).
+ */
+export type RequestOutcome = 'collected' | 'missed';
+
+/**
+ * RequestOutcomeCreate
+ *
+ * O resultado da visita ao pedido agendado: recolhido, ou ausência (a 3.ª expira o pedido).
+ */
+export type RequestOutcomeCreate = {
+    outcome: RequestOutcome;
+};
+
+/**
+ * RequestSubject
+ *
+ * Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+ *
+ * Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+ * máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+ */
+export type RequestSubject = 'citizen' | 'local';
 
 /**
  * ReservationOut
@@ -9596,6 +12071,12 @@ export type ScenarioRequest = {
      */
     siting?: 'parish' | 'sites';
     /**
+     * Stop Policy
+     *
+     * Política de paragem (ADR #42): `fixed` mantém o degrau global `on_demand_every_weeks` para todas as freguesias; `dynamic` deixa o otimizador escolher o degrau de cada freguesia na escada discreta (semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura. O aviso «sacos prontos» garante paragem nas duas. Cenários antigos, sem o campo: `fixed`
+     */
+    stop_policy?: 'fixed' | 'dynamic';
+    /**
      * Target Tonnes
      *
      * Meta de captura (min_cost)
@@ -9611,6 +12092,10 @@ export type ScenarioResult = {
      * Allocations
      */
     allocations: Array<Allocation>;
+    /**
+     * A calibração que o cenário usou (fotografia da tabela de agregados: métrica × unidade, n, rótulo, prior vs observado vs calibrado). Nulo nos cenários calculados sem observação — comparam-se com honestidade, cada um com a calibração que teve (ADR: captura anual é derivada)
+     */
+    calibration?: CalibrationPhoto | null;
     /**
      * Collection Plan
      *
@@ -9633,6 +12118,12 @@ export type ScenarioResult = {
      */
     modes: Array<ModeSummary>;
     /**
+     * Public Agenda
+     *
+     * Agenda pública (dado introduzido): as rondas publicadas, por dia, freguesia e canal, com a cadência do degrau escolhido — nenhuma visita publicada é saltada. Nulo nos cenários calculados antes da política de paragem (a página pública de #63 lê este campo)
+     */
+    public_agenda?: Array<PublicAgendaEntry> | null;
+    /**
      * Routes
      */
     routes: Array<RouteOut>;
@@ -9652,6 +12143,12 @@ export type ScenarioResult = {
      * Preenchido nos cenários por locais
      */
     siting?: SitingSummary | null;
+    /**
+     * Stop Policy
+     *
+     * Política de paragem com que o cenário foi calculado (`fixed` = degrau global; `dynamic` = degrau por freguesia na escada). Cenários antigos, sem o campo: `fixed`
+     */
+    stop_policy?: 'fixed' | 'dynamic';
 };
 
 /**
@@ -9747,6 +12244,13 @@ export type ScheduleEntry = {
     shift: Shift;
     typology: Typology;
 };
+
+/**
+ * Season
+ *
+ * Estação: quando faz sentido voltar a colocar a peça em uso (critério da Retex).
+ */
+export type Season = 'all_season' | 'warm' | 'cold';
 
 /**
  * SensitivityOut
@@ -10101,6 +12605,10 @@ export type SiteSelection = {
      */
     coord_precision: 'precise' | 'approximate';
     /**
+     * O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa
+     */
+    frequency?: CollectionFrequency | null;
+    /**
      * Kind
      *
      * `staffed`: ponto assistido (escola), sem contentor de rua
@@ -10220,6 +12728,17 @@ export type SitingSummary = {
 };
 
 /**
+ * SizeBand
+ *
+ * Tamanho em bandas, lido SÓ da etiqueta. Nunca se deduz da foto.
+ *
+ * Bandas e não tamanhos exatos: as etiquetas variam (letras, P/M/G, numerais). Numerais
+ * («42», «98») ficam `unknown` — as tabelas EU de homem e de mulher conflituam e a função
+ * não inventa o mapeamento (regra zero); o operador, com a etiqueta à mão, escolhe a banda.
+ */
+export type SizeBand = 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl' | 'unknown';
+
+/**
  * SlotCount
  */
 export type SlotCount = {
@@ -10321,6 +12840,95 @@ export type StatusCounts = {
      * Total
      */
     total?: number;
+};
+
+/**
+ * StopLotOpen
+ *
+ * Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier.
+ */
+export type StopLotOpen = {
+    /**
+     * Locality Id
+     *
+     * Local da paragem (à porta ou num local assistido)
+     */
+    locality_id: string;
+    /**
+     * Parish Code
+     *
+     * Freguesia da paragem (código INE); por omissão, a do local
+     */
+    parish_code?: string | null;
+};
+
+/**
+ * StopNoticeCreate
+ *
+ * O que o local diz ao avisar: quantos sacos (opcional) e um recado para a equipa (opcional).
+ */
+export type StopNoticeCreate = {
+    /**
+     * Bag Count
+     *
+     * Quantos sacos estão prontos (o protótipo pede «diz quantos»)
+     */
+    bag_count?: number | null;
+    /**
+     * Note
+     *
+     * Recado para a equipa, ex.: «sala 12»
+     */
+    note?: string | null;
+};
+
+/**
+ * StopNoticeCurrent
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum (a porta do herói mostra o estado certo).
+ */
+export type StopNoticeCurrent = {
+    notice: StopNoticeOut | null;
+};
+
+/**
+ * StopNoticeOut
+ *
+ * Um aviso «sacos prontos»: garante paragem no dia (política de paragem).
+ */
+export type StopNoticeOut = {
+    /**
+     * Bag Count
+     *
+     * Sacos que o local declara prontos (sinal, não contagem)
+     */
+    bag_count?: number | null;
+    /**
+     * Cancelled At
+     */
+    cancelled_at: string | null;
+    /**
+     * Created At
+     *
+     * Quando o aviso foi dado
+     */
+    created_at: string;
+    /**
+     * Id
+     */
+    id: string;
+    /**
+     * Locality Id
+     */
+    locality_id: string | null;
+    /**
+     * Note
+     */
+    note: string | null;
+    /**
+     * `active` garante paragem; `cancelled` é histórico
+     */
+    state: NoticeState;
 };
 
 /**
@@ -10861,31 +13469,13 @@ export type TimelineEvent = {
 };
 
 /**
- * TimelineItem
- */
-export type TimelineItem = {
-    /**
-     * At
-     */
-    at: string;
-    /**
-     * Detail
-     */
-    detail?: string | null;
-    /**
-     * Label
-     */
-    label: string;
-};
-
-/**
  * TimelineSpec
  */
 export type TimelineSpec = {
     /**
      * Items
      */
-    items: Array<TimelineItem>;
+    items: Array<NoveloFeaturesCopilotSchemasArtifactsTimelineItem>;
     /**
      * Source
      */
@@ -11110,31 +13700,42 @@ export type TreemapItem = {
 /**
  * TriageAnalysis
  *
- * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ * O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.
+ *
+ * A IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),
+ * e o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.
  */
 export type TriageAnalysis = {
     /**
      * Brand
      */
     brand?: string | null;
+    colour: Colour;
     /**
      * Composition
      */
     composition: Array<CompositionPart>;
     /**
-     * reuse, recycle ou reject
-     */
-    condition: TextileDestination;
-    /**
      * Confidence
      */
     confidence: number;
+    fine_state: FineState;
     garment_type: GarmentType;
+    gender: Gender;
     /**
      * Notes
      */
     notes: string;
+    season: Season;
+    size_band?: SizeBand;
 };
+
+/**
+ * TriageAxis
+ *
+ * Os seis eixos da taxonomia; o eval mede a IA em cada um.
+ */
+export type TriageAxis = 'fine_state' | 'garment_type' | 'season' | 'colour' | 'gender' | 'size_band';
 
 /**
  * TriageEvalModel
@@ -11143,7 +13744,7 @@ export type TriageEvalModel = {
     /**
      * Accuracy
      *
-     * Por campo, de 0 a 1: garment_type, condition, brand, dominant_fibre, composition_within_10pp
+     * Por campo, de 0 a 1: eixos da taxonomia (fine_state, garment_type, season, colour, gender, size_band), destination, brand, dominant_fibre, composition_within_10pp
      */
     accuracy: {
         [key: string]: number;
@@ -11159,9 +13760,9 @@ export type TriageEvalModel = {
      */
     avg_latency_s: number;
     /**
-     * Confusion Condition
+     * Confusion Fine State
      */
-    confusion_condition: {
+    confusion_fine_state: {
         [key: string]: {
             [key: string]: number;
         };
@@ -11195,6 +13796,20 @@ export type TriageEvalModel = {
      */
     pieces: number;
     /**
+     * Promised Axes
+     *
+     * Eixos «prometidos»: género e tamanho enquanto a exatidão e a amostra não aguentarem
+     */
+    promised_axes?: Array<string>;
+    /**
+     * Samples
+     *
+     * Por eixo da taxonomia, com quantas peças de verdade-terreno se mediu
+     */
+    samples?: {
+        [key: string]: number;
+    };
+    /**
      * Total Cost Usd
      */
     total_cost_usd: number | null;
@@ -11223,10 +13838,63 @@ export type TriageEvalReport = {
 };
 
 /**
+ * TriageProposal
+ *
+ * Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores).
+ */
+export type TriageProposal = {
+    /**
+     * Confidence
+     */
+    confidence: number;
+    /**
+     * Model
+     */
+    model: string;
+    /**
+     * Prompt Version
+     */
+    prompt_version: string;
+    values: TriageProposalValues;
+};
+
+/**
+ * TriageProposalValues
+ *
+ * O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados).
+ */
+export type TriageProposalValues = {
+    colour?: Colour | null;
+    fine_state?: FineState | null;
+    garment_type?: GarmentType | null;
+    gender?: Gender | null;
+    season?: Season | null;
+    size_band?: SizeBand | null;
+};
+
+/**
+ * TriageProvenance
+ *
+ * Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor.
+ */
+export type TriageProvenance = {
+    colour?: AttributeSource | null;
+    fine_state?: AttributeSource | null;
+    garment_type?: AttributeSource | null;
+    gender?: AttributeSource | null;
+    season?: AttributeSource | null;
+    size_band?: AttributeSource | null;
+};
+
+/**
  * TriageResult
  */
 export type TriageResult = {
     analysis: TriageAnalysis;
+    /**
+     * Destino derivado do estado fino (reuse/recycle/reject)
+     */
+    destination: TextileDestination;
     dominant_fibre: Fibre;
     /**
      * Estimated Weight G
@@ -11457,7 +14125,7 @@ export type UserAdminOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -11477,7 +14145,7 @@ export type UserAdminUpdate = {
     /**
      * Role
      */
-    role?: 'admin' | 'operator' | 'guest' | null;
+    role?: 'admin' | 'operator' | 'guest' | 'local' | 'donor' | null;
 };
 
 /**
@@ -11529,7 +14197,7 @@ export type UserOut = {
     /**
      * Role
      */
-    role: 'admin' | 'operator' | 'guest';
+    role: 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 };
 
 /**
@@ -11956,6 +14624,864 @@ export type ZoneOut = {
      */
     tipau: Tipau | null;
 };
+
+/**
+ * TimelineItem
+ */
+export type NoveloFeaturesCopilotSchemasArtifactsTimelineItem = {
+    /**
+     * At
+     */
+    at: string;
+    /**
+     * Detail
+     */
+    detail?: string | null;
+    /**
+     * Label
+     */
+    label: string;
+};
+
+/**
+ * TimelineItem
+ *
+ * Uma data de expiração FIFO e quantos pontos caem nela (o calendário do saldo).
+ */
+export type NoveloFeaturesPrivacySchemasTimelineItem = {
+    /**
+     * Amount
+     */
+    amount: number;
+    /**
+     * Expires At
+     */
+    expires_at: string;
+};
+
+export type ListAdminCampaignsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns';
+};
+
+export type ListAdminCampaignsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAdminCampaignsError = ListAdminCampaignsErrors[keyof ListAdminCampaignsErrors];
+
+export type ListAdminCampaignsResponses = {
+    /**
+     * Response List Admin Campaigns
+     *
+     * Successful Response
+     */
+    200: Array<CampaignOut>;
+};
+
+export type ListAdminCampaignsResponse = ListAdminCampaignsResponses[keyof ListAdminCampaignsResponses];
+
+export type CreatePointCampaignData = {
+    body: CampaignCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns';
+};
+
+export type CreatePointCampaignErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreatePointCampaignError = CreatePointCampaignErrors[keyof CreatePointCampaignErrors];
+
+export type CreatePointCampaignResponses = {
+    /**
+     * Successful Response
+     */
+    201: CampaignOut;
+};
+
+export type CreatePointCampaignResponse = CreatePointCampaignResponses[keyof CreatePointCampaignResponses];
+
+export type UpdatePointCampaignData = {
+    body: CampaignUpdate;
+    path: {
+        /**
+         * Campaign Id
+         */
+        campaign_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/campaigns/{campaign_id}';
+};
+
+export type UpdatePointCampaignErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdatePointCampaignError = UpdatePointCampaignErrors[keyof UpdatePointCampaignErrors];
+
+export type UpdatePointCampaignResponses = {
+    /**
+     * Successful Response
+     */
+    200: CampaignOut;
+};
+
+export type UpdatePointCampaignResponse = UpdatePointCampaignResponses[keyof UpdatePointCampaignResponses];
+
+export type ListAdminCatalogItemsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/items';
+};
+
+export type ListAdminCatalogItemsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListAdminCatalogItemsError = ListAdminCatalogItemsErrors[keyof ListAdminCatalogItemsErrors];
+
+export type ListAdminCatalogItemsResponses = {
+    /**
+     * Response List Admin Catalog Items
+     *
+     * Successful Response
+     */
+    200: Array<CatalogItemOut>;
+};
+
+export type ListAdminCatalogItemsResponse = ListAdminCatalogItemsResponses[keyof ListAdminCatalogItemsResponses];
+
+export type CreateCatalogItemData = {
+    body: CatalogItemCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/items';
+};
+
+export type CreateCatalogItemErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCatalogItemError = CreateCatalogItemErrors[keyof CreateCatalogItemErrors];
+
+export type CreateCatalogItemResponses = {
+    /**
+     * Successful Response
+     */
+    201: CatalogItemOut;
+};
+
+export type CreateCatalogItemResponse = CreateCatalogItemResponses[keyof CreateCatalogItemResponses];
+
+export type UpdateCatalogItemData = {
+    body: CatalogItemUpdate;
+    path: {
+        /**
+         * Item Id
+         */
+        item_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/items/{item_id}';
+};
+
+export type UpdateCatalogItemErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCatalogItemError = UpdateCatalogItemErrors[keyof UpdateCatalogItemErrors];
+
+export type UpdateCatalogItemResponses = {
+    /**
+     * Successful Response
+     */
+    200: CatalogItemOut;
+};
+
+export type UpdateCatalogItemResponse = UpdateCatalogItemResponses[keyof UpdateCatalogItemResponses];
+
+export type ListCatalogPartnersData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/partners';
+};
+
+export type ListCatalogPartnersErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCatalogPartnersError = ListCatalogPartnersErrors[keyof ListCatalogPartnersErrors];
+
+export type ListCatalogPartnersResponses = {
+    /**
+     * Response List Catalog Partners
+     *
+     * Successful Response
+     */
+    200: Array<PartnerOut>;
+};
+
+export type ListCatalogPartnersResponse = ListCatalogPartnersResponses[keyof ListCatalogPartnersResponses];
+
+export type CreateCatalogPartnerData = {
+    body: PartnerCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/catalog/partners';
+};
+
+export type CreateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCatalogPartnerError = CreateCatalogPartnerErrors[keyof CreateCatalogPartnerErrors];
+
+export type CreateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    201: PartnerOut;
+};
+
+export type CreateCatalogPartnerResponse = CreateCatalogPartnerResponses[keyof CreateCatalogPartnerResponses];
+
+export type UpdateCatalogPartnerData = {
+    body: PartnerUpdate;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}';
+};
+
+export type UpdateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateCatalogPartnerError = UpdateCatalogPartnerErrors[keyof UpdateCatalogPartnerErrors];
+
+export type UpdateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type UpdateCatalogPartnerResponse = UpdateCatalogPartnerResponses[keyof UpdateCatalogPartnerResponses];
+
+export type ApproveCatalogPartnerData = {
+    body?: never;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}/approve';
+};
+
+export type ApproveCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ApproveCatalogPartnerError = ApproveCatalogPartnerErrors[keyof ApproveCatalogPartnerErrors];
+
+export type ApproveCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type ApproveCatalogPartnerResponse = ApproveCatalogPartnerResponses[keyof ApproveCatalogPartnerResponses];
+
+export type DeactivateCatalogPartnerData = {
+    body?: never;
+    path: {
+        /**
+         * Partner Id
+         */
+        partner_id: string;
+    };
+    query?: never;
+    url: '/api/v1/admin/catalog/partners/{partner_id}/deactivate';
+};
+
+export type DeactivateCatalogPartnerErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeactivateCatalogPartnerError = DeactivateCatalogPartnerErrors[keyof DeactivateCatalogPartnerErrors];
+
+export type DeactivateCatalogPartnerResponses = {
+    /**
+     * Successful Response
+     */
+    200: PartnerOut;
+};
+
+export type DeactivateCatalogPartnerResponse = DeactivateCatalogPartnerResponses[keyof DeactivateCatalogPartnerResponses];
+
+export type CreatePointsAnnulmentData = {
+    body: AnnulmentCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/points/annulments';
+};
+
+export type CreatePointsAnnulmentErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreatePointsAnnulmentError = CreatePointsAnnulmentErrors[keyof CreatePointsAnnulmentErrors];
+
+export type CreatePointsAnnulmentResponses = {
+    /**
+     * Successful Response
+     */
+    201: PointEntryOut;
+};
+
+export type CreatePointsAnnulmentResponse = CreatePointsAnnulmentResponses[keyof CreatePointsAnnulmentResponses];
+
+export type ValidateRedemptionCodeData = {
+    body: RedemptionValidate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/admin/redemptions/validate';
+};
+
+export type ValidateRedemptionCodeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ValidateRedemptionCodeError = ValidateRedemptionCodeErrors[keyof ValidateRedemptionCodeErrors];
+
+export type ValidateRedemptionCodeResponses = {
+    /**
+     * Successful Response
+     */
+    200: RedemptionOut;
+};
+
+export type ValidateRedemptionCodeResponse = ValidateRedemptionCodeResponses[keyof ValidateRedemptionCodeResponses];
 
 export type GetAppSettingsData = {
     body?: never;
@@ -12714,6 +16240,75 @@ export type GetAuthConfigResponses = {
 };
 
 export type GetAuthConfigResponse = GetAuthConfigResponses[keyof GetAuthConfigResponses];
+
+export type DonorSignUpData = {
+    body: DonorSignUpRequest;
+    headers?: {
+        /**
+         * X-Turnstile-Token
+         *
+         * Token do widget Cloudflare Turnstile (uso único)
+         */
+        'X-Turnstile-Token'?: string | null;
+    };
+    path?: never;
+    query?: never;
+    url: '/api/v1/auth/donor/sign-up';
+};
+
+export type DonorSignUpErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DonorSignUpError = DonorSignUpErrors[keyof DonorSignUpErrors];
+
+export type DonorSignUpResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DonorSignUpResponse = DonorSignUpResponses[keyof DonorSignUpResponses];
 
 export type ForgotPasswordData = {
     body: ForgotPasswordRequest;
@@ -14363,6 +17958,1665 @@ export type GetBrandEvidenceResponses = {
 };
 
 export type GetBrandEvidenceResponse = GetBrandEvidenceResponses[keyof GetBrandEvidenceResponses];
+
+export type GetCalibrationData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/calibration';
+};
+
+export type GetCalibrationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCalibrationError = GetCalibrationErrors[keyof GetCalibrationErrors];
+
+export type GetCalibrationResponses = {
+    /**
+     * Successful Response
+     */
+    200: CalibrationOut;
+};
+
+export type GetCalibrationResponse = GetCalibrationResponses[keyof GetCalibrationResponses];
+
+export type GetDonorAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account';
+};
+
+export type GetDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorAccountError = GetDonorAccountErrors[keyof GetDonorAccountErrors];
+
+export type GetDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorAccountOut;
+};
+
+export type GetDonorAccountResponse = GetDonorAccountResponses[keyof GetDonorAccountResponses];
+
+export type DeleteDonorAccountData = {
+    body: DeletionRequest;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/delete';
+};
+
+export type DeleteDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteDonorAccountError = DeleteDonorAccountErrors[keyof DeleteDonorAccountErrors];
+
+export type DeleteDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteDonorAccountResponse = DeleteDonorAccountResponses[keyof DeleteDonorAccountResponses];
+
+export type GetDonorDeletionPreviewData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/delete-preview';
+};
+
+export type GetDonorDeletionPreviewErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorDeletionPreviewError = GetDonorDeletionPreviewErrors[keyof GetDonorDeletionPreviewErrors];
+
+export type GetDonorDeletionPreviewResponses = {
+    /**
+     * Successful Response
+     */
+    200: DeletionPreviewOut;
+};
+
+export type GetDonorDeletionPreviewResponse = GetDonorDeletionPreviewResponses[keyof GetDonorDeletionPreviewResponses];
+
+export type ExportDonorAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/export';
+};
+
+export type ExportDonorAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ExportDonorAccountError = ExportDonorAccountErrors[keyof ExportDonorAccountErrors];
+
+export type ExportDonorAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: AccountExportOut;
+};
+
+export type ExportDonorAccountResponse = ExportDonorAccountResponses[keyof ExportDonorAccountResponses];
+
+export type GetDonorAccountQrData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/account/qr';
+};
+
+export type GetDonorAccountQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorAccountQrError = GetDonorAccountQrErrors[keyof GetDonorAccountQrErrors];
+
+export type GetDonorAccountQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorQrOut;
+};
+
+export type GetDonorAccountQrResponse = GetDonorAccountQrResponses[keyof GetDonorAccountQrResponses];
+
+export type ListBagActivationsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/bags';
+};
+
+export type ListBagActivationsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListBagActivationsError = ListBagActivationsErrors[keyof ListBagActivationsErrors];
+
+export type ListBagActivationsResponses = {
+    /**
+     * Response List Bag Activations
+     *
+     * Successful Response
+     */
+    200: Array<BagActivationOut>;
+};
+
+export type ListBagActivationsResponse = ListBagActivationsResponses[keyof ListBagActivationsResponses];
+
+export type CreateBagActivationData = {
+    body: BagActivationCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/bags';
+};
+
+export type CreateBagActivationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateBagActivationError = CreateBagActivationErrors[keyof CreateBagActivationErrors];
+
+export type CreateBagActivationResponses = {
+    /**
+     * Successful Response
+     */
+    201: BagActivationOut;
+};
+
+export type CreateBagActivationResponse = CreateBagActivationResponses[keyof CreateBagActivationResponses];
+
+export type UpdateBagActivationData = {
+    body: BagActivationUpdate;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}';
+};
+
+export type UpdateBagActivationErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type UpdateBagActivationError = UpdateBagActivationErrors[keyof UpdateBagActivationErrors];
+
+export type UpdateBagActivationResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type UpdateBagActivationResponse = UpdateBagActivationResponses[keyof UpdateBagActivationResponses];
+
+export type ActivateBagData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/activate';
+};
+
+export type ActivateBagErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ActivateBagError = ActivateBagErrors[keyof ActivateBagErrors];
+
+export type ActivateBagResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type ActivateBagResponse = ActivateBagResponses[keyof ActivateBagResponses];
+
+export type DeactivateBagData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/deactivate';
+};
+
+export type DeactivateBagErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeactivateBagError = DeactivateBagErrors[keyof DeactivateBagErrors];
+
+export type DeactivateBagResponses = {
+    /**
+     * Successful Response
+     */
+    200: BagActivationOut;
+};
+
+export type DeactivateBagResponse = DeactivateBagResponses[keyof DeactivateBagResponses];
+
+export type GetBagQrData = {
+    body?: never;
+    path: {
+        /**
+         * Bag Id
+         */
+        bag_id: string;
+    };
+    query?: never;
+    url: '/api/v1/cidadao/bags/{bag_id}/qr';
+};
+
+export type GetBagQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetBagQrError = GetBagQrErrors[keyof GetBagQrErrors];
+
+export type GetBagQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: DonorQrOut;
+};
+
+export type GetBagQrResponse = GetBagQrResponses[keyof GetBagQrResponses];
+
+export type ListDonorCampaignsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/campaigns';
+};
+
+export type ListDonorCampaignsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorCampaignsError = ListDonorCampaignsErrors[keyof ListDonorCampaignsErrors];
+
+export type ListDonorCampaignsResponses = {
+    /**
+     * Response List Donor Campaigns
+     *
+     * Successful Response
+     */
+    200: Array<CampaignOut>;
+};
+
+export type ListDonorCampaignsResponse = ListDonorCampaignsResponses[keyof ListDonorCampaignsResponses];
+
+export type GetDonorCatalogData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/catalog';
+};
+
+export type GetDonorCatalogErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorCatalogError = GetDonorCatalogErrors[keyof GetDonorCatalogErrors];
+
+export type GetDonorCatalogResponses = {
+    /**
+     * Response Get Donor Catalog
+     *
+     * Successful Response
+     */
+    200: Array<CatalogItemPublic>;
+};
+
+export type GetDonorCatalogResponse = GetDonorCatalogResponses[keyof GetDonorCatalogResponses];
+
+export type GetDonorConsentsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/consents';
+};
+
+export type GetDonorConsentsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorConsentsError = GetDonorConsentsErrors[keyof GetDonorConsentsErrors];
+
+export type GetDonorConsentsResponses = {
+    /**
+     * Successful Response
+     */
+    200: ConsentsOut;
+};
+
+export type GetDonorConsentsResponse = GetDonorConsentsResponses[keyof GetDonorConsentsResponses];
+
+export type SetDonorConsentData = {
+    body: ConsentUpdate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/consents';
+};
+
+export type SetDonorConsentErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetDonorConsentError = SetDonorConsentErrors[keyof SetDonorConsentErrors];
+
+export type SetDonorConsentResponses = {
+    /**
+     * Successful Response
+     */
+    200: ConsentsOut;
+};
+
+export type SetDonorConsentResponse = SetDonorConsentResponses[keyof SetDonorConsentResponses];
+
+export type GetCollectionHistoryData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/history';
+};
+
+export type GetCollectionHistoryErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetCollectionHistoryError = GetCollectionHistoryErrors[keyof GetCollectionHistoryErrors];
+
+export type GetCollectionHistoryResponses = {
+    /**
+     * Response Get Collection History
+     *
+     * Successful Response
+     */
+    200: Array<CollectionHistoryOut>;
+};
+
+export type GetCollectionHistoryResponse = GetCollectionHistoryResponses[keyof GetCollectionHistoryResponses];
+
+export type ListDonorPointsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Limit
+         */
+        limit?: number;
+        /**
+         * Offset
+         */
+        offset?: number;
+    };
+    url: '/api/v1/cidadao/pontos';
+};
+
+export type ListDonorPointsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorPointsError = ListDonorPointsErrors[keyof ListDonorPointsErrors];
+
+export type ListDonorPointsResponses = {
+    /**
+     * Successful Response
+     */
+    200: PointsHistoryOut;
+};
+
+export type ListDonorPointsResponse = ListDonorPointsResponses[keyof ListDonorPointsResponses];
+
+export type ListDonorRedemptionsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/redemptions';
+};
+
+export type ListDonorRedemptionsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListDonorRedemptionsError = ListDonorRedemptionsErrors[keyof ListDonorRedemptionsErrors];
+
+export type ListDonorRedemptionsResponses = {
+    /**
+     * Response List Donor Redemptions
+     *
+     * Successful Response
+     */
+    200: Array<RedemptionOut>;
+};
+
+export type ListDonorRedemptionsResponse = ListDonorRedemptionsResponses[keyof ListDonorRedemptionsResponses];
+
+export type CreateRedemptionData = {
+    body: RedemptionCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/redemptions';
+};
+
+export type CreateRedemptionErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateRedemptionError = CreateRedemptionErrors[keyof CreateRedemptionErrors];
+
+export type CreateRedemptionResponses = {
+    /**
+     * Successful Response
+     */
+    201: RedemptionOut;
+};
+
+export type CreateRedemptionResponse = CreateRedemptionResponses[keyof CreateRedemptionResponses];
+
+export type GetDonorPointsBalanceData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/cidadao/saldo';
+};
+
+export type GetDonorPointsBalanceErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetDonorPointsBalanceError = GetDonorPointsBalanceErrors[keyof GetDonorPointsBalanceErrors];
+
+export type GetDonorPointsBalanceResponses = {
+    /**
+     * Successful Response
+     */
+    200: PointsBalanceOut;
+};
+
+export type GetDonorPointsBalanceResponse = GetDonorPointsBalanceResponses[keyof GetDonorPointsBalanceResponses];
+
+export type ListCollectionRequestsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * State
+         */
+        state?: CollectionRequestState | null;
+        /**
+         * Subject
+         */
+        subject?: RequestSubject | null;
+        /**
+         * Parish Code
+         */
+        parish_code?: string | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/collection-requests';
+};
+
+export type ListCollectionRequestsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListCollectionRequestsError = ListCollectionRequestsErrors[keyof ListCollectionRequestsErrors];
+
+export type ListCollectionRequestsResponses = {
+    /**
+     * Response List Collection Requests
+     *
+     * Successful Response
+     */
+    200: Array<CollectionRequestOut>;
+};
+
+export type ListCollectionRequestsResponse = ListCollectionRequestsResponses[keyof ListCollectionRequestsResponses];
+
+export type CreateCollectionRequestData = {
+    body: CollectionRequestCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/collection-requests';
+};
+
+export type CreateCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateCollectionRequestError = CreateCollectionRequestErrors[keyof CreateCollectionRequestErrors];
+
+export type CreateCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    201: CollectionRequestOut;
+};
+
+export type CreateCollectionRequestResponse = CreateCollectionRequestResponses[keyof CreateCollectionRequestResponses];
+
+export type CancelCollectionRequestData = {
+    body?: never;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}';
+};
+
+export type CancelCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CancelCollectionRequestError = CancelCollectionRequestErrors[keyof CancelCollectionRequestErrors];
+
+export type CancelCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CancelCollectionRequestResponse = CancelCollectionRequestResponses[keyof CancelCollectionRequestResponses];
+
+export type DispatchCollectionRequestData = {
+    body: DispatchRequest;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}/dispatch';
+};
+
+export type DispatchCollectionRequestErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DispatchCollectionRequestError = DispatchCollectionRequestErrors[keyof DispatchCollectionRequestErrors];
+
+export type DispatchCollectionRequestResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionRequestOut;
+};
+
+export type DispatchCollectionRequestResponse = DispatchCollectionRequestResponses[keyof DispatchCollectionRequestResponses];
+
+export type RecordRequestOutcomeData = {
+    body: RequestOutcomeCreate;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: string;
+    };
+    query?: never;
+    url: '/api/v1/collection-requests/{request_id}/outcome';
+};
+
+export type RecordRequestOutcomeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type RecordRequestOutcomeError = RecordRequestOutcomeErrors[keyof RecordRequestOutcomeErrors];
+
+export type RecordRequestOutcomeResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionRequestOut;
+};
+
+export type RecordRequestOutcomeResponse = RecordRequestOutcomeResponses[keyof RecordRequestOutcomeResponses];
 
 export type ListCopilotActionsData = {
     body?: never;
@@ -17546,6 +22800,357 @@ export type GetDataQualityResponses = {
 
 export type GetDataQualityResponse = GetDataQualityResponses[keyof GetDataQualityResponses];
 
+export type ListExportLotsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Fine State
+         */
+        fine_state?: FineState | null;
+        /**
+         * Garment Type
+         */
+        garment_type?: GarmentType | null;
+        /**
+         * Season
+         */
+        season?: Season | null;
+        /**
+         * Gender
+         */
+        gender?: Gender | null;
+        /**
+         * Colour
+         *
+         * Lotes com pelo menos uma peça desta cor (filtro, não chave)
+         */
+        colour?: Colour | null;
+        /**
+         * Size Band
+         *
+         * Lotes com pelo menos uma peça desta banda (filtro, não chave)
+         */
+        size_band?: SizeBand | null;
+    };
+    url: '/api/v1/export-lots';
+};
+
+export type ListExportLotsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListExportLotsError = ListExportLotsErrors[keyof ListExportLotsErrors];
+
+export type ListExportLotsResponses = {
+    /**
+     * Response List Export Lots
+     *
+     * Successful Response
+     */
+    200: Array<ExportLotSummary>;
+};
+
+export type ListExportLotsResponse = ListExportLotsResponses[keyof ListExportLotsResponses];
+
+export type CreateExportLotData = {
+    body: ExportLotKeyIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/export-lots';
+};
+
+export type CreateExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateExportLotError = CreateExportLotErrors[keyof CreateExportLotErrors];
+
+export type CreateExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    201: ExportLotDetail;
+};
+
+export type CreateExportLotResponse = CreateExportLotResponses[keyof CreateExportLotResponses];
+
+export type GetExportLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}';
+};
+
+export type GetExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetExportLotError = GetExportLotErrors[keyof GetExportLotErrors];
+
+export type GetExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: ExportLotDetail;
+};
+
+export type GetExportLotResponse = GetExportLotResponses[keyof GetExportLotResponses];
+
+export type CloseExportLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}/close';
+};
+
+export type CloseExportLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CloseExportLotError = CloseExportLotErrors[keyof CloseExportLotErrors];
+
+export type CloseExportLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: ExportLotDetail;
+};
+
+export type CloseExportLotResponse = CloseExportLotResponses[keyof CloseExportLotResponses];
+
+export type AddExportLotItemsData = {
+    body: ExportLotItemsIn;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/export-lots/{code}/items';
+};
+
+export type AddExportLotItemsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AddExportLotItemsError = AddExportLotItemsErrors[keyof AddExportLotItemsErrors];
+
+export type AddExportLotItemsResponses = {
+    /**
+     * Successful Response
+     */
+    201: ExportLotDetail;
+};
+
+export type AddExportLotItemsResponse = AddExportLotItemsResponses[keyof AddExportLotItemsResponses];
+
 export type HealthData = {
     body?: never;
     path?: never;
@@ -17607,6 +23212,498 @@ export type HealthResponses = {
 
 export type HealthResponse = HealthResponses[keyof HealthResponses];
 
+export type GetLocalAccountData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/account';
+};
+
+export type GetLocalAccountErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLocalAccountError = GetLocalAccountErrors[keyof GetLocalAccountErrors];
+
+export type GetLocalAccountResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalAccountOut;
+};
+
+export type GetLocalAccountResponse = GetLocalAccountResponses[keyof GetLocalAccountResponses];
+
+export type SetLocalCertificateData = {
+    body: CertificateOptIn;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/certificate';
+};
+
+export type SetLocalCertificateErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetLocalCertificateError = SetLocalCertificateErrors[keyof SetLocalCertificateErrors];
+
+export type SetLocalCertificateResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalAccountOut;
+};
+
+export type SetLocalCertificateResponse = SetLocalCertificateResponses[keyof SetLocalCertificateResponses];
+
+export type ListLocalLotsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/lots';
+};
+
+export type ListLocalLotsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLocalLotsError = ListLocalLotsErrors[keyof ListLocalLotsErrors];
+
+export type ListLocalLotsResponses = {
+    /**
+     * Response List Local Lots
+     *
+     * Successful Response
+     */
+    200: Array<LotSummary>;
+};
+
+export type ListLocalLotsResponse = ListLocalLotsResponses[keyof ListLocalLotsResponses];
+
+export type CreateLocalNoticeData = {
+    body: StopNoticeCreate;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices';
+};
+
+export type CreateLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CreateLocalNoticeError = CreateLocalNoticeErrors[keyof CreateLocalNoticeErrors];
+
+export type CreateLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    201: StopNoticeOut;
+};
+
+export type CreateLocalNoticeResponse = CreateLocalNoticeResponses[keyof CreateLocalNoticeResponses];
+
+export type CancelLocalNoticeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices/active';
+};
+
+export type CancelLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CancelLocalNoticeError = CancelLocalNoticeErrors[keyof CancelLocalNoticeErrors];
+
+export type CancelLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type CancelLocalNoticeResponse = CancelLocalNoticeResponses[keyof CancelLocalNoticeResponses];
+
+export type GetActiveLocalNoticeData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/notices/active';
+};
+
+export type GetActiveLocalNoticeErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetActiveLocalNoticeError = GetActiveLocalNoticeErrors[keyof GetActiveLocalNoticeErrors];
+
+export type GetActiveLocalNoticeResponses = {
+    /**
+     * Successful Response
+     */
+    200: StopNoticeCurrent;
+};
+
+export type GetActiveLocalNoticeResponse = GetActiveLocalNoticeResponses[keyof GetActiveLocalNoticeResponses];
+
+export type GetLocalReportData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/local/report';
+};
+
+export type GetLocalReportErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLocalReportError = GetLocalReportErrors[keyof GetLocalReportErrors];
+
+export type GetLocalReportResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalReportOut;
+};
+
+export type GetLocalReportResponse = GetLocalReportResponses[keyof GetLocalReportResponses];
+
+export type ListLocalAccountsData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/locals';
+};
+
+export type ListLocalAccountsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListLocalAccountsError = ListLocalAccountsErrors[keyof ListLocalAccountsErrors];
+
+export type ListLocalAccountsResponses = {
+    /**
+     * Response List Local Accounts
+     *
+     * Successful Response
+     */
+    200: Array<LocalAccountAdminOut>;
+};
+
+export type ListLocalAccountsResponse = ListLocalAccountsResponses[keyof ListLocalAccountsResponses];
+
 export type ListLotsData = {
     body?: never;
     path?: never;
@@ -17623,6 +23720,12 @@ export type ListLotsData = {
          * Parish Code
          */
         parish_code?: string | null;
+        /**
+         * Locality Id
+         *
+         * Lotes de um local (conta de local, #59)
+         */
+        locality_id?: string | null;
     };
     url: '/api/v1/lots';
 };
@@ -17744,6 +23847,67 @@ export type OpenLotResponses = {
 
 export type OpenLotResponse = OpenLotResponses[keyof OpenLotResponses];
 
+export type OpenStopLotData = {
+    body: StopLotOpen;
+    path?: never;
+    query?: never;
+    url: '/api/v1/lots/stops';
+};
+
+export type OpenStopLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type OpenStopLotError = OpenStopLotErrors[keyof OpenStopLotErrors];
+
+export type OpenStopLotResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotSummary;
+};
+
+export type OpenStopLotResponse = OpenStopLotResponses[keyof OpenStopLotResponses];
+
 export type GetLotData = {
     body?: never;
     path: {
@@ -17809,6 +23973,72 @@ export type GetLotResponses = {
 };
 
 export type GetLotResponse = GetLotResponses[keyof GetLotResponses];
+
+export type CloseStopLotData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/departure';
+};
+
+export type CloseStopLotErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type CloseStopLotError = CloseStopLotErrors[keyof CloseStopLotErrors];
+
+export type CloseStopLotResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotDetail;
+};
+
+export type CloseStopLotResponse = CloseStopLotResponses[keyof CloseStopLotResponses];
 
 export type AddLotItemData = {
     body: LotItemIn;
@@ -18149,6 +24379,282 @@ export type ChangeLotStateResponses = {
 };
 
 export type ChangeLotStateResponse = ChangeLotStateResponses[keyof ChangeLotStateResponses];
+
+export type AddLotUnitData = {
+    body: LotUnitIn;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units';
+};
+
+export type AddLotUnitErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type AddLotUnitError = AddLotUnitErrors[keyof AddLotUnitErrors];
+
+export type AddLotUnitResponses = {
+    /**
+     * Successful Response
+     */
+    201: LotUnitOut;
+};
+
+export type AddLotUnitResponse = AddLotUnitResponses[keyof AddLotUnitResponses];
+
+export type DeleteLotUnitData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}';
+};
+
+export type DeleteLotUnitErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type DeleteLotUnitError = DeleteLotUnitErrors[keyof DeleteLotUnitErrors];
+
+export type DeleteLotUnitResponses = {
+    /**
+     * Successful Response
+     */
+    204: void;
+};
+
+export type DeleteLotUnitResponse = DeleteLotUnitResponses[keyof DeleteLotUnitResponses];
+
+export type SetLotUnitWeightData = {
+    body: LotUnitWeight;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}';
+};
+
+export type SetLotUnitWeightErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type SetLotUnitWeightError = SetLotUnitWeightErrors[keyof SetLotUnitWeightErrors];
+
+export type SetLotUnitWeightResponses = {
+    /**
+     * Successful Response
+     */
+    200: LotUnitOut;
+};
+
+export type SetLotUnitWeightResponse = SetLotUnitWeightResponses[keyof SetLotUnitWeightResponses];
+
+export type GetLotUnitQrData = {
+    body?: never;
+    path: {
+        /**
+         * Code
+         */
+        code: string;
+        /**
+         * Unit Id
+         */
+        unit_id: string;
+    };
+    query?: never;
+    url: '/api/v1/lots/{code}/units/{unit_id}/qr';
+};
+
+export type GetLotUnitQrErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetLotUnitQrError = GetLotUnitQrErrors[keyof GetLotUnitQrErrors];
+
+export type GetLotUnitQrResponses = {
+    /**
+     * Successful Response
+     */
+    200: Blob | File;
+};
+
+export type GetLotUnitQrResponse = GetLotUnitQrResponses[keyof GetLotUnitQrResponses];
 
 export type GetFibreMarketData = {
     body?: never;
@@ -21023,6 +27529,133 @@ export type ListZonesResponses = {
 
 export type ListZonesResponse = ListZonesResponses[keyof ListZonesResponses];
 
+export type GetPublicCollectionAgendaData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/public/collection-agenda';
+};
+
+export type GetPublicCollectionAgendaErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicCollectionAgendaError = GetPublicCollectionAgendaErrors[keyof GetPublicCollectionAgendaErrors];
+
+export type GetPublicCollectionAgendaResponses = {
+    /**
+     * Successful Response
+     */
+    200: CollectionAgendaOut;
+};
+
+export type GetPublicCollectionAgendaResponse = GetPublicCollectionAgendaResponses[keyof GetPublicCollectionAgendaResponses];
+
+export type GetPublicLocalCertificateData = {
+    body?: never;
+    path: {
+        /**
+         * Account Id
+         */
+        account_id: string;
+    };
+    query?: never;
+    url: '/api/v1/public/locals/{account_id}/certificate';
+};
+
+export type GetPublicLocalCertificateErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicLocalCertificateError = GetPublicLocalCertificateErrors[keyof GetPublicLocalCertificateErrors];
+
+export type GetPublicLocalCertificateResponses = {
+    /**
+     * Successful Response
+     */
+    200: LocalCertificateOut;
+};
+
+export type GetPublicLocalCertificateResponse = GetPublicLocalCertificateResponses[keyof GetPublicLocalCertificateResponses];
+
 export type GetPassportData = {
     body?: never;
     path: {
@@ -21222,6 +27855,67 @@ export type GetLotQrResponses = {
 };
 
 export type GetLotQrResponse = GetLotQrResponses[keyof GetLotQrResponses];
+
+export type GetPublicPrivacyPolicyData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/v1/public/privacy-policy';
+};
+
+export type GetPublicPrivacyPolicyErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type GetPublicPrivacyPolicyError = GetPublicPrivacyPolicyErrors[keyof GetPublicPrivacyPolicyErrors];
+
+export type GetPublicPrivacyPolicyResponses = {
+    /**
+     * Successful Response
+     */
+    200: PolicyOut;
+};
+
+export type GetPublicPrivacyPolicyResponse = GetPublicPrivacyPolicyResponses[keyof GetPublicPrivacyPolicyResponses];
 
 export type ReadyData = {
     body?: never;
@@ -21783,6 +28477,78 @@ export type AnalyseGarmentResponses = {
 };
 
 export type AnalyseGarmentResponse = AnalyseGarmentResponses[keyof AnalyseGarmentResponses];
+
+export type ListTriageGoldenLabelsData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Axis
+         */
+        axis?: TriageAxis | null;
+        /**
+         * Limit
+         */
+        limit?: number;
+    };
+    url: '/api/v1/triage/golden-labels';
+};
+
+export type ListTriageGoldenLabelsErrors = {
+    /**
+     * Pedido inválido
+     */
+    400: ErrorBody;
+    /**
+     * Sem sessão ou credenciais inválidas
+     */
+    401: ErrorBody;
+    /**
+     * Sem permissão
+     */
+    403: ErrorBody;
+    /**
+     * Não encontrado
+     */
+    404: ErrorBody;
+    /**
+     * Conflito
+     */
+    409: ErrorBody;
+    /**
+     * Dados inválidos
+     */
+    422: ValidationErrorBody;
+    /**
+     * Demasiados pedidos
+     */
+    429: ErrorBody;
+    /**
+     * Erro interno
+     */
+    500: ErrorBody;
+    /**
+     * Falha num serviço externo
+     */
+    502: ErrorBody;
+    /**
+     * Funcionalidade indisponível
+     */
+    503: ErrorBody;
+};
+
+export type ListTriageGoldenLabelsError = ListTriageGoldenLabelsErrors[keyof ListTriageGoldenLabelsErrors];
+
+export type ListTriageGoldenLabelsResponses = {
+    /**
+     * Response List Triage Golden Labels
+     *
+     * Successful Response
+     */
+    200: Array<GoldenLabelOut>;
+};
+
+export type ListTriageGoldenLabelsResponse = ListTriageGoldenLabelsResponses[keyof ListTriageGoldenLabelsResponses];
 
 export type ListUsersData = {
     body?: never;

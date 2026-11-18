@@ -7,9 +7,10 @@ from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, In
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
-from novelo.core.database import Base, TimestampMixin, UuidPkMixin
+from novelo.core.database import Base, TimestampMixin, UuidPkMixin, enum_check, enum_column
+from novelo.domain.vocab import LocalKind
 
-Role = Literal["admin", "operator", "guest"]
+Role = Literal["admin", "operator", "guest", "local", "donor"]
 JoinedVia = Literal["password", "google", "quick_join", "magic_link", "invited"]
 ApprovalStatus = Literal["pending", "approved", "rejected"]
 
@@ -32,6 +33,8 @@ class User(Base, UuidPkMixin, TimestampMixin):
     __tablename__ = "users"
     __table_args__ = (
         CheckConstraint("approval_status IN ('pending', 'approved', 'rejected')", name="approval_status_valid"),
+        # A idade DECLARADA do doador: abaixo de 13 nunca entra (recusa explícita na criação, #63).
+        CheckConstraint("declared_age IS NULL OR declared_age >= 13", name="declared_age_minimum"),
     )
     __allow_unmapped__ = True
 
@@ -61,6 +64,11 @@ class User(Base, UuidPkMixin, TimestampMixin):
     # Introdução guiada: quando foi vista (ou saltada) e o checklist «Primeiros passos» (`done`, `dismissed`).
     onboarding_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     onboarding_state: Mapped[dict[str, Any]] = mapped_column(JSONB, default=dict, server_default=text("'{}'::jsonb"))
+    # Perfil de doador (#63): só nas contas com papel `donor`. A idade é DECLARADA na criação — a regra
+    # dos 13 anos recusa a conta abaixo disso (ADR: RGPD da conta de doador); o código é o pseudónimo do
+    # QR de conta (portador de crédito, nunca credencial de sessão).
+    declared_age: Mapped[int | None] = mapped_column(Integer)
+    donor_code: Mapped[str | None] = mapped_column(String(16), unique=True, index=True)
     # Não persistido: preenchido em cada pedido por `core/deps.get_current_user`. `None` = sessão normal.
     impersonation: ImpersonationInfo | None = None
 
@@ -69,12 +77,14 @@ class Invitation(Base, UuidPkMixin):
     """Convite por email. Só o SHA-256 do token fica aqui; uso único (`accepted_at` atómico).
 
     Estado: aceite (`accepted_at`), revogado (`revoked_at`), expirado (`expires_at` no passado) ou pendente.
-    Um email só tem um convite pendente de cada vez (índice parcial único).
+    Um email só tem um convite pendente de cada vez (índice parcial único). No papel `local` traz o local
+    e a natureza do sítio: ao aceitar, nasce a conta de local (`local_accounts`).
     """
 
     __tablename__ = "invitations"
     __table_args__ = (
-        CheckConstraint("role IN ('admin', 'operator', 'guest')", name="role_valid"),
+        CheckConstraint("role IN ('admin', 'operator', 'guest', 'local')", name="role_valid"),
+        enum_check("local_kind", LocalKind),
         Index(
             "uq_invitations_pending_email",
             "email",
@@ -88,6 +98,11 @@ class Invitation(Base, UuidPkMixin):
     role: Mapped[str] = mapped_column(String(20))
     locale: Mapped[str] = mapped_column(String(8), default="pt-PT", server_default="pt-PT")
     message: Mapped[str | None] = mapped_column(String(500))
+    # Só no papel `local`: o local da conta e a natureza do sítio (assistido — escola — ou produtor B2B).
+    locality_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("localities.id", ondelete="SET NULL")
+    )
+    local_kind: Mapped[LocalKind | None] = mapped_column(enum_column(LocalKind))
     token_hash: Mapped[str] = mapped_column(String(64), unique=True, index=True)
     invited_by_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"), index=True

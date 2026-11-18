@@ -28,7 +28,7 @@ import { getErrorMessage } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { formatDateTime } from '@/lib/i18n';
 import { formatPhotoCredit, photoActionFor, photoAlt } from '@/lib/lot-photos';
-import { fibreLabel, garmentLabel, lotStateLabel } from '@/lib/lots';
+import { fibreLabel, garmentLabel, lotStateLabel, weightSourceLabel } from '@/lib/lots';
 import { destinationLabel } from '@/lib/vocab';
 import { m } from '@/paraglide/messages';
 
@@ -177,12 +177,17 @@ function LotPage() {
         <StatCell
           label={m.lot_stat_weight()}
           value={`${formatNumber(lot.weight_kg, 2)} kg`}
-          tag={m.common_estimate()}
-          hint={m.lot_stat_weight_hint()}
+          tag={weightSourceLabel[lot.weight_source ?? 'estimated']()}
+          hint={
+            lot.weight_source === 'measured'
+              ? m.lot_stat_weight_hint_measured()
+              : m.lot_stat_weight_hint()
+          }
         />
         <StatCell
           label={m.lot_stat_destination()}
-          // Mesmas casas que o peso (0,55 kg nos dois, nunca 0,55 kg ao lado de 0,6 kg) e também estimativa.
+          // Mesmas casas que o peso (0,55 kg nos dois, nunca 0,55 kg ao lado de 0,6 kg); a repartição vem das
+          // peças triadas, por isso é sempre estimativa mesmo quando o total é medido.
           value={`${formatNumber(lot.reuse_kg, 2)} kg`}
           tag={m.common_estimate()}
           hint={m.lot_stat_destination_hint({

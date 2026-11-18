@@ -12,6 +12,17 @@ _Avoid_: circuito (é do RSU da Vitrus), volta
 Pedido opcional, com conta, que dá certeza de recolha (data e aviso) num saco que a ronda já apanha. Não encolhe a ronda.
 _Avoid_: recolha expressa
 
+**Ausência**:
+Visita agendada ao pedido que não encontra o saco. Conta no pedido; à 3.ª ausência o pedido expira.
+
+**Fila de exceções**:
+Fila única do gestor da Vitrus para os pedidos que as regras não auto-aceitaram: fora de ronda, fora do prazo de 48 h, urgências e recolha especial. Despacha-se agendando com data ou recusando com motivo.
+_Avoid_: fila de espera; triagem manual de pedidos
+
+**Recolha especial**:
+Pedido de local/B2B acima do teto de 20 sacos (estimativa). Não é erro: cai na fila de exceções e o gestor confirma o volume.
+_Avoid_: recolha de grande volume
+
 **Aviso («sacos prontos»)**:
 Sinal de um local («estou pronto, vem cá») que garante paragem nesse dia. Única escrita da conta de local no MVP.
 
@@ -56,6 +67,12 @@ Página pública de um lote (origem, composição, peso, histórico), aberta pel
 **Estado fino**:
 Nível de qualidade em 4 graus + reciclar/rejeitar, mapeado nos 3 destinos. Atributo confirmável pelo operador (padrão-ouro) e estimado pela IA.
 
+**Taxonomia da triagem**:
+Vocabulário fechado e versionado (`domain/taxonomy.py`, v1) dos seis eixos — estado fino, tipologia (+ calçado e acessório), estação, cor, género e tamanho em bandas lidas só da etiqueta. A chave do lote de escoamento usa estado fino, tipologia, estação e género; cor e tamanho ficam para filtros.
+
+**Proveniência**:
+De onde veio o valor de um atributo: proposto pela IA («IA», com a confiança da proposta) ou definido pelo operador («confirmado»). Guardada por atributo e mostrada em selos no ecrã de triagem.
+
 **Linhagem**:
 Rastreio das peças de um lote de escoamento até aos lotes de recolha de origem.
 
@@ -81,6 +98,10 @@ _Avoid_: saco registado
 **Pontos**:
 Moeda de incentivo, ganha por saco recolhido (mais bónus de conformidade), com teto mensal. Não são dinheiro nem conversíveis.
 _Avoid_: prémios (estão no catálogo), ponto assistido/paragem (são sítios)
+
+**Livro-razão de pontos**:
+Registo imutável e auditável de todos os lançamentos (ganhos, bónus, anulações, resgates); o saldo é sempre derivado dele, nunca guardado.
+_Avoid_: saldo em cache, apagar lançamento (a correção é anular)
 
 **Código de resgate**:
 Código pseudónimo que troca pontos por prémio sem revelar o doador ao parceiro.

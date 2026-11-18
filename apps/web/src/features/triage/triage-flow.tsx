@@ -14,6 +14,7 @@ import {
 import { BrandSpinner } from '@/components/brand-logo';
 import { Panel, SectionTitle } from '@/components/page';
 import { StatCell, StatStrip } from '@/components/stat-strip';
+import { EmptyState } from '@/components/states';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import {
@@ -137,7 +138,7 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
   if (!lotCode || !lot) {
     return (
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-        {openLots.length > 0 && (
+        {openLots.length > 0 ? (
           <Panel className="space-y-4 sm:p-6">
             <div className="space-y-1">
               <SectionTitle>{m.rw_triage_continue_title()}</SectionTitle>
@@ -159,6 +160,13 @@ export function TriageFlow({ zones, openLots, initialLot }: TriageFlowProps) {
               </SelectContent>
             </Select>
           </Panel>
+        ) : (
+          <div className="self-start">
+            <EmptyState
+              title={m.triage_no_open_lots()}
+              description={m.triage_no_open_lots_text()}
+            />
+          </div>
         )}
         <Panel className="space-y-4 sm:p-6">
           <div className="space-y-1">

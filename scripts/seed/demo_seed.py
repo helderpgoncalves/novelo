@@ -77,12 +77,17 @@ PHOTOS: dict[str, tuple[str, str, str]] = {
 # Item: foto, tipo de peça, estado, composição CONFIRMADA pelo operador (None = a que a etiqueta deu ao modelo),
 # marca (None = a que o modelo leu). `label` = a foto é só da etiqueta (composição lida pelo modelo).
 Item = dict[str, object]
+# Bag: o QR lido no saco da plataforma, ou None (o servidor gera o UUID da etiqueta impressa) e o peso medido
+# na balança da viatura (pratos ≤ 15 kg; aqui já somados por saco). O peso do lote é o medido, nunca o estimado.
+Bag = dict[str, object]
 LOTS: list[dict[str, object]] = [
     {
         "name": "Camisas e polos de algodão",
         "parish": "030813",  # Creixomil
+        "locality": "Creixomil",  # paragem no local, à porta
         "opened_days_ago": 14,
         "final": "delivered",
+        "bags": [{"bag_code": "SACO-2143", "weight_g": 6400}, {"bag_code": None, "weight_g": 5200}],
         "items": [
             {"p": "b072", "g": "shirt", "c": [("cotton", 100)], "brand": "Lacoste"},
             {"p": "b064", "g": "shirt", "c": [("cotton", 100)], "brand": "FUMAREL"},
@@ -95,8 +100,10 @@ LOTS: list[dict[str, object]] = [
     {
         "name": "Lã e malhas",
         "parish": "030804",  # Azurém
+        "locality": "Azurém",
         "opened_days_ago": 10,
         "final": "reserved",
+        "bags": [{"bag_code": None, "weight_g": 7800}],
         "items": [
             {"p": "b085", "g": "jumper", "c": [("wool", 100)], "brand": "Carraig Donn"},
             {"p": "b083", "g": "jumper", "c": [("wool", 100)]},
@@ -113,8 +120,10 @@ LOTS: list[dict[str, object]] = [
     {
         "name": "Denim e calças",
         "parish": "030838",  # Ponte
+        "locality": "Ponte",
         "opened_days_ago": 7,
         "final": "sorted",
+        "bags": [{"bag_code": "SACO-2178", "weight_g": 8900}, {"bag_code": None, "weight_g": 6100}],
         "items": [
             {"p": "a030", "g": "jacket", "c": [("cotton", 100)]},
             {"p": "a017", "g": "trousers", "c": [("cotton", 100)]},
@@ -125,8 +134,10 @@ LOTS: list[dict[str, object]] = [
     {
         "name": "Roupa de casa",
         "parish": "030837",  # Polvoreira
+        "locality": "Polvoreira",
         "opened_days_ago": 16,
         "final": "delivered",
+        "bags": [{"bag_code": None, "weight_g": 9400}],
         "items": [
             {"p": "b184", "g": "bedding", "c": [("cotton", 100)]},
             {"p": "b187", "g": "bedding", "c": [("cotton", 100)]},
@@ -138,8 +149,10 @@ LOTS: list[dict[str, object]] = [
     {
         "name": "Hoodies, lã e cachecóis",
         "parish": "030865",  # São Torcato
+        "locality": "São Torcato",
         "opened_days_ago": 5,
         "final": "reserved",
+        "bags": [{"bag_code": "SACO-2201", "weight_g": 6800}],
         "items": [
             {"p": "b146", "g": "jumper", "c": [("cotton", 80), ("polyester", 20)]},
             {"p": "b150", "g": "jumper", "c": [("cotton", 80), ("polyester", 20)]},
@@ -151,8 +164,10 @@ LOTS: list[dict[str, object]] = [
     {
         "name": "Lote em curso (etiquetas lidas pelo modelo)",
         "parish": "030840",  # Ronfe
+        "locality": "Ronfe",
         "opened_days_ago": 1,
         "final": "collected",
+        "bags": [{"bag_code": None, "weight_g": 5100}],
         "items": [
             {"p": "b037", "g": "other", "c": [("nylon", 78), ("elastane", 21), ("polyester", 1)], "label": True},  # etiqueta DIM: o modelo leu 73/21/6 numa execução; o operador corrige
             {"p": "b239", "g": "other", "c": [("cotton", 100)], "label": True},  # etiqueta Muji: corpo 100% algodão (a malha canelada é 75/25)
@@ -233,15 +248,43 @@ def download(key: str) -> bytes:
 
 
 async def seed_lots(c: httpx.AsyncClient, manifest: dict[str, object]) -> None:
+    # Localidades da Vitrus (o lote nasce na paragem, ancorado ao local e à freguesia).
+    localities = {
+        loc["name"]: loc["id"]
+        for loc in (await c.get("/network/localities")).json()
+    }
     lots_out: list[dict[str, object]] = []
     manifest["lots"] = lots_out
     for spec in LOTS:
-        r = await c.post("/lots", json={"parish_code": spec["parish"]})
+        locality_id = localities.get(str(spec["locality"]))
+        if locality_id is None:
+            raise RuntimeError(f"Localidade {spec['locality']} não existe na base (corre o seed primeiro)")
+        r = await c.post("/lots/stops", json={"locality_id": locality_id, "parish_code": spec["parish"]})
         r.raise_for_status()
         code = r.json()["code"]
-        out: dict[str, object] = {"code": code, "name": spec["name"], "final": spec["final"], "items": []}
+        out: dict[str, object] = {
+            "code": code,
+            "name": spec["name"],
+            "locality": spec["locality"],
+            "final": spec["final"],
+            "units": [],
+            "items": [],
+        }
         lots_out.append(out)
-        print(f"\nLote {code} · {spec['name']} ({spec['parish']})", flush=True)
+        print(f"\nLote {code} · {spec['name']} ({spec['locality']}, {spec['parish']})", flush=True)
+        for bag in spec["bags"]:  # type: ignore[union-attr]
+            unit = (
+                await c.post(f"/lots/{code}/units", json={"bag_code": bag["bag_code"]})  # type: ignore[union-attr]
+            ).json()
+            weighed = await c.put(f"/lots/{code}/units/{unit['id']}", json={"weight_g": bag["weight_g"]})  # type: ignore[index]
+            weighed.raise_for_status()
+            out["units"].append(  # type: ignore[union-attr]
+                {"id": unit["id"], "code": unit["code"], "source": unit["source"], "weight_g": unit["weight_g"]}
+            )
+            kind = "saco da plataforma" if unit["source"] == "bag" else "etiqueta impressa"
+            print(f"  unidade {unit['code']} ({kind}): {unit['weight_g']} g", flush=True)
+        departed = await c.post(f"/lots/{code}/departure")
+        departed.raise_for_status()
         for it in spec["items"]:  # type: ignore[attr-defined]
             key = str(it["p"])
             data = download(key)
@@ -342,8 +385,12 @@ async def backdate(lots_out: list[dict[str, object]]) -> None:
                 if kind == "opened":
                     ts = t0
                 elif kind == "item_added":
-                    ts = t0 + timedelta(minutes=6 * (added + 1) + 2 * added)
+                    ts = t0 + timedelta(hours=1, minutes=6 * (added + 1) + 2 * added)
                     added += 1
+                elif kind == "departed":
+                    ts = t0 + timedelta(minutes=42)  # paragem de ~40 minutos: pesa-se, etiqueta-se e parte-se
+                elif kind == "unit_removed":
+                    ts = t0 + timedelta(minutes=20)
                 elif kind == "sorted":
                     ts = t0 + timedelta(hours=26, minutes=41)
                 elif kind == "reserved":
@@ -353,6 +400,21 @@ async def backdate(lots_out: list[dict[str, object]]) -> None:
                 await c.execute(
                     text("update lot_events set occurred_at=:t where id=:i"),
                     {"t": min(ts, now - timedelta(minutes=5)), "i": ev_id},
+                )
+            # As unidades nascem na paragem: scan e pesagem entre a chegada e o «Partir».
+            units = (
+                (
+                    await c.execute(
+                        text("select id from lot_units where lot_id=:i order by created_at, id"), {"i": lot_id}
+                    )
+                )
+                .scalars()
+                .all()
+            )
+            for n, unit_id in enumerate(units):
+                ts = t0 + timedelta(minutes=8 + 12 * n)
+                await c.execute(
+                    text("update lot_units set created_at=:t, updated_at=:t where id=:i"), {"t": ts, "i": unit_id}
                 )
             await c.execute(
                 text("update lot_reservations set created_at=:t where lot_id=:i"),

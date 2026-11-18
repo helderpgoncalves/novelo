@@ -10,3 +10,4 @@ Decisões difíceis de reverter, surpreendentes sem contexto e com trade-off rea
 | 17 nov 2026 | [Resgate por código pseudónimo: zero partilha de dados com parceiros](resgate-por-codigo-pseudonimo.md) | [#39](https://github.com/helderpgoncalves/novelo/issues/39) |
 | 17 nov 2026 | [Captura anual é derivada, nunca auto-calibrada pelo piloto](captura-anual-e-derivada.md) | [#53](https://github.com/helderpgoncalves/novelo/issues/53) |
 | 17 nov 2026 | [RGPD da conta de doador: bases legais, 13 anos, responsável e limites](rgpd-conta-de-doador.md) | [#49](https://github.com/helderpgoncalves/novelo/issues/49) |
+| 17 nov 2026 | [Porta de dispositivo da viatura: o Web Bluetooth vive só no adaptador](porta-de-dispositivo-da-viatura.md) | [#58](https://github.com/helderpgoncalves/novelo/issues/58) |

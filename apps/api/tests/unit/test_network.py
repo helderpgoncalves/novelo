@@ -90,6 +90,21 @@ def test_on_demand_is_a_round_of_the_dedicated_vehicle_every_n_weeks() -> None:
     assert rural.capex_eur == 0 and urban.capex_eur == 0
 
 
+def test_calibrated_bags_per_round_changes_the_tour_n_not_the_kg() -> None:
+    # A calibração (#62) diz que a freguesia põe 3,5 sacos por ronda (blended), não os 6,97846 do
+    # prior. O n da fórmula da volta (BHH) passa a 3,5: volta = 0,7124 · √(3,5 · 4) · 1,3 = 3,46639 km
+    # por ronda -> km/ano = 26 · 3,46639 = 90,13. Os kg NUNCA mudam com o n: as toneladas, os sacos/ano
+    # e as viagens por ronda ficam as do prior (o pedido calibra o n, não multiplica quilos).
+    p = params()
+    prior = build_option(URBAN, (Mode.ON_DEMAND,), p).parts[0]
+    calibrated = build_option(URBAN, (Mode.ON_DEMAND,), p, on_demand_bags_per_round=3.5).parts[0]
+    assert calibrated.km_year == pytest.approx(26 * 0.7124 * (3.5 * 4.0) ** 0.5 * 1.3, abs=0.01)
+    assert calibrated.km_year < prior.km_year
+    assert calibrated.capture == prior.capture
+    assert calibrated.collections_year == prior.collections_year
+    assert calibrated.trips_per_round == prior.trips_per_round
+
+
 def test_on_demand_round_above_capacity_goes_back_to_the_depot() -> None:
     # rural: 0,4536 t / 26 rondas = 17,45 kg por ronda; com 10 kg de capacidade são 2 viagens por ronda
     one = build_option(RURAL, (Mode.ON_DEMAND,), params()).parts[0]
@@ -99,11 +114,92 @@ def test_on_demand_round_above_capacity_goes_back_to_the_depot() -> None:
 
 
 def test_rounds_every_four_weeks_halve_the_km() -> None:
-    # 13 rondas em vez de 26: a ida e volta conta metade das vezes (a volta na freguesia cresce com √2 por ronda)
+    # 13 rondas em vez de 26: a ida e volta conta metade das vezes (a volta na freguesia cresce com √2 por ronda).
+    # Com a taxa × degrau (ADR captura derivada), a captura ao ritmo mensal é metade: os mesmos sacos POR RONDA.
     two = build_option(RURAL, (Mode.ON_DEMAND,), params()).parts[0]
     four = build_option(RURAL, (Mode.ON_DEMAND,), params(on_demand_every_weeks=4.0)).parts[0]
     assert four.rounds_year == 13.0 and four.km_year == pytest.approx(two.km_year / 2)
-    assert four.collections_year == two.collections_year  # os mesmos sacos
+    # taxa × degrau: 0,4536 t à quinzenal -> 0,2268 t ao mensal (13/26); sacos por ronda iguais (0,6978)
+    assert four.collections_year == pytest.approx(two.collections_year * 13 / 26)
+    assert four.collections_year / four.rounds_year == pytest.approx(two.collections_year / two.rounds_year)
+
+
+def test_rung_weeks_scale_capture_and_cost_by_hand() -> None:
+    # urbana (no estaleiro): 84 t · 0,054 = 4,536 t à quinzenal (26/ano).
+    # trimestral (4/ano): captura 0,054 · 4/26 = 0,0083077 -> 0,697846 t; 27,91385 sacos/ano; 4 rondas
+    # volta 4,89307 km por ronda (a mesma: sacos por ronda constantes) -> km = 4 · 4,89307 = 19,5723
+    # custo = 27,91385 · 6 € + 19,5723 · 1,1 € = 167,483 + 21,530 = 189,013 €
+    quarterly = build_option(URBAN, (Mode.ON_DEMAND,), params(), on_demand_weeks=13.0).parts[0]
+    assert quarterly.rounds_year == 4.0
+    assert quarterly.capture == pytest.approx(0.054 * 4 / 26)
+    assert quarterly.km_year == pytest.approx(4 * 0.7124 * (181.44 / 26 * 4.0) ** 0.5 * 1.3, rel=1e-6)
+    assert quarterly.annual_cost_eur == pytest.approx(189.01, abs=0.01)
+    # semanal (52/ano): captura dobra (0,108) -> 84 · 0,108 = 9,072 t; 362,88 sacos/ano em 52 rondas; km = 52 · 4,89307
+    weekly = build_option(URBAN, (Mode.ON_DEMAND,), params(), on_demand_weeks=1.0).parts[0]
+    assert weekly.capture == pytest.approx(0.108) and weekly.capture * 84 == pytest.approx(9.072)
+    assert weekly.km_year == pytest.approx(52 * 0.7124 * (181.44 / 26 * 4.0) ** 0.5 * 1.3, rel=1e-6)
+    assert weekly.annual_cost_eur == pytest.approx(362.88 * 6 + weekly.km_year * 1.1)
+    # a quinzenal pura o prior fica intacto: igual a não passar semanas (cenários fixos de hoje)
+    biweekly = build_option(URBAN, (Mode.ON_DEMAND,), params(), on_demand_weeks=2.0).parts[0]
+    legacy = build_option(URBAN, (Mode.ON_DEMAND,), params()).parts[0]
+    assert biweekly == legacy
+
+
+def test_build_options_enumerate_one_option_per_rung() -> None:
+    # 7 combinações na urbana; as 4 com a pedido × 4 degraus = 16, mais 3 sem a pedido = 19 opções
+    rungs = [1.0, 2.0, 4.0, 13.0]
+    options = build_options([URBAN], params(), on_demand_weeks=rungs)
+    assert len(options) == 19
+    ladder_options = [o for o in options if o.modes == (Mode.ON_DEMAND,)]
+    assert [o.on_demand_weeks for o in ladder_options] == rungs  # ordem determinista da escada
+    assert all(o.on_demand_weeks is None for o in options if Mode.ON_DEMAND not in o.modes)
+    # sem degraus (política fixa): uma variante por combinação, com as semanas globais gravadas
+    fixed = build_options([URBAN], params())
+    assert len(fixed) == 7
+    assert {o.on_demand_weeks for o in fixed if Mode.ON_DEMAND in o.modes} == {2.0}
+
+
+def test_a_notice_forces_the_door_round() -> None:
+    # aviso numa freguesia onde os constraints excluem a pedido: a garantia ganha e as combinações têm de a incluir
+    options = build_options([RURAL], params(), allowed={"rur": {Mode.EXISTING}}, required={"rur": {Mode.ON_DEMAND}})
+    assert {o.modes for o in options} == {(Mode.ON_DEMAND,), (Mode.EXISTING, Mode.ON_DEMAND)}
+    # sem aviso, a restrição vale
+    restricted = build_options([RURAL], params(), allowed={"rur": {Mode.EXISTING}})
+    assert {o.modes for o in restricted} == {(Mode.EXISTING,)}
+
+
+def test_mandatory_zones_are_always_served() -> None:
+    # aviso: a freguesia tem de ser servida, mesmo quando o orçamento a deixaria de fora.
+    # à mensal (4 semanas), a urbana custa 90,72 sacos·6 € + 63,61 km·1,1 € = 614,29 €; a rural,
+    # 9,072 sacos·6 € + 225,5 km·1,1 € = 302,48 € (a ida e volta é que pesa).
+    options = build_options([URBAN, RURAL], params(on_demand_every_weeks=4.0))
+    free = solve(options, "max_tonnes", budget_eur_year=400.0)
+    assert {o.zone_id for o in free.chosen} == {"rur"}  # sem aviso, o orçamento só chega para a rural
+    forced = solve(options, "max_tonnes", budget_eur_year=700.0, mandatory={"urb"})
+    assert "urb" in {o.zone_id for o in forced.chosen}  # a paragem garantida (e a rural fica de fora: 916 > 700)
+    assert "rur" not in {o.zone_id for o in forced.chosen}
+    # se nem a freguesia obrigatória couber, o cenário é inviável: a garantia é dura
+    assert solve(options, "max_tonnes", budget_eur_year=400.0, mandatory={"urb"}).status == "infeasible"
+
+
+def test_min_cost_picks_the_rarest_rung_that_meets_the_target() -> None:
+    # meta de 0,5 t: o trimestral sozinho dá 0,6978 t por 189 € — mais barato do que qualquer outro degrau ou modo
+    options = build_options([URBAN], params(), on_demand_weeks=[1.0, 2.0, 4.0, 13.0])
+    result = solve(options, "min_cost", target_tonnes=0.5)
+    assert len(result.chosen) == 1
+    (chosen,) = result.chosen
+    assert chosen.modes == (Mode.ON_DEMAND,) and chosen.on_demand_weeks == 13.0
+    assert chosen.annual_cost_eur == pytest.approx(189.01, abs=0.01)
+
+
+def test_max_tonnes_spends_the_budget_on_the_most_frequent_rung_that_fits() -> None:
+    # 2 200 €: rua sozinha (1 932 €, 15,456 t) ou rua + trimestral (2 121 €, 16,03 t) — o combo com o degrau raro ganha
+    options = build_options([URBAN], params(), on_demand_weeks=[1.0, 2.0, 4.0, 13.0])
+    result = solve(options, "max_tonnes", budget_eur_year=2200.0)
+    assert {o.modes for o in result.chosen} == {(Mode.STREET, Mode.ON_DEMAND)}
+    assert result.chosen[0].on_demand_weeks == 13.0
+    # e capta mais do que a rua sozinha: 84 · (1 − 0,816 · (1 − 0,054 · 4/26)) = 16,03 t
+    assert result.chosen[0].tonnes == pytest.approx(84 * (1 - 0.816 * (1 - 0.054 * 4 / 26)))
 
 
 def test_site_hours_use_the_site_stop_minutes() -> None:

@@ -58,6 +58,8 @@ const OBJECTIVES: ScenarioObjective[] = ['max_tonnes', 'min_cost'];
 const BUDGET_MAX = 200_000;
 const RADII = [200, 300, 500] as const;
 type Siting = NonNullable<ScenarioRequest['siting']>;
+/** Política de paragem (ADR #42): `fixed` = o passo global; `dynamic` = o degrau por freguesia na escada discreta. */
+export type StopPolicy = NonNullable<ScenarioRequest['stop_policy']>;
 /** `existing` por omissão; `street` só como referência explícita (a Vitrus não usa contentores de têxtil). */
 type SiteMode = Extract<CollectionMode, 'existing' | 'street'>;
 /** Candidatos da rede por locais: públicos (contentores municipais), escolas (pontos assistidos) ou ambos. */
@@ -82,6 +84,8 @@ export interface FormSeed {
   siteCandidates: SiteCandidates;
   /** Completar a rede com recolha a pedido nas freguesias onde compensa. */
   onDemand: boolean;
+  /** Política de paragem: o passo global de sempre ou o degrau por freguesia na escada. */
+  stopPolicy: StopPolicy;
 }
 
 interface ScenarioFormProps {
@@ -119,6 +123,7 @@ function matchesRequest(s: ScenarioOut, r: ScenarioRequest): boolean {
   return (
     sameNetwork &&
     sameModes &&
+    (s.result.stop_policy ?? 'fixed') === (r.stop_policy ?? 'fixed') &&
     s.objective === r.objective &&
     (s.budget_eur_year ?? null) === (r.budget_eur_year ?? null) &&
     Math.abs((s.target_tonnes ?? 0) - (r.target_tonnes ?? 0)) < 0.002 &&
@@ -150,6 +155,7 @@ export function ScenarioForm({
   // Com o contentor de rua (só referência) os candidatos são sempre os públicos: uma escola não tem contentor de rua.
   const candidates: SiteCandidates = siteMode === 'street' ? 'public' : siteCandidates;
   const [onDemand, setOnDemand] = useState(seed.onDemand);
+  const [stopPolicy, setStopPolicy] = useState<StopPolicy>(seed.stopPolicy);
   const [submitted, setSubmitted] = useState(false);
   const [open, setOpen] = useState<Set<SectionId>>(new Set(['goal']));
   const resultRef = useRef<HTMLElement>(null);
@@ -200,6 +206,7 @@ export function ScenarioForm({
       site_mode: siteMode,
       site_candidates: candidates,
       site_on_demand: onDemand,
+      stop_policy: stopPolicy,
     }),
     [
       label,
@@ -214,6 +221,7 @@ export function ScenarioForm({
       siteMode,
       candidates,
       onDemand,
+      stopPolicy,
     ],
   );
 
@@ -398,13 +406,14 @@ export function ScenarioForm({
             zones: formatNumber(zonesWithContainers),
           })
         : m.sim_existing_none(),
-    networkText:
+    networkText: `${
       siting === 'sites'
         ? `${m.site_sum_sites({
             radius: String(radiusM),
             mode: siteModeLabel[siteMode]().toLowerCase(),
           })} · ${candidatesLabel[candidates]()}${onDemand ? ` · ${m.site_sum_on_demand()}` : ''}`
-        : m.site_sum_parish(),
+        : m.site_sum_parish()
+    } · ${stopPolicy === 'dynamic' ? m.sim_policy_dynamic() : m.sim_policy_fixed()}`,
     runNote:
       siting === 'sites'
         ? objective === 'max_tonnes'
@@ -576,6 +585,8 @@ export function ScenarioForm({
                 onSiteCandidatesChange={setSiteCandidates}
                 onDemand={onDemand}
                 onOnDemandChange={setOnDemand}
+                stopPolicy={stopPolicy}
+                onStopPolicyChange={setStopPolicy}
               />
             </FormSection>
 
@@ -694,6 +705,8 @@ interface NetworkControlProps {
   onSiteCandidatesChange: (v: SiteCandidates) => void;
   onDemand: boolean;
   onOnDemandChange: (v: boolean) => void;
+  stopPolicy: StopPolicy;
+  onStopPolicyChange: (v: StopPolicy) => void;
 }
 
 /** Rede a desenhar: locais reais da rede municipal (por omissão) ou freguesias, com raio a pé e tipo de ponto. */
@@ -708,9 +721,38 @@ function NetworkControl({
   onSiteCandidatesChange,
   onDemand,
   onOnDemandChange,
+  stopPolicy,
+  onStopPolicyChange,
 }: NetworkControlProps) {
   return (
     <div className="space-y-4 border-t pt-4">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between gap-2">
+          <span className="font-medium text-sm">{m.sim_policy_label()}</span>
+          <HelpHint label={m.sim_policy_label()}>
+            <ul className="space-y-2">
+              <li>
+                <span className="font-medium">{m.sim_policy_fixed()}.</span>{' '}
+                {m.sim_policy_help_fixed()}
+              </li>
+              <li>
+                <span className="font-medium">{m.sim_policy_dynamic()}.</span>{' '}
+                {m.sim_policy_help_dynamic()}
+              </li>
+              <li className="text-muted-foreground">{m.sim_policy_note()}</li>
+            </ul>
+          </HelpHint>
+        </div>
+        <Segmented
+          label={m.sim_policy_aria()}
+          value={stopPolicy}
+          onChange={onStopPolicyChange}
+          options={[
+            { value: 'fixed', label: m.sim_policy_fixed() },
+            { value: 'dynamic', label: m.sim_policy_dynamic() },
+          ]}
+        />
+      </div>
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
           <span className="font-medium text-sm">{m.site_net_label()}</span>

@@ -8,16 +8,16 @@ Script: `scripts/seed/demo_seed.py`. Corre **dentro do contentor da API** (usa o
 
 - **6 lotes, 24 peças**, cada peça com a sua fotografia real (miniatura de 640 px, sem metadados) e o crédito do autor e da licença:
 
-  | Lote | Freguesia | Estado | Peças |
-  | --- | --- | --- | --- |
-  | Camisas e polos de algodão | Creixomil | entregue | 5 |
-  | Lã e malhas | Azurém | reservado | 5 |
-  | Denim e calças | Ponte | triado | 4 |
-  | Roupa de casa | Polvoreira | entregue | 4 |
-  | Hoodies, lã e cachecóis | São Torcato | reservado | 4 |
-  | Lote em curso (etiquetas lidas pelo modelo) | Ronfe | recolhido | 2 |
+  | Lote | Paragem (local, freguesia) | Estado | Sacos pesados | Peças |
+  | --- | --- | --- | --- | --- |
+  | Camisas e polos de algodão | Creixomil, Creixomil | entregue | 2 · 11,6 kg medidos | 5 |
+  | Lã e malhas | Azurém, Azurém | reservado | 1 · 7,8 kg medidos | 5 |
+  | Denim e calças | Ponte, Ponte | triado | 2 · 15,0 kg medidos | 4 |
+  | Roupa de casa | Polvoreira, Polvoreira | entregue | 1 · 9,4 kg medidos | 4 |
+  | Hoodies, lã e cachecóis | São Torcato, São Torcato | reservado | 1 · 6,8 kg medidos | 4 |
+  | Lote em curso (etiquetas lidas pelo modelo) | Ronfe, Ronfe | recolhido | 1 · 5,1 kg medidos | 2 |
 
-  Cobrem os quatro estados, quatro reservas de recicladores claramente de demonstração (`demo@example.org`), peças para reutilização e para reciclagem (sem rejeito: nenhuma peça o justifica).
+  Cobrem os quatro estados, quatro reservas de recicladores claramente de demonstração (`demo@example.org`), peças para reutilização e para reciclagem (sem rejeito: nenhuma peça o justifica). Cada lote nasce na paragem (`POST /lots/stops`) ancorado ao **local** da Vitrus com o mesmo nome da freguesia, acumula sacos com QR próprio (um código de saco da plataforma, as outras etiqueta impressa com UUID) e o peso **medido** por saco, e fecha com «Partir»; as peças entram depois, na mesa de triagem.
 - **Cenários `Demo · …` (19 + o francês), para a demo e para comparar**, todos com as rotas por estrada ([Rotas por estrada](rotas-reais.md)), ligados por `parent_id` para a comparação abrir com um clique:
   - **Par do guião:** Cenário A (contentores de rua, só referência, 60 000 €/ano) contra Cenário B (sem contentores, 60 000 €/ano; filho de A).
   - **Por freguesia:** 40 000, 90 000 e 150 000 €/ano (cadeia de orçamentos), custo mínimo para 350 t, só recolha a pedido para 250 t, restrições por freguesia (Azurém e Creixomil só em locais existentes; Ronfe e São Torcato só a pedido) e o teto do modelo sem limite de orçamento.
@@ -25,12 +25,12 @@ Script: `scripts/seed/demo_seed.py`. Corre **dentro do contentor da API** (usa o
   - **Referência francesa** (4,27 kg/hab/ano, por verificar) como cenário de comparação.
   - **Três «E se...?» sobre o B**, com o modelo a sério (a pergunta, a confirmação, o otimizador e a explicação com números verificados): orçamento de 60 000 para 90 000 €, Creixomil e Azurém só a pedido, e captura da recolha a pedido 30% mais baixa. São os exemplos que se repetem ao vivo com o júri.
   - **Relatório RAP pré-gerado** com B, A e os locais a 60 000 €/ano, para a demo não depender de o gerar ao vivo.
-- **Histórico espalhado por dias**: lote aberto de manhã, peças ao longo de minutos, triado no dia seguinte, reservado dois dias depois da abertura, entregue dois dias a seguir (nunca no futuro). É a única parte escrita por SQL, e só mexe em datas.
+- **Histórico espalhado por dias**: lote aberto de manhã na paragem, sacos pesados e «Partir» ~40 minutos depois, peças triadas a seguir (na mesa), triado no dia seguinte, reservado dois dias depois da abertura, entregue dois dias a seguir (nunca no futuro). É a única parte escrita por SQL, e só mexe em datas.
 
 ## Honestidade dos dados
 
 - A **triagem é real** (modelo de visão, prompt versionado), e a composição vem da etiqueta quando a foto a mostra (o cachecol Ralph Lauren, a etiqueta DIM e a da Muji foram lidas pelo modelo). Nas restantes peças a composição é a que **o operador confirma** no formulário, que é o passo real do produto: no seed está fixada por tipo de peça (por exemplo, t-shirt de algodão a 100%) e é um pressuposto de demonstração, não uma leitura. Por isso só estas fibras entram na bolsa e nas marcas como dados de demonstração.
-- Os **pesos** são os da tabela de pesos médios por tipo de peça, como em todo o produto (estimativa).
+- Os **pesos dos lotes** são **medidos** (por saco, na paragem): os valores do quadro acima são fixados no seed como viriam da balança da viatura, e é essa a fonte que o lote e o passaporte mostram («medido»). O peso **por peça** continua o da tabela de pesos médios por tipo de peça (estimativa): só serve para ponderar a composição, nunca substitui o medido.
 - As **fotografias** são da Wikimedia Commons (CC0, domínio público, CC BY e CC BY-SA). Autor e licença vão no crédito de cada miniatura, no lote e no passaporte, e a página de créditos explica as licenças. Escolheram-se só peças inteiras sem pessoas. Não se guardam originais: o script descarrega uma versão de 1 024 px, a API reduz para 640 px e remove os metadados.
 - As miniaturas expiram ao fim da retenção (90 dias por omissão; [Privacidade das fotografias](privacidade-fotografias.md)): depois dessa data o seed tem de se repetir para as voltar a ter.
 

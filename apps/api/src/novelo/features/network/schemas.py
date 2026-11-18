@@ -88,6 +88,7 @@ class FleetSummary(BaseModel):
 
 
 class LocalityOut(BaseModel):
+    id: uuid.UUID
     name: str
     latitude: float | None = Field(description="OpenStreetMap (Nominatim); vazio se a localidade não é um lugar")
     longitude: float | None

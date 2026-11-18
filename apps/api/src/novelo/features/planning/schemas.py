@@ -6,10 +6,22 @@ from typing import Literal, Self
 from pydantic import BaseModel, Field, model_validator
 
 from novelo.domain.routing import PlanSource, RoutingSource
-from novelo.domain.vocab import CollectionMode, ProducerType, ScenarioObjective, ScenarioStatus, Tipau
+from novelo.domain.vocab import (
+    CollectionFrequency,
+    CollectionMode,
+    ProducerType,
+    ScenarioObjective,
+    ScenarioStatus,
+    Tipau,
+)
+from novelo.features.calibration.schemas import CalibrationPhoto
 from novelo.features.planning import assumptions as a
 
 Siting = Literal["parish", "sites"]
+# Política de paragem (ADR #42): `fixed` = o degrau global (`on_demand_every_weeks`) para todas as freguesias, como
+# até aqui; `dynamic` = o otimizador escolhe o degrau de cada freguesia na escada discreta (semanal, quinzenal,
+# mensal, trimestral — pressupostos em dados-e-modelo.md). O aviso «sacos prontos» garante paragem nas duas.
+StopPolicy = Literal["fixed", "dynamic"]
 # Candidatos da rede por locais: `public` (locais de contentores municipais na rua), `staffed` (pontos assistidos:
 # escolas, sem contentor de rua; caixa ou saco no interior), `both`.
 SiteCandidates = Literal["public", "staffed", "both"]
@@ -24,6 +36,7 @@ class ParamSource(StrEnum):
 
     VITRUS_DATA = "vitrus_data"  # dados reais da Vitrus (com a APA, para o têxtil no RSU)
     ASSUMPTION = "assumption"  # pressuposto da equipa, a validar com a Vitrus
+    OBSERVED = "observed"  # observado nos pilotos com n amostras (calibração, spec #62: «observado·n»)
 
 
 class ModeParams(BaseModel):
@@ -105,6 +118,13 @@ class ParamMeta(BaseModel):
     key: str = Field(description="Caminho do parâmetro, ex.: `modes.street.capture_rate`")
     unit: str
     source: ParamSource
+    n: int | None = Field(
+        default=None,
+        description=(
+            "Amostras observadas (calibração #62): visitas ou semanas, conforme a métrica. Com n abaixo do "
+            "limiar de dominância a fonte mostra «estimativa·n»; a partir dele, «observado·n». Nulo sem calibração"
+        ),
+    )
     note: str | None = Field(default=None, description="Fonte em texto, quando o valor ainda está por preencher")
 
 
@@ -200,6 +220,15 @@ class ScenarioRequest(BaseModel):
         description=(
             "Pressupostos de captura e custo usados nos locais: `existing` (paragem com sacos fechados nos locais "
             "municipais onde a viatura já passa, sem contentor novo) ou `street` (contentor de rua, só referência)"
+        ),
+    )
+    stop_policy: StopPolicy = Field(
+        default="fixed",
+        description=(
+            "Política de paragem (ADR #42): `fixed` mantém o degrau global `on_demand_every_weeks` para todas as "
+            "freguesias; `dynamic` deixa o otimizador escolher o degrau de cada freguesia na escada discreta "
+            "(semanal, quinzenal, mensal, trimestral), trocando custo de rondas por procura. O aviso «sacos "
+            "prontos» garante paragem nas duas. Cenários antigos, sem o campo: `fixed`"
         ),
     )
 
@@ -379,6 +408,10 @@ class SiteSelection(BaseModel):
     population_covered: float
     served_points: int
     vehicle: int | None = Field(description="Viatura da rota que o visita")
+    frequency: CollectionFrequency | None = Field(
+        default=None,
+        description="O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa",
+    )
 
 
 class SitingSummary(BaseModel):
@@ -412,6 +445,13 @@ class CollectionPlanEntry(BaseModel):
     weekday: int | None = Field(description="Dia de recolha (1 = segunda ... 5 = sexta); nulo sem horas")
     vehicle: int | None = Field(description="Viatura dedicada (1, 2, ...) que faz a ronda")
     every_weeks: float = Field(description="Uma ronda a cada N semanas")
+    frequency: CollectionFrequency | None = Field(
+        default=None,
+        description=(
+            "Degrau da escada escolhido pelo otimizador para esta freguesia (`weekly`, `biweekly`, `monthly`, "
+            "`quarterly`). Nulo na política fixa e nos cenários antigos — o passo global não é um degrau gravado"
+        ),
+    )
     rounds_year: float = Field(description="Rondas por ano")
     trips_per_round: int | None = Field(
         description="Viagens ao estaleiro numa ronda porta a porta (carga acima da capacidade); nulo nos locais"
@@ -421,6 +461,25 @@ class CollectionPlanEntry(BaseModel):
     kg_per_round: float = Field(description="Têxtil por ronda (estimativa)")
     km_year: float = Field(description="Km por ano da viatura dedicada neste canal")
     hours_year: float = Field(description="Horas por ano da viatura dedicada neste canal")
+
+
+class PublicAgendaEntry(BaseModel):
+    """Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).
+
+    É a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do
+    degrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.
+    A página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.
+    """
+
+    parish_code: str
+    parish_name: str
+    channel: CollectionMode = Field(description="`on_demand`: ronda porta a porta; `existing`: paragens nos locais")
+    weekday: int = Field(description="Dia da ronda (1 = segunda ... 5 = sexta)")
+    every_weeks: float = Field(description="Uma visita a cada N semanas (a cadência do degrau escolhido)")
+    rounds_year: float = Field(description="Visitas por ano")
+    frequency: CollectionFrequency | None = Field(
+        default=None, description="O degrau escolhido (`weekly` a `quarterly`); nulo na política fixa"
+    )
 
 
 def _drop_legacy_plan(data: object) -> object:
@@ -452,11 +511,34 @@ class ScenarioResult(BaseModel):
         default_factory=lambda: list(CollectionMode),
         description="Modos permitidos nas freguesias sem restrição (cenários antigos, sem o campo: todos)",
     )
+    stop_policy: StopPolicy = Field(
+        default="fixed",
+        description=(
+            "Política de paragem com que o cenário foi calculado (`fixed` = degrau global; `dynamic` = degrau por "
+            "freguesia na escada). Cenários antigos, sem o campo: `fixed`"
+        ),
+    )
     collection_plan: list[CollectionPlanEntry] | None = Field(
         default=None,
         description=(
             "Plano da viatura dedicada ao têxtil: por freguesia e canal, dia, viatura, rondas, kg por ronda, km e "
             "horas. Nulo nos cenários calculados antes de 22 out 2026 (saco nos circuitos PAP, que a Vitrus excluiu)"
+        ),
+    )
+    public_agenda: list[PublicAgendaEntry] | None = Field(
+        default=None,
+        description=(
+            "Agenda pública (dado introduzido): as rondas publicadas, por dia, freguesia e canal, com a cadência do "
+            "degrau escolhido — nenhuma visita publicada é saltada. Nulo nos cenários calculados antes da política "
+            "de paragem (a página pública de #63 lê este campo)"
+        ),
+    )
+    calibration: CalibrationPhoto | None = Field(
+        default=None,
+        description=(
+            "A calibração que o cenário usou (fotografia da tabela de agregados: métrica × unidade, n, rótulo, "
+            "prior vs observado vs calibrado). Nulo nos cenários calculados sem observação — comparam-se com "
+            "honestidade, cada um com a calibração que teve (ADR: captura anual é derivada)"
         ),
     )
 
@@ -513,12 +595,13 @@ class ScenarioOut(ScenarioSummary):
     result: ScenarioResult
 
     def siting_options(self) -> dict[str, object]:
-        """Campos de `ScenarioRequest` que repetem os modos e a rede por locais ao duplicar ou alterar este cenário."""
+        """Campos de `ScenarioRequest` que repetem os modos, a política e a rede por locais ao duplicar o cenário."""
         s = self.result.siting
         if s is None:
-            return {"default_modes": self.result.default_modes}
+            return {"default_modes": self.result.default_modes, "stop_policy": self.result.stop_policy}
         return {
             "default_modes": self.result.default_modes,
+            "stop_policy": self.result.stop_policy,
             "siting": "sites",
             "site_candidates": s.site_candidates,
             "site_radius_m": s.radius_m,

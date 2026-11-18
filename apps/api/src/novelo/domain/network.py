@@ -23,7 +23,7 @@ forma exata para as 48 freguesias de Guimarães, com o número de viaturas dedic
 from __future__ import annotations
 
 import math
-from collections.abc import Collection, Sequence
+from collections.abc import Collection, Mapping, Sequence
 from dataclasses import dataclass, field, replace
 from itertools import combinations
 from typing import Literal
@@ -35,6 +35,7 @@ from novelo.domain import fleet, routing
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.geo import haversine_km, simplify_polyline
 from novelo.domain.routing import PlanSource, RoadRouter, RoutingSource
+from novelo.domain.stop_policy import rung_capture
 from novelo.domain.vocab import CollectionMode as Mode
 
 SCALE_T = 1000  # toneladas -> quilogramas inteiros no solver
@@ -118,12 +119,13 @@ class ModeCost:
 
 @dataclass(frozen=True)
 class Option:
-    """Uma combinação de modos numa zona."""
+    """Uma combinação de modos numa zona (com os degraus da escada, uma opção por degrau quando há saco à porta)."""
 
     zone_id: str
     parts: tuple[ModeCost, ...]
     tonnes: float
     population_covered: float
+    on_demand_weeks: float | None = None  # semanas entre rondas porta a porta desta variante; None sem o modo
 
     @property
     def modes(self) -> tuple[Mode, ...]:
@@ -182,9 +184,33 @@ def part_hours(mode: Mode, km_year: float, stops_year: float, params: Params) ->
     return fleet.hours(km_year, stops_year, params.vehicle_speed_kmh, params.stop_minutes(mode))
 
 
-def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
+def mode_cost(
+    zone: Zone,
+    mode: Mode,
+    params: Params,
+    on_demand_weeks: float | None = None,
+    on_demand_capture: float | None = None,
+    on_demand_bags_per_round: float | None = None,
+) -> ModeCost:
+    """Custo e captura de um modo numa zona.
+
+    `on_demand_capture` substitui a captura prior do saco à porta (`capture_rate × coverage_factor`)
+    nas freguesias com calibração (spec #62): o observado calibra o modo a pedido; a escala do degrau
+    (`rung_capture`) aplica-se igualmente ao valor calibrado e o teto continua a ser a procura.
+    `on_demand_bags_per_round` é o *n* da fórmula da volta calibrado (sacos por ronda da freguesia,
+    métrica `bags_per_round`): muda SÓ o traçado da volta (BHH, km ∝ √n) — as toneladas, os sacos/ano
+    e as viaturas ficam sempre derivados dos kg; o pedido nunca multiplica quilos nem corta a ronda.
+    """
     mp = params.modes[mode]
-    capture = mp.capture_rate * mp.coverage_factor
+    base_capture = mp.capture_rate * mp.coverage_factor
+    if mode == Mode.ON_DEMAND and on_demand_capture is not None:
+        base_capture = on_demand_capture
+    capture = base_capture
+    weeks = params.on_demand_every_weeks if on_demand_weeks is None else on_demand_weeks
+    if mode == Mode.ON_DEMAND:
+        # Taxa × degrau (ADR «Captura anual é derivada»): o prior de captura vale ao degrau quinzenal e escala
+        # com o ritmo de rondas (52 ÷ semanas), limitado a 1. À quinzenal pura fica intacto.
+        capture = rung_capture(capture, fleet.WEEKS_PER_YEAR / weeks)
     tonnes = zone_demand_t(zone, params) * capture  # o que este canal captaria sozinho
     covered = zone.population * mp.coverage_factor
     round_trip = radial_km(zone, params)
@@ -192,12 +218,13 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
     if mode == Mode.ON_DEMAND:
         # Saco fechado à porta, recolhido pela viatura dedicada numa ronda por freguesia a cada N semanas.
         pickups = tonnes * 1000 / params.on_demand_kg_per_pickup
-        rounds = fleet.rounds_per_year(params.on_demand_every_weeks) if tonnes > 0 else 0.0
+        rounds = fleet.rounds_per_year(weeks) if tonnes > 0 else 0.0
         trips = 0
         km = 0.0
         if rounds:
             trips = fleet.trips_per_round(tonnes * 1000 / rounds, params.vehicle_capacity_t * 1000)
-            tour = fleet.tour_km(pickups / rounds, zone.area_km2, params.detour_factor)
+            stops_per_round = pickups / rounds if on_demand_bags_per_round is None else on_demand_bags_per_round
+            tour = fleet.tour_km(stops_per_round, zone.area_km2, params.detour_factor)
             km = rounds * (trips * round_trip + tour)
         opex = pickups * params.cost_per_collection_eur + km * params.cost_per_km_eur
         return ModeCost(
@@ -240,9 +267,23 @@ def mode_cost(zone: Zone, mode: Mode, params: Params) -> ModeCost:
     )
 
 
-def build_option(zone: Zone, modes: tuple[Mode, ...], params: Params) -> Option:
-    """Opção (zona, combinação de modos): toneladas por captura independente, custos somados."""
-    parts = tuple(mode_cost(zone, m, params) for m in modes)
+def build_option(
+    zone: Zone,
+    modes: tuple[Mode, ...],
+    params: Params,
+    on_demand_weeks: float | None = None,
+    on_demand_capture: float | None = None,
+    on_demand_bags_per_round: float | None = None,
+) -> Option:
+    """Opção (zona, combinação de modos): toneladas por captura independente, custos somados.
+
+    `on_demand_weeks` é o degrau da escada desta variante do saco à porta (None = as semanas globais);
+    `on_demand_capture` é a captura calibrada da freguesia (None = o prior dos pressupostos);
+    `on_demand_bags_per_round` é o n calibrado da fórmula da volta (None = o derivado dos kg).
+    """
+    parts = tuple(
+        mode_cost(zone, m, params, on_demand_weeks, on_demand_capture, on_demand_bags_per_round) for m in modes
+    )
     miss = 1.0
     uncovered = 1.0
     for p in parts:
@@ -253,6 +294,7 @@ def build_option(zone: Zone, modes: tuple[Mode, ...], params: Params) -> Option:
         parts=parts,
         tonnes=zone_demand_t(zone, params) * (1 - miss),
         population_covered=zone.population * (1 - uncovered),
+        on_demand_weeks=on_demand_weeks if Mode.ON_DEMAND in modes else None,
     )
 
 
@@ -261,18 +303,48 @@ def build_options(
     params: Params,
     allowed: dict[str, set[Mode]] | None = None,
     default_modes: Collection[Mode] | None = None,
+    *,
+    on_demand_weeks: Sequence[float] | None = None,
+    required: dict[str, set[Mode]] | None = None,
+    on_demand_capture: Mapping[str, float] | None = None,
+    on_demand_bags_per_round: Mapping[str, float] | None = None,
 ) -> list[Option]:
     """Todas as combinações de modos por zona.
 
     `allowed` restringe os modos por zona (ex.: "só a pedido em Serzedelo"); as zonas sem entrada usam `default_modes`
     (omitido = todos os modos).
+
+    `on_demand_weeks` são os DEGRAUS da escada (ADR: política de paragem): cada combinação com saco à porta vira uma
+    opção por degrau — as variáveis novas do MIP são estas linhas, uma por degrau, e a escolha continua a ser "no
+    máximo uma opção por zona". Omitido (política fixa) = uma variante com as semanas globais.
+
+    `required` GARANTE modos por zona (o aviso «sacos prontos» garante paragem, ADR): as combinações da zona têm de
+    os incluir, mesmo que `allowed` os exclua — o aviso ganha a restrição.
+
+    `on_demand_capture` é a captura calibrada por freguesia (spec #62): nas zonas com entrada substitui a captura
+    prior do saco à porta; as restantes ficam com o prior (nunca auto-substituído).
+
+    `on_demand_bags_per_round` é o n calibrado da fórmula da volta por freguesia (métrica `bags_per_round`,
+    spec #62): muda só o traçado da volta, nunca os kg; as zonas sem entrada ficam com o n derivado.
     """
     fallback = set(default_modes) if default_modes is not None else set(Mode)
+    weeks_list = list(on_demand_weeks) if on_demand_weeks is not None else [params.on_demand_every_weeks]
     options = []
     for zone in zones:
         modes = [m for m in Mode if m in (allowed or {}).get(zone.id, fallback)]
+        must = (required or {}).get(zone.id)
+        if must:
+            modes = [m for m in Mode if m in set(modes) | must]
+        capture = (on_demand_capture or {}).get(zone.id)
+        bags_round = (on_demand_bags_per_round or {}).get(zone.id)
         for size in range(1, len(modes) + 1):
-            options += [build_option(zone, combo, params) for combo in combinations(modes, size)]
+            for combo in combinations(modes, size):
+                if must and not must <= set(combo):
+                    continue
+                if Mode.ON_DEMAND in combo:
+                    options += [build_option(zone, combo, params, w, capture, bags_round) for w in weeks_list]
+                else:
+                    options.append(build_option(zone, combo, params))
     return options
 
 
@@ -308,8 +380,9 @@ def solve(
     time_limit_s: float = 20.0,
     seed: int = 7,
     vehicles: FleetCost | None = None,
+    mandatory: Collection[str] = (),
 ) -> SolveResult:
-    """Escolhe no máximo um modo por zona.
+    """Escolhe no máximo um modo por zona (exatamente um nas freguesias com paragem garantida).
 
     - `max_tonnes`: maximiza as toneladas com custo anual total <= `budget_eur_year`.
     - `min_cost`: minimiza o custo anual total garantindo toneladas >= `target_tonnes`.
@@ -317,14 +390,21 @@ def solve(
     Com `vehicles`, o número de viaturas dedicadas `V` é uma variável inteira: as horas das opções escolhidas cabem em
     `V · horas de uma viatura`, há pelo menos uma viatura logo que se recolha alguma coisa, e o custo soma `V · custo
     anual de uma viatura`.
+
+    `mandatory` são as freguesias com aviso «sacos prontos» ativo (ADR: política de paragem): têm de ser servidas
+    (exatamente uma opção), mesmo a custo — se não couber no orçamento, o cenário é inviável.
     """
     model = cp_model.CpModel()
     pick = {i: model.new_bool_var(f"x{i}") for i in range(len(options))}
     by_zone: dict[str, list[int]] = {}
     for i, o in enumerate(options):
         by_zone.setdefault(o.zone_id, []).append(i)
-    for idx in by_zone.values():
-        model.add_at_most_one(pick[i] for i in idx)
+    mandatory_set = set(mandatory)
+    for zone_id, idx in by_zone.items():
+        if zone_id in mandatory_set:
+            model.add_exactly_one(pick[i] for i in idx)
+        else:
+            model.add_at_most_one(pick[i] for i in idx)
 
     tonnes = [round(o.tonnes * SCALE_T) for o in options]
     cost = [round(o.annual_cost_eur * SCALE_EUR) for o in options]

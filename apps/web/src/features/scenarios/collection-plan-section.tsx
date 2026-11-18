@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Info, MapPin, RefreshCw, ShoppingBag, Truck } from 'lucide-react';
 import { useMemo } from 'react';
-import type { CollectionPlanEntry, Kpis } from '@/client';
+import type { CollectionFrequency, CollectionPlanEntry, Kpis } from '@/client';
 import { type Column, DataTable } from '@/components/data-table';
 import { EstimateTag } from '@/components/panel';
 import { EmptyState } from '@/components/states';
@@ -26,6 +26,14 @@ const channelShort: Record<PlanChannel, () => string> = {
 };
 
 const dash = <span className="text-muted-foreground">{m.common_dash()}</span>;
+
+/** Degraus da escada de frequências (política de paragem): o que o otimizador escolheu por freguesia. */
+const rungLabel: Record<CollectionFrequency, () => string> = {
+  weekly: () => m.plan_rung_weekly(),
+  biweekly: () => m.plan_rung_biweekly(),
+  monthly: () => m.plan_rung_monthly(),
+  quarterly: () => m.plan_rung_quarterly(),
+};
 
 const everyLabel = (weeks: number) =>
   weeks <= 1 ? m.plan_every_week() : m.plan_every_weeks({ n: formatNumber(weeks) });
@@ -150,6 +158,26 @@ function PlanBody({ plan, kpis }: { plan: CollectionPlanEntry[]; kpis?: Kpis }) 
       cell: (e) => everyLabel(e.every_weeks),
     },
     {
+      id: 'rung',
+      header: m.plan_col_rung(),
+      value: (e) => e.frequency,
+      exportValue: (e) => (e.frequency == null ? null : rungLabel[e.frequency]()),
+      filter: { format: (v) => rungLabel[v as CollectionFrequency]() },
+      searchable: false,
+      cell: (e) =>
+        e.frequency == null ? (
+          <span className="text-muted-foreground">{m.plan_rung_none()}</span>
+        ) : (
+          <Badge
+            variant="outline"
+            className="h-auto bg-primary/8 py-0.5 font-medium leading-snug text-primary"
+          >
+            {rungLabel[e.frequency]()}
+          </Badge>
+        ),
+      defaultHidden: true,
+    },
+    {
       id: 'vehicle',
       header: m.plan_col_vehicle(),
       type: 'number',
@@ -271,12 +299,20 @@ function PlanBody({ plan, kpis }: { plan: CollectionPlanEntry[]; kpis?: Kpis }) 
           <li className="flex gap-3 rounded-xl bg-card p-3.5 ring-1 ring-foreground/10">
             <ShoppingBag className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
             <p className="font-medium text-sm leading-snug" data-testid="plan-summary-door">
-              {(doorBag.parishes === 1 ? m.plan_summary_door_one : m.plan_summary_door)({
-                n: formatNumber(doorBag.parishes),
-                tonnes: formatTonnes(doorBag.tonnes, 1),
-                every: everyLabel(summary.everyWeeks ?? 2),
-                km: formatNumber(doorBag.km),
-              })}
+              {summary.everyWeeks == null
+                ? (doorBag.parishes === 1
+                    ? m.plan_summary_door_mixed_one
+                    : m.plan_summary_door_mixed)({
+                    n: formatNumber(doorBag.parishes),
+                    tonnes: formatTonnes(doorBag.tonnes, 1),
+                    km: formatNumber(doorBag.km),
+                  })
+                : (doorBag.parishes === 1 ? m.plan_summary_door_one : m.plan_summary_door)({
+                    n: formatNumber(doorBag.parishes),
+                    tonnes: formatTonnes(doorBag.tonnes, 1),
+                    every: everyLabel(summary.everyWeeks),
+                    km: formatNumber(doorBag.km),
+                  })}
             </p>
           </li>
         )}

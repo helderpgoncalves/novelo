@@ -8,6 +8,9 @@ export const Route = createFileRoute('/_app')({
   beforeLoad: async ({ context: { queryClient }, location }) => {
     const user = await resolveSessionUser(queryClient);
     if (!user) throw redirect({ to: '/login', search: { next: location.href } });
+    // Contas com área própria não entram na app de equipa: o local vai ao seu portão, o doador à carteira.
+    if (user.role === 'local') throw redirect({ to: '/local' });
+    if (user.role === 'donor') throw redirect({ to: '/cidadao' });
     // Conta por aprovar (ou rejeitada): só o ecrã de espera. A API também o impõe (403 em todas as rotas).
     if (user.approval_status !== 'approved') throw redirect({ to: '/pending-approval' });
     // A preferência de idioma da conta manda: ao entrar noutro dispositivo, a interface segue-a.

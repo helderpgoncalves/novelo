@@ -10,8 +10,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 
 from novelo.domain import fleet, network
-from novelo.domain.vocab import CollectionMode
-from novelo.features.planning.schemas import Allocation, CollectionPlanEntry, RouteOut, ZoneOut
+from novelo.domain.stop_policy import PublishedVisit, public_agenda
+from novelo.domain.vocab import CollectionFrequency, CollectionMode
+from novelo.features.planning.schemas import Allocation, CollectionPlanEntry, PublicAgendaEntry, RouteOut, ZoneOut
 
 
 @dataclass(frozen=True)
@@ -25,6 +26,7 @@ class ChannelLoad:
     stops_year: float  # sacos à porta ou paragens nos locais
     rounds_year: float
     trips_per_round: int | None = None  # só porta a porta
+    frequency: CollectionFrequency | None = None  # o degrau escolhido na escada (só porta a porta dinâmica)
 
 
 @dataclass(frozen=True)
@@ -104,6 +106,7 @@ def build_collection_plan(
                 weekday=slot.weekday if slot else None,
                 vehicle=slot.vehicle if slot else None,
                 every_weeks=round(fleet.WEEKS_PER_YEAR / rounds, 2) if rounds > 0 else 0.0,
+                frequency=ld.frequency,
                 rounds_year=round(rounds, 1),
                 trips_per_round=ld.trips_per_round,
                 stops_year=round(ld.stops_year, 1),
@@ -114,6 +117,38 @@ def build_collection_plan(
             )
         )
     return sorted(out, key=lambda e: (-e.tonnes_year, e.parish_code, e.channel.value))
+
+
+def public_agenda_of(plan: Sequence[CollectionPlanEntry]) -> list[PublicAgendaEntry]:
+    """A agenda pública (dado introduzido): as rondas publicadas do plano, por dia, freguesia e canal.
+
+    Derivada do plano escolhido — nunca reagenda nem salta: cada linha é uma visita prometida (ADR: visita
+    publicada nunca é saltada). É o campo `result.public_agenda` que a página pública (#63) lê.
+    """
+    visits = [
+        PublishedVisit(
+            e.parish_code,
+            e.parish_name,
+            e.channel.value,
+            e.weekday,
+            e.every_weeks,
+            e.rounds_year,
+            e.frequency,
+        )
+        for e in plan
+    ]
+    return [
+        PublicAgendaEntry(
+            parish_code=v.parish_code,
+            parish_name=v.parish_name,
+            channel=CollectionMode(v.channel),
+            weekday=v.weekday or 0,
+            every_weeks=v.every_weeks,
+            rounds_year=v.rounds_year,
+            frequency=v.frequency,
+        )
+        for v in public_agenda(visits)
+    ]
 
 
 def with_vehicle_share(

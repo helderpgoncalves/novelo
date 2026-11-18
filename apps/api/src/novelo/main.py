@@ -20,12 +20,20 @@ from novelo.features.ai_admin.router import router as ai_router
 from novelo.features.app_settings.router import router as app_settings_router
 from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
+from novelo.features.calibration.router import router as calibration_router
+from novelo.features.catalog.router import router as catalog_router
+from novelo.features.citizen.router import public_router as public_citizen_router
+from novelo.features.citizen.router import router as citizen_router
+from novelo.features.collection_requests.router import router as collection_requests_router
 from novelo.features.copilot.router import router as copilot_router
 from novelo.features.datasets.router import router as datasets_router
 from novelo.features.dev.router import router as dev_router
 from novelo.features.email_log.router import admin_router as email_admin_router
 from novelo.features.email_log.router import webhook_router
+from novelo.features.export_lots.router import router as export_lots_router
 from novelo.features.health.router import router as health_router
+from novelo.features.locals.router import public_router as public_locals_router
+from novelo.features.locals.router import router as locals_router
 from novelo.features.lots import photo_store
 from novelo.features.lots.router import public_router as public_lots_router
 from novelo.features.lots.router import router as lots_router
@@ -35,6 +43,10 @@ from novelo.features.planning import reference
 from novelo.features.planning.insights_router import router as insights_router
 from novelo.features.planning.router import router as planning_router
 from novelo.features.planning.whatif_router import router as whatif_router
+from novelo.features.points.router import router as points_router
+from novelo.features.privacy import service as privacy_service
+from novelo.features.privacy.router import public_router as public_privacy_router
+from novelo.features.privacy.router import router as privacy_router
 from novelo.features.reports.router import router as reports_router
 from novelo.features.textile.router import router as textile_router
 from novelo.features.users.router import router as users_router
@@ -56,8 +68,10 @@ async def lifespan(_: FastAPI) -> AsyncIterator[None]:
         await auth_service.seed_admin(db)
     task = asyncio.create_task(reference.seed_in_background()) if get_settings().seed_reference_scenarios else None
     purge_task = asyncio.create_task(photo_store.purge_loop())  # retenção das miniaturas (RGPD)
+    login_log_task = asyncio.create_task(privacy_service.retention_loop())  # logs de entrada: 12 meses (RGPD)
     yield
     purge_task.cancel()
+    login_log_task.cancel()
     if task is not None:
         task.cancel()
 
@@ -136,7 +150,54 @@ def create_app() -> FastAPI:
         responses=COMMON_ERRORS,
     )
     app.include_router(lots_router, prefix=API_PREFIX, tags=["lots"], dependencies=protected, responses=COMMON_ERRORS)
+    # Pedido de recolha unificado (#60): cidadão, local assistido e produtor B2B na mesma entidade.
+    app.include_router(
+        collection_requests_router,
+        prefix=API_PREFIX,
+        tags=["collection-requests"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
+    # Painel «Calibração» (#62): a tabela de agregados da retroalimentação (leitura; a recomputação é
+    # ao recalcular um cenário). O planeamento também consome só esta tabela, nunca os eventos.
+    app.include_router(
+        calibration_router,
+        prefix=API_PREFIX,
+        tags=["calibration"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
+    app.include_router(
+        export_lots_router,
+        prefix=f"{API_PREFIX}/export-lots",
+        tags=["export-lots"],
+        dependencies=protected,
+        responses=COMMON_ERRORS,
+    )
     app.include_router(public_lots_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    # Conta de local e aviso «sacos prontos» (#59): leitura do próprio local; o certificado opt-in é público.
+    app.include_router(
+        locals_router, prefix=API_PREFIX, tags=["locals"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    app.include_router(public_locals_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    # Área do cidadão (#63): conta de doador, sacos ativados e histórico; a agenda pública é sem sessão.
+    app.include_router(
+        citizen_router, prefix=API_PREFIX, tags=["citizen"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    app.include_router(public_citizen_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    # Pontos (#64): saldo e histórico do doador (livro-razão imutável); anulação em abuso é de equipa.
+    app.include_router(
+        points_router, prefix=API_PREFIX, tags=["points"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    # Catálogo e resgate (#65): o doador vê e resgata; a equipa gere parceiros/campanhas e valida códigos.
+    app.include_router(
+        catalog_router, prefix=API_PREFIX, tags=["catalog"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    # RGPD do doador (#66): política pública por finalidades, consentimentos, exportação e apagamento.
+    app.include_router(
+        privacy_router, prefix=API_PREFIX, tags=["privacy"], dependencies=protected, responses=COMMON_ERRORS
+    )
+    app.include_router(public_privacy_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     if settings.environment == "development":
         app.include_router(dev_router, prefix=f"{API_PREFIX}/dev", include_in_schema=False)
     return app

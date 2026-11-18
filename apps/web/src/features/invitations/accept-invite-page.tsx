@@ -51,7 +51,9 @@ const roleLabel = (role: InvitationPreview['role']) =>
     ? m.account_role_admin()
     : role === 'guest'
       ? m.account_role_guest()
-      : m.account_role_operator();
+      : role === 'local'
+        ? m.account_role_local()
+        : m.account_role_operator();
 
 // Mensagens como funções: avaliadas na validação, no idioma ativo. A password é opcional, mas se vier tem regras.
 const schema = z.object({
@@ -260,6 +262,11 @@ function AcceptForm({
         <p className="text-muted-foreground text-sm leading-relaxed">
           {inviter ? m.inv_invited_by({ inviter, role }) : m.inv_invited_generic({ role })}
         </p>
+        {preview.locality_name && (
+          <p className="text-sm leading-relaxed">
+            {m.inv_locality({ locality: preview.locality_name })}
+          </p>
+        )}
         <p className="flex min-w-0 items-center gap-3 rounded-md bg-muted px-3 py-2 font-medium text-sm">
           <UserAvatar person={preview} size="md" decorative />
           <span className="min-w-0 [overflow-wrap:anywhere]">

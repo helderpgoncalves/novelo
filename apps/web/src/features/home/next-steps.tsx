@@ -30,7 +30,7 @@ import { m } from '@/paraglide/messages';
 import { newestFirst } from './recent';
 import { eur, tonnes } from './safe';
 
-type Role = 'admin' | 'operator' | 'guest';
+type Role = 'admin' | 'operator' | 'guest' | 'local' | 'donor';
 
 interface StepProps {
   icon: ReactNode;

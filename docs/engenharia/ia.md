@@ -50,7 +50,7 @@ Todos os modelos passam pelo **OpenRouter** (API compatível com OpenAI), atrav�
 | `explain` | Explicação do resultado do "E se...?" | structured outputs | `explain_v1.md` |
 | `briefing` | Parágrafo executivo do relatório RAP | structured outputs | `briefing_v1.md` |
 | `alert_resolution` | Proposta de resolução de alertas de qualidade | structured outputs | `alert_resolution_v2.md` |
-| `triage` | Triagem por foto (visão) | imagem + structured outputs | `triage_v3.md` |
+| `triage` | Triagem por foto (visão) | imagem + structured outputs | `triage_v4.md` |
 
 **Modelo recomendado: `openai/gpt-6-luna`.** US$ 0,10 por milhão de tokens de entrada, US$ 0,50 por milhão de saída, contexto de 1,05 M, texto e imagem. É o valor por omissão de todas as tarefas, incluindo a visão. `typesafe/jev-router` existe no catálogo mas tem preço dinâmico e escolhe o modelo por baixo; não é default e só serve para ser avaliado (`just eval-triage --models ...`).
 
@@ -218,7 +218,7 @@ O que o copiloto sabe fazer de ponta a ponta, com o `copilot_v6`: montar e corre
 
 ## Avaliação da triagem
 
-`just eval-triage` lê `data/eval/triage/` (fotos e `truth.csv` com `file, label_file, garment_type, condition, brand, composition`), corre o modelo de visão e escreve [avaliacao-triagem.md](avaliacao-triagem.md) (exatidão por campo, matrizes de confusão, custo e latência por peça) e `data/eval/triage-last.json`, que o painel mostra (`GET /ai/eval/triage`). Com `--models a,b,c` compara vários modelos numa tabela de exatidão, custo e latência. Sem imagens, escreve o modelo vazio com as instruções.
+`just eval-triage` lê `data/eval/triage/` (fotos e `truth.csv` com `file, label_file, garment_type, fine_state, condition, season, colour, gender, size_band, brand, composition` — os eixos da taxonomia são opcionais e validados contra o vocabulário fechado), corre o modelo de visão e escreve [avaliacao-triagem.md](avaliacao-triagem.md) (**exatidão por eixo**, matrizes de confusão da tipologia e do estado fino, custo e latência por peça) e `data/eval/triage-last.json`, que o painel mostra (`GET /ai/eval/triage`). A verdade-terreno legada (só `condition`) mede o destino derivado do estado fino previsto. Género e tamanho ficam marcados **«prometido»** enquanto não houver ≥ 90% de acerto com ≥ 30 peças por eixo. As correções do operador na triagem viram **rótulos dourados** (`GET /api/v1/triage/golden-labels`), verdade-terreno adicional por eixo (ver [Taxonomia da triagem](dados-e-modelo.md#proveniência-e-rótulos-dourados)). Com `--models a,b,c` compara vários modelos numa tabela de exatidão, custo e latência. Sem imagens, escreve o modelo vazio com as instruções.
 
 ## Testes
 

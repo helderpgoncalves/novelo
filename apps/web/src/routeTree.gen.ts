@@ -13,10 +13,14 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as AcceptInviteRouteImport } from './routes/accept-invite'
+import { Route as CidadaoRouteImport } from './routes/cidadao'
 import { Route as CreditsRouteImport } from './routes/credits'
 import { Route as JoinRouteImport } from './routes/join'
+import { Route as LocalRouteImport } from './routes/local'
 import { Route as MagicLinkRouteImport } from './routes/magic-link'
+import { Route as OndeQuandoRouteImport } from './routes/onde-quando'
 import { Route as PendingApprovalRouteImport } from './routes/pending-approval'
+import { Route as PoliticaDadosRouteImport } from './routes/politica-dados'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
@@ -24,6 +28,8 @@ import { Route as AppSplatRouteImport } from './routes/_app/$'
 import { Route as AppAccountRouteImport } from './routes/_app/account'
 import { Route as AppAssumptionsRouteImport } from './routes/_app/assumptions'
 import { Route as AppBrandsRouteImport } from './routes/_app/brands'
+import { Route as AppCalibrationRouteImport } from './routes/_app/calibration'
+import { Route as AppCatalogoRouteImport } from './routes/_app/catalogo'
 import { Route as AppChatRouteImport } from './routes/_app/chat'
 import { Route as AppCircuitsRouteImport } from './routes/_app/circuits'
 import { Route as AppCoverageRouteImport } from './routes/_app/coverage'
@@ -39,12 +45,17 @@ import { Route as AppSimulatorRouteImport } from './routes/_app/simulator'
 import { Route as AppTriageRouteImport } from './routes/_app/triage'
 import { Route as AppUsersRouteImport } from './routes/_app/users'
 import { Route as AppValidationRouteImport } from './routes/_app/validation'
+import { Route as AppViaturaRouteImport } from './routes/_app/viatura'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthRegisterRouteImport } from './routes/_auth/register'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
+import { Route as CertificadoLocalIdRouteImport } from './routes/certificado.$localId'
 import { Route as PassportCodeRouteImport } from './routes/passport.$code'
 import { Route as AppAdminAiRouteImport } from './routes/_app/admin.ai'
+import { Route as AppCollectionRequestsIndexRouteImport } from './routes/_app/collection-requests.index'
+import { Route as AppExportLotsIndexRouteImport } from './routes/_app/export-lots.index'
+import { Route as AppExportLotsCodeRouteImport } from './routes/_app/export-lots.$code'
 import { Route as AppLotsIndexRouteImport } from './routes/_app/lots.index'
 import { Route as AppLotsCodeRouteImport } from './routes/_app/lots.$code'
 import { Route as AppScenariosIndexRouteImport } from './routes/_app/scenarios.index'
@@ -70,6 +81,11 @@ const AcceptInviteRoute = AcceptInviteRouteImport.update({
   path: '/accept-invite',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CidadaoRoute = CidadaoRouteImport.update({
+  id: '/cidadao',
+  path: '/cidadao',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CreditsRoute = CreditsRouteImport.update({
   id: '/credits',
   path: '/credits',
@@ -80,14 +96,29 @@ const JoinRoute = JoinRouteImport.update({
   path: '/join',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LocalRoute = LocalRouteImport.update({
+  id: '/local',
+  path: '/local',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const MagicLinkRoute = MagicLinkRouteImport.update({
   id: '/magic-link',
   path: '/magic-link',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OndeQuandoRoute = OndeQuandoRouteImport.update({
+  id: '/onde-quando',
+  path: '/onde-quando',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PendingApprovalRoute = PendingApprovalRouteImport.update({
   id: '/pending-approval',
   path: '/pending-approval',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PoliticaDadosRoute = PoliticaDadosRouteImport.update({
+  id: '/politica-dados',
+  path: '/politica-dados',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -123,6 +154,16 @@ const AppAssumptionsRoute = AppAssumptionsRouteImport.update({
 const AppBrandsRoute = AppBrandsRouteImport.update({
   id: '/brands',
   path: '/brands',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCalibrationRoute = AppCalibrationRouteImport.update({
+  id: '/calibration',
+  path: '/calibration',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCatalogoRoute = AppCatalogoRouteImport.update({
+  id: '/catalogo',
+  path: '/catalogo',
   getParentRoute: () => AppRoute,
 } as any)
 const AppChatRoute = AppChatRouteImport.update({
@@ -200,6 +241,11 @@ const AppValidationRoute = AppValidationRouteImport.update({
   path: '/validation',
   getParentRoute: () => AppRoute,
 } as any)
+const AppViaturaRoute = AppViaturaRouteImport.update({
+  id: '/viatura',
+  path: '/viatura',
+  getParentRoute: () => AppRoute,
+} as any)
 const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
   id: '/forgot-password',
   path: '/forgot-password',
@@ -220,6 +266,11 @@ const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
   path: '/reset-password',
   getParentRoute: () => AuthRoute,
 } as any)
+const CertificadoLocalIdRoute = CertificadoLocalIdRouteImport.update({
+  id: '/certificado/$localId',
+  path: '/certificado/$localId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PassportCodeRoute = PassportCodeRouteImport.update({
   id: '/passport/$code',
   path: '/passport/$code',
@@ -228,6 +279,22 @@ const PassportCodeRoute = PassportCodeRouteImport.update({
 const AppAdminAiRoute = AppAdminAiRouteImport.update({
   id: '/admin/ai',
   path: '/admin/ai',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCollectionRequestsIndexRoute =
+  AppCollectionRequestsIndexRouteImport.update({
+    id: '/collection-requests/',
+    path: '/collection-requests/',
+    getParentRoute: () => AppRoute,
+  } as any)
+const AppExportLotsIndexRoute = AppExportLotsIndexRouteImport.update({
+  id: '/export-lots/',
+  path: '/export-lots/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppExportLotsCodeRoute = AppExportLotsCodeRouteImport.update({
+  id: '/export-lots/$code',
+  path: '/export-lots/$code',
   getParentRoute: () => AppRoute,
 } as any)
 const AppLotsIndexRoute = AppLotsIndexRouteImport.update({
@@ -264,10 +331,14 @@ const AppChatSharedTokenRoute = AppChatSharedTokenRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -275,6 +346,8 @@ export interface FileRoutesByFullPath {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/calibration': typeof AppCalibrationRoute
+  '/catalogo': typeof AppCatalogoRoute
   '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
@@ -290,15 +363,20 @@ export interface FileRoutesByFullPath {
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
   '/validation': typeof AppValidationRoute
+  '/viatura': typeof AppViaturaRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
+  '/export-lots/$code': typeof AppExportLotsCodeRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/collection-requests/': typeof AppCollectionRequestsIndexRoute
+  '/export-lots/': typeof AppExportLotsIndexRoute
   '/lots/': typeof AppLotsIndexRoute
   '/scenarios/': typeof AppScenariosIndexRoute
   '/chat/shared/$token': typeof AppChatSharedTokenRoute
@@ -306,10 +384,14 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -317,6 +399,8 @@ export interface FileRoutesByTo {
   '/account': typeof AppAccountRoute
   '/assumptions': typeof AppAssumptionsRoute
   '/brands': typeof AppBrandsRoute
+  '/calibration': typeof AppCalibrationRoute
+  '/catalogo': typeof AppCatalogoRoute
   '/chat': typeof AppChatRoute
   '/circuits': typeof AppCircuitsRoute
   '/coverage': typeof AppCoverageRoute
@@ -332,15 +416,20 @@ export interface FileRoutesByTo {
   '/triage': typeof AppTriageRoute
   '/users': typeof AppUsersRoute
   '/validation': typeof AppValidationRoute
+  '/viatura': typeof AppViaturaRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/register': typeof AuthRegisterRoute
   '/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/admin/ai': typeof AppAdminAiRoute
+  '/export-lots/$code': typeof AppExportLotsCodeRoute
   '/lots/$code': typeof AppLotsCodeRoute
   '/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/scenarios/compare': typeof AppScenariosCompareRoute
+  '/collection-requests': typeof AppCollectionRequestsIndexRoute
+  '/export-lots': typeof AppExportLotsIndexRoute
   '/lots': typeof AppLotsIndexRoute
   '/scenarios': typeof AppScenariosIndexRoute
   '/chat/shared/$token': typeof AppChatSharedTokenRoute
@@ -351,10 +440,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_auth': typeof AuthRouteWithChildren
   '/accept-invite': typeof AcceptInviteRoute
+  '/cidadao': typeof CidadaoRoute
   '/credits': typeof CreditsRoute
   '/join': typeof JoinRoute
+  '/local': typeof LocalRoute
   '/magic-link': typeof MagicLinkRoute
+  '/onde-quando': typeof OndeQuandoRoute
   '/pending-approval': typeof PendingApprovalRoute
+  '/politica-dados': typeof PoliticaDadosRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
   '/verify-email': typeof VerifyEmailRoute
@@ -362,6 +455,8 @@ export interface FileRoutesById {
   '/_app/account': typeof AppAccountRoute
   '/_app/assumptions': typeof AppAssumptionsRoute
   '/_app/brands': typeof AppBrandsRoute
+  '/_app/calibration': typeof AppCalibrationRoute
+  '/_app/catalogo': typeof AppCatalogoRoute
   '/_app/chat': typeof AppChatRoute
   '/_app/circuits': typeof AppCircuitsRoute
   '/_app/coverage': typeof AppCoverageRoute
@@ -377,15 +472,20 @@ export interface FileRoutesById {
   '/_app/triage': typeof AppTriageRoute
   '/_app/users': typeof AppUsersRoute
   '/_app/validation': typeof AppValidationRoute
+  '/_app/viatura': typeof AppViaturaRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/register': typeof AuthRegisterRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
+  '/certificado/$localId': typeof CertificadoLocalIdRoute
   '/passport/$code': typeof PassportCodeRoute
   '/_app/admin/ai': typeof AppAdminAiRoute
+  '/_app/export-lots/$code': typeof AppExportLotsCodeRoute
   '/_app/lots/$code': typeof AppLotsCodeRoute
   '/_app/scenarios/$scenarioId': typeof AppScenariosScenarioIdRoute
   '/_app/scenarios/compare': typeof AppScenariosCompareRoute
+  '/_app/collection-requests/': typeof AppCollectionRequestsIndexRoute
+  '/_app/export-lots/': typeof AppExportLotsIndexRoute
   '/_app/lots/': typeof AppLotsIndexRoute
   '/_app/scenarios/': typeof AppScenariosIndexRoute
   '/_app/chat_/shared/$token': typeof AppChatSharedTokenRoute
@@ -395,10 +495,14 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -406,6 +510,8 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/calibration'
+    | '/catalogo'
     | '/chat'
     | '/circuits'
     | '/coverage'
@@ -421,15 +527,20 @@ export interface FileRouteTypes {
     | '/triage'
     | '/users'
     | '/validation'
+    | '/viatura'
     | '/forgot-password'
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
+    | '/export-lots/$code'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/collection-requests/'
+    | '/export-lots/'
     | '/lots/'
     | '/scenarios/'
     | '/chat/shared/$token'
@@ -437,10 +548,14 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -448,6 +563,8 @@ export interface FileRouteTypes {
     | '/account'
     | '/assumptions'
     | '/brands'
+    | '/calibration'
+    | '/catalogo'
     | '/chat'
     | '/circuits'
     | '/coverage'
@@ -463,15 +580,20 @@ export interface FileRouteTypes {
     | '/triage'
     | '/users'
     | '/validation'
+    | '/viatura'
     | '/forgot-password'
     | '/login'
     | '/register'
     | '/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/admin/ai'
+    | '/export-lots/$code'
     | '/lots/$code'
     | '/scenarios/$scenarioId'
     | '/scenarios/compare'
+    | '/collection-requests'
+    | '/export-lots'
     | '/lots'
     | '/scenarios'
     | '/chat/shared/$token'
@@ -481,10 +603,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_auth'
     | '/accept-invite'
+    | '/cidadao'
     | '/credits'
     | '/join'
+    | '/local'
     | '/magic-link'
+    | '/onde-quando'
     | '/pending-approval'
+    | '/politica-dados'
     | '/privacy'
     | '/terms'
     | '/verify-email'
@@ -492,6 +618,8 @@ export interface FileRouteTypes {
     | '/_app/account'
     | '/_app/assumptions'
     | '/_app/brands'
+    | '/_app/calibration'
+    | '/_app/catalogo'
     | '/_app/chat'
     | '/_app/circuits'
     | '/_app/coverage'
@@ -507,15 +635,20 @@ export interface FileRouteTypes {
     | '/_app/triage'
     | '/_app/users'
     | '/_app/validation'
+    | '/_app/viatura'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/register'
     | '/_auth/reset-password'
+    | '/certificado/$localId'
     | '/passport/$code'
     | '/_app/admin/ai'
+    | '/_app/export-lots/$code'
     | '/_app/lots/$code'
     | '/_app/scenarios/$scenarioId'
     | '/_app/scenarios/compare'
+    | '/_app/collection-requests/'
+    | '/_app/export-lots/'
     | '/_app/lots/'
     | '/_app/scenarios/'
     | '/_app/chat_/shared/$token'
@@ -526,13 +659,18 @@ export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   AuthRoute: typeof AuthRouteWithChildren
   AcceptInviteRoute: typeof AcceptInviteRoute
+  CidadaoRoute: typeof CidadaoRoute
   CreditsRoute: typeof CreditsRoute
   JoinRoute: typeof JoinRoute
+  LocalRoute: typeof LocalRoute
   MagicLinkRoute: typeof MagicLinkRoute
+  OndeQuandoRoute: typeof OndeQuandoRoute
   PendingApprovalRoute: typeof PendingApprovalRoute
+  PoliticaDadosRoute: typeof PoliticaDadosRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
+  CertificadoLocalIdRoute: typeof CertificadoLocalIdRoute
   PassportCodeRoute: typeof PassportCodeRoute
 }
 
@@ -566,6 +704,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AcceptInviteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/cidadao': {
+      id: '/cidadao'
+      path: '/cidadao'
+      fullPath: '/cidadao'
+      preLoaderRoute: typeof CidadaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/credits': {
       id: '/credits'
       path: '/credits'
@@ -580,6 +725,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof JoinRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/local': {
+      id: '/local'
+      path: '/local'
+      fullPath: '/local'
+      preLoaderRoute: typeof LocalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/magic-link': {
       id: '/magic-link'
       path: '/magic-link'
@@ -587,11 +739,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MagicLinkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onde-quando': {
+      id: '/onde-quando'
+      path: '/onde-quando'
+      fullPath: '/onde-quando'
+      preLoaderRoute: typeof OndeQuandoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pending-approval': {
       id: '/pending-approval'
       path: '/pending-approval'
       fullPath: '/pending-approval'
       preLoaderRoute: typeof PendingApprovalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/politica-dados': {
+      id: '/politica-dados'
+      path: '/politica-dados'
+      fullPath: '/politica-dados'
+      preLoaderRoute: typeof PoliticaDadosRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -641,6 +807,20 @@ declare module '@tanstack/react-router' {
       path: '/brands'
       fullPath: '/brands'
       preLoaderRoute: typeof AppBrandsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/calibration': {
+      id: '/_app/calibration'
+      path: '/calibration'
+      fullPath: '/calibration'
+      preLoaderRoute: typeof AppCalibrationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/catalogo': {
+      id: '/_app/catalogo'
+      path: '/catalogo'
+      fullPath: '/catalogo'
+      preLoaderRoute: typeof AppCatalogoRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/chat': {
@@ -748,6 +928,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppValidationRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/viatura': {
+      id: '/_app/viatura'
+      path: '/viatura'
+      fullPath: '/viatura'
+      preLoaderRoute: typeof AppViaturaRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_auth/forgot-password': {
       id: '/_auth/forgot-password'
       path: '/forgot-password'
@@ -776,6 +963,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthResetPasswordRouteImport
       parentRoute: typeof AuthRoute
     }
+    '/certificado/$localId': {
+      id: '/certificado/$localId'
+      path: '/certificado/$localId'
+      fullPath: '/certificado/$localId'
+      preLoaderRoute: typeof CertificadoLocalIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/passport/$code': {
       id: '/passport/$code'
       path: '/passport/$code'
@@ -788,6 +982,27 @@ declare module '@tanstack/react-router' {
       path: '/admin/ai'
       fullPath: '/admin/ai'
       preLoaderRoute: typeof AppAdminAiRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/collection-requests/': {
+      id: '/_app/collection-requests/'
+      path: '/collection-requests'
+      fullPath: '/collection-requests/'
+      preLoaderRoute: typeof AppCollectionRequestsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/export-lots/': {
+      id: '/_app/export-lots/'
+      path: '/export-lots'
+      fullPath: '/export-lots/'
+      preLoaderRoute: typeof AppExportLotsIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/export-lots/$code': {
+      id: '/_app/export-lots/$code'
+      path: '/export-lots/$code'
+      fullPath: '/export-lots/$code'
+      preLoaderRoute: typeof AppExportLotsCodeRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/lots/': {
@@ -840,6 +1055,8 @@ interface AppRouteChildren {
   AppAccountRoute: typeof AppAccountRoute
   AppAssumptionsRoute: typeof AppAssumptionsRoute
   AppBrandsRoute: typeof AppBrandsRoute
+  AppCalibrationRoute: typeof AppCalibrationRoute
+  AppCatalogoRoute: typeof AppCatalogoRoute
   AppChatRoute: typeof AppChatRoute
   AppCircuitsRoute: typeof AppCircuitsRoute
   AppCoverageRoute: typeof AppCoverageRoute
@@ -855,10 +1072,14 @@ interface AppRouteChildren {
   AppTriageRoute: typeof AppTriageRoute
   AppUsersRoute: typeof AppUsersRoute
   AppValidationRoute: typeof AppValidationRoute
+  AppViaturaRoute: typeof AppViaturaRoute
   AppAdminAiRoute: typeof AppAdminAiRoute
+  AppExportLotsCodeRoute: typeof AppExportLotsCodeRoute
   AppLotsCodeRoute: typeof AppLotsCodeRoute
   AppScenariosScenarioIdRoute: typeof AppScenariosScenarioIdRoute
   AppScenariosCompareRoute: typeof AppScenariosCompareRoute
+  AppCollectionRequestsIndexRoute: typeof AppCollectionRequestsIndexRoute
+  AppExportLotsIndexRoute: typeof AppExportLotsIndexRoute
   AppLotsIndexRoute: typeof AppLotsIndexRoute
   AppScenariosIndexRoute: typeof AppScenariosIndexRoute
   AppChatSharedTokenRoute: typeof AppChatSharedTokenRoute
@@ -869,6 +1090,8 @@ const AppRouteChildren: AppRouteChildren = {
   AppAccountRoute: AppAccountRoute,
   AppAssumptionsRoute: AppAssumptionsRoute,
   AppBrandsRoute: AppBrandsRoute,
+  AppCalibrationRoute: AppCalibrationRoute,
+  AppCatalogoRoute: AppCatalogoRoute,
   AppChatRoute: AppChatRoute,
   AppCircuitsRoute: AppCircuitsRoute,
   AppCoverageRoute: AppCoverageRoute,
@@ -884,10 +1107,14 @@ const AppRouteChildren: AppRouteChildren = {
   AppTriageRoute: AppTriageRoute,
   AppUsersRoute: AppUsersRoute,
   AppValidationRoute: AppValidationRoute,
+  AppViaturaRoute: AppViaturaRoute,
   AppAdminAiRoute: AppAdminAiRoute,
+  AppExportLotsCodeRoute: AppExportLotsCodeRoute,
   AppLotsCodeRoute: AppLotsCodeRoute,
   AppScenariosScenarioIdRoute: AppScenariosScenarioIdRoute,
   AppScenariosCompareRoute: AppScenariosCompareRoute,
+  AppCollectionRequestsIndexRoute: AppCollectionRequestsIndexRoute,
+  AppExportLotsIndexRoute: AppExportLotsIndexRoute,
   AppLotsIndexRoute: AppLotsIndexRoute,
   AppScenariosIndexRoute: AppScenariosIndexRoute,
   AppChatSharedTokenRoute: AppChatSharedTokenRoute,
@@ -916,13 +1143,18 @@ const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   AuthRoute: AuthRouteWithChildren,
   AcceptInviteRoute: AcceptInviteRoute,
+  CidadaoRoute: CidadaoRoute,
   CreditsRoute: CreditsRoute,
   JoinRoute: JoinRoute,
+  LocalRoute: LocalRoute,
   MagicLinkRoute: MagicLinkRoute,
+  OndeQuandoRoute: OndeQuandoRoute,
   PendingApprovalRoute: PendingApprovalRoute,
+  PoliticaDadosRoute: PoliticaDadosRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
   VerifyEmailRoute: VerifyEmailRoute,
+  CertificadoLocalIdRoute: CertificadoLocalIdRoute,
   PassportCodeRoute: PassportCodeRoute,
 }
 export const routeTree = rootRouteImport

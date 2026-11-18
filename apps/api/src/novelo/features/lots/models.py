@@ -3,16 +3,33 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, Index, Integer, LargeBinary, Numeric, String, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    Index,
+    Integer,
+    LargeBinary,
+    Numeric,
+    String,
+    Text,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.dialects.postgresql import JSONB, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from novelo.core.database import Base, TimestampMixin, UuidPkMixin, enum_check, enum_column
-from novelo.domain.vocab import Fibre, GarmentType, LotEventKind, LotState, TextileDestination
+from novelo.domain.taxonomy import Colour, FineState, Gender, Season, SizeBand, TriageAxis
+from novelo.domain.vocab import Fibre, GarmentType, LotEventKind, LotState, LotUnitSource, TextileDestination
 
 
 class Lot(Base, UuidPkMixin, TimestampMixin):
-    """Conjunto de peças triadas no mesmo ponto: tem QR, passaporte público e entra na bolsa de fibra."""
+    """Lote de recolha: nasce na paragem da viatura (um por paragem), com QR, peso e histórico públicos.
+
+    Âncora: o local e a freguesia onde a paragem aconteceu. O peso do lote é o medido nas unidades
+    (`LotUnit.weight_g`); sem unidades pesadas (lotes antigos) cai na soma estimada das peças.
+    """
 
     __tablename__ = "lots"
     __table_args__ = (
@@ -31,6 +48,11 @@ class Lot(Base, UuidPkMixin, TimestampMixin):
     container_id: Mapped[uuid.UUID | None] = mapped_column(
         UUID(as_uuid=True), ForeignKey("containers.id", ondelete="SET NULL")
     )
+    locality_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("localities.id", ondelete="SET NULL"), index=True
+    )
+    # Momento «Partir»: a viatura deixou a paragem; a partir daí as unidades do lote congelam.
+    departed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     dominant_fibre: Mapped[Fibre] = mapped_column(
         enum_column(Fibre), default=Fibre.UNKNOWN, server_default=Fibre.UNKNOWN.value
     )
@@ -39,6 +61,9 @@ class Lot(Base, UuidPkMixin, TimestampMixin):
     )
 
     items: Mapped[list["LotItem"]] = relationship(back_populates="lot", cascade="all, delete-orphan")
+    units: Mapped[list["LotUnit"]] = relationship(
+        back_populates="lot", cascade="all, delete-orphan", order_by="LotUnit.created_at"
+    )
     events: Mapped[list["LotEvent"]] = relationship(
         back_populates="lot", cascade="all, delete-orphan", order_by="LotEvent.occurred_at"
     )
@@ -46,12 +71,22 @@ class Lot(Base, UuidPkMixin, TimestampMixin):
 
 
 class LotItem(Base, UuidPkMixin, TimestampMixin):
-    """Uma peça triada. Guarda marca, composição e estado. A miniatura opcional vive à parte (`LotItemPhoto`)."""
+    """Uma peça triada. Guarda marca, composição, estado fino e a proveniência por eixo.
+
+    `condition` é o destino (reuse/recycle/reject) derivado do `fine_state` — mantém passaporte, bolsa
+    e relatório RAP a funcionar. Peças anteriores à taxonomia (bilhete #56) têm `fine_state` nulo e
+    ficam fora dos lotes de escoamento (#57) até re-triagem.
+    """
 
     __tablename__ = "lot_items"
     __table_args__ = (
         enum_check("garment_type", GarmentType),
         enum_check("condition", TextileDestination),
+        enum_check("fine_state", FineState),
+        enum_check("season", Season),
+        enum_check("colour", Colour),
+        enum_check("gender", Gender),
+        enum_check("size_band", SizeBand),
         enum_check("dominant_fibre", Fibre),
         CheckConstraint("estimated_weight_g > 0", name="weight_positive"),
         CheckConstraint("confidence >= 0 AND confidence <= 1", name="confidence_range"),
@@ -60,6 +95,12 @@ class LotItem(Base, UuidPkMixin, TimestampMixin):
     lot_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("lots.id", ondelete="CASCADE"), index=True)
     garment_type: Mapped[GarmentType] = mapped_column(enum_column(GarmentType))
     condition: Mapped[TextileDestination] = mapped_column(enum_column(TextileDestination))
+    fine_state: Mapped[FineState | None] = mapped_column(enum_column(FineState))
+    season: Mapped[Season | None] = mapped_column(enum_column(Season))
+    colour: Mapped[Colour | None] = mapped_column(enum_column(Colour))
+    gender: Mapped[Gender | None] = mapped_column(enum_column(Gender))
+    size_band: Mapped[SizeBand | None] = mapped_column(enum_column(SizeBand))
+    provenance: Mapped[dict[str, Any] | None] = mapped_column(JSONB)
     composition: Mapped[list[dict[str, Any]]] = mapped_column(JSONB, default=list)
     dominant_fibre: Mapped[Fibre] = mapped_column(enum_column(Fibre))
     brand: Mapped[str | None] = mapped_column(String(80), index=True)
@@ -71,6 +112,30 @@ class LotItem(Base, UuidPkMixin, TimestampMixin):
     )
 
     lot: Mapped[Lot] = relationship(back_populates="items")
+    golden_labels: Mapped[list["GoldenLabel"]] = relationship(back_populates="item", cascade="all, delete-orphan")
+
+
+class LotUnit(Base, UuidPkMixin, TimestampMixin):
+    """Uma unidade física na paragem (um saco): um QR próprio e o peso medido na balança da viatura.
+
+    O QR é o do saco da plataforma (`source="bag"`) ou o UUID de uma etiqueta impressa na viatura quando o
+    saco não tem (`source="label"`; o código é o próprio UUID). O peso vem de pratos ≤ 15 kg: um saco pesado
+    em vários pratos entra com a soma. O código é único dentro do lote (o mesmo saco não entra duas vezes).
+    """
+
+    __tablename__ = "lot_units"
+    __table_args__ = (
+        enum_check("source", LotUnitSource),
+        UniqueConstraint("lot_id", "code", name="uq_lot_units_lot_code"),
+        CheckConstraint("weight_g > 0", name="weight_positive"),
+    )
+
+    lot_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("lots.id", ondelete="CASCADE"), index=True)
+    code: Mapped[str] = mapped_column(String(80))
+    source: Mapped[LotUnitSource] = mapped_column(enum_column(LotUnitSource))
+    weight_g: Mapped[int | None] = mapped_column(Integer)
+
+    lot: Mapped[Lot] = relationship(back_populates="units")
 
 
 class LotItemPhoto(Base, UuidPkMixin):
@@ -127,3 +192,34 @@ class LotReservation(Base, UuidPkMixin, TimestampMixin):
     note: Mapped[str | None] = mapped_column(Text)
 
     lot: Mapped[Lot] = relationship(back_populates="reservation")
+
+
+class GoldenLabel(Base, UuidPkMixin, TimestampMixin):
+    """Rótulo dourado: o operador corrigiu um valor que a IA propôs (padrão-ouro da triagem).
+
+    Uma linha por eixo corrigido, com o valor proposto e o valor humano — é a verdade-terreno que o
+    eval por eixo (`just eval-triage`) usa para saber em que atributo a IA falha. `lot_id` é
+    desnormalizado para linhagem barata; apagar a peça apaga os rótulos.
+    """
+
+    __tablename__ = "golden_labels"
+    __table_args__ = (
+        enum_check("axis", TriageAxis),
+        UniqueConstraint("item_id", "axis", name="uq_golden_labels_item_axis"),
+    )
+
+    item_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("lot_items.id", ondelete="CASCADE"), index=True
+    )
+    lot_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("lots.id", ondelete="CASCADE"), index=True)
+    axis: Mapped[TriageAxis] = mapped_column(enum_column(TriageAxis))
+    ai_value: Mapped[str | None] = mapped_column(String(40))
+    operator_value: Mapped[str] = mapped_column(String(40))
+    ai_confidence: Mapped[Decimal | None] = mapped_column(Numeric(3, 2))
+    model: Mapped[str | None] = mapped_column(String(120))
+    prompt_version: Mapped[str | None] = mapped_column(String(20))
+    confirmed_by_id: Mapped[uuid.UUID | None] = mapped_column(
+        UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL")
+    )
+
+    item: Mapped[LotItem] = relationship(back_populates="golden_labels")

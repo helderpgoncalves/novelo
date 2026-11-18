@@ -202,6 +202,18 @@ export const zAlertUpdate = z.object({
 });
 
 /**
+ * AnnulmentCreate
+ *
+ * Anulação em abuso (interesse legítimo declarado): valor positivo, motivo OBRIGATÓRIO — fica no
+ * livro-razão como entrada negativa com autor; nunca se apaga nem se edita uma linha.
+ */
+export const zAnnulmentCreate = z.object({
+    amount: z.int().gt(0),
+    reason: z.string().min(3).max(2000),
+    user_id: z.uuid()
+});
+
+/**
  * AppSettingsOut
  */
 export const zAppSettingsOut = z.object({
@@ -304,7 +316,9 @@ export const zApproveRequest = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local',
+        'donor'
     ]).optional().default('operator')
 });
 
@@ -384,6 +398,51 @@ export const zAuthConfig = z.object({
 });
 
 /**
+ * BagDeclaration
+ *
+ * Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+ *
+ * É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+ * dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+ */
+export const zBagDeclaration = z.enum(['reuse', 'recycle']);
+
+/**
+ * BagActivationCreate
+ *
+ * Ativar um saco da plataforma: apelido privado opcional e a declaração «Vai no saco?» opcional.
+ */
+export const zBagActivationCreate = z.object({
+    declaration: zBagDeclaration.nullish(),
+    nickname: z.string().max(80).nullish()
+});
+
+/**
+ * BagActivationOut
+ *
+ * Um saco ativado, visto pelo dono. `active` é `deactivated_at is null`.
+ */
+export const zBagActivationOut = z.object({
+    active: z.boolean(),
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    declaration: zBagDeclaration.nullable(),
+    declared_at: z.iso.datetime().nullable(),
+    id: z.uuid(),
+    nickname: z.string().nullable()
+});
+
+/**
+ * BagActivationUpdate
+ *
+ * Corrigir o apelido ou a declaração enquanto o saco está ativo (desativado congela).
+ */
+export const zBagActivationUpdate = z.object({
+    declaration: zBagDeclaration.nullish(),
+    nickname: z.string().max(80).nullish()
+});
+
+/**
  * Body_analyse_garment
  */
 export const zBodyAnalyseGarment = z.object({
@@ -429,6 +488,118 @@ export const zBudgetOut = z.object({
     ]),
     used_pct: z.number().nullable(),
     warn_pct: z.number()
+});
+
+/**
+ * CalibrationMetric
+ *
+ * As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+ *
+ * O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+ * (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+ * captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+ * fotografia do cenário, mas nunca se guarda na tabela de agregados.
+ */
+export const zCalibrationMetric = z.enum([
+    'generation_rate',
+    'kg_per_bag',
+    'bags_per_round',
+    'requests_per_week',
+    'on_demand_capture'
+]);
+
+/**
+ * CalibrationScope
+ *
+ * Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado.
+ */
+export const zCalibrationScope = z.enum([
+    'local',
+    'parish',
+    'concelho'
+]);
+
+/**
+ * CalibrationReadingOut
+ *
+ * Uma linha da calibração: métrica × unidade na janela atual (a tabela de agregados).
+ */
+export const zCalibrationReadingOut = z.object({
+    blended: z.number(),
+    label: z.string(),
+    metric: zCalibrationMetric,
+    n: z.int(),
+    observed: z.number().nullable(),
+    parish_code: z.string(),
+    prior: z.number(),
+    pseudo_k: z.int(),
+    scope: zCalibrationScope,
+    unit_code: z.string(),
+    unit_name: z.string(),
+    weight: z.number()
+});
+
+/**
+ * CalibrationOut
+ *
+ * O painel «Calibração» (gestão): a tabela de agregados atual, por métrica e unidade.
+ */
+export const zCalibrationOut = z.object({
+    computed_at: z.iso.datetime().nullable(),
+    rows: z.array(zCalibrationReadingOut),
+    window_weeks: z.int()
+});
+
+/**
+ * CalibrationPhoto
+ *
+ * A fotografia da calibração que um cenário copia para o seu resultado (reprodutível e comparável).
+ */
+export const zCalibrationPhoto = z.object({
+    computed_at: z.iso.datetime().nullish(),
+    readings: z.array(zCalibrationReadingOut),
+    window_weeks: z.int()
+});
+
+/**
+ * CampaignCreate
+ *
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
+ */
+export const zCampaignCreate = z.object({
+    description: z.string().max(2000).nullish(),
+    ends_at: z.iso.datetime(),
+    gain_multiplier: z.number().gt(0).lte(10).optional().default(1),
+    name: z.string().min(3).max(120),
+    starts_at: z.iso.datetime()
+});
+
+/**
+ * CampaignOut
+ *
+ * Uma campanha: o web mostra-a ao doador enquanto `starts_at ≤ agora < ends_at`.
+ */
+export const zCampaignOut = z.object({
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    ends_at: z.iso.datetime(),
+    gain_multiplier: z.number(),
+    id: z.uuid(),
+    name: z.string(),
+    starts_at: z.iso.datetime()
+});
+
+/**
+ * CampaignUpdate
+ *
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
+ */
+export const zCampaignUpdate = z.object({
+    description: z.string().max(2000).nullish(),
+    ends_at: z.iso.datetime().nullish(),
+    gain_multiplier: z.number().gt(0).lte(10).nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    starts_at: z.iso.datetime().nullish()
 });
 
 /**
@@ -493,6 +664,96 @@ export const zCardKpis = z.object({
 });
 
 /**
+ * CatalogItemKind
+ *
+ * As três prateleiras do catálogo (espec #54): o valor guardado na base é a string inglesa.
+ *
+ * Só o donativo IPSS tem âncora € (`donation_value_cents`) — e é APRESENTAÇÃO do valor do donativo
+ * (1 000 pontos ≈ 5 €), nunca câmbio. Prémios de parceiro são cedidos e PAGOS pelo parceiro
+ * (pagamento integral por código apresentado); o acumulado ambiental é conquista não monetária.
+ */
+export const zCatalogItemKind = z.enum([
+    'ipss_donation',
+    'partner_prize',
+    'environmental'
+]);
+
+/**
+ * CatalogItemCreate
+ *
+ * Criar um item: a forma é fechada — âncora € SÓ em donativo IPSS, parceiro OBRIGATÓRIO em prémio.
+ */
+export const zCatalogItemCreate = z.object({
+    active: z.boolean().optional().default(true),
+    description: z.string().max(2000).nullish(),
+    donation_value_cents: z.int().gt(0).nullish(),
+    kind: zCatalogItemKind,
+    name: z.string().min(3).max(120),
+    partner_id: z.uuid().nullish(),
+    points_cost: z.int().gt(0),
+    stock: z.int().gte(0).nullish()
+});
+
+/**
+ * CatalogItemOut
+ *
+ * Um item do catálogo visto pela EQUIPA: inclui inativos e o parceiro (pseudónimo zero-dados fica).
+ */
+export const zCatalogItemOut = z.object({
+    active: z.boolean(),
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    kind: zCatalogItemKind,
+    name: z.string(),
+    partner_id: z.uuid().nullable(),
+    partner_name: z.string().nullish(),
+    points_cost: z.int(),
+    stock: z.int().nullable()
+});
+
+/**
+ * CatalogItemPublic
+ *
+ * Um item visto pelo DOADOR: só o que ele precisa para escolher — nunca dados internos do parceiro.
+ */
+export const zCatalogItemPublic = z.object({
+    description: z.string().nullable(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    kind: zCatalogItemKind,
+    name: z.string(),
+    partner_name: z.string().nullish(),
+    points_cost: z.int(),
+    stock: z.int().nullable()
+});
+
+/**
+ * CatalogItemUpdate
+ *
+ * Editar um item: campos parciais; a forma é revalidada sobre o estado resultante no serviço.
+ */
+export const zCatalogItemUpdate = z.object({
+    active: z.boolean().nullish(),
+    description: z.string().max(2000).nullish(),
+    donation_value_cents: z.int().gt(0).nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    partner_id: z.uuid().nullish(),
+    points_cost: z.int().gt(0).nullish(),
+    stock: z.int().gte(0).nullish()
+});
+
+/**
+ * CertificateOptIn
+ *
+ * Opt-in do certificado público: só o próprio local decide partilhar os kg agregados.
+ */
+export const zCertificateOptIn = z.object({
+    opt_in: z.boolean()
+});
+
+/**
  * ChangePasswordRequest
  */
 export const zChangePasswordRequest = z.object({
@@ -517,6 +778,42 @@ export const zCircuitStatus = z.enum([
     'weekend_only',
     'unassigned'
 ]);
+
+/**
+ * CollectionFrequency
+ *
+ * Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+ *
+ * Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+ * confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+ * `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+ */
+export const zCollectionFrequency = z.enum([
+    'weekly',
+    'biweekly',
+    'monthly',
+    'quarterly'
+]);
+
+/**
+ * CollectionHistoryOut
+ *
+ * Uma linha do histórico do doador: o saco e o lote que o levou (link só para o passaporte público).
+ *
+ * O lote chega por `lot_units.code == bag code` — é o scan da viatura que faz a ligação; sem scan o
+ * saco ainda está em casa (`lot_code` nulo). O passaporte nunca mostra o doador.
+ */
+export const zCollectionHistoryOut = z.object({
+    activated_at: z.iso.datetime(),
+    bag_code: z.string(),
+    bag_id: z.uuid(),
+    collected_at: z.iso.datetime().nullish(),
+    declaration: zBagDeclaration.nullable(),
+    lot_code: z.string().nullish(),
+    lot_state: z.string().nullish(),
+    nickname: z.string().nullable(),
+    weight_kg: z.number().nullish()
+});
 
 /**
  * CollectionMode
@@ -603,6 +900,7 @@ export const zCaptureScale = z.object({
 export const zCollectionPlanEntry = z.object({
     channel: zCollectionMode,
     every_weeks: z.number(),
+    frequency: zCollectionFrequency.nullish(),
     hours_year: z.number(),
     kg_per_round: z.number(),
     km_year: z.number(),
@@ -617,6 +915,44 @@ export const zCollectionPlanEntry = z.object({
 });
 
 /**
+ * CollectionRequestCreate
+ *
+ * O que quem pede envia: sacos, dia, e — só para cidadão — morada e freguesia.
+ *
+ * O teto de validação (500 no local) é o travão de sanidade do campo; acima do teto de 20 o pedido
+ * segue para a fila de exceções como **recolha especial** (não é erro). O teto de 5 do cidadão é
+ * validado no serviço, que já sabe o sujeito.
+ */
+export const zCollectionRequestCreate = z.object({
+    address: z.string().max(280).nullish(),
+    bag_count: z.int().gte(1).lte(500),
+    ephemeral_address: z.boolean().optional().default(false),
+    note: z.string().max(240).nullish(),
+    parish_code: z.string().max(6).nullish(),
+    requested_date: z.iso.date(),
+    urgent: z.boolean().optional().default(false)
+});
+
+/**
+ * CollectionRequestState
+ *
+ * Estado do pedido de recolha.
+ *
+ * A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+ * Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+ * 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+ * pedido; nenhum estado volta atrás.
+ */
+export const zCollectionRequestState = z.enum([
+    'scheduled',
+    'exception',
+    'rejected',
+    'collected',
+    'expired',
+    'cancelled'
+]);
+
+/**
  * CollectionType
  */
 export const zCollectionType = z.enum([
@@ -624,6 +960,27 @@ export const zCollectionType = z.enum([
     'moloks',
     'containers',
     'unspecified'
+]);
+
+/**
+ * Colour
+ *
+ * Cor observada na peça (nunca entra na chave do lote de escoamento; só filtros).
+ */
+export const zColour = z.enum([
+    'black',
+    'white',
+    'grey',
+    'beige',
+    'brown',
+    'red',
+    'orange',
+    'yellow',
+    'green',
+    'blue',
+    'pink',
+    'multicolour',
+    'unknown'
 ]);
 
 /**
@@ -644,6 +1001,48 @@ export const zComparisonColumn = z.object({
 export const zConfirmActionIn = z.object({
     confirmation_text: z.string().max(40).nullish(),
     idempotency_key: z.string().max(64).nullish()
+});
+
+/**
+ * ConsentPurpose
+ *
+ * As finalidades que EXIGEM consentimento (prévio e expresso, em duas camadas; nunca soft opt-in).
+ *
+ * O essencial da conta (crédito, recolhas, triagem) é contrato — não anda aqui. Marketing e parcerias
+ * têm caixas próprias, desligadas por defeito, retiráveis a qualquer momento (art. 7.º/3 RGPD).
+ */
+export const zConsentPurpose = z.enum(['marketing', 'partnerships']);
+
+/**
+ * ConsentStateOut
+ *
+ * O estado corrente de uma finalidade: a última linha vence; sem linhas é desligado e nunca pedido.
+ */
+export const zConsentStateOut = z.object({
+    granted: z.boolean(),
+    policy_version: z.string().nullish(),
+    purpose: zConsentPurpose,
+    updated_at: z.iso.datetime().nullish()
+});
+
+/**
+ * ConsentUpdate
+ *
+ * Uma decisão: finalidade + dado ou retirado (o histórico fica append-only lá atrás).
+ */
+export const zConsentUpdate = z.object({
+    granted: z.boolean(),
+    purpose: zConsentPurpose,
+    source: z.enum(['account', 'api']).optional().default('account')
+});
+
+/**
+ * ConsentsOut
+ *
+ * As DUAS camadas (marketing e parcerias), sempre ambas, com o estado corrente de cada uma.
+ */
+export const zConsentsOut = z.object({
+    items: z.array(zConsentStateOut)
 });
 
 /**
@@ -813,6 +1212,27 @@ export const zCopilotErrorEvent = z.object({
         'captcha_required',
         'captcha_failed',
         'captcha_unavailable',
+        'local_account_missing',
+        'notice_already_active',
+        'certificate_not_public',
+        'address_request_active',
+        'citizen_address_required',
+        'citizen_parish_required',
+        'citizen_bags_limit',
+        'age_below_minimum',
+        'bag_limit_reached',
+        'bag_inactive',
+        'local_address_forbidden',
+        'request_not_dispatchable',
+        'request_not_scheduled',
+        'request_cancel_not_allowed',
+        'insufficient_points',
+        'donation_cap_reached',
+        'out_of_stock',
+        'catalog_item_inactive',
+        'redemption_already_used',
+        'catalog_item_shape',
+        'campaign_window',
         'internal_error'
     ]),
     message: z.string(),
@@ -1178,6 +1598,33 @@ export const zDeleteUserRequest = z.object({
 });
 
 /**
+ * DeletionRequest
+ *
+ * A confirmação: o email da conta, escrito à mão (a 3.ª proteção é o texto no ecrã; esta é a trava).
+ */
+export const zDeletionRequest = z.object({
+    confirm_email: z.string().min(3).max(255)
+});
+
+/**
+ * DispatchAction
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo).
+ */
+export const zDispatchAction = z.enum(['schedule', 'reject']);
+
+/**
+ * DispatchRequest
+ *
+ * A decisão do gestor na fila de exceções: agendar (com data, que pode ser outra) ou recusar (com motivo).
+ */
+export const zDispatchRequest = z.object({
+    action: zDispatchAction,
+    reason: z.string().max(280).nullish(),
+    requested_date: z.iso.date().nullish()
+});
+
+/**
  * DnsCheck
  */
 export const zDnsCheck = z.object({
@@ -1195,6 +1642,44 @@ export const zDnsCheck = z.object({
         'fail',
         'unknown'
     ])
+});
+
+/**
+ * DonorAccountOut
+ *
+ * A conta de doador vista por quem nela entra: pseudónimo do QR de conta e a idade declarada.
+ */
+export const zDonorAccountOut = z.object({
+    created_at: z.iso.datetime(),
+    declared_age: z.int().nullable(),
+    donor_code: z.string().nullable(),
+    email: z.string(),
+    id: z.uuid(),
+    name: z.string().nullable()
+});
+
+/**
+ * DonorQrOut
+ *
+ * QR em SVG (fundo branco, como o passaporte) e o código que ele codifica.
+ */
+export const zDonorQrOut = z.object({
+    code: z.string(),
+    svg: z.string()
+});
+
+/**
+ * DonorSignUpRequest
+ *
+ * Conta de doador por email, sem password: idade DECLARADA (13+; abaixo é recusa explícita) e
+ * consentimento RGPD (conta e crédito = contrato, ADR #49).
+ */
+export const zDonorSignUpRequest = z.object({
+    consent: z.literal(true),
+    declared_age: z.int().gte(0).lte(120),
+    email: z.email(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    website: z.string().max(200).nullish()
 });
 
 /**
@@ -1400,9 +1885,54 @@ export const zErrorBody = z.object({
         'captcha_required',
         'captcha_failed',
         'captcha_unavailable',
+        'local_account_missing',
+        'notice_already_active',
+        'certificate_not_public',
+        'address_request_active',
+        'citizen_address_required',
+        'citizen_parish_required',
+        'citizen_bags_limit',
+        'age_below_minimum',
+        'bag_limit_reached',
+        'bag_inactive',
+        'local_address_forbidden',
+        'request_not_dispatchable',
+        'request_not_scheduled',
+        'request_cancel_not_allowed',
+        'insufficient_points',
+        'donation_cap_reached',
+        'out_of_stock',
+        'catalog_item_inactive',
+        'redemption_already_used',
+        'catalog_item_shape',
+        'campaign_window',
         'internal_error'
     ]),
+    details: z.record(z.string(), z.unknown()).nullish(),
     message: z.string()
+});
+
+/**
+ * ExportBag
+ */
+export const zExportBag = z.object({
+    active: z.boolean(),
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    deactivated_at: z.iso.datetime().nullable(),
+    declaration: zBagDeclaration.nullable(),
+    nickname: z.string().nullable()
+});
+
+/**
+ * ExportConsent
+ */
+export const zExportConsent = z.object({
+    created_at: z.iso.datetime(),
+    granted: z.boolean(),
+    policy_version: z.string(),
+    purpose: z.string(),
+    source: z.string()
 });
 
 /**
@@ -1413,6 +1943,50 @@ export const zExportFormat = z.enum([
     'xlsx',
     'geojson'
 ]);
+
+/**
+ * ExportLotItemsIn
+ *
+ * Peças a juntar a um lote de escoamento aberto (triadas depois do fecho da chave).
+ */
+export const zExportLotItemsIn = z.object({
+    item_ids: z.array(z.uuid()).min(1).max(500)
+});
+
+/**
+ * ExportLotState
+ *
+ * Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado).
+ */
+export const zExportLotState = z.enum(['open', 'closed']);
+
+/**
+ * ExportPointEntry
+ */
+export const zExportPointEntry = z.object({
+    amount: z.int(),
+    bag_code: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    expires_at: z.iso.datetime().nullable(),
+    kind: z.string(),
+    lot_code: z.string().nullable(),
+    reason: z.string().nullable()
+});
+
+/**
+ * ExportProfile
+ *
+ * O perfil fornecido pelo titular: identificador, nome opcional, pseudónimo, idade declarada.
+ */
+export const zExportProfile = z.object({
+    created_at: z.iso.datetime(),
+    declared_age: z.int().nullable(),
+    donor_code: z.string().nullable(),
+    email: z.string(),
+    joined_via: z.string(),
+    locale: z.string(),
+    name: z.string().nullable()
+});
 
 /**
  * ExportScope
@@ -1534,6 +2108,23 @@ export const zAlertSuggestionOut = z.object({
 });
 
 /**
+ * FineState
+ *
+ * Estado fino: 4 graus de qualidade reutilizável + reciclar/rejeitar, mapeado nos 3 destinos.
+ *
+ * Os graus seguem a letra usada no comércio de roupa usada (A é a melhor); `recycle` e `reject`
+ * mantêm o significado dos 3 destinos que a plataforma já usa (`TextileDestination`).
+ */
+export const zFineState = z.enum([
+    'grade_a',
+    'grade_b',
+    'grade_c',
+    'grade_d',
+    'recycle',
+    'reject'
+]);
+
+/**
  * FlowLink
  */
 export const zFlowLink = z.object({
@@ -1603,6 +2194,8 @@ export const zFranceReference = z.object({
 
 /**
  * GarmentType
+ *
+ * Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`).
  */
 export const zGarmentType = z.enum([
     'tshirt',
@@ -1614,6 +2207,8 @@ export const zGarmentType = z.enum([
     'skirt',
     'bedding',
     'towel',
+    'footwear',
+    'accessory',
     'other'
 ]);
 
@@ -1632,6 +2227,18 @@ export const zGaugeChart = z.object({
     unit: z.string().nullish(),
     value: z.number()
 });
+
+/**
+ * Gender
+ *
+ * Género/segmento como o mercado compra (entra na chave do lote de escoamento).
+ */
+export const zGender = z.enum([
+    'men',
+    'women',
+    'kids',
+    'babies'
+]);
 
 /**
  * GlobalDefaults
@@ -1757,108 +2364,6 @@ export const zImpersonationOut = z.object({
 });
 
 /**
- * InvitationCreate
- */
-export const zInvitationCreate = z.object({
-    confirm_admin: z.boolean().optional().default(false),
-    email: z.email(),
-    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
-    message: z.string().max(500).nullish(),
-    name: z.string().max(120).nullish(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ]).optional().default('operator')
-});
-
-/**
- * InvitationOut
- */
-export const zInvitationOut = z.object({
-    accepted_at: z.iso.datetime().nullable(),
-    created_at: z.iso.datetime(),
-    delivery_error: z.string().nullable(),
-    delivery_status: z.enum([
-        'queued',
-        'sent',
-        'delivered',
-        'delayed',
-        'bounced',
-        'complained',
-        'failed',
-        'skipped',
-        'none'
-    ]),
-    email: z.string(),
-    email_delivered: z.boolean(),
-    expires_at: z.iso.datetime(),
-    id: z.uuid(),
-    invited_by_avatar_url: z.string().nullish(),
-    invited_by_email: z.string().nullish(),
-    invited_by_id: z.uuid().nullable(),
-    invited_by_name: z.string().nullable(),
-    last_email_at: z.iso.datetime().nullable(),
-    last_sent_at: z.iso.datetime().nullable(),
-    locale: z.enum(['pt-PT', 'en']),
-    message: z.string().nullable(),
-    name: z.string().nullable(),
-    revoked_at: z.iso.datetime().nullable(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ]),
-    send_count: z.int(),
-    status: z.enum([
-        'pending',
-        'accepted',
-        'expired',
-        'revoked'
-    ])
-});
-
-/**
- * InvitationLinkOut
- *
- * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
- */
-export const zInvitationLinkOut = z.object({
-    expires_at: z.iso.datetime(),
-    invitation: zInvitationOut,
-    url: z.string()
-});
-
-/**
- * InvitationPage
- */
-export const zInvitationPage = z.object({
-    items: z.array(zInvitationOut),
-    limit: z.int(),
-    offset: z.int(),
-    total: z.int()
-});
-
-/**
- * InvitationPreview
- *
- * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
- */
-export const zInvitationPreview = z.object({
-    email: z.string(),
-    expires_at: z.iso.datetime(),
-    invited_by_name: z.string().nullable(),
-    locale: z.enum(['pt-PT', 'en']),
-    message: z.string().nullable(),
-    name: z.string().nullable(),
-    role: z.enum([
-        'admin',
-        'operator',
-        'guest'
-    ])
-});
-
-/**
  * InvitationTokenRequest
  */
 export const zInvitationTokenRequest = z.object({
@@ -1928,6 +2433,203 @@ export const zKpisArtifact = z.object({
 });
 
 /**
+ * LineageLotOut
+ *
+ * Um lote de recolha de origem: quantas peças do escoamento vêm dele, de que paragem, e quanto pesam.
+ */
+export const zLineageLotOut = z.object({
+    items: z.int(),
+    locality_name: z.string().nullable(),
+    lot_code: z.string(),
+    parish_name: z.string().nullable(),
+    weight_kg: z.number()
+});
+
+/**
+ * LocalCertificateOut
+ *
+ * Página pública do certificado (opt-in): totais agregados do local. Nunca doadores, nunca CO₂.
+ */
+export const zLocalCertificateOut = z.object({
+    first_stop_at: z.iso.datetime().nullable(),
+    locality_name: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    recycle_kg: z.number(),
+    recycle_pct: z.number(),
+    reject_kg: z.number(),
+    reject_pct: z.number(),
+    reuse_kg: z.number(),
+    reuse_pct: z.number(),
+    stops: z.int(),
+    updated_at: z.iso.datetime(),
+    weight_kg: z.number()
+});
+
+/**
+ * LocalKind
+ *
+ * Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+ *
+ * Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+ * A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+ */
+export const zLocalKind = z.enum(['assistido', 'b2b']);
+
+/**
+ * InvitationCreate
+ */
+export const zInvitationCreate = z.object({
+    confirm_admin: z.boolean().optional().default(false),
+    email: z.email(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']).optional().default('pt-PT'),
+    locality_id: z.uuid().nullish(),
+    message: z.string().max(500).nullish(),
+    name: z.string().max(120).nullish(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local',
+        'donor'
+    ]).optional().default('operator')
+});
+
+/**
+ * InvitationOut
+ */
+export const zInvitationOut = z.object({
+    accepted_at: z.iso.datetime().nullable(),
+    created_at: z.iso.datetime(),
+    delivery_error: z.string().nullable(),
+    delivery_status: z.enum([
+        'queued',
+        'sent',
+        'delivered',
+        'delayed',
+        'bounced',
+        'complained',
+        'failed',
+        'skipped',
+        'none'
+    ]),
+    email: z.string(),
+    email_delivered: z.boolean(),
+    expires_at: z.iso.datetime(),
+    id: z.uuid(),
+    invited_by_avatar_url: z.string().nullish(),
+    invited_by_email: z.string().nullish(),
+    invited_by_id: z.uuid().nullable(),
+    invited_by_name: z.string().nullable(),
+    last_email_at: z.iso.datetime().nullable(),
+    last_sent_at: z.iso.datetime().nullable(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    revoked_at: z.iso.datetime().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local',
+        'donor'
+    ]),
+    send_count: z.int(),
+    status: z.enum([
+        'pending',
+        'accepted',
+        'expired',
+        'revoked'
+    ])
+});
+
+/**
+ * InvitationLinkOut
+ *
+ * O link do convite, mostrado UMA vez; o anterior deixou de funcionar.
+ */
+export const zInvitationLinkOut = z.object({
+    expires_at: z.iso.datetime(),
+    invitation: zInvitationOut,
+    url: z.string()
+});
+
+/**
+ * InvitationPage
+ */
+export const zInvitationPage = z.object({
+    items: z.array(zInvitationOut),
+    limit: z.int(),
+    offset: z.int(),
+    total: z.int()
+});
+
+/**
+ * InvitationPreview
+ *
+ * O que a página de aceitar convite mostra antes de pedir o nome (só com um token válido).
+ */
+export const zInvitationPreview = z.object({
+    email: z.string(),
+    expires_at: z.iso.datetime(),
+    invited_by_name: z.string().nullable(),
+    local_kind: zLocalKind.nullish(),
+    locale: z.enum(['pt-PT', 'en']),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    message: z.string().nullable(),
+    name: z.string().nullable(),
+    role: z.enum([
+        'admin',
+        'operator',
+        'guest',
+        'local',
+        'donor'
+    ])
+});
+
+/**
+ * LocalAccountOut
+ *
+ * A conta de local vista por quem nela entra: o sítio, a natureza e o certificado.
+ */
+export const zLocalAccountOut = z.object({
+    certificate_opt_in: z.boolean(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    kind: zLocalKind,
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    parish_name: z.string().nullish()
+});
+
+/**
+ * LocalReportOut
+ *
+ * Relatório do local em kg por destino — medido na pesagem, destinos pela triagem. Sem CO₂ nem doadores.
+ *
+ * O peso total soma o medido na paragem de cada lote (estimado nos lotes anteriores à balança);
+ * os destinos vêm da mesa de triagem, logo só cobrem os lotes triados (`lots_in_triage` fica de fora).
+ */
+export const zLocalReportOut = z.object({
+    first_stop_at: z.iso.datetime().nullable(),
+    last_stop_at: z.iso.datetime().nullable(),
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    lots: z.int(),
+    lots_in_triage: z.int(),
+    measured_lots: z.int(),
+    recycle_kg: z.number(),
+    reject_kg: z.number(),
+    reuse_kg: z.number(),
+    sorted_lots: z.int(),
+    weight_kg: z.number()
+});
+
+/**
  * LoginRequest
  */
 export const zLoginRequest = z.object({
@@ -1942,6 +2644,8 @@ export const zLoginRequest = z.object({
 export const zLotEventKind = z.enum([
     'opened',
     'item_added',
+    'departed',
+    'unit_removed',
     'sorted',
     'reserved',
     'delivered'
@@ -1981,17 +2685,67 @@ export const zLotStateChange = z.object({
 });
 
 /**
+ * LotUnitIn
+ *
+ * Unidade física a entrar no lote: o QR do saco da plataforma, ou nada (o servidor gera o UUID da etiqueta).
+ *
+ * `label_code` é o UUID gerado NA viatura quando a etiqueta se imprime offline (#58): o QR do papel leva esse
+ * UUID e a reconciliação faz-se pelo código quando a fila «à espera de sincronização» despeja. Um só código:
+ * ou o QR do saco, ou o UUID da etiqueta.
+ */
+export const zLotUnitIn = z.object({
+    bag_code: z.string().min(1).max(80).nullish(),
+    label_code: z.string().max(36).nullish()
+});
+
+/**
+ * LotUnitSource
+ *
+ * De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem).
+ */
+export const zLotUnitSource = z.enum(['bag', 'label']);
+
+/**
+ * LotUnitOut
+ */
+export const zLotUnitOut = z.object({
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    source: zLotUnitSource,
+    weight_g: z.int().nullable()
+});
+
+/**
+ * LotUnitWeight
+ */
+export const zLotUnitWeight = z.object({
+    weight_g: z.int().gt(0).lte(30000)
+});
+
+/**
+ * LotWeightSource
+ *
+ * De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado).
+ */
+export const zLotWeightSource = z.enum(['measured', 'estimated']);
+
+/**
  * LotSummary
  */
 export const zLotSummary = z.object({
     code: z.string(),
     dominant_fibre: zFibre,
     items: z.int(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
     opened_at: z.iso.datetime(),
     parish_code: z.string().nullable(),
     parish_name: z.string().nullable(),
     state: zLotState,
-    weight_kg: z.number()
+    units: z.int().optional().default(0),
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -2605,6 +3359,16 @@ export const zMunicipalDensityBenchmarkOut = z.object({
 });
 
 /**
+ * NoticeState
+ *
+ * Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+ *
+ * Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+ * avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+ */
+export const zNoticeState = z.enum(['active', 'cancelled']);
+
+/**
  * OnboardingOut
  *
  * Estado da introdução guiada da conta (vale em todos os dispositivos).
@@ -2652,7 +3416,9 @@ export const zMeOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local',
+        'donor'
     ])
 });
 
@@ -2807,13 +3573,18 @@ export const zCopilotStreamRequest = z.object({
  *
  * Origem de cada pressuposto: o web mostra-a ao lado do valor, para ninguém confundir dado com palpite.
  */
-export const zParamSource = z.enum(['vitrus_data', 'assumption']);
+export const zParamSource = z.enum([
+    'vitrus_data',
+    'assumption',
+    'observed'
+]);
 
 /**
  * ParamMeta
  */
 export const zParamMeta = z.object({
     key: z.string(),
+    n: z.int().nullish(),
     note: z.string().nullish(),
     source: zParamSource,
     unit: z.string()
@@ -2860,6 +3631,62 @@ export const zParishMatchLevel = z.enum([
 ]);
 
 /**
+ * PartnerCreate
+ *
+ * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
+ */
+export const zPartnerCreate = z.object({
+    contact: z.string().max(200).nullish(),
+    description: z.string().max(2000).nullish(),
+    name: z.string().min(3).max(120),
+    parish_code: z.string().length(6).nullish()
+});
+
+/**
+ * PartnerState
+ *
+ * Vida de um parceiro: a freguesia PROPÕE, a Vitrus APROVA (e pode pôr em pausa).
+ */
+export const zPartnerState = z.enum([
+    'proposed',
+    'active',
+    'inactive'
+]);
+
+/**
+ * PartnerOut
+ *
+ * Um parceiro: estado de vida (proposto/aprovado/em pausa) e quem propôs.
+ */
+export const zPartnerOut = z.object({
+    contact: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    description: z.string().nullable(),
+    id: z.uuid(),
+    name: z.string(),
+    parish_code: z.string().nullish(),
+    parish_id: z.uuid().nullable(),
+    parish_name: z.string().nullish(),
+    proposed_by_id: z.uuid().nullable(),
+    state: zPartnerState
+});
+
+/**
+ * PartnerUpdate
+ *
+ * Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`.
+ */
+export const zPartnerUpdate = z.object({
+    contact: z.string().max(200).nullish(),
+    description: z.string().max(2000).nullish(),
+    name: z.string().min(3).max(120).nullish(),
+    parish_code: z.string().length(6).nullish()
+});
+
+/**
  * PassportPhoto
  *
  * Miniatura pública de uma peça (sem metadados; apagada ao fim da retenção).
@@ -2875,7 +3702,7 @@ export const zPassportPhoto = z.object({
 /**
  * Passport
  *
- * Página pública do lote (o QR aponta para aqui): origem, composição, peso e histórico. Sem dados pessoais.
+ * Página pública do lote (o QR aponta para aqui): paragem, composição, peso e histórico. Sem dados pessoais.
  */
 export const zPassport = z.object({
     brands: z.array(zBrandCount),
@@ -2884,6 +3711,7 @@ export const zPassport = z.object({
     dominant_fibre: zFibre,
     events: z.array(zLotEventOut),
     items: z.int(),
+    locality_name: z.string().nullish(),
     opened_at: z.iso.datetime(),
     parish_name: z.string().nullable(),
     photos: z.array(zPassportPhoto).optional(),
@@ -2891,7 +3719,8 @@ export const zPassport = z.object({
     reject_pct: z.number(),
     reuse_pct: z.number(),
     state: zLotState,
-    weight_kg: z.number()
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
 });
 
 /**
@@ -3157,11 +3986,83 @@ export const zPoint = z.object({
 });
 
 /**
+ * PointEntryKind
+ *
+ * Tipos de lançamento do livro-razão (imutável: nunca se atualiza nem se apaga uma linha).
+ *
+ * `redemption` fica reservado ao #65 (catálogo e resgate): o valor e o CHECK da tabela já o aceitam,
+ * mas nenhum caminho de código o escreve até lá.
+ */
+export const zPointEntryKind = z.enum([
+    'gain_flat',
+    'gain_bonus',
+    'annulment',
+    'redemption'
+]);
+
+/**
+ * PointEntryOut
+ *
+ * Uma linha do livro-razão vista pelo doador: valor assinado, fontes e, nos ganhos, a expiração.
+ */
+export const zPointEntryOut = z.object({
+    amount: z.int(),
+    bag_code: z.string().nullable(),
+    created_at: z.iso.datetime(),
+    expires_at: z.iso.datetime().nullable(),
+    id: z.uuid(),
+    kind: zPointEntryKind,
+    lot_code: z.string().nullable(),
+    reason: z.string().nullable()
+});
+
+/**
  * PointGeometry
  */
 export const zPointGeometry = z.object({
     coordinates: z.tuple([z.number(), z.number()]),
     type: z.literal('Point').optional().default('Point')
+});
+
+/**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export const zPointsBalanceOut = z.object({
+    balance: z.int(),
+    bonus: z.int(),
+    bonus_conformity_points: z.int(),
+    credited_this_month: z.int(),
+    expired: z.int(),
+    expiring_soon: z.int(),
+    flat: z.int(),
+    gain_flat_points: z.int(),
+    monthly_cap: z.int()
+});
+
+/**
+ * PointsHistoryOut
+ *
+ * Página do histórico de pontos (o mais recente primeiro).
+ */
+export const zPointsHistoryOut = z.object({
+    items: z.array(zPointEntryOut),
+    total: z.int()
+});
+
+/**
+ * PolicyCategory
+ *
+ * Uma categoria de dados dentro de uma finalidade, com o SEU prazo de conservação.
+ */
+export const zPolicyCategory = z.object({
+    applied_by: z.string(),
+    name: z.string(),
+    retention: z.string()
 });
 
 /**
@@ -3365,6 +4266,99 @@ export const zProposeActionIn = z.object({
 });
 
 /**
+ * Provenance
+ *
+ * De onde vem o valor de um atributo: proposto pela IA e aceite, ou definido pelo operador.
+ */
+export const zProvenance = z.enum(['confirmed', 'ai']);
+
+/**
+ * AttributeSource
+ *
+ * Selo de um atributo: «IA» (aceite tal e qual, com a confiança da proposta) ou «confirmado» (operador).
+ */
+export const zAttributeSource = z.object({
+    confidence: z.number().gte(0).lte(1),
+    origin: zProvenance
+});
+
+/**
+ * PublicAgendaEntry
+ *
+ * Uma ronda publicada na agenda pública (dado introduzido, derivado do plano escolhido).
+ *
+ * É a promessa do serviço municipal ao cidadão: onde e quando a viatura de têxtil passa, com a cadência do
+ * degrau escolhido. Nenhuma visita publicada é saltada (ADR: política de paragem) — o que está aqui fica.
+ * A página pública «onde e quando entrego» (#63) lê este campo do resultado do cenário.
+ */
+export const zPublicAgendaEntry = z.object({
+    channel: zCollectionMode,
+    every_weeks: z.number(),
+    frequency: zCollectionFrequency.nullish(),
+    parish_code: z.string(),
+    parish_name: z.string(),
+    rounds_year: z.number(),
+    weekday: z.int()
+});
+
+/**
+ * CollectionAgendaOut
+ *
+ * A agenda pública «onde e quando entrego»: as rondas publicadas do cenário mais recente.
+ *
+ * `agenda` nulo = nenhum cenário publicado tem agenda (política fixa antiga): a página diz que ainda
+ * não há promessa publicada — nunca inventa dias.
+ */
+export const zCollectionAgendaOut = z.object({
+    agenda: z.array(zPublicAgendaEntry).nullable(),
+    scenario_label: z.string().nullish(),
+    updated_at: z.iso.datetime().nullish()
+});
+
+/**
+ * PurposeId
+ *
+ * Identificadores estáveis das finalidades (o contrato público da política entre versões).
+ */
+export const zPurposeId = z.enum([
+    'conta',
+    'sacos',
+    'pedidos',
+    'pontos',
+    'triagem',
+    'logs_autenticacao',
+    'marketing',
+    'parcerias'
+]);
+
+/**
+ * PolicyPurpose
+ *
+ * Uma finalidade de tratamento: base legal, texto claro e as categorias com prazos.
+ */
+export const zPolicyPurpose = z.object({
+    categories: z.array(zPolicyCategory),
+    consent_required: z.boolean().optional().default(false),
+    description: z.string(),
+    id: zPurposeId,
+    legal_basis: z.string(),
+    title: z.string()
+});
+
+/**
+ * PolicyOut
+ *
+ * A política inteira, como a página pública a recebe (JSON; a web só desenha).
+ */
+export const zPolicyOut = z.object({
+    controller: z.string(),
+    minimum_age: z.int(),
+    purposes: z.array(zPolicyPurpose),
+    rights: z.array(z.string()),
+    version: z.string()
+});
+
+/**
  * QuantilesOut
  */
 export const zQuantilesOut = z.object({
@@ -3437,6 +4431,49 @@ export const zReadiness = z.object({
     ]),
     llm_enabled: z.boolean(),
     status: z.enum(['ok', 'degraded'])
+});
+
+/**
+ * RedemptionCreate
+ *
+ * Resgatar um item do catálogo: o saldo FIFO é debitado e nasce um código pseudónimo.
+ */
+export const zRedemptionCreate = z.object({
+    item_id: z.uuid()
+});
+
+/**
+ * RedemptionState
+ *
+ * Estado do código de resgate: nasce pendente e valida-se UMA única vez (pagamento integral).
+ */
+export const zRedemptionState = z.enum(['pending', 'validated']);
+
+/**
+ * RedemptionOut
+ *
+ * Um resgate visto pelo doador OU pela equipa na validação: o código e o seu estado de vida.
+ */
+export const zRedemptionOut = z.object({
+    code: z.string(),
+    created_at: z.iso.datetime(),
+    donation_value_cents: z.int().nullable(),
+    id: z.uuid(),
+    item_kind: zCatalogItemKind,
+    item_name: z.string(),
+    partner_name: z.string().nullable(),
+    points_spent: z.int(),
+    state: zRedemptionState,
+    validated_at: z.iso.datetime().nullable()
+});
+
+/**
+ * RedemptionValidate
+ *
+ * Validar um código apresentado (equipa, no MVP; portal do parceiro fica para depois).
+ */
+export const zRedemptionValidate = z.object({
+    code: z.string().min(3).max(16)
 });
 
 /**
@@ -3536,6 +4573,110 @@ export const zReportSpec = z.object({
 export const zReportArtifact = z.object({
     artifact_type: z.literal('report').optional().default('report'),
     spec: zReportSpec
+});
+
+/**
+ * RequestExceptionReason
+ *
+ * Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+ *
+ * `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+ * `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+ * urgente — nunca é auto-aceite, o gestor decide.
+ */
+export const zRequestExceptionReason = z.enum([
+    'out_of_round',
+    'cutoff',
+    'special_volume',
+    'urgency'
+]);
+
+/**
+ * RequestOutcome
+ *
+ * O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª).
+ */
+export const zRequestOutcome = z.enum(['collected', 'missed']);
+
+/**
+ * RequestOutcomeCreate
+ *
+ * O resultado da visita ao pedido agendado: recolhido, ou ausência (a 3.ª expira o pedido).
+ */
+export const zRequestOutcomeCreate = z.object({
+    outcome: zRequestOutcome
+});
+
+/**
+ * RequestSubject
+ *
+ * Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+ *
+ * Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+ * máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+ */
+export const zRequestSubject = z.enum(['citizen', 'local']);
+
+/**
+ * CollectionRequestOut
+ *
+ * Um pedido de recolha, visto por quem pediu ou pela equipa (com o pedido e o despacho).
+ */
+export const zCollectionRequestOut = z.object({
+    address: z.string().nullish(),
+    address_retained_until: z.iso.datetime().nullish(),
+    bag_count: z.int(),
+    cancelled_at: z.iso.datetime().nullish(),
+    collected_at: z.iso.datetime().nullish(),
+    created_at: z.iso.datetime(),
+    dispatch_reason: z.string().nullish(),
+    dispatched_at: z.iso.datetime().nullish(),
+    ephemeral_address: z.boolean().optional().default(false),
+    exception_reason: zRequestExceptionReason.nullish(),
+    expired_at: z.iso.datetime().nullish(),
+    id: z.uuid(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    missed_count: z.int(),
+    note: z.string().nullish(),
+    parish_code: z.string().nullish(),
+    parish_name: z.string().nullish(),
+    requested_date: z.iso.date(),
+    requester_email: z.string().nullish(),
+    requester_id: z.uuid().nullable(),
+    state: zCollectionRequestState,
+    subject_kind: zRequestSubject,
+    urgent: z.boolean()
+});
+
+/**
+ * ExportRequest
+ */
+export const zExportRequest = z.object({
+    address: z.string().nullable(),
+    bag_count: z.int(),
+    created_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    requested_date: z.string(),
+    state: zCollectionRequestState,
+    subject_kind: zRequestSubject,
+    urgent: z.boolean()
+});
+
+/**
+ * AccountExportOut
+ *
+ * A conta inteira, legível por máquina (JSON). Só dados FORNECIDOS ou OBSERVADOS — nunca
+ * derivados (sem calibração, sem pontuações de conformidade: WP29 242 rev.01, p. 10).
+ */
+export const zAccountExportOut = z.object({
+    bags: z.array(zExportBag),
+    collection_requests: z.array(zExportRequest),
+    consents: z.array(zExportConsent),
+    exported_at: z.iso.datetime(),
+    points: z.array(zExportPointEntry),
+    policy_version: z.string(),
+    profile: zExportProfile
 });
 
 /**
@@ -3759,6 +4900,7 @@ export const zScenarioRequest = z.object({
     site_on_demand: z.boolean().optional().default(true),
     site_radius_m: z.int().gte(100).lte(1000).optional().default(300),
     siting: z.enum(['parish', 'sites']).optional().default('parish'),
+    stop_policy: z.enum(['fixed', 'dynamic']).optional().default('fixed'),
     target_tonnes: z.number().gte(0).nullish()
 });
 
@@ -3817,6 +4959,48 @@ export const zScenarioSummary = z.object({
     status: zScenarioStatus,
     target_tonnes: z.number().nullable(),
     tonnes_year: z.number()
+});
+
+/**
+ * Season
+ *
+ * Estação: quando faz sentido voltar a colocar a peça em uso (critério da Retex).
+ */
+export const zSeason = z.enum([
+    'all_season',
+    'warm',
+    'cold'
+]);
+
+/**
+ * ExportLotKeyIn
+ *
+ * A chave fechada do lote de escoamento: os quatro eixos, nenhum opcional.
+ */
+export const zExportLotKeyIn = z.object({
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    season: zSeason
+});
+
+/**
+ * ExportLotSummary
+ */
+export const zExportLotSummary = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    items: z.int(),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
 });
 
 /**
@@ -4067,6 +5251,7 @@ export const zSiteFeatureCollection = z.object({
 export const zSiteSelection = z.object({
     containers: z.int(),
     coord_precision: z.enum(['precise', 'approximate']),
+    frequency: zCollectionFrequency.nullish(),
     kind: z.enum(['public', 'staffed']).optional().default('public'),
     latitude: z.number(),
     longitude: z.number(),
@@ -4110,11 +5295,13 @@ export const zSitingSummary = z.object({
  */
 export const zScenarioResult = z.object({
     allocations: z.array(zAllocation),
+    calibration: zCalibrationPhoto.nullish(),
     collection_plan: z.array(zCollectionPlanEntry).nullish(),
     default_modes: z.array(zCollectionMode).optional(),
     depot: z.array(z.number()),
     kpis: zKpis,
     modes: z.array(zModeSummary),
+    public_agenda: z.array(zPublicAgendaEntry).nullish(),
     routes: z.array(zRouteOut),
     routing: z.enum([
         'road',
@@ -4122,7 +5309,8 @@ export const zScenarioResult = z.object({
         'estimate'
     ]).optional().default('estimate'),
     sites: z.array(zSiteSelection).optional(),
-    siting: zSitingSummary.nullish()
+    siting: zSitingSummary.nullish(),
+    stop_policy: z.enum(['fixed', 'dynamic']).optional().default('fixed')
 });
 
 /**
@@ -4153,6 +5341,25 @@ export const zScenarioOut = z.object({
     target_tonnes: z.number().nullable(),
     tonnes_year: z.number()
 });
+
+/**
+ * SizeBand
+ *
+ * Tamanho em bandas, lido SÓ da etiqueta. Nunca se deduz da foto.
+ *
+ * Bandas e não tamanhos exatos: as etiquetas variam (letras, P/M/G, numerais). Numerais
+ * («42», «98») ficam `unknown` — as tabelas EU de homem e de mulher conflituam e a função
+ * não inventa o mapeamento (regra zero); o operador, com a etiqueta à mão, escolhe a banda.
+ */
+export const zSizeBand = z.enum([
+    'xs',
+    's',
+    'm',
+    'l',
+    'xl',
+    'xxl',
+    'unknown'
+]);
 
 /**
  * SlotCount
@@ -4209,6 +5416,68 @@ export const zEmailSummary = z.object({
     success_rate_24h_pct: z.number().nullable(),
     unconfirmed: z.int(),
     webhook_configured: z.boolean()
+});
+
+/**
+ * StopLotOpen
+ *
+ * Abertura do lote na paragem («Cheguei»): ancorada ao local; a freguesia deduz-se se não vier.
+ */
+export const zStopLotOpen = z.object({
+    locality_id: z.uuid(),
+    parish_code: z.string().max(6).nullish()
+});
+
+/**
+ * StopNoticeCreate
+ *
+ * O que o local diz ao avisar: quantos sacos (opcional) e um recado para a equipa (opcional).
+ */
+export const zStopNoticeCreate = z.object({
+    bag_count: z.int().gte(1).lte(50).nullish(),
+    note: z.string().max(240).nullish()
+});
+
+/**
+ * StopNoticeOut
+ *
+ * Um aviso «sacos prontos»: garante paragem no dia (política de paragem).
+ */
+export const zStopNoticeOut = z.object({
+    bag_count: z.int().nullish(),
+    cancelled_at: z.iso.datetime().nullable(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    locality_id: z.uuid().nullable(),
+    note: z.string().nullable(),
+    state: zNoticeState
+});
+
+/**
+ * LocalAccountAdminOut
+ *
+ * A conta de local vista pela equipa (gestão): quem entra, o sítio, o certificado e o aviso ativo.
+ */
+export const zLocalAccountAdminOut = z.object({
+    certificate_opt_in: z.boolean(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    kind: zLocalKind,
+    locality_id: z.uuid().nullable(),
+    locality_name: z.string().nullable(),
+    notice: zStopNoticeOut.nullish(),
+    user_email: z.string(),
+    user_id: z.uuid(),
+    user_name: z.string().nullable()
+});
+
+/**
+ * StopNoticeCurrent
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum (a porta do herói mostra o estado certo).
+ */
+export const zStopNoticeCurrent = z.object({
+    notice: zStopNoticeOut.nullable()
 });
 
 /**
@@ -4419,60 +5688,6 @@ export const zFlows = z.object({
 });
 
 /**
- * LotItemIn
- *
- * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
- */
-export const zLotItemIn = z.object({
-    brand: z.string().max(80).nullish(),
-    composition: z.array(zCompositionPart).max(6),
-    condition: zTextileDestination,
-    confidence: z.number().gte(0).lte(1).optional().default(1),
-    estimated_weight_g: z.int().gt(0).lte(20000),
-    garment_type: zGarmentType,
-    prompt_version: z.string().nullish()
-});
-
-/**
- * LotItemOut
- */
-export const zLotItemOut = z.object({
-    brand: z.string().nullable(),
-    composition: z.array(zCompositionPart),
-    condition: zTextileDestination,
-    confidence: z.number(),
-    created_at: z.iso.datetime(),
-    dominant_fibre: zFibre,
-    estimated_weight_g: z.int(),
-    garment_type: zGarmentType,
-    has_photo: z.boolean().optional().default(false),
-    id: z.uuid(),
-    photo_credit: z.string().nullish(),
-    photo_url: z.string().nullish()
-});
-
-/**
- * LotDetail
- */
-export const zLotDetail = z.object({
-    code: z.string(),
-    composition: z.array(zCompositionPart),
-    dominant_fibre: zFibre,
-    events: z.array(zLotEventOut),
-    item_list: z.array(zLotItemOut),
-    items: z.int(),
-    opened_at: z.iso.datetime(),
-    parish_code: z.string().nullable(),
-    parish_name: z.string().nullable(),
-    recycle_kg: z.number(),
-    reject_kg: z.number(),
-    reservation: zReservationOut.nullable(),
-    reuse_kg: z.number(),
-    state: zLotState,
-    weight_kg: z.number()
-});
-
-/**
  * ThreadExport
  */
 export const zThreadExport = z.object({
@@ -4549,32 +5764,6 @@ export const zTimelineEvent = z.object({
     ]),
     label: z.string(),
     ref_id: z.uuid().nullish()
-});
-
-/**
- * TimelineItem
- */
-export const zTimelineItem = z.object({
-    at: z.string(),
-    detail: z.string().nullish(),
-    label: z.string()
-});
-
-/**
- * TimelineSpec
- */
-export const zTimelineSpec = z.object({
-    items: z.array(zTimelineItem),
-    source: z.string(),
-    title: z.string()
-});
-
-/**
- * TimelineArtifact
- */
-export const zTimelineArtifact = z.object({
-    artifact_type: z.literal('timeline').optional().default('timeline'),
-    spec: zTimelineSpec
 });
 
 /**
@@ -4808,15 +5997,53 @@ export const zTreemapChart = z.object({
 /**
  * TriageAnalysis
  *
- * O que o modelo de visão devolve. Nunca inclui peso nem preço: isso calcula-se do lado do servidor.
+ * O que o modelo de visão devolve: a proposta nos seis eixos da taxonomia.
+ *
+ * A IA nunca devolve o destino: `fine_state` mapeia-se nos 3 destinos no servidor (`domain/taxonomy.py`),
+ * e o tamanho é lido só da etiqueta (`unknown` quando ilegível). Nunca inclui peso nem preço.
  */
 export const zTriageAnalysis = z.object({
     brand: z.string().max(80).nullish(),
+    colour: zColour,
     composition: z.array(zCompositionPart).max(6),
-    condition: zTextileDestination,
     confidence: z.number().gte(0).lte(1),
+    fine_state: zFineState,
     garment_type: zGarmentType,
-    notes: z.string().max(240)
+    gender: zGender,
+    notes: z.string().max(240),
+    season: zSeason,
+    size_band: zSizeBand.optional().default('unknown')
+});
+
+/**
+ * TriageAxis
+ *
+ * Os seis eixos da taxonomia; o eval mede a IA em cada um.
+ */
+export const zTriageAxis = z.enum([
+    'fine_state',
+    'garment_type',
+    'season',
+    'colour',
+    'gender',
+    'size_band'
+]);
+
+/**
+ * GoldenLabelOut
+ *
+ * Rótulo dourado: uma correção do operador a um valor proposto pela IA (verdade-terreno por eixo).
+ */
+export const zGoldenLabelOut = z.object({
+    ai_confidence: z.number().nullable(),
+    ai_value: z.string().nullable(),
+    axis: zTriageAxis,
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    lot_code: z.string().nullable(),
+    model: z.string().nullable(),
+    operator_value: z.string(),
+    prompt_version: z.string().nullable()
 });
 
 /**
@@ -4826,13 +6053,15 @@ export const zTriageEvalModel = z.object({
     accuracy: z.record(z.string(), z.number()),
     avg_cost_usd: z.number().nullable(),
     avg_latency_s: z.number(),
-    confusion_condition: z.record(z.string(), z.record(z.string(), z.int())),
+    confusion_fine_state: z.record(z.string(), z.record(z.string(), z.int())),
     confusion_garment_type: z.record(z.string(), z.record(z.string(), z.int())),
     errors: z.array(z.string()),
     failures: z.int(),
     model: z.string(),
     p95_latency_s: z.number(),
     pieces: z.int(),
+    promised_axes: z.array(z.string()).optional(),
+    samples: z.record(z.string(), z.int()).optional(),
     total_cost_usd: z.number().nullable()
 });
 
@@ -4847,10 +6076,169 @@ export const zTriageEvalReport = z.object({
 });
 
 /**
+ * TriageProposalValues
+ *
+ * O que a IA propôs em cada eixo (o que o cliente devolve no confirmar, para os rótulos dourados).
+ */
+export const zTriageProposalValues = z.object({
+    colour: zColour.nullish(),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType.nullish(),
+    gender: zGender.nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * TriageProposal
+ *
+ * Proposta da IA que o operador acabou de rever (modelo, versão do prompt e valores).
+ */
+export const zTriageProposal = z.object({
+    confidence: z.number().gte(0).lte(1),
+    model: z.string().max(120),
+    prompt_version: z.string().max(20),
+    values: zTriageProposalValues
+});
+
+/**
+ * LotItemIn
+ *
+ * Peça confirmada pelo operador (pode corrigir o que o modelo sugeriu).
+ *
+ * O caminho novo manda `fine_state` (+ eixos da taxonomia e a proposta da IA); o destino (`condition`)
+ * é derivado no servidor. O caminho legado manda só `condition`: entra sem estado fino nem eixos.
+ */
+export const zLotItemIn = z.object({
+    ai_proposal: zTriageProposal.nullish(),
+    brand: z.string().max(80).nullish(),
+    colour: zColour.nullish(),
+    composition: z.array(zCompositionPart).max(6),
+    condition: zTextileDestination.nullish(),
+    confidence: z.number().gte(0).lte(1).optional().default(1),
+    estimated_weight_g: z.int().gt(0).lte(20000),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType,
+    gender: zGender.nullish(),
+    prompt_version: z.string().nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * TriageProvenance
+ *
+ * Proveniência por eixo da taxonomia; um eixo sem selo é uma peça antiga ou sem valor.
+ */
+export const zTriageProvenance = z.object({
+    colour: zAttributeSource.nullish(),
+    fine_state: zAttributeSource.nullish(),
+    garment_type: zAttributeSource.nullish(),
+    gender: zAttributeSource.nullish(),
+    season: zAttributeSource.nullish(),
+    size_band: zAttributeSource.nullish()
+});
+
+/**
+ * ExportLotItemOut
+ *
+ * Peça do escoamento com o elo de origem: o lote de recolha e a paragem donde veio.
+ */
+export const zExportLotItemOut = z.object({
+    added_at: z.iso.datetime(),
+    brand: z.string().nullable(),
+    colour: zColour.nullable(),
+    estimated_weight_g: z.int(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    id: z.uuid(),
+    locality_name: z.string().nullish(),
+    lot_code: z.string(),
+    parish_name: z.string().nullish(),
+    provenance: zTriageProvenance.nullish(),
+    season: zSeason,
+    size_band: zSizeBand.nullable()
+});
+
+/**
+ * ExportLotDetail
+ */
+export const zExportLotDetail = z.object({
+    closed_at: z.iso.datetime().nullable(),
+    code: z.string(),
+    collection_lots: z.int(),
+    composition: z.array(zCompositionPart),
+    created_at: z.iso.datetime(),
+    fine_state: zFineState,
+    garment_type: zGarmentType,
+    gender: zGender,
+    item_list: z.array(zExportLotItemOut),
+    items: z.int(),
+    lineage: z.array(zLineageLotOut),
+    localities: z.int(),
+    season: zSeason,
+    state: zExportLotState,
+    taxonomy_version: z.int(),
+    weight_kg: z.number()
+});
+
+/**
+ * LotItemOut
+ */
+export const zLotItemOut = z.object({
+    brand: z.string().nullable(),
+    colour: zColour.nullish(),
+    composition: z.array(zCompositionPart),
+    condition: zTextileDestination,
+    confidence: z.number(),
+    created_at: z.iso.datetime(),
+    dominant_fibre: zFibre,
+    estimated_weight_g: z.int(),
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType,
+    gender: zGender.nullish(),
+    has_photo: z.boolean().optional().default(false),
+    id: z.uuid(),
+    photo_credit: z.string().nullish(),
+    photo_url: z.string().nullish(),
+    provenance: zTriageProvenance.nullish(),
+    season: zSeason.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * LotDetail
+ */
+export const zLotDetail = z.object({
+    code: z.string(),
+    composition: z.array(zCompositionPart),
+    dominant_fibre: zFibre,
+    events: z.array(zLotEventOut),
+    item_list: z.array(zLotItemOut),
+    items: z.int(),
+    locality_id: z.uuid().nullish(),
+    locality_name: z.string().nullish(),
+    opened_at: z.iso.datetime(),
+    parish_code: z.string().nullable(),
+    parish_name: z.string().nullable(),
+    recycle_kg: z.number(),
+    reject_kg: z.number(),
+    reservation: zReservationOut.nullable(),
+    reuse_kg: z.number(),
+    state: zLotState,
+    unit_list: z.array(zLotUnitOut).optional(),
+    units: z.int().optional().default(0),
+    weight_kg: z.number(),
+    weight_source: zLotWeightSource.optional().default('estimated')
+});
+
+/**
  * TriageResult
  */
 export const zTriageResult = z.object({
     analysis: zTriageAnalysis,
+    destination: zTextileDestination,
     dominant_fibre: zFibre,
     estimated_weight_g: z.int(),
     model: z.string(),
@@ -4907,6 +6295,7 @@ export const zLocalityOut = z.object({
     circuits: z.array(z.string()),
     collection_types: z.array(zCollectionType),
     days_per_week: z.int(),
+    id: z.uuid(),
     latitude: z.number().nullable(),
     longitude: z.number().nullable(),
     name: z.string(),
@@ -5026,7 +6415,9 @@ export const zUserAdminOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local',
+        'donor'
     ])
 });
 
@@ -5039,7 +6430,9 @@ export const zUserAdminUpdate = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local',
+        'donor'
     ]).nullish()
 });
 
@@ -5070,7 +6463,9 @@ export const zUserOut = z.object({
     role: z.enum([
         'admin',
         'operator',
-        'guest'
+        'guest',
+        'local',
+        'donor'
     ])
 });
 
@@ -5253,185 +6648,6 @@ export const zChartArtifact = z.object({
         zRangeChart,
         zGaugeChart
     ])
-});
-
-/**
- * ArtifactEnvelope
- */
-export const zArtifactEnvelope = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    id: z.uuid(),
-    sources: z.array(zArtifactSource),
-    title: z.string()
-});
-
-/**
- * ArtifactOut
- */
-export const zArtifactOut = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    artifact_type: z.string(),
-    created_at: z.iso.datetime(),
-    id: z.uuid(),
-    message_id: z.uuid().nullable(),
-    pinned: z.boolean(),
-    refreshable: z.boolean(),
-    refreshed_at: z.iso.datetime().nullable(),
-    sources: z.array(z.record(z.string(), z.string().nullable())),
-    thread_id: z.uuid().nullable(),
-    title: z.string()
-});
-
-/**
- * ArtifactPage
- */
-export const zArtifactPage = z.object({
-    items: z.array(zArtifactOut),
-    next_cursor: z.string().nullable()
-});
-
-/**
- * CopilotArtifactEvent
- *
- * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
- */
-export const zCopilotArtifactEvent = z.object({
-    artifact: z.discriminatedUnion('artifact_type', [
-        zChartArtifact,
-        zTableArtifact,
-        zMapArtifact,
-        zKpisArtifact,
-        zComparisonArtifact,
-        zTimelineArtifact,
-        zScenarioCardArtifact,
-        zReportArtifact,
-        zFormArtifact
-    ]),
-    id: z.uuid(),
-    sources: z.array(zArtifactSource),
-    title: z.string(),
-    type: z.literal('artifact').optional().default('artifact')
-});
-
-/**
- * CopilotEventMessage
- *
- * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
- */
-export const zCopilotEventMessage = z.discriminatedUnion('type', [
-    zCopilotStartEvent,
-    zCopilotStatusEvent,
-    zCopilotToolStartEvent,
-    zCopilotToolResultEvent,
-    zCopilotTextDeltaEvent,
-    zCopilotCardEvent,
-    zCopilotRetractEvent,
-    zCopilotVerificationEvent,
-    zCopilotSuggestionsEvent,
-    zCopilotContextEvent,
-    zCopilotUsageEvent,
-    zCopilotTitleEvent,
-    zCopilotErrorEvent,
-    zCopilotMemoryEvent,
-    zCopilotPlanEvent,
-    zCopilotClarifyEvent,
-    zCopilotSourcesEvent,
-    zCopilotWebSearchEvent,
-    zCopilotArtifactEvent,
-    zCopilotConfirmEvent,
-    zCopilotActionResultEvent,
-    zCopilotNavigateEvent,
-    zCopilotDoneEvent
-]);
-
-/**
- * CopilotEventCatalog
- *
- * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
- */
-export const zCopilotEventCatalog = z.object({
-    events: z.array(zCopilotEventMessage)
-});
-
-/**
- * MessageOut
- */
-export const zMessageOut = z.object({
-    actions: z.array(zActionOut),
-    artifacts: z.array(zArtifactEnvelope),
-    attachments: z.array(zAttachmentOut),
-    cards: z.array(zScenarioCard),
-    cost_usd: z.number().nullable(),
-    created_at: z.iso.datetime(),
-    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
-    id: z.uuid(),
-    mentions: z.array(zMentionRef),
-    model: z.string().nullable(),
-    role: z.enum(['user', 'assistant']),
-    status: z.enum([
-        'complete',
-        'cancelled',
-        'error'
-    ]),
-    text: z.string(),
-    tokens: z.int().nullable(),
-    tools: z.array(zToolTraceOut),
-    verified: z.boolean().nullable(),
-    web_sources: z.array(zCopilotSource).optional()
-});
-
-/**
- * ThreadOut
- */
-export const zThreadOut = z.object({
-    archived: z.boolean(),
-    created_at: z.iso.datetime(),
-    ephemeral: z.boolean(),
-    has_summary: z.boolean(),
-    id: z.uuid(),
-    message_count: z.int(),
-    messages: z.array(zMessageOut),
-    parent_thread_id: z.uuid().nullable(),
-    pinned: z.boolean(),
-    project: z.string(),
-    shared: z.boolean(),
-    snippet: z.string().nullish(),
-    summary: z.string(),
-    title: z.string(),
-    updated_at: z.iso.datetime(),
-    used_tokens: z.int(),
-    window_tokens: z.int()
-});
-
-/**
- * DataExport
- */
-export const zDataExport = z.object({
-    actions: z.array(zActionOut),
-    exported_at: z.iso.datetime(),
-    memory: z.array(z.record(z.string(), z.unknown())),
-    settings: z.record(z.string(), z.unknown()),
-    threads: z.array(zThreadOut)
 });
 
 /**
@@ -5622,6 +6838,347 @@ export const zZoneOut = z.object({
 });
 
 /**
+ * TimelineItem
+ */
+export const zNoveloFeaturesCopilotSchemasArtifactsTimelineItem = z.object({
+    at: z.string(),
+    detail: z.string().nullish(),
+    label: z.string()
+});
+
+/**
+ * TimelineSpec
+ */
+export const zTimelineSpec = z.object({
+    items: z.array(zNoveloFeaturesCopilotSchemasArtifactsTimelineItem),
+    source: z.string(),
+    title: z.string()
+});
+
+/**
+ * TimelineArtifact
+ */
+export const zTimelineArtifact = z.object({
+    artifact_type: z.literal('timeline').optional().default('timeline'),
+    spec: zTimelineSpec
+});
+
+/**
+ * ArtifactEnvelope
+ */
+export const zArtifactEnvelope = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string()
+});
+
+/**
+ * ArtifactOut
+ */
+export const zArtifactOut = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    artifact_type: z.string(),
+    created_at: z.iso.datetime(),
+    id: z.uuid(),
+    message_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    refreshable: z.boolean(),
+    refreshed_at: z.iso.datetime().nullable(),
+    sources: z.array(z.record(z.string(), z.string().nullable())),
+    thread_id: z.uuid().nullable(),
+    title: z.string()
+});
+
+/**
+ * ArtifactPage
+ */
+export const zArtifactPage = z.object({
+    items: z.array(zArtifactOut),
+    next_cursor: z.string().nullable()
+});
+
+/**
+ * CopilotArtifactEvent
+ *
+ * Gráfico, tabela, mapa... com os dados reais já embutidos. O servidor constrói-o; o modelo só escolhe e titula.
+ */
+export const zCopilotArtifactEvent = z.object({
+    artifact: z.discriminatedUnion('artifact_type', [
+        zChartArtifact,
+        zTableArtifact,
+        zMapArtifact,
+        zKpisArtifact,
+        zComparisonArtifact,
+        zTimelineArtifact,
+        zScenarioCardArtifact,
+        zReportArtifact,
+        zFormArtifact
+    ]),
+    id: z.uuid(),
+    sources: z.array(zArtifactSource),
+    title: z.string(),
+    type: z.literal('artifact').optional().default('artifact')
+});
+
+/**
+ * CopilotEventMessage
+ *
+ * Um evento do stream `text/event-stream` (campo `data:` de cada mensagem SSE).
+ */
+export const zCopilotEventMessage = z.discriminatedUnion('type', [
+    zCopilotStartEvent,
+    zCopilotStatusEvent,
+    zCopilotToolStartEvent,
+    zCopilotToolResultEvent,
+    zCopilotTextDeltaEvent,
+    zCopilotCardEvent,
+    zCopilotRetractEvent,
+    zCopilotVerificationEvent,
+    zCopilotSuggestionsEvent,
+    zCopilotContextEvent,
+    zCopilotUsageEvent,
+    zCopilotTitleEvent,
+    zCopilotErrorEvent,
+    zCopilotMemoryEvent,
+    zCopilotPlanEvent,
+    zCopilotClarifyEvent,
+    zCopilotSourcesEvent,
+    zCopilotWebSearchEvent,
+    zCopilotArtifactEvent,
+    zCopilotConfirmEvent,
+    zCopilotActionResultEvent,
+    zCopilotNavigateEvent,
+    zCopilotDoneEvent
+]);
+
+/**
+ * CopilotEventCatalog
+ *
+ * Um exemplo de cada evento, na ordem típica de uma resposta: serve de contrato para o web.
+ */
+export const zCopilotEventCatalog = z.object({
+    events: z.array(zCopilotEventMessage)
+});
+
+/**
+ * MessageOut
+ */
+export const zMessageOut = z.object({
+    actions: z.array(zActionOut),
+    artifacts: z.array(zArtifactEnvelope),
+    attachments: z.array(zAttachmentOut),
+    cards: z.array(zScenarioCard),
+    cost_usd: z.number().nullable(),
+    created_at: z.iso.datetime(),
+    feedback: z.union([z.literal(1), z.literal(-1)]).nullable(),
+    id: z.uuid(),
+    mentions: z.array(zMentionRef),
+    model: z.string().nullable(),
+    role: z.enum(['user', 'assistant']),
+    status: z.enum([
+        'complete',
+        'cancelled',
+        'error'
+    ]),
+    text: z.string(),
+    tokens: z.int().nullable(),
+    tools: z.array(zToolTraceOut),
+    verified: z.boolean().nullable(),
+    web_sources: z.array(zCopilotSource).optional()
+});
+
+/**
+ * ThreadOut
+ */
+export const zThreadOut = z.object({
+    archived: z.boolean(),
+    created_at: z.iso.datetime(),
+    ephemeral: z.boolean(),
+    has_summary: z.boolean(),
+    id: z.uuid(),
+    message_count: z.int(),
+    messages: z.array(zMessageOut),
+    parent_thread_id: z.uuid().nullable(),
+    pinned: z.boolean(),
+    project: z.string(),
+    shared: z.boolean(),
+    snippet: z.string().nullish(),
+    summary: z.string(),
+    title: z.string(),
+    updated_at: z.iso.datetime(),
+    used_tokens: z.int(),
+    window_tokens: z.int()
+});
+
+/**
+ * DataExport
+ */
+export const zDataExport = z.object({
+    actions: z.array(zActionOut),
+    exported_at: z.iso.datetime(),
+    memory: z.array(z.record(z.string(), z.unknown())),
+    settings: z.record(z.string(), z.unknown()),
+    threads: z.array(zThreadOut)
+});
+
+/**
+ * TimelineItem
+ *
+ * Uma data de expiração FIFO e quantos pontos caem nela (o calendário do saldo).
+ */
+export const zNoveloFeaturesPrivacySchemasTimelineItem = z.object({
+    amount: z.int(),
+    expires_at: z.iso.datetime()
+});
+
+/**
+ * DeletionPreviewOut
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde.
+ *
+ * `points_are_not_money` é o texto decidido no ADR («pontos não são dinheiro nem conversíveis») —
+ * o web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.
+ */
+export const zDeletionPreviewOut = z.object({
+    active_bags: z.int(),
+    bags: z.int(),
+    balance: zPointsBalanceOut,
+    points_are_not_money: z.boolean().optional().default(true),
+    points_entries: z.int(),
+    redeem_hint_path: z.string().optional().default('/cidadao?tab=saldo'),
+    requests: z.int(),
+    timeline: z.array(zNoveloFeaturesPrivacySchemasTimelineItem)
+});
+
+/**
+ * Response List Admin Campaigns
+ *
+ * Successful Response
+ */
+export const zListAdminCampaignsResponse = z.array(zCampaignOut);
+
+export const zCreatePointCampaignBody = zCampaignCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreatePointCampaignResponse = zCampaignOut;
+
+export const zUpdatePointCampaignBody = zCampaignUpdate;
+
+export const zUpdatePointCampaignPath = z.object({
+    campaign_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdatePointCampaignResponse = zCampaignOut;
+
+/**
+ * Response List Admin Catalog Items
+ *
+ * Successful Response
+ */
+export const zListAdminCatalogItemsResponse = z.array(zCatalogItemOut);
+
+export const zCreateCatalogItemBody = zCatalogItemCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCatalogItemResponse = zCatalogItemOut;
+
+export const zUpdateCatalogItemBody = zCatalogItemUpdate;
+
+export const zUpdateCatalogItemPath = z.object({
+    item_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCatalogItemResponse = zCatalogItemOut;
+
+/**
+ * Response List Catalog Partners
+ *
+ * Successful Response
+ */
+export const zListCatalogPartnersResponse = z.array(zPartnerOut);
+
+export const zCreateCatalogPartnerBody = zPartnerCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCatalogPartnerResponse = zPartnerOut;
+
+export const zUpdateCatalogPartnerBody = zPartnerUpdate;
+
+export const zUpdateCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateCatalogPartnerResponse = zPartnerOut;
+
+export const zApproveCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zApproveCatalogPartnerResponse = zPartnerOut;
+
+export const zDeactivateCatalogPartnerPath = z.object({
+    partner_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeactivateCatalogPartnerResponse = zPartnerOut;
+
+export const zCreatePointsAnnulmentBody = zAnnulmentCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreatePointsAnnulmentResponse = zPointEntryOut;
+
+export const zValidateRedemptionCodeBody = zRedemptionValidate;
+
+/**
+ * Successful Response
+ */
+export const zValidateRedemptionCodeResponse = zRedemptionOut;
+
+/**
  * Successful Response
  */
 export const zGetAppSettingsResponse = zAppSettingsOut;
@@ -5708,6 +7265,17 @@ export const zChangePasswordResponse = z.void();
  * Successful Response
  */
 export const zGetAuthConfigResponse = zAuthConfig;
+
+export const zDonorSignUpBody = zDonorSignUpRequest;
+
+export const zDonorSignUpHeaders = z.object({
+    'X-Turnstile-Token': z.string().nullish()
+});
+
+/**
+ * Successful Response
+ */
+export const zDonorSignUpResponse = z.void();
 
 export const zForgotPasswordBody = zForgotPasswordRequest;
 
@@ -5889,6 +7457,204 @@ export const zVerifyEmailResponse = z.void();
  * Successful Response
  */
 export const zGetBrandEvidenceResponse = zBrandsOut;
+
+/**
+ * Successful Response
+ */
+export const zGetCalibrationResponse = zCalibrationOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorAccountResponse = zDonorAccountOut;
+
+export const zDeleteDonorAccountBody = zDeletionRequest;
+
+/**
+ * Successful Response
+ */
+export const zDeleteDonorAccountResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetDonorDeletionPreviewResponse = zDeletionPreviewOut;
+
+/**
+ * Successful Response
+ */
+export const zExportDonorAccountResponse = zAccountExportOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorAccountQrResponse = zDonorQrOut;
+
+/**
+ * Response List Bag Activations
+ *
+ * Successful Response
+ */
+export const zListBagActivationsResponse = z.array(zBagActivationOut);
+
+export const zCreateBagActivationBody = zBagActivationCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateBagActivationResponse = zBagActivationOut;
+
+export const zUpdateBagActivationBody = zBagActivationUpdate;
+
+export const zUpdateBagActivationPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zUpdateBagActivationResponse = zBagActivationOut;
+
+export const zActivateBagPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zActivateBagResponse = zBagActivationOut;
+
+export const zDeactivateBagPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeactivateBagResponse = zBagActivationOut;
+
+export const zGetBagQrPath = z.object({
+    bag_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetBagQrResponse = zDonorQrOut;
+
+/**
+ * Response List Donor Campaigns
+ *
+ * Successful Response
+ */
+export const zListDonorCampaignsResponse = z.array(zCampaignOut);
+
+/**
+ * Response Get Donor Catalog
+ *
+ * Successful Response
+ */
+export const zGetDonorCatalogResponse = z.array(zCatalogItemPublic);
+
+/**
+ * Successful Response
+ */
+export const zGetDonorConsentsResponse = zConsentsOut;
+
+export const zSetDonorConsentBody = zConsentUpdate;
+
+/**
+ * Successful Response
+ */
+export const zSetDonorConsentResponse = zConsentsOut;
+
+/**
+ * Response Get Collection History
+ *
+ * Successful Response
+ */
+export const zGetCollectionHistoryResponse = z.array(zCollectionHistoryOut);
+
+export const zListDonorPointsQuery = z.object({
+    limit: z.int().gte(1).lte(100).optional().default(20),
+    offset: z.int().gte(0).optional().default(0)
+});
+
+/**
+ * Successful Response
+ */
+export const zListDonorPointsResponse = zPointsHistoryOut;
+
+/**
+ * Response List Donor Redemptions
+ *
+ * Successful Response
+ */
+export const zListDonorRedemptionsResponse = z.array(zRedemptionOut);
+
+export const zCreateRedemptionBody = zRedemptionCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateRedemptionResponse = zRedemptionOut;
+
+/**
+ * Successful Response
+ */
+export const zGetDonorPointsBalanceResponse = zPointsBalanceOut;
+
+export const zListCollectionRequestsQuery = z.object({
+    state: zCollectionRequestState.nullish(),
+    subject: zRequestSubject.nullish(),
+    parish_code: z.string().max(6).nullish(),
+    limit: z.int().gte(1).lte(1000).optional().default(200)
+});
+
+/**
+ * Response List Collection Requests
+ *
+ * Successful Response
+ */
+export const zListCollectionRequestsResponse = z.array(zCollectionRequestOut);
+
+export const zCreateCollectionRequestBody = zCollectionRequestCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateCollectionRequestResponse = zCollectionRequestOut;
+
+export const zCancelCollectionRequestPath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zCancelCollectionRequestResponse = z.void();
+
+export const zDispatchCollectionRequestBody = zDispatchRequest;
+
+export const zDispatchCollectionRequestPath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDispatchCollectionRequestResponse = zCollectionRequestOut;
+
+export const zRecordRequestOutcomeBody = zRequestOutcomeCreate;
+
+export const zRecordRequestOutcomePath = z.object({
+    request_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zRecordRequestOutcomeResponse = zCollectionRequestOut;
 
 export const zListCopilotActionsQuery = z.object({
     scope: z.enum(['mine', 'all']).optional().default('mine'),
@@ -6344,15 +8110,116 @@ export const zSuggestAlertResolutionResponse = zAlertSuggestionOut;
  */
 export const zGetDataQualityResponse = zDataQuality;
 
+export const zListExportLotsQuery = z.object({
+    fine_state: zFineState.nullish(),
+    garment_type: zGarmentType.nullish(),
+    season: zSeason.nullish(),
+    gender: zGender.nullish(),
+    colour: zColour.nullish(),
+    size_band: zSizeBand.nullish()
+});
+
+/**
+ * Response List Export Lots
+ *
+ * Successful Response
+ */
+export const zListExportLotsResponse = z.array(zExportLotSummary);
+
+export const zCreateExportLotBody = zExportLotKeyIn;
+
+/**
+ * Successful Response
+ */
+export const zCreateExportLotResponse = zExportLotDetail;
+
+export const zGetExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetExportLotResponse = zExportLotDetail;
+
+export const zCloseExportLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseExportLotResponse = zExportLotDetail;
+
+export const zAddExportLotItemsBody = zExportLotItemsIn;
+
+export const zAddExportLotItemsPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddExportLotItemsResponse = zExportLotDetail;
+
 /**
  * Successful Response
  */
 export const zHealthResponse = zHealth;
 
+/**
+ * Successful Response
+ */
+export const zGetLocalAccountResponse = zLocalAccountOut;
+
+export const zSetLocalCertificateBody = zCertificateOptIn;
+
+/**
+ * Successful Response
+ */
+export const zSetLocalCertificateResponse = zLocalAccountOut;
+
+/**
+ * Response List Local Lots
+ *
+ * Successful Response
+ */
+export const zListLocalLotsResponse = z.array(zLotSummary);
+
+export const zCreateLocalNoticeBody = zStopNoticeCreate;
+
+/**
+ * Successful Response
+ */
+export const zCreateLocalNoticeResponse = zStopNoticeOut;
+
+/**
+ * Successful Response
+ */
+export const zCancelLocalNoticeResponse = z.void();
+
+/**
+ * Successful Response
+ */
+export const zGetActiveLocalNoticeResponse = zStopNoticeCurrent;
+
+/**
+ * Successful Response
+ */
+export const zGetLocalReportResponse = zLocalReportOut;
+
+/**
+ * Response List Local Accounts
+ *
+ * Successful Response
+ */
+export const zListLocalAccountsResponse = z.array(zLocalAccountAdminOut);
+
 export const zListLotsQuery = z.object({
     fibre: zFibre.nullish(),
     state: zLotState.nullish(),
-    parish_code: z.string().max(6).nullish()
+    parish_code: z.string().max(6).nullish(),
+    locality_id: z.uuid().nullish()
 });
 
 /**
@@ -6369,6 +8236,13 @@ export const zOpenLotBody = zLotOpen;
  */
 export const zOpenLotResponse = zLotSummary;
 
+export const zOpenStopLotBody = zStopLotOpen;
+
+/**
+ * Successful Response
+ */
+export const zOpenStopLotResponse = zLotSummary;
+
 export const zGetLotPath = z.object({
     code: z.string()
 });
@@ -6377,6 +8251,15 @@ export const zGetLotPath = z.object({
  * Successful Response
  */
 export const zGetLotResponse = zLotDetail;
+
+export const zCloseStopLotPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zCloseStopLotResponse = zLotDetail;
 
 export const zAddLotItemBody = zLotItemIn;
 
@@ -6426,6 +8309,49 @@ export const zChangeLotStatePath = z.object({
  * Successful Response
  */
 export const zChangeLotStateResponse = zLotDetail;
+
+export const zAddLotUnitBody = zLotUnitIn;
+
+export const zAddLotUnitPath = z.object({
+    code: z.string()
+});
+
+/**
+ * Successful Response
+ */
+export const zAddLotUnitResponse = zLotUnitOut;
+
+export const zDeleteLotUnitPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zDeleteLotUnitResponse = z.void();
+
+export const zSetLotUnitWeightBody = zLotUnitWeight;
+
+export const zSetLotUnitWeightPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zSetLotUnitWeightResponse = zLotUnitOut;
+
+export const zGetLotUnitQrPath = z.object({
+    code: z.string(),
+    unit_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetLotUnitQrResponse = z.string();
 
 export const zGetFibreMarketQuery = z.object({
     fibre: zFibre.nullish()
@@ -6826,6 +8752,20 @@ export const zRunScenarioSensitivityResponse = zSensitivityOut;
  */
 export const zListZonesResponse = z.array(zZoneOut);
 
+/**
+ * Successful Response
+ */
+export const zGetPublicCollectionAgendaResponse = zCollectionAgendaOut;
+
+export const zGetPublicLocalCertificatePath = z.object({
+    account_id: z.uuid()
+});
+
+/**
+ * Successful Response
+ */
+export const zGetPublicLocalCertificateResponse = zLocalCertificateOut;
+
 export const zGetPassportPath = z.object({
     code: z.string()
 });
@@ -6848,6 +8788,11 @@ export const zGetLotQrPath = z.object({
  * Successful Response
  */
 export const zGetLotQrResponse = z.string();
+
+/**
+ * Successful Response
+ */
+export const zGetPublicPrivacyPolicyResponse = zPolicyOut;
 
 /**
  * Successful Response
@@ -6907,6 +8852,18 @@ export const zAnalyseGarmentQuery = z.object({
  * Successful Response
  */
 export const zAnalyseGarmentResponse = zTriageResult;
+
+export const zListTriageGoldenLabelsQuery = z.object({
+    axis: zTriageAxis.nullish(),
+    limit: z.int().gte(1).lte(500).optional().default(200)
+});
+
+/**
+ * Response List Triage Golden Labels
+ *
+ * Successful Response
+ */
+export const zListTriageGoldenLabelsResponse = z.array(zGoldenLabelOut);
 
 export const zListUsersQuery = z.object({
     approval_status: z.enum([

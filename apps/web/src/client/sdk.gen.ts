@@ -2,7 +2,7 @@
 
 import { type Client, type ClientMeta, formDataBodySerializer, type Options as Options2, type RequestResult, type ServerSentEventsResult, type TDataShape } from './client';
 import { client } from './client.gen';
-import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, AddLotItemData, AddLotItemErrors, AddLotItemResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, ApprovePendingMemoryData, ApprovePendingMemoryErrors, ApprovePendingMemoryResponses, ApproveUserData, ApproveUserErrors, ApproveUserResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ClearCopilotMemoryData, ClearCopilotMemoryErrors, ClearCopilotMemoryResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, ConfirmCopilotActionData, ConfirmCopilotActionErrors, ConfirmCopilotActionResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryErrors, CreateCopilotMemoryEntryResponses, CreateEmailSuppressionData, CreateEmailSuppressionErrors, CreateEmailSuppressionResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationLinkData, CreateInvitationLinkErrors, CreateInvitationLinkResponses, CreateInvitationResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeleteCopilotArtifactData, DeleteCopilotArtifactErrors, DeleteCopilotArtifactResponses, DeleteCopilotDataData, DeleteCopilotDataErrors, DeleteCopilotDataResponses, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryErrors, DeleteCopilotMemoryEntryResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteEmailSuppressionData, DeleteEmailSuppressionErrors, DeleteEmailSuppressionResponses, DeleteItemPhotoData, DeleteItemPhotoErrors, DeleteItemPhotoResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotDataData, ExportCopilotDataErrors, ExportCopilotDataResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadPdfData, ExportCopilotThreadPdfErrors, ExportCopilotThreadPdfResponses, ExportCopilotThreadResponses, ExportMunicipalSitesData, ExportMunicipalSitesErrors, ExportMunicipalSitesResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetApprovalStatusData, GetApprovalStatusErrors, GetApprovalStatusResponses, GetAppSettingsData, GetAppSettingsErrors, GetAppSettingsResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetB2bChannelData, GetB2bChannelErrors, GetB2bChannelResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCaopParishesGeojsonData, GetCaopParishesGeojsonErrors, GetCaopParishesGeojsonResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotSettingsData, GetCopilotSettingsErrors, GetCopilotSettingsResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCopilotThreadTimelineData, GetCopilotThreadTimelineErrors, GetCopilotThreadTimelineResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetEmailData, GetEmailDnsHealthData, GetEmailDnsHealthErrors, GetEmailDnsHealthResponses, GetEmailErrors, GetEmailResponses, GetEmailSummaryData, GetEmailSummaryErrors, GetEmailSummaryResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetItemPhotoData, GetItemPhotoErrors, GetItemPhotoResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetMeData, GetMeErrors, GetMeResponses, GetModelValidationData, GetModelValidationErrors, GetModelValidationResponses, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkErrors, GetMunicipalDensityBenchmarkResponses, GetMunicipalGapRankingData, GetMunicipalGapRankingErrors, GetMunicipalGapRankingResponses, GetMunicipalOverviewData, GetMunicipalOverviewErrors, GetMunicipalOverviewResponses, GetMunicipalParishData, GetMunicipalParishErrors, GetMunicipalParishResponses, GetMunicipalSiteData, GetMunicipalSiteErrors, GetMunicipalSiteResponses, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonErrors, GetMunicipalSitesGeojsonResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetPublicItemPhotoData, GetPublicItemPhotoErrors, GetPublicItemPhotoResponses, GetQuickJoinInfoData, GetQuickJoinInfoErrors, GetQuickJoinInfoResponses, GetQuickJoinQrData, GetQuickJoinQrErrors, GetQuickJoinQrResponses, GetRegistrationInfoData, GetRegistrationInfoErrors, GetRegistrationInfoResponses, GetScenarioCoverageData, GetScenarioCoverageErrors, GetScenarioCoverageResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetSharedCopilotThreadData, GetSharedCopilotThreadErrors, GetSharedCopilotThreadResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTextileCandidateSitesData, GetTextileCandidateSitesErrors, GetTextileCandidateSitesResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetUsersSummaryData, GetUsersSummaryErrors, GetUsersSummaryResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListAuditData, ListAuditErrors, ListAuditResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotActionsData, ListCopilotActionsErrors, ListCopilotActionsResponses, ListCopilotArtifactsData, ListCopilotArtifactsErrors, ListCopilotArtifactsResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotHistoryData, ListCopilotHistoryErrors, ListCopilotHistoryResponses, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesErrors, ListCopilotMemoryEntriesResponses, ListCopilotProjectsData, ListCopilotProjectsErrors, ListCopilotProjectsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListEmailsData, ListEmailsErrors, ListEmailsResponses, ListEmailSuppressionsData, ListEmailSuppressionsErrors, ListEmailSuppressionsResponses, ListGuestsData, ListGuestsErrors, ListGuestsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListMunicipalContainersData, ListMunicipalContainersErrors, ListMunicipalContainersResponses, ListMunicipalParishesData, ListMunicipalParishesErrors, ListMunicipalParishesResponses, ListMunicipalProducersData, ListMunicipalProducersErrors, ListMunicipalProducersResponses, ListMunicipalSitesData, ListMunicipalSitesErrors, ListMunicipalSitesResponses, ListPendingMemoryData, ListPendingMemoryErrors, ListPendingMemoryResponses, ListReferenceScenariosData, ListReferenceScenariosErrors, ListReferenceScenariosResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, PinCopilotArtifactData, PinCopilotArtifactErrors, PinCopilotArtifactResponses, PreviewCopilotPersonaData, PreviewCopilotPersonaErrors, PreviewCopilotPersonaResponses, PreviewInvitationData, PreviewInvitationErrors, PreviewInvitationResponses, ProposeCopilotActionData, ProposeCopilotActionErrors, ProposeCopilotActionResponses, QuickJoinData, QuickJoinErrors, QuickJoinResponses, ReadyData, ReadyErrors, ReadyResponses, ReceiveResendWebhookData, ReceiveResendWebhookErrors, ReceiveResendWebhookResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RefreshCopilotArtifactData, RefreshCopilotArtifactErrors, RefreshCopilotArtifactResponses, RefreshData, RefreshEmailStatusData, RefreshEmailStatusErrors, RefreshEmailStatusResponses, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RejectCopilotActionData, RejectCopilotActionErrors, RejectCopilotActionResponses, RejectPendingMemoryData, RejectPendingMemoryErrors, RejectPendingMemoryResponses, RejectUserData, RejectUserErrors, RejectUserResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, RequestMagicLinkData, RequestMagicLinkErrors, RequestMagicLinkResponses, ResendInvitationData, ResendInvitationErrors, ResendInvitationResponses, ResendRegistrationEmailData, ResendRegistrationEmailErrors, ResendRegistrationEmailResponses, ResendUserEmailData, ResendUserEmailErrors, ResendUserEmailResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SearchCopilotSessionsData, SearchCopilotSessionsErrors, SearchCopilotSessionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, SendTestEmailData, SendTestEmailErrors, SendTestEmailResponses, ShareCopilotThreadData, ShareCopilotThreadErrors, ShareCopilotThreadResponses, StartImpersonationData, StartImpersonationErrors, StartImpersonationResponses, StopImpersonationData, StopImpersonationErrors, StopImpersonationResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UndoCopilotActionData, UndoCopilotActionErrors, UndoCopilotActionResponses, UnshareCopilotThreadData, UnshareCopilotThreadErrors, UnshareCopilotThreadResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateAppSettingsData, UpdateAppSettingsErrors, UpdateAppSettingsResponses, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryErrors, UpdateCopilotMemoryEntryResponses, UpdateCopilotSettingsData, UpdateCopilotSettingsErrors, UpdateCopilotSettingsResponses, UpdateCopilotThreadData, UpdateCopilotThreadErrors, UpdateCopilotThreadResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateOnboardingData, UpdateOnboardingErrors, UpdateOnboardingResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, UploadItemPhotoData, UploadItemPhotoErrors, UploadItemPhotoResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses, VerifyMagicLinkData, VerifyMagicLinkErrors, VerifyMagicLinkResponses } from './types.gen';
+import type { AcceptInvitationData, AcceptInvitationErrors, AcceptInvitationResponses, ActivateBagData, ActivateBagErrors, ActivateBagResponses, AddExportLotItemsData, AddExportLotItemsErrors, AddExportLotItemsResponses, AddLotItemData, AddLotItemErrors, AddLotItemResponses, AddLotUnitData, AddLotUnitErrors, AddLotUnitResponses, AnalyseGarmentData, AnalyseGarmentErrors, AnalyseGarmentResponses, ApplyWhatIfData, ApplyWhatIfErrors, ApplyWhatIfResponses, ApproveCatalogPartnerData, ApproveCatalogPartnerErrors, ApproveCatalogPartnerResponses, ApprovePendingMemoryData, ApprovePendingMemoryErrors, ApprovePendingMemoryResponses, ApproveUserData, ApproveUserErrors, ApproveUserResponses, AskWhatIfData, AskWhatIfErrors, AskWhatIfResponses, CancelCollectionRequestData, CancelCollectionRequestErrors, CancelCollectionRequestResponses, CancelLocalNoticeData, CancelLocalNoticeErrors, CancelLocalNoticeResponses, ChangeLotStateData, ChangeLotStateErrors, ChangeLotStateResponses, ChangePasswordData, ChangePasswordErrors, ChangePasswordResponses, ClearCopilotMemoryData, ClearCopilotMemoryErrors, ClearCopilotMemoryResponses, CloseExportLotData, CloseExportLotErrors, CloseExportLotResponses, CloseStopLotData, CloseStopLotErrors, CloseStopLotResponses, CompactCopilotThreadData, CompactCopilotThreadErrors, CompactCopilotThreadResponses, CompareScenarioRobustnessData, CompareScenarioRobustnessErrors, CompareScenarioRobustnessResponses, ConfirmCopilotActionData, ConfirmCopilotActionErrors, ConfirmCopilotActionResponses, CopilotChatData, CopilotChatErrors, CopilotChatResponses, CopilotStreamData, CopilotStreamErrors, CopilotStreamResponse, CopilotStreamResponses, CreateBagActivationData, CreateBagActivationErrors, CreateBagActivationResponses, CreateBenchmarkScenarioData, CreateBenchmarkScenarioErrors, CreateBenchmarkScenarioResponses, CreateCatalogItemData, CreateCatalogItemErrors, CreateCatalogItemResponses, CreateCatalogPartnerData, CreateCatalogPartnerErrors, CreateCatalogPartnerResponses, CreateCollectionRequestData, CreateCollectionRequestErrors, CreateCollectionRequestResponses, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryErrors, CreateCopilotMemoryEntryResponses, CreateEmailSuppressionData, CreateEmailSuppressionErrors, CreateEmailSuppressionResponses, CreateExportLotData, CreateExportLotErrors, CreateExportLotResponses, CreateInvitationData, CreateInvitationErrors, CreateInvitationLinkData, CreateInvitationLinkErrors, CreateInvitationLinkResponses, CreateInvitationResponses, CreateLocalNoticeData, CreateLocalNoticeErrors, CreateLocalNoticeResponses, CreatePointCampaignData, CreatePointCampaignErrors, CreatePointCampaignResponses, CreatePointsAnnulmentData, CreatePointsAnnulmentErrors, CreatePointsAnnulmentResponses, CreateRapReportData, CreateRapReportErrors, CreateRapReportResponses, CreateRedemptionData, CreateRedemptionErrors, CreateRedemptionResponses, CreateScenarioData, CreateScenarioErrors, CreateScenarioResponses, DeactivateBagData, DeactivateBagErrors, DeactivateBagResponses, DeactivateCatalogPartnerData, DeactivateCatalogPartnerErrors, DeactivateCatalogPartnerResponses, DeleteCopilotArtifactData, DeleteCopilotArtifactErrors, DeleteCopilotArtifactResponses, DeleteCopilotDataData, DeleteCopilotDataErrors, DeleteCopilotDataResponses, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryErrors, DeleteCopilotMemoryEntryResponses, DeleteCopilotThreadData, DeleteCopilotThreadErrors, DeleteCopilotThreadResponses, DeleteDonorAccountData, DeleteDonorAccountErrors, DeleteDonorAccountResponses, DeleteEmailSuppressionData, DeleteEmailSuppressionErrors, DeleteEmailSuppressionResponses, DeleteItemPhotoData, DeleteItemPhotoErrors, DeleteItemPhotoResponses, DeleteLotUnitData, DeleteLotUnitErrors, DeleteLotUnitResponses, DeleteScenarioData, DeleteScenarioErrors, DeleteScenarioResponses, DeleteUserData, DeleteUserErrors, DeleteUserResponses, DispatchCollectionRequestData, DispatchCollectionRequestErrors, DispatchCollectionRequestResponses, DonorSignUpData, DonorSignUpErrors, DonorSignUpResponses, DownloadReportData, DownloadReportErrors, DownloadReportResponses, ExportCopilotDataData, ExportCopilotDataErrors, ExportCopilotDataResponses, ExportCopilotThreadData, ExportCopilotThreadErrors, ExportCopilotThreadPdfData, ExportCopilotThreadPdfErrors, ExportCopilotThreadPdfResponses, ExportCopilotThreadResponses, ExportDonorAccountData, ExportDonorAccountErrors, ExportDonorAccountResponses, ExportMunicipalSitesData, ExportMunicipalSitesErrors, ExportMunicipalSitesResponses, ForgotPasswordData, ForgotPasswordErrors, ForgotPasswordResponses, GetActiveLocalNoticeData, GetActiveLocalNoticeErrors, GetActiveLocalNoticeResponses, GetAiCreditsData, GetAiCreditsErrors, GetAiCreditsResponses, GetAiSettingsData, GetAiSettingsErrors, GetAiSettingsResponses, GetAiUsageData, GetAiUsageErrors, GetAiUsageResponses, GetApprovalStatusData, GetApprovalStatusErrors, GetApprovalStatusResponses, GetAppSettingsData, GetAppSettingsErrors, GetAppSettingsResponses, GetAuthConfigData, GetAuthConfigErrors, GetAuthConfigResponses, GetB2bChannelData, GetB2bChannelErrors, GetB2bChannelResponses, GetBagQrData, GetBagQrErrors, GetBagQrResponses, GetBrandEvidenceData, GetBrandEvidenceErrors, GetBrandEvidenceResponses, GetCalibrationData, GetCalibrationErrors, GetCalibrationResponses, GetCaopParishesGeojsonData, GetCaopParishesGeojsonErrors, GetCaopParishesGeojsonResponses, GetCollectionHistoryData, GetCollectionHistoryErrors, GetCollectionHistoryResponses, GetCopilotEventSchemaData, GetCopilotEventSchemaErrors, GetCopilotEventSchemaResponses, GetCopilotSettingsData, GetCopilotSettingsErrors, GetCopilotSettingsResponses, GetCopilotThreadData, GetCopilotThreadErrors, GetCopilotThreadResponses, GetCopilotThreadTimelineData, GetCopilotThreadTimelineErrors, GetCopilotThreadTimelineResponses, GetCoverageData, GetCoverageErrors, GetCoverageResponses, GetDataQualityData, GetDataQualityErrors, GetDataQualityResponses, GetDonorAccountData, GetDonorAccountErrors, GetDonorAccountQrData, GetDonorAccountQrErrors, GetDonorAccountQrResponses, GetDonorAccountResponses, GetDonorCatalogData, GetDonorCatalogErrors, GetDonorCatalogResponses, GetDonorConsentsData, GetDonorConsentsErrors, GetDonorConsentsResponses, GetDonorDeletionPreviewData, GetDonorDeletionPreviewErrors, GetDonorDeletionPreviewResponses, GetDonorPointsBalanceData, GetDonorPointsBalanceErrors, GetDonorPointsBalanceResponses, GetEmailData, GetEmailDnsHealthData, GetEmailDnsHealthErrors, GetEmailDnsHealthResponses, GetEmailErrors, GetEmailResponses, GetEmailSummaryData, GetEmailSummaryErrors, GetEmailSummaryResponses, GetExportLotData, GetExportLotErrors, GetExportLotResponses, GetFibreMarketData, GetFibreMarketErrors, GetFibreMarketResponses, GetFleetData, GetFleetErrors, GetFleetResponses, GetItemPhotoData, GetItemPhotoErrors, GetItemPhotoResponses, GetLocalAccountData, GetLocalAccountErrors, GetLocalAccountResponses, GetLocalReportData, GetLocalReportErrors, GetLocalReportResponses, GetLotData, GetLotErrors, GetLotQrData, GetLotQrErrors, GetLotQrResponses, GetLotResponses, GetLotUnitQrData, GetLotUnitQrErrors, GetLotUnitQrResponses, GetMeData, GetMeErrors, GetMeResponses, GetModelValidationData, GetModelValidationErrors, GetModelValidationResponses, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkErrors, GetMunicipalDensityBenchmarkResponses, GetMunicipalGapRankingData, GetMunicipalGapRankingErrors, GetMunicipalGapRankingResponses, GetMunicipalOverviewData, GetMunicipalOverviewErrors, GetMunicipalOverviewResponses, GetMunicipalParishData, GetMunicipalParishErrors, GetMunicipalParishResponses, GetMunicipalSiteData, GetMunicipalSiteErrors, GetMunicipalSiteResponses, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonErrors, GetMunicipalSitesGeojsonResponses, GetObservedFlowsData, GetObservedFlowsErrors, GetObservedFlowsResponses, GetOverviewData, GetOverviewErrors, GetOverviewResponses, GetPassportData, GetPassportErrors, GetPassportResponses, GetPlanningParametersData, GetPlanningParametersErrors, GetPlanningParametersResponses, GetPublicCollectionAgendaData, GetPublicCollectionAgendaErrors, GetPublicCollectionAgendaResponses, GetPublicItemPhotoData, GetPublicItemPhotoErrors, GetPublicItemPhotoResponses, GetPublicLocalCertificateData, GetPublicLocalCertificateErrors, GetPublicLocalCertificateResponses, GetPublicPrivacyPolicyData, GetPublicPrivacyPolicyErrors, GetPublicPrivacyPolicyResponses, GetQuickJoinInfoData, GetQuickJoinInfoErrors, GetQuickJoinInfoResponses, GetQuickJoinQrData, GetQuickJoinQrErrors, GetQuickJoinQrResponses, GetRegistrationInfoData, GetRegistrationInfoErrors, GetRegistrationInfoResponses, GetScenarioCoverageData, GetScenarioCoverageErrors, GetScenarioCoverageResponses, GetScenarioData, GetScenarioErrors, GetScenarioFlowsData, GetScenarioFlowsErrors, GetScenarioFlowsResponses, GetScenarioResponses, GetSharedCopilotThreadData, GetSharedCopilotThreadErrors, GetSharedCopilotThreadResponses, GetTextileBaselineData, GetTextileBaselineErrors, GetTextileBaselineResponses, GetTextileCandidateSitesData, GetTextileCandidateSitesErrors, GetTextileCandidateSitesResponses, GetTriageEvalData, GetTriageEvalErrors, GetTriageEvalResponses, GetUsersSummaryData, GetUsersSummaryErrors, GetUsersSummaryResponses, GetWasteCompositionData, GetWasteCompositionErrors, GetWasteCompositionResponses, GoogleCallbackData, GoogleCallbackErrors, GoogleLoginData, GoogleLoginErrors, HealthData, HealthErrors, HealthResponses, ListAdminCampaignsData, ListAdminCampaignsErrors, ListAdminCampaignsResponses, ListAdminCatalogItemsData, ListAdminCatalogItemsErrors, ListAdminCatalogItemsResponses, ListAiModelsData, ListAiModelsErrors, ListAiModelsResponses, ListAuditData, ListAuditErrors, ListAuditResponses, ListBagActivationsData, ListBagActivationsErrors, ListBagActivationsResponses, ListBenchmarksData, ListBenchmarksErrors, ListBenchmarksResponses, ListCatalogPartnersData, ListCatalogPartnersErrors, ListCatalogPartnersResponses, ListCircuitsData, ListCircuitsErrors, ListCircuitsResponses, ListCollectionRequestsData, ListCollectionRequestsErrors, ListCollectionRequestsResponses, ListContainersData, ListContainersErrors, ListContainersResponses, ListCopilotActionsData, ListCopilotActionsErrors, ListCopilotActionsResponses, ListCopilotArtifactsData, ListCopilotArtifactsErrors, ListCopilotArtifactsResponses, ListCopilotCommandsData, ListCopilotCommandsErrors, ListCopilotCommandsResponses, ListCopilotHistoryData, ListCopilotHistoryErrors, ListCopilotHistoryResponses, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesErrors, ListCopilotMemoryEntriesResponses, ListCopilotProjectsData, ListCopilotProjectsErrors, ListCopilotProjectsResponses, ListCopilotThreadsData, ListCopilotThreadsErrors, ListCopilotThreadsResponses, ListDonorCampaignsData, ListDonorCampaignsErrors, ListDonorCampaignsResponses, ListDonorPointsData, ListDonorPointsErrors, ListDonorPointsResponses, ListDonorRedemptionsData, ListDonorRedemptionsErrors, ListDonorRedemptionsResponses, ListEmailsData, ListEmailsErrors, ListEmailsResponses, ListEmailSuppressionsData, ListEmailSuppressionsErrors, ListEmailSuppressionsResponses, ListExportLotsData, ListExportLotsErrors, ListExportLotsResponses, ListGuestsData, ListGuestsErrors, ListGuestsResponses, ListInvitationsData, ListInvitationsErrors, ListInvitationsResponses, ListLocalAccountsData, ListLocalAccountsErrors, ListLocalAccountsResponses, ListLocalitiesData, ListLocalitiesErrors, ListLocalitiesResponses, ListLocalLotsData, ListLocalLotsErrors, ListLocalLotsResponses, ListLotsData, ListLotsErrors, ListLotsResponses, ListMunicipalContainersData, ListMunicipalContainersErrors, ListMunicipalContainersResponses, ListMunicipalParishesData, ListMunicipalParishesErrors, ListMunicipalParishesResponses, ListMunicipalProducersData, ListMunicipalProducersErrors, ListMunicipalProducersResponses, ListMunicipalSitesData, ListMunicipalSitesErrors, ListMunicipalSitesResponses, ListPendingMemoryData, ListPendingMemoryErrors, ListPendingMemoryResponses, ListReferenceScenariosData, ListReferenceScenariosErrors, ListReferenceScenariosResponses, ListReportsData, ListReportsErrors, ListReportsResponses, ListScenariosData, ListScenariosErrors, ListScenariosResponses, ListTriageGoldenLabelsData, ListTriageGoldenLabelsErrors, ListTriageGoldenLabelsResponses, ListUsersData, ListUsersErrors, ListUsersResponses, ListWhatIfsData, ListWhatIfsErrors, ListWhatIfsResponses, ListZonesData, ListZonesErrors, ListZonesResponses, LoginData, LoginErrors, LoginResponses, LogoutAllData, LogoutAllErrors, LogoutAllResponses, LogoutData, LogoutErrors, LogoutResponses, OpenLotData, OpenLotErrors, OpenLotResponses, OpenStopLotData, OpenStopLotErrors, OpenStopLotResponses, PinCopilotArtifactData, PinCopilotArtifactErrors, PinCopilotArtifactResponses, PreviewCopilotPersonaData, PreviewCopilotPersonaErrors, PreviewCopilotPersonaResponses, PreviewInvitationData, PreviewInvitationErrors, PreviewInvitationResponses, ProposeCopilotActionData, ProposeCopilotActionErrors, ProposeCopilotActionResponses, QuickJoinData, QuickJoinErrors, QuickJoinResponses, ReadyData, ReadyErrors, ReadyResponses, ReceiveResendWebhookData, ReceiveResendWebhookErrors, ReceiveResendWebhookResponses, RecommendPilotData, RecommendPilotErrors, RecommendPilotResponses, RecordRequestOutcomeData, RecordRequestOutcomeErrors, RecordRequestOutcomeResponses, RefreshCopilotArtifactData, RefreshCopilotArtifactErrors, RefreshCopilotArtifactResponses, RefreshData, RefreshEmailStatusData, RefreshEmailStatusErrors, RefreshEmailStatusResponses, RefreshErrors, RefreshResponses, RegenerateCopilotResponseData, RegenerateCopilotResponseErrors, RegenerateCopilotResponseResponse, RegenerateCopilotResponseResponses, RegisterData, RegisterErrors, RegisterResponses, RejectCopilotActionData, RejectCopilotActionErrors, RejectCopilotActionResponses, RejectPendingMemoryData, RejectPendingMemoryErrors, RejectPendingMemoryResponses, RejectUserData, RejectUserErrors, RejectUserResponses, RenameScenarioData, RenameScenarioErrors, RenameScenarioResponses, RequestMagicLinkData, RequestMagicLinkErrors, RequestMagicLinkResponses, ResendInvitationData, ResendInvitationErrors, ResendInvitationResponses, ResendRegistrationEmailData, ResendRegistrationEmailErrors, ResendRegistrationEmailResponses, ResendUserEmailData, ResendUserEmailErrors, ResendUserEmailResponses, ResendVerificationData, ResendVerificationErrors, ResendVerificationResponses, ReserveLotData, ReserveLotErrors, ReserveLotResponses, ResetPasswordData, ResetPasswordErrors, ResetPasswordResponses, RevokeInvitationData, RevokeInvitationErrors, RevokeInvitationResponses, RunScenarioSensitivityData, RunScenarioSensitivityErrors, RunScenarioSensitivityResponses, SearchCopilotMentionsData, SearchCopilotMentionsErrors, SearchCopilotMentionsResponses, SearchCopilotSessionsData, SearchCopilotSessionsErrors, SearchCopilotSessionsResponses, SendCopilotFeedbackData, SendCopilotFeedbackErrors, SendCopilotFeedbackResponses, SendTestEmailData, SendTestEmailErrors, SendTestEmailResponses, SetDonorConsentData, SetDonorConsentErrors, SetDonorConsentResponses, SetLocalCertificateData, SetLocalCertificateErrors, SetLocalCertificateResponses, SetLotUnitWeightData, SetLotUnitWeightErrors, SetLotUnitWeightResponses, ShareCopilotThreadData, ShareCopilotThreadErrors, ShareCopilotThreadResponses, StartImpersonationData, StartImpersonationErrors, StartImpersonationResponses, StopImpersonationData, StopImpersonationErrors, StopImpersonationResponses, SuggestAlertResolutionData, SuggestAlertResolutionErrors, SuggestAlertResolutionResponses, TestAiModelData, TestAiModelErrors, TestAiModelResponses, UndoCopilotActionData, UndoCopilotActionErrors, UndoCopilotActionResponses, UnshareCopilotThreadData, UnshareCopilotThreadErrors, UnshareCopilotThreadResponses, UpdateAiSettingsData, UpdateAiSettingsErrors, UpdateAiSettingsResponses, UpdateAppSettingsData, UpdateAppSettingsErrors, UpdateAppSettingsResponses, UpdateBagActivationData, UpdateBagActivationErrors, UpdateBagActivationResponses, UpdateCatalogItemData, UpdateCatalogItemErrors, UpdateCatalogItemResponses, UpdateCatalogPartnerData, UpdateCatalogPartnerErrors, UpdateCatalogPartnerResponses, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryErrors, UpdateCopilotMemoryEntryResponses, UpdateCopilotSettingsData, UpdateCopilotSettingsErrors, UpdateCopilotSettingsResponses, UpdateCopilotThreadData, UpdateCopilotThreadErrors, UpdateCopilotThreadResponses, UpdateDataAlertData, UpdateDataAlertErrors, UpdateDataAlertResponses, UpdateMeData, UpdateMeErrors, UpdateMeResponses, UpdateOnboardingData, UpdateOnboardingErrors, UpdateOnboardingResponses, UpdatePlanningParametersData, UpdatePlanningParametersErrors, UpdatePlanningParametersResponses, UpdatePointCampaignData, UpdatePointCampaignErrors, UpdatePointCampaignResponses, UpdateUserData, UpdateUserErrors, UpdateUserResponses, UploadCopilotAttachmentsData, UploadCopilotAttachmentsErrors, UploadCopilotAttachmentsResponses, UploadItemPhotoData, UploadItemPhotoErrors, UploadItemPhotoResponses, ValidateRedemptionCodeData, ValidateRedemptionCodeErrors, ValidateRedemptionCodeResponses, VerifyEmailData, VerifyEmailErrors, VerifyEmailResponses, VerifyMagicLinkData, VerifyMagicLinkErrors, VerifyMagicLinkResponses } from './types.gen';
 
 export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends boolean = boolean, TResponse = unknown> = Options2<TData, ThrowOnError, TResponse> & {
     /**
@@ -17,6 +17,156 @@ export type Options<TData extends TDataShape = TDataShape, ThrowOnError extends 
      */
     meta?: keyof ClientMeta extends never ? Record<string, unknown> : ClientMeta;
 };
+
+/**
+ * List Admin Campaigns
+ *
+ * Todas as campanhas (passadas, correntes e futuras): a gestão agenda o calendário do impulso.
+ */
+export const listAdminCampaigns = <ThrowOnError extends boolean = false>(options?: Options<ListAdminCampaignsData, ThrowOnError>): RequestResult<ListAdminCampaignsResponses, ListAdminCampaignsErrors, ThrowOnError> => (options?.client ?? client).get<ListAdminCampaignsResponses, ListAdminCampaignsErrors, ThrowOnError>({ url: '/api/v1/admin/catalog/campaigns', ...options });
+
+/**
+ * Create Point Campaign
+ *
+ * Criar campanha sazonal de pontos: janela temporal + descrição (informativa no MVP).
+ */
+export const createPointCampaign = <ThrowOnError extends boolean = false>(options: Options<CreatePointCampaignData, ThrowOnError>): RequestResult<CreatePointCampaignResponses, CreatePointCampaignErrors, ThrowOnError> => (options.client ?? client).post<CreatePointCampaignResponses, CreatePointCampaignErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/campaigns',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Point Campaign
+ *
+ * Editar campanha: nome, descrição e janela (o fim continua a ter de ser depois do início).
+ */
+export const updatePointCampaign = <ThrowOnError extends boolean = false>(options: Options<UpdatePointCampaignData, ThrowOnError>): RequestResult<UpdatePointCampaignResponses, UpdatePointCampaignErrors, ThrowOnError> => (options.client ?? client).patch<UpdatePointCampaignResponses, UpdatePointCampaignErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/campaigns/{campaign_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Admin Catalog Items
+ *
+ * O catálogo pela equipa: tudo (incl. inativos e parceiros em pausa), o mais recente primeiro.
+ */
+export const listAdminCatalogItems = <ThrowOnError extends boolean = false>(options?: Options<ListAdminCatalogItemsData, ThrowOnError>): RequestResult<ListAdminCatalogItemsResponses, ListAdminCatalogItemsErrors, ThrowOnError> => (options?.client ?? client).get<ListAdminCatalogItemsResponses, ListAdminCatalogItemsErrors, ThrowOnError>({ url: '/api/v1/admin/catalog/items', ...options });
+
+/**
+ * Create Catalog Item
+ *
+ * Criar item (donativo IPSS, prémio de parceiro ou acumulado ambiental): a forma é fechada —
+ * âncora € só no donativo, parceiro obrigatório no prémio (422 caso contrário).
+ */
+export const createCatalogItem = <ThrowOnError extends boolean = false>(options: Options<CreateCatalogItemData, ThrowOnError>): RequestResult<CreateCatalogItemResponses, CreateCatalogItemErrors, ThrowOnError> => (options.client ?? client).post<CreateCatalogItemResponses, CreateCatalogItemErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Catalog Item
+ *
+ * Editar item (nome, custo, âncora, ativo, stock…): a forma revalida-se sobre o resultado.
+ */
+export const updateCatalogItem = <ThrowOnError extends boolean = false>(options: Options<UpdateCatalogItemData, ThrowOnError>): RequestResult<UpdateCatalogItemResponses, UpdateCatalogItemErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCatalogItemResponses, UpdateCatalogItemErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/items/{item_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Catalog Partners
+ *
+ * O gestor de parcerias: propostas por aprovar, ativos e em pausa, o mais recente primeiro.
+ */
+export const listCatalogPartners = <ThrowOnError extends boolean = false>(options?: Options<ListCatalogPartnersData, ThrowOnError>): RequestResult<ListCatalogPartnersResponses, ListCatalogPartnersErrors, ThrowOnError> => (options?.client ?? client).get<ListCatalogPartnersResponses, ListCatalogPartnersErrors, ThrowOnError>({ url: '/api/v1/admin/catalog/partners', ...options });
+
+/**
+ * Create Catalog Partner
+ *
+ * Registar a proposta de um parceiro (a freguesia propõe, nasce `proposed`; a Vitrus aprova depois).
+ */
+export const createCatalogPartner = <ThrowOnError extends boolean = false>(options: Options<CreateCatalogPartnerData, ThrowOnError>): RequestResult<CreateCatalogPartnerResponses, CreateCatalogPartnerErrors, ThrowOnError> => (options.client ?? client).post<CreateCatalogPartnerResponses, CreateCatalogPartnerErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/partners',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Catalog Partner
+ *
+ * Editar dados do parceiro (nome, descrição, contato da equipa); o estado vai pelos portões.
+ */
+export const updateCatalogPartner = <ThrowOnError extends boolean = false>(options: Options<UpdateCatalogPartnerData, ThrowOnError>): RequestResult<UpdateCatalogPartnerResponses, UpdateCatalogPartnerErrors, ThrowOnError> => (options.client ?? client).patch<UpdateCatalogPartnerResponses, UpdateCatalogPartnerErrors, ThrowOnError>({
+    url: '/api/v1/admin/catalog/partners/{partner_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Approve Catalog Partner
+ *
+ * Aprovar a proposta: o parceiro fica ativo (prémios no catálogo, códigos aceites).
+ */
+export const approveCatalogPartner = <ThrowOnError extends boolean = false>(options: Options<ApproveCatalogPartnerData, ThrowOnError>): RequestResult<ApproveCatalogPartnerResponses, ApproveCatalogPartnerErrors, ThrowOnError> => (options.client ?? client).post<ApproveCatalogPartnerResponses, ApproveCatalogPartnerErrors, ThrowOnError>({ url: '/api/v1/admin/catalog/partners/{partner_id}/approve', ...options });
+
+/**
+ * Deactivate Catalog Partner
+ *
+ * Pôr em pausa: os prémios saem do catálogo do doador e novos resgates são recusados (409).
+ */
+export const deactivateCatalogPartner = <ThrowOnError extends boolean = false>(options: Options<DeactivateCatalogPartnerData, ThrowOnError>): RequestResult<DeactivateCatalogPartnerResponses, DeactivateCatalogPartnerErrors, ThrowOnError> => (options.client ?? client).post<DeactivateCatalogPartnerResponses, DeactivateCatalogPartnerErrors, ThrowOnError>({ url: '/api/v1/admin/catalog/partners/{partner_id}/deactivate', ...options });
+
+/**
+ * Create Points Annulment
+ *
+ * Anular pontos em abuso (interesse legítimo declarado): entrada NEGATIVA com motivo OBRIGATÓRIO
+ * no livro-razão — nunca se apaga nem se edita linha. Fica na trilha de auditoria com o autor.
+ */
+export const createPointsAnnulment = <ThrowOnError extends boolean = false>(options: Options<CreatePointsAnnulmentData, ThrowOnError>): RequestResult<CreatePointsAnnulmentResponses, CreatePointsAnnulmentErrors, ThrowOnError> => (options.client ?? client).post<CreatePointsAnnulmentResponses, CreatePointsAnnulmentErrors, ThrowOnError>({
+    url: '/api/v1/admin/points/annulments',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Validate Redemption Code
+ *
+ * Validar o código apresentado pelo parceiro/IPSS: marca usado UMA vez (pagamento integral,
+ * auditado) e devolve o estado. Segunda apresentação é 409 `redemption_already_used`.
+ */
+export const validateRedemptionCode = <ThrowOnError extends boolean = false>(options: Options<ValidateRedemptionCodeData, ThrowOnError>): RequestResult<ValidateRedemptionCodeResponses, ValidateRedemptionCodeErrors, ThrowOnError> => (options.client ?? client).post<ValidateRedemptionCodeResponses, ValidateRedemptionCodeErrors, ThrowOnError>({
+    url: '/api/v1/admin/redemptions/validate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Get App Settings
@@ -129,6 +279,24 @@ export const changePassword = <ThrowOnError extends boolean = false>(options: Op
  * O que o ecrã de entrada precisa de saber: Google ligado? registo permitido? precisa de aprovação?
  */
 export const getAuthConfig = <ThrowOnError extends boolean = false>(options?: Options<GetAuthConfigData, ThrowOnError>): RequestResult<GetAuthConfigResponses, GetAuthConfigErrors, ThrowOnError> => (options?.client ?? client).get<GetAuthConfigResponses, GetAuthConfigErrors, ThrowOnError>({ url: '/api/v1/auth/config', ...options });
+
+/**
+ * Donor Sign Up
+ *
+ * Conta de doador por email, sem password (13+ com idade declarada; menor de 13 é recusa explícita).
+ *
+ * Email novo: cria a conta leve logo aprovada (papel `donor`) e envia o link de entrada para
+ * `/cidadao`. Email que já tem conta: só o link de entrada — nunca revela que existia. A resposta é
+ * sempre 204 exista ou não a conta, como no magic link.
+ */
+export const donorSignUp = <ThrowOnError extends boolean = false>(options: Options<DonorSignUpData, ThrowOnError>): RequestResult<DonorSignUpResponses, DonorSignUpErrors, ThrowOnError> => (options.client ?? client).post<DonorSignUpResponses, DonorSignUpErrors, ThrowOnError>({
+    url: '/api/v1/auth/donor/sign-up',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * Forgot Password
@@ -392,6 +560,266 @@ export const verifyEmail = <ThrowOnError extends boolean = false>(options: Optio
  * Quilos e composição por marca, com o tamanho da amostra (evidência para a RAP).
  */
 export const getBrandEvidence = <ThrowOnError extends boolean = false>(options?: Options<GetBrandEvidenceData, ThrowOnError>): RequestResult<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError> => (options?.client ?? client).get<GetBrandEvidenceResponses, GetBrandEvidenceErrors, ThrowOnError>({ url: '/api/v1/brands', ...options });
+
+/**
+ * Get Calibration
+ *
+ * O estado atual da calibração: por métrica e unidade, com n, rótulo, taxa corrente vs prior.
+ *
+ * Vazio até alguém recalcular um cenário (a recomputação é manual, nunca agendada — ADR: captura
+ * anual é derivada). A taxa de pedidos por freguesia está aqui como KPI de procura manifesta.
+ */
+export const getCalibration = <ThrowOnError extends boolean = false>(options?: Options<GetCalibrationData, ThrowOnError>): RequestResult<GetCalibrationResponses, GetCalibrationErrors, ThrowOnError> => (options?.client ?? client).get<GetCalibrationResponses, GetCalibrationErrors, ThrowOnError>({ url: '/api/v1/calibration', ...options });
+
+/**
+ * Get Donor Account
+ *
+ * A conta de doador de quem pede: o pseudónimo do QR de conta e a idade declarada.
+ */
+export const getDonorAccount = <ThrowOnError extends boolean = false>(options?: Options<GetDonorAccountData, ThrowOnError>): RequestResult<GetDonorAccountResponses, GetDonorAccountErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorAccountResponses, GetDonorAccountErrors, ThrowOnError>({ url: '/api/v1/cidadao/account', ...options });
+
+/**
+ * Delete Donor Account
+ *
+ * Apagar a própria conta (art. 17.º): exige o email da conta escrito à mão. A pessoa desaparece;
+ * sacos, livro de pontos, pedidos e consentimentos ficam anónimos (os agregados sobrevivem) e o
+ * facto fica na auditoria, sem email nem IP do próprio.
+ */
+export const deleteDonorAccount = <ThrowOnError extends boolean = false>(options: Options<DeleteDonorAccountData, ThrowOnError>): RequestResult<DeleteDonorAccountResponses, DeleteDonorAccountErrors, ThrowOnError> => (options.client ?? client).post<DeleteDonorAccountResponses, DeleteDonorAccountErrors, ThrowOnError>({
+    url: '/api/v1/cidadao/account/delete',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Donor Deletion Preview
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde. O web usa-o
+ * para as três proteções do ADR (aviso, resgatar antes, «pontos não são dinheiro nem conversíveis»).
+ */
+export const getDonorDeletionPreview = <ThrowOnError extends boolean = false>(options?: Options<GetDonorDeletionPreviewData, ThrowOnError>): RequestResult<GetDonorDeletionPreviewResponses, GetDonorDeletionPreviewErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorDeletionPreviewResponses, GetDonorDeletionPreviewErrors, ThrowOnError>({ url: '/api/v1/cidadao/account/delete-preview', ...options });
+
+/**
+ * Export Donor Account
+ *
+ * Portabilidade (art. 20.º): a conta inteira em JSON legível por máquina — perfil, consentimentos,
+ * sacos, pedidos e livro de pontos. Nunca inclui dados derivados (calibração, pontuações).
+ */
+export const exportDonorAccount = <ThrowOnError extends boolean = false>(options?: Options<ExportDonorAccountData, ThrowOnError>): RequestResult<ExportDonorAccountResponses, ExportDonorAccountErrors, ThrowOnError> => (options?.client ?? client).get<ExportDonorAccountResponses, ExportDonorAccountErrors, ThrowOnError>({ url: '/api/v1/cidadao/account/export', ...options });
+
+/**
+ * Get Donor Account Qr
+ *
+ * O QR de conta (segundo portador, ADR #35): entrega mão a mão, sem saco da plataforma.
+ *
+ * É um portador de CRÉDITO, nunca uma credencial de sessão — quem o apresenta atribui a entrega à
+ * própria conta; o scan só etiqueta o lote com o código pseudónimo. Perder o telemóvel não perde a
+ * conta; o QR pode voltar a abrir-se a qualquer momento.
+ */
+export const getDonorAccountQr = <ThrowOnError extends boolean = false>(options?: Options<GetDonorAccountQrData, ThrowOnError>): RequestResult<GetDonorAccountQrResponses, GetDonorAccountQrErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorAccountQrResponses, GetDonorAccountQrErrors, ThrowOnError>({ url: '/api/v1/cidadao/account/qr', ...options });
+
+/**
+ * List Bag Activations
+ *
+ * Os sacos do próprio, o mais recente primeiro (apelido e declaração incluídos: são privados).
+ */
+export const listBagActivations = <ThrowOnError extends boolean = false>(options?: Options<ListBagActivationsData, ThrowOnError>): RequestResult<ListBagActivationsResponses, ListBagActivationsErrors, ThrowOnError> => (options?.client ?? client).get<ListBagActivationsResponses, ListBagActivationsErrors, ThrowOnError>({ url: '/api/v1/cidadao/bags', ...options });
+
+/**
+ * Create Bag Activation
+ *
+ * Ativa um saco da plataforma: nasce com código e QR próprios (`NVL-…`), apelido privado opcional
+ * e a declaração «Vai no saco?» opcional — a base do bónus de conformidade quando a triagem confirma.
+ */
+export const createBagActivation = <ThrowOnError extends boolean = false>(options: Options<CreateBagActivationData, ThrowOnError>): RequestResult<CreateBagActivationResponses, CreateBagActivationErrors, ThrowOnError> => (options.client ?? client).post<CreateBagActivationResponses, CreateBagActivationErrors, ThrowOnError>({
+    url: '/api/v1/cidadao/bags',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Update Bag Activation
+ *
+ * Corrige o apelido ou a declaração enquanto o saco está ativo; desativado congela (409).
+ */
+export const updateBagActivation = <ThrowOnError extends boolean = false>(options: Options<UpdateBagActivationData, ThrowOnError>): RequestResult<UpdateBagActivationResponses, UpdateBagActivationErrors, ThrowOnError> => (options.client ?? client).patch<UpdateBagActivationResponses, UpdateBagActivationErrors, ThrowOnError>({
+    url: '/api/v1/cidadao/bags/{bag_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Activate Bag
+ *
+ * Reativa um saco desativado (o código é o mesmo: o QR impresso continua a valer).
+ */
+export const activateBag = <ThrowOnError extends boolean = false>(options: Options<ActivateBagData, ThrowOnError>): RequestResult<ActivateBagResponses, ActivateBagErrors, ThrowOnError> => (options.client ?? client).post<ActivateBagResponses, ActivateBagErrors, ThrowOnError>({ url: '/api/v1/cidadao/bags/{bag_id}/activate', ...options });
+
+/**
+ * Deactivate Bag
+ *
+ * Desativa um saco (saiu do sistema: rasgou-se, perdeu-se). Congela sem apagar — o histórico fica.
+ */
+export const deactivateBag = <ThrowOnError extends boolean = false>(options: Options<DeactivateBagData, ThrowOnError>): RequestResult<DeactivateBagResponses, DeactivateBagErrors, ThrowOnError> => (options.client ?? client).post<DeactivateBagResponses, DeactivateBagErrors, ThrowOnError>({ url: '/api/v1/cidadao/bags/{bag_id}/deactivate', ...options });
+
+/**
+ * Get Bag Qr
+ *
+ * O QR do saco ativado: imprime-se ou mostra-se à viatura; o payload é o próprio código `NVL-…`.
+ */
+export const getBagQr = <ThrowOnError extends boolean = false>(options: Options<GetBagQrData, ThrowOnError>): RequestResult<GetBagQrResponses, GetBagQrErrors, ThrowOnError> => (options.client ?? client).get<GetBagQrResponses, GetBagQrErrors, ThrowOnError>({ url: '/api/v1/cidadao/bags/{bag_id}/qr', ...options });
+
+/**
+ * List Donor Campaigns
+ *
+ * As campanhas de pontos na janela corrente (banner informativo; sem multiplicador no MVP).
+ */
+export const listDonorCampaigns = <ThrowOnError extends boolean = false>(options?: Options<ListDonorCampaignsData, ThrowOnError>): RequestResult<ListDonorCampaignsResponses, ListDonorCampaignsErrors, ThrowOnError> => (options?.client ?? client).get<ListDonorCampaignsResponses, ListDonorCampaignsErrors, ThrowOnError>({ url: '/api/v1/cidadao/campaigns', ...options });
+
+/**
+ * Get Donor Catalog
+ *
+ * O catálogo do doador: ativos, com a âncora € APENAS como valor do donativo IPSS — nunca como
+ * valor dos pontos. Parceiro em pausa sai (o prémio não se pode cumprir).
+ */
+export const getDonorCatalog = <ThrowOnError extends boolean = false>(options?: Options<GetDonorCatalogData, ThrowOnError>): RequestResult<GetDonorCatalogResponses, GetDonorCatalogErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorCatalogResponses, GetDonorCatalogErrors, ThrowOnError>({ url: '/api/v1/cidadao/catalog', ...options });
+
+/**
+ * Get Donor Consents
+ *
+ * As duas camadas de consentimento (marketing da Vitrus e ofertas de parceiros), desligadas por
+ * defeito — cada uma com o momento e a versão da política em que foi dada ou retirada.
+ */
+export const getDonorConsents = <ThrowOnError extends boolean = false>(options?: Options<GetDonorConsentsData, ThrowOnError>): RequestResult<GetDonorConsentsResponses, GetDonorConsentsErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorConsentsResponses, GetDonorConsentsErrors, ThrowOnError>({ url: '/api/v1/cidadao/consents', ...options });
+
+/**
+ * Set Donor Consent
+ *
+ * Dar ou retirar UMA camada de consentimento: linha nova append-only + trilha de auditoria (a
+ * prova do art. 7.º/1 RGPD). Retirar é tão fácil como dar; a outra camada não se mexe.
+ */
+export const setDonorConsent = <ThrowOnError extends boolean = false>(options: Options<SetDonorConsentData, ThrowOnError>): RequestResult<SetDonorConsentResponses, SetDonorConsentErrors, ThrowOnError> => (options.client ?? client).put<SetDonorConsentResponses, SetDonorConsentErrors, ThrowOnError>({
+    url: '/api/v1/cidadao/consents',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Collection History
+ *
+ * O histórico do doador: cada saco ligado ao lote que o levou, com link só para o passaporte
+ * público — o passaporte nunca mostra quem entregou (ADR #35).
+ */
+export const getCollectionHistory = <ThrowOnError extends boolean = false>(options?: Options<GetCollectionHistoryData, ThrowOnError>): RequestResult<GetCollectionHistoryResponses, GetCollectionHistoryErrors, ThrowOnError> => (options?.client ?? client).get<GetCollectionHistoryResponses, GetCollectionHistoryErrors, ThrowOnError>({ url: '/api/v1/cidadao/history', ...options });
+
+/**
+ * List Donor Points
+ *
+ * O livro-razão do próprio, o mais recente primeiro, paginado: cada ganho com o saco e o lote que
+ * o originou, cada anulação com o motivo — auditável, mas sem sair da conta.
+ */
+export const listDonorPoints = <ThrowOnError extends boolean = false>(options?: Options<ListDonorPointsData, ThrowOnError>): RequestResult<ListDonorPointsResponses, ListDonorPointsErrors, ThrowOnError> => (options?.client ?? client).get<ListDonorPointsResponses, ListDonorPointsErrors, ThrowOnError>({ url: '/api/v1/cidadao/pontos', ...options });
+
+/**
+ * List Donor Redemptions
+ *
+ * Os meus códigos de resgate, o mais recente primeiro: `RDM-…` e o estado (pendente/validado).
+ */
+export const listDonorRedemptions = <ThrowOnError extends boolean = false>(options?: Options<ListDonorRedemptionsData, ThrowOnError>): RequestResult<ListDonorRedemptionsResponses, ListDonorRedemptionsErrors, ThrowOnError> => (options?.client ?? client).get<ListDonorRedemptionsResponses, ListDonorRedemptionsErrors, ThrowOnError>({ url: '/api/v1/cidadao/redemptions', ...options });
+
+/**
+ * Create Redemption
+ *
+ * Resgatar um item: saldo FIFO debitado (409 com a falta se não chegar), teto de donativos IPSS
+ * indexado ao custo evitado, e nasce o código pseudónimo — o parceiro nunca sabe quem trocou.
+ */
+export const createRedemption = <ThrowOnError extends boolean = false>(options: Options<CreateRedemptionData, ThrowOnError>): RequestResult<CreateRedemptionResponses, CreateRedemptionErrors, ThrowOnError> => (options.client ?? client).post<CreateRedemptionResponses, CreateRedemptionErrors, ThrowOnError>({
+    url: '/api/v1/cidadao/redemptions',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Donor Points Balance
+ *
+ * O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,
+ * o que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web.
+ */
+export const getDonorPointsBalance = <ThrowOnError extends boolean = false>(options?: Options<GetDonorPointsBalanceData, ThrowOnError>): RequestResult<GetDonorPointsBalanceResponses, GetDonorPointsBalanceErrors, ThrowOnError> => (options?.client ?? client).get<GetDonorPointsBalanceResponses, GetDonorPointsBalanceErrors, ThrowOnError>({ url: '/api/v1/cidadao/saldo', ...options });
+
+/**
+ * List Collection Requests
+ *
+ * Os pedidos de recolha: quem pede vê os seus; a equipa vê todos com filtros (`state=exception`
+ * é a fila de despacho). Moradas fora dos 12 meses de retenção são purgadas à leitura.
+ */
+export const listCollectionRequests = <ThrowOnError extends boolean = false>(options?: Options<ListCollectionRequestsData, ThrowOnError>): RequestResult<ListCollectionRequestsResponses, ListCollectionRequestsErrors, ThrowOnError> => (options?.client ?? client).get<ListCollectionRequestsResponses, ListCollectionRequestsErrors, ThrowOnError>({ url: '/api/v1/collection-requests', ...options });
+
+/**
+ * Create Collection Request
+ *
+ * Pede uma recolha. Cidadão: morada manual + freguesia, 1–5 sacos, corte de 48 h, auto-aceite pelas
+ * regras — fora de ronda, fora do prazo, urgência ou mais de 20 sacos (local/B2B) caem na fila de
+ * exceções do gestor. Local/B2B: morada institucional do sítio da conta, teto de 20 (estimativa).
+ */
+export const createCollectionRequest = <ThrowOnError extends boolean = false>(options: Options<CreateCollectionRequestData, ThrowOnError>): RequestResult<CreateCollectionRequestResponses, CreateCollectionRequestErrors, ThrowOnError> => (options.client ?? client).post<CreateCollectionRequestResponses, CreateCollectionRequestErrors, ThrowOnError>({
+    url: '/api/v1/collection-requests',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Cancel Collection Request
+ *
+ * Anula um pedido ativo (agendado ou em exceção). Quem pediu anula o seu; a equipa pode anular qualquer um.
+ */
+export const cancelCollectionRequest = <ThrowOnError extends boolean = false>(options: Options<CancelCollectionRequestData, ThrowOnError>): RequestResult<CancelCollectionRequestResponses, CancelCollectionRequestErrors, ThrowOnError> => (options.client ?? client).delete<CancelCollectionRequestResponses, CancelCollectionRequestErrors, ThrowOnError>({ url: '/api/v1/collection-requests/{request_id}', ...options });
+
+/**
+ * Dispatch Collection Request
+ *
+ * O gestor despacha uma exceção: agendar (com data, que pode sair da ronda pedida) ou recusar com motivo.
+ */
+export const dispatchCollectionRequest = <ThrowOnError extends boolean = false>(options: Options<DispatchCollectionRequestData, ThrowOnError>): RequestResult<DispatchCollectionRequestResponses, DispatchCollectionRequestErrors, ThrowOnError> => (options.client ?? client).post<DispatchCollectionRequestResponses, DispatchCollectionRequestErrors, ThrowOnError>({
+    url: '/api/v1/collection-requests/{request_id}/dispatch',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Record Request Outcome
+ *
+ * Aponta o resultado da visita: recolhido fecha o pedido; a ausência soma — à 3.ª, o pedido expira.
+ */
+export const recordRequestOutcome = <ThrowOnError extends boolean = false>(options: Options<RecordRequestOutcomeData, ThrowOnError>): RequestResult<RecordRequestOutcomeResponses, RecordRequestOutcomeErrors, ThrowOnError> => (options.client ?? client).post<RecordRequestOutcomeResponses, RecordRequestOutcomeErrors, ThrowOnError>({
+    url: '/api/v1/collection-requests/{request_id}/outcome',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
 
 /**
  * List Copilot Actions
@@ -795,11 +1223,132 @@ export const suggestAlertResolution = <ThrowOnError extends boolean = false>(opt
 export const getDataQuality = <ThrowOnError extends boolean = false>(options?: Options<GetDataQualityData, ThrowOnError>): RequestResult<GetDataQualityResponses, GetDataQualityErrors, ThrowOnError> => (options?.client ?? client).get<GetDataQualityResponses, GetDataQualityErrors, ThrowOnError>({ url: '/api/v1/datasets/quality', ...options });
 
 /**
+ * List Export Lots
+ *
+ * Lotes de escoamento, mais recentes primeiro; os filtros da chave e os de cor/tamanho combinam.
+ */
+export const listExportLots = <ThrowOnError extends boolean = false>(options?: Options<ListExportLotsData, ThrowOnError>): RequestResult<ListExportLotsResponses, ListExportLotsErrors, ThrowOnError> => (options?.client ?? client).get<ListExportLotsResponses, ListExportLotsErrors, ThrowOnError>({ url: '/api/v1/export-lots', ...options });
+
+/**
+ * Create Export Lot
+ *
+ * Fecha um lote de escoamento por (estado fino, tipologia, estação, género): agrega todas as peças
+ * triadas que apanham a chave e ainda não têm lote. Cor e tamanho ficam fora, para filtros.
+ */
+export const createExportLot = <ThrowOnError extends boolean = false>(options: Options<CreateExportLotData, ThrowOnError>): RequestResult<CreateExportLotResponses, CreateExportLotErrors, ThrowOnError> => (options.client ?? client).post<CreateExportLotResponses, CreateExportLotErrors, ThrowOnError>({
+    url: '/api/v1/export-lots',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Export Lot
+ *
+ * Detalhe com linhagem: peças com a paragem de origem e lotes de recolha, mais pesado primeiro.
+ */
+export const getExportLot = <ThrowOnError extends boolean = false>(options: Options<GetExportLotData, ThrowOnError>): RequestResult<GetExportLotResponses, GetExportLotErrors, ThrowOnError> => (options.client ?? client).get<GetExportLotResponses, GetExportLotErrors, ThrowOnError>({ url: '/api/v1/export-lots/{code}', ...options });
+
+/**
+ * Close Export Lot
+ *
+ * Sela o lote para o mercado: as peças nunca mais entram noutro lote e a chave fica livre.
+ */
+export const closeExportLot = <ThrowOnError extends boolean = false>(options: Options<CloseExportLotData, ThrowOnError>): RequestResult<CloseExportLotResponses, CloseExportLotErrors, ThrowOnError> => (options.client ?? client).post<CloseExportLotResponses, CloseExportLotErrors, ThrowOnError>({ url: '/api/v1/export-lots/{code}/close', ...options });
+
+/**
+ * Add Export Lot Items
+ *
+ * Junta a um lote aberto peças triadas depois do fecho: a chave tem de bater certo e a peça não
+ * pode já pertencer a outro lote de escoamento.
+ */
+export const addExportLotItems = <ThrowOnError extends boolean = false>(options: Options<AddExportLotItemsData, ThrowOnError>): RequestResult<AddExportLotItemsResponses, AddExportLotItemsErrors, ThrowOnError> => (options.client ?? client).post<AddExportLotItemsResponses, AddExportLotItemsErrors, ThrowOnError>({
+    url: '/api/v1/export-lots/{code}/items',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Health
  *
  * Liveness: o processo responde. Usado pelo healthcheck do Docker/Coolify.
  */
 export const health = <ThrowOnError extends boolean = false>(options?: Options<HealthData, ThrowOnError>): RequestResult<HealthResponses, HealthErrors, ThrowOnError> => (options?.client ?? client).get<HealthResponses, HealthErrors, ThrowOnError>({ url: '/api/v1/health', ...options });
+
+/**
+ * Get Local Account
+ *
+ * A conta de local de quem pede: o sítio, a natureza e o estado do certificado público.
+ */
+export const getLocalAccount = <ThrowOnError extends boolean = false>(options?: Options<GetLocalAccountData, ThrowOnError>): RequestResult<GetLocalAccountResponses, GetLocalAccountErrors, ThrowOnError> => (options?.client ?? client).get<GetLocalAccountResponses, GetLocalAccountErrors, ThrowOnError>({ url: '/api/v1/local/account', ...options });
+
+/**
+ * Set Local Certificate
+ *
+ * Opt-in do certificado público: ligar ou desligar. Só o próprio local decide — a equipa vê, não muda.
+ */
+export const setLocalCertificate = <ThrowOnError extends boolean = false>(options: Options<SetLocalCertificateData, ThrowOnError>): RequestResult<SetLocalCertificateResponses, SetLocalCertificateErrors, ThrowOnError> => (options.client ?? client).put<SetLocalCertificateResponses, SetLocalCertificateErrors, ThrowOnError>({
+    url: '/api/v1/local/certificate',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * List Local Lots
+ *
+ * Os lotes das paragens do próprio local, com o peso medido (`weight_source` diz de onde vem).
+ */
+export const listLocalLots = <ThrowOnError extends boolean = false>(options?: Options<ListLocalLotsData, ThrowOnError>): RequestResult<ListLocalLotsResponses, ListLocalLotsErrors, ThrowOnError> => (options?.client ?? client).get<ListLocalLotsResponses, ListLocalLotsErrors, ThrowOnError>({ url: '/api/v1/local/lots', ...options });
+
+/**
+ * Create Local Notice
+ *
+ * Avisa «sacos prontos»: o sinal que garante paragem no dia (ADR: política de paragem). 409 se já houver um.
+ */
+export const createLocalNotice = <ThrowOnError extends boolean = false>(options: Options<CreateLocalNoticeData, ThrowOnError>): RequestResult<CreateLocalNoticeResponses, CreateLocalNoticeErrors, ThrowOnError> => (options.client ?? client).post<CreateLocalNoticeResponses, CreateLocalNoticeErrors, ThrowOnError>({
+    url: '/api/v1/local/notices',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Cancel Local Notice
+ *
+ * Anula o aviso ativo (o histórico fica). 404 quando não há aviso ativo.
+ */
+export const cancelLocalNotice = <ThrowOnError extends boolean = false>(options?: Options<CancelLocalNoticeData, ThrowOnError>): RequestResult<CancelLocalNoticeResponses, CancelLocalNoticeErrors, ThrowOnError> => (options?.client ?? client).delete<CancelLocalNoticeResponses, CancelLocalNoticeErrors, ThrowOnError>({ url: '/api/v1/local/notices/active', ...options });
+
+/**
+ * Get Active Local Notice
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum.
+ */
+export const getActiveLocalNotice = <ThrowOnError extends boolean = false>(options?: Options<GetActiveLocalNoticeData, ThrowOnError>): RequestResult<GetActiveLocalNoticeResponses, GetActiveLocalNoticeErrors, ThrowOnError> => (options?.client ?? client).get<GetActiveLocalNoticeResponses, GetActiveLocalNoticeErrors, ThrowOnError>({ url: '/api/v1/local/notices/active', ...options });
+
+/**
+ * Get Local Report
+ *
+ * Relatório do local em kg medidos por destino. Sem CO₂ e sem dados de doadores — nunca.
+ */
+export const getLocalReport = <ThrowOnError extends boolean = false>(options?: Options<GetLocalReportData, ThrowOnError>): RequestResult<GetLocalReportResponses, GetLocalReportErrors, ThrowOnError> => (options?.client ?? client).get<GetLocalReportResponses, GetLocalReportErrors, ThrowOnError>({ url: '/api/v1/local/report', ...options });
+
+/**
+ * List Local Accounts
+ *
+ * As contas de local, com o aviso ativo de cada sítio — a mesa da equipa para despachar rondas.
+ */
+export const listLocalAccounts = <ThrowOnError extends boolean = false>(options?: Options<ListLocalAccountsData, ThrowOnError>): RequestResult<ListLocalAccountsResponses, ListLocalAccountsErrors, ThrowOnError> => (options?.client ?? client).get<ListLocalAccountsResponses, ListLocalAccountsErrors, ThrowOnError>({ url: '/api/v1/locals', ...options });
 
 /**
  * List Lots
@@ -809,7 +1358,7 @@ export const listLots = <ThrowOnError extends boolean = false>(options?: Options
 /**
  * Open Lot
  *
- * Abre um lote no ponto de recolha: gera o código que vai no QR.
+ * Abre um lote ancorado só à freguesia (caminho antigo, antes do lote nascer na paragem).
  */
 export const openLot = <ThrowOnError extends boolean = false>(options: Options<OpenLotData, ThrowOnError>): RequestResult<OpenLotResponses, OpenLotErrors, ThrowOnError> => (options.client ?? client).post<OpenLotResponses, OpenLotErrors, ThrowOnError>({
     url: '/api/v1/lots',
@@ -821,9 +1370,33 @@ export const openLot = <ThrowOnError extends boolean = false>(options: Options<O
 });
 
 /**
+ * Open Stop Lot
+ *
+ * Abre o lote na paragem («Cheguei»): um lote por paragem, ancorado ao local e à freguesia.
+ *
+ * Na recolha a pedido a paragem é 1:1 com o saco; nas rondas acumula os sacos do local. O peso só fica
+ * completo quando as unidades passam pela balança e a viatura parte (`POST /lots/{code}/departure`).
+ */
+export const openStopLot = <ThrowOnError extends boolean = false>(options: Options<OpenStopLotData, ThrowOnError>): RequestResult<OpenStopLotResponses, OpenStopLotErrors, ThrowOnError> => (options.client ?? client).post<OpenStopLotResponses, OpenStopLotErrors, ThrowOnError>({
+    url: '/api/v1/lots/stops',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
  * Get Lot
  */
 export const getLot = <ThrowOnError extends boolean = false>(options: Options<GetLotData, ThrowOnError>): RequestResult<GetLotResponses, GetLotErrors, ThrowOnError> => (options.client ?? client).get<GetLotResponses, GetLotErrors, ThrowOnError>({ url: '/api/v1/lots/{code}', ...options });
+
+/**
+ * Close Stop Lot
+ *
+ * Fecha a paragem («Partir»): exige todas as unidades pesadas; o peso do lote passa a ser o medido.
+ */
+export const closeStopLot = <ThrowOnError extends boolean = false>(options: Options<CloseStopLotData, ThrowOnError>): RequestResult<CloseStopLotResponses, CloseStopLotErrors, ThrowOnError> => (options.client ?? client).post<CloseStopLotResponses, CloseStopLotErrors, ThrowOnError>({ url: '/api/v1/lots/{code}/departure', ...options });
 
 /**
  * Add Lot Item
@@ -881,6 +1454,50 @@ export const changeLotState = <ThrowOnError extends boolean = false>(options: Op
         ...options.headers
     }
 });
+
+/**
+ * Add Lot Unit
+ *
+ * Regista uma unidade física na paragem: o QR do saco da plataforma, ou etiqueta impressa com UUID.
+ *
+ * Sem `bag_code` o servidor gera o UUID da etiqueta (o QR imprime-se em `GET /lots/{code}/units/{id}/qr`).
+ */
+export const addLotUnit = <ThrowOnError extends boolean = false>(options: Options<AddLotUnitData, ThrowOnError>): RequestResult<AddLotUnitResponses, AddLotUnitErrors, ThrowOnError> => (options.client ?? client).post<AddLotUnitResponses, AddLotUnitErrors, ThrowOnError>({
+    url: '/api/v1/lots/{code}/units',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Delete Lot Unit
+ *
+ * Retira uma unidade do lote (scan enganado); fica no histórico e é impossível depois de partir.
+ */
+export const deleteLotUnit = <ThrowOnError extends boolean = false>(options: Options<DeleteLotUnitData, ThrowOnError>): RequestResult<DeleteLotUnitResponses, DeleteLotUnitErrors, ThrowOnError> => (options.client ?? client).delete<DeleteLotUnitResponses, DeleteLotUnitErrors, ThrowOnError>({ url: '/api/v1/lots/{code}/units/{unit_id}', ...options });
+
+/**
+ * Set Lot Unit Weight
+ *
+ * Peso medido da unidade na balança da viatura (pratos ≤ 15 kg: aqui entra a soma dos pratos).
+ */
+export const setLotUnitWeight = <ThrowOnError extends boolean = false>(options: Options<SetLotUnitWeightData, ThrowOnError>): RequestResult<SetLotUnitWeightResponses, SetLotUnitWeightErrors, ThrowOnError> => (options.client ?? client).put<SetLotUnitWeightResponses, SetLotUnitWeightErrors, ThrowOnError>({
+    url: '/api/v1/lots/{code}/units/{unit_id}',
+    ...options,
+    headers: {
+        'Content-Type': 'application/json',
+        ...options.headers
+    }
+});
+
+/**
+ * Get Lot Unit Qr
+ *
+ * QR em SVG da unidade física: o que vai na etiqueta impressa na viatura (UUID quando o saco não tem QR).
+ */
+export const getLotUnitQr = <ThrowOnError extends boolean = false>(options: Options<GetLotUnitQrData, ThrowOnError>): RequestResult<GetLotUnitQrResponses, GetLotUnitQrErrors, ThrowOnError> => (options.client ?? client).get<GetLotUnitQrResponses, GetLotUnitQrErrors, ThrowOnError>({ url: '/api/v1/lots/{code}/units/{unit_id}/qr', ...options });
 
 /**
  * Get Fibre Market
@@ -1189,6 +1806,24 @@ export const runScenarioSensitivity = <ThrowOnError extends boolean = false>(opt
 export const listZones = <ThrowOnError extends boolean = false>(options?: Options<ListZonesData, ThrowOnError>): RequestResult<ListZonesResponses, ListZonesErrors, ThrowOnError> => (options?.client ?? client).get<ListZonesResponses, ListZonesErrors, ThrowOnError>({ url: '/api/v1/planning/zones', ...options });
 
 /**
+ * Get Public Collection Agenda
+ *
+ * As rondas publicadas («onde e quando entrego»), do cenário completo mais recente com agenda.
+ *
+ * Público e sem sessão: é a promessa do serviço ao cidadão. `agenda` nulo = ainda não há agenda
+ * publicada — a página diz-o, nunca inventa dias. Agregado: nenhum dado de contas aqui. Cache curto
+ * no cliente: a agenda muda quando a equipa publica um cenário novo, não a cada minuto.
+ */
+export const getPublicCollectionAgenda = <ThrowOnError extends boolean = false>(options?: Options<GetPublicCollectionAgendaData, ThrowOnError>): RequestResult<GetPublicCollectionAgendaResponses, GetPublicCollectionAgendaErrors, ThrowOnError> => (options?.client ?? client).get<GetPublicCollectionAgendaResponses, GetPublicCollectionAgendaErrors, ThrowOnError>({ url: '/api/v1/public/collection-agenda', ...options });
+
+/**
+ * Get Public Local Certificate
+ *
+ * Página pública do certificado de um local (opt-in). 404 quando desligado: sem opt-in não há página.
+ */
+export const getPublicLocalCertificate = <ThrowOnError extends boolean = false>(options: Options<GetPublicLocalCertificateData, ThrowOnError>): RequestResult<GetPublicLocalCertificateResponses, GetPublicLocalCertificateErrors, ThrowOnError> => (options.client ?? client).get<GetPublicLocalCertificateResponses, GetPublicLocalCertificateErrors, ThrowOnError>({ url: '/api/v1/public/locals/{account_id}/certificate', ...options });
+
+/**
  * Get Passport
  *
  * Passaporte público do lote: o QR aponta para aqui. Sem dados pessoais e sem sessão.
@@ -1208,6 +1843,16 @@ export const getPublicItemPhoto = <ThrowOnError extends boolean = false>(options
  * QR em SVG do passaporte.
  */
 export const getLotQr = <ThrowOnError extends boolean = false>(options: Options<GetLotQrData, ThrowOnError>): RequestResult<GetLotQrResponses, GetLotQrErrors, ThrowOnError> => (options.client ?? client).get<GetLotQrResponses, GetLotQrErrors, ThrowOnError>({ url: '/api/v1/public/lots/{code}/qr', ...options });
+
+/**
+ * Get Public Privacy Policy
+ *
+ * A política de privacidade por finalidades, com prazos por categoria — pública e sem sessão.
+ *
+ * UMA fonte (`features/privacy/policy.py`): o web desenha-a tal e qual; mudou algo, muda-se lá.
+ * Cache curta no cliente: a política só muda quando a equipa muda a versão.
+ */
+export const getPublicPrivacyPolicy = <ThrowOnError extends boolean = false>(options?: Options<GetPublicPrivacyPolicyData, ThrowOnError>): RequestResult<GetPublicPrivacyPolicyResponses, GetPublicPrivacyPolicyErrors, ThrowOnError> => (options?.client ?? client).get<GetPublicPrivacyPolicyResponses, GetPublicPrivacyPolicyErrors, ThrowOnError>({ url: '/api/v1/public/privacy-policy', ...options });
 
 /**
  * Ready
@@ -1284,6 +1929,13 @@ export const analyseGarment = <ThrowOnError extends boolean = false>(options: Op
         ...options.headers
     }
 });
+
+/**
+ * List Triage Golden Labels
+ *
+ * Rótulos dourados: correções do operador a propostas da IA, por eixo (verdade-terreno do eval).
+ */
+export const listTriageGoldenLabels = <ThrowOnError extends boolean = false>(options?: Options<ListTriageGoldenLabelsData, ThrowOnError>): RequestResult<ListTriageGoldenLabelsResponses, ListTriageGoldenLabelsErrors, ThrowOnError> => (options?.client ?? client).get<ListTriageGoldenLabelsResponses, ListTriageGoldenLabelsErrors, ThrowOnError>({ url: '/api/v1/triage/golden-labels', ...options });
 
 /**
  * List Users

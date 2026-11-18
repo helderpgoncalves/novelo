@@ -3,8 +3,8 @@
 import { type InfiniteData, infiniteQueryOptions, queryOptions, type UseMutationOptions } from '@tanstack/react-query';
 
 import { client } from '../client.gen';
-import { acceptInvitation, addLotItem, analyseGarment, applyWhatIf, approvePendingMemory, approveUser, askWhatIf, changeLotState, changePassword, clearCopilotMemory, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBenchmarkScenario, createCopilotMemoryEntry, createEmailSuppression, createInvitation, createInvitationLink, createRapReport, createScenario, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteEmailSuppression, deleteItemPhoto, deleteScenario, deleteUser, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, exportMunicipalSites, forgotPassword, getAiCredits, getAiSettings, getAiUsage, getApprovalStatus, getAppSettings, getAuthConfig, getB2bChannel, getBrandEvidence, getCaopParishesGeojson, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getEmail, getEmailDnsHealth, getEmailSummary, getFibreMarket, getFleet, getItemPhoto, getLot, getLotQr, getMe, getModelValidation, getMunicipalDensityBenchmark, getMunicipalGapRanking, getMunicipalOverview, getMunicipalParish, getMunicipalSite, getMunicipalSitesGeojson, getObservedFlows, getOverview, getPassport, getPlanningParameters, getPublicItemPhoto, getQuickJoinInfo, getQuickJoinQr, getRegistrationInfo, getScenario, getScenarioCoverage, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTextileCandidateSites, getTriageEval, getUsersSummary, getWasteComposition, googleCallback, googleLogin, health, listAiModels, listAudit, listBenchmarks, listCircuits, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listEmails, listEmailSuppressions, listGuests, listInvitations, listLocalities, listLots, listMunicipalContainers, listMunicipalParishes, listMunicipalProducers, listMunicipalSites, listPendingMemory, listReferenceScenarios, listReports, listScenarios, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, type Options, pinCopilotArtifact, previewCopilotPersona, previewInvitation, proposeCopilotAction, quickJoin, ready, receiveResendWebhook, recommendPilot, refresh, refreshCopilotArtifact, refreshEmailStatus, register, rejectCopilotAction, rejectPendingMemory, rejectUser, renameScenario, requestMagicLink, resendInvitation, resendRegistrationEmail, resendUserEmail, resendVerification, reserveLot, resetPassword, revokeInvitation, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, sendTestEmail, shareCopilotThread, startImpersonation, stopImpersonation, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateAppSettings, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updateOnboarding, updatePlanningParameters, updateUser, uploadCopilotAttachments, uploadItemPhoto, verifyEmail, verifyMagicLink } from '../sdk.gen';
-import type { AcceptInvitationData, AcceptInvitationError, AcceptInvitationResponse, AddLotItemData, AddLotItemError, AddLotItemResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, ApproveUserData, ApproveUserError, ApproveUserResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateEmailSuppressionData, CreateEmailSuppressionError, CreateEmailSuppressionResponse, CreateInvitationData, CreateInvitationError, CreateInvitationLinkData, CreateInvitationLinkError, CreateInvitationLinkResponse, CreateInvitationResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteEmailSuppressionData, DeleteEmailSuppressionError, DeleteEmailSuppressionResponse, DeleteItemPhotoData, DeleteItemPhotoError, DeleteItemPhotoResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ExportMunicipalSitesData, ExportMunicipalSitesError, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetApprovalStatusData, GetApprovalStatusError, GetApprovalStatusResponse, GetAppSettingsData, GetAppSettingsError, GetAppSettingsResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetB2bChannelData, GetB2bChannelError, GetB2bChannelResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCaopParishesGeojsonData, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetEmailData, GetEmailDnsHealthData, GetEmailDnsHealthError, GetEmailDnsHealthResponse, GetEmailError, GetEmailResponse, GetEmailSummaryData, GetEmailSummaryError, GetEmailSummaryResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetItemPhotoData, GetItemPhotoError, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetMeData, GetMeError, GetMeResponse, GetModelValidationData, GetModelValidationError, GetModelValidationResponse, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, GetMunicipalGapRankingData, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, GetMunicipalOverviewData, GetMunicipalOverviewError, GetMunicipalOverviewResponse, GetMunicipalParishData, GetMunicipalParishError, GetMunicipalParishResponse, GetMunicipalSiteData, GetMunicipalSiteError, GetMunicipalSiteResponse, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetPublicItemPhotoData, GetPublicItemPhotoError, GetQuickJoinInfoData, GetQuickJoinInfoError, GetQuickJoinInfoResponse, GetQuickJoinQrData, GetQuickJoinQrError, GetQuickJoinQrResponse, GetRegistrationInfoData, GetRegistrationInfoError, GetRegistrationInfoResponse, GetScenarioCoverageData, GetScenarioCoverageError, GetScenarioCoverageResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTextileCandidateSitesData, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetUsersSummaryData, GetUsersSummaryError, GetUsersSummaryResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListAuditData, ListAuditError, ListAuditResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListEmailsData, ListEmailsError, ListEmailsResponse, ListEmailSuppressionsData, ListEmailSuppressionsError, ListEmailSuppressionsResponse, ListGuestsData, ListGuestsError, ListGuestsResponse, ListInvitationsData, ListInvitationsError, ListInvitationsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLotsData, ListLotsError, ListLotsResponse, ListMunicipalContainersData, ListMunicipalContainersError, ListMunicipalContainersResponse, ListMunicipalParishesData, ListMunicipalParishesError, ListMunicipalParishesResponse, ListMunicipalProducersData, ListMunicipalProducersError, ListMunicipalProducersResponse, ListMunicipalSitesData, ListMunicipalSitesError, ListMunicipalSitesResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReferenceScenariosData, ListReferenceScenariosError, ListReferenceScenariosResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, PreviewInvitationData, PreviewInvitationError, PreviewInvitationResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, QuickJoinData, QuickJoinError, QuickJoinResponse, ReadyData, ReadyError, ReadyResponse, ReceiveResendWebhookData, ReceiveResendWebhookError, ReceiveResendWebhookResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshEmailStatusData, RefreshEmailStatusError, RefreshEmailStatusResponse, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RejectUserData, RejectUserError, RejectUserResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, RequestMagicLinkData, RequestMagicLinkError, RequestMagicLinkResponse, ResendInvitationData, ResendInvitationError, ResendInvitationResponse, ResendRegistrationEmailData, ResendRegistrationEmailError, ResendRegistrationEmailResponse, ResendUserEmailData, ResendUserEmailError, ResendUserEmailResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RevokeInvitationData, RevokeInvitationError, RevokeInvitationResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, SendTestEmailData, SendTestEmailError, SendTestEmailResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, StartImpersonationData, StartImpersonationError, StartImpersonationResponse, StopImpersonationData, StopImpersonationError, StopImpersonationResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateAppSettingsData, UpdateAppSettingsError, UpdateAppSettingsResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateOnboardingData, UpdateOnboardingError, UpdateOnboardingResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, UploadItemPhotoData, UploadItemPhotoError, UploadItemPhotoResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse, VerifyMagicLinkData, VerifyMagicLinkError, VerifyMagicLinkResponse } from '../types.gen';
+import { acceptInvitation, activateBag, addExportLotItems, addLotItem, addLotUnit, analyseGarment, applyWhatIf, approveCatalogPartner, approvePendingMemory, approveUser, askWhatIf, cancelCollectionRequest, cancelLocalNotice, changeLotState, changePassword, clearCopilotMemory, closeExportLot, closeStopLot, compactCopilotThread, compareScenarioRobustness, confirmCopilotAction, copilotChat, createBagActivation, createBenchmarkScenario, createCatalogItem, createCatalogPartner, createCollectionRequest, createCopilotMemoryEntry, createEmailSuppression, createExportLot, createInvitation, createInvitationLink, createLocalNotice, createPointCampaign, createPointsAnnulment, createRapReport, createRedemption, createScenario, deactivateBag, deactivateCatalogPartner, deleteCopilotArtifact, deleteCopilotData, deleteCopilotMemoryEntry, deleteCopilotThread, deleteDonorAccount, deleteEmailSuppression, deleteItemPhoto, deleteLotUnit, deleteScenario, deleteUser, dispatchCollectionRequest, donorSignUp, downloadReport, exportCopilotData, exportCopilotThread, exportCopilotThreadPdf, exportDonorAccount, exportMunicipalSites, forgotPassword, getActiveLocalNotice, getAiCredits, getAiSettings, getAiUsage, getApprovalStatus, getAppSettings, getAuthConfig, getB2bChannel, getBagQr, getBrandEvidence, getCalibration, getCaopParishesGeojson, getCollectionHistory, getCopilotEventSchema, getCopilotSettings, getCopilotThread, getCopilotThreadTimeline, getCoverage, getDataQuality, getDonorAccount, getDonorAccountQr, getDonorCatalog, getDonorConsents, getDonorDeletionPreview, getDonorPointsBalance, getEmail, getEmailDnsHealth, getEmailSummary, getExportLot, getFibreMarket, getFleet, getItemPhoto, getLocalAccount, getLocalReport, getLot, getLotQr, getLotUnitQr, getMe, getModelValidation, getMunicipalDensityBenchmark, getMunicipalGapRanking, getMunicipalOverview, getMunicipalParish, getMunicipalSite, getMunicipalSitesGeojson, getObservedFlows, getOverview, getPassport, getPlanningParameters, getPublicCollectionAgenda, getPublicItemPhoto, getPublicLocalCertificate, getPublicPrivacyPolicy, getQuickJoinInfo, getQuickJoinQr, getRegistrationInfo, getScenario, getScenarioCoverage, getScenarioFlows, getSharedCopilotThread, getTextileBaseline, getTextileCandidateSites, getTriageEval, getUsersSummary, getWasteComposition, googleCallback, googleLogin, health, listAdminCampaigns, listAdminCatalogItems, listAiModels, listAudit, listBagActivations, listBenchmarks, listCatalogPartners, listCircuits, listCollectionRequests, listContainers, listCopilotActions, listCopilotArtifacts, listCopilotCommands, listCopilotHistory, listCopilotMemoryEntries, listCopilotProjects, listCopilotThreads, listDonorCampaigns, listDonorPoints, listDonorRedemptions, listEmails, listEmailSuppressions, listExportLots, listGuests, listInvitations, listLocalAccounts, listLocalities, listLocalLots, listLots, listMunicipalContainers, listMunicipalParishes, listMunicipalProducers, listMunicipalSites, listPendingMemory, listReferenceScenarios, listReports, listScenarios, listTriageGoldenLabels, listUsers, listWhatIfs, listZones, login, logout, logoutAll, openLot, openStopLot, type Options, pinCopilotArtifact, previewCopilotPersona, previewInvitation, proposeCopilotAction, quickJoin, ready, receiveResendWebhook, recommendPilot, recordRequestOutcome, refresh, refreshCopilotArtifact, refreshEmailStatus, register, rejectCopilotAction, rejectPendingMemory, rejectUser, renameScenario, requestMagicLink, resendInvitation, resendRegistrationEmail, resendUserEmail, resendVerification, reserveLot, resetPassword, revokeInvitation, runScenarioSensitivity, searchCopilotMentions, searchCopilotSessions, sendCopilotFeedback, sendTestEmail, setDonorConsent, setLocalCertificate, setLotUnitWeight, shareCopilotThread, startImpersonation, stopImpersonation, suggestAlertResolution, testAiModel, undoCopilotAction, unshareCopilotThread, updateAiSettings, updateAppSettings, updateBagActivation, updateCatalogItem, updateCatalogPartner, updateCopilotMemoryEntry, updateCopilotSettings, updateCopilotThread, updateDataAlert, updateMe, updateOnboarding, updatePlanningParameters, updatePointCampaign, updateUser, uploadCopilotAttachments, uploadItemPhoto, validateRedemptionCode, verifyEmail, verifyMagicLink } from '../sdk.gen';
+import type { AcceptInvitationData, AcceptInvitationError, AcceptInvitationResponse, ActivateBagData, ActivateBagError, ActivateBagResponse, AddExportLotItemsData, AddExportLotItemsError, AddExportLotItemsResponse, AddLotItemData, AddLotItemError, AddLotItemResponse, AddLotUnitData, AddLotUnitError, AddLotUnitResponse, AnalyseGarmentData, AnalyseGarmentError, AnalyseGarmentResponse, ApplyWhatIfData, ApplyWhatIfError, ApplyWhatIfResponse, ApproveCatalogPartnerData, ApproveCatalogPartnerError, ApproveCatalogPartnerResponse, ApprovePendingMemoryData, ApprovePendingMemoryError, ApprovePendingMemoryResponse, ApproveUserData, ApproveUserError, ApproveUserResponse, AskWhatIfData, AskWhatIfError, AskWhatIfResponse, CancelCollectionRequestData, CancelCollectionRequestError, CancelCollectionRequestResponse, CancelLocalNoticeData, CancelLocalNoticeError, CancelLocalNoticeResponse, ChangeLotStateData, ChangeLotStateError, ChangeLotStateResponse, ChangePasswordData, ChangePasswordError, ChangePasswordResponse, ClearCopilotMemoryData, ClearCopilotMemoryError, ClearCopilotMemoryResponse, CloseExportLotData, CloseExportLotError, CloseExportLotResponse, CloseStopLotData, CloseStopLotError, CloseStopLotResponse, CompactCopilotThreadData, CompactCopilotThreadError, CompactCopilotThreadResponse, CompareScenarioRobustnessData, CompareScenarioRobustnessError, CompareScenarioRobustnessResponse, ConfirmCopilotActionData, ConfirmCopilotActionError, ConfirmCopilotActionResponse, CopilotChatData, CopilotChatError, CopilotChatResponse, CreateBagActivationData, CreateBagActivationError, CreateBagActivationResponse, CreateBenchmarkScenarioData, CreateBenchmarkScenarioError, CreateBenchmarkScenarioResponse, CreateCatalogItemData, CreateCatalogItemError, CreateCatalogItemResponse, CreateCatalogPartnerData, CreateCatalogPartnerError, CreateCatalogPartnerResponse, CreateCollectionRequestData, CreateCollectionRequestError, CreateCollectionRequestResponse, CreateCopilotMemoryEntryData, CreateCopilotMemoryEntryError, CreateCopilotMemoryEntryResponse, CreateEmailSuppressionData, CreateEmailSuppressionError, CreateEmailSuppressionResponse, CreateExportLotData, CreateExportLotError, CreateExportLotResponse, CreateInvitationData, CreateInvitationError, CreateInvitationLinkData, CreateInvitationLinkError, CreateInvitationLinkResponse, CreateInvitationResponse, CreateLocalNoticeData, CreateLocalNoticeError, CreateLocalNoticeResponse, CreatePointCampaignData, CreatePointCampaignError, CreatePointCampaignResponse, CreatePointsAnnulmentData, CreatePointsAnnulmentError, CreatePointsAnnulmentResponse, CreateRapReportData, CreateRapReportError, CreateRapReportResponse, CreateRedemptionData, CreateRedemptionError, CreateRedemptionResponse, CreateScenarioData, CreateScenarioError, CreateScenarioResponse, DeactivateBagData, DeactivateBagError, DeactivateBagResponse, DeactivateCatalogPartnerData, DeactivateCatalogPartnerError, DeactivateCatalogPartnerResponse, DeleteCopilotArtifactData, DeleteCopilotArtifactError, DeleteCopilotArtifactResponse, DeleteCopilotDataData, DeleteCopilotDataError, DeleteCopilotMemoryEntryData, DeleteCopilotMemoryEntryError, DeleteCopilotMemoryEntryResponse, DeleteCopilotThreadData, DeleteCopilotThreadError, DeleteCopilotThreadResponse, DeleteDonorAccountData, DeleteDonorAccountError, DeleteDonorAccountResponse, DeleteEmailSuppressionData, DeleteEmailSuppressionError, DeleteEmailSuppressionResponse, DeleteItemPhotoData, DeleteItemPhotoError, DeleteItemPhotoResponse, DeleteLotUnitData, DeleteLotUnitError, DeleteLotUnitResponse, DeleteScenarioData, DeleteScenarioError, DeleteScenarioResponse, DeleteUserData, DeleteUserError, DeleteUserResponse, DispatchCollectionRequestData, DispatchCollectionRequestError, DispatchCollectionRequestResponse, DonorSignUpData, DonorSignUpError, DonorSignUpResponse, DownloadReportData, DownloadReportError, DownloadReportResponse, ExportCopilotDataData, ExportCopilotDataError, ExportCopilotDataResponse, ExportCopilotThreadData, ExportCopilotThreadError, ExportCopilotThreadPdfData, ExportCopilotThreadPdfError, ExportCopilotThreadPdfResponse, ExportCopilotThreadResponse, ExportDonorAccountData, ExportDonorAccountError, ExportDonorAccountResponse, ExportMunicipalSitesData, ExportMunicipalSitesError, ForgotPasswordData, ForgotPasswordError, ForgotPasswordResponse, GetActiveLocalNoticeData, GetActiveLocalNoticeError, GetActiveLocalNoticeResponse, GetAiCreditsData, GetAiCreditsError, GetAiCreditsResponse, GetAiSettingsData, GetAiSettingsError, GetAiSettingsResponse, GetAiUsageData, GetAiUsageError, GetAiUsageResponse, GetApprovalStatusData, GetApprovalStatusError, GetApprovalStatusResponse, GetAppSettingsData, GetAppSettingsError, GetAppSettingsResponse, GetAuthConfigData, GetAuthConfigError, GetAuthConfigResponse, GetB2bChannelData, GetB2bChannelError, GetB2bChannelResponse, GetBagQrData, GetBagQrError, GetBagQrResponse, GetBrandEvidenceData, GetBrandEvidenceError, GetBrandEvidenceResponse, GetCalibrationData, GetCalibrationError, GetCalibrationResponse, GetCaopParishesGeojsonData, GetCaopParishesGeojsonError, GetCaopParishesGeojsonResponse, GetCollectionHistoryData, GetCollectionHistoryError, GetCollectionHistoryResponse, GetCopilotEventSchemaData, GetCopilotEventSchemaError, GetCopilotEventSchemaResponse, GetCopilotSettingsData, GetCopilotSettingsError, GetCopilotSettingsResponse, GetCopilotThreadData, GetCopilotThreadError, GetCopilotThreadResponse, GetCopilotThreadTimelineData, GetCopilotThreadTimelineError, GetCopilotThreadTimelineResponse, GetCoverageData, GetCoverageError, GetCoverageResponse, GetDataQualityData, GetDataQualityError, GetDataQualityResponse, GetDonorAccountData, GetDonorAccountError, GetDonorAccountQrData, GetDonorAccountQrError, GetDonorAccountQrResponse, GetDonorAccountResponse, GetDonorCatalogData, GetDonorCatalogError, GetDonorCatalogResponse, GetDonorConsentsData, GetDonorConsentsError, GetDonorConsentsResponse, GetDonorDeletionPreviewData, GetDonorDeletionPreviewError, GetDonorDeletionPreviewResponse, GetDonorPointsBalanceData, GetDonorPointsBalanceError, GetDonorPointsBalanceResponse, GetEmailData, GetEmailDnsHealthData, GetEmailDnsHealthError, GetEmailDnsHealthResponse, GetEmailError, GetEmailResponse, GetEmailSummaryData, GetEmailSummaryError, GetEmailSummaryResponse, GetExportLotData, GetExportLotError, GetExportLotResponse, GetFibreMarketData, GetFibreMarketError, GetFibreMarketResponse, GetFleetData, GetFleetError, GetFleetResponse, GetItemPhotoData, GetItemPhotoError, GetLocalAccountData, GetLocalAccountError, GetLocalAccountResponse, GetLocalReportData, GetLocalReportError, GetLocalReportResponse, GetLotData, GetLotError, GetLotQrData, GetLotQrError, GetLotQrResponse, GetLotResponse, GetLotUnitQrData, GetLotUnitQrError, GetLotUnitQrResponse, GetMeData, GetMeError, GetMeResponse, GetModelValidationData, GetModelValidationError, GetModelValidationResponse, GetMunicipalDensityBenchmarkData, GetMunicipalDensityBenchmarkError, GetMunicipalDensityBenchmarkResponse, GetMunicipalGapRankingData, GetMunicipalGapRankingError, GetMunicipalGapRankingResponse, GetMunicipalOverviewData, GetMunicipalOverviewError, GetMunicipalOverviewResponse, GetMunicipalParishData, GetMunicipalParishError, GetMunicipalParishResponse, GetMunicipalSiteData, GetMunicipalSiteError, GetMunicipalSiteResponse, GetMunicipalSitesGeojsonData, GetMunicipalSitesGeojsonError, GetMunicipalSitesGeojsonResponse, GetObservedFlowsData, GetObservedFlowsError, GetObservedFlowsResponse, GetOverviewData, GetOverviewError, GetOverviewResponse, GetPassportData, GetPassportError, GetPassportResponse, GetPlanningParametersData, GetPlanningParametersError, GetPlanningParametersResponse, GetPublicCollectionAgendaData, GetPublicCollectionAgendaError, GetPublicCollectionAgendaResponse, GetPublicItemPhotoData, GetPublicItemPhotoError, GetPublicLocalCertificateData, GetPublicLocalCertificateError, GetPublicLocalCertificateResponse, GetPublicPrivacyPolicyData, GetPublicPrivacyPolicyError, GetPublicPrivacyPolicyResponse, GetQuickJoinInfoData, GetQuickJoinInfoError, GetQuickJoinInfoResponse, GetQuickJoinQrData, GetQuickJoinQrError, GetQuickJoinQrResponse, GetRegistrationInfoData, GetRegistrationInfoError, GetRegistrationInfoResponse, GetScenarioCoverageData, GetScenarioCoverageError, GetScenarioCoverageResponse, GetScenarioData, GetScenarioError, GetScenarioFlowsData, GetScenarioFlowsError, GetScenarioFlowsResponse, GetScenarioResponse, GetSharedCopilotThreadData, GetSharedCopilotThreadError, GetSharedCopilotThreadResponse, GetTextileBaselineData, GetTextileBaselineError, GetTextileBaselineResponse, GetTextileCandidateSitesData, GetTextileCandidateSitesError, GetTextileCandidateSitesResponse, GetTriageEvalData, GetTriageEvalError, GetTriageEvalResponse, GetUsersSummaryData, GetUsersSummaryError, GetUsersSummaryResponse, GetWasteCompositionData, GetWasteCompositionError, GetWasteCompositionResponse, GoogleCallbackData, GoogleCallbackError, GoogleLoginData, GoogleLoginError, HealthData, HealthError, HealthResponse, ListAdminCampaignsData, ListAdminCampaignsError, ListAdminCampaignsResponse, ListAdminCatalogItemsData, ListAdminCatalogItemsError, ListAdminCatalogItemsResponse, ListAiModelsData, ListAiModelsError, ListAiModelsResponse, ListAuditData, ListAuditError, ListAuditResponse, ListBagActivationsData, ListBagActivationsError, ListBagActivationsResponse, ListBenchmarksData, ListBenchmarksError, ListBenchmarksResponse, ListCatalogPartnersData, ListCatalogPartnersError, ListCatalogPartnersResponse, ListCircuitsData, ListCircuitsError, ListCircuitsResponse, ListCollectionRequestsData, ListCollectionRequestsError, ListCollectionRequestsResponse, ListContainersData, ListContainersError, ListContainersResponse, ListCopilotActionsData, ListCopilotActionsError, ListCopilotActionsResponse, ListCopilotArtifactsData, ListCopilotArtifactsError, ListCopilotArtifactsResponse, ListCopilotCommandsData, ListCopilotCommandsError, ListCopilotCommandsResponse, ListCopilotHistoryData, ListCopilotHistoryError, ListCopilotHistoryResponse, ListCopilotMemoryEntriesData, ListCopilotMemoryEntriesError, ListCopilotMemoryEntriesResponse, ListCopilotProjectsData, ListCopilotProjectsError, ListCopilotProjectsResponse, ListCopilotThreadsData, ListCopilotThreadsError, ListCopilotThreadsResponse, ListDonorCampaignsData, ListDonorCampaignsError, ListDonorCampaignsResponse, ListDonorPointsData, ListDonorPointsError, ListDonorPointsResponse, ListDonorRedemptionsData, ListDonorRedemptionsError, ListDonorRedemptionsResponse, ListEmailsData, ListEmailsError, ListEmailsResponse, ListEmailSuppressionsData, ListEmailSuppressionsError, ListEmailSuppressionsResponse, ListExportLotsData, ListExportLotsError, ListExportLotsResponse, ListGuestsData, ListGuestsError, ListGuestsResponse, ListInvitationsData, ListInvitationsError, ListInvitationsResponse, ListLocalAccountsData, ListLocalAccountsError, ListLocalAccountsResponse, ListLocalitiesData, ListLocalitiesError, ListLocalitiesResponse, ListLocalLotsData, ListLocalLotsError, ListLocalLotsResponse, ListLotsData, ListLotsError, ListLotsResponse, ListMunicipalContainersData, ListMunicipalContainersError, ListMunicipalContainersResponse, ListMunicipalParishesData, ListMunicipalParishesError, ListMunicipalParishesResponse, ListMunicipalProducersData, ListMunicipalProducersError, ListMunicipalProducersResponse, ListMunicipalSitesData, ListMunicipalSitesError, ListMunicipalSitesResponse, ListPendingMemoryData, ListPendingMemoryError, ListPendingMemoryResponse, ListReferenceScenariosData, ListReferenceScenariosError, ListReferenceScenariosResponse, ListReportsData, ListReportsError, ListReportsResponse, ListScenariosData, ListScenariosError, ListScenariosResponse, ListTriageGoldenLabelsData, ListTriageGoldenLabelsError, ListTriageGoldenLabelsResponse, ListUsersData, ListUsersError, ListUsersResponse, ListWhatIfsData, ListWhatIfsError, ListWhatIfsResponse, ListZonesData, ListZonesError, ListZonesResponse, LoginData, LoginError, LoginResponse, LogoutAllData, LogoutAllError, LogoutAllResponse, LogoutData, LogoutError, LogoutResponse, OpenLotData, OpenLotError, OpenLotResponse, OpenStopLotData, OpenStopLotError, OpenStopLotResponse, PinCopilotArtifactData, PinCopilotArtifactError, PinCopilotArtifactResponse, PreviewCopilotPersonaData, PreviewCopilotPersonaError, PreviewCopilotPersonaResponse, PreviewInvitationData, PreviewInvitationError, PreviewInvitationResponse, ProposeCopilotActionData, ProposeCopilotActionError, ProposeCopilotActionResponse, QuickJoinData, QuickJoinError, QuickJoinResponse, ReadyData, ReadyError, ReadyResponse, ReceiveResendWebhookData, ReceiveResendWebhookError, ReceiveResendWebhookResponse, RecommendPilotData, RecommendPilotError, RecommendPilotResponse, RecordRequestOutcomeData, RecordRequestOutcomeError, RecordRequestOutcomeResponse, RefreshCopilotArtifactData, RefreshCopilotArtifactError, RefreshCopilotArtifactResponse, RefreshData, RefreshEmailStatusData, RefreshEmailStatusError, RefreshEmailStatusResponse, RefreshError, RefreshResponse, RegisterData, RegisterError, RegisterResponse, RejectCopilotActionData, RejectCopilotActionError, RejectCopilotActionResponse, RejectPendingMemoryData, RejectPendingMemoryError, RejectPendingMemoryResponse, RejectUserData, RejectUserError, RejectUserResponse, RenameScenarioData, RenameScenarioError, RenameScenarioResponse, RequestMagicLinkData, RequestMagicLinkError, RequestMagicLinkResponse, ResendInvitationData, ResendInvitationError, ResendInvitationResponse, ResendRegistrationEmailData, ResendRegistrationEmailError, ResendRegistrationEmailResponse, ResendUserEmailData, ResendUserEmailError, ResendUserEmailResponse, ResendVerificationData, ResendVerificationError, ResendVerificationResponse, ReserveLotData, ReserveLotError, ReserveLotResponse, ResetPasswordData, ResetPasswordError, ResetPasswordResponse, RevokeInvitationData, RevokeInvitationError, RevokeInvitationResponse, RunScenarioSensitivityData, RunScenarioSensitivityError, RunScenarioSensitivityResponse, SearchCopilotMentionsData, SearchCopilotMentionsError, SearchCopilotMentionsResponse, SearchCopilotSessionsData, SearchCopilotSessionsError, SearchCopilotSessionsResponse, SendCopilotFeedbackData, SendCopilotFeedbackError, SendCopilotFeedbackResponse, SendTestEmailData, SendTestEmailError, SendTestEmailResponse, SetDonorConsentData, SetDonorConsentError, SetDonorConsentResponse, SetLocalCertificateData, SetLocalCertificateError, SetLocalCertificateResponse, SetLotUnitWeightData, SetLotUnitWeightError, SetLotUnitWeightResponse, ShareCopilotThreadData, ShareCopilotThreadError, ShareCopilotThreadResponse, StartImpersonationData, StartImpersonationError, StartImpersonationResponse, StopImpersonationData, StopImpersonationError, StopImpersonationResponse, SuggestAlertResolutionData, SuggestAlertResolutionError, SuggestAlertResolutionResponse, TestAiModelData, TestAiModelError, TestAiModelResponse, UndoCopilotActionData, UndoCopilotActionError, UndoCopilotActionResponse, UnshareCopilotThreadData, UnshareCopilotThreadError, UnshareCopilotThreadResponse, UpdateAiSettingsData, UpdateAiSettingsError, UpdateAiSettingsResponse, UpdateAppSettingsData, UpdateAppSettingsError, UpdateAppSettingsResponse, UpdateBagActivationData, UpdateBagActivationError, UpdateBagActivationResponse, UpdateCatalogItemData, UpdateCatalogItemError, UpdateCatalogItemResponse, UpdateCatalogPartnerData, UpdateCatalogPartnerError, UpdateCatalogPartnerResponse, UpdateCopilotMemoryEntryData, UpdateCopilotMemoryEntryError, UpdateCopilotMemoryEntryResponse, UpdateCopilotSettingsData, UpdateCopilotSettingsError, UpdateCopilotSettingsResponse, UpdateCopilotThreadData, UpdateCopilotThreadError, UpdateCopilotThreadResponse, UpdateDataAlertData, UpdateDataAlertError, UpdateDataAlertResponse, UpdateMeData, UpdateMeError, UpdateMeResponse, UpdateOnboardingData, UpdateOnboardingError, UpdateOnboardingResponse, UpdatePlanningParametersData, UpdatePlanningParametersError, UpdatePlanningParametersResponse, UpdatePointCampaignData, UpdatePointCampaignError, UpdatePointCampaignResponse, UpdateUserData, UpdateUserError, UpdateUserResponse, UploadCopilotAttachmentsData, UploadCopilotAttachmentsError, UploadCopilotAttachmentsResponse, UploadItemPhotoData, UploadItemPhotoError, UploadItemPhotoResponse, ValidateRedemptionCodeData, ValidateRedemptionCodeError, ValidateRedemptionCodeResponse, VerifyEmailData, VerifyEmailError, VerifyEmailResponse, VerifyMagicLinkData, VerifyMagicLinkError, VerifyMagicLinkResponse } from '../types.gen';
 
 export type QueryKey<TOptions extends Options> = [
     Pick<TOptions, 'baseUrl' | 'body' | 'headers' | 'path' | 'query'> & {
@@ -37,6 +37,259 @@ const createQueryKey = <TOptions extends Options>(id: string, options?: TOptions
         params.query = options.query;
     }
     return [params];
+};
+
+export const listAdminCampaignsQueryKey = (options?: Options<ListAdminCampaignsData>) => createQueryKey('listAdminCampaigns', options);
+
+/**
+ * List Admin Campaigns
+ *
+ * Todas as campanhas (passadas, correntes e futuras): a gestão agenda o calendário do impulso.
+ */
+export const listAdminCampaignsOptions = (options?: Options<ListAdminCampaignsData>) => queryOptions<ListAdminCampaignsResponse, ListAdminCampaignsError, ListAdminCampaignsResponse, ReturnType<typeof listAdminCampaignsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listAdminCampaigns({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listAdminCampaignsQueryKey(options)
+});
+
+/**
+ * Create Point Campaign
+ *
+ * Criar campanha sazonal de pontos: janela temporal + descrição (informativa no MVP).
+ */
+export const createPointCampaignMutation = (options?: Partial<Options<CreatePointCampaignData>>): UseMutationOptions<CreatePointCampaignResponse, CreatePointCampaignError, Options<CreatePointCampaignData>> => {
+    const mutationOptions: UseMutationOptions<CreatePointCampaignResponse, CreatePointCampaignError, Options<CreatePointCampaignData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createPointCampaign({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update Point Campaign
+ *
+ * Editar campanha: nome, descrição e janela (o fim continua a ter de ser depois do início).
+ */
+export const updatePointCampaignMutation = (options?: Partial<Options<UpdatePointCampaignData>>): UseMutationOptions<UpdatePointCampaignResponse, UpdatePointCampaignError, Options<UpdatePointCampaignData>> => {
+    const mutationOptions: UseMutationOptions<UpdatePointCampaignResponse, UpdatePointCampaignError, Options<UpdatePointCampaignData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updatePointCampaign({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listAdminCatalogItemsQueryKey = (options?: Options<ListAdminCatalogItemsData>) => createQueryKey('listAdminCatalogItems', options);
+
+/**
+ * List Admin Catalog Items
+ *
+ * O catálogo pela equipa: tudo (incl. inativos e parceiros em pausa), o mais recente primeiro.
+ */
+export const listAdminCatalogItemsOptions = (options?: Options<ListAdminCatalogItemsData>) => queryOptions<ListAdminCatalogItemsResponse, ListAdminCatalogItemsError, ListAdminCatalogItemsResponse, ReturnType<typeof listAdminCatalogItemsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listAdminCatalogItems({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listAdminCatalogItemsQueryKey(options)
+});
+
+/**
+ * Create Catalog Item
+ *
+ * Criar item (donativo IPSS, prémio de parceiro ou acumulado ambiental): a forma é fechada —
+ * âncora € só no donativo, parceiro obrigatório no prémio (422 caso contrário).
+ */
+export const createCatalogItemMutation = (options?: Partial<Options<CreateCatalogItemData>>): UseMutationOptions<CreateCatalogItemResponse, CreateCatalogItemError, Options<CreateCatalogItemData>> => {
+    const mutationOptions: UseMutationOptions<CreateCatalogItemResponse, CreateCatalogItemError, Options<CreateCatalogItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCatalogItem({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update Catalog Item
+ *
+ * Editar item (nome, custo, âncora, ativo, stock…): a forma revalida-se sobre o resultado.
+ */
+export const updateCatalogItemMutation = (options?: Partial<Options<UpdateCatalogItemData>>): UseMutationOptions<UpdateCatalogItemResponse, UpdateCatalogItemError, Options<UpdateCatalogItemData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCatalogItemResponse, UpdateCatalogItemError, Options<UpdateCatalogItemData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateCatalogItem({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listCatalogPartnersQueryKey = (options?: Options<ListCatalogPartnersData>) => createQueryKey('listCatalogPartners', options);
+
+/**
+ * List Catalog Partners
+ *
+ * O gestor de parcerias: propostas por aprovar, ativos e em pausa, o mais recente primeiro.
+ */
+export const listCatalogPartnersOptions = (options?: Options<ListCatalogPartnersData>) => queryOptions<ListCatalogPartnersResponse, ListCatalogPartnersError, ListCatalogPartnersResponse, ReturnType<typeof listCatalogPartnersQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCatalogPartners({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCatalogPartnersQueryKey(options)
+});
+
+/**
+ * Create Catalog Partner
+ *
+ * Registar a proposta de um parceiro (a freguesia propõe, nasce `proposed`; a Vitrus aprova depois).
+ */
+export const createCatalogPartnerMutation = (options?: Partial<Options<CreateCatalogPartnerData>>): UseMutationOptions<CreateCatalogPartnerResponse, CreateCatalogPartnerError, Options<CreateCatalogPartnerData>> => {
+    const mutationOptions: UseMutationOptions<CreateCatalogPartnerResponse, CreateCatalogPartnerError, Options<CreateCatalogPartnerData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCatalogPartner({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update Catalog Partner
+ *
+ * Editar dados do parceiro (nome, descrição, contato da equipa); o estado vai pelos portões.
+ */
+export const updateCatalogPartnerMutation = (options?: Partial<Options<UpdateCatalogPartnerData>>): UseMutationOptions<UpdateCatalogPartnerResponse, UpdateCatalogPartnerError, Options<UpdateCatalogPartnerData>> => {
+    const mutationOptions: UseMutationOptions<UpdateCatalogPartnerResponse, UpdateCatalogPartnerError, Options<UpdateCatalogPartnerData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateCatalogPartner({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Approve Catalog Partner
+ *
+ * Aprovar a proposta: o parceiro fica ativo (prémios no catálogo, códigos aceites).
+ */
+export const approveCatalogPartnerMutation = (options?: Partial<Options<ApproveCatalogPartnerData>>): UseMutationOptions<ApproveCatalogPartnerResponse, ApproveCatalogPartnerError, Options<ApproveCatalogPartnerData>> => {
+    const mutationOptions: UseMutationOptions<ApproveCatalogPartnerResponse, ApproveCatalogPartnerError, Options<ApproveCatalogPartnerData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await approveCatalogPartner({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Deactivate Catalog Partner
+ *
+ * Pôr em pausa: os prémios saem do catálogo do doador e novos resgates são recusados (409).
+ */
+export const deactivateCatalogPartnerMutation = (options?: Partial<Options<DeactivateCatalogPartnerData>>): UseMutationOptions<DeactivateCatalogPartnerResponse, DeactivateCatalogPartnerError, Options<DeactivateCatalogPartnerData>> => {
+    const mutationOptions: UseMutationOptions<DeactivateCatalogPartnerResponse, DeactivateCatalogPartnerError, Options<DeactivateCatalogPartnerData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deactivateCatalogPartner({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Create Points Annulment
+ *
+ * Anular pontos em abuso (interesse legítimo declarado): entrada NEGATIVA com motivo OBRIGATÓRIO
+ * no livro-razão — nunca se apaga nem se edita linha. Fica na trilha de auditoria com o autor.
+ */
+export const createPointsAnnulmentMutation = (options?: Partial<Options<CreatePointsAnnulmentData>>): UseMutationOptions<CreatePointsAnnulmentResponse, CreatePointsAnnulmentError, Options<CreatePointsAnnulmentData>> => {
+    const mutationOptions: UseMutationOptions<CreatePointsAnnulmentResponse, CreatePointsAnnulmentError, Options<CreatePointsAnnulmentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createPointsAnnulment({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Validate Redemption Code
+ *
+ * Validar o código apresentado pelo parceiro/IPSS: marca usado UMA vez (pagamento integral,
+ * auditado) e devolve o estado. Segunda apresentação é 409 `redemption_already_used`.
+ */
+export const validateRedemptionCodeMutation = (options?: Partial<Options<ValidateRedemptionCodeData>>): UseMutationOptions<ValidateRedemptionCodeResponse, ValidateRedemptionCodeError, Options<ValidateRedemptionCodeData>> => {
+    const mutationOptions: UseMutationOptions<ValidateRedemptionCodeResponse, ValidateRedemptionCodeError, Options<ValidateRedemptionCodeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await validateRedemptionCode({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
 };
 
 export const getAppSettingsQueryKey = (options?: Options<GetAppSettingsData>) => createQueryKey('getAppSettings', options);
@@ -274,6 +527,29 @@ export const getAuthConfigOptions = (options?: Options<GetAuthConfigData>) => qu
     },
     queryKey: getAuthConfigQueryKey(options)
 });
+
+/**
+ * Donor Sign Up
+ *
+ * Conta de doador por email, sem password (13+ com idade declarada; menor de 13 é recusa explícita).
+ *
+ * Email novo: cria a conta leve logo aprovada (papel `donor`) e envia o link de entrada para
+ * `/cidadao`. Email que já tem conta: só o link de entrada — nunca revela que existia. A resposta é
+ * sempre 204 exista ou não a conta, como no magic link.
+ */
+export const donorSignUpMutation = (options?: Partial<Options<DonorSignUpData>>): UseMutationOptions<DonorSignUpResponse, DonorSignUpError, Options<DonorSignUpData>> => {
+    const mutationOptions: UseMutationOptions<DonorSignUpResponse, DonorSignUpError, Options<DonorSignUpData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await donorSignUp({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Forgot Password
@@ -834,6 +1110,570 @@ export const getBrandEvidenceOptions = (options?: Options<GetBrandEvidenceData>)
     },
     queryKey: getBrandEvidenceQueryKey(options)
 });
+
+export const getCalibrationQueryKey = (options?: Options<GetCalibrationData>) => createQueryKey('getCalibration', options);
+
+/**
+ * Get Calibration
+ *
+ * O estado atual da calibração: por métrica e unidade, com n, rótulo, taxa corrente vs prior.
+ *
+ * Vazio até alguém recalcular um cenário (a recomputação é manual, nunca agendada — ADR: captura
+ * anual é derivada). A taxa de pedidos por freguesia está aqui como KPI de procura manifesta.
+ */
+export const getCalibrationOptions = (options?: Options<GetCalibrationData>) => queryOptions<GetCalibrationResponse, GetCalibrationError, GetCalibrationResponse, ReturnType<typeof getCalibrationQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCalibration({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCalibrationQueryKey(options)
+});
+
+export const getDonorAccountQueryKey = (options?: Options<GetDonorAccountData>) => createQueryKey('getDonorAccount', options);
+
+/**
+ * Get Donor Account
+ *
+ * A conta de doador de quem pede: o pseudónimo do QR de conta e a idade declarada.
+ */
+export const getDonorAccountOptions = (options?: Options<GetDonorAccountData>) => queryOptions<GetDonorAccountResponse, GetDonorAccountError, GetDonorAccountResponse, ReturnType<typeof getDonorAccountQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorAccount({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorAccountQueryKey(options)
+});
+
+/**
+ * Delete Donor Account
+ *
+ * Apagar a própria conta (art. 17.º): exige o email da conta escrito à mão. A pessoa desaparece;
+ * sacos, livro de pontos, pedidos e consentimentos ficam anónimos (os agregados sobrevivem) e o
+ * facto fica na auditoria, sem email nem IP do próprio.
+ */
+export const deleteDonorAccountMutation = (options?: Partial<Options<DeleteDonorAccountData>>): UseMutationOptions<DeleteDonorAccountResponse, DeleteDonorAccountError, Options<DeleteDonorAccountData>> => {
+    const mutationOptions: UseMutationOptions<DeleteDonorAccountResponse, DeleteDonorAccountError, Options<DeleteDonorAccountData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteDonorAccount({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getDonorDeletionPreviewQueryKey = (options?: Options<GetDonorDeletionPreviewData>) => createQueryKey('getDonorDeletionPreview', options);
+
+/**
+ * Get Donor Deletion Preview
+ *
+ * O pré-aviso OBRIGATÓRIO antes de apagar: saldo atual, prazos FIFO e o que se perde. O web usa-o
+ * para as três proteções do ADR (aviso, resgatar antes, «pontos não são dinheiro nem conversíveis»).
+ */
+export const getDonorDeletionPreviewOptions = (options?: Options<GetDonorDeletionPreviewData>) => queryOptions<GetDonorDeletionPreviewResponse, GetDonorDeletionPreviewError, GetDonorDeletionPreviewResponse, ReturnType<typeof getDonorDeletionPreviewQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorDeletionPreview({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorDeletionPreviewQueryKey(options)
+});
+
+export const exportDonorAccountQueryKey = (options?: Options<ExportDonorAccountData>) => createQueryKey('exportDonorAccount', options);
+
+/**
+ * Export Donor Account
+ *
+ * Portabilidade (art. 20.º): a conta inteira em JSON legível por máquina — perfil, consentimentos,
+ * sacos, pedidos e livro de pontos. Nunca inclui dados derivados (calibração, pontuações).
+ */
+export const exportDonorAccountOptions = (options?: Options<ExportDonorAccountData>) => queryOptions<ExportDonorAccountResponse, ExportDonorAccountError, ExportDonorAccountResponse, ReturnType<typeof exportDonorAccountQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await exportDonorAccount({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: exportDonorAccountQueryKey(options)
+});
+
+export const getDonorAccountQrQueryKey = (options?: Options<GetDonorAccountQrData>) => createQueryKey('getDonorAccountQr', options);
+
+/**
+ * Get Donor Account Qr
+ *
+ * O QR de conta (segundo portador, ADR #35): entrega mão a mão, sem saco da plataforma.
+ *
+ * É um portador de CRÉDITO, nunca uma credencial de sessão — quem o apresenta atribui a entrega à
+ * própria conta; o scan só etiqueta o lote com o código pseudónimo. Perder o telemóvel não perde a
+ * conta; o QR pode voltar a abrir-se a qualquer momento.
+ */
+export const getDonorAccountQrOptions = (options?: Options<GetDonorAccountQrData>) => queryOptions<GetDonorAccountQrResponse, GetDonorAccountQrError, GetDonorAccountQrResponse, ReturnType<typeof getDonorAccountQrQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorAccountQr({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorAccountQrQueryKey(options)
+});
+
+export const listBagActivationsQueryKey = (options?: Options<ListBagActivationsData>) => createQueryKey('listBagActivations', options);
+
+/**
+ * List Bag Activations
+ *
+ * Os sacos do próprio, o mais recente primeiro (apelido e declaração incluídos: são privados).
+ */
+export const listBagActivationsOptions = (options?: Options<ListBagActivationsData>) => queryOptions<ListBagActivationsResponse, ListBagActivationsError, ListBagActivationsResponse, ReturnType<typeof listBagActivationsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listBagActivations({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listBagActivationsQueryKey(options)
+});
+
+/**
+ * Create Bag Activation
+ *
+ * Ativa um saco da plataforma: nasce com código e QR próprios (`NVL-…`), apelido privado opcional
+ * e a declaração «Vai no saco?» opcional — a base do bónus de conformidade quando a triagem confirma.
+ */
+export const createBagActivationMutation = (options?: Partial<Options<CreateBagActivationData>>): UseMutationOptions<CreateBagActivationResponse, CreateBagActivationError, Options<CreateBagActivationData>> => {
+    const mutationOptions: UseMutationOptions<CreateBagActivationResponse, CreateBagActivationError, Options<CreateBagActivationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createBagActivation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Update Bag Activation
+ *
+ * Corrige o apelido ou a declaração enquanto o saco está ativo; desativado congela (409).
+ */
+export const updateBagActivationMutation = (options?: Partial<Options<UpdateBagActivationData>>): UseMutationOptions<UpdateBagActivationResponse, UpdateBagActivationError, Options<UpdateBagActivationData>> => {
+    const mutationOptions: UseMutationOptions<UpdateBagActivationResponse, UpdateBagActivationError, Options<UpdateBagActivationData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await updateBagActivation({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Activate Bag
+ *
+ * Reativa um saco desativado (o código é o mesmo: o QR impresso continua a valer).
+ */
+export const activateBagMutation = (options?: Partial<Options<ActivateBagData>>): UseMutationOptions<ActivateBagResponse, ActivateBagError, Options<ActivateBagData>> => {
+    const mutationOptions: UseMutationOptions<ActivateBagResponse, ActivateBagError, Options<ActivateBagData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await activateBag({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Deactivate Bag
+ *
+ * Desativa um saco (saiu do sistema: rasgou-se, perdeu-se). Congela sem apagar — o histórico fica.
+ */
+export const deactivateBagMutation = (options?: Partial<Options<DeactivateBagData>>): UseMutationOptions<DeactivateBagResponse, DeactivateBagError, Options<DeactivateBagData>> => {
+    const mutationOptions: UseMutationOptions<DeactivateBagResponse, DeactivateBagError, Options<DeactivateBagData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deactivateBag({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getBagQrQueryKey = (options: Options<GetBagQrData>) => createQueryKey('getBagQr', options);
+
+/**
+ * Get Bag Qr
+ *
+ * O QR do saco ativado: imprime-se ou mostra-se à viatura; o payload é o próprio código `NVL-…`.
+ */
+export const getBagQrOptions = (options: Options<GetBagQrData>) => queryOptions<GetBagQrResponse, GetBagQrError, GetBagQrResponse, ReturnType<typeof getBagQrQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getBagQr({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getBagQrQueryKey(options)
+});
+
+export const listDonorCampaignsQueryKey = (options?: Options<ListDonorCampaignsData>) => createQueryKey('listDonorCampaigns', options);
+
+/**
+ * List Donor Campaigns
+ *
+ * As campanhas de pontos na janela corrente (banner informativo; sem multiplicador no MVP).
+ */
+export const listDonorCampaignsOptions = (options?: Options<ListDonorCampaignsData>) => queryOptions<ListDonorCampaignsResponse, ListDonorCampaignsError, ListDonorCampaignsResponse, ReturnType<typeof listDonorCampaignsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listDonorCampaigns({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listDonorCampaignsQueryKey(options)
+});
+
+export const getDonorCatalogQueryKey = (options?: Options<GetDonorCatalogData>) => createQueryKey('getDonorCatalog', options);
+
+/**
+ * Get Donor Catalog
+ *
+ * O catálogo do doador: ativos, com a âncora € APENAS como valor do donativo IPSS — nunca como
+ * valor dos pontos. Parceiro em pausa sai (o prémio não se pode cumprir).
+ */
+export const getDonorCatalogOptions = (options?: Options<GetDonorCatalogData>) => queryOptions<GetDonorCatalogResponse, GetDonorCatalogError, GetDonorCatalogResponse, ReturnType<typeof getDonorCatalogQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorCatalog({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorCatalogQueryKey(options)
+});
+
+export const getDonorConsentsQueryKey = (options?: Options<GetDonorConsentsData>) => createQueryKey('getDonorConsents', options);
+
+/**
+ * Get Donor Consents
+ *
+ * As duas camadas de consentimento (marketing da Vitrus e ofertas de parceiros), desligadas por
+ * defeito — cada uma com o momento e a versão da política em que foi dada ou retirada.
+ */
+export const getDonorConsentsOptions = (options?: Options<GetDonorConsentsData>) => queryOptions<GetDonorConsentsResponse, GetDonorConsentsError, GetDonorConsentsResponse, ReturnType<typeof getDonorConsentsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorConsents({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorConsentsQueryKey(options)
+});
+
+/**
+ * Set Donor Consent
+ *
+ * Dar ou retirar UMA camada de consentimento: linha nova append-only + trilha de auditoria (a
+ * prova do art. 7.º/1 RGPD). Retirar é tão fácil como dar; a outra camada não se mexe.
+ */
+export const setDonorConsentMutation = (options?: Partial<Options<SetDonorConsentData>>): UseMutationOptions<SetDonorConsentResponse, SetDonorConsentError, Options<SetDonorConsentData>> => {
+    const mutationOptions: UseMutationOptions<SetDonorConsentResponse, SetDonorConsentError, Options<SetDonorConsentData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await setDonorConsent({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getCollectionHistoryQueryKey = (options?: Options<GetCollectionHistoryData>) => createQueryKey('getCollectionHistory', options);
+
+/**
+ * Get Collection History
+ *
+ * O histórico do doador: cada saco ligado ao lote que o levou, com link só para o passaporte
+ * público — o passaporte nunca mostra quem entregou (ADR #35).
+ */
+export const getCollectionHistoryOptions = (options?: Options<GetCollectionHistoryData>) => queryOptions<GetCollectionHistoryResponse, GetCollectionHistoryError, GetCollectionHistoryResponse, ReturnType<typeof getCollectionHistoryQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getCollectionHistory({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getCollectionHistoryQueryKey(options)
+});
+
+export const listDonorPointsQueryKey = (options?: Options<ListDonorPointsData>) => createQueryKey('listDonorPoints', options);
+
+/**
+ * List Donor Points
+ *
+ * O livro-razão do próprio, o mais recente primeiro, paginado: cada ganho com o saco e o lote que
+ * o originou, cada anulação com o motivo — auditável, mas sem sair da conta.
+ */
+export const listDonorPointsOptions = (options?: Options<ListDonorPointsData>) => queryOptions<ListDonorPointsResponse, ListDonorPointsError, ListDonorPointsResponse, ReturnType<typeof listDonorPointsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listDonorPoints({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listDonorPointsQueryKey(options)
+});
+
+export const listDonorPointsInfiniteQueryKey = (options?: Options<ListDonorPointsData>): QueryKey<Options<ListDonorPointsData>> => createQueryKey('listDonorPoints', options, true);
+
+/**
+ * List Donor Points
+ *
+ * O livro-razão do próprio, o mais recente primeiro, paginado: cada ganho com o saco e o lote que
+ * o originou, cada anulação com o motivo — auditável, mas sem sair da conta.
+ */
+export const listDonorPointsInfiniteOptions = (options?: Options<ListDonorPointsData>) => {
+    const opts = infiniteQueryOptions<ListDonorPointsResponse, ListDonorPointsError, InfiniteData<ListDonorPointsResponse>, QueryKey<Options<ListDonorPointsData>>, number | Pick<QueryKey<Options<ListDonorPointsData>>[0], 'body' | 'headers' | 'path' | 'query'>>(
+    // @ts-ignore
+    {
+        queryFn: async ({ pageParam, queryKey, signal }) => {
+            // @ts-ignore
+            const page: Pick<QueryKey<Options<ListDonorPointsData>>[0], 'body' | 'headers' | 'path' | 'query'> = typeof pageParam === 'object' ? pageParam : {
+                query: {
+                    offset: pageParam
+                }
+            };
+            const params = createInfiniteParams(queryKey, page);
+            const { data } = await listDonorPoints({
+                ...options,
+                ...params,
+                signal,
+                throwOnError: true
+            });
+            return data;
+        },
+        queryKey: listDonorPointsInfiniteQueryKey(options)
+    });
+    return opts as Omit<typeof opts, 'initialData'>;
+};
+
+export const listDonorRedemptionsQueryKey = (options?: Options<ListDonorRedemptionsData>) => createQueryKey('listDonorRedemptions', options);
+
+/**
+ * List Donor Redemptions
+ *
+ * Os meus códigos de resgate, o mais recente primeiro: `RDM-…` e o estado (pendente/validado).
+ */
+export const listDonorRedemptionsOptions = (options?: Options<ListDonorRedemptionsData>) => queryOptions<ListDonorRedemptionsResponse, ListDonorRedemptionsError, ListDonorRedemptionsResponse, ReturnType<typeof listDonorRedemptionsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listDonorRedemptions({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listDonorRedemptionsQueryKey(options)
+});
+
+/**
+ * Create Redemption
+ *
+ * Resgatar um item: saldo FIFO debitado (409 com a falta se não chegar), teto de donativos IPSS
+ * indexado ao custo evitado, e nasce o código pseudónimo — o parceiro nunca sabe quem trocou.
+ */
+export const createRedemptionMutation = (options?: Partial<Options<CreateRedemptionData>>): UseMutationOptions<CreateRedemptionResponse, CreateRedemptionError, Options<CreateRedemptionData>> => {
+    const mutationOptions: UseMutationOptions<CreateRedemptionResponse, CreateRedemptionError, Options<CreateRedemptionData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createRedemption({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getDonorPointsBalanceQueryKey = (options?: Options<GetDonorPointsBalanceData>) => createQueryKey('getDonorPointsBalance', options);
+
+/**
+ * Get Donor Points Balance
+ *
+ * O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,
+ * o que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web.
+ */
+export const getDonorPointsBalanceOptions = (options?: Options<GetDonorPointsBalanceData>) => queryOptions<GetDonorPointsBalanceResponse, GetDonorPointsBalanceError, GetDonorPointsBalanceResponse, ReturnType<typeof getDonorPointsBalanceQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getDonorPointsBalance({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getDonorPointsBalanceQueryKey(options)
+});
+
+export const listCollectionRequestsQueryKey = (options?: Options<ListCollectionRequestsData>) => createQueryKey('listCollectionRequests', options);
+
+/**
+ * List Collection Requests
+ *
+ * Os pedidos de recolha: quem pede vê os seus; a equipa vê todos com filtros (`state=exception`
+ * é a fila de despacho). Moradas fora dos 12 meses de retenção são purgadas à leitura.
+ */
+export const listCollectionRequestsOptions = (options?: Options<ListCollectionRequestsData>) => queryOptions<ListCollectionRequestsResponse, ListCollectionRequestsError, ListCollectionRequestsResponse, ReturnType<typeof listCollectionRequestsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listCollectionRequests({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listCollectionRequestsQueryKey(options)
+});
+
+/**
+ * Create Collection Request
+ *
+ * Pede uma recolha. Cidadão: morada manual + freguesia, 1–5 sacos, corte de 48 h, auto-aceite pelas
+ * regras — fora de ronda, fora do prazo, urgência ou mais de 20 sacos (local/B2B) caem na fila de
+ * exceções do gestor. Local/B2B: morada institucional do sítio da conta, teto de 20 (estimativa).
+ */
+export const createCollectionRequestMutation = (options?: Partial<Options<CreateCollectionRequestData>>): UseMutationOptions<CreateCollectionRequestResponse, CreateCollectionRequestError, Options<CreateCollectionRequestData>> => {
+    const mutationOptions: UseMutationOptions<CreateCollectionRequestResponse, CreateCollectionRequestError, Options<CreateCollectionRequestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createCollectionRequest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Cancel Collection Request
+ *
+ * Anula um pedido ativo (agendado ou em exceção). Quem pediu anula o seu; a equipa pode anular qualquer um.
+ */
+export const cancelCollectionRequestMutation = (options?: Partial<Options<CancelCollectionRequestData>>): UseMutationOptions<CancelCollectionRequestResponse, CancelCollectionRequestError, Options<CancelCollectionRequestData>> => {
+    const mutationOptions: UseMutationOptions<CancelCollectionRequestResponse, CancelCollectionRequestError, Options<CancelCollectionRequestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await cancelCollectionRequest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Dispatch Collection Request
+ *
+ * O gestor despacha uma exceção: agendar (com data, que pode sair da ronda pedida) ou recusar com motivo.
+ */
+export const dispatchCollectionRequestMutation = (options?: Partial<Options<DispatchCollectionRequestData>>): UseMutationOptions<DispatchCollectionRequestResponse, DispatchCollectionRequestError, Options<DispatchCollectionRequestData>> => {
+    const mutationOptions: UseMutationOptions<DispatchCollectionRequestResponse, DispatchCollectionRequestError, Options<DispatchCollectionRequestData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await dispatchCollectionRequest({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Record Request Outcome
+ *
+ * Aponta o resultado da visita: recolhido fecha o pedido; a ausência soma — à 3.ª, o pedido expira.
+ */
+export const recordRequestOutcomeMutation = (options?: Partial<Options<RecordRequestOutcomeData>>): UseMutationOptions<RecordRequestOutcomeResponse, RecordRequestOutcomeError, Options<RecordRequestOutcomeData>> => {
+    const mutationOptions: UseMutationOptions<RecordRequestOutcomeResponse, RecordRequestOutcomeError, Options<RecordRequestOutcomeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await recordRequestOutcome({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 export const listCopilotActionsQueryKey = (options?: Options<ListCopilotActionsData>) => createQueryKey('listCopilotActions', options);
 
@@ -1816,6 +2656,105 @@ export const getDataQualityOptions = (options?: Options<GetDataQualityData>) => 
     queryKey: getDataQualityQueryKey(options)
 });
 
+export const listExportLotsQueryKey = (options?: Options<ListExportLotsData>) => createQueryKey('listExportLots', options);
+
+/**
+ * List Export Lots
+ *
+ * Lotes de escoamento, mais recentes primeiro; os filtros da chave e os de cor/tamanho combinam.
+ */
+export const listExportLotsOptions = (options?: Options<ListExportLotsData>) => queryOptions<ListExportLotsResponse, ListExportLotsError, ListExportLotsResponse, ReturnType<typeof listExportLotsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listExportLots({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listExportLotsQueryKey(options)
+});
+
+/**
+ * Create Export Lot
+ *
+ * Fecha um lote de escoamento por (estado fino, tipologia, estação, género): agrega todas as peças
+ * triadas que apanham a chave e ainda não têm lote. Cor e tamanho ficam fora, para filtros.
+ */
+export const createExportLotMutation = (options?: Partial<Options<CreateExportLotData>>): UseMutationOptions<CreateExportLotResponse, CreateExportLotError, Options<CreateExportLotData>> => {
+    const mutationOptions: UseMutationOptions<CreateExportLotResponse, CreateExportLotError, Options<CreateExportLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createExportLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getExportLotQueryKey = (options: Options<GetExportLotData>) => createQueryKey('getExportLot', options);
+
+/**
+ * Get Export Lot
+ *
+ * Detalhe com linhagem: peças com a paragem de origem e lotes de recolha, mais pesado primeiro.
+ */
+export const getExportLotOptions = (options: Options<GetExportLotData>) => queryOptions<GetExportLotResponse, GetExportLotError, GetExportLotResponse, ReturnType<typeof getExportLotQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getExportLot({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getExportLotQueryKey(options)
+});
+
+/**
+ * Close Export Lot
+ *
+ * Sela o lote para o mercado: as peças nunca mais entram noutro lote e a chave fica livre.
+ */
+export const closeExportLotMutation = (options?: Partial<Options<CloseExportLotData>>): UseMutationOptions<CloseExportLotResponse, CloseExportLotError, Options<CloseExportLotData>> => {
+    const mutationOptions: UseMutationOptions<CloseExportLotResponse, CloseExportLotError, Options<CloseExportLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await closeExportLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Add Export Lot Items
+ *
+ * Junta a um lote aberto peças triadas depois do fecho: a chave tem de bater certo e a peça não
+ * pode já pertencer a outro lote de escoamento.
+ */
+export const addExportLotItemsMutation = (options?: Partial<Options<AddExportLotItemsData>>): UseMutationOptions<AddExportLotItemsResponse, AddExportLotItemsError, Options<AddExportLotItemsData>> => {
+    const mutationOptions: UseMutationOptions<AddExportLotItemsResponse, AddExportLotItemsError, Options<AddExportLotItemsData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await addExportLotItems({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
 export const healthQueryKey = (options?: Options<HealthData>) => createQueryKey('health', options);
 
 /**
@@ -1834,6 +2773,163 @@ export const healthOptions = (options?: Options<HealthData>) => queryOptions<Hea
         return data;
     },
     queryKey: healthQueryKey(options)
+});
+
+export const getLocalAccountQueryKey = (options?: Options<GetLocalAccountData>) => createQueryKey('getLocalAccount', options);
+
+/**
+ * Get Local Account
+ *
+ * A conta de local de quem pede: o sítio, a natureza e o estado do certificado público.
+ */
+export const getLocalAccountOptions = (options?: Options<GetLocalAccountData>) => queryOptions<GetLocalAccountResponse, GetLocalAccountError, GetLocalAccountResponse, ReturnType<typeof getLocalAccountQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLocalAccount({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLocalAccountQueryKey(options)
+});
+
+/**
+ * Set Local Certificate
+ *
+ * Opt-in do certificado público: ligar ou desligar. Só o próprio local decide — a equipa vê, não muda.
+ */
+export const setLocalCertificateMutation = (options?: Partial<Options<SetLocalCertificateData>>): UseMutationOptions<SetLocalCertificateResponse, SetLocalCertificateError, Options<SetLocalCertificateData>> => {
+    const mutationOptions: UseMutationOptions<SetLocalCertificateResponse, SetLocalCertificateError, Options<SetLocalCertificateData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await setLocalCertificate({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const listLocalLotsQueryKey = (options?: Options<ListLocalLotsData>) => createQueryKey('listLocalLots', options);
+
+/**
+ * List Local Lots
+ *
+ * Os lotes das paragens do próprio local, com o peso medido (`weight_source` diz de onde vem).
+ */
+export const listLocalLotsOptions = (options?: Options<ListLocalLotsData>) => queryOptions<ListLocalLotsResponse, ListLocalLotsError, ListLocalLotsResponse, ReturnType<typeof listLocalLotsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listLocalLots({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listLocalLotsQueryKey(options)
+});
+
+/**
+ * Create Local Notice
+ *
+ * Avisa «sacos prontos»: o sinal que garante paragem no dia (ADR: política de paragem). 409 se já houver um.
+ */
+export const createLocalNoticeMutation = (options?: Partial<Options<CreateLocalNoticeData>>): UseMutationOptions<CreateLocalNoticeResponse, CreateLocalNoticeError, Options<CreateLocalNoticeData>> => {
+    const mutationOptions: UseMutationOptions<CreateLocalNoticeResponse, CreateLocalNoticeError, Options<CreateLocalNoticeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await createLocalNotice({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Cancel Local Notice
+ *
+ * Anula o aviso ativo (o histórico fica). 404 quando não há aviso ativo.
+ */
+export const cancelLocalNoticeMutation = (options?: Partial<Options<CancelLocalNoticeData>>): UseMutationOptions<CancelLocalNoticeResponse, CancelLocalNoticeError, Options<CancelLocalNoticeData>> => {
+    const mutationOptions: UseMutationOptions<CancelLocalNoticeResponse, CancelLocalNoticeError, Options<CancelLocalNoticeData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await cancelLocalNotice({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getActiveLocalNoticeQueryKey = (options?: Options<GetActiveLocalNoticeData>) => createQueryKey('getActiveLocalNotice', options);
+
+/**
+ * Get Active Local Notice
+ *
+ * O aviso ativo do local, ou `null` quando não há nenhum.
+ */
+export const getActiveLocalNoticeOptions = (options?: Options<GetActiveLocalNoticeData>) => queryOptions<GetActiveLocalNoticeResponse, GetActiveLocalNoticeError, GetActiveLocalNoticeResponse, ReturnType<typeof getActiveLocalNoticeQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getActiveLocalNotice({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getActiveLocalNoticeQueryKey(options)
+});
+
+export const getLocalReportQueryKey = (options?: Options<GetLocalReportData>) => createQueryKey('getLocalReport', options);
+
+/**
+ * Get Local Report
+ *
+ * Relatório do local em kg medidos por destino. Sem CO₂ e sem dados de doadores — nunca.
+ */
+export const getLocalReportOptions = (options?: Options<GetLocalReportData>) => queryOptions<GetLocalReportResponse, GetLocalReportError, GetLocalReportResponse, ReturnType<typeof getLocalReportQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLocalReport({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLocalReportQueryKey(options)
+});
+
+export const listLocalAccountsQueryKey = (options?: Options<ListLocalAccountsData>) => createQueryKey('listLocalAccounts', options);
+
+/**
+ * List Local Accounts
+ *
+ * As contas de local, com o aviso ativo de cada sítio — a mesa da equipa para despachar rondas.
+ */
+export const listLocalAccountsOptions = (options?: Options<ListLocalAccountsData>) => queryOptions<ListLocalAccountsResponse, ListLocalAccountsError, ListLocalAccountsResponse, ReturnType<typeof listLocalAccountsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listLocalAccounts({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listLocalAccountsQueryKey(options)
 });
 
 export const listLotsQueryKey = (options?: Options<ListLotsData>) => createQueryKey('listLots', options);
@@ -1857,12 +2953,34 @@ export const listLotsOptions = (options?: Options<ListLotsData>) => queryOptions
 /**
  * Open Lot
  *
- * Abre um lote no ponto de recolha: gera o código que vai no QR.
+ * Abre um lote ancorado só à freguesia (caminho antigo, antes do lote nascer na paragem).
  */
 export const openLotMutation = (options?: Partial<Options<OpenLotData>>): UseMutationOptions<OpenLotResponse, OpenLotError, Options<OpenLotData>> => {
     const mutationOptions: UseMutationOptions<OpenLotResponse, OpenLotError, Options<OpenLotData>> = {
         mutationFn: async (fnOptions) => {
             const { data } = await openLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Open Stop Lot
+ *
+ * Abre o lote na paragem («Cheguei»): um lote por paragem, ancorado ao local e à freguesia.
+ *
+ * Na recolha a pedido a paragem é 1:1 com o saco; nas rondas acumula os sacos do local. O peso só fica
+ * completo quando as unidades passam pela balança e a viatura parte (`POST /lots/{code}/departure`).
+ */
+export const openStopLotMutation = (options?: Partial<Options<OpenStopLotData>>): UseMutationOptions<OpenStopLotResponse, OpenStopLotError, Options<OpenStopLotData>> => {
+    const mutationOptions: UseMutationOptions<OpenStopLotResponse, OpenStopLotError, Options<OpenStopLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await openStopLot({
                 ...options,
                 ...fnOptions,
                 throwOnError: true
@@ -1890,6 +3008,25 @@ export const getLotOptions = (options: Options<GetLotData>) => queryOptions<GetL
     },
     queryKey: getLotQueryKey(options)
 });
+
+/**
+ * Close Stop Lot
+ *
+ * Fecha a paragem («Partir»): exige todas as unidades pesadas; o peso do lote passa a ser o medido.
+ */
+export const closeStopLotMutation = (options?: Partial<Options<CloseStopLotData>>): UseMutationOptions<CloseStopLotResponse, CloseStopLotError, Options<CloseStopLotData>> => {
+    const mutationOptions: UseMutationOptions<CloseStopLotResponse, CloseStopLotError, Options<CloseStopLotData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await closeStopLot({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
 
 /**
  * Add Lot Item
@@ -1986,6 +3123,85 @@ export const changeLotStateMutation = (options?: Partial<Options<ChangeLotStateD
     };
     return mutationOptions;
 };
+
+/**
+ * Add Lot Unit
+ *
+ * Regista uma unidade física na paragem: o QR do saco da plataforma, ou etiqueta impressa com UUID.
+ *
+ * Sem `bag_code` o servidor gera o UUID da etiqueta (o QR imprime-se em `GET /lots/{code}/units/{id}/qr`).
+ */
+export const addLotUnitMutation = (options?: Partial<Options<AddLotUnitData>>): UseMutationOptions<AddLotUnitResponse, AddLotUnitError, Options<AddLotUnitData>> => {
+    const mutationOptions: UseMutationOptions<AddLotUnitResponse, AddLotUnitError, Options<AddLotUnitData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await addLotUnit({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Delete Lot Unit
+ *
+ * Retira uma unidade do lote (scan enganado); fica no histórico e é impossível depois de partir.
+ */
+export const deleteLotUnitMutation = (options?: Partial<Options<DeleteLotUnitData>>): UseMutationOptions<DeleteLotUnitResponse, DeleteLotUnitError, Options<DeleteLotUnitData>> => {
+    const mutationOptions: UseMutationOptions<DeleteLotUnitResponse, DeleteLotUnitError, Options<DeleteLotUnitData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await deleteLotUnit({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+/**
+ * Set Lot Unit Weight
+ *
+ * Peso medido da unidade na balança da viatura (pratos ≤ 15 kg: aqui entra a soma dos pratos).
+ */
+export const setLotUnitWeightMutation = (options?: Partial<Options<SetLotUnitWeightData>>): UseMutationOptions<SetLotUnitWeightResponse, SetLotUnitWeightError, Options<SetLotUnitWeightData>> => {
+    const mutationOptions: UseMutationOptions<SetLotUnitWeightResponse, SetLotUnitWeightError, Options<SetLotUnitWeightData>> = {
+        mutationFn: async (fnOptions) => {
+            const { data } = await setLotUnitWeight({
+                ...options,
+                ...fnOptions,
+                throwOnError: true
+            });
+            return data;
+        }
+    };
+    return mutationOptions;
+};
+
+export const getLotUnitQrQueryKey = (options: Options<GetLotUnitQrData>) => createQueryKey('getLotUnitQr', options);
+
+/**
+ * Get Lot Unit Qr
+ *
+ * QR em SVG da unidade física: o que vai na etiqueta impressa na viatura (UUID quando o saco não tem QR).
+ */
+export const getLotUnitQrOptions = (options: Options<GetLotUnitQrData>) => queryOptions<GetLotUnitQrResponse, GetLotUnitQrError, GetLotUnitQrResponse, ReturnType<typeof getLotUnitQrQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getLotUnitQr({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getLotUnitQrQueryKey(options)
+});
 
 export const getFibreMarketQueryKey = (options?: Options<GetFibreMarketData>) => createQueryKey('getFibreMarket', options);
 
@@ -2877,6 +4093,50 @@ export const listZonesOptions = (options?: Options<ListZonesData>) => queryOptio
     queryKey: listZonesQueryKey(options)
 });
 
+export const getPublicCollectionAgendaQueryKey = (options?: Options<GetPublicCollectionAgendaData>) => createQueryKey('getPublicCollectionAgenda', options);
+
+/**
+ * Get Public Collection Agenda
+ *
+ * As rondas publicadas («onde e quando entrego»), do cenário completo mais recente com agenda.
+ *
+ * Público e sem sessão: é a promessa do serviço ao cidadão. `agenda` nulo = ainda não há agenda
+ * publicada — a página diz-o, nunca inventa dias. Agregado: nenhum dado de contas aqui. Cache curto
+ * no cliente: a agenda muda quando a equipa publica um cenário novo, não a cada minuto.
+ */
+export const getPublicCollectionAgendaOptions = (options?: Options<GetPublicCollectionAgendaData>) => queryOptions<GetPublicCollectionAgendaResponse, GetPublicCollectionAgendaError, GetPublicCollectionAgendaResponse, ReturnType<typeof getPublicCollectionAgendaQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getPublicCollectionAgenda({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getPublicCollectionAgendaQueryKey(options)
+});
+
+export const getPublicLocalCertificateQueryKey = (options: Options<GetPublicLocalCertificateData>) => createQueryKey('getPublicLocalCertificate', options);
+
+/**
+ * Get Public Local Certificate
+ *
+ * Página pública do certificado de um local (opt-in). 404 quando desligado: sem opt-in não há página.
+ */
+export const getPublicLocalCertificateOptions = (options: Options<GetPublicLocalCertificateData>) => queryOptions<GetPublicLocalCertificateResponse, GetPublicLocalCertificateError, GetPublicLocalCertificateResponse, ReturnType<typeof getPublicLocalCertificateQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getPublicLocalCertificate({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getPublicLocalCertificateQueryKey(options)
+});
+
 export const getPassportQueryKey = (options: Options<GetPassportData>) => createQueryKey('getPassport', options);
 
 /**
@@ -2935,6 +4195,29 @@ export const getLotQrOptions = (options: Options<GetLotQrData>) => queryOptions<
         return data;
     },
     queryKey: getLotQrQueryKey(options)
+});
+
+export const getPublicPrivacyPolicyQueryKey = (options?: Options<GetPublicPrivacyPolicyData>) => createQueryKey('getPublicPrivacyPolicy', options);
+
+/**
+ * Get Public Privacy Policy
+ *
+ * A política de privacidade por finalidades, com prazos por categoria — pública e sem sessão.
+ *
+ * UMA fonte (`features/privacy/policy.py`): o web desenha-a tal e qual; mudou algo, muda-se lá.
+ * Cache curta no cliente: a política só muda quando a equipa muda a versão.
+ */
+export const getPublicPrivacyPolicyOptions = (options?: Options<GetPublicPrivacyPolicyData>) => queryOptions<GetPublicPrivacyPolicyResponse, GetPublicPrivacyPolicyError, GetPublicPrivacyPolicyResponse, ReturnType<typeof getPublicPrivacyPolicyQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await getPublicPrivacyPolicy({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: getPublicPrivacyPolicyQueryKey(options)
 });
 
 export const readyQueryKey = (options?: Options<ReadyData>) => createQueryKey('ready', options);
@@ -3112,6 +4395,26 @@ export const analyseGarmentMutation = (options?: Partial<Options<AnalyseGarmentD
     };
     return mutationOptions;
 };
+
+export const listTriageGoldenLabelsQueryKey = (options?: Options<ListTriageGoldenLabelsData>) => createQueryKey('listTriageGoldenLabels', options);
+
+/**
+ * List Triage Golden Labels
+ *
+ * Rótulos dourados: correções do operador a propostas da IA, por eixo (verdade-terreno do eval).
+ */
+export const listTriageGoldenLabelsOptions = (options?: Options<ListTriageGoldenLabelsData>) => queryOptions<ListTriageGoldenLabelsResponse, ListTriageGoldenLabelsError, ListTriageGoldenLabelsResponse, ReturnType<typeof listTriageGoldenLabelsQueryKey>>({
+    queryFn: async ({ queryKey, signal }) => {
+        const { data } = await listTriageGoldenLabels({
+            ...options,
+            ...queryKey[0],
+            signal,
+            throwOnError: true
+        });
+        return data;
+    },
+    queryKey: listTriageGoldenLabelsQueryKey(options)
+});
 
 export const listUsersQueryKey = (options?: Options<ListUsersData>) => createQueryKey('listUsers', options);
 

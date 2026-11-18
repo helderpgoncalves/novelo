@@ -11,6 +11,10 @@ export const IMPERSONATION_REASON_MAX = 300;
 export const REJECT_REASON_MAX = 300;
 export const INVITE_MESSAGE_MAX = 500;
 
+// O papel `local` só se atribui no convite (com o local e a natureza do sítio): mudar o papel de
+// uma conta existente sem ligações deixava uma conta que não vê nada. A conta de local nasce do convite.
+export const INVITE_ROLES: Role[] = ['operator', 'admin', 'guest', 'local'];
+
 /** Mesma normalização da API ao comparar emails: espaços colapsados e minúsculas. */
 export const normalizeText = (value: string): string => value.trim().split(/\s+/).join(' ');
 const normalizeEmail = (value: string): string => normalizeText(value).toLowerCase();

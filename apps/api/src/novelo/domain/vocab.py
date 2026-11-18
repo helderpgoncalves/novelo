@@ -180,6 +180,8 @@ class Fibre(StrEnum):
 
 
 class GarmentType(StrEnum):
+    """Tipologia da peça. O eixo de triagem inclui calçado e acessório (taxonomia v1, `domain/taxonomy.py`)."""
+
     TSHIRT = "tshirt"
     SHIRT = "shirt"
     TROUSERS = "trousers"
@@ -189,6 +191,8 @@ class GarmentType(StrEnum):
     SKIRT = "skirt"
     BEDDING = "bedding"
     TOWEL = "towel"
+    FOOTWEAR = "footwear"  # calçado (par)
+    ACCESSORY = "accessory"  # acessório: cinto, lenço, mala pequena, chapéu
     OTHER = "other"
 
 
@@ -202,9 +206,43 @@ class LotState(StrEnum):
 class LotEventKind(StrEnum):
     OPENED = "opened"
     ITEM_ADDED = "item_added"
+    DEPARTED = "departed"  # «Partir»: a viatura deixou a paragem; o lote segue para a mesa de triagem
+    UNIT_REMOVED = "unit_removed"  # unidade retirada do lote (scan enganado, corrigido na paragem)
     SORTED = "sorted"
     RESERVED = "reserved"
     DELIVERED = "delivered"
+
+
+class LotUnitSource(StrEnum):
+    """De onde vem o QR de uma unidade física do lote (um QR por saco, na paragem)."""
+
+    BAG = "bag"  # saco da plataforma: o QR lido no scan
+    LABEL = "label"  # saco sem QR: etiqueta impressa na viatura com UUID no QR
+
+
+class LotWeightSource(StrEnum):
+    """De onde vem o peso do lote: medido na balança da viatura ou estimado pelo tipo de peça (legado)."""
+
+    MEASURED = "measured"  # soma dos pesos medidos por unidade na paragem
+    ESTIMATED = "estimated"  # média por tipo de peça (pressuposto, antes de haver balança)
+
+
+class BagDeclaration(StrEnum):
+    """Declaração «Vai no saco?» na ativação, ao nível do SACO (vocabulário da pré-recolha, 2 níveis Retex).
+
+    É a base do bónus de conformidade (#64): a triagem confirma (ou corrige) comparando com o destino
+    dominante das unidades do saco. `reject` não é declaração de saco — o que é rejeitado nem entra.
+    """
+
+    REUSE = "reuse"  # «vestir de novo»: roupa limpa e seca, nível A do modelo Retex
+    RECYCLE = "recycle"  # «dar a vida»: têxtil gasto para matéria-prima, nível B
+
+
+class ExportLotState(StrEnum):
+    """Estado do lote de escoamento: aberto (a agregar peças da chave) e fechado (selado para o mercado)."""
+
+    OPEN = "open"  # criado por chave; ainda aceita peças por POST /items
+    CLOSED = "closed"  # selado: a peça seguiu para o mercado e nunca volta a entrar noutro lote
 
 
 class WhatIfStatus(StrEnum):
@@ -307,3 +345,119 @@ PRODUCER_TYPE_LABELS: dict[ProducerType, str] = {
     ProducerType.CARE_HOME: "Lar",
     ProducerType.HOSPITALITY: "Hotelaria",
 }
+
+
+class LocalKind(StrEnum):
+    """Natureza do sítio da conta de local: decide a home de `/local` e o tom da leitura.
+
+    Assistido = escola (MVP) ou IPSS com pessoas; B2B = produtor (lar, hotelaria) com pedido de volume.
+    A conta pertence ao local, nunca à pessoa («Local assistido» e «Produtor B2B» no glossário).
+    """
+
+    ASSISTED = "assistido"
+    B2B = "b2b"
+
+
+class NoticeState(StrEnum):
+    """Estado do aviso «sacos prontos»: o sinal do local que garante paragem (ADR: política de paragem).
+
+    Um só aviso ativo por local (índice parcial único). Anular não apaga: o histórico fica e voltar a
+    avisar cria um aviso novo. O otimizador (#61) consome os ativos; pode vir a acrescentar estados.
+    """
+
+    ACTIVE = "active"
+    CANCELLED = "cancelled"
+
+
+class CollectionFrequency(StrEnum):
+    """Degraus da escada de frequências (ADR: política de paragem): entre os quais o otimizador escolhe.
+
+    Os DEGRAUS são pressupostos com fonte em docs/engenharia/dados-e-modelo.md (prática da Vitrus, a
+    confirmar): semanal, quinzenal, mensal (4 semanas) e trimestral (13 semanas). As semanas vivem em
+    `domain/stop_policy.py`; aqui só o vocabulário (a base guarda o valor inglês).
+    """
+
+    WEEKLY = "weekly"
+    BIWEEKLY = "biweekly"
+    MONTHLY = "monthly"
+    QUARTERLY = "quarterly"
+
+
+class CalibrationMetric(StrEnum):
+    """As quatro métricas operacionais da retroalimentação (ADR: captura anual é derivada, #53).
+
+    O observado (pesos medidos por paragem, pedidos) calibra só estas métricas — a tabela de agregados
+    (métrica × unidade × janela de 12 semanas) é a única ponte entre os eventos e o planeamento. A
+    captura anual é DERIVADA das taxas (`on_demand_capture`), nunca medida diretamente: entra na
+    fotografia do cenário, mas nunca se guarda na tabela de agregados.
+    """
+
+    GENERATION_RATE = "generation_rate"  # taxa de geração: kg/dia por local (peso ÷ intervalo entre visitas)
+    KG_PER_BAG = "kg_per_bag"  # kg por saco, por local (e o agrupado do concelho)
+    BAGS_PER_ROUND = "bags_per_round"  # sacos por ronda, por freguesia
+    REQUESTS_PER_WEEK = "requests_per_week"  # pedidos por semana, por freguesia (nunca multiplicam kg)
+    ON_DEMAND_CAPTURE = "on_demand_capture"  # DERIVADA: captura do saco à porta por freguesia (taxa × degrau)
+
+
+class CalibrationScope(StrEnum):
+    """Unidade da métrica na tabela de agregados: por local, por freguesia ou o concelho agrupado."""
+
+    LOCAL = "local"  # localidade da rede da Vitrus (taxa de geração, kg por saco)
+    PARISH = "parish"  # freguesia (sacos por ronda, pedidos por semana, captura derivada)
+    CONCELHO = "concelho"  # agrupamento do concelho (kg por saco que calibra o parâmetro global)
+
+
+class RequestSubject(StrEnum):
+    """Quem pede a recolha: o cidadão com conta (morada manual) ou o local/B2B (morada institucional).
+
+    Entidade única (`collection_requests`) com um discriminador — cidadão e local partilham a mesma
+    máquina de estados e as mesmas regras, mudando só o teto de sacos e a morada (decisão da spec #54).
+    """
+
+    CITIZEN = "citizen"
+    LOCAL = "local"
+
+
+class CollectionRequestState(StrEnum):
+    """Estado do pedido de recolha.
+
+    A criação resolve logo: `scheduled` (auto-aceite pelas regras) ou `exception` (fila de despacho da
+    Vitrus — fora de ronda, fora do prazo, urgência ou recolha especial). `collected`, `expired` (à
+    3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu ou a equipa) terminam o
+    pedido; nenhum estado volta atrás.
+    """
+
+    SCHEDULED = "scheduled"
+    EXCEPTION = "exception"
+    REJECTED = "rejected"
+    COLLECTED = "collected"
+    EXPIRED = "expired"
+    CANCELLED = "cancelled"
+
+
+class RequestExceptionReason(StrEnum):
+    """Porque é que o pedido caiu na fila de exceções do gestor (precedência: urgência > volume > prazo > ronda).
+
+    `out_of_round` = a data pedida não tem ronda na freguesia; `cutoff` = dentro do corte de 48 h;
+    `special_volume` = acima do teto de 20 sacos do local (recolha especial); `urgency` = marcado
+    urgente — nunca é auto-aceite, o gestor decide.
+    """
+
+    OUT_OF_ROUND = "out_of_round"
+    CUTOFF = "cutoff"
+    SPECIAL_VOLUME = "special_volume"
+    URGENCY = "urgency"
+
+
+class RequestOutcome(StrEnum):
+    """O resultado da visita ao pedido agendado: recolhido ou ausência (conta para a 3.ª)."""
+
+    COLLECTED = "collected"
+    MISSED = "missed"
+
+
+class DispatchAction(StrEnum):
+    """A decisão do gestor na fila de exceções: agendar (com data) ou recusar (com motivo)."""
+
+    SCHEDULE = "schedule"
+    REJECT = "reject"

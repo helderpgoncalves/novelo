@@ -5,11 +5,15 @@ import {
   Compass,
   FileText,
   FlaskConical,
+  Gauge,
+  Gift,
   GitCompareArrows,
+  HandHeart,
   type LucideIcon,
   MapPinned,
   MessagesSquare,
   Network,
+  PackageOpen,
   QrCode,
   Route as RouteIcon,
   ScanLine,
@@ -34,6 +38,11 @@ export interface NavItem {
     | '/chat'
     | '/triage'
     | '/lots'
+    | '/viatura'
+    | '/export-lots'
+    | '/collection-requests'
+    | '/catalogo'
+    | '/calibration'
     | '/reports'
     | '/simulator'
     | '/scenarios'
@@ -74,6 +83,7 @@ export const NAV: NavSection[] = [
     items: [
       { label: () => m.nav_validation(), to: '/validation', icon: BadgeCheck },
       { label: () => m.nav_assumptions(), to: '/assumptions', icon: Sigma },
+      { label: () => m.nav_calibration(), to: '/calibration', icon: Gauge },
       { label: () => m.nav_data_quality(), to: '/data-quality', icon: ClipboardCheck },
     ],
   },
@@ -90,7 +100,11 @@ export const NAV: NavSection[] = [
     title: () => m.nav_section_operations(),
     items: [
       { label: () => m.nav_triage(), to: '/triage', icon: ScanLine },
+      { label: () => m.nav_viatura(), to: '/viatura', icon: Truck },
       { label: () => m.nav_lots(), to: '/lots', icon: QrCode },
+      { label: () => m.nav_export_lots(), to: '/export-lots', icon: PackageOpen },
+      { label: () => m.nav_collection_requests(), to: '/collection-requests', icon: HandHeart },
+      { label: () => m.nav_catalog(), to: '/catalogo', icon: Gift },
     ],
   },
   {

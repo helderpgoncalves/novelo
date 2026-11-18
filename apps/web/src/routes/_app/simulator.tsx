@@ -67,6 +67,8 @@ function seedFrom(scenario: ScenarioOut | null | undefined, defaults: FormSeed):
     siting: scenario.result.siting ? 'sites' : 'parish',
     radiusM: scenario.result.siting?.radius_m ?? defaults.radiusM,
     onDemand: scenario.result.siting?.on_demand ?? defaults.onDemand,
+    // Cenários antigos, sem o campo: política fixa (o passo global de sempre).
+    stopPolicy: scenario.result.stop_policy ?? defaults.stopPolicy,
     siteMode: scenario.result.siting
       ? scenario.result.siting.site_mode === 'street'
         ? 'street'
@@ -98,6 +100,7 @@ function Simulator() {
     siteMode: 'existing',
     siteCandidates: 'both',
     onDemand: true,
+    stopPolicy: 'fixed',
   };
   const fromBase = seedFrom(base, defaults);
   const seed: FormSeed = {
@@ -111,6 +114,7 @@ function Simulator() {
     siteMode: search.point ?? fromBase.siteMode,
     siteCandidates: search.cand ?? fromBase.siteCandidates,
     onDemand: search.ondemand ?? fromBase.onDemand,
+    stopPolicy: fromBase.stopPolicy,
   };
 
   return (

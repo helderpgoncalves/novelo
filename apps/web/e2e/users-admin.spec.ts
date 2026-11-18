@@ -82,10 +82,11 @@ test.describe('acesso', () => {
 
     await login(page);
     await page.goto('/pt/users');
-    for (const name of ['Contas', 'Convites', 'Auditoria']) {
+    for (const name of ['Contas', 'Convites', 'Locais', 'Auditoria']) {
       await expect(page.getByRole('tab', { name: new RegExp(name) })).toBeVisible();
     }
-    await expect(page.getByRole('tab')).toHaveCount(3);
+    // Quatro separadores desde o #59: «Locais» juntou-se (contas de local criadas pela equipa).
+    await expect(page.getByRole('tab')).toHaveCount(4);
     // Sem cartões de resumo: o conteúdo começa logo nos separadores. «Por aprovar» só aparece como estado nas linhas
     // da tabela (a conta acabada de criar está por aprovar), nunca num cartão por cima dela.
     const pendingText = page.getByText('Por aprovar', { exact: true }).filter({ visible: true });
@@ -117,7 +118,9 @@ test.describe('acesso', () => {
     await page.goto('/pt/users?tab=emails');
     await expect(page).toHaveURL(/tab=audit/);
     await expect(page).toHaveURL(/view=emails/);
-    await expect(page.getByRole('tab')).toHaveCount(3);
+    // Quatro separadores (o #59 acrescentou «Locais»); os emails continuam SEM ser um deles.
+    await expect(page.getByRole('tab')).toHaveCount(4);
+    await expect(page.getByRole('tab', { name: /Emails/ })).toHaveCount(0);
     const panel = page.getByTestId('emails-panel');
     await expect(panel).toBeVisible();
     // O que sabemos de cada envio, dito em linguagem simples, e a saúde do DNS.
@@ -153,10 +156,11 @@ test.describe('acesso', () => {
     await login(page);
     // O convite está no separador Convites (ainda não é uma conta): procura-o lá.
     await page.goto('/pt/users?tab=invitations');
-    await page
-      .getByRole('searchbox', { name: /Pesquisar por nome/ })
-      .first()
-      .fill(invited);
+    // A pesquisa só aparece quando a tabela tem linhas suficientes (toolbar automática do DataTable).
+    const pesquisa = page.getByRole('searchbox', { name: /Pesquisar por nome/ }).first();
+    if (await pesquisa.isVisible().catch(() => false)) {
+      await pesquisa.fill(invited);
+    }
     const row = page.getByRole('row', { name: new RegExp(invited.replace(/[.+]/g, '\\$&')) });
     await expect(row).toBeVisible();
     await row.getByRole('button', { name: /^Ações de/ }).click();

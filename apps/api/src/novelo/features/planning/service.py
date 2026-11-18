@@ -4,6 +4,7 @@ import asyncio
 import uuid
 from collections import defaultdict
 from collections.abc import Sequence
+from dataclasses import replace
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -12,23 +13,29 @@ from sqlalchemy.orm import defer, selectinload
 
 from novelo.adapters.osrm import get_road_router
 from novelo.core.errors import NotFoundError
-from novelo.domain import door_to_door, network
+from novelo.domain import door_to_door, network, stop_policy
+from novelo.domain.calibration import Calibration
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.demand import yearly_demand_t
 from novelo.domain.reuse import EntityReuse, ReuseShares, reuse_shares
 from novelo.domain.routing import RoadRouter, overall_source
+from novelo.domain.stop_policy import rung_of_weeks
 from novelo.domain.vocab import (
+    CollectionFrequency,
     CollectionMode,
     CollectionType,
     ContainerKind,
     ContainerStatus,
     DayGroup,
+    NoticeState,
     ScenarioStatus,
     Shift,
     TextileDestination,
     Typology,
     WeighingMethod,
 )
+from novelo.features.calibration import service as calibration_service
+from novelo.features.locals.models import StopNotice
 from novelo.features.municipal.models import MunicipalParishStat
 from novelo.features.network.models import Circuit, Container, Locality, Parish, ShiftAssignment, Vehicle
 from novelo.features.planning import site_service
@@ -37,6 +44,7 @@ from novelo.features.planning.collection_plan import (
     build_collection_plan,
     fleet_figures,
     load_hours,
+    public_agenda_of,
     with_vehicle_share,
 )
 from novelo.features.planning.models import ParameterSet, Scenario
@@ -84,10 +92,11 @@ async def ensure_default_parameters(db: AsyncSession) -> ParameterSet:
 
 async def get_parameters(db: AsyncSession) -> ParametersOut:
     row = await ensure_default_parameters(db)
+    calibration = calibration_service.calibration_of_rows(await calibration_service.load_rows(db))
     return ParametersOut(
         values=PlanningParams.model_validate(row.values),
         version=row.version,
-        meta=params_meta(),
+        meta=params_meta(calibration),
         updated_at=row.updated_at,
     )
 
@@ -239,6 +248,80 @@ def reuse_shares_of(baseline: TextileBaseline) -> ReuseShares | None:
 _domain_params = to_domain_params
 
 
+def _split_by_zone(
+    zones: list[ZoneOut],
+    chosen_by_zone: dict[str, network.Option],
+    km_scale: dict[CollectionMode, float],
+    params: PlanningParams,
+    tonnes_by_part: dict[tuple[str, CollectionMode], float],
+    frequency_of: dict[str, CollectionFrequency | None],
+) -> tuple[list[Allocation], list[ChannelLoad]]:
+    """Uma alocação (e o que a viatura dedicada faz) por freguesia: o que a opção escolhida lá faz."""
+    allocations: list[Allocation] = []
+    channel_loads: list[ChannelLoad] = []
+    for z in zones:
+        option = chosen_by_zone.get(z.code)
+        if option is None:
+            allocations.append(
+                Allocation(
+                    parish_code=z.code,
+                    parish_name=z.name,
+                    population=z.population,
+                    demand_t=z.demand_t,
+                    mode=None,
+                    modes=[],
+                    parts=[],
+                    points=0,
+                    tonnes=0,
+                    covered_population=0,
+                    capex_eur=0,
+                    annual_cost_eur=0,
+                    km_year=0,
+                )
+            )
+            continue
+        parts = []
+        for p in option.parts:
+            km = p.km_year * km_scale.get(p.mode, 1.0)
+            opex = p.opex_eur_year + (km - p.km_year) * params.cost_per_km_eur
+            channel_loads.append(
+                ChannelLoad(
+                    z.code, p.mode, tonnes_by_part[(z.code, p.mode)], km, p.collections_year, p.rounds_year,
+                    p.trips_per_round if p.mode == CollectionMode.ON_DEMAND else None,
+                    frequency_of.get(z.code) if p.mode == CollectionMode.ON_DEMAND else None,
+                )
+            )  # fmt: skip
+            parts.append(
+                AllocationPart(
+                    mode=p.mode,
+                    points=p.points,
+                    tonnes=round(tonnes_by_part[(z.code, p.mode)], 3),
+                    capex_eur=round(p.capex_eur, 2),
+                    annual_cost_eur=round(p.capex_eur / params.modes[p.mode].lifetime_years + opex, 2),
+                    km_year=round(km, 1),
+                )
+            )
+        parts.sort(key=lambda x: -x.tonnes)
+        allocations.append(
+            Allocation(
+                parish_code=z.code,
+                parish_name=z.name,
+                population=z.population,
+                demand_t=z.demand_t,
+                mode=parts[0].mode,
+                modes=[x.mode for x in parts],
+                parts=parts,
+                points=sum(x.points for x in parts),
+                tonnes=round(option.tonnes, 3),
+                covered_population=round(option.population_covered),
+                capex_eur=round(sum(x.capex_eur for x in parts), 2),
+                annual_cost_eur=round(sum(x.annual_cost_eur for x in parts), 2),
+                km_year=round(sum(x.km_year for x in parts), 1),
+            )
+        )
+    return allocations, channel_loads
+
+
 def compute(
     zones: list[ZoneOut],
     params: PlanningParams,
@@ -246,15 +329,48 @@ def compute(
     baseline_t: float,
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
+    notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Núcleo puro do simulador (sem base de dados): escolhe as combinações de modos, planeia rotas e calcula KPIs.
 
     Com `road` (OSRM) os km são por estrada, tanto na escolha da rede como nas rotas; sem ele, estimativa.
+    `notice_parishes` são as freguesias com um aviso «sacos prontos» ativo: a paragem nelas é garantida (ADR:
+    política de paragem), à revelia das restrições e da escada. `calibration` é a retroalimentação observada
+    (spec #62, só agregados): nas freguesias com amostras substitui a captura prior do saco à porta e o kg por
+    saco; o `q` da APA e os priores das restantes freguesias nunca são substituídos.
     """
     dp = _domain_params(params, road)
+    if calibration is not None and (kg_bag := calibration.kg_per_pickup()) is not None:
+        dp = replace(dp, on_demand_kg_per_pickup=kg_bag)
     dzones = network.with_road_distances([to_domain_zone(z, existing_points=True) for z in zones], dp)
     allowed = {code: set(modes) for code, modes in request.constraints.items()}
-    options = network.build_options(dzones, dp, allowed or None, request.default_modes)
+    # Política de paragem: dinâmica = o otimizador escolhe o degrau de cada freguesia na escada discreta;
+    # fixa = o degrau global de sempre (`on_demand_every_weeks`). O aviso garante paragem nas duas.
+    weeks = [float(stop_policy.weeks_of(r)) for r in stop_policy.LADDER] if request.stop_policy == "dynamic" else None
+    required = {code: {CollectionMode.ON_DEMAND} for code in notice_parishes}
+    calibrated_capture = (
+        {code: reading.blended for code, reading in calibration.capture_by_parish().items()}
+        if calibration is not None
+        else None
+    )
+    # Sacos por ronda calibrados (spec #62): o *n* da fórmula da volta passa a blended — a ronda não
+    # encolhe nem os kg se multiplicam; os pedidos por semana ficam KPI + sinal de arranque.
+    calibrated_bags_round = (
+        {code: reading.blended for code, reading in calibration.bags_per_round_by_parish().items()}
+        if calibration is not None
+        else None
+    )
+    options = network.build_options(
+        dzones,
+        dp,
+        allowed or None,
+        request.default_modes,
+        on_demand_weeks=weeks,
+        required=required or None,
+        on_demand_capture=calibrated_capture,
+        on_demand_bags_per_round=calibrated_bags_round,
+    )
 
     solved = network.solve(
         options,
@@ -263,15 +379,20 @@ def compute(
         target_tonnes=request.target_tonnes,
         time_limit_s=params.solver_time_limit_s,
         vehicles=network.fleet_cost(dp),
+        mandatory=notice_parishes & {o.zone_id for o in options},
     )
     zone_by_code = {z.code: z for z in zones}
 
-    # Têxtil de cada canal numa opção combinada: partilha proporcional à captura de cada canal.
-    tonnes_by_part: dict[tuple[str, CollectionMode], float] = {}
-    for o in solved.chosen:
-        total_capture = sum(p.capture for p in o.parts) or 1.0
-        for p in o.parts:
-            tonnes_by_part[(o.zone_id, p.mode)] = o.tonnes * p.capture / total_capture
+    def part_tonnes() -> dict[tuple[str, CollectionMode], float]:
+        """Têxtil de cada canal numa opção combinada: partilha proporcional à captura de cada canal."""
+        out: dict[tuple[str, CollectionMode], float] = {}
+        for o in solved.chosen:
+            total_capture = sum(p.capture for p in o.parts) or 1.0
+            for p in o.parts:
+                out[(o.zone_id, p.mode)] = o.tonnes * p.capture / total_capture
+        return out
+
+    tonnes_by_part = part_tonnes()
 
     # Rotas (VRP) por modo com paragens fixas; os km reais substituem a estimativa radial.
     routes: list[RouteOut] = []
@@ -316,67 +437,15 @@ def compute(
             )
 
     chosen_by_zone = {o.zone_id: o for o in solved.chosen}
-    allocations: list[Allocation] = []
-    channel_loads: list[ChannelLoad] = []
-    for z in zones:
-        option = chosen_by_zone.get(z.code)
-        if option is None:
-            allocations.append(
-                Allocation(
-                    parish_code=z.code,
-                    parish_name=z.name,
-                    population=z.population,
-                    demand_t=z.demand_t,
-                    mode=None,
-                    modes=[],
-                    parts=[],
-                    points=0,
-                    tonnes=0,
-                    covered_population=0,
-                    capex_eur=0,
-                    annual_cost_eur=0,
-                    km_year=0,
-                )
-            )
-            continue
-        parts = []
-        for p in option.parts:
-            km = p.km_year * km_scale.get(p.mode, 1.0)
-            opex = p.opex_eur_year + (km - p.km_year) * params.cost_per_km_eur
-            channel_loads.append(
-                ChannelLoad(
-                    z.code, p.mode, tonnes_by_part[(z.code, p.mode)], km, p.collections_year, p.rounds_year,
-                    p.trips_per_round if p.mode == CollectionMode.ON_DEMAND else None,
-                )
-            )  # fmt: skip
-            parts.append(
-                AllocationPart(
-                    mode=p.mode,
-                    points=p.points,
-                    tonnes=round(tonnes_by_part[(z.code, p.mode)], 3),
-                    capex_eur=round(p.capex_eur, 2),
-                    annual_cost_eur=round(p.capex_eur / params.modes[p.mode].lifetime_years + opex, 2),
-                    km_year=round(km, 1),
-                )
-            )
-        parts.sort(key=lambda x: -x.tonnes)
-        allocations.append(
-            Allocation(
-                parish_code=z.code,
-                parish_name=z.name,
-                population=z.population,
-                demand_t=z.demand_t,
-                mode=parts[0].mode,
-                modes=[x.mode for x in parts],
-                parts=parts,
-                points=sum(x.points for x in parts),
-                tonnes=round(option.tonnes, 3),
-                covered_population=round(option.population_covered),
-                capex_eur=round(sum(x.capex_eur for x in parts), 2),
-                annual_cost_eur=round(sum(x.annual_cost_eur for x in parts), 2),
-                km_year=round(sum(x.km_year for x in parts), 1),
-            )
-        )
+    # O degrau escolhido de cada freguesia (só na política dinâmica; a fixa usa o passo global, que não se grava)
+    frequency_of: dict[str, CollectionFrequency | None] = {}
+    if request.stop_policy == "dynamic":
+        frequency_of = {
+            code: rung_of_weeks(o.on_demand_weeks)
+            for code, o in chosen_by_zone.items()
+            if o.on_demand_weeks is not None
+        }
+    allocations, channel_loads = _split_by_zone(zones, chosen_by_zone, km_scale, params, tonnes_by_part, frequency_of)
 
     total_pop = sum(z.population for z in zones)
     tonnes = sum(a.tonnes for a in allocations)
@@ -413,6 +482,7 @@ def compute(
         for m in CollectionMode
         if any(m in a.modes for a in allocations)
     ]
+    plan_rows = build_collection_plan(zones, channel_loads, routes, dp, vehicles.vehicles)
     result = ScenarioResult(
         kpis=kpis,
         allocations=allocations,
@@ -421,7 +491,9 @@ def compute(
         depot=[params.depot_lat, params.depot_lon],
         routing=overall_source([r.source for r in routes]),
         default_modes=request.default_modes,
-        collection_plan=build_collection_plan(zones, channel_loads, routes, dp, vehicles.vehicles),
+        stop_policy=request.stop_policy,
+        collection_plan=plan_rows,
+        public_agenda=public_agenda_of(plan_rows),
     )
     return result, solved.status
 
@@ -459,6 +531,23 @@ def _out(row: Scenario) -> ScenarioOut:
     )
 
 
+async def load_notice_parishes(db: AsyncSession) -> frozenset[str]:
+    """Freguesias (código dicofre) com um aviso «sacos prontos» ativo: nelas a paragem é garantida (ADR #42).
+
+    O aviso é do local (localidade); a ronda porta a porta é da freguesia — um aviso ativo em qualquer localidade
+    garante a paragem da freguesia no dia da sua ronda. `bag_count` é sinal de procura para a calibração (#62),
+    não entra nesta garantia.
+    """
+    rows = await db.execute(
+        select(Parish.dicofre)
+        .join(Locality, Locality.parish_id == Parish.id)
+        .join(StopNotice, StopNotice.locality_id == Locality.id)
+        .where(StopNotice.state == NoticeState.ACTIVE, Parish.dicofre.is_not(None))
+        .distinct()
+    )
+    return frozenset(code for (code,) in rows.all() if code)
+
+
 async def run_scenario(
     db: AsyncSession,
     request: ScenarioRequest,
@@ -472,17 +561,35 @@ async def run_scenario(
     road = road or get_road_router()
     stored = await ensure_default_parameters(db)
     params = request.params or PlanningParams.model_validate(stored.values)
+    # Retroalimentação (spec #62): o recálculo do cenário É o gatilho da recomputação dos agregados —
+    # manual, nunca agendada (ADR: captura anual é derivada). O cálculo depois consome só os agregados.
+    calibration = calibration_service.calibration_of_rows(await calibration_service.recompute(db, params))
     zones = await load_zone_rows(db, params.kg_per_inhab_month)
     baseline = await textile.get_baseline(db)
     reuse = reuse_shares_of(baseline)
+    notices = await load_notice_parishes(db)
     # CP-SAT e VRP são CPU síncrono (até `solver_time_limit_s`): fora do event loop, com dados puros (sem sessão).
     if request.siting == "sites":
         inputs = await site_service.load_site_inputs(db)
         result, solver_status = await asyncio.to_thread(
-            site_service.compute_sites, zones, params, request, baseline.total_t, inputs, reuse, road
+            site_service.compute_sites,
+            zones,
+            params,
+            request,
+            baseline.total_t,
+            inputs,
+            reuse,
+            road,
+            notices,
+            calibration,
         )
     else:
-        result, solver_status = await asyncio.to_thread(compute, zones, params, request, baseline.total_t, reuse, road)
+        result, solver_status = await asyncio.to_thread(
+            compute, zones, params, request, baseline.total_t, reuse, road, notices, calibration
+        )
+    # A fotografia da calibração usada: linha a linha da tabela de agregados (cenário comparável com honestidade).
+    rows = await calibration_service.load_rows(db)
+    result = result.model_copy(update={"calibration": calibration_service.photo_of_rows(rows)})
 
     infeasible = solver_status == "infeasible"
     kpis = result.kpis

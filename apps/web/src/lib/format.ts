@@ -9,11 +9,14 @@ export const formatNumber = (value: number, digits = 0) => number(digits).format
 export const formatTonnes = (value: number, digits = 1) => `${number(digits).format(value)} t`;
 export const formatPercent = (value: number, digits = 1) => `${number(digits).format(value)}%`;
 export const formatKg = (value: number, digits = 2) => `${number(digits).format(value)} kg`;
-export const formatEur = (value: number) =>
+export const formatEur = (value: number, digits = 0) =>
   new Intl.NumberFormat(intlTag(), {
     style: 'currency',
     currency: 'EUR',
-    maximumFractionDigits: 0,
+    // Em estilo moeda o pt-PT mete 2 casas por omissão. `digits = 0` (o costume da app) corta-as;
+    // `digits = 2` fixa-as a duas (valores em cêntimos: «1,50 €», nunca «1,5 €»).
+    minimumFractionDigits: digits,
+    maximumFractionDigits: digits,
     useGrouping: 'always',
   }).format(value);
 

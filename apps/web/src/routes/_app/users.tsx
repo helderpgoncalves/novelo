@@ -8,13 +8,14 @@ import { PageTabs } from '@/components/page-tabs';
 import { AccountsSection } from '@/features/users/accounts-section';
 import { AuditSection } from '@/features/users/audit-section';
 import { InvitationsSection } from '@/features/users/invitations-section';
+import { LocalsSection } from '@/features/users/locals-section';
 import { OpenRegistrationCard } from '@/features/users/open-registration-card';
 import { ForbiddenError } from '@/lib/errors';
 import { m } from '@/paraglide/messages';
 
 // Três separadores. Os valores antigos (`pending`, `guests`, `poster`, `emails`) continuam a abrir o sítio certo:
 // os emails são uma vista da Auditoria (`?tab=audit&view=emails`), não um quarto separador.
-const TABS = ['accounts', 'invitations', 'audit'] as const;
+const TABS = ['accounts', 'invitations', 'locals', 'audit'] as const;
 const LEGACY = {
   pending: 'accounts',
   guests: 'invitations',
@@ -106,6 +107,11 @@ function Users() {
             ),
           },
           { id: 'invitations', label: m.users_tab_invitations(), content: <InvitationsSection /> },
+          {
+            id: 'locals',
+            label: m.users_tab_locals(),
+            content: <LocalsSection />,
+          },
           {
             id: 'audit',
             label: m.users_tab_audit(),

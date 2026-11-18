@@ -11,6 +11,7 @@ from novelo.ai.images import UnreadableImageError, shrink_for_vision
 from novelo.ai.prompts import load
 from novelo.ai.tasks import AiTask
 from novelo.core.errors import AppError
+from novelo.domain.taxonomy import destination_for
 from novelo.features.lots.schemas import TriageAnalysis, TriageResult
 from novelo.features.lots.service import dominant_fibre, estimate_weight_g
 
@@ -74,6 +75,7 @@ async def analyse(
     )
     return TriageResult(
         analysis=analysis,
+        destination=destination_for(analysis.fine_state),
         dominant_fibre=dominant_fibre(analysis.composition),
         estimated_weight_g=estimate_weight_g(analysis.garment_type.value),
         prompt_version=version,

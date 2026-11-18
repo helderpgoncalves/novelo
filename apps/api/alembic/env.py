@@ -9,14 +9,22 @@ from novelo.features.ai_admin import models as ai_admin_models  # noqa: F401
 from novelo.features.app_settings import models as app_settings_models  # noqa: F401
 from novelo.features.audit import models as audit_models  # noqa: F401
 from novelo.features.auth import models as auth_models  # noqa: F401
+from novelo.features.calibration import models as calibration_models  # noqa: F401
+from novelo.features.catalog import models as catalog_models  # noqa: F401
+from novelo.features.citizen import models as citizen_models  # noqa: F401
+from novelo.features.collection_requests import models as collection_request_models  # noqa: F401
 from novelo.features.copilot import models as copilot_models  # noqa: F401
 from novelo.features.datasets import models as dataset_models  # noqa: F401
 from novelo.features.email_log import models as email_log_models  # noqa: F401
+from novelo.features.export_lots import models as export_lot_models  # noqa: F401
+from novelo.features.locals import models as local_models  # noqa: F401
 from novelo.features.lots import models as lot_models  # noqa: F401
 from novelo.features.municipal import models as municipal_models  # noqa: F401
 from novelo.features.network import models as network_models  # noqa: F401
 from novelo.features.planning import models as planning_models  # noqa: F401
 from novelo.features.planning import whatif_models  # noqa: F401
+from novelo.features.points import models as point_models  # noqa: F401
+from novelo.features.privacy import models as privacy_models  # noqa: F401
 from novelo.features.reports import models as report_models  # noqa: F401
 from novelo.features.textile import models as textile_models  # noqa: F401
 from novelo.features.users import models as user_models  # noqa: F401

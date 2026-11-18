@@ -49,6 +49,27 @@ ErrorCode = Literal[
     "captcha_required",
     "captcha_failed",
     "captcha_unavailable",
+    "local_account_missing",
+    "notice_already_active",
+    "certificate_not_public",
+    "address_request_active",
+    "citizen_address_required",
+    "citizen_parish_required",
+    "citizen_bags_limit",
+    "age_below_minimum",
+    "bag_limit_reached",
+    "bag_inactive",
+    "local_address_forbidden",
+    "request_not_dispatchable",
+    "request_not_scheduled",
+    "request_cancel_not_allowed",
+    "insufficient_points",
+    "donation_cap_reached",
+    "out_of_stock",
+    "catalog_item_inactive",
+    "redemption_already_used",
+    "catalog_item_shape",
+    "campaign_window",
     "internal_error",
 ]
 
@@ -58,6 +79,10 @@ class ErrorBody(BaseModel):
 
     code: ErrorCode
     message: str = Field(description="Mensagem técnica em inglês; o web traduz a partir de `code`")
+    details: dict[str, Any] | None = Field(
+        default=None,
+        description="Contexto opcional do erro (ex.: saldo e falta num `insufficient_points`); o web mostra-o",
+    )
 
 
 class FieldError(BaseModel):
@@ -274,6 +299,169 @@ class UpstreamError(AppError):
     code = "upstream_error"
 
 
+class LocalAccountMissingError(AppError):
+    """Utilizador com papel `local` sem conta de local (a equipa cria as duas coisas juntas; nunca devia acontecer)."""
+
+    status_code = 404
+    code = "local_account_missing"
+
+
+class LocalNoticeActiveError(AppError):
+    """Já há um aviso «sacos prontos» ativo para este local (um só por local; anular antes de avisar outra vez)."""
+
+    status_code = 409
+    code = "notice_already_active"
+
+
+class CertificateNotPublicError(AppError):
+    """O certificado público não existe: o local não ligou o opt-in (ou voltou a desligá-lo)."""
+
+    status_code = 404
+    code = "certificate_not_public"
+
+
+class AgeBelowMinimumError(AppError):
+    """A conta de doador exige 13 anos declarados (ADR: RGPD da conta de doador, art. 16.º da Lei 58/2019)."""
+
+    status_code = 422
+    code = "age_below_minimum"
+
+
+class BagLimitReachedError(AppError):
+    """Teto de sacos ativos por conta (`domain.bags.MAX_ACTIVE_BAGS`, estimativa); desativar liberta."""
+
+    status_code = 409
+    code = "bag_limit_reached"
+
+
+class BagInactiveError(AppError):
+    """O saco está desativado: congela (sem edições); reativar volta a permitir editar."""
+
+    status_code = 409
+    code = "bag_inactive"
+
+
+class AddressRequestActiveError(AppError):
+    """Já há um pedido de recolha ativo (agendado ou em exceção) para esta morada — 1 ativo por morada."""
+
+    status_code = 409
+    code = "address_request_active"
+
+
+class CitizenAddressRequiredError(AppError):
+    """Pedido de cidadão sem morada (a morada manual é de primeira classe; nunca GPS)."""
+
+    status_code = 422
+    code = "citizen_address_required"
+
+
+class CitizenParishRequiredError(AppError):
+    """Pedido de cidadão sem freguesia: é ela que liga o pedido à ronda e às estatísticas."""
+
+    status_code = 422
+    code = "citizen_parish_required"
+
+
+class CitizenBagsLimitError(AppError):
+    """Mais de 5 sacos num pedido de cidadão (o teto do local é outro: acima de 20 é recolha especial)."""
+
+    status_code = 422
+    code = "citizen_bags_limit"
+
+
+class LocalAddressForbiddenError(AppError):
+    """O local/B2B não escreve morada: a institucional vem do local da conta (corpo com `address` ou `parish_code`)."""
+
+    status_code = 422
+    code = "local_address_forbidden"
+
+
+class RequestNotDispatchableError(AppError):
+    """Só um pedido na fila de exceções se despacha (agendar ou recusar)."""
+
+    status_code = 409
+    code = "request_not_dispatchable"
+
+
+class RequestNotScheduledError(AppError):
+    """Só um pedido agendado recebe o resultado da visita (recolhido ou ausência)."""
+
+    status_code = 409
+    code = "request_not_scheduled"
+
+
+class RequestCancelNotAllowedError(AppError):
+    """Só um pedido ativo (agendado ou em exceção) se anula; os terminais ficam como estão."""
+
+    status_code = 409
+    code = "request_cancel_not_allowed"
+
+
+class InsufficientPointsError(AppError):
+    """Saldo FIFO insuficiente para o resgate: falta a diferença — nada entrou no livro-razão."""
+
+    status_code = 409
+    code = "insufficient_points"
+
+    def __init__(self, balance: int, shortfall: int) -> None:
+        self.details = {"balance": balance, "shortfall": shortfall}
+        super().__init__(f"Insufficient FIFO balance ({balance}); short by {shortfall}")
+
+
+class DonationCapReachedError(AppError):
+    """O valor-euro doado a IPSS este mês transborda o teto indexado ao custo evitado (105,64 €/t)."""
+
+    status_code = 409
+    code = "donation_cap_reached"
+
+    def __init__(self, cap_cents: int, donated_this_month_cents: int, item_value_cents: int) -> None:
+        self.details = {
+            "cap_cents": cap_cents,
+            "donated_this_month_cents": donated_this_month_cents,
+            "item_value_cents": item_value_cents,
+        }
+        super().__init__(f"Donation cap {cap_cents} cents reached; {donated_this_month_cents} donated this month")
+
+
+class OutOfStockError(AppError):
+    """O item tem stock finito e esgotou-se (o decremento é atómico: nunca vende o que não há)."""
+
+    status_code = 409
+    code = "out_of_stock"
+
+
+class CatalogItemInactiveError(AppError):
+    """O item está desativado (ou o parceiro em pausa): saiu do catálogo do doador."""
+
+    status_code = 409
+    code = "catalog_item_inactive"
+
+
+class RedemptionAlreadyUsedError(AppError):
+    """O código já foi validado: pagamento integral é UMA vez por código (nunca valida outra vez)."""
+
+    status_code = 409
+    code = "redemption_already_used"
+
+
+class CatalogItemShapeError(AppError):
+    """Forma inválida do item ao editar: âncora € só em donativo IPSS; parceiro obrigatório em prémio."""
+
+    status_code = 422
+    code = "catalog_item_shape"
+
+    def __init__(self, fields: list[str]) -> None:
+        self.details = {"fields": fields}
+        super().__init__(f"Invalid catalog item shape: {', '.join(fields)}")
+
+
+class CampaignWindowError(AppError):
+    """A janela da campanha não faz sentido temporal: o fim tem de ser DEPOIS do início."""
+
+    status_code = 422
+    code = "campaign_window"
+
+
 # Declarado em todos os routers: é o que dá ao cliente gerado os tipos de erro.
 COMMON_ERRORS: dict[int | str, dict[str, Any]] = {
     400: {"model": ErrorBody, "description": "Pedido inválido"},
@@ -292,8 +480,11 @@ COMMON_ERRORS: dict[int | str, dict[str, Any]] = {
 def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def _app_error(_: Request, exc: AppError) -> JSONResponse:
-        body = ErrorBody(code=exc.code, message=exc.message)
-        return JSONResponse(status_code=exc.status_code, content=body.model_dump())
+        details = getattr(exc, "details", None)
+        body = ErrorBody(code=exc.code, message=exc.message, details=details)
+        # `details` só existe quando faz sentido (ex.: falta num `insufficient_points`): sem o campo
+        # nulo, os corpos dos erros continuam iguais ao contrato anterior ({code, message}).
+        return JSONResponse(status_code=exc.status_code, content=body.model_dump(exclude_none=True))
 
     @app.exception_handler(RequestValidationError)
     async def _validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:

@@ -37,6 +37,9 @@ from novelo.features.auth import service as auth_service
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.models import EmailDelivery
 from novelo.features.email_log.schemas import DeliveryStatusOrNone
+from novelo.features.locals import service as locals_service
+from novelo.features.locals.models import LocalAccount
+from novelo.features.network.models import Locality
 from novelo.features.users import service as users
 from novelo.features.users.models import Invitation, Role, User
 from novelo.features.users.schemas import (
@@ -61,7 +64,17 @@ def status_of(inv: Invitation, now: datetime | None = None) -> InvitationStatus:
     return "expired" if inv.expires_at <= now else "pending"
 
 
-def to_out(inv: Invitation, inviter: User | None, delivery: EmailDelivery | None = None) -> InvitationOut:
+async def _locality_names(db: AsyncSession, ids: list[uuid.UUID | None]) -> dict[uuid.UUID, str]:
+    wanted = {i for i in ids if i is not None}
+    if not wanted:
+        return {}
+    rows = await db.execute(select(Locality.id, Locality.name).where(Locality.id.in_(wanted)))
+    return dict(rows.all())
+
+
+def to_out(
+    inv: Invitation, inviter: User | None, delivery: EmailDelivery | None = None, locality: str | None = None
+) -> InvitationOut:
     return InvitationOut(
         id=inv.id,
         email=inv.email,
@@ -69,6 +82,9 @@ def to_out(inv: Invitation, inviter: User | None, delivery: EmailDelivery | None
         role=cast(Role, inv.role),
         locale=cast(Locale, inv.locale),
         message=inv.message,
+        locality_id=inv.locality_id,
+        locality_name=locality,
+        local_kind=inv.local_kind,
         status=status_of(inv),
         invited_by_id=inv.invited_by_id,
         invited_by_name=(inviter.name or inviter.email) if inviter else None,
@@ -89,7 +105,8 @@ def to_out(inv: Invitation, inviter: User | None, delivery: EmailDelivery | None
 
 async def _out(db: AsyncSession, inv: Invitation, inviter: User | None) -> InvitationOut:
     latest = (await email_log.latest_by_invitation(db, [inv.id])).get(inv.id)
-    return to_out(inv, inviter, latest)
+    name = (await _locality_names(db, [inv.locality_id])).get(inv.locality_id) if inv.locality_id else None
+    return to_out(inv, inviter, latest, locality=name)
 
 
 async def _inviter(db: AsyncSession, inv: Invitation) -> User | None:
@@ -137,6 +154,11 @@ async def create(
     if body.role == "admin" and not body.confirm_admin:
         raise AdminConfirmationRequiredError("Inviting an administrator needs confirm_admin")
     email = body.email.lower()
+    locality: Locality | None = None
+    if body.role == "local":  # o modelo já exige os dois campos (422); aqui prova-se que o local existe
+        locality = await db.get(Locality, body.locality_id)
+        if locality is None:
+            raise NotFoundError("Locality not found")
     if await users.get_by_email(db, email) is not None:
         raise EmailTakenError("An account with this email already exists")
     now = datetime.now(UTC)
@@ -159,6 +181,8 @@ async def create(
         role=body.role,
         locale=body.locale,
         message=body.message,
+        locality_id=locality.id if locality else None,
+        local_kind=body.local_kind,
         token_hash=hash_token(token),
         invited_by_id=admin.id,
         expires_at=now + timedelta(days=get_settings().invitation_days),
@@ -177,11 +201,17 @@ async def create(
         target_type="invitation",
         target_id=inv.id,
         target_label=email,
-        details={"role": inv.role, "locale": inv.locale, "has_message": inv.message is not None},
+        details={
+            "role": inv.role,
+            "locale": inv.locale,
+            "has_message": inv.message is not None,
+            "locality_id": str(inv.locality_id) if inv.locality_id else None,
+            "local_kind": inv.local_kind,
+        },
     )
     await db.commit()
     delivery = await _send(db, sender, inv, admin, token)
-    return to_out(inv, admin, delivery)
+    return to_out(inv, admin, delivery, locality=locality.name if locality else None)
 
 
 async def _get(db: AsyncSession, invitation_id: uuid.UUID) -> Invitation:
@@ -358,8 +388,12 @@ async def list_invitations(
         )
     ).all()
     latest = await email_log.latest_by_invitation(db, [inv.id for inv, _ in rows])
+    names = await _locality_names(db, [inv.locality_id for inv, _ in rows])
     return InvitationPage(
-        items=[to_out(inv, who, latest.get(inv.id)) for inv, who in rows],
+        items=[
+            to_out(inv, who, latest.get(inv.id), locality=names.get(inv.locality_id) if inv.locality_id else None)
+            for inv, who in rows
+        ],
         total=int(total),
         offset=offset,
         limit=limit,
@@ -394,6 +428,9 @@ async def preview(db: AsyncSession, token: str) -> InvitationPreview:
         invited_by_name=await _inviter_name(db, inv),
         message=inv.message,
         expires_at=inv.expires_at,
+        locality_id=inv.locality_id,
+        locality_name=await locals_service.locality_name_of(db, inv.locality_id),
+        local_kind=inv.local_kind,
     )
 
 
@@ -437,6 +474,13 @@ async def accept(
     except IntegrityError as exc:
         await db.rollback()
         raise EmailTakenError("An account with this email already exists") from exc
+    if inv.role == "local":
+        # Conta de local: o convite traz o local e a natureza; sem os dois, o convite já não é válido
+        # (criado antes de existir a regra, ou a localidade foi retirada entretanto).
+        if inv.locality_id is None or inv.local_kind is None:
+            await db.rollback()
+            raise InvalidTokenError("Invalid or expired invitation")
+        db.add(LocalAccount(user_id=user.id, locality_id=inv.locality_id, kind=inv.local_kind))
     await db.execute(update(Invitation).where(Invitation.id == inv.id).values(accepted_user_id=user.id))
     await audit.record(
         db,
@@ -446,7 +490,13 @@ async def accept(
         target_id=inv.id,
         target_label=inv.email,
         meta=meta,
-        details={"role": inv.role, "with_password": password is not None, "invited_by": inv.invited_by_id},
+        details={
+            "role": inv.role,
+            "with_password": password is not None,
+            "invited_by": inv.invited_by_id,
+            "locality_id": str(inv.locality_id) if inv.locality_id else None,
+            "local_kind": inv.local_kind,
+        },
     )
     access, refresh = await auth_service.issue_session(db, user, remember=True)
     return user, access, refresh

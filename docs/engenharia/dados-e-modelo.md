@@ -107,7 +107,7 @@ Os lotes são o lado real do modelo: o que foi mesmo recolhido, triado e entregu
 | Evento do lote | tipo (recolhido, triado, reservado, entregue), data, quem |
 | Reserva | lote, reciclador, data |
 
-**Peso no MVP:** cada peça recebe o peso médio do seu tipo (camisola, calças, lençol...), que é um pressuposto marcado como tal. No piloto o peso vem da **balança na viatura, por paragem** (um lote de recolha por paragem; [Funcionalidades](features.md#2-lote-com-passaporte-e-bolsa-de-fibra)), não de uma balança na mesa de triagem.
+**Peso no MVP:** o peso do lote é o **medido na viatura, por unidade** (`lot_units.weight_g`, pratos ≤ 15 kg somados por saco; um lote de recolha por paragem; [Funcionalidades](features.md#2-lote-com-passaporte-e-bolsa-de-fibra)), não de uma balança na mesa de triagem — e `weight_source` diz-o em todo o produto («medido» vs «estimativa»). Lotes abertos antes de haver balança (e as peças triadas, para a composição) usam o peso médio do tipo de peça (camisola, calças, lençol...), que é um pressuposto marcado como tal; nunca substitui o medido.
 
 **Fluxos (Sankey):** soma de toneladas por freguesia → modo → estado → destino, a partir do cenário (previsto) ou dos lotes (observado).
 
@@ -116,16 +116,22 @@ Os lotes são o lado real do modelo: o que foi mesmo recolhido, triado e entregu
 Decidida em [#53](https://github.com/helderpgoncalves/novelo/issues/53) ([ADR](adr/captura-anual-e-derivada.md)): o observado (pesos medidos por paragem, pedidos) calibra **quatro métricas operacionais** — taxa de geração (kg/dia por local), kg por saco, sacos por ronda por freguesia, pedidos por semana — e a **captura anual é derivada** (taxa × frequência do degrau; sacos por ronda × rondas por ano), limitada por *D*<sub>z</sub>. O *q* da APA e os priores dos locais não visitados nunca são substituídos automaticamente (viés de adoção do piloto).
 
 - **Estado por local = taxa de geração.** O observado é sempre kg/visita num dado intervalo; o estado é kg/dia (peso ÷ dias desde a última visita) e a procura a qualquer degrau é taxa × intervalo.
-- **Janela de 12 semanas, mediana móvel** (robusta a outliers); toda a pesagem > 0 conta; peso 0 = falha, não amostra. Sem sazonalidade até haver um ano de dados.
-- **Pseudo-contagem, sem penhascos**: peso do prior *k* = 4 visitas (local) ou 8 semanas (freguesia); o observado empata à 4.ª visita e domina depois. Rótulos «estimativa·n» / «observado·n». Os pedidos chegam primeiro (sinal de arranque) e nunca multiplicam kg.
+- **Janela de 12 semanas, mediana móvel** (robusta a outliers); toda a pesagem > 0 conta; peso 0 = falha, não amostra. Sem sazonalidade até haver um ano de dados. A janela corta os **pesos**, nunca o tempo: a primeira partida dentro da janela divide pelo intervalo até à partida anterior, mesmo que essa seja anterior à janela.
+- **Pseudo-contagem, sem penhascos**: o prior pesa *k* − 1 (3 visitas no local, 7 semanas na freguesia) e o observado pesa *n* ÷ (*n* + *k* − 1); à 4.ª visita o observado já **domina** (pesa 4/7, nunca empata — critério da spec). Rótulos «estimativa·n» / «observado·n». Os pedidos chegam primeiro (sinal de arranque) e nunca multiplicam kg.
 
 ```latex
-\hat{m} = \frac{k \cdot m^{\text{prior}} + s \cdot m^{\text{observado}}}{k + s}
+\hat{m} = \frac{(k-1) \cdot m^{\text{prior}} + n \cdot m^{\text{observado}}}{n + k - 1}
 ```
 
-- **Atualização manual, ao recalcular o cenário** (nunca agendada); o cenário fotografa a calibração que usou (janela, n por métrica, mistura) e a tabela de agregados (métrica × unidade × janela) é a única ponte entre os eventos e o planeamento — morada e identidade nunca passam dela ([RGPD](adr/rgpd-conta-de-doador.md)).
+**Exemplo à mão (taxa de geração, métrica por local).** Prior 26,232 kg/dia (D_z = 19 149,96 kg/ano ÷ 2 locais ÷ 365); duas visitas com pesos 8 kg e 2,8 kg, ambas 7 dias após a anterior → taxas 1,143 e 0,4 kg/dia → mediana 0,771 kg/dia. Blend com n=2, k=4: (3 × 26,232 + 2 × 0,771) ÷ 5 = 15,888 kg/dia, rótulo **«estimativa·2»** (o observado pesa 2/5). À 4.ª amostra o observado domina (pesa 4/7): o blend dá (3 × 26,232 + 4 × 0,771) ÷ 7 = 11,519 kg/dia e o rótulo passa a **«observado·4»**.
 
-Esta secção substitui a antiga «calibração semanal das taxas de captura por modo pelo copiloto» (17 nov 2026).
+**Exemplo à mão (captura derivada, por freguesia).** Freguesia com D_z = 19 149,96 kg/ano e prior de captura 0,15 (0,25 × 0,6); um local observado com taxa mediana 0,771 kg/dia → evidência anual 0,771 × 365 = 281,6 kg → captura observada min(1, 281,6 ÷ 19 149,96) = 0,0147 — **a procura da APA é o teto**. Blend de freguesia (k=8, n=2): (7 × 0,15 + 2 × 0,0147) ÷ 9 = 0,120, rótulo «estimativa·2». No otimizador, `rung_capture` escala este valor pelo degrau (taxa × degrau) e as toneladas ficam sempre ≤ D_z. A vista equivalente em sacos: sacos por ronda × rondas por ano × kg por saco dá o mesmo annualizado.
+
+- **Priors e o que nunca muda.** Os priores são pressupostos com fonte nesta secção: taxa por local = D_z repartida igualmente pelos locais da freguesia ÷ 365; kg por saco = `on_demand_kg_per_pickup` (25 kg); sacos por ronda = D_z × captura prior ÷ 25 ÷ rondas por ano; pedidos por semana = 0 (sinal de arranque). Os **locais não visitados melhoram concelho afora** pela conversão observada nos visitados — ratio = Σ taxas observadas ÷ Σ priores dos visitados, misturado com 1,0 pela pseudo-contagem (nunca para além do blend). O **q da APA nunca é substituído**: a fonte de `kg_per_inhab_month` mantém-se «Dados da Vitrus» e o potencial do cenário não muda com o observado.
+- **Fontes nos pressupostos.** Com amostras, `modes.on_demand.capture_rate` e `on_demand_kg_per_pickup` passam a «observado·n» (n ≥ k) ou «estimativa·n» (n < k) no ecrã de pressupostos e nos meta-dados da API; tudo o que o observado não toca fica como estava.
+- **Atualização manual, ao recalcular o cenário** (nunca agendada); o cenário fotografa a calibração que usou (`result.calibration`: janela, n por métrica, prior vs observado vs calibrado) e a tabela de agregados (`calibration_aggregates`, métrica × unidade × janela) é a única ponte entre os eventos e o planeamento — morada e identidade nunca passam dela ([RGPD](adr/rgpd-conta-de-doador.md)). O painel «Calibração» (`/calibration`) lê essa tabela: n, rótulo e valor corrente vs prior por métrica e unidade, incluindo a taxa de pedidos por freguesia (KPI de procura manifesta).
+
+Esta secção substitui a antiga «calibração semanal das taxas de captura por modo pelo copiloto» (17 nov 2026). Implementação: `domain/calibration.py` (puro, testado à mão), `features/calibration/` (recomputação e leitura) e consumo no `compute`/`compute_sites` via objeto `Calibration` (sem sessão).
 
 **Tipologia de território** para o relatório RAP: Tipologia de Áreas Urbanas do INE (predominantemente urbanas, mediamente urbanas, predominantemente rurais), cruzada com as freguesias (`data/raw/public/tipau.json`). Os códigos de zona `0308U1` a `0308U5` são provisórios até serem validados.
 
@@ -202,7 +208,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Têxtil no indiferenciado | 5,86% | Fonte: APA, RARU 2025, p. 24 (indiferenciado nacional), indicado pela Vitrus |
 | Têxtil por habitante por desviar (*q*) | 1,596 kg/hab/mês (derivado; 1,59583 nos pressupostos) | Cálculo: 51 250,6 t × 5,86% ÷ 156 830 ÷ 12; **estimativa** |
 | Habitantes | 156 830 | Fonte: INE, Censos 2021 (soma das freguesias) |
-| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto; **prior** dos locais não visitados — a captura anual é derivada pela [calibração](#calibração) |
+| Taxa de captura por modo (*c*) | baixo / médio / alto | Pressuposto; **prior** dos locais não visitados — a captura anual é derivada pela [calibração](#calibração); com amostras, a fonte passa a «estimativa·n» / «observado·n» (o `q` nunca muda) |
 | Modos por omissão | `existing` e `on_demand` | Decisão (Vitrus, 21 de outubro): sem contentores de têxtil; `street` só como referência |
 | Distância máxima a pé por modo | a definir | Pressuposto, validar com o mentor |
 | Desvio da estrada (`detour_factor`) | 1,3 (estrada ÷ linha reta) | Pressuposto da equipa. **Já não mede as rotas dos cenários** (vêm do OSRM): só vale na estimativa de reserva, na volta porta a porta dentro da freguesia (fórmula, secção 9) e como alavanca da sensibilidade. Calibração de 23 out 2026 contra a estrada (OSRM, `portugal-261020`): mediana **1,48** nas 48 freguesias e **1,37** em 300 locais candidatos, logo 1,3 é otimista; subir para ~1,4 a 1,5 fica por decidir ([Rotas por estrada](rotas-reais.md#calibração-23-out-2026-dados-portugal-261020)) |
@@ -215,7 +221,7 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Perfil de condução do OSRM (`novelo-van`) | furgoneta de 2,8 m de altura, 2,1 m de largura, 6,0 m de comprimento e 3 500 kg | Pressuposto: a Vitrus ainda não indicou a viatura (ver [Rotas por estrada](rotas-reais.md)) |
 | Minutos por paragem | 2 por saco à porta, 10 por local | Pressuposto da equipa |
 | Horas úteis por turno | 7 h, 5 dias por semana (1 820 h por ano por viatura) | Pressuposto da equipa (8 h menos descarga e pausas) |
-| Frequência da ronda porta a porta (`on_demand_every_weeks`) | a cada 2 semanas (26 rondas por ano) | Pressuposto da equipa; nos locais, a frequência passa a ser **por local, na escada discreta** (semanal, quinzenal, mensal, trimestral — degraus como pressuposto com fonte; [#42](https://github.com/helderpgoncalves/novelo/issues/42)) |
+| Escada de frequências da ronda porta a porta (`weekly` 1 semana, `biweekly` 2, `monthly` 4, `quarterly` 13) | os 4 degraus da [política de paragem](#política-de-paragem) | **Pressuposto com fonte a confirmar**: prática de recolha da Vitrus nos circuitos semanais/quinzenais e ritmos municipais correntes (mensal e trimestral); indicado «prática da Vitrus, a confirmar» a 22 out 2026, sem resposta escrita ainda. O passo por omissão é a quinzenal (`on_demand_every_weeks` = 2, 26 rondas por ano; pressuposto da equipa). Na política dinâmica o otimizador escolhe o degrau de cada freguesia; nas outras frequências (N = 3, 5 … 8) só a política fixa os usa ([#42](https://github.com/helderpgoncalves/novelo/issues/42)) |
 | Volta dentro da freguesia (porta a porta) | 0,7124 · √(sacos por ronda · área) · desvio | Beardwood, Halton e Hammersley (1959); área CAOP 2019; cada ronda é uma viagem própria (teto dos km). **Sempre estimativa por fórmula, mesmo nos cenários `routing = road`**: não há paragens com morada para pedir ao OSRM |
 | Custo de um contentor de rua | pressuposto | Só para o cenário de referência; a Vitrus não quer contentores |
 | Variação da sensibilidade | ±30%, distribuição triangular | Pressuposto da equipa (secção 5), configurável |
@@ -229,10 +235,60 @@ O inventário municipal de 20 de outubro (**não é de têxteis**) entra no mode
 | Ponto assistido (escola) com os pressupostos do modo `existing` | captura, investimento, recolhas | Pressuposto, sem dados próprios (secção 8) |
 | Litros desconhecidos de um contentor | mediana do tipo | Regra explícita (secção 8); 10 contentores, todos de produtores |
 | Quota de reutilização igual em todos os modos | 59,4% (50,0% a 72,9%) | Calculada dos fluxos de 2025 na base, não escrita à mão; aplicá-la a todos os canais é **pressuposto** (não há qualidade por canal; secção 3) |
+| Peso médio do calçado (par) e do acessório na triagem | 400 g / 150 g | Pressuposto da equipa (tabela `AVERAGE_WEIGHT_G`, «estimativa»; no piloto vem de uma balança) |
+| Pontos: ganho flat por saco (`POINTS_GAIN_FLAT`) | 100 pontos | Pressuposto da equipa, «estimativa» no ecrã; configurável por ambiente (secção 13). Crédito por saco ativado recolhido E pesado, nunca por kg ([ADR](adr/identidade-e-credito-do-doador.md)) |
+| Pontos: bónus de conformidade (`POINTS_BONUS_CONFORMITY`) | 50 pontos | Pressuposto da equipa, «estimativa»; a triagem confirma a declaração «Vai no saco?» por maioria estrita do destino (secção 13) |
+| Pontos: teto mensal por conta (`POINTS_MONTHLY_CAP`) | 500 pontos; o que transborda é recusado | Pressuposto da equipa, «estimativa»; 0 = sem teto. A escolha «recusado, não adiado» segue o [ADR economia dos pontos](adr/economia-dos-pontos.md) (secção 13) |
+| Pontos: teto de donativos (`POINTS_DONATION_CAP_PCT`) | 100% do custo evitado (105,64 €/t × kg medidos da conta) | Pressuposto da equipa: o incentivo nunca custa mais do que a poupança ([ADR economia dos pontos](adr/economia-dos-pontos.md)); 0 desliga o financiamento de donativos (secção 14) |
+| Âncora € do donativo IPSS | 1 000 pontos ≈ 5 € | Pressuposto da equipa, «estimativa»; APRESENTAÇÃO do valor do donativo, nunca câmbio de pontos (secção 14) |
+| Códigos pseudónimos | `NVL-`/`NVA-`/`RDM-` + 6 caracteres do alfabeto sem 0/O/1/I/L | Decisão de forma (legibilidade em QR impresso); 32⁶ combinações por prefixo; o parceiro só vê `RDM-…` (secção 14) |
+| Campanhas sazonais de pontos | janela + descrição + multiplicador do ganho flat (US40), 1,0 por omissão | Configurável por campanha («estimativa»); teto mensal aplica-se ao valor já multiplicado; sem composição entre campanhas sobrepostas (vale a maior) |
+| Pontos: expiração 12 meses por ganho, FIFO | 12 meses | Pressuposto da equipa («estimativa»), decidido na spec #54; saldo sempre derivado do livro-razão, nunca em cache (secção 13) |
+| Tamanho em bandas só com letras da etiqueta | XS–XXL (PT P/M/G/GG/XG; 3XL/4XL → XXL+) | Regra da taxonomia: numerais («42», «98») e «tamanho único» ficam `unknown` — as tabelas EU de homem e de mulher conflituam e o sistema não inventa o mapeamento; o operador, com a etiqueta à mão, escolhe a banda |
+| Eixo «prometido» no eval (género, tamanho) | ≥ 90% de acerto com ≥ 30 peças por eixo | Pressuposto da equipa (`ai/eval_triage.py`); abaixo disso a coluna leva «prometido» no relatório e no painel `/admin/ai` |
 | Proximidade na matriz de cobertura | % da área a ≤ 300 m de um local municipal | Proxy de área, não de população (sem BGRI; secção 10) |
 | Localidades dos circuitos sem freguesia inequívoca | ficam sem freguesia | Regra explícita (Fontes de dados); 3 por resolver e 2 por confirmar nos alertas 101 e 102 |
 
 Regra: nenhum valor entra em `apps/api/src/novelo/features/planning/params.py` sem uma linha nesta tabela. Os custos e as taxas por modo estão lá marcados como `assumption` e aparecem com a sua origem no ecrã "Pressupostos".
+
+## Taxonomia da triagem (v1)
+
+Vocabulário **fechado e versionado** (`apps/api/src/novelo/domain/taxonomy.py`, `TAXONOMY_VERSION = 1`):
+mudar um valor é uma decisão visível — nova versão do módulo, migração (CHECKs das colunas),
+`just gen` e traduções no web (`apps/web/src/lib/taxonomy.ts`). A IA propõe cada eixo; o operador
+confirma ou corrige, e cada atributo guarda a proveniência («confirmado»/«IA») e a confiança.
+As correções do operador viram **rótulos dourados** (tabela `golden_labels`, uma linha por eixo
+corrigido, com o valor proposto e o humano, o modelo e a versão do prompt) — a verdade-terreno que
+o eval por eixo mede. Os quatro graus e a sazonalidade vêm do que a Retex (Maia) faz
+(`research/retex-maia`); os segmentos seguem o que o mercado de roupa usada compra.
+
+| Eixo | Valores | Na chave do lote de escoamento (#57) |
+| --- | --- | --- |
+| Estado fino (`fine_state`) | 4 graus de qualidade + reciclar/rejeitar: `grade_a` como nova, `grade_b` muito boa, `grade_c` boa, `grade_d` suficiente, `recycle`, `reject` — mapeado nos 3 destinos (A–D → reutilização) | sim |
+| Tipologia (`garment_type`) | as 10 tipologias existentes + `footwear` (calçado, o par) + `accessory` (cinto, lenço, mala pequena, chapéu) | sim |
+| Estação (`season`) | `all_season`, `warm` (primavera/verão), `cold` (outono/inverno) | sim |
+| Cor (`colour`) | 12 cores + `unknown` (foto escura/ilegível) | não — só filtros |
+| Género (`gender`) | `men`, `women`, `kids`, `babies` | sim |
+| Tamanho (`size_band`) | bandas lidas **só da etiqueta**: `xs`–`xxl` (PT P/M/G/GG/XG; 3XL/4XL → XXL+); numerais e «tamanho único» → `unknown` | não — só filtros |
+
+Peças anteriores à taxonomia (só com o destino legado `reuse`/`recycle`/`reject`) entram com
+`fine_state` nulo e ficam fora dos lotes de escoamento até re-triagem. O destino continua a ser
+guardado e derivado do estado fino (`destination_for`), para o passaporte, a bolsa de fibra e o
+relatório RAP não mudarem.
+
+## Proveniência e rótulos dourados
+
+- Cada eixo confirmado pelo operador guarda `{"origin": "confirmed" | "ai", "confidence": 0..1}`
+  (JSONB `provenance` da peça): «IA» quando o operador aceitou o valor proposto tal e qual (com a
+  confiança da proposta), «confirmado» quando definiu o valor. Os selos aparecem no ecrã de triagem
+  ao lado de cada atributo.
+- Quando o valor final difere do proposto e havia proposta (`ai_proposal` no pedido), o servidor
+  cria rótulos dourados (`POST /lots/{code}/items`); sem proposta não há correção a medir.
+- Leitura dos rótulos: `GET /api/v1/triage/golden-labels?axis=…&limit=…` (sessão obrigatória).
+- O eval (`just eval-triage`) mede **por eixo** (estado, tipologia, estação, cor, género, tamanho,
+  destino derivado, marca, fibra, composição ±10 pp); género e tamanho levam a marca
+  **«prometido»** enquanto não houver ≥ 90% de acerto com ≥ 30 peças por eixo (pressuposto,
+  tabela acima). A verdade-terreno do CSV também é validada contra o vocabulário fechado.
 
 ## 7. Validação do modelo
 
@@ -301,7 +357,7 @@ Leitura: sem contentores, a rede por locais reais a 500 m com públicos e escola
 
 A Vitrus respondeu a 22 de outubro de 2026: o saco de têxtil **não pode** ir na compactadora do porta a porta (vai para a caixa de compactação e estraga-se; cabine, gancho ou caixa lateral também não), uma compactadora **não pode** fazer uma volta só de têxtil (contaminação) e **não há viaturas livres à tarde** (a folha de turnos tinha um erro). O caminho é a «aquisição de um meio novo de recolha». Por isso toda a recolha de têxtil, saco à porta e paragens nos locais, é feita por uma **viatura nova, de caixa fechada e sem compactação**, a partir do estaleiro da Rua das Lameiras, Polvoreira. Código: `domain/fleet.py` (funções puras), `network.mode_cost` e `network.solve` (custo e número de viaturas), `domain/siting.evaluate` (rede por locais) e `features/planning/collection_plan.py` (plano no resultado).
 
-**Saco à porta (modo `on_demand`).** Uma ronda por freguesia a cada *N* semanas (`on_demand_every_weeks`, 2 por omissão: 26 rondas por ano), que recolhe todos os sacos da freguesia:
+**Saco à porta (modo `on_demand`).** Uma ronda por freguesia a cada *N* semanas — *N* é o **degrau da escada** escolhido para a freguesia pela [política de paragem](#política-de-paragem) (na política fixa, o passo global `on_demand_every_weeks`, 2 por omissão: 26 rondas por ano) — que recolhe todos os sacos da freguesia:
 
 ```latex
 \text{sacos} = \frac{C_z \cdot 1000}{\text{kg por saco}} \qquad v = \left\lceil \frac{C_z \cdot 1000 / R}{\text{capacidade}} \right\rceil \qquad L = 0{,}7124 \sqrt{\tfrac{\text{sacos}}{R} \cdot A_z} \cdot \text{desvio}
@@ -310,6 +366,10 @@ A Vitrus respondeu a 22 de outubro de 2026: o saco de têxtil **não pode** ir n
 ```latex
 \text{km} = R \cdot (v \cdot \text{ida e volta ao estaleiro} + L) \qquad \text{custo} = \text{sacos} \cdot c_{\text{recolha}} + \text{km} \cdot c_{\text{km}}
 ```
+
+**Captura ao degrau (taxa × degrau).** O prior de captura do modo vale **ao degrau quinzenal** (26 visitas por ano); noutro degrau escala linearmente com o ritmo de visitas, limitado a 1 — `c_r = min(1, c · (52/N) ÷ 26)`, o mesmo «taxa × frequência do degrau» do [ADR da captura anual](adr/captura-anual-e-derivada.md), que a calibração (#62) passa de prior a observado. À quinzenal pura a captura fica intacta: os cenários fixos de hoje dão exatamente os mesmos números de antes. Consequências à mão: no semanal a captura dobra (limitada pela procura na união de canais); no mensal fica a 13/26 e no trimestral a 4/26 do prior — e os **sacos por ronda ficam iguais** (a captura e as rondas escalam juntas), só a ida e volta ao estaleiro conta menos vezes. É esta troca que o MIP decide: mais frequência capta mais e paga mais rondas; menos frequência poupa paragens onde há menos procura.
+
+*Aviso garante paragem.* Um aviso «sacos prontos» ativo (`stop_notices`, um por local) numa freguesia **garante a ronda** nela: constraint dura no MIP (exatamente uma opção, e sempre com o modo a pedido, mesmo à revelia de restrições por freguesia). Se nem a freguesia avisada couber no orçamento, o cenário é inviável — a garantia não negocia. Sem aviso, o degrau é escolhido pelo otimizador (política dinâmica) ou é o passo global (política fixa). A escolha de cada freguesia fica gravada no resultado (`collection_plan[].frequency`) e alimenta a **agenda pública** (`result.public_agenda`), derivada do plano: nenhuma visita publicada é saltada (ADR). Sem reotimização a meio do dia: o cenário é calculado uma vez e guardado; pedidos e avisos novos não o reescrevem (só quando alguém o recalcula).
 
 *R* = rondas por ano; *v* = viagens por ronda (cada viagem extra volta ao estaleiro para descarregar); a ida e volta ao estaleiro é medida **pela estrada** (OSRM, `with_road_distances`; sem OSRM, 2 × linha reta × desvio); *L* = volta dentro da freguesia, **estimativa por fórmula, nunca medida pela estrada** (multiplica pelo desvio, `detour_factor`), pela fórmula de Beardwood, Halton e Hammersley (1959) para a volta mais curta por *n* pontos espalhados numa área *A* (constante 0,7124), com *A* = área CAOP 2019 da freguesia (pacote municipal; todas as 48 têm área). Cada ronda é uma viagem própria a partir do estaleiro: juntar freguesias vizinhas no mesmo dia baixaria os km, por isso este valor é um **teto**. O custo por saco é o de uma recolha (6 €, pressuposto; a Vitrus ainda não deu o custo por hora).
 
@@ -345,3 +405,89 @@ Código: `domain/coverage_matrix.py` (funções puras, testadas à mão), `featu
 | Concelho | 48 | 156 830 | 110 467 | 70,4% | 431,1 t | 43 914 € | 101,9 |
 
 Fora das freguesias urbanas (21 370 habitantes) o cenário serve 55,5% da população, contra 72,8% nas urbanas (razão 0,762). A freguesia APR é uma só (Arosa e Castelões, 699 habitantes) e fica sem recolha neste orçamento: a ronda da viatura dedicada até lá não compensa ao lado de outras freguesias. Antes (22 out, linha reta × 1,3): 73,9% nas urbanas, 60,2% nas restantes (razão 0,814), 72,1% no concelho. Com 60 000 €/ano a rede por locais reais serve 88,2% da população (secção 8).
+
+## 11. Pedido de recolha: regras e retenção (17 nov 2026)
+
+O pedido de recolha é **uma entidade só** (`collection_requests`) para cidadão com conta, local assistido e produtor B2B (decisão da spec #54): um discriminador `subject_kind` (`citizen` | `local`, deduzido do papel de quem pede — nunca do corpo) e a mesma máquina de estados. É diferente do **aviso «sacos prontos»** (secção de contas de local em [Funcionalidades](features.md#11-contas-de-local-assistidas-e-produtor-b2b-local)): aquele é o sinal de procura do local; este é um pedido com data, morada e ciclo de vida próprio. O pedido vale **certeza**, nunca corta quilómetros — a ronda mantém-se universal ([ADR](adr/politica-de-paragem.md)).
+
+**Estados** (nenhum volta atrás): a criação resolve logo — `scheduled` (auto-aceite pelas regras) ou `exception` (a **fila de exceções** do gestor: fora de ronda, fora do prazo, urgência ou recolha especial; despacho = agendar com data, que pode sair da ronda pedida, ou recusar com motivo). Depois: `collected` (a visita recolheu), `expired` (à 3.ª ausência), `rejected` (gestor, com motivo) e `cancelled` (quem pediu, ou a equipa). A visita ao agendado aponta-se como `collected` ou `missed` (ausência); o pedido guarda `missed_count`.
+
+**Regras de auto-aceite** (puras em `domain/collection_requests.py`, testadas à mão; precedência: urgência > volume > prazo > ronda):
+
+| Regra | Valor | Fonte/natureza |
+| --- | --- | --- |
+| Sacos por pedido (cidadão) | 1–5 | Decisão da spec #54 |
+| Teto por pedido (local/B2B) | 20 sacos — **estimativa**; acima = recolha especial (exceção, não erro) | Decisão da spec #54 |
+| Corte | **48 h** aplicadas à data: o dia pedido tem de ser hoje + 2 dias, no mínimo (a recolha só tem dia, não hora; simplificação documentada — um pedido tardio da noite pode ficar com menos de 48 h relógio até à meia-noite do dia) | Decisão da spec #54 |
+| Um ativo por morada | Chave normalizada da morada (cidadão) ou `localidade:<uuid>` (local), índice parcial único nos estados ativos (`scheduled`/`exception`) | Decisão da spec #54 |
+| Expiração | À **3.ª ausência** (`missed_count ≥ 3` → `expired`) | Decisão da spec #54 |
+| Urgência | `urgent: true` nunca é auto-aceite — cai na fila do gestor | Decisão da spec #54 |
+| Fora de ronda | A data pedida não tem nenhum circuito da Vitrus a passar nesse dia da semana na freguesia (cidadão: freguesias dos circuitos; local: os circuitos do próprio sítio) — **proxy do MVP, estimativa**: não é o calendário da viatura de têxtil, que o otimizador escolherá (#61) | Rede da Vitrus (`circuit_days` × `circuit_localities`), estimativa |
+
+**Morada normalizada** (a chave de «1 ativo por morada», `normalize_address`): minúsculas, sem acentos (NFKD), indicadores ordinais `º ª °` retirados antes da decomposição (assim «nº» e «n.º» batem certo), letras e dígitos em contacto separados («nº42» → «n 42»), tudo o que não é letra/dígito vira um espaço. É **lexical, nunca geocodificação**: «Av.» e «Avenida» dão chaves diferentes — a mesma morada escrita de outra forma dá a mesma chave, mas formas distintas da mesma rua ficam distintas (o gestor vê-as na fila de exceções). O local/B2B não escreve morada: a institucional é o sítio da conta (`local_accounts.locality_id`), e a chave institucional vive num espaço de nomes à parte (`localidade:<uuid>`) que nenhuma morada escrita alcança (uma chave normalizada nunca contém «:»). GPS fora do MVP; a morada manual é alternativa igual ([ADR RGPD](adr/rgpd-conta-de-doador.md)).
+
+**Retenção da morada — 12 meses, ou efémera (11.1, feito 18 nov 2026, migração `0030`)** (categoria própria na política de privacidade, mesma vida dos logs de magic link; [ADR RGPD](adr/rgpd-conta-de-doador.md)): a morada vive **só ligada ao pedido** — nunca no perfil da conta (não há livro de moradas). O campo `address_retained_until` = criação + 12 meses de calendário (29 de fevereiro aperta para 28); passado o prazo, a **purga à leitura** nas listagens põe `address`/`address_key` a nulo e o pedido fica (o histórico e os agregados de calibração nunca dependem da morada). **Morada efémera** (`ephemeral_address`, «morada efémera só em pedidos agendados» da spec): bandeira explícita SÓ em pedidos de cidadão com data (local/B2B é recusado — a morada institucional é o sítio da conta); quando ativa, não há `address_retained_until` e a morada é **apagada ao chegar ao estado terminal** (recolhido, cancelado, recusado ou expirado), sem os 12 meses. Enquanto o pedido está ativo a morada existe sempre — é dela que a equipa despacha. A regra «1 ativo por morada» só olha a pedidos ativos: a purga ao fechar não a afeta.
+
+**Para o planeamento (#62, wiring feito 18 nov 2026):** o pedido é **sinal de procura** (pedidos por semana por freguesia, na tabela de agregados) e a métrica **sacos por ronda** calibra o *n* da fórmula da volta — o valor *blended* entra em `mode_cost(..., on_demand_bags_per_round)` e muda SÓ o traçado BHH da ronda (km ∝ √n); **nunca multiplica quilos** (toneladas, sacos/ano e viagens ficam sempre derivados dos kg) **nem corta a ronda**. Os **pedidos por semana** ficam KPI por freguesia e sinal de arranque — nenhum número do plano se mexe com eles ([captura anual derivada](adr/captura-anual-e-derivada.md)). Código: `features/collection_requests/` (serviço), `domain/collection_requests.py` (regras puras), migração `0023_collection_requests`.
+
+## 12. Conta de doador e sacos ativados (17 nov 2026)
+
+A conta de doador é uma **conta normal com perfil de doador** — decisão da spec #54; o papel novo `donor` é o portão da área `/cidadao` no web (mesma mecânica do `local`: a web redireciona, a API recusa escritas de equipa com `require_role`). Nasce por **magic link de email, sem password**, em `POST /auth/donor/sign-up`: idade **declarada** (`users.declared_age`, CHECK ≥ 13; abaixo é recusa explícita `age_below_minimum`, 422 — nunca silenciosa), consentimento RGPD versão `donor-2026-11` (conta e crédito = contrato, [ADR](adr/rgpd-conta-de-doador.md)), honeypot e limites de taxa. A conta nasce logo **aprovada** (leve por desígnio: sem password, sem acesso à app de equipa; os admins vêem-na em `/users` e podem desativar). **Sem adaptador de SMS no MVP**: a entrada por telefone do ADR fica como trabalho futuro — nada de inventar um remetente de SMS.
+
+**Sacos ativados** (`bag_activations`, migração `0024_donor_account_and_bags`) — a unidade de crédito ([ADR](adr/identidade-e-credito-do-doador.md)): código `NVL-XXXXXX` **único no mundo** (alfabeto dos lotes sem 0/O/1/I/L; geração pura em `domain/bags.py`), apelido **privado** (nunca sai do próprio; não existe em passaportes nem em listas da equipa), declaração **«Vai no saco?»** opcional `reuse`/`recycle` (vocabulário de 2 níveis da pré-recolha Retex; a triagem confirma ao comparar com o destino dominante das unidades do saco — é a base do **bónus de conformidade de #64**), e `deactivated_at`: desativar **congela** (sem edições; reativar volta a permitir), nunca apaga. Teto de **10 sacos ativos** por conta (estimativa; desativar liberta). `user_id` é SET NULL: apagar a conta **perde o crédito** e limpa o rastreio pessoal, mas a ativação sobrevive anónima (os agregados ficam, como no [ADR RGPD](adr/rgpd-conta-de-doador.md)).
+
+**Os dois portadores e o modelo de confiança** ([ADR](adr/identidade-e-credito-do-doador.md)): o QR do saco codifica só o código `NVL-…` (como as etiquetas da viatura — o ecrã da paragem lê offline e cria a `lot_units` com `source="bag"`); o **QR de conta** codifica `NVA-XXXXXX`, pseudónimo estável da conta (`users.donor_code`). O QR de conta é **portador de crédito, nunca credencial de sessão**: quem o apresenta atribui a entrega à própria conta (o scan etiqueta o lote com o código, nunca com o nome); dá zero acesso ao saldo ou à conta. Perda de telemóvel não é perda de conta — o QR volta a abrir-se a qualquer momento; a rotação de código fica para #64/#66. A ligação saco→lote é feita pelo **scan da viatura**: `lot_units.code == bag_activations.code`, e é por aí que o histórico do doador (`GET /cidadao/history`) chega ao passaporte público — que continua a nunca mostrar o doador.
+
+**Saldo**: desde #64 é real — `GET /cidadao/saldo`, derivado do livro-razão a cada leitura (nunca em cache; secção 13).
+
+**Agenda pública** (`GET /public/collection-agenda`): devolve a `public_agenda` do cenário **completo mais recente que tenha rondas publicadas** (`result.public_agenda`, política de paragem #61), com o rótulo e a data do cenário de origem e `Cache-Control: public, max-age=60`. `agenda` nulo = nenhuma promessa publicada; a página `/onde-quando` diz-o com honestidade — nunca inventa dias. Agregado: nenhum dado de contas.
+
+## 13. Pontos: livro-razão, saldo e expiração (18 nov 2026)
+
+**Livro-razão imutável** (`points_entries`, migração `0026_points_ledger`): linhas **append-only** — não existe caminho de UPDATE nem de DELETE no código; a única correção é a **anulação em abuso** (interesse legítimo declarado), que entra como linha **negativa** com motivo obrigatório e autor (`POST /admin/points/annulments`, portões `admin`/`operator`, trilha de auditoria `points.annul`). Tipos (`domain/points.py::PointEntryKind`): `gain_flat`, `gain_bonus`, `annulment` e `redemption` **reservado ao #65** (o CHECK da tabela já o aceita; nenhum código o escreve). `seq` é uma sequência global monótona — dentro da transação todas as linhas nascem com o mesmo `created_at` (`now()` do Postgres), e o seq desempata o histórico e o FIFO; dá aos auditores um número único por lançamento. `user_id` é SET NULL: apagar a conta perde o crédito, o livro-razão sobrevive para os agregados ([ADR RGPD](adr/rgpd-conta-de-doador.md)) — as leituras filtram por conta viva e as linhas órfãs nunca incomodam.
+
+**Idempotência até em corrida**: índices únicos **parciais** na base — um ganho `gain_flat` por saco no mundo e um `gain_bonus` por saco na vida (`bag_code` parcial por tipo). O serviço insere com `ON CONFLICT DO NOTHING` no índice parcial: a mesma pesagem repetida, a mesma peça re-triada, nunca creditam duas vezes.
+
+**Os dois disparos** (decididos no bilhete #64):
+- **Flat (+100, estimativa): na PESAGEM da unidade** (`PUT /lots/{code}/units/{id}`, `set_unit_weight`) — é o momento em que o scan ligou o código `NVL-…` da sacola a um peso medido na balança da viatura («recolhido E pesado», [ADR](adr/identidade-e-credito-do-doador.md)). Etiquetas impressas (`source="label"`) nunca creditam: não revelam doador. Sacos sem dono (`user_id` nulo) também não.
+- **Bónus de conformidade (+50, estimativa): na CRIAÇÃO da peça triada** (`POST /lots/{code}/items`, `add_item`) — a triagem compara a declaração do doador com o **destino dominante das peças do lote**. Aproximação do MVP: as peças não estão ligadas à unidade, e o lote nasce numa paragem (na regra geral, um saco por doador). Confirma por maioria **estrita** (`domain/points.py::declaration_confirmed`): «reuse» exige maioria reutilizável (os 4 graus A–D), «recycle» exige maioria recicável; **empate, zero peças ou dominância de rejeito não confirmam** — a dúvida nunca credita e o MVP nunca penaliza.
+
+**Teto mensal por conta**: janela de **mês de calendário**, sobre **todos os ganhos** (flat + bónus somados). O ganho que transborda é **RECUSADO, não adiado** — decisão no espírito do [ADR economia dos pontos](adr/economia-dos-pontos.md): o teto existe para o sistema não ser jogado, e adiar crédito exigiria estado pendente; sem crédito parcial («ou entra, ou não entra»), mais simples de explicar e auditar. O saco recusado no mês cheio não ganha mais tarde: teve a sua chance. `POINTS_MONTHLY_CAP=0` desliga o teto. Concorrência: duas pesagens simultâneas do mesmo doador podem passar ambas a verificação do teto (a exatidão exata exigiria bloqueio por conta; índices únicos garantem sempre a não-duplicação por saco).
+
+**Expiração 12 meses por ganho, FIFO** (`domain/points.py::fifo_balance` — função pura, valores calculados à mão em `tests/unit/test_points.py`): cada ganho nasce com `expires_at` (+12 meses); o saldo é **sempre derivado do livro-razão a cada leitura** — não há coluna de saldo em cache. Anulações e resgates **consomem os ganhos mais antigos primeiro** (FIFO estrito); um ganho já expirado não pode ser consumido nem ressuscitar; o saldo nunca fica negativo (uma anulação maior que o saldo come o que há). «Expira brevemente» do ecrã = 30 dias (`EXPIRING_SOON_DAYS`, estimativa de UX).
+
+**Endpoints**: `GET /cidadao/saldo` (saldo, repartição flat/bónus, expira breve, expirados, teto e ganhos do mês — o web marca os configuráveis «estimativa»), `GET /cidadao/pontos` (histórico paginado do próprio, `limit`/`offset`, o mais recente primeiro), `POST /admin/points/annulments` (equipa, motivo obrigatório 3–2000, 404 para conta inexistente). O passaporte e os lotes continuam sem qualquer dado de doador (testes vizinhos mantêm a disciplina).
+
+## Catálogo, resgate por código e teto de donativos (18 nov 2026, bilhete #65)
+
+**Três prateleiras** (`catalog_items`, migração `0027_catalog_redemptions`; tipos em `domain/catalog.py::CatalogItemKind`): **donativo a IPSS** (única prateleira com âncora € — `donation_value_cents`, CHECK `donation_value_only_ipss`), **prémio de parceiro local** (CHECK `partner_only_prizes`: obrigatoriamente ligado a um parceiro ativo) e **acumulado ambiental** (conquista não monetária, sem € nem parceiro). A âncora **1 000 pontos ≈ 5 € é APRESENTAÇÃO do valor do donativo** — o que a Vitrus paga à IPSS por aquele resgate — **nunca o valor dos pontos** (pontos não são dinheiro nem conversíveis; ADR [economia dos pontos](adr/economia-dos-pontos.md)). Os CHECKs da base fecham a forma; o serviço revalida no PATCH (422 `catalog_item_shape`).
+
+**Resgate por código pseudónimo** (ADR [resgate por código pseudónimo](adr/resgate-por-codigo-pseudonimo.md)): `POST /cidadao/redemptions` é uma transação com ordem fixa — bloqueio por conta (`pg_advisory_xact_lock`), item ativo (parceiro ativo), **saldo FIFO suficiente** (`fifo_balance`; 409 `insufficient_points` com `{balance, shortfall}` em `details`), **teto de donativos** (só IPSS), **stock condicional** (`UPDATE … WHERE stock > 0`; 409 `out_of_stock`), linha **negativa** no livro-razão (`points_entries.kind = 'redemption'`, sem expiração — consome) e o **bilhete** (`redemptions`, código `RDM-XXXXXX` do alfabeto dos sacos, único no mundo; snapshots de item/parceiro/valor para o pagamento sobreviver a renomeações). O parceiro vê **só o código** — zero partilha de dados por defeito. `GET /cidadao/redemptions` lista os códigos do próprio com o estado (`pending`/`validated`).
+
+**Validação = pagamento integral por código apresentado** (uma única vez): `POST /admin/redemptions/validate` (equipa `admin`/`operator`, aceita o código em qualquer caixa) faz UPDATE condicional ao estado `pending` → `validated` com autor e momento (409 `redemption_already_used` na segunda apresentação, também em corrida; trilha de auditoria `catalog.redeem`/`catalog.validate`). **Decisão do MVP**: a validação é feita pela equipa na app de gestão (a parceira apresenta o código à Vitrus ou à mesa); o portal do parceiro com token próprio e autenticação dedicada fica para depois — o ADR não define auth de parceiro, e assim não nasce mais nenhuma máquina de credenciais. Pagamento apura-se por `redemptions` validados por parceiro (`ix_redemptions_partner_state`).
+
+**Teto de donativos indexado ao custo evitado** (`domain/catalog.py::donation_cap_cents`, função pura com valores calculados à mão): o valor-euro de donativos IPSS empenhados num mês de calendário, por conta, não passa de `POINTS_DONATION_CAP_PCT` (100 por omissão; 0 desliga) do **custo evitado** da têxtil que a conta fez pesar na balança, vida toda:
+
+```
+teto_cêntimos = ⌊ gramas_medidos × 10 564 × pct ÷ (100 × 1 000 000) ⌋
+```
+
+onde **10 564 cênt./t = 105,64 €/t** (40 € de TGR + 65,64 € de tarifa da Resinorte; fonte «Vitrus, 22 out 2026», tabela «Pressupostos» acima). Os gramas medidos somam `lot_units.weight_g` das unidades `source='bag'` de sacos da conta (medido, nunca estimado; etiquetas impressas e sacos sem dono não contam). Exemplo à mão: 30 kg medidos → ⌊30 000 × 10 564 ÷ 10⁸⌋ = 316 cênt. (3,16 €). O valor doado no mês inclui resgates **pendentes** (empenho é despesa). Conta sem quilos medidos não financia donativos — pode resgatar prémios de parceiro (pagos pelo parceiro) e acumulado ambiental, que não custam € ao município: **o incentivo nunca custa mais do que a poupança** (ADR «economia dos pontos»).
+
+**Parcerias** (`catalog_partners`): a freguesia **propõe**, a Vitrus **aprova** — estados `proposed`/`active`/`inactive` (`POST /admin/catalog/partners` + `/approve` + `/deactivate`, auditados; nunca se apaga um parceiro com códigos validados). Parceiro em pausa: os prémios saem do catálogo do doador e novos resgates são recusados (409 `catalog_item_inactive`), sem afetar códigos já emitidos.
+
+**Campanhas sazonais** (`point_campaigns`): janela temporal (`starts_at ≤ agora < ends_at`, CHECK `window_valid`) + descrição + `gain_multiplier` (US40, feito 18 nov 2026, migração `0029`), mostradas ao doador como banner em `/cidadao` (só as da janela corrente; a equipa vê todas). O multiplicador («estimativa», configurável, > 0, 1,0 = informativa) multiplica o ganho FLAT por saco creditado dentro da janela (`domain.points.campaign_gain_multiplier`: sem composição — campanhas sobrepostas ficam pela maior); o **teto mensal aplica-se ao valor já multiplicado** (recusa, não adia) e o FIFO/a expiração de 12 meses não mudam. O bónus de conformidade fica de fora (a campanha impulsiona a entrega, não a exatidão da declaração).
+
+**Gestão no web**: `/catalogo` na app de equipa — itens, parceiros (com validação de código na mesma página) e campanhas, tudo em `DataTable`; no doador, separador **«Catálogo»** da carteira com a lista, a folha de resgate e «Os meus códigos». A âncora € aparece sempre como valor do donativo, nunca como câmbio.
+
+
+## Política de paragem (17 nov 2026)
+
+A política de paragem (ADR [#42](https://github.com/helderpgoncalves/novelo/issues/42), código `domain/stop_policy.py`) decide quando a viatura de têxtil para: **dinâmica na frequência, nunca no salto**.
+
+- **Aviso garante paragem.** O aviso «sacos prontos» de um local (`stop_notices`, um ativo por local, #59) garante a ronda porta a porta na freguesia desse local: constraint dura no MIP — exatamente uma opção, sempre com o modo a pedido, à revelia de restrições por freguesia. Se não couber no orçamento, o cenário é inviável. O `bag_count` do aviso é sinal de procura para a calibração (#62), não entra nesta garantia.
+- **Escada discreta.** Sem aviso, a frequência da ronda porta a porta é **por freguesia** e a das paragens nos locais é **por local** (US43, feito 18 nov 2026: variáveis `x_{local,degrau}` no MIP, no máximo um degrau por local — «não pagar paragens sem procura»), ambas escolhidas pelo otimizador entre os degraus da escada: semanal (52 visitas/ano), quinzenal (26), mensal (13, 4 semanas), trimestral (4, 13 semanas). Os degraus são pressupostos com fonte por confirmar (ver «Pressupostos»). A escolha troca custo de visitas por procura com a captura «taxa × degrau» (secção 9) e fica gravada em `collection_plan[].frequency` e em `result.sites[].frequency` (e em `result.stop_policy = "dynamic"`). Nas paragens, o custo fixo do local desdobra-se em anuidade do capex + visitas do degrau × custo por recolha, e as rotas planeiam-se POR DEGRAU (os locais do mesmo degrau saem juntos: km/ano = Σ degrau rondas × km da ronda); na política fixa é o passo global do modo — números de sempre, paridade exata.
+- **A porta não encolhe.** A ronda universal de cada freguesia mantém-se inteira: a calibração (#62) ajusta o *n* da fórmula da volta (sacos por ronda = blended da métrica `bags_per_round`; sem amostras, sacos/ano ÷ rondas como sempre) — nunca corta km como decisão, nem salta a freguesia por ter poucos sacos, nem multiplica kg. As paragens nos locais seguem a regra atual (a viagem do VRP que mais têxtil leva da freguesia) e a sua frequência é escolhida **por local** na mesma escada (secção 11).
+- **Fixa vs dinâmica.** `ScenarioRequest.stop_policy`: `fixed` (por omissão; cenários antigos sem o campo) usa o passo global `on_demand_every_weeks` para todas as freguesias — os números de hoje, sem migração forçada dos cenários guardados; `dynamic` escolhe o degrau por freguesia. A comparação entre dois cenários (um de cada) faz-se como hoje, pelos KPIs dos resumos.
+- **Agenda pública (dado introduzido).** `result.public_agenda` deriva do plano escolhido (`domain/stop_policy.public_agenda`): por dia da semana, freguesia e canal, com a cadência do degrau. **Nenhuma visita publicada é saltada** — quem publica conta com a visita; a página pública «onde e quando entrego» (#63) lê este campo.
+- **Sem reotimização a meio do dia.** O cenário calcula-se uma vez e guarda-se; pedidos, avisos e despachos novos não o reescrevem (a captura derivada da calibração também só entra quando alguém recalcula o cenário, ADR #53).

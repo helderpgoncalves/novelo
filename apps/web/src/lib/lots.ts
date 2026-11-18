@@ -1,4 +1,11 @@
-import type { Fibre, GarmentType, LotEventKind, LotState } from '@/client';
+import type {
+  Fibre,
+  GarmentType,
+  LotEventKind,
+  LotState,
+  LotUnitSource,
+  LotWeightSource,
+} from '@/client';
 import { m } from '@/paraglide/messages';
 
 export const FIBRES: Fibre[] = [
@@ -24,6 +31,8 @@ export const GARMENTS: GarmentType[] = [
   'skirt',
   'bedding',
   'towel',
+  'footwear',
+  'accessory',
   'other',
 ];
 
@@ -51,6 +60,8 @@ export const garmentLabel: Record<GarmentType, () => string> = {
   skirt: () => m.garment_skirt(),
   bedding: () => m.garment_bedding(),
   towel: () => m.garment_towel(),
+  footwear: () => m.garment_footwear(),
+  accessory: () => m.garment_accessory(),
   other: () => m.garment_other(),
 };
 
@@ -64,12 +75,27 @@ export const lotStateLabel: Record<LotState, () => string> = {
 export const lotEventLabel: Record<LotEventKind, () => string> = {
   opened: () => m.lot_event_opened(),
   item_added: () => m.lot_event_item_added(),
+  departed: () => m.lot_event_departed(),
+  unit_removed: () => m.lot_event_unit_removed(),
   sorted: () => m.lot_event_sorted(),
   reserved: () => m.lot_event_reserved(),
   delivered: () => m.lot_event_delivered(),
 };
 
+// A etiqueta do peso segue a fonte: «medido» quando veio da balança da viatura, «estimativa» quando é o
+// pressuposto por tipo de peça (regra zero: nunca fingir medição).
+export const weightSourceLabel: Record<LotWeightSource, () => string> = {
+  measured: () => m.common_measured(),
+  estimated: () => m.common_estimate(),
+};
+
+export const lotUnitSourceLabel: Record<LotUnitSource, () => string> = {
+  bag: () => m.lot_unit_source_bag(),
+  label: () => m.lot_unit_source_label(),
+};
+
 // Pesos médios por peça usados quando o operador altera o tipo (pressuposto; o piloto usa balança).
+// Calçado conta o par, acessório é uma peça (cinto, lenço, chapéu) — pressupostos, ver dados-e-modelo.md.
 export const AVERAGE_WEIGHT_G: Record<GarmentType, number> = {
   tshirt: 150,
   shirt: 200,
@@ -80,5 +106,7 @@ export const AVERAGE_WEIGHT_G: Record<GarmentType, number> = {
   skirt: 250,
   bedding: 900,
   towel: 500,
+  footwear: 400,
+  accessory: 150,
   other: 300,
 };

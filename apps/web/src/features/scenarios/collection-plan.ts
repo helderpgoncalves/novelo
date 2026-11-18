@@ -40,6 +40,7 @@ export function summarizePlan(plan: readonly CollectionPlanEntry[]): PlanSummary
   const doorBag = empty();
   const sites = empty();
   const parishes = { door: new Set<string>(), sites: new Set<string>() };
+  // A cadência única da ronda porta a porta (política fixa); nulo quando os degraus diferem (política dinâmica).
   let everyWeeks: number | null = null;
   let vehicles = 0;
   for (const e of plan) {
@@ -50,6 +51,7 @@ export function summarizePlan(plan: readonly CollectionPlanEntry[]): PlanSummary
     totals.km += e.km_year;
     totals.hours += e.hours_year;
     if (door && everyWeeks == null) everyWeeks = e.every_weeks;
+    else if (door && everyWeeks !== e.every_weeks) everyWeeks = null;
     if (e.vehicle != null) vehicles = Math.max(vehicles, e.vehicle);
   }
   doorBag.parishes = parishes.door.size;

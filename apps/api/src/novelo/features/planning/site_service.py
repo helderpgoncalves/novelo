@@ -8,24 +8,27 @@ import hashlib
 import json
 import threading
 from collections import OrderedDict, defaultdict
-from dataclasses import dataclass
+from collections.abc import Mapping
+from dataclasses import dataclass, replace
 from typing import Literal
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from novelo.domain import network, siting
+from novelo.domain import network, siting, stop_policy
+from novelo.domain.calibration import Calibration
 from novelo.domain.costs import avoided_treatment_eur, net_cost_eur
 from novelo.domain.demand import potential_t as zones_potential_t
 from novelo.domain.reuse import ReuseShares, reusable
 from novelo.domain.routing import RoadRouter, overall_source
-from novelo.domain.vocab import CollectionMode, ProducerType, SiteClass
+from novelo.domain.vocab import CollectionFrequency, CollectionMode, ProducerType, SiteClass
 from novelo.features.municipal.models import MunicipalContainer, MunicipalSite
 from novelo.features.planning.collection_plan import (
     ChannelLoad,
     FleetFigures,
     build_collection_plan,
     fleet_figures,
+    public_agenda_of,
     with_vehicle_share,
 )
 from novelo.features.planning.params import to_domain_params, to_domain_zone
@@ -180,26 +183,64 @@ def reuse_kpis(tonnes: float, annual_cost_eur: float, shares: ReuseShares | None
 
 
 def _on_demand_zones(
-    zones: list[ZoneOut], params: PlanningParams, dp: network.Params, request: ScenarioRequest
-) -> dict[str, siting.OnDemandZone]:
-    """Recolha a pedido por freguesia, com o custo do modelo por zonas (ronda da viatura dedicada a cada N semanas)."""
-    if not request.site_on_demand:
+    zones: list[ZoneOut],
+    params: PlanningParams,
+    dp: network.Params,
+    request: ScenarioRequest,
+    notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
+) -> dict[str, list[siting.OnDemandZone]]:
+    """Recolha a pedido por freguesia, com o custo do modelo por zonas (ronda da viatura dedicada).
+
+    Na política dinâmica cada freguesia traz uma variante por degrau da escada (o MIP escolhe um); na fixa,
+    uma só variante com o passo global `on_demand_every_weeks`. A captura calibrada (spec #62) substitui a
+    prior nas freguesias com amostras; a escala do degrau aplica-se ao valor que entre.
+    """
+    if not request.site_on_demand and not notice_parishes:
         return {}
-    out: dict[str, siting.OnDemandZone] = {}
+    out: dict[str, list[siting.OnDemandZone]] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
-    eligible = [z for z in zones if CollectionMode.ON_DEMAND in request.constraints.get(z.code, request.default_modes)]
+    calibrated = calibration.capture_by_parish() if calibration is not None else {}
+    calibrated_bags = calibration.bags_per_round_by_parish() if calibration is not None else {}
+    # o aviso garante paragem mesmo onde os constraints ou o `site_on_demand` a excluem (ADR #42)
+    eligible = [
+        z
+        for z in zones
+        if z.code in notice_parishes
+        or CollectionMode.ON_DEMAND in request.constraints.get(z.code, request.default_modes)
+    ]
+    rungs: list[CollectionFrequency | None] = list(stop_policy.LADDER) if request.stop_policy == "dynamic" else [None]
     for z, zone in zip(eligible, network.with_road_distances([to_domain_zone(z) for z in eligible], dp), strict=True):
-        c = network.mode_cost(zone, CollectionMode.ON_DEMAND, dp)
-        out[z.code] = siting.OnDemandZone(
-            z.code, c.capture, coverage, c.annual_cost_eur, c.km_year, c.hours_year, c.collections_year, c.rounds_year,
-            c.trips_per_round,
-        )  # fmt: skip
+        override = calibrated[z.code].blended if z.code in calibrated else None
+        variants = []
+        for rung in rungs:
+            c = network.mode_cost(
+                zone,
+                CollectionMode.ON_DEMAND,
+                dp,
+                stop_policy.weeks_of(rung) if rung else None,
+                override,
+                calibrated_bags[z.code].blended if z.code in calibrated_bags else None,
+            )
+            variants.append(
+                siting.OnDemandZone(
+                    z.code, c.capture, coverage, c.annual_cost_eur, c.km_year, c.hours_year, c.collections_year,
+                    c.rounds_year, c.trips_per_round, rung,
+                )
+            )  # fmt: skip
+        out[z.code] = variants
     return out
 
 
 def _routes_out(
-    plan: siting.SitePlan, mode: CollectionMode, candidates: list[siting.Candidate], inputs: SiteInputs, freq: float
+    plan: siting.SitePlan,
+    mode: CollectionMode,
+    candidates: list[siting.Candidate],
+    inputs: SiteInputs,
+    visits_of_site: Mapping[str, float],
 ) -> tuple[list[RouteOut], dict[str, int]]:
+    """As rotas de UM cenário por locais: por degrau (as rotas vêm agrupadas por degrau do plano),
+    com a carga de cada paragem a acompanhar as VISITAS do seu degrau (US43)."""
     vehicle_of: dict[str, int] = {}
     cand_by_id = {c.id: c for c in candidates}
     site_tonnes = {s.candidate.id: s.tonnes for s in plan.sites}
@@ -215,7 +256,7 @@ def _routes_out(
                     parish_name=m.parish_name,
                     latitude=cand.lat,
                     longitude=cand.lon,
-                    load_t=round(site_tonnes.get(site_id, 0.0) / freq, 3),
+                    load_t=round(site_tonnes.get(site_id, 0.0) / visits_of_site.get(site_id, 1.0), 3),
                     site_id=site_id,
                     label=m.street,
                 )
@@ -256,6 +297,7 @@ def _site_selections(plan: siting.SitePlan, inputs: SiteInputs, vehicle_of: dict
                 population_covered=round(s.population_covered),
                 served_points=s.served_points,
                 vehicle=vehicle_of.get(s.candidate.id),
+                frequency=s.frequency,
             )
         )
     return sorted(out, key=lambda x: -x.tonnes)
@@ -332,8 +374,21 @@ def _allocations(
 def _channel_loads(
     allocations: list[Allocation], plan: siting.SitePlan, mode: CollectionMode, collections_per_year: float
 ) -> list[ChannelLoad]:
-    """O que a viatura dedicada faz em cada freguesia: paragens nos locais (km das rotas repartidos pelos locais) e
-    rondas porta a porta (do modelo por zonas)."""
+    """O que a viatura dedicada faz em cada freguesia: paragens nos locais (km das rotas repartidos pelos
+    locais) e rondas porta a porta (do modelo por zonas).
+
+    Nas paragens com escada POR LOCAL (US43), cada degrau da freguesia vira uma linha própria: o
+    plano da viatura mostra a frequência escolhida para aqueles locais (o `collection_plan` e a
+    agenda pública publicam-na tal qual)."""
+    sites_by_parish: dict[str, dict[CollectionFrequency | None, list[float]]] = defaultdict(
+        lambda: defaultdict(lambda: [0.0, 0.0])
+    )  # freguesia → degrau → [n.º paragens, visitas/ano do degrau]
+    tonnes_by_parish_rung: dict[tuple[str, CollectionFrequency | None], float] = defaultdict(float)
+    for s in plan.sites:
+        row = sites_by_parish[s.candidate.zone_id][s.frequency]
+        row[0] += 1
+        row[1] = stop_policy.visits_per_year(s.frequency) if s.frequency else collections_per_year
+        tonnes_by_parish_rung[(s.candidate.zone_id, s.frequency)] += s.tonnes
     out: list[ChannelLoad] = []
     for a in allocations:
         for p in a.parts:
@@ -341,9 +396,24 @@ def _channel_loads(
                 od = plan.on_demand[a.parish_code]
                 out.append(
                     ChannelLoad(
-                        a.parish_code, p.mode, p.tonnes, od.km_year, od.stops_year, od.rounds_year, od.trips_per_round
+                        a.parish_code, p.mode, p.tonnes, od.km_year, od.stops_year, od.rounds_year,
+                        od.trips_per_round, frequency=od.rung,
                     )
-                )
+                )  # fmt: skip
+            elif a.parish_code in sites_by_parish:
+                rungs = sites_by_parish[a.parish_code]
+                total_stops = sum(n for n, _ in rungs.values())
+                for rung, (n_sites, visits) in rungs.items():
+                    if p.km_year <= 0 and len(rungs) > 1:
+                        share = 0.0
+                    else:
+                        share = p.km_year * (n_sites / total_stops if total_stops else 1.0)
+                    out.append(
+                        ChannelLoad(
+                            a.parish_code, p.mode, round(tonnes_by_parish_rung.get((a.parish_code, rung), 0.0), 3),
+                            share, n_sites * visits, visits, frequency=rung,
+                        )
+                    )  # fmt: skip
             else:
                 out.append(
                     ChannelLoad(a.parish_code, p.mode, p.tonnes, p.km_year, p.points * collections_per_year,
@@ -366,8 +436,9 @@ def _cache_key(
     inputs: SiteInputs,
     reuse: ReuseShares | None,
     road_id: str,
+    calibration: Calibration | None = None,
 ) -> str:
-    """Identifica um cálculo: os mesmos dados, pressupostos, pedido (sem o nome) e estradas dão o mesmo cenário."""
+    """Identifica um cálculo: mesmos dados, pressupostos, pedido (sem o nome), estradas e calibração."""
     body = {
         "road": road_id,
         "request": request.model_dump(mode="json", exclude={"label", "parent_id"}),
@@ -379,6 +450,9 @@ def _cache_key(
         ],
         "sites": [(d.id, d.zone_id, d.weight) for d in inputs.demand],
         "candidates": [(c.id, c.zone_id, inputs.meta[c.id].kind) for c in inputs.candidates],
+        "calibration": None
+        if calibration is None
+        else [(r.metric, r.unit_code, r.n, r.blended) for r in calibration.readings],
     }
     return hashlib.sha256(json.dumps(body, sort_keys=True, default=str).encode()).hexdigest()
 
@@ -391,6 +465,8 @@ def compute_sites(
     inputs: SiteInputs,
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
+    notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
     """Simulador por locais com cache em memória: o mesmo pedido sobre os mesmos dados não volta ao solver.
 
@@ -398,10 +474,10 @@ def compute_sites(
     A chave inclui a versão do mapa de estradas; se o OSRM falhar a meio, o cálculo (estimado) não se guarda.
     """
     road_id = road.fingerprint if road is not None else "estimate"
-    key = _cache_key(zones, params, request, baseline_t, inputs, reuse, road_id)
+    key = _cache_key(zones, params, request, baseline_t, inputs, reuse, road_id, calibration)
     with _cache_lock:
         hit = _cache.get(key)
-        if hit is not None:
+        if hit is not None and not notice_parishes:
             _cache.move_to_end(key)
             return hit[0].model_copy(deep=True), hit[1]
         lock = _key_locks.setdefault(key, threading.Lock())
@@ -409,7 +485,7 @@ def compute_sites(
         with _cache_lock:
             hit = _cache.get(key)
         if hit is None:
-            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse, road)
+            hit = _compute_sites(zones, params, request, baseline_t, inputs, reuse, road, notice_parishes, calibration)
             if road is None or road_id == road.fingerprint:  # o OSRM aguentou o cálculo todo
                 with _cache_lock:
                     _cache[key] = hit
@@ -428,9 +504,19 @@ def _compute_sites(
     inputs: SiteInputs,
     reuse: ReuseShares | None = None,
     road: RoadRouter | None = None,
+    notice_parishes: frozenset[str] = frozenset(),
+    calibration: Calibration | None = None,
 ) -> tuple[ScenarioResult, str]:
-    """Núcleo puro do simulador por locais (sem base de dados)."""
+    """Núcleo puro do simulador por locais (sem base de dados).
+
+    `notice_parishes`: freguesias com aviso «sacos prontos» ativo — a recolha a pedido fica GARANTIDA nelas
+    (ADR: política de paragem), mesmo sem local aberto e à revelia das restrições. `calibration`: a
+    retroalimentação observada (spec #62) — o kg por saco calibra o parâmetro global e a captura do saco
+    à porta nas freguesias com amostras; os restantes priores nunca são substituídos.
+    """
     dp = to_domain_params(params, road)
+    if calibration is not None and (kg_bag := calibration.kg_per_pickup()) is not None:
+        dp = replace(dp, on_demand_kg_per_pickup=kg_bag)
     mode: CollectionMode = request.site_mode
     mp = params.modes[mode]
     costs = siting.SiteCosts(
@@ -438,6 +524,8 @@ def _compute_sites(
         annual_fixed_eur=mp.capex_per_point_eur / mp.lifetime_years
         + mp.collections_per_year * params.cost_per_collection_eur,
         collections_year=mp.collections_per_year,
+        # desdobra o fixo para a escada POR LOCAL (US43): anuidade + visitas do degrau × custo por recolha
+        collection_cost_eur=params.cost_per_collection_eur,
     )
     # Restrições por freguesia: se o modo dos locais não é permitido lá, os seus locais deixam de ser candidatos.
     blocked = {code for code, modes in request.constraints.items() if mode not in modes}
@@ -460,12 +548,19 @@ def _compute_sites(
         objective=request.objective.value,
         budget_eur_year=request.budget_eur_year,
         target_tonnes=request.target_tonnes,
-        on_demand=_on_demand_zones(zones, params, dp, request),
+        on_demand=_on_demand_zones(zones, params, dp, request, notice_parishes, calibration),
         time_limit_s=float(params.solver_time_limit_s),
+        required_od=notice_parishes,
+        # Escada POR LOCAL (US43): na política dinâmica cada paragem tem o seu degrau no MIP;
+        # na fixa mantém-se o passo global do modo (números de hoje).
+        site_ladder=list(stop_policy.LADDER) if request.stop_policy == "dynamic" else None,
     )
 
     freq = max(mp.collections_per_year, 1.0)
-    routes, vehicle_of = _routes_out(plan, mode, candidates, inputs, freq)
+    visits_of_site = {
+        s.candidate.id: stop_policy.visits_per_year(s.frequency) if s.frequency else freq for s in plan.sites
+    }
+    routes, vehicle_of = _routes_out(plan, mode, candidates, inputs, visits_of_site)
     allocations = _allocations(zones, plan, costs, mode, params)
 
     n_sites = len(plan.sites)
@@ -502,6 +597,7 @@ def _compute_sites(
                     annual_cost_eur=round(sum(p.annual_cost_eur for _, p in parts), 2),
                 )
             )
+    plan_rows = build_collection_plan(zones, loads, routes, dp, vehicles.vehicles)
     result = ScenarioResult(
         kpis=kpis,
         allocations=allocations,
@@ -511,7 +607,9 @@ def _compute_sites(
         routing=overall_source([r.source for r in routes]),
         sites=_site_selections(plan, inputs, vehicle_of),
         default_modes=request.default_modes,
-        collection_plan=build_collection_plan(zones, loads, routes, dp, vehicles.vehicles),
+        stop_policy=request.stop_policy,
+        collection_plan=plan_rows,
+        public_agenda=public_agenda_of(plan_rows),
         siting=SitingSummary(
             radius_m=request.site_radius_m,
             site_mode=mode,
