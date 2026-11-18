@@ -11,7 +11,9 @@ from sqlalchemy import select
 
 from novelo.domain.vocab import CircuitStatus, CollectionType, Typology
 from novelo.features.datasets.models import DataSource
+from novelo.features.locals.models import LocalAccount
 from novelo.features.network.models import Circuit, CircuitDay, CircuitLocality, Locality, Parish
+from novelo.features.users.models import User
 
 # 0 = segunda (Python); o CircuitDay guarda 1 = segunda (Vitrus).
 MONDAY = 0
@@ -262,17 +264,16 @@ async def test_ephemeral_address_is_purged_when_collected_too(make_user, session
 
 async def test_local_requests_reject_the_ephemeral_flag(make_user, session) -> None:
     """A morada do local é institucional (o sítio da conta): não há «efémera» — 422 como a morada manual."""
-    from tests.api.test_collection_requests_manager import local_body, make_local_with_site
-
-    locality = await make_local_with_site(session)
+    parish = await make_parish_with_round(session)  # já traz um local ligado ao circuito
+    locality = (await session.execute(select(Locality).where(Locality.parish_id == parish.id))).scalar_one()
     email = f"{uuid.uuid4().hex[:8]}@test.pt"
     c = await make_user(email, role="local")
-    from novelo.features.locals.models import LocalAccount
-    from novelo.features.users.models import User
-
     user = (await session.execute(select(User).where(User.email == email))).scalar_one()
     session.add(LocalAccount(user_id=user.id, locality_id=locality.id, kind="assistido"))
     await session.flush()
-    resp = await c.post("/api/v1/collection-requests", json={**local_body(), "ephemeral_address": True})
+    resp = await c.post(
+        "/api/v1/collection-requests",
+        json={"bag_count": 4, "requested_date": future_dow(MONDAY).isoformat(), "ephemeral_address": True},
+    )
     assert resp.status_code == 422, resp.text
     assert resp.json()["code"] == "local_address_forbidden"

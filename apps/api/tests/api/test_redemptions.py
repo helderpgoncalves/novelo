@@ -14,8 +14,10 @@ import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.core.config import get_settings
 from novelo.features.audit.models import AuditLog
 from novelo.features.catalog.models import Redemption
+from novelo.features.network.models import Parish
 from novelo.features.points.models import PointEntry
 
 AUTH = "/api/v1/auth"
@@ -488,8 +490,6 @@ async def test_campaign_multiplier_one_is_exact_parity(
 async def test_monthly_cap_still_applies_to_the_multiplied_gain(
     client: httpx.AsyncClient, session: AsyncSession, outbox, make_user, monkeypatch
 ) -> None:
-    from novelo.core.config import get_settings
-
     monkeypatch.setattr(get_settings(), "points_monthly_cap", 300)
     team = await _team_client(make_user)
     now = datetime.now(UTC)
@@ -518,8 +518,6 @@ async def test_partner_proposal_carries_the_parish_by_dicofre(
     client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
 ) -> None:
     """US39: a proposta é POR FREGUESIA — o formulário manda o dicofre do zoneamento, a API resolve."""
-    from novelo.features.network.models import Parish
-
     tag = uuid.uuid4().hex[:6]
     parish = Parish(dicofre=f"99{tag[:4]}", name=f"Freguesia {tag}", population=1000)
     session.add(parish)
