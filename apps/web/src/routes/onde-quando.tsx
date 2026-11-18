@@ -8,7 +8,6 @@ import { WeekdayDots } from '@/components/weekdays';
 import { agendaView } from '@/features/citizen/agenda';
 import { getLocale } from '@/lib/i18n';
 import { ogImage, SITE_URL } from '@/lib/seo';
-
 // Strings em pt-PT de propósito: página pública do cidadão, só portuguesa no MVP (decisão da spec #54).
 
 /** Página pública «Onde e quando entrego» (bilhete #63): sem sessão, a promessa do serviço ao cidadão.
@@ -17,6 +16,14 @@ A agenda é a publicada pela equipa da Vitrus (o cenário mais recente com ronda
 política de paragem, #61): nenhuma visita publicada é saltada. Sem agenda, a página diz-o — nunca
 inventa dias. */
 export const Route = createFileRoute('/onde-quando')({
+  // A agenda entra pelo loader (AGENTS: `ensureQueryData` nos loaders). Falhas ficam à página —
+  // é ela que mostra o vazio e o «tentar outra vez», nunca um ecrã de erro de rota.
+  loader: async ({ context: { queryClient } }) => {
+    await queryClient.ensureQueryData(getPublicCollectionAgendaOptions()).catch(() => null);
+  },
+  pendingComponent: AgendaSkeleton,
+  pendingMs: 0,
+  pendingMinMs: 0,
   head: () => ({
     meta: [
       { title: 'Onde e quando entregar têxtil · Guimarães' },
@@ -179,4 +186,23 @@ function channelLabelOf(channel: CollectionMode): string {
   if (channel === 'on_demand') return 'ronda à porta';
   if (channel === 'existing') return 'paragens nos locais';
   return 'contentores de rua (referência)';
+}
+
+/** O esqueleto da página enquanto o loader traz a agenda (o mesmo ritmo do cartão «Dias da ronda»). */
+function AgendaSkeleton() {
+  return (
+    <div className="bg-background min-h-dvh pr-[env(safe-area-inset-right)] pl-[env(safe-area-inset-left)]">
+      <main className="mx-auto max-w-lg space-y-6 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-16">
+        <div className="space-y-2">
+          <div className="bg-muted/60 h-3 w-40 animate-pulse rounded" />
+          <div className="bg-muted/60 h-8 w-full animate-pulse rounded" />
+        </div>
+        <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-5 ring-1">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="bg-muted/60 h-6 w-2/3 animate-pulse rounded" />
+          ))}
+        </div>
+      </main>
+    </div>
+  );
 }

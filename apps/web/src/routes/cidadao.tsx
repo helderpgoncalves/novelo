@@ -1,6 +1,11 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 import type { MeOut } from '@/client';
+import {
+  getCollectionHistoryOptions,
+  getDonorAccountOptions,
+  listBagActivationsOptions,
+} from '@/client/@tanstack/react-query.gen';
 import { AppShellSkeleton } from '@/components/app-loading';
 import { CitizenPage } from '@/features/citizen/citizen-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
@@ -21,6 +26,16 @@ export const Route = createFileRoute('/cidadao')({
     if (user && user.approval_status !== 'approved') throw redirect({ to: '/pending-approval' });
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
+  },
+  // Os dados do doador entram pelo loader (AGENTS: `ensureQueryData` nos loaders); sem sessão a
+  // carteira mostra a porta de entrada — nada se carrega. O saldo é secundário e refresca no ecrã.
+  loader: async ({ context: { queryClient, user } }) => {
+    if (user?.role !== 'donor') return;
+    await Promise.all([
+      queryClient.ensureQueryData(getDonorAccountOptions()),
+      queryClient.ensureQueryData(listBagActivationsOptions()),
+      queryClient.ensureQueryData(getCollectionHistoryOptions()),
+    ]);
   },
   // Área pessoal: nunca se indexa (a página pública é /onde-quando).
   head: () => ({
