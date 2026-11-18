@@ -7257,6 +7257,9 @@
             "title": "Bags",
             "type": "integer"
           },
+          "balance": {
+            "$ref": "#/components/schemas/PointsBalanceOut"
+          },
           "points_are_not_money": {
             "default": true,
             "title": "Points Are Not Money",
@@ -7275,9 +7278,6 @@
             "title": "Requests",
             "type": "integer"
           },
-          "saldo": {
-            "$ref": "#/components/schemas/SaldoOut"
-          },
           "timeline": {
             "items": {
               "$ref": "#/components/schemas/novelo__features__privacy__schemas__TimelineItem"
@@ -7287,7 +7287,7 @@
           }
         },
         "required": [
-          "saldo",
+          "balance",
           "timeline",
           "active_bags",
           "bags",
@@ -18082,6 +18082,57 @@
         "title": "PointGeometry",
         "type": "object"
       },
+      "PointsBalanceOut": {
+        "description": "O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).\n\n`balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias\n(estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.",
+        "properties": {
+          "balance": {
+            "description": "Pontos não expirados disponíveis (ganhos − anulações; FIFO)",
+            "title": "Balance",
+            "type": "integer"
+          },
+          "bonus": {
+            "description": "Parte do saldo que veio de bónus de conformidade confirmados pela triagem",
+            "title": "Bonus",
+            "type": "integer"
+          },
+          "credited_this_month": {
+            "description": "Ganhos já creditados no mês corrente (flat + bónus)",
+            "title": "Credited This Month",
+            "type": "integer"
+          },
+          "expired": {
+            "description": "Pontos já expirados (12 meses por ganho, FIFO)",
+            "title": "Expired",
+            "type": "integer"
+          },
+          "expiring_soon": {
+            "description": "Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)",
+            "title": "Expiring Soon",
+            "type": "integer"
+          },
+          "flat": {
+            "description": "Parte do saldo que veio de ganhos flat por saco recolhido e pesado",
+            "title": "Flat",
+            "type": "integer"
+          },
+          "monthly_cap": {
+            "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
+            "title": "Monthly Cap",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "balance",
+          "flat",
+          "bonus",
+          "expiring_soon",
+          "expired",
+          "monthly_cap",
+          "credited_this_month"
+        ],
+        "title": "PointsBalanceOut",
+        "type": "object"
+      },
       "PointsHistoryOut": {
         "description": "Página do histórico de pontos (o mais recente primeiro).",
         "properties": {
@@ -19642,57 +19693,6 @@
           "load_t"
         ],
         "title": "RouteStop",
-        "type": "object"
-      },
-      "SaldoOut": {
-        "description": "O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).\n\n`balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias\n(estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.",
-        "properties": {
-          "balance": {
-            "description": "Pontos não expirados disponíveis (ganhos − anulações; FIFO)",
-            "title": "Balance",
-            "type": "integer"
-          },
-          "bonus": {
-            "description": "Parte do saldo que veio de bónus de conformidade confirmados pela triagem",
-            "title": "Bonus",
-            "type": "integer"
-          },
-          "credited_this_month": {
-            "description": "Ganhos já creditados no mês corrente (flat + bónus)",
-            "title": "Credited This Month",
-            "type": "integer"
-          },
-          "expired": {
-            "description": "Pontos já expirados (12 meses por ganho, FIFO)",
-            "title": "Expired",
-            "type": "integer"
-          },
-          "expiring_soon": {
-            "description": "Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)",
-            "title": "Expiring Soon",
-            "type": "integer"
-          },
-          "flat": {
-            "description": "Parte do saldo que veio de ganhos flat por saco recolhido e pesado",
-            "title": "Flat",
-            "type": "integer"
-          },
-          "monthly_cap": {
-            "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
-            "title": "Monthly Cap",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "balance",
-          "flat",
-          "bonus",
-          "expiring_soon",
-          "expired",
-          "monthly_cap",
-          "credited_this_month"
-        ],
-        "title": "SaldoOut",
         "type": "object"
       },
       "SankeyChart": {
@@ -31812,7 +31812,7 @@
         },
         "summary": "Get Donor Account",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32303,7 +32303,7 @@
         },
         "summary": "Get Donor Account Qr",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32429,7 +32429,7 @@
         },
         "summary": "List Bag Activations",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       },
       "post": {
@@ -32559,7 +32559,7 @@
         },
         "summary": "Create Bag Activation",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32703,7 +32703,7 @@
         },
         "summary": "Update Bag Activation",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32837,7 +32837,7 @@
         },
         "summary": "Activate Bag",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32971,7 +32971,7 @@
         },
         "summary": "Deactivate Bag",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -33105,7 +33105,7 @@
         },
         "summary": "Get Bag Qr",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -33735,7 +33735,7 @@
         },
         "summary": "Get Collection History",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -34145,13 +34145,13 @@
     "/api/v1/cidadao/saldo": {
       "get": {
         "description": "O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,\no que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web.",
-        "operationId": "get_donor_saldo",
+        "operationId": "get_donor_points_balance",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SaldoOut"
+                  "$ref": "#/components/schemas/PointsBalanceOut"
                 }
               }
             },
@@ -34258,7 +34258,7 @@
             "description": "Funcionalidade indisponível"
           }
         },
-        "summary": "Get Donor Saldo",
+        "summary": "Get Donor Points Balance",
         "tags": [
           "points"
         ]

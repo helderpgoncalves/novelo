@@ -5,7 +5,7 @@ import type { CollectionMode } from '@/client';
 import { getPublicCollectionAgendaOptions } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
 import { WeekdayDots } from '@/components/weekdays';
-import { agendaView } from '@/features/cidadao/agenda';
+import { agendaView } from '@/features/citizen/agenda';
 import { getLocale } from '@/lib/i18n';
 import { ogImage, SITE_URL } from '@/lib/seo';
 

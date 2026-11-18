@@ -4264,6 +4264,7 @@ export type DeletionPreviewOut = {
      * Bags
      */
     bags: number;
+    balance: PointsBalanceOut;
     /**
      * Points Are Not Money
      */
@@ -4280,7 +4281,6 @@ export type DeletionPreviewOut = {
      * Requests
      */
     requests: number;
-    saldo: SaldoOut;
     /**
      * Timeline
      */
@@ -10577,6 +10577,59 @@ export type PointGeometry = {
 };
 
 /**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export type PointsBalanceOut = {
+    /**
+     * Balance
+     *
+     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
+     */
+    balance: number;
+    /**
+     * Bonus
+     *
+     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
+     */
+    bonus: number;
+    /**
+     * Credited This Month
+     *
+     * Ganhos já creditados no mês corrente (flat + bónus)
+     */
+    credited_this_month: number;
+    /**
+     * Expired
+     *
+     * Pontos já expirados (12 meses por ganho, FIFO)
+     */
+    expired: number;
+    /**
+     * Expiring Soon
+     *
+     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
+     */
+    expiring_soon: number;
+    /**
+     * Flat
+     *
+     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
+     */
+    flat: number;
+    /**
+     * Monthly Cap
+     *
+     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
+     */
+    monthly_cap: number;
+};
+
+/**
  * PointsHistoryOut
  *
  * Página do histórico de pontos (o mais recente primeiro).
@@ -11615,59 +11668,6 @@ export type RouteStop = {
      * Local da rede municipal (cenários por locais)
      */
     site_id?: string | null;
-};
-
-/**
- * SaldoOut
- *
- * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
- *
- * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
- * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
- */
-export type SaldoOut = {
-    /**
-     * Balance
-     *
-     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
-     */
-    balance: number;
-    /**
-     * Bonus
-     *
-     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
-     */
-    bonus: number;
-    /**
-     * Credited This Month
-     *
-     * Ganhos já creditados no mês corrente (flat + bónus)
-     */
-    credited_this_month: number;
-    /**
-     * Expired
-     *
-     * Pontos já expirados (12 meses por ganho, FIFO)
-     */
-    expired: number;
-    /**
-     * Expiring Soon
-     *
-     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
-     */
-    expiring_soon: number;
-    /**
-     * Flat
-     *
-     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
-     */
-    flat: number;
-    /**
-     * Monthly Cap
-     *
-     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
-     */
-    monthly_cap: number;
 };
 
 /**
@@ -19159,14 +19159,14 @@ export type CreateRedemptionResponses = {
 
 export type CreateRedemptionResponse = CreateRedemptionResponses[keyof CreateRedemptionResponses];
 
-export type GetDonorSaldoData = {
+export type GetDonorPointsBalanceData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/v1/cidadao/saldo';
 };
 
-export type GetDonorSaldoErrors = {
+export type GetDonorPointsBalanceErrors = {
     /**
      * Pedido inválido
      */
@@ -19209,16 +19209,16 @@ export type GetDonorSaldoErrors = {
     503: ErrorBody;
 };
 
-export type GetDonorSaldoError = GetDonorSaldoErrors[keyof GetDonorSaldoErrors];
+export type GetDonorPointsBalanceError = GetDonorPointsBalanceErrors[keyof GetDonorPointsBalanceErrors];
 
-export type GetDonorSaldoResponses = {
+export type GetDonorPointsBalanceResponses = {
     /**
      * Successful Response
      */
-    200: SaldoOut;
+    200: PointsBalanceOut;
 };
 
-export type GetDonorSaldoResponse = GetDonorSaldoResponses[keyof GetDonorSaldoResponses];
+export type GetDonorPointsBalanceResponse = GetDonorPointsBalanceResponses[keyof GetDonorPointsBalanceResponses];
 
 export type ListCollectionRequestsData = {
     body?: never;

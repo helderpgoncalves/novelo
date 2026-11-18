@@ -3,7 +3,7 @@ import type {
   DeletionPreviewOut,
   NoveloFeaturesPrivacySchemasTimelineItem as TimelineItem,
 } from '@/client';
-import { losses, timelineRows } from '@/features/cidadao/privacy';
+import { losses, timelineRows } from '@/features/citizen/privacy';
 
 /** Datas fixas: a formatação pt-PT não pode depender do relógio do teste. */
 const JUNHO = '2027-06-10T10:00:00Z';
@@ -11,7 +11,7 @@ const DEZEMBRO = '2027-12-25T10:00:00Z';
 
 function preview(overrides: Partial<DeletionPreviewOut> = {}): DeletionPreviewOut {
   return {
-    saldo: {
+    balance: {
       balance: 150,
       flat: 100,
       bonus: 50,

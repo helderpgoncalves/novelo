@@ -215,8 +215,8 @@ async def test_delete_preview_shows_balance_fifo_timeline_and_what_is_lost(
     resp = await client.get(f"{CID}/account/delete-preview")
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["saldo"]["balance"] == 150  # 100 flat + 50 bónus
-    assert body["saldo"]["flat"] == 100 and body["saldo"]["bonus"] == 50
+    assert body["balance"]["balance"] == 150  # 100 flat + 50 bónus
+    assert body["balance"]["flat"] == 100 and body["balance"]["bonus"] == 50
     timeline = body["timeline"]
     assert len(timeline) == 2  # duas datas de expiração (o ganho de 12 meses e o de 24)
     assert sum(item["amount"] for item in timeline) == 150

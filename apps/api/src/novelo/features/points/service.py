@@ -34,10 +34,10 @@ from novelo.domain.points import (
 )
 from novelo.domain.vocab import LotUnitSource
 from novelo.features.audit import service as audit
-from novelo.features.cidadao.models import BagActivation
+from novelo.features.citizen.models import BagActivation
 from novelo.features.lots.models import Lot
 from novelo.features.points.models import PointEntry
-from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsHistoryOut, SaldoOut
+from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsBalanceOut, PointsHistoryOut
 
 
 def _month_start(now: datetime) -> datetime:
@@ -166,7 +166,7 @@ def _to_ledger(row: PointEntry) -> LedgerEntry:
     return LedgerEntry(kind=row.kind, amount=row.amount, created_at=row.created_at, expires_at=row.expires_at)
 
 
-async def saldo(db: AsyncSession, user_id: uuid.UUID) -> SaldoOut:
+async def balance(db: AsyncSession, user_id: uuid.UUID) -> PointsBalanceOut:
     """O saldo do doador, calculado de fresco das linhas (nunca em cache): FIFO, teto e expira breve."""
     now = datetime.now(UTC)
     rows = (
@@ -180,7 +180,7 @@ async def saldo(db: AsyncSession, user_id: uuid.UUID) -> SaldoOut:
         .all()
     )
     balance = fifo_balance([_to_ledger(row) for row in rows], now=now)
-    return SaldoOut(
+    return PointsBalanceOut(
         balance=balance.balance,
         flat=balance.flat,
         bonus=balance.bonus,
@@ -247,8 +247,8 @@ async def annul(db: AsyncSession, admin_id: uuid.UUID, body: AnnulmentCreate, me
 
 __all__ = [
     "annul",
+    "balance",
     "credit_confirmed_declarations",
     "credit_flat_for_bag",
     "history",
-    "saldo",
 ]

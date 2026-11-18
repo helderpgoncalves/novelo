@@ -4016,6 +4016,24 @@ export const zPointGeometry = z.object({
 });
 
 /**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export const zPointsBalanceOut = z.object({
+    balance: z.int(),
+    bonus: z.int(),
+    credited_this_month: z.int(),
+    expired: z.int(),
+    expiring_soon: z.int(),
+    flat: z.int(),
+    monthly_cap: z.int()
+});
+
+/**
  * PointsHistoryOut
  *
  * Página do histórico de pontos (o mais recente primeiro).
@@ -4735,24 +4753,6 @@ export const zRouteOut = z.object({
     source: z.enum(['road', 'estimate']).optional().default('estimate'),
     stops: z.array(zRouteStop),
     vehicle: z.int()
-});
-
-/**
- * SaldoOut
- *
- * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
- *
- * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
- * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
- */
-export const zSaldoOut = z.object({
-    balance: z.int(),
-    bonus: z.int(),
-    credited_this_month: z.int(),
-    expired: z.int(),
-    expiring_soon: z.int(),
-    flat: z.int(),
-    monthly_cap: z.int()
 });
 
 /**
@@ -7050,11 +7050,11 @@ export const zNoveloFeaturesPrivacySchemasTimelineItem = z.object({
 export const zDeletionPreviewOut = z.object({
     active_bags: z.int(),
     bags: z.int(),
+    balance: zPointsBalanceOut,
     points_are_not_money: z.boolean().optional().default(true),
     points_entries: z.int(),
     redeem_hint_path: z.string().optional().default('/cidadao?tab=saldo'),
     requests: z.int(),
-    saldo: zSaldoOut,
     timeline: z.array(zNoveloFeaturesPrivacySchemasTimelineItem)
 });
 
@@ -7589,7 +7589,7 @@ export const zCreateRedemptionResponse = zRedemptionOut;
 /**
  * Successful Response
  */
-export const zGetDonorSaldoResponse = zSaldoOut;
+export const zGetDonorPointsBalanceResponse = zPointsBalanceOut;
 
 export const zListCollectionRequestsQuery = z.object({
     state: zCollectionRequestState.nullish(),

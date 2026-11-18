@@ -2,7 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 import type { MeOut } from '@/client';
 import { AppShellSkeleton } from '@/components/app-loading';
-import { CidadaoPage } from '@/features/cidadao/cidadao-page';
+import { CitizenPage } from '@/features/citizen/citizen-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { resolvePublicSessionUser } from '@/lib/session';
 
@@ -35,5 +35,5 @@ export const Route = createFileRoute('/cidadao')({
 function CidadaoView() {
   const { user } = Route.useRouteContext();
   const { tab } = Route.useSearch();
-  return <CidadaoPage user={user satisfies MeOut | null} tab={tab ?? 'inicio'} />;
+  return <CitizenPage user={user satisfies MeOut | null} tab={tab ?? 'inicio'} />;
 }

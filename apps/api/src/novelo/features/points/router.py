@@ -15,7 +15,7 @@ from novelo.core.deps import require_role
 from novelo.core.ratelimit import donor_bags_limiter
 from novelo.core.request_meta import Meta
 from novelo.features.points import service
-from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsHistoryOut, SaldoOut
+from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsBalanceOut, PointsHistoryOut
 from novelo.features.users.models import User
 
 router = APIRouter()
@@ -27,11 +27,11 @@ Donor = Annotated[User, Depends(require_role("donor"))]
 Team = Annotated[User, Depends(require_role("admin", "operator"))]
 
 
-@router.get("/cidadao/saldo", response_model=SaldoOut, dependencies=[Depends(donor_bags_limiter)])
-async def get_donor_saldo(user: Donor, db: Db) -> SaldoOut:
+@router.get("/cidadao/saldo", response_model=PointsBalanceOut, dependencies=[Depends(donor_bags_limiter)])
+async def get_donor_points_balance(user: Donor, db: Db) -> PointsBalanceOut:
     """O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,
     o que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web."""
-    return await service.saldo(db, user.id)
+    return await service.balance(db, user.id)
 
 
 @router.get("/cidadao/pontos", response_model=PointsHistoryOut, dependencies=[Depends(donor_bags_limiter)])

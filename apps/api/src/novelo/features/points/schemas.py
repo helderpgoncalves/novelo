@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from novelo.domain.points import PointEntryKind
 
 
-class SaldoOut(BaseModel):
+class PointsBalanceOut(BaseModel):
     """O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
 
     `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias

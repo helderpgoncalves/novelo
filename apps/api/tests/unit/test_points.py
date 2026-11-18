@@ -76,9 +76,9 @@ def test_balance_of_two_open_gains() -> None:
         _gain(100, datetime(2026, 1, 10, tzinfo=UTC)),  # flat: expira 2027-01-10
         _gain(50, datetime(2026, 3, 1, tzinfo=UTC), kind=PointEntryKind.GAIN_BONUS),  # expira 2027-03-01
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert (saldo.balance, saldo.flat, saldo.bonus) == (150, 100, 50)
-    assert saldo.expiring_soon == 0 and saldo.expired == 0
+    balance = fifo_balance(entries, now=NOW)
+    assert (balance.balance, balance.flat, balance.bonus) == (150, 100, 50)
+    assert balance.expiring_soon == 0 and balance.expired == 0
 
 
 def test_gain_12_months_and_1_day_old_is_expired() -> None:
@@ -95,9 +95,9 @@ def test_expiring_soon_counts_gains_within_30_days_of_now() -> None:
         _gain(100, datetime(2025, 12, 1, tzinfo=UTC)),
         _gain(50, datetime(2026, 6, 1, tzinfo=UTC)),  # expira 2027-06-01: longe
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert saldo.expiring_soon == 100
-    assert saldo.balance == 150
+    balance = fifo_balance(entries, now=NOW)
+    assert balance.expiring_soon == 100
+    assert balance.balance == 150
 
 
 def test_fifo_consumes_oldest_gain_first() -> None:
@@ -107,9 +107,9 @@ def test_fifo_consumes_oldest_gain_first() -> None:
         _gain(100, datetime(2026, 2, 10, tzinfo=UTC)),
         LedgerEntry(kind=PointEntryKind.ANNULMENT, amount=-150, created_at=datetime(2026, 3, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert saldo.balance == 50
-    assert saldo.expired == 0
+    balance = fifo_balance(entries, now=NOW)
+    assert balance.balance == 50
+    assert balance.expired == 0
 
 
 def test_annulment_consumes_flat_before_bonus_when_older() -> None:
@@ -119,8 +119,8 @@ def test_annulment_consumes_flat_before_bonus_when_older() -> None:
         _gain(50, datetime(2026, 3, 1, tzinfo=UTC), kind=PointEntryKind.GAIN_BONUS),
         LedgerEntry(kind=PointEntryKind.ANNULMENT, amount=-100, created_at=datetime(2026, 4, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert (saldo.balance, saldo.flat, saldo.bonus) == (50, 0, 50)
+    balance = fifo_balance(entries, now=NOW)
+    assert (balance.balance, balance.flat, balance.bonus) == (50, 0, 50)
 
 
 def test_consumption_cannot_resurrect_or_go_negative() -> None:
@@ -129,8 +129,8 @@ def test_consumption_cannot_resurrect_or_go_negative() -> None:
         _gain(100, datetime(2025, 6, 1, tzinfo=UTC)),  # expira 2026-06-01
         LedgerEntry(kind=PointEntryKind.ANNULMENT, amount=-100, created_at=datetime(2026, 7, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=datetime(2026, 7, 2, tzinfo=UTC))
-    assert (saldo.balance, saldo.expired) == (0, 100)
+    balance = fifo_balance(entries, now=datetime(2026, 7, 2, tzinfo=UTC))
+    assert (balance.balance, balance.expired) == (0, 100)
 
 
 def test_consumption_before_a_gain_does_not_touch_it() -> None:
@@ -139,8 +139,8 @@ def test_consumption_before_a_gain_does_not_touch_it() -> None:
         _gain(100, datetime(2026, 2, 1, tzinfo=UTC)),
         LedgerEntry(kind=PointEntryKind.ANNULMENT, amount=-100, created_at=datetime(2026, 1, 15, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert saldo.balance == 100
+    balance = fifo_balance(entries, now=NOW)
+    assert balance.balance == 100
 
 
 def test_fifo_order_is_independent_of_input_order() -> None:
@@ -157,8 +157,8 @@ def test_redemption_kind_consumes_like_annulment() -> None:
         _gain(100, datetime(2026, 1, 10, tzinfo=UTC)),
         LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-40, created_at=datetime(2026, 5, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert saldo.balance == 60
+    balance = fifo_balance(entries, now=NOW)
+    assert balance.balance == 60
 
 
 # --- resgate (#65): o gasto FIFO com exemplos trabalhados ------------------------------------------
@@ -172,8 +172,8 @@ def test_redemption_spends_oldest_first_across_two_gains() -> None:
         _gain(700, datetime(2026, 2, 1, tzinfo=UTC), kind=PointEntryKind.GAIN_BONUS),
         LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-1200, created_at=datetime(2026, 3, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert (saldo.balance, saldo.flat, saldo.bonus, saldo.expired) == (300, 0, 300, 0)
+    balance = fifo_balance(entries, now=NOW)
+    assert (balance.balance, balance.flat, balance.bonus, balance.expired) == (300, 0, 300, 0)
 
 
 def test_redemption_after_expiry_spends_only_what_survived() -> None:
@@ -183,8 +183,8 @@ def test_redemption_after_expiry_spends_only_what_survived() -> None:
         _gain(800, datetime(2025, 1, 1, tzinfo=UTC)),
         LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-500, created_at=datetime(2026, 2, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=datetime(2026, 2, 2, tzinfo=UTC))
-    assert (saldo.balance, saldo.expired) == (0, 800)
+    balance = fifo_balance(entries, now=datetime(2026, 2, 2, tzinfo=UTC))
+    assert (balance.balance, balance.expired) == (0, 800)
 
 
 def test_redemption_between_expiries_consumes_the_dying_gain_first() -> None:
@@ -221,13 +221,13 @@ def test_redemption_bigger_than_balance_leaves_zero_never_negative() -> None:
         LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-400, created_at=datetime(2026, 2, 1, tzinfo=UTC)),
         LedgerEntry(kind=PointEntryKind.REDEMPTION, amount=-1200, created_at=datetime(2026, 3, 1, tzinfo=UTC)),
     ]
-    saldo = fifo_balance(entries, now=NOW)
-    assert saldo.balance == 0
+    balance = fifo_balance(entries, now=NOW)
+    assert balance.balance == 0
 
 
 def test_empty_ledger_has_zero_balance() -> None:
-    saldo = fifo_balance([], now=NOW)
-    assert (saldo.balance, saldo.flat, saldo.bonus, saldo.expiring_soon, saldo.expired) == (0, 0, 0, 0, 0)
+    balance = fifo_balance([], now=NOW)
+    assert (balance.balance, balance.flat, balance.bonus, balance.expiring_soon, balance.expired) == (0, 0, 0, 0, 0)
 
 
 # --- bónus de conformidade: a triagem confirma (ou não) a declaração «Vai no saco?» ---------------

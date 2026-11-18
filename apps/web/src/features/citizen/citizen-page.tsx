@@ -5,9 +5,9 @@ import type { MeOut } from '@/client';
 import { getPublicCollectionAgendaOptions } from '@/client/@tanstack/react-query.gen';
 import { BrandLogo } from '@/components/brand-logo';
 import { WeekdayDots } from '@/components/weekdays';
-import { agendaByDay } from '@/features/cidadao/agenda';
-import { SignupCard } from '@/features/cidadao/signup-card';
-import { Wallet } from '@/features/cidadao/wallet';
+import { agendaByDay } from '@/features/citizen/agenda';
+import { SignupCard } from '@/features/citizen/signup-card';
+import { Wallet } from '@/features/citizen/wallet';
 import { getErrorCode } from '@/lib/errors';
 
 // Strings em pt-PT de propósito: a área do cidadão é só portuguesa no MVP (decisão da spec #54).
@@ -20,7 +20,7 @@ export type WalletTab = 'inicio' | 'sacos' | 'saldo' | 'catalogo' | 'historico' 
  * com conta de doador é a «Carteira» (Início / Sacos / Saldo / Histórico).
  * O `beforeLoad` da rota já resolveu a sessão e redirecionou contas de equipa — aqui só se escolhe o desenho.
  */
-export function CidadaoPage({ user, tab }: { user: MeOut | null; tab: WalletTab }) {
+export function CitizenPage({ user, tab }: { user: MeOut | null; tab: WalletTab }) {
   if (user?.role === 'donor') return <Wallet tab={tab} />;
   return <CidadaoPublic />;
 }

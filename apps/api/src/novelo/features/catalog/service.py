@@ -45,7 +45,7 @@ from novelo.features.catalog.schemas import (
     PartnerUpdate,
     RedemptionOut,
 )
-from novelo.features.cidadao.models import BagActivation
+from novelo.features.citizen.models import BagActivation
 from novelo.features.lots.models import LotUnit
 from novelo.features.points.models import PointEntry
 from novelo.features.users.models import User

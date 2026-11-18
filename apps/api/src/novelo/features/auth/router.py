@@ -66,8 +66,8 @@ from novelo.features.auth.schemas import (
     SignedIn,
     VerifyEmailRequest,
 )
-from novelo.features.cidadao import service as cidadao
-from novelo.features.cidadao.schemas import DonorSignUpRequest
+from novelo.features.citizen import service as citizen
+from novelo.features.citizen.schemas import DonorSignUpRequest
 from novelo.features.email_log import monitor
 from novelo.features.email_log import service as email_log
 from novelo.features.email_log.schemas import DeliveryStatusOrNone
@@ -266,7 +266,7 @@ async def donor_sign_up(body: DonorSignUpRequest, request: Request, db: Db, send
     Email novo: cria a conta leve logo aprovada (papel `donor`) e envia o link de entrada para
     `/cidadao`. Email que já tem conta: só o link de entrada — nunca revela que existia. A resposta é
     sempre 204 exista ou não a conta, como no magic link."""
-    await cidadao.sign_up_donor(db, sender, body, ip=client_ip(request), user_agent=_user_agent(request), meta=meta)
+    await citizen.sign_up_donor(db, sender, body, ip=client_ip(request), user_agent=_user_agent(request), meta=meta)
 
 
 @router.post("/refresh", status_code=204)

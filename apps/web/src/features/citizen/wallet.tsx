@@ -21,9 +21,9 @@ import { toast } from 'sonner';
 import type {
   BagActivationOut,
   CollectionHistoryOut,
-  GetDonorSaldoError,
+  GetDonorPointsBalanceError,
   PointEntryOut,
-  SaldoOut,
+  PointsBalanceOut,
 } from '@/client';
 import {
   activateBagMutation,
@@ -33,7 +33,7 @@ import {
   getCollectionHistoryOptions,
   getDonorAccountOptions,
   getDonorAccountQrOptions,
-  getDonorSaldoOptions,
+  getDonorPointsBalanceOptions,
   getPublicCollectionAgendaOptions,
   listBagActivationsOptions,
   listDonorPointsOptions,
@@ -51,11 +51,11 @@ import {
   SheetHeader,
   SheetTitle,
 } from '@/components/ui/sheet';
-import { agendaByDay, cadenceLabel, channelLabel } from '@/features/cidadao/agenda';
-import { CatalogoTab } from '@/features/cidadao/catalogo-tab';
-import { bagsAtHome, milestones, onboardingCollapsed } from '@/features/cidadao/onboarding';
-import { PrivacyTab } from '@/features/cidadao/privacy-tab';
-import { RequestSheet } from '@/features/cidadao/request-sheet';
+import { agendaByDay, cadenceLabel, channelLabel } from '@/features/citizen/agenda';
+import { CatalogTab } from '@/features/citizen/catalog-tab';
+import { bagsAtHome, milestones, onboardingCollapsed } from '@/features/citizen/onboarding';
+import { PrivacyTab } from '@/features/citizen/privacy-tab';
+import { RequestSheet } from '@/features/citizen/request-sheet';
 import { getErrorCode } from '@/lib/errors';
 import { formatKg, formatNumber } from '@/lib/format';
 import { formatDate, weekdayLong } from '@/lib/i18n';
@@ -96,7 +96,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
   // A agenda é secundária: a carteira desenha sem ela (a página pública é quem manda nela).
   const { data: agendaData } = useQuery(getPublicCollectionAgendaOptions());
   // O saldo real (#64): derivado do livro-razão; o Início mostra-o em resumo, o Saldo por inteiro.
-  const saldoQuery = useQuery({ ...getDonorSaldoOptions(), refetchOnWindowFocus: false });
+  const balanceQuery = useQuery({ ...getDonorPointsBalanceOptions(), refetchOnWindowFocus: false });
 
   const invalidate = () => {
     void queryClient.invalidateQueries({ queryKey: listBagActivationsOptions().queryKey });
@@ -131,7 +131,7 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
                 bags={bags}
                 history={history}
                 agenda={agendaByDay(agendaData?.agenda ?? null)}
-                saldoBalance={saldoQuery.data?.balance}
+                saldoBalance={balanceQuery.data?.balance}
                 onShowAccountQr={() => setAccountQrOpen(true)}
                 onNewBag={() => changeTab('sacos')}
                 onRequest={() => setRequesting(true)}
@@ -147,8 +147,8 @@ export function Wallet({ tab }: { tab: WalletTabId }) {
                 onChanged={invalidate}
               />
             )}
-            {tab === 'saldo' && <SaldoTab saldoQuery={saldoQuery} />}
-            {tab === 'catalogo' && <CatalogoTab balance={saldoQuery.data?.balance ?? 0} />}
+            {tab === 'saldo' && <BalanceTab balanceQuery={balanceQuery} />}
+            {tab === 'catalogo' && <CatalogTab balance={balanceQuery.data?.balance ?? 0} />}
             {tab === 'historico' && <HistoricoTab history={history} />}
             {tab === 'privacidade' && <PrivacyTab />}
           </>
@@ -621,8 +621,12 @@ const POINT_KIND_LABEL: Record<PointEntryOut['kind'], string> = {
   redemption: 'Resgate',
 };
 
-function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDonorSaldoError> }) {
-  const { data: saldo, error: saldoError, refetch: refetchSaldo } = saldoQuery;
+function BalanceTab({
+  balanceQuery,
+}: {
+  balanceQuery: UseQueryResult<PointsBalanceOut, GetDonorPointsBalanceError>;
+}) {
+  const { data: balance, error: balanceError, refetch: refetchBalance } = balanceQuery;
   // O histórico de pontos: dez recentes chegam ao ecrã (a lista completa é o livro-razão paginado).
   const {
     data: pontos,
@@ -634,12 +638,12 @@ function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDono
     refetchOnWindowFocus: false,
   });
 
-  if (saldoError) {
-    return <ErrorState error={saldoError} onRetry={() => void refetchSaldo()} />;
+  if (balanceError) {
+    return <ErrorState error={balanceError} onRetry={() => void refetchBalance()} />;
   }
   const capShare =
-    saldo && saldo.monthly_cap > 0
-      ? Math.min(100, Math.round((saldo.credited_this_month / saldo.monthly_cap) * 100))
+    balance && balance.monthly_cap > 0
+      ? Math.min(100, Math.round((balance.credited_this_month / balance.monthly_cap) * 100))
       : null;
 
   return (
@@ -650,50 +654,50 @@ function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDono
           <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px]">estimativa</span>
         </p>
         <p className="font-serif text-5xl" aria-live="polite">
-          {saldo ? formatNumber(saldo.balance) : '…'}
+          {balance ? formatNumber(balance.balance) : '…'}
         </p>
         <p className="text-muted-foreground text-sm">
           pontos · só leitura — nunca são dinheiro nem conversíveis
         </p>
-        {saldo && (
+        {balance && (
           <dl className="text-muted-foreground grid grid-cols-2 gap-2 pt-2 text-xs">
             <div className="rounded-xl bg-muted/60 p-2">
               <dt className="sr-only">De ganhos flat</dt>
               <dd>
-                <span className="font-medium text-foreground">{formatNumber(saldo.flat)}</span> por
-                sacos
+                <span className="font-medium text-foreground">{formatNumber(balance.flat)}</span>{' '}
+                por sacos
               </dd>
             </div>
             <div className="rounded-xl bg-muted/60 p-2">
               <dt className="sr-only">De bónus de conformidade</dt>
               <dd>
-                <span className="font-medium text-foreground">{formatNumber(saldo.bonus)}</span> de
-                bónus
+                <span className="font-medium text-foreground">{formatNumber(balance.bonus)}</span>{' '}
+                de bónus
               </dd>
             </div>
           </dl>
         )}
-        {saldo && saldo.expiring_soon > 0 && (
+        {balance && balance.expiring_soon > 0 && (
           <p className="rounded-xl bg-amber-500/10 p-2 text-xs text-amber-700 dark:text-amber-400">
-            {formatNumber(saldo.expiring_soon)} pontos expiram nos próximos 30 dias (os mais antigos
-            primeiro).
+            {formatNumber(balance.expiring_soon)} pontos expiram nos próximos 30 dias (os mais
+            antigos primeiro).
           </p>
         )}
-        {saldo && saldo.expired > 0 && (
+        {balance && balance.expired > 0 && (
           <p className="text-muted-foreground text-xs">
-            {formatNumber(saldo.expired)} pontos já expiraram (12 meses por ganho).
+            {formatNumber(balance.expired)} pontos já expiraram (12 meses por ganho).
           </p>
         )}
       </div>
 
       {/* Teto mensal (configurável, estimativa): o que transborda é recusado — nunca adiado. */}
-      {saldo && (
+      {balance && (
         <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-5 text-sm ring-1">
           <div className="flex items-baseline justify-between gap-2">
             <p className="font-medium">Teto deste mês</p>
             <p className="text-muted-foreground text-xs">
-              {formatNumber(saldo.credited_this_month)}
-              {saldo.monthly_cap > 0 ? ` de ${formatNumber(saldo.monthly_cap)}` : ''}{' '}
+              {formatNumber(balance.credited_this_month)}
+              {balance.monthly_cap > 0 ? ` de ${formatNumber(balance.monthly_cap)}` : ''}{' '}
               <span className="ml-1 rounded-full bg-muted px-2 py-0.5 text-[10px]">estimativa</span>
             </p>
           </div>
@@ -709,7 +713,7 @@ function SaldoTab({ saldoQuery }: { saldoQuery: UseQueryResult<SaldoOut, GetDono
               <div className="bg-primary h-2 rounded-full" style={{ width: `${capShare}%` }} />
             </div>
           )}
-          {saldo.monthly_cap === 0 && (
+          {balance.monthly_cap === 0 && (
             <p className="text-muted-foreground text-xs">Este mês não tem teto de ganhos.</p>
           )}
         </div>

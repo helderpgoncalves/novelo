@@ -19,8 +19,8 @@ from novelo.core.request_meta import RequestMeta
 from novelo.domain.bags import MAX_ACTIVE_BAGS, new_account_code, new_bag_code
 from novelo.domain.vocab import ScenarioStatus
 from novelo.features.auth import entry
-from novelo.features.cidadao.models import BagActivation
-from novelo.features.cidadao.schemas import (
+from novelo.features.citizen.models import BagActivation
+from novelo.features.citizen.schemas import (
     BagActivationCreate,
     BagActivationOut,
     BagActivationUpdate,
