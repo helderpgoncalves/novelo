@@ -99,8 +99,8 @@ async def test_scenario_creation_recomputes_the_aggregates(logged_in: httpx.Asyn
     assert taxa["n"] == 2
     assert taxa["observed"] == pytest.approx((8.0 / 7.0 + 2.8 / 7.0) / 2)
     assert taxa["prior"] == pytest.approx(prior, rel=1e-6)
-    assert taxa["blended"] == pytest.approx((4 * prior + 2 * taxa["observed"]) / 6)  # k=4
-    assert taxa["weight"] == pytest.approx(2 / 6)
+    assert taxa["blended"] == pytest.approx((3 * prior + 2 * taxa["observed"]) / 5)  # k=4 (o prior pesa k−1)
+    assert taxa["weight"] == pytest.approx(2 / 5)
     assert taxa["label"] == "estimativa·2"
     assert taxa["parish_code"] == parish.dicofre
 
@@ -111,7 +111,7 @@ async def test_scenario_creation_recomputes_the_aggregates(logged_in: httpx.Asyn
     assert bags["label"] == "observado·4"
     pooled = row_of(body["rows"], "kg_per_bag", "concelho")
     assert pooled["n"] == 4
-    assert pooled["blended"] == pytest.approx((4 * 25.0 + 4 * 3.65) / 8)  # 114,6 ÷ 8 = 14,325
+    assert pooled["blended"] == pytest.approx((3 * 25.0 + 4 * 3.65) / 7)  # 89,6 ÷ 7 = 12,8
     assert pooled["label"] == "observado·4"
 
     # Sacos por ronda na freguesia: 3 visitas em 3 semanas com 1, 2 e 1 sacos → mediana 1,0; n=3 semanas.
@@ -123,7 +123,7 @@ async def test_scenario_creation_recomputes_the_aggregates(logged_in: httpx.Asyn
     # blend de freguesia k=8, n=2: (8·0,15 + 2·0,014703) ÷ 10 = 0,122941.
     capture = row_of(body["rows"], "on_demand_capture", parish.dicofre)
     assert capture["observed"] == pytest.approx(taxa["observed"] * 365 / (1000 * 1.59583 * 12))
-    assert capture["blended"] == pytest.approx((8 * 0.15 + 2 * capture["observed"]) / 10)
+    assert capture["blended"] == pytest.approx((7 * 0.15 + 2 * capture["observed"]) / 9)
     assert capture["label"] == "estimativa·2"
 
     # A fotografia do cenário é esta mesma calibração.
@@ -251,7 +251,7 @@ async def test_requests_are_a_signal_that_never_multiplies_kg(
     assert requests["n"] == 2  # 8 dias → 2 semanas observadas
     assert requests["observed"] == pytest.approx(1.0)  # 2 pedidos ÷ 2 semanas
     assert requests["prior"] == 0.0  # sem prior de pedidos (sinal de arranque)
-    assert requests["blended"] == pytest.approx((8 * 0.0 + 2 * 1.0) / 10)
+    assert requests["blended"] == pytest.approx((7 * 0.0 + 2 * 1.0) / 9)
     assert requests["label"] == "estimativa·2"
 
     # Os mesmos pesos SEM os pedidos dão as mesmas toneladas: pedidos nunca multiplicam kg.
@@ -276,7 +276,7 @@ async def test_unvisited_local_gets_the_calibrated_prior(logged_in: httpx.AsyncC
     prior_base = 1000 * 1.59583 * 12 / 2 / 365
     assert unvisited["n"] == 0
     assert unvisited["observed"] is None
-    assert unvisited["prior"] == pytest.approx(prior_base * (4 + (375 / 7) / prior_base) / 5)
+    assert unvisited["prior"] == pytest.approx(prior_base * (3 + (375 / 7) / prior_base) / 4)
     assert unvisited["blended"] == unvisited["prior"]  # sem amostras, o blend não mexe no valor
     assert unvisited["label"] == "pressuposto"
 

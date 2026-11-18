@@ -78,10 +78,10 @@ def test_prior_run_without_calibration_uses_the_assumption() -> None:
 
 
 def test_calibrated_capture_raises_the_tonnes_by_the_blend() -> None:
-    # Captura observada 0,5 com n=8 (domina o prior 0,15): blend = (8·0,15 + 8·0,5) ÷ 16 = 0,325.
-    # As toneladas da freguesia sobem de (≤) 0,15·D_z para 0,325·D_z = 6,2237 t.
+    # Captura observada 0,5 com n=8 (domina o prior 0,15): blend = (7·0,15 + 8·0,5) ÷ 15 = 0,3367.
+    # As toneladas da freguesia sobem de (≤) 0,15·D_z para 0,3367·D_z.
     calibrated = compute([_zone()], default_params(), _request(), baseline_t=0.0, calibration=_calibration(0.5, 8))[0]
-    expected = DEMAND_T * (8 * 0.15 + 8 * 0.5) / 16
+    expected = DEMAND_T * (7 * 0.15 + 8 * 0.5) / 15
     assert calibrated.allocations[0].tonnes == pytest.approx(expected, abs=0.01)
 
 
