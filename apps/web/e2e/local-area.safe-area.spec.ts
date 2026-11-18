@@ -69,6 +69,13 @@ test.describe('conta de local: «Duas portas»', () => {
 
     // A home do local: o sítio no cabeçalho e o herói com o aviso por dar.
     await expect(page.getByRole('heading', { name: locality.name })).toBeVisible();
+    // A localidade é partilhada entre corridas: anular um aviso que tenha ficado ativo antes de começar.
+    const hero = page.getByRole('button', { name: /Tem sacos prontos\?|Aviso enviado/ }).first();
+    if ((await hero.textContent())?.includes('Aviso enviado')) {
+      await hero.click();
+      await page.getByRole('button', { name: 'Anular aviso' }).click();
+      await expect(page.getByRole('button', { name: /Tem sacos prontos\?/ })).toBeVisible();
+    }
     await expect(page.getByText('Tem sacos prontos?')).toBeVisible();
 
     // Porta 1 — a única escrita: avisar com 3 sacos e ver o ativo.
@@ -78,7 +85,7 @@ test.describe('conta de local: «Duas portas»', () => {
     await expect(bags).toHaveValue('2'); // o protótipo começa em 2
     await page.getByRole('button', { name: 'Mais um saco' }).click();
     await page
-      .getByLabel('Nota para a equipa (opcional) — ex.: sala 12, porta dos fundos')
+      .getByPlaceholder('Nota para a equipa (opcional) — ex.: sala 12, porta dos fundos')
       .fill('sala 12');
     await page.getByRole('button', { name: 'Avisar a viatura' }).click();
     await expect(page.getByText('Aviso enviado — sacos prontos')).toBeVisible();
@@ -89,9 +96,12 @@ test.describe('conta de local: «Duas portas»', () => {
     await expect(page.getByText('3 sacos prontos')).toBeVisible();
     await page.keyboard.press('Escape');
 
-    // Porta 2 — leitura: sem paragens, o vazio diz-o sem inventar números.
+    // Porta 2 — leitura: sem paragens o vazio diz-o sem inventar números; a localidade é partilhada
+    // entre corridas, por isso aceita-se também o histórico de paragens já escrito.
     await page.getByRole('button', { name: /As nossas rondas/ }).click();
-    await expect(page.getByText(/Ainda não há paragens neste local/)).toBeVisible();
+    const vazio = page.getByText(/Ainda não há paragens neste local/);
+    const paragem = page.locator('li a[href^="/passport/"]').first();
+    await expect(vazio.or(paragem)).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Porta 3 — certificado opt-in: desligado não há página; ligado, a página pública existe.
@@ -100,10 +110,15 @@ test.describe('conta de local: «Duas portas»', () => {
       return ((await res.json()) as { id: string }).id;
     });
     const certUrl = `/pt/certificado/${accountId}`;
-    await page.request.get(certUrl).then((res) => expect(res.status()).toBe(404));
+    // O 404 afirma-se na API (a SPA do web responde 200 a qualquer rota com o seu invólucro).
+    const status = await page.evaluate(async (id) => {
+      const res = await fetch(`/api/v1/public/locals/${id}/certificate`);
+      return res.status;
+    }, accountId);
+    expect(status).toBe(404);
 
     await page.getByRole('button', { name: /Certificado público/ }).click();
-    await expect(page.getByText('Desligado — nada é público')).toBeVisible();
+    await expect(page.getByRole('dialog').getByText('Desligado — nada é público')).toBeVisible();
     await page.getByRole('switch', { name: 'Publicar certificado' }).click();
     await expect(page.getByText(/Certificado de recolha · rede Novelo/)).toBeVisible();
     await page.keyboard.press('Escape');
@@ -139,10 +154,12 @@ test.describe('conta de local: «Duas portas»', () => {
 
       await loginLocal(page, email);
       await page.getByRole('button', { name: /As nossas rondas/ }).click();
-      await expect(page.getByText(lot.code)).toBeVisible();
-      // O peso é o medido (4,30 kg), com a etiqueta «medido» — nunca «estimativa».
-      await expect(page.getByText(/4,30 kg/)).toBeVisible();
-      await expect(page.getByText(/\(medido\)/)).toBeVisible();
+      // O peso é o medido (4,3 kg — o formatKg corta o zero final), com «medido» — nunca «estimativa».
+      // A linha do lote é a âncora: a localidade acumula paragens de corridas anteriores.
+      const row = page.locator('li', { hasText: lot.code });
+      await expect(row).toBeVisible();
+      await expect(row.getByText(/4,3 kg/)).toBeVisible();
+      await expect(row.getByText('(medido)')).toBeVisible();
     } finally {
       await api.dispose();
     }
