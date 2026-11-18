@@ -12,6 +12,7 @@ import {
   listAdminCampaignsOptions,
   listAdminCatalogItemsOptions,
   listCatalogPartnersOptions,
+  listZonesOptions,
   updateCatalogItemMutation,
   updatePointCampaignMutation,
   validateRedemptionCodeMutation,
@@ -437,6 +438,14 @@ export function PartnersTable({ id }: { id: string }) {
       filter: true,
     },
     {
+      id: 'parish',
+      header: m.partner_col_parish(),
+      cell: (row) => row.parish_name ?? <span className="text-muted-foreground">—</span>,
+      value: (row) => row.parish_name ?? '',
+      filter: true,
+      hideable: true,
+    },
+    {
       id: 'contact',
       header: m.partner_col_contact(),
       cell: (row) => row.contact ?? <span className="text-muted-foreground">—</span>,
@@ -563,6 +572,8 @@ function PartnerDialog({
     },
     onError: (e) => toast(`${m.partner_toast_failed()} ${getErrorCode(e) ?? ''}`),
   });
+  // US39: a proposta é POR FREGUESIA — o seletor é o zoneamento de sempre (dicofre), nunca GPS.
+  const zones = useQuery({ ...listZonesOptions(), enabled: open });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -579,6 +590,7 @@ function PartnerDialog({
             create.mutate({
               body: {
                 name: String(data.get('name') ?? '').trim(),
+                parish_code: String(data.get('parish_code') ?? '') || null,
                 description: String(data.get('description') ?? '').trim() || null,
                 contact: String(data.get('contact') ?? '').trim() || null,
               },
@@ -588,6 +600,22 @@ function PartnerDialog({
           <div className="space-y-1.5">
             <Label htmlFor="partner-name">{m.partner_form_name()}</Label>
             <Input id="partner-name" name="name" required minLength={3} maxLength={120} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="partner-parish">{m.partner_form_parish()}</Label>
+            <select
+              id="partner-parish"
+              name="parish_code"
+              defaultValue=""
+              className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="">{m.partner_form_parish_none()}</option>
+              {(zones.data ?? []).map((zone) => (
+                <option key={zone.code} value={zone.code}>
+                  {zone.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="partner-contact">{m.partner_form_contact()}</Label>

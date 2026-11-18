@@ -3633,12 +3633,15 @@ export const zParishMatchLevel = z.enum([
  * PartnerCreate
  *
  * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
  */
 export const zPartnerCreate = z.object({
     contact: z.string().max(200).nullish(),
     description: z.string().max(2000).nullish(),
     name: z.string().min(3).max(120),
-    parish_id: z.uuid().nullish()
+    parish_code: z.string().length(6).nullish()
 });
 
 /**
@@ -3663,7 +3666,9 @@ export const zPartnerOut = z.object({
     description: z.string().nullable(),
     id: z.uuid(),
     name: z.string(),
+    parish_code: z.string().nullish(),
     parish_id: z.uuid().nullable(),
+    parish_name: z.string().nullish(),
     proposed_by_id: z.uuid().nullable(),
     state: zPartnerState
 });
@@ -3677,7 +3682,7 @@ export const zPartnerUpdate = z.object({
     contact: z.string().max(200).nullish(),
     description: z.string().max(2000).nullish(),
     name: z.string().min(3).max(120).nullish(),
-    parish_id: z.uuid().nullish()
+    parish_code: z.string().length(6).nullish()
 });
 
 /**

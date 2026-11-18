@@ -90,10 +90,16 @@ class CatalogItemPublic(BaseModel):
 
 
 class PartnerCreate(BaseModel):
-    """Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois."""
+    """Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+
+    `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+    a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
+    """
 
     name: str = Field(min_length=3, max_length=120)
-    parish_id: uuid.UUID | None = Field(default=None, description="Freguesia proponente (gestor de parcerias)")
+    parish_code: str | None = Field(
+        default=None, min_length=6, max_length=6, description="Dicofre da freguesia proponente"
+    )
     description: str | None = Field(default=None, max_length=2000)
     contact: str | None = Field(default=None, max_length=200, description="Contato da equipa; nunca sai para o doador")
 
@@ -102,7 +108,7 @@ class PartnerUpdate(BaseModel):
     """Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`."""
 
     name: str | None = Field(default=None, min_length=3, max_length=120)
-    parish_id: uuid.UUID | None = None
+    parish_code: str | None = Field(default=None, min_length=6, max_length=6)
     description: str | None = Field(default=None, max_length=2000)
     contact: str | None = Field(default=None, max_length=200)
 
@@ -116,6 +122,10 @@ class PartnerOut(BaseModel):
     name: str
     state: PartnerState
     parish_id: uuid.UUID | None
+    parish_code: str | None = Field(
+        default=None, description="Dicofre da freguesia proponente (vazio se a proposta veio da equipa)"
+    )
+    parish_name: str | None = Field(default=None, description="Nome da freguesia proponente, para a mesa da equipa")
     description: str | None
     contact: str | None
     proposed_by_id: uuid.UUID | None

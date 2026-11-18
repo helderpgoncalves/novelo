@@ -5076,5 +5076,8 @@
   "error_campaign_window": "A janela da campanha é inválida: o fim tem de ser depois do início.",
   "campaign_col_multiplier": "Multiplicador",
   "campaign_form_multiplier": "Multiplicador do ganho (estimativa)",
-  "campaign_form_multiplier_hint": "1 = campanha só informativa. Multiplica o ganho flat por saco creditado na janela; o teto mensal continua a aplicar-se."
+  "campaign_form_multiplier_hint": "1 = campanha só informativa. Multiplica o ganho flat por saco creditado na janela; o teto mensal continua a aplicar-se.",
+  "partner_col_parish": "Freguesia",
+  "partner_form_parish": "Freguesia proponente",
+  "partner_form_parish_none": "A proposta veio da equipa"
 }

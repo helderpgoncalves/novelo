@@ -47,6 +47,7 @@ from novelo.features.catalog.schemas import (
 )
 from novelo.features.citizen.models import BagActivation
 from novelo.features.lots.models import LotUnit
+from novelo.features.network.models import Parish
 from novelo.features.points.models import PointEntry
 from novelo.features.users.models import User
 
@@ -381,12 +382,30 @@ async def update_item(db: AsyncSession, item_id: uuid.UUID, body: CatalogItemUpd
 # --- gestão: parceiros (freguesias propõem, Vitrus aprova) ------------------------------------------
 
 
+async def _parish_of_code(db: AsyncSession, dicofre: str) -> Parish:
+    """A freguesia pelo dicofre do zoneamento (404 se não existe): o web nunca lida com UUIDs."""
+    parish: Parish | None = (await db.execute(select(Parish).where(Parish.dicofre == dicofre))).scalar_one_or_none()
+    if parish is None:
+        raise NotFoundError(f"Unknown parish code {dicofre}")
+    return parish
+
+
+async def _partner_out(db: AsyncSession, partner: CatalogPartner) -> PartnerOut:
+    """O parceiro com o nome da freguesia proponente (a mesa mostra «proposta por freguesia»)."""
+    parish = await db.get(Parish, partner.parish_id) if partner.parish_id is not None else None
+    out = PartnerOut.model_validate(partner)
+    if parish is not None:
+        out = out.model_copy(update={"parish_code": parish.dicofre, "parish_name": parish.name})
+    return out
+
+
 async def create_partner(db: AsyncSession, team_user: User, body: PartnerCreate) -> PartnerOut:
     """Registar a proposta de um parceiro (nasce `proposed`): quem propôs fica na trilha."""
+    parish = await _parish_of_code(db, body.parish_code) if body.parish_code else None
     partner = CatalogPartner(
         name=body.name,
         state=PartnerState.PROPOSED,
-        parish_id=body.parish_id,
+        parish_id=parish.id if parish else None,
         proposed_by_id=team_user.id,
         description=body.description,
         contact=body.contact,
@@ -397,7 +416,7 @@ async def create_partner(db: AsyncSession, team_user: User, body: PartnerCreate)
     )
     await db.commit()
     await db.refresh(partner)
-    return PartnerOut.model_validate(partner)
+    return await _partner_out(db, partner)
 
 
 async def _set_partner_state(
@@ -411,7 +430,7 @@ async def _set_partner_state(
     await audit.record(db, action, actor_id=team_user.id, target_type="catalog_partner", target_id=partner.id)
     await db.commit()
     await db.refresh(partner)
-    return PartnerOut.model_validate(partner)
+    return await _partner_out(db, partner)
 
 
 async def approve_partner(db: AsyncSession, team_user: User, partner_id: uuid.UUID) -> PartnerOut:
@@ -427,7 +446,7 @@ async def deactivate_partner(db: AsyncSession, team_user: User, partner_id: uuid
 async def list_partners(db: AsyncSession) -> list[PartnerOut]:
     """Todos os parceiros (equipa): a fila de propostas por aprovar inclui-se — é o gestor de parcerias."""
     rows = (await db.execute(select(CatalogPartner).order_by(CatalogPartner.created_at.desc()))).scalars().all()
-    return [PartnerOut.model_validate(row) for row in rows]
+    return [await _partner_out(db, row) for row in rows]
 
 
 async def update_partner(db: AsyncSession, partner_id: uuid.UUID, body: PartnerUpdate) -> PartnerOut:
@@ -435,11 +454,16 @@ async def update_partner(db: AsyncSession, partner_id: uuid.UUID, body: PartnerU
     partner = await db.get(CatalogPartner, partner_id)
     if partner is None:
         raise NotFoundError("Partner not found")
+    if body.parish_code is not None:
+        parish = await _parish_of_code(db, body.parish_code) if body.parish_code else None
+        partner.parish_id = parish.id if parish else None
     for field, value in body.model_dump(exclude_unset=True).items():
+        if field == "parish_code":
+            continue  # já resolvido acima para `parish_id` (o modelo guarda o UUID)
         setattr(partner, field, value)
     await db.commit()
     await db.refresh(partner)
-    return PartnerOut.model_validate(partner)
+    return await _partner_out(db, partner)
 
 
 # --- gestão: campanhas sazonais ---------------------------------------------------------------------

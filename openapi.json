@@ -16889,7 +16889,7 @@
         "type": "string"
       },
       "PartnerCreate": {
-        "description": "Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.",
+        "description": "Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.\n\n`parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);\na API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.",
         "properties": {
           "contact": {
             "anyOf": [
@@ -16922,18 +16922,19 @@
             "title": "Name",
             "type": "string"
           },
-          "parish_id": {
+          "parish_code": {
             "anyOf": [
               {
-                "format": "uuid",
+                "maxLength": 6,
+                "minLength": 6,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Freguesia proponente (gestor de parcerias)",
-            "title": "Parish Id"
+            "description": "Dicofre da freguesia proponente",
+            "title": "Parish Code"
           }
         },
         "required": [
@@ -16981,6 +16982,18 @@
             "title": "Name",
             "type": "string"
           },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Dicofre da freguesia proponente (vazio se a proposta veio da equipa)",
+            "title": "Parish Code"
+          },
           "parish_id": {
             "anyOf": [
               {
@@ -16992,6 +17005,18 @@
               }
             ],
             "title": "Parish Id"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome da freguesia proponente, para a mesa da equipa",
+            "title": "Parish Name"
           },
           "proposed_by_id": {
             "anyOf": [
@@ -17072,17 +17097,18 @@
             ],
             "title": "Name"
           },
-          "parish_id": {
+          "parish_code": {
             "anyOf": [
               {
-                "format": "uuid",
+                "maxLength": 6,
+                "minLength": 6,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Parish Id"
+            "title": "Parish Code"
           }
         },
         "title": "PartnerUpdate",

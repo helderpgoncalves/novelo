@@ -512,3 +512,42 @@ async def test_monthly_cap_still_applies_to_the_multiplied_gain(
     assert saldo["credited_this_month"] == 200
     rows = (await session.execute(select(PointEntry).where(PointEntry.amount > 0))).scalars().all()
     assert len(rows) == 1 and rows[0].amount == 200
+
+
+async def test_partner_proposal_carries_the_parish_by_dicofre(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
+) -> None:
+    """US39: a proposta é POR FREGUESIA — o formulário manda o dicofre do zoneamento, a API resolve."""
+    from novelo.features.network.models import Parish
+
+    tag = uuid.uuid4().hex[:6]
+    parish = Parish(dicofre=f"99{tag[:4]}", name=f"Freguesia {tag}", population=1000)
+    session.add(parish)
+    await session.commit()
+
+    team = await _team_client(make_user)
+    created = await team.post(
+        f"{ADMIN}/partners",
+        json={"name": f"Tinturaria {tag}", "parish_code": parish.dicofre, "contact": "253 000 000"},
+    )
+    assert created.status_code == 201, created.text
+    body = created.json()
+    assert body["parish_code"] == parish.dicofre
+    assert body["parish_name"] == f"Freguesia {tag}"
+
+    # A mesa vê a freguesia da proposta (a vista «propostas» filtra por estado, não por freguesia).
+    listed = (await team.get(f"{ADMIN}/partners")).json()
+    mine = next(p for p in listed if p["id"] == body["id"])
+    assert mine["parish_name"] == f"Freguesia {tag}"
+
+    # Editar para outra freguesia e limpar: a API resolve sempre o dicofre (nunca UUIDs no web).
+    other = Parish(dicofre=f"98{tag[:4]}", name=f"Outra {tag}", population=500)
+    session.add(other)
+    await session.commit()
+    moved = await team.patch(f"{ADMIN}/partners/{body['id']}", json={"parish_code": other.dicofre})
+    assert moved.status_code == 200 and moved.json()["parish_code"] == other.dicofre
+    cleared = await team.patch(f"{ADMIN}/partners/{body['id']}", json={"parish_code": ""})
+    assert cleared.status_code == 422  # dicofre tem 6 caracteres: vazio não é freguesia
+
+    unknown = await team.post(f"{ADMIN}/partners", json={"name": "Sem terra", "parish_code": "999999"})
+    assert unknown.status_code == 404  # freguesia não existe: recusa explícita

@@ -9866,6 +9866,9 @@ export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'parti
  * PartnerCreate
  *
  * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
  */
 export type PartnerCreate = {
     /**
@@ -9883,11 +9886,11 @@ export type PartnerCreate = {
      */
     name: string;
     /**
-     * Parish Id
+     * Parish Code
      *
-     * Freguesia proponente (gestor de parcerias)
+     * Dicofre da freguesia proponente
      */
-    parish_id?: string | null;
+    parish_code?: string | null;
 };
 
 /**
@@ -9917,9 +9920,21 @@ export type PartnerOut = {
      */
     name: string;
     /**
+     * Parish Code
+     *
+     * Dicofre da freguesia proponente (vazio se a proposta veio da equipa)
+     */
+    parish_code?: string | null;
+    /**
      * Parish Id
      */
     parish_id: string | null;
+    /**
+     * Parish Name
+     *
+     * Nome da freguesia proponente, para a mesa da equipa
+     */
+    parish_name?: string | null;
     /**
      * Proposed By Id
      */
@@ -9953,9 +9968,9 @@ export type PartnerUpdate = {
      */
     name?: string | null;
     /**
-     * Parish Id
+     * Parish Code
      */
-    parish_id?: string | null;
+    parish_code?: string | null;
 };
 
 /**
