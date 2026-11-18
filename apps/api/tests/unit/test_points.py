@@ -264,3 +264,15 @@ def test_reject_does_not_confirm_either_declaration() -> None:
         )
         is False
     )
+
+
+def test_config_defaults_read_the_domain_constants() -> None:
+    """S3: uma só fonte — as omissões de `core/config.py` lêem as constantes do domínio, nunca as repetem."""
+    from novelo.core.config import Settings
+    from novelo.domain.points import BONUS_CONFORMITY_POINTS, GAIN_FLAT_POINTS, MONTHLY_CAP_POINTS
+
+    fields = Settings.model_fields
+    assert fields["points_gain_flat"].default is GAIN_FLAT_POINTS  # 100
+    assert fields["points_bonus_conformity"].default is BONUS_CONFORMITY_POINTS  # 50
+    assert fields["points_monthly_cap"].default is MONTHLY_CAP_POINTS  # 500
+    assert (GAIN_FLAT_POINTS, BONUS_CONFORMITY_POINTS, MONTHLY_CAP_POINTS) == (100, 50, 500)

@@ -10598,6 +10598,12 @@ export type PointsBalanceOut = {
      */
     bonus: number;
     /**
+     * Bonus Conformity Points
+     *
+     * Bónus de conformidade por saco confirmado, tal como configurado (estimativa; o web desenha «+N» daqui)
+     */
+    bonus_conformity_points: number;
+    /**
      * Credited This Month
      *
      * Ganhos já creditados no mês corrente (flat + bónus)
@@ -10621,6 +10627,12 @@ export type PointsBalanceOut = {
      * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
      */
     flat: number;
+    /**
+     * Gain Flat Points
+     *
+     * Ganho flat por saco recolhido e pesado, tal como configurado (estimativa; o web desenha «+N» daqui)
+     */
+    gain_flat_points: number;
     /**
      * Monthly Cap
      *

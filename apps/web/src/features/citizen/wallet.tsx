@@ -722,8 +722,18 @@ function BalanceTab({
       <div className="ring-foreground/10 space-y-2 rounded-2xl bg-card p-5 text-sm ring-1">
         <p className="font-medium">Como se ganha</p>
         <ul className="text-muted-foreground space-y-1.5">
-          <li>+100 por saco ativado, recolhido e pesado (nunca por kg — estimativa)</li>
-          <li>+50 de bónus quando a triagem confirma a tua declaração (estimativa)</li>
+          {balance && (
+            <>
+              <li>
+                +{formatNumber(balance.gain_flat_points)} por saco ativado, recolhido e pesado (nunca
+                por kg — estimativa)
+              </li>
+              <li>
+                +{formatNumber(balance.bonus_conformity_points)} de bónus quando a triagem confirma a
+                tua declaração (estimativa)
+              </li>
+            </>
+          )}
           <li>
             1 000 pontos ≈ 5 € <span className="text-foreground">de donativo</span> a IPSS — a
             âncora € é o valor do donativo, nunca o valor dos pontos (estimativa)

@@ -27,6 +27,12 @@ class PointsBalanceOut(BaseModel):
     expired: int = Field(description="Pontos já expirados (12 meses por ganho, FIFO)")
     monthly_cap: int = Field(description="Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)")
     credited_this_month: int = Field(description="Ganhos já creditados no mês corrente (flat + bónus)")
+    gain_flat_points: int = Field(
+        description="Ganho flat por saco recolhido e pesado, tal como configurado (estimativa; o web desenha «+N» daqui)"
+    )
+    bonus_conformity_points: int = Field(
+        description="Bónus de conformidade por saco confirmado, tal como configurado (estimativa; o web desenha «+N» daqui)"
+    )
 
 
 class PointEntryOut(BaseModel):

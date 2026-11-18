@@ -18095,6 +18095,11 @@
             "title": "Bonus",
             "type": "integer"
           },
+          "bonus_conformity_points": {
+            "description": "Bónus de conformidade por saco confirmado, tal como configurado (estimativa; o web desenha «+N» daqui)",
+            "title": "Bonus Conformity Points",
+            "type": "integer"
+          },
           "credited_this_month": {
             "description": "Ganhos já creditados no mês corrente (flat + bónus)",
             "title": "Credited This Month",
@@ -18115,6 +18120,11 @@
             "title": "Flat",
             "type": "integer"
           },
+          "gain_flat_points": {
+            "description": "Ganho flat por saco recolhido e pesado, tal como configurado (estimativa; o web desenha «+N» daqui)",
+            "title": "Gain Flat Points",
+            "type": "integer"
+          },
           "monthly_cap": {
             "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
             "title": "Monthly Cap",
@@ -18128,7 +18138,9 @@
           "expiring_soon",
           "expired",
           "monthly_cap",
-          "credited_this_month"
+          "credited_this_month",
+          "gain_flat_points",
+          "bonus_conformity_points"
         ],
         "title": "PointsBalanceOut",
         "type": "object"

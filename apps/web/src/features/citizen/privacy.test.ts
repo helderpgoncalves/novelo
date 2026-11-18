@@ -19,6 +19,8 @@ function preview(overrides: Partial<DeletionPreviewOut> = {}): DeletionPreviewOu
       expired: 0,
       monthly_cap: 500,
       credited_this_month: 0,
+      gain_flat_points: 100,
+      bonus_conformity_points: 50,
     },
     timeline: [],
     active_bags: 1,

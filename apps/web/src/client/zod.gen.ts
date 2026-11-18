@@ -4026,10 +4026,12 @@ export const zPointGeometry = z.object({
 export const zPointsBalanceOut = z.object({
     balance: z.int(),
     bonus: z.int(),
+    bonus_conformity_points: z.int(),
     credited_this_month: z.int(),
     expired: z.int(),
     expiring_soon: z.int(),
     flat: z.int(),
+    gain_flat_points: z.int(),
     monthly_cap: z.int()
 });
 

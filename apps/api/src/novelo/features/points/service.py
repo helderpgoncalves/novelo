@@ -188,6 +188,8 @@ async def balance(db: AsyncSession, user_id: uuid.UUID) -> PointsBalanceOut:
         expired=balance.expired,
         monthly_cap=get_settings().points_monthly_cap,
         credited_this_month=await _gain_credited_this_month(db, user_id, now),
+        gain_flat_points=get_settings().points_gain_flat,
+        bonus_conformity_points=get_settings().points_bonus_conformity,
     )
 
 
