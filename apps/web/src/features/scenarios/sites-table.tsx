@@ -21,6 +21,16 @@ const kindLabel: Record<SiteKind, () => string> = {
   staffed: () => m.site_kind_staffed(),
 };
 
+/** Degraus da escada POR LOCAL (US43): a frequência que o otimizador escolheu para esta paragem. */
+const rungLabel: Record<NonNullable<SiteSelection['frequency']>, () => string> = {
+  weekly: () => m.plan_rung_weekly(),
+  biweekly: () => m.plan_rung_biweekly(),
+  monthly: () => m.plan_rung_monthly(),
+  quarterly: () => m.plan_rung_quarterly(),
+};
+
+const dash = <span className="text-muted-foreground">{m.common_dash()}</span>;
+
 /** Locais abertos de um cenário por locais reais: o que cada um serve, em quantidades estimadas. */
 export function SitesTable({ sites }: { sites: SiteSelection[] }) {
   const rows = useMemo(() => [...sites].sort((x, y) => y.tonnes - x.tonnes), [sites]);
@@ -103,6 +113,22 @@ export function SitesTable({ sites }: { sites: SiteSelection[] }) {
       value: (s) => s.vehicle,
       filter: { format: (v) => `#${v}` },
       cell: (s) => (s.vehicle == null ? m.common_dash() : <span>#{s.vehicle}</span>),
+    },
+    {
+      id: 'frequency',
+      header: m.site_col_frequency(),
+      searchable: false,
+      value: (s) => s.frequency,
+      exportValue: (s) => (s.frequency == null ? null : rungLabel[s.frequency]()),
+      filter: { format: (v) => rungLabel[v as NonNullable<SiteSelection['frequency']>]() },
+      cell: (s) =>
+        s.frequency == null ? (
+          dash
+        ) : (
+          <span className="text-muted-foreground whitespace-nowrap">
+            {rungLabel[s.frequency]()}
+          </span>
+        ),
     },
     {
       id: 'precision',

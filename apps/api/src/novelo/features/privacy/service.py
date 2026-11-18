@@ -19,7 +19,7 @@ from novelo.core.request_meta import RequestMeta
 from novelo.domain.points import LedgerEntry
 from novelo.domain.privacy import ConsentPurpose, expiry_timeline, retention_cutoff
 from novelo.features.audit import service as audit
-from novelo.features.cidadao.models import BagActivation
+from novelo.features.citizen.models import BagActivation
 from novelo.features.collection_requests.models import CollectionRequest
 from novelo.features.email_log.models import EmailDelivery
 from novelo.features.network.models import Parish
@@ -231,7 +231,7 @@ async def export_account(db: AsyncSession, user: User) -> AccountExportOut:
 async def deletion_preview(db: AsyncSession, user: User) -> DeletionPreviewOut:
     """O que se perde ao apagar: saldo atual, calendário FIFO e contagens — o web junta o texto
     («pontos não são dinheiro nem conversíveis»; resgatar ainda é possível antes de confirmar)."""
-    saldo = await points_service.saldo(db, user.id)
+    balance = await points_service.balance(db, user.id)
     entries = (await db.execute(select(PointEntry).where(PointEntry.user_id == user.id))).scalars().all()
     timeline = expiry_timeline(
         [LedgerEntry(kind=e.kind, amount=e.amount, created_at=e.created_at, expires_at=e.expires_at) for e in entries],
@@ -253,7 +253,7 @@ async def deletion_preview(db: AsyncSession, user: User) -> DeletionPreviewOut:
         or 0
     )
     return DeletionPreviewOut(
-        saldo=saldo,
+        balance=balance,
         timeline=[TimelineItem(expires_at=at, amount=amount) for at, amount in timeline],
         active_bags=sum(1 for b in bags if b.deactivated_at is None),
         bags=len(bags),

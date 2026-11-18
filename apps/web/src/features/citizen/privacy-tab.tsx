@@ -23,7 +23,7 @@ import {
   SheetTitle,
 } from '@/components/ui/sheet';
 import { Switch } from '@/components/ui/switch';
-import { losses, timelineRows } from '@/features/cidadao/privacy';
+import { losses, timelineRows } from '@/features/citizen/privacy';
 import { getErrorCode } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 
@@ -283,10 +283,10 @@ function DeleteAccountSheet({
             <DeletePreview preview={preview} />
           )}
 
-          {preview && preview.saldo.balance > 0 && (
+          {preview && preview.balance.balance > 0 && (
             <div className="bg-primary/10 text-primary rounded-xl p-3 text-sm">
               <p className="font-medium">
-                Ainda tens {formatNumber(preview.saldo.balance)} pontos.
+                Ainda tens {formatNumber(preview.balance.balance)} pontos.
               </p>
               <p className="mt-0.5 text-xs">
                 Podes usá-los antes de apagar — o resgate continua possível até confirmares.{' '}

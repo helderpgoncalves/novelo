@@ -90,10 +90,16 @@ class CatalogItemPublic(BaseModel):
 
 
 class PartnerCreate(BaseModel):
-    """Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois."""
+    """Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+
+    `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+    a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
+    """
 
     name: str = Field(min_length=3, max_length=120)
-    parish_id: uuid.UUID | None = Field(default=None, description="Freguesia proponente (gestor de parcerias)")
+    parish_code: str | None = Field(
+        default=None, min_length=6, max_length=6, description="Dicofre da freguesia proponente"
+    )
     description: str | None = Field(default=None, max_length=2000)
     contact: str | None = Field(default=None, max_length=200, description="Contato da equipa; nunca sai para o doador")
 
@@ -102,7 +108,7 @@ class PartnerUpdate(BaseModel):
     """Editar parceiro: dados descritivos; o estado vai pelos portões `approve`/`deactivate`."""
 
     name: str | None = Field(default=None, min_length=3, max_length=120)
-    parish_id: uuid.UUID | None = None
+    parish_code: str | None = Field(default=None, min_length=6, max_length=6)
     description: str | None = Field(default=None, max_length=2000)
     contact: str | None = Field(default=None, max_length=200)
 
@@ -116,6 +122,10 @@ class PartnerOut(BaseModel):
     name: str
     state: PartnerState
     parish_id: uuid.UUID | None
+    parish_code: str | None = Field(
+        default=None, description="Dicofre da freguesia proponente (vazio se a proposta veio da equipa)"
+    )
+    parish_name: str | None = Field(default=None, description="Nome da freguesia proponente, para a mesa da equipa")
     description: str | None
     contact: str | None
     proposed_by_id: uuid.UUID | None
@@ -126,21 +136,28 @@ class PartnerOut(BaseModel):
 
 
 class CampaignCreate(BaseModel):
-    """Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador)."""
+    """Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40)."""
 
     name: str = Field(min_length=3, max_length=120)
     description: str | None = Field(default=None, max_length=2000)
     starts_at: datetime
     ends_at: datetime = Field(description="Tem de ser DEPOIS de `starts_at` (422 caso contrário)")
+    gain_multiplier: float = Field(
+        default=1.0,
+        gt=0,
+        le=10,
+        description="Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)",
+    )
 
 
 class CampaignUpdate(BaseModel):
-    """Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço."""
+    """Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço."""
 
     name: str | None = Field(default=None, min_length=3, max_length=120)
     description: str | None = Field(default=None, max_length=2000)
     starts_at: datetime | None = None
     ends_at: datetime | None = None
+    gain_multiplier: float | None = Field(default=None, gt=0, le=10)
 
 
 class CampaignOut(BaseModel):
@@ -153,6 +170,7 @@ class CampaignOut(BaseModel):
     description: str | None
     starts_at: datetime
     ends_at: datetime
+    gain_multiplier: float = Field(description="Multiplicador do ganho flat na janela (estimativa; 1 = informativa)")
     created_at: datetime
 
 

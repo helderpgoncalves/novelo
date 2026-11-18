@@ -11,7 +11,7 @@ from novelo.features.audit import models as audit_models  # noqa: F401
 from novelo.features.auth import models as auth_models  # noqa: F401
 from novelo.features.calibration import models as calibration_models  # noqa: F401
 from novelo.features.catalog import models as catalog_models  # noqa: F401
-from novelo.features.cidadao import models as cidadao_models  # noqa: F401
+from novelo.features.citizen import models as citizen_models  # noqa: F401
 from novelo.features.collection_requests import models as collection_request_models  # noqa: F401
 from novelo.features.copilot import models as copilot_models  # noqa: F401
 from novelo.features.datasets import models as dataset_models  # noqa: F401

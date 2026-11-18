@@ -14,9 +14,9 @@ linha do tempo FIFO), a possibilidade de resgatar antes (link no ecrã) e o avis
 não são dinheiro nem conversíveis — sempre presente na última linha. */
 export function losses(preview: DeletionPreviewOut): string[] {
   const rows: string[] = [];
-  if (preview.saldo.balance > 0) {
+  if (preview.balance.balance > 0) {
     rows.push(
-      `Perdes ${formatNumber(preview.saldo.balance)} pontos de saldo — os pontos não são dinheiro nem conversíveis.`,
+      `Perdes ${formatNumber(preview.balance.balance)} pontos de saldo — os pontos não são dinheiro nem conversíveis.`,
     );
   }
   if (preview.bags > 0) {

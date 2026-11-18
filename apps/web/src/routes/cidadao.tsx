@@ -1,8 +1,13 @@
 import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 import type { MeOut } from '@/client';
+import {
+  getCollectionHistoryOptions,
+  getDonorAccountOptions,
+  listBagActivationsOptions,
+} from '@/client/@tanstack/react-query.gen';
 import { AppShellSkeleton } from '@/components/app-loading';
-import { CidadaoPage } from '@/features/cidadao/cidadao-page';
+import { CitizenPage } from '@/features/citizen/citizen-page';
 import { getLocale, switchLocale } from '@/lib/i18n';
 import { resolvePublicSessionUser } from '@/lib/session';
 
@@ -22,6 +27,16 @@ export const Route = createFileRoute('/cidadao')({
     if (user && user.locale !== getLocale()) switchLocale(user.locale);
     return { user };
   },
+  // Os dados do doador entram pelo loader (AGENTS: `ensureQueryData` nos loaders); sem sessão a
+  // carteira mostra a porta de entrada — nada se carrega. O saldo é secundário e refresca no ecrã.
+  loader: async ({ context: { queryClient, user } }) => {
+    if (user?.role !== 'donor') return;
+    await Promise.all([
+      queryClient.ensureQueryData(getDonorAccountOptions()),
+      queryClient.ensureQueryData(listBagActivationsOptions()),
+      queryClient.ensureQueryData(getCollectionHistoryOptions()),
+    ]);
+  },
   // Área pessoal: nunca se indexa (a página pública é /onde-quando).
   head: () => ({
     meta: [{ title: 'Carteira · Novelo' }, { name: 'robots', content: 'noindex, nofollow' }],
@@ -35,5 +50,5 @@ export const Route = createFileRoute('/cidadao')({
 function CidadaoView() {
   const { user } = Route.useRouteContext();
   const { tab } = Route.useSearch();
-  return <CidadaoPage user={user satisfies MeOut | null} tab={tab ?? 'inicio'} />;
+  return <CitizenPage user={user satisfies MeOut | null} tab={tab ?? 'inicio'} />;
 }

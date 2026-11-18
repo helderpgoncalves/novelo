@@ -564,11 +564,12 @@ export const zCalibrationPhoto = z.object({
 /**
  * CampaignCreate
  *
- * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
  */
 export const zCampaignCreate = z.object({
     description: z.string().max(2000).nullish(),
     ends_at: z.iso.datetime(),
+    gain_multiplier: z.number().gt(0).lte(10).optional().default(1),
     name: z.string().min(3).max(120),
     starts_at: z.iso.datetime()
 });
@@ -582,6 +583,7 @@ export const zCampaignOut = z.object({
     created_at: z.iso.datetime(),
     description: z.string().nullable(),
     ends_at: z.iso.datetime(),
+    gain_multiplier: z.number(),
     id: z.uuid(),
     name: z.string(),
     starts_at: z.iso.datetime()
@@ -590,11 +592,12 @@ export const zCampaignOut = z.object({
 /**
  * CampaignUpdate
  *
- * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
  */
 export const zCampaignUpdate = z.object({
     description: z.string().max(2000).nullish(),
     ends_at: z.iso.datetime().nullish(),
+    gain_multiplier: z.number().gt(0).lte(10).nullish(),
     name: z.string().min(3).max(120).nullish(),
     starts_at: z.iso.datetime().nullish()
 });
@@ -923,6 +926,7 @@ export const zCollectionPlanEntry = z.object({
 export const zCollectionRequestCreate = z.object({
     address: z.string().max(280).nullish(),
     bag_count: z.int().gte(1).lte(500),
+    ephemeral_address: z.boolean().optional().default(false),
     note: z.string().max(240).nullish(),
     parish_code: z.string().max(6).nullish(),
     requested_date: z.iso.date(),
@@ -3630,12 +3634,15 @@ export const zParishMatchLevel = z.enum([
  * PartnerCreate
  *
  * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
  */
 export const zPartnerCreate = z.object({
     contact: z.string().max(200).nullish(),
     description: z.string().max(2000).nullish(),
     name: z.string().min(3).max(120),
-    parish_id: z.uuid().nullish()
+    parish_code: z.string().length(6).nullish()
 });
 
 /**
@@ -3660,7 +3667,9 @@ export const zPartnerOut = z.object({
     description: z.string().nullable(),
     id: z.uuid(),
     name: z.string(),
+    parish_code: z.string().nullish(),
     parish_id: z.uuid().nullable(),
+    parish_name: z.string().nullish(),
     proposed_by_id: z.uuid().nullable(),
     state: zPartnerState
 });
@@ -3674,7 +3683,7 @@ export const zPartnerUpdate = z.object({
     contact: z.string().max(200).nullish(),
     description: z.string().max(2000).nullish(),
     name: z.string().min(3).max(120).nullish(),
-    parish_id: z.uuid().nullish()
+    parish_code: z.string().length(6).nullish()
 });
 
 /**
@@ -4013,6 +4022,26 @@ export const zPointEntryOut = z.object({
 export const zPointGeometry = z.object({
     coordinates: z.tuple([z.number(), z.number()]),
     type: z.literal('Point').optional().default('Point')
+});
+
+/**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export const zPointsBalanceOut = z.object({
+    balance: z.int(),
+    bonus: z.int(),
+    bonus_conformity_points: z.int(),
+    credited_this_month: z.int(),
+    expired: z.int(),
+    expiring_soon: z.int(),
+    flat: z.int(),
+    gain_flat_points: z.int(),
+    monthly_cap: z.int()
 });
 
 /**
@@ -4602,6 +4631,7 @@ export const zCollectionRequestOut = z.object({
     created_at: z.iso.datetime(),
     dispatch_reason: z.string().nullish(),
     dispatched_at: z.iso.datetime().nullish(),
+    ephemeral_address: z.boolean().optional().default(false),
     exception_reason: zRequestExceptionReason.nullish(),
     expired_at: z.iso.datetime().nullish(),
     id: z.uuid(),
@@ -4735,24 +4765,6 @@ export const zRouteOut = z.object({
     source: z.enum(['road', 'estimate']).optional().default('estimate'),
     stops: z.array(zRouteStop),
     vehicle: z.int()
-});
-
-/**
- * SaldoOut
- *
- * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
- *
- * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
- * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
- */
-export const zSaldoOut = z.object({
-    balance: z.int(),
-    bonus: z.int(),
-    credited_this_month: z.int(),
-    expired: z.int(),
-    expiring_soon: z.int(),
-    flat: z.int(),
-    monthly_cap: z.int()
 });
 
 /**
@@ -5239,6 +5251,7 @@ export const zSiteFeatureCollection = z.object({
 export const zSiteSelection = z.object({
     containers: z.int(),
     coord_precision: z.enum(['precise', 'approximate']),
+    frequency: zCollectionFrequency.nullish(),
     kind: z.enum(['public', 'staffed']).optional().default('public'),
     latitude: z.number(),
     longitude: z.number(),
@@ -7050,11 +7063,11 @@ export const zNoveloFeaturesPrivacySchemasTimelineItem = z.object({
 export const zDeletionPreviewOut = z.object({
     active_bags: z.int(),
     bags: z.int(),
+    balance: zPointsBalanceOut,
     points_are_not_money: z.boolean().optional().default(true),
     points_entries: z.int(),
     redeem_hint_path: z.string().optional().default('/cidadao?tab=saldo'),
     requests: z.int(),
-    saldo: zSaldoOut,
     timeline: z.array(zNoveloFeaturesPrivacySchemasTimelineItem)
 });
 
@@ -7589,7 +7602,7 @@ export const zCreateRedemptionResponse = zRedemptionOut;
 /**
  * Successful Response
  */
-export const zGetDonorSaldoResponse = zSaldoOut;
+export const zGetDonorPointsBalanceResponse = zPointsBalanceOut;
 
 export const zListCollectionRequestsQuery = z.object({
     state: zCollectionRequestState.nullish(),

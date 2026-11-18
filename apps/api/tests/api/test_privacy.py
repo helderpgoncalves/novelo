@@ -24,7 +24,7 @@ from novelo.features.privacy import service as privacy
 from novelo.features.privacy.models import DonorConsent
 from novelo.features.users import service as users
 from novelo.features.users.models import User
-from tests.api.test_cidadao import _sign_up_donor
+from tests.api.test_citizen import _sign_up_donor
 from tests.api.test_collection_requests import citizen_body, make_parish_with_round
 from tests.conftest import PASSWORD
 
@@ -215,8 +215,8 @@ async def test_delete_preview_shows_balance_fifo_timeline_and_what_is_lost(
     resp = await client.get(f"{CID}/account/delete-preview")
     assert resp.status_code == 200, resp.text
     body = resp.json()
-    assert body["saldo"]["balance"] == 150  # 100 flat + 50 bónus
-    assert body["saldo"]["flat"] == 100 and body["saldo"]["bonus"] == 50
+    assert body["balance"]["balance"] == 150  # 100 flat + 50 bónus
+    assert body["balance"]["flat"] == 100 and body["balance"]["bonus"] == 50
     timeline = body["timeline"]
     assert len(timeline) == 2  # duas datas de expiração (o ganho de 12 meses e o de 24)
     assert sum(item["amount"] for item in timeline) == 150

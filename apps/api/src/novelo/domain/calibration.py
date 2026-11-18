@@ -8,8 +8,10 @@ limitada pela procura da APA) e nunca medida diretamente.
 Mecânica:
   janela móvel       12 semanas (84 dias), por métrica e unidade
   mediana            estatística da janela das métricas de peso (robusta a outliers; peso 0 = falha, não amostra)
-  pseudo-contagem    m̂ = (k·prior + n·observado) ÷ (k + n), com k = 4 visitas (por local) ou 8 semanas (por freguesia)
-  rótulos            «pressuposto» (n=0), «estimativa·n» (n < k) e «observado·n» (n ≥ k: o observado domina)
+  pseudo-contagem    m̂ = ((k−1)·prior + n·observado) ÷ (n + k − 1), com k = 4 visitas (por local)
+                     ou 8 semanas (por freguesia)
+  rótulos            «pressuposto» (n=0), «estimativa·n» (n < k) e «observado·n» (n ≥ k: o observado domina —
+                     à 4.ª visita pesa 4/7, nunca empata)
   captura derivada   c = min(1, taxa × 365 ÷ D_z) misturada com o prior na pseudo-contagem da freguesia
   priores            os locais não visitados melhoram concelho afora pela conversão litros→kg calibrada
                      pelos visitados — e NUNCA para além do blend documentado
@@ -30,8 +32,8 @@ WINDOW_WEEKS = 12
 WINDOW_DAYS = WINDOW_WEEKS * 7
 DAYS_PER_YEAR = 365
 # Pseudo-contagem: k = 4 VISITAS nas métricas por local (taxa de geração, kg por saco); k = 8 SEMANAS
-# nas métricas por freguesia (sacos por ronda, pedidos por semana). O observado empata à 4.ª visita (ou
-# 8.ª semana) e domina depois.
+# nas métricas por freguesia (sacos por ronda, pedidos por semana). O observado pesa n ÷ (n + k − 1):
+# DOMINA a partir da n=k (à 4.ª visita pesa 4/7), nunca empata — critério de aceitação da spec.
 PSEUDO_K_LOCAL = 4
 PSEUDO_K_PARISH = 8
 
@@ -50,17 +52,19 @@ def median(values: Sequence[float]) -> float:
 
 
 def observed_weight(n: int, k: int) -> float:
-    """Peso do observado no blend: n ÷ (n + k). À n=k o observado empata o prior; domina depois."""
-    if n < 0 or k <= 0:
-        raise ValueError("n não negativo e k positivo")
-    return n / (n + k)
+    """Peso do observado no blend: n ÷ (n + k − 1). À n=k o observado já DOMINA (k=4 → 4/7 > 1/2)."""
+    if n < 0 or k < 1 or n + k - 1 <= 0:
+        raise ValueError("n não negativo e k positivo, com n + k − 1 > 0")
+    return n / (n + k - 1)
 
 
 def blend(prior: float, observed: float, n: int, k: int) -> float:
-    """Pseudo-contagem: m̂ = (k·prior + n·observado) ÷ (k + n) — sem penhascos entre prior e observado."""
+    """Pseudo-contagem: m̂ = ((k−1)·prior + n·observado) ÷ (n + k − 1) — sem penhascos entre prior e
+    observado, e o observado passa a dominar exatamente à n=k (nunca empata)."""
     if prior < 0 or observed < 0:
         raise ValueError("prior e observado não negativos")
-    return (k * prior + n * observed) / (k + n)
+    weight = observed_weight(n, k)
+    return (1 - weight) * prior + weight * observed
 
 
 def sample_label(n: int, k: int) -> str:
@@ -168,7 +172,7 @@ class Reading:
     observed: float | None  # None sem amostras
     prior: float
     blended: float
-    weight: float  # n ÷ (n + k)
+    weight: float  # n ÷ (n + k − 1)
     label: str  # pressuposto | estimativa·n | observado·n
 
 
@@ -194,6 +198,10 @@ class Calibration:
     def capture_by_parish(self) -> dict[str, Reading]:
         """Captura derivada do saco à porta por freguesia (linhas `on_demand_capture` da fotografia)."""
         return {r.unit_code: r for r in self.readings if r.metric == CalibrationMetric.ON_DEMAND_CAPTURE}
+
+    def bags_per_round_by_parish(self) -> dict[str, Reading]:
+        """Sacos por ronda por freguesia (linhas `bags_per_round`): o *n* da fórmula da volta calibrado."""
+        return {r.unit_code: r for r in self.readings if r.metric == CalibrationMetric.BAGS_PER_ROUND}
 
 
 def pooled_kg_per_bag(readings: Sequence[Reading]) -> float | None:

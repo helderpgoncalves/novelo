@@ -11,7 +11,7 @@ obrigatório em prémio de parceiro. O resgate vive no livro-razão (`points_ent
 import uuid
 from datetime import datetime
 
-from sqlalchemy import Boolean, CheckConstraint, DateTime, ForeignKey, Index, Integer, String, Text
+from sqlalchemy import Boolean, CheckConstraint, DateTime, Float, ForeignKey, Index, Integer, String, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
@@ -82,17 +82,22 @@ class CatalogItem(Base, UuidPkMixin, TimestampMixin):
 class PointCampaign(Base, UuidPkMixin, TimestampMixin):
     """Uma campanha sazonal de pontos da Vitrus: janela temporal + descrição mostrada no web.
 
-    No MVP a campanha é INFORMATIVA (impulso comunicado ao doador); multiplicadores automáticos de
-    ganho ficam para depois — decisão documentada em «docs/engenharia/features.md» (#65).
+    `gain_multiplier` multiplica o ganho FLAT por saco creditado dentro da janela (US40; «estimativa»,
+    configurável — 1,0 = campanha só informativa). O teto mensal continua a aplicar-se ao valor já
+    multiplicado; FIFO e expiração não mudam; o bónus de conformidade fica de fora.
     """
 
     __tablename__ = "point_campaigns"
-    __table_args__ = (CheckConstraint("ends_at > starts_at", name="window_valid"),)
+    __table_args__ = (
+        CheckConstraint("ends_at > starts_at", name="window_valid"),
+        CheckConstraint("gain_multiplier > 0", name="multiplier_positive"),
+    )
 
     name: Mapped[str] = mapped_column(String(120))
     description: Mapped[str | None] = mapped_column(Text)
     starts_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     ends_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    gain_multiplier: Mapped[float] = mapped_column(Float, default=1.0, server_default="1.0")
 
 
 class Redemption(Base, UuidPkMixin, TimestampMixin):

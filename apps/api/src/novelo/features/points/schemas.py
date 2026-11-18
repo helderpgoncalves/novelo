@@ -13,7 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from novelo.domain.points import PointEntryKind
 
 
-class SaldoOut(BaseModel):
+class PointsBalanceOut(BaseModel):
     """O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
 
     `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
@@ -27,6 +27,10 @@ class SaldoOut(BaseModel):
     expired: int = Field(description="Pontos já expirados (12 meses por ganho, FIFO)")
     monthly_cap: int = Field(description="Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)")
     credited_this_month: int = Field(description="Ganhos já creditados no mês corrente (flat + bónus)")
+    gain_flat_points: int = Field(description="Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)")
+    bonus_conformity_points: int = Field(
+        description="Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)"
+    )
 
 
 class PointEntryOut(BaseModel):

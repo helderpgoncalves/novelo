@@ -7,6 +7,8 @@ from typing import Literal
 from pydantic import Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from novelo.domain.points import BONUS_CONFORMITY_POINTS, GAIN_FLAT_POINTS, MONTHLY_CAP_POINTS
+
 
 def _find_repo_root() -> Path:
     """Raiz do repositório (tem data/processed); no Docker não existe e usa-se DATA_DIR."""
@@ -190,12 +192,14 @@ class Settings(BaseSettings):
     lot_photo_max_bytes: int = Field(153_600, ge=20_000, le=1_000_000, alias="LOT_PHOTO_MAX_BYTES")  # já processada
 
     # Pontos (economia dos pontos, ADR #39): valores de LANÇAMENTO, pressuposto da equipa («estimativa»
-    # no ecrã), configuráveis por ambiente. O teto mensal RECUSA o ganho que transborda (não adia); 0 = sem teto.
-    points_gain_flat: int = Field(100, ge=0, alias="POINTS_GAIN_FLAT")
-    points_bonus_conformity: int = Field(50, ge=0, alias="POINTS_BONUS_CONFORMITY")
-    points_monthly_cap: int = Field(500, ge=0, alias="POINTS_MONTHLY_CAP")
+    # no ecrã), configuráveis por ambiente. As omissões lêem as constantes de `domain/points.py` —
+    # UMA única fonte para o domínio e para o contrato (o teto mensal RECUSA o ganho que transborda,
+    # não adia; 0 = sem teto).
+    points_gain_flat: int = Field(GAIN_FLAT_POINTS, ge=0, alias="POINTS_GAIN_FLAT")
+    points_bonus_conformity: int = Field(BONUS_CONFORMITY_POINTS, ge=0, alias="POINTS_BONUS_CONFORMITY")
+    points_monthly_cap: int = Field(MONTHLY_CAP_POINTS, ge=0, alias="POINTS_MONTHLY_CAP")
     # Teto de donativos a IPSS: % do custo evitado (105,64 €/t × kg MEDIDOS da conta) que financia
-    # o valor-eu­ro doado num mês (#65, ADR «economia dos pontos»); 0 desliga o financiamento.
+    # o valor-euro doado num mês (#65, ADR «economia dos pontos»); 0 desliga o financiamento.
     points_donation_cap_pct: int = Field(100, ge=0, le=100, alias="POINTS_DONATION_CAP_PCT")
 
     @model_validator(mode="after")

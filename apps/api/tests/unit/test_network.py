@@ -90,6 +90,21 @@ def test_on_demand_is_a_round_of_the_dedicated_vehicle_every_n_weeks() -> None:
     assert rural.capex_eur == 0 and urban.capex_eur == 0
 
 
+def test_calibrated_bags_per_round_changes_the_tour_n_not_the_kg() -> None:
+    # A calibração (#62) diz que a freguesia põe 3,5 sacos por ronda (blended), não os 6,97846 do
+    # prior. O n da fórmula da volta (BHH) passa a 3,5: volta = 0,7124 · √(3,5 · 4) · 1,3 = 3,46639 km
+    # por ronda -> km/ano = 26 · 3,46639 = 90,13. Os kg NUNCA mudam com o n: as toneladas, os sacos/ano
+    # e as viagens por ronda ficam as do prior (o pedido calibra o n, não multiplica quilos).
+    p = params()
+    prior = build_option(URBAN, (Mode.ON_DEMAND,), p).parts[0]
+    calibrated = build_option(URBAN, (Mode.ON_DEMAND,), p, on_demand_bags_per_round=3.5).parts[0]
+    assert calibrated.km_year == pytest.approx(26 * 0.7124 * (3.5 * 4.0) ** 0.5 * 1.3, abs=0.01)
+    assert calibrated.km_year < prior.km_year
+    assert calibrated.capture == prior.capture
+    assert calibrated.collections_year == prior.collections_year
+    assert calibrated.trips_per_round == prior.trips_per_round
+
+
 def test_on_demand_round_above_capacity_goes_back_to_the_depot() -> None:
     # rural: 0,4536 t / 26 rondas = 17,45 kg por ronda; com 10 kg de capacidade são 2 viagens por ronda
     one = build_option(RURAL, (Mode.ON_DEMAND,), params()).parts[0]

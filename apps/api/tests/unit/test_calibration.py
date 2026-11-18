@@ -58,12 +58,14 @@ def test_median_ignores_nothing_it_is_given() -> None:
     assert median([4.0, 4.1, 3.9, 4.0, 400.0]) == 4.0
 
 
-def test_observed_weight_is_n_over_n_plus_k() -> None:
+def test_observed_weight_is_n_over_n_plus_k_minus_one() -> None:
+    # w = n ÷ (n + k − 1): o prior pesa (k−1). À 4.ª visita (k=4) o observado já DOMINA (4/7 > 1/2),
+    # como pede o critério de aceitação — nunca empata.
     assert observed_weight(0, 4) == 0.0
-    assert observed_weight(2, 4) == pytest.approx(2 / 6)  # o prior ainda pesa 4/6
-    assert observed_weight(4, 4) == pytest.approx(0.5)  # à 4.ª visita empata
-    assert observed_weight(5, 4) == pytest.approx(5 / 9)  # domina
-    assert observed_weight(3, 8) == pytest.approx(3 / 11)
+    assert observed_weight(2, 4) == pytest.approx(2 / 5)  # o prior ainda pesa 3/5
+    assert observed_weight(4, 4) == pytest.approx(4 / 7)  # domina à 4.ª visita (AC)
+    assert observed_weight(5, 4) == pytest.approx(5 / 8)
+    assert observed_weight(3, 8) == pytest.approx(3 / 10)
 
 
 def test_blend_with_no_samples_is_exactly_the_prior() -> None:
@@ -71,18 +73,19 @@ def test_blend_with_no_samples_is_exactly_the_prior() -> None:
 
 
 def test_blend_prior_taxa_with_two_visits() -> None:
-    # (4·0,18 + 2·0,36) ÷ 6 = 1,44 ÷ 6 = 0,24 — o observado ainda não domina (peso 1/3).
-    assert blend(0.18, 0.36, 2, 4) == pytest.approx(0.24)
+    # (3·0,18 + 2·0,36) ÷ 5 = 1,26 ÷ 5 = 0,252 — o observado ainda não domina (peso 2/5).
+    assert blend(0.18, 0.36, 2, 4) == pytest.approx(0.252)
 
 
-def test_blend_at_four_visits_observed_ties_the_prior() -> None:
-    # (4·0,18 + 4·0,36) ÷ 8 = 2,16 ÷ 8 = 0,27 — meio caminho: o observado empata o prior.
-    assert blend(0.18, 0.36, 4, 4) == pytest.approx(0.27)
+def test_blend_at_four_visits_observed_dominates_the_prior() -> None:
+    # (3·0,18 + 4·0,36) ÷ 7 = 1,98 ÷ 7 ≈ 0,2829 — à 4.ª visita o observado pesa 4/7 e DOMINA (AC).
+    assert blend(0.18, 0.36, 4, 4) == pytest.approx(1.98 / 7)
+    assert blend(0.18, 0.36, 4, 4) > 0.27  # acima do meio caminho (0,18+0,36)/2
 
 
 def test_blend_of_bag_weight_with_twelve_units() -> None:
-    # (4·25 + 12·10) ÷ 16 = 220 ÷ 16 = 13,75 kg por saco.
-    assert blend(25.0, 10.0, 12, 4) == pytest.approx(13.75)
+    # (3·25 + 12·10) ÷ 15 = 195 ÷ 15 = 13 kg por saco.
+    assert blend(25.0, 10.0, 12, 4) == pytest.approx(13.0)
 
 
 def test_blend_rejects_negative_prior_or_observed() -> None:
@@ -95,7 +98,7 @@ def test_blend_rejects_negative_prior_or_observed() -> None:
 def test_sample_label_prefixes_the_sample_count() -> None:
     assert sample_label(0, 4) == "pressuposto"
     assert sample_label(2, 4) == "estimativa·2"  # abaixo do limiar de dominância
-    assert sample_label(4, 4) == "observado·4"  # empata: passa a observado
+    assert sample_label(4, 4) == "observado·4"  # domina: passa a observado
     assert sample_label(1, 8) == "estimativa·1"
     assert sample_label(12, 8) == "observado·12"
 
@@ -170,11 +173,11 @@ def test_annual_capture_is_observed_over_demand_capped_at_one() -> None:
 
 def test_unvisited_priors_improve_by_the_calibrated_conversion_within_the_blend() -> None:
     # Conversão litros→kg observada nos visitados: 600 kg observados ÷ 400 kg prior = 1,5.
-    # Melhorada com pseudo-contagem k=4 e n=2 visitas: (4·1 + 2·1,5) ÷ 6 = 7/6 ≈ 1,1667.
-    # O prior do local não visitado (2 kg/dia) passa a 2 × 7/6 ≈ 2,3333 — melhorado, nunca substituído.
+    # Melhorada com pseudo-contagem k=4 e n=2 visitas: (3·1 + 2·1,5) ÷ 5 = 6/5 = 1,2.
+    # O prior do local não visitado (2 kg/dia) passa a 2 × 1,2 = 2,4 — melhorado, nunca substituído.
     ratio = conversion_ratio(600.0, 400.0)
     assert ratio == pytest.approx(1.5)
-    assert improved_prior(2.0, ratio, 2, 4) == pytest.approx(2.0 * 7 / 6)
+    assert improved_prior(2.0, ratio, 2, 4) == pytest.approx(2.0 * 1.2)
     # Sem amostras, o prior fica intacto (nunca auto-substituído para além do blend).
     assert improved_prior(2.0, ratio, 0, 4) == 2.0
 
@@ -203,7 +206,7 @@ def test_on_demand_capture_is_derived_from_taxa_and_blended_with_the_prior() -> 
     # Freguesia com procura D_z = 2 000 kg/ano e prior de captura 0,15 (0,25 × 0,6).
     # Dois locais observados: A 1,0 kg/dia com n=2; B 0,5 kg/dia com n=1.
     # Evidência anual: (1,0 + 0,5) × 365 = 547,5 kg → captura observada = 547,5 ÷ 2000 = 0,27375.
-    # Blend de freguesia (k=8, n=3): (8·0,15 + 3·0,27375) ÷ 11 = 2,02125 ÷ 11 = 0,18375.
+    # Blend de freguesia (k=8, n=3): (7·0,15 + 3·0,27375) ÷ 10 = 2,02125 ÷ 10 = 0,202125.
     readings = [
         taxa_reading("l-a", "Escola A", "030810", 2, 1.0, 0.05),
         taxa_reading("l-b", "Escola B", "030810", 1, 0.5, 0.05),
@@ -212,19 +215,19 @@ def test_on_demand_capture_is_derived_from_taxa_and_blended_with_the_prior() -> 
     assert set(derived) == {"030810"}
     row = derived["030810"]
     assert row.observed == pytest.approx(547.5 / 2000.0)  # 0,27375
-    assert row.blended == pytest.approx((8 * 0.15 + 3 * (547.5 / 2000.0)) / 11)
+    assert row.blended == pytest.approx((7 * 0.15 + 3 * (547.5 / 2000.0)) / 10)
     assert row.label == "estimativa·3"  # n=3 < k=8
-    assert row.weight == pytest.approx(3 / 11)
+    assert row.weight == pytest.approx(3 / 10)
 
 
 def test_on_demand_capture_observed_dominates_with_enough_visits() -> None:
     # Um local com 10 visitas e taxa observada 1,0 kg/dia; D_z = 2 000 kg/ano → evidência 365 kg → 0,1825.
-    # (8·0,15 + 10·0,1825) ÷ 18 = (1,2 + 1,825) ÷ 18 = 3,025 ÷ 18 = 0,168055…
+    # (7·0,15 + 10·0,1825) ÷ 17 = (1,05 + 1,825) ÷ 17 = 2,875 ÷ 17 = 0,169117…
     readings = [taxa_reading("l-a", "Escola A", "030810", 10, 1.0, 0.05)]
     derived = on_demand_capture_readings(readings, demand_kg_year={"030810": 2000.0}, prior_capture={"030810": 0.15})
     row = derived["030810"]
     assert row.label == "observado·10"
-    assert row.blended == pytest.approx((8 * 0.15 + 10 * (365.0 / 2000.0)) / 18)
+    assert row.blended == pytest.approx((7 * 0.15 + 10 * (365.0 / 2000.0)) / 17)
 
 
 def test_on_demand_capture_capped_at_one_by_demand() -> None:

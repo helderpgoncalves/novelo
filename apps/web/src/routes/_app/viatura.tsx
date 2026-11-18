@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ViaturaPage } from '@/features/viatura/viatura-page';
+import { VehiclePage } from '@/features/vehicle/vehicle-page';
 import { m } from '@/paraglide/messages';
 
 /** O ecrã da paragem da viatura (#58): «Cheguei», scan, pesar em pratos, «Partir» — offline-first.
@@ -10,5 +10,5 @@ import { m } from '@/paraglide/messages';
 export const Route = createFileRoute('/_app/viatura')({
   head: () => ({ meta: [{ title: m.viatura_title() }] }),
   staticData: { skeleton: 'form' },
-  component: ViaturaPage,
+  component: VehiclePage,
 });

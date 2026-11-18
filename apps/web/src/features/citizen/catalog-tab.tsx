@@ -23,7 +23,7 @@ import {
   donationValueNote,
   redeemBlocked,
   redemptionStateLabel,
-} from '@/features/cidadao/catalogo';
+} from '@/features/citizen/catalog';
 import { getErrorCode } from '@/lib/errors';
 import { formatNumber } from '@/lib/format';
 import { formatDate } from '@/lib/i18n';
@@ -41,7 +41,7 @@ const KIND_ICON: Record<CatalogItemPublic['kind'], typeof Gift> = {
  * O separador «Catálogo» da carteira (#65): três prateleiras, o resgate por código pseudónimo e
  * os meus códigos. A âncora € aparece SÓ como valor do donativo — os pontos nunca valem dinheiro.
  */
-export function CatalogoTab({ balance }: { balance: number }) {
+export function CatalogTab({ balance }: { balance: number }) {
   const queryClient = useQueryClient();
   const [redeeming, setRedeeming] = useState<CatalogItemPublic | null>(null);
   const [redemption, setRedemption] = useState<RedemptionOut | null>(null);
@@ -100,6 +100,13 @@ export function CatalogoTab({ balance }: { balance: number }) {
           </p>
           {campaign.description && (
             <p className="text-muted-foreground text-xs">{campaign.description}</p>
+          )}
+          {campaign.gain_multiplier !== 1 && (
+            <p className="text-xs">
+              Cada saco recolhido e pesado na campanha vale{' '}
+              {campaign.gain_multiplier.toLocaleString('pt-PT')}× os pontos habituais (estimativa) —
+              o teto do mês continua a aplicar-se.
+            </p>
           )}
         </div>
       )}

@@ -12,6 +12,7 @@ import {
   listAdminCampaignsOptions,
   listAdminCatalogItemsOptions,
   listCatalogPartnersOptions,
+  listZonesOptions,
   updateCatalogItemMutation,
   updatePointCampaignMutation,
   validateRedemptionCodeMutation,
@@ -437,6 +438,14 @@ export function PartnersTable({ id }: { id: string }) {
       filter: true,
     },
     {
+      id: 'parish',
+      header: m.partner_col_parish(),
+      cell: (row) => row.parish_name ?? <span className="text-muted-foreground">—</span>,
+      value: (row) => row.parish_name ?? '',
+      filter: true,
+      hideable: true,
+    },
+    {
       id: 'contact',
       header: m.partner_col_contact(),
       cell: (row) => row.contact ?? <span className="text-muted-foreground">—</span>,
@@ -563,6 +572,8 @@ function PartnerDialog({
     },
     onError: (e) => toast(`${m.partner_toast_failed()} ${getErrorCode(e) ?? ''}`),
   });
+  // US39: a proposta é POR FREGUESIA — o seletor é o zoneamento de sempre (dicofre), nunca GPS.
+  const zones = useQuery({ ...listZonesOptions(), enabled: open });
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -579,6 +590,7 @@ function PartnerDialog({
             create.mutate({
               body: {
                 name: String(data.get('name') ?? '').trim(),
+                parish_code: String(data.get('parish_code') ?? '') || null,
                 description: String(data.get('description') ?? '').trim() || null,
                 contact: String(data.get('contact') ?? '').trim() || null,
               },
@@ -588,6 +600,22 @@ function PartnerDialog({
           <div className="space-y-1.5">
             <Label htmlFor="partner-name">{m.partner_form_name()}</Label>
             <Input id="partner-name" name="name" required minLength={3} maxLength={120} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="partner-parish">{m.partner_form_parish()}</Label>
+            <select
+              id="partner-parish"
+              name="parish_code"
+              defaultValue=""
+              className="border-input bg-background h-10 w-full rounded-md border px-3 text-sm"
+            >
+              <option value="">{m.partner_form_parish_none()}</option>
+              {(zones.data ?? []).map((zone) => (
+                <option key={zone.code} value={zone.code}>
+                  {zone.name}
+                </option>
+              ))}
+            </select>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="partner-contact">{m.partner_form_contact()}</Label>
@@ -613,7 +641,7 @@ function PartnerDialog({
 
 // --- campanhas sazonais ----------------------------------------------------------------------------
 
-/** As campanhas de pontos: janela temporal + descrição (informativa no MVP, sem multiplicador). */
+/** As campanhas de pontos: janela + descrição + multiplicador opcional do ganho flat (US40, estimativa). */
 export function CampaignsTable({ id }: { id: string }) {
   const query = useQuery(listAdminCampaignsOptions());
   const queryClient = useQueryClient();
@@ -640,6 +668,19 @@ export function CampaignsTable({ id }: { id: string }) {
         </span>
       ),
       value: (row) => `${row.starts_at} → ${row.ends_at}`,
+    },
+    {
+      id: 'multiplier',
+      header: m.campaign_col_multiplier(),
+      cell: (row) => (
+        <span className="text-muted-foreground text-sm tabular-nums">
+          ×{row.gain_multiplier.toLocaleString('pt-PT')}
+          {row.gain_multiplier === 1 ? '' : ' · estimativa'}
+        </span>
+      ),
+      value: (row) => row.gain_multiplier,
+      type: 'number',
+      filter: true,
     },
     {
       id: 'description',
@@ -741,6 +782,7 @@ function CampaignDialog({
               description: String(data.get('description') ?? '').trim() || null,
               starts_at: new Date(String(data.get('starts_at'))).toISOString(),
               ends_at: new Date(String(data.get('ends_at'))).toISOString(),
+              gain_multiplier: Number(data.get('gain_multiplier') ?? 1) || 1,
             };
             if (campaign) {
               update.mutate({ path: { campaign_id: campaign.id }, body });
@@ -781,6 +823,21 @@ function CampaignDialog({
                 defaultValue={campaign?.ends_at?.slice(0, 16) ?? ''}
               />
             </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="campaign-multiplier">{m.campaign_form_multiplier()}</Label>
+            <Input
+              id="campaign-multiplier"
+              name="gain_multiplier"
+              type="number"
+              min={0.1}
+              max={10}
+              step={0.1}
+              inputMode="decimal"
+              required
+              defaultValue={campaign?.gain_multiplier ?? 1}
+            />
+            <p className="text-muted-foreground text-xs">{m.campaign_form_multiplier_hint()}</p>
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="campaign-description">{m.campaign_col_description()}</Label>

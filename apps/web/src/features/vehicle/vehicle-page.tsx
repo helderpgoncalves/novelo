@@ -60,7 +60,7 @@ const toStopLocality = (locality: LocalityOut): StopLocality => ({
   parishCode: locality.parish_code,
 });
 
-export function ViaturaPage() {
+export function VehiclePage() {
   const ctl = useStopController();
   const { session } = ctl;
 

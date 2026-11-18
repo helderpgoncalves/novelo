@@ -5003,7 +5003,7 @@
   "campaign_create": "New campaign",
   "campaign_create_title": "New campaign",
   "campaign_edit_title": "Edit campaign",
-  "campaign_form_description": "Time-boxed window shown to donors. In this MVP the campaign is informational — automatic multipliers are a follow-up.",
+  "campaign_form_description": "Time window shown to donors. The multiplier (estimate) multiplies the flat gain per bag credited inside the window; 1 keeps the campaign informational.",
   "campaign_form_name": "Name",
   "campaign_form_starts": "Starts",
   "campaign_form_ends": "Ends",
@@ -5016,5 +5016,12 @@
   "error_catalog_item_inactive": "This item is no longer available.",
   "error_redemption_already_used": "This code was already validated and cannot be used again.",
   "error_catalog_item_shape": "Invalid item shape: the euro anchor is IPSS-only and prizes require a partner.",
-  "error_campaign_window": "The campaign window is invalid: the end must come after the start."
+  "error_campaign_window": "The campaign window is invalid: the end must come after the start.",
+  "campaign_col_multiplier": "Multiplier",
+  "campaign_form_multiplier": "Gain multiplier (estimate)",
+  "campaign_form_multiplier_hint": "1 = informational only. Multiplies the flat gain per bag credited inside the window; the monthly cap still applies.",
+  "partner_col_parish": "Parish",
+  "partner_form_parish": "Proposing parish",
+  "partner_form_parish_none": "Proposed by the team",
+  "site_col_frequency": "Rung"
 }

@@ -28,16 +28,18 @@ from novelo.domain.points import (
     LedgerEntry,
     PointEntryKind,
     apply_monthly_cap,
+    campaign_gain_multiplier,
     declaration_confirmed,
     fifo_balance,
     gain_expiry,
 )
 from novelo.domain.vocab import LotUnitSource
 from novelo.features.audit import service as audit
-from novelo.features.cidadao.models import BagActivation
+from novelo.features.catalog.models import PointCampaign
+from novelo.features.citizen.models import BagActivation
 from novelo.features.lots.models import Lot
 from novelo.features.points.models import PointEntry
-from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsHistoryOut, SaldoOut
+from novelo.features.points.schemas import AnnulmentCreate, PointEntryOut, PointsBalanceOut, PointsHistoryOut
 
 
 def _month_start(now: datetime) -> datetime:
@@ -94,9 +96,23 @@ async def _credit_gain(
     return bool(int(getattr(result, "rowcount", 0) or 0))
 
 
+async def _active_campaign_multiplier(db: AsyncSession, now: datetime) -> float:
+    """O multiplicador das campanhas ativas (US40): a maior das janelas que contêm `now`; 1,0 sem campanha."""
+    rows = (
+        await db.execute(
+            select(PointCampaign.starts_at, PointCampaign.ends_at, PointCampaign.gain_multiplier).where(
+                PointCampaign.starts_at <= now, PointCampaign.ends_at > now
+            )
+        )
+    ).all()
+    return campaign_gain_multiplier([(start, end, float(mult)) for start, end, mult in rows], now)
+
+
 async def credit_flat_for_bag(db: AsyncSession, bag_code: str, *, lot_code: str | None = None) -> bool:
     """Ganho flat (+100, estimativa) ao saco ATIVADO recolhido e pesado. Idempotente: uma linha por saco
-    no mundo. Sacos sem dono (conta apagada: `user_id` nulo) e etiquetas impressas nunca creditam."""
+    no mundo. Sacos sem dono (conta apagada: `user_id` nulo) e etiquetas impressas nunca creditam.
+    Campanha sazonal ativa (US40): o ganho flat multiplica-se pelo multiplicador da campanha
+    («estimativa», configurável); o teto mensal continua a aplicar-se ao valor já multiplicado."""
     now = datetime.now(UTC)
     activation = (
         await db.execute(
@@ -105,10 +121,11 @@ async def credit_flat_for_bag(db: AsyncSession, bag_code: str, *, lot_code: str 
     ).scalar_one_or_none()
     if activation is None or activation.user_id is None:
         return False
+    multiplier = await _active_campaign_multiplier(db, now)
     return await _credit_gain(
         db,
         kind=PointEntryKind.GAIN_FLAT,
-        points=get_settings().points_gain_flat,
+        points=round(get_settings().points_gain_flat * multiplier),
         user_id=activation.user_id,
         bag_code=bag_code,
         lot_code=lot_code,
@@ -166,7 +183,7 @@ def _to_ledger(row: PointEntry) -> LedgerEntry:
     return LedgerEntry(kind=row.kind, amount=row.amount, created_at=row.created_at, expires_at=row.expires_at)
 
 
-async def saldo(db: AsyncSession, user_id: uuid.UUID) -> SaldoOut:
+async def balance(db: AsyncSession, user_id: uuid.UUID) -> PointsBalanceOut:
     """O saldo do doador, calculado de fresco das linhas (nunca em cache): FIFO, teto e expira breve."""
     now = datetime.now(UTC)
     rows = (
@@ -180,7 +197,7 @@ async def saldo(db: AsyncSession, user_id: uuid.UUID) -> SaldoOut:
         .all()
     )
     balance = fifo_balance([_to_ledger(row) for row in rows], now=now)
-    return SaldoOut(
+    return PointsBalanceOut(
         balance=balance.balance,
         flat=balance.flat,
         bonus=balance.bonus,
@@ -188,6 +205,8 @@ async def saldo(db: AsyncSession, user_id: uuid.UUID) -> SaldoOut:
         expired=balance.expired,
         monthly_cap=get_settings().points_monthly_cap,
         credited_this_month=await _gain_credited_this_month(db, user_id, now),
+        gain_flat_points=get_settings().points_gain_flat,
+        bonus_conformity_points=get_settings().points_bonus_conformity,
     )
 
 
@@ -247,8 +266,8 @@ async def annul(db: AsyncSession, admin_id: uuid.UUID, body: AnnulmentCreate, me
 
 __all__ = [
     "annul",
+    "balance",
     "credit_confirmed_declarations",
     "credit_flat_for_bag",
     "history",
-    "saldo",
 ]

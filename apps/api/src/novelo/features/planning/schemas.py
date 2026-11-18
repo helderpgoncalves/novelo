@@ -408,6 +408,10 @@ class SiteSelection(BaseModel):
     population_covered: float
     served_points: int
     vehicle: int | None = Field(description="Viatura da rota que o visita")
+    frequency: CollectionFrequency | None = Field(
+        default=None,
+        description="O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa",
+    )
 
 
 class SitingSummary(BaseModel):

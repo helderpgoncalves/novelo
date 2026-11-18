@@ -22,8 +22,8 @@ from novelo.features.auth import service as auth_service
 from novelo.features.auth.router import router as auth_router
 from novelo.features.calibration.router import router as calibration_router
 from novelo.features.catalog.router import router as catalog_router
-from novelo.features.cidadao.router import public_router as public_cidadao_router
-from novelo.features.cidadao.router import router as cidadao_router
+from novelo.features.citizen.router import public_router as public_citizen_router
+from novelo.features.citizen.router import router as citizen_router
 from novelo.features.collection_requests.router import router as collection_requests_router
 from novelo.features.copilot.router import router as copilot_router
 from novelo.features.datasets.router import router as datasets_router
@@ -182,9 +182,9 @@ def create_app() -> FastAPI:
     app.include_router(public_locals_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     # Área do cidadão (#63): conta de doador, sacos ativados e histórico; a agenda pública é sem sessão.
     app.include_router(
-        cidadao_router, prefix=API_PREFIX, tags=["cidadao"], dependencies=protected, responses=COMMON_ERRORS
+        citizen_router, prefix=API_PREFIX, tags=["citizen"], dependencies=protected, responses=COMMON_ERRORS
     )
-    app.include_router(public_cidadao_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
+    app.include_router(public_citizen_router, prefix=f"{API_PREFIX}/public", tags=["public"], responses=COMMON_ERRORS)
     # Pontos (#64): saldo e histórico do doador (livro-razão imutável); anulação em abuso é de equipa.
     app.include_router(
         points_router, prefix=API_PREFIX, tags=["points"], dependencies=protected, responses=COMMON_ERRORS

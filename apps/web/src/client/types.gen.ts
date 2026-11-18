@@ -1586,7 +1586,7 @@ export type CalibrationScope = 'local' | 'parish' | 'concelho';
 /**
  * CampaignCreate
  *
- * Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).
+ * Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).
  */
 export type CampaignCreate = {
     /**
@@ -1599,6 +1599,12 @@ export type CampaignCreate = {
      * Tem de ser DEPOIS de `starts_at` (422 caso contrário)
      */
     ends_at: string;
+    /**
+     * Gain Multiplier
+     *
+     * Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)
+     */
+    gain_multiplier?: number;
     /**
      * Name
      */
@@ -1628,6 +1634,12 @@ export type CampaignOut = {
      */
     ends_at: string;
     /**
+     * Gain Multiplier
+     *
+     * Multiplicador do ganho flat na janela (estimativa; 1 = informativa)
+     */
+    gain_multiplier: number;
+    /**
      * Id
      */
     id: string;
@@ -1644,7 +1656,7 @@ export type CampaignOut = {
 /**
  * CampaignUpdate
  *
- * Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.
+ * Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.
  */
 export type CampaignUpdate = {
     /**
@@ -1655,6 +1667,10 @@ export type CampaignUpdate = {
      * Ends At
      */
     ends_at?: string | null;
+    /**
+     * Gain Multiplier
+     */
+    gain_multiplier?: number | null;
     /**
      * Name
      */
@@ -2419,6 +2435,12 @@ export type CollectionRequestCreate = {
      */
     bag_count: number;
     /**
+     * Ephemeral Address
+     *
+     * «Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)
+     */
+    ephemeral_address?: boolean;
+    /**
      * Note
      *
      * Recado para a equipa (ex.: «portão azul»)
@@ -2490,6 +2512,12 @@ export type CollectionRequestOut = {
      * Dispatched At
      */
     dispatched_at?: string | null;
+    /**
+     * Ephemeral Address
+     *
+     * Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal
+     */
+    ephemeral_address?: boolean;
     /**
      * `out_of_round`, `cutoff`, `special_volume` (recolha especial) ou `urgency`
      */
@@ -4264,6 +4292,7 @@ export type DeletionPreviewOut = {
      * Bags
      */
     bags: number;
+    balance: PointsBalanceOut;
     /**
      * Points Are Not Money
      */
@@ -4280,7 +4309,6 @@ export type DeletionPreviewOut = {
      * Requests
      */
     requests: number;
-    saldo: SaldoOut;
     /**
      * Timeline
      */
@@ -9850,6 +9878,9 @@ export type ParishMatchLevel = 'exact' | 'same_words' | 'contains_name' | 'parti
  * PartnerCreate
  *
  * Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.
+ *
+ * `parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);
+ * a API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.
  */
 export type PartnerCreate = {
     /**
@@ -9867,11 +9898,11 @@ export type PartnerCreate = {
      */
     name: string;
     /**
-     * Parish Id
+     * Parish Code
      *
-     * Freguesia proponente (gestor de parcerias)
+     * Dicofre da freguesia proponente
      */
-    parish_id?: string | null;
+    parish_code?: string | null;
 };
 
 /**
@@ -9901,9 +9932,21 @@ export type PartnerOut = {
      */
     name: string;
     /**
+     * Parish Code
+     *
+     * Dicofre da freguesia proponente (vazio se a proposta veio da equipa)
+     */
+    parish_code?: string | null;
+    /**
      * Parish Id
      */
     parish_id: string | null;
+    /**
+     * Parish Name
+     *
+     * Nome da freguesia proponente, para a mesa da equipa
+     */
+    parish_name?: string | null;
     /**
      * Proposed By Id
      */
@@ -9937,9 +9980,9 @@ export type PartnerUpdate = {
      */
     name?: string | null;
     /**
-     * Parish Id
+     * Parish Code
      */
-    parish_id?: string | null;
+    parish_code?: string | null;
 };
 
 /**
@@ -10574,6 +10617,71 @@ export type PointGeometry = {
      * Type
      */
     type?: 'Point';
+};
+
+/**
+ * PointsBalanceOut
+ *
+ * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
+ *
+ * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
+ * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
+ */
+export type PointsBalanceOut = {
+    /**
+     * Balance
+     *
+     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
+     */
+    balance: number;
+    /**
+     * Bonus
+     *
+     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
+     */
+    bonus: number;
+    /**
+     * Bonus Conformity Points
+     *
+     * Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)
+     */
+    bonus_conformity_points: number;
+    /**
+     * Credited This Month
+     *
+     * Ganhos já creditados no mês corrente (flat + bónus)
+     */
+    credited_this_month: number;
+    /**
+     * Expired
+     *
+     * Pontos já expirados (12 meses por ganho, FIFO)
+     */
+    expired: number;
+    /**
+     * Expiring Soon
+     *
+     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
+     */
+    expiring_soon: number;
+    /**
+     * Flat
+     *
+     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
+     */
+    flat: number;
+    /**
+     * Gain Flat Points
+     *
+     * Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)
+     */
+    gain_flat_points: number;
+    /**
+     * Monthly Cap
+     *
+     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
+     */
+    monthly_cap: number;
 };
 
 /**
@@ -11618,59 +11726,6 @@ export type RouteStop = {
 };
 
 /**
- * SaldoOut
- *
- * O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).
- *
- * `balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias
- * (estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.
- */
-export type SaldoOut = {
-    /**
-     * Balance
-     *
-     * Pontos não expirados disponíveis (ganhos − anulações; FIFO)
-     */
-    balance: number;
-    /**
-     * Bonus
-     *
-     * Parte do saldo que veio de bónus de conformidade confirmados pela triagem
-     */
-    bonus: number;
-    /**
-     * Credited This Month
-     *
-     * Ganhos já creditados no mês corrente (flat + bónus)
-     */
-    credited_this_month: number;
-    /**
-     * Expired
-     *
-     * Pontos já expirados (12 meses por ganho, FIFO)
-     */
-    expired: number;
-    /**
-     * Expiring Soon
-     *
-     * Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)
-     */
-    expiring_soon: number;
-    /**
-     * Flat
-     *
-     * Parte do saldo que veio de ganhos flat por saco recolhido e pesado
-     */
-    flat: number;
-    /**
-     * Monthly Cap
-     *
-     * Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)
-     */
-    monthly_cap: number;
-};
-
-/**
  * SankeyChart
  */
 export type SankeyChart = {
@@ -12549,6 +12604,10 @@ export type SiteSelection = {
      * Coord Precision
      */
     coord_precision: 'precise' | 'approximate';
+    /**
+     * O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa
+     */
+    frequency?: CollectionFrequency | null;
     /**
      * Kind
      *
@@ -19159,14 +19218,14 @@ export type CreateRedemptionResponses = {
 
 export type CreateRedemptionResponse = CreateRedemptionResponses[keyof CreateRedemptionResponses];
 
-export type GetDonorSaldoData = {
+export type GetDonorPointsBalanceData = {
     body?: never;
     path?: never;
     query?: never;
     url: '/api/v1/cidadao/saldo';
 };
 
-export type GetDonorSaldoErrors = {
+export type GetDonorPointsBalanceErrors = {
     /**
      * Pedido inválido
      */
@@ -19209,16 +19268,16 @@ export type GetDonorSaldoErrors = {
     503: ErrorBody;
 };
 
-export type GetDonorSaldoError = GetDonorSaldoErrors[keyof GetDonorSaldoErrors];
+export type GetDonorPointsBalanceError = GetDonorPointsBalanceErrors[keyof GetDonorPointsBalanceErrors];
 
-export type GetDonorSaldoResponses = {
+export type GetDonorPointsBalanceResponses = {
     /**
      * Successful Response
      */
-    200: SaldoOut;
+    200: PointsBalanceOut;
 };
 
-export type GetDonorSaldoResponse = GetDonorSaldoResponses[keyof GetDonorSaldoResponses];
+export type GetDonorPointsBalanceResponse = GetDonorPointsBalanceResponses[keyof GetDonorPointsBalanceResponses];
 
 export type ListCollectionRequestsData = {
     body?: never;

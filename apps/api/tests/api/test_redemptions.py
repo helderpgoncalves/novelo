@@ -14,8 +14,10 @@ import httpx
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from novelo.core.config import get_settings
 from novelo.features.audit.models import AuditLog
 from novelo.features.catalog.models import Redemption
+from novelo.features.network.models import Parish
 from novelo.features.points.models import PointEntry
 
 AUTH = "/api/v1/auth"
@@ -407,3 +409,141 @@ async def test_redemption_and_validation_are_audited(
     actions = (await session.execute(select(AuditLog.action).order_by(AuditLog.created_at))).scalars().all()
     assert "catalog.redeem" in actions
     assert "catalog.validate" in actions
+
+
+# --- campanhas sazonais: multiplicador do ganho flat (US40) -----------------------------------------
+
+
+async def _weigh_one_bag(client, outbox, make_user, email: str) -> httpx.AsyncClient:
+    """Doador novo com UM saco pesado agora: devolve o cliente com a sessão do doador."""
+    c, _ = await _donor_with_weighed_bags(client, None, outbox, make_user, email=email, bags=1)  # type: ignore[arg-type]
+    return c
+
+
+async def test_active_campaign_multiplies_the_flat_gain(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
+) -> None:
+    team = await _team_client(make_user)
+    now = datetime.now(UTC)
+    # Campanha ×2 ativa AGORA: o saco pesado dentro da janela credita 100 × 2 = 200 (estimativa).
+    campaign = await team.post(
+        f"{ADMIN}/campaigns",
+        json={
+            "name": "Janeiro a dobrar",
+            "starts_at": (now - timedelta(hours=1)).isoformat(),
+            "ends_at": (now + timedelta(days=7)).isoformat(),
+            "gain_multiplier": 2,
+        },
+    )
+    assert campaign.status_code == 201, campaign.text
+    assert campaign.json()["gain_multiplier"] == 2.0
+
+    c = await _weigh_one_bag(client, outbox, make_user, "doador+mult@exemplo.pt")
+    saldo = (await c.get(f"{CID}/saldo")).json()
+    assert saldo["balance"] == 200  # 100 × 2 — multiplicador ativo na janela
+    assert saldo["gain_flat_points"] == 100  # a regra configurada não muda com a campanha
+
+
+async def test_campaign_outside_the_window_is_parity(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
+) -> None:
+    team = await _team_client(make_user)
+    now = datetime.now(UTC)
+    # Campanha ×3 que JÁ ACABOU: fora da janela o ganho é o de sempre (paridade).
+    ended = await team.post(
+        f"{ADMIN}/campaigns",
+        json={
+            "name": "Natal passado",
+            "starts_at": (now - timedelta(days=10)).isoformat(),
+            "ends_at": (now - timedelta(days=1)).isoformat(),
+            "gain_multiplier": 3,
+        },
+    )
+    assert ended.status_code == 201
+
+    c = await _weigh_one_bag(client, outbox, make_user, "doador+fora@exemplo.pt")
+    saldo = (await c.get(f"{CID}/saldo")).json()
+    assert saldo["balance"] == 100  # fora da janela: nada se multiplica
+
+
+async def test_campaign_multiplier_one_is_exact_parity(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
+) -> None:
+    team = await _team_client(make_user)
+    now = datetime.now(UTC)
+    active = await team.post(
+        f"{ADMIN}/campaigns",
+        json={
+            "name": "Só comunicação",
+            "starts_at": (now - timedelta(hours=1)).isoformat(),
+            "ends_at": (now + timedelta(days=7)).isoformat(),
+            "gain_multiplier": 1,
+        },
+    )
+    assert active.status_code == 201
+
+    c = await _weigh_one_bag(client, outbox, make_user, "doador+um@exemplo.pt")
+    saldo = (await c.get(f"{CID}/saldo")).json()
+    assert saldo["balance"] == 100  # multiplicador 1 = campanha informativa, números de sempre
+
+
+async def test_monthly_cap_still_applies_to_the_multiplied_gain(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user, monkeypatch
+) -> None:
+    monkeypatch.setattr(get_settings(), "points_monthly_cap", 300)
+    team = await _team_client(make_user)
+    now = datetime.now(UTC)
+    await team.post(
+        f"{ADMIN}/campaigns",
+        json={
+            "name": "Dobrado com teto",
+            "starts_at": (now - timedelta(hours=1)).isoformat(),
+            "ends_at": (now + timedelta(days=7)).isoformat(),
+            "gain_multiplier": 2,
+        },
+    )
+    # Dois sacos no mesmo lote, campanha ×2: cada ganho vale 200; o teto de 300 RECUSA o 2.º
+    # (200 + 200 = 400 > 300) — o teto aplica-se ao valor JÁ multiplicado, sem adiar.
+    c, _lot = await _donor_with_weighed_bags(client, session, outbox, make_user, email="doador+teto@exemplo.pt", bags=2)
+    saldo = (await c.get(f"{CID}/saldo")).json()
+    assert saldo["balance"] == 200
+    assert saldo["credited_this_month"] == 200
+    rows = (await session.execute(select(PointEntry).where(PointEntry.amount > 0))).scalars().all()
+    assert len(rows) == 1 and rows[0].amount == 200
+
+
+async def test_partner_proposal_carries_the_parish_by_dicofre(
+    client: httpx.AsyncClient, session: AsyncSession, outbox, make_user
+) -> None:
+    """US39: a proposta é POR FREGUESIA — o formulário manda o dicofre do zoneamento, a API resolve."""
+    tag = uuid.uuid4().hex[:6]
+    parish = Parish(dicofre=f"99{tag[:4]}", name=f"Freguesia {tag}", population=1000)
+    session.add(parish)
+    await session.commit()
+
+    team = await _team_client(make_user)
+    created = await team.post(
+        f"{ADMIN}/partners",
+        json={"name": f"Tinturaria {tag}", "parish_code": parish.dicofre, "contact": "253 000 000"},
+    )
+    assert created.status_code == 201, created.text
+    body = created.json()
+    assert body["parish_code"] == parish.dicofre
+    assert body["parish_name"] == f"Freguesia {tag}"
+
+    # A mesa vê a freguesia da proposta (a vista «propostas» filtra por estado, não por freguesia).
+    listed = (await team.get(f"{ADMIN}/partners")).json()
+    mine = next(p for p in listed if p["id"] == body["id"])
+    assert mine["parish_name"] == f"Freguesia {tag}"
+
+    # Editar para outra freguesia e limpar: a API resolve sempre o dicofre (nunca UUIDs no web).
+    other = Parish(dicofre=f"98{tag[:4]}", name=f"Outra {tag}", population=500)
+    session.add(other)
+    await session.commit()
+    moved = await team.patch(f"{ADMIN}/partners/{body['id']}", json={"parish_code": other.dicofre})
+    assert moved.status_code == 200 and moved.json()["parish_code"] == other.dicofre
+    cleared = await team.patch(f"{ADMIN}/partners/{body['id']}", json={"parish_code": ""})
+    assert cleared.status_code == 422  # dicofre tem 6 caracteres: vazio não é freguesia
+
+    unknown = await team.post(f"{ADMIN}/partners", json={"name": "Sem terra", "parish_code": "999999"})
+    assert unknown.status_code == 404  # freguesia não existe: recusa explícita

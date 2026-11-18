@@ -11,7 +11,9 @@ from sqlalchemy import select
 
 from novelo.domain.vocab import CircuitStatus, CollectionType, Typology
 from novelo.features.datasets.models import DataSource
+from novelo.features.locals.models import LocalAccount
 from novelo.features.network.models import Circuit, CircuitDay, CircuitLocality, Locality, Parish
+from novelo.features.users.models import User
 
 # 0 = segunda (Python); o CircuitDay guarda 1 = segunda (Vitrus).
 MONDAY = 0
@@ -207,3 +209,71 @@ async def test_listing_by_role_team_sees_all_and_filters_the_queue(make_user, se
     resp = await first.get("/api/v1/collection-requests", params={"subject": "local"})
     assert resp.status_code == 200, resp.text
     assert resp.json() == []
+
+
+# --- morada efémera: apaga-se ao fechar o pedido, sem os 12 meses ----------------------------------
+
+
+async def test_ephemeral_address_is_purged_when_the_request_closes(make_user, session) -> None:
+    """«Morada efémera só em pedidos agendados» (spec): criada com a bandeira, a morada apaga-se ao
+    chegar ao estado terminal — `address_retained_until` nem existe (nenhuma retenção de 12 meses)."""
+    parish = await make_parish_with_round(session)
+    c = await make_user("efemero1@test.pt")
+    created = await c.post("/api/v1/collection-requests", json=citizen_body(parish, ephemeral_address=True))
+    assert created.status_code == 201, created.text
+    body = created.json()
+    assert body["ephemeral_address"] is True
+    assert body["address"] == "Rua de Santa Maria, N.º 42, 2.º Esq."  # ativo: a equipa precisa dela
+    assert body["address_retained_until"] is None  # sem retenção: o fecho apaga
+
+    cancelled = await c.delete(f"/api/v1/collection-requests/{body['id']}")
+    assert cancelled.status_code == 204
+    after = (await c.get("/api/v1/collection-requests")).json()[0]
+    assert after["state"] == "cancelled"
+    assert after["address"] is None  # terminal: morada efémera apagada na hora
+    assert after["ephemeral_address"] is True  # a bandeira fica (história da regra aplicada)
+
+
+async def test_normal_address_keeps_the_12_month_retention_on_terminal_states(make_user, session) -> None:
+    """Sem a bandeira é o caminho de sempre: cancelado mantém a morada, retida 12 meses (purga à leitura)."""
+    parish = await make_parish_with_round(session)
+    c = await make_user("normal1@test.pt")
+    created = await c.post("/api/v1/collection-requests", json=citizen_body(parish))
+    assert created.status_code == 201
+    body = created.json()
+    assert body["ephemeral_address"] is False
+    assert body["address_retained_until"] is not None
+
+    cancelled = await c.delete(f"/api/v1/collection-requests/{body['id']}")
+    assert cancelled.status_code == 204
+    after = (await c.get("/api/v1/collection-requests")).json()[0]
+    assert after["address"] == "Rua de Santa Maria, N.º 42, 2.º Esq."  # fica retida
+
+
+async def test_ephemeral_address_is_purged_when_collected_too(make_user, session) -> None:
+    parish = await make_parish_with_round(session)
+    c = await make_user("efemero2@test.pt")
+    team = await make_user("gestor@test.pt", role="admin")
+    created = await c.post("/api/v1/collection-requests", json=citizen_body(parish, ephemeral_address=True))
+    request_id = created.json()["id"]
+    outcome = await team.post(f"/api/v1/collection-requests/{request_id}/outcome", json={"outcome": "collected"})
+    assert outcome.status_code == 200
+    assert outcome.json()["state"] == "collected"
+    assert outcome.json()["address"] is None  # recolhido é terminal: morada efémera apagada
+
+
+async def test_local_requests_reject_the_ephemeral_flag(make_user, session) -> None:
+    """A morada do local é institucional (o sítio da conta): não há «efémera» — 422 como a morada manual."""
+    parish = await make_parish_with_round(session)  # já traz um local ligado ao circuito
+    locality = (await session.execute(select(Locality).where(Locality.parish_id == parish.id))).scalar_one()
+    email = f"{uuid.uuid4().hex[:8]}@test.pt"
+    c = await make_user(email, role="local")
+    user = (await session.execute(select(User).where(User.email == email))).scalar_one()
+    session.add(LocalAccount(user_id=user.id, locality_id=locality.id, kind="assistido"))
+    await session.flush()
+    resp = await c.post(
+        "/api/v1/collection-requests",
+        json={"bag_count": 4, "requested_date": future_dow(MONDAY).isoformat(), "ephemeral_address": True},
+    )
+    assert resp.status_code == 422, resp.text
+    assert resp.json()["code"] == "local_address_forbidden"

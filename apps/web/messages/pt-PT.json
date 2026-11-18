@@ -5060,7 +5060,7 @@
   "campaign_create": "Nova campanha",
   "campaign_create_title": "Nova campanha",
   "campaign_edit_title": "Editar campanha",
-  "campaign_form_description": "Janela temporal mostrada aos doadores. Neste MVP a campanha é informativa — multiplicadores automáticos ficam para depois.",
+  "campaign_form_description": "Janela temporal mostrada aos doadores. O multiplicador (estimativa) multiplica o ganho flat por saco creditado na janela; 1 deixa a campanha informativa.",
   "campaign_form_name": "Nome",
   "campaign_form_starts": "Começa",
   "campaign_form_ends": "Termina",
@@ -5073,5 +5073,12 @@
   "error_catalog_item_inactive": "Este item já não está disponível.",
   "error_redemption_already_used": "Este código já foi validado e não se pode usar outra vez.",
   "error_catalog_item_shape": "Forma inválida do item: a âncora € é só de donativo IPSS e o prémio exige parceiro.",
-  "error_campaign_window": "A janela da campanha é inválida: o fim tem de ser depois do início."
+  "error_campaign_window": "A janela da campanha é inválida: o fim tem de ser depois do início.",
+  "campaign_col_multiplier": "Multiplicador",
+  "campaign_form_multiplier": "Multiplicador do ganho (estimativa)",
+  "campaign_form_multiplier_hint": "1 = campanha só informativa. Multiplica o ganho flat por saco creditado na janela; o teto mensal continua a aplicar-se.",
+  "partner_col_parish": "Freguesia",
+  "partner_form_parish": "Freguesia proponente",
+  "partner_form_parish_none": "A proposta veio da equipa",
+  "site_col_frequency": "Degrau"
 }

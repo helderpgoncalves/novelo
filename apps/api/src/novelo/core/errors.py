@@ -409,7 +409,7 @@ class InsufficientPointsError(AppError):
 
 
 class DonationCapReachedError(AppError):
-    """O valor-eu­ro doado a IPSS este mês transborda o teto indexado ao custo evitado (105,64 €/t)."""
+    """O valor-euro doado a IPSS este mês transborda o teto indexado ao custo evitado (105,64 €/t)."""
 
     status_code = 409
     code = "donation_cap_reached"

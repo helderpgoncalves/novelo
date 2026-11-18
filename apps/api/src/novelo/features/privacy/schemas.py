@@ -7,7 +7,7 @@ from pydantic import BaseModel, Field
 
 from novelo.domain.privacy import ConsentPurpose
 from novelo.domain.vocab import BagDeclaration, CollectionRequestState, RequestSubject
-from novelo.features.points.schemas import SaldoOut
+from novelo.features.points.schemas import PointsBalanceOut
 
 # De onde veio a decisão de consentimento (o toggle da carteira é a via normal; `api` fica para o histórico).
 ConsentSource = Literal["account", "api"]
@@ -130,7 +130,7 @@ class DeletionPreviewOut(BaseModel):
     o web escreve-o sempre neste ecrã; a API assinala que a regra se aplica.
     """
 
-    saldo: SaldoOut
+    balance: PointsBalanceOut
     timeline: list[TimelineItem]
     active_bags: int
     bags: int

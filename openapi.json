@@ -2712,7 +2712,7 @@
         "type": "string"
       },
       "CampaignCreate": {
-        "description": "Campanha sazonal de pontos: janela temporal + descrição (no MVP é informativa, sem multiplicador).",
+        "description": "Campanha sazonal de pontos: janela, descrição e multiplicador opcional do ganho flat (US40).",
         "properties": {
           "description": {
             "anyOf": [
@@ -2731,6 +2731,14 @@
             "format": "date-time",
             "title": "Ends At",
             "type": "string"
+          },
+          "gain_multiplier": {
+            "default": 1.0,
+            "description": "Multiplica o ganho flat por saco creditado na janela (estimativa, configurável; 1 = informativa)",
+            "exclusiveMinimum": 0.0,
+            "maximum": 10.0,
+            "title": "Gain Multiplier",
+            "type": "number"
           },
           "name": {
             "maxLength": 120,
@@ -2776,6 +2784,11 @@
             "title": "Ends At",
             "type": "string"
           },
+          "gain_multiplier": {
+            "description": "Multiplicador do ganho flat na janela (estimativa; 1 = informativa)",
+            "title": "Gain Multiplier",
+            "type": "number"
+          },
           "id": {
             "format": "uuid",
             "title": "Id",
@@ -2797,13 +2810,14 @@
           "description",
           "starts_at",
           "ends_at",
+          "gain_multiplier",
           "created_at"
         ],
         "title": "CampaignOut",
         "type": "object"
       },
       "CampaignUpdate": {
-        "description": "Editar campanha: nome, descrição e janela; a ordem da janela revalida-se no serviço.",
+        "description": "Editar campanha: nome, descrição, janela e multiplicador; a ordem da janela revalida-se no serviço.",
         "properties": {
           "description": {
             "anyOf": [
@@ -2828,6 +2842,19 @@
               }
             ],
             "title": "Ends At"
+          },
+          "gain_multiplier": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "maximum": 10.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Gain Multiplier"
           },
           "name": {
             "anyOf": [
@@ -4116,6 +4143,12 @@
             "title": "Bag Count",
             "type": "integer"
           },
+          "ephemeral_address": {
+            "default": false,
+            "description": "«Morada efémera» (só cidadão, com data): a morada apaga-se ao fechar o pedido — sem retenção de 12 meses. Recusado em pedidos de local/B2B (a morada é institucional)",
+            "title": "Ephemeral Address",
+            "type": "boolean"
+          },
           "note": {
             "anyOf": [
               {
@@ -4247,6 +4280,12 @@
               }
             ],
             "title": "Dispatched At"
+          },
+          "ephemeral_address": {
+            "default": false,
+            "description": "Morada efémera (só cidadão): a morada foi apagada ao chegar ao estado terminal",
+            "title": "Ephemeral Address",
+            "type": "boolean"
           },
           "exception_reason": {
             "anyOf": [
@@ -7257,6 +7296,9 @@
             "title": "Bags",
             "type": "integer"
           },
+          "balance": {
+            "$ref": "#/components/schemas/PointsBalanceOut"
+          },
           "points_are_not_money": {
             "default": true,
             "title": "Points Are Not Money",
@@ -7275,9 +7317,6 @@
             "title": "Requests",
             "type": "integer"
           },
-          "saldo": {
-            "$ref": "#/components/schemas/SaldoOut"
-          },
           "timeline": {
             "items": {
               "$ref": "#/components/schemas/novelo__features__privacy__schemas__TimelineItem"
@@ -7287,7 +7326,7 @@
           }
         },
         "required": [
-          "saldo",
+          "balance",
           "timeline",
           "active_bags",
           "bags",
@@ -16862,7 +16901,7 @@
         "type": "string"
       },
       "PartnerCreate": {
-        "description": "Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.",
+        "description": "Propor um parceiro: a freguesia propõe (nasce `proposed`), a Vitrus aprova depois.\n\n`parish_code` é o dicofre do zoneamento (o mesmo que o simulador e o pedido de recolha usam);\na API resolve-o para a freguesia (404 se não existir) — o web nunca precisa de UUIDs.",
         "properties": {
           "contact": {
             "anyOf": [
@@ -16895,18 +16934,19 @@
             "title": "Name",
             "type": "string"
           },
-          "parish_id": {
+          "parish_code": {
             "anyOf": [
               {
-                "format": "uuid",
+                "maxLength": 6,
+                "minLength": 6,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "description": "Freguesia proponente (gestor de parcerias)",
-            "title": "Parish Id"
+            "description": "Dicofre da freguesia proponente",
+            "title": "Parish Code"
           }
         },
         "required": [
@@ -16954,6 +16994,18 @@
             "title": "Name",
             "type": "string"
           },
+          "parish_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Dicofre da freguesia proponente (vazio se a proposta veio da equipa)",
+            "title": "Parish Code"
+          },
           "parish_id": {
             "anyOf": [
               {
@@ -16965,6 +17017,18 @@
               }
             ],
             "title": "Parish Id"
+          },
+          "parish_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Nome da freguesia proponente, para a mesa da equipa",
+            "title": "Parish Name"
           },
           "proposed_by_id": {
             "anyOf": [
@@ -17045,17 +17109,18 @@
             ],
             "title": "Name"
           },
-          "parish_id": {
+          "parish_code": {
             "anyOf": [
               {
-                "format": "uuid",
+                "maxLength": 6,
+                "minLength": 6,
                 "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Parish Id"
+            "title": "Parish Code"
           }
         },
         "title": "PartnerUpdate",
@@ -18080,6 +18145,69 @@
           "coordinates"
         ],
         "title": "PointGeometry",
+        "type": "object"
+      },
+      "PointsBalanceOut": {
+        "description": "O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).\n\n`balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias\n(estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.",
+        "properties": {
+          "balance": {
+            "description": "Pontos não expirados disponíveis (ganhos − anulações; FIFO)",
+            "title": "Balance",
+            "type": "integer"
+          },
+          "bonus": {
+            "description": "Parte do saldo que veio de bónus de conformidade confirmados pela triagem",
+            "title": "Bonus",
+            "type": "integer"
+          },
+          "bonus_conformity_points": {
+            "description": "Bónus de conformidade configurado (estimativa; o web desenha «+N» daqui)",
+            "title": "Bonus Conformity Points",
+            "type": "integer"
+          },
+          "credited_this_month": {
+            "description": "Ganhos já creditados no mês corrente (flat + bónus)",
+            "title": "Credited This Month",
+            "type": "integer"
+          },
+          "expired": {
+            "description": "Pontos já expirados (12 meses por ganho, FIFO)",
+            "title": "Expired",
+            "type": "integer"
+          },
+          "expiring_soon": {
+            "description": "Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)",
+            "title": "Expiring Soon",
+            "type": "integer"
+          },
+          "flat": {
+            "description": "Parte do saldo que veio de ganhos flat por saco recolhido e pesado",
+            "title": "Flat",
+            "type": "integer"
+          },
+          "gain_flat_points": {
+            "description": "Ganho flat por saco configurado (estimativa; o web desenha «+N» daqui)",
+            "title": "Gain Flat Points",
+            "type": "integer"
+          },
+          "monthly_cap": {
+            "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
+            "title": "Monthly Cap",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "balance",
+          "flat",
+          "bonus",
+          "expiring_soon",
+          "expired",
+          "monthly_cap",
+          "credited_this_month",
+          "gain_flat_points",
+          "bonus_conformity_points"
+        ],
+        "title": "PointsBalanceOut",
         "type": "object"
       },
       "PointsHistoryOut": {
@@ -19644,57 +19772,6 @@
         "title": "RouteStop",
         "type": "object"
       },
-      "SaldoOut": {
-        "description": "O saldo do doador e a sua decomposição, mais o estado do teto do mês (configurável, estimativa).\n\n`balance` é o que se pode resgatar (#65); `expiring_soon` antecipa o que cai nos próximos 30 dias\n(estimativa de UX); `expired` é o que já caiu — o doador vê a verdade, nunca um saldo eterno.",
-        "properties": {
-          "balance": {
-            "description": "Pontos não expirados disponíveis (ganhos − anulações; FIFO)",
-            "title": "Balance",
-            "type": "integer"
-          },
-          "bonus": {
-            "description": "Parte do saldo que veio de bónus de conformidade confirmados pela triagem",
-            "title": "Bonus",
-            "type": "integer"
-          },
-          "credited_this_month": {
-            "description": "Ganhos já creditados no mês corrente (flat + bónus)",
-            "title": "Credited This Month",
-            "type": "integer"
-          },
-          "expired": {
-            "description": "Pontos já expirados (12 meses por ganho, FIFO)",
-            "title": "Expired",
-            "type": "integer"
-          },
-          "expiring_soon": {
-            "description": "Parte do saldo que expira nos próximos 30 dias (estimativa de aviso)",
-            "title": "Expiring Soon",
-            "type": "integer"
-          },
-          "flat": {
-            "description": "Parte do saldo que veio de ganhos flat por saco recolhido e pesado",
-            "title": "Flat",
-            "type": "integer"
-          },
-          "monthly_cap": {
-            "description": "Teto de ganhos por mês (estimativa, configurável; 0 = sem teto)",
-            "title": "Monthly Cap",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "balance",
-          "flat",
-          "bonus",
-          "expiring_soon",
-          "expired",
-          "monthly_cap",
-          "credited_this_month"
-        ],
-        "title": "SaldoOut",
-        "type": "object"
-      },
       "SankeyChart": {
         "additionalProperties": false,
         "properties": {
@@ -21187,6 +21264,17 @@
             ],
             "title": "Coord Precision",
             "type": "string"
+          },
+          "frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionFrequency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa"
           },
           "kind": {
             "default": "public",
@@ -31812,7 +31900,7 @@
         },
         "summary": "Get Donor Account",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32303,7 +32391,7 @@
         },
         "summary": "Get Donor Account Qr",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32429,7 +32517,7 @@
         },
         "summary": "List Bag Activations",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       },
       "post": {
@@ -32559,7 +32647,7 @@
         },
         "summary": "Create Bag Activation",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32703,7 +32791,7 @@
         },
         "summary": "Update Bag Activation",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32837,7 +32925,7 @@
         },
         "summary": "Activate Bag",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -32971,7 +33059,7 @@
         },
         "summary": "Deactivate Bag",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -33105,7 +33193,7 @@
         },
         "summary": "Get Bag Qr",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -33735,7 +33823,7 @@
         },
         "summary": "Get Collection History",
         "tags": [
-          "cidadao"
+          "citizen"
         ]
       }
     },
@@ -34145,13 +34233,13 @@
     "/api/v1/cidadao/saldo": {
       "get": {
         "description": "O saldo de pontos do próprio, derivado do livro-razão (FIFO 12 meses): repartição flat/bónus,\no que expira brevemente e o estado do teto mensal — valores configuráveis são «estimativa» no web.",
-        "operationId": "get_donor_saldo",
+        "operationId": "get_donor_points_balance",
         "responses": {
           "200": {
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/SaldoOut"
+                  "$ref": "#/components/schemas/PointsBalanceOut"
                 }
               }
             },
@@ -34258,7 +34346,7 @@
             "description": "Funcionalidade indisponível"
           }
         },
-        "summary": "Get Donor Saldo",
+        "summary": "Get Donor Points Balance",
         "tags": [
           "points"
         ]

@@ -8,6 +8,7 @@ import hashlib
 import json
 import threading
 from collections import OrderedDict, defaultdict
+from collections.abc import Mapping
 from dataclasses import dataclass, replace
 from typing import Literal
 
@@ -200,6 +201,7 @@ def _on_demand_zones(
     out: dict[str, list[siting.OnDemandZone]] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
     calibrated = calibration.capture_by_parish() if calibration is not None else {}
+    calibrated_bags = calibration.bags_per_round_by_parish() if calibration is not None else {}
     # o aviso garante paragem mesmo onde os constraints ou o `site_on_demand` a excluem (ADR #42)
     eligible = [
         z
@@ -213,7 +215,12 @@ def _on_demand_zones(
         variants = []
         for rung in rungs:
             c = network.mode_cost(
-                zone, CollectionMode.ON_DEMAND, dp, stop_policy.weeks_of(rung) if rung else None, override
+                zone,
+                CollectionMode.ON_DEMAND,
+                dp,
+                stop_policy.weeks_of(rung) if rung else None,
+                override,
+                calibrated_bags[z.code].blended if z.code in calibrated_bags else None,
             )
             variants.append(
                 siting.OnDemandZone(
@@ -226,8 +233,14 @@ def _on_demand_zones(
 
 
 def _routes_out(
-    plan: siting.SitePlan, mode: CollectionMode, candidates: list[siting.Candidate], inputs: SiteInputs, freq: float
+    plan: siting.SitePlan,
+    mode: CollectionMode,
+    candidates: list[siting.Candidate],
+    inputs: SiteInputs,
+    visits_of_site: Mapping[str, float],
 ) -> tuple[list[RouteOut], dict[str, int]]:
+    """As rotas de UM cenário por locais: por degrau (as rotas vêm agrupadas por degrau do plano),
+    com a carga de cada paragem a acompanhar as VISITAS do seu degrau (US43)."""
     vehicle_of: dict[str, int] = {}
     cand_by_id = {c.id: c for c in candidates}
     site_tonnes = {s.candidate.id: s.tonnes for s in plan.sites}
@@ -243,7 +256,7 @@ def _routes_out(
                     parish_name=m.parish_name,
                     latitude=cand.lat,
                     longitude=cand.lon,
-                    load_t=round(site_tonnes.get(site_id, 0.0) / freq, 3),
+                    load_t=round(site_tonnes.get(site_id, 0.0) / visits_of_site.get(site_id, 1.0), 3),
                     site_id=site_id,
                     label=m.street,
                 )
@@ -284,6 +297,7 @@ def _site_selections(plan: siting.SitePlan, inputs: SiteInputs, vehicle_of: dict
                 population_covered=round(s.population_covered),
                 served_points=s.served_points,
                 vehicle=vehicle_of.get(s.candidate.id),
+                frequency=s.frequency,
             )
         )
     return sorted(out, key=lambda x: -x.tonnes)
@@ -360,8 +374,21 @@ def _allocations(
 def _channel_loads(
     allocations: list[Allocation], plan: siting.SitePlan, mode: CollectionMode, collections_per_year: float
 ) -> list[ChannelLoad]:
-    """O que a viatura dedicada faz em cada freguesia: paragens nos locais (km das rotas repartidos pelos locais) e
-    rondas porta a porta (do modelo por zonas)."""
+    """O que a viatura dedicada faz em cada freguesia: paragens nos locais (km das rotas repartidos pelos
+    locais) e rondas porta a porta (do modelo por zonas).
+
+    Nas paragens com escada POR LOCAL (US43), cada degrau da freguesia vira uma linha própria: o
+    plano da viatura mostra a frequência escolhida para aqueles locais (o `collection_plan` e a
+    agenda pública publicam-na tal qual)."""
+    sites_by_parish: dict[str, dict[CollectionFrequency | None, list[float]]] = defaultdict(
+        lambda: defaultdict(lambda: [0.0, 0.0])
+    )  # freguesia → degrau → [n.º paragens, visitas/ano do degrau]
+    tonnes_by_parish_rung: dict[tuple[str, CollectionFrequency | None], float] = defaultdict(float)
+    for s in plan.sites:
+        row = sites_by_parish[s.candidate.zone_id][s.frequency]
+        row[0] += 1
+        row[1] = stop_policy.visits_per_year(s.frequency) if s.frequency else collections_per_year
+        tonnes_by_parish_rung[(s.candidate.zone_id, s.frequency)] += s.tonnes
     out: list[ChannelLoad] = []
     for a in allocations:
         for p in a.parts:
@@ -373,6 +400,20 @@ def _channel_loads(
                         od.trips_per_round, frequency=od.rung,
                     )
                 )  # fmt: skip
+            elif a.parish_code in sites_by_parish:
+                rungs = sites_by_parish[a.parish_code]
+                total_stops = sum(n for n, _ in rungs.values())
+                for rung, (n_sites, visits) in rungs.items():
+                    if p.km_year <= 0 and len(rungs) > 1:
+                        share = 0.0
+                    else:
+                        share = p.km_year * (n_sites / total_stops if total_stops else 1.0)
+                    out.append(
+                        ChannelLoad(
+                            a.parish_code, p.mode, round(tonnes_by_parish_rung.get((a.parish_code, rung), 0.0), 3),
+                            share, n_sites * visits, visits, frequency=rung,
+                        )
+                    )  # fmt: skip
             else:
                 out.append(
                     ChannelLoad(a.parish_code, p.mode, p.tonnes, p.km_year, p.points * collections_per_year,
@@ -483,6 +524,8 @@ def _compute_sites(
         annual_fixed_eur=mp.capex_per_point_eur / mp.lifetime_years
         + mp.collections_per_year * params.cost_per_collection_eur,
         collections_year=mp.collections_per_year,
+        # desdobra o fixo para a escada POR LOCAL (US43): anuidade + visitas do degrau × custo por recolha
+        collection_cost_eur=params.cost_per_collection_eur,
     )
     # Restrições por freguesia: se o modo dos locais não é permitido lá, os seus locais deixam de ser candidatos.
     blocked = {code for code, modes in request.constraints.items() if mode not in modes}
@@ -508,10 +551,16 @@ def _compute_sites(
         on_demand=_on_demand_zones(zones, params, dp, request, notice_parishes, calibration),
         time_limit_s=float(params.solver_time_limit_s),
         required_od=notice_parishes,
+        # Escada POR LOCAL (US43): na política dinâmica cada paragem tem o seu degrau no MIP;
+        # na fixa mantém-se o passo global do modo (números de hoje).
+        site_ladder=list(stop_policy.LADDER) if request.stop_policy == "dynamic" else None,
     )
 
     freq = max(mp.collections_per_year, 1.0)
-    routes, vehicle_of = _routes_out(plan, mode, candidates, inputs, freq)
+    visits_of_site = {
+        s.candidate.id: stop_policy.visits_per_year(s.frequency) if s.frequency else freq for s in plan.sites
+    }
+    routes, vehicle_of = _routes_out(plan, mode, candidates, inputs, visits_of_site)
     allocations = _allocations(zones, plan, costs, mode, params)
 
     n_sites = len(plan.sites)

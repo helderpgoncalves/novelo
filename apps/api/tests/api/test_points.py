@@ -98,6 +98,8 @@ async def test_weighing_a_donor_bag_credits_flat_once(
     assert data["flat"] == 100 and data["bonus"] == 0
     assert data["credited_this_month"] == 100
     assert data["monthly_cap"] == 500  # teto de lançamento (estimativa, configurável)
+    # As regras viajam no payload (S3): o web desenha o «+N» daqui, nunca de constantes soltas.
+    assert data["gain_flat_points"] == 100 and data["bonus_conformity_points"] == 50
     assert data["expiring_soon"] == 0
 
     rows = await _entries(session)

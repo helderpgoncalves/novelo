@@ -16,8 +16,8 @@ from novelo.core.deps import require_role
 from novelo.core.ratelimit import agenda_limiter, donor_bags_limiter
 from novelo.core.request_meta import Meta
 from novelo.features.audit import service as audit
-from novelo.features.cidadao import service
-from novelo.features.cidadao.schemas import (
+from novelo.features.citizen import service
+from novelo.features.citizen.schemas import (
     BagActivationCreate,
     BagActivationOut,
     BagActivationUpdate,
