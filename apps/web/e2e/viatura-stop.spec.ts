@@ -64,17 +64,15 @@ test.describe('paragem da viatura com o dispositivo falso', () => {
     // «Partir»: o único gesto deliberado fecha a paragem (exige todos os sacos pesados).
     await page.getByRole('button', { name: /^Partir/ }).click();
     await expect(page.getByText('O lote segue para a mesa de triagem')).toBeVisible();
-    // A fila despeja quando a rede volta (gatilho `online` do sync-trigger) — simula-se o corte e o regresso.
-    await page.context().setOffline(true);
-    await page.context().setOffline(false);
-    // Sob carga da suíte completa a resposta pode demorar: dá-se folga ao despejo.
-    await expect(page.getByText('Tudo sincronizado')).toBeVisible({ timeout: 20_000 });
-
     // O passaporte público leva o peso medido (não a estimativa).
     const passaporteHref = await page
       .getByRole('link', { name: 'Abrir o passaporte do lote' })
       .getAttribute('href');
     expect(passaporteHref).toMatch(/^\/passport\//);
+    // Recarregar restaura a fila do dispositivo e despeja-a (o gatilho de arranque é determinístico;
+    // o `online` da emulação de rede não dispara de igual modo em todos os ambientes).
+    await page.reload();
+    await expect(page.getByText('Tudo sincronizado')).toBeVisible({ timeout: 20_000 });
     await page.goto(passaporteHref ?? '/pt/');
     await expect(page.getByText('medido', { exact: true })).toBeVisible();
     await expect(page.getByText('6,4 kg')).toBeVisible();
