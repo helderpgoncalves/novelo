@@ -199,6 +199,10 @@ class Calibration:
         """Captura derivada do saco à porta por freguesia (linhas `on_demand_capture` da fotografia)."""
         return {r.unit_code: r for r in self.readings if r.metric == CalibrationMetric.ON_DEMAND_CAPTURE}
 
+    def bags_per_round_by_parish(self) -> dict[str, Reading]:
+        """Sacos por ronda por freguesia (linhas `bags_per_round`): o *n* da fórmula da volta calibrado."""
+        return {r.unit_code: r for r in self.readings if r.metric == CalibrationMetric.BAGS_PER_ROUND}
+
 
 def pooled_kg_per_bag(readings: Sequence[Reading]) -> float | None:
     """Kg por saco do concelho: média das medianas observadas por local, ponderada por n.

@@ -200,6 +200,7 @@ def _on_demand_zones(
     out: dict[str, list[siting.OnDemandZone]] = {}
     coverage = params.modes[CollectionMode.ON_DEMAND].coverage_factor
     calibrated = calibration.capture_by_parish() if calibration is not None else {}
+    calibrated_bags = calibration.bags_per_round_by_parish() if calibration is not None else {}
     # o aviso garante paragem mesmo onde os constraints ou o `site_on_demand` a excluem (ADR #42)
     eligible = [
         z
@@ -213,7 +214,12 @@ def _on_demand_zones(
         variants = []
         for rung in rungs:
             c = network.mode_cost(
-                zone, CollectionMode.ON_DEMAND, dp, stop_policy.weeks_of(rung) if rung else None, override
+                zone,
+                CollectionMode.ON_DEMAND,
+                dp,
+                stop_policy.weeks_of(rung) if rung else None,
+                override,
+                calibrated_bags[z.code].blended if z.code in calibrated_bags else None,
             )
             variants.append(
                 siting.OnDemandZone(

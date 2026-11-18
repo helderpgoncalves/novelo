@@ -354,6 +354,13 @@ def compute(
         if calibration is not None
         else None
     )
+    # Sacos por ronda calibrados (spec #62): o *n* da fórmula da volta passa a blended — a ronda não
+    # encolhe nem os kg se multiplicam; os pedidos por semana ficam KPI + sinal de arranque.
+    calibrated_bags_round = (
+        {code: reading.blended for code, reading in calibration.bags_per_round_by_parish().items()}
+        if calibration is not None
+        else None
+    )
     options = network.build_options(
         dzones,
         dp,
@@ -362,6 +369,7 @@ def compute(
         on_demand_weeks=weeks,
         required=required or None,
         on_demand_capture=calibrated_capture,
+        on_demand_bags_per_round=calibrated_bags_round,
     )
 
     solved = network.solve(
