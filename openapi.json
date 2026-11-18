@@ -21265,6 +21265,17 @@
             "title": "Coord Precision",
             "type": "string"
           },
+          "frequency": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CollectionFrequency"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa"
+          },
           "kind": {
             "default": "public",
             "description": "`staffed`: ponto assistido (escola), sem contentor de rua",

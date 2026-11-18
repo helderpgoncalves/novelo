@@ -12605,6 +12605,10 @@ export type SiteSelection = {
      */
     coord_precision: 'precise' | 'approximate';
     /**
+     * O degrau escolhido para ESTE local na escada discreta (US43); None na política fixa
+     */
+    frequency?: CollectionFrequency | null;
+    /**
      * Kind
      *
      * `staffed`: ponto assistido (escola), sem contentor de rua

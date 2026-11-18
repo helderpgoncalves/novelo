@@ -5022,5 +5022,6 @@
   "campaign_form_multiplier_hint": "1 = informational only. Multiplies the flat gain per bag credited inside the window; the monthly cap still applies.",
   "partner_col_parish": "Parish",
   "partner_form_parish": "Proposing parish",
-  "partner_form_parish_none": "Proposed by the team"
+  "partner_form_parish_none": "Proposed by the team",
+  "site_col_frequency": "Rung"
 }

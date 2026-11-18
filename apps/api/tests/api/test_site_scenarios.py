@@ -146,6 +146,32 @@ async def test_the_dynamic_policy_chooses_the_rung_in_site_scenarios(operator: h
     assert agenda is not None and agenda
 
 
+async def test_the_dynamic_policy_chooses_the_rung_per_local_in_site_scenarios(
+    operator: httpx.AsyncClient,
+) -> None:
+    """US43/AC: a frequência é POR LOCAL (as paragens), não só na ronda à porta — o MIP decide o degrau
+    de cada local aberto («não pagar paragens sem procura») e o plano mostra a frequência por local."""
+    fixed = await run(operator, budget_eur_year=30000, label="Locais fixos por local")
+    dynamic = await run(operator, budget_eur_year=30000, label="Locais dinâmicos por local", stop_policy="dynamic")
+
+    # Cada local aberto traz o SEU degrau na política dinâmica; na fixa, nenhum (passo global).
+    sites = dynamic["result"]["sites"]
+    assert sites and all(s["frequency"] in {"weekly", "biweekly", "monthly", "quarterly"} for s in sites)
+    assert all(s["frequency"] is None for s in fixed["result"]["sites"])
+    # O plano da viatura publica as paragens nos locais por freguesia E degrau: cada linha do canal
+    # de locais tem a frequência dos locais a que diz respeito (rondas = visitas do degrau).
+    visits = {"weekly": 52.0, "biweekly": 26.0, "monthly": 13.0, "quarterly": 4.0}
+    rows = [e for e in dynamic["result"]["collection_plan"] if e["channel"] != "on_demand"]
+    assert rows and {e["frequency"] for e in rows} <= {"weekly", "biweekly", "monthly", "quarterly", None}
+    for e in rows:
+        if e["frequency"] is not None:
+            assert e["rounds_year"] == pytest.approx(visits[e["frequency"]])
+    # A escada por local não pode dar MENOS têxtil que a política fixa com o mesmo orçamento
+    # (cada local pode ficar ao degrau de âncora, que é exatamente o fixo).
+    dk, fk = dynamic["result"]["kpis"], fixed["result"]["kpis"]
+    assert dk["tonnes_year"] >= fk["tonnes_year"] - 0.01
+
+
 async def test_the_decision_room_frontier_prefers_site_scenarios(operator: httpx.AsyncClient) -> None:
     parish = (
         await operator.post(

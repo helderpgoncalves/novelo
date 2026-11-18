@@ -5251,6 +5251,7 @@ export const zSiteFeatureCollection = z.object({
 export const zSiteSelection = z.object({
     containers: z.int(),
     coord_precision: z.enum(['precise', 'approximate']),
+    frequency: zCollectionFrequency.nullish(),
     kind: z.enum(['public', 'staffed']).optional().default('public'),
     latitude: z.number(),
     longitude: z.number(),

@@ -5079,5 +5079,6 @@
   "campaign_form_multiplier_hint": "1 = campanha só informativa. Multiplica o ganho flat por saco creditado na janela; o teto mensal continua a aplicar-se.",
   "partner_col_parish": "Freguesia",
   "partner_form_parish": "Freguesia proponente",
-  "partner_form_parish_none": "A proposta veio da equipa"
+  "partner_form_parish_none": "A proposta veio da equipa",
+  "site_col_frequency": "Degrau"
 }
