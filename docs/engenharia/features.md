@@ -106,6 +106,8 @@ Um agente que escreve o resumo semanal para a Vitrus: lê os lotes e os pesos da
 
 O PWA que existe evolui; **sem app nativa** (é na viatura que o Android + Chrome é exigido, para o Bluetooth da balança e da impressora). Conta por magic link de email (ou telefone, sem password); só `pt-PT` no MVP; sem conta, só o que já é público. RGPD no [ADR](adr/rgpd-conta-de-doador.md) (13 anos, consentimentos em duas camadas, apagamento).
 
+**Duas mecânicas de idioma, por decisão da spec #54 (18 nov 2026).** As áreas do cidadão, do local e públicas (`/cidadao`, `/onde-quando`, `/politica-dados`, `/local`, `/certificado`, `/viatura`) são **pt-PT hardcoded**: são produto municipal em português no MVP, sem paraglide nem chaves de mensagem — as strings vivem nos componentes. A app de equipa (`_app`) mantém o paraglide pt-PT/en como sempre. Os **URLs públicos destas áreas são produto** (`/cidadao`, `?tab=saldo`, …) e ficam em português; **ficheiros e identificadores de código são inglês** (`features/citizen`, `features/vehicle`, `get_donor_points_balance`), como manda o AGENTS.md — a regra «identificadores em inglês» nunca se exceciona, só o texto visível e os slugs é que são pt-PT.
+
 - **Os meus sacos**: ativar/desativar, apelido privado; saldo só leitura; histórico ligado ao passaporte; crédito por **saco ativado**, nunca por kg ([ADR](adr/identidade-e-credito-do-doador.md)).
 - **Dois portadores**: saco da plataforma com QR único, ou mão a mão com o QR de conta (locais públicos sem sacos = lote sem doador).
 - **«Onde e quando entrego»**: página pública com a agenda real de cada local (dado introduzido, não saída do otimizador).
