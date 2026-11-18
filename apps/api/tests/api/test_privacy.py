@@ -24,7 +24,7 @@ from novelo.features.privacy import service as privacy
 from novelo.features.privacy.models import DonorConsent
 from novelo.features.users import service as users
 from novelo.features.users.models import User
-from tests.api.test_cidadao import _sign_up_donor
+from tests.api.test_citizen import _sign_up_donor
 from tests.api.test_collection_requests import citizen_body, make_parish_with_round
 from tests.conftest import PASSWORD
 
