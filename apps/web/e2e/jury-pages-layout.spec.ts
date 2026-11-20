@@ -111,7 +111,7 @@ async function collect(page: Page) {
         }
         return { x: x1, y: y1, w: x2 - x1, h: y2 - y1 };
       };
-      const describe = (el: Element) => {
+      const describeEl = (el: Element) => {
         const label = el.getAttribute('aria-label') ?? el.textContent ?? '';
         return `${el.tagName.toLowerCase()} «${label.trim().replace(/\s+/g, ' ').slice(0, 32)}»`;
       };
@@ -132,7 +132,7 @@ async function collect(page: Page) {
         if (b.w <= 2 || b.h <= 2) return [];
         kept.push(el);
         const raw = el.getBoundingClientRect();
-        return [{ name: describe(el), ...b, left: raw.left, right: raw.right }];
+        return [{ name: describeEl(el), ...b, left: raw.left, right: raw.right }];
       });
       const related: [number, number][] = [];
       kept.forEach((a, i) => {

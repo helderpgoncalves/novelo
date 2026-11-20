@@ -52,7 +52,7 @@ async function collect(page: Page) {
         const s = getComputedStyle(el);
         return r.width > 2 && r.height > 2 && s.visibility !== 'hidden' && s.display !== 'none';
       };
-      const describe = (el: Element) => {
+      const describeEl = (el: Element) => {
         const cls = (el.getAttribute('class') ?? '').split(' ')[0];
         const text = (el.textContent ?? '').trim().slice(0, 28);
         return `${el.tagName.toLowerCase()}${cls ? `.${cls}` : ''} «${text}»`;
@@ -64,7 +64,7 @@ async function collect(page: Page) {
       const unique = [...new Set(els)];
       const boxes = unique.map((el) => {
         const r = el.getBoundingClientRect();
-        return { name: describe(el), x: r.left, y: r.top, w: r.width, h: r.height };
+        return { name: describeEl(el), x: r.left, y: r.top, w: r.width, h: r.height };
       });
       const related: [number, number][] = [];
       unique.forEach((a, i) => {
