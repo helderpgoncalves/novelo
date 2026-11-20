@@ -17,22 +17,23 @@ RUN curl -fsSL --retry 5 --retry-delay 5 -D headers.txt -o portugal.osm.pbf "$OS
     && osmium fileinfo -e area.osm.pbf | head -20 > FILEINFO \
     && rm portugal.osm.pbf headers.txt
 
-FROM ghcr.io/project-osrm/osrm-backend:v5.27.1 AS prepare
+FROM ghcr.io/project-osrm/osrm-backend:v26.4.0 AS prepare
 WORKDIR /data
 COPY --from=clip /data/area.osm.pbf /data/SNAPSHOT /data/
 # Perfil da viatura de têxtil (sem compactação): o `car.lua` oficial com as dimensões de uma furgoneta/camião ligeiro
 # (PRESSUPOSTO, ver docs/engenharia/rotas-reais.md), para respeitar maxheight/maxwidth/maxweight das vias.
+# O `test` confirma que as 4 substituições pegaram (a imagem v26 é Alpine: o diff do busybox não tem o formato `>`).
 RUN sed -e 's/vehicle_height = 2.0/vehicle_height = 2.8/' \
         -e 's/vehicle_width = 1.9/vehicle_width = 2.1/' \
         -e 's/vehicle_length = 4.8/vehicle_length = 6.0/' \
         -e 's/vehicle_weight = 2000/vehicle_weight = 3500/' /opt/car.lua > /opt/novelo-van.lua \
-    && test "$(diff /opt/car.lua /opt/novelo-van.lua | grep -c '^>')" = 4
+    && test "$(grep -cE 'vehicle_(height = 2\.8|width = 2\.1|length = 6\.0|weight = 3500),' /opt/novelo-van.lua)" = 4
 RUN osrm-extract -p /opt/novelo-van.lua /data/area.osm.pbf \
     && osrm-partition /data/area.osrm \
     && osrm-customize /data/area.osrm \
     && rm /data/area.osm.pbf
 
-FROM ghcr.io/project-osrm/osrm-backend:v5.27.1
+FROM ghcr.io/project-osrm/osrm-backend:v26.4.0
 WORKDIR /data
 COPY --from=prepare /data /data
 EXPOSE 5000

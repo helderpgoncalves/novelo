@@ -25,7 +25,8 @@ services:
     ports:
       - "${OSRM_HOST_PORT:-5190}:5000"
     healthcheck:
-      test: ["CMD", "bash", "-c", 'exec 3<>/dev/tcp/127.0.0.1/5000 && printf "GET /route/v1/driving/-8.3187,41.4592;-8.2918,41.4425?overview=false HTTP/1.0\r\n\r\n" >&3 && read -r line <&3 && [[ $$line == *200* ]]']
+      # A imagem do OSRM v26 é Alpine (sem bash): o wget do busybox falha se a resposta não for 2xx.
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:5000/route/v1/driving/-8.3187,41.4592;-8.2918,41.4425?overview=false"]
       interval: 15s
       timeout: 5s
       retries: 5

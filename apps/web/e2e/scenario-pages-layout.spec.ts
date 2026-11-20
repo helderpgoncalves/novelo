@@ -55,7 +55,7 @@ async function collect(page: Page) {
       const s = getComputedStyle(el);
       return s.visibility !== 'hidden' && s.display !== 'none' && Number(s.opacity) > 0;
     };
-    const describe = (el: Element) => {
+    const describeEl = (el: Element) => {
       const text = (el.textContent ?? '').trim().replace(/\s+/g, ' ').slice(0, 32);
       return `${el.tagName.toLowerCase()} «${text}»`;
     };
@@ -66,7 +66,7 @@ async function collect(page: Page) {
       const b = clipOf(el);
       if (b.w <= 2 || b.h <= 2) continue;
       kept.push(el);
-      boxes.push({ name: describe(el), ...b });
+      boxes.push({ name: describeEl(el), ...b });
     }
     const related: [number, number][] = [];
     kept.forEach((a, i) => {
