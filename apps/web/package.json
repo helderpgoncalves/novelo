@@ -39,7 +39,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.6.6",
     "@hey-api/openapi-ts": "^0.99.0",
-    "@inlang/paraglide-js": "^2.29.0",
+    "@inlang/paraglide-js": "^3.2.2",
     "@playwright/test": "^1.65.0",
     "@tailwindcss/vite": "^4.3.5",
     "@tanstack/react-query-devtools": "^5.107.1",
